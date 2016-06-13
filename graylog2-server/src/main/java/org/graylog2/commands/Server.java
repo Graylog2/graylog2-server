@@ -26,6 +26,7 @@ import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
 import org.graylog2.auditlog.AuditLogModule;
+import org.graylog2.auditlog.AuditLogStdOutConfiguration;
 import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.InitializerBindings;
@@ -65,7 +66,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
@@ -81,6 +81,7 @@ public class Server extends ServerBootstrap {
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
     private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
+    private final AuditLogStdOutConfiguration auditLogStdOutConfiguration = new AuditLogStdOutConfiguration();
 
     public Server() {
         super("server", configuration);
@@ -129,7 +130,8 @@ public class Server extends ServerBootstrap {
                 emailConfiguration,
                 mongoDbConfiguration,
                 versionCheckConfiguration,
-                kafkaJournalConfiguration);
+                kafkaJournalConfiguration,
+                auditLogStdOutConfiguration);
     }
 
     @Override

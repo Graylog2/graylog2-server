@@ -32,7 +32,13 @@ public class StdOutAppenderTest {
 
     @Before
     public void setUp() throws Exception {
-        appender = new StdOutAppender();
+        appender = new StdOutAppender(true);
+    }
+
+    @Test
+    public void enabledReturnsConfigurationValue() {
+        assertThat(new StdOutAppender(true).enabled()).isTrue();
+        assertThat(new StdOutAppender(false).enabled()).isFalse();
     }
 
     @Test

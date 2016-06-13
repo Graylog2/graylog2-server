@@ -18,14 +18,23 @@ package org.graylog2.auditlog;
 
 import com.google.common.base.Joiner;
 
+import javax.inject.Inject;
+import javax.inject.Named;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 
 public class StdOutAppender implements AuditLogAppender {
+    private final boolean enabled;
+
+    @Inject
+    public StdOutAppender(@Named("auditlog_stdout_enabled") boolean enabled) {
+        this.enabled = enabled;
+    }
+
     @Override
     public boolean enabled() {
-        return false;
+        return enabled;
     }
 
     @Override
