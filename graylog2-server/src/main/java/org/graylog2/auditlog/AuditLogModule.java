@@ -23,7 +23,6 @@ public class AuditLogModule extends AbstractModule {
     @Override
     protected void configure() {
         final Multibinder<AuditLogAppender> appenders = Multibinder.newSetBinder(binder(), AuditLogAppender.class);
-        appenders.addBinding().to(NoOpAppender.class);
         appenders.addBinding().to(StdOutAppender.class);
     }
 }
