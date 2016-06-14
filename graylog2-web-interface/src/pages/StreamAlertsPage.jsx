@@ -89,26 +89,28 @@ const StreamAlertsPage = React.createClass({
           </Col>
         </Row>
 
-        <Row className="content">
-          <Col md={12}>
-            <IfPermitted permissions={'streams:edit:' + stream.id}>
-              <div className="sendDummyAlert">
-                <Button className="pull-right" bsStyle="info" onClick={this._onSendDummyAlert}>Send test alert</Button>
-              </div>
-            </IfPermitted>
+        <IfPermitted permissions={'users:list'}>
+          <Row className="content">
+            <Col md={12}>
+              <IfPermitted permissions={'streams:edit:' + stream.id}>
+                <div className="sendDummyAlert">
+                  <Button className="pull-right" bsStyle="info" onClick={this._onSendDummyAlert}>Send test alert</Button>
+                </div>
+              </IfPermitted>
 
-            <h2>Receivers</h2>
+              <h2>Receivers</h2>
 
-            <p className="description">
-              The following Graylog users will be notified about alerts via email if they have configured
-              an email address in their profile. You can also add any other email address to the alert
-              receivers if it has no Graylog user associated.
-            </p>
+              <p className="description">
+                The following Graylog users will be notified about alerts via email if they have configured
+                an email address in their profile. You can also add any other email address to the alert
+                receivers if it has no Graylog user associated.
+              </p>
 
-            <AlertReceiversList receivers={stream.alert_receivers} streamId={stream.id}/>
+              <AlertReceiversList receivers={stream.alert_receivers} streamId={stream.id}/>
 
-          </Col>
-        </Row>
+            </Col>
+          </Row>
+        </IfPermitted>
 
         <AlertsComponent streamId={stream.id} />
       </span>

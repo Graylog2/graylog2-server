@@ -12,13 +12,6 @@ const AlarmCallbacksStore = Reflux.createStore({
   listenables: [AlarmCallbacksActions],
   types: undefined,
 
-  init() {
-    this.available(undefined).then((types) => {
-      this.types = types;
-      this.trigger({types: types});
-    });
-  },
-
   getInitialState() {
     return {
       types: this.types,

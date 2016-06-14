@@ -6,6 +6,9 @@ import StoreProvider from 'injection/StoreProvider';
 const AlarmCallbackHistoryStore = StoreProvider.getStore('AlarmCallbackHistory');
 const AlarmCallbacksStore = StoreProvider.getStore('AlarmCallbacks');
 
+import ActionsProvider from 'injection/ActionsProvider';
+const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
+
 import { Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';
 
@@ -14,7 +17,6 @@ const AlarmCallbackHistoryOverview = React.createClass({
     alertId: React.PropTypes.string.isRequired,
     streamId: React.PropTypes.string.isRequired,
   },
-  mixins: [Reflux.connect(AlarmCallbacksStore)],
   getInitialState() {
     return {};
   },
@@ -22,6 +24,9 @@ const AlarmCallbackHistoryOverview = React.createClass({
     this.loadData();
   },
   loadData() {
+    AlarmCallbacksActions.available(this.props.streamId).then((types) => {
+      this.setState({ types: types });
+    });
     AlarmCallbackHistoryStore.listForAlert(this.props.streamId, this.props.alertId).done((histories) => {
       this.setState({histories: histories});
     });
