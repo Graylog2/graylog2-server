@@ -19,10 +19,9 @@ const AlarmCallbacksStore = Reflux.createStore({
   },
 
   available(streamId) {
-    const failCallback = (error) => {
-      UserNotification.error('Fetching available AlarmCallback types failed with status: ' + error.message,
+    const failCallback = (error) =>
+      UserNotification.error(`Fetching available AlarmCallback types failed with status: ${error.message}`,
         'Could not retrieve available AlarmCallbacks');
-    };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.available(streamId).url);
     const promise = fetch('GET', url).then((response) => {
@@ -34,10 +33,9 @@ const AlarmCallbacksStore = Reflux.createStore({
     return promise;
   },
   list(streamId) {
-    const failCallback = (error) => {
-      UserNotification.error('Fetching AlarmCallbacks failed with status: ' + error.message,
+    const failCallback = (error) =>
+      UserNotification.error(`Fetching AlarmCallbacks failed with status: ${error.message}`,
         'Could not retrieve AlarmCallbacks');
-    };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.list(streamId).url);
     const promise = fetch('GET', url).then((response) => response.alarmcallbacks, failCallback);
@@ -45,10 +43,9 @@ const AlarmCallbacksStore = Reflux.createStore({
     AlarmCallbacksActions.list.promise(promise);
   },
   save(streamId, alarmCallback) {
-    const failCallback = (error) => {
-      UserNotification.error('Saving AlarmCallback failed with status: ' + error.message,
+    const failCallback = (error) =>
+      UserNotification.error(`Saving AlarmCallback failed with status: ${error.message}`,
         'Could not save AlarmCallback');
-    };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.create(streamId).url);
 
@@ -57,10 +54,9 @@ const AlarmCallbacksStore = Reflux.createStore({
     AlarmCallbacksActions.save.promise(promise);
   },
   delete(streamId, alarmCallbackId) {
-    const failCallback = (error) => {
-      UserNotification.error('Removing AlarmCallback failed with status: ' + error.message,
+    const failCallback = (error) =>
+      UserNotification.error(`Removing AlarmCallback failed with status: ${error.message}`,
         'Could not remove AlarmCallback');
-    };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.delete(streamId, alarmCallbackId).url);
 
@@ -69,10 +65,9 @@ const AlarmCallbacksStore = Reflux.createStore({
     AlarmCallbacksActions.delete.promise(promise);
   },
   update(streamId, alarmCallbackId, deltas) {
-    const failCallback = (error) => {
-      UserNotification.error('Updating Alarm Callback \'' + alarmCallbackId + '\' failed with status: ' + error.message,
+    const failCallback = (error) =>
+      UserNotification.error(`Updating Alarm Callback '${alarmCallbackId}' failed with status: ${error.message}`,
         'Could not update Alarm Callback');
-    };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.update(streamId, alarmCallbackId).url);
 
