@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
+import org.graylog.plugins.pipelineprocessor.simulator.PipelineInterpreterTracer;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
@@ -61,18 +62,19 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
                 message.addStream(stream);
             }
 
-            List<ResultMessageSummary> simulationResults = new ArrayList<>();
+            final List<ResultMessageSummary> simulationResults = new ArrayList<>();
+            final PipelineInterpreterTracer pipelineInterpreterTracer = new PipelineInterpreterTracer();
 
             for (MessageProcessor messageProcessor : orderedMessageProcessors) {
                 if (messageProcessor instanceof PipelineInterpreter) {
-                    org.graylog2.plugin.Messages processedMessages = messageProcessor.process(message);
+                    org.graylog2.plugin.Messages processedMessages = ((PipelineInterpreter)messageProcessor).process(message, pipelineInterpreterTracer.getSimulatorInterpreterListener());
                     for (Message processedMessage : processedMessages) {
                         simulationResults.add(ResultMessageSummary.create(null, processedMessage.getFields(), ""));
                     }
                 }
             }
 
-            return SimulationResponse.create(simulationResults);
+            return SimulationResponse.create(simulationResults, pipelineInterpreterTracer.getExecutionTrace(), pipelineInterpreterTracer.took());
         } catch (DocumentNotFoundException e) {
             throw new NotFoundException(e);
         }

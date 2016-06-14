@@ -57,4 +57,8 @@ public abstract class Stage implements Comparable<Stage> {
 
         public abstract Builder ruleReferences(List<String> ruleRefs);
     }
+
+    public String toString() {
+        return "Stage " + stage();
+    }
 }

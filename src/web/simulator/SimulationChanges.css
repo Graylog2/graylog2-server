@@ -1,0 +1,39 @@
+.simulation-changes {
+    padding-top: 15px;
+}
+
+.simulation-changes dl {
+    margin-bottom: 10px;
+    margin-top: 5px;
+}
+
+.simulation-changes dt, .simulation-changes dd {
+    padding-left: 20px;
+}
+
+.original-message-changes {
+    margin-top: 10px;
+}
+
+.added-fields dl {
+    background-color: #dff0d8;
+    color: #3c763d;
+}
+
+.removed-fields dl {
+    background-color: #f2dede;
+    color: #a94442;
+}
+
+.mutated-fields dl {
+    background-color: #d9edf7;
+    color: #31708f;
+}
+
+.field-value {
+    font-family: monospace;
+}
+
+.mutated-fields .removed-field {
+    text-decoration: line-through;
+}

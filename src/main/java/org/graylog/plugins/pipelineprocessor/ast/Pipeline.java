@@ -54,4 +54,11 @@ public abstract class Pipeline {
 
         public abstract Builder stages(SortedSet<Stage> stages);
     }
+
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Pipeline ");
+        sb.append("'").append(name()).append("'");
+        sb.append(" (").append(id()).append(")");
+        return sb.toString();
+    }
 }

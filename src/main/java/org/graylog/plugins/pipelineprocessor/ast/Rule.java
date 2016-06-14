@@ -62,4 +62,11 @@ public abstract class Rule {
         public abstract Rule build();
     }
 
+
+    public String toString() {
+        final StringBuilder sb = new StringBuilder("Rule ");
+        sb.append("'").append(name()).append("'");
+        sb.append(" (").append(id()).append(")");
+        return sb.toString();
+    }
 }

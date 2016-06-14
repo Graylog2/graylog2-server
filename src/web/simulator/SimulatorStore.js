@@ -3,6 +3,7 @@ import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 import MessageFormatter from 'logic/message/MessageFormatter';
+import ObjectUtils from 'util/ObjectUtils';
 
 import SimulatorActions from './SimulatorActions';
 
@@ -21,7 +22,10 @@ const SimulatorStore = Reflux.createStore({
 
     let promise = fetch('POST', url, simulation);
     promise = promise.then(response => {
-      return response.messages.map(MessageFormatter.formatMessageSummary);
+      const formattedResponse = ObjectUtils.clone(response);
+      formattedResponse.messages = response.messages.map(MessageFormatter.formatMessageSummary);
+
+      return formattedResponse;
     });
 
     SimulatorActions.simulate.promise(promise);
