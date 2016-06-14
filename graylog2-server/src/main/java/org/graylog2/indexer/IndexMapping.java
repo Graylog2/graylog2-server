@@ -34,11 +34,17 @@ public class IndexMapping {
     public static final String TYPE_MESSAGE = "message";
 
     public Map<String, Object> messageTemplate(final String template, final String analyzer) {
-        final ImmutableMap<String, Object> map = ImmutableMap.<String, Object>of(TYPE_MESSAGE, messageMapping(analyzer));
+        final Map<String, Object> analyzerKeyword = ImmutableMap.of("analyzer_keyword", ImmutableMap.of(
+            "tokenizer", "keyword",
+            "filter", "lowercase"));
+        final Map<String, Object> analysis = ImmutableMap.of("analyzer", analyzerKeyword);
+        final Map<String, Object> settings = ImmutableMap.of("analysis", analysis);
+        final Map<String, Object> mappings = ImmutableMap.of(TYPE_MESSAGE, messageMapping(analyzer));
 
-        return ImmutableMap.<String, Object>of(
+        return ImmutableMap.of(
                 "template", template,
-                "mappings", map
+                "settings", settings,
+                "mappings", mappings
         );
     }
 
