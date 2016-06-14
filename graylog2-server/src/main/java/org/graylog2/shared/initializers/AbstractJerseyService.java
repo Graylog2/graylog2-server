@@ -45,7 +45,6 @@ import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.WebApplicationExceptionMapper;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
 import org.graylog2.shared.security.tls.PemKeyStore;
-import org.graylog2.shared.security.tls.SelfSignedCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,11 +54,13 @@ import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
 import java.security.KeyStore;
+import java.security.cert.CertificateException;
 import java.util.Set;
-import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -155,7 +156,7 @@ public abstract class AbstractJerseyService extends AbstractIdleService {
         );
 
         final SSLEngineConfigurator sslEngineConfigurator = enableTls ?
-                buildSslEngineConfigurator(listenUri.getHost(), tlsCertFile, tlsKeyFile, tlsKeyPassword) : null;
+                buildSslEngineConfigurator(tlsCertFile, tlsKeyFile, tlsKeyPassword) : null;
 
         httpServer = GrizzlyHttpServerFactory.createHttpServer(listenUri, resourceConfig, enableTls, sslEngineConfigurator);
 
@@ -172,22 +173,21 @@ public abstract class AbstractJerseyService extends AbstractIdleService {
         return httpServer;
     }
 
-    protected SSLEngineConfigurator buildSslEngineConfigurator(String fqdn, Path certFile, Path keyFile, String keyPassword)
+    protected SSLEngineConfigurator buildSslEngineConfigurator(Path certFile, Path keyFile, String keyPassword)
             throws GeneralSecurityException, IOException {
-        final SSLContextConfigurator sslContext = new SSLContextConfigurator();
-        if (keyFile == null || certFile == null) {
-            LOG.warn("Private key or certificate is empty. Using self-signed certificates for {} instead.", fqdn);
-
-            final String password = UUID.randomUUID().toString();
-            final SelfSignedCertificate selfSignedCertificate = SelfSignedCertificate.create(fqdn, password);
-            sslContext.setKeyStorePass(password);
-            sslContext.setKeyStoreBytes(KeyStoreUtils.getBytes(selfSignedCertificate.keyStore(), password.toCharArray()));
-        } else {
-            final char[] password = firstNonNull(keyPassword, "").toCharArray();
-            final KeyStore keyStore = PemKeyStore.buildKeyStore(certFile, keyFile, password);
-            sslContext.setKeyStorePass(password);
-            sslContext.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
+        if (keyFile == null || !Files.isRegularFile(keyFile) || !Files.isReadable(keyFile)) {
+            throw new InvalidKeyException("Unreadable or missing private key: " + keyFile);
         }
+
+        if(certFile == null || !Files.isRegularFile(certFile) || !Files.isReadable(certFile)) {
+            throw new CertificateException("Unreadable or missing X.509 certificate: " + certFile);
+        }
+
+        final SSLContextConfigurator sslContext = new SSLContextConfigurator();
+        final char[] password = firstNonNull(keyPassword, "").toCharArray();
+        final KeyStore keyStore = PemKeyStore.buildKeyStore(certFile, keyFile, password);
+        sslContext.setKeyStorePass(password);
+        sslContext.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
 
         if (!sslContext.validateConfiguration(true)) {
             throw new IllegalStateException("Couldn't initialize SSL context for HTTP server");
