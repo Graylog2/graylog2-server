@@ -26,6 +26,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.auditlog.Actions;
+import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.WidgetResultCache;
@@ -84,6 +86,7 @@ public class DashboardsResource extends RestResource {
     @RequiresPermissions(RestPermissions.DASHBOARDS_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @AuditLog(object = "dashboard", captureRequestEntity = true, captureResponseEntity = true)
     public Response create(@ApiParam(name = "JSON body", required = true) CreateDashboardRequest cr) throws ValidationException {
         // Create dashboard.
         final Dashboard dashboard = dashboardService.create(cr.title(), cr.description(), getCurrentUser().getName(), Tools.nowUTC());
@@ -134,6 +137,7 @@ public class DashboardsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Dashboard not found."),
     })
+    @AuditLog(object = "dashboard")
     public void delete(@ApiParam(name = "dashboardId", required = true)
                        @PathParam("dashboardId") String dashboardId) throws NotFoundException {
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
@@ -155,6 +159,7 @@ public class DashboardsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Dashboard not found.")
     })
+    @AuditLog(object = "dashboard", captureRequestEntity = true, captureResponseEntity = true)
     public void update(@ApiParam(name = "dashboardId", required = true)
                        @PathParam("dashboardId") String dashboardId,
                        @ApiParam(name = "JSON body", required = true) UpdateDashboardRequest cr) throws ValidationException, NotFoundException {
@@ -181,6 +186,7 @@ public class DashboardsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Dashboard not found.")
     })
+    @AuditLog(object = "dashboard widget positions", captureRequestEntity = true, captureResponseEntity = true)
     public void setPositions(
             @ApiParam(name = "dashboardId", required = true)
             @PathParam("dashboardId") String dashboardId,

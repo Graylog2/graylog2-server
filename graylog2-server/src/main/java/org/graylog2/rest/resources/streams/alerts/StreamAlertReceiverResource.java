@@ -31,6 +31,7 @@ import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.types.DummyAlertCondition;
+import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
@@ -90,6 +91,7 @@ public class StreamAlertReceiverResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
+    @AuditLog(object = "alert receiver")
     public Response addReceiver(
             @ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
             @PathParam("streamId") String streamid,
@@ -131,6 +133,7 @@ public class StreamAlertReceiverResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
+    @AuditLog(object = "alert receiver")
     public void removeReceiver(
             @ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamid,
             @ApiParam(name = "entity", value = "Name/ID of user or email address to remove from alert receivers.", required = true) @QueryParam("entity") String entity,

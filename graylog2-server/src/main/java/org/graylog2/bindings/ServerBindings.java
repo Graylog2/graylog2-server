@@ -28,6 +28,7 @@ import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.alerts.types.FieldContentValueAlertCondition;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
+import org.graylog2.auditlog.jersey.AuditLogDynamicFeature;
 import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
@@ -185,6 +186,7 @@ public class ServerBindings extends Graylog2Module {
         final Multibinder<Class<? extends DynamicFeature>> dynamicFeatures = jerseyDynamicFeatureBinder();
         dynamicFeatures.addBinding().toInstance(MetricsDynamicBinding.class);
         dynamicFeatures.addBinding().toInstance(RestrictToMasterFeature.class);
+        dynamicFeatures.addBinding().toInstance(AuditLogDynamicFeature.class);
     }
 
     private void bindExceptionMappers() {

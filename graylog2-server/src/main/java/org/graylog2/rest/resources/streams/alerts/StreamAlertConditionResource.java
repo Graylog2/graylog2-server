@@ -26,6 +26,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertService;
+import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.ValidationException;
@@ -82,6 +83,7 @@ public class StreamAlertConditionResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
+    @AuditLog(object = "alert condition", captureRequestEntity = true, captureResponseEntity = true)
     public Response create(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
                            @PathParam("streamId") String streamid,
                            @ApiParam(name = "JSON body", required = true)
@@ -115,6 +117,7 @@ public class StreamAlertConditionResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
+    @AuditLog(object = "alert condition", captureRequestEntity = true, captureResponseEntity = true)
     public void update(@ApiParam(name = "streamId", value = "The stream id the alert condition belongs to.", required = true)
                        @PathParam("streamId") String streamid,
                        @ApiParam(name = "conditionId", value = "The alert condition id.", required = true)
@@ -173,6 +176,7 @@ public class StreamAlertConditionResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
+    @AuditLog(object = "alert condition")
     public void delete(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
                        @PathParam("streamId") String streamid,
                        @ApiParam(name = "conditionId", value = "The stream id this new alert condition belongs to.", required = true)

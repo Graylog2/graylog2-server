@@ -20,6 +20,8 @@ import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.auditlog.Actions;
+import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -52,6 +54,7 @@ public class SystemShutdownResource extends RestResource {
             notes = "Attempts to process all buffered and cached messages before exiting, " +
                     "shuts down inputs first to make sure that no new messages are accepted.")
     @Path("/shutdown")
+    @AuditLog(action = Actions.SHUTDOWN, object = "Graylog node")
     public Response shutdown() {
         checkPermission(RestPermissions.NODE_SHUTDOWN, serverStatus.getNodeId().toString());
 

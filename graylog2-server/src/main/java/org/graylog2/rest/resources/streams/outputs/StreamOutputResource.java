@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.database.ValidationException;
@@ -133,6 +134,7 @@ public class StreamOutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid output specification in input.")
     })
+    @AuditLog(object = "stream output", captureRequestEntity = true, captureResponseEntity = true)
     public Response add(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true)
                         @PathParam("streamid") String streamid,
                         @ApiParam(name = "JSON body", required = true)
@@ -155,6 +157,7 @@ public class StreamOutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
+    @AuditLog(object = "stream output")
     public void remove(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true)
                        @PathParam("streamid") String streamid,
                        @ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)

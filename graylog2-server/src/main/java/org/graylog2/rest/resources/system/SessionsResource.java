@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources.system;
 
+import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,7 +30,11 @@ import org.apache.shiro.session.Session;
 import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
+import org.glassfish.grizzly.http.server.Request;
+import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.requests.SessionCreateRequest;
 import org.graylog2.rest.models.system.sessions.responses.SessionResponse;
 import org.graylog2.rest.models.system.sessions.responses.SessionValidationResponse;
@@ -37,12 +42,14 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ShiroAuthenticationFilter;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
@@ -60,6 +67,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Path("/system/sessions")
@@ -72,21 +81,31 @@ public class SessionsResource extends RestResource {
     private final UserService userService;
     private final DefaultSecurityManager securityManager;
     private final ShiroAuthenticationFilter authenticationFilter;
+    private final AuditLogger auditLogger;
+    private final Set<IpSubnet> trustedSubnets;
+    private final Request grizzlyRequest;
+
 
     @Inject
     public SessionsResource(UserService userService,
                             DefaultSecurityManager securityManager,
-                            ShiroAuthenticationFilter authenticationFilter) {
+                            ShiroAuthenticationFilter authenticationFilter,
+                            AuditLogger auditLogger,
+                            @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
+                            @Context Request grizzlyRequest) {
         this.userService = userService;
         this.securityManager = securityManager;
         this.authenticationFilter = authenticationFilter;
+        this.auditLogger = auditLogger;
+        this.trustedSubnets = trustedSubnets;
+        this.grizzlyRequest = grizzlyRequest;
     }
 
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
     public SessionResponse newSession(@Context ContainerRequestContext requestContext,
-                              @ApiParam(name = "Login request", value = "Username and credentials", required = true)
-                              @Valid @NotNull SessionCreateRequest createRequest) {
+                                      @ApiParam(name = "Login request", value = "Username and credentials", required = true)
+                                      @Valid @NotNull SessionCreateRequest createRequest) {
         final SecurityContext securityContext = requestContext.getSecurityContext();
         if (!(securityContext instanceof ShiroSecurityContext)) {
             throw new InternalServerErrorException("Unsupported SecurityContext class, this is a bug!");
@@ -122,14 +141,28 @@ public class SessionsResource extends RestResource {
         } catch (UnknownSessionException e) {
             subject.logout();
         }
+
         if (subject.isAuthenticated()) {
             final Session session = subject.getSession();
             id = session.getId();
+
+            final Map<String, Object> auditLogContext = ImmutableMap.of(
+                "session_id", id,
+                "remote_address", RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedSubnets)
+            );
+            auditLogger.success(createRequest.username(), "create", "session", auditLogContext);
+
             // TODO is the validUntil attribute even used by anyone yet?
             return SessionResponse.create(new DateTime(session.getLastAccessTime(), DateTimeZone.UTC).plus(session.getTimeout()).toDate(),
                     id.toString());
+        } else {
+            final Map<String, Object> auditLogContext = ImmutableMap.of(
+                "remote_address", RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedSubnets)
+            );
+            auditLogger.failure(createRequest.username(), "create", "session", auditLogContext);
+
+            throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
         }
-        throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
     }
 
     @GET
@@ -155,6 +188,7 @@ public class SessionsResource extends RestResource {
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication
+    @AuditLog(object = "session")
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);
