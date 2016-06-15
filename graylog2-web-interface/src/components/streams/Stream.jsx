@@ -25,6 +25,13 @@ const Stream = React.createClass({
     };
   },
   mixins: [PermissionsMixin],
+
+  getInitialState() {
+    return {
+      loading: false,
+    };
+  },
+
   _formatNumberOfStreamRules(stream) {
     let verbalMatchingType;
     switch (stream.matching_type) {
@@ -41,8 +48,9 @@ const Stream = React.createClass({
     }
   },
   _onResume() {
-    StreamsStore.resume(this.props.stream.id, () => {
-    });
+    this.setState({ loading: true });
+    StreamsStore.resume(this.props.stream.id, () => {})
+      .finally(() => this.setState({ loading: false }));
   },
   _onUpdate(streamId, stream) {
     StreamsStore.update(streamId, stream, () => UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success'));
@@ -52,8 +60,9 @@ const Stream = React.createClass({
   },
   _onPause() {
     if (window.confirm(`Do you really want to pause stream '${this.props.stream.title}'?`)) {
-      StreamsStore.pause(this.props.stream.id, () => {
-      });
+      this.setState({ loading: true });
+      StreamsStore.pause(this.props.stream.id, () => {})
+        .finally(() => this.setState({ loading: false }));
     }
   },
   _onQuickAdd() {
@@ -94,11 +103,15 @@ const Stream = React.createClass({
     if (this.isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`])) {
       if (stream.disabled) {
         toggleStreamLink = (
-          <a className="btn btn-success toggle-stream-button" onClick={this._onResume}>Start Stream</a>
+          <Button bsStyle="success" className="toggle-stream-button" onClick={this._onResume} disabled={this.state.loading}>
+            {this.state.loading ? 'Starting...' : 'Start Stream'}
+          </Button>
         );
       } else {
         toggleStreamLink = (
-          <a className="btn btn-primary toggle-stream-button" onClick={this._onPause}>Pause Stream</a>
+          <Button bsStyle="primary" className="toggle-stream-button" onClick={this._onPause} disabled={this.state.loading}>
+            {this.state.loading ? 'Pausing...' : 'Pause Stream'}
+          </Button>
         );
       }
     }

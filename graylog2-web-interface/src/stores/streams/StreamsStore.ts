@@ -68,7 +68,7 @@ class StreamsStore {
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.pause(streamId).url);
-    fetch('POST', url).then(callback, failCallback).then(this._emitChange.bind(this));
+    return fetch('POST', url).then(callback, failCallback).then(this._emitChange.bind(this));
   }
   resume(streamId: string, callback: (() => void)) {
     const failCallback = (errorThrown) => {
@@ -77,7 +77,7 @@ class StreamsStore {
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.resume(streamId).url);
-    fetch('POST', url)
+    return fetch('POST', url)
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
   save(stream: any, callback: ((streamId: string) => void)) {
