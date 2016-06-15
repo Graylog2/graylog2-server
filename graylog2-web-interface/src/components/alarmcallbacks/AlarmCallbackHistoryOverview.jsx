@@ -1,10 +1,13 @@
 import React from 'react';
-import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
 const AlarmCallbackHistoryStore = StoreProvider.getStore('AlarmCallbackHistory');
+// eslint-disable-next-line no-unused-vars
 const AlarmCallbacksStore = StoreProvider.getStore('AlarmCallbacks');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
 
 import { Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';
@@ -14,7 +17,6 @@ const AlarmCallbackHistoryOverview = React.createClass({
     alertId: React.PropTypes.string.isRequired,
     streamId: React.PropTypes.string.isRequired,
   },
-  mixins: [Reflux.connect(AlarmCallbacksStore)],
   getInitialState() {
     return {};
   },
@@ -22,8 +24,11 @@ const AlarmCallbackHistoryOverview = React.createClass({
     this.loadData();
   },
   loadData() {
+    AlarmCallbacksActions.available(this.props.streamId).then((types) => {
+      this.setState({ types: types });
+    });
     AlarmCallbackHistoryStore.listForAlert(this.props.streamId, this.props.alertId).done((histories) => {
-      this.setState({histories: histories});
+      this.setState({ histories: histories });
     });
   },
   _formatHistory(history) {

@@ -37,20 +37,20 @@ const StreamAlertsPage = React.createClass({
     this.loadData();
   },
   onAlertConditionsList(response) {
-    this.setState({alertConditions: response.alertConditions.sort((a1, a2) => a1.id.localeCompare(a2.id))});
+    this.setState({ alertConditions: response.alertConditions.sort((a1, a2) => a1.id.localeCompare(a2.id)) });
   },
   _onSendDummyAlert() {
     const stream = this.state.stream;
     StreamsStore.sendDummyAlert(stream.id).then(() => {
-      UserNotification.success('Sent dummy alert for stream »' + stream.title + '«', 'Success!');
+      UserNotification.success(`Sent dummy alert for stream »${stream.title}«`, 'Success!');
     }, (error) => {
-      UserNotification.error('Unable to send dummy alert for stream »' + stream.title + '«: ' + error.message,
+      UserNotification.error(`Unable to send dummy alert for stream »${stream.title}«: ${error.message}`,
         'Sending dummy alert failed!');
     });
   },
   loadData() {
     StreamsStore.get(this.props.params.streamId, (stream) => {
-      this.setState({stream: stream});
+      this.setState({ stream: stream });
     });
 
     AlertConditionsActions.list(this.props.params.streamId);
@@ -62,7 +62,7 @@ const StreamAlertsPage = React.createClass({
     const stream = this.state.stream;
     return (
       <span>
-        <PageHeader title={'Alerts configuration for stream »' + stream.title + '«'}>
+        <PageHeader title={`Alerts configuration for stream »${stream.title}«`}>
           <span>You can define thresholds on any message field or message count of a stream and be alerted based on this definition.</span>
           <span>
             Learn more about alerts in the <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="documentation"/>.</span>
@@ -72,7 +72,7 @@ const StreamAlertsPage = React.createClass({
 
         <Row className="content alert-conditions">
           <Col md={12}>
-            <h2 style={{marginBottom: '15px'}}>Configured alert conditions</h2>
+            <h2 style={{ marginBottom: '15px' }}>Configured alert conditions</h2>
 
             <AlertConditionsList alertConditions={this.state.alertConditions}/>
           </Col>
@@ -89,26 +89,28 @@ const StreamAlertsPage = React.createClass({
           </Col>
         </Row>
 
-        <Row className="content">
-          <Col md={12}>
-            <IfPermitted permissions={'streams:edit:' + stream.id}>
-              <div className="sendDummyAlert">
-                <Button className="pull-right" bsStyle="info" onClick={this._onSendDummyAlert}>Send test alert</Button>
-              </div>
-            </IfPermitted>
+        <IfPermitted permissions={'users:list'}>
+          <Row className="content">
+            <Col md={12}>
+              <IfPermitted permissions={`streams:edit:${stream.id}`}>
+                <div className="sendDummyAlert">
+                  <Button className="pull-right" bsStyle="info" onClick={this._onSendDummyAlert}>Send test alert</Button>
+                </div>
+              </IfPermitted>
 
-            <h2>Receivers</h2>
+              <h2>Receivers</h2>
 
-            <p className="description">
-              The following Graylog users will be notified about alerts via email if they have configured
-              an email address in their profile. You can also add any other email address to the alert
-              receivers if it has no Graylog user associated.
-            </p>
+              <p className="description">
+                The following Graylog users will be notified about alerts via email if they have configured
+                an email address in their profile. You can also add any other email address to the alert
+                receivers if it has no Graylog user associated.
+              </p>
 
-            <AlertReceiversList receivers={stream.alert_receivers} streamId={stream.id}/>
+              <AlertReceiversList receivers={stream.alert_receivers} streamId={stream.id}/>
 
-          </Col>
-        </Row>
+            </Col>
+          </Row>
+        </IfPermitted>
 
         <AlertsComponent streamId={stream.id} />
       </span>
