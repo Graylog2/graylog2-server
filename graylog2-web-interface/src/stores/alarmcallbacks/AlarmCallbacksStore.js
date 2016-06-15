@@ -10,13 +10,6 @@ import fetch from 'logic/rest/FetchProvider';
 
 const AlarmCallbacksStore = Reflux.createStore({
   listenables: [AlarmCallbacksActions],
-  types: undefined,
-
-  getInitialState() {
-    return {
-      types: this.types,
-    };
-  },
 
   available(streamId) {
     const failCallback = (error) =>
