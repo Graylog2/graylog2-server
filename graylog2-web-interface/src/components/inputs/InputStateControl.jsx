@@ -14,6 +14,13 @@ const InputStateControl = React.createClass({
     input: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connectFilter(InputStatesStore, 'inputState', inputStateFilter)],
+
+  getInitialState() {
+    return {
+      loading: false,
+    };
+  },
+
   _isInputRunning() {
     if (!this.state.inputState) {
       return false;
@@ -29,18 +36,33 @@ const InputStateControl = React.createClass({
       return nodeState.state === 'RUNNING';
     });
   },
+
   _startInput() {
-    InputStatesStore.start(this.props.input);
+    this.setState({ loading: true });
+    InputStatesStore.start(this.props.input)
+      .finally(() => this.setState({ loading: false }));
   },
+
   _stopInput() {
-    InputStatesStore.stop(this.props.input);
+    this.setState({ loading: true });
+    InputStatesStore.stop(this.props.input)
+      .finally(() => this.setState({ loading: false }));
   },
+
   render() {
     if (this._isInputRunning()) {
-      return <Button bsStyle="primary" onClick={this._stopInput}>Stop input</Button>;
+      return (
+        <Button bsStyle="primary" onClick={this._stopInput} disabled={this.state.loading}>
+          {this.state.loading ? 'Stopping...' : 'Stop input'}
+        </Button>
+      );
     }
 
-    return <Button bsStyle="success" onClick={this._startInput}>Start input</Button>;
+    return (
+      <Button bsStyle="success" onClick={this._startInput} disabled={this.state.loading}>
+        {this.state.loading ? 'Starting...' : 'Start input'}
+      </Button>
+    );
   },
 });
 
