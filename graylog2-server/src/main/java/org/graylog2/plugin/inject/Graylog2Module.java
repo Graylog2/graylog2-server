@@ -308,13 +308,15 @@ public abstract class Graylog2Module extends AbstractModule {
         return MapBinder.newMapBinder(binder(), String.class, PasswordAlgorithm.class);
     }
 
-    protected Multibinder<MessageDecorator> messageDecoratorBinder() {
-        final Multibinder<MessageDecorator> messageDecoratorMultibinder = Multibinder.newSetBinder(binder(), MessageDecorator.class);
-        return messageDecoratorMultibinder;
+    protected MapBinder<String, MessageDecorator.Factory> messageDecoratorBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, MessageDecorator.Factory.class);
     }
 
-    protected void installMessageDecorator(Multibinder<MessageDecorator> messageDecoratorBinder, Class<? extends MessageDecorator> messageDecoratorCLass) {
-        messageDecoratorBinder.addBinding().to(messageDecoratorCLass);
+    protected void installMessageDecorator(MapBinder<String, MessageDecorator.Factory> messageDecoratorBinder,
+                                           Class<? extends MessageDecorator> messageDecoratorClass,
+                                           Class<? extends MessageDecorator.Factory> messageDecoratorFactoryClass) {
+        install(new FactoryModuleBuilder().implement(MessageDecorator.class, messageDecoratorClass).build(messageDecoratorFactoryClass));
+        messageDecoratorBinder.addBinding(messageDecoratorClass.getCanonicalName()).to(messageDecoratorFactoryClass);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}

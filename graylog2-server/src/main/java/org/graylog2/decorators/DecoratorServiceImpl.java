@@ -9,6 +9,7 @@ import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -26,12 +27,15 @@ public class DecoratorServiceImpl implements DecoratorService {
 
     @Override
     public List<Decorator> findForStream(String streamId) {
-        return toInterfaceList(coll.find(DBQuery.is(DecoratorImpl.FIELD_STREAM, streamId)).toArray());
+        return toInterfaceList(coll.find(DBQuery.is(DecoratorImpl.FIELD_STREAM, Optional.of(streamId))).toArray());
     }
 
     @Override
     public List<Decorator> findForGlobal() {
-        return toInterfaceList(coll.find(DBQuery.notExists(DecoratorImpl.FIELD_STREAM)).toArray());
+        return toInterfaceList(coll.find(DBQuery.or(
+            DBQuery.notExists(DecoratorImpl.FIELD_STREAM),
+            DBQuery.is(DecoratorImpl.FIELD_STREAM, Optional.empty())
+        )).toArray());
     }
 
     @Override
@@ -40,19 +44,24 @@ public class DecoratorServiceImpl implements DecoratorService {
     }
 
     @Override
-    public Decorator create(String type, String field, String stream) {
-        return DecoratorImpl.create(type, field, Optional.of(stream));
+    public Decorator create(String type, Map<String, Object> config, String stream) {
+        return DecoratorImpl.create(type, config, Optional.of(stream));
     }
 
     @Override
-    public Decorator create(String type, String field) {
-        return DecoratorImpl.create(type, field);
+    public Decorator create(String type, Map<String, Object> config) {
+        return DecoratorImpl.create(type, config);
     }
 
     @Override
     public Decorator save(Decorator decorator) {
         checkArgument(decorator instanceof DecoratorImpl, "Argument must be an instance of DecoratorImpl, not %s", decorator.getClass());
         return this.coll.save((DecoratorImpl)decorator).getSavedObject();
+    }
+
+    @Override
+    public int delete(String id) {
+        return this.coll.removeById(id).getN();
     }
 
     private List<Decorator> toInterfaceList(List<DecoratorImpl> concreteList) {

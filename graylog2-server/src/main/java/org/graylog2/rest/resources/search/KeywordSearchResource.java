@@ -56,6 +56,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @RequiresAuthentication
 @Api(value = "Search/Keyword", description = "Message search")
@@ -105,8 +106,10 @@ public class KeywordSearchResource extends SearchResource {
                 .sorting(sorting)
                 .build();
 
+        final Optional<String> streamId = extractStreamId(filter);
+
         try {
-            return buildSearchResponse(searches.search(searchesConfig), timeRange, decorate);
+            return buildSearchResponse(searches.search(searchesConfig), timeRange, decorate, streamId);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }

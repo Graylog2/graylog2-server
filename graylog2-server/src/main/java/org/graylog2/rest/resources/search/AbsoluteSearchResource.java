@@ -56,6 +56,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 @RequiresAuthentication
 @Api(value = "Search/Absolute", description = "Message search")
@@ -106,8 +107,10 @@ public class AbsoluteSearchResource extends SearchResource {
                 .sorting(sorting)
                 .build();
 
+        final Optional<String> streamId = extractStreamId(filter);
+
         try {
-            return buildSearchResponse(searches.search(searchesConfig), timeRange, decorate);
+            return buildSearchResponse(searches.search(searchesConfig), timeRange, decorate, streamId);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }

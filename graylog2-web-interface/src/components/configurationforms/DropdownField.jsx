@@ -11,6 +11,12 @@ const DropdownField = React.createClass({
     title: React.PropTypes.string.isRequired,
     typeName: React.PropTypes.string.isRequired,
     value: React.PropTypes.any,
+    addPlaceholder: React.PropTypes.bool,
+  },
+  getDefaultProps() {
+    return {
+      addPlaceholder: false,
+    };
   },
   getInitialState() {
     return {
@@ -23,9 +29,9 @@ const DropdownField = React.createClass({
   componentWillReceiveProps(props) {
     this.setState(props);
   },
-  _formatOption(value, key) {
+  _formatOption(value, key, disabled) {
     return (
-      <option key={this.state.typeName + '-' + this.state.field + '-' + key} value={key} id={key}>{value}</option>
+      <option key={`${this.state.typeName}-${this.state.field}-${key}`} value={key} id={key} disabled={disabled}>{value}</option>
     );
   },
   handleChange(evt) {
@@ -35,6 +41,9 @@ const DropdownField = React.createClass({
   render() {
     const field = this.state.field;
     const options = $.map(field.additional_info.values, this._formatOption);
+    if (this.props.addPlaceholder) {
+      options.unshift(this._formatOption(`Select ${this.state.title}`, '', true));
+    }
     const typeName = this.state.typeName;
     return (
       <div className="form-group">

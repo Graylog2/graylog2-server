@@ -263,7 +263,7 @@ const SearchSidebar = React.createClass({
             </div>
           </div>
           <hr />
-          <DecoratorSidebar />
+          <DecoratorSidebar stream={this.props.searchInStream ? this.props.searchInStream.id : undefined} />
         </div>
       </AutoAffix>
     );

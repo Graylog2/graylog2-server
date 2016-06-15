@@ -8,7 +8,6 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class DecoratorProcessorImpl implements DecoratorProcessor {
     private final DecoratorResolver decoratorResolver;
@@ -19,18 +18,22 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
     }
 
     @Override
-    public List<ResultMessage> decorate(List<ResultMessage> messages) {
-        final Optional<MessageDecorator> metaDecorator = decoratorResolver.messageDecoratorsForGlobal().stream()
+    public List<ResultMessage> decorate(List<ResultMessage> messages, Optional<String> streamId) {
+        final List<MessageDecorator> messageDecorators = streamId.isPresent() ?
+            decoratorResolver.messageDecoratorsForStream(streamId.get()) : decoratorResolver.messageDecoratorsForGlobal();
+        final Optional<MessageDecorator> metaDecorator = messageDecorators.stream()
             .reduce((f, g) -> (v) -> f.apply(g.apply(v)));
         if (metaDecorator.isPresent()) {
-            return messages.stream().map(metaDecorator.get()).collect(Collectors.toList());
+            return metaDecorator.get().apply(messages);
         }
         return messages;
     }
 
     @Override
-    public SearchResponse decorate(SearchResponse searchResponse) {
-        final Optional<SearchResponseDecorator> metaDecorator = decoratorResolver.searchResponseDecoratorsForGlobal().stream()
+    public SearchResponse decorate(SearchResponse searchResponse, Optional<String> streamId) {
+        final List<SearchResponseDecorator> searchResponseDecorators = streamId.isPresent() ?
+            decoratorResolver.searchResponseDecoratorsForStream(streamId.get()) : decoratorResolver.searchResponseDecoratorsForGlobal();
+        final Optional<SearchResponseDecorator> metaDecorator = searchResponseDecorators.stream()
             .reduce((f, g) -> (v) -> f.apply(g.apply(v)));
         if (metaDecorator.isPresent()) {
             return metaDecorator.get().apply(searchResponse);

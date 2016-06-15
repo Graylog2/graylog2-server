@@ -1,3 +1,4 @@
+export { default as AddDecoratorButton } from './AddDecoratorButton';
 export { default as AddSearchCountToDashboard } from './AddSearchCountToDashboard';
 export { default as Decorator } from './Decorator';
 export { default as DecoratorSidebar } from './DecoratorSidebar';

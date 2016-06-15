@@ -19,6 +19,16 @@ const DecoratorsStore = Reflux.createStore({
 
     return promise;
   },
+  available() {
+    const url = URLUtils.qualifyUrl(ApiRoutes.DecoratorsResource.available().url);
+    const promise = fetch('GET', url);
+    promise.then(response => {
+      this.trigger({ types: response });
+    });
+    DecoratorsActions.available.promise(promise);
+
+    return promise;
+  },
   create(request) {
     const url = URLUtils.qualifyUrl(ApiRoutes.DecoratorsResource.create().url);
     const promise = fetch('POST', url, request);

@@ -48,6 +48,7 @@ const ApiRoutes = {
   DecoratorsResource: {
     create: () => { return { url: '/search/decorators' }; },
     get: () => { return { url: '/search/decorators' }; },
+    available: () => { return { url: '/search/decorators/available' }; },
   },
   DeflectorApiController: {
     cycle: () => { return { url: '/cluster/deflector/cycle' }; },
