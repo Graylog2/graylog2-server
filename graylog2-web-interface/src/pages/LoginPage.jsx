@@ -12,6 +12,13 @@ import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
 const LoginPage = React.createClass({
   mixins: [Reflux.connect(SessionStore), Reflux.ListenerMethods],
+
+  getInitialState() {
+    return {
+      loading: false,
+    };
+  },
+
   componentDidMount() {
     disconnectedStyle.use();
     authStyle.use();
@@ -24,16 +31,19 @@ const LoginPage = React.createClass({
   onSignInClicked(event) {
     event.preventDefault();
     this.resetLastError();
+    this.setState({ loading: true });
     const username = this.refs.username.getValue();
     const password = this.refs.password.getValue();
     const location = document.location.host;
-    SessionActions.login.triggerPromise(username, password, location).catch((error) => {
+    const promise = SessionActions.login.triggerPromise(username, password, location);
+    promise.catch((error) => {
       if (error.additional.status === 401) {
         this.setState({lastError: 'Invalid credentials, please verify them and retry.'});
       } else {
         this.setState({lastError: 'Error - the server returned: ' + error.additional.status + ' - ' + error.message});
       }
     });
+    promise.finally(() => this.setState({ loading: false }));
   },
   formatLastError(error) {
     if (error) {
@@ -65,7 +75,9 @@ const LoginPage = React.createClass({
 
               <Input ref="password" type="password" placeholder="Password" />
 
-              <ButtonInput type="submit" bsStyle="info">Sign in</ButtonInput>
+              <ButtonInput type="submit" bsStyle="info" disabled={this.state.loading}>
+                {this.state.loading ? 'Signing in...' : 'Sign in'}
+              </ButtonInput>
 
             </form>
           </Row>
