@@ -10,6 +10,7 @@ const InputDropdown = React.createClass({
     title: PropTypes.string,
     preselectedInputId: PropTypes.string,
     onLoadMessage: PropTypes.func,
+    disabled: PropTypes.bool,
   },
   mixins: [LinkedStateMixin],
   getInitialState() {
@@ -57,7 +58,7 @@ const InputDropdown = React.createClass({
             {inputs.toArray()}
           </Input>
 
-          <Button bsStyle="info" disabled={this.state.selectedInput === this.PLACEHOLDER}
+          <Button bsStyle="info" disabled={this.props.disabled || this.state.selectedInput === this.PLACEHOLDER}
              onClick={this._onLoadMessage}>{this.props.title}</Button>
         </div>
       );
