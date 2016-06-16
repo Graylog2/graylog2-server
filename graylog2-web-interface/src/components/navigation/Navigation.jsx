@@ -142,7 +142,7 @@ const Navigation = React.createClass({
         </Navbar.Header>
         <Navbar.Collapse eventKey={0}>
           <Nav navbar>
-            {this.isPermitted(this.props.permissions, ['SEARCHES_ABSOLUTE', 'SEARCHES_RELATIVE', 'SEARCHES_KEYWORD']) &&
+            {this.isPermitted(this.props.permissions, ['searches:absolute', 'searches:relative', 'searches:keyword']) &&
               <LinkContainer to={Routes.SEARCH}>
                 <NavItem to="search">Search</NavItem>
               </LinkContainer>
@@ -155,7 +155,7 @@ const Navigation = React.createClass({
               <NavItem >Dashboards</NavItem>
             </LinkContainer>
 
-            {this.isPermitted(this.props.permissions, ['SOURCES_READ']) &&
+            {this.isPermitted(this.props.permissions, ['sources:read']) &&
               <LinkContainer to={Routes.SOURCES}>
                 <NavItem>Sources</NavItem>
               </LinkContainer>
@@ -167,7 +167,7 @@ const Navigation = React.createClass({
               <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <MenuItem>Overview</MenuItem>
               </LinkContainer>
-              {this.isPermitted(this.props.permissions, ['CLUSTER_CONFIG_ENTRY_READ']) &&
+              {this.isPermitted(this.props.permissions, ['clusterconfigentry:read']) &&
               <LinkContainer to={Routes.SYSTEM.CONFIGURATIONS}>
                 <MenuItem>Configurations</MenuItem>
               </LinkContainer>
@@ -175,42 +175,42 @@ const Navigation = React.createClass({
               <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
                 <MenuItem>Nodes</MenuItem>
               </LinkContainer>
-              {this.isPermitted(this.props.permissions, ['INPUTS_READ']) &&
+              {this.isPermitted(this.props.permissions, ['inputs:read']) &&
                 <LinkContainer to={Routes.SYSTEM.INPUTS}>
                   <MenuItem>Inputs</MenuItem>
                 </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['OUTPUTS_READ']) &&
+              {this.isPermitted(this.props.permissions, ['outputs:read']) &&
                 <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
                   <MenuItem>Outputs</MenuItem>
                 </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['INDICES_READ']) &&
+              {this.isPermitted(this.props.permissions, ['indices:read']) &&
                 <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
                   <MenuItem>Indices</MenuItem>
                 </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['LOGGERS_READ']) &&
+              {this.isPermitted(this.props.permissions, ['loggers:read']) &&
                 <LinkContainer to={Routes.SYSTEM.LOGGING}>
                   <MenuItem>Logging</MenuItem>
                 </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['USERS_READ']) &&
+              {this.isPermitted(this.props.permissions, ['users:list']) &&
                 <LinkContainer to={Routes.SYSTEM.USERS.LIST}>
                   <MenuItem>Users</MenuItem>
                 </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['ROLES_READ']) &&
+              {this.isPermitted(this.props.permissions, ['roles:read']) &&
                 <LinkContainer to={Routes.SYSTEM.ROLES}>
                   <MenuItem>Roles</MenuItem>
                 </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['DASHBOARDS_CREATE', 'INPUTS_CREATE', 'STREAMS_CREATE']) &&
+              {this.isPermitted(this.props.permissions, ['dashboards:create', 'inputs:create', 'streams:create']) &&
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>
                 <MenuItem>Content Packs</MenuItem>
               </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['INPUTS_EDIT']) &&
+              {this.isPermitted(this.props.permissions, ['inputs:edit']) &&
               <LinkContainer to={Routes.SYSTEM.GROKPATTERNS}>
                 <MenuItem>Grok Patterns</MenuItem>
               </LinkContainer>

@@ -209,7 +209,7 @@ const UserForm = React.createClass({
                        onChange={this._bindValue} labelClassName="col-sm-3" wrapperClassName="col-sm-9"
                        label="Email Address" help="Give the contact email address." required />
 
-                {this.isPermitted(permissions, 'USERS_EDIT') &&
+                {this.isPermitted(permissions, 'users:edit') &&
                   <span>
                     <div className="form-group">
                       <Col sm={9} smOffset={3}>
