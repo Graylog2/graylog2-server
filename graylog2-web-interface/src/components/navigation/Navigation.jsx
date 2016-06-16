@@ -15,6 +15,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from 'components/navigation/UserMenu';
 import HelpMenu from 'components/navigation/HelpMenu';
+import { IfPermitted } from 'components/common';
 
 const Navigation = React.createClass({
   propTypes: {
@@ -94,7 +95,6 @@ const Navigation = React.createClass({
       <LinkContainer to={Routes.STARTPAGE}>
         <a><img src={logoUrl}/></a>
       </LinkContainer>);
-    // TODO: fix permission names
 
     let notificationBadge;
 
@@ -142,11 +142,11 @@ const Navigation = React.createClass({
         </Navbar.Header>
         <Navbar.Collapse eventKey={0}>
           <Nav navbar>
-            {this.isPermitted(this.props.permissions, ['searches:absolute', 'searches:relative', 'searches:keyword']) &&
+            <IfPermitted permissions={['searches:absolute', 'searches:relative', 'searches:keyword']}>
               <LinkContainer to={Routes.SEARCH}>
                 <NavItem to="search">Search</NavItem>
               </LinkContainer>
-            }
+            </IfPermitted>
             <LinkContainer to={Routes.STREAMS}>
               <NavItem>Streams</NavItem>
             </LinkContainer>
@@ -155,14 +155,19 @@ const Navigation = React.createClass({
               <NavItem >Dashboards</NavItem>
             </LinkContainer>
 
-            {this.isPermitted(this.props.permissions, ['sources:read']) &&
+            <IfPermitted permissions="sources:read">
               <LinkContainer to={Routes.SOURCES}>
                 <NavItem>Sources</NavItem>
               </LinkContainer>
-            }
+            </IfPermitted>
 
             {pluginNavigations}
 
+            {/*
+             * We cannot use IfPermitted in the dropdown unless we modify it to clone children elements and pass
+             * props down to them. NavDropdown is passing some props needed in MenuItems that are being blocked
+             * by IfPermitted.
+             */}
             <NavDropdown navItem title={this._systemTitle()} id="system-menu-dropdown">
               <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <MenuItem>Overview</MenuItem>

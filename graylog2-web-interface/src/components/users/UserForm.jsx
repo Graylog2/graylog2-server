@@ -209,7 +209,7 @@ const UserForm = React.createClass({
                        onChange={this._bindValue} labelClassName="col-sm-3" wrapperClassName="col-sm-9"
                        label="Email Address" help="Give the contact email address." required />
 
-                {this.isPermitted(permissions, 'users:edit') &&
+                <IfPermitted permissions="users:edit">
                   <span>
                     <div className="form-group">
                       <Col sm={9} smOffset={3}>
@@ -252,11 +252,11 @@ const UserForm = React.createClass({
                       </Col>
                     </div>
                   </span>
-                }
-                {this.isPermitted(permissions, '*') &&
-                <TimeoutInput ref="session_timeout_ms" value={user.session_timeout_ms} labelSize={3} controlSize={9}
-                              onChange={this._onFieldChange('session_timeout_ms')} />
-                }
+                </IfPermitted>
+                <IfPermitted permissions="*">
+                  <TimeoutInput ref="session_timeout_ms" value={user.session_timeout_ms} labelSize={3} controlSize={9}
+                                onChange={this._onFieldChange('session_timeout_ms')} />
+                </IfPermitted>
 
                 <Input label="Time Zone"
                        help="Choose your local time zone or leave it as it is to use the system's default."

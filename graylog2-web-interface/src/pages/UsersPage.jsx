@@ -10,15 +10,13 @@ import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-import PageHeader from 'components/common/PageHeader';
+import { IfPermitted, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 import UserList from 'components/users/UserList';
 
 const UsersPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
   render() {
-    const permissions = this.state.currentUser.permissions;
-    // TODO: fix permission names
     return (
       <span>
         <PageHeader title="User accounts">
@@ -26,23 +24,23 @@ const UsersPage = React.createClass({
 
           <span>Read more about user management in the <DocumentationLink page={DocsHelper.PAGES.USERS_ROLES} text="documentation"/>.</span>
           <span>
-            {this.isPermitted(permissions, 'ldap:edit') &&
+            <IfPermitted permissions="ldap:edit">
               <LinkContainer to={Routes.SYSTEM.LDAP.SETTINGS}>
                 <Button bsStyle="info">Configure LDAP</Button>
               </LinkContainer>
-            }
+            </IfPermitted>
             {' '}
-            {this.isPermitted(permissions, 'ldapgroups:edit') &&
+            <IfPermitted permissions="ldapgroups:edit">
               <LinkContainer to={Routes.SYSTEM.LDAP.GROUPS}>
                 <Button bsStyle="info">LDAP Group Mapping</Button>
               </LinkContainer>
-            }
+            </IfPermitted>
             {' '}
-            {this.isPermitted(permissions, 'users:create') &&
+            <IfPermitted permissions="users:create">
               <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
                 <Button bsStyle="success">Add new user</Button>
               </LinkContainer>
-            }
+            </IfPermitted>
           </span>
         </PageHeader>
 
