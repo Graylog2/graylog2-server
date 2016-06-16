@@ -37,7 +37,7 @@ const IndicesPage = React.createClass({
   },
   REFRESH_INTERVAL: 2000,
   _totalIndexCount() {
-    return (Object.keys(this.state.indexerOverview.indices).length + this.state.indexDetails.closedIndices.length);
+    return Object.keys(this.state.indexerOverview.indices).length;
   },
   render() {
     if (!this.state.indexerOverview || !this.state.indexDetails.closedIndices) {
