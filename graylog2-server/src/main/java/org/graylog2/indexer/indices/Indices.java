@@ -282,8 +282,6 @@ public class Indices {
         final Settings settings = Settings.builder()
                 .put("number_of_shards", numShards)
                 .put("number_of_replicas", numReplicas)
-                .put("analysis.analyzer.analyzer_keyword.tokenizer", "keyword")
-                .put("analysis.analyzer.analyzer_keyword.filter", "lowercase")
                 .put(customSettings)
                 .build();
 
