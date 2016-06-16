@@ -321,7 +321,7 @@ const UserForm = React.createClass({
             }
           </Col>
         </Row>
-        <IfPermitted permissions="USERS_ROLESEDIT">
+        <IfPermitted permissions="users:rolesedit">
           <EditRolesForm user={this.props.user} />
         </IfPermitted>
       </div>
