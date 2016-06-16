@@ -25,6 +25,10 @@ const AddDecoratorButton = React.createClass({
       typeDefinition: {},
     };
   },
+  shouldComponentUpdate(nextProps, nextState) {
+    return (this.props !== nextProps) || (this.state !== nextState);
+  },
+
   PLACEHOLDER: '=== SELECT === ',
   _formatDecoratorType(typeDefinition, typeName) {
     return (<option key={typeName} value={typeName}>{typeName}</option>);
