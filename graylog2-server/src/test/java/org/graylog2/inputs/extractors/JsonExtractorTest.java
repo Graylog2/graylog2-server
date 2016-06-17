@@ -150,4 +150,15 @@ public class JsonExtractorTest {
                 new Extractor.Result("text:foobar, number:1234.5678, bool:true, nested:{text=foobar}", "object", -1, -1)
         );
     }
+
+    @Test
+    public void issue2375() throws Exception {
+        final String value = "{\"Source\" : \"Myserver#DS\",\"Observer\" : {\"Account\" : {\"Domain\" : \"MYDOMAIN\",\"Name\" : \"CN=domain,OU=service,O=org,C=DE\"},\"Entity\" : {\"SysAddr\" : \"123.123.123.123\",\"SysName\" : \"dir\"}},\"Initiator\" : {\"Account\" : {\"Domain\" : \"Domain\"},\"Entity\" : {\"SysAddr\" : \"0.0.0.0:0\"}},\"Target\" : {\"Data\" : {\"Attribute Name\" : \"Purge Vector\",\"Attribute Value\" : \"Seconds: 1466090058, Replica Number: 3, Event: 1\",\"ClassName\" : \"Organizational Unit\",\"Syntax\" : \"19\"},\"Account\" : {\"Domain\" : \"Domain\",\"Name\" : \"OU=myOrg,O=org,C=DE\",\"Id\" : \"34621\"}},\"Action\" : {\"Event\" : {\"Id\" : \"0.0.0.2\",\"Name\" : \"DISABLE_ACCOUNT\",\"CorrelationID\" : \"eDirectory#0#6b2c7a3d-a223-19da-85ad-3d7a1c6b82a3\",\"SubEvent\" : \"DSE_ADD_VALUE\"},\"Time\" : {\"Offset\" : 1466090106},\"Log\" : {\"Severity\" : 7},\"Outcome\" : \"0\",\"ExtendedOutcome\" : \"0\"}}";
+        final Extractor.Result[] results = jsonExtractor.run(value);
+
+        assertThat(results).contains(
+            new Extractor.Result("Myserver#DS", "Source", -1, -1),
+            new Extractor.Result("Purge Vector", "Target_Data_Attribute Name", -1, -1)
+        );
+    }
 }
