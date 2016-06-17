@@ -17,10 +17,11 @@
 package org.graylog2.web.resources;
 
 import com.floreysoft.jmte.Engine;
-import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.graylog2.Configuration;
 import org.graylog2.rest.MoreMediaTypes;
+import org.graylog2.rest.RestTools;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -29,18 +30,12 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Path("/config.js")
 public class AppConfigResource {
-    private static final String CK_OVERRIDE_SERVER_URI = "X-Graylog-Server-URL";
     private static final Engine engine = new Engine();
     private final Configuration configuration;
 
@@ -60,39 +55,10 @@ public class AppConfigResource {
             throw new RuntimeException("Unable to read AppConfig template while generating web interface configuration: ", e);
         }
 
-        final Map<String, Object> model = new HashMap<String, Object>() {{
-            put("rootTimeZone", configuration.getRootTimeZone());
-            put("serverUri", buildEndpointUri(headers));
-            put("appPathPrefix", "");
-        }};
+        final Map<String, Object> model = ImmutableMap.of(
+            "rootTimeZone", configuration.getRootTimeZone(),
+            "serverUri", RestTools.buildEndpointUri(headers, configuration.getWebEndpointUri()),
+            "appPathPrefix", "");
         return engine.transform(template, model);
-    }
-
-    private String buildEndpointUri(HttpHeaders httpHeaders) {
-        Optional<String> endpointUri = Optional.empty();
-        final List<String> headers = httpHeaders.getRequestHeader(CK_OVERRIDE_SERVER_URI);
-        if (headers != null && !headers.isEmpty()) {
-            endpointUri = headers.stream().filter(s -> {
-                try {
-                    if (Strings.isNullOrEmpty(s)) {
-                        return false;
-                    }
-                    final URI uri = new URI(s);
-                    if (!uri.isAbsolute()) {
-                        return true;
-                    }
-                    switch (uri.getScheme()) {
-                        case "http":
-                        case "https":
-                            return true;
-                    }
-                    return false;
-                } catch (URISyntaxException e) {
-                    return false;
-                }
-            }).findFirst();
-        }
-
-        return endpointUri.orElse(configuration.getWebEndpointUri().toString());
     }
 }

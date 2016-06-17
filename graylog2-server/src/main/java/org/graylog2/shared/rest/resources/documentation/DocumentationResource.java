@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.RestTools;
 import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -31,6 +32,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Arrays;
@@ -83,9 +86,11 @@ public class DocumentationResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{route: .+}")
     public Response route(@ApiParam(name = "route", value = "Route to fetch. For example /system", required = true)
-                          @PathParam("route") String route) {
+                          @PathParam("route") String route,
+                          @Context HttpHeaders httpHeaders) {
+        final String basePath = RestTools.buildEndpointUri(httpHeaders, configuration.getWebEndpointUri());
         return buildSuccessfulCORSResponse(
-                new Generator(restControllerPackages, pluginRestControllerMapping, PLUGIN_PREFIX, objectMapper).generateForRoute(route, configuration.getRestTransportUri().toString())
+                new Generator(restControllerPackages, pluginRestControllerMapping, PLUGIN_PREFIX, objectMapper).generateForRoute(route, basePath)
         );
     }
 
