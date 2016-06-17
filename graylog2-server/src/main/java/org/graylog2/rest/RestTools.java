@@ -16,17 +16,23 @@
  */
 package org.graylog2.rest;
 
-import com.google.common.net.HttpHeaders;
+import com.google.common.base.Strings;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.jboss.netty.handler.ipfilter.IpSubnet;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import javax.ws.rs.container.ContainerRequestContext;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.SecurityContext;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.security.Principal;
+import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class RestTools {
@@ -56,12 +62,12 @@ public class RestTools {
      */
     public static String getRemoteAddrFromRequest(Request request, Set<IpSubnet> trustedSubnets) {
         final String remoteAddr = request.getRemoteAddr();
-        final String XForwardedFor = request.getHeader(HttpHeaders.X_FORWARDED_FOR);
+        final String XForwardedFor = request.getHeader("X-Forwarded-For");
         if (XForwardedFor != null) {
             for (IpSubnet s : trustedSubnets) {
                 try {
                     if (s.contains(remoteAddr)) {
-                        // Request came from trusted source, trust X-forwarded-For and return it
+                        // Request came from trusted source, trust X-Forwarded-For and return it
                         return XForwardedFor;
                     }
                 } catch (UnknownHostException e) {
@@ -72,5 +78,33 @@ public class RestTools {
 
         // Request did not come from a trusted source, or the X-Forwarded-For header was not set
         return remoteAddr;
+    }
+
+    public static String buildEndpointUri(@NotNull HttpHeaders httpHeaders, @NotNull URI defaultEndpointUri) {
+        Optional<String> endpointUri = Optional.empty();
+        final List<String> headers = httpHeaders.getRequestHeader("X-Graylog-Server-URL");
+        if (headers != null && !headers.isEmpty()) {
+            endpointUri = headers.stream().filter(s -> {
+                try {
+                    if (Strings.isNullOrEmpty(s)) {
+                        return false;
+                    }
+                    final URI uri = new URI(s);
+                    if (!uri.isAbsolute()) {
+                        return true;
+                    }
+                    switch (uri.getScheme()) {
+                        case "http":
+                        case "https":
+                            return true;
+                    }
+                    return false;
+                } catch (URISyntaxException e) {
+                    return false;
+                }
+            }).findFirst();
+        }
+
+        return endpointUri.orElse(defaultEndpointUri.toString());
     }
 }
