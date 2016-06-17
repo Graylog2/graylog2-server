@@ -60,13 +60,13 @@ const LdapGroupsPage = React.createClass({
           </span>
 
           <span>
-            <IfPermitted permissions="LDAP_EDIT">
+            <IfPermitted permissions="ldap:edit">
               <LinkContainer to={Routes.SYSTEM.LDAP.SETTINGS}>
                 <Button bsStyle="info">Configure LDAP</Button>
               </LinkContainer>
             </IfPermitted>
             &nbsp;
-            <IfPermitted permissions="USERS_LIST">
+            <IfPermitted permissions="users:list">
               <LinkContainer to={Routes.SYSTEM.USERS.LIST}>
                 <Button bsStyle="info">Manage users</Button>
               </LinkContainer>
