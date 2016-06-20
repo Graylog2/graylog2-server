@@ -33,6 +33,10 @@ const ConfigurationForm = React.createClass({
     newState.values = $.extend(newState.values, values);
     this.setState(newState);
   },
+  shouldComponentUpdate(nextProps, nextState) {
+    return false;
+  },
+
   getValue() {
     const data = {};
     const values = this.state.values;

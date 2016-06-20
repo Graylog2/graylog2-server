@@ -15,9 +15,6 @@ const DecoratorSidebar = React.createClass({
     stream: React.PropTypes.string,
   },
   mixins: [Reflux.connect(DecoratorsStore)],
-  componentDidMount() {
-    DecoratorsActions.list();
-  },
   render() {
     if (!this.state.decorators) {
       return <Spinner />;
@@ -25,14 +22,9 @@ const DecoratorSidebar = React.createClass({
     const decorators = this.state.decorators.filter((decorator) => (this.props.stream ? decorator.stream === this.props.stream : !decorator.stream));
     return (
       <span>
-        <h3>Decorators</h3>
-        <ul>
-          {decorators.map(decorator =>
-            <li key={`decorator-${decorator._id}`}>
-              <Decorator decorator={decorator} />
-            </li>)}
-        </ul>
         <AddDecoratorButton stream={this.props.stream}/>
+        {decorators.map(decorator =>
+          <Decorator key={`decorator-${decorator._id}`} decorator={decorator} typeDefinition={this.state.types[decorator.type]} />)}
       </span>
     );
   },

@@ -16,9 +16,6 @@ const AddDecoratorButton = React.createClass({
     stream: React.PropTypes.string,
   },
   mixins: [Reflux.connect(DecoratorsStore)],
-  componentDidMount() {
-    DecoratorsActions.available();
-  },
   getInitialState() {
     return {
       typeName: this.PLACEHOLDER,
@@ -31,7 +28,7 @@ const AddDecoratorButton = React.createClass({
 
   PLACEHOLDER: '=== SELECT === ',
   _formatDecoratorType(typeDefinition, typeName) {
-    return (<option key={typeName} value={typeName}>{typeName}</option>);
+    return (<option key={typeName} value={typeName}>{typeDefinition.name}</option>);
   },
   _handleCancel() {
     this.setState({typeName: this.PLACEHOLDER});
@@ -64,7 +61,8 @@ const AddDecoratorButton = React.createClass({
     const decoratorTypes = jQuery.map(this.state.types, this._formatDecoratorType);
     const configurationForm = (this.state.typeName !== this.PLACEHOLDER ?
       <ConfigurationForm ref="configurationForm"
-                         key="configuration-form-output" configFields={this.state.typeDefinition} title={'Create new Decorator'}
+                         key="configuration-form-output" configFields={this.state.typeDefinition.requested_configuration}
+                         title={`Create new ${this.state.typeDefinition.name}`}
                          typeName={this.state.typeName} includeTitleField={false}
                          submitAction={this._handleSubmit} cancelAction={this._handleCancel} /> : null);
     return (

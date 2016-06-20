@@ -25,6 +25,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.decorators.DecoratorService;
+import org.graylog2.decorators.DecoratorTypeInfo;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.decorators.MessageDecorator;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -72,9 +73,15 @@ public class DecoratorResource extends RestResource {
     @Path("/available")
     @ApiOperation(value = "Returns all available message decorations",
         notes = "")
-    public Map<String, ConfigurationRequest> getAvailable() {
+    public Map<String, DecoratorTypeInfo> getAvailable() {
         return this.messageDecorators.entrySet().stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getConfig().getRequestedConfiguration()));
+            .collect(Collectors.toMap(
+                Map.Entry::getKey, entry -> DecoratorTypeInfo.create(
+                    entry.getKey(),
+                    entry.getValue().getDescriptor(),
+                    entry.getValue().getConfig().getRequestedConfiguration()
+                )
+            ));
     }
 
     @POST

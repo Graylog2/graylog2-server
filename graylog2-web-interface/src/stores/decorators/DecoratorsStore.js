@@ -9,11 +9,20 @@ const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 const DecoratorsStore = Reflux.createStore({
   listenables: [DecoratorsActions],
+  state: {},
+  getInitialState() {
+    return this.state;
+  },
+  init() {
+    DecoratorsActions.available();
+    DecoratorsActions.list();
+  },
   list() {
     const url = URLUtils.qualifyUrl(ApiRoutes.DecoratorsResource.get().url);
     const promise = fetch('GET', url);
     promise.then(response => {
       this.trigger({ decorators: response });
+      this.state.decorators = response;
     });
     DecoratorsActions.list.promise(promise);
 
@@ -24,6 +33,7 @@ const DecoratorsStore = Reflux.createStore({
     const promise = fetch('GET', url);
     promise.then(response => {
       this.trigger({ types: response });
+      this.state.types = response;
     });
     DecoratorsActions.available.promise(promise);
 
@@ -33,11 +43,24 @@ const DecoratorsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.DecoratorsResource.create().url);
     const promise = fetch('POST', url, request);
 
-    promise.then(() => DecoratorsActions.list());
-
     DecoratorsActions.create.promise(promise);
 
     return promise;
+  },
+  createCompleted() {
+    DecoratorsActions.list();
+  },
+  remove(decoratorId) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.DecoratorsResource.remove(decoratorId).url);
+
+    const promise = fetch('DELETE', url);
+
+    DecoratorsActions.remove.promise(promise);
+
+    return promise;
+  },
+  removeCompleted() {
+    DecoratorsActions.list();
   },
 });
 
