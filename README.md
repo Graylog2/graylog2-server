@@ -10,13 +10,19 @@ information.
 Installation
 ------------
 
-[Download the plugin](https://github.com/Graylog2/graylog-plugin-map-widget/releases)
-and place the `.jar` file in your Graylog plugin directory. The plugin directory
-is the `plugins/` folder relative from your `graylog-server` directory by default
-and can be configured in your `graylog.conf` file.
+This plugin is included by default in Graylog 2.0 tarballs and packages, so you
+do not need to install it by hand.
 
-Restart `graylog-server` and you are done.
+For now we do not provide individual releases of the plugin, but you can still
+find it inside the Graylog tarball available in the
+[downloads page](https://www.graylog.org/download/). The plugin is located in
+the plugin directory of the tarball.
 
+Once you get the .jar file from the tarball, place it in your Graylog plugin
+directory. The plugin directory is the plugins/ folder relative from your
+graylog-server directory by default and can be configured in your graylog.conf file.
+
+Restart graylog-server and you are done.
 
 Development
 -----------
