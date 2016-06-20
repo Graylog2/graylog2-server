@@ -36,7 +36,6 @@ const SearchPage = React.createClass({
   getInitialState() {
     return {
       selectedFields: ['message', 'source'],
-      query: SearchStore.query.length > 0 ? SearchStore.query : '*',
       error: undefined,
     };
   },
@@ -66,8 +65,11 @@ const SearchPage = React.createClass({
       clearInterval(this.timer);
     }
   },
+  _getEffectiveQuery() {
+    return SearchStore.query.length > 0 ? SearchStore.query : '*';
+  },
   _refreshData() {
-    const query = this.state.query;
+    const query = this._getEffectiveQuery();
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
     UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
       .then(
