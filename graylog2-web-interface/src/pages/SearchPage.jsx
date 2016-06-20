@@ -51,6 +51,14 @@ const SearchPage = React.createClass({
 
     NodesActions.list();
   },
+  componentWillReceiveProps(nextProps) {
+    const currentLocation = this.props.location || {};
+    const nextLocation = nextProps.location || {};
+
+    if ((currentLocation !== nextLocation) || (currentLocation.search !== nextLocation.search)) {
+      this._refreshData();
+    }
+  },
   componentWillUnmount() {
     this._stopTimer();
   },
