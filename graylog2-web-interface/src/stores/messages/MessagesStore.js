@@ -1,8 +1,7 @@
 import Reflux from 'reflux';
-import moment from 'moment';
 
 import fetch from 'logic/rest/FetchProvider';
-import MessageFieldsFilter from 'logic/message/MessageFieldsFilter';
+import MessageFormatter from 'logic/message/MessageFormatter';
 import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
@@ -22,23 +21,7 @@ const MessagesStore = Reflux.createStore({
     const url = ApiRoutes.MessagesController.single(index.trim(), messageId.trim()).url;
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
       .then(
-        response => {
-          const message = response.message;
-          const fields = message.fields;
-          const filteredFields = MessageFieldsFilter.filterFields(fields);
-
-          return {
-            id: message.id,
-            timestamp: moment(message.timestamp).unix(),
-            filtered_fields: filteredFields,
-            formatted_fields: filteredFields,
-            fields: fields,
-            index: response.index,
-            source_node_id: fields.gl2_source_node,
-            source_input_id: fields.gl2_source_input,
-            stream_ids: message.streams,
-          };
-        },
+        response => MessageFormatter.formatResultMessage(response),
         errorThrown => {
           UserNotification.error(`Loading message information failed with status: ${errorThrown}`,
             'Could not load message information');
