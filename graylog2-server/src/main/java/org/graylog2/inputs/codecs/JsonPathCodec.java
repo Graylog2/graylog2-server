@@ -134,7 +134,7 @@ public class JsonPathCodec extends AbstractCodec {
                     CK_PATH,
                     "JSON path of data to extract",
                     "$.store.book[1].number_of_orders",
-                    "Path to the value you want to extract from the JSON response. Take a look at the documentation for a more detailled explanation.",
+                    "Path to the value you want to extract from the JSON response. Take a look at the documentation for a more detailed explanation.",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
 
