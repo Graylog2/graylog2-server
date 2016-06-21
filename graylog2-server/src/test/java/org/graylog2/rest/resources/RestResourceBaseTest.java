@@ -16,9 +16,7 @@
  */
 package org.graylog2.rest.resources;
 
-import com.google.inject.Module;
 import org.apache.shiro.subject.Subject;
-import org.assertj.core.util.Lists;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.junit.Before;
@@ -26,7 +24,7 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.internal.matchers.VarargMatcher;
 
-import java.util.List;
+import java.util.Collections;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -38,10 +36,8 @@ public class RestResourceBaseTest {
     @Before
     public void setUpInjector() throws Exception {
         // The list of modules is empty for now so only JIT injection will be used.
-        final List<Module> modules = Lists.emptyList();
-        GuiceInjectorHolder.createInjector(modules);
+        GuiceInjectorHolder.createInjector(Collections.emptyList());
     }
-
 
     @Test
     public void testisAnyPermitted() {
@@ -91,9 +87,10 @@ public class RestResourceBaseTest {
         }
     }
 
-    static class MyVarargMatcher implements VarargMatcher, ArgumentMatcher<String[]> {
-        @Override public boolean matches(Object varargArgument) {
-            return /* does it match? */ true;
+    private static class MyVarargMatcher implements VarargMatcher, ArgumentMatcher<String[]> {
+        @Override
+        public boolean matches(String[] strings) {
+            return true;
         }
     }
 }
