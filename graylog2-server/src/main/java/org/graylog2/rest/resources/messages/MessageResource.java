@@ -49,6 +49,7 @@ import javax.ws.rs.core.MediaType;
 @RequiresAuthentication
 @Api(value = "Messages", description = "Single messages")
 @Path("/messages/{index}")
+@Produces(MediaType.APPLICATION_JSON)
 public class MessageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
 
@@ -63,7 +64,6 @@ public class MessageResource extends RestResource {
     @Path("/{messageId}")
     @Timed
     @ApiOperation(value = "Get a single message.")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Specified index does not exist."),
             @ApiResponse(code = 404, message = "Message does not exist.")
@@ -113,7 +113,6 @@ public class MessageResource extends RestResource {
     @Timed
     @ApiOperation(value = "Analyze a message string",
             notes = "Returns what tokens/terms a message string (message or full_message) is split to.")
-    @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.MESSAGES_ANALYZE)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Specified index does not exist."),
