@@ -16,21 +16,23 @@ const TimezoneSelect = React.createClass({
     const timezones = {};
     moment.tz.names().forEach((timezone) => {
       const splitted = timezone.split('/');
-      const continent = (splitted.length > 1 ? splitted[0] : 'Etc');
-      const city = (splitted.length > 1 ? splitted[1] : splitted[0]);
+      const area = (splitted.length > 1 ? splitted[0] : 'Etc');
+      const location = (splitted.length > 1 ? splitted[1] : splitted[0]);
 
-      if (!timezones[continent]) {
-        timezones[continent] = [];
+      if (!timezones[area]) {
+        timezones[area] = [];
       }
 
-      timezones[continent].push(city);
+      timezones[area].push(location);
     });
 
-    return [].concat.apply([], Object.keys(timezones).sort().map((continent) => {
-      return [{label: continent, disabled: true, value: continent}]
-        .concat(jQuery.unique(timezones[continent])
+    return [].concat.apply([], Object.keys(timezones).sort().map((area) => {
+      return [{ label: area, disabled: true, value: area }]
+        .concat(jQuery.unique(timezones[area])
           .sort()
-          .map((timezone) => { return {value: continent + '/' + timezone, label: timezone.replace("_", " ")}; })
+          .map((location) => {
+            return { value: `${area}/${location}`, label: location.replace('_', ' ') };
+          })
         );
     }));
   },
@@ -46,7 +48,7 @@ const TimezoneSelect = React.createClass({
       <Select ref="timezone" {...this.props}
               placeholder="Pick a time zone"
               options={timezones}
-              optionRenderer={this._renderOption}/>
+              optionRenderer={this._renderOption} />
     );
   },
 });
