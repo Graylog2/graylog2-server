@@ -20,8 +20,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.sun.istack.internal.Nullable;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @JsonAutoDetect
