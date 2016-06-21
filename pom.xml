@@ -96,7 +96,7 @@
         <apache-directory-version>1.0.0-M31</apache-directory-version>
         <apacheds-server.version>2.0.0-M20</apacheds-server.version>
         <surefire.version>2.19.1</surefire.version>
-        <guice.version>4.0</guice.version>
+        <guice.version>4.1.0</guice.version>
         <drools.version>6.4.0.Final</drools.version>
         <slf4j.version>1.7.21</slf4j.version>
         <log4j.version>2.6.1</log4j.version>
