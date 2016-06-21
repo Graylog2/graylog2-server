@@ -80,7 +80,6 @@ public class EsNodeProvider implements Provider<Node> {
         settings.put("transport.tcp.port", conf.getTransportTcpPort());
 
         settings.put("discovery.initial_state_timeout", conf.getInitialStateTimeout());
-        settings.put("discovery.zen.ping.multicast.enabled", conf.isMulticastDiscovery());
 
         final List<String> unicastHosts = conf.getUnicastHosts();
         if (unicastHosts != null && !unicastHosts.isEmpty()) {
