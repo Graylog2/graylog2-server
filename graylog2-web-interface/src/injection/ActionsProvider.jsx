@@ -25,6 +25,7 @@ class ActionsProvider {
       LdapGroups: () => require('actions/ldap/LdapGroupsActions'),
       Loggers: () => require('actions/system/LoggersActions'),
       MessageCounts: () => require('actions/messages/MessageCountsActions'),
+      Messages: () => require('actions/messages/MessagesActions'),
       Metrics: () => require('actions/metrics/MetricsActions'),
       Nodes: () => require('actions/nodes/NodesActions'),
       Notifications: () => require('actions/notifications/NotificationsActions'),

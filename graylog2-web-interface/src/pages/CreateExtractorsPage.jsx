@@ -12,10 +12,12 @@ import Routes from 'routing/Routes';
 import StoreProvider from 'injection/StoreProvider';
 const ExtractorsStore = StoreProvider.getStore('Extractors');
 const InputsStore = StoreProvider.getStore('Inputs');
+// eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');
+const MessagesActions = ActionsProvider.getActions('Messages');
 
 const CreateExtractorsPage = React.createClass({
   propTypes: {
@@ -39,7 +41,7 @@ const CreateExtractorsPage = React.createClass({
   },
   componentDidMount() {
     InputsActions.get.triggerPromise(this.props.params.inputId);
-    MessagesStore.loadMessage(this.state.exampleIndex, this.state.exampleId)
+    MessagesActions.loadMessage.triggerPromise(this.state.exampleIndex, this.state.exampleId)
       .then(message => this.setState({exampleMessage: message}));
   },
   _isLoading() {

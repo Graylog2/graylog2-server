@@ -7,11 +7,13 @@ import Spinner from 'components/common/Spinner';
 import ActionsProvider from 'injection/ActionsProvider';
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
+const MessagesActions = ActionsProvider.getActions('Messages');
 
 import StoreProvider from 'injection/StoreProvider';
 const NodesStore = StoreProvider.getStore('Nodes');
 const StreamsStore = StoreProvider.getStore('Streams');
 const InputsStore = StoreProvider.getStore('Inputs');
+// eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
 
 const ShowMessagePage = React.createClass({
@@ -28,7 +30,7 @@ const ShowMessagePage = React.createClass({
     };
   },
   componentDidMount() {
-    MessagesStore.loadMessage(this.props.params.index, this.props.params.messageId).then(message => {
+    MessagesActions.loadMessage.triggerPromise(this.props.params.index, this.props.params.messageId).then(message => {
       this.setState({ message: message });
       InputsActions.get.triggerPromise(message.source_input_id);
     });
