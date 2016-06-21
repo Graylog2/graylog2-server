@@ -12,11 +12,16 @@ const TimezoneSelect = React.createClass({
   getValue() {
     return this.refs.timezone.getValue();
   },
+
+  // Some time zones are not stored into any areas, this is the group we use to put them apart in the dropdown
+  // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  _UNCLASSIFIED_AREA: 'Unclassified',
+
   _formatTimezones() {
     const timezones = {};
     moment.tz.names().forEach((timezone) => {
       const splitted = timezone.split('/');
-      const area = (splitted.length > 1 ? splitted[0] : 'Etc');
+      const area = (splitted.length > 1 ? splitted[0] : this._UNCLASSIFIED_AREA);
       const location = (splitted.length > 1 ? splitted[1] : splitted[0]);
 
       if (!timezones[area]) {
@@ -31,7 +36,8 @@ const TimezoneSelect = React.createClass({
         .concat(jQuery.unique(timezones[area])
           .sort()
           .map((location) => {
-            return { value: `${area}/${location}`, label: location.replace('_', ' ') };
+            const timezone = (area === this._UNCLASSIFIED_AREA ? location : `${area}/${location}`);
+            return { value: timezone, label: location.replace('_', ' ') };
           })
         );
     }));
