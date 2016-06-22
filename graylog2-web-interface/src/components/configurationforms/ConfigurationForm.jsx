@@ -16,7 +16,10 @@ const ConfigurationForm = React.createClass({
     return this._copyStateFromProps(this.props);
   },
   componentWillReceiveProps(props) {
-    this.setState(this._copyStateFromProps(props));
+    const newState = this._copyStateFromProps(props);
+    const values = this.state ? this.state.values : {};
+    newState.values = $.extend(newState.values, values);
+    this.setState(newState);
   },
   getValue() {
     const data = {};
@@ -63,17 +66,18 @@ const ConfigurationForm = React.createClass({
     this.refs.modal.open();
   },
   _closeModal() {
+    this.setState(this.getInitialState());
     if (this.props.cancelAction) {
       this.props.cancelAction();
     }
   },
   _handleTitleChange(field, value) {
-    this.setState({titleValue: value});
+    this.setState({ titleValue: value });
   },
   _handleChange(field, value) {
     const values = this.state.values;
     values[field] = value;
-    this.setState({values: values});
+    this.setState({ values: values });
   },
   _renderConfigField(configField, key, autoFocus) {
     const value = this.state.values[key];
@@ -120,7 +124,7 @@ const ConfigurationForm = React.createClass({
     return (
       <BootstrapModalForm ref="modal"
                           title={title}
-                          onModalClose={this._closeModal}
+                          onCancel={this._closeModal}
                           onSubmitForm={this._save}
                           submitButtonText="Save">
         <fieldset>
