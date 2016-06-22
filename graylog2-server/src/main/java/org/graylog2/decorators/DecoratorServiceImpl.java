@@ -16,10 +16,12 @@
  */
 package org.graylog2.decorators;
 
+import com.google.common.base.Strings;
 import com.mongodb.DBCollection;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
+import org.graylog2.database.NotFoundException;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
 
@@ -55,6 +57,16 @@ public class DecoratorServiceImpl implements DecoratorService {
     }
 
     @Override
+    public Decorator findById(String decoratorId) throws NotFoundException {
+        final Decorator result = coll.findOneById(decoratorId);
+        if (result == null) {
+            throw new NotFoundException("Decorator with id " + decoratorId + " not found.");
+        }
+
+        return result;
+    }
+
+    @Override
     public List<Decorator> findAll() {
         return toInterfaceList(coll.find().toArray());
     }
@@ -72,7 +84,11 @@ public class DecoratorServiceImpl implements DecoratorService {
     @Override
     public Decorator save(Decorator decorator) {
         checkArgument(decorator instanceof DecoratorImpl, "Argument must be an instance of DecoratorImpl, not %s", decorator.getClass());
-        return this.coll.save((DecoratorImpl)decorator).getSavedObject();
+        if (!Strings.isNullOrEmpty(decorator.id())) {
+            this.coll.updateById(decorator.id(), (DecoratorImpl)decorator);
+            return this.coll.findOneById(decorator.id());
+        }
+        return this.coll.save((DecoratorImpl) decorator).getSavedObject();
     }
 
     @Override

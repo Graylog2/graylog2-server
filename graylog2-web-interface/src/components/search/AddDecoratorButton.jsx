@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import jQuery from 'jquery';
 
 import { ConfigurationForm } from 'components/configurationforms';
-import { Spinner } from 'components/common';
+import { Select, Spinner } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
 const DecoratorsStore = StoreProvider.getStore('Decorators');
@@ -18,7 +18,6 @@ const AddDecoratorButton = React.createClass({
   mixins: [Reflux.connect(DecoratorsStore)],
   getInitialState() {
     return {
-      typeName: this.PLACEHOLDER,
       typeDefinition: {},
     };
   },
@@ -26,12 +25,11 @@ const AddDecoratorButton = React.createClass({
     return (this.props !== nextProps) || (this.state !== nextState);
   },
 
-  PLACEHOLDER: '=== SELECT === ',
   _formatDecoratorType(typeDefinition, typeName) {
-    return (<option key={typeName} value={typeName}>{typeDefinition.name}</option>);
+    return { value: typeName, label: typeDefinition.name };
   },
   _handleCancel() {
-    this.setState({typeName: this.PLACEHOLDER});
+    this.refs.select.clearValue();
   },
   _handleSubmit(data) {
     const request = {
@@ -45,8 +43,7 @@ const AddDecoratorButton = React.createClass({
   _openModal() {
     this.refs.configurationForm.open();
   },
-  _onTypeChange(evt) {
-    const decoratorType = evt.target.value;
+  _onTypeChange(decoratorType) {
     this.setState({ typeName: decoratorType });
     if (this.state.types[decoratorType]) {
       this.setState({ typeDefinition: this.state.types[decoratorType] });
@@ -66,14 +63,18 @@ const AddDecoratorButton = React.createClass({
                          typeName={this.state.typeName} includeTitleField={false}
                          submitAction={this._handleSubmit} cancelAction={this._handleCancel} /> : null);
     return (
-      <div className="form-inline">
+      <div className="form-inline" style={{ margin: '4px' }}>
         <div className="form-group">
-          <select id="decorator-type" value={this.state.typeName} onChange={this._onTypeChange} className="form-control">
-            <option value={this.PLACEHOLDER} disabled>Select Decorator</option>
-            {decoratorTypes}
-          </select>
+          <div className="form-group" style={{ width: 300 }}>
+            <Select ref="select"
+                    placeholder="Select decorator"
+                    onValueChange={this._onTypeChange}
+                    options={decoratorTypes}
+                    matchProp="label"
+                    value={this.state.typeName} />
+          </div>
           {' '}
-          <button className="btn btn-success form-control" disabled={this.state.typeName === this.PLACEHOLDER}
+          <button className="btn btn-success form-control" disabled={!this.state.typeName}
                   onClick={this._openModal}>Add</button>
 
         </div>

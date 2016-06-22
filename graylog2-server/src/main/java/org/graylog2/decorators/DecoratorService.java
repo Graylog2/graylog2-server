@@ -17,6 +17,7 @@
 package org.graylog2.decorators;
 
 import com.google.inject.ImplementedBy;
+import org.graylog2.database.NotFoundException;
 
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,7 @@ public interface DecoratorService {
     List<Decorator> findForStream(String streamId);
     List<Decorator> findForGlobal();
     List<Decorator> findAll();
+    Decorator findById(String decoratorId) throws NotFoundException;
     Decorator create(String type, Map<String, Object> config, String stream);
     Decorator create(String type, Map<String, Object> config);
     Decorator save(Decorator decorator);

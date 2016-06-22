@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.decorators.DecoratorService;
@@ -36,6 +37,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -95,8 +97,17 @@ public class DecoratorResource extends RestResource {
     @Path("/{decoratorId}")
     @Timed
     @ApiOperation(value = "Create a decorator")
-    @RequiresPermissions(RestPermissions.STREAMS_CREATE)
-    public void create(@ApiParam(name = "decorator id", required = true) @PathParam("decoratorId") final String decoratorId) {
+    public void delete(@ApiParam(name = "decorator id", required = true) @PathParam("decoratorId") final String decoratorId) {
         this.decoratorService.delete(decoratorId);
+    }
+
+    @PUT
+    @Path("/{decoratorId}")
+    @Timed
+    @ApiOperation(value = "Update a decorator")
+    public Decorator update(@ApiParam(name = "decorator id", required = true) @PathParam("decoratorId") final String decoratorId,
+                            @ApiParam(name = "JSON body", required = true) DecoratorImpl decorator) throws NotFoundException {
+        final Decorator originalDecorator = decoratorService.findById(decoratorId);
+        return this.decoratorService.save(decorator.toBuilder().id(originalDecorator.id()).build());
     }
 }

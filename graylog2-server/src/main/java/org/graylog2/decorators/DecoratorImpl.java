@@ -55,12 +55,19 @@ public abstract class DecoratorImpl implements Decorator {
     @Override
     public abstract Optional<String> stream();
 
+    public abstract Builder toBuilder();
+
     @JsonCreator
     public static DecoratorImpl create(@JsonProperty(FIELD_ID) @Nullable String id,
                                        @JsonProperty(FIELD_TYPE) String type,
                                        @JsonProperty(FIELD_CONFIG) Map<String, Object> config,
                                        @JsonProperty(FIELD_STREAM) Optional<String> stream) {
-        return new AutoValue_DecoratorImpl(id, type, config, stream);
+        return new AutoValue_DecoratorImpl.Builder()
+            .id(id)
+            .type(type)
+            .config(config)
+            .stream(stream)
+            .build();
     }
 
     public static Decorator create(@JsonProperty(FIELD_TYPE) String type,
@@ -72,5 +79,14 @@ public abstract class DecoratorImpl implements Decorator {
     public static Decorator create(@JsonProperty(FIELD_TYPE) String type,
                                    @JsonProperty(FIELD_CONFIG) Map<String, Object> config) {
         return create(type, config, Optional.empty());
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder id(String id);
+        abstract Builder type(String type);
+        abstract Builder config(Map<String, Object> config);
+        abstract Builder stream(Optional<String> stream);
+        public abstract DecoratorImpl build();
     }
 }

@@ -24,7 +24,9 @@ const DecoratorSidebar = React.createClass({
       <span>
         <AddDecoratorButton stream={this.props.stream}/>
         {decorators.map(decorator =>
-          <Decorator key={`decorator-${decorator._id}`} decorator={decorator} typeDefinition={this.state.types[decorator.type]} />)}
+          <Decorator key={`decorator-${decorator._id}`}
+                     decorator={decorator}
+                     typeDefinition={this.state.types[decorator.type]} />)}
       </span>
     );
   },

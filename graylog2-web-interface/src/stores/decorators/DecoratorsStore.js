@@ -62,6 +62,17 @@ const DecoratorsStore = Reflux.createStore({
   removeCompleted() {
     DecoratorsActions.list();
   },
+  update(decoratorId, request) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.DecoratorsResource.update(decoratorId).url);
+    const promise = fetch('PUT', url, request);
+
+    DecoratorsActions.update.promise(promise);
+
+    return promise;
+  },
+  updateCompleted() {
+    DecoratorsActions.list();
+  },
 });
 
 export default DecoratorsStore;
