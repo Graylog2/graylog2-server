@@ -50,6 +50,7 @@ import LdapPage from 'pages/LdapPage';
 import LdapGroupsPage from 'pages/LdapGroupsPage';
 import ConfigurationsPage from 'pages/ConfigurationsPage';
 import NotFoundPage from 'pages/NotFoundPage';
+import AuthenticationPage from 'pages/AuthenticationPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -95,6 +96,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage}/>
             <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
             <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>
+            <Route path={Routes.SYSTEM.AUTHENTICATION} component={AuthenticationPage}/>
             <Route path={Routes.SYSTEM.USERS.CREATE} component={CreateUsersPage}/>
             <Route path={Routes.SYSTEM.USERS.edit(':username')} component={EditUsersPage}/>
             <Route path={Routes.SYSTEM.USERS.LIST} component={UsersPage}/>

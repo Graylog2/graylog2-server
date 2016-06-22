@@ -38,6 +38,7 @@ const Routes = {
       SETTINGS: '/system/ldap',
       GROUPS: '/system/ldap/groups',
     },
+    AUTHENTICATION: '/system/authentication',
   },
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,
   stream_edit: (streamId) => `/streams/${streamId}/edit`,
