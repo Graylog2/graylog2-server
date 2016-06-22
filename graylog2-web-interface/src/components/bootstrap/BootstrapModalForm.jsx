@@ -1,6 +1,6 @@
-import React, {Component, PropTypes} from 'react';
+import React, { Component, PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import {Modal, Button} from 'react-bootstrap';
+import { Modal, Button } from 'react-bootstrap';
 import $ from 'jquery';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';

@@ -1,5 +1,5 @@
-import React, {Component, PropTypes} from 'react';
-import {Modal} from 'react-bootstrap';
+import React, { Component, PropTypes } from 'react';
+import { Modal } from 'react-bootstrap';
 
 /**
  * Encapsulates a react-bootstrap modal, hiding the state handling for the modal
@@ -29,11 +29,11 @@ class BootstrapModalWrapper extends Component {
   }
 
   open() {
-    this.setState({showModal: true}, this.onOpen);
+    this.setState({ showModal: true }, this.onOpen);
   }
 
   close() {
-    this.setState({showModal: false}, this.onClose);
+    this.setState({ showModal: false }, this.onClose);
   }
 
   render() {
