@@ -21,9 +21,6 @@ const AddDecoratorButton = React.createClass({
       typeDefinition: {},
     };
   },
-  shouldComponentUpdate(nextProps, nextState) {
-    return (this.props !== nextProps) || (this.state !== nextState);
-  },
 
   _formatDecoratorType(typeDefinition, typeName) {
     return { value: typeName, label: typeDefinition.name };
