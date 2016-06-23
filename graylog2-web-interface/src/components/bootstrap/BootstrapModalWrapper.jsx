@@ -1,5 +1,5 @@
-import React, {Component, PropTypes} from 'react';
-import {Modal} from 'react-bootstrap';
+import React, { Component, PropTypes } from 'react';
+import { Modal } from 'react-bootstrap';
 
 /**
  * Encapsulates a react-bootstrap modal, hiding the state handling for the modal
@@ -10,6 +10,7 @@ class BootstrapModalWrapper extends Component {
 
     this.open = this.open.bind(this);
     this.close = this.close.bind(this);
+    this._hide = this._hide.bind(this);
 
     this.state = {
       showModal: props.showModal || false,
@@ -28,17 +29,27 @@ class BootstrapModalWrapper extends Component {
     }
   }
 
+  onHide() {
+    if (typeof this.props.onHide === 'function') {
+      this.props.onHide();
+    }
+  }
+
   open() {
-    this.setState({showModal: true}, this.onOpen);
+    this.setState({ showModal: true }, this.onOpen);
   }
 
   close() {
-    this.setState({showModal: false}, this.onClose);
+    this.setState({ showModal: false }, this.onClose);
+  }
+
+  _hide() {
+    this.setState({ showModal: false }, this.onHide);
   }
 
   render() {
     return (
-      <Modal show={this.state.showModal} onHide={this.close}>
+      <Modal show={this.state.showModal} onHide={this._hide}>
         {this.props.children}
       </Modal>
     );
@@ -53,6 +64,7 @@ BootstrapModalWrapper.propTypes = {
   ]).isRequired,
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
+  onHide: PropTypes.func,
 };
 
 export default BootstrapModalWrapper;
