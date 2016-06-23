@@ -7,14 +7,17 @@ import { AddDecoratorButton, Decorator } from 'components/search';
 import StoreProvider from 'injection/StoreProvider';
 const DecoratorsStore = StoreProvider.getStore('Decorators');
 
-import ActionsProvider from 'injection/ActionsProvider';
-const DecoratorsActions = ActionsProvider.getActions('Decorators');
-
 const DecoratorSidebar = React.createClass({
   propTypes: {
     stream: React.PropTypes.string,
   },
   mixins: [Reflux.connect(DecoratorsStore)],
+  _formatDecorator(decorator) {
+    const typeDefinition = this.state.types[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
+    return (<Decorator key={`decorator-${decorator._id}`}
+                      decorator={decorator}
+                      typeDefinition={typeDefinition} />);
+  },
   render() {
     if (!this.state.decorators) {
       return <Spinner />;
@@ -23,10 +26,7 @@ const DecoratorSidebar = React.createClass({
     return (
       <span>
         <AddDecoratorButton stream={this.props.stream}/>
-        {decorators.map(decorator =>
-          <Decorator key={`decorator-${decorator._id}`}
-                     decorator={decorator}
-                     typeDefinition={this.state.types[decorator.type]} />)}
+        {decorators.map(decorator => this._formatDecorator(decorator))}
       </span>
     );
   },

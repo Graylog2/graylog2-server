@@ -33,12 +33,17 @@ const Decorator = React.createClass({
   _handleSubmit(data) {
     DecoratorsActions.update(this.props.decorator._id, { type: data.type, config: data.configuration });
   },
+  _decoratorTypeNotPresent() {
+    return {
+      name: <strong>Unknown decorator type</strong>,
+    };
+  },
   render() {
     if (!this.state.types) {
       return <Spinner />;
     }
     const decorator = this.props.decorator;
-    const decoratorType = this.state.types[decorator.type];
+    const decoratorType = this.state.types[decorator.type] || this._decoratorTypeNotPresent();
     return (
       <Row className="row-sm">
         <Col md={8}>
