@@ -33,7 +33,6 @@ class BootstrapModalWrapper extends Component {
     if (typeof this.props.onCancel === 'function') {
       this.props.onCancel();
     }
-    this.onClose();
   }
 
   open() {
