@@ -1,6 +1,5 @@
 package org.graylog2.security;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Set;
 
 @AutoValue
-@JsonAutoDetect
 public abstract class AuthenticationConfig {
 
     @JsonProperty("realm_order")
@@ -27,7 +25,7 @@ public abstract class AuthenticationConfig {
 
 
     @JsonCreator
-    public AuthenticationConfig create(@JsonProperty("realm_order") List<String> order,
+    public static AuthenticationConfig create(@JsonProperty("realm_order") List<String> order,
                                        @JsonProperty("disabled_realms") Set<String> disabledRealms) {
         return builder()
                 .realmOrder(order)

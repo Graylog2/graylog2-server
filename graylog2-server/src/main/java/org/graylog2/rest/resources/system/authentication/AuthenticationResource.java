@@ -48,7 +48,7 @@ public class AuthenticationResource extends RestResource {
     @PUT
     @Path("config")
     @ApiOperation("Update authentication providers configuration")
-    public AuthenticationConfig saveConfig(@ApiParam(name = "config", required = true) final AuthenticationConfig config) {
+    public AuthenticationConfig create(@ApiParam(name = "config", required = true) final AuthenticationConfig config) {
         checkPermission(RestPermissions.CLUSTER_CONFIG_ENTRY_READ);
 
         clusterConfigService.write(config);

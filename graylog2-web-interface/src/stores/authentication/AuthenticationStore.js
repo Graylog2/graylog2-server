@@ -29,19 +29,22 @@ const AuthenticationStore = Reflux.createStore({
         (error) => UserNotification.error(`Unable to load authentication configuration: ${error}`, 'Could not load authenticators')
       );
 
-    return promise;
+    AuthenticationActions.load.promise(promise);
   },
 
   update(type, config) {
     const url = URLUtils.qualifyUrl(this.sourceUrl);
     if (type === 'providers') {
-      return fetch('POST', url, config)
+      const promise = fetch('PUT', url, config)
         .then(
-          (response) => {},
+          (response) => {
+            this.trigger({ authenticators: response });
+            UserNotification.success('Configuration updated successfully');
+          },
           (error) => UserNotification.error(`Unable to save authentication provider configuration: ${error}`, 'Could not save configuration')
         );
+      AuthenticationActions.update.promise(promise);
     }
-    return null;
   },
 });
 
