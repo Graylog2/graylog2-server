@@ -10,6 +10,7 @@ class BootstrapModalWrapper extends Component {
 
     this.open = this.open.bind(this);
     this.close = this.close.bind(this);
+    this._cancel = this._cancel.bind(this);
 
     this.state = {
       showModal: props.showModal || false,
@@ -28,6 +29,13 @@ class BootstrapModalWrapper extends Component {
     }
   }
 
+  onCancel() {
+    if (typeof this.props.onCancel === 'function') {
+      this.props.onCancel();
+    }
+    this.onClose();
+  }
+
   open() {
     this.setState({ showModal: true }, this.onOpen);
   }
@@ -36,9 +44,13 @@ class BootstrapModalWrapper extends Component {
     this.setState({ showModal: false }, this.onClose);
   }
 
+  _cancel() {
+    this.setState({ showModal: false }, this.onCancel);
+  }
+
   render() {
     return (
-      <Modal show={this.state.showModal} onHide={this.close}>
+      <Modal show={this.state.showModal} onHide={this._cancel}>
         {this.props.children}
       </Modal>
     );
@@ -53,6 +65,7 @@ BootstrapModalWrapper.propTypes = {
   ]).isRequired,
   onOpen: PropTypes.func,
   onClose: PropTypes.func,
+  onCancel: PropTypes.func,
 };
 
 export default BootstrapModalWrapper;

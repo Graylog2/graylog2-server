@@ -67,7 +67,10 @@ class BootstrapModalForm extends Component {
     );
 
     return (
-      <BootstrapModalWrapper ref="modal" onOpen={this.props.onModalOpen} onClose={this.props.onModalClose}>
+      <BootstrapModalWrapper ref="modal"
+                             onOpen={this.props.onModalOpen}
+                             onClose={this.props.onModalClose}
+                             onCancel={this._onModalCancel}>
         <Modal.Header closeButton>
           <Modal.Title>{this.props.title}</Modal.Title>
         </Modal.Header>
