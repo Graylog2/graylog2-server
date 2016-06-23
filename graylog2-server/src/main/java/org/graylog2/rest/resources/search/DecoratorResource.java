@@ -67,6 +67,7 @@ public class DecoratorResource extends RestResource {
     @ApiOperation(value = "Returns all configured message decorations",
         notes = "")
     public List<Decorator> get() {
+        checkPermission(RestPermissions.DECORATORS_READ);
         return this.decoratorService.findAll();
     }
 
@@ -90,6 +91,10 @@ public class DecoratorResource extends RestResource {
     @Timed
     @ApiOperation(value = "Creates a message decoration configuration")
     public Decorator create(@ApiParam(name = "JSON body", required = true) DecoratorImpl decorator) {
+        checkPermission(RestPermissions.DECORATORS_CREATE);
+        if (decorator.stream().isPresent()) {
+            checkPermission(RestPermissions.STREAMS_EDIT, decorator.stream().get());
+        }
         return this.decoratorService.save(decorator);
     }
 
@@ -97,7 +102,13 @@ public class DecoratorResource extends RestResource {
     @Path("/{decoratorId}")
     @Timed
     @ApiOperation(value = "Create a decorator")
-    public void delete(@ApiParam(name = "decorator id", required = true) @PathParam("decoratorId") final String decoratorId) {
+    public void delete(@ApiParam(name = "decorator id", required = true) @PathParam("decoratorId") final String decoratorId) throws NotFoundException {
+        checkPermission(RestPermissions.DECORATORS_EDIT);
+        final Decorator decorator = this.decoratorService.findById(decoratorId);
+
+        if (decorator.stream().isPresent()) {
+            checkPermission(RestPermissions.STREAMS_EDIT, decorator.stream().get());
+        }
         this.decoratorService.delete(decoratorId);
     }
 
@@ -108,6 +119,10 @@ public class DecoratorResource extends RestResource {
     public Decorator update(@ApiParam(name = "decorator id", required = true) @PathParam("decoratorId") final String decoratorId,
                             @ApiParam(name = "JSON body", required = true) DecoratorImpl decorator) throws NotFoundException {
         final Decorator originalDecorator = decoratorService.findById(decoratorId);
+        checkPermission(RestPermissions.DECORATORS_CREATE);
+        if (originalDecorator.stream().isPresent()) {
+            checkPermission(RestPermissions.STREAMS_EDIT, originalDecorator.stream().get());
+        }
         return this.decoratorService.save(decorator.toBuilder().id(originalDecorator.id()).build());
     }
 }
