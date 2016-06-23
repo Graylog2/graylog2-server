@@ -5,6 +5,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import UserList from 'components/users/UserList';
 import RolesComponent from 'components/users/RolesComponent';
+import AuthProvidersConfig from './AuthProvidersConfig';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const AuthenticationActions = ActionsProvider.getActions('Authentication');
@@ -41,19 +42,32 @@ const AuthenticationComponent = React.createClass({
     }
   },
 
+  _onUpdateProviders(config) {
+    return AuthenticationActions.update('providers', config);
+  },
+
   render() {
     let authenticators = <Tab disabled title="Loading..."/>;
     const auths = this.state.authenticators;
     if (auths) {
-      authenticators = auths.realm_order.map((name) => {
+      authenticators = auths.realm_order.map((name, idx) => {
         const auth = this.authenticatorConfigurations[name];
         const title = (auth || { displayName: name }).displayName;
-        return <Tab key={name} eventKey={name} title={title}>{this._pluginPane(name)}</Tab>;
+        return <Tab key={name} eventKey={name} title={`${idx + 1}. ${title}`}>{this._pluginPane(name)}</Tab>;
       });
+
+      // settings
+      authenticators.push(
+        <Tab key="settings" eventKey="settings" title="Configure Providers">
+          <AuthProvidersConfig config={this.state.authenticators}
+                               descriptors={this.authenticatorConfigurations}
+                               updateConfig={this._onUpdateProviders} />
+        </Tab>
+      );
     }
 
     return (
-      <Tabs defaultActiveKey={"users"} position="left" tabWidth={1}>
+      <Tabs defaultActiveKey={"users"} position="left" tabWidth={2}>
         <Tab eventKey={"users"} title="Users">
           <UserList currentUsername={this.state.currentUser.username} currentUser={this.state.currentUser}/>
         </Tab>

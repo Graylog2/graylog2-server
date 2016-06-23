@@ -31,6 +31,18 @@ const AuthenticationStore = Reflux.createStore({
 
     return promise;
   },
+
+  update(type, config) {
+    const url = URLUtils.qualifyUrl(this.sourceUrl);
+    if (type === 'providers') {
+      return fetch('POST', url, config)
+        .then(
+          (response) => {},
+          (error) => UserNotification.error(`Unable to save authentication provider configuration: ${error}`, 'Could not save configuration')
+        );
+    }
+    return null;
+  },
 });
 
 export default AuthenticationStore;
