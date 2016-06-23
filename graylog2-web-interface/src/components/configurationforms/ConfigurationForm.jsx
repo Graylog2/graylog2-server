@@ -11,7 +11,7 @@ const ConfigurationForm = React.createClass({
     helpBlock: React.PropTypes.node,
     includeTitleField: React.PropTypes.bool,
     submitAction: React.PropTypes.func.isRequired,
-    title: React.PropTypes.string,
+    title: React.PropTypes.node,
     titleValue: React.PropTypes.string,
     typeName: React.PropTypes.string,
     values: React.PropTypes.object,
@@ -78,7 +78,7 @@ const ConfigurationForm = React.createClass({
     this.refs.modal.open();
   },
   _closeModal() {
-    this.setState(this.getInitialState());
+    this.setState($.extend(this.getInitialState(), { titleValue: this.props.titleValue }));
     if (this.props.cancelAction) {
       this.props.cancelAction();
     }
