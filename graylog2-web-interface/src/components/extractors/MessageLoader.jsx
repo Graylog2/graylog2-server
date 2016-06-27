@@ -16,6 +16,7 @@ const MessageLoader = React.createClass({
   getInitialState() {
     return ({
       hidden: this.props.hidden,
+      loading: false,
     });
   },
 
@@ -33,8 +34,10 @@ const MessageLoader = React.createClass({
     if (messageId === '' || index === '') {
       return;
     }
+    this.setState({ loading: true });
     const promise = MessagesStore.loadMessage(index, messageId);
     promise.then(data => this.props.onMessageLoaded(data));
+    promise.finally(() => this.setState({ loading: false }));
 
     event.preventDefault();
   },
@@ -58,8 +61,8 @@ const MessageLoader = React.createClass({
         <form className="form-inline message-loader-form" onSubmit={this.loadMessage}>
           <input type="text" ref="messageId" className="form-control" placeholder="Message ID" required/>
           <input type="text" ref="index" className="form-control" placeholder="Index" required/>
-          <button ref="submitButton" type="submit" className="btn btn-info">
-            Load message
+          <button ref="submitButton" type="submit" className="btn btn-info" disabled={this.state.loading}>
+            {this.state.loading ? 'Loading message...' : 'Load message'}
           </button>
         </form>
       </div>
