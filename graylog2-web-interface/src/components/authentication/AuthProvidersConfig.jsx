@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col, Button, Alert, Table } from 'react-bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { IfPermitted, SortableList } from 'components/common';
+import { PageHeader, IfPermitted, SortableList } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import naturalSort from 'javascript-natural-sort';
 
@@ -137,58 +137,60 @@ const AuthProvidersConfig = React.createClass({
 
   render() {
     return (
-      <Row>
-        <Col md={6}>
-          <h2>Authentication Providers</h2>
-          <p>The following authentication providers executed in order during login. Disabled providers will be
-            skipped.</p>
-          <p>A user is authenticated by the first matching provider, a successful match can cause a Graylog account for
-            this user to be created.</p>
-
-          <Table striped bordered condensed className="top-margin">
-            <thead>
-            <tr>
-              <th>#</th>
-              <th>Provider</th>
-              <th>Description</th>
-              <th>Status</th>
-            </tr>
-            </thead>
-            <tbody>
-            {this._summary()}
-            </tbody>
-          </Table>
-
-          <IfPermitted permissions="clusterconfigentry:edit">
-            <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
-          </IfPermitted>
-
-          <BootstrapModalForm ref="configModal"
-                              title="Update Authentication Provider Configuration"
-                              onSubmitForm={this._saveConfig}
-                              onModalClose={this._resetConfig}
-                              submitButtonText="Save">
-            <h3>Order</h3>
-            <p>Use drag and drop to change the execution order of the authentication providers.</p>
-            <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting}/>
-
-            <h3>Status</h3>
-            <p>Change the checkboxes to change the status of an authentication provider.</p>
+      <span>
+        <PageHeader title="Authentication Providers" subpage>
+          <span>The following authentication providers executed in order during login. Disabled providers will be
+            skipped.<br/>A user is authenticated by the first matching provider, a successful match can cause a Graylog account for
+            this user to be created.
+          </span>
+          </PageHeader>
+        <Row>
+          <Col md={6}>
             <Table striped bordered condensed className="top-margin">
               <thead>
               <tr>
+                <th>#</th>
                 <th>Provider</th>
-                <th>Enabled</th>
+                <th>Description</th>
+                <th>Status</th>
               </tr>
               </thead>
               <tbody>
-              {this._statusForm()}
+              {this._summary()}
               </tbody>
             </Table>
-            {this._noActiveRealmWarning()}
-          </BootstrapModalForm>
-        </Col>
-      </Row>
+
+            <IfPermitted permissions="clusterconfigentry:edit">
+              <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+            </IfPermitted>
+
+            <BootstrapModalForm ref="configModal"
+                                title="Update Authentication Provider Configuration"
+                                onSubmitForm={this._saveConfig}
+                                onModalClose={this._resetConfig}
+                                submitButtonText="Save">
+              <h3>Order</h3>
+              <p>Use drag and drop to change the execution order of the authentication providers.</p>
+              <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting}/>
+
+              <h3>Status</h3>
+              <p>Change the checkboxes to change the status of an authentication provider.</p>
+              <Table striped bordered condensed className="top-margin">
+                <thead>
+                <tr>
+                  <th>Provider</th>
+                  <th>Enabled</th>
+                </tr>
+                </thead>
+                <tbody>
+                {this._statusForm()}
+                </tbody>
+              </Table>
+              {this._noActiveRealmWarning()}
+            </BootstrapModalForm>
+          </Col>
+        </Row>
+      </span>
     );
   },
 });
