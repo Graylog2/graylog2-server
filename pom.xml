@@ -30,7 +30,7 @@
         <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.site.skip>true</maven.site.skip>
-        <graylog2.version>2.0.0</graylog2.version>
+        <graylog2.version>2.1.0-SNAPSHOT</graylog2.version>
         <graylog2.plugin-dir>/usr/share/graylog-server/plugin</graylog2.plugin-dir>
     </properties>
 
