@@ -35,6 +35,7 @@ import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +123,9 @@ public class JsonPathCodec extends AbstractCodec {
 
         @Override
         Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
     }
 
     @ConfigClass
@@ -151,6 +155,13 @@ public class JsonPathCodec extends AbstractCodec {
         @Override
         public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
 
+        }
+    }
+
+    public static class Descriptor extends AbstractCodec.Descriptor {
+        @Inject
+        public Descriptor() {
+            super(JsonPathCodec.class.getAnnotation(Codec.class).displayName());
         }
     }
 }

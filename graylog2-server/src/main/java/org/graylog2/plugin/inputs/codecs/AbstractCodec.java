@@ -85,4 +85,10 @@ public abstract class AbstractCodec implements Codec {
         public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
         }
     }
+
+    public static class Descriptor extends Codec.Descriptor {
+        public Descriptor(String name) {
+            super(name);
+        }
+    }
 }

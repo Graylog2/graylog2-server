@@ -33,6 +33,7 @@ import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.net.InetAddress;
 
 @Codec(name = "raw", displayName = "Raw String")
@@ -64,6 +65,9 @@ public class RawCodec extends AbstractCodec {
 
         @Override
         Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
     }
 
     @ConfigClass
@@ -76,4 +80,10 @@ public class RawCodec extends AbstractCodec {
         }
     }
 
+    public static class Descriptor extends AbstractCodec.Descriptor {
+        @Inject
+        public Descriptor() {
+            super(RawCodec.class.getAnnotation(Codec.class).displayName());
+        }
+    }
 }

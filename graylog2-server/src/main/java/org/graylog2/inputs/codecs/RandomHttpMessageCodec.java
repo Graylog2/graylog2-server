@@ -81,6 +81,9 @@ public class RandomHttpMessageCodec extends AbstractCodec {
 
         @Override
         Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
     }
 
     @ConfigClass
@@ -91,4 +94,10 @@ public class RandomHttpMessageCodec extends AbstractCodec {
         }
     }
 
+    public static class Descriptor extends AbstractCodec.Descriptor {
+        @Inject
+        public Descriptor() {
+            super(RandomHttpMessageCodec.class.getAnnotation(Codec.class).displayName());
+        }
+    }
 }

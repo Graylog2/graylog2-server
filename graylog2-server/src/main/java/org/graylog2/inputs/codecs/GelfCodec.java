@@ -226,6 +226,9 @@ public class GelfCodec extends AbstractCodec {
 
         @Override
         Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
     }
 
     @ConfigClass
@@ -240,6 +243,13 @@ public class GelfCodec extends AbstractCodec {
             if (cr.containsField(TcpTransport.CK_USE_NULL_DELIMITER)) {
                 cr.getField(TcpTransport.CK_USE_NULL_DELIMITER).setDefaultValue(true);
             }
+        }
+    }
+
+    public static class Descriptor extends AbstractCodec.Descriptor {
+        @Inject
+        public Descriptor() {
+            super(GelfCodec.class.getAnnotation(Codec.class).displayName());
         }
     }
 }
