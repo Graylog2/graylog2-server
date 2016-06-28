@@ -26,7 +26,7 @@ public abstract class AbstractDescriptor {
 
     // required for guice, but isn't called.
     protected AbstractDescriptor() {
-        throw new IllegalStateException("This class should not be instantiated directly, this is a bug.");
+        throw new IllegalStateException("This class " + this.getClass().getCanonicalName() + " should not be instantiated directly, this is a bug.");
     }
 
     protected AbstractDescriptor(String name, boolean exclusive, String linkToDocs) {
