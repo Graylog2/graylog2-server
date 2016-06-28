@@ -22,14 +22,10 @@
  */
 package org.graylog2.inputs.codecs;
 
-import com.google.inject.Provides;
 import com.google.inject.Scopes;
-import com.google.inject.Singleton;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.codecs.Codec;
-
-import java.util.Map;
 
 public class CodecsModule extends Graylog2Module {
     protected void configure() {
@@ -43,27 +39,5 @@ public class CodecsModule extends Graylog2Module {
         installCodec(mapBinder, RandomHttpMessageCodec.class);
         installCodec(mapBinder, GelfCodec.class);
         installCodec(mapBinder, JsonPathCodec.class);
-    }
-
-    @Provides
-    @Singleton
-    public CodecFactoryHolder provideCodecFactoryHolder(Map<String, Codec.Factory<? extends Codec>> codecFactory) {
-        return new CodecFactoryHolder(codecFactory);
-    }
-
-    /**
-     * Helper provider class to work around type erasure of Codec.Factory. Unfortunately HK2 doesn't seem to see the
-     * correct type to be able to find it in its injector bridge. So we make love to it. Hard.
-     */
-    public static class CodecFactoryHolder {
-        private Map<String, Codec.Factory<? extends Codec>> codecFactory;
-
-        public CodecFactoryHolder(Map<String, Codec.Factory<? extends Codec>> codecFactory) {
-            this.codecFactory = codecFactory;
-        }
-
-        public Map<String, Codec.Factory<? extends Codec>> getFactory() {
-            return codecFactory;
-        }
     }
 }

@@ -30,7 +30,7 @@ import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.inputs.codecs.CodecsModule;
+import org.graylog2.inputs.codecs.CodecFactory;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.Tools;
@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
@@ -57,7 +58,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.net.InetSocketAddress;
-import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -69,12 +69,12 @@ public class MessageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
 
     private Messages messages;
-    private Map<String, Codec.Factory<? extends Codec>> codecFactory;
+    private CodecFactory codecFactory;
 
     @Inject
-    public MessageResource(Messages messages, CodecsModule.CodecFactoryHolder codecFactoryHolder) {
+    public MessageResource(Messages messages, CodecFactory codecFactory) {
         this.messages = messages;
-        this.codecFactory = codecFactoryHolder.getFactory();
+        this.codecFactory = codecFactory;
     }
 
     @GET
@@ -131,17 +131,17 @@ public class MessageResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Parse a raw message")
     @ApiResponses(value = {
-            @ApiResponse(code = 404, message = "Specified codec does not exist.")
+            @ApiResponse(code = 404, message = "Specified codec does not exist."),
+            @ApiResponse(code = 400, message = "Could not decode message.")
     })
     public ResultMessage parse(@ApiParam(name = "JSON body", required = true) MessageParseRequest request) {
-        final Codec.Factory<? extends Codec> factory = codecFactory.get(request.codec());
-
-        if (factory == null) {
-            throw new NotFoundException("Codec " + request.codec() + " does not exist.");
+        Codec codec;
+        try {
+            final Configuration configuration = new Configuration(request.configuration());
+            codec = codecFactory.create(request.codec(), configuration);
+        } catch (IllegalArgumentException e) {
+            throw new NotFoundException(e);
         }
-
-        final Configuration configuration = new Configuration(request.configuration());
-        final Codec codec = factory.create(configuration);
 
         final ResolvableInetSocketAddress remoteAddress = ResolvableInetSocketAddress.wrap(new InetSocketAddress(request.remoteAddress(), 1234));
 
@@ -153,6 +153,10 @@ public class MessageResource extends RestResource {
 
     private Message decodeMessage(Codec codec, ResolvableInetSocketAddress remoteAddress, RawMessage rawMessage) {
         final Message message = codec.decode(rawMessage);
+
+        if (message == null) {
+            throw new BadRequestException("Could not decode message");
+        }
 
         // Ensure the decoded Message has a source, otherwise creating a ResultMessage will fail
         if (isNullOrEmpty(message.getSource())) {
