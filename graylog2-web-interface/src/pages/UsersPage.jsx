@@ -21,8 +21,7 @@ const UsersPage = React.createClass({
       <span>
         <PageHeader title="User accounts" subpage>
           <span>Create as many users as you want next to the default administrator user here. You can also make changes to already existing users.</span>
-
-          {undefined}
+          {null}
           <span>
             <IfPermitted permissions="users:edit">
               <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.CREATE}>

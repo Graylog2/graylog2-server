@@ -1,5 +1,6 @@
 import React from 'react';
 import { Alert, Col, Button, Input, Row } from 'react-bootstrap';
+import Routes from 'routing/Routes';
 
 import UserNotification from 'util/UserNotification';
 
@@ -13,6 +14,7 @@ import { Spinner } from 'components/common';
 const EditRolesForm = React.createClass({
   propTypes: {
     user: React.PropTypes.object.isRequired,
+    history: React.PropTypes.object,
   },
   getInitialState() {
     return {};
@@ -28,6 +30,7 @@ const EditRolesForm = React.createClass({
       const roles = this.refs.roles.getValue().filter((value) => value !== '');
       UsersStore.updateRoles(this.props.user.username, roles).then(() => {
         UserNotification.success('Roles updated successfully.', 'Success!');
+        this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }, () => {
         UserNotification.error('Updating roles failed.', 'Error!');
       });
@@ -72,7 +75,7 @@ const EditRolesForm = React.createClass({
       </span>
     );
     return (
-      <Row className="content">
+      <Row>
         <Col md={8}>
           <h2>Change user role</h2>
           {editUserForm}
