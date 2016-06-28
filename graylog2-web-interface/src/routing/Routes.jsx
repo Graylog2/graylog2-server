@@ -42,7 +42,7 @@ const Routes = {
       },
       PROVIDERS: {
         CONFIG: '/system/authentication/config',
-        provider: (index) => `/system/authentication/config/${index}`,
+        provider: (name) => `/system/authentication/config/${name}`,
       },
     },
   },

@@ -23,6 +23,7 @@ const AuthenticationComponent = React.createClass({
   propTypes: {
     location: React.PropTypes.object.isRequired,
     params: React.PropTypes.object.isRequired,
+    children: React.PropTypes.element,
   },
 
   mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore)],
@@ -45,7 +46,8 @@ const AuthenticationComponent = React.createClass({
   // contains the 'authname' -> plugin descriptor
   authenticatorConfigurations: {},
 
-  _pluginPane(name) {
+  _pluginPane() {
+    const name = this.props.params.name;
     const auth = this.authenticatorConfigurations[name];
 
     if (auth) {
@@ -62,7 +64,6 @@ const AuthenticationComponent = React.createClass({
   },
 
   _handleTabChange(key) {
-    console.log("navigating to " + key);
     this.setState({ activeTab: key });
   },
 
@@ -70,12 +71,12 @@ const AuthenticationComponent = React.createClass({
     if (!this.state.authenticators) {
       return <Spinner />;
     }
-    if (this.props.params.index === undefined) {
+    if (this.props.params.name === undefined) {
       return (<AuthProvidersConfig config={this.state.authenticators}
                                   descriptors={this.authenticatorConfigurations}
                                   updateConfig={this._onUpdateProviders} />);
     }
-    return (<span>Hallo</span>);
+    return this._pluginPane();
   },
 
   render() {
@@ -86,8 +87,8 @@ const AuthenticationComponent = React.createClass({
         const auth = this.authenticatorConfigurations[name];
         const title = (auth || { displayName: name }).displayName;
         const numberedTitle = `${idx + 1}. ${title}`;
-        return (<LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(idx)}>
-          <NavItem key={name} eventKey={`config/${idx}`} title={numberedTitle}>{numberedTitle}</NavItem>
+        return (<LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(name)}>
+          <NavItem key={name} eventKey={name} title={numberedTitle}>{numberedTitle}</NavItem>
         </LinkContainer>);
       });
 

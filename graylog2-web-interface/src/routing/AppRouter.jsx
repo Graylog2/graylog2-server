@@ -102,7 +102,7 @@ const AppRouter = React.createClass({
               <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.edit(':username')} component={EditUsersPage}/>
               <Route path={Routes.SYSTEM.AUTHENTICATION.ROLES} component={RolesPage}/>
               <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}/>
-              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':index')} />
+              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
             </Route>
             <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage}/>
             <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage}/>
