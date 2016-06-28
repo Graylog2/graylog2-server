@@ -8,6 +8,13 @@ const PageHeader = React.createClass({
     title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
     children: PropTypes.oneOfType([PropTypes.array, PropTypes.node]),
     experimental: PropTypes.bool,
+    subpage: PropTypes.bool,
+  },
+  getDefaultProps() {
+    return {
+      experimental: false,
+      subpage: false,
+    };
   },
   render() {
     const children = (this.props.children !== undefined && this.props.children.length !== undefined ? this.props.children : [this.props.children]);
@@ -23,9 +30,10 @@ const PageHeader = React.createClass({
       );
     }
 
+    const topLevelClassNames = this.props.subpage ? 'content-head' : 'content content-head';
     return (
       <div>
-        <Row className="content content-head">
+        <Row className={topLevelClassNames}>
           <Col sm={12}>
             {children[2] &&
             <div className="actions-lg visible-lg visible-md">

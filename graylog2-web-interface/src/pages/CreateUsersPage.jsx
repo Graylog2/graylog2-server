@@ -13,39 +13,48 @@ import PageHeader from 'components/common/PageHeader';
 import NewUserForm from 'components/users/NewUserForm';
 
 const CreateUsersPage = React.createClass({
-  componentDidMount() {
-    RolesStore.loadRoles().then(roles => {
-      this.setState({roles: roles});
-    });
+
+  propTypes: {
+    history: React.PropTypes.object,
   },
+
   getInitialState() {
     return {
       roles: undefined,
     };
   },
-  _onSubmit(request) {
+
+  componentDidMount() {
+    RolesStore.loadRoles().then(roles => {
+      this.setState({ roles: roles });
+    });
+  },
+
+  _onSubmit(r) {
+    const request = r;
     request.permissions = [];
     delete request['session-timeout-never'];
-    UsersStore.create(request).then((result) => {
-      UserNotification.success('User ' + request.username + ' was created successfully.', 'Success!');
+    UsersStore.create(request).then(() => {
+      UserNotification.success(`User ${request.username} was created successfully.`, 'Success!');
       this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
-    }, (error) => {
+    }, () => {
       UserNotification.error('Failed to create user!', 'Error!');
     });
   },
+
   render() {
     if (!this.state.roles) {
       return <Spinner />;
     }
     return (
       <span>
-        <PageHeader title="Create new user">
+        <PageHeader title="Create new user" subpage>
           <span>
             Use this page to create new Graylog users. The users and their permissions created here are not limited
             to the web interface but valid and required for the REST APIs of your Graylog server nodes, too.
           </span>
         </PageHeader>
-        <Row className="content">
+        <Row>
           <Col lg={8}>
             <NewUserForm roles={this.state.roles} onSubmit={this._onSubmit}/>
           </Col>
