@@ -37,7 +37,7 @@ const UsersPage = React.createClass({
             </IfPermitted>
             {' '}
             <IfPermitted permissions="users:create">
-              <LinkContainer to={Routes.SYSTEM.USERS.CREATE}>
+              <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.CREATE}>
                 <Button bsStyle="success">Add new user</Button>
               </LinkContainer>
             </IfPermitted>

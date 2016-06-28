@@ -1,6 +1,9 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Alert, Tabs, Tab } from 'react-bootstrap';
+import { Alert, Nav, NavItem, Row, Col } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import Routes from 'routing/Routes';
+import { Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import UserList from 'components/users/UserList';
@@ -16,7 +19,19 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 
 const AuthenticationComponent = React.createClass({
+
+  propTypes: {
+    location: React.PropTypes.object.isRequired,
+    params: React.PropTypes.object.isRequired,
+  },
+
   mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore)],
+
+  getInitialState() {
+    return {
+      activeTab: 'users',
+    };
+  },
 
   componentDidMount() {
     AuthenticationActions.load();
@@ -46,37 +61,66 @@ const AuthenticationComponent = React.createClass({
     return AuthenticationActions.update('providers', config);
   },
 
+  _handleTabChange(key) {
+    console.log("navigating to " + key);
+    this.setState({ activeTab: key });
+  },
+
+  _contentComponent() {
+    if (!this.state.authenticators) {
+      return <Spinner />;
+    }
+    if (this.props.params.index === undefined) {
+      return (<AuthProvidersConfig config={this.state.authenticators}
+                                  descriptors={this.authenticatorConfigurations}
+                                  updateConfig={this._onUpdateProviders} />);
+    }
+    return (<span>Hallo</span>);
+  },
+
   render() {
-    let authenticators = <Tab disabled title="Loading..."/>;
+    let authenticators = [<NavItem key={"loading"} disabled title="Loading...">Loading...</NavItem>];
     const auths = this.state.authenticators;
     if (auths) {
       authenticators = auths.realm_order.map((name, idx) => {
         const auth = this.authenticatorConfigurations[name];
         const title = (auth || { displayName: name }).displayName;
-        return <Tab key={name} eventKey={name} title={`${idx + 1}. ${title}`}>{this._pluginPane(name)}</Tab>;
+        const numberedTitle = `${idx + 1}. ${title}`;
+        return (<LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(idx)}>
+          <NavItem key={name} eventKey={`config/${idx}`} title={numberedTitle}>{numberedTitle}</NavItem>
+        </LinkContainer>);
       });
 
       // settings
-      authenticators.push(
-        <Tab key="settings" eventKey="settings" title="Configure Providers">
-          <AuthProvidersConfig config={this.state.authenticators}
-                               descriptors={this.authenticatorConfigurations}
-                               updateConfig={this._onUpdateProviders} />
-        </Tab>
+      /*
+
+
+       */
+      authenticators.unshift(
+        <LinkContainer key="container-settings" to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}>
+          <NavItem key="settings" eventKey="config" title="Configure Providers">Configure providers</NavItem>
+        </LinkContainer>
       );
     }
 
-    return (
-      <Tabs defaultActiveKey={"users"} position="left" tabWidth={2}>
-        <Tab eventKey={"users"} title="Users">
-          <UserList currentUsername={this.state.currentUser.username} currentUser={this.state.currentUser}/>
-        </Tab>
-        <Tab eventKey="roles" title="Roles">
-          <RolesComponent />
-        </Tab>
+    //           <UserList currentUsername={this.state.currentUser.username} currentUser={this.state.currentUser}/>
+    // <RolesComponent />
+
+
+    const subnavigation = (
+      <Nav activeKey={this.state.activeTab} onSelect={this._handleTabChange} stacked bsStyle="pills">
+        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}><NavItem eventKey="users" title="Users">Users</NavItem></LinkContainer>
+        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.ROLES}><NavItem eventKey="roles" title="Roles">Roles</NavItem></LinkContainer>
         {authenticators}
-      </Tabs>
+      </Nav>
     );
+
+    let contentComponent = React.Children.count(this.props.children) === 1 ? React.Children.only(this.props.children) : this._contentComponent();
+
+    return (<Row>
+      <Col md={2}>{subnavigation}</Col>
+      <Col md={10}>{contentComponent}</Col>
+    </Row>);
   },
 });
 

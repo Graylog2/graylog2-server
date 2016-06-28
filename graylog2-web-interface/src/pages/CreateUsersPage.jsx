@@ -28,7 +28,7 @@ const CreateUsersPage = React.createClass({
     delete request['session-timeout-never'];
     UsersStore.create(request).then((result) => {
       UserNotification.success('User ' + request.username + ' was created successfully.', 'Success!');
-      this.props.history.replaceState(null, Routes.SYSTEM.USERS.LIST);
+      this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
     }, (error) => {
       UserNotification.error('Failed to create user!', 'Error!');
     });

@@ -3,7 +3,6 @@ import { Row, Col } from 'react-bootstrap';
 
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
-import Routes from 'routing/Routes';
 
 import {} from 'components/authentication'; // Make sure to load all auth config plugins!
 
@@ -13,7 +12,15 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import AuthenticationComponent from 'components/authentication/AuthenticationComponent';
 
 const AuthenticationPage = React.createClass({
+
+  propTypes: {
+    children: React.PropTypes.object,
+    location: React.PropTypes.object.isRequired,
+    params: React.PropTypes.object.isRequired,
+  },
+
   mixins: [PermissionsMixin],
+
   render() {
     return (
       <span>
@@ -25,7 +32,9 @@ const AuthenticationPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <AuthenticationComponent />
+            <AuthenticationComponent location={this.props.location} params={this.props.params}>
+              {this.props.children}
+            </AuthenticationComponent>
           </Col>
         </Row>
       </span>
