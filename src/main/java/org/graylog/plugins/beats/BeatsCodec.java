@@ -212,20 +212,9 @@ public class BeatsCodec extends AbstractCodec {
 
         @Override
         Config getConfig();
-
-        @Override
-        Descriptor getDescriptor();
     }
 
     @ConfigClass
     public static class Config extends AbstractCodec.Config {
-    }
-
-
-    public static class Descriptor extends AbstractCodec.Descriptor {
-        @Inject
-        public Descriptor() {
-            super(BeatsCodec.class.getAnnotation(Codec.class).displayName());
-        }
     }
 }
