@@ -99,8 +99,11 @@ const AuthenticationComponent = React.createClass({
       });
 
       authenticators.unshift(
+        <NavItem key="divider" disabled title="Provider Settings" className="divider">Provider Settings</NavItem>
+      );
+      authenticators.unshift(
         <LinkContainer key="container-settings" to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}>
-          <NavItem key="settings" eventKey="config" title="Configure Providers">Configure providers</NavItem>
+          <NavItem key="settings" eventKey="config" title="Configure Provider Order">Configure Provider Order</NavItem>
         </LinkContainer>
       );
     }

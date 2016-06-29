@@ -6,3 +6,7 @@
     border-left: #939393 solid 1px;
     margin-left: -1px;
 }
+
+.divider {
+    border-bottom: #939393 solid 1px;
+}
