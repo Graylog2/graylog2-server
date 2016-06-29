@@ -30,10 +30,13 @@ const Metric = React.createClass({
     return this.iconMapping.unknown;
   },
   _formatName(metricName) {
+    const namespace = this.props.namespace;
+    const split = metricName.split(namespace);
+    const unqualifiedMetricName = split.slice(1).join(namespace);
     return (
       <span>
-        <span className="prefix">{this.props.namespace}</span>
-        {metricName.split(this.props.namespace)[1]}
+        <span className="prefix">{namespace}</span>
+        {unqualifiedMetricName}
       </span>
     );
   },
