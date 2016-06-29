@@ -62,9 +62,11 @@ const RawMessageLoader = React.createClass({
     }
 
     return codecTypesIds
-      .filter(id => id !== 'random-http-msg')
+      .filter(id => id !== 'random-http-msg') // Skip Random HTTP codec, as nobody wants to enter a raw random message.
       .map(id => {
-        return { value: id, label: this.state.codecTypes[id].name };
+        const name = this.state.codecTypes[id].name;
+        // Add id as label on codecs not having a descriptor name
+        return { value: id, label: name === '' ? id : name };
       })
       .sort((codecA, codecB) => codecA.label.toLowerCase().localeCompare(codecB.label.toLowerCase()));
   },
