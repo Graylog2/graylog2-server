@@ -14,6 +14,11 @@ const ClosedIndexDetails = React.createClass({
   _onReopen() {
     IndicesActions.reopen(this.props.indexName);
   },
+  _onDeleteIndex() {
+    if (window.confirm(`Really delete index ${this.props.indexName}?`)) {
+      IndicesActions.delete(this.props.indexName);
+    }
+  },
   render() {
     const { indexRange } = this.props;
     return (
@@ -25,6 +30,7 @@ const ClosedIndexDetails = React.createClass({
         <hr style={{ marginBottom: '5', marginTop: '10' }}/>
 
         <Button bsStyle="warning" bsSize="xs" onClick={this._onReopen}>Reopen index</Button>{' '}
+        <Button bsStyle="danger" bsSize="xs" onClick={this._onDeleteIndex}>Delete index</Button>
       </div>
     );
   },
