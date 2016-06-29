@@ -120,8 +120,9 @@ public class SessionsResource extends RestResource {
         }
         final Subject subject = new Subject.Builder().sessionId(id).buildSubject();
         ThreadContext.bind(subject);
-
+        ThreadContext.put(ShiroSecurityContext.REQUEST_HEADERS, shiroSecurityContext.getHeaders());
         try {
+
             subject.login(new UsernamePasswordToken(createRequest.username(), createRequest.password()));
             final User user = userService.load(createRequest.username());
             if (user != null) {
@@ -140,6 +141,8 @@ public class SessionsResource extends RestResource {
             LOG.info("Invalid username or password for user \"{}\"", createRequest.username());
         } catch (UnknownSessionException e) {
             subject.logout();
+        } finally {
+            ThreadContext.remove(ShiroSecurityContext.REQUEST_HEADERS);
         }
 
         if (subject.isAuthenticated()) {

@@ -32,6 +32,8 @@ import java.security.Principal;
 public class ShiroSecurityContext implements SecurityContext {
     private static final Logger LOG = LoggerFactory.getLogger(ShiroSecurityContext.class);
 
+    public static final String REQUEST_HEADERS = "REQUEST_HEADERS";
+
     private Subject subject;
     private final AuthenticationToken token;
     private final boolean secure;
@@ -91,9 +93,13 @@ public class ShiroSecurityContext implements SecurityContext {
         return token;
     }
 
+    public MultivaluedMap<String, String> getHeaders() {
+        return headers;
+    }
+
     public void loginSubject() throws AuthenticationException {
         // what a hack :(
-        ThreadContext.put("REQUEST_HEADERS", headers);
+        ThreadContext.put(REQUEST_HEADERS, headers);
 
         subject.login(token);
 
@@ -103,6 +109,11 @@ public class ShiroSecurityContext implements SecurityContext {
             subject = newSubject;
         }
 
-        ThreadContext.remove("REQUEST_HEADERS");
+        ThreadContext.remove(REQUEST_HEADERS);
+    }
+
+    public static MultivaluedHashMap<String, String> requestHeaders() {
+        //noinspection unchecked
+        return (MultivaluedHashMap<String, String>) ThreadContext.get(REQUEST_HEADERS);
     }
 }
