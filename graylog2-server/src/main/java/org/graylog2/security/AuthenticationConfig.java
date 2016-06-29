@@ -10,6 +10,7 @@ import org.graylog2.security.realm.PasswordAuthenticator;
 import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.security.realm.SessionAuthenticator;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -45,6 +46,25 @@ public abstract class AuthenticationConfig {
                 .disabledRealms(Collections.emptySet())
                 .build();
     }
+
+    public AuthenticationConfig withRealms(final Set<String> availableRealms) {
+        final List<String> newOrder = new ArrayList<>();
+
+        // Check if processor actually exists.
+        realmOrder().stream()
+                .filter(availableRealms::contains)
+                .forEach(newOrder::add);
+
+        // Add availableProcessors which are not in the config yet to the end.
+        availableRealms.stream()
+                .filter(realm -> !newOrder.contains(realm))
+                .sorted(String.CASE_INSENSITIVE_ORDER)
+                .forEach(newOrder::add);
+
+        return toBuilder().realmOrder(newOrder).build();
+    }
+
+    public abstract Builder toBuilder();
 
     private static Builder builder() {
         return new AutoValue_AuthenticationConfig.Builder();

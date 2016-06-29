@@ -42,7 +42,7 @@ public class AuthenticationResource extends RestResource {
         checkPermission(RestPermissions.CLUSTER_CONFIG_ENTRY_READ);
         final AuthenticationConfig config = clusterConfigService.getOrDefault(AuthenticationConfig.class,
                                                                               AuthenticationConfig.defaultInstance());
-        return config;
+        return config.withRealms(availableRealms.keySet());
     }
 
     @PUT
