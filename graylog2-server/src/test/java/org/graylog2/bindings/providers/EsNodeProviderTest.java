@@ -85,7 +85,6 @@ public class EsNodeProviderTest {
         assertEquals(defaultConfig.isHttpEnabled(), nodeSettings.getAsBoolean("http.enabled", false));
         assertEquals(defaultConfig.getTransportTcpPort(), nodeSettings.getAsInt("transport.tcp.port", 0).intValue());
         assertEquals(defaultConfig.getInitialStateTimeout(), nodeSettings.get("discovery.initial_state_timeout"));
-        assertEquals(defaultConfig.isMulticastDiscovery(), nodeSettings.getAsBoolean("discovery.zen.ping.multicast.enabled", false));
         assertEquals(false, nodeSettings.getAsBoolean("action.auto_create_index", true));
 
     }
@@ -105,11 +104,6 @@ public class EsNodeProviderTest {
         addEsConfig(esPropNames, settings, "path.data", "elasticsearch_path_data", "data/elasticsearch");
         addEsConfig(esPropNames, settings, "transport.tcp.port", "elasticsearch_transport_tcp_port", "9999");
         addEsConfig(esPropNames, settings, "http.enabled", "elasticsearch_http_enabled", "true");
-        addEsConfig(esPropNames,
-                settings,
-                "discovery.zen.ping.multicast.enabled",
-                "elasticsearch_discovery_zen_ping_multicast_enabled",
-                "false");
         addEsConfig(esPropNames,
                 settings,
                 "discovery.zen.ping.unicast.hosts.0",
@@ -163,8 +157,6 @@ public class EsNodeProviderTest {
         assertNotEquals("http.enabled", config.isHttpEnabled(), nodeSettings.get("http.enabled"));
         assertNotEquals("transport.tcp.port", config.getTransportTcpPort(), nodeSettings.get("transport.tcp.port"));
         assertNotEquals("discovery.initial_state_timeout", config.getInitialStateTimeout(), nodeSettings.get("discovery.initial_state_timeout"));
-        assertNotEquals("discovery.zen.ping.multicast.enabled", config.isMulticastDiscovery(),
-                nodeSettings.get("discovery.zen.ping.multicast.enabled"));
         assertNotEquals("discovery.zen.ping.unicast.hosts", config.getUnicastHosts(),
                 Lists.newArrayList(nodeSettings.getAsArray("discovery.zen.ping.unicast.hosts")));
     }
