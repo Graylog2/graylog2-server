@@ -6,8 +6,7 @@ import Routes from 'routing/Routes';
 import { Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import UserList from 'components/users/UserList';
-import RolesComponent from 'components/users/RolesComponent';
+import PermissionsMixin from 'util/PermissionsMixin';
 import AuthProvidersConfig from './AuthProvidersConfig';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -26,7 +25,7 @@ const AuthenticationComponent = React.createClass({
     children: React.PropTypes.element,
   },
 
-  mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   getInitialState() {
     return {
@@ -99,11 +98,6 @@ const AuthenticationComponent = React.createClass({
         </LinkContainer>);
       });
 
-      // settings
-      /*
-
-
-       */
       authenticators.unshift(
         <LinkContainer key="container-settings" to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}>
           <NavItem key="settings" eventKey="config" title="Configure Providers">Configure providers</NavItem>
@@ -111,14 +105,23 @@ const AuthenticationComponent = React.createClass({
       );
     }
 
-    //           <UserList currentUsername={this.state.currentUser.username} currentUser={this.state.currentUser}/>
-    // <RolesComponent />
-
-
+    // add submenu items based on permissions
+    if (this.isPermitted(this.state.currentUser.permissions, ['ROLES_READ'])) {
+      authenticators.unshift(
+        <LinkContainer key="roles" to={Routes.SYSTEM.AUTHENTICATION.ROLES}>
+          <NavItem eventKey="roles" title="Roles">Roles</NavItem>
+        </LinkContainer>
+      );
+    }
+    if (this.isPermitted(this.state.currentUser.permissions, ['ROLES_READ'])) {
+      authenticators.unshift(
+        <LinkContainer key="users" to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
+          <NavItem eventKey="users" title="Users">Users</NavItem>
+        </LinkContainer>
+      );
+    }
     const subnavigation = (
       <Nav activeKey={this.state.activeTab} onSelect={this._handleTabChange} stacked bsStyle="pills">
-        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}><NavItem eventKey="users" title="Users">Users</NavItem></LinkContainer>
-        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.ROLES}><NavItem eventKey="roles" title="Roles">Roles</NavItem></LinkContainer>
         {authenticators}
       </Nav>
     );
