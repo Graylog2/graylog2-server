@@ -21,7 +21,6 @@ const webpackConfig = {
   output: {
     path: BUILD_PATH,
     filename: '[name].[hash].js',
-    publicPath: '/',
   },
   module: {
     preLoaders: [
@@ -51,6 +50,7 @@ const webpackConfig = {
     new HtmlWebpackPlugin({
       title: 'Graylog',
       favicon: 'public/images/favicon.png',
+      filename: 'index.html',
       template: 'templates/index.html.template',
       chunksSortMode: (c1, c2) => {
         // Render the polyfill chunk first

@@ -4,7 +4,8 @@ const AppConfig = {
   },
 
   gl2AppPathPrefix() {
-    return window.appConfig.gl2AppPathPrefix;
+    const appPrefix = window.appConfig.gl2AppPathPrefix;
+    return appPrefix.endsWith('/') ? appPrefix : `${appPrefix}/`;
   },
 
   rootTimeZone() {

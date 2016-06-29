@@ -1,3 +1,5 @@
+import AppConfig from 'util/AppConfig';
+
 const Routes = {
   STARTPAGE: '/',
   SEARCH: '/search',
@@ -64,4 +66,31 @@ const Routes = {
   filtered_metrics: (nodeId, filter) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
 };
 
-export default Routes;
+const qualifyUrls = (routes, appPrefix) => {
+  const qualifiedRoutes = {};
+
+  Object.keys(routes).forEach((routeName) => {
+    switch (typeof routes[routeName]) {
+      case 'string':
+        qualifiedRoutes[routeName] = `${appPrefix}${routes[routeName]}`;
+        break;
+      case 'function':
+        qualifiedRoutes[routeName] = () => {
+          const result = routes[routeName](...arguments);
+          return `${appPrefix}${result}`;
+        };
+        break;
+      case 'object':
+        qualifiedRoutes[routeName] = qualifyUrls(routes[routeName]);
+        break;
+      default:
+        break;
+    }
+  });
+
+  return qualifiedRoutes;
+};
+
+defaultExport = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
+
+export default defaultExport;

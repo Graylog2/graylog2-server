@@ -1,10 +1,12 @@
 import React from 'react';
+import { IndexRoute, Redirect, Router, Route } from 'react-router';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
-import { IndexRoute, Redirect, Router, Route } from 'react-router';
 import history from 'util/History';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import AppConfig from 'util/AppConfig';
 
 import Routes from 'routing/Routes';
 
@@ -55,7 +57,7 @@ const AppRouter = React.createClass({
     });
     return (
       <Router history={history}>
-        <Route path="/" component={App}>
+        <Route path={AppConfig.gl2AppPathPrefix()} component={App}>
           <IndexRoute component={StartPage}/>
           <Route component={AppWithSearchBar}>
             <Route path={Routes.SEARCH} component={SearchPage}/>
