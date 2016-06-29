@@ -12,25 +12,33 @@ const TimezoneSelect = React.createClass({
   getValue() {
     return this.refs.timezone.getValue();
   },
+
+  // Some time zones are not stored into any areas, this is the group we use to put them apart in the dropdown
+  // https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+  _UNCLASSIFIED_AREA: 'Unclassified',
+
   _formatTimezones() {
     const timezones = {};
     moment.tz.names().forEach((timezone) => {
       const splitted = timezone.split('/');
-      const continent = (splitted.length > 1 ? splitted[0] : 'Etc');
-      const city = (splitted.length > 1 ? splitted[1] : splitted[0]);
+      const area = (splitted.length > 1 ? splitted[0] : this._UNCLASSIFIED_AREA);
+      const location = (splitted.length > 1 ? splitted[1] : splitted[0]);
 
-      if (!timezones[continent]) {
-        timezones[continent] = [];
+      if (!timezones[area]) {
+        timezones[area] = [];
       }
 
-      timezones[continent].push(city);
+      timezones[area].push(location);
     });
 
-    return [].concat.apply([], Object.keys(timezones).sort().map((continent) => {
-      return [{label: continent, disabled: true, value: continent}]
-        .concat(jQuery.unique(timezones[continent])
+    return [].concat.apply([], Object.keys(timezones).sort().map((area) => {
+      return [{ label: area, disabled: true, value: area }]
+        .concat(jQuery.unique(timezones[area])
           .sort()
-          .map((timezone) => { return {value: continent + '/' + timezone, label: timezone.replace("_", " ")}; })
+          .map((location) => {
+            const timezone = (area === this._UNCLASSIFIED_AREA ? location : `${area}/${location}`);
+            return { value: timezone, label: location.replace('_', ' ') };
+          })
         );
     }));
   },
@@ -46,7 +54,7 @@ const TimezoneSelect = React.createClass({
       <Select ref="timezone" {...this.props}
               placeholder="Pick a time zone"
               options={timezones}
-              optionRenderer={this._renderOption}/>
+              optionRenderer={this._renderOption} />
     );
   },
 });
