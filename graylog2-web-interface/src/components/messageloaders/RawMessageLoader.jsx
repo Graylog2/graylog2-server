@@ -15,10 +15,15 @@ const MessagesStore = StoreProvider.getStore('Messages');
 const CodecTypesStore = StoreProvider.getStore('CodecTypes');
 
 const RawMessageLoader = React.createClass({
+  propTypes: {
+    onMessageLoaded: React.PropTypes.func.isRequired,
+  },
+
   mixins: [Reflux.connect(CodecTypesStore)],
 
   getInitialState() {
     return {
+      loading: false,
       message: '',
       remoteAddress: '',
       codec: '',
@@ -34,8 +39,10 @@ const RawMessageLoader = React.createClass({
     event.preventDefault();
 
     const { message, remoteAddress, codec, codecConfiguration } = this.state;
+    this.setState({ loading: true });
     const promise = MessagesActions.loadRawMessage.triggerPromise(message, remoteAddress, codec, codecConfiguration);
-    promise.then(loadedMessage => console.log('loaded: ', loadedMessage));
+    promise.then(loadedMessage => this.props.onMessageLoaded(loadedMessage));
+    promise.finally(() => this.setState({ loading: false }));
   },
 
   _bindValue(event) {
@@ -96,6 +103,10 @@ const RawMessageLoader = React.createClass({
     }
   },
 
+  _isSubmitDisabled() {
+    return !this.state.message || !this.state.remoteAddress || !this.state.codec || this.state.loading;
+  },
+
   render() {
     let codecConfigurationOptions;
     if (this.state.codecTypes && this.state.codec) {
@@ -125,7 +136,9 @@ const RawMessageLoader = React.createClass({
               </Input>
               {codecConfigurationOptions}
             </fieldset>
-            <Button type="submit" bsStyle="info">Load raw message</Button>
+            <Button type="submit" bsStyle="info" disabled={this._isSubmitDisabled()}>
+              {this.state.loading ? 'Loading message...' : 'Load message'}
+            </Button>
           </form>
         </Col>
       </Row>
