@@ -34,7 +34,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-@Path("/config.js")
+@Path("/web/config.js")
 public class AppConfigResource {
     private static final Engine engine = new Engine();
     private final Configuration configuration;
@@ -58,7 +58,7 @@ public class AppConfigResource {
         final Map<String, Object> model = ImmutableMap.of(
             "rootTimeZone", configuration.getRootTimeZone(),
             "serverUri", RestTools.buildEndpointUri(headers, configuration.getWebEndpointUri()),
-            "appPathPrefix", "");
+            "gl2AppPathPrefix", configuration.getWebPrefix());
         return engine.transform(template, model);
     }
 }

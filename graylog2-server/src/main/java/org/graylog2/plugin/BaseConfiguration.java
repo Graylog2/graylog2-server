@@ -157,6 +157,9 @@ public abstract class BaseConfiguration {
     @Parameter(value = "web_tls_key_password")
     private String webTlsKeyPassword;
 
+    @Parameter(value = "web_prefix")
+    private String webPrefix = "";
+
     public String getRestUriScheme() {
         return getUriScheme(isRestEnableTls());
     }
@@ -389,5 +392,9 @@ public abstract class BaseConfiguration {
 
     public URI getWebEndpointUri() {
         return webEndpointUri == null ? getRestTransportUri() : webEndpointUri;
+    }
+
+    public String getWebPrefix() {
+        return webPrefix;
     }
 }
