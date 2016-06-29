@@ -86,6 +86,13 @@ if (TARGET === 'start') {
       inline: true,
       progress: true,
     },
+    output: {
+      path: BUILD_PATH,
+      filename: '[name].js',
+      publicPath: '/',
+      hotUpdateChunkFilename: "[id].hot-update.js",
+      hotUpdateMainFilename: "hot-update.json",
+    },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
       new webpack.DefinePlugin({DEVELOPMENT: true}),
