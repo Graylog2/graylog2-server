@@ -35,6 +35,7 @@ const AuthenticationComponent = React.createClass({
   },
 
   componentDidMount() {
+    this.style.use();
     AuthenticationActions.load();
 
     PluginStore.exports('authenticatorConfigurations').forEach((authConfig) => {
@@ -43,8 +44,14 @@ const AuthenticationComponent = React.createClass({
     });
   },
 
+  componentWillUnmount() {
+    this.style.unuse();
+  },
+
   // contains the 'authname' -> plugin descriptor
   authenticatorConfigurations: {},
+
+  style: require('!style/useable!css!./AuthenticationComponent.css'),
 
   _pluginPane() {
     const name = this.props.params.name;
@@ -119,8 +126,8 @@ const AuthenticationComponent = React.createClass({
     let contentComponent = React.Children.count(this.props.children) === 1 ? React.Children.only(this.props.children) : this._contentComponent();
 
     return (<Row>
-      <Col md={2}>{subnavigation}</Col>
-      <Col md={10}>{contentComponent}</Col>
+      <Col md={2} className="subnavigation">{subnavigation}</Col>
+      <Col md={10} className="contentpane">{contentComponent}</Col>
     </Row>);
   },
 });
