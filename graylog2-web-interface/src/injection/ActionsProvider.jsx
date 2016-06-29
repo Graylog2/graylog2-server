@@ -8,6 +8,7 @@ class ActionsProvider {
       AlertConditions: () => require('actions/alertconditions/AlertConditionsActions'),
       AlertReceivers: () => require('actions/alertreceivers/AlertReceiversActions'),
       Alerts: () => require('actions/alerts/AlertsActions'),
+      CodecTypes: () => require('actions/codecs/CodecTypesActions'),
       Configuration: () => require('actions/configurations/ConfigurationActions'),
       ConfigurationBundles: () => require('actions/configuration-bundles/ConfigurationBundlesActions'),
       Deflector: () => require('actions/indices/DeflectorActions'),

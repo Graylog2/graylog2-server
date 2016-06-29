@@ -23,6 +23,9 @@ const ApiRoutes = {
     export: () => { return { url: '/system/bundles/export' }; },
     list: () => { return { url: '/system/bundles' }; },
   },
+  CodecTypesController: {
+    list: () => { return { url: '/system/codecs/types/all' }; },
+  },
   CountsApiController: {
     total: () => { return { url: '/count/total' }; },
   },
