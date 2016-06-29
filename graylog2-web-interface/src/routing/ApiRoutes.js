@@ -285,8 +285,9 @@ const ApiRoutes = {
     update: (inputId, extractorId) => { return { url: `/system/inputs/${inputId}/extractors/${extractorId}` }; },
   },
   MessagesController: {
-    single: (index, messageId) => { return { url: `/messages/${index}/${messageId}` }; },
     analyze: (index, string) => { return { url: `/messages/${index}/analyze?string=${string}` }; },
+    parse: () => { return { url: `/messages/parse` }; },
+    single: (index, messageId) => { return { url: `/messages/${index}/${messageId}` }; },
   },
   NodesController: {
     node: (nodeId) => { return { url: `/system/nodes/${nodeId}` }; },

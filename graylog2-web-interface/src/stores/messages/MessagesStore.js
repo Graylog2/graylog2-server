@@ -42,6 +42,26 @@ const MessagesStore = Reflux.createStore({
 
     MessagesActions.fieldTerms.promise(promise);
   },
+
+  loadRawMessage(message, remoteAddress, codec, codecConfiguration) {
+    const url = ApiRoutes.MessagesController.parse().url;
+    const payload = {
+      message: message,
+      remote_address: remoteAddress,
+      codec: codec,
+      configuration: codecConfiguration,
+    };
+
+    const promise = fetch('POST', URLUtils.qualifyUrl(url), payload)
+      .then(
+        response => MessageFormatter.formatResultMessage(response),
+        error => {
+          UserNotification.error(`Loading raw message failed with status: ${error}`,
+            'Could not load raw message');
+        });
+
+    MessagesActions.loadRawMessage.promise(promise);
+  },
 });
 
 export default MessagesStore;
