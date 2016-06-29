@@ -52,9 +52,7 @@ public class IndexMapping {
         return ImmutableMap.of(
                 "properties", partFieldProperties(analyzer),
                 "dynamic_templates", partDefaultAllInDynamicTemplate(),
-                "_source", enabled(),
-                // Enable purging by TTL
-                "_ttl", enabled());
+                "_source", enabled());
     }
 
     /*
