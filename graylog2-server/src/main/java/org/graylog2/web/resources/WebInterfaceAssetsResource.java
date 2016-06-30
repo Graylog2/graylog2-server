@@ -23,6 +23,7 @@ import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
+import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.graylog2.web.PluginAssets;
@@ -42,6 +43,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -65,7 +67,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.Objects.requireNonNull;
 
 @Singleton
-@Path("/")
+@Path("")
 public class WebInterfaceAssetsResource {
     private final MimetypesFileTypeMap mimeTypes;
     private final IndexHtmlGenerator indexHtmlGenerator;
@@ -95,7 +97,7 @@ public class WebInterfaceAssetsResource {
                 });
     }
 
-    @Path("/plugin/{plugin}/{filename}")
+    @Path("plugin/{plugin}/{filename}")
     @GET
     public Response get(@Context Request request,
                         @PathParam("plugin") String pluginName,
@@ -130,6 +132,16 @@ public class WebInterfaceAssetsResource {
         } catch (IOException | URISyntaxException e) {
             return getDefaultResponse();
         }
+    }
+
+    @GET
+    public Response getIndex(@Context ContainerRequest request) {
+        final URI originalLocation = request.getRequestUri();
+        if (originalLocation.getPath().endsWith("/")) {
+            return get(request, originalLocation.getPath());
+        }
+        final URI redirect = UriBuilder.fromPath(originalLocation.getPath() + "/").build();
+        return Response.temporaryRedirect(redirect).build();
     }
 
     private Response getResponse(Request request, String filename,

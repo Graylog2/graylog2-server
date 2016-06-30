@@ -18,13 +18,19 @@ package org.graylog2.initializers;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.shared.initializers.AbstractJerseyService;
+import org.graylog2.web.resources.AppConfigResource;
+import org.graylog2.web.resources.WebInterfaceAssetsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class WebInterfaceService extends AbstractJerseyService {
     private static final Logger LOG = LoggerFactory.getLogger(WebInterfaceService.class);
@@ -39,9 +45,20 @@ public class WebInterfaceService extends AbstractJerseyService {
         this.configuration = configuration;
     }
 
+    private Set<Resource> prefixedResources(String appPrefix, Class<?>... resourceClasses) {
+        return Arrays.stream(resourceClasses)
+            .map((resourceClass) -> Resource.builder(resourceClass).build())
+            .map((resource) -> Resource.builder(resource).path(appPrefix + resource.getPath()).build())
+            .collect(Collectors.toSet());
+    }
+
     @Override
     protected void startUp() throws Exception {
-        final String[] resources = new String[]{"org.graylog2.web.resources"};
+        final Set<Resource> resources = prefixedResources(
+            configuration.getWebPrefix(),
+            AppConfigResource.class,
+            WebInterfaceAssetsResource.class
+        );
 
         httpServer = setUp("web",
                 configuration.getWebListenUri(),
@@ -54,8 +71,8 @@ public class WebInterfaceService extends AbstractJerseyService {
                 configuration.getWebMaxHeaderSize(),
                 configuration.isWebEnableGzip(),
                 configuration.isWebEnableCors(),
-                Collections.emptySet(),
-                resources);
+                resources,
+                new String[]{});
 
         httpServer.start();
 
