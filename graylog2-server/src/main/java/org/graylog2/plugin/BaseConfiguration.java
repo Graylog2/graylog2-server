@@ -22,6 +22,7 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -158,7 +159,7 @@ public abstract class BaseConfiguration {
     private String webTlsKeyPassword;
 
     @Parameter(value = "web_prefix")
-    private String webPrefix = "";
+    private String webPrefix = "/";
 
     public String getRestUriScheme() {
         return getUriScheme(isRestEnableTls());
@@ -395,6 +396,9 @@ public abstract class BaseConfiguration {
     }
 
     public String getWebPrefix() {
+        if (webPrefix.endsWith("/")) {
+            return webPrefix.substring(0, webPrefix.length() - 1);
+        }
         return webPrefix;
     }
 }
