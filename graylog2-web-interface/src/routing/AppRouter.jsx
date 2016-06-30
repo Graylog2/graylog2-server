@@ -7,6 +7,7 @@ import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import history from 'util/History';
 import AppConfig from 'util/AppConfig';
+import URLUtils from 'util/URLUtils';
 
 import Routes from 'routing/Routes';
 
@@ -53,7 +54,7 @@ import NotFoundPage from 'pages/NotFoundPage';
 const AppRouter = React.createClass({
   render() {
     const pluginRoutes = PluginStore.exports('routes').map((pluginRoute) => {
-      return <Route key={pluginRoute.component.displayName} path={pluginRoute.path} component={pluginRoute.component} />;
+      return <Route key={pluginRoute.component.displayName} path={URLUtils.appPrefixed(pluginRoute.path)} component={pluginRoute.component} />;
     });
     return (
       <Router history={history}>
