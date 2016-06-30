@@ -18,7 +18,6 @@ const webpackConfig = {
   output: {
     path: BUILD_PATH,
     filename: '[name].js',
-//    publicPath: '/',
     library: '__[name]',
   },
   module: {
