@@ -5,7 +5,7 @@
     <meta name="robots" content="noindex, nofollow">
     <meta charset="UTF-8">
     <title>${title}</title>
-    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="shortcut icon" href="${appPrefix}/favicon.png">
     ${foreach cssFiles cssFile}
     <link href="${appPrefix}/${cssfile}" rel="stylesheet">
     ${end}
