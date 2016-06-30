@@ -1,0 +1,15 @@
+{
+  "name": "eslint-config-graylog",
+  "version": "1.0.0",
+  "description": "Graylog ESLint config for web interface plugin authors",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "graylog",
+    "eslint"
+  ],
+  "author": "Graylog, Inc. <hello@graylog.com>",
+  "license": "MIT"
+}
