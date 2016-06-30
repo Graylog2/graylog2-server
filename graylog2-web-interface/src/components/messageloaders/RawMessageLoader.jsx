@@ -41,7 +41,16 @@ const RawMessageLoader = React.createClass({
     const { message, remoteAddress, codec, codecConfiguration } = this.state;
     this.setState({ loading: true });
     const promise = MessagesActions.loadRawMessage.triggerPromise(message, remoteAddress, codec, codecConfiguration);
-    promise.then(loadedMessage => this.props.onMessageLoaded(loadedMessage));
+    promise.then(loadedMessage => {
+      this.props.onMessageLoaded(
+        loadedMessage,
+        {
+          message: message,
+          remoteAddress: remoteAddress,
+          codec: codec,
+          codecConfiguration: codecConfiguration,
+        });
+    });
     promise.finally(() => this.setState({ loading: false }));
   },
 
