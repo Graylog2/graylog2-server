@@ -24,7 +24,7 @@ const processSourcesData = (sources: Object): Array<Source> => {
 };
 
 const SourcesStore = {
-    SOURCES_URL: URLUtils.appPrefixed('/sources'),
+    SOURCES_URL: '/sources',
 
     loadSources(range: number, callback: (sources: Array<Source>) => void) {
         let url = URLUtils.qualifyUrl(this.SOURCES_URL);

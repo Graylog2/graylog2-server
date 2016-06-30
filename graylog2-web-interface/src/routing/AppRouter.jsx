@@ -57,7 +57,7 @@ const AppRouter = React.createClass({
     });
     return (
       <Router history={history}>
-        <Route path={AppConfig.gl2AppPathPrefix()} component={App}>
+        <Route path={Routes.STARTPAGE} component={App}>
           <IndexRoute component={StartPage}/>
           <Route component={AppWithSearchBar}>
             <Route path={Routes.SEARCH} component={SearchPage}/>

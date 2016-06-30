@@ -75,13 +75,13 @@ const qualifyUrls = (routes, appPrefix) => {
         qualifiedRoutes[routeName] = `${appPrefix}${routes[routeName]}`;
         break;
       case 'function':
-        qualifiedRoutes[routeName] = () => {
+        qualifiedRoutes[routeName] = function() {
           const result = routes[routeName](...arguments);
           return `${appPrefix}${result}`;
         };
         break;
       case 'object':
-        qualifiedRoutes[routeName] = qualifyUrls(routes[routeName]);
+        qualifiedRoutes[routeName] = qualifyUrls(routes[routeName], appPrefix);
         break;
       default:
         break;
@@ -91,6 +91,6 @@ const qualifyUrls = (routes, appPrefix) => {
   return qualifiedRoutes;
 };
 
-defaultExport = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
+const defaultExport = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
 
 export default defaultExport;

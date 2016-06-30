@@ -4,7 +4,7 @@ import AppConfig from 'util/AppConfig';
 
 const URLUtils = {
   qualifyUrl(url) {
-    return new URI(AppConfig.gl2ServerUrl() + this.appPrefixed(url)).normalizePathname().toString();
+    return new URI(AppConfig.gl2ServerUrl() + url).normalizePathname().toString();
   },
   appPrefixed(url) {
     return this.concatURLPath(AppConfig.gl2AppPathPrefix(), url);
