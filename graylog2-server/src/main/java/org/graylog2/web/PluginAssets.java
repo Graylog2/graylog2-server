@@ -34,7 +34,7 @@ public class PluginAssets {
     private static final Logger LOG = LoggerFactory.getLogger(PluginAssets.class);
 
     public static String pathPrefix = "web-interface/assets";
-    private static String pluginPathPrefix = "/plugin/";
+    private static String pluginPathPrefix = "plugin/";
     private static String manifestFilename = "module.json";
 
     private final ObjectMapper objectMapper;

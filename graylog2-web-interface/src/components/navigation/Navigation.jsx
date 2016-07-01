@@ -1,5 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
+
 import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
@@ -113,7 +114,7 @@ const Navigation = React.createClass({
       .map((pluginRoute) => {
         if (this._shouldAddPluginRoute(pluginRoute)) {
           return (
-            <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
+            <LinkContainer key={pluginRoute.path} to={URLUtils.appPrefixed(pluginRoute.path)}>
               <NavItem>{pluginRoute.description}</NavItem>
             </LinkContainer>
           );
@@ -127,7 +128,7 @@ const Navigation = React.createClass({
       .map((pluginRoute) => {
         if (this._shouldAddPluginRoute(pluginRoute)) {
           return (
-            <LinkContainer key={pluginRoute.path} to={pluginRoute.path}>
+            <LinkContainer key={pluginRoute.path} to={URLUtils.appPrefixed(pluginRoute.path)}>
               <NavItem>{pluginRoute.description}</NavItem>
             </LinkContainer>
           );

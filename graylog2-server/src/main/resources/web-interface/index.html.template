@@ -5,16 +5,16 @@
     <meta name="robots" content="noindex, nofollow">
     <meta charset="UTF-8">
     <title>${title}</title>
-    <link rel="shortcut icon" href="/favicon.png">
+    <link rel="shortcut icon" href="${appPrefix}/favicon.png">
     ${foreach cssFiles cssFile}
-    <link href="${cssfile}" rel="stylesheet">
+    <link href="${appPrefix}/${cssfile}" rel="stylesheet">
     ${end}
   </head>
   <body>
-    <script src="/config.js"></script>
-    <script src="/vendor.js"></script>
+    <script src="${appPrefix}/config.js"></script>
+    <script src="${appPrefix}/vendor.js"></script>
     ${foreach jsFiles jsFile}
-    <script src="${jsFile}"></script>
+    <script src="${appPrefix}/${jsFile}"></script>
     ${end}
   </body>
 </html>

@@ -390,4 +390,12 @@ public abstract class BaseConfiguration {
     public URI getWebEndpointUri() {
         return webEndpointUri == null ? getRestTransportUri() : webEndpointUri;
     }
+
+    public String getWebPrefix() {
+        final String webPrefix = getWebListenUri().getPath();
+        if (webPrefix.endsWith("/")) {
+            return webPrefix.substring(0, webPrefix.length() - 1);
+        }
+        return webPrefix;
+    }
 }

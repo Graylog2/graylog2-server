@@ -1,10 +1,13 @@
 import React from 'react';
+import { IndexRoute, Redirect, Router, Route } from 'react-router';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+
 import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
-import { IndexRoute, Redirect, Router, Route } from 'react-router';
 import history from 'util/History';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import AppConfig from 'util/AppConfig';
+import URLUtils from 'util/URLUtils';
 
 import Routes from 'routing/Routes';
 
@@ -51,11 +54,11 @@ import NotFoundPage from 'pages/NotFoundPage';
 const AppRouter = React.createClass({
   render() {
     const pluginRoutes = PluginStore.exports('routes').map((pluginRoute) => {
-      return <Route key={pluginRoute.component.displayName} path={pluginRoute.path} component={pluginRoute.component} />;
+      return <Route key={pluginRoute.component.displayName} path={URLUtils.appPrefixed(pluginRoute.path)} component={pluginRoute.component} />;
     });
     return (
       <Router history={history}>
-        <Route path="/" component={App}>
+        <Route path={Routes.STARTPAGE} component={App}>
           <IndexRoute component={StartPage}/>
           <Route component={AppWithSearchBar}>
             <Route path={Routes.SEARCH} component={SearchPage}/>
