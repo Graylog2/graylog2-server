@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-graylog",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Graylog ESLint config for web interface plugin authors",
   "main": "index.js",
   "scripts": {
