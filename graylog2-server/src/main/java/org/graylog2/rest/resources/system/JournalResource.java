@@ -26,11 +26,11 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ThrottleState;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.resources.system.responses.JournalSummaryResponse;
-import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.journal.KafkaJournal;
+import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -71,7 +71,6 @@ public class JournalResource extends RestResource {
         if (journal instanceof KafkaJournal) {
             final KafkaJournal kafkaJournal = (KafkaJournal) journal;
             final ThrottleState throttleState = kafkaJournal.getThrottleState();
-            kafkaJournal.numberOfSegments();
 
             long oldestSegment = Long.MAX_VALUE;
             for (final LogSegment segment : kafkaJournal.getSegments()) {
