@@ -14,6 +14,7 @@ module.exports = {
     'no-underscore-dangle': 0,
     'object-shorthand': [2, 'methods'],
     'react/jsx-closing-bracket-location': 0,
+    'react/jsx-first-prop-new-line': 0,
     'react/jsx-indent-props': 0,
     'react/jsx-space-before-closing': 0,
     'react/prefer-es6-class': 0,
