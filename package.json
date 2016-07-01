@@ -4,7 +4,7 @@
   "description": "Helper code for streamlining Graylog web interface plugin development",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "eslint src/*",
     "compile": "babel -d lib/ src/",
     "prepublish": "npm run compile"
   },
@@ -32,6 +32,9 @@
     "webpack-merge": "^0.7.1"
   },
   "devDependencies": {
-    "babel": "^5.8.34"
+    "babel": "^5.8.34",
+    "babel-eslint": "^6.1.0",
+    "eslint": "^2.13.1",
+    "eslint-config-graylog": "^1.0.2"
   }
 }
