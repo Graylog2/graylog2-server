@@ -39,6 +39,7 @@ const LoaderTabs = React.createClass({
 
   getInitialState() {
     return {
+      activeTab: undefined,
       message: undefined,
       inputs: undefined,
     };
@@ -83,7 +84,11 @@ const LoaderTabs = React.createClass({
     return this.props.tabs === tabKey || this.props.tabs.indexOf(tabKey) !== -1;
   },
 
-  _getDefaultActiveKey() {
+  _getActiveTab() {
+    if (this.state.activeTab) {
+      return this.state.activeTab;
+    }
+
     if (this._isTabVisible('messageId') && this.props.messageId && this.props.index) {
       return this.TAB_KEYS.messageId;
     }
@@ -95,6 +100,12 @@ const LoaderTabs = React.createClass({
       return this.TAB_KEYS.messageId;
     }
     return this.TAB_KEYS.raw;
+  },
+
+  _changeActiveTab(selectedTab) {
+    if (this.state.activeTab !== selectedTab) {
+      this.setState({ activeTab: selectedTab, message: undefined });
+    }
   },
 
   _formatMessageLoaders() {
@@ -154,7 +165,7 @@ const LoaderTabs = React.createClass({
 
     return (
       <div>
-        <Tabs defaultActiveKey={this._getDefaultActiveKey()} animation={false}>
+        <Tabs activeKey={this._getActiveTab()} onSelect={this._changeActiveTab} animation={false}>
           {this._formatMessageLoaders()}
         </Tabs>
         {displayMessage}
