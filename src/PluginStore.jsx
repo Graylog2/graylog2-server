@@ -12,10 +12,10 @@ class PluginStore {
     }
     return window.plugins;
   }
-  
+
   static exports(entity) {
     return [].concat.apply([], this.get()
-      .map((plugin) => plugin.exports && plugin.exports[entity] ? plugin.exports[entity] : [])
+      .map((plugin) => (plugin.exports && plugin.exports[entity] ? plugin.exports[entity] : []))
     );
   }
 }

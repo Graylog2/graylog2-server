@@ -13,11 +13,11 @@ const defaultOptions = {
   build_path: path.resolve(defaultRootPath, 'build'),
 };
 
-const getPluginFullName = function(fqcn) {
-  return 'plugin.' + fqcn;
+function getPluginFullName(fqcn) {
+  return `plugin.${fqcn}`;
 }
 
-const PluginWebpackConfig = function(fqcn, _options, additionalConfig) {
+function PluginWebpackConfig(fqcn, _options, additionalConfig) {
   const options = merge(defaultOptions, _options);
   const moduleJsonTemplate = path.resolve(module.parent.filename, '../templates/module.json.template');
   const config = {
@@ -36,13 +36,13 @@ const PluginWebpackConfig = function(fqcn, _options, additionalConfig) {
         { test: /\.css$/, loaders: ['style', 'css'] },
         { test: /\.json$/, loader: 'json-loader' },
         { test: /\.ts$/, loader: 'babel-loader!ts-loader', exclude: /node_modules|\.node_cache/ },
-        { test: /\.js(x)?$/, loader: 'babel-loader', exclude: /node_modules|\.node_cache/ }
+        { test: /\.js(x)?$/, loader: 'babel-loader', exclude: /node_modules|\.node_cache/ },
       ],
     },
     plugins: [
-      new HtmlWebpackPlugin({filename: getPluginFullName(fqcn) + '.module.json', template: moduleJsonTemplate}),
+      new HtmlWebpackPlugin({ filename: `${getPluginFullName(fqcn)}.module.json`, template: moduleJsonTemplate }),
       new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
-      new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.web_src_path}),
+      new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.web_src_path }),
     ],
     resolve: {
       root: [path.resolve(options.web_src_path, 'src')],
@@ -50,7 +50,7 @@ const PluginWebpackConfig = function(fqcn, _options, additionalConfig) {
       modulesDirectories: ['src/web', 'node_modules', 'src'],
     },
   };
-  
+
   config.entry[getPluginFullName(fqcn)] = options.entry_path;
 
   if (TARGET === 'build') {
@@ -60,8 +60,7 @@ const PluginWebpackConfig = function(fqcn, _options, additionalConfig) {
   if (additionalConfig) {
     return merge.smart(config, additionalConfig);
   }
-  
-  
+
   return config;
 }
 

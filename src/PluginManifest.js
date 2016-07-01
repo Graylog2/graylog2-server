@@ -3,6 +3,6 @@ const create = (metadata, exports) => {
     metadata: metadata,
     exports: exports,
   };
-}
+};
 
 module.exports = create;
