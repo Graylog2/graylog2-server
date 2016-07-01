@@ -32,7 +32,6 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -134,7 +133,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         return new DateTime(newValue, DateTimeZone.UTC);
     }
 
-    @Nonnull
+    @Nullable
     @Override
     protected Result shouldRotate(String index) {
         final TimeBasedRotationStrategyConfig config = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
