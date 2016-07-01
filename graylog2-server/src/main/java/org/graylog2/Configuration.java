@@ -98,9 +98,6 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "allow_highlighting")
     private boolean allowHighlighting = false;
 
-    @Parameter(value = "enable_metrics_collection")
-    private boolean metricsCollectionEnabled = false;
-
     @Parameter(value = "lb_recognition_period_seconds", validator = PositiveIntegerValidator.class)
     private int loadBalancerRecognitionPeriodSeconds = 3;
 
@@ -237,10 +234,6 @@ public class Configuration extends BaseConfiguration {
 
     public boolean isAllowHighlighting() {
         return allowHighlighting;
-    }
-
-    public boolean isMetricsCollectionEnabled() {
-        return metricsCollectionEnabled;
     }
 
     public int getLoadBalancerRecognitionPeriodSeconds() {
