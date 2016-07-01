@@ -21,19 +21,28 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
-import com.google.common.collect.Maps;
-import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
+import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 
 public class BaseConfigurationTest {
+    @Rule
+    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
+
     private class Configuration extends BaseConfiguration {
         @Parameter(value = "rest_listen_uri", required = true)
         private URI restListenUri = URI.create("http://127.0.0.1:12900/");
@@ -61,26 +70,15 @@ public class BaseConfigurationTest {
     }
 
     private Map<String, String> validProperties;
-    private File tempFile;
 
     @Before
     public void setUp() throws Exception {
-        validProperties = Maps.newHashMap();
-        tempFile = File.createTempFile("graylog", null);
+        validProperties = new HashMap<>();
 
         // Required properties
         validProperties.put("password_secret", "ipNUnWxmBLCxTEzXcyamrdy0Q3G7HxdKsAvyg30R9SCof0JydiZFiA3dLSkRsbLF");
-        validProperties.put("elasticsearch_config_file", tempFile.getAbsolutePath());
-        validProperties.put("use_gelf", "true");
-        validProperties.put("gelf_listen_port", "12201");
-        validProperties.put("root_password_sha2", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918"); // sha2 of admin
-    }
-
-    @After
-    public void tearDown() {
-        if(tempFile != null) {
-            tempFile.delete();
-        }
+        // SHA-256 of "admin"
+        validProperties.put("root_password_sha2", "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918");
     }
 
     @Test
@@ -126,12 +124,14 @@ public class BaseConfigurationTest {
     }
 
     @Test
-    public void testGetRestUriScheme() throws RepositoryException, ValidationException {
+    public void testGetRestUriScheme() throws RepositoryException, ValidationException, IOException {
         validProperties.put("rest_enable_tls", "false");
         final Configuration configWithoutTls = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configWithoutTls).process();
 
         validProperties.put("rest_enable_tls", "true");
+        validProperties.put("rest_tls_key_file", temporaryFolder.newFile("graylog.key").getAbsolutePath());
+        validProperties.put("rest_tls_cert_file", temporaryFolder.newFile("graylog.crt").getAbsolutePath());
         final Configuration configWithTls = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configWithTls).process();
 
@@ -140,16 +140,222 @@ public class BaseConfigurationTest {
     }
 
     @Test
-    public void testGetWebUriScheme() throws RepositoryException, ValidationException {
+    public void testGetWebUriScheme() throws RepositoryException, ValidationException, IOException {
         validProperties.put("web_enable_tls", "false");
         final Configuration configWithoutTls = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configWithoutTls).process();
 
         validProperties.put("web_enable_tls", "true");
+        validProperties.put("web_tls_key_file", temporaryFolder.newFile("graylog.key").getAbsolutePath());
+        validProperties.put("web_tls_cert_file", temporaryFolder.newFile("graylog.crt").getAbsolutePath());
         final Configuration configWithTls = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configWithTls).process();
 
         assertEquals("http", configWithoutTls.getWebUriScheme());
         assertEquals("https", configWithTls.getWebUriScheme());
+    }
+
+    @Test
+    public void restTlsValidationFailsIfPrivateKeyIsMissing() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("rest_enable_tls", "true");
+        validProperties.put("rest_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("rest_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(privateKey.delete()).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing REST API private key: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void restTlsValidationFailsIfPrivateKeyIsDirectory() throws Exception {
+        final File privateKey = temporaryFolder.newFolder("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("rest_enable_tls", "true");
+        validProperties.put("rest_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("rest_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(privateKey.isDirectory()).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing REST API private key: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void restTlsValidationFailsIfPrivateKeyIsUnreadable() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("rest_enable_tls", "true");
+        validProperties.put("rest_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("rest_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(privateKey.setReadable(false, false)).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing REST API private key: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void restTlsValidationFailsIfCertificateIsMissing() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("rest_enable_tls", "true");
+        validProperties.put("rest_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("rest_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(certificate.delete()).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing REST API X.509 certificate: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void restTlsValidationFailsIfCertificateIsDirectory() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFolder("graylog.crt");
+
+        validProperties.put("rest_enable_tls", "true");
+        validProperties.put("rest_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("rest_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(certificate.isDirectory()).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing REST API X.509 certificate: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void restTlsValidationFailsIfCertificateIsUnreadable() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("rest_enable_tls", "true");
+        validProperties.put("rest_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("rest_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(certificate.setReadable(false, false)).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing REST API X.509 certificate: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void webTlsValidationFailsIfPrivateKeyIsMissing() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("web_enable_tls", "true");
+        validProperties.put("web_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("web_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(privateKey.delete()).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing web interface private key: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void webTlsValidationFailsIfPrivateKeyIsDirectory() throws Exception {
+        final File privateKey = temporaryFolder.newFolder("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("web_enable_tls", "true");
+        validProperties.put("web_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("web_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(privateKey.isDirectory()).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing web interface private key: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void webTlsValidationFailsIfPrivateKeyIsUnreadable() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("web_enable_tls", "true");
+        validProperties.put("web_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("web_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(privateKey.setReadable(false, false)).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing web interface private key: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void webTlsValidationFailsIfCertificateIsMissing() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("web_enable_tls", "true");
+        validProperties.put("web_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("web_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(certificate.delete()).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing web interface X.509 certificate: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void webTlsValidationFailsIfCertificateIsDirectory() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFolder("graylog.crt");
+
+        validProperties.put("web_enable_tls", "true");
+        validProperties.put("web_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("web_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(certificate.isDirectory()).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing web interface X.509 certificate: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
+    }
+
+    @Test
+    public void webTlsValidationFailsIfCertificateIsUnreadable() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("web_enable_tls", "true");
+        validProperties.put("web_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("web_tls_cert_file", certificate.getAbsolutePath());
+
+        assertThat(certificate.setReadable(false, false)).isTrue();
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Unreadable or missing web interface X.509 certificate: ");
+
+        new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
     }
 }
