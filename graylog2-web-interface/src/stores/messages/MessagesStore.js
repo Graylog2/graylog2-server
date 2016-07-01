@@ -56,6 +56,11 @@ const MessagesStore = Reflux.createStore({
       .then(
         response => MessageFormatter.formatResultMessage(response),
         error => {
+          if (error.additional && error.additional.status === 400) {
+            UserNotification.error('Please ensure the selected codec and its configuration are right. ' +
+              'Check your server logs for more information.', 'Could not load raw message');
+            return;
+          }
           UserNotification.error(`Loading raw message failed with status: ${error}`,
             'Could not load raw message');
         });

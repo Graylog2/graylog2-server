@@ -152,9 +152,14 @@ public class MessageResource extends RestResource {
     }
 
     private Message decodeMessage(Codec codec, ResolvableInetSocketAddress remoteAddress, RawMessage rawMessage) {
-        final Message message = codec.decode(rawMessage);
+        Message message;
+        try {
+            message = codec.decode(rawMessage);
 
-        if (message == null) {
+            if (message == null) {
+                throw new BadRequestException("Could not decode message");
+            }
+        } catch (Exception e) {
             throw new BadRequestException("Could not decode message");
         }
 
