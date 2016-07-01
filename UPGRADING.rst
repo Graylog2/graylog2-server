@@ -19,6 +19,14 @@ Previous versions of Graylog were automatically generating a private key/certifi
 Due to those shortcomings, the feature has been removed completely. Users need to use proper certificates or generate their own self-signed certificates and configure them with the appropriate settings, see `Using HTTPS <http://docs.graylog.org/en/2.0/pages/configuration/https.html>`_ for reference.
 
 
+Internal Metrics to MongoDB
+---------------------------
+
+Previous versions of Graylog included a (long deprecated) metrics reporter for writing internal `metrics <http://metrics.dropwizard.io/3.1.0/>`__ into MongoDB in a fixed interval of 1 second.
+
+This feature has been removed completely and can be optionally pulled in by using the `Graylog Metrics Reporter Plugins <https://github.com/Graylog2/graylog-plugin-metrics-reporter>`_.
+
+
 For Plugin Authors
 ------------------
 
