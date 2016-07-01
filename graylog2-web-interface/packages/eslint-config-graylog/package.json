@@ -1,0 +1,25 @@
+{
+  "name": "eslint-config-graylog",
+  "version": "1.0.1",
+  "description": "Graylog ESLint config for web interface plugin authors",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "graylog",
+    "eslint"
+  ],
+  "author": "Graylog, Inc. <hello@graylog.com>",
+  "license": "MIT",
+  "dependencies": {
+    "eslint": "^2.10.2",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-import": "^1.10.0",
+    "eslint-plugin-jsx-a11y": "^1.5.3",
+    "eslint-plugin-react": "^5.2.2"
+  },
+  "peerDependencies": {
+    "eslint": "^2.10.2"
+  }
+}
