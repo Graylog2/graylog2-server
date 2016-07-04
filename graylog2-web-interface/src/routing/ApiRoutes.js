@@ -43,7 +43,7 @@ const ApiRoutes = {
     updatePositions: (dashboardId) => { return { url: `/dashboards/${dashboardId}/positions` }; },
   },
   DeflectorApiController: {
-    cycle: () => { return { url: '/cluster/system/deflector/cycle' }; },
+    cycle: () => { return { url: '/cluster/deflector/cycle' }; },
     list: () => { return { url: '/system/deflector' }; },
   },
   IndexerClusterApiController: {
