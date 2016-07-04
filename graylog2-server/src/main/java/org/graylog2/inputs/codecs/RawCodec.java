@@ -14,23 +14,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-/**
- *
- * This file is part of Graylog.
- *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Graylog is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
- */
 package org.graylog2.inputs.codecs;
 
 import com.google.common.base.Charsets;
@@ -50,6 +33,7 @@ import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.net.InetAddress;
 
 @Codec(name = "raw", displayName = "Raw String")
@@ -81,6 +65,9 @@ public class RawCodec extends AbstractCodec {
 
         @Override
         Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
     }
 
     @ConfigClass
@@ -93,4 +80,10 @@ public class RawCodec extends AbstractCodec {
         }
     }
 
+    public static class Descriptor extends AbstractCodec.Descriptor {
+        @Inject
+        public Descriptor() {
+            super(RawCodec.class.getAnnotation(Codec.class).displayName());
+        }
+    }
 }

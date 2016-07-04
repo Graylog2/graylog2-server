@@ -73,6 +73,16 @@ public class ResultMessage {
         return m;
     }
 
+    public static ResultMessage createFromMessage(Message message) {
+        ResultMessage m = new ResultMessage();
+        m.setMessage(message);
+        return m;
+    }
+
+    public void setMessage(Message message) {
+        this.message = message;
+    }
+
     public void setMessage(String id, Map<String, Object> message) {
         Map<String, Object> tmp = Maps.newHashMap();
         tmp.putAll(message);

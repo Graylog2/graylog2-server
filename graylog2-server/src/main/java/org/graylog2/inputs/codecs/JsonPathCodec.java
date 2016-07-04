@@ -35,6 +35,7 @@ import org.graylog2.plugin.journal.RawMessage;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
@@ -122,6 +123,9 @@ public class JsonPathCodec extends AbstractCodec {
 
         @Override
         Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
     }
 
     @ConfigClass
@@ -134,7 +138,7 @@ public class JsonPathCodec extends AbstractCodec {
                     CK_PATH,
                     "JSON path of data to extract",
                     "$.store.book[1].number_of_orders",
-                    "Path to the value you want to extract from the JSON response. Take a look at the documentation for a more detailled explanation.",
+                    "Path to the value you want to extract from the JSON response. Take a look at the documentation for a more detailed explanation.",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
 
@@ -151,6 +155,13 @@ public class JsonPathCodec extends AbstractCodec {
         @Override
         public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
 
+        }
+    }
+
+    public static class Descriptor extends AbstractCodec.Descriptor {
+        @Inject
+        public Descriptor() {
+            super(JsonPathCodec.class.getAnnotation(Codec.class).displayName());
         }
     }
 }

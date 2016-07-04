@@ -17,6 +17,8 @@
 package org.graylog2.rest.resources.messages;
 
 import com.codahale.metrics.annotation.Timed;
+import com.eaio.uuid.UUID;
+import com.google.common.net.InetAddresses;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,7 +30,14 @@ import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.inputs.codecs.CodecFactory;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.ResolvableInetSocketAddress;
+import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.configuration.Configuration;
+import org.graylog2.plugin.inputs.codecs.Codec;
+import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.rest.models.messages.requests.MessageParseRequest;
 import org.graylog2.rest.models.messages.responses.MessageTokens;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -37,33 +46,41 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.net.InetSocketAddress;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 @RequiresAuthentication
 @Api(value = "Messages", description = "Single messages")
-@Path("/messages/{index}")
+@Produces(MediaType.APPLICATION_JSON)
+@Path("/messages")
 public class MessageResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(MessageResource.class);
 
     private Messages messages;
+    private CodecFactory codecFactory;
 
     @Inject
-    public MessageResource(Messages messages) {
+    public MessageResource(Messages messages, CodecFactory codecFactory) {
         this.messages = messages;
+        this.codecFactory = codecFactory;
     }
 
     @GET
-    @Path("/{messageId}")
+    @Path("/{index}/{messageId}")
     @Timed
     @ApiOperation(value = "Get a single message.")
-    @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Specified index does not exist."),
             @ApiResponse(code = 404, message = "Message does not exist.")
@@ -108,12 +125,63 @@ public class MessageResource extends RestResource {
         }
     }
 
+    @POST
+    @Path("/parse")
+    @Timed
+    @Consumes(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Parse a raw message")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Specified codec does not exist."),
+            @ApiResponse(code = 400, message = "Could not decode message.")
+    })
+    public ResultMessage parse(@ApiParam(name = "JSON body", required = true) MessageParseRequest request) {
+        Codec codec;
+        try {
+            final Configuration configuration = new Configuration(request.configuration());
+            codec = codecFactory.create(request.codec(), configuration);
+        } catch (IllegalArgumentException e) {
+            throw new NotFoundException(e);
+        }
+
+        final ResolvableInetSocketAddress remoteAddress = ResolvableInetSocketAddress.wrap(new InetSocketAddress(request.remoteAddress(), 1234));
+
+        final RawMessage rawMessage = new RawMessage(0, new UUID(), Tools.nowUTC(), remoteAddress, request.message().getBytes());
+        final Message message = decodeMessage(codec, remoteAddress, rawMessage);
+
+        return ResultMessage.createFromMessage(message);
+    }
+
+    private Message decodeMessage(Codec codec, ResolvableInetSocketAddress remoteAddress, RawMessage rawMessage) {
+        Message message;
+        try {
+            message = codec.decode(rawMessage);
+
+            if (message == null) {
+                throw new BadRequestException("Could not decode message");
+            }
+        } catch (Exception e) {
+            throw new BadRequestException("Could not decode message");
+        }
+
+        // Ensure the decoded Message has a source, otherwise creating a ResultMessage will fail
+        if (isNullOrEmpty(message.getSource())) {
+            final String address = InetAddresses.toAddrString(remoteAddress.getAddress());
+            message.setSource(address);
+        }
+
+        // Override source
+        if (codec.getConfiguration() != null && codec.getConfiguration().stringIsSet(Codec.Config.CK_OVERRIDE_SOURCE)) {
+            message.setSource(codec.getConfiguration().getString(Codec.Config.CK_OVERRIDE_SOURCE));
+        }
+
+        return message;
+    }
+
     @GET
-    @Path("/analyze")
+    @Path("/{index}/analyze")
     @Timed
     @ApiOperation(value = "Analyze a message string",
             notes = "Returns what tokens/terms a message string (message or full_message) is split to.")
-    @Produces(MediaType.APPLICATION_JSON)
     @RequiresPermissions(RestPermissions.MESSAGES_ANALYZE)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Specified index does not exist."),

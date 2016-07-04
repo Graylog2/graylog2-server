@@ -9,6 +9,7 @@ class StoreProvider {
       AlertConditions: () => require('stores/alertconditions/AlertConditionsStore'),
       Alerts: () => require('stores/alerts/AlertsStore'),
       ClusterOverview: () => require('stores/cluster/ClusterOverviewStore'),
+      CodecTypes: () => require('stores/codecs/CodecTypesStore'),
       ConfigurationBundles: () => require('stores/configuration-bundles/ConfigurationBundlesStore'),
       Configurations: () => require('stores/configurations/ConfigurationsStore'),
       CurrentUser: () => require('stores/users/CurrentUserStore'),

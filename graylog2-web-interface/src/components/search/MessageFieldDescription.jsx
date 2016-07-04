@@ -3,8 +3,12 @@ import {Alert} from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import StoreProvider from 'injection/StoreProvider';
-const MessagesStore = StoreProvider.getStore('Messages');
 const SearchStore = StoreProvider.getStore('Search');
+// eslint-disable-next-line no-unused-vars
+const MessagesStore = StoreProvider.getStore('Messages');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const MessagesActions = ActionsProvider.getActions('Messages');
 
 import MessageFieldSearchActions from './MessageFieldSearchActions';
 
@@ -24,7 +28,7 @@ const MessageFieldDescription = React.createClass({
   },
   loadTerms(field) {
     return () => {
-      const promise = MessagesStore.fieldTerms(this.props.message.index, this.props.message.fields[field]);
+      const promise = MessagesActions.fieldTerms.triggerPromise(this.props.message.index, this.props.message.fields[field]);
       promise.then((terms) => this._onTermsLoaded(terms));
     };
   },

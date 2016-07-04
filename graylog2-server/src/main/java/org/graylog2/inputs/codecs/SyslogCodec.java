@@ -43,6 +43,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import javax.inject.Inject;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -217,6 +218,9 @@ public class SyslogCodec extends AbstractCodec {
 
         @Override
         Config getConfig();
+
+        @Override
+        Descriptor getDescriptor();
     }
 
     @ConfigClass
@@ -269,6 +273,13 @@ public class SyslogCodec extends AbstractCodec {
             if (cr.containsField(NettyTransport.CK_PORT)) {
                 cr.getField(NettyTransport.CK_PORT).setDefaultValue(514);
             }
+        }
+    }
+
+    public static class Descriptor extends AbstractCodec.Descriptor {
+        @Inject
+        public Descriptor() {
+            super(SyslogCodec.class.getAnnotation(Codec.class).displayName());
         }
     }
 
