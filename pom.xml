@@ -958,6 +958,21 @@
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>findbugs-maven-plugin</artifactId>
                     <version>3.0.3</version>
+                    <configuration>
+                        <excludeFilterFile>config/findbugs-exclude.xml</excludeFilterFile>
+                        <plugins>
+                            <plugin>
+                                <groupId>com.h3xstream.findsecbugs</groupId>
+                                <artifactId>findsecbugs-plugin</artifactId>
+                                <version>1.4.6</version>
+                            </plugin>
+                            <plugin>
+                                <groupId>com.mebigfatguy.fb-contrib</groupId>
+                                <artifactId>fb-contrib</artifactId>
+                                <version>6.6.1</version>
+                            </plugin>
+                        </plugins>
+                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
