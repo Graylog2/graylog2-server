@@ -31,6 +31,7 @@ import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -57,13 +58,13 @@ public class ClusterDeflectorResource extends ProxiedResource {
     public void cycle() throws IOException {
         final Optional<Node> master = nodeService.allActive().values().stream().filter(Node::isMaster).findFirst();
         if (!master.isPresent()) {
-            throw new InternalServerErrorException("No master present.");
+            throw new ServiceUnavailableException("No master present.");
         }
         final Function<String, Optional<RemoteDeflectorResource>> remoteInterfaceProvider = createRemoteInterfaceProvider(RemoteDeflectorResource.class);
         final Optional<RemoteDeflectorResource> deflectorResource = remoteInterfaceProvider.apply(master.get().getNodeId());
-        if (!deflectorResource.isPresent()) {
-            throw new InternalServerErrorException("Unable to get remote deflector resource.");
-        }
-        deflectorResource.get().cycle().execute();
+
+        deflectorResource
+            .orElseThrow(() -> new InternalServerErrorException("Unable to get remote deflector resource."))
+            .cycle().execute();
     }
 }
