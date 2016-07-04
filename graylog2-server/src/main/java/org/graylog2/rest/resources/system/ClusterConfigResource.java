@@ -60,7 +60,7 @@ import static java.util.Objects.requireNonNull;
 @Path("/system/cluster_config")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterConfigResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigResource.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
 
 
     private final ClusterConfigService clusterConfigService;
