@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import java.util.Map;
+
 @AutoValue
 @JsonAutoDetect
 public abstract class SimulationRequest {
@@ -28,10 +30,7 @@ public abstract class SimulationRequest {
     public abstract String streamId();
 
     @JsonProperty
-    public abstract String index();
-
-    @JsonProperty
-    public abstract String messageId();
+    public abstract Map<String, Object> message();
 
     public static Builder builder() {
         return new AutoValue_SimulationRequest.Builder();
@@ -39,12 +38,10 @@ public abstract class SimulationRequest {
 
     @JsonCreator
     public static SimulationRequest create (@JsonProperty("stream_id") String streamId,
-                                            @JsonProperty("index") String index,
-                                            @JsonProperty("message_id")  String messageId) {
+                                            @JsonProperty("message") Map<String, Object> message) {
         return builder()
                 .streamId(streamId)
-                .index(index)
-                .messageId(messageId)
+                .message(message)
                 .build();
     }
 
@@ -54,8 +51,6 @@ public abstract class SimulationRequest {
 
         public abstract Builder streamId(String streamId);
 
-        public abstract Builder index(String index);
-
-        public abstract Builder messageId(String messageId);
+        public abstract Builder message(Map<String, Object> message);
     }
 }
