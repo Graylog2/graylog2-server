@@ -244,9 +244,15 @@ public abstract class SearchResource extends RestResource {
             try {
                 queryParser.parse(query);
             } catch (ParseException parseException) {
-                // FIXME I have no idea why this is necessary but without that call currentToken will be null.
-                final ParseException exception = queryParser.generateParseException();
-                Token currentToken = exception.currentToken;
+                Token currentToken = null;
+                try {
+                    // FIXME I have no idea why this is necessary but without that call currentToken will be null.
+                    final ParseException exception = queryParser.generateParseException();
+                    currentToken = exception.currentToken;
+                } catch (NullPointerException npe) {
+                    LOG.warn("Exception thrown while generating parse exception.", npe);
+                }
+
                 if (currentToken == null) {
                     LOG.warn("No position/token available for ParseException.", parseException);
                     errorMessage = QueryParseError.create(
