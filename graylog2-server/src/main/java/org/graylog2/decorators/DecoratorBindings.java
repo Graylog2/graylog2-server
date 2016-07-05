@@ -25,7 +25,6 @@ public class DecoratorBindings extends Graylog2Module {
     @Override
     protected void configure() {
         Multibinder<MessageDecorator> messageDecoratorMultibinder = Multibinder.newSetBinder(binder(), MessageDecorator.class);
-        //messageDecoratorMultibinder.addBinding().to(UpperCaseDecorator.class);
 
         Multibinder<SearchResponseDecorator> searchResponseDecoratorMultibinder = Multibinder.newSetBinder(binder(), SearchResponseDecorator.class);
     }

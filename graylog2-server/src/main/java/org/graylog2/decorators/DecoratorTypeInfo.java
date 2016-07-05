@@ -29,7 +29,7 @@ public abstract class DecoratorTypeInfo {
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_HUMAN_NAME = "human_name";
-    private static final String FIELD_IS_EXCLUSIVE = "is_exlusive";
+    private static final String FIELD_IS_EXCLUSIVE = "is_exclusive";
     private static final String FIELD_REQUESTED_CONFIGURATION = "requested_configuration";
     private static final String FIELD_LINK_TO_DOCS = "link_to_docs";
 
