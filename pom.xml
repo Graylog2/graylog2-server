@@ -7,7 +7,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-beats</artifactId>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.1.0-alpha.1</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
