@@ -73,9 +73,8 @@ public class ResultMessage {
         return m;
     }
 
-    public static ResultMessage fromMessage(Message message, String index, Multimap<String, Range<Integer>> highlightFieldMap) {
-        final ResultMessage result = new ResultMessage();
-        result.setMessage(message);
+    public static ResultMessage createFromMessage(Message message, String index, Multimap<String, Range<Integer>> highlightFieldMap) {
+        final ResultMessage result = createFromMessage(message);
         result.setIndex(index);
         result.setHighlightRanges(highlightFieldMap);
 
