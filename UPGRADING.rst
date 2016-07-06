@@ -27,6 +27,26 @@ Previous versions of Graylog included a (long deprecated) metrics reporter for w
 This feature has been removed completely and can be optionally pulled in by using the `Graylog Metrics Reporter Plugins <https://github.com/Graylog2/graylog-plugin-metrics-reporter>`_.
 
 
+Graylog REST API
+----------------
+
+Removed resources
+^^^^^^^^^^^^^^^^^
+
++-----------------------------+--------------------------------------------------------+ 
+| Original resource           | Replacement                                            |
++=============================+========================================================+ 
+| ``/system/buffers``         | ``/system/metrics/org.graylog2.buffers.input.size``    |
+|                             | ``/system/metrics/org.graylog2.buffers.input.usage``   |
+|                             | ``/system/metrics/org.graylog2.buffers.process.size``  |
+|                             | ``/system/metrics/org.graylog2.buffers.process.usage`` |
+|                             | ``/system/metrics/org.graylog2.buffers.output.size``   |
+|                             | ``/system/metrics/org.graylog2.buffers.output.usage``  |
++-----------------------------+--------------------------------------------------------+ 
+| ``/system/buffers/classes`` | None                                                   |
++-----------------------------+--------------------------------------------------------+ 
+
+
 For Plugin Authors
 ------------------
 
