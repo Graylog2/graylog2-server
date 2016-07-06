@@ -24,6 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.map.search.MapDataSearch;
 import org.graylog.plugins.map.search.MapDataSearchRequest;
 import org.graylog.plugins.map.search.MapDataSearchResult;
+import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -52,8 +53,8 @@ public class MapDataResource extends SearchResource implements PluginRestResourc
     private final MapDataSearch search;
 
     @Inject
-    public MapDataResource(MapDataSearch search, Searches searches, ClusterConfigService clusterConfigService) {
-        super(searches, clusterConfigService);
+    public MapDataResource(MapDataSearch search, Searches searches, ClusterConfigService clusterConfigService, DecoratorProcessor decoratorProcessor) {
+        super(searches, clusterConfigService, decoratorProcessor);
         this.search = search;
     }
 
