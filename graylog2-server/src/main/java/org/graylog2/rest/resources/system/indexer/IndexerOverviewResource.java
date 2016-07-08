@@ -73,7 +73,7 @@ public class IndexerOverviewResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get overview of current indexing state, including deflector config, cluster state, index ranges & message counts.")
     @Produces(MediaType.APPLICATION_JSON)
-    public IndexerOverview index() throws ClassNotFoundException {
+    public IndexerOverview index() throws ClassNotFoundException, Indices.ESAliasesException {
         final DeflectorSummary deflectorSummary = deflectorResource.deflector();
         final List<IndexRangeSummary> indexRanges = indexRangesResource.list().ranges();
         final Map<String, IndexStats> allDocCounts = indices.getAllDocCounts().entrySet().stream()

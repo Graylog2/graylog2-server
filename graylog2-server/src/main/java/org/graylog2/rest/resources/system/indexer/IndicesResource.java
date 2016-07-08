@@ -219,7 +219,7 @@ public class IndicesResource extends RestResource {
         @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
     })
     @AuditLog(action = "closed", object = "index")
-    public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) {
+    public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws Indices.ESAliasesException {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
         if (!deflector.isGraylogIndex(index)) {
@@ -244,7 +244,7 @@ public class IndicesResource extends RestResource {
         @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
     })
     @AuditLog(object = "index")
-    public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) {
+    public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws Indices.ESAliasesException {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 
         if (!deflector.isGraylogIndex(index)) {

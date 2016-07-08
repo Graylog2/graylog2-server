@@ -143,7 +143,20 @@ public class IndexRotationThread extends Periodical {
             }
         } else {
             try {
-                String currentTarget = deflector.getCurrentActualTargetIndex();
+                String currentTarget;
+                try {
+                    currentTarget = deflector.getCurrentActualTargetIndex();
+                } catch (Indices.ESAliasesException e) {
+                    // If we get this exception, there are multiple indices which have the deflector alias set.
+                    // We try to cleanup the alias and try again. This should not happen, but might under certain
+                    // circumstances.
+                    deflector.cleanupAliases(e.getIndices());
+                    try {
+                        currentTarget = deflector.getCurrentActualTargetIndex();
+                    } catch (Indices.ESAliasesException e1) {
+                        throw new IllegalStateException(e1);
+                    }
+                }
                 String shouldBeTarget = deflector.getNewestTargetName();
 
                 if (!shouldBeTarget.equals(currentTarget)) {

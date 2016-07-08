@@ -247,14 +247,19 @@ public class Indices {
     }
 
     @Nullable
-    public String aliasTarget(String alias) {
+    public String aliasTarget(String alias) throws ESAliasesException {
         final IndicesAdminClient indicesAdminClient = c.admin().indices();
 
         final GetAliasesRequest request = indicesAdminClient.prepareGetAliases(alias).request();
         final GetAliasesResponse response = indicesAdminClient.getAliases(request).actionGet();
 
         // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
-        return response.getAliases().isEmpty() ? null : response.getAliases().keysIt().next();
+        final ImmutableOpenMap<String, List<AliasMetaData>> aliases = response.getAliases();
+
+        if (aliases.size() > 1) {
+            throw new ESAliasesException(Sets.newHashSet(aliases.keysIt()));
+        }
+        return aliases.isEmpty() ? null : aliases.keysIt().next();
     }
 
     private void ensureIndexTemplate() {
@@ -494,6 +499,12 @@ public class Indices {
                 .execute().actionGet().isAcknowledged();
     }
 
+    public boolean removeAliases(String alias, Set<String> indices) {
+        return c.admin().indices().prepareAliases()
+                .removeAlias(indices.toArray(new String[]{}), alias)
+                .execute().actionGet().isAcknowledged();
+    }
+
     public void optimizeIndex(String index) {
         // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/indices-forcemerge.html
         final ForceMergeRequest request = c.admin().indices().prepareForceMerge(index)
@@ -584,5 +595,22 @@ public class Indices {
         final DateTime max = new DateTime((long) maxAgg.getValue(), DateTimeZone.UTC);
 
         return TimestampStats.create(min, max);
+    }
+
+    public static class ESAliasesException extends Exception {
+        private final Set<String> indices;
+
+        public ESAliasesException(final Set<String> indices) {
+            this.indices = indices;
+        }
+
+        @Override
+        public String getMessage() {
+            return "More than one index in deflector alias: " + indices.toString();
+        }
+
+        public Set<String> getIndices() {
+            return indices;
+        }
     }
 }

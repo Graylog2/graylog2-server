@@ -21,6 +21,7 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
@@ -44,6 +45,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -236,5 +238,26 @@ public class DeflectorTest {
         assertThat(deflectorIndices).isNotEmpty();
         assertThat(deflectorIndices.keySet())
             .containsExactlyInAnyOrder("graylog_1", "graylog_2", "graylog_3", "graylog_5");
+    }
+
+    @Test
+    public void testCleanupAliases() throws Exception {
+        final Indices indices = mock(Indices.class);
+        Map<String, Set<String>> indexNameAliases = Maps.newHashMap();
+        indexNameAliases.put("graylog_1", Collections.emptySet());
+        indexNameAliases.put("graylog_2", Collections.singleton("graylog_deflector"));
+        indexNameAliases.put("graylog_3", Collections.singleton("graylog_deflector"));
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        final Deflector deflector = new Deflector(systemJobManager,
+                "graylog",
+                activityWriter,
+                indices,
+                indexRangeService,
+                setIndexReadOnlyAndCalculateRangeJobFactory);
+
+        deflector.cleanupAliases(Sets.newHashSet("graylog_2", "graylog_3"));
+
+        verify(indices).removeAliases("graylog_deflector", Sets.newHashSet("graylog_2"));
     }
 }

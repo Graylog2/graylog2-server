@@ -274,7 +274,7 @@ public class Deflector { // extends Ablenkblech
     }
 
     @Nullable
-    public String getCurrentActualTargetIndex() {
+    public String getCurrentActualTargetIndex() throws Indices.ESAliasesException {
         return indices.aliasTarget(getName());
     }
 
@@ -296,5 +296,23 @@ public class Deflector { // extends Ablenkblech
 
     public boolean isGraylogIndex(final String indexName) {
         return !isNullOrEmpty(indexName) && !isDeflectorAlias(indexName) && indexPattern.matcher(indexName).matches();
+    }
+
+    /**
+     * Sorts the given set of index names and removes the deflector alias from all indices but the last one.
+     *
+     * This might be used when multiple indices have the same alias. This should be really rare!
+     *
+     * @param indexNames the set of index names that have the deflector alias
+     */
+    public void cleanupAliases(Set<String> indexNames) {
+        final Set<String> indicesToRemove = indexNames.stream()
+                .mapToInt(Deflector::extractIndexNumber)
+                .sorted()
+                .limit(indexNames.size() - 1) // Get all but the newest one
+                .mapToObj(num -> indexPrefix + SEPARATOR + num)
+                .collect(Collectors.toSet());
+
+        indices.removeAliases(getName(), indicesToRemove);
     }
 }
