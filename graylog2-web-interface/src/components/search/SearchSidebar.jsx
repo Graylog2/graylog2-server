@@ -61,6 +61,8 @@ const SearchSidebar = React.createClass({
   },
 
   eventsThrottler: new EventHandlersThrottler(),
+  MINIMUM_FIELDS_HEIGHT: 50,
+  TABS_DEFAULT_HEIGHT: 37,
 
   _resizeCallback() {
     this.eventsThrottler.throttle(() => this._updateHeight());
@@ -77,14 +79,21 @@ const SearchSidebar = React.createClass({
     const sidebarPaddingTop = parseFloat(sidebarCss.getPropertyValue('padding-top'));
     const sidebarPaddingBottom = parseFloat(sidebarCss.getPropertyValue('padding-bottom'));
 
+    const fieldsFilter = ReactDOM.findDOMNode(this.refs.fieldsFilter);
+
+    const tabsContainer = ReactDOM.findDOMNode(this.refs.tabsContainer);
+    const tabs = tabsContainer.getElementsByClassName('nav-tabs')[0];
+    const tabsHeight = (tabs ? tabs.offsetHeight : this.TABS_DEFAULT_HEIGHT);
+
     const viewPortHeight = window.innerHeight;
     const maxHeight =
       viewPortHeight -
-      header.clientHeight - footer.clientHeight -
+      header.offsetHeight - footer.offsetHeight -
       sidebarTop - sidebarPaddingTop - sidebarPaddingBottom -
-      35; // for good measure™
+      fieldsFilter.offsetHeight - tabsHeight -
+      45; // for good measure™
 
-    this.setState({ maxFieldsHeight: maxHeight });
+    this.setState({ maxFieldsHeight: Math.max(maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
   },
 
   _updateFieldSelection(setName) {
@@ -221,43 +230,45 @@ const SearchSidebar = React.createClass({
 
             <hr />
           </div>
-          <Tabs animation={false}>
+          <Tabs ref="tabsContainer" animation={false}>
             <Tab eventKey={1} title={<h4>Fields</h4>}>
+              <div ref="fieldsFilter" className="input-group input-group-sm" style={{ marginTop: 5, marginBottom: 5 }}>
+                <span className="input-group-btn">
+                  <button type="button" className="btn btn-default"
+                          onClick={this._updateFieldSelectionToDefault}>Default
+                  </button>
+                  <button type="button" className="btn btn-default"
+                          onClick={this._updateFieldSelectionToAll}>All
+                  </button>
+                  <button type="button" className="btn btn-default"
+                          onClick={this._updateFieldSelectionToNone}>None
+                  </button>
+                </span>
+                <input type="text" className="form-control" placeholder="Filter fields"
+                       onChange={this._filterFields}
+                       value={this.state.fieldFilter}/>
+              </div>
               <div ref="fields" style={{ maxHeight: this.state.maxFieldsHeight, overflowY: 'scroll' }}>
-                <div className="input-group input-group-sm" style={{ marginTop: 5, marginBottom: 5 }}>
-                  <span className="input-group-btn">
-                      <button type="button" className="btn btn-default"
-                              onClick={this._updateFieldSelectionToDefault}>Default
-                      </button>
-                      <button type="button" className="btn btn-default"
-                              onClick={this._updateFieldSelectionToAll}>All
-                      </button>
-                      <button type="button" className="btn btn-default"
-                              onClick={this._updateFieldSelectionToNone}>None
-                      </button>
-                  </span>
-                  <input type="text" className="form-control" placeholder="Filter fields"
-                         onChange={this._filterFields}
-                         value={this.state.fieldFilter}/>
-                </div>
                 <ul className="search-result-fields">
                   {messageFields}
                 </ul>
               </div>
-              <div style={{ marginTop: 13, marginBottom: 0 }}>
-                List <span className="message-result-fields-range"> fields of&nbsp;
-                <a href="#" style={{ fontWeight: this.props.showAllFields ? 'normal' : 'bold' }}
-                   onClick={this._showPageFields}>current page</a> or <a href="#"
-                                                                         style={{ fontWeight: this.props.showAllFields ? 'bold' : 'normal' }}
-                                                                         onClick={this._showAllFields}>all
-                  fields</a>.
-                    </span>
-                <br/>
-                { this.props.showHighlightToggle &&
-                <Input type="checkbox" bsSize="small" checked={this.props.shouldHighlight}
-                       onChange={this.props.toggleShouldHighlight} label="Highlight results"
-                       groupClassName="result-highlight-control"/>
-                }
+              <div ref="footer">
+                <div style={{ marginTop: 13, marginBottom: 0 }}>
+                  List <span className="message-result-fields-range"> fields of&nbsp;
+                  <a href="#" style={{ fontWeight: this.props.showAllFields ? 'normal' : 'bold' }}
+                     onClick={this._showPageFields}>current page</a> or <a href="#"
+                                                                           style={{ fontWeight: this.props.showAllFields ? 'bold' : 'normal' }}
+                                                                           onClick={this._showAllFields}>all
+                    fields</a>.
+                      </span>
+                  <br/>
+                  { this.props.showHighlightToggle &&
+                  <Input type="checkbox" bsSize="small" checked={this.props.shouldHighlight}
+                         onChange={this.props.toggleShouldHighlight} label="Highlight results"
+                         groupClassName="result-highlight-control"/>
+                  }
+                </div>
               </div>
             </Tab>
 
@@ -265,8 +276,6 @@ const SearchSidebar = React.createClass({
               <DecoratorSidebar stream={this.props.searchInStream ? this.props.searchInStream.id : undefined} />
             </Tab>
           </Tabs>
-          <div ref="footer">
-          </div>
         </div>
       </AutoAffix>
     );
