@@ -25,11 +25,14 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.glassfish.jersey.server.ChunkedOutput;
+import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesConfig;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.decorators.MessageDecorator;
+import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
@@ -46,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -54,6 +58,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
+import java.util.Set;
 
 @RequiresAuthentication
 @Api(value = "Search/Relative", description = "Message search")
@@ -63,8 +69,10 @@ public class RelativeSearchResource extends SearchResource {
     private static final Logger LOG = LoggerFactory.getLogger(RelativeSearchResource.class);
 
     @Inject
-    public RelativeSearchResource(Searches searches, ClusterConfigService clusterConfigService) {
-        super(searches, clusterConfigService);
+    public RelativeSearchResource(Searches searches,
+                                  ClusterConfigService clusterConfigService,
+                                  DecoratorProcessor decoratorProcessor) {
+        super(searches, clusterConfigService, decoratorProcessor);
     }
 
     @GET
@@ -84,7 +92,8 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(name = "offset", value = "Offset", required = false) @QueryParam("offset") int offset,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(name = "fields", value = "Comma separated list of fields to return", required = false) @QueryParam("fields") String fields,
-            @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort) {
+            @ApiParam(name = "sort", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("sort") String sort,
+            @ApiParam(name = "decorate", value = "Run decorators on search result", required = false) @QueryParam("decorate") @DefaultValue("true") boolean decorate) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         final List<String> fieldList = parseOptionalFields(fields);
@@ -101,8 +110,10 @@ public class RelativeSearchResource extends SearchResource {
                 .sorting(sorting)
                 .build();
 
+        final Optional<String> streamId = extractStreamId(filter);
+
         try {
-            return buildSearchResponse(searches.search(searchesConfig), timeRange);
+            return buildSearchResponse(searches.search(searchesConfig), timeRange, decorate, streamId);
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }

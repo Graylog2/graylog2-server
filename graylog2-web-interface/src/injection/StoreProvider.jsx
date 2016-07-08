@@ -14,6 +14,7 @@ class StoreProvider {
       Configurations: () => require('stores/configurations/ConfigurationsStore'),
       CurrentUser: () => require('stores/users/CurrentUserStore'),
       Dashboards: () => require('stores/dashboards/DashboardsStore'),
+      Decorators: () => require('stores/decorators/DecoratorsStore'),
       Deflector: () => require('stores/indices/DeflectorStore'),
       Extractors: () => require('stores/extractors/ExtractorsStore'),
       FieldGraphs: () => require('stores/field-analyzers/FieldGraphsStore'),

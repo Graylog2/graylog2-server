@@ -25,6 +25,7 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.name.Names;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
+import org.graylog2.plugin.decorators.MessageDecorator;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -305,6 +306,17 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<String, PasswordAlgorithm> passwordAlgorithmBinder() {
         return MapBinder.newMapBinder(binder(), String.class, PasswordAlgorithm.class);
+    }
+
+    protected MapBinder<String, MessageDecorator.Factory> messageDecoratorBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, MessageDecorator.Factory.class);
+    }
+
+    protected void installMessageDecorator(MapBinder<String, MessageDecorator.Factory> messageDecoratorBinder,
+                                           Class<? extends MessageDecorator> messageDecoratorClass,
+                                           Class<? extends MessageDecorator.Factory> messageDecoratorFactoryClass) {
+        install(new FactoryModuleBuilder().implement(MessageDecorator.class, messageDecoratorClass).build(messageDecoratorFactoryClass));
+        messageDecoratorBinder.addBinding(messageDecoratorClass.getCanonicalName()).to(messageDecoratorFactoryClass);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}
