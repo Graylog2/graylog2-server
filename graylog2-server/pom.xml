@@ -430,6 +430,7 @@
     </dependencies>
 
     <build>
+        <finalName>graylog</finalName>
         <resources>
             <resource>
                 <directory>${webInterface.path}/build</directory>
@@ -499,7 +500,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
-                    <finalName>graylog</finalName>
                     <archive>
                         <manifest>
                             <mainClass>${mainClass}</mainClass>
@@ -541,15 +541,7 @@
         <profile>
             <id>release</id>
             <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-assembly-plugin</artifactId>
-                        <configuration>
-                            <finalName>graylog-${project.version}</finalName>
-                        </configuration>
-                    </plugin>
-                </plugins>
+                <finalName>graylog-${project.version}</finalName>
             </build>
         </profile>
         <profile>
