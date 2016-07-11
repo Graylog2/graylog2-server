@@ -250,7 +250,8 @@ public abstract class SearchResource extends RestResource {
                     final ParseException exception = queryParser.generateParseException();
                     currentToken = exception.currentToken;
                 } catch (NullPointerException npe) {
-                    LOG.warn("Exception thrown while generating parse exception.", npe);
+                    // "Normal" exception and no need to spam the logs with it.
+                    LOG.debug("Exception thrown while generating parse exception.", npe);
                 }
 
                 if (currentToken == null) {
