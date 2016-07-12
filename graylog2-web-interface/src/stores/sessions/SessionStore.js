@@ -49,11 +49,12 @@ const SessionStore = Reflux.createStore({
     const username = Store.get('username');
     this._validateSession(sessionId).then((response) => {
       if (response.is_valid) {
-        this.sessionId = sessionId || response.new_session_id;
-        this.username = username || response.username;
-        Store.set('sessionId', this.sessionId);
-        Store.set('username', this.username);
-        this._propagateState();
+        this.loginCompleted({
+          sessionId: sessionId || response.new_session_id,
+          username: username || response.username,
+        });
+      } else {
+        this._removeSession();
       }
     });
   },
