@@ -63,7 +63,7 @@ public class ShiroSecurityContextFilterTest {
         when(requestContext.getSecurityContext()).thenReturn(securityContext);
 
         final DefaultSecurityManager securityManager = new DefaultSecurityManager();
-        filter = new ShiroSecurityContextFilter(securityManager);
+        filter = new ShiroSecurityContextFilter(securityManager, null);
     }
 
     @Test

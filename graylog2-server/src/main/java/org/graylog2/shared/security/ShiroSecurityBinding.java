@@ -37,7 +37,7 @@ public class ShiroSecurityBinding implements DynamicFeature {
         final Class<?> resourceClass = resourceInfo.getResourceClass();
         final Method resourceMethod = resourceInfo.getResourceMethod();
 
-        context.register(ShiroSecurityContextFilter.class, 0);
+        context.register(ShiroSecurityContextFilter.class);
 
         if (resourceMethod.isAnnotationPresent(RequiresAuthentication.class) || resourceClass.isAnnotationPresent(RequiresAuthentication.class)) {
             if (resourceMethod.isAnnotationPresent(RequiresGuest.class)) {

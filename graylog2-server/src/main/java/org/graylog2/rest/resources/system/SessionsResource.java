@@ -120,7 +120,6 @@ public class SessionsResource extends RestResource {
         }
         final Subject subject = new Subject.Builder().sessionId(id).buildSubject();
         ThreadContext.bind(subject);
-        ThreadContext.put(ShiroSecurityContext.REQUEST_HEADERS, shiroSecurityContext.getHeaders());
         try {
 
             subject.login(new UsernamePasswordToken(createRequest.username(), createRequest.password()));
@@ -141,8 +140,6 @@ public class SessionsResource extends RestResource {
             LOG.info("Invalid username or password for user \"{}\"", createRequest.username());
         } catch (UnknownSessionException e) {
             subject.logout();
-        } finally {
-            ThreadContext.remove(ShiroSecurityContext.REQUEST_HEADERS);
         }
 
         if (subject.isAuthenticated()) {
@@ -184,6 +181,25 @@ public class SessionsResource extends RestResource {
             return SessionValidationResponse.invalid();
         }
 
+        if (subject.getSession(false) != null) {
+            // the subject has a valid session, do not create a new one
+            LOG.info("Session present {}", subject.getSession(false));
+        } else {
+            // there's no valid session, but the authenticator would like us to create one
+            if (ShiroSecurityContext.isSessionCreationRequested()) {
+                LOG.info("Authenticator wants to create a session");
+
+                final Session session = subject.getSession();
+                session.touch();
+                // save subject in session, otherwise we can't get the username back in subsequent requests.
+                ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
+
+                return SessionValidationResponse.validWithNewSession(String.valueOf(session.getId()),
+                                                                     String.valueOf(subject.getPrincipal()));
+            } else {
+                LOG.info("No session {}", subject);
+            }
+        }
         return SessionValidationResponse.valid();
     }
 

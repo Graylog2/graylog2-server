@@ -30,9 +30,8 @@ import javax.ws.rs.core.SecurityContext;
 import java.security.Principal;
 
 public class ShiroSecurityContext implements SecurityContext {
+    public static final String AUTO_CREATE_SESSION_KEY = "AUTO_CREATE_SESSION";
     private static final Logger LOG = LoggerFactory.getLogger(ShiroSecurityContext.class);
-
-    public static final String REQUEST_HEADERS = "REQUEST_HEADERS";
 
     private Subject subject;
     private final AuthenticationToken token;
@@ -46,6 +45,7 @@ public class ShiroSecurityContext implements SecurityContext {
         this.token = token;
         this.secure = isSecure;
         this.authcScheme = authcScheme;
+        //noinspection Convert2Diamond
         this.headers = new MultivaluedHashMap<String, String>(headers);
     }
 
@@ -89,7 +89,7 @@ public class ShiroSecurityContext implements SecurityContext {
     }
 
     @VisibleForTesting
-    protected AuthenticationToken getToken() {
+    public AuthenticationToken getToken() {
         return token;
     }
 
@@ -98,9 +98,6 @@ public class ShiroSecurityContext implements SecurityContext {
     }
 
     public void loginSubject() throws AuthenticationException {
-        // what a hack :(
-        ThreadContext.put(REQUEST_HEADERS, headers);
-
         subject.login(token);
 
         // the subject instance will change to include the session
@@ -108,12 +105,13 @@ public class ShiroSecurityContext implements SecurityContext {
         if (newSubject != null) {
             subject = newSubject;
         }
-
-        ThreadContext.remove(REQUEST_HEADERS);
     }
 
-    public static MultivaluedHashMap<String, String> requestHeaders() {
-        //noinspection unchecked
-        return (MultivaluedHashMap<String, String>) ThreadContext.get(REQUEST_HEADERS);
+    public static boolean isSessionCreationRequested() {
+        return Boolean.TRUE.equals(ThreadContext.get(AUTO_CREATE_SESSION_KEY));
+    }
+
+    public static void requestSessionCreation(boolean createSessionRequest) {
+        ThreadContext.put(AUTO_CREATE_SESSION_KEY, createSessionRequest);
     }
 }

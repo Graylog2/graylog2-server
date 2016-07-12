@@ -20,9 +20,11 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
+import org.glassfish.grizzly.http.server.Request;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -39,17 +41,21 @@ import static java.util.Objects.requireNonNull;
 @Priority(Priorities.AUTHENTICATION)
 public class ShiroSecurityContextFilter implements ContainerRequestFilter {
     private final DefaultSecurityManager securityManager;
+    private Provider<Request> grizzlyRequestProvider;
 
     @Inject
-    public ShiroSecurityContextFilter(DefaultSecurityManager securityManager) {
+    public ShiroSecurityContextFilter(DefaultSecurityManager securityManager, Provider<Request> grizzlyRequestProvider) {
         this.securityManager = requireNonNull(securityManager);
+        this.grizzlyRequestProvider = grizzlyRequestProvider;
     }
 
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         final boolean secure = requestContext.getSecurityContext().isSecure();
         final MultivaluedMap<String, String> headers = requestContext.getHeaders();
-        final String host = headers.getFirst(HttpHeaders.HOST);
+        final Request grizzlyRequest = grizzlyRequestProvider.get();
+
+        final String host = grizzlyRequest.getRemoteAddr();
         final String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
 
         final SecurityContext securityContext;
@@ -83,16 +89,24 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
                                                   MultivaluedMap<String, String> headers) {
         final AuthenticationToken authToken;
         if ("session".equalsIgnoreCase(credential)) {
-            authToken = new SessionIdToken(userName, host);
+            // Basic auth: undefined:session is sent when the UI doesn't have a valid session id,
+            // we don't want to create a SessionIdToken in that case but fall back to looking at the headers instead
+            if ("undefined".equalsIgnoreCase(userName)) {
+                authToken = new HttpHeadersToken(headers, host);
+            } else {
+                authToken = new SessionIdToken(userName, host);
+            }
         } else if ("token".equalsIgnoreCase(credential)) {
             authToken = new AccessTokenAuthToken(userName, host);
-        } else {
+        } else if (userName == null) { // without a username we default to using the header environment as potentially containing tokens used by plugins
+            authToken = new HttpHeadersToken(headers, host);
+        } else { // otherwise we use the "standard" username/password combination
             authToken = new UsernamePasswordToken(userName, credential, host);
         }
 
         final Subject subject = new Subject.Builder(securityManager)
                 .host(host)
-                .sessionCreationEnabled(false)
+                .sessionCreationEnabled(true)
                 .buildSubject();
 
         return new ShiroSecurityContext(subject, authToken, isSecure, authcScheme, headers);
