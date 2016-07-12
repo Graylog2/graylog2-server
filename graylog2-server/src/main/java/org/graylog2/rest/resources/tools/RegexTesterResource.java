@@ -62,7 +62,7 @@ public class RegexTesterResource extends RestResource {
         try {
             pattern = Pattern.compile(regex, Pattern.DOTALL);
         } catch (PatternSyntaxException e) {
-            throw new BadRequestException("Invalid regular expression: " + e.getMessage());
+            throw new BadRequestException("Invalid regular expression: " + e.getMessage(), e);
         }
 
         final Matcher matcher = pattern.matcher(example);
