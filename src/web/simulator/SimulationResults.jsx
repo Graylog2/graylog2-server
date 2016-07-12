@@ -131,7 +131,7 @@ const SimulationResults = React.createClass({
         </Col>
         <Col md={6}>
           <div className="pull-right">
-            <DropdownButton id="simulation-view-options" title="View options" onSelect={this._changeViewOptions}
+            <DropdownButton id="simulation-view-options" title="More results" onSelect={this._changeViewOptions}
                             bsStyle="default" bsSize="small" pullRight>
               {this._getViewOptionsMenuItems()}
             </DropdownButton>

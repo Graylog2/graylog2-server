@@ -17,8 +17,8 @@ const SimulationPreview = React.createClass({
         <Alert bsStyle="info">
           <p><strong>Message would be dropped</strong></p>
           <p>
-            Processing the loaded message would drop it from the system. That means that the message <strong>would
-            not be stored</strong>, and would not be available on searches, alerts, or dashboards.
+            The pipeline processor would drop such a message. That means that the message <strong>would
+            not be stored</strong>, and would not be available for searches, alerts, outputs, or dashboards.
           </p>
         </Alert>
       );

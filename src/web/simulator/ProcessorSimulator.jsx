@@ -44,8 +44,8 @@ const ProcessorSimulator = React.createClass({
           <Col md={12}>
             <h1>Load a message</h1>
             <p>
-              Load a message to be used in the simulation.{' '}
-              <strong>No changes will be done in your stored messages.</strong>
+              Build an example message that will be used in the simulation.{' '}
+              <strong>No real messages stored in Graylog will be changed. All actions are purely simulated on the temporary input you provide below.</strong>
             </p>
             <RawMessageLoader onMessageLoaded={this._onMessageLoad} />
           </Col>
