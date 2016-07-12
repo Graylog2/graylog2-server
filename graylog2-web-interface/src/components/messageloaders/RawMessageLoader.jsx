@@ -134,8 +134,8 @@ const RawMessageLoader = React.createClass({
             <fieldset>
               <Input id="message" name="message" type="textarea" label="Raw message"
                      value={this.state.message} onChange={this._bindValue} rows={3} />
-              <Input id="remoteAddress" name="remoteAddress" type="text" label="Source address"
-                     help="Remote address to use as message source."
+              <Input id="remoteAddress" name="remoteAddress" type="text" label="Source IP address"
+                     help="Remote IP address to use as message source."
                      value={this.state.remoteAddress} onChange={this._bindValue} />
             </fieldset>
             <fieldset>
