@@ -168,7 +168,7 @@
             </dependency>
             <dependency>
                 <groupId>org.mongodb</groupId>
-                <artifactId>mongo-java-driver</artifactId>
+                <artifactId>mongodb-driver</artifactId>
                 <version>3.2.2</version>
             </dependency>
             <dependency>

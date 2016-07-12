@@ -114,7 +114,7 @@
         </dependency>
         <dependency>
             <groupId>org.mongodb</groupId>
-            <artifactId>mongo-java-driver</artifactId>
+            <artifactId>mongodb-driver</artifactId>
 	        <scope>test</scope>
         </dependency>
         <dependency>
