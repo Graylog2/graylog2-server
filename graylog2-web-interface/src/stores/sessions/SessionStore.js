@@ -51,6 +51,8 @@ const SessionStore = Reflux.createStore({
       if (response.is_valid) {
         this.sessionId = sessionId || response.new_session_id;
         this.username = username || response.username;
+        Store.set('sessionId', this.sessionId);
+        Store.set('username', this.username);
         this._propagateState();
       }
     });
