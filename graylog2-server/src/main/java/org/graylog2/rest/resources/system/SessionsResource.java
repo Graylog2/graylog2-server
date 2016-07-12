@@ -181,24 +181,16 @@ public class SessionsResource extends RestResource {
             return SessionValidationResponse.invalid();
         }
 
-        if (subject.getSession(false) != null) {
-            // the subject has a valid session, do not create a new one
-            LOG.info("Session present {}", subject.getSession(false));
-        } else {
-            // there's no valid session, but the authenticator would like us to create one
-            if (ShiroSecurityContext.isSessionCreationRequested()) {
-                LOG.info("Authenticator wants to create a session");
+        // there's no valid session, but the authenticator would like us to create one
+        if (subject.getSession(false) == null && ShiroSecurityContext.isSessionCreationRequested()) {
+            final Session session = subject.getSession();
+            LOG.debug("Session created {}", session.getId());
+            session.touch();
+            // save subject in session, otherwise we can't get the username back in subsequent requests.
+            ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
 
-                final Session session = subject.getSession();
-                session.touch();
-                // save subject in session, otherwise we can't get the username back in subsequent requests.
-                ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
-
-                return SessionValidationResponse.validWithNewSession(String.valueOf(session.getId()),
-                                                                     String.valueOf(subject.getPrincipal()));
-            } else {
-                LOG.info("No session {}", subject);
-            }
+            return SessionValidationResponse.validWithNewSession(String.valueOf(session.getId()),
+                                                                 String.valueOf(subject.getPrincipal()));
         }
         return SessionValidationResponse.valid();
     }
