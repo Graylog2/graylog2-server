@@ -12,6 +12,7 @@ class ActionsProvider {
       Authentication: () => require('actions/authentication/AuthenticationActions'),
       Configuration: () => require('actions/configurations/ConfigurationActions'),
       ConfigurationBundles: () => require('actions/configuration-bundles/ConfigurationBundlesActions'),
+      Decorators: () => require('actions/decorators/DecoratorsActions'),
       Deflector: () => require('actions/indices/DeflectorActions'),
       Extractors: () => require('actions/extractors/ExtractorsActions'),
       GettingStarted: () => require('actions/gettingstarted/GettingStartedActions'),

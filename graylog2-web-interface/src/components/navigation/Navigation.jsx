@@ -126,7 +126,7 @@ const Navigation = React.createClass({
         if (this._shouldAddPluginRoute(pluginRoute)) {
           return (
             <LinkContainer key={pluginRoute.path} to={URLUtils.appPrefixed(pluginRoute.path)}>
-              <NavItem>{pluginRoute.description}</NavItem>
+              <MenuItem>{pluginRoute.description}</MenuItem>
             </LinkContainer>
           );
         } else {

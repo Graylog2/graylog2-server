@@ -25,7 +25,7 @@
 
     <groupId>org.graylog2</groupId>
     <artifactId>graylog2-parent</artifactId>
-    <version>2.1.0-alpha.2-SNAPSHOT</version>
+    <version>2.1.0-alpha.3-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>Graylog</name>
     <url>https://www.graylog.org/</url>
@@ -104,7 +104,7 @@
         <swagger.version>1.5.9</swagger.version>
         <sigar.version>1.6.4</sigar.version>
         <restassured.version>2.9.0</restassured.version>
-        <elasticsearch.version>2.3.3</elasticsearch.version>
+        <elasticsearch.version>2.3.4</elasticsearch.version>
         <jna.version>4.1.0</jna.version> <!-- for ES, make sure to use the version that ES uses -->
         <retrofit.version>2.1.0</retrofit.version>
         <forbiddenapis.version>2.0</forbiddenapis.version>
@@ -447,7 +447,7 @@
             <dependency>
                 <groupId>org.scala-lang</groupId>
                 <artifactId>scala-library</artifactId>
-                <version>2.11.6</version>
+                <version>2.11.8</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.kafka</groupId>
@@ -508,7 +508,7 @@
             <dependency>
                 <groupId>com.rabbitmq</groupId>
                 <artifactId>amqp-client</artifactId>
-                <version>3.6.2</version>
+                <version>3.6.3</version>
             </dependency>
 
             <dependency>
@@ -667,7 +667,7 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>2.0.70-beta</version>
+                <version>2.0.82-beta</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -692,7 +692,7 @@
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.4.1</version>
+                <version>3.5.1</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

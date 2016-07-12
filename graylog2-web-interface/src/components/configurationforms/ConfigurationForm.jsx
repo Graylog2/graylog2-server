@@ -108,7 +108,7 @@ const ConfigurationForm = React.createClass({
                               value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
       case 'dropdown':
         return (<DropdownField key={elementKey} typeName={typeName} title={key} field={configField}
-                               value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
+                               value={value} onChange={this._handleChange} autoFocus={autoFocus} addPlaceholder/>);
       default:
         return null;
     }
