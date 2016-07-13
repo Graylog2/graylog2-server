@@ -99,7 +99,7 @@
         <guice.version>4.1.0</guice.version>
         <drools.version>6.4.0.Final</drools.version>
         <slf4j.version>1.7.21</slf4j.version>
-        <log4j.version>2.6.1</log4j.version>
+        <log4j.version>2.6.2</log4j.version>
         <mongojack.version>2.6.1</mongojack.version>
         <swagger.version>1.5.9</swagger.version>
         <sigar.version>1.6.4</sigar.version>
