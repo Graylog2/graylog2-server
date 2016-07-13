@@ -200,13 +200,13 @@ public class Cluster {
      * @throws TimeoutException
      */
     public void waitForConnectedAndDeflectorHealthy(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
-        LOG.debug("Waiting until cluster connection comes back and the write index is healthy, checking once per second.");
+        LOG.debug("Waiting until the write-active index is healthy again, checking once per second.");
 
         final CountDownLatch latch = new CountDownLatch(1);
         final ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(() -> {
             try {
                 if (isConnected() && isDeflectorHealthy()) {
-                    LOG.debug("Cluster and write index is healthy again, unblocking waiting threads.");
+                    LOG.debug("Write-active index is healthy again, unblocking waiting threads.");
                     latch.countDown();
                 }
             } catch (Exception ignore) {
@@ -217,7 +217,7 @@ public class Cluster {
         scheduledFuture.cancel(true); // Make sure to cancel the task to avoid task leaks!
 
         if (!waitSuccess) {
-            throw new TimeoutException("Elasticsearch cluster or write index didn't get healthy within timeout");
+            throw new TimeoutException("Write-active index didn't get healthy within timeout");
         }
     }
 
