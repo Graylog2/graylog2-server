@@ -92,7 +92,7 @@ const EditExtractor = React.createClass({
     promise.then(result => this.setState({conditionTestResult: result.matched}));
   },
   _tryButtonDisabled() {
-    return this.state.updatedExtractor.condition_value === '' || !this.state.exampleMessage;
+    return this.state.updatedExtractor.condition_value === '' || this.state.updatedExtractor.condition_value === undefined || !this.state.exampleMessage;
   },
   _getExtractorConditionControls() {
     if (!this.state.updatedExtractor.condition_type || this.state.updatedExtractor.condition_type === 'none') {
