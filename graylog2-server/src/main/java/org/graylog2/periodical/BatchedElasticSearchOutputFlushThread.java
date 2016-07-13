@@ -18,7 +18,6 @@ package org.graylog2.periodical;
 
 import com.codahale.metrics.MetricRegistry;
 import org.graylog2.Configuration;
-import org.graylog2.outputs.BatchedElasticSearchOutput;
 import org.graylog2.outputs.BlockingBatchedESOutput;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.outputs.MessageOutput;
@@ -83,15 +82,6 @@ public class BatchedElasticSearchOutputFlushThread extends Periodical {
     public void doRun() {
         LOG.debug("Checking for outputs to flush ...");
         for (MessageOutput output : outputRegistry.getMessageOutputs()) {
-            if (output instanceof BatchedElasticSearchOutput) {
-                BatchedElasticSearchOutput batchedOutput = (BatchedElasticSearchOutput)output;
-                try {
-                    LOG.debug("Flushing output <{}>", batchedOutput);
-                    batchedOutput.flush();
-                } catch (Exception e) {
-                    LOG.error("Caught exception while trying to flush output: {}", e);
-                }
-            }
             if (output instanceof BlockingBatchedESOutput) {
                 try {
                     LOG.debug("Flushing output <{}>", output);

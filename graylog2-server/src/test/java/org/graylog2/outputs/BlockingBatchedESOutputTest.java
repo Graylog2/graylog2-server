@@ -18,7 +18,6 @@ package org.graylog2.outputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
-import com.jayway.awaitility.Duration;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
@@ -33,122 +32,112 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
 
-import static com.jayway.awaitility.Awaitility.await;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class BatchedElasticSearchOutputTest {
+public class BlockingBatchedESOutputTest {
 
     private MetricRegistry metricRegistry;
+    private NoopJournal journal;
+    private Configuration config;
+
     @Mock
     private Messages messages;
     @Mock
     private Cluster cluster;
 
     @Before
-    public void setUp() {
-        metricRegistry = new MetricRegistry();
+    public void setUp() throws Exception {
+        this.metricRegistry = new MetricRegistry();
+        this.journal = new NoopJournal();
+        this.config = new Configuration() {
+            @Override
+            public int getOutputBatchSize() {
+                return 3;
+            }
+        };
     }
 
     @Test
-    public void flushingBatchWritesBulk() throws Exception {
-        final Configuration config = new Configuration() {
-            @Override
-            public int getOutputBatchSize() {
-                return 10;
-            }
-        };
+    public void write() throws Exception {
         when(cluster.isConnected()).thenReturn(true);
         when(cluster.isHealthy()).thenReturn(true);
 
-        Messages messages = mock(Messages.class);
-        final List<Message> messageList = buildMessages(3);
-        MetricRegistry metricRegistry = new MetricRegistry();
+        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
-        final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages,
-                cluster, config, new NoopJournal());
+        final List<Message> messageList = buildMessages(config.getOutputBatchSize());
 
         for (Message message : messageList) {
             output.write(message);
         }
-
-        output.flush(false);
 
         verify(messages, times(1)).bulkIndex(eq(messageList));
     }
 
     @Test
-    public void dontFlushWritesIfElasticsearchIsUnhealthy() throws Exception {
-        final Configuration config = new Configuration() {
-            @Override
-            public int getOutputBatchSize() {
-                return 10;
-            }
-        };
+    public void writeDoesNotFlushIfClusterIsNotConnected() throws Exception {
         when(cluster.isConnected()).thenReturn(false);
-        when(cluster.isHealthy()).thenReturn(false);
+        when(cluster.isHealthy()).thenReturn(true);
 
-        final List<Message> messageList = buildMessages(3);
-        BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
+        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndHealthy();
+
+        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
+
+        final List<Message> messageList = buildMessages(config.getOutputBatchSize());
 
         for (Message message : messageList) {
-            output.write(message);
+            try {
+                output.write(message);
+            } catch(RuntimeException ignore) {
+            }
         }
-
-        output.flush(false);
 
         verify(messages, never()).bulkIndex(eq(messageList));
     }
 
     @Test
-    public void flushIfBatchSizeIsExceeded() throws Exception {
-        final int batchSize = 5;
-        final Configuration config = new Configuration() {
-            @Override
-            public int getOutputBatchSize() {
-                return batchSize;
+    public void writeDoesNotFlushIfClusterIsUnhealthy() throws Exception {
+        when(cluster.isConnected()).thenReturn(true);
+        when(cluster.isHealthy()).thenReturn(false);
+
+        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndHealthy();
+
+        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
+
+        final List<Message> messageList = buildMessages(config.getOutputBatchSize());
+
+        for (Message message : messageList) {
+            try {
+                output.write(message);
+            } catch(RuntimeException ignore) {
             }
-        };
+        }
+
+        verify(messages, never()).bulkIndex(eq(messageList));
+    }
+
+    @Test
+    public void forceFlushIfTimedOut() throws Exception {
         when(cluster.isConnected()).thenReturn(true);
         when(cluster.isHealthy()).thenReturn(true);
 
-        final List<Message> messageList = buildMessages(batchSize + 1);
-        final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
+        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
+
+        final List<Message> messageList = buildMessages(config.getOutputBatchSize() - 1);
 
         for (Message message : messageList) {
             output.write(message);
         }
 
-        await().atMost(Duration.FIVE_SECONDS).until(new Runnable() {
-            @Override
-            public void run() {
-                verify(messages, times(1)).bulkIndex(eq(messageList.subList(0, batchSize)));
-            }
-        });
-    }
+        // Should flush the buffer even though the batch size is not reached yet
+        output.forceFlushIfTimedout();
 
-    @Test
-    public void dontFlushEmptyBuffer() {
-        final Configuration config = new Configuration() {
-            @Override
-            public int getOutputBatchSize() {
-                return 10;
-            }
-        };
-        when(cluster.isConnected()).thenReturn(true);
-        when(cluster.isHealthy()).thenReturn(true);
-
-        final BatchedElasticSearchOutput output = new BatchedElasticSearchOutput(metricRegistry, messages, cluster, config, new NoopJournal());
-
-        output.flush(false);
-
-        verify(messages, never()).bulkIndex(anyListOf(Message.class));
+        verify(messages, times(1)).bulkIndex(eq(messageList));
     }
 
     private List<Message> buildMessages(final int count) {
