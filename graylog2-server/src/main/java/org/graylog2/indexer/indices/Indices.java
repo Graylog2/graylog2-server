@@ -501,7 +501,7 @@ public class Indices {
 
     public boolean removeAliases(String alias, Set<String> indices) {
         return c.admin().indices().prepareAliases()
-                .removeAlias(indices.toArray(new String[]{}), alias)
+                .removeAlias(indices.toArray(new String[0]), alias)
                 .execute().actionGet().isAcknowledged();
     }
 

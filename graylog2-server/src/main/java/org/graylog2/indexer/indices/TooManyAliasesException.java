@@ -22,12 +22,8 @@ public class TooManyAliasesException extends Exception {
     private final Set<String> indices;
 
     public TooManyAliasesException(final Set<String> indices) {
+        super("More than one index in deflector alias: " + indices.toString());
         this.indices = indices;
-    }
-
-    @Override
-    public String getMessage() {
-        return "More than one index in deflector alias: " + indices.toString();
     }
 
     public Set<String> getIndices() {
