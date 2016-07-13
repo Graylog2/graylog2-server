@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer;
 
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.ImmutableSortedSet;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.indexer.indices.Indices;
@@ -34,9 +36,11 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -307,13 +311,30 @@ public class Deflector { // extends Ablenkblech
      * @param indexNames the set of index names that have the deflector alias
      */
     public void cleanupAliases(Set<String> indexNames) {
-        final Set<String> indicesToRemove = indexNames.stream()
-                .mapToInt(Deflector::extractIndexNumber)
-                .sorted()
-                .limit(indexNames.size() - 1) // Get all but the newest one
-                .mapToObj(num -> indexPrefix + SEPARATOR + num)
-                .collect(Collectors.toSet());
+        final SortedSet<String> sortedSet = ImmutableSortedSet
+            .orderedBy(new IndexNameComparator())
+            .addAll(indexNames)
+            .build();
 
-        indices.removeAliases(getName(), indicesToRemove);
+        indices.removeAliases(getName(), sortedSet.headSet(sortedSet.last()));
+    }
+
+    private static class IndexNameComparator implements Comparator<String> {
+        @Override
+        public int compare(String o1, String o2) {
+            final int indexNumber1 = silentlyExtractIndexNumber(o1);
+            final int indexNumber2 = silentlyExtractIndexNumber(o2);
+            return ComparisonChain.start()
+                .compare(indexNumber1, indexNumber2)
+                .result();
+        }
+
+        private int silentlyExtractIndexNumber(String indexName) {
+            try {
+                return extractIndexNumber(indexName);
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+        }
     }
 }
