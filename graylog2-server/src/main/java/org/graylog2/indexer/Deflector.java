@@ -16,9 +16,12 @@
  */
 package org.graylog2.indexer;
 
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.ImmutableSortedSet;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -33,9 +36,11 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -274,7 +279,7 @@ public class Deflector { // extends Ablenkblech
     }
 
     @Nullable
-    public String getCurrentActualTargetIndex() {
+    public String getCurrentActualTargetIndex() throws TooManyAliasesException {
         return indices.aliasTarget(getName());
     }
 
@@ -296,5 +301,40 @@ public class Deflector { // extends Ablenkblech
 
     public boolean isGraylogIndex(final String indexName) {
         return !isNullOrEmpty(indexName) && !isDeflectorAlias(indexName) && indexPattern.matcher(indexName).matches();
+    }
+
+    /**
+     * Sorts the given set of index names and removes the deflector alias from all indices but the last one.
+     *
+     * This might be used when multiple indices have the same alias. This should be really rare!
+     *
+     * @param indexNames the set of index names that have the deflector alias
+     */
+    public void cleanupAliases(Set<String> indexNames) {
+        final SortedSet<String> sortedSet = ImmutableSortedSet
+            .orderedBy(new IndexNameComparator())
+            .addAll(indexNames)
+            .build();
+
+        indices.removeAliases(getName(), sortedSet.headSet(sortedSet.last()));
+    }
+
+    private static class IndexNameComparator implements Comparator<String> {
+        @Override
+        public int compare(String o1, String o2) {
+            final int indexNumber1 = silentlyExtractIndexNumber(o1);
+            final int indexNumber2 = silentlyExtractIndexNumber(o2);
+            return ComparisonChain.start()
+                .compare(indexNumber1, indexNumber2)
+                .result();
+        }
+
+        private int silentlyExtractIndexNumber(String indexName) {
+            try {
+                return extractIndexNumber(indexName);
+            } catch (NumberFormatException e) {
+                return -1;
+            }
+        }
     }
 }
