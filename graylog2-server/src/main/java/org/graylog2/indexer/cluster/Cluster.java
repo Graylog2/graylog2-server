@@ -71,8 +71,26 @@ public class Cluster {
         ClusterStateMonitor.setCluster(this);
     }
 
+    /**
+     * Requests the cluster health for all indices managed by Graylog. (default: graylog_*)
+     *
+     * @return the cluster health response
+     */
     public ClusterHealthResponse health() {
         ClusterHealthRequest request = new ClusterHealthRequest(deflector.getDeflectorWildcard());
+        return c.admin().cluster().health(request).actionGet();
+    }
+
+    /**
+     * Requests the cluster health for the current write index. (deflector)
+     *
+     * This can be used to decide if the current write index is healthy and writable even when older indices have
+     * problems.
+     *
+     * @return the cluster health response
+     */
+    public ClusterHealthResponse deflectorHealth() {
+        ClusterHealthRequest request = new ClusterHealthRequest(deflector.getName());
         return c.admin().cluster().health(request).actionGet();
     }
 
@@ -158,14 +176,37 @@ public class Cluster {
         }
     }
 
-    public void waitForConnectedAndHealthy(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
-        LOG.debug("Waiting until cluster connection comes back and cluster is healthy, checking once per second.");
+    /**
+     * Check if the deflector (write index) health status is not {@link ClusterHealthStatus#RED} and that the
+     * {@link org.graylog2.indexer.Deflector#isUp() deflector is up}.
+     *
+     * @return {@code true} if the deflector is healthy and up, {@code false} otherwise
+     */
+    public boolean isDeflectorHealthy() {
+        try {
+            return deflectorHealth().getStatus() != ClusterHealthStatus.RED && deflector.isUp();
+        } catch (ElasticsearchException e) {
+            LOG.trace("Couldn't determine deflector index health properly", e);
+            return false;
+        }
+    }
+
+    /**
+     * Blocks until the Elasticsearch cluster and current write index is healthy again or the given timeout fires.
+     *
+     * @param timeout the timeout value
+     * @param unit the timeout unit
+     * @throws InterruptedException
+     * @throws TimeoutException
+     */
+    public void waitForConnectedAndDeflectorHealthy(long timeout, TimeUnit unit) throws InterruptedException, TimeoutException {
+        LOG.debug("Waiting until cluster connection comes back and the write index is healthy, checking once per second.");
 
         final CountDownLatch latch = new CountDownLatch(1);
         final ScheduledFuture<?> scheduledFuture = scheduler.scheduleAtFixedRate(() -> {
             try {
-                if (isConnected() && isHealthy()) {
-                    LOG.debug("Cluster is healthy again, unblocking waiting threads.");
+                if (isConnected() && isDeflectorHealthy()) {
+                    LOG.debug("Cluster and write index is healthy again, unblocking waiting threads.");
                     latch.countDown();
                 }
             } catch (Exception ignore) {
@@ -176,12 +217,18 @@ public class Cluster {
         scheduledFuture.cancel(true); // Make sure to cancel the task to avoid task leaks!
 
         if (!waitSuccess) {
-            throw new TimeoutException("Elasticsearch cluster didn't get healthy within timeout");
+            throw new TimeoutException("Elasticsearch cluster or write index didn't get healthy within timeout");
         }
     }
 
-    public void waitForConnectedAndHealthy() throws InterruptedException, TimeoutException {
-        waitForConnectedAndHealthy(requestTimeout.getQuantity(), requestTimeout.getUnit());
+    /**
+     * Blocks until the Elasticsearch cluster and current write index is healthy again or the default timeout fires.
+     *
+     * @throws InterruptedException
+     * @throws TimeoutException
+     */
+    public void waitForConnectedAndDeflectorHealthy() throws InterruptedException, TimeoutException {
+        waitForConnectedAndDeflectorHealthy(requestTimeout.getQuantity(), requestTimeout.getUnit());
     }
 
     public void updateDataNodeList(Map<String, DiscoveryNode> nodes) {

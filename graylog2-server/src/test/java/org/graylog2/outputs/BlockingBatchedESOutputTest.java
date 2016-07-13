@@ -84,7 +84,7 @@ public class BlockingBatchedESOutputTest {
         when(cluster.isConnected()).thenReturn(false);
         when(cluster.isHealthy()).thenReturn(true);
 
-        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndHealthy();
+        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndDeflectorHealthy();
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
@@ -105,7 +105,7 @@ public class BlockingBatchedESOutputTest {
         when(cluster.isConnected()).thenReturn(true);
         when(cluster.isHealthy()).thenReturn(false);
 
-        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndHealthy();
+        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndDeflectorHealthy();
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
