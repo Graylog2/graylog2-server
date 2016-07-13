@@ -161,7 +161,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
 
     public interface Factory extends ElasticSearchOutput.Factory {
         @Override
-        BatchedElasticSearchOutput create(Stream stream, Configuration configuration);
+        BlockingBatchedESOutput create(Stream stream, Configuration configuration);
 
         @Override
         Config getConfig();
