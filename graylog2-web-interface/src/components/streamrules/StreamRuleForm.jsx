@@ -73,7 +73,7 @@ const StreamRuleForm = React.createClass({
             {valueBox}
             <Input type="checkbox" label="Inverted" checkedLink={this.linkState('inverted')}/>
 
-            <Input type="textarea" label="Description" valueLink={this.linkState('description')} />
+            <Input type="textarea" label="Description (optional)" valueLink={this.linkState('description')} />
 
             <p>
               <strong>Result:</strong>

@@ -35,9 +35,9 @@ const AlertConditionForm = React.createClass({
     const alertCondition = this.props.alertCondition;
     return (
       <Well className="alert-type-form alert-type-form-message-count form-inline well-sm">
-        Title: <input ref="title" type="text" className="form-control" autoComplete="off" defaultValue={alertCondition.title}/>
+        Title: <input ref="title" type="text" className="form-control alert-type-title" autoComplete="off" defaultValue={alertCondition.title}/>
         <span className="help-text">
-          This title can be included in alert notifications.
+          A descriptive title for this alert condition. (optional)
         </span>
 
         <p />
