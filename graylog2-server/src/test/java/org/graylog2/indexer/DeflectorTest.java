@@ -247,6 +247,7 @@ public class DeflectorTest {
         indexNameAliases.put("graylog_1", Collections.emptySet());
         indexNameAliases.put("graylog_2", Collections.singleton("graylog_deflector"));
         indexNameAliases.put("graylog_3", Collections.singleton("graylog_deflector"));
+        indexNameAliases.put("foobar", Collections.singleton("graylog_deflector"));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final Deflector deflector = new Deflector(systemJobManager,
@@ -256,8 +257,8 @@ public class DeflectorTest {
                 indexRangeService,
                 setIndexReadOnlyAndCalculateRangeJobFactory);
 
-        deflector.cleanupAliases(Sets.newHashSet("graylog_2", "graylog_3"));
+        deflector.cleanupAliases(Sets.newHashSet("graylog_2", "graylog_3", "foobar"));
 
-        verify(indices).removeAliases("graylog_deflector", Sets.newHashSet("graylog_2"));
+        verify(indices).removeAliases("graylog_deflector", Sets.newHashSet("graylog_2", "foobar"));
     }
 }
