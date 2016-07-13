@@ -432,7 +432,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             final long logStartOffset = getLogStartOffset();
 
             if (readOffset < logStartOffset) {
-                LOG.error(
+                LOG.info(
                         "Read offset {} before start of log at {}, starting to read from the beginning of the journal.",
                         readOffset,
                         logStartOffset);
