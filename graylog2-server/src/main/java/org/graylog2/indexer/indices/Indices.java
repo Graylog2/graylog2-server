@@ -247,7 +247,7 @@ public class Indices {
     }
 
     @Nullable
-    public String aliasTarget(String alias) throws ESAliasesException {
+    public String aliasTarget(String alias) throws TooManyAliasesException {
         final IndicesAdminClient indicesAdminClient = c.admin().indices();
 
         final GetAliasesRequest request = indicesAdminClient.prepareGetAliases(alias).request();
@@ -257,7 +257,7 @@ public class Indices {
         final ImmutableOpenMap<String, List<AliasMetaData>> aliases = response.getAliases();
 
         if (aliases.size() > 1) {
-            throw new ESAliasesException(Sets.newHashSet(aliases.keysIt()));
+            throw new TooManyAliasesException(Sets.newHashSet(aliases.keysIt()));
         }
         return aliases.isEmpty() ? null : aliases.keysIt().next();
     }
@@ -595,22 +595,5 @@ public class Indices {
         final DateTime max = new DateTime((long) maxAgg.getValue(), DateTimeZone.UTC);
 
         return TimestampStats.create(min, max);
-    }
-
-    public static class ESAliasesException extends Exception {
-        private final Set<String> indices;
-
-        public ESAliasesException(final Set<String> indices) {
-            this.indices = indices;
-        }
-
-        @Override
-        public String getMessage() {
-            return "More than one index in deflector alias: " + indices.toString();
-        }
-
-        public Set<String> getIndices() {
-            return indices;
-        }
     }
 }

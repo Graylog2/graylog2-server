@@ -21,6 +21,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -146,14 +147,14 @@ public class IndexRotationThread extends Periodical {
                 String currentTarget;
                 try {
                     currentTarget = deflector.getCurrentActualTargetIndex();
-                } catch (Indices.ESAliasesException e) {
+                } catch (TooManyAliasesException e) {
                     // If we get this exception, there are multiple indices which have the deflector alias set.
                     // We try to cleanup the alias and try again. This should not happen, but might under certain
                     // circumstances.
                     deflector.cleanupAliases(e.getIndices());
                     try {
                         currentTarget = deflector.getCurrentActualTargetIndex();
-                    } catch (Indices.ESAliasesException e1) {
+                    } catch (TooManyAliasesException e1) {
                         throw new IllegalStateException(e1);
                     }
                 }

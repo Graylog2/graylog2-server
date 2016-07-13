@@ -19,6 +19,7 @@ package org.graylog2.indexer;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -274,7 +275,7 @@ public class Deflector { // extends Ablenkblech
     }
 
     @Nullable
-    public String getCurrentActualTargetIndex() throws Indices.ESAliasesException {
+    public String getCurrentActualTargetIndex() throws TooManyAliasesException {
         return indices.aliasTarget(getName());
     }
 
