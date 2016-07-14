@@ -119,7 +119,7 @@ public class StreamRuleResource extends RestResource {
         streamRule = streamRuleService.load(streamRuleId);
 
         if (!streamRule.getStreamId().equals(streamid)) {
-            throw new NotFoundException("Couldn'T update stream rule " + streamRuleId + "in stream " + streamid);
+            throw new NotFoundException("Couldn't update stream rule " + streamRuleId + "in stream " + streamid);
         }
 
         final StreamRuleType streamRuleType = StreamRuleType.fromInteger(cr.type());
