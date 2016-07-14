@@ -56,7 +56,7 @@ public class FilterServiceImpl implements FilterService {
         final FilterDescription filter = dbCollection.findOneById(new ObjectId(filterId));
 
         if (filter == null) {
-            throw new NotFoundException();
+            throw new NotFoundException("Couldn't find filter with ID " + filterId);
         }
         return filter;
     }

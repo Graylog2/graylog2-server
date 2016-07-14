@@ -95,8 +95,9 @@ public class RoleServiceImpl implements RoleService {
         try {
             previousRole = load(roleName);
             if (!previousRole.isReadOnly() || !expectedPermissions.equals(previousRole.getPermissions()))  {
-                log.error("Invalid role '{}', fixing it.", roleName);
-                throw new IllegalArgumentException(); // jump to fix code
+                final String msg = "Invalid role '" + roleName + "', fixing it.";
+                log.error(msg);
+                throw new IllegalArgumentException(msg); // jump to fix code
             }
         } catch (NotFoundException | IllegalArgumentException | NoSuchElementException ignored) {
             log.info("{} role is missing or invalid, re-adding it as a built-in role.", roleName);

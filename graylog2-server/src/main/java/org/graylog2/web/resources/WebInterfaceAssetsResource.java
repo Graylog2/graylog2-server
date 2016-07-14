@@ -104,14 +104,14 @@ public class WebInterfaceAssetsResource {
                         @PathParam("filename") String filename) {
         final Optional<Plugin> plugin = getPluginForName(pluginName);
         if (!plugin.isPresent()) {
-            throw new NotFoundException();
+            throw new NotFoundException("Couldn't find plugin " + pluginName);
         }
 
         try {
             final URL resourceUrl = getResourceUri(true, filename, plugin.get().metadata().getClass());
             return getResponse(request, filename, resourceUrl, true);
         } catch (URISyntaxException | IOException e) {
-            throw new NotFoundException();
+            throw new NotFoundException("Couldn't find " + filename + " in plugin " + pluginName, e);
         }
     }
 

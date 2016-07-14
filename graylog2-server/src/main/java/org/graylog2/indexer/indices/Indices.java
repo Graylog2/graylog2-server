@@ -173,7 +173,7 @@ public class Indices {
     public long numberOfMessages(String indexName) throws IndexNotFoundException {
         final IndexStats index = indexStats(indexName);
         if (index == null) {
-            throw new IndexNotFoundException();
+            throw new IndexNotFoundException("Couldn't find index " + indexName);
         }
 
         return index.getPrimaries().getDocs().getCount();

@@ -65,7 +65,7 @@ public class BundleService {
         final ConfigurationBundle bundle = dbCollection.findOneById(new ObjectId(bundleId));
 
         if (bundle == null) {
-            throw new NotFoundException();
+            throw new NotFoundException("Couldn't find content pack with ID " + bundleId);
         }
 
         return bundle;

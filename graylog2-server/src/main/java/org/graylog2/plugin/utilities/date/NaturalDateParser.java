@@ -51,7 +51,7 @@ public class NaturalDateParser {
                 to = dates.get(1);
             }
         } else {
-            throw new DateNotParsableException();
+            throw new DateNotParsableException("Unparsable date: " + string);
         }
 
         return new Result(from, to);
@@ -98,6 +98,9 @@ public class NaturalDateParser {
     }
 
     public static class DateNotParsableException extends Exception {
+        public DateNotParsableException(String message) {
+            super(message);
+        }
     }
 
 }

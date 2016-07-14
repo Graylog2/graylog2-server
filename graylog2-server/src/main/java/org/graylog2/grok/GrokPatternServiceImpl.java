@@ -60,7 +60,7 @@ public class GrokPatternServiceImpl implements GrokPatternService {
     public GrokPattern load(String patternId) throws NotFoundException {
         final GrokPattern pattern = dbCollection.findOneById(new ObjectId(patternId));
         if (pattern == null) {
-            throw new NotFoundException();
+            throw new NotFoundException("Couldn't find Grok pattern with ID " + patternId);
         }
         return pattern;
     }

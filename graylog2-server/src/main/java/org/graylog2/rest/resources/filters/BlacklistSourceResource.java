@@ -152,7 +152,7 @@ public class BlacklistSourceResource extends RestResource {
     public void delete(@ApiParam(name = "filterId", required = true)
                        @PathParam("filterId") String filterId) {
         if (filterService.delete(filterId) == 0) {
-            throw new NotFoundException();
+            throw new NotFoundException("Couldn't find filter with ID "+ filterId);
         }
     }
 }
