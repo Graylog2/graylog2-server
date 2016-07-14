@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.decorators.MessageDecorator;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 
 @AutoValue
@@ -51,10 +50,6 @@ public abstract class DecoratorTypeInfo {
                                            @JsonProperty(FIELD_REQUESTED_CONFIGURATION) ConfigurationRequest requestedConfiguration,
                                            @JsonProperty(FIELD_LINK_TO_DOCS) String linkToDocs) {
         return new AutoValue_DecoratorTypeInfo(type, name, humanName, requestedConfiguration, linkToDocs);
-    }
-
-    public static DecoratorTypeInfo create(String type, MessageDecorator.Descriptor descriptor, ConfigurationRequest requestedConfiguration) {
-        return create(type, descriptor.getName(), descriptor.getHumanName(), requestedConfiguration, descriptor.getLinkToDocs());
     }
 
     public static DecoratorTypeInfo create(String type, SearchResponseDecorator.Descriptor descriptor, ConfigurationRequest requestedConfiguration) {

@@ -26,7 +26,6 @@ import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.decorators.DecoratorService;
 import org.graylog2.decorators.DecoratorTypeInfo;
-import org.graylog2.plugin.decorators.MessageDecorator;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -41,7 +40,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,15 +51,12 @@ import java.util.stream.Collectors;
 @Consumes(MediaType.APPLICATION_JSON)
 public class DecoratorResource extends RestResource {
     private final DecoratorService decoratorService;
-    private final Map<String, MessageDecorator.Factory> messageDecorators;
     private final Map<String, SearchResponseDecorator.Factory> searchResponseDecorators;
 
     @Inject
     public DecoratorResource(DecoratorService decoratorService,
-                             Map<String, MessageDecorator.Factory> messageDecorators,
                              Map<String, SearchResponseDecorator.Factory> searchResponseDecorators) {
         this.decoratorService = decoratorService;
-        this.messageDecorators = messageDecorators;
         this.searchResponseDecorators = searchResponseDecorators;
     }
 
@@ -80,26 +75,14 @@ public class DecoratorResource extends RestResource {
     @ApiOperation(value = "Returns all available message decorations",
         notes = "")
     public Map<String, DecoratorTypeInfo> getAvailable() {
-        final Map<String, DecoratorTypeInfo> result = new HashMap<>(messageDecorators.size() + searchResponseDecorators.size());
-        result.putAll(this.messageDecorators.entrySet().stream()
+        return this.searchResponseDecorators.entrySet().stream()
             .collect(Collectors.toMap(
                 Map.Entry::getKey, entry -> DecoratorTypeInfo.create(
                     entry.getKey(),
                     entry.getValue().getDescriptor(),
                     entry.getValue().getConfig().getRequestedConfiguration()
                 )
-            )));
-
-        result.putAll(this.searchResponseDecorators.entrySet().stream()
-            .collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> DecoratorTypeInfo.create(
-                    entry.getKey(),
-                    entry.getValue().getDescriptor(),
-                    entry.getValue().getConfig().getRequestedConfiguration()
-                )
-            )));
-
-        return result;
+            ));
     }
 
     @POST
