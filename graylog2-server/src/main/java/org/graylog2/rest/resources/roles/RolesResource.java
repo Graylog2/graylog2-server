@@ -170,7 +170,7 @@ public class RolesResource extends RestResource {
         userService.dissociateAllUsersFromRole(role);
 
         if (roleService.delete(name) == 0) {
-            throw new NotFoundException();
+            throw new NotFoundException("Couldn't find role " + name);
         }
     }
 

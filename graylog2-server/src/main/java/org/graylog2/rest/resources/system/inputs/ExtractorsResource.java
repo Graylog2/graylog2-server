@@ -122,8 +122,9 @@ public class ExtractorsResource extends RestResource {
 
         final MessageInput input = inputs.getRunningInput(inputId);
         if (input == null) {
-            LOG.error("Input <{}> not found.", inputId);
-            throw new javax.ws.rs.NotFoundException();
+            final String msg = "Input <" + inputId + "> not found.";
+            LOG.error(msg);
+            throw new javax.ws.rs.NotFoundException(msg);
         }
 
         final Input mongoInput = inputService.find(input.getPersistId());
@@ -133,8 +134,9 @@ public class ExtractorsResource extends RestResource {
         try {
             inputService.addExtractor(mongoInput, extractor);
         } catch (ValidationException e) {
-            LOG.error("Extractor persist validation failed.", e);
-            throw new BadRequestException(e);
+            final String msg = "Extractor persist validation failed.";
+            LOG.error(msg, e);
+            throw new BadRequestException(msg, e);
         }
 
         final String msg = "Added extractor <" + id + "> of type [" + cer.extractorType() + "] to input <" + inputId + ">.";
@@ -209,8 +211,9 @@ public class ExtractorsResource extends RestResource {
 
         final Input input = inputService.find(inputId);
         if (input == null) {
-            LOG.error("Input <{}> not found.", inputId);
-            throw new javax.ws.rs.NotFoundException();
+            final String msg = "Input <" + inputId + "> not found.";
+            LOG.error(msg);
+            throw new javax.ws.rs.NotFoundException(msg);
         }
 
         final List<ExtractorSummary> extractors = Lists.newArrayList();

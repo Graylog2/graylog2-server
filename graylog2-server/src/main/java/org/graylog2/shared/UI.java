@@ -28,12 +28,12 @@ public class UI {
     private static final Logger LOG = LoggerFactory.getLogger(UI.class);
 
     public static void exitHardWithWall(String msg) {
-        exitHardWithWall(msg, new String[]{});
+        exitHardWithWall(msg, new String[0]);
     }
 
     public static void exitHardWithWall(String msg, String... docLinks) {
         LOG.error(wallString(msg, docLinks));
-        throw new IllegalStateException();
+        throw new IllegalStateException(msg);
     }
 
     public static String wallString(String msg, String... docLinks) {

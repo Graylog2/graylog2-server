@@ -164,7 +164,7 @@ public class GrokResource extends RestResource {
         clusterBus.post(GrokPatternsChangedEvent.create(Sets.newHashSet(pattern.name), Collections.emptySet()));
 
         if (grokPatternService.delete(patternId) == 0) {
-            throw new javax.ws.rs.NotFoundException();
+            throw new javax.ws.rs.NotFoundException("Couldn't remove Grok pattern with ID " + patternId);
         }
     }
 }

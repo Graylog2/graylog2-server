@@ -119,7 +119,7 @@ public class StreamRuleResource extends RestResource {
         streamRule = streamRuleService.load(streamRuleId);
 
         if (!streamRule.getStreamId().equals(streamid)) {
-            throw new NotFoundException();
+            throw new NotFoundException("Couldn'T update stream rule " + streamRuleId + "in stream " + streamid);
         }
 
         final StreamRuleType streamRuleType = StreamRuleType.fromInteger(cr.type());
@@ -197,7 +197,7 @@ public class StreamRuleResource extends RestResource {
         if (streamRule.getStreamId().equals(streamid)) {
             streamRuleService.destroy(streamRule);
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Couldn't delete stream rule " + streamRuleId + "in stream " + streamid);
         }
     }
 
