@@ -30,6 +30,7 @@ const JSONExtractorConfiguration = React.createClass({
     list_separator: ', ',
     key_separator: '_',
     kv_separator: '=',
+    key_prefix: '',
     replace_key_whitespace: false,
     key_whitespace_replacement: '_',
   },
@@ -50,7 +51,7 @@ const JSONExtractorConfiguration = React.createClass({
     const configuration = this.state.configuration;
     const promise = ToolsStore.testJSON(configuration.flatten, configuration.list_separator,
       configuration.key_separator, configuration.kv_separator, configuration.replace_key_whitespace,
-      configuration.key_whitespace_replacement, this.props.exampleMessage);
+      configuration.key_whitespace_replacement, configuration.key_prefix, this.props.exampleMessage);
 
     promise.then(result => {
       const matches = [];
@@ -110,6 +111,16 @@ const JSONExtractorConfiguration = React.createClass({
                required
                onChange={this._onChange('kv_separator')}
                help="What string to use when concatenating key/value pairs of a JSON object (only used if flattened)."/>
+
+        <Input type="text"
+               id="key_prefix"
+               label="Key prefix"
+               labelClassName="col-md-2"
+               wrapperClassName="col-md-10"
+               defaultValue={this.state.configuration.key_prefix}
+               required
+               onChange={this._onChange('key_prefix')}
+               help="Add the configured prefix to each key in the message."/>
 
         <Input type="checkbox"
                id="replace_key_whitespace"

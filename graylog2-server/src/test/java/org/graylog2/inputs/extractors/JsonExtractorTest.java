@@ -194,4 +194,19 @@ public class JsonExtractorTest {
                 new Extractor.Result(true, "bool", -1, -1)
         );
     }
+
+    @Test
+    public void testRunWithKeyPrefix() throws Exception {
+        final String value = "{\"text string\": \"foobar\", \"num   b er\": 1234.5678, \"bool\": true, \"null\": null}";
+
+        final JsonExtractor jsonExtractor1 = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
+                "source", "target", ImmutableMap.of("key_prefix", "test_"), "user", Collections.emptyList(), Extractor.ConditionType.NONE,
+                "");
+
+        assertThat(jsonExtractor1.run(value)).contains(
+                new Extractor.Result("foobar", "test_text string", -1, -1),
+                new Extractor.Result(1234.5678, "test_num   b er", -1, -1),
+                new Extractor.Result(true, "test_bool", -1, -1)
+        );
+    }
 }
