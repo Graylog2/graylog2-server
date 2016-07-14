@@ -163,7 +163,7 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
                 .isNotNull()
                 .isEqualTo("cn=John Doe,ou=users,dc=example,dc=com");
 
-        assertThat(entry.getGroups()).hasSize(1).contains("Engineers");
+        assertThat(entry.getGroups()).hasSize(2).contains("Engineers", "Whitespace Engineers");
     }
 
     @Test
@@ -204,8 +204,8 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
                 .isEqualTo("cn=John Doe,ou=users,dc=example,dc=com");
 
         assertThat(entry.getGroups())
-                .hasSize(3)
-                .contains("Developers", "QA", "Engineers");
+                .hasSize(4)
+                .contains("Developers", "QA", "Engineers", "Whitespace Engineers");
     }
 
     @Test
@@ -213,8 +213,8 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
         final Set<String> groups = connector.listGroups(connection, "ou=groups,dc=example,dc=com", "(objectClass=top)", "cn");
 
         assertThat(groups)
-                .hasSize(3)
-                .contains("Developers", "QA", "Engineers");
+                .hasSize(4)
+                .contains("Developers", "QA", "Engineers", "Whitespace Engineers");
     }
 
     @Test
