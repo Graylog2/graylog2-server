@@ -57,6 +57,8 @@ const UserForm = React.createClass({
       session_timeout_ms: props.user.session_timeout_ms,
       timezone: props.user.timezone,
       permissions: props.user.permissions,
+      read_only: props.user.read_only,
+      external: props.user.external,
     };
   },
 
