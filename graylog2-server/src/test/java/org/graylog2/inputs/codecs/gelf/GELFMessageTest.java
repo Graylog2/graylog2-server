@@ -72,13 +72,13 @@ public class GELFMessageTest {
     @Test
     public void testGetJSONFromZLIBCompressedMessage() throws Exception {
         GELFMessage msg = new GELFMessage(TestHelper.zlibCompress(GELF_JSON));
-        assertEquals(GELF_JSON, msg.getJSON());
+        assertEquals(GELF_JSON, msg.getJSON(1024));
     }
 
     @Test
     public void testGetJSONFromGZIPCompressedMessage() throws Exception {
         GELFMessage msg = new GELFMessage(TestHelper.gzipCompress(GELF_JSON));
-        assertEquals(GELF_JSON, msg.getJSON());
+        assertEquals(GELF_JSON, msg.getJSON(1024));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class GELFMessageTest {
         byte[] text = GELF_JSON.getBytes("UTF-8");
 
         GELFMessage msg = new GELFMessage(text);
-        assertEquals(GELF_JSON, msg.getJSON());
+        assertEquals(GELF_JSON, msg.getJSON(1024));
     }
 
     @Test
@@ -98,7 +98,7 @@ public class GELFMessageTest {
 
         GELFMessage msg = new GELFMessage(TestHelper.buildGELFMessageChunk(id, seqNum, seqCnt, data));
         GELFMessageChunk chunk = new GELFMessageChunk(msg, null);
-        
+
         assertEquals(TestHelper.toHex(id), chunk.getId());
         assertEquals(seqNum, chunk.getSequenceNumber());
         assertEquals(seqCnt, chunk.getSequenceCount());

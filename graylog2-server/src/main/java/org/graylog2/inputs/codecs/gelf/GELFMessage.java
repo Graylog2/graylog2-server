@@ -48,13 +48,32 @@ public class GELFMessage {
         return Type.determineType(payload[0], payload[1]);
     }
 
+    /**
+     * Return the JSON payload of the GELF message
+     *
+     * @return The extracted JSON payload of the GELF message.
+     * @deprecated Use {@link #getJSON(long)}.
+     */
+    @Deprecated
     public String getJSON() {
+        return getJSON(Long.MAX_VALUE);
+    }
+
+    /**
+     * Return the JSON payload of the GELF message.
+     *
+     * @param maxBytes The maximum number of bytes to read from a compressed GELF payload. {@code -1} means unlimited.
+     * @return The extracted JSON payload of the GELF message.
+     * @see Tools#decompressGzip(byte[], long)
+     * @see Tools#decompressZlib(byte[], long)
+     */
+    public String getJSON(long maxBytes) {
         try {
             switch (getGELFType()) {
                 case ZLIB:
-                    return Tools.decompressZlib(payload);
+                    return Tools.decompressZlib(payload, maxBytes);
                 case GZIP:
-                    return Tools.decompressGzip(payload);
+                    return Tools.decompressGzip(payload, maxBytes);
                 case UNCOMPRESSED:
                     return new String(payload, StandardCharsets.UTF_8);
                 case CHUNKED:

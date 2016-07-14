@@ -27,6 +27,8 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.inputs.annotations.Codec;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
@@ -47,16 +49,19 @@ import java.util.Map;
 @Codec(name = "gelf", displayName = "GELF")
 public class GelfCodec extends AbstractCodec {
     private static final Logger log = LoggerFactory.getLogger(GelfCodec.class);
+    private static final String CK_DECOMPRESS_SIZE_LIMIT = "decompress_size_limit";
+    private static final int DEFAULT_DECOMPRESS_SIZE_LIMIT = 8388608;
 
     private final GelfChunkAggregator aggregator;
     private final ObjectMapper objectMapper;
+    private final long decompressSizeLimit;
 
     @Inject
     public GelfCodec(@Assisted Configuration configuration, GelfChunkAggregator aggregator) {
         super(configuration);
         this.aggregator = aggregator;
-        this.objectMapper = new ObjectMapper();
-        objectMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true);
+        this.objectMapper = new ObjectMapper().enable(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS);
+        this.decompressSizeLimit = configuration.getInt(CK_DECOMPRESS_SIZE_LIMIT, DEFAULT_DECOMPRESS_SIZE_LIMIT);
     }
 
     private static String stringValue(final JsonNode json, final String fieldName) {
@@ -107,7 +112,7 @@ public class GelfCodec extends AbstractCodec {
     @Override
     public Message decode(@Nonnull final RawMessage rawMessage) {
         final GELFMessage gelfMessage = new GELFMessage(rawMessage.getPayload(), rawMessage.getRemoteAddress());
-        final String json = gelfMessage.getJSON();
+        final String json = gelfMessage.getJSON(decompressSizeLimit);
 
         final JsonNode node;
 
@@ -233,6 +238,19 @@ public class GelfCodec extends AbstractCodec {
 
     @ConfigClass
     public static class Config extends AbstractCodec.Config {
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            final ConfigurationRequest requestedConfiguration = super.getRequestedConfiguration();
+            requestedConfiguration.addField(new NumberField(
+                CK_DECOMPRESS_SIZE_LIMIT,
+                "Decompressed size limit",
+                DEFAULT_DECOMPRESS_SIZE_LIMIT,
+                "The maximum number of bytes after decompression.",
+                ConfigurationField.Optional.OPTIONAL));
+
+            return requestedConfiguration;
+        }
+
         @Override
         public void overrideDefaultValues(@Nonnull ConfigurationRequest cr) {
             if (cr.containsField(NettyTransport.CK_PORT)) {

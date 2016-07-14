@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -182,25 +183,30 @@ public final class Tools {
     /**
      * Decompress ZLIB (RFC 1950) compressed data
      *
+     * @param compressedData A byte array containing the ZLIB-compressed data.
+     * @param maxBytes       The maximum number of uncompressed bytes to read. {@code -1} means unlimited.
      * @return A string containing the decompressed data
      */
-    public static String decompressZlib(byte[] compressedData) throws IOException {
+    public static String decompressZlib(byte[] compressedData, long maxBytes) throws IOException {
         try (final ByteArrayInputStream dataStream = new ByteArrayInputStream(compressedData);
-             final InflaterInputStream in = new InflaterInputStream(dataStream)) {
-            return new String(ByteStreams.toByteArray(in), StandardCharsets.UTF_8);
+             final InflaterInputStream in = new InflaterInputStream(dataStream);
+             final InputStream limited = ByteStreams.limit(in, maxBytes)) {
+            return new String(ByteStreams.toByteArray(limited), StandardCharsets.UTF_8);
         }
     }
 
     /**
      * Decompress GZIP (RFC 1952) compressed data
      *
+     * @param compressedData A byte array containing the GZIP-compressed data.
+     * @param maxBytes       The maximum number of uncompressed bytes to read. {@code -1} means unlimited.
      * @return A string containing the decompressed data
      */
-    public static String decompressGzip(byte[] compressedData) throws IOException {
+    public static String decompressGzip(byte[] compressedData, long maxBytes) throws IOException {
         try (final ByteArrayInputStream dataStream = new ByteArrayInputStream(compressedData);
-             final GZIPInputStream in = new GZIPInputStream(dataStream)) {
-            return new String(ByteStreams.toByteArray(in), StandardCharsets.UTF_8);
-
+             final GZIPInputStream in = new GZIPInputStream(dataStream);
+             final InputStream limited = ByteStreams.limit(in, maxBytes)) {
+            return new String(ByteStreams.toByteArray(limited), StandardCharsets.UTF_8);
         }
     }
 

@@ -17,6 +17,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.Resources;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
@@ -24,12 +25,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -113,7 +119,14 @@ public class ToolsTest {
         deflater.deflate(buffer);
         deflater.end();
 
-        assertEquals(testString, Tools.decompressZlib(buffer));
+        assertEquals(testString, Tools.decompressZlib(buffer, 1024));
+    }
+
+    @Test
+    public void testDecompressZlibBomb() throws URISyntaxException, IOException {
+        final URL url = Resources.getResource("org/graylog2/plugin/zlib64mb.raw");
+        final byte[] testData = Files.readAllBytes(Paths.get(url.toURI()));
+        assertThat(Tools.decompressZlib(testData, 1024)).hasSize(1024);
     }
 
     @Test
@@ -128,13 +141,19 @@ public class ToolsTest {
 
         byte[] buffer = out.toByteArray();
 
-        assertEquals(testString, Tools.decompressGzip(buffer));
+        assertEquals(testString, Tools.decompressGzip(buffer, 1024));
+    }
+
+    @Test
+    public void testDecompressGzipBomb() throws URISyntaxException, IOException {
+        final URL url = Resources.getResource("org/graylog2/plugin/gzip64mb.gz");
+        final byte[] testData = Files.readAllBytes(Paths.get(url.toURI()));
+        assertThat(Tools.decompressGzip(testData, 1024)).hasSize(1024);
     }
 
     @Test(expected = EOFException.class)
     public void testDecompressGzipEmptyInput() throws IOException {
-
-        Tools.decompressGzip(new byte[0]);
+        Tools.decompressGzip(new byte[0], 1024);
     }
 
     /**
