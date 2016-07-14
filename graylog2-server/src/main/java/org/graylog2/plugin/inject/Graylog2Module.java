@@ -27,6 +27,7 @@ import com.google.inject.name.Names;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.decorators.MessageDecorator;
+import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -323,6 +324,17 @@ public abstract class Graylog2Module extends AbstractModule {
                                            Class<? extends MessageDecorator.Factory> messageDecoratorFactoryClass) {
         install(new FactoryModuleBuilder().implement(MessageDecorator.class, messageDecoratorClass).build(messageDecoratorFactoryClass));
         messageDecoratorBinder.addBinding(messageDecoratorClass.getCanonicalName()).to(messageDecoratorFactoryClass);
+    }
+
+    protected MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, SearchResponseDecorator.Factory.class);
+    }
+
+    protected void installSearchResponseDecorator(MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder,
+                                           Class<? extends SearchResponseDecorator> searchResponseDecoratorClass,
+                                           Class<? extends SearchResponseDecorator.Factory> searchResponseDecoratorFactoryClass) {
+        install(new FactoryModuleBuilder().implement(SearchResponseDecorator.class, searchResponseDecoratorClass).build(searchResponseDecoratorFactoryClass));
+        searchResponseDecoratorBinder.addBinding(searchResponseDecoratorClass.getCanonicalName()).to(searchResponseDecoratorFactoryClass);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}
