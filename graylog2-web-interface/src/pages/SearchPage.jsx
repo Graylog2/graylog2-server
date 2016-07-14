@@ -12,6 +12,7 @@ const RefreshStore = StoreProvider.getStore('Refresh');
 const StreamsStore = StoreProvider.getStore('Streams');
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 const SearchStore = StoreProvider.getStore('Search');
+const DecoratorsStore = StoreProvider.getStore('Decorators');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const NodesActions = ActionsProvider.getActions('Nodes');
@@ -40,6 +41,7 @@ const SearchPage = React.createClass({
     };
   },
   componentDidMount() {
+    this.unsubscribe = DecoratorsStore.listen(this._refreshData);
     this._refreshData();
     InputsActions.list.triggerPromise();
 
@@ -61,6 +63,9 @@ const SearchPage = React.createClass({
   },
   componentWillUnmount() {
     this._stopTimer();
+    if (this.unsubscribe) {
+      this.unsubscribe();
+    }
   },
   _setupTimer(refresh) {
     this._stopTimer();
