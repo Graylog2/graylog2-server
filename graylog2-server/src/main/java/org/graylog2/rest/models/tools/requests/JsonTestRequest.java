@@ -40,6 +40,12 @@ public abstract class JsonTestRequest {
     @NotEmpty
     public abstract String kvSeparator();
 
+    @JsonProperty("replace_key_whitespace")
+    public abstract boolean replaceKeyWhitespace();
+
+    @JsonProperty("key_whitespace_replacement")
+    public abstract String keyWhitespaceReplacement();
+
     @JsonProperty("string")
     @NotEmpty
     public abstract String string();
@@ -49,7 +55,9 @@ public abstract class JsonTestRequest {
                                          @JsonProperty("list_separator") @NotEmpty String listSeparator,
                                          @JsonProperty("key_separator") @NotEmpty String keySeparator,
                                          @JsonProperty("kv_separator") @NotEmpty String kvSeparator,
+                                         @JsonProperty("replace_key_whitespace") boolean replaceKeyWhitespace,
+                                         @JsonProperty("key_whitespace_replacement") String keyWhitespaceReplacement,
                                          @JsonProperty("string") @NotEmpty String string) {
-        return new AutoValue_JsonTestRequest(flatten, listSeparator, keySeparator, kvSeparator, string);
+        return new AutoValue_JsonTestRequest(flatten, listSeparator, keySeparator, kvSeparator, replaceKeyWhitespace, keyWhitespaceReplacement, string);
     }
 }

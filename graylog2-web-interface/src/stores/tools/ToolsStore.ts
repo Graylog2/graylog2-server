@@ -30,13 +30,15 @@ const ToolsStore = {
 
         return promise;
     },
-    testJSON(flatten: boolean, listSeparator: string, keySeparator: string, kvSeparator: string, string: string): Promise<Object> {
+    testJSON(flatten: boolean, listSeparator: string, keySeparator: string, kvSeparator: string, replaceKeyWhitespace: boolean, keyWhitespaceReplacement: string, string: string): Promise<Object> {
         const url = ApiRoutes.ToolsApiController.jsonTest().url;
         const payload = {
             flatten: flatten,
             list_separator: listSeparator,
             key_separator: keySeparator,
             kv_separator: kvSeparator,
+            replace_key_whitespace: replaceKeyWhitespace,
+            key_whitespace_replacement: keyWhitespaceReplacement,
             string: string,
         };
 

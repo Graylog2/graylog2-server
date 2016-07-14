@@ -26,7 +26,13 @@ const JSONExtractorConfiguration = React.createClass({
   componentWillReceiveProps(nextProps) {
     this.setState({configuration: this._getEffectiveConfiguration(nextProps.configuration)});
   },
-  DEFAULT_CONFIGURATION: {list_separator: ', ', key_separator: '_', kv_separator: '='},
+  DEFAULT_CONFIGURATION: {
+    list_separator: ', ',
+    key_separator: '_',
+    kv_separator: '=',
+    replace_key_whitespace: false,
+    key_whitespace_replacement: '_',
+  },
   _getEffectiveConfiguration(configuration) {
     return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
   },
@@ -43,7 +49,8 @@ const JSONExtractorConfiguration = React.createClass({
 
     const configuration = this.state.configuration;
     const promise = ToolsStore.testJSON(configuration.flatten, configuration.list_separator,
-      configuration.key_separator, configuration.kv_separator, this.props.exampleMessage);
+      configuration.key_separator, configuration.kv_separator, configuration.replace_key_whitespace,
+      configuration.key_whitespace_replacement, this.props.exampleMessage);
 
     promise.then(result => {
       const matches = [];
@@ -103,6 +110,24 @@ const JSONExtractorConfiguration = React.createClass({
                required
                onChange={this._onChange('kv_separator')}
                help="What string to use when concatenating key/value pairs of a JSON object (only used if flattened)."/>
+
+        <Input type="checkbox"
+               id="replace_key_whitespace"
+               label="Replace whitespace in keys"
+               wrapperClassName="col-md-offset-2 col-md-10"
+               defaultChecked={this.state.configuration.replace_key_whitespace}
+               onChange={this._onChange('replace_key_whitespace')}
+               help="Whether to replace whitespace in message keys."/>
+
+        <Input type="text"
+               id="key_whitespace_replacement"
+               label="Key whitespace replacement"
+               labelClassName="col-md-2"
+               wrapperClassName="col-md-10"
+               defaultValue={this.state.configuration.key_whitespace_replacement}
+               required
+               onChange={this._onChange('key_whitespace_replacement')}
+               help="What character to use when replacing whitespace in message keys. Make sure the replacement is valid in Lucene! (i.e. '-' or '_')"/>
 
         <Input wrapperClassName="col-md-offset-2 col-md-10">
           <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
