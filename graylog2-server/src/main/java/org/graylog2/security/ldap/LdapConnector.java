@@ -27,10 +27,12 @@ import org.apache.directory.api.ldap.model.entry.Attribute;
 import org.apache.directory.api.ldap.model.entry.Entry;
 import org.apache.directory.api.ldap.model.entry.Value;
 import org.apache.directory.api.ldap.model.exception.LdapException;
+import org.apache.directory.api.ldap.model.exception.LdapInvalidDnException;
 import org.apache.directory.api.ldap.model.message.BindRequestImpl;
 import org.apache.directory.api.ldap.model.message.BindResponse;
 import org.apache.directory.api.ldap.model.message.ResultCodeEnum;
 import org.apache.directory.api.ldap.model.message.SearchScope;
+import org.apache.directory.api.ldap.model.name.Dn;
 import org.apache.directory.ldap.client.api.LdapConnectionConfig;
 import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.graylog2.plugin.DocsHelper;
@@ -268,12 +270,12 @@ public class LdapConnector {
                     }
                     final Attribute members = e.get(memberAttribute);
                     if (members != null) {
-                        final String dn = ldapEntry.getDn();
+                        final String dn = normalizedDn(ldapEntry.getDn());
                         final String uid = ldapEntry.get("uid");
 
                         for (Value<?> member : members) {
                             LOG.trace("DN {} == {} member?", dn, member.getString());
-                            if (dn.equalsIgnoreCase(member.getString())) {
+                            if (dn.equalsIgnoreCase(normalizedDn(member.getString()))) {
                                 groups.add(groupId);
                             } else {
                                 // The posixGroup object class is using the memberUid attribute for group members.
@@ -301,6 +303,32 @@ public class LdapConnector {
         }
 
         return groups;
+    }
+
+    /**
+     * Makes sure the given DN string is normalized so it can be used in string comparison.
+     *
+     * Example:
+     *
+     *   input  = "cn=John Doe, ou=groups, ou=system"
+     *   output = "cn=John Doe,ou=groups,ou=system"
+     *
+     * See: https://github.com/Graylog2/graylog2-server/issues/1790
+     *
+     * @param dn denormalized DN string
+     * @return normalized DN string
+     */
+    private String normalizedDn(String dn) {
+        if (isNullOrEmpty(dn)) {
+            return dn;
+        } else {
+            try {
+                return new Dn(dn).getNormName();
+            } catch (LdapInvalidDnException e) {
+                LOG.warn("Invalid DN", e);
+                return dn;
+            }
+        }
     }
 
     public Set<String> listGroups(LdapNetworkConnection connection,

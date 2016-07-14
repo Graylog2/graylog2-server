@@ -218,6 +218,31 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
     }
 
     @Test
+    public void testFindGroupsWithWhitespace() throws Exception {
+        final LdapEntry ldapEntry1 = new LdapEntry();
+        ldapEntry1.setDn("cn=John Doe,ou=users,dc=example,dc=com");
+        ldapEntry1.put("uid", "john");
+
+        final LdapEntry ldapEntry2 = new LdapEntry();
+        ldapEntry2.setDn("cn=John Doe,  ou=users, dc=example, dc=com");
+        ldapEntry2.put("uid", "john");
+
+        final Set<String> groups1 = connector.findGroups(connection,
+                "ou=groups,dc=example,dc=com",
+                "(objectClass=groupOfUniqueNames)",
+                "cn",
+                ldapEntry1);
+        final Set<String> groups2 = connector.findGroups(connection,
+                "ou=groups,dc=example,dc=com",
+                "(objectClass=groupOfUniqueNames)",
+                "cn",
+                ldapEntry2);
+
+        assertThat(groups1).hasSize(2).containsOnly("Whitespace Engineers", "Engineers");
+        assertThat(groups2).hasSize(2).containsOnly("Whitespace Engineers", "Engineers");
+    }
+
+    @Test
     public void authenticateThrowsIllegalArgumentExceptionIfPrincipalIsNull() throws LdapException {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("Binding with empty principal is forbidden.");

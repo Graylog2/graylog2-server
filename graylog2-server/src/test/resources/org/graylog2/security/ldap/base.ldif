@@ -35,6 +35,12 @@ objectClass: top
 cn: Engineers
 uniqueMember: cn=John Doe,ou=users,dc=example,dc=com
 
+dn: cn=Whitespace Engineers,ou=groups,dc=example,dc=com
+objectClass: groupOfUniqueNames
+objectClass: top
+cn: Whitespace Engineers
+uniqueMember: cn=John Doe, ou=users, dc=example, dc=com
+
 dn: cn=QA,ou=groups,dc=example,dc=com
 objectClass: groupOfNames
 objectClass: top
