@@ -16,6 +16,7 @@
  */
 package org.graylog2.filters;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Lists;
@@ -29,26 +30,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 public class ExtractorFilter implements MessageFilter {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorFilter.class);
     private static final String NAME = "Extractor";
 
-    private Cache<String, List<Extractor>> cache = CacheBuilder.newBuilder()
-            .expireAfterWrite(1, TimeUnit.SECONDS)
-            .build();
-
+    private final Cache<String, List<Extractor>> cache;
     private final InputService inputService;
 
     @Inject
-    public ExtractorFilter(InputService inputService) {
+    public ExtractorFilter(InputService inputService, @Named("extractor_filter_refresh_interval") Duration refreshInterval) {
         this.inputService = inputService;
+        this.cache = CacheBuilder.newBuilder()
+                .expireAfterWrite(refreshInterval.getQuantity(), refreshInterval.getUnit())
+                .build();
     }
 
     @Override

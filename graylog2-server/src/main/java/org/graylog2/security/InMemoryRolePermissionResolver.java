@@ -16,6 +16,7 @@
  */
 package org.graylog2.security;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Function;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
@@ -38,7 +39,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Singleton
@@ -50,7 +50,8 @@ public class InMemoryRolePermissionResolver implements RolePermissionResolver {
 
     @Inject
     public InMemoryRolePermissionResolver(RoleService roleService,
-                                          @Named("daemonScheduler") ScheduledExecutorService daemonScheduler) {
+                                          @Named("daemonScheduler") ScheduledExecutorService daemonScheduler,
+                                          @Named("role_permission_resolver_refresh_interval") Duration refreshInterval) {
         this.roleService = roleService;
         final RoleUpdater updater = new RoleUpdater();
 
@@ -58,7 +59,7 @@ public class InMemoryRolePermissionResolver implements RolePermissionResolver {
         updater.run();
 
         // update rules every second in the background
-        daemonScheduler.scheduleAtFixedRate(updater, 1, 1, TimeUnit.SECONDS);
+        daemonScheduler.scheduleAtFixedRate(updater, 1, refreshInterval.getQuantity(), refreshInterval.getUnit());
     }
 
     @Override
