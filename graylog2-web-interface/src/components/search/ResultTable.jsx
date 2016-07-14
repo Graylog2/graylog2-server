@@ -141,40 +141,45 @@ const ResultTable = React.createClass({
         <MessageTablePaginator position="top" currentPage={Number(this.props.page)}
                                resultCount={this.props.resultCount} />
 
-        <div className="table-responsive">
-          <table className="table table-condensed messages">
-            <thead>
-              <tr>
-                <th style={{ width: 180 }}>Timestamp {this._sortIcons('timestamp')}</th>
-                {selectedColumns.toSeq().map(selectedFieldName => {
+        <div className="search-results-table">
+          <div className="table-responsive">
+            <div className="messages-container">
+              <table className="table table-condensed messages">
+                <thead>
+                  <tr>
+                    <th style={{ width: 180 }}>Timestamp {this._sortIcons('timestamp')}</th>
+                    {selectedColumns.toSeq().map(selectedFieldName => {
+                      return (
+                        <th key={selectedFieldName}
+                            style={this._columnStyle(selectedFieldName)}>
+                          {selectedFieldName} {this._sortIcons(selectedFieldName)}
+                        </th>
+                      );
+                    })}
+                  </tr>
+                </thead>
+                {this.props.messages.map((message) => {
                   return (
-                    <th key={selectedFieldName} style={this._columnStyle(selectedFieldName)}>
-                      {selectedFieldName} {this._sortIcons(selectedFieldName)}
-                    </th>
+                    <MessageTableEntry key={message.id}
+                                       message={message}
+                                       showMessageRow={this.props.selectedFields.contains('message')}
+                                       selectedFields={selectedColumns}
+                                       expanded={this.state.expandedMessages.contains(message.id)}
+                                       toggleDetail={this._toggleMessageDetail}
+                                       inputs={this.props.inputs}
+                                       streams={this.props.streams}
+                                       allStreams={this.state.allStreams}
+                                       allStreamsLoaded={this.state.allStreamsLoaded}
+                                       nodes={this.props.nodes}
+                                       highlight={this.props.highlight}
+                                       highlightMessage={SearchStore.highlightMessage}
+                                       expandAllRenderAsync={this.state.expandAllRenderAsync}
+                                       searchConfig={this.props.searchConfig} />
                   );
                 })}
-              </tr>
-            </thead>
-            {this.props.messages.map((message) => {
-              return (
-                <MessageTableEntry key={message.id}
-                                   message={message}
-                                   showMessageRow={this.props.selectedFields.contains('message')}
-                                   selectedFields={selectedColumns}
-                                   expanded={this.state.expandedMessages.contains(message.id)}
-                                   toggleDetail={this._toggleMessageDetail}
-                                   inputs={this.props.inputs}
-                                   streams={this.props.streams}
-                                   allStreams={this.state.allStreams}
-                                   allStreamsLoaded={this.state.allStreamsLoaded}
-                                   nodes={this.props.nodes}
-                                   highlight={this.props.highlight}
-                                   highlightMessage={SearchStore.highlightMessage}
-                                   expandAllRenderAsync={this.state.expandAllRenderAsync}
-                                   searchConfig={this.props.searchConfig} />
-              );
-            })}
-          </table>
+              </table>
+            </div>
+          </div>
         </div>
 
         <MessageTablePaginator position="bottom" currentPage={Number(this.props.page)}
