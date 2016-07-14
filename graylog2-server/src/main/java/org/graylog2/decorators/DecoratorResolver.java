@@ -25,23 +25,21 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Singleton
 public class DecoratorResolver {
     private final DecoratorService decoratorService;
     private final Map<String, MessageDecorator.Factory> messageDecoratorMap;
-    private final Map<String, SearchResponseDecorator> searchResponseDecoratorsMap;
+    private final Map<String, SearchResponseDecorator.Factory> searchResponseDecoratorsMap;
 
     @Inject
     public DecoratorResolver(DecoratorService decoratorService,
                              Map<String, MessageDecorator.Factory> messageDecorators,
-                             Set<SearchResponseDecorator> searchResponseDecorators) {
+                             Map<String, SearchResponseDecorator.Factory> searchResponseDecorators) {
         this.decoratorService = decoratorService;
         this.messageDecoratorMap = messageDecorators;
-        this.searchResponseDecoratorsMap = searchResponseDecorators.stream().collect(Collectors.toMap((decorator) -> decorator.getClass().toString(), Function.identity()));
+        this.searchResponseDecoratorsMap = searchResponseDecorators;
     }
 
     public List<MessageDecorator> messageDecoratorsForStream(String streamId) {
@@ -60,14 +58,14 @@ public class DecoratorResolver {
 
     public List<SearchResponseDecorator> searchResponseDecoratorsForStream(String streamId) {
         return this.decoratorService.findForStream(streamId).stream()
-            .map(decorator -> this.searchResponseDecoratorsMap.get(decorator.type()))
+            .map(this::instantiateSearchResponseDecorator)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
     public List<SearchResponseDecorator> searchResponseDecoratorsForGlobal() {
         return this.decoratorService.findForGlobal().stream()
-            .map(decorator -> this.searchResponseDecoratorsMap.get(decorator.type()))
+            .map(this::instantiateSearchResponseDecorator)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
@@ -75,6 +73,15 @@ public class DecoratorResolver {
     @Nullable
     private MessageDecorator instantiateMessageDecorator(Decorator decorator) {
         final MessageDecorator.Factory factory = this.messageDecoratorMap.get(decorator.type());
+        if (factory != null) {
+            return factory.create(decorator);
+        }
+        return null;
+    }
+
+    @Nullable
+    private SearchResponseDecorator instantiateSearchResponseDecorator(Decorator decorator) {
+        final SearchResponseDecorator.Factory factory = this.searchResponseDecoratorsMap.get(decorator.type());
         if (factory != null) {
             return factory.create(decorator);
         }
