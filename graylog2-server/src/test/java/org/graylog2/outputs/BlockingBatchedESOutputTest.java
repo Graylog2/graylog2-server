@@ -66,7 +66,7 @@ public class BlockingBatchedESOutputTest {
     @Test
     public void write() throws Exception {
         when(cluster.isConnected()).thenReturn(true);
-        when(cluster.isHealthy()).thenReturn(true);
+        when(cluster.isDeflectorHealthy()).thenReturn(true);
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
@@ -82,9 +82,9 @@ public class BlockingBatchedESOutputTest {
     @Test
     public void writeDoesNotFlushIfClusterIsNotConnected() throws Exception {
         when(cluster.isConnected()).thenReturn(false);
-        when(cluster.isHealthy()).thenReturn(true);
+        when(cluster.isDeflectorHealthy()).thenReturn(true);
 
-        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndHealthy();
+        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndDeflectorHealthy();
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
@@ -103,9 +103,9 @@ public class BlockingBatchedESOutputTest {
     @Test
     public void writeDoesNotFlushIfClusterIsUnhealthy() throws Exception {
         when(cluster.isConnected()).thenReturn(true);
-        when(cluster.isHealthy()).thenReturn(false);
+        when(cluster.isDeflectorHealthy()).thenReturn(false);
 
-        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndHealthy();
+        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndDeflectorHealthy();
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
@@ -124,7 +124,7 @@ public class BlockingBatchedESOutputTest {
     @Test
     public void forceFlushIfTimedOut() throws Exception {
         when(cluster.isConnected()).thenReturn(true);
-        when(cluster.isHealthy()).thenReturn(true);
+        when(cluster.isDeflectorHealthy()).thenReturn(true);
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
