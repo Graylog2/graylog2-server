@@ -186,8 +186,9 @@ public final class Tools {
      */
     public static String decompressZlib(byte[] compressedData) throws IOException {
         try (final ByteArrayInputStream dataStream = new ByteArrayInputStream(compressedData);
-             final InflaterInputStream in = new InflaterInputStream(dataStream)) {
-            return new String(ByteStreams.toByteArray(in), StandardCharsets.UTF_8);
+             final InflaterInputStream in = new InflaterInputStream(dataStream);
+             final LimitedInputStream limited = new LimitedInputStream(in)) {
+            return new String(ByteStreams.toByteArray(limited), StandardCharsets.UTF_8);
         }
     }
 
@@ -198,9 +199,9 @@ public final class Tools {
      */
     public static String decompressGzip(byte[] compressedData) throws IOException {
         try (final ByteArrayInputStream dataStream = new ByteArrayInputStream(compressedData);
-             final GZIPInputStream in = new GZIPInputStream(dataStream)) {
-            return new String(ByteStreams.toByteArray(in), StandardCharsets.UTF_8);
-
+             final GZIPInputStream in = new GZIPInputStream(dataStream);
+             final LimitedInputStream limited = new LimitedInputStream(in)) {
+            return new String(ByteStreams.toByteArray(limited), StandardCharsets.UTF_8);
         }
     }
 
