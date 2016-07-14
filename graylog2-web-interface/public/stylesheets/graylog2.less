@@ -2148,6 +2148,7 @@ span.blob {
 
 #message-table-paginator-bottom {
   height: 75px;
+  margin-top: 20px;
 }
 
 #message-table-paginator-bottom nav {
@@ -2169,16 +2170,63 @@ span.blob {
   border: 0;
 }
 
+.search-results-table {
+  border-left: 2px solid #e3e3e3;
+  margin-left: -13px;
+  overflow-y: auto;
+}
+
+.search-results-table > div {
+  border-left: 1px solid #D1D1D1;
+}
+
+.messages-container {
+  padding-right: 13px;
+  width: 100%;
+}
+
+table.messages {
+  position: relative;
+  font-size: 11px;
+  margin-top: 15px;
+  margin-bottom: 60px;
+  border-collapse: collapse;
+  padding-left: 13px;
+  width: 100%;
+  word-break: break-all;
+}
+
+table.messages thead > tr {
+  color: #fff;
+}
+
+table.messages td, table.messages th {
+  position: relative;
+  left: 13px;
+}
+
+table.messages > thead th {
+  border: 0;
+  font-size: 11px;
+  font-weight: normal;
+  background-color: #222;
+  white-space: nowrap;
+}
+
+table.messages tr {
+  border: 0 !important;
+}
+
 table.messages tbody.message-group {
   border-top: 0;
 }
 
 table.messages tbody.message-group-toggled {
-  border-left: 5px solid #16ace3;
+  border-left: 7px solid #16ace3;
 }
 
 table.messages tbody.message-highlight {
-  border-left: 5px solid #8dc63f;
+  border-left: 7px solid #8dc63f;
 }
 
 table.messages tr.fields-row {
@@ -2227,6 +2275,14 @@ table.messages tr.message-detail-row {
 table.messages tr.message-detail-row td {
   padding-top: 5px;
   border-top: 0;
+}
+
+table.messages tr.message-detail-row .row {
+  margin-right: 0;
+}
+
+table.messages tr.message-detail-row div[class*="col-"] {
+  padding-right: 0;
 }
 
 .message-details-title {
@@ -2286,37 +2342,6 @@ dl.message-details dd.stream-list ul li {
   margin-top: 3px;
 }
 
-table.messages {
-  position: static;
-  margin-left: -13px;
-  font-size: 11px;
-  margin-top: 15px;
-  border-collapse: collapse;
-  width: 100%;
-  word-break: break-all;
-}
-
-table.messages thead > tr {
-  color: #fff;
-}
-
-table.messages td, table.messages th {
-  position: relative;
-  left: 13px;
-}
-
-table.messages > thead th {
-  border: 0;
-  font-size: 11px;
-  font-weight: normal;
-  background-color: #222;
-  white-space: nowrap;
-}
-
-table.messages tr {
-  border: 0 !important;
-}
-
 dl.message-details dd div.message-field-actions {
   padding-left: 10px;
   position: relative;
@@ -2327,15 +2352,6 @@ dl.message-details dd div.message-field-actions {
   opacity: 0.5; /* Safari, Opera */
   -moz-opacity:0.50; /* FireFox */
   z-index: 20;
-}
-
-// this overrides the .table-responsive overflow-x to be able to show the blue message-group-toggled bar
-// if there's enough space. For lower widths we don't care about showing the bar (it's outside of the table's container,
-// so it triggers the overflox-x scroll behavior).
-@media(min-width: 600px) {
-  .table-responsive {
-    overflow-x: visible;
-  }
 }
 
 div#navigation-bar ul.dropdown-menu li a {
