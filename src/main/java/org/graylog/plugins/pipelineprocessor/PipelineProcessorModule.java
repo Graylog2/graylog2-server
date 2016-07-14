@@ -46,5 +46,7 @@ public class PipelineProcessorModule extends PluginModule {
         addPermissions(PipelineRestPermissions.class);
 
         install(new ProcessorFunctionsModule());
+
+        installMessageDecorator(messageDecoratorBinder(), PipelineProcessorMessageDecorator.class, PipelineProcessorMessageDecorator.Factory.class);
     }
 }
