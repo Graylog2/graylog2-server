@@ -32,6 +32,7 @@ import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.auditlog.jersey.AuditLogDynamicFeature;
 import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
+import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.EsClientProvider;
 import org.graylog2.bindings.providers.EsNodeProvider;
@@ -45,7 +46,6 @@ import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.FilterServiceImpl;
 import org.graylog2.grok.GrokPatternRegistry;
@@ -62,7 +62,7 @@ import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.decorators.MessageDecorator;
+import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
@@ -113,7 +113,7 @@ public class ServerBindings extends Graylog2Module {
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
         bindEventBusListeners();
-        bindMessageDecorators();
+        bindSearchResponseDecorators();
     }
 
     private void bindProviders() {
@@ -209,8 +209,8 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterDebugEventListener.class).asEagerSingleton();
     }
 
-    private void bindMessageDecorators() {
+    private void bindSearchResponseDecorators() {
         // only triggering an initialize to make sure that the binding exists
-        final MapBinder<String, MessageDecorator.Factory> messageDecoratorBinder = messageDecoratorBinder();
+        final MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder = searchResponseDecoratorBinder();
     }
 }

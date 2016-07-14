@@ -17,7 +17,6 @@
 package org.graylog2.decorators;
 
 import com.google.inject.Singleton;
-import org.graylog2.plugin.decorators.MessageDecorator;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 
 import javax.annotation.Nullable;
@@ -30,30 +29,13 @@ import java.util.stream.Collectors;
 @Singleton
 public class DecoratorResolver {
     private final DecoratorService decoratorService;
-    private final Map<String, MessageDecorator.Factory> messageDecoratorMap;
     private final Map<String, SearchResponseDecorator.Factory> searchResponseDecoratorsMap;
 
     @Inject
     public DecoratorResolver(DecoratorService decoratorService,
-                             Map<String, MessageDecorator.Factory> messageDecorators,
                              Map<String, SearchResponseDecorator.Factory> searchResponseDecorators) {
         this.decoratorService = decoratorService;
-        this.messageDecoratorMap = messageDecorators;
         this.searchResponseDecoratorsMap = searchResponseDecorators;
-    }
-
-    public List<MessageDecorator> messageDecoratorsForStream(String streamId) {
-        return this.decoratorService.findForStream(streamId).stream()
-            .map(this::instantiateMessageDecorator)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-    }
-
-    public List<MessageDecorator> messageDecoratorsForGlobal() {
-        return this.decoratorService.findForGlobal().stream()
-            .map(this::instantiateMessageDecorator)
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
     }
 
     public List<SearchResponseDecorator> searchResponseDecoratorsForStream(String streamId) {
@@ -68,15 +50,6 @@ public class DecoratorResolver {
             .map(this::instantiateSearchResponseDecorator)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
-    }
-
-    @Nullable
-    private MessageDecorator instantiateMessageDecorator(Decorator decorator) {
-        final MessageDecorator.Factory factory = this.messageDecoratorMap.get(decorator.type());
-        if (factory != null) {
-            return factory.create(decorator);
-        }
-        return null;
     }
 
     @Nullable

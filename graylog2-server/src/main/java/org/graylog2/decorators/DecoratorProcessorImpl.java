@@ -16,8 +16,6 @@
  */
 package org.graylog2.decorators;
 
-import org.graylog2.indexer.results.ResultMessage;
-import org.graylog2.plugin.decorators.MessageDecorator;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
@@ -31,18 +29,6 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
     @Inject
     public DecoratorProcessorImpl(DecoratorResolver decoratorResolver) {
         this.decoratorResolver = decoratorResolver;
-    }
-
-    @Override
-    public List<ResultMessage> decorate(List<ResultMessage> messages, Optional<String> streamId) {
-        final List<MessageDecorator> messageDecorators = streamId.isPresent() ?
-            decoratorResolver.messageDecoratorsForStream(streamId.get()) : decoratorResolver.messageDecoratorsForGlobal();
-        final Optional<MessageDecorator> metaDecorator = messageDecorators.stream()
-            .reduce((f, g) -> (v) -> f.apply(g.apply(v)));
-        if (metaDecorator.isPresent()) {
-            return metaDecorator.get().apply(messages);
-        }
-        return messages;
     }
 
     @Override
