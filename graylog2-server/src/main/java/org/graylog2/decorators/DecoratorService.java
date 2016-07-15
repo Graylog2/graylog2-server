@@ -28,8 +28,8 @@ public interface DecoratorService {
     List<Decorator> findForGlobal();
     List<Decorator> findAll();
     Decorator findById(String decoratorId) throws NotFoundException;
-    Decorator create(String type, Map<String, Object> config, String stream);
-    Decorator create(String type, Map<String, Object> config);
+    Decorator create(String type, Map<String, Object> config, String stream, int order);
+    Decorator create(String type, Map<String, Object> config, int order);
     Decorator save(Decorator decorator);
     int delete(String decoratorId);
 }

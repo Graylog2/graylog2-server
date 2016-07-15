@@ -20,7 +20,7 @@ const SortableList = React.createClass({
     const tempItem = sortedItems[dragIndex];
     sortedItems[dragIndex] = sortedItems[hoverIndex];
     sortedItems[hoverIndex] = tempItem;
-    this.setState({items: sortedItems});
+    this.setState({ items: sortedItems });
     if (typeof this.props.onMoveItem === 'function') {
       this.props.onMoveItem(sortedItems);
     }
