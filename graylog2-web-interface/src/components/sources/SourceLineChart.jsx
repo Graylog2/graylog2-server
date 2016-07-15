@@ -1,6 +1,6 @@
 import React, {PropTypes} from 'react';
 import $ from 'jquery';
-import {} from 'jquery-ui';
+import {} from 'jquery-ui/ui/effects/effect-bounce';
 import dc from 'dc';
 import d3 from 'd3';
 
