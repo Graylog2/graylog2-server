@@ -120,15 +120,15 @@ const JSONExtractorConfiguration = React.createClass({
                defaultValue={this.state.configuration.key_prefix}
                required
                onChange={this._onChange('key_prefix')}
-               help="Add the configured prefix to each key in the message."/>
+               help="Text to prepend to each key extracted from the JSON object."/>
 
         <Input type="checkbox"
                id="replace_key_whitespace"
-               label="Replace whitespace in keys"
+               label="Replace whitespaces in keys"
                wrapperClassName="col-md-offset-2 col-md-10"
                defaultChecked={this.state.configuration.replace_key_whitespace}
                onChange={this._onChange('replace_key_whitespace')}
-               help="Whether to replace whitespace in message keys."/>
+               help="Field keys containing whitespaces will be discarded when storing the extracted message. Check this box to replace whitespaces in JSON keys with another character."/>
 
         <Input type="text"
                id="key_whitespace_replacement"
@@ -139,7 +139,7 @@ const JSONExtractorConfiguration = React.createClass({
                disabled={!this.state.configuration.replace_key_whitespace}
                required
                onChange={this._onChange('key_whitespace_replacement')}
-               help="What character to use when replacing whitespace in message keys. Make sure the replacement is valid in Lucene! (i.e. '-' or '_')"/>
+               help="What character to use when replacing whitespaces in message keys. Please ensure the replacement character is valid in Lucene, e.g. '-' or '_'."/>
 
         <Input wrapperClassName="col-md-offset-2 col-md-10">
           <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
