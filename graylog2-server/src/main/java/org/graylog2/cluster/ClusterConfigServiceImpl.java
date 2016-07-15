@@ -93,7 +93,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
         try {
             return objectMapper.convertValue(payload, type);
         } catch (IllegalArgumentException e) {
-            LOG.debug("Error while deserializing payload", e);
+            LOG.error("Error while deserializing payload", e);
             return null;
         }
     }
