@@ -163,7 +163,7 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
                 .isNotNull()
                 .isEqualTo("cn=John Doe,ou=users,dc=example,dc=com");
 
-        assertThat(entry.getGroups()).hasSize(1).contains("Engineers");
+        assertThat(entry.getGroups()).hasSize(2).contains("Engineers", "Whitespace Engineers");
     }
 
     @Test
@@ -204,8 +204,8 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
                 .isEqualTo("cn=John Doe,ou=users,dc=example,dc=com");
 
         assertThat(entry.getGroups())
-                .hasSize(3)
-                .contains("Developers", "QA", "Engineers");
+                .hasSize(4)
+                .contains("Developers", "QA", "Engineers", "Whitespace Engineers");
     }
 
     @Test
@@ -213,8 +213,33 @@ public class LdapConnectorTest extends AbstractLdapTestUnit {
         final Set<String> groups = connector.listGroups(connection, "ou=groups,dc=example,dc=com", "(objectClass=top)", "cn");
 
         assertThat(groups)
-                .hasSize(3)
-                .contains("Developers", "QA", "Engineers");
+                .hasSize(4)
+                .contains("Developers", "QA", "Engineers", "Whitespace Engineers");
+    }
+
+    @Test
+    public void testFindGroupsWithWhitespace() throws Exception {
+        final LdapEntry ldapEntry1 = new LdapEntry();
+        ldapEntry1.setDn("cn=John Doe,ou=users,dc=example,dc=com");
+        ldapEntry1.put("uid", "john");
+
+        final LdapEntry ldapEntry2 = new LdapEntry();
+        ldapEntry2.setDn("cn=John Doe,  ou=users, dc=example, dc=com");
+        ldapEntry2.put("uid", "john");
+
+        final Set<String> groups1 = connector.findGroups(connection,
+                "ou=groups,dc=example,dc=com",
+                "(objectClass=groupOfUniqueNames)",
+                "cn",
+                ldapEntry1);
+        final Set<String> groups2 = connector.findGroups(connection,
+                "ou=groups,dc=example,dc=com",
+                "(objectClass=groupOfUniqueNames)",
+                "cn",
+                ldapEntry2);
+
+        assertThat(groups1).hasSize(2).containsOnly("Whitespace Engineers", "Engineers");
+        assertThat(groups2).hasSize(2).containsOnly("Whitespace Engineers", "Engineers");
     }
 
     @Test
