@@ -179,12 +179,21 @@ public final class Tools {
         return ret;
     }
 
+    /**
+     * Decompress ZLIB (RFC 1950) compressed data
+     *
+     * @param compressedData A byte array containing the ZLIB-compressed data.
+     * @return A string containing the decompressed data
+     */
+    public static String decompressZlib(byte[] compressedData) throws IOException {
+        return decompressZlib(compressedData, Long.MAX_VALUE);
+    }
 
     /**
      * Decompress ZLIB (RFC 1950) compressed data
      *
      * @param compressedData A byte array containing the ZLIB-compressed data.
-     * @param maxBytes       The maximum number of uncompressed bytes to read. {@code -1} means unlimited.
+     * @param maxBytes       The maximum number of uncompressed bytes to read.
      * @return A string containing the decompressed data
      */
     public static String decompressZlib(byte[] compressedData, long maxBytes) throws IOException {
@@ -199,7 +208,17 @@ public final class Tools {
      * Decompress GZIP (RFC 1952) compressed data
      *
      * @param compressedData A byte array containing the GZIP-compressed data.
-     * @param maxBytes       The maximum number of uncompressed bytes to read. {@code -1} means unlimited.
+     * @return A string containing the decompressed data
+     */
+    public static String decompressGzip(byte[] compressedData) throws IOException {
+        return decompressGzip(compressedData, Long.MAX_VALUE);
+    }
+
+    /**
+     * Decompress GZIP (RFC 1952) compressed data
+     *
+     * @param compressedData A byte array containing the GZIP-compressed data.
+     * @param maxBytes       The maximum number of uncompressed bytes to read.
      * @return A string containing the decompressed data
      */
     public static String decompressGzip(byte[] compressedData, long maxBytes) throws IOException {

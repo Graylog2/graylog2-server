@@ -18,10 +18,10 @@ package org.graylog2.plugin;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
+import org.graylog2.inputs.TestHelper;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.URI;
@@ -32,8 +32,6 @@ import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.zip.Deflater;
-import java.util.zip.GZIPOutputStream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -109,17 +107,10 @@ public class ToolsTest {
 
     @Test
     public void testDecompressZlib() throws IOException {
+        final String testString = "Teststring 123";
+        final byte[] compressed = TestHelper.zlibCompress(testString);
 
-        String testString = "Teststring 123";
-        byte[] buffer = new byte[100];
-        Deflater deflater = new Deflater();
-
-        deflater.setInput(testString.getBytes());
-        deflater.finish();
-        deflater.deflate(buffer);
-        deflater.end();
-
-        assertEquals(testString, Tools.decompressZlib(buffer, 1024));
+        assertEquals(testString, Tools.decompressZlib(compressed));
     }
 
     @Test
@@ -131,17 +122,10 @@ public class ToolsTest {
 
     @Test
     public void testDecompressGzip() throws IOException {
+        final String testString = "Teststring 123";
+        final byte[] compressed = TestHelper.gzipCompress(testString);
 
-        String testString = "Teststring 123";
-
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        GZIPOutputStream gzip = new GZIPOutputStream(out);
-        gzip.write(testString.getBytes());
-        gzip.close();
-
-        byte[] buffer = out.toByteArray();
-
-        assertEquals(testString, Tools.decompressGzip(buffer, 1024));
+        assertEquals(testString, Tools.decompressGzip(compressed));
     }
 
     @Test
@@ -153,7 +137,7 @@ public class ToolsTest {
 
     @Test(expected = EOFException.class)
     public void testDecompressGzipEmptyInput() throws IOException {
-        Tools.decompressGzip(new byte[0], 1024);
+        Tools.decompressGzip(new byte[0]);
     }
 
     /**
