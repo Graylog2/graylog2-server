@@ -318,6 +318,7 @@ public class LdapConnector {
      * @param dn denormalized DN string
      * @return normalized DN string
      */
+    @Nullable
     private String normalizedDn(String dn) {
         if (isNullOrEmpty(dn)) {
             return dn;
