@@ -53,28 +53,37 @@ public class JsonTesterResource extends RestResource {
                                   @QueryParam("flatten") @DefaultValue("false") boolean flatten,
                                   @QueryParam("list_separator") @NotEmpty String listSeparator,
                                   @QueryParam("key_separator") @NotEmpty String keySeparator,
+                                  @QueryParam("replace_key_whitespace") boolean replaceKeyWhitespace,
+                                  @QueryParam("key_whitespace_replacement") String keyWhitespaceReplacement,
+                                  @QueryParam("key_prefix") String keyPrefix,
                                   @QueryParam("kv_separator") @NotEmpty String kvSeparator) {
-        return testJsonExtractor(string, flatten, listSeparator, keySeparator, kvSeparator);
+        return testJsonExtractor(string, flatten, listSeparator, keySeparator, kvSeparator, replaceKeyWhitespace, keyWhitespaceReplacement, keyPrefix);
     }
 
     @POST
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     public JsonTesterResponse post(@Valid @NotNull JsonTestRequest r) {
-        return testJsonExtractor(r.string(), r.flatten(), r.listSeparator(), r.keySeparator(), r.kvSeparator());
+        return testJsonExtractor(r.string(), r.flatten(), r.listSeparator(), r.keySeparator(), r.kvSeparator(), r.replaceKeyWhitespace(), r.keyWhitespaceReplacement(), r.keyPrefix());
     }
 
     private JsonTesterResponse testJsonExtractor(String testString,
                                                  boolean flatten,
                                                  String listSeparator,
                                                  String keySeparator,
-                                                 String kvSeparator) {
-        final Map<String, Object> config = ImmutableMap.<String, Object>of(
-                "flatten", flatten,
-                "list_separator", listSeparator,
-                "key_separator", keySeparator,
-                "kv_separator", kvSeparator
-        );
+                                                 String kvSeparator,
+                                                 boolean replaceKeyWhitespace,
+                                                 String keyWhitespaceReplacement,
+                                                 String keyPrefix) {
+        final Map<String, Object> config = ImmutableMap.<String, Object>builder()
+                .put("flatten", flatten)
+                .put("list_separator", listSeparator)
+                .put("key_separator", keySeparator)
+                .put("kv_separator", kvSeparator)
+                .put("replace_key_whitespace", replaceKeyWhitespace)
+                .put("key_whitespace_replacement", keyWhitespaceReplacement)
+                .put("key_prefix", keyPrefix)
+                .build();
         final JsonExtractor extractor;
         try {
             extractor = new JsonExtractor(
