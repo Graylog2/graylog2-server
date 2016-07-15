@@ -136,6 +136,7 @@ const JSONExtractorConfiguration = React.createClass({
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
                defaultValue={this.state.configuration.key_whitespace_replacement}
+               disabled={!this.state.configuration.replace_key_whitespace}
                required
                onChange={this._onChange('key_whitespace_replacement')}
                help="What character to use when replacing whitespace in message keys. Make sure the replacement is valid in Lucene! (i.e. '-' or '_')"/>
