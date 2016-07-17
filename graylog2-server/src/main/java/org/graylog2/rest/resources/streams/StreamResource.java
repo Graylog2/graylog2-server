@@ -35,6 +35,7 @@ import org.graylog2.alerts.AlertService;
 import org.graylog2.auditlog.Actions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -59,6 +60,7 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.events.StreamsChangedEvent;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -104,18 +106,21 @@ public class StreamResource extends RestResource {
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final AlertService alertService;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public StreamResource(StreamService streamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
                           AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                          AlertService alertService) {
+                          AlertService alertService,
+                          ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.alertService = alertService;
+        this.clusterEventBus = clusterEventBus;
     }
 
     @POST
@@ -137,6 +142,8 @@ public class StreamResource extends RestResource {
             StreamRule streamRule = streamRuleService.create(id, request);
             streamRuleService.save(streamRule);
         }
+
+        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
 
         final Map<String, String> result = ImmutableMap.of("stream_id", id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
@@ -231,6 +238,7 @@ public class StreamResource extends RestResource {
         }
 
         streamService.save(stream);
+        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
 
         return streamToResponse(stream);
     }
@@ -249,6 +257,7 @@ public class StreamResource extends RestResource {
 
         final Stream stream = streamService.load(streamId);
         streamService.destroy(stream);
+        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
     }
 
     @POST
@@ -266,6 +275,7 @@ public class StreamResource extends RestResource {
 
         final Stream stream = streamService.load(streamId);
         streamService.pause(stream);
+        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
     }
 
     @POST
@@ -283,6 +293,7 @@ public class StreamResource extends RestResource {
 
         final Stream stream = streamService.load(streamId);
         streamService.resume(stream);
+        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
     }
 
     @POST
@@ -388,6 +399,8 @@ public class StreamResource extends RestResource {
         for (Output output : sourceStream.getOutputs()) {
             streamService.addOutput(stream, output);
         }
+
+        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
 
         final Map<String, String> result = ImmutableMap.of("stream_id", id);
         final URI streamUri = getUriBuilderToSelf().path(StreamResource.class)
