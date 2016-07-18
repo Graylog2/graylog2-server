@@ -1,5 +1,6 @@
 import jQuery from 'jquery';
-import jQueryUI from 'jquery-ui';
+import {} from 'jquery-ui/ui/widgets/draggable';
+import {} from 'jquery-ui/ui/widgets/droppable';
 import moment from 'moment';
 import numeral from 'numeral';
 import Rickshaw from 'rickshaw';
