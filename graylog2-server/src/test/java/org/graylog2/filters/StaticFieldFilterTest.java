@@ -18,6 +18,7 @@ package org.graylog2.filters;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.eventbus.EventBus;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
@@ -26,6 +27,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import java.util.concurrent.Executors;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.eq;
@@ -43,11 +46,13 @@ public class StaticFieldFilterTest {
         Message msg = new Message("hello", "junit", Tools.nowUTC());
         msg.setSourceInputId("someid");
 
+        when(input.getId()).thenReturn("someid");
+        when(inputService.all()).thenReturn(Lists.newArrayList(input));
         when(inputService.find(eq("someid"))).thenReturn(input);
         when(inputService.getStaticFields(eq(input)))
                 .thenReturn(Lists.newArrayList(Maps.immutableEntry("foo", "bar")));
 
-        final StaticFieldFilter filter = new StaticFieldFilter(inputService);
+        final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), Executors.newSingleThreadScheduledExecutor());
         filter.filter(msg);
 
         assertEquals("hello", msg.getMessage());
@@ -64,7 +69,7 @@ public class StaticFieldFilterTest {
         when(inputService.getStaticFields(eq(input)))
                 .thenReturn(Lists.newArrayList(Maps.immutableEntry("foo", "bar")));
 
-        final StaticFieldFilter filter = new StaticFieldFilter(inputService);
+        final StaticFieldFilter filter = new StaticFieldFilter(inputService, new EventBus(), Executors.newSingleThreadScheduledExecutor());
         filter.filter(msg);
 
         assertEquals("hello", msg.getMessage());

@@ -200,6 +200,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         };
 
         embed(input, InputImpl.EMBEDDED_STATIC_FIELDS, obj);
+        publishChange(InputUpdated.create(input.getId()));
     }
 
     @Override
@@ -317,6 +318,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public void removeStaticField(Input input, String key) {
         removeEmbedded(input, InputImpl.FIELD_STATIC_FIELD_KEY, InputImpl.EMBEDDED_STATIC_FIELDS, key);
+        publishChange(InputUpdated.create(input.getId()));
     }
 
     @Override
