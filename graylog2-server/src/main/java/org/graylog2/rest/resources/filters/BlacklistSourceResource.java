@@ -22,6 +22,8 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.events.ClusterEventBus;
+import org.graylog2.filters.events.FilterDescriptionUpdateEvent;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.blacklist.FilterDescription;
@@ -58,10 +60,12 @@ public class BlacklistSourceResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(BlacklistSourceResource.class);
 
     private FilterService filterService;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public BlacklistSourceResource(FilterService filterService) {
+    public BlacklistSourceResource(FilterService filterService, ClusterEventBus clusterEventBus) {
         this.filterService = filterService;
+        this.clusterEventBus = clusterEventBus;
     }
 
     @POST
@@ -83,6 +87,8 @@ public class BlacklistSourceResource extends RestResource {
         filterDescription.creatorUserId = currentUser.getName();
 
         final FilterDescription savedFilter = filterService.save(filterDescription);
+
+        clusterEventBus.post(FilterDescriptionUpdateEvent.create(savedFilter._id.toHexString()));
 
         final URI filterUri = getUriBuilderToSelf().path(BlacklistSourceResource.class)
                 .path("{filterId}")
@@ -142,6 +148,7 @@ public class BlacklistSourceResource extends RestResource {
         }
 
         filterService.save(filter);
+        clusterEventBus.post(FilterDescriptionUpdateEvent.create(filterId));
     }
 
     @DELETE
@@ -154,5 +161,6 @@ public class BlacklistSourceResource extends RestResource {
         if (filterService.delete(filterId) == 0) {
             throw new NotFoundException("Couldn't find filter with ID "+ filterId);
         }
+        clusterEventBus.post(FilterDescriptionUpdateEvent.create(filterId));
     }
 }
