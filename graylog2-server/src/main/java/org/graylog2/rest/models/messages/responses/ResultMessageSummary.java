@@ -20,12 +20,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 
 import javax.annotation.Nullable;
-import java.util.Collections;
 import java.util.Map;
 
 @AutoValue
@@ -47,7 +45,8 @@ public abstract class ResultMessageSummary {
     public abstract String index();
 
     @JsonProperty(FIELD_DECORATION_STATS)
-    public abstract Map<String, DecorationStats> decorationStats();
+    @Nullable
+    public abstract DecorationStats decorationStats();
 
     private static Builder builder() {
         return new AutoValue_ResultMessageSummary.Builder();
@@ -59,9 +58,9 @@ public abstract class ResultMessageSummary {
     public static ResultMessageSummary create(@Nullable @JsonProperty(FIELD_HIGHLIGHT_RANGES) Multimap<String, Range<Integer>> highlightRanges,
                                               @JsonProperty(FIELD_MESSAGE) Map<String, Object> message,
                                               @JsonProperty(FIELD_INDEX) String index,
-                                              @JsonProperty(FIELD_DECORATION_STATS) Map<String, DecorationStats> decorationStats) {
+                                              @JsonProperty(FIELD_DECORATION_STATS) DecorationStats decorationStats) {
         return builder()
-            .decorationStats(ImmutableMap.copyOf(decorationStats))
+            .decorationStats(decorationStats)
             .highlightRanges(highlightRanges)
             .index(index)
             .message(message)
@@ -72,7 +71,6 @@ public abstract class ResultMessageSummary {
                                               @JsonProperty(FIELD_MESSAGE) Map<String, Object> message,
                                               @JsonProperty(FIELD_INDEX) String index) {
         return builder()
-            .decorationStats(Collections.emptyMap())
             .highlightRanges(highlightRanges)
             .index(index)
             .message(message)
@@ -87,7 +85,7 @@ public abstract class ResultMessageSummary {
 
         public abstract Builder index(String index);
 
-        public abstract Builder decorationStats(Map<String, DecorationStats> decorationStats);
+        public abstract Builder decorationStats(DecorationStats decorationStats);
 
         public abstract ResultMessageSummary build();
     }

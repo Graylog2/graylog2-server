@@ -17,14 +17,18 @@
 package org.graylog2.decorators;
 
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
+import org.graylog2.rest.models.messages.responses.DecorationStats;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
 import javax.inject.Inject;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class DecoratorProcessorImpl implements DecoratorProcessor {
     private final DecoratorResolver decoratorResolver;
@@ -41,9 +45,30 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
         final Optional<SearchResponseDecorator> metaDecorator = searchResponseDecorators.stream()
             .reduce((f, g) -> (v) -> g.apply(f.apply(v)));
         if (metaDecorator.isPresent()) {
+            final Map<String, ResultMessageSummary> originalMessages = searchResponse.messages()
+                .stream()
+                .collect(Collectors.toMap(message -> message.message().get("_id").toString(), Function.identity()));
             final SearchResponse newSearchResponse = metaDecorator.get().apply(searchResponse);
             final Set<String> newFields = extractFields(newSearchResponse.messages());
-            return newSearchResponse.toBuilder().fields(newFields).build();
+
+            final List<ResultMessageSummary> decoratedMessages = newSearchResponse.messages()
+                .stream()
+                .map(resultMessage -> {
+                    final ResultMessageSummary originalMessage = originalMessages.get(resultMessage.message().get("_id").toString());
+                    if (originalMessage != null) {
+                        return resultMessage
+                            .toBuilder()
+                            .decorationStats(DecorationStats.create(originalMessage.message(), resultMessage.message()))
+                            .build();
+                    }
+                    return resultMessage;
+                })
+                .collect(Collectors.toList());
+            return newSearchResponse
+                .toBuilder()
+                .messages(decoratedMessages)
+                .fields(newFields)
+                .build();
         }
 
         return searchResponse;
