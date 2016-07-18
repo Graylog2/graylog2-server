@@ -16,8 +16,8 @@
  */
 package org.graylog2.streams;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import javax.inject.Named;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.streams.Stream;
@@ -25,12 +25,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -38,8 +38,6 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class StreamRouter {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
-
-    private static final long ENGINE_UPDATE_INTERVAL = 1L;
 
     protected final StreamService streamService;
     private final ServerStatus serverStatus;
@@ -50,13 +48,14 @@ public class StreamRouter {
     public StreamRouter(StreamService streamService,
                         ServerStatus serverStatus,
                         StreamRouterEngine.Factory routerEngineFactory,
+                        @Named("stream_router_refresh_interval") Duration refreshInterval,
                         @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.streamService = streamService;
         this.serverStatus = serverStatus;
 
         final StreamRouterEngineUpdater streamRouterEngineUpdater = new StreamRouterEngineUpdater(routerEngine, routerEngineFactory, streamService, executorService());
         this.routerEngine.set(streamRouterEngineUpdater.getNewEngine());
-        scheduler.scheduleAtFixedRate(streamRouterEngineUpdater, 0, ENGINE_UPDATE_INTERVAL, TimeUnit.SECONDS);
+        scheduler.scheduleAtFixedRate(streamRouterEngineUpdater, 0, refreshInterval.getQuantity(), refreshInterval.getUnit());
     }
 
     private ExecutorService executorService() {

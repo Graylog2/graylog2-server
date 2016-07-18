@@ -158,6 +158,21 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "trusted_proxies", converter = IPSubnetConverter.class)
     private Set<IpSubnet> trustedProxies = Collections.emptySet();
 
+    @Parameter(value = "stream_router_refresh_interval", validator = PositiveDurationValidator.class)
+    private Duration streamRouterRefreshInterval = Duration.seconds(1L);
+
+    @Parameter(value = "rules_filter_refresh_interval", validator = PositiveDurationValidator.class)
+    private Duration rulesFilterRefreshInterval = Duration.seconds(1L);
+
+    @Parameter(value = "static_fields_filter_refresh_interval", validator = PositiveDurationValidator.class)
+    private Duration staticFieldsFilterRefreshInterval = Duration.seconds(1L);
+
+    @Parameter(value = "extractor_filter_refresh_interval", validator = PositiveDurationValidator.class)
+    private Duration extractorFilterRefreshInterval = Duration.seconds(1L);
+
+    @Parameter(value = "role_permission_resolver_refresh_interval", validator = PositiveDurationValidator.class)
+    private Duration rolePermissionResolverRefreshInterval = Duration.seconds(1L);
+
     public boolean isMaster() {
         return isMaster;
     }

@@ -16,6 +16,7 @@
  */
 package org.graylog2.filters;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Sets;
@@ -27,10 +28,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>
@@ -44,12 +45,14 @@ public class RulesFilter implements MessageFilter {
     private Set<FilterDescription> currentFilterSet;
 
     @Inject
-    public RulesFilter(RulesEngine rulesEngine, final FilterService filterService) {
+    public RulesFilter(RulesEngine rulesEngine,
+                       final FilterService filterService,
+                       @Named("rules_filter_refresh_interval") Duration refreshInterval) {
         this.filterService = filterService;
 
         currentFilterSet = Sets.newHashSet();
         cache = CacheBuilder.newBuilder()
-                .expireAfterWrite(1, TimeUnit.SECONDS)
+                .expireAfterWrite(refreshInterval.getQuantity(), refreshInterval.getUnit())
                 .build();
         privateSession = rulesEngine.createPrivateSession();
     }

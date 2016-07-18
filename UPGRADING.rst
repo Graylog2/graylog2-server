@@ -62,3 +62,24 @@ Changed Elasticsearch Cluster Status Behavior
 In previous versions Graylog stopped indexing into the current write index if the `Elasticsearch cluster status <http://docs.graylog.org/en/2.1/pages/configuration/elasticsearch.html#cluster-status-explained>`_ turned RED. Since 2.1 Graylog only checks the status of the current write index when it tries to index messages.
 
 If the current write index is GREEN or YELLOW, Graylog will continue to index messages even though the overall cluster status is RED. This avoids Graylog downtimes when doing Elasticsearch maintenance or when older indices have problems.
+
+New Configuration File Settings
+-------------------------------
+
+.. list-table:: New Configuration Settings
+  :header-rows: 1
+
+  * - Name
+    - Default Value
+  * - ``stream_router_refresh_interval``
+    - ``1s``
+  * - ``rules_filter_refresh_interval``
+    - ``1s``
+  * - ``static_fields_filter_refresh_interval``
+    - ``1s``
+  * - ``extractor_filter_refresh_interval``
+    - ``1s``
+  * - ``role_permission_resolver_refresh_interval``
+    - ``1s``
+
+Check the `new example config <https://github.com/Graylog2/graylog2-server/blob/2.1/misc/graylog.conf>`_ for details.

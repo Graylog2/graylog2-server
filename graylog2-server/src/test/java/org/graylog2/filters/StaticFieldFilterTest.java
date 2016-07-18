@@ -16,6 +16,7 @@
  */
 package org.graylog2.filters;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.inputs.Input;
@@ -47,7 +48,7 @@ public class StaticFieldFilterTest {
         when(inputService.getStaticFields(eq(input)))
                 .thenReturn(Lists.newArrayList(Maps.immutableEntry("foo", "bar")));
 
-        final StaticFieldFilter filter = new StaticFieldFilter(inputService);
+        final StaticFieldFilter filter = new StaticFieldFilter(inputService, Duration.seconds(1L));
         filter.filter(msg);
 
         assertEquals("hello", msg.getMessage());
@@ -64,7 +65,7 @@ public class StaticFieldFilterTest {
         when(inputService.getStaticFields(eq(input)))
                 .thenReturn(Lists.newArrayList(Maps.immutableEntry("foo", "bar")));
 
-        final StaticFieldFilter filter = new StaticFieldFilter(inputService);
+        final StaticFieldFilter filter = new StaticFieldFilter(inputService, Duration.seconds(1L));
         filter.filter(msg);
 
         assertEquals("hello", msg.getMessage());

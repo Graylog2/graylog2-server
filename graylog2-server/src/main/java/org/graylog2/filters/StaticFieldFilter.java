@@ -16,6 +16,7 @@
  */
 package org.graylog2.filters;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.graylog2.database.NotFoundException;
@@ -27,12 +28,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -43,15 +44,15 @@ public class StaticFieldFilter implements MessageFilter {
 
     private static final String NAME = "Static field appender";
 
-    private final Cache<String, List<Map.Entry<String, String>>> cache = CacheBuilder.newBuilder()
-            .expireAfterWrite(1, TimeUnit.SECONDS)
-            .build();
-
+    private final Cache<String, List<Map.Entry<String, String>>> cache;
     private final InputService inputService;
 
     @Inject
-    public StaticFieldFilter(InputService inputService) {
+    public StaticFieldFilter(InputService inputService, @Named("static_fields_filter_refresh_interval") Duration refreshInterval) {
         this.inputService = inputService;
+        this.cache = CacheBuilder.newBuilder()
+            .expireAfterWrite(refreshInterval.getQuantity(), refreshInterval.getUnit())
+            .build();
     }
 
     @Override
