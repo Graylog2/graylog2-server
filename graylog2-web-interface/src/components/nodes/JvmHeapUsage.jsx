@@ -4,6 +4,8 @@ import { ProgressBar } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
 
+import humanizeDuration from 'humanize-duration'
+
 import NumberUtils from 'util/NumberUtils';
 import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
@@ -23,6 +25,8 @@ const JvmHeapUsage = React.createClass({
       usedMemory: 'jvm.memory.heap.used',
       committedMemory: 'jvm.memory.heap.committed',
       maxMemory: 'jvm.memory.heap.max',
+      gcCount: 'jvm.gc.summary.count',
+      gcTime: 'jvm.gc.summary.time',
     };
 
     Object.keys(this.metricNames).forEach(metricShortName => MetricsActions.add(this.props.nodeId, this.metricNames[metricShortName]));
@@ -59,17 +63,26 @@ const JvmHeapUsage = React.createClass({
         );
 
         detail = (
-          <p>
-            The JVM is using{' '}
-            <span className="blob used-memory"/>
-            <strong> {NumberUtils.formatBytes(metrics.usedMemory)}</strong>
-            {' '}of{' '}
-            <span className="blob committed-memory"/>
-            <strong> {NumberUtils.formatBytes(metrics.committedMemory)}</strong>
-            {' '}heap space and will not attempt to use more than{' '}
-            <span className="blob max-memory" style={{border: '1px solid #ccc'}}/>
-            <strong> {NumberUtils.formatBytes(metrics.maxMemory)}</strong>
-          </p>
+          <div>
+            <p>
+              The JVM is using{' '}
+              <span className="blob used-memory"/>
+              <strong> {NumberUtils.formatBytes(metrics.usedMemory)}</strong>
+              {' '}of{' '}
+              <span className="blob committed-memory"/>
+              <strong> {NumberUtils.formatBytes(metrics.committedMemory)}</strong>
+              {' '}heap space and will not attempt to use more than{' '}
+              <span className="blob max-memory" style={{border: '1px solid #ccc'}}/>
+              <strong> {NumberUtils.formatBytes(metrics.maxMemory)}</strong>
+            </p>
+            <p>
+              Garbage collected
+              <strong> {metrics.gcCount} </strong>
+              times taking
+              <strong> {humanizeDuration(metrics.gcTime)} </strong>
+              in total
+            </p>
+          </div>
         );
       }
     } else {
