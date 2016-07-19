@@ -32,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,8 +48,6 @@ public class StaticFieldFilter implements MessageFilter {
     private static final Logger LOG = LoggerFactory.getLogger(StaticFieldFilter.class);
 
     private static final String NAME = "Static field appender";
-
-    private static final List<Map.Entry<String, String>> EMPTY = ImmutableList.of();
 
     private final ConcurrentMap<String, List<Map.Entry<String, String>>> staticFields = new ConcurrentHashMap<>();
 
@@ -73,7 +72,7 @@ public class StaticFieldFilter implements MessageFilter {
         if (msg.getSourceInputId() == null)
             return false;
 
-        for(final Map.Entry<String, String> field : staticFields.getOrDefault(msg.getSourceInputId(), EMPTY)) {
+        for(final Map.Entry<String, String> field : staticFields.getOrDefault(msg.getSourceInputId(), Collections.emptyList())) {
             if(!msg.hasField(field.getKey())) {
                 msg.addField(field.getKey(), field.getValue());
             } else {

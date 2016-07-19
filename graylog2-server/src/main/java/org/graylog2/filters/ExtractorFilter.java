@@ -44,7 +44,6 @@ import java.util.concurrent.TimeUnit;
 public class ExtractorFilter implements MessageFilter {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorFilter.class);
     private static final String NAME = "Extractor";
-    private static final List<Extractor> EMPTY_LIST = ImmutableList.of();
 
     private final ConcurrentMap<String, List<Extractor>> extractors = new ConcurrentHashMap<>();
 
@@ -70,7 +69,7 @@ public class ExtractorFilter implements MessageFilter {
             return false;
         }
 
-        for (final Extractor extractor : extractors.getOrDefault(msg.getSourceInputId(), EMPTY_LIST)) {
+        for (final Extractor extractor : extractors.getOrDefault(msg.getSourceInputId(), Collections.emptyList())) {
             try {
                 extractor.runExtractor(msg);
             } catch (Exception e) {
