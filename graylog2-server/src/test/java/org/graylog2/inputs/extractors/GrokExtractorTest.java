@@ -17,7 +17,6 @@
 package org.graylog2.inputs.extractors;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog2.ConfigurationException;
 import org.graylog2.grok.GrokPattern;
@@ -30,9 +29,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -90,8 +91,52 @@ public class GrokExtractorTest {
         assertEquals(773, date.getMillisOfSecond());
     }
 
+    @Test
+    public void testNamedCapturesOnly() throws Exception {
+        final Map<String, Object> config = new HashMap<>();
+
+        final GrokPattern mynumber = new GrokPattern();
+        mynumber.name = "MYNUMBER";
+        mynumber.pattern = "(?:%{BASE10NUM})";
+
+        patternSet.add(mynumber);
+
+        config.put("named_captures_only", true);
+        final GrokExtractor extractor1 = makeExtractor("%{MYNUMBER:num}", config);
+
+        config.put("named_captures_only", true);
+        final GrokExtractor extractor2 = makeExtractor("%{MYNUMBER:num;int}", config);
+
+        config.put("named_captures_only", false);
+        final GrokExtractor extractor3 = makeExtractor("%{MYNUMBER:num}", config);
+
+        final GrokExtractor extractor4 = makeExtractor("%{MYNUMBER:num}");
+
+        assertThat(extractor1.run("2015"))
+                .hasSize(1)
+                .containsOnly(new Extractor.Result("2015", "num", -1, -1));
+        assertThat(extractor2.run("2015"))
+                .hasSize(1)
+                .containsOnly(new Extractor.Result(2015, "num", -1, -1));
+        assertThat(extractor3.run("2015"))
+                .hasSize(2)
+                .containsOnly(
+                        new Extractor.Result("2015", "num", -1, -1),
+                        new Extractor.Result("2015", "BASE10NUM", -1, -1)
+                );
+        assertThat(extractor4.run("2015"))
+                .hasSize(2)
+                .containsOnly(
+                        new Extractor.Result("2015", "num", -1, -1),
+                        new Extractor.Result("2015", "BASE10NUM", -1, -1)
+                );
+    }
+
     private GrokExtractor makeExtractor(String pattern) {
-        Map<String, Object> config = Maps.newHashMap();
+        return makeExtractor(pattern, new HashMap<>());
+    }
+
+    private GrokExtractor makeExtractor(String pattern, Map<String, Object> config) {
         config.put("grok_pattern", pattern);
 
         try {

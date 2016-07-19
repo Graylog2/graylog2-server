@@ -19,9 +19,9 @@ const ToolsStore = {
 
         return promise;
     },
-    testGrok(pattern: string, string: string): Promise<Object> {
+    testGrok(pattern: string, namedCapturesOnly: boolean, string: string): Promise<Object> {
         const url = ApiRoutes.ToolsApiController.grokTest().url;
-        const promise = fetch('POST', URLUtils.qualifyUrl(url), {pattern: pattern, string: string});
+        const promise = fetch('POST', URLUtils.qualifyUrl(url), {pattern: pattern, string: string, named_captures_only: namedCapturesOnly});
 
         promise.catch((errorThrown) => {
             UserNotification.error('Details: ' + errorThrown,

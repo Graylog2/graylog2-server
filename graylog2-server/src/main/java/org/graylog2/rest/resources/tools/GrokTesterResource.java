@@ -59,9 +59,10 @@ public class GrokTesterResource extends RestResource {
     @GET
     @Timed
     public GrokTesterResponse grokTest(@QueryParam("pattern") @NotEmpty String pattern,
-                                       @QueryParam("string") @NotNull String string) throws GrokException {
+                                       @QueryParam("string") @NotNull String string,
+                                       @QueryParam("named_captures_only") @NotNull boolean namedCapturesOnly) throws GrokException {
 
-        return doTestGrok(string, pattern);
+        return doTestGrok(string, pattern, namedCapturesOnly);
     }
 
     @POST
@@ -69,10 +70,10 @@ public class GrokTesterResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public GrokTesterResponse testGrok(@Valid @NotNull GrokTestRequest grokTestRequest) throws GrokException {
-        return doTestGrok(grokTestRequest.string(), grokTestRequest.pattern());
+        return doTestGrok(grokTestRequest.string(), grokTestRequest.pattern(), grokTestRequest.namedCapturesOnly());
     }
 
-    private GrokTesterResponse doTestGrok(String string, String pattern) throws GrokException {
+    private GrokTesterResponse doTestGrok(String string, String pattern, boolean namedCapturesOnly) throws GrokException {
         final Set<GrokPattern> grokPatterns = grokPatternService.loadAll();
 
         final Grok grok = new Grok();
@@ -80,7 +81,7 @@ public class GrokTesterResource extends RestResource {
             grok.addPattern(grokPattern.name, grokPattern.pattern);
         }
 
-        grok.compile(pattern);
+        grok.compile(pattern, namedCapturesOnly);
         final Match match = grok.match(string);
         match.captures();
         final Map<String, Object> matches = match.toMap();

@@ -641,7 +641,13 @@
             <dependency>
                 <groupId>org.graylog2.repackaged</groupId>
                 <artifactId>grok</artifactId>
-                <version>0.1.3-graylog</version>
+                <version>0.1.6-graylog</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.tony19</groupId>
+                <artifactId>named-regexp</artifactId>
+                <version>0.2.3</version>
+                <scope>compile</scope>
             </dependency>
             <dependency>
                 <groupId>io.swagger</groupId>
