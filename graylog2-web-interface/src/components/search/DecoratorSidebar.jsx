@@ -1,5 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
+import { Well } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
 import { AddDecoratorButton, Decorator } from 'components/search';
@@ -42,6 +43,17 @@ const DecoratorSidebar = React.createClass({
       <span>
         <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder}/>
         <SortableList items={decoratorItems} onMoveItem={this._updateOrder} />
+
+        <Well style={{ marginTop: '10px' }}>
+          <p className="description">
+            Decorators can modify messages shown in the search results on the fly. These changes are not stored, but only
+            shown in the search results. Decorator config is stored <strong>per stream</strong>.
+          </p>
+          <p className="description">
+            Decorators are processed in order, from top to bottom. If you want to change the order in which decorators are
+            processed, you can reorder them using drag and drop.
+          </p>
+        </Well>
       </span>
     );
   },
