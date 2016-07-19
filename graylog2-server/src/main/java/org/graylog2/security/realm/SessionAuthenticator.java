@@ -33,17 +33,19 @@ import javax.ws.rs.core.MultivaluedMap;
 
 public class SessionAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(SessionAuthenticator.class);
+    public static final String NAME = "mongodb-session";
 
     private final UserService userService;
     private final LdapUserAuthenticator ldapAuthenticator;
 
     @Inject
-    public SessionAuthenticator(UserService userService, LdapUserAuthenticator ldapAuthenticator) {
+    SessionAuthenticator(UserService userService, LdapUserAuthenticator ldapAuthenticator) {
         this.userService = userService;
         this.ldapAuthenticator = ldapAuthenticator;
         // this realm either rejects a session, or allows the associated user implicitly
-        setAuthenticationTokenClass(SessionIdToken.class);
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
+        setAuthenticationTokenClass(SessionIdToken.class);
+        setCachingEnabled(false);
     }
 
     @Override

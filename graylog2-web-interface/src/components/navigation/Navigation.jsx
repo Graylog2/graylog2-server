@@ -64,11 +64,8 @@ const Navigation = React.createClass({
     if (this._isActive('/system/logging')) {
       return prefix + ' / Logging';
     }
-    if (this._isActive('/system/users')) {
-      return prefix + ' / Users';
-    }
-    if (this._isActive('/system/roles')) {
-      return prefix + ' / Roles';
+    if (this._isActive('/system/authentication')) {
+      return prefix + ' / Authentication';
     }
     if (this._isActive('/system/contentpacks')) {
       return prefix + ' / Content Packs';
@@ -203,15 +200,10 @@ const Navigation = React.createClass({
                   <MenuItem>Logging</MenuItem>
                 </LinkContainer>
               }
-              {this.isPermitted(this.props.permissions, ['users:list']) &&
-                <LinkContainer to={Routes.SYSTEM.USERS.LIST}>
-                  <MenuItem>Users</MenuItem>
-                </LinkContainer>
-              }
-              {this.isPermitted(this.props.permissions, ['roles:read']) &&
-                <LinkContainer to={Routes.SYSTEM.ROLES}>
-                  <MenuItem>Roles</MenuItem>
-                </LinkContainer>
+              {this.isAnyPermitted(this.props.permissions, ['users:list, roles:read']) &&
+              <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.OVERVIEW}>
+                <MenuItem>Authentication</MenuItem>
+              </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['dashboards:create', 'inputs:create', 'streams:create']) &&
               <LinkContainer to={Routes.SYSTEM.CONTENTPACKS.LIST}>

@@ -18,13 +18,13 @@ package org.graylog2.messageprocessors;
 
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog2.cluster.ClusterConfigChangedEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
+import org.graylog2.utilities.LenientExplicitOrdering;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -71,7 +70,7 @@ public class OrderedMessageProcessors implements Iterable<MessageProcessor> {
 
         if (config != null) {
             // if we have an explicit ordering use that (unknown last, partial ordering over the given list)
-            classNameOrdering = new ExplicitOrdering(config.processorOrder());
+            classNameOrdering = new LenientExplicitOrdering<>(config.processorOrder());
         }
         final ImmutableList<MessageProcessor> sortedCopy =
                 classNameOrdering.onResultOf(mp -> mp.getClass().getCanonicalName()).immutableSortedCopy(processors);
@@ -97,34 +96,4 @@ public class OrderedMessageProcessors implements Iterable<MessageProcessor> {
         return sortedProcessors.get().iterator();
     }
 
-    private static class ExplicitOrdering extends Ordering<String> {
-        private final Map<String, Integer> idxMap;
-
-        public ExplicitOrdering(List<String> order) {
-            this.idxMap = Maps.newHashMapWithExpectedSize(order.size());
-            int idx = 0;
-            for (String s : order) {
-                idxMap.put(s, idx);
-                idx++;
-            }
-        }
-
-        @Override
-        public int compare(String left, String right) {
-            final Integer leftIdx = idxMap.get(left);
-            final Integer rightIdx = idxMap.get(right);
-
-            if (leftIdx != null && rightIdx != null) {
-                //noinspection SuspiciousNameCombination
-                return Integer.compare(leftIdx, rightIdx);
-            }
-            if (leftIdx == null && rightIdx == null) {
-                return left.compareTo(right);
-            }
-            if (leftIdx == null) {
-                return -1;
-            }
-            return  1;
-        }
-    }
 }

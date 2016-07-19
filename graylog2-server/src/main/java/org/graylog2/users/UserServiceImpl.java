@@ -35,9 +35,6 @@ import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.InMemoryRolePermissionResolver;
-import org.graylog2.shared.security.Permissions;
-import org.graylog2.shared.security.ldap.LdapEntry;
-import org.graylog2.shared.security.ldap.LdapSettings;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserService;
@@ -50,12 +47,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class UserServiceImpl extends PersistedServiceImpl implements UserService {
     private static final Logger LOG = LoggerFactory.getLogger(UserServiceImpl.class);
@@ -63,7 +56,6 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     private final Configuration configuration;
     private final RoleService roleService;
     private final UserImpl.Factory userFactory;
-    private final Permissions permissions;
     private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
 
     @Inject
@@ -71,13 +63,11 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
                            final Configuration configuration,
                            final RoleService roleService,
                            final UserImpl.Factory userFactory,
-                           final Permissions permissions,
                            final InMemoryRolePermissionResolver inMemoryRolePermissionResolver) {
         super(mongoConnection);
         this.configuration = configuration;
         this.roleService = roleService;
         this.userFactory = userFactory;
-        this.permissions = permissions;
         this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
 
         // ensure that the users' roles array is indexed
@@ -130,7 +120,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     @Override
     public User create() {
-        return userFactory.create(Maps.<String, Object>newHashMap());
+        return userFactory.create(Maps.newHashMap());
     }
 
     @Override
@@ -144,92 +134,6 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         }
 
         return users;
-    }
-
-    @Override
-    @Nullable
-    public User syncFromLdapEntry(LdapEntry userEntry, LdapSettings ldapSettings, String username) {
-        UserImpl user = (UserImpl) load(username);
-
-        // create new user object if necessary
-        if (user == null) {
-            user = userFactory.create(Maps.<String, Object>newHashMap());
-        }
-
-        // update user attributes from ldap entry
-        updateFromLdap(user, userEntry, ldapSettings, username);
-
-        try {
-            save(user);
-        } catch (ValidationException e) {
-            LOG.error("Cannot save user.", e);
-            return null;
-        }
-
-        return user;
-    }
-
-    @Override
-    public void updateFromLdap(User user, LdapEntry userEntry, LdapSettings ldapSettings, String username) {
-        final String displayNameAttribute = ldapSettings.getDisplayNameAttribute();
-        final String fullName = firstNonNull(userEntry.get(displayNameAttribute), username);
-
-        user.setName(username);
-        user.setFullName(fullName);
-        user.setExternal(true);
-
-        if (user.getTimeZone() == null) {
-            user.setTimeZone(configuration.getRootTimeZone());
-        }
-
-        final String email = userEntry.getEmail();
-        if (isNullOrEmpty(email)) {
-            LOG.debug("No email address found for user {} in LDAP. Using {}@localhost", username, username);
-            user.setEmail(username + "@localhost");
-        } else {
-            user.setEmail(email);
-        }
-
-        // TODO This is a crude hack until we have a proper way to distinguish LDAP users from normal users
-        if (isNullOrEmpty(user.getHashedPassword())) {
-            ((UserImpl) user).setHashedPassword("User synced from LDAP.");
-        }
-
-        // map ldap groups to user roles, if the mapping is present
-        final Set<String> translatedRoleIds = Sets.newHashSet(Sets.union(Sets.newHashSet(ldapSettings.getDefaultGroupId()),
-                                                                         ldapSettings.getAdditionalDefaultGroupIds()));
-        if (!userEntry.getGroups().isEmpty()) {
-            // ldap search returned groups, these always override the ones set on the user
-            try {
-                final Map<String, Role> roleNameToRole = roleService.loadAllLowercaseNameMap();
-                for (String ldapGroupName : userEntry.getGroups()) {
-                    final String roleName = ldapSettings.getGroupMapping().get(ldapGroupName);
-                    if (roleName == null) {
-                        LOG.debug("User {}: No group mapping for ldap group <{}>", username, ldapGroupName);
-                        continue;
-                    }
-                    final Role role = roleNameToRole.get(roleName.toLowerCase(Locale.ENGLISH));
-                    if (role != null) {
-                        LOG.debug("User {}: Mapping ldap group <{}> to role <{}>", username, ldapGroupName, role.getName());
-                        translatedRoleIds.add(role.getId());
-                    } else {
-                        LOG.warn("User {}: No role found for ldap group <{}>", username, ldapGroupName);
-                    }
-                }
-
-            } catch (NotFoundException e) {
-                LOG.error("Unable to load user roles", e);
-            }
-        } else if (ldapSettings.getGroupMapping().isEmpty()
-                || ldapSettings.getGroupSearchBase().isEmpty()
-                || ldapSettings.getGroupSearchPattern().isEmpty()
-                || ldapSettings.getGroupIdAttribute().isEmpty()) {
-            // no group mapping or configuration set, we'll leave the previously set groups alone on sync
-            // when first creating the user these will be empty
-            translatedRoleIds.addAll(user.getRoleIds());
-        }
-        user.setRoleIds(translatedRoleIds);
-        user.setPermissions(Collections.emptyList());
     }
 
     @Override

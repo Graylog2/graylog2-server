@@ -16,29 +16,37 @@
  */
 package org.graylog2.security.realm;
 
-import org.apache.shiro.authc.*;
+import org.apache.shiro.authc.AuthenticationException;
+import org.apache.shiro.authc.AuthenticationInfo;
+import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.apache.shiro.util.ByteSource;
-import org.graylog2.Configuration;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 
 /**
  * @author Kay Roepke <kay@torch.sh>
  */
 public class PasswordAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(PasswordAuthenticator.class);
+    public static final String NAME = "mongodb-password";
     private final UserService userService;
-    private final Configuration configuration;
+    private ByteSource credentialsSalt;
 
     @Inject
-    public PasswordAuthenticator(UserService userService, Configuration configuration) {
+    PasswordAuthenticator(UserService userService,
+                          @Named("password_secret") String passwordSecret,
+                          PasswordAlgorithmCredentialsMatcher passwordAlgorithmCredentialsMatcher) {
         this.userService = userService;
-        this.configuration = configuration;
+        credentialsSalt = ByteSource.Util.bytes(passwordSecret);
+        setCachingEnabled(false);
+        setCredentialsMatcher(passwordAlgorithmCredentialsMatcher);
     }
 
     @Override
@@ -61,9 +69,9 @@ public class PasswordAuthenticator extends AuthenticatingRealm {
             LOG.debug("Found user {} to be authenticated with password.", user.getName());
         }
         return new UserAccount(token.getPrincipal(),
-                user.getHashedPassword(),
-                ByteSource.Util.bytes(configuration.getPasswordSecret()),
-                "graylog2MongoDbRealm",
-                user);
+                               user.getHashedPassword(),
+                               credentialsSalt,
+                               "graylog2MongoDbRealm",
+                               user);
     }
 }

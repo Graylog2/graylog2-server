@@ -104,7 +104,7 @@ const LdapGroupsComponent = React.createClass({
             </Col>
             <Col md={10} mdPush={2}>
               <Button type="submit" bsStyle="success">Save</Button>&nbsp;
-              <LinkContainer to={Routes.SYSTEM.USERS.LIST}>
+              <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
                 <Button>Cancel</Button>
               </LinkContainer>
             </Col>

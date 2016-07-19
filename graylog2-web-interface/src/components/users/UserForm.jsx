@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Input, Button, Row, Col, Alert, Panel } from 'react-bootstrap';
+import Routes from 'routing/Routes';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
@@ -21,6 +22,7 @@ import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/co
 const UserForm = React.createClass({
   propTypes: {
     user: React.PropTypes.object.isRequired,
+    history: React.PropTypes.object,
   },
   mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
   getInitialState() {
@@ -93,6 +95,7 @@ const UserForm = React.createClass({
 
     UsersStore.changePassword(this.props.user.username, request).then(() => {
       UserNotification.success('Password updated successfully.', 'Success');
+      this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
     }, () => {
       UserNotification.error('Could not update password. Please verify that your current password is correct.', 'Updating password failed');
     });
@@ -103,6 +106,7 @@ const UserForm = React.createClass({
 
     UsersStore.update(this.props.user.username, this.state.user).then(() => {
       UserNotification.success('User updated successfully.', 'Success');
+      this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
     }, () => {
       UserNotification.error('Could not update the user. Please check your logs for more information.', 'Updating user failed');
     });
@@ -186,7 +190,7 @@ const UserForm = React.createClass({
 
     return (
       <div>
-        <Row className="row content">
+        <Row>
           <Col lg={8}>
             <h2>User information</h2>
             <form className="form-horizontal user-form" id="edit-user-form" onSubmit={this._updateUser}>
@@ -278,7 +282,7 @@ const UserForm = React.createClass({
             </form>
           </Col>
         </Row>
-        <Row className="content">
+        <Row>
           <Col lg={8}>
             <h2>Change password</h2>
             {user.read_only ?
@@ -324,7 +328,7 @@ const UserForm = React.createClass({
           </Col>
         </Row>
         <IfPermitted permissions="users:rolesedit">
-          <EditRolesForm user={this.props.user} />
+          <EditRolesForm user={this.props.user} history={this.props.history} />
         </IfPermitted>
       </div>
     );
