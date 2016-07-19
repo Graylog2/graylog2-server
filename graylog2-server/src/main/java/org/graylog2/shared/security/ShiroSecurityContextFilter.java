@@ -21,9 +21,12 @@ import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.apache.shiro.subject.Subject;
 import org.glassfish.grizzly.http.server.Request;
+import org.graylog2.rest.RestTools;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Priorities;
@@ -35,6 +38,7 @@ import javax.ws.rs.core.SecurityContext;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
 
@@ -42,11 +46,15 @@ import static java.util.Objects.requireNonNull;
 public class ShiroSecurityContextFilter implements ContainerRequestFilter {
     private final DefaultSecurityManager securityManager;
     private Provider<Request> grizzlyRequestProvider;
+    private final Set<IpSubnet> trustedProxies;
 
     @Inject
-    public ShiroSecurityContextFilter(DefaultSecurityManager securityManager, Provider<Request> grizzlyRequestProvider) {
+    public ShiroSecurityContextFilter(DefaultSecurityManager securityManager,
+                                      Provider<Request> grizzlyRequestProvider,
+                                      @Named("trusted_proxies") Set<IpSubnet> trustedProxies) {
         this.securityManager = requireNonNull(securityManager);
         this.grizzlyRequestProvider = grizzlyRequestProvider;
+        this.trustedProxies = trustedProxies;
     }
 
     @Override
@@ -55,7 +63,7 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         final MultivaluedMap<String, String> headers = requestContext.getHeaders();
         final Request grizzlyRequest = grizzlyRequestProvider.get();
 
-        final String host = grizzlyRequest.getRemoteAddr();
+        final String host = RestTools.getRemoteAddrFromRequest(grizzlyRequest, trustedProxies);
         final String authHeader = headers.getFirst(HttpHeaders.AUTHORIZATION);
 
         final SecurityContext securityContext;
