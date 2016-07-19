@@ -9,7 +9,7 @@ const MessageField = React.createClass({
     fieldName: React.PropTypes.string.isRequired,
     message: React.PropTypes.object.isRequired,
     possiblyHighlight: React.PropTypes.func.isRequired,
-    value: React.PropTypes.stirng.isRequired,
+    value: React.PropTypes.string.isRequired,
   },
   getInitialState() {
     return {
