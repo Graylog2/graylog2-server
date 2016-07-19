@@ -83,18 +83,21 @@ public class ExtractorFilter implements MessageFilter {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleInputCreate(final InputCreated event) {
         LOG.debug("Load extractors for input <{}>", event.id());
         scheduler.schedule(() -> loadExtractors(event.id()), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleInputDelete(final InputDeleted event) {
         LOG.debug("Removing input from extractors cache <{}>", event.id());
         extractors.remove(event.id());
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleInputUpdate(final InputUpdated event) {
         scheduler.schedule(() -> loadExtractors(event.id()), 0, TimeUnit.SECONDS);
     }

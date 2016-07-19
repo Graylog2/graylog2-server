@@ -67,6 +67,7 @@ public class StreamRouter {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleStreamsUpdate(StreamsChangedEvent event) {
         scheduler.schedule(engineUpdater, 0, TimeUnit.SECONDS);
     }

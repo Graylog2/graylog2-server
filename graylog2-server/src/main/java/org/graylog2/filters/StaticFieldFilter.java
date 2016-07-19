@@ -84,18 +84,21 @@ public class StaticFieldFilter implements MessageFilter {
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleInputCreate(final InputCreated event) {
         LOG.debug("Load static fields for input <{}>", event.id());
         scheduler.schedule(() -> loadStaticFields(event.id()), 0, TimeUnit.SECONDS);
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleInputDelete(final InputDeleted event) {
         LOG.debug("Removing input from static fields cache <{}>", event.id());
         staticFields.remove(event.id());
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void handleInputUpdate(final InputUpdated event) {
         scheduler.schedule(() -> loadStaticFields(event.id()), 0, TimeUnit.SECONDS);
     }
