@@ -33,7 +33,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -69,7 +68,7 @@ public class StreamRouter {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleStreamsUpdate(StreamsChangedEvent event) {
-        scheduler.schedule(engineUpdater, 0, TimeUnit.SECONDS);
+        scheduler.submit(engineUpdater);
     }
 
     private ExecutorService executorService() {

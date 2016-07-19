@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 /**
  * @author Lennart Koopmann <lennart@torch.sh>
@@ -87,7 +86,7 @@ public class StaticFieldFilter implements MessageFilter {
     @SuppressWarnings("unused")
     public void handleInputCreate(final InputCreated event) {
         LOG.debug("Load static fields for input <{}>", event.id());
-        scheduler.schedule(() -> loadStaticFields(event.id()), 0, TimeUnit.SECONDS);
+        scheduler.submit(() -> loadStaticFields(event.id()));
     }
 
     @Subscribe
@@ -100,7 +99,7 @@ public class StaticFieldFilter implements MessageFilter {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleInputUpdate(final InputUpdated event) {
-        scheduler.schedule(() -> loadStaticFields(event.id()), 0, TimeUnit.SECONDS);
+        scheduler.submit(() -> loadStaticFields(event.id()));
     }
 
     private void loadAllStaticFields() {

@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -71,7 +70,7 @@ public class RulesFilter implements MessageFilter {
     @SuppressWarnings("unused")
     public void handleRulesUpdate(FilterDescriptionUpdateEvent ignored) {
         LOG.debug("Updating filter descriptions: {}", ignored);
-        scheduler.schedule(this::loadRules, 0, TimeUnit.SECONDS);
+        scheduler.submit(this::loadRules);
     }
 
     private void loadRules() {
