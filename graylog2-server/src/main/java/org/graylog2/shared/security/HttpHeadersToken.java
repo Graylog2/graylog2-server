@@ -18,6 +18,7 @@ package org.graylog2.shared.security;
 
 import org.apache.shiro.authc.HostAuthenticationToken;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.core.MultivaluedMap;
 
 public class HttpHeadersToken implements HostAuthenticationToken {
@@ -30,14 +31,26 @@ public class HttpHeadersToken implements HostAuthenticationToken {
         this.host = host;
     }
 
+    /**
+     * A HttpHeadersToken does not have a natural principal associated with it, so this is always null.
+     *
+     * @return null
+     */
     @Override
+    @Nullable
     public Object getPrincipal() {
-        return httpHeaders.get("remote_user");
+        return null;
     }
 
+    /**
+     * A HttpHeadersToken does not have a natural credential associated with it, so this is always null.
+     *
+     * @return null
+     */
     @Override
+    @Nullable
     public Object getCredentials() {
-        return httpHeaders.get("remote_credentials");
+        return null;
     }
 
     @Override
