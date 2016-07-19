@@ -69,7 +69,7 @@ public class RulesFilter implements MessageFilter {
 
     @Subscribe
     public void handleRulesUpdate(FilterDescriptionUpdateEvent ignored) {
-        LOG.info("Updating filter descriptions: {}", ignored);
+        LOG.debug("Updating filter descriptions: {}", ignored);
         scheduler.schedule(this::loadRules, 0, TimeUnit.SECONDS);
     }
 
