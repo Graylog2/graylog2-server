@@ -18,7 +18,7 @@ const Connection = React.createClass({
 
   _pipelineRowFormatter(pipeline) {
     return (
-      <tr>
+      <tr key={pipeline.id}>
         <td style={{ width: 400 }}>
           <LinkContainer to={`/system/pipelines/${pipeline.id}`}><a>{pipeline.title}</a></LinkContainer>
         </td>

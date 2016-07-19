@@ -41,7 +41,7 @@ const Stage = React.createClass({
 
     }
     return (
-      <tr>
+      <tr key={rule.id}>
         <td style={{ width: 400 }}>
           {ruleTitle}
         </td>
