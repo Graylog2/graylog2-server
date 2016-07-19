@@ -67,7 +67,7 @@ public class ShiroSecurityContextFilterTest {
 
         final DefaultSecurityManager securityManager = new DefaultSecurityManager();
         final Provider<Request> grizzlyRequestProvider = () -> mock(Request.class);
-        filter = new ShiroSecurityContextFilter(securityManager, grizzlyRequestProvider);
+        filter = new ShiroSecurityContextFilter(securityManager, grizzlyRequestProvider, Collections.emptySet());
     }
 
     @Test
