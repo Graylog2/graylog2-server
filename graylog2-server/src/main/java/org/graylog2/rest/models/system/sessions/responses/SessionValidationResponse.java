@@ -29,9 +29,9 @@ public abstract class SessionValidationResponse {
     @JsonProperty("is_valid")
     public abstract boolean isValid();
 
-    @JsonProperty("new_session_id")
+    @JsonProperty("session_id")
     @Nullable
-    public abstract String newSessionId();
+    public abstract String sessionId();
 
     @JsonProperty("username")
     @Nullable
@@ -40,7 +40,7 @@ public abstract class SessionValidationResponse {
     @JsonCreator
     public static SessionValidationResponse create(
             @JsonProperty("is_valid") boolean isValid,
-            @JsonProperty("new_session_id") @Nullable String newSessionId,
+            @JsonProperty("session_id") @Nullable String newSessionId,
             @JsonProperty("username") @Nullable String username) {
         return new AutoValue_SessionValidationResponse(isValid, newSessionId, username);
     }
