@@ -17,7 +17,6 @@
 package org.graylog2.filters;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog2.database.NotFoundException;
@@ -40,6 +39,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class ExtractorFilter implements MessageFilter {
     private static final Logger LOG = LoggerFactory.getLogger(ExtractorFilter.class);
@@ -112,11 +112,12 @@ public class ExtractorFilter implements MessageFilter {
 
         try {
             final Input input = inputService.find(inputId);
-            final List<Extractor> sorted = Lists.newArrayList(inputService.getExtractors(input));
+            final List<Extractor> sortedExtractors = inputService.getExtractors(input)
+                    .stream()
+                    .sorted((e1, e2) -> e1.getOrder().intValue() - e2.getOrder().intValue())
+                    .collect(Collectors.toList());
 
-            Collections.sort(sorted, (e1, e2) -> e1.getOrder().intValue() - e2.getOrder().intValue());
-
-            extractors.put(inputId, ImmutableList.copyOf(sorted));
+            extractors.put(inputId, ImmutableList.copyOf(sortedExtractors));
         } catch (NotFoundException e) {
             LOG.warn("Unable to load input <{}>: {}", inputId, e.getMessage());
         }
