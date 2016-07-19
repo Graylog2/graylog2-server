@@ -32,7 +32,7 @@ const GrokExtractorConfiguration = React.createClass({
   _onTryClick() {
     this.setState({trying: true});
 
-    const promise = ToolsStore.testGrok(this.props.configuration.grok_pattern, this.props.exampleMessage);
+    const promise = ToolsStore.testGrok(this.props.configuration.grok_pattern, this.props.configuration.named_captures_only, this.props.exampleMessage);
     promise.then(result => {
       if (!result.matched) {
         UserNotification.warning('We were not able to run the grok extraction. Please check your parameters.');
@@ -64,6 +64,14 @@ const GrokExtractorConfiguration = React.createClass({
 
     return (
       <div>
+        <Input type="checkbox"
+               id="named_captures_only"
+               label="Named captures only"
+               wrapperClassName="col-md-offset-2 col-md-10"
+               defaultChecked={this.props.configuration.named_captures_only}
+               onChange={this._onChange('named_captures_only')}
+               help="Only put the explicitly named captures into the message."/>
+
         <Input id="grok_pattern"
                label="Grok pattern"
                labelClassName="col-md-2"

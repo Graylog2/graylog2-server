@@ -31,9 +31,13 @@ public abstract class GrokTestRequest {
     @JsonProperty
     public abstract String pattern();
 
+    @JsonProperty("named_captures_only")
+    public abstract boolean namedCapturesOnly();
+
     @JsonCreator
     public static GrokTestRequest create(@JsonProperty("string") String string,
-                                         @JsonProperty("pattern") String pattern) {
-        return new AutoValue_GrokTestRequest(string, pattern);
+                                         @JsonProperty("pattern") String pattern,
+                                         @JsonProperty("named_captures_only") boolean namedCapturesOnly) {
+        return new AutoValue_GrokTestRequest(string, pattern, namedCapturesOnly);
     }
 }
