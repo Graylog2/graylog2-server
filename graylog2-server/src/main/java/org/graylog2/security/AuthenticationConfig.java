@@ -43,7 +43,7 @@ public abstract class AuthenticationConfig {
 
     @JsonCreator
     public static AuthenticationConfig create(@JsonProperty("realm_order") List<String> order,
-                                       @JsonProperty("disabled_realms") Set<String> disabledRealms) {
+                                              @JsonProperty("disabled_realms") Set<String> disabledRealms) {
         return builder()
                 .realmOrder(order)
                 .disabledRealms(disabledRealms)
@@ -66,12 +66,12 @@ public abstract class AuthenticationConfig {
     public AuthenticationConfig withRealms(final Set<String> availableRealms) {
         final List<String> newOrder = new ArrayList<>();
 
-        // Check if processor actually exists.
+        // Check if realm actually exists.
         realmOrder().stream()
                 .filter(availableRealms::contains)
                 .forEach(newOrder::add);
 
-        // Add availableProcessors which are not in the config yet to the end.
+        // Add availableRealms which are not in the config yet to the end.
         availableRealms.stream()
                 .filter(realm -> !newOrder.contains(realm))
                 .sorted(String.CASE_INSENSITIVE_ORDER)
