@@ -29,6 +29,7 @@ import org.graylog2.auditlog.AuditLogModule;
 import org.graylog2.auditlog.AuditLogStdOutConfiguration;
 import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.bindings.AlarmCallbackBindings;
+import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.bindings.InitializerBindings;
 import org.graylog2.bindings.MessageFilterBindings;
@@ -99,6 +100,7 @@ public class Server extends ServerBootstrap {
     protected List<Module> getCommandBindings() {
         final ImmutableList.Builder<Module> modules = ImmutableList.builder();
         modules.add(
+            new ConfigurationModule(configuration),
             new ServerBindings(configuration),
             new PersistenceServicesBindings(),
             new MessageFilterBindings(),

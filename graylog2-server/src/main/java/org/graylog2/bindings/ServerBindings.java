@@ -139,9 +139,6 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindSingletons() {
-        bind(Configuration.class).toInstance(configuration);
-        bind(BaseConfiguration.class).toInstance(configuration);
-
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
 
         if (configuration.isMessageJournalEnabled()) {
