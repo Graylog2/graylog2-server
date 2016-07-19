@@ -24,13 +24,10 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.simulator.PipelineInterpreterTracer;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
-import org.graylog2.rest.resources.messages.MessageResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
@@ -51,14 +48,13 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class SimulatorResource extends RestResource implements PluginRestResource {
-    private final OrderedMessageProcessors orderedMessageProcessors;
-    private final MessageResource messageResource;
     private final StreamService streamService;
+    private final PipelineInterpreter pipelineInterpreter;
 
     @Inject
-    public SimulatorResource(OrderedMessageProcessors orderedMessageProcessors, MessageResource messageResource, StreamService streamService) {
-        this.orderedMessageProcessors = orderedMessageProcessors;
-        this.messageResource = messageResource;
+    public SimulatorResource(PipelineInterpreter pipelineInterpreter,
+                             StreamService streamService) {
+        this.pipelineInterpreter = pipelineInterpreter;
         this.streamService = streamService;
     }
 
@@ -77,15 +73,13 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
         final List<ResultMessageSummary> simulationResults = new ArrayList<>();
         final PipelineInterpreterTracer pipelineInterpreterTracer = new PipelineInterpreterTracer();
 
-        for (MessageProcessor messageProcessor : orderedMessageProcessors) {
-            if (messageProcessor instanceof PipelineInterpreter) {
-                org.graylog2.plugin.Messages processedMessages = ((PipelineInterpreter) messageProcessor).process(message, pipelineInterpreterTracer.getSimulatorInterpreterListener());
-                for (Message processedMessage : processedMessages) {
-                    simulationResults.add(ResultMessageSummary.create(null, processedMessage.getFields(), ""));
-                }
-            }
+        org.graylog2.plugin.Messages processedMessages = pipelineInterpreter.process(message,
+                                                                                     pipelineInterpreterTracer.getSimulatorInterpreterListener());
+        for (Message processedMessage : processedMessages) {
+            simulationResults.add(ResultMessageSummary.create(null, processedMessage.getFields(), ""));
         }
-
-        return SimulationResponse.create(simulationResults, pipelineInterpreterTracer.getExecutionTrace(), pipelineInterpreterTracer.took());
+        return SimulationResponse.create(simulationResults,
+                                         pipelineInterpreterTracer.getExecutionTrace(),
+                                         pipelineInterpreterTracer.took());
     }
 }
