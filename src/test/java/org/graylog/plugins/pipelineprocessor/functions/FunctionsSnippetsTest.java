@@ -49,6 +49,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
@@ -113,6 +114,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(HasField.NAME, new HasField());
         functions.put(SetField.NAME, new SetField());
         functions.put(SetFields.NAME, new SetFields());
+        functions.put(RenameField.NAME, new RenameField());
         functions.put(RemoveField.NAME, new RemoveField());
 
         functions.put(DropMessage.NAME, new DropMessage());
@@ -451,5 +453,20 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         evaluateRule(rule, in);
 
         assertThat(actionsTriggered.get()).isFalse();
+    }
+
+    @Test
+    public void fieldRenaming() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final Message in = new Message("some message", "somehost.graylog.org", Tools.nowUTC());
+        in.addField("field_a", "fieldAContent");
+        in.addField("field_b", "not deleted");
+
+        final Message message = evaluateRule(rule, in);
+
+        assertThat(message.hasField("field_1")).isFalse();
+        assertThat(message.hasField("field_2")).isTrue();
+        assertThat(message.hasField("field_b")).isTrue();
     }
 }
