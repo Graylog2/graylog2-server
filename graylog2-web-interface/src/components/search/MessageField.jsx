@@ -11,12 +11,6 @@ const MessageField = React.createClass({
     possiblyHighlight: React.PropTypes.func.isRequired,
     value: React.PropTypes.string.isRequired,
   },
-  getInitialState() {
-    return {
-      showOriginal: false,
-    };
-  },
-
   SPECIAL_FIELDS: ['full_message', 'level'],
   _decorationMarker(key) {
     if (this._isAdded(key)) {
@@ -24,8 +18,7 @@ const MessageField = React.createClass({
     }
 
     if (this._isChanged(key)) {
-      return (<DecoratedMessageFieldMarker title="This field was modified by a decorator. Click here to show the original content."
-                                           onClick={this._toggleShowOriginalContent} />);
+      return (<DecoratedMessageFieldMarker title="This field was modified by a decorator for the search result.." />);
     }
 
     return null;
@@ -38,33 +31,11 @@ const MessageField = React.createClass({
     const decorationStats = this.props.message.decoration_stats;
     return decorationStats && decorationStats.changed_fields && decorationStats.changed_fields[key] !== undefined;
   },
-  _originalValue(key) {
-    const decorationStats = this.props.message.decoration_stats;
-    if (decorationStats && decorationStats.changed_fields) {
-      return decorationStats.changed_fields[key];
-    }
-
-    return null;
-  },
-  _toggleShowOriginalContent() {
-    this.setState({ showOriginal: !this.state.showOriginal });
-  },
-  _wrapPossiblyHighlight(fieldName) {
-    if (this.state.showOriginal) {
-      return <span>{this._originalValue(fieldName)} <i>(Original Content)</i></span>;
-    } else {
-      return this.props.possiblyHighlight(fieldName);
-    }
-  },
   render() {
     let innerValue = this.props.value;
     const key = this.props.fieldName;
     if (this.SPECIAL_FIELDS.indexOf(key) !== -1) {
       innerValue = this.props.message.fields[key];
-    }
-
-    if (this.state.showOriginal) {
-      innerValue = this._originalValue(key);
     }
 
     return (
@@ -74,7 +45,7 @@ const MessageField = React.createClass({
                                  message={this.props.message}
                                  fieldName={key}
                                  fieldValue={innerValue}
-                                 possiblyHighlight={this._wrapPossiblyHighlight}
+                                 possiblyHighlight={this.props.possiblyHighlight}
                                  disableFieldActions={this._isAdded(key) || this.props.disableFieldActions}
                                  customFieldActions={this.props.customFieldActions}/>
       </span>
