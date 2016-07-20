@@ -40,7 +40,7 @@ public class ClusterEventCleanupPeriodical extends Periodical {
     private static final String COLLECTION_NAME = ClusterEventPeriodical.COLLECTION_NAME;
 
     @VisibleForTesting
-    static final long DEFAULT_MAX_EVENT_AGE = TimeUnit.HOURS.toMillis(1L);
+    static final long DEFAULT_MAX_EVENT_AGE = TimeUnit.DAYS.toMillis(1L);
 
     private final JacksonDBCollection<ClusterEvent, String> dbCollection;
     private final long maxEventAge;
@@ -89,7 +89,7 @@ public class ClusterEventCleanupPeriodical extends Periodical {
 
     @Override
     public int getPeriodSeconds() {
-        return Ints.saturatedCast(TimeUnit.MINUTES.toSeconds(5L));
+        return Ints.saturatedCast(TimeUnit.DAYS.toSeconds(1L));
     }
 
     @Override
