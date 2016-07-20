@@ -131,9 +131,9 @@ public class Message implements Messages {
     public Message(final String message, final String source, final DateTime timestamp) {
         // Adding the fields directly because they would not be accepted as a reserved fields.
         fields.put(FIELD_ID, new UUID().toString());
-        fields.put(FIELD_MESSAGE, message);
-        fields.put(FIELD_SOURCE, source);
-        fields.put(FIELD_TIMESTAMP, timestamp);
+        addRequiredField(FIELD_MESSAGE, message);
+        addRequiredField(FIELD_SOURCE, source);
+        addRequiredField(FIELD_TIMESTAMP, timestamp);
     }
 
     public Message(final Map<String, Object> fields) {
@@ -296,6 +296,14 @@ public class Message implements Messages {
     }
 
     public void addField(final String key, final Object value) {
+        addField(key, value, false);
+    }
+
+    private void addRequiredField(final String key, final Object value) {
+        addField(key, value, true);
+    }
+
+    private void addField(final String key, final Object value, final boolean isRequiredField) {
         // Don't accept protected keys. (some are allowed though lol)
         if (RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key) || !validKey(key)) {
             if (LOG.isDebugEnabled()) {
@@ -309,7 +317,7 @@ public class Message implements Messages {
         } else if(value instanceof String) {
             final String str = ((String) value).trim();
 
-            if(!str.isEmpty()) {
+            if (isRequiredField || !str.isEmpty()) {
                 fields.put(key.trim(), str);
             }
         } else if(value != null) {
