@@ -265,6 +265,8 @@ public class PipelineInterpreter implements MessageProcessor {
                 }
             }
         }
+
+        interpreterListener.finishProcessing();
         // 7. return the processed messages
         return new MessageCollection(fullyProcessed);
     }
@@ -374,7 +376,6 @@ public class PipelineInterpreter implements MessageProcessor {
             }
         }
 
-        interpreterListener.finishProcessing();
         // 7. return the processed messages
         return result;
     }
