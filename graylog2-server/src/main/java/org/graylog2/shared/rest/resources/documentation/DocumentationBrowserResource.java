@@ -53,7 +53,7 @@ public class DocumentationBrowserResource extends RestResource {
     public Response asset(@PathParam("route") String route) {
         // Directory traversal should not be possible but just to make sure..
         if (route.contains("..")) {
-            throw new BadRequestException();
+            throw new BadRequestException("Not allowed to access parent directory");
         }
 
         if (route.trim().equals("")) {
@@ -69,10 +69,10 @@ public class DocumentationBrowserResource extends RestResource {
                         .header("Content-Length", resourceBytes.length)
                         .build();
             } catch (IOException e) {
-                throw new NotFoundException(e);
+                throw new NotFoundException("Couldn't load " + resource, e);
             }
         } else {
-            throw new NotFoundException();
+            throw new NotFoundException("Couldn't find " + route);
         }
     }
 }

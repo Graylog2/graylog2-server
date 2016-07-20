@@ -69,6 +69,7 @@ import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
 import org.graylog2.security.ldap.LdapConnector;
 import org.graylog2.security.ldap.LdapSettingsImpl;
+import org.graylog2.security.realm.AuthenticatingRealmModule;
 import org.graylog2.security.realm.LdapUserAuthenticator;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.inputs.PersistedInputs;
@@ -113,6 +114,7 @@ public class ServerBindings extends Graylog2Module {
         bindExceptionMappers();
         bindAdditionalJerseyComponents();
         bindEventBusListeners();
+        install(new AuthenticatingRealmModule());
         bindSearchResponseDecorators();
     }
 
@@ -139,9 +141,6 @@ public class ServerBindings extends Graylog2Module {
     }
 
     private void bindSingletons() {
-        bind(Configuration.class).toInstance(configuration);
-        bind(BaseConfiguration.class).toInstance(configuration);
-
         bind(MongoConnection.class).toProvider(MongoConnectionProvider.class);
 
         if (configuration.isMessageJournalEnabled()) {

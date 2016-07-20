@@ -161,4 +161,52 @@ public class JsonExtractorTest {
             new Extractor.Result("Purge Vector", "Target_Data_Attribute Name", -1, -1)
         );
     }
+
+    @Test
+    public void testRunWithWhitespaceInKey() throws Exception {
+        final String value = "{\"text string\": \"foobar\", \"num   b er\": 1234.5678, \"bool\": true, \"null\": null}";
+
+        final JsonExtractor jsonExtractor1 = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
+                "source", "target", Collections.emptyMap(), "user", Collections.emptyList(), Extractor.ConditionType.NONE,
+                "");
+
+        final JsonExtractor jsonExtractor2 = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
+                "source", "target", ImmutableMap.of("replace_key_whitespace", true), "user", Collections.emptyList(), Extractor.ConditionType.NONE,
+                "");
+
+        final JsonExtractor jsonExtractor3 = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
+                "source", "target", ImmutableMap.of("replace_key_whitespace", true, "key_whitespace_replacement", ":"), "user", Collections.emptyList(), Extractor.ConditionType.NONE,
+                "");
+
+        assertThat(jsonExtractor1.run(value)).contains(
+                new Extractor.Result("foobar", "text string", -1, -1),
+                new Extractor.Result(1234.5678, "num   b er", -1, -1),
+                new Extractor.Result(true, "bool", -1, -1)
+        );
+        assertThat(jsonExtractor2.run(value)).contains(
+                new Extractor.Result("foobar", "text_string", -1, -1),
+                new Extractor.Result(1234.5678, "num___b_er", -1, -1),
+                new Extractor.Result(true, "bool", -1, -1)
+        );
+        assertThat(jsonExtractor3.run(value)).contains(
+                new Extractor.Result("foobar", "text:string", -1, -1),
+                new Extractor.Result(1234.5678, "num:::b:er", -1, -1),
+                new Extractor.Result(true, "bool", -1, -1)
+        );
+    }
+
+    @Test
+    public void testRunWithKeyPrefix() throws Exception {
+        final String value = "{\"text string\": \"foobar\", \"num   b er\": 1234.5678, \"bool\": true, \"null\": null}";
+
+        final JsonExtractor jsonExtractor1 = new JsonExtractor(new MetricRegistry(), "json", "title", 0L, Extractor.CursorStrategy.COPY,
+                "source", "target", ImmutableMap.of("key_prefix", "test_"), "user", Collections.emptyList(), Extractor.ConditionType.NONE,
+                "");
+
+        assertThat(jsonExtractor1.run(value)).contains(
+                new Extractor.Result("foobar", "test_text string", -1, -1),
+                new Extractor.Result(1234.5678, "test_num   b er", -1, -1),
+                new Extractor.Result(true, "test_bool", -1, -1)
+        );
+    }
 }

@@ -24,6 +24,7 @@ import org.graylog2.security.AccessToken;
 import org.graylog2.shared.security.AccessTokenAuthToken;
 import org.graylog2.security.AccessTokenService;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,19 +33,21 @@ import javax.inject.Inject;
 
 public class AccessTokenAuthenticator extends AuthenticatingRealm {
     private static final Logger LOG = LoggerFactory.getLogger(AccessTokenAuthenticator.class);
+    public static final String NAME = "access-token";
 
     private final AccessTokenService accessTokenService;
     private final UserService userService;
     private final LdapUserAuthenticator ldapAuthenticator;
 
     @Inject
-    public AccessTokenAuthenticator(AccessTokenService accessTokenService,
-                                    UserService userService,
-                                    LdapUserAuthenticator ldapAuthenticator) {
+    AccessTokenAuthenticator(AccessTokenService accessTokenService,
+                             UserService userService,
+                             LdapUserAuthenticator ldapAuthenticator) {
         this.accessTokenService = accessTokenService;
         this.userService = userService;
         this.ldapAuthenticator = ldapAuthenticator;
         setAuthenticationTokenClass(AccessTokenAuthToken.class);
+        setCachingEnabled(false);
         // the presence of a valid access token is enough, we don't have any other credentials
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
     }
@@ -72,6 +75,7 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
         } catch (ValidationException e) {
             LOG.warn("Unable to update access token's last access date.", e);
         }
+        ShiroSecurityContext.requestSessionCreation(false);
         return new SimpleAccount(user.getName(), null, "access token realm");
     }
 }

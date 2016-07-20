@@ -47,6 +47,9 @@ public class JsonExtractor extends Extractor {
     private static final String CK_LIST_SEPARATOR = "list_separator";
     private static final String CK_KEY_SEPARATOR = "key_separator";
     private static final String CK_KV_SEPARATOR = "kv_separator";
+    private static final String CK_REPLACE_KEY_WHITESPACE = "replace_key_whitespace";
+    private static final String CK_KEY_WHITESPACE_REPLACEMENT = "key_whitespace_replacement";
+    private static final String CK_KEY_PREFIX = "key_prefix";
     private static final RemoveNullPredicate REMOVE_NULL_PREDICATE = new RemoveNullPredicate();
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -54,6 +57,9 @@ public class JsonExtractor extends Extractor {
     private final String listSeparator;
     private final String keySeparator;
     private final String kvSeparator;
+    private final boolean replaceKeyWhitespace;
+    private final String keyWhitespaceReplacement;
+    private final String keyPrefix;
 
     public JsonExtractor(final MetricRegistry metricRegistry,
                          final String id,
@@ -77,6 +83,9 @@ public class JsonExtractor extends Extractor {
         this.listSeparator = firstNonNull((String) extractorConfig.get(CK_LIST_SEPARATOR), ", ");
         this.keySeparator = firstNonNull((String) extractorConfig.get(CK_KEY_SEPARATOR), "_");
         this.kvSeparator = firstNonNull((String) extractorConfig.get(CK_KV_SEPARATOR), "=");
+        this.replaceKeyWhitespace = firstNonNull((Boolean) extractorConfig.get(CK_REPLACE_KEY_WHITESPACE), false);
+        this.keyWhitespaceReplacement = firstNonNull((String) extractorConfig.get(CK_KEY_WHITESPACE_REPLACEMENT), "_");
+        this.keyPrefix = firstNonNull((String) extractorConfig.get(CK_KEY_PREFIX), "");
     }
 
     @Override
@@ -105,7 +114,17 @@ public class JsonExtractor extends Extractor {
 
         final Map<String, Object> results = new HashMap<>(json.size());
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
-            for (Entry entry : parseValue(mapEntry.getKey(), mapEntry.getValue())) {
+            String key = keyPrefix + mapEntry.getKey();
+            if (replaceKeyWhitespace && key.contains(" ")) {
+                key = key.replace(" ", keyWhitespaceReplacement);
+            } else {
+                if (LOG.isDebugEnabled()) {
+                    if (key.contains(" ")) {
+                        LOG.debug("Invalid key \"{}\" in JSON object!", key);
+                    }
+                }
+            }
+            for (Entry entry : parseValue(key, mapEntry.getValue())) {
                 results.put(entry.key(), entry.value());
             }
         }

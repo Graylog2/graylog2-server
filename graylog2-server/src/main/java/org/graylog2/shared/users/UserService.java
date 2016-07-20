@@ -18,8 +18,6 @@ package org.graylog2.shared.users;
 
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.shared.security.ldap.LdapEntry;
-import org.graylog2.shared.security.ldap.LdapSettings;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
@@ -35,11 +33,6 @@ public interface UserService extends PersistedService {
     User create();
 
     List<User> loadAll();
-
-    @Nullable
-    User syncFromLdapEntry(LdapEntry userEntry, LdapSettings ldapSettings, String username);
-
-    void updateFromLdap(User user, LdapEntry userEntry, LdapSettings ldapSettings, String username);
 
     User getAdminUser();
 

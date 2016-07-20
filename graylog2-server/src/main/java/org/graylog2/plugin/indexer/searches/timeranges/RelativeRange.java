@@ -93,7 +93,7 @@ public abstract class RelativeRange extends TimeRange {
         // TODO replace with custom build()
         public Builder checkRange(int range) throws InvalidRangeParametersException {
             if (range < 0) {
-                throw new InvalidRangeParametersException();
+                throw new InvalidRangeParametersException("Range must not be negative");
             }
             return range(range);
         }

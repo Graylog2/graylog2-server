@@ -28,15 +28,22 @@ const Routes = {
     THREADDUMP: (nodeId) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
-    ROLES: '/system/roles',
-    USERS: {
-      CREATE: '/system/users/new',
-      edit: (username) => `/system/users/edit/${username}`,
-      LIST: '/system/users',
-    },
     LDAP: {
       SETTINGS: '/system/ldap',
       GROUPS: '/system/ldap/groups',
+    },
+    AUTHENTICATION: {
+      OVERVIEW: '/system/authentication',
+      ROLES: '/system/authentication/roles',
+      USERS: {
+        CREATE: '/system/authentication/users/new',
+        edit: (username) => `/system/authentication/users/edit/${username}`,
+        LIST: '/system/authentication/users',
+      },
+      PROVIDERS: {
+        CONFIG: '/system/authentication/config',
+        provider: (name) => `/system/authentication/config/${name}`,
+      },
     },
   },
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,

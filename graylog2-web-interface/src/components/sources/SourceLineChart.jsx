@@ -1,6 +1,6 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
 import $ from 'jquery';
-import {} from 'jquery-ui';
+import {} from 'jquery-ui/ui/effects/effect-bounce';
 import dc from 'dc';
 import d3 from 'd3';
 
@@ -12,10 +12,10 @@ import graphHelper from 'legacy/graphHelper';
 
 const SourceLineChart = React.createClass({
   propTypes: {
-    histogramDataAvailable: PropTypes.bool.isRequired,
-    reloadingHistogram: PropTypes.bool.isRequired,
-    resetFilters: PropTypes.func.isRequired,
-    resolution: PropTypes.string.isRequired,
+    histogramDataAvailable: React.PropTypes.bool.isRequired,
+    reloadingHistogram: React.PropTypes.bool.isRequired,
+    resetFilters: React.PropTypes.func.isRequired,
+    resolution: React.PropTypes.string.isRequired,
   },
 
   getInitialState() {
@@ -38,7 +38,7 @@ const SourceLineChart = React.createClass({
 
   _configureWidth(lineChartWidth) {
     this._lineChart.width(lineChartWidth);
-    this.setState({lineChartWidth: String(lineChartWidth) + 'px'});
+    this.setState({ lineChartWidth: `${String(lineChartWidth)}px` });
   },
 
   updateWidth() {
@@ -63,7 +63,7 @@ const SourceLineChart = React.createClass({
     this._lineChart = dc.lineChart(lineChartDomNode);
     this._lineChart
       .height(200)
-      .margins({left: 35, right: 20, top: 20, bottom: 20})
+      .margins({ left: 35, right: 20, top: 20, bottom: 20 })
       .dimension(dimension)
       .group(group)
       .x(d3.time.scale())

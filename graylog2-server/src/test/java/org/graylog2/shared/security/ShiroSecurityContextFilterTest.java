@@ -18,6 +18,7 @@ package org.graylog2.shared.security;
 
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.mgt.DefaultSecurityManager;
+import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -28,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import javax.inject.Provider;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
@@ -38,6 +40,7 @@ import java.util.Base64;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -63,7 +66,8 @@ public class ShiroSecurityContextFilterTest {
         when(requestContext.getSecurityContext()).thenReturn(securityContext);
 
         final DefaultSecurityManager securityManager = new DefaultSecurityManager();
-        filter = new ShiroSecurityContextFilter(securityManager);
+        final Provider<Request> grizzlyRequestProvider = () -> mock(Request.class);
+        filter = new ShiroSecurityContextFilter(securityManager, grizzlyRequestProvider, Collections.emptySet());
     }
 
     @Test

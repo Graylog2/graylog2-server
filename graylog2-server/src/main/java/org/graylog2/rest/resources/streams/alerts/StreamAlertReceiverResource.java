@@ -104,8 +104,9 @@ public class StreamAlertReceiverResource extends RestResource {
         checkArgument(!Strings.isNullOrEmpty(entity));
 
         if (type == null || (!type.equals("users") && !type.equals("emails"))) {
-            LOG.warn("No such type: [{}]", type);
-            throw new BadRequestException();
+            final String msg = "No such type: [" + type + "]";
+            LOG.warn(msg);
+            throw new BadRequestException(msg);
         }
 
         final Stream stream = streamService.load(streamid);
@@ -140,9 +141,10 @@ public class StreamAlertReceiverResource extends RestResource {
             @ApiParam(name = "type", value = "Type: users or emails", required = true) @QueryParam("type") String type) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
-        if (!type.equals("users") && !type.equals("emails")) {
-            LOG.warn("No such type: [{}]", type);
-            throw new BadRequestException();
+        if (!"users".equals(type) && !"emails".equals(type)) {
+            final String msg = "No such type: [" + type + "]";
+            LOG.warn(msg);
+            throw new BadRequestException(msg);
         }
 
         final Stream stream = streamService.load(streamid);

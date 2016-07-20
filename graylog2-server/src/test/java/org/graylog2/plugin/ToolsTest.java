@@ -17,19 +17,23 @@
 package org.graylog2.plugin;
 
 import com.google.common.collect.Lists;
+import com.google.common.io.Resources;
+import org.graylog2.inputs.TestHelper;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.zip.Deflater;
-import java.util.zip.GZIPOutputStream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -103,37 +107,36 @@ public class ToolsTest {
 
     @Test
     public void testDecompressZlib() throws IOException {
+        final String testString = "Teststring 123";
+        final byte[] compressed = TestHelper.zlibCompress(testString);
 
-        String testString = "Teststring 123";
-        byte[] buffer = new byte[100];
-        Deflater deflater = new Deflater();
+        assertEquals(testString, Tools.decompressZlib(compressed));
+    }
 
-        deflater.setInput(testString.getBytes());
-        deflater.finish();
-        deflater.deflate(buffer);
-        deflater.end();
-
-        assertEquals(testString, Tools.decompressZlib(buffer));
+    @Test
+    public void testDecompressZlibBomb() throws URISyntaxException, IOException {
+        final URL url = Resources.getResource("org/graylog2/plugin/zlib64mb.raw");
+        final byte[] testData = Files.readAllBytes(Paths.get(url.toURI()));
+        assertThat(Tools.decompressZlib(testData, 1024)).hasSize(1024);
     }
 
     @Test
     public void testDecompressGzip() throws IOException {
+        final String testString = "Teststring 123";
+        final byte[] compressed = TestHelper.gzipCompress(testString);
 
-        String testString = "Teststring 123";
+        assertEquals(testString, Tools.decompressGzip(compressed));
+    }
 
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        GZIPOutputStream gzip = new GZIPOutputStream(out);
-        gzip.write(testString.getBytes());
-        gzip.close();
-
-        byte[] buffer = out.toByteArray();
-
-        assertEquals(testString, Tools.decompressGzip(buffer));
+    @Test
+    public void testDecompressGzipBomb() throws URISyntaxException, IOException {
+        final URL url = Resources.getResource("org/graylog2/plugin/gzip64mb.gz");
+        final byte[] testData = Files.readAllBytes(Paths.get(url.toURI()));
+        assertThat(Tools.decompressGzip(testData, 1024)).hasSize(1024);
     }
 
     @Test(expected = EOFException.class)
     public void testDecompressGzipEmptyInput() throws IOException {
-
         Tools.decompressGzip(new byte[0]);
     }
 

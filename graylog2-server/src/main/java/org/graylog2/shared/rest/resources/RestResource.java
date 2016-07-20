@@ -84,8 +84,9 @@ public abstract class RestResource {
 
         final Principal p = securityContext.getUserPrincipal();
         if (!(p instanceof ShiroPrincipal)) {
-            LOG.error("Unknown SecurityContext class {}, cannot continue.", securityContext);
-            throw new IllegalStateException();
+            final String msg = "Unknown SecurityContext class " + securityContext + ", cannot continue.";
+            LOG.error(msg);
+            throw new IllegalStateException(msg);
         }
 
         final ShiroPrincipal principal = (ShiroPrincipal) p;

@@ -50,6 +50,7 @@ import LdapPage from 'pages/LdapPage';
 import LdapGroupsPage from 'pages/LdapGroupsPage';
 import ConfigurationsPage from 'pages/ConfigurationsPage';
 import NotFoundPage from 'pages/NotFoundPage';
+import AuthenticationPage from 'pages/AuthenticationPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -94,10 +95,15 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.NODES.LIST} component={NodesPage}/>
             <Route path={Routes.SYSTEM.NODES.SHOW(':nodeId')} component={ShowNodePage}/>
             <Route path={Routes.SYSTEM.OUTPUTS} component={SystemOutputsPage}/>
-            <Route path={Routes.SYSTEM.ROLES} component={RolesPage}/>
-            <Route path={Routes.SYSTEM.USERS.CREATE} component={CreateUsersPage}/>
-            <Route path={Routes.SYSTEM.USERS.edit(':username')} component={EditUsersPage}/>
-            <Route path={Routes.SYSTEM.USERS.LIST} component={UsersPage}/>
+            <Route path={Routes.SYSTEM.AUTHENTICATION.OVERVIEW} component={AuthenticationPage}>
+              <IndexRoute component={UsersPage}/>
+              <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.LIST} component={UsersPage}/>
+              <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.CREATE} component={CreateUsersPage}/>
+              <Route path={Routes.SYSTEM.AUTHENTICATION.USERS.edit(':username')} component={EditUsersPage}/>
+              <Route path={Routes.SYSTEM.AUTHENTICATION.ROLES} component={RolesPage}/>
+              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}/>
+              <Route path={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(':name')} />
+            </Route>
             <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage}/>
             <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage}/>
             <Route path={Routes.SYSTEM.LDAP.SETTINGS} component={LdapPage}/>

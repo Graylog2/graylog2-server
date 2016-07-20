@@ -26,7 +26,7 @@ const LdapPage = React.createClass({
             </IfPermitted>
             &nbsp;
             <IfPermitted permissions="USERS_LIST">
-              <LinkContainer to={Routes.SYSTEM.USERS.LIST}>
+              <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
                 <Button bsStyle="info">Manage users</Button>
               </LinkContainer>
             </IfPermitted>

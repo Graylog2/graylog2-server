@@ -1,5 +1,6 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
+import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
 const UsersStore = StoreProvider.getStore('Users');
@@ -14,6 +15,7 @@ import UserPreferencesButton from 'components/users/UserPreferencesButton';
 const EditUsersPage = React.createClass({
   propTypes: {
     params: React.PropTypes.object.isRequired,
+    history: React.PropTypes.object,
   },
   getInitialState() {
     return {
@@ -60,7 +62,7 @@ const EditUsersPage = React.createClass({
 
     return (
       <span>
-        <PageHeader title={<span>Edit user <em>{this.props.params.username}</em></span>}>
+        <PageHeader title={<span>Edit user <em>{this.props.params.username}</em></span>} subpage>
           <span>You can either change the details of a user here or set a new password.</span>
           {null}
           <div>
@@ -69,7 +71,7 @@ const EditUsersPage = React.createClass({
           </div>
         </PageHeader>
 
-        <UserForm user={this.state.user} />
+        <UserForm user={this.state.user} history={this.props.history} />
       </span>
     );
   },

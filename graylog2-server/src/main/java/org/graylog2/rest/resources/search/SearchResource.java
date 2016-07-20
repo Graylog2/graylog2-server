@@ -153,8 +153,9 @@ public abstract class SearchResource extends RestResource {
                 timeRange,
                 includeCardinality);
         } catch (Searches.FieldTypeException e) {
-            LOG.error("Field histogram query failed. Make sure that field [{}] is a numeric type.", field);
-            throw new BadRequestException();
+            final String msg = "Field histogram query failed. Make sure that field [" + field + "] is a numeric type.";
+            LOG.error(msg);
+            throw new BadRequestException(msg, e);
         }
     }
 
@@ -325,8 +326,9 @@ public abstract class SearchResource extends RestResource {
 
             for (String streamId : streams) {
                 if (!isPermitted(RestPermissions.STREAMS_READ, streamId)) {
-                    LOG.warn("Not allowed to search with filter: [" + filter + "]. (Forbidden stream: " + streamId + ")");
-                    throw new ForbiddenException();
+                    final String msg = "Not allowed to search with filter: [" + filter + "]. (Forbidden stream: " + streamId + ")";
+                    LOG.warn(msg);
+                    throw new ForbiddenException(msg);
                 }
             }
         }

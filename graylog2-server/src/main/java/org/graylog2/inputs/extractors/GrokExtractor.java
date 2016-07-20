@@ -68,13 +68,15 @@ public class GrokExtractor extends Extractor {
             throw new ConfigurationException("grok_pattern not set");
         }
 
+        final boolean namedCapturesOnly = (boolean) extractorConfig.getOrDefault("named_captures_only", false);
+
         try {
             // TODO we should really share this somehow, but unfortunately the extractors are reloaded every second.
             for (final GrokPattern grokPattern : grokPatterns) {
                 grok.addPattern(grokPattern.name, grokPattern.pattern);
             }
 
-            grok.compile((String) extractorConfig.get("grok_pattern"));
+            grok.compile((String) extractorConfig.get("grok_pattern"), namedCapturesOnly);
         } catch (GrokException e) {
             log.error("Unable to parse grok patterns", e);
             throw new ConfigurationException("Unable to parse grok patterns");

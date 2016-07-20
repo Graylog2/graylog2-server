@@ -120,8 +120,8 @@ public class SessionsResource extends RestResource {
         }
         final Subject subject = new Subject.Builder().sessionId(id).buildSubject();
         ThreadContext.bind(subject);
-
         try {
+
             subject.login(new UsernamePasswordToken(createRequest.username(), createRequest.password()));
             final User user = userService.load(createRequest.username());
             if (user != null) {
@@ -181,6 +181,17 @@ public class SessionsResource extends RestResource {
             return SessionValidationResponse.invalid();
         }
 
+        // there's no valid session, but the authenticator would like us to create one
+        if (subject.getSession(false) == null && ShiroSecurityContext.isSessionCreationRequested()) {
+            final Session session = subject.getSession();
+            LOG.debug("Session created {}", session.getId());
+            session.touch();
+            // save subject in session, otherwise we can't get the username back in subsequent requests.
+            ((DefaultSecurityManager) SecurityUtils.getSecurityManager()).getSubjectDAO().save(subject);
+
+            return SessionValidationResponse.validWithNewSession(String.valueOf(session.getId()),
+                                                                 String.valueOf(subject.getPrincipal()));
+        }
         return SessionValidationResponse.valid();
     }
 

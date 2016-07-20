@@ -25,12 +25,12 @@ import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.MongoDbAuthorizationCacheManager;
 import org.graylog2.shared.users.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Collections;
 import java.util.List;
 
 public class MongoDbAuthorizationRealm extends AuthorizingRealm {
@@ -39,8 +39,10 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
     private final UserService userService;
 
     @Inject
-    public MongoDbAuthorizationRealm(UserService userService) {
+    MongoDbAuthorizationRealm(UserService userService, MongoDbAuthorizationCacheManager mongoDbAuthorizationCacheManager) {
         this.userService = userService;
+        setCachingEnabled(true);
+        setCacheManager(mongoDbAuthorizationCacheManager);
     }
 
     @Override

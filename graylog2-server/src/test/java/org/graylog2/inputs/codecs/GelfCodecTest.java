@@ -16,12 +16,15 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.fasterxml.jackson.core.JsonParseException;
+import org.graylog2.inputs.TestHelper;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -30,10 +33,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.isA;
+import static org.junit.Assume.assumeTrue;
 
 public class GelfCodecTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private GelfChunkAggregator aggregator;
@@ -109,6 +117,31 @@ public class GelfCodecTest {
         assertThat(message.getFieldNames()).containsOnly(
                 "_id", "source", "message", "full_message", "timestamp", "level",
                 "user_id", "some_info", "some_env_var");
+    }
+    @Test
+    public void decodeLargeCompressedMessageFails() throws Exception {
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("JSON is null/could not be parsed (invalid JSON)");
+        expectedException.expectCause(isA(JsonParseException.class));
+
+        final Configuration configuration = new Configuration(Collections.singletonMap("decompress_size_limit", 100));
+        final GelfCodec codec = new GelfCodec(configuration, aggregator);
+        final String json = "{"
+            + "\"version\": \"1.1\","
+            + "\"host\": \"example.org\","
+            + "\"short_message\": \"A short message that helps you identify what is going on\","
+            + "\"full_message\": \"Backtrace here\\n\\nMore stuff\","
+            + "\"timestamp\": 1385053862.3072,"
+            + "\"level\": 1,"
+            + "\"_some_bytes1\": \"Lorem ipsum dolor sit amet, consetetur sadipscing elitr, \","
+            + "\"_some_bytes2\": \"sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, \","
+            + "\"_some_bytes2\": \"sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum.\""
+            + "}";
+
+        final byte[] payload = TestHelper.zlibCompress(json);
+        assumeTrue(payload.length > 100);
+        final RawMessage rawMessage = new RawMessage(payload);
+        codec.decode(rawMessage);
     }
 
     @Test

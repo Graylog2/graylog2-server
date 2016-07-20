@@ -22,6 +22,7 @@ const LoginPage = React.createClass({
   componentDidMount() {
     disconnectedStyle.use();
     authStyle.use();
+    SessionActions.validate();
   },
   componentWillUnmount() {
     disconnectedStyle.unuse();

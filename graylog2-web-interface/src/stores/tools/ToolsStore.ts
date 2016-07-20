@@ -19,9 +19,9 @@ const ToolsStore = {
 
         return promise;
     },
-    testGrok(pattern: string, string: string): Promise<Object> {
+    testGrok(pattern: string, namedCapturesOnly: boolean, string: string): Promise<Object> {
         const url = ApiRoutes.ToolsApiController.grokTest().url;
-        const promise = fetch('POST', URLUtils.qualifyUrl(url), {pattern: pattern, string: string});
+        const promise = fetch('POST', URLUtils.qualifyUrl(url), {pattern: pattern, string: string, named_captures_only: namedCapturesOnly});
 
         promise.catch((errorThrown) => {
             UserNotification.error('Details: ' + errorThrown,
@@ -30,13 +30,16 @@ const ToolsStore = {
 
         return promise;
     },
-    testJSON(flatten: boolean, listSeparator: string, keySeparator: string, kvSeparator: string, string: string): Promise<Object> {
+    testJSON(flatten: boolean, listSeparator: string, keySeparator: string, kvSeparator: string, replaceKeyWhitespace: boolean, keyWhitespaceReplacement: string, keyPrefix: string, string: string): Promise<Object> {
         const url = ApiRoutes.ToolsApiController.jsonTest().url;
         const payload = {
             flatten: flatten,
             list_separator: listSeparator,
             key_separator: keySeparator,
             kv_separator: kvSeparator,
+            replace_key_whitespace: replaceKeyWhitespace,
+            key_whitespace_replacement: keyWhitespaceReplacement,
+            key_prefix: keyPrefix,
             string: string,
         };
 

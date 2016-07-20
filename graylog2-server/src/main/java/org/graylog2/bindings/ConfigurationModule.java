@@ -14,21 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.buffers.responses;
+package org.graylog2.bindings;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
+import com.google.inject.Binder;
+import com.google.inject.Module;
+import org.graylog2.Configuration;
+import org.graylog2.plugin.BaseConfiguration;
 
-@AutoValue
-@JsonAutoDetect
-public abstract class BuffersUtilizationSummary {
-    @JsonProperty
-    public abstract RingSummary buffers();
+import static java.util.Objects.requireNonNull;
 
-    @JsonCreator
-    public static BuffersUtilizationSummary create(@JsonProperty("buffers") RingSummary buffers) {
-        return new AutoValue_BuffersUtilizationSummary(buffers);
+public class ConfigurationModule implements Module {
+    private final Configuration configuration;
+
+    public ConfigurationModule(Configuration configuration) {
+        this.configuration = requireNonNull(configuration);
+    }
+
+    @Override
+    public void configure(Binder binder) {
+        binder.bind(Configuration.class).toInstance(configuration);
+        binder.bind(BaseConfiguration.class).toInstance(configuration);
     }
 }
