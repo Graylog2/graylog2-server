@@ -31,6 +31,7 @@ import org.antlr.v4.runtime.RuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTreeProperty;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.apache.mina.util.IdentityHashSet;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -192,6 +193,10 @@ public class PipelineRuleParser {
             return string.substring(1, string.length() - 1);
         }
         return string;
+    }
+
+    public static String unescape(String string) {
+        return StringEscapeUtils.unescapeJava(string);
     }
 
     private static class SyntaxErrorListener extends BaseErrorListener {
@@ -474,7 +479,7 @@ public class PipelineRuleParser {
 
         @Override
         public void exitString(RuleLangParser.StringContext ctx) {
-            final String text = unquote(ctx.getText(), '\"');
+            final String text = unescape(unquote(ctx.getText(), '\"'));
             final StringExpression expr = new StringExpression(ctx.getStart(), text);
             log.trace("STRING: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);
@@ -869,7 +874,7 @@ public class PipelineRuleParser {
 
         @Override
         public void exitString(RuleLangParser.StringContext ctx) {
-            final String text = unquote(ctx.getText(), '\"');
+            final String text = unescape(unquote(ctx.getText(), '\"'));
             final StringExpression expr = new StringExpression(ctx.getStart(), text);
             log.trace("STRING: ctx {} => {}", ctx, expr);
             parseContext.exprs.put(ctx, expr);

@@ -17,5 +17,6 @@ when
     concat("foo", "bar") == "foobar"
 then
     set_field("has_xyz", contains("abcdef", "xyz"));
+    set_field("string_literal", "abcd\\.e\tfg\u03a9\363");
     trigger_test();
 end

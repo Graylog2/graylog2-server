@@ -1,9 +1,8 @@
 rule "regexMatch"
 when
-// the second matcher group is always empty and will not be present in the result
-    regex(".*(cde)(:(\\d+))?.*", "abcdefg").matches == true
+    regex(".*(cde\\.)(:(\\d+))?.*", "abcde.fg").matches == true
 then
-    let result = regex(".*(cde).*", "abcdefg");
+    let result = regex(".*(cd\\.e).*", "abcd.efg");
     set_field("group_1", result["0"]);
     set_field("matched_regex", result.matches);
 end

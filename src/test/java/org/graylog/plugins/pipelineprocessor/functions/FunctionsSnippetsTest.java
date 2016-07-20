@@ -305,6 +305,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message).isNotNull();
         assertThat(message.getField("has_xyz")).isInstanceOf(Boolean.class);
         assertThat((boolean)message.getField("has_xyz")).isFalse();
+        assertThat(message.getField("string_literal")).isInstanceOf(String.class);
+        assertThat((String)message.getField("string_literal")).isEqualTo("abcd\\.e\tfg\u03a9\363");
     }
 
     @Test
