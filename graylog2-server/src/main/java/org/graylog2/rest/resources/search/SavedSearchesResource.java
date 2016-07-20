@@ -32,8 +32,6 @@ import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.decorators.MessageDecorator;
-import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.resources.search.requests.CreateSavedSearchRequest;
 import org.graylog2.savedsearches.SavedSearch;
 import org.graylog2.savedsearches.SavedSearchService;
@@ -55,7 +53,6 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @RequiresAuthentication
 @Api(value = "Search/Saved", description = "Saved searches")

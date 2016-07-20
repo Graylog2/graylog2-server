@@ -21,14 +21,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.decorators.DecoratorService;
 import org.graylog2.decorators.DecoratorTypeInfo;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.decorators.MessageDecorator;
+import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -53,13 +51,13 @@ import java.util.stream.Collectors;
 @Consumes(MediaType.APPLICATION_JSON)
 public class DecoratorResource extends RestResource {
     private final DecoratorService decoratorService;
-    private final Map<String, MessageDecorator.Factory> messageDecorators;
+    private final Map<String, SearchResponseDecorator.Factory> searchResponseDecorators;
 
     @Inject
     public DecoratorResource(DecoratorService decoratorService,
-                             Map<String, MessageDecorator.Factory> messageDecorators) {
+                             Map<String, SearchResponseDecorator.Factory> searchResponseDecorators) {
         this.decoratorService = decoratorService;
-        this.messageDecorators = messageDecorators;
+        this.searchResponseDecorators = searchResponseDecorators;
     }
 
     @GET
@@ -77,7 +75,7 @@ public class DecoratorResource extends RestResource {
     @ApiOperation(value = "Returns all available message decorations",
         notes = "")
     public Map<String, DecoratorTypeInfo> getAvailable() {
-        return this.messageDecorators.entrySet().stream()
+        return this.searchResponseDecorators.entrySet().stream()
             .collect(Collectors.toMap(
                 Map.Entry::getKey, entry -> DecoratorTypeInfo.create(
                     entry.getKey(),

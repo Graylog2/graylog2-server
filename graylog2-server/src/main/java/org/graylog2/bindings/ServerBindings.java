@@ -62,7 +62,7 @@ import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.decorators.MessageDecorator;
+import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
@@ -115,7 +115,7 @@ public class ServerBindings extends Graylog2Module {
         bindAdditionalJerseyComponents();
         bindEventBusListeners();
         install(new AuthenticatingRealmModule());
-        bindMessageDecorators();
+        bindSearchResponseDecorators();
     }
 
     private void bindProviders() {
@@ -208,8 +208,8 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterDebugEventListener.class).asEagerSingleton();
     }
 
-    private void bindMessageDecorators() {
+    private void bindSearchResponseDecorators() {
         // only triggering an initialize to make sure that the binding exists
-        final MapBinder<String, MessageDecorator.Factory> messageDecoratorBinder = messageDecoratorBinder();
+        final MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder = searchResponseDecoratorBinder();
     }
 }

@@ -12,10 +12,12 @@ const RefreshStore = StoreProvider.getStore('Refresh');
 const StreamsStore = StoreProvider.getStore('Streams');
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 const SearchStore = StoreProvider.getStore('Search');
+const DecoratorsStore = StoreProvider.getStore('Decorators');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const NodesActions = ActionsProvider.getActions('Nodes');
 const InputsActions = ActionsProvider.getActions('Inputs');
+const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 import { Spinner } from 'components/common';
 import { MalformedSearchQuery, SearchResult } from 'components/search';
@@ -40,6 +42,7 @@ const SearchPage = React.createClass({
     };
   },
   componentDidMount() {
+    [DecoratorsActions.create.completed, DecoratorsActions.remove.completed, DecoratorsActions.update.completed].forEach((action) => action.listen(this._refreshData));
     this._refreshData();
     InputsActions.list.triggerPromise();
 
