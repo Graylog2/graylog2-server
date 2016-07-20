@@ -97,6 +97,12 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
                 final int groupCount = matchResult.groupCount();
                 for (int i = 1; i <= groupCount; i++) {
                     final String groupValue = matchResult.group(i);
+
+                    if (groupValue == null) {
+                        // You cannot add null values to an ImmutableMap but optional matcher groups may be null.
+                        continue;
+                    }
+
                     // try to get a group name, if that fails use a 0-based index as the name
                     final String groupName = Iterables.get(groupNames, i - 1, null);
                     builder.put(groupName != null ? groupName : String.valueOf(i - 1), groupValue);

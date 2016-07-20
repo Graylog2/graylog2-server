@@ -1,6 +1,7 @@
 rule "regexMatch"
 when
-    regex(".*(cde).*", "abcdefg").matches == true
+// the second matcher group is always empty and will not be present in the result
+    regex(".*(cde)(:(\\d+))?.*", "abcdefg").matches == true
 then
     let result = regex(".*(cde).*", "abcdefg");
     set_field("group_1", result["0"]);
