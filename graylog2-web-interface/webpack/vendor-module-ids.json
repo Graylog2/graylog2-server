@@ -1,5 +1,5 @@
 {
-  "nextFreeModuleId": 1368,
+  "nextFreeModuleId": 1371,
   "modules": {
     "byIdentifier": {
       "node_modules/react/react.js": 1,
@@ -1369,7 +1369,10 @@
       ".node_cache/master/strict-uri-encode/index.js": 1364,
       ".node_cache/master/uncontrollable/createUncontrollable.js": 1365,
       ".node_cache/master/uncontrollable/utils.js": 1366,
-      ".node_cache/master/webpack/buildin/module.js": 1367
+      ".node_cache/master/webpack/buildin/module.js": 1367,
+      "node_modules/react-prop-types/lib/mountable.js": 1368,
+      "node_modules/react-bootstrap/node_modules/react-overlays/lib/utils/calculatePosition.js": 1369,
+      "node_modules/react-bootstrap/node_modules/react-overlays/node_modules/warning/browser.js": 1370
     }
   },
   "nextFreeChunkId": 1,
