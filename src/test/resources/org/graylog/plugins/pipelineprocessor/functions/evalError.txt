@@ -2,5 +2,5 @@ rule "trigger null"
 when
   true
 then
-  set_field("this_is_null", to_ip($message.does_not_exist));
+  set_field("do_not_exist", regex(".*", to_string($message.do_not_exist)).matches);
 end
