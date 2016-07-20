@@ -15,6 +15,9 @@ const SortableList = React.createClass({
       items: this.props.items,
     };
   },
+  componentWillReceiveProps(nextProps) {
+    this.setState({ items: nextProps.items });
+  },
   _moveItem(dragIndex, hoverIndex) {
     const sortedItems = this.state.items;
     const tempItem = sortedItems[dragIndex];
