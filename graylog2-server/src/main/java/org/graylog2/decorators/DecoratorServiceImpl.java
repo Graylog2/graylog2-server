@@ -72,13 +72,13 @@ public class DecoratorServiceImpl implements DecoratorService {
     }
 
     @Override
-    public Decorator create(String type, Map<String, Object> config, String stream) {
-        return DecoratorImpl.create(type, config, Optional.of(stream));
+    public Decorator create(String type, Map<String, Object> config, String stream, int order) {
+        return DecoratorImpl.create(type, config, Optional.of(stream), order);
     }
 
     @Override
-    public Decorator create(String type, Map<String, Object> config) {
-        return DecoratorImpl.create(type, config);
+    public Decorator create(String type, Map<String, Object> config, int order) {
+        return DecoratorImpl.create(type, config, order);
     }
 
     @Override

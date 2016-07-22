@@ -39,14 +39,18 @@ public class DecoratorResolver {
     }
 
     public List<SearchResponseDecorator> searchResponseDecoratorsForStream(String streamId) {
-        return this.decoratorService.findForStream(streamId).stream()
+        return this.decoratorService.findForStream(streamId)
+            .stream()
+            .sorted()
             .map(this::instantiateSearchResponseDecorator)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
     }
 
     public List<SearchResponseDecorator> searchResponseDecoratorsForGlobal() {
-        return this.decoratorService.findForGlobal().stream()
+        return this.decoratorService.findForGlobal()
+            .stream()
+            .sorted()
             .map(this::instantiateSearchResponseDecorator)
             .filter(Objects::nonNull)
             .collect(Collectors.toList());

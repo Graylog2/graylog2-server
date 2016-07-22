@@ -42,8 +42,8 @@ public interface SearchResponseDecorator extends Function<SearchResponse, Search
             throw new IllegalStateException("This class should not be instantiated directly, this is a bug.");
         }
 
-        public Descriptor(String name, boolean exclusive, String linkToDocs, String humanName) {
-            super(name, exclusive, linkToDocs);
+        public Descriptor(String name, String linkToDocs, String humanName) {
+            super(name, false, linkToDocs);
             this.humanName = humanName;
         }
 

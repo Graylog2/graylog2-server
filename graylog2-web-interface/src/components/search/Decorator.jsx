@@ -45,7 +45,7 @@ const Decorator = React.createClass({
     const decorator = this.props.decorator;
     const decoratorType = this.state.types[decorator.type] || this._decoratorTypeNotPresent();
     return (
-      <Row className="row-sm">
+      <span>
         <Col md={8}>
           <strong>{decoratorType.name}</strong>
         </Col>
@@ -69,7 +69,7 @@ const Decorator = React.createClass({
                            submitAction={this._handleSubmit}
                            cancelAction={this._handleCancel}
                            values={decorator.config} />
-      </Row>
+      </span>
     );
   },
 });

@@ -31,11 +31,21 @@ import java.util.Optional;
 @AutoValue
 @JsonAutoDetect
 @CollectionName("decorators")
-public abstract class DecoratorImpl implements Decorator {
+public abstract class DecoratorImpl implements Decorator, Comparable {
     static final String FIELD_ID = "_id";
     static final String FIELD_TYPE = "type";
     static final String FIELD_CONFIG = "config";
     static final String FIELD_STREAM = "stream";
+    static final String FIELD_ORDER = "order";
+
+    @Override
+    public int compareTo(Object o) {
+        if (o instanceof Decorator) {
+            Decorator decorator = (Decorator)o;
+            return order() - decorator.order();
+        }
+        return 0;
+    }
 
     @JsonProperty(FIELD_ID)
     @ObjectId
@@ -55,30 +65,38 @@ public abstract class DecoratorImpl implements Decorator {
     @Override
     public abstract Optional<String> stream();
 
+    @JsonProperty(FIELD_ORDER)
+    @Override
+    public abstract int order();
+
     public abstract Builder toBuilder();
 
     @JsonCreator
     public static DecoratorImpl create(@JsonProperty(FIELD_ID) @Nullable String id,
                                        @JsonProperty(FIELD_TYPE) String type,
                                        @JsonProperty(FIELD_CONFIG) Map<String, Object> config,
-                                       @JsonProperty(FIELD_STREAM) Optional<String> stream) {
+                                       @JsonProperty(FIELD_STREAM) Optional<String> stream,
+                                       @JsonProperty(FIELD_ORDER) int order) {
         return new AutoValue_DecoratorImpl.Builder()
             .id(id)
             .type(type)
             .config(config)
             .stream(stream)
+            .order(order)
             .build();
     }
 
     public static Decorator create(@JsonProperty(FIELD_TYPE) String type,
                                    @JsonProperty(FIELD_CONFIG) Map<String, Object> config,
-                                   @JsonProperty(FIELD_STREAM) Optional<String> stream) {
-        return create(null, type, config, stream);
+                                   @JsonProperty(FIELD_STREAM) Optional<String> stream,
+                                   @JsonProperty(FIELD_ORDER) int order) {
+        return create(null, type, config, stream, order);
     }
 
     public static Decorator create(@JsonProperty(FIELD_TYPE) String type,
-                                   @JsonProperty(FIELD_CONFIG) Map<String, Object> config) {
-        return create(type, config, Optional.empty());
+                                   @JsonProperty(FIELD_CONFIG) Map<String, Object> config,
+                                   @JsonProperty(FIELD_ORDER) int order) {
+        return create(type, config, Optional.empty(), order);
     }
 
     @AutoValue.Builder
@@ -87,6 +105,7 @@ public abstract class DecoratorImpl implements Decorator {
         abstract Builder type(String type);
         abstract Builder config(Map<String, Object> config);
         abstract Builder stream(Optional<String> stream);
+        abstract Builder order(int order);
         public abstract DecoratorImpl build();
     }
 }

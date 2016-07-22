@@ -27,7 +27,7 @@ const MessageFieldSearchActions = React.createClass({
       <div className="message-field-actions pull-right">
         <SplitButton pullRight
                      bsSize="xsmall"
-                     title={<i className="fa fa-search-plus"></i>}
+                     title={<i className="fa fa-search-plus"/>}
                      key={1}
                      onClick={this.props.onAddFieldToSearchBar}
                      id={`more-actions-dropdown-field-${this.props.fieldName}`}>

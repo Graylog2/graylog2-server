@@ -8,7 +8,7 @@ import FieldStatistics from './FieldStatistics';
 import FieldQuickValues from './FieldQuickValues';
 import FieldGraphs from './FieldGraphs';
 
-PluginStore.register(new PluginManifest({}, {
+const pluginManifest = new PluginManifest({}, {
   fieldAnalyzers: [
     {
       refId: 'fieldStatisticsComponent',
@@ -29,4 +29,9 @@ PluginStore.register(new PluginManifest({}, {
       displayPriority: 0,
     },
   ],
-}));
+});
+
+const registeredAnalyzers = PluginStore.exports('fieldAnalyzers').map(analyzer => analyzer.refId);
+if (!pluginManifest.exports.fieldAnalyzers.every(analyzer => registeredAnalyzers.includes(analyzer.refId))) {
+  PluginStore.register(pluginManifest);
+}

@@ -15,12 +15,15 @@ const SortableList = React.createClass({
       items: this.props.items,
     };
   },
+  componentWillReceiveProps(nextProps) {
+    this.setState({ items: nextProps.items });
+  },
   _moveItem(dragIndex, hoverIndex) {
     const sortedItems = this.state.items;
     const tempItem = sortedItems[dragIndex];
     sortedItems[dragIndex] = sortedItems[hoverIndex];
     sortedItems[hoverIndex] = tempItem;
-    this.setState({items: sortedItems});
+    this.setState({ items: sortedItems });
     if (typeof this.props.onMoveItem === 'function') {
       this.props.onMoveItem(sortedItems);
     }

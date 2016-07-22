@@ -1,15 +1,15 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
 
 import { Input, Panel } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 const SidebarMessageField = React.createClass({
   propTypes: {
-    field: PropTypes.object,
+    field: React.PropTypes.object,
     fieldAnalyzers: React.PropTypes.array,
     onFieldAnalyzer: React.PropTypes.func,
-    onToggled: PropTypes.func,
-    selected: PropTypes.bool,
+    onToggled: React.PropTypes.func,
+    selected: React.PropTypes.bool,
   },
   getInitialState() {
     return {

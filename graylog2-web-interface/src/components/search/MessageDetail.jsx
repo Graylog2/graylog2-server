@@ -37,6 +37,7 @@ const MessageDetail = React.createClass({
     return {
       allStreamsLoaded: false,
       allStreams: Immutable.List(),
+      showOriginal: false,
     };
   },
   componentDidMount() {
@@ -135,6 +136,7 @@ const MessageDetail = React.createClass({
 
     return (
       <ButtonGroup className="pull-right" bsSize="small">
+        <Button onClick={this._toggleShowOriginal} active={this.state.showOriginal}>Show Original</Button>
         <Button href={messageUrl}>Permalink</Button>
 
         <ClipboardButton title="Copy ID" text={this.props.message.id} />
@@ -142,6 +144,10 @@ const MessageDetail = React.createClass({
         {this._getTestAgainstStreamButton()}
       </ButtonGroup>
     );
+  },
+
+  _toggleShowOriginal() {
+    this.setState({ showOriginal: !this.state.showOriginal });
   },
 
   render() {
@@ -245,9 +251,12 @@ const MessageDetail = React.createClass({
         </Col>
         <Col md={9}>
           <div ref="messageList">
-            <MessageFields message={this.props.message} possiblyHighlight={this.props.possiblyHighlight}
+            <MessageFields message={this.props.message}
+                           possiblyHighlight={this.props.possiblyHighlight}
                            disableFieldActions={this.props.disableFieldActions}
-                           customFieldActions={this.props.customFieldActions} />
+                           customFieldActions={this.props.customFieldActions}
+                           showDecoration={this.state.showOriginal}
+            />
           </div>
         </Col>
       </Row>

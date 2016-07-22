@@ -23,6 +23,7 @@ import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Set;
 
@@ -55,6 +56,10 @@ public abstract class SearchResponse {
 
     @JsonProperty
     public abstract DateTime to();
+
+    @JsonProperty
+    @Nullable
+    public abstract SearchDecorationStats decorationStats();
 
     public abstract Builder toBuilder();
 
@@ -95,6 +100,7 @@ public abstract class SearchResponse {
         public abstract Builder totalResults(long totalResults);
         public abstract Builder from(DateTime from);
         public abstract Builder to(DateTime to);
+        public abstract Builder decorationStats(SearchDecorationStats searchDecorationStats);
         public abstract SearchResponse build();
     }
 }

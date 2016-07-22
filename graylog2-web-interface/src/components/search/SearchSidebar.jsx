@@ -9,9 +9,13 @@ import StoreProvider from 'injection/StoreProvider';
 const SessionStore = StoreProvider.getStore('Session');
 const SearchStore = StoreProvider.getStore('Search');
 
-import { AddSearchCountToDashboard, DecoratorSidebar, SavedSearchControls, ShowQueryModal } from 'components/search';
+import { AddSearchCountToDashboard,
+  DecoratedSidebarMessageField,
+  DecoratorSidebar,
+  SavedSearchControls,
+  SidebarMessageField,
+  ShowQueryModal } from 'components/search';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
-import SidebarMessageField from './SidebarMessageField';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -170,17 +174,24 @@ const SearchSidebar = React.createClass({
       </BootstrapModalWrapper>
     );
 
+    const addedFields = this.props.result.decoration_stats && this.props.result.decoration_stats.added_fields ?
+      this.props.result.decoration_stats.added_fields : [];
     const messageFields = this.props.fields
       .filter((field) => field.name.indexOf(this.state.fieldFilter) !== -1)
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((field) => {
-        return (
-          <SidebarMessageField key={field.name}
-                               field={field}
-                               fieldAnalyzers={this.props.fieldAnalyzers}
-                               onToggled={this.props.onFieldToggled}
-                               onFieldAnalyzer={this.props.onFieldAnalyzer}
-                               selected={this.props.selectedFields.contains(field.name)}/>
+
+        return (addedFields.includes(field.name) ?
+            <DecoratedSidebarMessageField key={field.name}
+                                          field={field}
+                                          onToggled={this.props.onFieldToggled}
+                                          selected={this.props.selectedFields.contains(field.name)}/> :
+            <SidebarMessageField key={field.name}
+                                 field={field}
+                                 fieldAnalyzers={this.props.fieldAnalyzers}
+                                 onToggled={this.props.onFieldToggled}
+                                 onFieldAnalyzer={this.props.onFieldAnalyzer}
+                                 selected={this.props.selectedFields.contains(field.name)}/>
         );
       });
     let searchTitle = null;

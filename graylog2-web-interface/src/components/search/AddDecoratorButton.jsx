@@ -13,6 +13,7 @@ const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 const AddDecoratorButton = React.createClass({
   propTypes: {
+    nextOrder: React.PropTypes.number,
     stream: React.PropTypes.string,
   },
   mixins: [Reflux.connect(DecoratorsStore)],
@@ -33,6 +34,7 @@ const AddDecoratorButton = React.createClass({
       stream: this.props.stream,
       type: data.type,
       config: data.configuration,
+      order: this.props.nextOrder,
     };
     DecoratorsActions.create(request);
     this.setState({typeName: this.PLACEHOLDER});

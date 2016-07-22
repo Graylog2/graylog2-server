@@ -24,4 +24,5 @@ public interface Decorator {
     String type();
     Optional<String> stream();
     Map<String, Object> config();
+    int order();
 }
