@@ -41,6 +41,7 @@ public abstract class DecorationStats {
     @JsonIgnore
     public abstract Map<String, Object> decoratedMessage();
 
+    @SuppressWarnings("unused")
     @JsonProperty(FIELD_ADDED_FIELDS)
     public Map<String, Object> addedFields() {
         return Sets.difference(decoratedMessage().keySet(), originalMessage().keySet())
@@ -48,6 +49,7 @@ public abstract class DecorationStats {
             .collect(Collectors.toMap(Function.identity(), key -> decoratedMessage().get(key)));
     }
 
+    @SuppressWarnings("unused")
     @JsonProperty(FIELD_CHANGED_FIELDS)
     public Map<String, Object> changedFields() {
         return Sets.intersection(originalMessage().keySet(), decoratedMessage().keySet())
@@ -56,6 +58,7 @@ public abstract class DecorationStats {
             .collect(Collectors.toMap(Function.identity(), key -> originalMessage().get(key)));
     }
 
+    @SuppressWarnings("unused")
     @JsonProperty(FIELD_REMOVED_FIELDS)
     public Map<String, Object> removedFields() {
         return Sets.difference(originalMessage().keySet(), decoratedMessage().keySet())

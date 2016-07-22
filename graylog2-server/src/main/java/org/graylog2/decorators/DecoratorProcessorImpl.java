@@ -16,9 +16,12 @@
  */
 package org.graylog2.decorators;
 
+import com.google.common.collect.Sets;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.DecorationStats;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
+import org.graylog2.rest.resources.search.responses.SearchDecorationStats;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 
 import javax.inject.Inject;
@@ -50,6 +53,7 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
                 .collect(Collectors.toMap(message -> message.message().get("_id").toString(), Function.identity()));
             final SearchResponse newSearchResponse = metaDecorator.get().apply(searchResponse);
             final Set<String> newFields = extractFields(newSearchResponse.messages());
+            final Set<String> addedFields = Sets.difference(Sets.difference(newFields, searchResponse.fields()), Message.RESERVED_FIELDS);
 
             final List<ResultMessageSummary> decoratedMessages = newSearchResponse.messages()
                 .stream()
@@ -68,6 +72,7 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
                 .toBuilder()
                 .messages(decoratedMessages)
                 .fields(newFields)
+                .decorationStats(SearchDecorationStats.create(addedFields))
                 .build();
         }
 
