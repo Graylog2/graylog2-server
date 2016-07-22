@@ -62,3 +62,10 @@ Changed Elasticsearch Cluster Status Behavior
 In previous versions Graylog stopped indexing into the current write index if the `Elasticsearch cluster status <http://docs.graylog.org/en/2.1/pages/configuration/elasticsearch.html#cluster-status-explained>`_ turned RED. Since 2.1 Graylog only checks the status of the current write index when it tries to index messages.
 
 If the current write index is GREEN or YELLOW, Graylog will continue to index messages even though the overall cluster status is RED. This avoids Graylog downtimes when doing Elasticsearch maintenance or when older indices have problems.
+
+Changes in message field values trimming
+----------------------------------------
+
+Previous versions of Graylog were trimming message field values inconsistently, depending on the codec used. We have changed that behaviour in 2.1, so all message field values are trimmed by default.
+
+**Important**: This change will break your existing stream rules, extractors, and Drool rules if you are expecting leading or trailing white spaces in them. Please adapt them so they do not require those white spaces.
