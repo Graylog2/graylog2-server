@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.inject.assistedinject.Assisted;
@@ -82,7 +83,7 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
 
     public static class Descriptor extends SearchResponseDecorator.Descriptor {
         public Descriptor() {
-            super("Pipeline Processor Decorator", false, "http://docs.graylog.org/en/2.0/pages/pipelines.html", "Pipeline Processor Decorator");
+            super("Pipeline Processor Decorator", "http://docs.graylog.org/en/2.0/pages/pipelines.html", "Pipeline Processor Decorator");
         }
     }
 
@@ -114,7 +115,11 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
             results.add(ResultMessageSummary.create(inMessage.highlightRanges(), message.getFields(), inMessage.index()));
             additionalCreatedMessages.forEach((additionalMessage) -> {
                 // TODO: pass proper highlight ranges. Need to rebuild them for new messages.
-                results.add(ResultMessageSummary.create(ImmutableMultimap.of(), additionalMessage.getFields(), "[created from decorator]"));
+                results.add(ResultMessageSummary.create(
+                        ImmutableMultimap.of(),
+                        additionalMessage.getFields(),
+                        "[created from decorator]"
+                ));
             });
         });
 

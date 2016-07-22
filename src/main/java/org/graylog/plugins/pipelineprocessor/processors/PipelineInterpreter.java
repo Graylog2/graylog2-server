@@ -272,12 +272,20 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     public List<Message> processForPipelines(Message message, String msgId, Set<String> pipelines, InterpreterListener interpreterListener) {
-        final ImmutableSet<Pipeline> pipelinesToRun = ImmutableSet.copyOf(pipelines.stream().map(pipelineId -> this.currentPipelines.get().get(pipelineId)).collect(Collectors.toSet()));
+        final ImmutableSet<Pipeline> pipelinesToRun = ImmutableSet.copyOf(pipelines
+                .stream()
+                .map(pipelineId -> this.currentPipelines.get().get(pipelineId))
+                .collect(Collectors.toSet()));
+
+        return processForResolvedPipelines(message, msgId, pipelinesToRun, interpreterListener);
+    }
+
+    public List<Message> processForResolvedPipelines(Message message, String msgId, Set<Pipeline> pipelines, InterpreterListener interpreterListener) {
         final List<Message> result = new ArrayList<>();
         // record execution of pipeline in metrics
-        pipelinesToRun.stream().forEach(pipeline -> metricRegistry.counter(name(Pipeline.class, pipeline.id(), "executed")).inc());
+        pipelines.forEach(pipeline -> metricRegistry.counter(name(Pipeline.class, pipeline.id(), "executed")).inc());
 
-        final StageIterator stages = new StageIterator(pipelinesToRun);
+        final StageIterator stages = new StageIterator(pipelines);
         final Set<Pipeline> pipelinesToSkip = Sets.newHashSet();
 
         // iterate through all stages for all matching pipelines, per "stage slice" instead of per pipeline.
