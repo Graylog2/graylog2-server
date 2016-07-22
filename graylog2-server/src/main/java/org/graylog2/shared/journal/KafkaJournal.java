@@ -383,7 +383,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 final byte[] idBytes = entry.getIdBytes();
 
                 payloadSize += messageBytes.length;
-                messages.add(new Message(messageBytes, idBytes));
+                messages.add(new Message(messageBytes, idBytes, Message.NoTimestamp(), Message.MagicValue_V0()));
 
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("Message {} contains bytes {}", bytesToHex(idBytes), bytesToHex(messageBytes));
