@@ -55,7 +55,7 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
             final Set<String> newFields = extractFields(newSearchResponse.messages());
             final Set<String> addedFields = Sets.difference(newFields, searchResponse.fields())
                 .stream()
-                .filter(field -> !Message.RESERVED_FIELDS.contains(field) && !field.equals("stream"))
+                .filter(field -> !Message.RESERVED_FIELDS.contains(field) && !field.equals("streams"))
                 .collect(Collectors.toSet());
 
             final List<ResultMessageSummary> decoratedMessages = newSearchResponse.messages()
