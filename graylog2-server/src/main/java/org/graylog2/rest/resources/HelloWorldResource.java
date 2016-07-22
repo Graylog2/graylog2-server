@@ -19,7 +19,7 @@ package org.graylog2.rest.resources;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.Configuration;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
@@ -32,6 +32,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,11 +41,15 @@ import static java.util.Objects.requireNonNull;
 public class HelloWorldResource extends RestResource {
     private final NodeId nodeId;
     private final ClusterConfigService clusterConfigService;
+    private final Configuration configuration;
 
     @Inject
-    public HelloWorldResource(NodeId nodeId, ClusterConfigService clusterConfigService) {
+    public HelloWorldResource(NodeId nodeId,
+                              ClusterConfigService clusterConfigService,
+                              Configuration configuration) {
         this.nodeId = requireNonNull(nodeId);
         this.clusterConfigService = requireNonNull(clusterConfigService);
+        this.configuration = configuration;
     }
 
     @GET
@@ -59,5 +64,22 @@ public class HelloWorldResource extends RestResource {
             Version.CURRENT_CLASSPATH.toString(),
             "Manage your logs in the dark and have lasers going and make it look like you're from space!"
         );
+    }
+
+    @GET
+    @Timed
+    @ApiOperation(value = "Redirecting to web console if it runs on same port.")
+    @Produces(MediaType.TEXT_HTML)
+    public Response redirectToWebConsole() {
+        if (configuration.isRestAndWebOnSamePort()) {
+            return Response
+                .temporaryRedirect(configuration.getWebListenUri())
+                .build();
+        }
+
+        return Response
+            .ok(helloWorld())
+            .type(MediaType.APPLICATION_JSON)
+            .build();
     }
 }
