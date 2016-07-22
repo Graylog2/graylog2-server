@@ -34,22 +34,29 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 public class KeyUtilTest {
-    private static final String SERVER_KEY_PEM_E_PKCS8 = "server.key.pem.e.pkcs8";
+    private static final String SERVER_KEY_PEM_E_PKCS8_RSA = "server.key.pem.e.pkcs8.rsa";
+    private static final String SERVER_KEY_PEM_E_PKCS8_DSA = "server.key.pem.e.pkcs8.dsa";
     private static final String X509 = "X509";
     private static final String DIR = "dir";
-    private static final String SERVER_KEY_PEM_UE_PKCS1 = "server.key.pem.ue.pkcs1";
-    private static final String SERVER_KEY_DER_E_PKCS8 = "server.key.der.e.pkcs8";
-    private static final String SERVER_KEY_PEM_UE_PKCS8 = "server.key.pem.ue.pkcs8";
-    private static final String SERVER_KEY_DER_UE_PKCS8 = "server.key.der.ue.pkcs8";
-    private static final String SERVER_CRT = "server.crt";
+    private static final String SERVER_KEY_PEM_UE_PKCS1_RSA = "server.key.pem.ue.pkcs1.rsa";
+    private static final String SERVER_KEY_PEM_UE_PKCS1_DSA = "server.key.pem.ue.pkcs1.dsa";
+    private static final String SERVER_KEY_DER_E_PKCS8_RSA = "server.key.der.e.pkcs8.rsa";
+    private static final String SERVER_KEY_DER_E_PKCS8_DSA = "server.key.der.e.pkcs8.dsa";
+    private static final String SERVER_KEY_PEM_UE_PKCS8_RSA = "server.key.pem.ue.pkcs8.rsa";
+    private static final String SERVER_KEY_PEM_UE_PKCS8_DSA = "server.key.pem.ue.pkcs8.dsa";
+    private static final String SERVER_KEY_DER_UE_PKCS8_RSA = "server.key.der.ue.pkcs8.rsa";
+    private static final String SERVER_KEY_DER_UE_PKCS8_DSA = "server.key.der.ue.pkcs8.dsa";
+    private static final String SERVER_CRT_RSA = "server.crt.rsa";
+    private static final String SERVER_CRT_DSA = "server.crt.dsa";
 
     @Test
-    public void testLoadCertificateFile()
+    public void testLoadCertificateFiles()
             throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
         final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(null, null);
-        KeyUtil.loadCertificates(ks, resourceToFile(SERVER_CRT), CertificateFactory.getInstance(X509));
-        assertEquals(1, ks.size());
+        KeyUtil.loadCertificates(ks, resourceToFile(SERVER_CRT_RSA), CertificateFactory.getInstance(X509));
+        KeyUtil.loadCertificates(ks, resourceToFile(SERVER_CRT_DSA), CertificateFactory.getInstance(X509));
+        assertEquals(2, ks.size());
     }
 
     private File resourceToFile(String fileName) {
@@ -62,38 +69,62 @@ public class KeyUtilTest {
         final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(null, null);
         KeyUtil.loadCertificates(ks, resourceToFile(DIR), CertificateFactory.getInstance(X509));
-        assertEquals(1, ks.size());
+        assertEquals(2, ks.size());
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testLoadPrivateKeyPemUnencryptedPKCS1() throws IOException, GeneralSecurityException {
-        final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS1);
+    public void testLoadPrivateKeyPemUnencryptedPKCS1RSA() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS1_RSA);
+        KeyUtil.loadPrivateKey(keyFile, null);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testLoadPrivateKeyPemUnencryptedPKCS1DSA() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS1_DSA);
         KeyUtil.loadPrivateKey(keyFile, null);
     }
 
     @Test
-    public void testLoadPrivateKeyPemUnencryptedPKCS8() throws IOException, GeneralSecurityException {
-        final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS8);
-        SslContext.newServerContext(resourceToFile(SERVER_CRT), keyFile, null);
+    public void testLoadPrivateKeyPemUnencryptedPKCS8RSA() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS8_RSA);
+        SslContext.newServerContext(resourceToFile(SERVER_CRT_RSA), keyFile, null);
 
         final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, null);
         assertNotNull(privateKey);
     }
 
     @Test
-    public void testLoadPrivateKeyPemPKCSEncrypted() throws IOException, GeneralSecurityException {
-        final File keyFile = resourceToFile(SERVER_KEY_PEM_E_PKCS8);
-        SslContext.newServerContext(resourceToFile(SERVER_CRT), keyFile, "test");
+    public void testLoadPrivateKeyPemUnencryptedPKCS8DSA() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS8_DSA);
+        SslContext.newServerContext(resourceToFile(SERVER_CRT_DSA), keyFile, null);
+
+        final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, null);
+        assertNotNull(privateKey);
+    }
+
+    @Test
+    public void testLoadPrivateKeyPemPKCSEncryptedRSA() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_PEM_E_PKCS8_RSA);
+        SslContext.newServerContext(resourceToFile(SERVER_CRT_RSA), keyFile, "test");
 
         final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, "test");
         assertNotNull(privateKey);
     }
 
     @Test
-    public void testLoadPrivateKeyDerPKCS8Encrypted() throws IOException, GeneralSecurityException {
-        final File keyFile = resourceToFile(SERVER_KEY_DER_E_PKCS8);
+    public void testLoadPrivateKeyPemPKCSEncryptedDSA() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_PEM_E_PKCS8_DSA);
+        SslContext.newServerContext(resourceToFile(SERVER_CRT_DSA), keyFile, "test");
+
+        final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, "test");
+        assertNotNull(privateKey);
+    }
+
+    @Test
+    public void testLoadPrivateKeyDerPKCS8EncryptedRSA() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_DER_E_PKCS8_RSA);
         try {
-            SslContext.newServerContext(resourceToFile(SERVER_CRT), keyFile, "test");
+            SslContext.newServerContext(resourceToFile(SERVER_CRT_RSA), keyFile, "test");
             fail();
         } catch (Exception e) {
             // expected, not supported by netty
@@ -103,10 +134,37 @@ public class KeyUtilTest {
     }
 
     @Test
-    public void testLoadPrivateKeyDerPKCS8Unencrypted() throws IOException, GeneralSecurityException {
-        final File keyFile = resourceToFile(SERVER_KEY_DER_UE_PKCS8);
+    public void testLoadPrivateKeyDerPKCS8EncryptedDSA() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_DER_E_PKCS8_DSA);
         try {
-            SslContext.newServerContext(resourceToFile(SERVER_CRT), keyFile, null);
+            SslContext.newServerContext(resourceToFile(SERVER_CRT_DSA), keyFile, "test");
+            fail();
+        } catch (Exception e) {
+            // expected, not supported by netty
+        }
+        final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, "test");
+        assertNotNull(privateKey);
+    }
+
+    @Test
+    public void testLoadPrivateKeyDerPKCS8UnencryptedRSA() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_DER_UE_PKCS8_RSA);
+        try {
+            SslContext.newServerContext(resourceToFile(SERVER_CRT_RSA), keyFile, null);
+            fail();
+        } catch (Exception e) {
+            // expected, not supported by netty
+        }
+
+        final PrivateKey privateKey = KeyUtil.loadPrivateKey(keyFile, null);
+        assertNotNull(privateKey);
+    }
+
+    @Test
+    public void testLoadPrivateKeyDerPKCS8UnencryptedDSA() throws IOException, GeneralSecurityException {
+        final File keyFile = resourceToFile(SERVER_KEY_DER_UE_PKCS8_DSA);
+        try {
+            SslContext.newServerContext(resourceToFile(SERVER_CRT_DSA), keyFile, null);
             fail();
         } catch (Exception e) {
             // expected, not supported by netty

@@ -149,8 +149,14 @@ public class KeyUtil {
                 throw new IllegalArgumentException("Unsupported key type");
             }
 
-            final KeyFactory kf = KeyFactory.getInstance("RSA");
-            return kf.generatePrivate(keySpec);
+            try {
+                final KeyFactory RSAkf = KeyFactory.getInstance("RSA");
+                return RSAkf.generatePrivate(keySpec);
+            } catch (InvalidKeySpecException e) {
+                LOG.debug("Generating RSA private key failed, attempting DSA next", e);
+                final KeyFactory DSAkf = KeyFactory.getInstance("DSA");
+                return DSAkf.generatePrivate(keySpec);
+            }
         }
     }
 
