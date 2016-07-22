@@ -53,7 +53,10 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
                 .collect(Collectors.toMap(message -> message.message().get("_id").toString(), Function.identity()));
             final SearchResponse newSearchResponse = metaDecorator.get().apply(searchResponse);
             final Set<String> newFields = extractFields(newSearchResponse.messages());
-            final Set<String> addedFields = Sets.difference(Sets.difference(newFields, searchResponse.fields()), Message.RESERVED_FIELDS);
+            final Set<String> addedFields = Sets.difference(newFields, searchResponse.fields())
+                .stream()
+                .filter(field -> !Message.RESERVED_FIELDS.contains(field) && !field.equals("stream"))
+                .collect(Collectors.toSet());
 
             final List<ResultMessageSummary> decoratedMessages = newSearchResponse.messages()
                 .stream()
