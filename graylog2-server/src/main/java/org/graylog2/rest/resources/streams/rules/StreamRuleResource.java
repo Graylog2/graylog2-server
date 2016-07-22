@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -37,6 +38,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.events.StreamsChangedEvent;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;
@@ -63,12 +65,15 @@ import java.util.List;
 public class StreamRuleResource extends RestResource {
     private final StreamRuleService streamRuleService;
     private final StreamService streamService;
+    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public StreamRuleResource(StreamRuleService streamRuleService,
-                              StreamService streamService) {
+                              StreamService streamService,
+                              ClusterEventBus clusterEventBus) {
         this.streamRuleService = streamRuleService;
         this.streamService = streamService;
+        this.clusterEventBus = clusterEventBus;
     }
 
     @POST
@@ -86,6 +91,8 @@ public class StreamRuleResource extends RestResource {
         final Stream stream = streamService.load(streamId);
         final StreamRule streamRule = streamRuleService.create(streamId, cr);
         final String id = streamService.save(streamRule);
+
+        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
 
         final SingleStreamRuleSummaryResponse response = SingleStreamRuleSummaryResponse.create(id);
 
@@ -134,6 +141,7 @@ public class StreamRuleResource extends RestResource {
         streamRule.setDescription(cr.description());
 
         streamRuleService.save(streamRule);
+        clusterEventBus.post(StreamsChangedEvent.create(streamid));
 
         return SingleStreamRuleSummaryResponse.create(streamRule.getId());
     }
@@ -196,6 +204,7 @@ public class StreamRuleResource extends RestResource {
         final StreamRule streamRule = streamRuleService.load(streamRuleId);
         if (streamRule.getStreamId().equals(streamid)) {
             streamRuleService.destroy(streamRule);
+            clusterEventBus.post(StreamsChangedEvent.create(streamid));
         } else {
             throw new NotFoundException("Couldn't delete stream rule " + streamRuleId + "in stream " + streamid);
         }

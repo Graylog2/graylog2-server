@@ -33,6 +33,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
+import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.EmbeddedPersistable;
@@ -184,6 +185,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public void addExtractor(Input input, Extractor extractor) throws ValidationException {
         embed(input, InputImpl.EMBEDDED_EXTRACTORS, extractor);
+        publishChange(InputUpdated.create(input.getId()));
     }
 
     @Override
@@ -198,6 +200,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
         };
 
         embed(input, InputImpl.EMBEDDED_STATIC_FIELDS, obj);
+        publishChange(InputUpdated.create(input.getId()));
     }
 
     @Override
@@ -309,11 +312,13 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public void removeExtractor(Input input, String extractorId) {
         removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractorId);
+        publishChange(InputUpdated.create(input.getId()));
     }
 
     @Override
     public void removeStaticField(Input input, String key) {
         removeEmbedded(input, InputImpl.FIELD_STATIC_FIELD_KEY, InputImpl.EMBEDDED_STATIC_FIELDS, key);
+        publishChange(InputUpdated.create(input.getId()));
     }
 
     @Override

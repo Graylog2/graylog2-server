@@ -16,21 +16,23 @@
  */
 package org.graylog2.streams;
 
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import javax.inject.Named;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.events.StreamsChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
@@ -39,24 +41,34 @@ import java.util.concurrent.atomic.AtomicReference;
 public class StreamRouter {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
 
-    private static final long ENGINE_UPDATE_INTERVAL = 1L;
-
     protected final StreamService streamService;
     private final ServerStatus serverStatus;
+    private final ScheduledExecutorService scheduler;
 
     private final AtomicReference<StreamRouterEngine> routerEngine = new AtomicReference<>(null);
+    private final StreamRouterEngineUpdater engineUpdater;
 
     @Inject
     public StreamRouter(StreamService streamService,
                         ServerStatus serverStatus,
                         StreamRouterEngine.Factory routerEngineFactory,
+                        EventBus serverEventBus,
                         @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.streamService = streamService;
         this.serverStatus = serverStatus;
+        this.scheduler = scheduler;
 
-        final StreamRouterEngineUpdater streamRouterEngineUpdater = new StreamRouterEngineUpdater(routerEngine, routerEngineFactory, streamService, executorService());
-        this.routerEngine.set(streamRouterEngineUpdater.getNewEngine());
-        scheduler.scheduleAtFixedRate(streamRouterEngineUpdater, 0, ENGINE_UPDATE_INTERVAL, TimeUnit.SECONDS);
+        this.engineUpdater = new StreamRouterEngineUpdater(routerEngine, routerEngineFactory, streamService, executorService());
+        this.routerEngine.set(engineUpdater.getNewEngine());
+
+        // TODO: This class needs lifecycle management to avoid leaking objects in the EventBus
+        serverEventBus.register(this);
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleStreamsUpdate(StreamsChangedEvent event) {
+        scheduler.submit(engineUpdater);
     }
 
     private ExecutorService executorService() {
