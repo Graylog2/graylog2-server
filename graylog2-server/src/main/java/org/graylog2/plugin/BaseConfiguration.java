@@ -24,6 +24,7 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -354,6 +355,12 @@ public abstract class BaseConfiguration {
         return webEnable;
     }
 
+    public boolean isRestAndWebOnSamePort() {
+        final URI restListenUri = getRestListenUri();
+        final URI webListenUri = getWebListenUri();
+        return restListenUri.getHost().equals(webListenUri.getHost()) && restListenUri.getPort() == webListenUri.getPort();
+    }
+
     public boolean isWebEnableCors() {
         return webEnableCors;
     }
@@ -403,6 +410,7 @@ public abstract class BaseConfiguration {
     }
 
     @ValidatorMethod
+    @SuppressWarnings("unused")
     public void validateRestTlsConfig() throws ValidationException {
         if(isRestEnableTls()) {
             if(!isRegularFileAndReadable(getRestTlsKeyFile())) {
@@ -416,6 +424,7 @@ public abstract class BaseConfiguration {
     }
 
     @ValidatorMethod
+    @SuppressWarnings("unused")
     public void validateWebTlsConfig() throws ValidationException {
         if(isWebEnableTls()) {
             if(!isRegularFileAndReadable(getWebTlsKeyFile())) {
@@ -425,6 +434,24 @@ public abstract class BaseConfiguration {
             if(!isRegularFileAndReadable(getWebTlsCertFile())) {
                 throw new ValidationException("Unreadable or missing web interface X.509 certificate: " + getWebTlsCertFile());
             }
+        }
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateRestAndWebListenConfigConflict() throws ValidationException {
+        if (isRestAndWebOnSamePort()) {
+            if (getRestListenUri().getPath().equals(getWebListenUri().getPath())) {
+                throw new ValidationException("If REST and Web interface are served on the same host/port, the path must be different!");
+            }
+        }
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateWebHasPathPrefixIfOnSamePort() throws ValidationException {
+        if (isRestAndWebOnSamePort() && (Strings.isNullOrEmpty(getWebPrefix()) || getWebPrefix().equals("/"))) {
+            throw new ValidationException("If REST and Web Interface are served on the same host/port, the web interface must have a path prefix!");
         }
     }
 

@@ -120,7 +120,7 @@ public class Server extends ServerBootstrap {
             new AuditLogModule()
         );
 
-        if (configuration.isWebEnable()) {
+        if (configuration.isWebEnable() && !configuration.isRestAndWebOnSamePort()) {
             modules.add(new WebInterfaceModule());
         }
 
