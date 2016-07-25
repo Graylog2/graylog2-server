@@ -116,8 +116,11 @@ public class PluginLoader {
             }
         });
 
-        LOG.debug("Creating shared class loader for {} plugins: {}", sharedClassLoaderUrls.size(), sharedClassLoaderUrls);
-        classLoader.addClassLoader(URLClassLoader.newInstance(sharedClassLoaderUrls.toArray(new URL[sharedClassLoaderUrls.size()])));
+        // Only create the shared class loader if any plugin requests to be shared.
+        if (!sharedClassLoaderUrls.isEmpty()) {
+            LOG.debug("Creating shared class loader for {} plugins: {}", sharedClassLoaderUrls.size(), sharedClassLoaderUrls);
+            classLoader.addClassLoader(URLClassLoader.newInstance(sharedClassLoaderUrls.toArray(new URL[sharedClassLoaderUrls.size()])));
+        }
 
         final ServiceLoader<Plugin> pluginServiceLoader = ServiceLoader.load(Plugin.class, classLoader);
 
