@@ -16,7 +16,7 @@
  */
 package org.graylog2.shared.rest;
 
-import com.google.common.base.Strings;
+import com.google.common.net.HttpHeaders;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -28,9 +28,10 @@ public class NotAuthorizedResponseFilter implements ContainerResponseFilter {
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         if (responseContext.getStatusInfo().equals(Response.Status.UNAUTHORIZED)) {
-            final String requestedWith = requestContext.getHeaderString("X-Requested-With");
-            if (!Strings.isNullOrEmpty(requestedWith) && requestedWith.equalsIgnoreCase("XMLHttpRequest")) {
-                responseContext.getHeaders().remove("WWW-Authenticate");
+            final String requestedWith = requestContext.getHeaderString(HttpHeaders.X_REQUESTED_WITH);
+            if ("XMLHttpRequest".equalsIgnoreCase(requestedWith)) {
+                responseContext.getHeaders().remove(HttpHeaders.WWW_AUTHENTICATE);
+
             }
         }
     }
