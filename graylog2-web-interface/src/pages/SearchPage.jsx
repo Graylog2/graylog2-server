@@ -3,21 +3,16 @@ import Reflux from 'reflux';
 import Immutable from 'immutable';
 import moment from 'moment';
 
-import StoreProvider from 'injection/StoreProvider';
-const NodesStore = StoreProvider.getStore('Nodes');
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const InputsStore = StoreProvider.getStore('Inputs');
-const MessageFieldsStore = StoreProvider.getStore('MessageFields');
-const RefreshStore = StoreProvider.getStore('Refresh');
-const StreamsStore = StoreProvider.getStore('Streams');
-const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
-const SearchStore = StoreProvider.getStore('Search');
-const DecoratorsStore = StoreProvider.getStore('Decorators');
-
-import ActionsProvider from 'injection/ActionsProvider';
-const NodesActions = ActionsProvider.getActions('Nodes');
-const InputsActions = ActionsProvider.getActions('Inputs');
-const DecoratorsActions = ActionsProvider.getActions('Decorators');
+import CombinedProvider from 'injection/CombinedProvider';
+const { NodesStore, NodesActions } = CombinedProvider.get('Nodes');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+const { InputsStore, InputsActions } = CombinedProvider.get('Inputs');
+const { MessageFieldsStore } = CombinedProvider.get('MessageFields');
+const { RefreshStore } = CombinedProvider.get('Refresh');
+const { StreamsStore } = CombinedProvider.get('Streams');
+const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
+const { SearchStore } = CombinedProvider.get('Search');
+const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
 import { Spinner } from 'components/common';
 import { MalformedSearchQuery, SearchResult } from 'components/search';

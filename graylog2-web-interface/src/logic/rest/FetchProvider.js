@@ -3,8 +3,6 @@ import request from 'superagent-bluebird-promise';
 import StoreProvider from 'injection/StoreProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const SessionActions = ActionsProvider.getActions('Session');
-const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -57,6 +55,7 @@ export class Builder {
       .accept('json')
       .then((resp) => {
         if (resp.ok) {
+          const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
           ServerAvailabilityActions.reportSuccess();
           return resp.body;
         }
@@ -65,6 +64,7 @@ export class Builder {
       }, (error) => {
         const SessionStore = StoreProvider.getStore('Session');
         if (SessionStore.isLoggedIn() && error.status === 401) {
+          const SessionActions = ActionsProvider.getActions('Session');
           SessionActions.logout(SessionStore.getSessionId());
         }
 
@@ -74,6 +74,7 @@ export class Builder {
         }
 
         if (error.originalError && !error.originalError.status) {
+          const ServerAvailabilityActions = ActionsProvider.getActions('ServerAvailability');
           ServerAvailabilityActions.reportError(error);
         }
 
@@ -98,6 +99,7 @@ export default function fetch(method, url, body) {
 
   if (!SessionStore.isLoggedIn()) {
     return new Promise((resolve, reject) => {
+      const SessionActions = ActionsProvider.getActions('Session');
       SessionActions.login.completed.listen(() => {
         promise().then(resolve, reject);
       });
