@@ -35,6 +35,7 @@ import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
+import org.graylog2.shared.rest.NotAuthorizedResponseFilter;
 import org.graylog2.shared.rest.PrintModelProcessor;
 import org.graylog2.shared.rest.RestAccessLogFilter;
 import org.graylog2.shared.rest.XHRFilter;
@@ -119,7 +120,8 @@ public abstract class AbstractJerseyService extends AbstractIdleService {
                 .registerResources(additionalResources)
                 .register(RestAccessLogFilter.class)
                 .register(NodeIdResponseFilter.class)
-                .register(XHRFilter.class);
+                .register(XHRFilter.class)
+                .register(NotAuthorizedResponseFilter.class);
 
         exceptionMappers.forEach(rc::registerClasses);
         dynamicFeatures.forEach(rc::registerClasses);

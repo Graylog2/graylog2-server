@@ -18,9 +18,14 @@ package org.graylog2.shared.initializers;
 
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.web.resources.AppConfigResource;
+import org.graylog2.web.resources.WebInterfaceAssetsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +36,12 @@ import javax.ws.rs.Path;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Singleton
 public class RestApiService extends AbstractJerseyService {
@@ -43,6 +51,8 @@ public class RestApiService extends AbstractJerseyService {
     private final BaseConfiguration configuration;
     private final Map<String, Set<PluginRestResource>> pluginRestResources;
     private final String[] restControllerPackages;
+    private final WebInterfaceAssetsResource webInterfaceAssetsResource;
+    private final AppConfigResource appConfigResource;
 
     @Inject
     private RestApiService(final BaseConfiguration configuration,
@@ -53,15 +63,28 @@ public class RestApiService extends AbstractJerseyService {
                            @Named("additionalJerseyComponents") final Set<Class> additionalComponents,
                            final Map<String, Set<PluginRestResource>> pluginRestResources,
                            @Named("RestControllerPackages") final String[] restControllerPackages,
-                           final ObjectMapper objectMapper) {
+                           final ObjectMapper objectMapper,
+                           WebInterfaceAssetsResource webInterfaceAssetsResource,
+                           AppConfigResource appConfigResource) {
         super(dynamicFeatures, containerResponseFilters, exceptionMappers, additionalComponents, objectMapper, metricRegistry);
         this.configuration = configuration;
         this.pluginRestResources = pluginRestResources;
         this.restControllerPackages = restControllerPackages;
+        this.webInterfaceAssetsResource = webInterfaceAssetsResource;
+        this.appConfigResource = appConfigResource;
     }
 
     @Override
     protected void startUp() throws Exception {
+        ImmutableSet.Builder<Resource> additionalResourcesBuilder = ImmutableSet
+            .<Resource>builder()
+            .addAll(prefixPluginResources(PLUGIN_PREFIX, pluginRestResources));
+
+        if (configuration.isWebEnable() && configuration.isRestAndWebOnSamePort()) {
+            additionalResourcesBuilder = additionalResourcesBuilder
+                .addAll(prefixResources(configuration.getWebPrefix(), ImmutableSet.of(webInterfaceAssetsResource, appConfigResource)));
+        }
+
         httpServer = setUp("rest",
                 configuration.getRestListenUri(),
                 configuration.isRestEnableTls(),
@@ -73,30 +96,41 @@ public class RestApiService extends AbstractJerseyService {
                 configuration.getRestMaxHeaderSize(),
                 configuration.isRestEnableGzip(),
                 configuration.isRestEnableCors(),
-                prefixPluginResources(PLUGIN_PREFIX, pluginRestResources),
+                additionalResourcesBuilder.build(),
                 restControllerPackages);
 
         httpServer.start();
 
         LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
+
+        if (configuration.isWebEnable() && configuration.isRestAndWebOnSamePort()) {
+            LOG.info("Started Web Interface at <{}>", configuration.getWebListenUri());
+        }
     }
 
     private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<PluginRestResource>> pluginResourceMap) {
-        final Set<Resource> result = new HashSet<>();
-        for (Map.Entry<String, Set<PluginRestResource>> entry : pluginResourceMap.entrySet()) {
-            for (PluginRestResource pluginRestResource : entry.getValue()) {
-                StringBuilder resourcePath = new StringBuilder(pluginPrefix).append("/").append(entry.getKey());
-                final Path pathAnnotation = Resource.getPath(pluginRestResource.getClass());
-                final String path = (pathAnnotation.value() == null ? "" : pathAnnotation.value());
-                if (!path.startsWith("/"))
-                    resourcePath.append("/");
+        return pluginResourceMap.entrySet().stream()
+            .map(entry -> prefixResources(pluginPrefix + "/" + entry.getKey(), entry.getValue()))
+            .flatMap(Collection::stream)
+            .collect(Collectors.toSet());
+    }
 
-                final Resource.Builder resourceBuilder = Resource.builder(pluginRestResource.getClass()).path(resourcePath.append(path).toString());
-                final Resource resource = resourceBuilder.build();
-                result.add(resource);
-            }
-        }
-        return result;
+    private <T> Set<Resource> prefixResources(String prefix, Set<T> resources) {
+        final String pathPrefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length()-1) : prefix;
+
+        return resources
+            .stream()
+            .map(resource -> {
+                final Path pathAnnotation = Resource.getPath(resource.getClass());
+                final String resourcePathSuffix = Strings.nullToEmpty(pathAnnotation.value());
+                final String resourcePath = resourcePathSuffix.startsWith("/") ? pathPrefix + resourcePathSuffix : pathPrefix + "/" + resourcePathSuffix;
+
+                return Resource
+                    .builder(resource.getClass())
+                    .path(resourcePath)
+                    .build();
+            })
+            .collect(Collectors.toSet());
     }
 
     @Override
