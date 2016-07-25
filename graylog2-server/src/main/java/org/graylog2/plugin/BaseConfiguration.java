@@ -37,6 +37,7 @@ import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -358,12 +359,14 @@ public abstract class BaseConfiguration {
     }
 
     public boolean isRestAndWebOnSamePort() {
+        final URI restListenUri = getRestListenUri();
+        final URI webListenUri = getWebListenUri();
         try {
-            final URL restListenUri = getRestListenUri().toURL();
-            final URL webListenUri = getWebListenUri().toURL();
-            return restListenUri.getHost().equals(webListenUri.getHost()) && restListenUri.getPort() == webListenUri.getPort();
-        } catch (MalformedURLException e) {
-            throw new RuntimeException("Unable to parse REST/web listen uris: ", e);
+            final InetAddress restAddress = InetAddress.getByName(restListenUri.getHost());
+            final InetAddress webAddress = InetAddress.getByName(webListenUri.getHost());
+            return restListenUri.getPort() == webListenUri.getPort() && restAddress.equals(webAddress);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("Unable to resolve hostnames of rest/web listen uris: ", e);
         }
     }
 
