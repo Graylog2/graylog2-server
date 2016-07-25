@@ -69,7 +69,7 @@ public class HelloWorldResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Redirecting to web console if it runs on same port.")
-    @Produces(MediaType.TEXT_HTML)
+    @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML})
     public Response redirectToWebConsole() {
         if (configuration.isRestAndWebOnSamePort()) {
             return Response
