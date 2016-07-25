@@ -108,15 +108,15 @@ public class PluginLoader {
             // (the default), it gets its own class loader and cannot see other plugins. Plugins which are not
             // isolated share one class loader so they can see each other. (makes plugin inter-dependencies work)
             if (properties.isIsolated()) {
-                LOG.debug("Create isolated class loader for {}", url);
+                LOG.debug("Creating isolated class loader for <{}>", url);
                 classLoader.addClassLoader(URLClassLoader.newInstance(new URL[]{url}));
             } else {
-                LOG.debug("Use shared class loader for {}", url);
+                LOG.debug("Using shared class loader for <{}>", url);
                 sharedClassLoaderUrls.add(url);
             }
         });
 
-        LOG.debug("Create shared class loader for {} plugins: {}", sharedClassLoaderUrls.size(), sharedClassLoaderUrls);
+        LOG.debug("Creating shared class loader for {} plugins: {}", sharedClassLoaderUrls.size(), sharedClassLoaderUrls);
         classLoader.addClassLoader(URLClassLoader.newInstance(sharedClassLoaderUrls.toArray(new URL[sharedClassLoaderUrls.size()])));
 
         final ServiceLoader<Plugin> pluginServiceLoader = ServiceLoader.load(Plugin.class, classLoader);
