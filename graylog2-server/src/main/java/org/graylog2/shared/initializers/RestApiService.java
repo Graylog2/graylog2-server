@@ -80,7 +80,7 @@ public class RestApiService extends AbstractJerseyService {
             .<Resource>builder()
             .addAll(prefixPluginResources(PLUGIN_PREFIX, pluginRestResources));
 
-        if (configuration.isRestAndWebOnSamePort()) {
+        if (configuration.isWebEnable() && configuration.isRestAndWebOnSamePort()) {
             additionalResourcesBuilder = additionalResourcesBuilder
                 .addAll(prefixResources(configuration.getWebPrefix(), ImmutableSet.of(webInterfaceAssetsResource, appConfigResource)));
         }
@@ -103,7 +103,7 @@ public class RestApiService extends AbstractJerseyService {
 
         LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
 
-        if (configuration.isRestAndWebOnSamePort()) {
+        if (configuration.isWebEnable() && configuration.isRestAndWebOnSamePort()) {
             LOG.info("Started Web Interface at <{}>", configuration.getWebListenUri());
         }
     }
