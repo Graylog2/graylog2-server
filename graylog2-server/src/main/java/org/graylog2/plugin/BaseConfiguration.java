@@ -34,7 +34,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -356,9 +358,13 @@ public abstract class BaseConfiguration {
     }
 
     public boolean isRestAndWebOnSamePort() {
-        final URI restListenUri = getRestListenUri();
-        final URI webListenUri = getWebListenUri();
-        return restListenUri.getHost().equals(webListenUri.getHost()) && restListenUri.getPort() == webListenUri.getPort();
+        try {
+            final URL restListenUri = getRestListenUri().toURL();
+            final URL webListenUri = getWebListenUri().toURL();
+            return restListenUri.getHost().equals(webListenUri.getHost()) && restListenUri.getPort() == webListenUri.getPort();
+        } catch (MalformedURLException e) {
+            throw new RuntimeException("Unable to parse REST/web listen uris: ", e);
+        }
     }
 
     public boolean isWebEnableCors() {
@@ -452,6 +458,14 @@ public abstract class BaseConfiguration {
     public void validateWebHasPathPrefixIfOnSamePort() throws ValidationException {
         if (isRestAndWebOnSamePort() && (Strings.isNullOrEmpty(getWebPrefix()) || getWebPrefix().equals("/"))) {
             throw new ValidationException("If REST and Web Interface are served on the same host/port, the web interface must have a path prefix!");
+        }
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateWebAndRestHaveSameProtocolIfOnSamePort() throws ValidationException {
+        if (isRestAndWebOnSamePort() && !getWebListenUri().getScheme().equals(getRestListenUri().getScheme())) {
+            throw new ValidationException("If REST and Web interface are served on the same host/port, the protocols must be identical!");
         }
     }
 
