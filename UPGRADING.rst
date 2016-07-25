@@ -66,6 +66,6 @@ If the current write index is GREEN or YELLOW, Graylog will continue to index me
 Changes in message field values trimming
 ----------------------------------------
 
-Previous versions of Graylog were trimming message field values inconsistently, depending on the codec used. We have changed that behaviour in 2.1, so all message field values are trimmed by default.
+Previous versions of Graylog were trimming message field values inconsistently, depending on the codec used. We have changed that behaviour in 2.1, so all message field values are trimmed by default. This means that leading or trailing whitespace of every field is removed during ingestion.
 
 **Important**: This change will break your existing stream rules, extractors, and Drool rules if you are expecting leading or trailing white spaces in them. Please adapt them so they do not require those white spaces.
