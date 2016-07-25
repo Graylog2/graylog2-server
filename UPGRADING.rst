@@ -19,6 +19,19 @@ Previous versions of Graylog were automatically generating a private key/certifi
 Due to those shortcomings, the feature has been removed completely. Users need to use proper certificates or generate their own self-signed certificates and configure them with the appropriate settings, see `Using HTTPS <http://docs.graylog.org/en/2.0/pages/configuration/https.html>`_ for reference.
 
 
+Web Interface Listener
+----------------------
+
+2.0.x was defaulting to separate listeners for the REST API and the web interface. The former defaulted to ``http://localhost:12900``, the latter to ``http://localhost:9000``.
+Beginning with 2.1.0 it is possible to run both the REST API and the web interface on the same host/port-combination and this is now the default. This means that the REST API is still running on ``http://localhost:12900`` per default, but the web interface is now running on ``http://localhost:12900/console``. Furthermore, all requests going to ``http://localhost:12900/`` requesting a content-type of ``text/html`` are redirected to the web interface, therefore making it even easier to set up Graylog and use it behind proxies, expose it externally, etc.
+
+Please take not that you can still run the REST API and the web interface on two separate listeners. If you are running a 2.0 configuration specifying ``web_listen_uri`` explicitly and you want to keep that, you do not have to change anything.
+
+Please also take note, that when you have configured ``rest_listen_uri`` and ``web_listen_uri`` to run on the same host/port-combination, the following configuration directives will have no effect:
+
+  - ``web_enable_tls``, ``web_tls_cert_file``, ``web_tls_key_file``, ``web_tls_key_password`` (These will depend on the TLS configuration of the REST listener).
+  - ``web_enable_cors``, ``web_enable_gzip``, ``web_thread_pool_size``, ``web_max_initial_line_length``, ``web_max_header_size`` (Those will depend on the corresponding settings of the REST listener).
+
 Internal Metrics to MongoDB
 ---------------------------
 
