@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.*;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 
 @CollectionName("sessions")
 public class MongoDbSession extends PersistedImpl {
@@ -82,6 +83,13 @@ public class MongoDbSession extends PersistedImpl {
         }
     }
 
+    public Optional<String> getUsernameAttribute() {
+        final Map<Object, Object> attributes = getAttributes();
+        if (attributes == null) {
+            return Optional.empty();
+        }
+        return Optional.ofNullable(String.valueOf(attributes.get("username")));
+    }
 
     public String getHost() {
         return (String) fields.get("host");

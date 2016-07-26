@@ -199,8 +199,11 @@ public class RolesResource extends RestResource {
                     user.isReadOnly(),
                     user.isExternalUser(),
                     user.getStartpage(),
-                    roleNames
-            ));
+                    roleNames,
+                    // there is no session information available in this call, so we set it to null
+                    false,
+                    null,
+                    null));
         }
 
         return RoleMembershipResponse.create(role.getName(), userSummaries);
