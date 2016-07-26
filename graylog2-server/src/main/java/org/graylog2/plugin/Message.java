@@ -129,7 +129,6 @@ public class Message implements Messages {
     private ArrayList<Recording> recordings;
 
     public Message(final String message, final String source, final DateTime timestamp) {
-        // Adding the fields directly because they would not be accepted as a reserved fields.
         fields.put(FIELD_ID, new UUID().toString());
         addRequiredField(FIELD_MESSAGE, message);
         addRequiredField(FIELD_SOURCE, source);
@@ -304,24 +303,26 @@ public class Message implements Messages {
     }
 
     private void addField(final String key, final Object value, final boolean isRequiredField) {
+        final String trimmedKey = key.trim();
+
         // Don't accept protected keys. (some are allowed though lol)
-        if (RESERVED_FIELDS.contains(key) && !RESERVED_SETTABLE_FIELDS.contains(key) || !validKey(key)) {
+        if (RESERVED_FIELDS.contains(trimmedKey) && !RESERVED_SETTABLE_FIELDS.contains(trimmedKey) || !validKey(trimmedKey)) {
             if (LOG.isDebugEnabled()) {
-                LOG.debug("Ignoring invalid or reserved key {} for message {}", key, getId());
+                LOG.debug("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
             }
             return;
         }
 
-        if (FIELD_TIMESTAMP.equals(key.trim()) && value != null && value instanceof Date) {
+        if (FIELD_TIMESTAMP.equals(trimmedKey) && value != null && value instanceof Date) {
             fields.put(FIELD_TIMESTAMP, new DateTime(value));
-        } else if(value instanceof String) {
+        } else if (value instanceof String) {
             final String str = ((String) value).trim();
 
             if (isRequiredField || !str.isEmpty()) {
-                fields.put(key.trim(), str);
+                fields.put(trimmedKey, str);
             }
-        } else if(value != null) {
-            fields.put(key.trim(), value);
+        } else if (value != null) {
+            fields.put(trimmedKey, value);
         }
     }
 
