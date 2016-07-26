@@ -52,6 +52,7 @@ import org.junit.runner.RunWith;
 
 import java.net.URI;
 import java.util.Collections;
+import java.util.HashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -192,6 +193,39 @@ public class LdapUserAuthenticatorTest extends AbstractLdapTestUnit {
         final User ldapUser = authenticator.syncFromLdapEntry(userEntry, ldapSettings, "user");
 
         assertThat(ldapUser).isNotNull();
+        assertThat(ldapUser.isExternalUser()).isTrue();
+        assertThat(ldapUser.getName()).isEqualTo("user");
+        assertThat(ldapUser.getEmail()).isEqualTo("user@localhost");
+        assertThat(ldapUser.getHashedPassword()).isEqualTo("User synced from LDAP.");
+        assertThat(ldapUser.getTimeZone()).isEqualTo(DateTimeZone.UTC);
+        assertThat(ldapUser.getRoleIds()).containsOnly("54e3deadbeefdeadbeef0001");
+        assertThat(ldapUser.getPermissions()).isNotEmpty();
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void testSyncFromLdapEntryExistingUser() {
+        final LdapUserAuthenticator authenticator = spy(new LdapUserAuthenticator(ldapConnector,
+                                                                                  ldapSettingsService,
+                                                                                  userService,
+                                                                                  mock(RoleService.class),
+                                                                                  DateTimeZone.UTC));
+
+        final LdapEntry userEntry = new LdapEntry();
+        final LdapSettings ldapSettings = mock(LdapSettings.class);
+        when(ldapSettings.getDisplayNameAttribute()).thenReturn("displayName");
+        when(ldapSettings.getDefaultGroupId()).thenReturn("54e3deadbeefdeadbeef0001");
+        when(ldapSettings.getAdditionalDefaultGroupIds()).thenReturn(Collections.emptySet());
+
+        final HashMap<String, Object> fields = Maps.newHashMap();
+        fields.put("permissions", Collections.singletonList("test:permission:1234"));
+        when(userService.load(anyString()))
+                .thenReturn(new UserImpl(null, new Permissions(Collections.emptySet()), fields));
+
+        final User ldapUser = authenticator.syncFromLdapEntry(userEntry, ldapSettings, "user");
+
+        assertThat(ldapUser).isNotNull();
+        assertThat(ldapUser.getPermissions()).contains("test:permission:1234");
         assertThat(ldapUser.isExternalUser()).isTrue();
         assertThat(ldapUser.getName()).isEqualTo("user");
         assertThat(ldapUser.getEmail()).isEqualTo("user@localhost");

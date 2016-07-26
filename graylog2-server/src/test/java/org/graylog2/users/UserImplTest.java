@@ -16,6 +16,7 @@
  */
 package org.graylog2.users;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
@@ -59,5 +60,18 @@ public class UserImplTest {
         assertThat(user.getPermissions())
             .containsAll(permissions.userSelfEditPermissions("foobar"))
             .contains("subject:action");
+    }
+
+    @Test
+    public void permissionsArentModified() {
+        final Permissions permissions = new Permissions(Collections.emptySet());
+        final Map<String, Object> fields = Collections.singletonMap(UserImpl.USERNAME, "foobar");
+        user = new UserImpl(passwordAlgorithmFactory, permissions, fields);
+
+        final List<String> newPermissions = ImmutableList.<String>builder()
+                .addAll(user.getPermissions())
+                .add("perm:1")
+                .build();
+        user.setPermissions(newPermissions);
     }
 }
