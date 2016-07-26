@@ -275,6 +275,7 @@ public class PipelineInterpreter implements MessageProcessor {
         final ImmutableSet<Pipeline> pipelinesToRun = ImmutableSet.copyOf(pipelines
                 .stream()
                 .map(pipelineId -> this.currentPipelines.get().get(pipelineId))
+                .filter(pipeline -> pipeline != null)
                 .collect(Collectors.toSet()));
 
         return processForResolvedPipelines(message, msgId, pipelinesToRun, interpreterListener);
