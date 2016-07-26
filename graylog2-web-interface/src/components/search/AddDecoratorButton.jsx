@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import jQuery from 'jquery';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import { ConfigurationForm } from 'components/configurationforms';
 import { Select, Spinner } from 'components/common';
@@ -16,7 +17,7 @@ const AddDecoratorButton = React.createClass({
     nextOrder: React.PropTypes.number,
     stream: React.PropTypes.string,
   },
-  mixins: [Reflux.connect(DecoratorsStore)],
+  mixins: [Reflux.connect(DecoratorsStore), PureRenderMixin],
   getInitialState() {
     return {
       typeDefinition: {},
@@ -28,6 +29,7 @@ const AddDecoratorButton = React.createClass({
   },
   _handleCancel() {
     this.refs.select.clearValue();
+    this.setState(this.getInitialState());
   },
   _handleSubmit(data) {
     const request = {
@@ -77,7 +79,7 @@ const AddDecoratorButton = React.createClass({
                   onClick={this._openModal}>Add</button>
 
         </div>
-        {configurationForm}
+        {this.state.typeName && configurationForm}
       </div>
     );
   },
