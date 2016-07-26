@@ -96,8 +96,11 @@ public abstract class PluginModule extends Graylog2Module {
     }
 
     protected void addRestResource(Class<? extends PluginRestResource> restResourceClass) {
-        MapBinder<String, PluginRestResource> pluginRestResourceMapBinder = MapBinder.newMapBinder(binder(), String.class, PluginRestResource.class).permitDuplicates();
-        pluginRestResourceMapBinder.addBinding(this.getClass().getPackage().getName()).to(restResourceClass);
+        MapBinder<String, Class<? extends PluginRestResource>> pluginRestResourceMapBinder =
+                MapBinder.newMapBinder(binder(), new TypeLiteral<String>() {},
+                                       new TypeLiteral<Class<? extends PluginRestResource>>() {})
+                        .permitDuplicates();
+        pluginRestResourceMapBinder.addBinding(this.getClass().getPackage().getName()).toInstance(restResourceClass);
     }
 
     protected void addConfigBeans() {

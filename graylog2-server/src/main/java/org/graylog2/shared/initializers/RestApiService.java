@@ -20,7 +20,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -37,10 +36,8 @@ import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -49,7 +46,7 @@ public class RestApiService extends AbstractJerseyService {
     public static final String PLUGIN_PREFIX = "/plugins";
 
     private final BaseConfiguration configuration;
-    private final Map<String, Set<PluginRestResource>> pluginRestResources;
+    private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
     private final String[] restControllerPackages;
     private final WebInterfaceAssetsResource webInterfaceAssetsResource;
     private final AppConfigResource appConfigResource;
@@ -61,7 +58,7 @@ public class RestApiService extends AbstractJerseyService {
                            final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                            final Set<Class<? extends ExceptionMapper>> exceptionMappers,
                            @Named("additionalJerseyComponents") final Set<Class> additionalComponents,
-                           final Map<String, Set<PluginRestResource>> pluginRestResources,
+                           final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
                            @Named("RestControllerPackages") final String[] restControllerPackages,
                            final ObjectMapper objectMapper,
                            WebInterfaceAssetsResource webInterfaceAssetsResource,
@@ -82,7 +79,7 @@ public class RestApiService extends AbstractJerseyService {
 
         if (configuration.isWebEnable() && configuration.isRestAndWebOnSamePort()) {
             additionalResourcesBuilder = additionalResourcesBuilder
-                .addAll(prefixResources(configuration.getWebPrefix(), ImmutableSet.of(webInterfaceAssetsResource, appConfigResource)));
+                .addAll(prefixResources(configuration.getWebPrefix(), ImmutableSet.of(webInterfaceAssetsResource.getClass(), appConfigResource.getClass())));
         }
 
         httpServer = setUp("rest",
@@ -108,25 +105,25 @@ public class RestApiService extends AbstractJerseyService {
         }
     }
 
-    private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<PluginRestResource>> pluginResourceMap) {
+    private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<Class<? extends PluginRestResource>>> pluginResourceMap) {
         return pluginResourceMap.entrySet().stream()
             .map(entry -> prefixResources(pluginPrefix + "/" + entry.getKey(), entry.getValue()))
             .flatMap(Collection::stream)
             .collect(Collectors.toSet());
     }
 
-    private <T> Set<Resource> prefixResources(String prefix, Set<T> resources) {
+    private <T> Set<Resource> prefixResources(String prefix, Set<Class<? extends T>> resources) {
         final String pathPrefix = prefix.endsWith("/") ? prefix.substring(0, prefix.length()-1) : prefix;
 
         return resources
             .stream()
             .map(resource -> {
-                final Path pathAnnotation = Resource.getPath(resource.getClass());
+                final Path pathAnnotation = Resource.getPath(resource);
                 final String resourcePathSuffix = Strings.nullToEmpty(pathAnnotation.value());
                 final String resourcePath = resourcePathSuffix.startsWith("/") ? pathPrefix + resourcePathSuffix : pathPrefix + "/" + resourcePathSuffix;
 
                 return Resource
-                    .builder(resource.getClass())
+                    .builder(resource)
                     .path(resourcePath)
                     .build();
             })
