@@ -12,6 +12,8 @@ const DecoratorsStore = StoreProvider.getStore('Decorators');
 import ActionsProvider from 'injection/ActionsProvider';
 const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
+import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
+
 const Decorator = React.createClass({
   propTypes: {
     decorator: React.PropTypes.object.isRequired,
@@ -45,21 +47,19 @@ const Decorator = React.createClass({
     const decorator = this.props.decorator;
     const decoratorType = this.state.types[decorator.type] || this._decoratorTypeNotPresent();
     return (
-      <span>
-        <Col md={8}>
+      <span className={DecoratorStyles.fullWidth}>
+        <span className={DecoratorStyles.decoratorBox}>
           <strong>{decoratorType.name}</strong>
-        </Col>
-        <Col md={4} className="text-right">
-          <Button bsStyle="primary" bsSize="xsmall" onClick={this._handleDeleteClick}>Delete</Button>
-          {' '}
-          <Button bsStyle="info" bsSize="xsmall" onClick={this._handleEditClick}>Edit</Button>
-        </Col>
-        <Col md={12}>
-          <ConfigurationWell key={`configuration-well-decorator-${decorator._id}`}
-                             id={decorator._id}
-                             configuration={decorator.config}
-                             typeDefinition={this.props.typeDefinition}/>
-        </Col>
+          <span>
+            <Button bsStyle="primary" bsSize="xsmall" onClick={this._handleDeleteClick}>Delete</Button>
+            {' '}
+            <Button bsStyle="info" bsSize="xsmall" onClick={this._handleEditClick}>Edit</Button>
+          </span>
+        </span>
+        <ConfigurationWell key={`configuration-well-decorator-${decorator._id}`}
+                           id={decorator._id}
+                           configuration={decorator.config}
+                           typeDefinition={this.props.typeDefinition}/>
         <ConfigurationForm ref="editForm"
                            key="configuration-form-decorator"
                            configFields={this.props.typeDefinition.requested_configuration}

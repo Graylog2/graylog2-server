@@ -12,6 +12,8 @@ const DecoratorsStore = StoreProvider.getStore('Decorators');
 import ActionsProvider from 'injection/ActionsProvider';
 const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
+import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
+
 const AddDecoratorButton = React.createClass({
   propTypes: {
     nextOrder: React.PropTypes.number,
@@ -64,9 +66,9 @@ const AddDecoratorButton = React.createClass({
                          typeName={this.state.typeName} includeTitleField={false}
                          submitAction={this._handleSubmit} cancelAction={this._handleCancel} /> : null);
     return (
-      <div className="form-inline" style={{ margin: '4px' }}>
-        <div className="form-group">
-          <div className="form-group" style={{ width: 300 }}>
+      <div className={`form-inline ${DecoratorStyles.addDecoratorButtonContainer}`}>
+        <div className={`form-group ${DecoratorStyles.decoratorBox} ${DecoratorStyles.fullWidth}`}>
+          <div className={`form-group ${DecoratorStyles.addDecoratorSelect}`}>
             <Select ref="select"
                     placeholder="Select decorator"
                     onValueChange={this._onTypeChange}
