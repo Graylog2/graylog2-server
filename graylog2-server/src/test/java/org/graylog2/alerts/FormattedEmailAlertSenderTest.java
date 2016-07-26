@@ -19,7 +19,6 @@ package org.graylog2.alerts;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
@@ -91,13 +90,8 @@ public class FormattedEmailAlertSenderTest {
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");
-        when(stream.getTitle()).thenReturn("Stream Title");
-
-        AlertCondition alertCondition = mock(AlertCondition.class);
 
         AlertCondition.CheckResult checkResult = mock(AbstractAlertCondition.CheckResult.class);
-        when(checkResult.getTriggeredAt()).thenReturn(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC));
-        when(checkResult.getTriggeredCondition()).thenReturn(alertCondition);
 
         String body = emailAlertSender.buildBody(stream, checkResult, Collections.<Message>emptyList());
 

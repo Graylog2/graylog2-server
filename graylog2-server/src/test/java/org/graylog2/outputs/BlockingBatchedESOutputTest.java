@@ -82,7 +82,6 @@ public class BlockingBatchedESOutputTest {
     @Test
     public void writeDoesNotFlushIfClusterIsNotConnected() throws Exception {
         when(cluster.isConnected()).thenReturn(false);
-        when(cluster.isDeflectorHealthy()).thenReturn(true);
 
         doThrow(RuntimeException.class).when(cluster).waitForConnectedAndDeflectorHealthy();
 

@@ -59,7 +59,6 @@ public class NodeServiceImplTest {
 
     @Before
     public void setUp() throws Exception {
-        when(configuration.getRestTransportUri()).thenReturn(TRANSPORT_URI);
         when(nodeId.toString()).thenReturn(NODE_ID);
 
         this.nodeService = new NodeServiceImpl(mongoRule.getMongoConnection(), configuration);

@@ -53,7 +53,6 @@ public class PasswordAlgorithmFactoryTest {
     @Test
     public void testForPasswordShouldReturnFirstAlgorithm() throws Exception {
         when(passwordAlgorithm1.supports(anyString())).thenReturn(true);
-        when(passwordAlgorithm2.supports(anyString())).thenReturn(false);
 
         final PasswordAlgorithmFactory passwordAlgorithmFactory = new PasswordAlgorithmFactory(passwordAlgorithms, passwordAlgorithm2);
 

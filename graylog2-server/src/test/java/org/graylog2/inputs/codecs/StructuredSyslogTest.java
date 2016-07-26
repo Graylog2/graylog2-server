@@ -64,8 +64,6 @@ public class StructuredSyslogTest {
     @Before
     public void setUp() {
         when(metricRegistry.timer(any(String.class))).thenReturn(mockedTimer);
-        when(mockedTimer.time()).thenReturn(mock(Timer.Context.class));
-
         syslogCodec = new SyslogCodec(configuration, metricRegistry);
     }
 

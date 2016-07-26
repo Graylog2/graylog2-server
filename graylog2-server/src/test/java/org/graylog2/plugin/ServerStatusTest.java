@@ -40,7 +40,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -135,8 +134,6 @@ public class ServerStatusTest {
         final CountDownLatch startLatch = new CountDownLatch(1);
         final CountDownLatch stopLatch = new CountDownLatch(1);
         final AtomicBoolean exceptionCaught = new AtomicBoolean(false);
-
-        doThrow(new RuntimeException()).when(runnable).run();
 
         new Thread(new Runnable() {
             @Override

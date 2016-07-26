@@ -132,8 +132,6 @@ public class IndexRotationThreadTest {
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
 
-        when(deflector.getNewestTargetName()).thenReturn("some_index");
-
         rotationThread.checkForRotation();
 
         verify(deflector, times(1)).cycle();
@@ -175,8 +173,6 @@ public class IndexRotationThreadTest {
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
 
-        when(deflector.getNewestTargetName()).thenReturn("some_index");
-
         rotationThread.checkForRotation();
 
         verify(deflector, never()).cycle();
@@ -186,8 +182,6 @@ public class IndexRotationThreadTest {
     public void testDontPerformRotationIfClusterIsDown() throws NoTargetIndexException {
         final Provider<RotationStrategy> provider = mock(Provider.class);
         when(cluster.isConnected()).thenReturn(false);
-        when(cluster.isHealthy()).thenReturn(false);
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
