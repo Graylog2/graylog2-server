@@ -26,6 +26,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Message;
@@ -89,8 +90,16 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     @Override
     protected CheckResult runCheck() {
         try {
+            // Create an absolute range from the relative range to make sure it doesn't change during the two
+            // search requests. (count and find messages)
+            // This is needed because the RelativeRange computes the range from NOW on every invocation of getFrom() and
+            // getTo().
+            // See: https://github.com/Graylog2/graylog2-server/issues/2382
+            final RelativeRange relativeRange = RelativeRange.create(time * 60);
+            final AbsoluteRange range = AbsoluteRange.create(relativeRange.getFrom(), relativeRange.getTo());
+
             final String filter = "streams:" + stream.getId();
-            final CountResult result = searches.count("*", RelativeRange.create(time * 60), filter);
+            final CountResult result = searches.count("*", range, filter);
             final long count = result.count();
 
             LOG.debug("Alert check <{}> result: [{}]", id, count);
@@ -111,7 +120,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                 final List<MessageSummary> summaries = Lists.newArrayList();
                 if (getBacklog() > 0) {
                     final SearchResult backlogResult = searches.search("*", filter,
-                                                                       RelativeRange.create(time * 60), getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
+                            range, getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
                     for (ResultMessage resultMessage : backlogResult.getResults()) {
                         final Message msg = resultMessage.getMessage();
                         summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
