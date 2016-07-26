@@ -16,6 +16,7 @@ import StoreProvider from 'injection/StoreProvider';
 const AuthenticationStore = StoreProvider.getStore('Authentication');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
+import AuthenticationComponentStyle from '!style!css!./AuthenticationComponent.css';
 
 const AuthenticationComponent = React.createClass({
 
@@ -28,7 +29,6 @@ const AuthenticationComponent = React.createClass({
   mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   componentDidMount() {
-    this.style.use();
     AuthenticationActions.load();
 
     PluginStore.exports('authenticatorConfigurations').forEach((authConfig) => {
@@ -37,14 +37,8 @@ const AuthenticationComponent = React.createClass({
     });
   },
 
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
   // contains the 'authname' -> plugin descriptor
   authenticatorConfigurations: {},
-
-  style: require('!style/useable!css!./AuthenticationComponent.css'),
 
   _pluginPane() {
     const name = this.props.params.name;
@@ -91,7 +85,7 @@ const AuthenticationComponent = React.createClass({
         });
 
         authenticators.unshift(
-          <NavItem key="divider" disabled title="Provider Settings" className="divider">Provider Settings</NavItem>
+          <NavItem key="divider" disabled title="Provider Settings" className={AuthenticationComponentStyle.divider}>Provider Settings</NavItem>
         );
         authenticators.unshift(
           <LinkContainer key="container-settings" to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}>
@@ -134,8 +128,8 @@ const AuthenticationComponent = React.createClass({
     let contentComponent = React.Children.count(this.props.children) === 1 ? React.Children.only(this.props.children) : this._contentComponent();
 
     return (<Row>
-      <Col md={2} className="subnavigation">{subnavigation}</Col>
-      <Col md={10} className="contentpane">{contentComponent}</Col>
+      <Col md={2} className={AuthenticationComponentStyle.subnavigation}>{subnavigation}</Col>
+      <Col md={10} className={AuthenticationComponentStyle.contentpane}>{contentComponent}</Col>
     </Row>);
   },
 });

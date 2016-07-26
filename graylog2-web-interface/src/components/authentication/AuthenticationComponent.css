@@ -1,12 +1,12 @@
-.subnavigation {
+:local(.subnavigation) {
     border-right: #939393 solid 1px;
 }
 
-.contentpane {
+:local(.contentpane) {
     border-left: #939393 solid 1px;
     margin-left: -1px;
 }
 
-.divider {
+:local(.divider) {
     border-bottom: #939393 solid 1px;
 }
