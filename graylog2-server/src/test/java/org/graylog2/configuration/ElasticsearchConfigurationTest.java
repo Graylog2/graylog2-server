@@ -20,16 +20,24 @@ import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assume.assumeTrue;
 
 public class ElasticsearchConfigurationTest {
+    @Rule
+    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
+
     @Test
     public void testGetElasticSearchIndexPrefix() throws RepositoryException, ValidationException {
         ElasticsearchConfiguration configuration = new ElasticsearchConfiguration();
@@ -74,5 +82,91 @@ public class ElasticsearchConfigurationTest {
         new JadConfig(new InMemoryRepository(props), configuration3).process();
 
         assertFalse(configuration3.isClientNode());
+    }
+
+    @Test(expected = ValidationException.class)
+    public void throwValidationExceptionIfHomePathIsNotReadable() throws Exception {
+        final File path = temporaryFolder.newFolder("elasticsearch-home");
+        assumeTrue(path.setReadable(false));
+
+        final ElasticsearchConfiguration configuration = new ElasticsearchConfiguration() {
+            @Override
+            public String getPathHome() {
+                return path.getAbsolutePath();
+            }
+        };
+        new JadConfig(new InMemoryRepository(), configuration).process();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void throwValidationExceptionIfDataPathIsNotReadable() throws Exception {
+        final File path = temporaryFolder.newFolder("elasticsearch-data");
+        assumeTrue(path.setReadable(false));
+
+        final ElasticsearchConfiguration configuration = new ElasticsearchConfiguration() {
+            @Override
+            public String getPathData() {
+                return path.getAbsolutePath();
+            }
+        };
+        new JadConfig(new InMemoryRepository(), configuration).process();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void throwValidationExceptionIfHomePathParentIsNotReadable() throws Exception {
+        final File parent = temporaryFolder.newFolder("elasticsearch");
+        final File path = new File(parent, "home");
+        assumeTrue(path.mkdir());
+        assumeTrue(parent.setReadable(false));
+
+        final ElasticsearchConfiguration configuration = new ElasticsearchConfiguration() {
+            @Override
+            public String getPathHome() {
+                return path.getAbsolutePath();
+            }
+        };
+        new JadConfig(new InMemoryRepository(), configuration).process();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void throwValidationExceptionIfDataPathParentIsNotReadable() throws Exception {
+        final File parent = temporaryFolder.newFolder("elasticsearch");
+        final File path = new File(parent, "data");
+        assumeTrue(path.mkdir());
+        assumeTrue(parent.setReadable(false));
+
+        final ElasticsearchConfiguration configuration = new ElasticsearchConfiguration() {
+            @Override
+            public String getPathData() {
+                return path.getAbsolutePath();
+            }
+        };
+        new JadConfig(new InMemoryRepository(), configuration).process();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void throwValidationExceptionIfHomePathIsNotADirectory() throws Exception {
+        final File path = temporaryFolder.newFile("elasticsearch-home");
+
+        final ElasticsearchConfiguration configuration = new ElasticsearchConfiguration() {
+            @Override
+            public String getPathHome() {
+                return path.getAbsolutePath();
+            }
+        };
+        new JadConfig(new InMemoryRepository(), configuration).process();
+    }
+
+    @Test(expected = ValidationException.class)
+    public void throwValidationExceptionIfDataPathIsNotADirectory() throws Exception {
+        final File path = temporaryFolder.newFile("elasticsearch-data");
+
+        final ElasticsearchConfiguration configuration = new ElasticsearchConfiguration() {
+            @Override
+            public String getPathData() {
+                return path.getAbsolutePath();
+            }
+        };
+        new JadConfig(new InMemoryRepository(), configuration).process();
     }
 }

@@ -17,8 +17,11 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
+import com.github.joschi.jadconfig.validators.DirectoryWritableValidator;
 import com.github.joschi.jadconfig.validators.FilePathReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
@@ -26,7 +29,10 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import org.joda.time.Period;
 
+import javax.validation.constraints.NotNull;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -267,5 +273,42 @@ public class ElasticsearchConfiguration {
 
     public Duration getRequestTimeout() {
         return requestTimeout;
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateElasticsearchHomePath() throws ValidationException {
+        if (getPathHome() != null) {
+            final Path homePath = Paths.get(getPathHome());
+            validateElasticsearchPath(homePath);
+        }
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateElasticsearchDataPath() throws ValidationException {
+        if (getPathData() != null) {
+            final Path dataPath = Paths.get(getPathData());
+            validateElasticsearchPath(dataPath);
+        }
+    }
+
+    private void validateElasticsearchPath(@NotNull Path path) throws ValidationException {
+        final Path parent = path.getParent();
+        if (Files.exists(parent) && !Files.isDirectory(parent)) {
+            throw new ValidationException("Path " + parent.toAbsolutePath() + " is not a directory.");
+        }
+
+        if (Files.exists(parent) && !Files.isReadable(parent)) {
+            throw new ValidationException("Path " + parent.toAbsolutePath() + " cannot be read.");
+        }
+
+        if (Files.exists(path) && !Files.isDirectory(path)) {
+            throw new ValidationException("Path " + path.toAbsolutePath() + " is not a directory.");
+        }
+
+        if (Files.exists(path) && !Files.isReadable(path)) {
+            throw new ValidationException("Path " + path.toAbsolutePath() + " cannot be read.");
+        }
     }
 }
