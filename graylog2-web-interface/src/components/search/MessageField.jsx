@@ -9,7 +9,7 @@ const MessageField = React.createClass({
     fieldName: React.PropTypes.string.isRequired,
     message: React.PropTypes.object.isRequired,
     possiblyHighlight: React.PropTypes.func.isRequired,
-    value: React.PropTypes.string.isRequired,
+    value: React.PropTypes.any.isRequired,
   },
   SPECIAL_FIELDS: ['full_message', 'level'],
   _decorationMarker(key) {
