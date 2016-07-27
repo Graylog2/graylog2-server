@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RestTools;
+import org.graylog2.shared.plugins.PluginRestResourceClasses;
 import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -55,19 +56,19 @@ public class DocumentationResource extends RestResource {
     @Inject
     public DocumentationResource(BaseConfiguration configuration,
                                  @Named("RestControllerPackages") String[] restControllerPackages,
-                                 Map<String, Set<PluginRestResource>> pluginRestResources) {
+                                 PluginRestResourceClasses pluginRestResourceClasses) {
 
         this.configuration = configuration;
 
         this.restControllerPackages.addAll(Arrays.asList(restControllerPackages));
 
         // All plugin resources get the plugin prefix + the plugin package.
-        for (Map.Entry<String, Set<PluginRestResource>> entry : pluginRestResources.entrySet()) {
+        for (Map.Entry<String, Set<Class<? extends PluginRestResource>>> entry : pluginRestResourceClasses.getMap().entrySet()) {
             final String pluginPackage = entry.getKey();
             this.restControllerPackages.add(pluginPackage);
 
-            for (PluginRestResource pluginRestResource : entry.getValue()) {
-                this.pluginRestControllerMapping.put(pluginRestResource.getClass(), pluginPackage);
+            for (Class<? extends PluginRestResource> pluginRestResource : entry.getValue()) {
+                this.pluginRestControllerMapping.put(pluginRestResource, pluginPackage);
             }
         }
     }
