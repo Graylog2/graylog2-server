@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import jQuery from 'jquery';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import { ConfigurationForm } from 'components/configurationforms';
 import { Select, Spinner } from 'components/common';
@@ -11,12 +12,14 @@ const DecoratorsStore = StoreProvider.getStore('Decorators');
 import ActionsProvider from 'injection/ActionsProvider';
 const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
+import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
+
 const AddDecoratorButton = React.createClass({
   propTypes: {
     nextOrder: React.PropTypes.number,
     stream: React.PropTypes.string,
   },
-  mixins: [Reflux.connect(DecoratorsStore)],
+  mixins: [Reflux.connect(DecoratorsStore), PureRenderMixin],
   getInitialState() {
     return {
       typeDefinition: {},
@@ -28,6 +31,7 @@ const AddDecoratorButton = React.createClass({
   },
   _handleCancel() {
     this.refs.select.clearValue();
+    this.setState(this.getInitialState());
   },
   _handleSubmit(data) {
     const request = {
@@ -62,9 +66,9 @@ const AddDecoratorButton = React.createClass({
                          typeName={this.state.typeName} includeTitleField={false}
                          submitAction={this._handleSubmit} cancelAction={this._handleCancel} /> : null);
     return (
-      <div className="form-inline" style={{ margin: '4px' }}>
-        <div className="form-group">
-          <div className="form-group" style={{ width: 300 }}>
+      <div className={`form-inline ${DecoratorStyles.addDecoratorButtonContainer}`}>
+        <div className={`form-group ${DecoratorStyles.decoratorBox} ${DecoratorStyles.fullWidth}`}>
+          <div className={`form-group ${DecoratorStyles.addDecoratorSelect}`}>
             <Select ref="select"
                     placeholder="Select decorator"
                     onValueChange={this._onTypeChange}
@@ -77,7 +81,7 @@ const AddDecoratorButton = React.createClass({
                   onClick={this._openModal}>Add</button>
 
         </div>
-        {configurationForm}
+        {this.state.typeName && configurationForm}
       </div>
     );
   },

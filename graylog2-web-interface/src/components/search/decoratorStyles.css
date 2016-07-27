@@ -1,0 +1,17 @@
+:local(.fullWidth) {
+    width: 100%;
+}
+
+:local(.decoratorBox) {
+    display: flex;
+    justify-content: space-between;
+}
+
+:local(.addDecoratorButtonContainer) {
+    margin: 4px;
+    display: flex;
+}
+
+:local(.addDecoratorSelect) {
+    width: 80%;
+}

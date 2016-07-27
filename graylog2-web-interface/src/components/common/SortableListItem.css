@@ -1,0 +1,11 @@
+:local(.fullWidth) {
+    width: 100%;
+}
+
+:local(.inlineFlex) {
+    display: inline-flex;
+}
+
+:local(.itemHandle) {
+    margin-right: 10px;
+}
