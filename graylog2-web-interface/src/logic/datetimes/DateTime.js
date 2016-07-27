@@ -64,6 +64,10 @@ class DateTime {
   }
 
   constructor(dateTime) {
+    if (!dateTime) {
+      this.dateTime = DateTime.now();
+      return;
+    }
     // Always use user's local time
     this.dateTime = moment.tz(dateTime, DateTime.getUserTimezone());
   }
