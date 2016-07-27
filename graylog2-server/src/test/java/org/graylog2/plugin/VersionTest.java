@@ -122,6 +122,16 @@ public class VersionTest {
         assertFalse(v.sameOrHigher(Version.from(2, 19, 0, "rc.1")));
         assertTrue(v.sameOrHigher(Version.from(0, 0, 0)));
         assertFalse(v.sameOrHigher(Version.from(Integer.MAX_VALUE, Integer.MAX_VALUE, Integer.MAX_VALUE)));
+
+        // See https://github.com/Graylog2/graylog2-server/issues/2462
+        v = Version.from(2, 1, 0, "beta.2");
+
+        assertTrue(v.sameOrHigher(Version.from(2, 1, 0, "alpha.1")));
+        assertTrue(v.sameOrHigher(Version.from(2, 1, 0, "beta.1")));
+        assertTrue(v.sameOrHigher(Version.from(2, 1, 0, "beta.2")));
+        assertTrue(v.sameOrHigher(Version.from(2, 1, 0))); // This needs to work!
+        assertFalse(v.sameOrHigher(Version.from(2, 2, 0, "alpha.1")));
+        assertFalse(v.sameOrHigher(Version.from(2, 2, 0)));
     }
 
     @Test
