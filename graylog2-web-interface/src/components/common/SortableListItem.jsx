@@ -3,6 +3,8 @@ import ReactDOM from 'react-dom';
 import {ListGroupItem} from 'react-bootstrap';
 import { DragSource, DropTarget } from 'react-dnd';
 
+import SortableListItemStyle from '!style!css!components/common/SortableListItem.css';
+
 const ItemTypes = {
   ITEM: 'item',
 };
@@ -90,7 +92,7 @@ const SortableListItem = React.createClass({
   },
   render() {
     const { text, isDragging, isOver, connectDragSource, connectDropTarget } = this.props;
-    const classes = [];
+    const classes = [SortableListItemStyle.inlineFlex, SortableListItemStyle.fullWidth];
     if (isDragging) {
       classes.push('dragging');
     }
@@ -100,8 +102,8 @@ const SortableListItem = React.createClass({
 
     return connectDragSource(connectDropTarget(
       <div className="sortable-list-item">
-        <ListGroupItem className={classes.join(' ')} style={{ display: 'inline-flex' }}>
-          <i className="fa fa-sort" style={{ marginRight: 10 }}/> {text}
+        <ListGroupItem className={classes.join(' ')}>
+          <i className={`fa fa-sort ${SortableListItemStyle.itemHandle}`}/> {text}
         </ListGroupItem>
       </div>
     ));

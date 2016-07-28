@@ -19,6 +19,7 @@ package org.graylog2.users;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.bson.types.ObjectId;
@@ -172,8 +173,9 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public void setPermissions(final List<String> permissions) {
+        final List<String> perms = Lists.newArrayList(permissions);
         // Do not store the dynamic user self edit permissions
-        permissions.removeAll(this.permissions.userSelfEditPermissions(getName()));
+        perms.removeAll(this.permissions.userSelfEditPermissions(getName()));
         fields.put(PERMISSIONS, permissions);
     }
 

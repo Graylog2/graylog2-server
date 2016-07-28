@@ -48,7 +48,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
-import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -250,7 +249,8 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             translatedRoleIds.addAll(user.getRoleIds());
         }
         user.setRoleIds(translatedRoleIds);
-        user.setPermissions(Collections.emptyList());
+        // preserve the raw permissions (the ones without the synthetic self-edit permissions or the "*" admin one)
+        user.setPermissions(user.getPermissions());
     }
 
 }

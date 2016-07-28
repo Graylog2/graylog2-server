@@ -109,14 +109,14 @@ const AuthenticationComponent = React.createClass({
     }
 
     // add submenu items based on permissions
-    if (this.isPermitted(this.state.currentUser.permissions, ['ROLES_READ'])) {
+    if (this.isPermitted(this.state.currentUser.permissions, ['roles:read'])) {
       authenticators.unshift(
         <LinkContainer key="roles" to={Routes.SYSTEM.AUTHENTICATION.ROLES}>
           <NavItem eventKey="roles" title="Roles">Roles</NavItem>
         </LinkContainer>
       );
     }
-    if (this.isPermitted(this.state.currentUser.permissions, ['ROLES_READ'])) {
+    if (this.isPermitted(this.state.currentUser.permissions, ['roles:read'])) {
       authenticators.unshift(
         <LinkContainer key="users" to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
           <NavItem eventKey="users" title="Users">Users</NavItem>

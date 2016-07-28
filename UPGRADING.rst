@@ -19,6 +19,21 @@ Previous versions of Graylog were automatically generating a private key/certifi
 Due to those shortcomings, the feature has been removed completely. Users need to use proper certificates or generate their own self-signed certificates and configure them with the appropriate settings, see `Using HTTPS <http://docs.graylog.org/en/2.0/pages/configuration/https.html>`_ for reference.
 
 
+Web Interface Listener
+----------------------
+
+Graylog 2.0.x has been using separate listeners for the REST API and the web interface by default. The Graylog REST API on ``http://127.0.0.1:12900``, the Graylog web interface on ``http://127.0.0.1:9000``.
+Beginning with Graylog 2.1.0 it is possible to run both the REST API and the web interface on the same host/port-combination and this is now the default. This means that the REST API is still running on ``http://127.0.0.1:12900`` per default, but the web interface is now running on ``http://127.0.0.1:12900/web``.
+Furthermore, all requests going to ``http://127.0.0.1:12900/`` requesting a content-type of ``text/html`` or ``application/xhtml+xml`` are redirected to the web interface, therefore making it even easier to set up Graylog and use it behind proxies, expose it externally etc.
+
+Please take not that you can still run the REST API and the web interface on two separate listeners. If you are running a Graylog 2.0.x configuration specifying ``web_listen_uri`` explicitly and you want to keep that, you do not have to change anything.
+
+Please also take note, that when you have configured ``rest_listen_uri`` and ``web_listen_uri`` to run on the same host/port-combination, the following configuration directives will have no effect:
+
+  - ``web_enable_tls``, ``web_tls_cert_file``, ``web_tls_key_file``, ``web_tls_key_password`` (These will depend on the TLS configuration of the REST listener).
+  - ``web_enable_cors``, ``web_enable_gzip``, ``web_thread_pool_size``, ``web_max_initial_line_length``, ``web_max_header_size`` (Those will depend on the corresponding settings of the REST listener).
+
+
 Internal Metrics to MongoDB
 ---------------------------
 
@@ -62,3 +77,10 @@ Changed Elasticsearch Cluster Status Behavior
 In previous versions Graylog stopped indexing into the current write index if the `Elasticsearch cluster status <http://docs.graylog.org/en/2.1/pages/configuration/elasticsearch.html#cluster-status-explained>`_ turned RED. Since 2.1 Graylog only checks the status of the current write index when it tries to index messages.
 
 If the current write index is GREEN or YELLOW, Graylog will continue to index messages even though the overall cluster status is RED. This avoids Graylog downtimes when doing Elasticsearch maintenance or when older indices have problems.
+
+Changes in message field values trimming
+----------------------------------------
+
+Previous versions of Graylog were trimming message field values inconsistently, depending on the codec used. We have changed that behaviour in 2.1, so all message field values are trimmed by default. This means that leading or trailing whitespace of every field is removed during ingestion.
+
+**Important**: This change will break your existing stream rules, extractors, and Drool rules if you are expecting leading or trailing white spaces in them. Please adapt them so they do not require those white spaces.

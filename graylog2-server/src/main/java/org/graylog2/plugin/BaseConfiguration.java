@@ -24,6 +24,7 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -33,7 +34,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
+import java.net.MalformedURLException;
 import java.net.URI;
+import java.net.URL;
+import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -41,7 +45,7 @@ import java.nio.file.Path;
 public abstract class BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
     protected static final int GRAYLOG_DEFAULT_PORT = 12900;
-    protected static final int GRAYLOG_DEFAULT_WEB_PORT = 9000;
+    protected static final int GRAYLOG_DEFAULT_WEB_PORT = 12900;
 
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
@@ -354,6 +358,18 @@ public abstract class BaseConfiguration {
         return webEnable;
     }
 
+    public boolean isRestAndWebOnSamePort() {
+        final URI restListenUri = getRestListenUri();
+        final URI webListenUri = getWebListenUri();
+        try {
+            final InetAddress restAddress = InetAddress.getByName(restListenUri.getHost());
+            final InetAddress webAddress = InetAddress.getByName(webListenUri.getHost());
+            return restListenUri.getPort() == webListenUri.getPort() && restAddress.equals(webAddress);
+        } catch (UnknownHostException e) {
+            throw new RuntimeException("Unable to resolve hostnames of rest/web listen uris: ", e);
+        }
+    }
+
     public boolean isWebEnableCors() {
         return webEnableCors;
     }
@@ -403,6 +419,7 @@ public abstract class BaseConfiguration {
     }
 
     @ValidatorMethod
+    @SuppressWarnings("unused")
     public void validateRestTlsConfig() throws ValidationException {
         if(isRestEnableTls()) {
             if(!isRegularFileAndReadable(getRestTlsKeyFile())) {
@@ -416,6 +433,7 @@ public abstract class BaseConfiguration {
     }
 
     @ValidatorMethod
+    @SuppressWarnings("unused")
     public void validateWebTlsConfig() throws ValidationException {
         if(isWebEnableTls()) {
             if(!isRegularFileAndReadable(getWebTlsKeyFile())) {
@@ -425,6 +443,32 @@ public abstract class BaseConfiguration {
             if(!isRegularFileAndReadable(getWebTlsCertFile())) {
                 throw new ValidationException("Unreadable or missing web interface X.509 certificate: " + getWebTlsCertFile());
             }
+        }
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateRestAndWebListenConfigConflict() throws ValidationException {
+        if (isRestAndWebOnSamePort()) {
+            if (getRestListenUri().getPath().equals(getWebListenUri().getPath())) {
+                throw new ValidationException("If REST and Web interface are served on the same host/port, the path must be different!");
+            }
+        }
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateWebHasPathPrefixIfOnSamePort() throws ValidationException {
+        if (isRestAndWebOnSamePort() && (Strings.isNullOrEmpty(getWebPrefix()) || getWebPrefix().equals("/"))) {
+            throw new ValidationException("If REST and Web Interface are served on the same host/port, the web interface must have a path prefix!");
+        }
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateWebAndRestHaveSameProtocolIfOnSamePort() throws ValidationException {
+        if (isRestAndWebOnSamePort() && !getWebListenUri().getScheme().equals(getRestListenUri().getScheme())) {
+            throw new ValidationException("If REST and Web interface are served on the same host/port, the protocols must be identical!");
         }
     }
 
