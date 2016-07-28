@@ -26,11 +26,18 @@ const UserList = React.createClass({
     };
   },
   componentDidMount() {
+    this.style.use();
     this.loadUsers();
     RolesStore.loadRoles().done(roles => {
       this.setState({ roles: roles.map(role => role.name) });
     });
   },
+  componentWillUnmount() {
+    this.style.unuse();
+  },
+
+  style: require('!style/useable!css!./UserList.css'),
+
   loadUsers() {
     const promise = UsersStore.loadUsers();
     promise.done((users) => {
@@ -77,17 +84,17 @@ const UserList = React.createClass({
     let userBadge = null;
     if (user.session_active) {
       const popover = (
-        <Popover id="session-badge-details" title="Logged in" style={{ fontSize: 12 }}>
+        <Popover id="session-badge-details" title="Logged in" className="sessionBadgeDetails">
           <div>Last activity: <Timestamp dateTime={user.last_activity} relative /></div>
           <div>Client address: {user.client_address}</div>
         </Popover>
       );
       userBadge = (<OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
-        <i className="fa fa-circle" style={{ color: '#72a230' }}/>
+        <i className="fa fa-circle activeSession"/>
       </OverlayTrigger>);
     }
 
-    const roleBadges = user.roles.map((role) => <span key={role} className={`label label-${role === 'Admin' ? 'info' : 'default'}`} style={{ marginRight: 5, marginBottom: 5, display: 'inline-block', lineHeight: '15px' }}>{role}</span>);
+    const roleBadges = user.roles.map((role) => <span key={role} className={`roleBadgeFixes label label-${role === 'Admin' ? 'info' : 'default'}`} >{role}</span>);
 
     let actions = null;
     if (user.read_only) {
@@ -124,7 +131,7 @@ const UserList = React.createClass({
         <td className="limited">{user.username}</td>
         <td className="limited">{user.email}</td>
         <td className="limited">{user.client_address}</td>
-        <td style={{ maxWidth: 300 }}>{roleBadges}</td>
+        <td className="limitedWide">{roleBadges}</td>
         <td>{actions}</td>
       </tr>
     );

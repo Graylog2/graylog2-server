@@ -1,0 +1,18 @@
+.sessionBadgeDetails {
+    font-size: 12px;
+}
+
+.activeSession {
+    color: #72a230;
+}
+
+.roleBadgeFixes {
+    margin-right: 5px;
+    margin-bottom: 5px;
+    display: inline-block;
+    line-height: 15px;
+}
+
+.limitedWide {
+    max-width: 300px;
+}
