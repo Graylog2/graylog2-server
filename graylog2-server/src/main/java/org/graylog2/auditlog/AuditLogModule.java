@@ -16,13 +16,11 @@
  */
 package org.graylog2.auditlog;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import org.graylog2.plugin.PluginModule;
 
-public class AuditLogModule extends AbstractModule {
+public class AuditLogModule extends PluginModule {
     @Override
     protected void configure() {
-        final Multibinder<AuditLogAppender> appenders = Multibinder.newSetBinder(binder(), AuditLogAppender.class);
-        appenders.addBinding().to(StdOutAppender.class);
+        addAuditLogAppender(StdOutAppender.class);
     }
 }
