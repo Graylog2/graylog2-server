@@ -1,4 +1,47 @@
 import AppConfig from 'util/AppConfig';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+import URI from 'urijs';
+
+/*
+ * Global registry of plugin routes. Route names are generated automatically from the route path, by removing
+ * any colons, replacing slashes with underscores, and making the string uppercase. Below there is an example of how
+ * to access the routes.
+ *
+ * Plugin register example:
+ * routes: [
+ *           { path: '/system/pipelines', component: Foo },
+ *           { path: '/system/pipelines/:pipelineId', component: Bar },
+ * ]
+ *
+ * Using routes on plugin components:
+ * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES')}>...</LinkContainer>
+ * <LinkContainer to={Routes.pluginRoutes('SYSTEM_PIPELINES_PIPELINEID')(123)}>...</LinkContainer>
+ *
+ */
+const pluginRoutes = {};
+PluginStore.exports('routes').forEach(pluginRoute => {
+  const uri = new URI(pluginRoute.path);
+  const segments = uri.segment();
+  const key = segments.map(segment => segment.replace(':', '')).join('_').toUpperCase();
+  const paramNames = segments.filter(segment => segment.startsWith(':'));
+
+  if (paramNames.length > 0) {
+    pluginRoutes[key] = (...paramValues) => {
+      paramNames.forEach((param, idx) => {
+        const value = paramValues[idx];
+        uri.segment(segments.indexOf(param), value);
+      });
+
+      return uri.pathname();
+    };
+
+    return;
+  }
+
+  pluginRoutes[key] = pluginRoute.path;
+});
+
+window.pluginRoutes = pluginRoutes;
 
 const Routes = {
   STARTPAGE: '/',
@@ -71,7 +114,10 @@ const Routes = {
   edit_input_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
   getting_started: (fromMenu) => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
   filtered_metrics: (nodeId, filter) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
+
+  pluginRoute: (key) => window.pluginRoutes[key],
 };
+
 
 const qualifyUrls = (routes, appPrefix) => {
   const qualifiedRoutes = {};
@@ -82,7 +128,7 @@ const qualifyUrls = (routes, appPrefix) => {
         qualifiedRoutes[routeName] = `${appPrefix}${routes[routeName]}`;
         break;
       case 'function':
-        qualifiedRoutes[routeName] = function() {
+        qualifiedRoutes[routeName] = function () {
           const result = routes[routeName](...arguments);
           return `${appPrefix}${result}`;
         };
@@ -97,6 +143,7 @@ const qualifyUrls = (routes, appPrefix) => {
 
   return qualifiedRoutes;
 };
+
 
 const defaultExport = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
 
