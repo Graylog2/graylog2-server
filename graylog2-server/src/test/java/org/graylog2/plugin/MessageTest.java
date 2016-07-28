@@ -18,10 +18,11 @@ package org.graylog2.plugin;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.eaio.uuid.UUID;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.assertj.core.api.Assertions;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -94,6 +95,27 @@ public class MessageTest {
 
         m.addField("something3", "bar ");
         assertEquals("bar", m.getField("something3"));
+    }
+
+    @Test
+    public void testConstructorsTrimValues() throws Exception {
+        final Map<String, Object> messageFields = ImmutableMap.of(
+                Message.FIELD_ID, new UUID().toString(),
+                Message.FIELD_MESSAGE, " foo ",
+                Message.FIELD_SOURCE, " bar ",
+                "something", " awesome ",
+                "something_else", " "
+        );
+
+        Message m = new Message((String) messageFields.get(Message.FIELD_MESSAGE), (String) messageFields.get(Message.FIELD_SOURCE), Tools.nowUTC());
+        assertEquals("foo", m.getMessage());
+        assertEquals("bar", m.getSource());
+
+        Message m2 = new Message(messageFields);
+        assertEquals("foo", m2.getMessage());
+        assertEquals("bar", m2.getSource());
+        assertEquals("awesome", m2.getField("something"));
+        assertNull(m2.getField("something_else"));
     }
 
     @Test
