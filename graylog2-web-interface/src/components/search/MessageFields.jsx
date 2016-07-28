@@ -19,7 +19,7 @@ const MessageFields = React.createClass({
 
   _formatFields(fields, showDecoration) {
     if (!showDecoration || !this.props.message.decoration_stats) {
-      return Object.keys(fields).sort().map(key => <MessageField {...this.props} fieldName={key} value={fields[key]} />);
+      return Object.keys(fields).sort().map(key => <MessageField key={key} {...this.props} fieldName={key} value={fields[key]} />);
     }
 
     const decorationStats = this.props.message.decoration_stats;
@@ -28,20 +28,22 @@ const MessageFields = React.createClass({
 
     return allKeys.map(key => {
       if (decorationStats.added_fields[key]) {
-        return <ChangedMessageField fieldName={key} newValue={fields[key]} />;
+        return <ChangedMessageField key={key} fieldName={key} newValue={fields[key]} />;
       }
       if (decorationStats.changed_fields[key]) {
-        return (<ChangedMessageField fieldName={key}
+        return (<ChangedMessageField key={key}
+                                     fieldName={key}
                                      originalValue={decorationStats.changed_fields[key]}
                                      newValue={fields[key]} />);
       }
 
       if (decorationStats.removed_fields[key]) {
-        return (<ChangedMessageField fieldName={key}
-                                    originalValue={decorationStats.removed_fields[key]} />);
+        return (<ChangedMessageField key={key}
+                                     fieldName={key}
+                                     originalValue={decorationStats.removed_fields[key]} />);
       }
 
-      return <MessageField {...this.props} fieldName={key} value={fields[key]} disableFieldActions={true} />;
+      return <MessageField key={key} {...this.props} fieldName={key} value={fields[key]} disableFieldActions />;
     });
   },
   render() {
