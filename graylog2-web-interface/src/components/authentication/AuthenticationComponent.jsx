@@ -86,26 +86,31 @@ const AuthenticationComponent = React.createClass({
   },
 
   render() {
-    let authenticators = [<NavItem key={"loading"} disabled title="Loading...">Loading...</NavItem>];
+    let authenticators = [];
     const auths = this.state.authenticators;
     if (auths) {
-      authenticators = auths.realm_order.map((name, idx) => {
-        const auth = this.authenticatorConfigurations[name];
-        const title = (auth || { displayName: name }).displayName;
-        const numberedTitle = `${idx + 1}. ${title}`;
-        return (<LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(name)}>
-          <NavItem key={name} eventKey={name} title={numberedTitle}>{numberedTitle}</NavItem>
-        </LinkContainer>);
-      });
+      // only show the entries if the user is permitted to change them, makes no sense otherwise
+      if (this.isPermitted(this.state.currentUser.permissions, ['authentication:edit'])) {
+        authenticators = auths.realm_order.map((name, idx) => {
+          const auth = this.authenticatorConfigurations[name];
+          const title = (auth || { displayName: name }).displayName;
+          const numberedTitle = `${idx + 1}. ${title}`;
+          return (<LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(name)}>
+            <NavItem key={name} eventKey={name} title={numberedTitle}>{numberedTitle}</NavItem>
+          </LinkContainer>);
+        });
 
-      authenticators.unshift(
-        <NavItem key="divider" disabled title="Provider Settings" className="divider">Provider Settings</NavItem>
-      );
-      authenticators.unshift(
-        <LinkContainer key="container-settings" to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}>
-          <NavItem key="settings" eventKey="config" title="Configure Provider Order">Configure Provider Order</NavItem>
-        </LinkContainer>
-      );
+        authenticators.unshift(
+          <NavItem key="divider" disabled title="Provider Settings" className="divider">Provider Settings</NavItem>
+        );
+        authenticators.unshift(
+          <LinkContainer key="container-settings" to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}>
+            <NavItem key="settings" eventKey="config" title="Configure Provider Order">Configure Provider Order</NavItem>
+          </LinkContainer>
+        );
+      }
+    } else {
+      authenticators = [<NavItem key={"loading"} disabled title="Loading...">Loading...</NavItem>];
     }
 
     // add submenu items based on permissions
@@ -116,15 +121,24 @@ const AuthenticationComponent = React.createClass({
         </LinkContainer>
       );
     }
-    if (this.isPermitted(this.state.currentUser.permissions, ['roles:read'])) {
+    if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
       authenticators.unshift(
         <LinkContainer key="users" to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
           <NavItem eventKey="users" title="Users">Users</NavItem>
         </LinkContainer>
       );
     }
+
+    let activeTab = this.state.activeTab;
+    if (authenticators.length === 0) {
+      // special case, this is a user editing their own profile
+      activeTab = 'profile-edit';
+      authenticators = [<LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(this.state.currentUser.username)}>
+        <NavItem eventKey="profile-edit" title="Edit User">Edit User</NavItem>
+      </LinkContainer>];
+    }
     const subnavigation = (
-      <Nav activeKey={this.state.activeTab} onSelect={this._handleTabChange} stacked bsStyle="pills">
+      <Nav activeKey={activeTab} onSelect={this._handleTabChange} stacked bsStyle="pills">
         {authenticators}
       </Nav>
     );
