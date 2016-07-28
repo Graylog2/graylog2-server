@@ -25,10 +25,12 @@ public class HttpHeadersToken implements HostAuthenticationToken {
 
     private final MultivaluedMap<String, String> httpHeaders;
     private final String host;
+    private final String remoteAddr;
 
-    public HttpHeadersToken(MultivaluedMap<String, String> httpHeaders, String host) {
+    public HttpHeadersToken(MultivaluedMap<String, String> httpHeaders, String host, String remoteAddr) {
         this.httpHeaders = httpHeaders;
         this.host = host;
+        this.remoteAddr = remoteAddr;
     }
 
     /**
@@ -60,5 +62,14 @@ public class HttpHeadersToken implements HostAuthenticationToken {
 
     public MultivaluedMap<String, String> getHeaders() {
         return httpHeaders;
+    }
+
+    /**
+     * The direct remote address, if the request came through a proxy, this will be the address of last hop.
+     * Typically used to verify that a client is "trusted".
+     * @return the direct peer's address
+     */
+    public String getRemoteAddr() {
+        return remoteAddr;
     }
 }
