@@ -21,9 +21,9 @@ const BulkLoadPatternModal = React.createClass({
     reader.onload = (loaded) => {
       const request = loaded.target.result.split('\n').map((line) => {
         if (!line.startsWith('#')) {
-          const splitted = line.split(/\s+/, 2);
-          if (splitted.length > 1) {
-            return {name: splitted[0], pattern: splitted[1]};
+          const splitted = line.match(/^(\w+)\s+(.*)$/)
+          if (splitted != null && splitted.length === 3) {
+            return {name: splitted[1], pattern: splitted[2]};
           }
         }
       }).filter((elem) => elem !== undefined);
