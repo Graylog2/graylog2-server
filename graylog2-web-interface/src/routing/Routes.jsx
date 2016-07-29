@@ -41,8 +41,6 @@ PluginStore.exports('routes').forEach(pluginRoute => {
   pluginRoutes[key] = pluginRoute.path;
 });
 
-window.pluginRoutes = pluginRoutes;
-
 const Routes = {
   STARTPAGE: '/',
   SEARCH: '/search',
@@ -114,8 +112,6 @@ const Routes = {
   edit_input_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
   getting_started: (fromMenu) => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
   filtered_metrics: (nodeId, filter) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
-
-  pluginRoute: (key) => window.pluginRoutes[key],
 };
 
 
@@ -144,7 +140,10 @@ const qualifyUrls = (routes, appPrefix) => {
   return qualifiedRoutes;
 };
 
-
 const defaultExport = AppConfig.gl2AppPathPrefix() ? qualifyUrls(Routes, AppConfig.gl2AppPathPrefix()) : Routes;
+window.pluginRoutes = AppConfig.gl2AppPathPrefix() ? qualifyUrls(pluginRoutes, AppConfig.gl2AppPathPrefix()) : pluginRoutes;
+
+// Plugin routes need to be prefixed separately, so we add them to the Routes object just at the end.
+defaultExport.pluginRoute = (key) => window.pluginRoutes[key];
 
 export default defaultExport;
