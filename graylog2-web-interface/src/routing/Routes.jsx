@@ -124,8 +124,8 @@ const qualifyUrls = (routes, appPrefix) => {
         qualifiedRoutes[routeName] = `${appPrefix}${routes[routeName]}`;
         break;
       case 'function':
-        qualifiedRoutes[routeName] = function () {
-          const result = routes[routeName](...arguments);
+        qualifiedRoutes[routeName] = (...params) => {
+          const result = routes[routeName](...params);
           return `${appPrefix}${result}`;
         };
         break;
