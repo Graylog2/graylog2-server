@@ -58,6 +58,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -145,7 +146,7 @@ public class MessageResource extends RestResource {
 
         final ResolvableInetSocketAddress remoteAddress = ResolvableInetSocketAddress.wrap(new InetSocketAddress(request.remoteAddress(), 1234));
 
-        final RawMessage rawMessage = new RawMessage(0, new UUID(), Tools.nowUTC(), remoteAddress, request.message().getBytes());
+        final RawMessage rawMessage = new RawMessage(0, new UUID(), Tools.nowUTC(), remoteAddress, request.message().getBytes(StandardCharsets.UTF_8));
         final Message message = decodeMessage(codec, remoteAddress, rawMessage);
 
         return ResultMessage.createFromMessage(message);
