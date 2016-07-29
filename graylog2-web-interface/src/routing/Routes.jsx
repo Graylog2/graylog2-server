@@ -28,7 +28,7 @@ PluginStore.exports('routes').forEach(pluginRoute => {
   if (paramNames.length > 0) {
     pluginRoutes[key] = (...paramValues) => {
       paramNames.forEach((param, idx) => {
-        const value = paramValues[idx];
+        const value = String(paramValues[idx]);
         uri.segment(segments.indexOf(param), value);
       });
 
