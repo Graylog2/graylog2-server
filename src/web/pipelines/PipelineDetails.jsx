@@ -11,11 +11,12 @@ const PipelineDetails = React.createClass({
     pipeline: React.PropTypes.object,
     create: React.PropTypes.bool,
     onChange: React.PropTypes.func.isRequired,
+    onCancel: React.PropTypes.func,
   },
 
   render() {
     if (this.props.create) {
-      return <PipelineForm create save={this.props.onChange} modal={false} />;
+      return <PipelineForm create save={this.props.onChange} onCancel={this.props.onCancel} modal={false} />;
     }
 
     const pipeline = this.props.pipeline;
