@@ -37,8 +37,9 @@ public class WidgetStrategyFactory {
             return factory.create(config, timeRange, widgetId);
         }
 
-        if (widgetStrategyFactories.containsKey(typeName.toUpperCase(Locale.ENGLISH))) {
-            final WidgetStrategy.Factory<? extends WidgetStrategy> factory = widgetStrategyFactories.get(typeName.toUpperCase(Locale.ENGLISH));
+        final String upperCaseTypeName = typeName.toUpperCase(Locale.ENGLISH);
+        if (widgetStrategyFactories.containsKey(upperCaseTypeName)) {
+            final WidgetStrategy.Factory<? extends WidgetStrategy> factory = widgetStrategyFactories.get(upperCaseTypeName);
             return factory.create(config, timeRange, widgetId);
         }
 
