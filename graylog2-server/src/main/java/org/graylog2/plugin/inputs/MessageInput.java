@@ -157,6 +157,7 @@ public abstract class MessageInput implements Stoppable {
         }
     }
 
+    @Override
     public void stop() {
         transport.stop();
         cleanupMetrics();
