@@ -103,7 +103,7 @@ const SortableListItem = React.createClass({
     return connectDragSource(connectDropTarget(
       <div className="sortable-list-item">
         <ListGroupItem className={classes.join(' ')}>
-          <i className={`fa fa-sort ${SortableListItemStyle.itemHandle}`}/> {text}
+          <div><i className={`fa fa-sort ${SortableListItemStyle.itemHandle}`}/> {text}</div>
         </ListGroupItem>
       </div>
     ));
