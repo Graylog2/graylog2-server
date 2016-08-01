@@ -16,13 +16,7 @@
  */
 package org.graylog2.cluster;
 
-import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategy;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.datatype.guava.GuavaModule;
-import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.google.common.eventbus.Subscribe;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -34,13 +28,11 @@ import com.mongodb.WriteConcern;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
-import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.jackson.SizeSerializer;
+import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.shared.plugins.ChainingClassLoader;
-import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -56,7 +48,6 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,16 +62,8 @@ public class ClusterConfigServiceImplTest {
 
     @Rule
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
-            .setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy())
-            .registerModule(new JodaModule())
-            .registerModule(new GuavaModule())
-            .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
-            .registerModule(new SimpleModule()
-                    .addSerializer(new ObjectIdSerializer())
-                    .addSerializer(new RangeJsonSerializer())
-                    .addSerializer(new SizeSerializer()));
+    private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
+
     @Mock
     private NodeId nodeId;
     @Spy
