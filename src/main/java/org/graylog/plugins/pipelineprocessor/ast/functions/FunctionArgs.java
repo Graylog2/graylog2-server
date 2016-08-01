@@ -40,7 +40,7 @@ public class FunctionArgs {
     public FunctionArgs(Function func, Map<String, Expression> args) {
         function = func;
         descriptor = function.descriptor();
-        this.args = firstNonNull(args, Collections.emptyMap());
+        this.args = firstNonNull(args, Collections.<String, Expression>emptyMap());
     }
 
     @Nonnull
