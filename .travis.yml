@@ -2,10 +2,7 @@ sudo: false
 language: java
 jdk:
   - oraclejdk8
-env:
-  global:
-    - MAVEN_OPTS="-Dskip.web.build=true"
 install:
-  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -B -V
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dskip.web.build=true -B -V
 script:
-  - mvn test -B
+  - mvn test -Dskip.web.build=true -B
