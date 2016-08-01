@@ -1,6 +1,6 @@
 # PipelineProcessor Plugin for Graylog
 
-[![Build Status](https://travis-ci.org/graylog-plugin-pipeline-processor.svg?branch=master)](https://travis-ci.org/graylog-plugin-pipeline-processor)
+[![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-pipeline-processor.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-pipeline-processor)
 
 __Use this paragraph to enter a description of your plugin.__
 
