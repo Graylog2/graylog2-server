@@ -48,8 +48,8 @@ java.net.URL#getPath()
 java.net.URL#getFile()
 
 @defaultMessage Use java.nio.file instead of java.io.File API
-java.util.jar.JarFile
-java.util.zip.ZipFile
+# java.util.jar.JarFile
+# java.util.zip.ZipFile
 # java.io.File
 # java.io.FileInputStream
 # java.io.FileOutputStream
