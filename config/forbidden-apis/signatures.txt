@@ -77,13 +77,6 @@ java.net.InetAddress#getCanonicalHostName()
 
 java.net.InetSocketAddress#getHostName() @ Use getHostString() instead, which avoids a DNS lookup
 
-@defaultMessage use NetworkAddress format/formatAddress to print IP or IP+ports
-java.net.InetAddress#toString()
-java.net.InetAddress#getHostAddress()
-java.net.Inet4Address#getHostAddress()
-java.net.Inet6Address#getHostAddress()
-java.net.InetSocketAddress#toString()
-
 @defaultMessage Avoid unchecked warnings by using Collections#empty(List|Map|Set) methods
 java.util.Collections#EMPTY_LIST
 java.util.Collections#EMPTY_MAP
