@@ -1126,6 +1126,9 @@
                 <artifactId>forbiddenapis</artifactId>
                 <version>${forbiddenapis.version}</version>
                 <configuration>
+                    <suppressAnnotations>
+                        <suppressAnnotation>org.graylog2.shared.SuppressForbidden</suppressAnnotation>
+                    </suppressAnnotations>
                     <!-- disallow undocumented classes like sun.misc.Unsafe: -->
                     <internalRuntimeForbidden>false</internalRuntimeForbidden>
                     <!-- if the used Java version is too new, don't fail, just do nothing: -->
