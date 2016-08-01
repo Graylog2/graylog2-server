@@ -43,6 +43,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         DUMMY;
 
         @JsonValue
+        @Override
         public String toString() {
             return super.toString().toLowerCase(Locale.ENGLISH);
         }
@@ -107,6 +108,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     }
 
     @JsonIgnore
+    @Override
     public Stream getStream() {
         return stream;
     }
@@ -172,18 +174,22 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
             }
         }
 
+        @Override
         public boolean isTriggered() {
             return isTriggered;
         }
 
+        @Override
         public String getResultDescription() {
             return resultDescription;
         }
 
+        @Override
         public AlertCondition getTriggeredCondition() {
             return triggeredCondition;
         }
 
+        @Override
         public DateTime getTriggeredAt() {
             return triggeredAt;
         }

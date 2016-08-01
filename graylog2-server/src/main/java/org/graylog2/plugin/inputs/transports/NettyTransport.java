@@ -319,7 +319,7 @@ public abstract class NettyTransport implements Transport {
         }
     }
 
-    private class RawMessageHandler extends SimpleChannelHandler {
+    private static class RawMessageHandler extends SimpleChannelHandler {
         private final MessageInput input;
 
         public RawMessageHandler(MessageInput input) {

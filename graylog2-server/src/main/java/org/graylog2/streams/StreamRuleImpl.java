@@ -61,6 +61,7 @@ public class StreamRuleImpl extends PersistedImpl implements StreamRule {
         return StreamRuleType.fromInteger((Integer) fields.get(FIELD_TYPE));
     }
 
+    @Override
     public void setType(StreamRuleType type) {
         fields.put(FIELD_TYPE, type.toInteger());
     }
@@ -70,6 +71,7 @@ public class StreamRuleImpl extends PersistedImpl implements StreamRule {
         return (String) fields.get(FIELD_VALUE);
     }
 
+    @Override
     public void setValue(String value) {
         fields.put(FIELD_VALUE, value);
     }
@@ -79,18 +81,22 @@ public class StreamRuleImpl extends PersistedImpl implements StreamRule {
         return (String) fields.get(FIELD_FIELD);
     }
 
+    @Override
     public void setField(String field) {
         fields.put(FIELD_FIELD, field);
     }
 
+    @Override
     public Boolean getInverted() {
         return (Boolean) firstNonNull(fields.get(FIELD_INVERTED), false);
     }
 
+    @Override
     public void setInverted(Boolean inverted) {
         fields.put(FIELD_INVERTED, inverted);
     }
 
+    @Override
     public String getStreamId() {
         return ((ObjectId) fields.get(FIELD_STREAM_ID)).toHexString();
     }
@@ -115,6 +121,7 @@ public class StreamRuleImpl extends PersistedImpl implements StreamRule {
         fields.put(FIELD_DESCRIPTION, description);
     }
 
+    @Override
     public Map<String, Validator> getValidations() {
         final ImmutableMap.Builder<String, Validator> validators = ImmutableMap.builder();
         validators.put(FIELD_TYPE, new IntegerValidator());
@@ -135,6 +142,7 @@ public class StreamRuleImpl extends PersistedImpl implements StreamRule {
     }
 
     @JsonValue
+    @Override
     public Map<String, Object> asMap() {
         // We work on the result a bit to allow correct JSON serializing.
         Map<String, Object> result = Maps.newHashMap(fields);

@@ -164,9 +164,9 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
                 return fieldValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters, title);
             case FIELD_CONTENT_VALUE:
                 return fieldContentValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters, title);
+            default:
+                throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
         }
-
-        throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
     }
 
     @Override

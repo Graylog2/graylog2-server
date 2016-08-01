@@ -23,11 +23,11 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPFramingRouterHandler;
-import org.graylog2.plugin.inputs.annotations.ConfigClass;
-import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.annotations.ConfigClass;
+import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
@@ -85,11 +85,11 @@ public class SyslogTcpTransport extends TcpTransport {
 
     @FactoryClass
     public interface Factory extends Transport.Factory<SyslogTcpTransport> {
+        @Override
         SyslogTcpTransport create(Configuration configuration);
     }
 
     @ConfigClass
     public static class Config extends TcpTransport.Config {
-
     }
 }

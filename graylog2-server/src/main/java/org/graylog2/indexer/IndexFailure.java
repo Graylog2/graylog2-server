@@ -18,11 +18,5 @@ package org.graylog2.indexer;
 
 import org.graylog2.plugin.database.Persisted;
 
-import java.util.Map;
-
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface IndexFailure extends Persisted {
-    Map<String, Object> asMap();
 }

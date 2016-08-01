@@ -97,6 +97,7 @@ public class InputBufferImpl implements InputBuffer {
                 numberOfHandlers);
     }
 
+    @Override
     public void insert(RawMessage message) {
         ringBuffer.publishEvent(RawMessageEvent.TRANSLATOR, message);
         incomingMessages.mark();

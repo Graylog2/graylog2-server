@@ -23,6 +23,7 @@ import java.util.Map;
 
 @JsonAutoDetect
 public interface StreamRule extends Persisted {
+    @Override
     String getId();
 
     StreamRuleType getType();
@@ -51,5 +52,6 @@ public interface StreamRule extends Persisted {
 
     void setDescription(String description);
 
+    @Override
     Map<String, Object> asMap();
 }

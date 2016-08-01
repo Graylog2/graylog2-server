@@ -50,6 +50,7 @@ public abstract class DecoratorImpl implements Decorator, Comparable {
     @JsonProperty(FIELD_ID)
     @ObjectId
     @Nullable
+    @Override
     public abstract String id();
 
     @JsonProperty(FIELD_TYPE)

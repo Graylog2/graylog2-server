@@ -18,10 +18,6 @@ package org.graylog2.savedsearches;
 
 import org.graylog2.plugin.database.Persisted;
 
-import java.util.Map;
-
 public interface SavedSearch extends Persisted {
-    Map<String,Object> asMap();
-
     String getTitle();
 }

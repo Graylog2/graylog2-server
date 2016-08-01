@@ -25,6 +25,7 @@ import com.google.auto.value.AutoValue;
 @JsonAutoDetect
 public abstract class AlarmCallbackSuccess extends AlarmCallbackResult {
     @JsonProperty("type")
+    @Override
     public String type() { return "success"; }
 
     @JsonCreator

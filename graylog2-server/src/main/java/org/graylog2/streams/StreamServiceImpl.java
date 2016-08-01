@@ -281,6 +281,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         addAlertCondition(stream, condition);
     }
 
+    @Override
     public void removeAlertCondition(Stream stream, String conditionId) {
         removeEmbedded(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, conditionId);
     }

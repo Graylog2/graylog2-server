@@ -200,7 +200,7 @@ public class HttpTransport extends AbstractTcpTransport {
             final String origin = request.headers().get(Names.ORIGIN);
 
             // to allow for future changes, let's be at least a little strict in what we accept here.
-            if (request.getMethod() != HttpMethod.POST) {
+            if (!HttpMethod.POST.equals(request.getMethod())) {
                 writeResponse(channel, keepAlive, httpRequestVersion, METHOD_NOT_ALLOWED, origin);
                 return;
             }

@@ -60,6 +60,7 @@ public class SavedSearchImpl extends PersistedImpl implements SavedSearch {
         return Collections.emptyMap();
     }
 
+    @Override
     public Map<String, Object> asMap() {
         return ImmutableMap.<String, Object>builder()
                 .put("id", ((ObjectId) fields.get("_id")).toHexString())

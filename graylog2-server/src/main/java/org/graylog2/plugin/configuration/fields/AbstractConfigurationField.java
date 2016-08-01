@@ -35,30 +35,37 @@ public abstract class AbstractConfigurationField implements ConfigurationField {
         this.optional = optional1;
     }
 
+    @Override
     public String getFieldType() {
         return field_type;
     }
 
+    @Override
     public ConfigurationField.Optional isOptional() {
         return optional;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getHumanName() {
         return humanName;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public List<String> getAttributes() {
         return Collections.emptyList();
     }
 
+    @Override
     public Map<String, Map<String, String>> getAdditionalInformation() {
         return Collections.emptyMap();
     }

@@ -106,6 +106,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         return userFactory.create((ObjectId) userId, userObject.toMap());
     }
 
+    @Override
     public int delete(final String username) {
         LOG.debug("Deleting user(s) with username \"{}\"", username);
         final DBObject query = BasicDBObjectBuilder.start(UserImpl.USERNAME, username).get();

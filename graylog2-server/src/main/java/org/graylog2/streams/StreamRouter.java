@@ -87,7 +87,7 @@ public class StreamRouter {
         return engine.match(msg);
     }
 
-    private class StreamRouterEngineUpdater implements Runnable {
+    private static class StreamRouterEngineUpdater implements Runnable {
         private final AtomicReference<StreamRouterEngine> routerEngine;
         private final StreamRouterEngine.Factory engineFactory;
         private final StreamService streamService;

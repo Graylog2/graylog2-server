@@ -325,6 +325,7 @@ public abstract class Extractor implements EmbeddedPersistable {
         return conditionType;
     }
 
+    @Override
     public Map<String, Object> getPersistedFields() {
         return ImmutableMap.<String, Object>builder()
                 .put(FIELD_ID, id)

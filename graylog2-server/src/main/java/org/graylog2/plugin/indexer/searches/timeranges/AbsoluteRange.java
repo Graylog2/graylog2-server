@@ -35,6 +35,7 @@ public abstract class AbsoluteRange extends TimeRange {
     public static final String ABSOLUTE = "absolute";
 
     @JsonProperty
+    @Override
     public abstract String type();
 
     @JsonProperty

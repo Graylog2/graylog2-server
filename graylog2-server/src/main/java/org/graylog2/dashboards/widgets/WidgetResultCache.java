@@ -70,7 +70,7 @@ public class WidgetResultCache {
         counter.dec();
     }
 
-    private class ComputationResultSupplier implements Supplier<ComputationResult> {
+    private static class ComputationResultSupplier implements Supplier<ComputationResult> {
         private final MetricRegistry metricRegistry;
         private final DashboardWidget dashboardWidget;
         private final WidgetStrategy widgetStrategy;

@@ -65,6 +65,7 @@ public class SyslogTCPInput extends MessageInput {
     }
 
     public interface Factory extends MessageInput.Factory<SyslogTCPInput> {
+        @Override
         SyslogTCPInput create(Configuration configuration);
 
         @Override
