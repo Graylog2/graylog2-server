@@ -27,7 +27,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.Configuration;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
@@ -43,6 +42,8 @@ import org.graylog2.rest.models.users.responses.UserList;
 import org.graylog2.rest.models.users.responses.UserSummary;
 import org.graylog2.security.AccessToken;
 import org.graylog2.security.AccessTokenService;
+import org.graylog2.security.MongoDBSessionService;
+import org.graylog2.security.MongoDbSession;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.Role;
@@ -72,12 +73,17 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.maxBy;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
@@ -93,17 +99,17 @@ public class UsersResource extends RestResource {
     private final UserService userService;
     private final AccessTokenService accessTokenService;
     private final RoleService roleService;
-    private final Configuration configuration;
+    private final MongoDBSessionService sessionService;
 
     @Inject
     public UsersResource(UserService userService,
                          AccessTokenService accessTokenService,
                          RoleService roleService,
-                         Configuration configuration) {
+                         MongoDBSessionService sessionService) {
         this.userService = userService;
         this.accessTokenService = accessTokenService;
         this.roleService = roleService;
-        this.configuration = configuration;
+        this.sessionService = sessionService;
     }
 
     @GET
@@ -115,7 +121,7 @@ public class UsersResource extends RestResource {
     })
     public UserSummary get(@ApiParam(name = "username", value = "The username to return information for.", required = true)
                            @PathParam("username") String username) {
-        final org.graylog2.plugin.database.users.User user = userService.load(username);
+        final User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
@@ -123,19 +129,29 @@ public class UsersResource extends RestResource {
         final boolean allowedToSeePermissions = isPermitted(RestPermissions.USERS_PERMISSIONSEDIT, username);
         final boolean permissionsAllowed = getSubject().getPrincipal().toString().equals(username) || allowedToSeePermissions;
 
-        return toUserResponse(user, permissionsAllowed);
+        return toUserResponse(user, permissionsAllowed, Optional.empty());
     }
 
     @GET
     @RequiresPermissions(RestPermissions.USERS_LIST)
     @ApiOperation(value = "List all users", notes = "The permissions assigned to the users are always included.")
     public UserList listUsers() {
-        final List<org.graylog2.plugin.database.users.User> users = userService.loadAll();
-        final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
-        resultUsers.add(toUserResponse(userService.getAdminUser()));
+        final List<User> users = userService.loadAll();
+        final Collection<MongoDbSession> sessions = sessionService.loadAll();
 
-        for (org.graylog2.plugin.database.users.User user : users) {
-            resultUsers.add(toUserResponse(user));
+        // among all active sessions, find the last recently used for each user
+        //noinspection OptionalGetWithoutIsPresent
+        final Map<String, Optional<MongoDbSession>> lastSessionForUser = sessions.stream()
+                .filter(s -> s.getUsernameAttribute().isPresent())
+                .collect(groupingBy(s -> s.getUsernameAttribute().get(),
+                                    maxBy((s1, s2) -> s1.getLastAccessTime().compareTo(s2.getLastAccessTime()))));
+
+        final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
+        final User adminUser = userService.getAdminUser();
+        resultUsers.add(toUserResponse(adminUser, lastSessionForUser.getOrDefault(adminUser.getName(), Optional.empty())));
+
+        for (User user : users) {
+            resultUsers.add(toUserResponse(user, lastSessionForUser.getOrDefault(user.getName(), Optional.empty())));
         }
 
         return UserList.create(resultUsers);
@@ -157,7 +173,7 @@ public class UsersResource extends RestResource {
         }
 
         // Create user.
-        org.graylog2.plugin.database.users.User user = userService.create();
+        User user = userService.create();
         user.setName(cr.username());
         user.setPassword(cr.password());
         user.setFullName(cr.fullName());
@@ -215,7 +231,7 @@ public class UsersResource extends RestResource {
                            @Valid @NotNull ChangeUserRequest cr) throws ValidationException {
         checkPermission(USERS_EDIT, username);
 
-        final org.graylog2.plugin.database.users.User user = userService.load(username);
+        final User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
@@ -294,7 +310,7 @@ public class UsersResource extends RestResource {
                                 @PathParam("username") String username,
                                 @ApiParam(name = "JSON body", value = "The list of permissions to assign to the user.", required = true)
                                 @Valid @NotNull PermissionEditRequest permissionRequest) throws ValidationException {
-        final org.graylog2.plugin.database.users.User user = userService.load(username);
+        final User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
@@ -314,7 +330,7 @@ public class UsersResource extends RestResource {
                                 @PathParam("username") String username,
                                 @ApiParam(name = "JSON body", value = "The map of preferences to assign to the user.", required = true)
                                 UpdateUserPreferences preferencesRequest) throws ValidationException {
-        final org.graylog2.plugin.database.users.User user = userService.load(username);
+        final User user = userService.load(username);
         checkPermission(RestPermissions.USERS_EDIT, username);
 
         if (user == null) {
@@ -335,7 +351,7 @@ public class UsersResource extends RestResource {
     @AuditLog(object = "user permissions")
     public void deletePermissions(@ApiParam(name = "username", value = "The name of the user to modify.", required = true)
                                   @PathParam("username") String username) throws ValidationException {
-        final org.graylog2.plugin.database.users.User user = userService.load(username);
+        final User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
@@ -359,7 +375,7 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "JSON body", value = "The old and new passwords.", required = true)
             @Valid ChangePasswordRequest cr) throws ValidationException {
 
-        final org.graylog2.plugin.database.users.User user = userService.load(username);
+        final User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
@@ -409,7 +425,7 @@ public class UsersResource extends RestResource {
     @ApiOperation("Retrieves the list of access tokens for a user")
     public TokenList listTokens(@ApiParam(name = "username", required = true)
                                 @PathParam("username") String username) {
-        final org.graylog2.plugin.database.users.User user = _tokensCheckAndLoadUser(username);
+        final User user = _tokensCheckAndLoadUser(username);
 
         final ImmutableList.Builder<Token> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
@@ -427,7 +443,7 @@ public class UsersResource extends RestResource {
     public Token generateNewToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name) {
-        final org.graylog2.plugin.database.users.User user = _tokensCheckAndLoadUser(username);
+        final User user = _tokensCheckAndLoadUser(username);
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
 
         return Token.create(accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
@@ -441,7 +457,7 @@ public class UsersResource extends RestResource {
     public void revokeToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
             @ApiParam(name = "access token", required = true) @PathParam("token") String token) {
-        final org.graylog2.plugin.database.users.User user = _tokensCheckAndLoadUser(username);
+        final User user = _tokensCheckAndLoadUser(username);
         final AccessToken accessToken = accessTokenService.load(token);
 
         if (accessToken != null) {
@@ -451,8 +467,8 @@ public class UsersResource extends RestResource {
         }
     }
 
-    private org.graylog2.plugin.database.users.User _tokensCheckAndLoadUser(String username) {
-        final org.graylog2.plugin.database.users.User user = userService.load(username);
+    private User _tokensCheckAndLoadUser(String username) {
+        final User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Unknown user " + username);
         }
@@ -462,11 +478,14 @@ public class UsersResource extends RestResource {
         return user;
     }
 
-    private UserSummary toUserResponse(org.graylog2.plugin.database.users.User user) {
-        return toUserResponse(user, true);
+    private UserSummary toUserResponse(User user,
+                                       @SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<MongoDbSession> mongoDbSession) {
+        return toUserResponse(user, true, mongoDbSession);
     }
 
-    private UserSummary toUserResponse(org.graylog2.plugin.database.users.User user, boolean includePermissions) {
+    private UserSummary toUserResponse(User user,
+                                       boolean includePermissions,
+                                       @SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<MongoDbSession> mongoDbSession) {
         final Set<String> roleIds = user.getRoleIds();
         Set<String> roleNames = Collections.emptySet();
 
@@ -476,6 +495,16 @@ public class UsersResource extends RestResource {
             if (roleNames.isEmpty()) {
                 LOG.error("Unable to load role names for role IDs {} for user {}", roleIds, user);
             }
+        }
+
+        boolean sessionActive = false;
+        Date lastActivity = null;
+        String clientAddress = null;
+        if (mongoDbSession.isPresent()) {
+            final MongoDbSession session = mongoDbSession.get();
+            sessionActive = true;
+            lastActivity = session.getLastAccessTime();
+            clientAddress = session.getHost();
         }
 
         return UserSummary.create(
@@ -490,7 +519,10 @@ public class UsersResource extends RestResource {
                 user.isReadOnly(),
                 user.isExternalUser(),
                 user.getStartpage(),
-                roleNames
+                roleNames,
+                sessionActive,
+                lastActivity,
+                clientAddress
         );
     }
 

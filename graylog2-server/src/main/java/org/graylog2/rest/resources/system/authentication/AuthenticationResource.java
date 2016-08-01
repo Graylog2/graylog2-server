@@ -20,11 +20,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.AuthenticationConfig;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -33,6 +33,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
+
+import static org.graylog2.shared.security.RestPermissions.AUTHENTICATION_EDIT;
+import static org.graylog2.shared.security.RestPermissions.CLUSTER_CONFIG_ENTRY_READ;
 
 @RequiresAuthentication
 @Path("/system/authentication")
@@ -54,8 +57,8 @@ public class AuthenticationResource extends RestResource {
     @GET
     @Path("config")
     @ApiOperation("Retrieve authentication providers configuration")
+    @RequiresPermissions(CLUSTER_CONFIG_ENTRY_READ)
     public AuthenticationConfig getAuthenticators() {
-        checkPermission(RestPermissions.CLUSTER_CONFIG_ENTRY_READ);
         final AuthenticationConfig config = clusterConfigService.getOrDefault(AuthenticationConfig.class,
                                                                               AuthenticationConfig.defaultInstance());
         return config.withRealms(availableRealms.keySet());
@@ -64,9 +67,8 @@ public class AuthenticationResource extends RestResource {
     @PUT
     @Path("config")
     @ApiOperation("Update authentication providers configuration")
+    @RequiresPermissions({CLUSTER_CONFIG_ENTRY_READ, AUTHENTICATION_EDIT})
     public AuthenticationConfig create(@ApiParam(name = "config", required = true) final AuthenticationConfig config) {
-        checkPermission(RestPermissions.CLUSTER_CONFIG_ENTRY_READ);
-
         clusterConfigService.write(config);
         return clusterConfigService.getOrDefault(AuthenticationConfig.class, config);
     }

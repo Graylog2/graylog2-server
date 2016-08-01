@@ -37,6 +37,8 @@ import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.google.common.collect.ImmutableList.of;
 
 @Singleton
@@ -74,6 +76,7 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
         final DefaultSessionManager defaultSessionManager = (DefaultSessionManager) sm.getSessionManager();
         defaultSessionManager.setSessionDAO(mongoDbSessionDAO);
         defaultSessionManager.setDeleteInvalidSessions(true);
+        defaultSessionManager.setSessionValidationInterval(TimeUnit.MINUTES.toMillis(5));
         defaultSessionManager.setCacheManager(new MemoryConstrainedCacheManager());
         // DO NOT USE global session timeout!!! It's fucky.
         //defaultSessionManager.setGlobalSessionTimeout(TimeUnit.SECONDS.toMillis(5));
