@@ -109,6 +109,7 @@
         <retrofit.version>2.1.0</retrofit.version>
         <forbiddenapis.version>2.2</forbiddenapis.version>
         <nosqlunit.version>0.10.0</nosqlunit.version>
+        <commons-io.version>2.5</commons-io.version>
     </properties>
 
     <repositories>
@@ -430,7 +431,7 @@
             <dependency>
                 <groupId>commons-io</groupId>
                 <artifactId>commons-io</artifactId>
-                <version>2.5</version>
+                <version>${commons-io.version}</version>
             </dependency>
             <dependency>
                 <groupId>commons-codec</groupId>
@@ -1120,6 +1121,37 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+                <groupId>de.thetaphi</groupId>
+                <artifactId>forbiddenapis</artifactId>
+                <version>${forbiddenapis.version}</version>
+                <configuration>
+                    <!-- disallow undocumented classes like sun.misc.Unsafe: -->
+                    <internalRuntimeForbidden>false</internalRuntimeForbidden>
+                    <!-- if the used Java version is too new, don't fail, just do nothing: -->
+                    <failOnUnsupportedJava>false</failOnUnsupportedJava>
+                    <failOnViolation>false</failOnViolation>
+                    <bundledSignatures>
+                        <!-- This will automatically choose the right signatures based on 'maven.compiler.target': -->
+                        <bundledSignature>jdk-unsafe</bundledSignature>
+                        <bundledSignature>jdk-deprecated</bundledSignature>
+                        <bundledSignature>jdk-reflection</bundledSignature>
+                        <bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature>
+                    </bundledSignatures>
+                    <signaturesFiles>
+                        <signaturesFile>${project.basedir}/../config/forbidden-apis/signatures.txt</signaturesFile>
+                    </signaturesFiles>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>check</goal>
+                            <goal>testCheck</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 
@@ -1271,36 +1303,6 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>cobertura-maven-plugin</artifactId>
-                    </plugin>
-                    <plugin>
-                        <groupId>de.thetaphi</groupId>
-                        <artifactId>forbiddenapis</artifactId>
-                        <version>${forbiddenapis.version}</version>
-                        <configuration>
-                            <!-- disallow undocumented classes like sun.misc.Unsafe: -->
-                            <internalRuntimeForbidden>true</internalRuntimeForbidden>
-                            <!-- if the used Java version is too new, don't fail, just do nothing: -->
-                            <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                            <failOnViolation>false</failOnViolation>
-                            <bundledSignatures>
-                                <!-- This will automatically choose the right signatures based on 'maven.compiler.target': -->
-                                <bundledSignature>jdk-unsafe</bundledSignature>
-                                <bundledSignature>jdk-deprecated</bundledSignature>
-                                <bundledSignature>jdk-system-out</bundledSignature>
-                            </bundledSignatures>
-                            <signaturesFiles>
-                                <signaturesFile>${project.basedir}/../config/forbidden-apis/signatures.txt</signaturesFile>
-                            </signaturesFiles>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <phase>compile</phase>
-                                <goals>
-                                    <goal>check</goal>
-                                    <goal>testCheck</goal>
-                                </goals>
-                            </execution>
-                        </executions>
                     </plugin>
                 </plugins>
             </build>
