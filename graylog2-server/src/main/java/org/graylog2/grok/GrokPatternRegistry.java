@@ -47,6 +47,7 @@ public class GrokPatternRegistry {
 
     private final AtomicReference<Set<GrokPattern>> patterns = new AtomicReference<>(Collections.emptySet());
     private final LoadingCache<String, Grok> grokCache;
+    private final LoadingCache<String, Grok> grokCacheNamedOnly;
 
     @Inject
     public GrokPatternRegistry(EventBus serverEventBus,
@@ -56,7 +57,11 @@ public class GrokPatternRegistry {
 
         grokCache = CacheBuilder.newBuilder()
                 .expireAfterAccess(1, TimeUnit.MINUTES) // prevent from hanging on to memory forever
-                .build(asyncReloading(new GrokReloader(), daemonExecutor));
+                .build(asyncReloading(new GrokReloader(false), daemonExecutor));
+
+        grokCacheNamedOnly = CacheBuilder.newBuilder()
+                .expireAfterAccess(1, TimeUnit.MINUTES) // prevent from hanging on to memory forever
+                .build(asyncReloading(new GrokReloader(true), daemonExecutor));
 
         // trigger initial loading
         reload();
@@ -71,8 +76,15 @@ public class GrokPatternRegistry {
     }
 
     public Grok cachedGrokForPattern(String pattern) {
+        return cachedGrokForPattern(pattern, false);
+    }
+    public Grok cachedGrokForPattern(String pattern, boolean namedCapturesOnly) {
         try {
-            return grokCache.get(pattern);
+            if (namedCapturesOnly) {
+                return grokCacheNamedOnly.get(pattern);
+            } else {
+                return grokCache.get(pattern);
+            }
         } catch (ExecutionException e) {
             log.error("Unable to load grok pattern {} into cache", pattern, e);
             throw new RuntimeException(e);
@@ -83,6 +95,7 @@ public class GrokPatternRegistry {
         final Set<GrokPattern> grokPatterns = grokPatternService.loadAll();
         patterns.set(grokPatterns);
         grokCache.invalidateAll();
+        grokCacheNamedOnly.invalidateAll();
     }
 
     public Set<GrokPattern> patterns() {
@@ -90,6 +103,12 @@ public class GrokPatternRegistry {
     }
 
     private class GrokReloader extends CacheLoader<String, Grok> {
+        private final boolean namedCapturesOnly;
+
+        GrokReloader(boolean namedCapturesOnly) {
+            this.namedCapturesOnly = namedCapturesOnly;
+        }
+
         @Override
         public Grok load(@Nonnull String pattern) throws Exception {
             final Grok grok = new Grok();
@@ -98,7 +117,7 @@ public class GrokPatternRegistry {
                     grok.addPattern(grokPattern.name, grokPattern.pattern);
                 }
             }
-            grok.compile(pattern);
+            grok.compile(pattern, namedCapturesOnly);
             return grok;
         }
     }
