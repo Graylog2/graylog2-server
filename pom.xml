@@ -1144,9 +1144,16 @@
                 </configuration>
                 <executions>
                     <execution>
+                        <id>forbidden-apis-src</id>
                         <phase>compile</phase>
                         <goals>
                             <goal>check</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>forbidden-apis-test</id>
+                        <phase>test-compile</phase>
+                        <goals>
                             <goal>testCheck</goal>
                         </goals>
                     </execution>
