@@ -40,8 +40,8 @@
         <graylog2.version>2.1.0-beta.2-SNAPSHOT</graylog2.version>
         <graylog2.plugin-dir>/usr/share/graylog-server/plugin</graylog2.plugin-dir>
         <antlr.version>4.5.1</antlr.version>
-        <slf4j.version>1.7.13</slf4j.version>
-        <log4j.version>2.5</log4j.version>
+        <slf4j.version>1.7.21</slf4j.version>
+        <log4j.version>2.6.2</log4j.version>
     </properties>
 
     <dependencyManagement>
@@ -54,7 +54,7 @@
             <dependency>
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value</artifactId>
-                <version>1.1</version>
+                <version>1.2</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
@@ -64,13 +64,13 @@
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>2.0.40-beta</version>
+                <version>2.0.95-beta</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.3.0</version>
+                <version>3.5.2</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
@@ -183,7 +183,6 @@
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.3.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
