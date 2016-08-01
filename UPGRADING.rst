@@ -71,6 +71,16 @@ Between 2.0 and 2.1 we also made changes to the Plugin API. These include:
 
 If you are maintaining a plugin that was originally written for 1.x or 2.0, you need to make sure that your plugin is still compiling and working under 2.1 or adapt it if necessary.
 
+UI Plugins
+^^^^^^^^^^
+
+The new app prefix feature requires some changes in UI plugins to make them work with that.
+
+* ``import webpackEntry from 'webpack-entry';`` needs to be added at the very top of the ``src/web/index.jsx`` file
+* The ``Routes.pluginRoute()`` function needs to be used instead of a literal string to build URLs for links and buttons
+
+Please check the `updated documentation <INSERT-DOC-LINK-HERE>`_ for details.
+
 Changed Elasticsearch Cluster Status Behavior
 ---------------------------------------------
 
