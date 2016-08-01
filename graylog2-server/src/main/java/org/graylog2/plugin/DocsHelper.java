@@ -31,9 +31,10 @@ public enum DocsHelper {
 
     @Override
     public String toString() {
-        final String version = Version.CURRENT_CLASSPATH.major + "." + Version.CURRENT_CLASSPATH.minor;
+        final com.github.zafarkhaja.semver.Version version = Version.CURRENT_CLASSPATH.getVersion();
+        final String shortVersion = version.getMajorVersion() + "." + version.getMinorVersion();
 
-        return DOCS_URL + version + "/pages/" + path;
+        return DOCS_URL + shortVersion + "/pages/" + path;
     }
 
     public String toLink(String title) {
