@@ -130,6 +130,11 @@ const HelperText = {
 
 const LdapComponent = React.createClass({
   mixins: [Reflux.listenTo(LdapStore, '_onLdapSettingsChange', '_onLdapSettingsChange')],
+
+  propTypes: {
+    onCancel: React.PropTypes.func.isRequired,
+  },
+
   getInitialState() {
     return {
       ldapSettings: undefined,
@@ -419,7 +424,8 @@ const LdapComponent = React.createClass({
               <legend className="col-sm-12">6. Store settings</legend>
               <div className="form-group">
                 <Col sm={9} smOffset={3}>
-                  <Button type="submit" bsStyle="success">Save LDAP settings</Button>
+                  <Button type="submit" bsStyle="primary" className="save-button-margin">Save LDAP settings</Button>
+                  <Button onClick={this.props.onCancel}>Cancel</Button>
                 </Col>
               </div>
             </fieldset>

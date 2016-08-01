@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from 'react-bootstrap';
-import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
 const UsersStore = StoreProvider.getStore('Users');

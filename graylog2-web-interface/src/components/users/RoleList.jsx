@@ -15,7 +15,6 @@ var RoleList = React.createClass({
         roles: React.PropTypes.instanceOf(Immutable.Set).isRequired,
         showEditRole: React.PropTypes.func.isRequired,
         deleteRole: React.PropTypes.func.isRequired,
-        createRole: React.PropTypes.func.isRequired,
     },
 
     _headerCellFormatter(header) {
@@ -55,11 +54,7 @@ var RoleList = React.createClass({
                            filterBy="Name"
                            dataRowFormatter={this._roleInfoFormatter}
                            filterLabel="Filter Roles"
-                           filterKeys={filterKeys}>
-                    <div className="pull-right">
-                        <Button bsStyle="success" onClick={this.props.createRole}>Add new role</Button>
-                    </div>
-                </DataTable>
+                           filterKeys={filterKeys}/>
             </div>
         );
     }

@@ -17,6 +17,7 @@ const AuthenticationPage = React.createClass({
     children: React.PropTypes.object,
     location: React.PropTypes.object.isRequired,
     params: React.PropTypes.object.isRequired,
+    history: React.PropTypes.object.isRequired,
   },
 
   mixins: [PermissionsMixin],
@@ -32,7 +33,7 @@ const AuthenticationPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <AuthenticationComponent location={this.props.location} params={this.props.params}>
+            <AuthenticationComponent location={this.props.location} params={this.props.params} history={this.props.history}>
               {this.props.children}
             </AuthenticationComponent>
           </Col>
