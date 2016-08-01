@@ -44,12 +44,6 @@ public class ExposedConfigurationTest {
         assertThat(c.nodeIdFile()).isEqualTo(configuration.getNodeIdFile());
         assertThat(c.allowHighlighting()).isEqualTo(configuration.isAllowHighlighting());
         assertThat(c.allowLeadingWildcardSearches()).isEqualTo(configuration.isAllowLeadingWildcardSearches());
-        assertThat(c.rotationStrategy()).isEqualTo(elasticsearchConfiguration.getRotationStrategy());
-        assertThat(c.retentionStrategy()).isEqualTo(elasticsearchConfiguration.getRetentionStrategy());
-        assertThat(c.maxDocsPerIndex()).isEqualTo(elasticsearchConfiguration.getMaxDocsPerIndex());
-        assertThat(c.maxSizePerIndex()).isEqualTo(elasticsearchConfiguration.getMaxSizePerIndex());
-        assertThat(c.maxTimePerIndex()).isEqualTo(elasticsearchConfiguration.getMaxTimePerIndex());
-        assertThat(c.maxNumberOfIndices()).isEqualTo(elasticsearchConfiguration.getMaxNumberOfIndices());
         assertThat(c.shards()).isEqualTo(elasticsearchConfiguration.getShards());
         assertThat(c.replicas()).isEqualTo(elasticsearchConfiguration.getReplicas());
         assertThat(c.streamProcessingTimeout()).isEqualTo(configuration.getStreamProcessingTimeout());
@@ -79,12 +73,6 @@ public class ExposedConfigurationTest {
         assertThat((String) JsonPath.read(json, "$.node_id_file")).isEqualTo(c.nodeIdFile());
         assertThat((boolean) JsonPath.read(json, "$.allow_highlighting")).isEqualTo(c.allowHighlighting());
         assertThat((boolean) JsonPath.read(json, "$.allow_leading_wildcard_searches")).isEqualTo(c.allowLeadingWildcardSearches());
-        assertThat((String) JsonPath.read(json, "$.rotation_strategy")).isEqualTo(c.rotationStrategy());
-        assertThat((String) JsonPath.read(json, "$.retention_strategy")).isEqualTo(c.retentionStrategy());
-        assertThat((int) JsonPath.read(json, "$.elasticsearch_max_docs_per_index")).isEqualTo(c.maxDocsPerIndex());
-        assertThat((int) JsonPath.read(json, "$.elasticsearch_max_size_per_index")).isEqualTo((int) c.maxSizePerIndex());
-        assertThat((String) JsonPath.read(json, "$.elasticsearch_max_time_per_index")).isEqualTo(c.maxTimePerIndex().toString());
-        assertThat((int) JsonPath.read(json, "$.elasticsearch_max_number_of_indices")).isEqualTo(c.maxNumberOfIndices());
         assertThat((int) JsonPath.read(json, "$.elasticsearch_shards")).isEqualTo(c.shards());
         assertThat((int) JsonPath.read(json, "$.elasticsearch_replicas")).isEqualTo(c.replicas());
         assertThat((int) JsonPath.read(json, "$.stream_processing_timeout")).isEqualTo((int) c.streamProcessingTimeout());
@@ -110,12 +98,6 @@ public class ExposedConfigurationTest {
                 "  \"node_id_file\": \"/etc/graylog/server/node-id\"," +
                 "  \"allow_highlighting\": false," +
                 "  \"allow_leading_wildcard_searches\": false," +
-                "  \"rotation_strategy\": \"count\"," +
-                "  \"retention_strategy\": \"delete\"," +
-                "  \"elasticsearch_max_docs_per_index\": 80000000," +
-                "  \"elasticsearch_max_size_per_index\": 1073741824," +
-                "  \"elasticsearch_max_time_per_index\": \"P1D\"," +
-                "  \"elasticsearch_max_number_of_indices\": 20," +
                 "  \"elasticsearch_shards\": 4," +
                 "  \"elasticsearch_replicas\": 0," +
                 "  \"stream_processing_timeout\": 2000," +
@@ -140,12 +122,6 @@ public class ExposedConfigurationTest {
         assertThat(c.nodeIdFile()).isEqualTo(JsonPath.read(json, "$.node_id_file"));
         assertThat(c.allowHighlighting()).isEqualTo(JsonPath.read(json, "$.allow_highlighting"));
         assertThat(c.allowLeadingWildcardSearches()).isEqualTo(JsonPath.read(json, "$.allow_leading_wildcard_searches"));
-        assertThat(c.rotationStrategy()).isEqualTo(JsonPath.read(json, "$.rotation_strategy"));
-        assertThat(c.retentionStrategy()).isEqualTo(JsonPath.read(json, "$.retention_strategy"));
-        assertThat(c.maxDocsPerIndex()).isEqualTo(JsonPath.read(json, "$.elasticsearch_max_docs_per_index"));
-        assertThat((int) c.maxSizePerIndex()).isEqualTo(JsonPath.read(json, "$.elasticsearch_max_size_per_index"));
-        assertThat(c.maxTimePerIndex().toString()).isEqualTo(JsonPath.read(json, "$.elasticsearch_max_time_per_index"));
-        assertThat(c.maxNumberOfIndices()).isEqualTo(JsonPath.read(json, "$.elasticsearch_max_number_of_indices"));
         assertThat(c.shards()).isEqualTo(JsonPath.read(json, "$.elasticsearch_shards"));
         assertThat(c.replicas()).isEqualTo(JsonPath.read(json, "$.elasticsearch_replicas"));
         assertThat((int) c.streamProcessingTimeout()).isEqualTo(JsonPath.read(json, "$.stream_processing_timeout"));
