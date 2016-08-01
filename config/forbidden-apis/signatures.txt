@@ -83,3 +83,10 @@ java.net.InetAddress#getHostAddress()
 java.net.Inet4Address#getHostAddress()
 java.net.Inet6Address#getHostAddress()
 java.net.InetSocketAddress#toString()
+
+@defaultMessage Avoid unchecked warnings by using Collections#empty(List|Map|Set) methods
+java.util.Collections#EMPTY_LIST
+java.util.Collections#EMPTY_MAP
+java.util.Collections#EMPTY_SET
+
+java.util.Collections#shuffle(java.util.List) @ Use java.util.Collections#shuffle(java.util.List, java.util.Random) with a reproducible source of randomness
