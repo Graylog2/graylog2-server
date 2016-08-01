@@ -1,6 +1,6 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Button, Label, OverlayTrigger, Popover, Tooltip } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
@@ -94,7 +94,14 @@ const UserList = React.createClass({
 
     let actions = null;
     if (user.read_only) {
-      actions = <span><i title="System User" className="fa fa-lock" /></span>;
+      const tooltip = <Tooltip>System users can only be modified in the Graylog configuration file.</Tooltip>;
+      actions = (
+        <OverlayTrigger placement="left" overlay={tooltip}>
+          <span className={UserListStyle.help}>
+            <Button bsSize="xs" bsStyle="info" disabled>System user</Button>
+          </span>
+        </OverlayTrigger>
+      );
     } else {
       const deleteAction = (
         <button id="delete-user" type="button" className="btn btn-xs btn-primary" title="Delete user"

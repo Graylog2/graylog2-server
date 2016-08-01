@@ -16,3 +16,7 @@
 :local(.limitedWide) {
     max-width: 300px;
 }
+
+:local(.help) {
+    cursor: help;
+}
