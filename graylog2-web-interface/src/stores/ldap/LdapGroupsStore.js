@@ -27,8 +27,10 @@ const LdapGroupsStore = Reflux.createStore({
         this.trigger({groups: this.groups});
       },
       error => {
-        UserNotification.error(`Loading LDAP group list failed with status: ${error}`,
-          'Could not load LDAP group list');
+        if (error.additional.status !== 400) {
+          UserNotification.error(`Loading LDAP group list failed with status: ${error}`,
+            'Could not load LDAP group list');
+        }
       }
     );
 
