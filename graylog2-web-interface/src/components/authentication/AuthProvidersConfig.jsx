@@ -143,17 +143,17 @@ const AuthProvidersConfig = React.createClass({
             skipped.<br/>A user is authenticated by the first matching provider, a successful match can cause a Graylog account for
             this user to be created.
           </span>
-          </PageHeader>
+        </PageHeader>
         <Row>
           <Col md={6}>
-            <Table striped bordered condensed className="top-margin">
+            <Table striped bordered className="top-margin">
               <thead>
-              <tr>
-                <th>#</th>
-                <th>Provider</th>
-                <th>Description</th>
-                <th>Status</th>
-              </tr>
+                <tr>
+                  <th>#</th>
+                  <th>Provider</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                </tr>
               </thead>
               <tbody>
               {this._summary()}
@@ -177,10 +177,10 @@ const AuthProvidersConfig = React.createClass({
               <p>Change the checkboxes to change the status of an authentication provider.</p>
               <Table striped bordered condensed className="top-margin">
                 <thead>
-                <tr>
-                  <th>Provider</th>
-                  <th>Enabled</th>
-                </tr>
+                  <tr>
+                    <th>Provider</th>
+                    <th>Enabled</th>
+                  </tr>
                 </thead>
                 <tbody>
                 {this._statusForm()}
