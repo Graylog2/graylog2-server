@@ -21,6 +21,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
+import com.google.common.net.InetAddresses;
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -42,6 +43,7 @@ import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA1;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA256;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
 import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
+import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
@@ -472,5 +474,44 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.hasField("field_1")).isFalse();
         assertThat(message.hasField("field_2")).isTrue();
         assertThat(message.hasField("field_b")).isTrue();
+    }
+
+    @Test
+    public void conversions() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final EvaluationContext context = contextForRuleEval(rule, new Message("test", "test", Tools.nowUTC()));
+
+        assertThat(context.evaluationErrors()).isEmpty();
+        final Message message = context.currentMessage();
+
+        assertNotNull(message);
+        assertThat(message.getField("string_1")).isEqualTo("1");
+        assertThat(message.getField("string_2")).isEqualTo("2");
+        // special case, Message doesn't allow adding fields with empty string values
+        assertThat(message.hasField("string_3")).isFalse();
+        assertThat(message.getField("string_4")).isEqualTo("default");
+
+        assertThat(message.getField("long_1")).isEqualTo(1L);
+        assertThat(message.getField("long_2")).isEqualTo(2L);
+        assertThat(message.getField("long_3")).isEqualTo(0L);
+        assertThat(message.getField("long_4")).isEqualTo(1L);
+
+        assertThat(message.getField("double_1")).isEqualTo(1d);
+        assertThat(message.getField("double_2")).isEqualTo(2d);
+        assertThat(message.getField("double_3")).isEqualTo(0d);
+        assertThat(message.getField("double_4")).isEqualTo(1d);
+
+        assertThat(message.getField("bool_1")).isEqualTo(true);
+        assertThat(message.getField("bool_2")).isEqualTo(false);
+        assertThat(message.getField("bool_3")).isEqualTo(false);
+        assertThat(message.getField("bool_4")).isEqualTo(true);
+
+        // the is wrapped in our own class for safey in rules
+        assertThat(message.getField("ip_1")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
+        assertThat(message.getField("ip_2")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
+        assertThat(message.getField("ip_3")).isEqualTo(new IpAddress(InetAddresses.forString("0.0.0.0")));
+        assertThat(message.getField("ip_4")).isEqualTo(new IpAddress(InetAddresses.forString("::1")));
+
     }
 }

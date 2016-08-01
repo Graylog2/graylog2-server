@@ -20,6 +20,7 @@ import com.google.common.net.InetAddresses;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Objects;
 
 /**
  * Graylog's rule language wrapper for InetAddress.
@@ -56,5 +57,18 @@ public class IpAddress {
             // cannot happen, it's created from a valid InetAddress to begin with
             throw new IllegalStateException(e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof IpAddress)) return false;
+        IpAddress ipAddress = (IpAddress) o;
+        return Objects.equals(address, ipAddress.address);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(address);
     }
 }

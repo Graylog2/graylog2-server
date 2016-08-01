@@ -32,6 +32,8 @@ import static com.google.common.collect.ImmutableList.of;
 public class IpAddressConversion extends AbstractFunction<IpAddress> {
 
     public static final String NAME = "to_ip";
+    private static final InetAddress ANYV4 = InetAddresses.forString("0.0.0.0");
+
     private final ParameterDescriptor<Object, Object> ipParam;
     private final ParameterDescriptor<String, String> defaultParam;
 
@@ -50,7 +52,7 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
         } catch (IllegalArgumentException e) {
             final Optional<String> defaultValue = defaultParam.optional(args, context);
             if (!defaultValue.isPresent()) {
-                return null;
+                return new IpAddress(ANYV4);
             }
             try {
                 return new IpAddress(InetAddresses.forString(defaultValue.get()));

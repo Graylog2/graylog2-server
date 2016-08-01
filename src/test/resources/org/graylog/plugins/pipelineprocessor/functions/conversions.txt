@@ -1,0 +1,30 @@
+rule "conversions"
+when true
+then
+    set_fields({
+        string_1: to_string("1"),                           // "1"
+        string_2: to_string("2", "default"),                // "2"
+        string_3: to_string($message.not_there),            // "" -> not being set in message!
+        string_4: to_string($message.not_there, "default"), // "default"
+
+        long_1: to_long(1),                     // 1L
+        long_2: to_long(2, 1),                  // 2L
+        long_3: to_long($message.not_there),    // 0L
+        long_4: to_long($message.not_there, 1), // 1L
+
+        double_1: to_double(1d),                        // 1d
+        double_2: to_double(2d, 1d),                    // 2d
+        double_3: to_double($message.not_there),        // 0d
+        double_4: to_double($message.not_there, 1d),    // 1d
+
+        bool_1: to_bool("true"),                      // true
+        bool_2: to_bool("false", true),               // false
+        bool_3: to_bool($message.not_there),          // false
+        bool_4: to_bool($message.not_there, true),    // true
+
+        ip_1: to_ip("127.0.0.1"),                 // 127.0.0.1
+        ip_2: to_ip("127.0.0.1", "2001:db8::1"),  // 127.0.0.1
+        ip_3: to_ip($message.not_there),          // 0.0.0.0
+        ip_4: to_ip($message.not_there, "::1")    // ::1 (v6)
+    });
+end

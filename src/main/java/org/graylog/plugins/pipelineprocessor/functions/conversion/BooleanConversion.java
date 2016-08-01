@@ -23,20 +23,28 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.object;
 
 public class BooleanConversion extends AbstractFunction<Boolean> {
     public static final String NAME = "to_bool";
 
-    private final ParameterDescriptor<Object, Boolean> valueParam;
+    private final ParameterDescriptor<Object, Object> valueParam;
+    private final ParameterDescriptor<Boolean, Boolean> defaultParam;
+
 
     public BooleanConversion() {
-        valueParam = object("value", Boolean.class).transform(o -> Boolean.parseBoolean(String.valueOf(o))).build();
+        valueParam = object("value").build();
+        defaultParam = bool("default").optional().build();
     }
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        return valueParam.required(args, context);
+        final Object value = valueParam.required(args, context);
+        if (value == null) {
+            return defaultParam.optional(args, context).orElse(false);
+        }
+        return Boolean.parseBoolean(String.valueOf(value));
     }
 
     @Override
@@ -44,7 +52,7 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
         return FunctionDescriptor.<Boolean>builder()
                 .name(NAME)
                 .returnType(Boolean.class)
-                .params(of(valueParam))
+                .params(of(valueParam, defaultParam))
                 .build();
     }
 }

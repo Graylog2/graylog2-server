@@ -60,7 +60,7 @@ public class StringConversion extends AbstractFunction<String> {
     public String evaluate(FunctionArgs args, EvaluationContext context) {
         final Object evaluated = valueParam.required(args, context);
         if (evaluated == null) {
-            return null;
+            return defaultParam.optional(args, context).orElse("");
         }
         // fast path for the most common targets
         if (evaluated instanceof String
