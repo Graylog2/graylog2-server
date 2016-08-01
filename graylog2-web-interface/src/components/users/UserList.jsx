@@ -104,10 +104,10 @@ const UserList = React.createClass({
       );
     } else {
       const deleteAction = (
-        <button id="delete-user" type="button" className="btn btn-xs btn-primary" title="Delete user"
+        <Button id="delete-user" bsStyle="primary" bsSize="xs" title="Delete user"
                 onClick={this._deleteUserFunction(user.username)}>
           Delete
-        </button>
+        </Button>
       );
 
       const editAction = (
