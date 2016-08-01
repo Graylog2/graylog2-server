@@ -16,6 +16,7 @@ import StoreProvider from 'injection/StoreProvider';
 const StreamsStore = StoreProvider.getStore('Streams');
 
 import DocsHelper from 'util/DocsHelper';
+import Routes from 'routing/Routes';
 
 const SimulatorPage = React.createClass({
   propTypes: {
@@ -78,11 +79,11 @@ const SimulatorPage = React.createClass({
           </span>
 
           <span>
-            <LinkContainer to={'/system/pipelines'}>
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
               <Button bsStyle="info">Manage connections</Button>
             </LinkContainer>
             &nbsp;
-            <LinkContainer to={'/system/pipelines/overview'}>
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_OVERVIEW')}>
               <Button bsStyle="info">Manage pipelines</Button>
             </LinkContainer>
           </span>

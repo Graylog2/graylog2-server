@@ -16,6 +16,7 @@ import StoreProvider from 'injection/StoreProvider';
 const StreamsStore = StoreProvider.getStore('Streams');
 
 import DocsHelper from 'util/DocsHelper';
+import Routes from 'routing/Routes';
 
 const PipelineConnectionsPage = React.createClass({
   mixins: [Reflux.connect(PipelinesStore), Reflux.connect(PipelineConnectionsStore)],
@@ -71,11 +72,11 @@ const PipelineConnectionsPage = React.createClass({
           </span>
 
           <span>
-            <LinkContainer to={'/system/pipelines/overview'}>
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_OVERVIEW')}>
               <Button bsStyle="info">Manage pipelines</Button>
             </LinkContainer>
             &nbsp;
-            <LinkContainer to={'/system/pipelines/rules'}>
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>
               <Button bsStyle="info">Manage rules</Button>
             </LinkContainer>
           </span>

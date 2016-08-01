@@ -9,6 +9,8 @@ import ObjectUtils from 'util/ObjectUtils';
 
 import PipelinesStore from 'pipelines/PipelinesStore';
 
+import Routes from 'routing/Routes';
+
 const ConnectionForm = React.createClass({
   propTypes: {
     stream: PropTypes.object,
@@ -117,7 +119,7 @@ const ConnectionForm = React.createClass({
       const streamHelp = (
         <span>
           Select the stream you want to connect pipelines to, or create one in the{' '}
-          <LinkContainer to="/streams"><a>Streams page</a></LinkContainer>.
+          <LinkContainer to={Routes.STREAMS}><a>Streams page</a></LinkContainer>.
         </span>
       );
       streamSelector = (
@@ -131,7 +133,7 @@ const ConnectionForm = React.createClass({
     const pipelineHelp = (
       <span>
         Select the pipelines to connect to this stream, or create one in the{' '}
-        <LinkContainer to="/system/pipelines/overview"><a>Pipelines Overview page</a></LinkContainer>.
+        <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_OVERVIEW')}><a>Pipelines Overview page</a></LinkContainer>.
       </span>
     );
 

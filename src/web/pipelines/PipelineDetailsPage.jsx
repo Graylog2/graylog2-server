@@ -13,6 +13,8 @@ import PipelinesActions from 'pipelines/PipelinesActions';
 import PipelinesStore from 'pipelines/PipelinesStore';
 import RulesStore from 'rules/RulesStore';
 
+import Routes from 'routing/Routes';
+
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter(p => p.id === this.props.params.pipelineId)[0] : undefined;
 }
@@ -101,11 +103,11 @@ const PipelineDetailsPage = React.createClass({
           </span>
 
           <span>
-            <LinkContainer to={'/system/pipelines/overview'}>
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_OVERVIEW')}>
               <Button bsStyle="info">Manage pipelines</Button>
             </LinkContainer>
             {' '}
-            <LinkContainer to={'/system/pipelines/rules'}>
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>
               <Button bsStyle="info">Manage rules</Button>
             </LinkContainer>
           </span>

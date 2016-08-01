@@ -13,6 +13,8 @@ import RulesComponent from './RulesComponent';
 import RulesStore from './RulesStore';
 import RulesActions from './RulesActions';
 
+import Routes from 'routing/Routes';
+
 const RulesPage = React.createClass({
   mixins: [
     Reflux.connect(RulesStore),
@@ -36,11 +38,11 @@ const RulesPage = React.createClass({
           </span>
 
           <span>
-            <LinkContainer to="/system/pipelines">
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
               <Button bsStyle="info">Manage connections</Button>
             </LinkContainer>
             &nbsp;
-            <LinkContainer to="/system/pipelines/overview">
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_OVERVIEW')}>
               <Button bsStyle="info">Manage pipelines</Button>
             </LinkContainer>
           </span>

@@ -5,6 +5,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { DataTable, EntityListItem, Timestamp } from 'components/common';
 import ConnectionForm from './ConnectionForm';
 
+import Routes from 'routing/Routes';
+
 const Connection = React.createClass({
   propTypes: {
     stream: React.PropTypes.object.isRequired,
@@ -20,7 +22,7 @@ const Connection = React.createClass({
     return (
       <tr key={pipeline.id}>
         <td style={{ width: 400 }}>
-          <LinkContainer to={`/system/pipelines/${pipeline.id}`}><a>{pipeline.title}</a></LinkContainer>
+          <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')(pipeline.id)}><a>{pipeline.title}</a></LinkContainer>
         </td>
         <td>{pipeline.description}</td>
         <td><Timestamp dateTime={pipeline.created_at} relative /></td>
@@ -47,7 +49,7 @@ const Connection = React.createClass({
 
   render() {
     const actions = [
-      <LinkContainer to={`/system/pipelines/simulate/${this.props.stream.id}`}>
+      <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_SIMULATE_STREAMID')(this.props.stream.id)}>
         <Button bsStyle="info" key={`simulate-${this.props.stream.id}`}>Simulate processing</Button>
       </LinkContainer>,
       <ConnectionForm key={`connection-${this.props.stream.id}`}

@@ -5,6 +5,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { PageHeader } from 'components/common';
 import ProcessingTimelineComponent from './ProcessingTimelineComponent';
 
+import Routes from 'routing/Routes';
+
 const PipelinesOverviewPage = React.createClass({
   render() {
     return (
@@ -19,11 +21,11 @@ const PipelinesOverviewPage = React.createClass({
           </span>
 
           <span>
-            <LinkContainer to={'/system/pipelines'}>
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
               <Button bsStyle="info">Manage connections</Button>
             </LinkContainer>
             {' '}
-            <LinkContainer to={'/system/pipelines/rules'}>
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>
               <Button bsStyle="info">Manage rules</Button>
             </LinkContainer>
           </span>

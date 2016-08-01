@@ -10,6 +10,8 @@ import DocsHelper from 'util/DocsHelper';
 import RuleForm from './RuleForm';
 import RuleHelper from './RuleHelper';
 
+import Routes from 'routing/Routes';
+
 const Rule = React.createClass({
   propTypes: {
     rule: React.PropTypes.object,
@@ -42,11 +44,11 @@ const Rule = React.createClass({
           </span>
 
           <span>
-            <LinkContainer to="/system/pipelines/rules">
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>
               <Button bsStyle="info">Manage rules</Button>
             </LinkContainer>
             &nbsp;
-            <LinkContainer to="/system/pipelines/overview">
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_OVERVIEW')}>
               <Button bsStyle="info">Manage pipelines</Button>
             </LinkContainer>
           </span>

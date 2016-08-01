@@ -10,6 +10,8 @@ import FormsUtils from 'util/FormsUtils';
 
 import RulesStore from 'rules/RulesStore';
 
+import Routes from 'routing/Routes';
+
 const StageForm = React.createClass({
   propTypes: {
     stage: PropTypes.object,
@@ -89,7 +91,7 @@ const StageForm = React.createClass({
     const rulesHelp = (
       <span>
         Select the rules evaluated on this stage, or create one in the{' '}
-        <LinkContainer to="/system/pipelines/rules"><a>Pipeline Rules page</a></LinkContainer>.
+        <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}><a>Pipeline Rules page</a></LinkContainer>.
       </span>
     );
 

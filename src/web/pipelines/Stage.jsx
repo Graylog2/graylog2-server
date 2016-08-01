@@ -8,6 +8,8 @@ import RulesStore from 'rules/RulesStore';
 import StageForm from './StageForm';
 import { MetricContainer, CounterRate } from 'components/metrics';
 
+import Routes from 'routing/Routes';
+
 const Stage = React.createClass({
   propTypes: {
     stage: PropTypes.object.isRequired,
@@ -34,7 +36,7 @@ const Stage = React.createClass({
       };
       ruleTitle = <span><i className="fa fa-warning text-danger"/> {stage.rules[ruleIdx]}</span>;
     } else {
-      ruleTitle = (<LinkContainer to={`/system/pipelines/rules/${rule.id}`}>
+      ruleTitle = (<LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES_RULEID')(rule.id)}>
           <a>{rule.title}</a>
         </LinkContainer>
       );

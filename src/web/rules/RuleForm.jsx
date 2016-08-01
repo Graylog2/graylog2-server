@@ -7,6 +7,8 @@ import brace from 'brace';
 import 'brace/mode/text';
 import 'brace/theme/chrome';
 
+import Routes from 'routing/Routes';
+
 const RuleForm = React.createClass({
   propTypes: {
     rule: PropTypes.object,
@@ -103,7 +105,7 @@ const RuleForm = React.createClass({
   },
 
   _saved() {
-    this.props.history.pushState(null, '/system/pipelines/rules');
+    this.props.history.pushState(null, Routes.pluginRoute('SYSTEM_PIPELINES_RULES'));
   },
 
   _save() {

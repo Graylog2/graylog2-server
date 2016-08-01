@@ -10,6 +10,8 @@ import { MetricContainer, CounterRate } from 'components/metrics';
 import PipelinesActions from 'pipelines/PipelinesActions';
 import PipelinesStore from 'pipelines/PipelinesStore';
 
+import Routes from 'routing/Routes';
+
 const ProcessingTimelineComponent = React.createClass({
   mixins: [Reflux.connect(PipelinesStore)],
 
@@ -66,7 +68,7 @@ const ProcessingTimelineComponent = React.createClass({
     return (
       <tr key={pipeline.id}>
         <td className="pipeline-name">
-          <LinkContainer to={`/system/pipelines/${pipeline.id}`}><a>{pipeline.title}</a></LinkContainer><br />
+          <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')(pipeline.id)}><a>{pipeline.title}</a></LinkContainer><br />
           {pipeline.description}
           <br />
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
@@ -77,7 +79,7 @@ const ProcessingTimelineComponent = React.createClass({
         <td>
           <Button bsStyle="primary" bsSize="xsmall" onClick={this._deletePipeline(pipeline)}>Delete</Button>
           &nbsp;
-          <LinkContainer to={`/system/pipelines/${pipeline.id}`}>
+          <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')(pipeline.id)}>
             <Button bsStyle="info" bsSize="xsmall">Edit</Button>
           </LinkContainer>
         </td>
@@ -100,7 +102,7 @@ const ProcessingTimelineComponent = React.createClass({
 
     const addNewPipelineButton = (
       <div className="text-right">
-        <LinkContainer to="/system/pipelines/new">
+        <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')('new')}>
           <Button bsStyle="success">Add new pipeline</Button>
         </LinkContainer>
       </div>

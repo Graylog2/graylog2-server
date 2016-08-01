@@ -3,6 +3,8 @@ import { Row, Col } from 'react-bootstrap';
 
 import PipelineDetails from './PipelineDetails';
 
+import Routes from 'routing/Routes';
+
 const NewPipeline = React.createClass({
   propTypes: {
     onChange: React.PropTypes.func.isRequired,
@@ -14,7 +16,7 @@ const NewPipeline = React.createClass({
   },
 
   _goToPipeline(pipeline) {
-    this.props.history.pushState(null, `/system/pipelines/${pipeline.id}`);
+    this.props.history.pushState(null, Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')(pipeline.id));
   },
 
   _goBack() {
