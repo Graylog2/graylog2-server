@@ -37,6 +37,8 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
 
     private final ParameterDescriptor<String, String> valueParam;
     private final ParameterDescriptor<String, String> patternParam;
+    private final ParameterDescriptor<Boolean, Boolean> namedOnly;
+
     private final GrokPatternRegistry grokPatternRegistry;
 
     @Inject
@@ -45,17 +47,20 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
 
         valueParam = ParameterDescriptor.string("value").build();
         patternParam = ParameterDescriptor.string("pattern").build();
+        namedOnly = ParameterDescriptor.bool("only_named_captures").optional().build();
     }
 
     @Override
     public GrokResult evaluate(FunctionArgs args, EvaluationContext context) {
         final String value = valueParam.required(args, context);
         final String pattern = patternParam.required(args, context);
+        final boolean onlyNamedCaptures = namedOnly.optional(args, context).orElse(false);
+
         if (value == null || pattern == null) {
             return null;
         }
 
-        final Grok grok = grokPatternRegistry.cachedGrokForPattern(pattern);
+        final Grok grok = grokPatternRegistry.cachedGrokForPattern(pattern, onlyNamedCaptures);
 
         final Match match = grok.match(value);
         match.captures();
@@ -67,7 +72,7 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
         return FunctionDescriptor.<GrokResult>builder()
                 .name(NAME)
                 .returnType(GrokResult.class)
-                .params(of(patternParam, valueParam))
+                .params(of(patternParam, valueParam, namedOnly))
                 .build();
     }
 

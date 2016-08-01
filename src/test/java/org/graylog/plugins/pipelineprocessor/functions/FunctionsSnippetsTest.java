@@ -183,7 +183,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         Set<GrokPattern> patterns = Sets.newHashSet(
                 GrokPattern.create("GREEDY", ".*"),
                 GrokPattern.create("BASE10NUM", "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))"),
-                GrokPattern.create("NUMBER", "(?:%{BASE10NUM:UNWANTED})")
+                GrokPattern.create("NUMBER", "(?:%{BASE10NUM:UNWANTED})"),
+                GrokPattern.create("NUM", "%{BASE10NUM}")
         );
         when(grokPatternService.loadAll()).thenReturn(patterns);
         final EventBus clusterBus = new EventBus();
@@ -370,8 +371,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Message message = evaluateRule(rule);
 
         assertThat(message).isNotNull();
-        assertThat(message.getFieldCount()).isEqualTo(4);
+        assertThat(message.getFieldCount()).isEqualTo(5);
         assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2015-07-31T10:05:36.773Z"));
+        // named captures only
+        assertThat(message.hasField("num")).isTrue();
+        assertThat(message.hasField("BASE10NUM")).isFalse();
     }
 
     @Test
