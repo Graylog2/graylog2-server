@@ -16,6 +16,7 @@
  */
 package org.graylog2.grok;
 
+import com.google.common.base.Throwables;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -36,7 +37,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.cache.CacheLoader.asyncReloading;
 
 @Singleton
@@ -78,6 +78,7 @@ public class GrokPatternRegistry {
     public Grok cachedGrokForPattern(String pattern) {
         return cachedGrokForPattern(pattern, false);
     }
+
     public Grok cachedGrokForPattern(String pattern, boolean namedCapturesOnly) {
         try {
             if (namedCapturesOnly) {
@@ -86,8 +87,9 @@ public class GrokPatternRegistry {
                 return grokCache.get(pattern);
             }
         } catch (ExecutionException e) {
-            log.error("Unable to load grok pattern {} into cache", pattern, e);
-            throw new RuntimeException(e);
+            final Throwable rootCause = Throwables.getRootCause(e);
+            log.error("Unable to load grok pattern {} into cache", pattern, rootCause);
+            throw new RuntimeException(rootCause);
         }
     }
 
@@ -113,9 +115,7 @@ public class GrokPatternRegistry {
         public Grok load(@Nonnull String pattern) throws Exception {
             final Grok grok = new Grok();
             for (GrokPattern grokPattern : patterns()) {
-                if (!isNullOrEmpty(grokPattern.name) || isNullOrEmpty(grokPattern.pattern)) {
-                    grok.addPattern(grokPattern.name, grokPattern.pattern);
-                }
+                grok.addPattern(grokPattern.name, grokPattern.pattern);
             }
             grok.compile(pattern, namedCapturesOnly);
             return grok;
