@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -51,7 +52,7 @@ public class KeyUtilTest {
 
     @Test
     public void testLoadCertificateFiles()
-            throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+            throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, URISyntaxException {
         final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(null, null);
         KeyUtil.loadCertificates(ks, resourceToFile(SERVER_CRT_RSA), CertificateFactory.getInstance(X509));
@@ -59,13 +60,13 @@ public class KeyUtilTest {
         assertEquals(2, ks.size());
     }
 
-    private File resourceToFile(String fileName) {
-        return new File(getClass().getResource(fileName).getFile());
+    private File resourceToFile(String fileName) throws URISyntaxException {
+        return new File(getClass().getResource(fileName).toURI());
     }
 
     @Test
     public void testLoadCertificateDir()
-            throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException {
+            throws CertificateException, KeyStoreException, IOException, NoSuchAlgorithmException, URISyntaxException {
         final KeyStore ks = KeyStore.getInstance(KeyStore.getDefaultType());
         ks.load(null, null);
         KeyUtil.loadCertificates(ks, resourceToFile(DIR), CertificateFactory.getInstance(X509));
@@ -73,19 +74,19 @@ public class KeyUtilTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testLoadPrivateKeyPemUnencryptedPKCS1RSA() throws IOException, GeneralSecurityException {
+    public void testLoadPrivateKeyPemUnencryptedPKCS1RSA() throws IOException, GeneralSecurityException, URISyntaxException {
         final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS1_RSA);
         KeyUtil.loadPrivateKey(keyFile, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testLoadPrivateKeyPemUnencryptedPKCS1DSA() throws IOException, GeneralSecurityException {
+    public void testLoadPrivateKeyPemUnencryptedPKCS1DSA() throws IOException, GeneralSecurityException, URISyntaxException {
         final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS1_DSA);
         KeyUtil.loadPrivateKey(keyFile, null);
     }
 
     @Test
-    public void testLoadPrivateKeyPemUnencryptedPKCS8RSA() throws IOException, GeneralSecurityException {
+    public void testLoadPrivateKeyPemUnencryptedPKCS8RSA() throws IOException, GeneralSecurityException, URISyntaxException {
         final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS8_RSA);
         SslContext.newServerContext(resourceToFile(SERVER_CRT_RSA), keyFile, null);
 
@@ -94,7 +95,7 @@ public class KeyUtilTest {
     }
 
     @Test
-    public void testLoadPrivateKeyPemUnencryptedPKCS8DSA() throws IOException, GeneralSecurityException {
+    public void testLoadPrivateKeyPemUnencryptedPKCS8DSA() throws IOException, GeneralSecurityException, URISyntaxException {
         final File keyFile = resourceToFile(SERVER_KEY_PEM_UE_PKCS8_DSA);
         SslContext.newServerContext(resourceToFile(SERVER_CRT_DSA), keyFile, null);
 
@@ -103,7 +104,7 @@ public class KeyUtilTest {
     }
 
     @Test
-    public void testLoadPrivateKeyPemPKCSEncryptedRSA() throws IOException, GeneralSecurityException {
+    public void testLoadPrivateKeyPemPKCSEncryptedRSA() throws IOException, GeneralSecurityException, URISyntaxException {
         final File keyFile = resourceToFile(SERVER_KEY_PEM_E_PKCS8_RSA);
         SslContext.newServerContext(resourceToFile(SERVER_CRT_RSA), keyFile, "test");
 
@@ -112,7 +113,7 @@ public class KeyUtilTest {
     }
 
     @Test
-    public void testLoadPrivateKeyPemPKCSEncryptedDSA() throws IOException, GeneralSecurityException {
+    public void testLoadPrivateKeyPemPKCSEncryptedDSA() throws IOException, GeneralSecurityException, URISyntaxException {
         final File keyFile = resourceToFile(SERVER_KEY_PEM_E_PKCS8_DSA);
         SslContext.newServerContext(resourceToFile(SERVER_CRT_DSA), keyFile, "test");
 
@@ -121,7 +122,7 @@ public class KeyUtilTest {
     }
 
     @Test
-    public void testLoadPrivateKeyDerPKCS8EncryptedRSA() throws IOException, GeneralSecurityException {
+    public void testLoadPrivateKeyDerPKCS8EncryptedRSA() throws IOException, GeneralSecurityException, URISyntaxException {
         final File keyFile = resourceToFile(SERVER_KEY_DER_E_PKCS8_RSA);
         try {
             SslContext.newServerContext(resourceToFile(SERVER_CRT_RSA), keyFile, "test");
@@ -134,7 +135,7 @@ public class KeyUtilTest {
     }
 
     @Test
-    public void testLoadPrivateKeyDerPKCS8EncryptedDSA() throws IOException, GeneralSecurityException {
+    public void testLoadPrivateKeyDerPKCS8EncryptedDSA() throws IOException, GeneralSecurityException, URISyntaxException {
         final File keyFile = resourceToFile(SERVER_KEY_DER_E_PKCS8_DSA);
         try {
             SslContext.newServerContext(resourceToFile(SERVER_CRT_DSA), keyFile, "test");
@@ -147,7 +148,7 @@ public class KeyUtilTest {
     }
 
     @Test
-    public void testLoadPrivateKeyDerPKCS8UnencryptedRSA() throws IOException, GeneralSecurityException {
+    public void testLoadPrivateKeyDerPKCS8UnencryptedRSA() throws IOException, GeneralSecurityException, URISyntaxException {
         final File keyFile = resourceToFile(SERVER_KEY_DER_UE_PKCS8_RSA);
         try {
             SslContext.newServerContext(resourceToFile(SERVER_CRT_RSA), keyFile, null);
@@ -161,7 +162,7 @@ public class KeyUtilTest {
     }
 
     @Test
-    public void testLoadPrivateKeyDerPKCS8UnencryptedDSA() throws IOException, GeneralSecurityException {
+    public void testLoadPrivateKeyDerPKCS8UnencryptedDSA() throws IOException, GeneralSecurityException, URISyntaxException {
         final File keyFile = resourceToFile(SERVER_KEY_DER_UE_PKCS8_DSA);
         try {
             SslContext.newServerContext(resourceToFile(SERVER_CRT_DSA), keyFile, null);

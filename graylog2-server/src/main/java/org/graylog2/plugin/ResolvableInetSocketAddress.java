@@ -17,6 +17,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.annotations.VisibleForTesting;
+import org.graylog2.shared.SuppressForbidden;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
@@ -44,6 +45,7 @@ public class ResolvableInetSocketAddress {
         return new ResolvableInetSocketAddress(socketAddress);
     }
 
+    @SuppressForbidden("Deliberate invocation")
     public String reverseLookup() {
         final String hostName = inetSocketAddress.getHostName();
         reverseLookedUp = true;
@@ -70,6 +72,7 @@ public class ResolvableInetSocketAddress {
         return inetSocketAddress.getPort();
     }
 
+    @SuppressForbidden("Deliberate invocation")
     public String getHostName() {
         if (isReverseLookedUp()) {
             return inetSocketAddress.getHostName();

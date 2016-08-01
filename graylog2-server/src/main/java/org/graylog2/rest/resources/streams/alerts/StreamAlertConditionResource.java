@@ -56,6 +56,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -157,7 +158,7 @@ public class StreamAlertConditionResource extends RestResource {
         final List<AlertConditionSummary> conditionSummaries = alertConditions
             .stream()
             .map((condition) -> AlertConditionSummary.create(condition.getId(),
-                condition.getTypeString().toLowerCase(),
+                condition.getTypeString().toLowerCase(Locale.ENGLISH),
                 condition.getCreatorUserId(),
                 condition.getCreatedAt().toDate(),
                 condition.getParameters(),

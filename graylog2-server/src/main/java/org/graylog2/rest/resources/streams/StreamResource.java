@@ -21,6 +21,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -90,6 +91,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
@@ -318,7 +320,12 @@ public class StreamResource extends RestResource {
         m.put(Message.FIELD_TIMESTAMP, Tools.dateTimeFromString(timeStamp));
         final Message message = new Message(m);
 
-        final StreamRouterEngine streamRouterEngine = streamRouterEngineFactory.create(Lists.newArrayList(stream), Executors.newSingleThreadExecutor());
+        final ExecutorService executor = Executors.newSingleThreadExecutor(
+                new ThreadFactoryBuilder()
+                        .setNameFormat("stream-" + streamId + "-test-match-%d")
+                        .build()
+        );
+        final StreamRouterEngine streamRouterEngine = streamRouterEngineFactory.create(Lists.newArrayList(stream), executor);
         final List<StreamRouterEngine.StreamTestMatch> streamTestMatches = streamRouterEngine.testMatch(message);
         final StreamRouterEngine.StreamTestMatch streamTestMatch = streamTestMatches.get(0);
 

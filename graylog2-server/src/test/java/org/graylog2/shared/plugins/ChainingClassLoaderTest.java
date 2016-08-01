@@ -16,7 +16,6 @@
  */
 package org.graylog2.shared.plugins;
 
-import edu.emory.mathcs.backport.java.util.Collections;
 import org.junit.Test;
 
 import java.io.ByteArrayInputStream;
@@ -25,6 +24,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.Enumeration;
 
 import static org.assertj.core.api.Assertions.assertThat;

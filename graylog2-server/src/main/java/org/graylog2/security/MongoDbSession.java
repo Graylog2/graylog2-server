@@ -20,6 +20,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.plugin.database.validators.Validator;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +52,7 @@ public class MongoDbSession extends PersistedImpl {
         return null;
     }
 
-
+    @SuppressForbidden("Deliberate use of ObjectInputStream")
     public Map<Object, Object> getAttributes() {
         final Object attributes = fields.get("attributes");
         if (attributes == null) {
@@ -59,6 +60,7 @@ public class MongoDbSession extends PersistedImpl {
         }
         final ByteArrayInputStream bis = new ByteArrayInputStream((byte[]) attributes);
         try {
+            // FIXME: This could break backward compatibility if different Java versions are being used.
             final ObjectInputStream ois = new ObjectInputStream(bis);
             final Object o = ois.readObject();
             return (Map<Object, Object>) o;
@@ -70,10 +72,12 @@ public class MongoDbSession extends PersistedImpl {
         return null;
     }
 
+    @SuppressForbidden("Deliberate use of ObjectOutputStream")
     public void setAttributes(Map<Object, Object> attributes) {
 
         try {
             final ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            // FIXME: This could break backward compatibility if different Java versions are being used.
             final ObjectOutputStream oos = new ObjectOutputStream(bos);
             oos.writeObject(attributes);
             oos.close();

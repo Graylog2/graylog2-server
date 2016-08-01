@@ -25,7 +25,7 @@ import com.mongodb.util.JSON;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +33,8 @@ import java.util.Map;
 public class JsonReader implements DumpReader {
     private final Map<String, List<DBObject>> collectionMap = new HashMap<>();
 
-    public JsonReader(URL location) throws IOException {
-        final File file = new File(location.getPath());
+    public JsonReader(URI location) throws IOException {
+        final File file = new File(location);
 
         final ObjectMapper mapper = new ObjectMapper();
         final TypeReference ref = new TypeReference<Map<String, List<Map<String, Object>>>>(){};

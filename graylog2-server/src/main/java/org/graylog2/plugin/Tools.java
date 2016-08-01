@@ -19,6 +19,7 @@ package org.graylog2.plugin;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Doubles;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.DateTimeFormat;
@@ -255,6 +256,7 @@ public final class Tools {
         return timestamp / 1000.0;
     }
 
+    @SuppressForbidden("Deliberate invocation")
     public static String getLocalHostname() {
         InetAddress addr = null;
         try {
@@ -266,6 +268,7 @@ public final class Tools {
         return addr.getHostName();
     }
 
+    @SuppressForbidden("Deliberate invocation")
     public static String getLocalCanonicalHostname() {
         InetAddress addr = null;
         try {
@@ -289,6 +292,7 @@ public final class Tools {
         return new String(BaseEncoding.base64().decode(what), StandardCharsets.UTF_8);
     }
 
+    @SuppressForbidden("Deliberate invocation")
     public static String rdnsLookup(InetAddress socketAddress) throws UnknownHostException {
         return socketAddress.getCanonicalHostName();
     }

@@ -26,7 +26,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -58,7 +57,7 @@ public class MongoDbSeedRule implements MethodRule {
             try {
                 nodeId = graylogController.getNodeId();
             } catch (MalformedURLException | URISyntaxException e) {
-                final String msg = "Unable to determine graylog node id for seeding: ";
+                final String msg = "Unable to determine Graylog node id for seeding: ";
                 log.error(msg, e);
                 return new IgnoreStatement(msg + e.toString());
             }
@@ -71,9 +70,9 @@ public class MongoDbSeedRule implements MethodRule {
                     }
 
                     try {
-                        log.debug("Using seed data from " + seedUrl.getPath());
+                        log.debug("Using seed data from {}", seedUrl);
                         mongodbSeed.loadDataset(seedUrl, nodeId);
-                    } catch (IOException e) {
+                    } catch (IOException | URISyntaxException e) {
                         throw new RuntimeException("Unable to read seed data: ", e);
                     }
                 }
@@ -81,10 +80,10 @@ public class MongoDbSeedRule implements MethodRule {
                 final URL seedUrl = findFirstInSearchPath(method.getName(), method.getDeclaringClass());
                 try {
                     if (seedUrl != null) {
-                        log.debug("Using seed data from " + seedUrl.getPath());
+                        log.debug("Using seed data from {}", seedUrl);
                         mongodbSeed.loadDataset(seedUrl, nodeId);
                     }
-                } catch (IOException e) {
+                } catch (IOException | URISyntaxException e) {
                     log.debug("MongoDB seed annotation present, but neither explicit location passed, nor inferenced location available, just cleaning databse. Exception was: ", e);
                 }
             }

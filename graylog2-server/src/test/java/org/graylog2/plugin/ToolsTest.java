@@ -29,7 +29,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Calendar;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 
@@ -72,7 +72,7 @@ public class ToolsTest {
     public void testGetUTCTimestampWithMilliseconds() {
 
         assertTrue(Tools.getUTCTimestampWithMilliseconds() > 0.0d);
-        assertTrue(Tools.getUTCTimestampWithMilliseconds(Calendar.getInstance().getTimeInMillis()) > 0.0d);
+        assertTrue(Tools.getUTCTimestampWithMilliseconds(Instant.now().toEpochMilli()) > 0.0d);
     }
 
     @Test

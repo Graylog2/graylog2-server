@@ -36,6 +36,7 @@ import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.text.MessageFormat;
+import java.util.Locale;
 
 import static org.joda.time.DateTimeFieldType.dayOfMonth;
 import static org.joda.time.DateTimeFieldType.hourOfDay;
@@ -157,7 +158,9 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
         final DateTime nextRotation = anchor.plus(rotationPeriod);
         if (nextRotation.isAfter(now)) {
-            return new SimpleResult(false, MessageFormat.format("Next rotation at {0}", nextRotation));
+            final String message = new MessageFormat("Next rotation at {0}", Locale.ENGLISH)
+                    .format(new Object[]{nextRotation});
+            return new SimpleResult(false, message);
         }
 
         // determine new anchor (push it to within less then one period before now) in case we missed one or more periods
@@ -168,7 +171,9 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         } while (tmpAnchor.isBefore(now));
         anchor = anchor.withPeriodAdded(rotationPeriod, multiplicator - 1);
         lastRotation = now;
-        return new SimpleResult(true, MessageFormat.format("Rotation period {0} elapsed, next rotation at {1}", rotationPeriod, anchor));
+        final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1}", Locale.ENGLISH)
+                .format(new Object[]{lastRotation, anchor});
+        return new SimpleResult(true, message);
     }
 
     private static class SimpleResult implements AbstractRotationStrategy.Result {

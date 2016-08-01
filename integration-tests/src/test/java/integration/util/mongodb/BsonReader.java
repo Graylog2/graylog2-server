@@ -29,7 +29,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -41,8 +41,8 @@ import java.util.Map;
 public class BsonReader implements DumpReader {
     private final Map<String, List<DBObject>> collectionMap;
 
-    public BsonReader(URL location) {
-        final File dir = new File(location.getPath());
+    public BsonReader(URI location) {
+        final File dir = new File(location);
         collectionMap = readBsonDirectory(dir);
     }
 
