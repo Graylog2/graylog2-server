@@ -12,10 +12,6 @@ const LdapStore = Reflux.createStore({
   sourceUrl: '/system/ldap/',
   ldapSettings: undefined,
 
-  init() {
-    this.loadSettings();
-  },
-
   getInitialState() {
     return {ldapSettings: this.ldapSettings};
   },

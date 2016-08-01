@@ -5,6 +5,9 @@ import { Button } from 'react-bootstrap';
 import LdapComponent from 'components/ldap/LdapComponent';
 import LdapGroupsComponent from 'components/ldap/LdapGroupsComponent';
 
+import CombinedProvider from 'injection/CombinedProvider';
+const { LdapActions } = CombinedProvider.get('Ldap');
+
 const LegacyLdapConfig = React.createClass({
   propTypes: {
     config: PropTypes.object,
@@ -13,6 +16,10 @@ const LegacyLdapConfig = React.createClass({
     return {
       showSettings: true,
     };
+  },
+
+  componentDidMount() {
+    LdapActions.loadSettings();
   },
 
   _toggleButton() {
