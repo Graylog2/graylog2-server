@@ -11,6 +11,8 @@ const RolesStore = StoreProvider.getStore('Roles');
 
 import { DataTable, Spinner, Timestamp } from 'components/common';
 
+import UserListStyle from '!style!css!./UserList.css';
+
 const UserList = React.createClass({
   propTypes: {
     currentUsername: React.PropTypes.string.isRequired,
@@ -26,17 +28,11 @@ const UserList = React.createClass({
     };
   },
   componentDidMount() {
-    this.style.use();
     this.loadUsers();
     RolesStore.loadRoles().done(roles => {
       this.setState({ roles: roles.map(role => role.name) });
     });
   },
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  style: require('!style/useable!css!./UserList.css'),
 
   loadUsers() {
     const promise = UsersStore.loadUsers();
@@ -84,17 +80,17 @@ const UserList = React.createClass({
     let userBadge = null;
     if (user.session_active) {
       const popover = (
-        <Popover id="session-badge-details" title="Logged in" className="sessionBadgeDetails">
+        <Popover id="session-badge-details" title="Logged in" className={UserListStyle.sessionBadgeDetails}>
           <div>Last activity: <Timestamp dateTime={user.last_activity} relative /></div>
           <div>Client address: {user.client_address}</div>
         </Popover>
       );
       userBadge = (<OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
-        <i className="fa fa-circle activeSession"/>
+        <i className={`fa fa-circle ${UserListStyle.activeSession}`}/>
       </OverlayTrigger>);
     }
 
-    const roleBadges = user.roles.map((role) => <span key={role} className={`roleBadgeFixes label label-${role === 'Admin' ? 'info' : 'default'}`} >{role}</span>);
+    const roleBadges = user.roles.map((role) => <span key={role} className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`} >{role}</span>);
 
     let actions = null;
     if (user.read_only) {
@@ -131,7 +127,7 @@ const UserList = React.createClass({
         <td className="limited">{user.username}</td>
         <td className="limited">{user.email}</td>
         <td className="limited">{user.client_address}</td>
-        <td className="limitedWide">{roleBadges}</td>
+        <td className={UserListStyle.limitedWide}>{roleBadges}</td>
         <td>{actions}</td>
       </tr>
     );

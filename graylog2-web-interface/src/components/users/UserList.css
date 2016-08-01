@@ -1,18 +1,18 @@
-.sessionBadgeDetails {
+:local(.sessionBadgeDetails) {
     font-size: 12px;
 }
 
-.activeSession {
+:local(.activeSession) {
     color: #72a230;
 }
 
-.roleBadgeFixes {
+:local(.roleBadgeFixes) {
     margin-right: 5px;
     margin-bottom: 5px;
     display: inline-block;
     line-height: 15px;
 }
 
-.limitedWide {
+:local(.limitedWide) {
     max-width: 300px;
 }
