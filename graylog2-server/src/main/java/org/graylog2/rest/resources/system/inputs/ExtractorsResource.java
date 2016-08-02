@@ -44,7 +44,6 @@ import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorCrea
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorMetrics;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummary;
 import org.graylog2.rest.models.system.inputs.extractors.responses.ExtractorSummaryList;
-import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.PersistedInputs;
 import org.graylog2.shared.metrics.MetricUtils;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -81,7 +80,6 @@ public class ExtractorsResource extends RestResource {
 
     private final InputService inputService;
     private final ActivityWriter activityWriter;
-    private final InputRegistry inputs;
     private final MetricRegistry metricRegistry;
     private final ExtractorFactory extractorFactory;
     private final PersistedInputs persistedInputs;
@@ -89,13 +87,11 @@ public class ExtractorsResource extends RestResource {
     @Inject
     public ExtractorsResource(final InputService inputService,
                               final ActivityWriter activityWriter,
-                              final InputRegistry inputs,
                               final MetricRegistry metricRegistry,
                               final ExtractorFactory extractorFactory,
                               final PersistedInputs persistedInputs) {
         this.inputService = inputService;
         this.activityWriter = activityWriter;
-        this.inputs = inputs;
         this.metricRegistry = metricRegistry;
         this.extractorFactory = extractorFactory;
         this.persistedInputs = persistedInputs;
@@ -120,14 +116,7 @@ public class ExtractorsResource extends RestResource {
                            @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        final MessageInput input = inputs.getRunningInput(inputId);
-        if (input == null) {
-            final String msg = "Input <" + inputId + "> not found.";
-            LOG.error(msg);
-            throw new javax.ws.rs.NotFoundException(msg);
-        }
-
-        final Input mongoInput = inputService.find(input.getPersistId());
+        final Input mongoInput = inputService.find(inputId);
         final String id = new com.eaio.uuid.UUID().toString();
         final Extractor extractor = buildExtractorFromRequest(cer, id);
 
@@ -146,7 +135,7 @@ public class ExtractorsResource extends RestResource {
         final ExtractorCreated result = ExtractorCreated.create(id);
         final URI extractorUri = getUriBuilderToSelf().path(ExtractorsResource.class)
                 .path("{inputId}")
-                .build(input.getId());
+                .build(mongoInput.getId());
 
         return Response.created(extractorUri).entity(result).build();
     }
@@ -173,13 +162,7 @@ public class ExtractorsResource extends RestResource {
                                       @Valid @NotNull CreateExtractorRequest cer) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        final MessageInput input = persistedInputs.get(inputId);
-        if (input == null) {
-            LOG.error("Input <{}> not found.", inputId);
-            throw new javax.ws.rs.NotFoundException("Couldn't find input " + inputId);
-        }
-
-        final Input mongoInput = inputService.find(input.getPersistId());
+        final Input mongoInput = inputService.find(inputId);
         final Extractor originalExtractor = inputService.getExtractor(mongoInput, extractorId);
         final Extractor extractor = buildExtractorFromRequest(cer, originalExtractor.getId());
 
@@ -210,12 +193,6 @@ public class ExtractorsResource extends RestResource {
         checkPermission(RestPermissions.INPUTS_READ, inputId);
 
         final Input input = inputService.find(inputId);
-        if (input == null) {
-            final String msg = "Input <" + inputId + "> not found.";
-            LOG.error(msg);
-            throw new javax.ws.rs.NotFoundException(msg);
-        }
-
         final List<ExtractorSummary> extractors = Lists.newArrayList();
         for (Extractor extractor : inputService.getExtractors(input)) {
             extractors.add(toSummary(extractor));
