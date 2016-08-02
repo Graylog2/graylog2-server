@@ -201,6 +201,7 @@ public class KafkaTransport extends ThrottleableTransport {
 
         for (final KafkaStream<byte[], byte[]> stream : streams) {
             executor.submit(new Runnable() {
+                @Override
                 public void run() {
                     final ConsumerIterator<byte[], byte[]> consumerIterator = stream.iterator();
                     boolean retry;

@@ -110,6 +110,7 @@ public class TcpTransport extends AbstractTcpTransport {
 
     @FactoryClass
     public interface Factory extends Transport.Factory<TcpTransport> {
+        @Override
         TcpTransport create(Configuration configuration);
 
         @Override

@@ -45,6 +45,7 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
         this.indexName = indexName;
     }
 
+    @Override
     public void execute() {
         final SystemJob setIndexReadOnlyJob = setIndexReadOnlyJobFactory.create(indexName);
         setIndexReadOnlyJob.execute();

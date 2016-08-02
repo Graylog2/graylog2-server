@@ -128,7 +128,7 @@ public class BenchmarkOutput implements MessageOutput {
         }
     }
 
-    private class CsvMetricFilter implements MetricFilter {
+    private static class CsvMetricFilter implements MetricFilter {
         private final List<String> prefixes;
 
         public CsvMetricFilter(List<String> prefixes) {

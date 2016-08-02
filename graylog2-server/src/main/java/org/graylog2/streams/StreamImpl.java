@@ -139,11 +139,13 @@ public class StreamImpl extends PersistedImpl implements Stream {
         fields.put(FIELD_CONTENT_PACK, contentPack);
     }
 
+    @Override
     public Boolean isPaused() {
         Boolean disabled = getDisabled();
         return (disabled != null && disabled);
     }
 
+    @Override
     public Map<String, Object> asMap(List<StreamRule> streamRules) {
         Map<String, Object> result = asMap();
 
@@ -159,6 +161,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
     }
 
     @JsonValue
+    @Override
     public Map<String, Object> asMap() {
         // We work on the result a bit to allow correct JSON serializing.
         Map<String, Object> result = Maps.newHashMap(fields);
@@ -172,6 +175,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
         return result;
     }
 
+    @Override
     public Map<String, Validator> getValidations() {
         return ImmutableMap.<String, Validator>builder()
                 .put(FIELD_TITLE, new FilledStringValidator())
@@ -192,6 +196,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
         return Collections.emptyMap();
     }
 
+    @Override
     public Map<String, List<String>> getAlertReceivers() {
         if (!fields.containsKey(FIELD_ALERT_RECEIVERS)) {
             return Collections.emptyMap();

@@ -26,6 +26,7 @@ import com.google.common.base.Strings;
 @JsonAutoDetect
 public abstract class AlarmCallbackError extends AlarmCallbackResult {
     @JsonProperty("type")
+    @Override
     public String type() { return "error"; }
 
     @JsonProperty("error")

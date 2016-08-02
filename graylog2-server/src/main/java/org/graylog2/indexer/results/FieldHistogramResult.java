@@ -51,10 +51,12 @@ public class FieldHistogramResult extends HistogramResult {
         this.interval = interval;
     }
 
+    @Override
     public Searches.DateHistogramInterval getInterval() {
         return interval;
     }
 
+    @Override
     public Map<Long, Map<String, Number>> getResults() {
         if (result.getBuckets().isEmpty()) {
             return Collections.emptyMap();

@@ -43,6 +43,4 @@ public interface Dashboard extends Persisted {
     DashboardWidget removeWidget(DashboardWidget widget);
 
     Map<String, DashboardWidget> getWidgets();
-
-    Map<String, Object> asMap();
 }

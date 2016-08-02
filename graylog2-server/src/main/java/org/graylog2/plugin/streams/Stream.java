@@ -17,10 +17,8 @@
 package org.graylog2.plugin.streams;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.Persisted;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -39,8 +37,6 @@ public interface Stream extends Persisted {
             return (emptyToNull(name) == null ? DEFAULT : valueOf(name));
         }
     }
-
-    String getId();
 
     String getTitle();
 
@@ -65,8 +61,6 @@ public interface Stream extends Persisted {
     Map<String, List<String>> getAlertReceivers();
 
     Map<String, Object> asMap(List<StreamRule> streamRules);
-
-    String toString();
 
     List<StreamRule> getStreamRules();
 

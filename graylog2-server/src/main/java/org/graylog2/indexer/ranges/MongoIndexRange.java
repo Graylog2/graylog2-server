@@ -37,15 +37,20 @@ public abstract class MongoIndexRange implements IndexRange {
     public abstract ObjectId id();
 
     @JsonProperty(FIELD_INDEX_NAME)
+    @Override
     public abstract String indexName();
 
+    @Override
     public abstract DateTime begin();
 
+    @Override
     public abstract DateTime end();
 
+    @Override
     public abstract DateTime calculatedAt();
 
     @JsonProperty(FIELD_TOOK_MS)
+    @Override
     public abstract int calculationDuration();
 
     @JsonProperty(FIELD_BEGIN)

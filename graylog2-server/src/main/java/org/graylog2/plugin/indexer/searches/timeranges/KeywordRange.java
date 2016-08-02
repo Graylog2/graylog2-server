@@ -36,6 +36,7 @@ public abstract class KeywordRange extends TimeRange {
     public static final String KEYWORD = "keyword";
 
     @JsonProperty
+    @Override
     public abstract String type();
 
     @JsonProperty
@@ -67,6 +68,7 @@ public abstract class KeywordRange extends TimeRange {
     }
 
     @JsonIgnore
+    @Override
     public DateTime getFrom() {
         try {
             return parseResult(keyword()).getFrom();
@@ -76,6 +78,7 @@ public abstract class KeywordRange extends TimeRange {
     }
 
     @JsonIgnore
+    @Override
     public DateTime getTo() {
         try {
             return parseResult(keyword()).getTo();

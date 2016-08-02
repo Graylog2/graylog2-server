@@ -26,6 +26,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class TransportsModule extends Graylog2Module {
+    @Override
     protected void configure() {
         final MapBinder<String, Transport.Factory<? extends Transport>> mapBinder = transportMapBinder();
 

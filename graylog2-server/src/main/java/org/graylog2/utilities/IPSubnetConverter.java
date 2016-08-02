@@ -30,6 +30,7 @@ import java.util.Set;
  * Converts a comma separated list of IP addresses / sub nets to set of {@link IpSubnet}.
  */
 public class IPSubnetConverter implements Converter<Set<IpSubnet>> {
+    @Override
     public Set<IpSubnet> convertFrom(String value) {
         final Set<IpSubnet> converted = new HashSet<>();
         if (value != null) {
@@ -45,6 +46,7 @@ public class IPSubnetConverter implements Converter<Set<IpSubnet>> {
         return converted;
     }
 
+    @Override
     public String convertTo(Set<IpSubnet> value) {
         if (value == null) {
             throw new ParameterException("Couldn't convert IP subnets <null> to string.");

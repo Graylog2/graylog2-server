@@ -55,7 +55,6 @@ public interface MessageOutput extends Stoppable {
         }
     }
 
-    void stop();
     boolean isRunning();
     void write(Message message) throws Exception;
     void write(List<Message> messages) throws Exception;

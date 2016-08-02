@@ -89,6 +89,7 @@ public final class DashboardWidget implements EmbeddedPersistable {
         return creatorUserId;
     }
 
+    @Override
     public Map<String, Object> getPersistedFields() {
         return ImmutableMap.<String, Object>builder()
                 .put(FIELD_ID, id)

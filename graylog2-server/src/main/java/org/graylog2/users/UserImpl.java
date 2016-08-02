@@ -114,6 +114,7 @@ public class UserImpl extends PersistedImpl implements User {
         return false;
     }
 
+    @Override
     public Map<String, Validator> getValidations() {
         return ImmutableMap.<String, Validator>builder()
                 .put(USERNAME, new LimitedStringValidator(1, MAX_USERNAME_LENGTH))
@@ -349,6 +350,7 @@ public class UserImpl extends PersistedImpl implements User {
             return "Administrator";
         }
 
+        @Override
         public String getEmail() {
             return configuration.getRootEmail();
         }

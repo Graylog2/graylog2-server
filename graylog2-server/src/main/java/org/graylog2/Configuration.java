@@ -198,6 +198,7 @@ public class Configuration extends BaseConfiguration {
         return droolsRulesFile;
     }
 
+    @Override
     public String getNodeIdFile() {
         return nodeIdFile;
     }

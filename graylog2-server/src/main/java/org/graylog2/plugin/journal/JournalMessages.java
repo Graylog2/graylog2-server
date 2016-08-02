@@ -179,6 +179,7 @@ public final class JournalMessages {
       return defaultInstance;
     }
 
+    @java.lang.Override
     public JournalMessage getDefaultInstanceForType() {
       return defaultInstance;
     }
@@ -291,6 +292,7 @@ public final class JournalMessages {
       return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_JournalMessage_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_JournalMessage_fieldAccessorTable
@@ -300,7 +302,8 @@ public final class JournalMessages {
 
     public static com.google.protobuf.Parser<JournalMessage> PARSER =
         new com.google.protobuf.AbstractParser<JournalMessage>() {
-      public JournalMessage parsePartialFrom(
+    @java.lang.Override
+    public JournalMessage parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
@@ -319,12 +322,14 @@ public final class JournalMessages {
     /**
      * <code>optional uint32 version = 1;</code>
      */
+    @java.lang.Override
     public boolean hasVersion() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>optional uint32 version = 1;</code>
      */
+    @java.lang.Override
     public int getVersion() {
       return version_;
     }
@@ -338,6 +343,7 @@ public final class JournalMessages {
      * uuid, time is upper 64 bits, clockseq is lower 64 bits of the 128 bit uuid value
      * </pre>
      */
+    @java.lang.Override
     public boolean hasUuidTime() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
@@ -348,6 +354,7 @@ public final class JournalMessages {
      * uuid, time is upper 64 bits, clockseq is lower 64 bits of the 128 bit uuid value
      * </pre>
      */
+    @java.lang.Override
     public long getUuidTime() {
       return uuidTime_;
     }
@@ -357,12 +364,14 @@ public final class JournalMessages {
     /**
      * <code>optional fixed64 uuid_clockseq = 3;</code>
      */
+    @java.lang.Override
     public boolean hasUuidClockseq() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>optional fixed64 uuid_clockseq = 3;</code>
      */
+    @java.lang.Override
     public long getUuidClockseq() {
       return uuidClockseq_;
     }
@@ -376,6 +385,7 @@ public final class JournalMessages {
      * milliseconds since Java epoch (1970/01/01 00:00:00.000)
      * </pre>
      */
+    @java.lang.Override
     public boolean hasTimestamp() {
       return ((bitField0_ & 0x00000008) == 0x00000008);
     }
@@ -386,6 +396,7 @@ public final class JournalMessages {
      * milliseconds since Java epoch (1970/01/01 00:00:00.000)
      * </pre>
      */
+    @java.lang.Override
     public long getTimestamp() {
       return timestamp_;
     }
@@ -395,18 +406,21 @@ public final class JournalMessages {
     /**
      * <code>optional .org.graylog2.plugin.journal.CodecInfo codec = 5;</code>
      */
+    @java.lang.Override
     public boolean hasCodec() {
       return ((bitField0_ & 0x00000010) == 0x00000010);
     }
     /**
      * <code>optional .org.graylog2.plugin.journal.CodecInfo codec = 5;</code>
      */
+    @java.lang.Override
     public org.graylog2.plugin.journal.JournalMessages.CodecInfo getCodec() {
       return codec_;
     }
     /**
      * <code>optional .org.graylog2.plugin.journal.CodecInfo codec = 5;</code>
      */
+    @java.lang.Override
     public org.graylog2.plugin.journal.JournalMessages.CodecInfoOrBuilder getCodecOrBuilder() {
       return codec_;
     }
@@ -420,6 +434,7 @@ public final class JournalMessages {
      * the list of graylog2 nodes which have handled the message (radios, servers) in receive order
      * </pre>
      */
+    @java.lang.Override
     public java.util.List<org.graylog2.plugin.journal.JournalMessages.SourceNode> getSourceNodesList() {
       return sourceNodes_;
     }
@@ -430,7 +445,8 @@ public final class JournalMessages {
      * the list of graylog2 nodes which have handled the message (radios, servers) in receive order
      * </pre>
      */
-    public java.util.List<? extends org.graylog2.plugin.journal.JournalMessages.SourceNodeOrBuilder> 
+    @java.lang.Override
+    public java.util.List<? extends org.graylog2.plugin.journal.JournalMessages.SourceNodeOrBuilder>
         getSourceNodesOrBuilderList() {
       return sourceNodes_;
     }
@@ -441,6 +457,7 @@ public final class JournalMessages {
      * the list of graylog2 nodes which have handled the message (radios, servers) in receive order
      * </pre>
      */
+    @java.lang.Override
     public int getSourceNodesCount() {
       return sourceNodes_.size();
     }
@@ -451,6 +468,7 @@ public final class JournalMessages {
      * the list of graylog2 nodes which have handled the message (radios, servers) in receive order
      * </pre>
      */
+    @java.lang.Override
     public org.graylog2.plugin.journal.JournalMessages.SourceNode getSourceNodes(int index) {
       return sourceNodes_.get(index);
     }
@@ -461,6 +479,7 @@ public final class JournalMessages {
      * the list of graylog2 nodes which have handled the message (radios, servers) in receive order
      * </pre>
      */
+    @java.lang.Override
     public org.graylog2.plugin.journal.JournalMessages.SourceNodeOrBuilder getSourceNodesOrBuilder(
         int index) {
       return sourceNodes_.get(index);
@@ -471,18 +490,21 @@ public final class JournalMessages {
     /**
      * <code>optional .org.graylog2.plugin.journal.RemoteAddress remote = 7;</code>
      */
+    @java.lang.Override
     public boolean hasRemote() {
       return ((bitField0_ & 0x00000020) == 0x00000020);
     }
     /**
      * <code>optional .org.graylog2.plugin.journal.RemoteAddress remote = 7;</code>
      */
+    @java.lang.Override
     public org.graylog2.plugin.journal.JournalMessages.RemoteAddress getRemote() {
       return remote_;
     }
     /**
      * <code>optional .org.graylog2.plugin.journal.RemoteAddress remote = 7;</code>
      */
+    @java.lang.Override
     public org.graylog2.plugin.journal.JournalMessages.RemoteAddressOrBuilder getRemoteOrBuilder() {
       return remote_;
     }
@@ -492,12 +514,14 @@ public final class JournalMessages {
     /**
      * <code>optional bytes payload = 8;</code>
      */
+    @java.lang.Override
     public boolean hasPayload() {
       return ((bitField0_ & 0x00000040) == 0x00000040);
     }
     /**
      * <code>optional bytes payload = 8;</code>
      */
+    @java.lang.Override
     public com.google.protobuf.ByteString getPayload() {
       return payload_;
     }
@@ -513,6 +537,7 @@ public final class JournalMessages {
       payload_ = com.google.protobuf.ByteString.EMPTY;
     }
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -522,6 +547,7 @@ public final class JournalMessages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -553,6 +579,7 @@ public final class JournalMessages {
     }
 
     private int memoizedSerializedSize = -1;
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
@@ -656,10 +683,12 @@ public final class JournalMessages {
     }
 
     public static Builder newBuilder() { return Builder.create(); }
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(org.graylog2.plugin.journal.JournalMessages.JournalMessage prototype) {
       return newBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
@@ -680,6 +709,7 @@ public final class JournalMessages {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_JournalMessage_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_JournalMessage_fieldAccessorTable
@@ -708,6 +738,7 @@ public final class JournalMessages {
         return new Builder();
       }
 
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         version_ = 0;
@@ -741,19 +772,23 @@ public final class JournalMessages {
         return this;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_JournalMessage_descriptor;
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.JournalMessage getDefaultInstanceForType() {
         return org.graylog2.plugin.journal.JournalMessages.JournalMessage.getDefaultInstance();
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.JournalMessage build() {
         org.graylog2.plugin.journal.JournalMessages.JournalMessage result = buildPartial();
         if (!result.isInitialized()) {
@@ -762,6 +797,7 @@ public final class JournalMessages {
         return result;
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.JournalMessage buildPartial() {
         org.graylog2.plugin.journal.JournalMessages.JournalMessage result = new org.graylog2.plugin.journal.JournalMessages.JournalMessage(this);
         int from_bitField0_ = bitField0_;
@@ -816,6 +852,7 @@ public final class JournalMessages {
         return result;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.graylog2.plugin.journal.JournalMessages.JournalMessage) {
           return mergeFrom((org.graylog2.plugin.journal.JournalMessages.JournalMessage)other);
@@ -878,10 +915,12 @@ public final class JournalMessages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -905,12 +944,14 @@ public final class JournalMessages {
       /**
        * <code>optional uint32 version = 1;</code>
        */
+      @java.lang.Override
       public boolean hasVersion() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
        * <code>optional uint32 version = 1;</code>
        */
+      @java.lang.Override
       public int getVersion() {
         return version_;
       }
@@ -941,6 +982,7 @@ public final class JournalMessages {
        * uuid, time is upper 64 bits, clockseq is lower 64 bits of the 128 bit uuid value
        * </pre>
        */
+      @java.lang.Override
       public boolean hasUuidTime() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
@@ -951,6 +993,7 @@ public final class JournalMessages {
        * uuid, time is upper 64 bits, clockseq is lower 64 bits of the 128 bit uuid value
        * </pre>
        */
+      @java.lang.Override
       public long getUuidTime() {
         return uuidTime_;
       }
@@ -985,12 +1028,14 @@ public final class JournalMessages {
       /**
        * <code>optional fixed64 uuid_clockseq = 3;</code>
        */
+      @java.lang.Override
       public boolean hasUuidClockseq() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
        * <code>optional fixed64 uuid_clockseq = 3;</code>
        */
+      @java.lang.Override
       public long getUuidClockseq() {
         return uuidClockseq_;
       }
@@ -1021,6 +1066,7 @@ public final class JournalMessages {
        * milliseconds since Java epoch (1970/01/01 00:00:00.000)
        * </pre>
        */
+      @java.lang.Override
       public boolean hasTimestamp() {
         return ((bitField0_ & 0x00000008) == 0x00000008);
       }
@@ -1031,6 +1077,7 @@ public final class JournalMessages {
        * milliseconds since Java epoch (1970/01/01 00:00:00.000)
        * </pre>
        */
+      @java.lang.Override
       public long getTimestamp() {
         return timestamp_;
       }
@@ -1067,12 +1114,14 @@ public final class JournalMessages {
       /**
        * <code>optional .org.graylog2.plugin.journal.CodecInfo codec = 5;</code>
        */
+      @java.lang.Override
       public boolean hasCodec() {
         return ((bitField0_ & 0x00000010) == 0x00000010);
       }
       /**
        * <code>optional .org.graylog2.plugin.journal.CodecInfo codec = 5;</code>
        */
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.CodecInfo getCodec() {
         if (codecBuilder_ == null) {
           return codec_;
@@ -1153,6 +1202,7 @@ public final class JournalMessages {
       /**
        * <code>optional .org.graylog2.plugin.journal.CodecInfo codec = 5;</code>
        */
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.CodecInfoOrBuilder getCodecOrBuilder() {
         if (codecBuilder_ != null) {
           return codecBuilder_.getMessageOrBuilder();
@@ -1196,6 +1246,7 @@ public final class JournalMessages {
        * the list of graylog2 nodes which have handled the message (radios, servers) in receive order
        * </pre>
        */
+      @java.lang.Override
       public java.util.List<org.graylog2.plugin.journal.JournalMessages.SourceNode> getSourceNodesList() {
         if (sourceNodesBuilder_ == null) {
           return java.util.Collections.unmodifiableList(sourceNodes_);
@@ -1210,6 +1261,7 @@ public final class JournalMessages {
        * the list of graylog2 nodes which have handled the message (radios, servers) in receive order
        * </pre>
        */
+      @java.lang.Override
       public int getSourceNodesCount() {
         if (sourceNodesBuilder_ == null) {
           return sourceNodes_.size();
@@ -1224,6 +1276,7 @@ public final class JournalMessages {
        * the list of graylog2 nodes which have handled the message (radios, servers) in receive order
        * </pre>
        */
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.SourceNode getSourceNodes(int index) {
         if (sourceNodesBuilder_ == null) {
           return sourceNodes_.get(index);
@@ -1418,6 +1471,7 @@ public final class JournalMessages {
        * the list of graylog2 nodes which have handled the message (radios, servers) in receive order
        * </pre>
        */
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.SourceNodeOrBuilder getSourceNodesOrBuilder(
           int index) {
         if (sourceNodesBuilder_ == null) {
@@ -1432,7 +1486,8 @@ public final class JournalMessages {
        * the list of graylog2 nodes which have handled the message (radios, servers) in receive order
        * </pre>
        */
-      public java.util.List<? extends org.graylog2.plugin.journal.JournalMessages.SourceNodeOrBuilder> 
+      @java.lang.Override
+      public java.util.List<? extends org.graylog2.plugin.journal.JournalMessages.SourceNodeOrBuilder>
            getSourceNodesOrBuilderList() {
         if (sourceNodesBuilder_ != null) {
           return sourceNodesBuilder_.getMessageOrBuilderList();
@@ -1495,12 +1550,14 @@ public final class JournalMessages {
       /**
        * <code>optional .org.graylog2.plugin.journal.RemoteAddress remote = 7;</code>
        */
+      @java.lang.Override
       public boolean hasRemote() {
         return ((bitField0_ & 0x00000040) == 0x00000040);
       }
       /**
        * <code>optional .org.graylog2.plugin.journal.RemoteAddress remote = 7;</code>
        */
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.RemoteAddress getRemote() {
         if (remoteBuilder_ == null) {
           return remote_;
@@ -1581,6 +1638,7 @@ public final class JournalMessages {
       /**
        * <code>optional .org.graylog2.plugin.journal.RemoteAddress remote = 7;</code>
        */
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.RemoteAddressOrBuilder getRemoteOrBuilder() {
         if (remoteBuilder_ != null) {
           return remoteBuilder_.getMessageOrBuilder();
@@ -1609,12 +1667,14 @@ public final class JournalMessages {
       /**
        * <code>optional bytes payload = 8;</code>
        */
+      @java.lang.Override
       public boolean hasPayload() {
         return ((bitField0_ & 0x00000080) == 0x00000080);
       }
       /**
        * <code>optional bytes payload = 8;</code>
        */
+      @java.lang.Override
       public com.google.protobuf.ByteString getPayload() {
         return payload_;
       }
@@ -1734,6 +1794,7 @@ public final class JournalMessages {
       return defaultInstance;
     }
 
+    @java.lang.Override
     public RemoteAddress getDefaultInstanceForType() {
       return defaultInstance;
     }
@@ -1800,6 +1861,7 @@ public final class JournalMessages {
       return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_RemoteAddress_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_RemoteAddress_fieldAccessorTable
@@ -1809,6 +1871,7 @@ public final class JournalMessages {
 
     public static com.google.protobuf.Parser<RemoteAddress> PARSER =
         new com.google.protobuf.AbstractParser<RemoteAddress>() {
+      @java.lang.Override
       public RemoteAddress parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -1832,6 +1895,7 @@ public final class JournalMessages {
      * the original remote (IP) address of the message sender, unresolved
      * </pre>
      */
+    @java.lang.Override
     public boolean hasAddress() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
@@ -1842,6 +1906,7 @@ public final class JournalMessages {
      * the original remote (IP) address of the message sender, unresolved
      * </pre>
      */
+    @java.lang.Override
     public com.google.protobuf.ByteString getAddress() {
       return address_;
     }
@@ -1855,6 +1920,7 @@ public final class JournalMessages {
      * the port of the sender, if available/applicable
      * </pre>
      */
+    @java.lang.Override
     public boolean hasPort() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
@@ -1865,6 +1931,7 @@ public final class JournalMessages {
      * the port of the sender, if available/applicable
      * </pre>
      */
+    @java.lang.Override
     public int getPort() {
       return port_;
     }
@@ -1878,6 +1945,7 @@ public final class JournalMessages {
      * a processing node can optionally resolve the address early
      * </pre>
      */
+    @java.lang.Override
     public boolean hasResolved() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
@@ -1888,6 +1956,7 @@ public final class JournalMessages {
      * a processing node can optionally resolve the address early
      * </pre>
      */
+    @java.lang.Override
     public java.lang.String getResolved() {
       java.lang.Object ref = resolved_;
       if (ref instanceof java.lang.String) {
@@ -1909,6 +1978,7 @@ public final class JournalMessages {
      * a processing node can optionally resolve the address early
      * </pre>
      */
+    @java.lang.Override
     public com.google.protobuf.ByteString
         getResolvedBytes() {
       java.lang.Object ref = resolved_;
@@ -1929,6 +1999,7 @@ public final class JournalMessages {
       resolved_ = "";
     }
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -1938,6 +2009,7 @@ public final class JournalMessages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -1954,6 +2026,7 @@ public final class JournalMessages {
     }
 
     private int memoizedSerializedSize = -1;
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
@@ -2037,10 +2110,12 @@ public final class JournalMessages {
     }
 
     public static Builder newBuilder() { return Builder.create(); }
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(org.graylog2.plugin.journal.JournalMessages.RemoteAddress prototype) {
       return newBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
@@ -2061,6 +2136,7 @@ public final class JournalMessages {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_RemoteAddress_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_RemoteAddress_fieldAccessorTable
@@ -2086,6 +2162,7 @@ public final class JournalMessages {
         return new Builder();
       }
 
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         address_ = com.google.protobuf.ByteString.EMPTY;
@@ -2097,19 +2174,23 @@ public final class JournalMessages {
         return this;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_RemoteAddress_descriptor;
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.RemoteAddress getDefaultInstanceForType() {
         return org.graylog2.plugin.journal.JournalMessages.RemoteAddress.getDefaultInstance();
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.RemoteAddress build() {
         org.graylog2.plugin.journal.JournalMessages.RemoteAddress result = buildPartial();
         if (!result.isInitialized()) {
@@ -2118,6 +2199,7 @@ public final class JournalMessages {
         return result;
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.RemoteAddress buildPartial() {
         org.graylog2.plugin.journal.JournalMessages.RemoteAddress result = new org.graylog2.plugin.journal.JournalMessages.RemoteAddress(this);
         int from_bitField0_ = bitField0_;
@@ -2139,6 +2221,7 @@ public final class JournalMessages {
         return result;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.graylog2.plugin.journal.JournalMessages.RemoteAddress) {
           return mergeFrom((org.graylog2.plugin.journal.JournalMessages.RemoteAddress)other);
@@ -2165,10 +2248,12 @@ public final class JournalMessages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2196,6 +2281,7 @@ public final class JournalMessages {
        * the original remote (IP) address of the message sender, unresolved
        * </pre>
        */
+      @java.lang.Override
       public boolean hasAddress() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
@@ -2206,6 +2292,7 @@ public final class JournalMessages {
        * the original remote (IP) address of the message sender, unresolved
        * </pre>
        */
+      @java.lang.Override
       public com.google.protobuf.ByteString getAddress() {
         return address_;
       }
@@ -2247,6 +2334,7 @@ public final class JournalMessages {
        * the port of the sender, if available/applicable
        * </pre>
        */
+      @java.lang.Override
       public boolean hasPort() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
@@ -2257,6 +2345,7 @@ public final class JournalMessages {
        * the port of the sender, if available/applicable
        * </pre>
        */
+      @java.lang.Override
       public int getPort() {
         return port_;
       }
@@ -2295,6 +2384,7 @@ public final class JournalMessages {
        * a processing node can optionally resolve the address early
        * </pre>
        */
+      @java.lang.Override
       public boolean hasResolved() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
@@ -2305,6 +2395,7 @@ public final class JournalMessages {
        * a processing node can optionally resolve the address early
        * </pre>
        */
+      @java.lang.Override
       public java.lang.String getResolved() {
         java.lang.Object ref = resolved_;
         if (!(ref instanceof java.lang.String)) {
@@ -2326,6 +2417,7 @@ public final class JournalMessages {
        * a processing node can optionally resolve the address early
        * </pre>
        */
+      @java.lang.Override
       public com.google.protobuf.ByteString
           getResolvedBytes() {
         java.lang.Object ref = resolved_;
@@ -2464,6 +2556,7 @@ public final class JournalMessages {
       return defaultInstance;
     }
 
+    @java.lang.Override
     public CodecInfo getDefaultInstanceForType() {
       return defaultInstance;
     }
@@ -2526,6 +2619,7 @@ public final class JournalMessages {
       return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_CodecInfo_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_CodecInfo_fieldAccessorTable
@@ -2535,6 +2629,7 @@ public final class JournalMessages {
 
     public static com.google.protobuf.Parser<CodecInfo> PARSER =
         new com.google.protobuf.AbstractParser<CodecInfo>() {
+      @java.lang.Override
       public CodecInfo parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2554,12 +2649,14 @@ public final class JournalMessages {
     /**
      * <code>optional string name = 1;</code>
      */
+    @java.lang.Override
     public boolean hasName() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>optional string name = 1;</code>
      */
+    @java.lang.Override
     public java.lang.String getName() {
       java.lang.Object ref = name_;
       if (ref instanceof java.lang.String) {
@@ -2577,6 +2674,7 @@ public final class JournalMessages {
     /**
      * <code>optional string name = 1;</code>
      */
+    @java.lang.Override
     public com.google.protobuf.ByteString
         getNameBytes() {
       java.lang.Object ref = name_;
@@ -2601,6 +2699,7 @@ public final class JournalMessages {
      * for optimal performance make sure the serialization is stable, i.e. same config == same serialization bytes
      * </pre>
      */
+    @java.lang.Override
     public boolean hasConfig() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
@@ -2612,6 +2711,7 @@ public final class JournalMessages {
      * for optimal performance make sure the serialization is stable, i.e. same config == same serialization bytes
      * </pre>
      */
+    @java.lang.Override
     public java.lang.String getConfig() {
       java.lang.Object ref = config_;
       if (ref instanceof java.lang.String) {
@@ -2634,6 +2734,7 @@ public final class JournalMessages {
      * for optimal performance make sure the serialization is stable, i.e. same config == same serialization bytes
      * </pre>
      */
+    @java.lang.Override
     public com.google.protobuf.ByteString
         getConfigBytes() {
       java.lang.Object ref = config_;
@@ -2653,6 +2754,7 @@ public final class JournalMessages {
       config_ = "";
     }
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -2662,6 +2764,7 @@ public final class JournalMessages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -2675,6 +2778,7 @@ public final class JournalMessages {
     }
 
     private int memoizedSerializedSize = -1;
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
@@ -2754,10 +2858,12 @@ public final class JournalMessages {
     }
 
     public static Builder newBuilder() { return Builder.create(); }
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(org.graylog2.plugin.journal.JournalMessages.CodecInfo prototype) {
       return newBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
@@ -2778,6 +2884,7 @@ public final class JournalMessages {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_CodecInfo_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_CodecInfo_fieldAccessorTable
@@ -2803,6 +2910,7 @@ public final class JournalMessages {
         return new Builder();
       }
 
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         name_ = "";
@@ -2812,19 +2920,23 @@ public final class JournalMessages {
         return this;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_CodecInfo_descriptor;
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.CodecInfo getDefaultInstanceForType() {
         return org.graylog2.plugin.journal.JournalMessages.CodecInfo.getDefaultInstance();
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.CodecInfo build() {
         org.graylog2.plugin.journal.JournalMessages.CodecInfo result = buildPartial();
         if (!result.isInitialized()) {
@@ -2833,6 +2945,7 @@ public final class JournalMessages {
         return result;
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.CodecInfo buildPartial() {
         org.graylog2.plugin.journal.JournalMessages.CodecInfo result = new org.graylog2.plugin.journal.JournalMessages.CodecInfo(this);
         int from_bitField0_ = bitField0_;
@@ -2850,6 +2963,7 @@ public final class JournalMessages {
         return result;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.graylog2.plugin.journal.JournalMessages.CodecInfo) {
           return mergeFrom((org.graylog2.plugin.journal.JournalMessages.CodecInfo)other);
@@ -2875,10 +2989,12 @@ public final class JournalMessages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -2902,12 +3018,14 @@ public final class JournalMessages {
       /**
        * <code>optional string name = 1;</code>
        */
+      @java.lang.Override
       public boolean hasName() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
        * <code>optional string name = 1;</code>
        */
+      @java.lang.Override
       public java.lang.String getName() {
         java.lang.Object ref = name_;
         if (!(ref instanceof java.lang.String)) {
@@ -2925,6 +3043,7 @@ public final class JournalMessages {
       /**
        * <code>optional string name = 1;</code>
        */
+      @java.lang.Override
       public com.google.protobuf.ByteString
           getNameBytes() {
         java.lang.Object ref = name_;
@@ -2983,6 +3102,7 @@ public final class JournalMessages {
        * for optimal performance make sure the serialization is stable, i.e. same config == same serialization bytes
        * </pre>
        */
+      @java.lang.Override
       public boolean hasConfig() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
@@ -2994,6 +3114,7 @@ public final class JournalMessages {
        * for optimal performance make sure the serialization is stable, i.e. same config == same serialization bytes
        * </pre>
        */
+      @java.lang.Override
       public java.lang.String getConfig() {
         java.lang.Object ref = config_;
         if (!(ref instanceof java.lang.String)) {
@@ -3016,6 +3137,7 @@ public final class JournalMessages {
        * for optimal performance make sure the serialization is stable, i.e. same config == same serialization bytes
        * </pre>
        */
+      @java.lang.Override
       public com.google.protobuf.ByteString
           getConfigBytes() {
         java.lang.Object ref = config_;
@@ -3151,6 +3273,7 @@ public final class JournalMessages {
       return defaultInstance;
     }
 
+    @java.lang.Override
     public SourceNode getDefaultInstanceForType() {
       return defaultInstance;
     }
@@ -3224,6 +3347,7 @@ public final class JournalMessages {
       return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_SourceNode_descriptor;
     }
 
+    @java.lang.Override
     protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
         internalGetFieldAccessorTable() {
       return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_SourceNode_fieldAccessorTable
@@ -3233,6 +3357,7 @@ public final class JournalMessages {
 
     public static com.google.protobuf.Parser<SourceNode> PARSER =
         new com.google.protobuf.AbstractParser<SourceNode>() {
+      @java.lang.Override
       public SourceNode parsePartialFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3271,6 +3396,7 @@ public final class JournalMessages {
       public static final int RADIO_VALUE = 1;
 
 
+      @java.lang.Override
       public final int getNumber() { return value; }
 
       public static Type valueOf(int value) {
@@ -3288,15 +3414,18 @@ public final class JournalMessages {
       private static com.google.protobuf.Internal.EnumLiteMap<Type>
           internalValueMap =
             new com.google.protobuf.Internal.EnumLiteMap<Type>() {
+              @java.lang.Override
               public Type findValueByNumber(int number) {
                 return Type.valueOf(number);
               }
             };
 
+      @java.lang.Override
       public final com.google.protobuf.Descriptors.EnumValueDescriptor
           getValueDescriptor() {
         return getDescriptor().getValues().get(index);
       }
+      @java.lang.Override
       public final com.google.protobuf.Descriptors.EnumDescriptor
           getDescriptorForType() {
         return getDescriptor();
@@ -3334,12 +3463,14 @@ public final class JournalMessages {
     /**
      * <code>optional string id = 1;</code>
      */
+    @java.lang.Override
     public boolean hasId() {
       return ((bitField0_ & 0x00000001) == 0x00000001);
     }
     /**
      * <code>optional string id = 1;</code>
      */
+    @java.lang.Override
     public java.lang.String getId() {
       java.lang.Object ref = id_;
       if (ref instanceof java.lang.String) {
@@ -3357,6 +3488,7 @@ public final class JournalMessages {
     /**
      * <code>optional string id = 1;</code>
      */
+    @java.lang.Override
     public com.google.protobuf.ByteString
         getIdBytes() {
       java.lang.Object ref = id_;
@@ -3376,12 +3508,14 @@ public final class JournalMessages {
     /**
      * <code>optional .org.graylog2.plugin.journal.SourceNode.Type type = 2 [default = SERVER];</code>
      */
+    @java.lang.Override
     public boolean hasType() {
       return ((bitField0_ & 0x00000002) == 0x00000002);
     }
     /**
      * <code>optional .org.graylog2.plugin.journal.SourceNode.Type type = 2 [default = SERVER];</code>
      */
+    @java.lang.Override
     public org.graylog2.plugin.journal.JournalMessages.SourceNode.Type getType() {
       return type_;
     }
@@ -3391,12 +3525,14 @@ public final class JournalMessages {
     /**
      * <code>optional string input_id = 3;</code>
      */
+    @java.lang.Override
     public boolean hasInputId() {
       return ((bitField0_ & 0x00000004) == 0x00000004);
     }
     /**
      * <code>optional string input_id = 3;</code>
      */
+    @java.lang.Override
     public java.lang.String getInputId() {
       java.lang.Object ref = inputId_;
       if (ref instanceof java.lang.String) {
@@ -3414,6 +3550,7 @@ public final class JournalMessages {
     /**
      * <code>optional string input_id = 3;</code>
      */
+    @java.lang.Override
     public com.google.protobuf.ByteString
         getInputIdBytes() {
       java.lang.Object ref = inputId_;
@@ -3434,6 +3571,7 @@ public final class JournalMessages {
       inputId_ = "";
     }
     private byte memoizedIsInitialized = -1;
+    @java.lang.Override
     public final boolean isInitialized() {
       byte isInitialized = memoizedIsInitialized;
       if (isInitialized == 1) return true;
@@ -3443,6 +3581,7 @@ public final class JournalMessages {
       return true;
     }
 
+    @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
       getSerializedSize();
@@ -3459,6 +3598,7 @@ public final class JournalMessages {
     }
 
     private int memoizedSerializedSize = -1;
+    @java.lang.Override
     public int getSerializedSize() {
       int size = memoizedSerializedSize;
       if (size != -1) return size;
@@ -3542,10 +3682,12 @@ public final class JournalMessages {
     }
 
     public static Builder newBuilder() { return Builder.create(); }
+    @java.lang.Override
     public Builder newBuilderForType() { return newBuilder(); }
     public static Builder newBuilder(org.graylog2.plugin.journal.JournalMessages.SourceNode prototype) {
       return newBuilder().mergeFrom(prototype);
     }
+    @java.lang.Override
     public Builder toBuilder() { return newBuilder(this); }
 
     @java.lang.Override
@@ -3566,6 +3708,7 @@ public final class JournalMessages {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_SourceNode_descriptor;
       }
 
+      @java.lang.Override
       protected com.google.protobuf.GeneratedMessage.FieldAccessorTable
           internalGetFieldAccessorTable() {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_SourceNode_fieldAccessorTable
@@ -3591,6 +3734,7 @@ public final class JournalMessages {
         return new Builder();
       }
 
+      @java.lang.Override
       public Builder clear() {
         super.clear();
         id_ = "";
@@ -3602,19 +3746,23 @@ public final class JournalMessages {
         return this;
       }
 
+      @java.lang.Override
       public Builder clone() {
         return create().mergeFrom(buildPartial());
       }
 
+      @java.lang.Override
       public com.google.protobuf.Descriptors.Descriptor
           getDescriptorForType() {
         return org.graylog2.plugin.journal.JournalMessages.internal_static_org_graylog2_plugin_journal_SourceNode_descriptor;
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.SourceNode getDefaultInstanceForType() {
         return org.graylog2.plugin.journal.JournalMessages.SourceNode.getDefaultInstance();
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.SourceNode build() {
         org.graylog2.plugin.journal.JournalMessages.SourceNode result = buildPartial();
         if (!result.isInitialized()) {
@@ -3623,6 +3771,7 @@ public final class JournalMessages {
         return result;
       }
 
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.SourceNode buildPartial() {
         org.graylog2.plugin.journal.JournalMessages.SourceNode result = new org.graylog2.plugin.journal.JournalMessages.SourceNode(this);
         int from_bitField0_ = bitField0_;
@@ -3644,6 +3793,7 @@ public final class JournalMessages {
         return result;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(com.google.protobuf.Message other) {
         if (other instanceof org.graylog2.plugin.journal.JournalMessages.SourceNode) {
           return mergeFrom((org.graylog2.plugin.journal.JournalMessages.SourceNode)other);
@@ -3672,10 +3822,12 @@ public final class JournalMessages {
         return this;
       }
 
+      @java.lang.Override
       public final boolean isInitialized() {
         return true;
       }
 
+      @java.lang.Override
       public Builder mergeFrom(
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
@@ -3699,12 +3851,14 @@ public final class JournalMessages {
       /**
        * <code>optional string id = 1;</code>
        */
+      @java.lang.Override
       public boolean hasId() {
         return ((bitField0_ & 0x00000001) == 0x00000001);
       }
       /**
        * <code>optional string id = 1;</code>
        */
+      @java.lang.Override
       public java.lang.String getId() {
         java.lang.Object ref = id_;
         if (!(ref instanceof java.lang.String)) {
@@ -3722,6 +3876,7 @@ public final class JournalMessages {
       /**
        * <code>optional string id = 1;</code>
        */
+      @java.lang.Override
       public com.google.protobuf.ByteString
           getIdBytes() {
         java.lang.Object ref = id_;
@@ -3775,12 +3930,14 @@ public final class JournalMessages {
       /**
        * <code>optional .org.graylog2.plugin.journal.SourceNode.Type type = 2 [default = SERVER];</code>
        */
+      @java.lang.Override
       public boolean hasType() {
         return ((bitField0_ & 0x00000002) == 0x00000002);
       }
       /**
        * <code>optional .org.graylog2.plugin.journal.SourceNode.Type type = 2 [default = SERVER];</code>
        */
+      @java.lang.Override
       public org.graylog2.plugin.journal.JournalMessages.SourceNode.Type getType() {
         return type_;
       }
@@ -3810,12 +3967,14 @@ public final class JournalMessages {
       /**
        * <code>optional string input_id = 3;</code>
        */
+      @java.lang.Override
       public boolean hasInputId() {
         return ((bitField0_ & 0x00000004) == 0x00000004);
       }
       /**
        * <code>optional string input_id = 3;</code>
        */
+      @java.lang.Override
       public java.lang.String getInputId() {
         java.lang.Object ref = inputId_;
         if (!(ref instanceof java.lang.String)) {
@@ -3833,6 +3992,7 @@ public final class JournalMessages {
       /**
        * <code>optional string input_id = 3;</code>
        */
+      @java.lang.Override
       public com.google.protobuf.ByteString
           getInputIdBytes() {
         java.lang.Object ref = inputId_;
@@ -3942,6 +4102,7 @@ public final class JournalMessages {
     };
     com.google.protobuf.Descriptors.FileDescriptor.InternalDescriptorAssigner assigner =
         new com.google.protobuf.Descriptors.FileDescriptor.    InternalDescriptorAssigner() {
+          @java.lang.Override
           public com.google.protobuf.ExtensionRegistry assignDescriptors(
               com.google.protobuf.Descriptors.FileDescriptor root) {
             descriptor = root;

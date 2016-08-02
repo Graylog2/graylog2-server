@@ -33,18 +33,23 @@ public abstract class EsIndexRange implements IndexRange {
     public static final String FIELD_INDEX_NAME = PREFIX + "index_name";
 
     @JsonProperty(FIELD_INDEX_NAME)
+    @Override
     public abstract String indexName();
 
     @JsonProperty(FIELD_BEGIN)
+    @Override
     public abstract DateTime begin();
 
     @JsonProperty(FIELD_END)
+    @Override
     public abstract DateTime end();
 
     @JsonProperty(FIELD_CALCULATED_AT)
+    @Override
     public abstract DateTime calculatedAt();
 
     @JsonProperty(FIELD_TOOK_MS)
+    @Override
     public abstract int calculationDuration();
 
     public static EsIndexRange create(String indexName,

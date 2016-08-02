@@ -58,6 +58,7 @@ public class EmailAlarmCallback implements AlarmCallback {
         this.nodeId = nodeId;
     }
 
+    @Override
     public void call(Stream stream, AlertCondition.CheckResult result) {
         // Send alerts.
         AlertCondition alertCondition = result.getTriggeredCondition();
