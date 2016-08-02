@@ -40,7 +40,7 @@ const Navigation = React.createClass({
   POLL_INTERVAL: 3000,
 
   _isActive(prefix) {
-    return this.props.requestPath.indexOf(prefix) === 0;
+    return this.props.requestPath.indexOf(URLUtils.appPrefixed(prefix)) === 0;
   },
 
   _systemTitle() {
