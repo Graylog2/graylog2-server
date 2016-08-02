@@ -12,7 +12,6 @@ const DashboardsStore = StoreProvider.getStore('Dashboards');
 const StartpageStore = StoreProvider.getStore('Startpage');
 
 import Routes from 'routing/Routes';
-import ApiRoutes from 'routing/ApiRoutes';
 
 const Dashboard = React.createClass({
   propTypes: {

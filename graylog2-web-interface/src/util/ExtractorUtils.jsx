@@ -1,4 +1,4 @@
-import ApiRoutes from 'routing/ApiRoutes';
+import Routes from 'routing/Routes';
 
 const ExtractorTypes = Object.freeze({
   COPY_INPUT: 'copy_input',
@@ -31,7 +31,7 @@ const ExtractorUtils = {
   getNewExtractorRoutes(sourceNodeId, sourceInputId, fieldName, messageIndex, messageId) {
     const routes = {};
     this.EXTRACTOR_TYPES.forEach(extractorType => {
-      routes[extractorType] = ApiRoutes.ExtractorsController.newExtractor(sourceNodeId, sourceInputId, extractorType, fieldName, messageIndex, messageId).url;
+      routes[extractorType] = Routes.new_extractor(sourceNodeId, sourceInputId, extractorType, fieldName, messageIndex, messageId);
     });
 
     return routes;
