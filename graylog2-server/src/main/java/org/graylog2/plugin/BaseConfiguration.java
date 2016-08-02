@@ -407,7 +407,7 @@ public abstract class BaseConfiguration {
     }
 
     public URI getWebEndpointUri() {
-        return webEndpointUri == null ? getRestTransportUri() : webEndpointUri;
+        return webEndpointUri == null || !webEndpointUri.isAbsolute() ? getRestTransportUri() : webEndpointUri;
     }
 
     public String getWebPrefix() {

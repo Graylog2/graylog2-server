@@ -358,4 +358,15 @@ public class BaseConfigurationTest {
 
         new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
     }
+
+    @Test
+    public void testWebEndpointUriWithNonAbsoluteUri() throws RepositoryException, ValidationException {
+        validProperties.put("rest_transport_uri", "http://192.168.1.1:12900");
+        validProperties.put("web_endpoint_uri", "/foo");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        Assert.assertEquals(URI.create("http://192.168.1.1:12900"), configuration.getWebEndpointUri());
+    }
 }
