@@ -1,6 +1,0 @@
-rule "trigger null"
-when
-  true
-then
-  set_field("do_not_exist", regex(".*", to_string($message.do_not_exist)).matches);
-end
