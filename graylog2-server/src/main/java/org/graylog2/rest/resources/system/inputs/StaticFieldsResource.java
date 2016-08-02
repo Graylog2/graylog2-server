@@ -23,18 +23,17 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.auditlog.Actions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.system.inputs.requests.CreateStaticFieldRequest;
+import org.graylog2.shared.inputs.PersistedInputs;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -66,7 +65,7 @@ public class StaticFieldsResource extends RestResource {
     @Inject
     private ActivityWriter activityWriter;
     @Inject
-    private InputRegistry inputs;
+    private PersistedInputs persistedInputs;
 
     @POST
     @Timed
@@ -85,7 +84,7 @@ public class StaticFieldsResource extends RestResource {
                            @Valid @NotNull CreateStaticFieldRequest csfr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        final MessageInput input = inputs.getRunningInput(inputId);
+        final MessageInput input = persistedInputs.get(inputId);
 
         if (input == null) {
             final String msg = "Input <" + inputId + "> not found.";
@@ -139,7 +138,7 @@ public class StaticFieldsResource extends RestResource {
                        @PathParam("inputId") String inputId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);
 
-        MessageInput input = inputs.getRunningInput(inputId);
+        MessageInput input = persistedInputs.get(inputId);
 
         if (input == null) {
             final String msg = "Input <" + inputId + "> not found.";
