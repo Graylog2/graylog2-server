@@ -1,6 +1,6 @@
 import React from 'react';
 import Immutable from 'immutable';
-import { Row, Col } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
 const StreamsStore = StoreProvider.getStore('Streams');
@@ -10,6 +10,7 @@ const RolesStore = StoreProvider.getStore('Roles');
 import UserNotification from 'util/UserNotification';
 import RoleList from 'components/users/RoleList';
 import EditRole from 'components/users/EditRole';
+import PageHeader from 'components/common/PageHeader';
 
 const RolesComponent = React.createClass({
   getInitialState() {
@@ -72,13 +73,27 @@ const RolesComponent = React.createClass({
                   onSave={this._saveRole} cancelEdit={this._clearEditRole}/>);
     } else {
       content = (<RoleList roles={this.state.roles}
-                          showEditRole={this._showEditRole}
-                          deleteRole={this._deleteRole}
-                          createRole={this._showCreateRole}/>);
+                           showEditRole={this._showEditRole}
+                           deleteRole={this._deleteRole} />);
+    }
+
+    let actionButton;
+    if (!this.state.showEditRole) {
+      actionButton = <Button bsStyle="success" onClick={this._showCreateRole}>Add new role</Button>;
     }
     return (
       <Row>
         <Col md={12}>
+          <PageHeader title="Roles" subpage>
+            <span>
+              Roles bundle permissions which can be assigned to multiple users at once
+            </span>
+            {null}
+            <span>
+              {actionButton}
+            </span>
+          </PageHeader>
+
           {content}
         </Col>
       </Row>

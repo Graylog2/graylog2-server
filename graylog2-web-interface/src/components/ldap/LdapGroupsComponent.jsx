@@ -16,6 +16,10 @@ const RolesStore = StoreProvider.getStore('Roles');
 const LdapGroupsStore = StoreProvider.getStore('LdapGroups');
 
 const LdapGroupsComponent = React.createClass({
+  propTypes: {
+    onCancel: React.PropTypes.func.isRequired,
+  },
+
   getInitialState() {
     return {
       groups: Immutable.Set.of(),
@@ -103,10 +107,8 @@ const LdapGroupsComponent = React.createClass({
               <ul style={{padding: 0}}>{content}</ul>
             </Col>
             <Col md={10} mdPush={2}>
-              <Button type="submit" bsStyle="success">Save</Button>&nbsp;
-              <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
-                <Button>Cancel</Button>
-              </LinkContainer>
+              <Button type="submit" bsStyle="primary" className="save-button-margin">Save</Button>
+              <Button onClick={this.props.onCancel}>Cancel</Button>
             </Col>
           </Row>
         </form>

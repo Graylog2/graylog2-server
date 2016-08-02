@@ -42,6 +42,10 @@ const CreateUsersPage = React.createClass({
     });
   },
 
+  _onCancel() {
+    this.props.history.pushState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+  },
+
   render() {
     if (!this.state.roles) {
       return <Spinner />;
@@ -56,7 +60,7 @@ const CreateUsersPage = React.createClass({
         </PageHeader>
         <Row>
           <Col lg={8}>
-            <NewUserForm roles={this.state.roles} onSubmit={this._onSubmit}/>
+            <NewUserForm roles={this.state.roles} onSubmit={this._onSubmit} onCancel={this._onCancel}/>
           </Col>
         </Row>
       </span>

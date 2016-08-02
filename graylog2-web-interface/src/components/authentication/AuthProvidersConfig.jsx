@@ -2,6 +2,7 @@ import React from 'react';
 import { Row, Col, Button, Alert, Table } from 'react-bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { PageHeader, IfPermitted, SortableList } from 'components/common';
+import Routes from 'routing/Routes';
 import ObjectUtils from 'util/ObjectUtils';
 import naturalSort from 'javascript-natural-sort';
 
@@ -10,6 +11,7 @@ const AuthProvidersConfig = React.createClass({
     config: React.PropTypes.object.isRequired,
     descriptors: React.PropTypes.object.isRequired,
     updateConfig: React.PropTypes.func.isRequired,
+    history: React.PropTypes.object.isRequired,
   },
 
   getDefaultProps() {
@@ -49,6 +51,10 @@ const AuthProvidersConfig = React.createClass({
   _resetConfig() {
     // Reset to initial state when the modal is closed without saving.
     this.setState(this.getInitialState());
+  },
+
+  _onCancel() {
+    this.props.history.pushState(null, Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
   },
 
   _updateSorting(newSorting) {
@@ -143,17 +149,17 @@ const AuthProvidersConfig = React.createClass({
             skipped.<br/>A user is authenticated by the first matching provider, a successful match can cause a Graylog account for
             this user to be created.
           </span>
-          </PageHeader>
+        </PageHeader>
         <Row>
           <Col md={6}>
-            <Table striped bordered condensed className="top-margin">
+            <Table striped bordered className="top-margin">
               <thead>
-              <tr>
-                <th>#</th>
-                <th>Provider</th>
-                <th>Description</th>
-                <th>Status</th>
-              </tr>
+                <tr>
+                  <th>#</th>
+                  <th>Provider</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                </tr>
               </thead>
               <tbody>
               {this._summary()}
@@ -161,7 +167,8 @@ const AuthProvidersConfig = React.createClass({
             </Table>
 
             <IfPermitted permissions="clusterconfigentry:edit">
-              <Button bsStyle="info" bsSize="xs" onClick={this._openModal}>Update</Button>
+              <Button bsStyle="primary" onClick={this._openModal} className="save-button-margin">Update</Button>
+              <Button onClick={this._onCancel}>Cancel</Button>
             </IfPermitted>
 
             <BootstrapModalForm ref="configModal"
@@ -177,10 +184,10 @@ const AuthProvidersConfig = React.createClass({
               <p>Change the checkboxes to change the status of an authentication provider.</p>
               <Table striped bordered condensed className="top-margin">
                 <thead>
-                <tr>
-                  <th>Provider</th>
-                  <th>Enabled</th>
-                </tr>
+                  <tr>
+                    <th>Provider</th>
+                    <th>Enabled</th>
+                  </tr>
                 </thead>
                 <tbody>
                 {this._statusForm()}

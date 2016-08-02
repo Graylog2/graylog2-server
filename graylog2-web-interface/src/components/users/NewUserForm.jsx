@@ -14,6 +14,7 @@ const NewUserForm = React.createClass({
   propTypes: {
     roles: React.PropTypes.array.isRequired,
     onSubmit: React.PropTypes.func.isRequired,
+    onCancel: React.PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -108,9 +109,10 @@ const NewUserForm = React.createClass({
 
         <div className="form-group">
           <Col smOffset={2} sm={10}>
-            <Button type="submit" bsStyle="success" className="create-user">
+            <Button type="submit" bsStyle="primary" className="create-user save-button-margin">
               Create User
             </Button>
+            <Button onClick={this.props.onCancel}>Cancel</Button>
           </Col>
         </div>
       </form>

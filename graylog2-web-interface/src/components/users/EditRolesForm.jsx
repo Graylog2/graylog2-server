@@ -36,6 +36,9 @@ const EditRolesForm = React.createClass({
       });
     }
   },
+  _onCancel() {
+    this.props.history.pushState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+  },
   render() {
     const user = this.props.user;
     if (!this.state.roles) {
@@ -66,9 +69,10 @@ const EditRolesForm = React.createClass({
           </Input>
           <div className="form-group">
             <Col smOffset={3} sm={9}>
-              <Button bsStyle="success" type="submit">
+              <Button bsStyle="primary" type="submit" className="save-button-margin">
                 Update role
               </Button>
+              <Button onClick={this._onCancel}>Cancel</Button>
             </Col>
           </div>
         </form>

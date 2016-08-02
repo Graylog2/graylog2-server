@@ -172,6 +172,10 @@ const UserForm = React.createClass({
     };
   },
 
+  _onCancel() {
+    this.props.history.pushState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+  },
+
   render() {
     if (!this.state.streams || !this.state.dashboards) {
       return <Spinner />;
@@ -277,9 +281,10 @@ const UserForm = React.createClass({
 
                 <div className="form-group">
                   <Col smOffset={3} sm={9}>
-                    <Button type="submit" bsStyle="success" className="create-user">
+                    <Button type="submit" bsStyle="primary" className="create-user save-button-margin">
                       Update User
                     </Button>
+                    <Button onClick={this._onCancel}>Cancel</Button>
                   </Col>
                 </div>
               </fieldset>
@@ -322,9 +327,10 @@ const UserForm = React.createClass({
 
                 <div className="form-group">
                   <Col smOffset={3} sm={9}>
-                    <Button bsStyle="success" type="submit">
+                    <Button bsStyle="primary" type="submit" className="save-button-margin">
                       Update Password
                     </Button>
+                    <Button onClick={this._onCancel}>Cancel</Button>
                   </Col>
                 </div>
               </form>

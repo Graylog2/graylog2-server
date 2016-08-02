@@ -1,6 +1,6 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Button, Label, OverlayTrigger, Popover, Tooltip } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
@@ -10,6 +10,8 @@ const UsersStore = StoreProvider.getStore('Users');
 const RolesStore = StoreProvider.getStore('Roles');
 
 import { DataTable, Spinner, Timestamp } from 'components/common';
+
+import UserListStyle from '!style!css!./UserList.css';
 
 const UserList = React.createClass({
   propTypes: {
@@ -26,17 +28,11 @@ const UserList = React.createClass({
     };
   },
   componentDidMount() {
-    this.style.use();
     this.loadUsers();
     RolesStore.loadRoles().done(roles => {
       this.setState({ roles: roles.map(role => role.name) });
     });
   },
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
-  style: require('!style/useable!css!./UserList.css'),
 
   loadUsers() {
     const promise = UsersStore.loadUsers();
@@ -84,27 +80,34 @@ const UserList = React.createClass({
     let userBadge = null;
     if (user.session_active) {
       const popover = (
-        <Popover id="session-badge-details" title="Logged in" className="sessionBadgeDetails">
+        <Popover id="session-badge-details" title="Logged in" className={UserListStyle.sessionBadgeDetails}>
           <div>Last activity: <Timestamp dateTime={user.last_activity} relative /></div>
           <div>Client address: {user.client_address}</div>
         </Popover>
       );
       userBadge = (<OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
-        <i className="fa fa-circle activeSession"/>
+        <i className={`fa fa-circle ${UserListStyle.activeSession}`}/>
       </OverlayTrigger>);
     }
 
-    const roleBadges = user.roles.map((role) => <span key={role} className={`roleBadgeFixes label label-${role === 'Admin' ? 'info' : 'default'}`} >{role}</span>);
+    const roleBadges = user.roles.map((role) => <span key={role} className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`} >{role}</span>);
 
     let actions = null;
     if (user.read_only) {
-      actions = <span><i title="System User" className="fa fa-lock" /></span>;
+      const tooltip = <Tooltip id="system-user">System users can only be modified in the Graylog configuration file.</Tooltip>;
+      actions = (
+        <OverlayTrigger placement="left" overlay={tooltip}>
+          <span className={UserListStyle.help}>
+            <Button bsSize="xs" bsStyle="info" disabled>System user</Button>
+          </span>
+        </OverlayTrigger>
+      );
     } else {
       const deleteAction = (
-        <button id="delete-user" type="button" className="btn btn-xs btn-primary" title="Delete user"
+        <Button id="delete-user" bsStyle="primary" bsSize="xs" title="Delete user"
                 onClick={this._deleteUserFunction(user.username)}>
           Delete
-        </button>
+        </Button>
       );
 
       const editAction = (
@@ -131,7 +134,7 @@ const UserList = React.createClass({
         <td className="limited">{user.username}</td>
         <td className="limited">{user.email}</td>
         <td className="limited">{user.client_address}</td>
-        <td className="limitedWide">{roleBadges}</td>
+        <td className={UserListStyle.limitedWide}>{roleBadges}</td>
         <td>{actions}</td>
       </tr>
     );

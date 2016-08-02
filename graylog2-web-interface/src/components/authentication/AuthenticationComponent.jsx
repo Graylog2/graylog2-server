@@ -16,25 +16,20 @@ import StoreProvider from 'injection/StoreProvider';
 const AuthenticationStore = StoreProvider.getStore('Authentication');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
+import AuthenticationComponentStyle from '!style!css!./AuthenticationComponent.css';
 
 const AuthenticationComponent = React.createClass({
 
   propTypes: {
     location: React.PropTypes.object.isRequired,
     params: React.PropTypes.object.isRequired,
+    history: React.PropTypes.object.isRequired,
     children: React.PropTypes.element,
   },
 
   mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 
-  getInitialState() {
-    return {
-      activeTab: 'users',
-    };
-  },
-
   componentDidMount() {
-    this.style.use();
     AuthenticationActions.load();
 
     PluginStore.exports('authenticatorConfigurations').forEach((authConfig) => {
@@ -43,14 +38,8 @@ const AuthenticationComponent = React.createClass({
     });
   },
 
-  componentWillUnmount() {
-    this.style.unuse();
-  },
-
   // contains the 'authname' -> plugin descriptor
   authenticatorConfigurations: {},
-
-  style: require('!style/useable!css!./AuthenticationComponent.css'),
 
   _pluginPane() {
     const name = this.props.params.name;
@@ -59,6 +48,7 @@ const AuthenticationComponent = React.createClass({
     if (auth) {
       return React.createElement(auth.component, {
         key: `auth-configuration-${name}`,
+        history: this.props.history,
       });
     } else {
       return (<Alert bsStyle="danger">Plugin component missing for authenticator <code>{name}</code>, this is an error.</Alert>);
@@ -69,18 +59,15 @@ const AuthenticationComponent = React.createClass({
     return AuthenticationActions.update('providers', config);
   },
 
-  _handleTabChange(key) {
-    this.setState({ activeTab: key });
-  },
-
   _contentComponent() {
     if (!this.state.authenticators) {
       return <Spinner />;
     }
     if (this.props.params.name === undefined) {
       return (<AuthProvidersConfig config={this.state.authenticators}
-                                  descriptors={this.authenticatorConfigurations}
-                                  updateConfig={this._onUpdateProviders} />);
+                                   descriptors={this.authenticatorConfigurations}
+                                   updateConfig={this._onUpdateProviders}
+                                   history={this.props.history} />);
     }
     return this._pluginPane();
   },
@@ -96,16 +83,16 @@ const AuthenticationComponent = React.createClass({
           const title = (auth || { displayName: name }).displayName;
           const numberedTitle = `${idx + 1}. ${title}`;
           return (<LinkContainer key={`container-${name}`} to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider(name)}>
-            <NavItem key={name} eventKey={name} title={numberedTitle}>{numberedTitle}</NavItem>
+            <NavItem key={name} title={numberedTitle}>{numberedTitle}</NavItem>
           </LinkContainer>);
         });
 
         authenticators.unshift(
-          <NavItem key="divider" disabled title="Provider Settings" className="divider">Provider Settings</NavItem>
+          <NavItem key="divider" disabled title="Provider Settings" className={AuthenticationComponentStyle.divider}>Provider Settings</NavItem>
         );
         authenticators.unshift(
           <LinkContainer key="container-settings" to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}>
-            <NavItem key="settings" eventKey="config" title="Configure Provider Order">Configure Provider Order</NavItem>
+            <NavItem key="settings" title="Configure Provider Order">Configure Provider Order</NavItem>
           </LinkContainer>
         );
       }
@@ -117,28 +104,26 @@ const AuthenticationComponent = React.createClass({
     if (this.isPermitted(this.state.currentUser.permissions, ['roles:read'])) {
       authenticators.unshift(
         <LinkContainer key="roles" to={Routes.SYSTEM.AUTHENTICATION.ROLES}>
-          <NavItem eventKey="roles" title="Roles">Roles</NavItem>
+          <NavItem title="Roles">Roles</NavItem>
         </LinkContainer>
       );
     }
     if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
       authenticators.unshift(
         <LinkContainer key="users" to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
-          <NavItem eventKey="users" title="Users">Users</NavItem>
+          <NavItem title="Users">Users</NavItem>
         </LinkContainer>
       );
     }
 
-    let activeTab = this.state.activeTab;
     if (authenticators.length === 0) {
       // special case, this is a user editing their own profile
-      activeTab = 'profile-edit';
       authenticators = [<LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(this.state.currentUser.username)}>
-        <NavItem eventKey="profile-edit" title="Edit User">Edit User</NavItem>
+        <NavItem title="Edit User">Edit User</NavItem>
       </LinkContainer>];
     }
     const subnavigation = (
-      <Nav activeKey={activeTab} onSelect={this._handleTabChange} stacked bsStyle="pills">
+      <Nav stacked bsStyle="pills">
         {authenticators}
       </Nav>
     );
@@ -146,8 +131,8 @@ const AuthenticationComponent = React.createClass({
     let contentComponent = React.Children.count(this.props.children) === 1 ? React.Children.only(this.props.children) : this._contentComponent();
 
     return (<Row>
-      <Col md={2} className="subnavigation">{subnavigation}</Col>
-      <Col md={10} className="contentpane">{contentComponent}</Col>
+      <Col md={2} className={AuthenticationComponentStyle.subnavigation}>{subnavigation}</Col>
+      <Col md={10} className={AuthenticationComponentStyle.contentpane}>{contentComponent}</Col>
     </Row>);
   },
 });
