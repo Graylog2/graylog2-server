@@ -20,8 +20,6 @@ import com.google.common.util.concurrent.Service;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
-import org.graylog2.auditlog.AuditLogAppender;
-import org.graylog2.auditlog.StdOutAppender;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -157,10 +155,5 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addPermissions(Class<? extends PluginPermissions> permissionsClass) {
         installPermissions(permissionsBinder(), permissionsClass);
-    }
-
-    protected void addAuditLogAppender(Class<? extends AuditLogAppender> auditLogAppenderClass) {
-        final Multibinder<AuditLogAppender> appenders = Multibinder.newSetBinder(binder(), AuditLogAppender.class);
-        appenders.addBinding().to(auditLogAppenderClass);
     }
 }

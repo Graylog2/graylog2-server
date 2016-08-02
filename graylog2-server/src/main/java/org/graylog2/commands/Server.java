@@ -25,8 +25,6 @@ import com.mongodb.MongoException;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
-import org.graylog2.auditlog.AuditLogModule;
-import org.graylog2.auditlog.AuditLogStdOutConfiguration;
 import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.ConfigurationModule;
@@ -83,7 +81,6 @@ public class Server extends ServerBootstrap {
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
     private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
-    private final AuditLogStdOutConfiguration auditLogStdOutConfiguration = new AuditLogStdOutConfiguration();
 
     public Server() {
         super("server", configuration);
@@ -116,8 +113,7 @@ public class Server extends ServerBootstrap {
             new PasswordAlgorithmBindings(),
             new WidgetStrategyBindings(),
             new DashboardBindings(),
-            new DecoratorBindings(),
-            new AuditLogModule()
+            new DecoratorBindings()
         );
 
         if (configuration.isWebEnable() && !configuration.isRestAndWebOnSamePort()) {
@@ -134,8 +130,7 @@ public class Server extends ServerBootstrap {
                 emailConfiguration,
                 mongoDbConfiguration,
                 versionCheckConfiguration,
-                kafkaJournalConfiguration,
-                auditLogStdOutConfiguration);
+                kafkaJournalConfiguration);
     }
 
     @Override

@@ -29,7 +29,7 @@ import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.alerts.types.FieldContentValueAlertCondition;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
-import org.graylog2.auditlog.jersey.AuditLogDynamicFeature;
+import org.graylog2.auditlog.NullAuditLogger;
 import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
@@ -59,7 +59,6 @@ import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.inputs.InputEventListener;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
-import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
@@ -116,6 +115,9 @@ public class ServerBindings extends Graylog2Module {
         bindEventBusListeners();
         install(new AuthenticatingRealmModule());
         bindSearchResponseDecorators();
+
+        // make sure there is a default binding
+        auditLoggerBinder().setDefault().to(NullAuditLogger.class);
     }
 
     private void bindProviders() {
@@ -188,7 +190,6 @@ public class ServerBindings extends Graylog2Module {
         final Multibinder<Class<? extends DynamicFeature>> dynamicFeatures = jerseyDynamicFeatureBinder();
         dynamicFeatures.addBinding().toInstance(MetricsDynamicBinding.class);
         dynamicFeatures.addBinding().toInstance(RestrictToMasterFeature.class);
-        dynamicFeatures.addBinding().toInstance(AuditLogDynamicFeature.class);
     }
 
     private void bindExceptionMappers() {
