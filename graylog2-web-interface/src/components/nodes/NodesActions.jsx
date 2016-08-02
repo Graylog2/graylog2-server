@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import URI from 'urijs';
 
 import { IfPermitted } from 'components/common';
 
@@ -38,6 +39,7 @@ const NodesActions = React.createClass({
     }
   },
   render() {
+    const apiBrowserURI = new URI(`${this.props.node.transport_address}/api-browser`).normalizePathname();
     return (
       <div className="item-actions">
         <LinkContainer to={Routes.SYSTEM.NODES.SHOW(this.props.node.node_id)}>
@@ -47,6 +49,10 @@ const NodesActions = React.createClass({
         <LinkContainer to={Routes.SYSTEM.METRICS(this.props.node.node_id)}>
           <Button bsStyle="info">Metrics</Button>
         </LinkContainer>
+
+        <Button bsStyle="info" href={apiBrowserURI} target="_blank">
+          <i className="fa fa-external-link"/>&nbsp; API browser
+        </Button>
 
         <DropdownButton title="More actions" id={`more-actions-dropdown-${this.props.node.node_id}`} pullRight>
           <IfPermitted permissions="processing:changestate">
