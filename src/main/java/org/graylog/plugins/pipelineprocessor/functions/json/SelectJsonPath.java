@@ -54,8 +54,8 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
         // sigh generics and type erasure
         //noinspection unchecked
         pathsParam = ParameterDescriptor.type("paths",
-                                              (Class<? extends Map<String, String>>) new TypeLiteral<Map<String, String>>() {}.getRawType(),
-                                              (Class<? extends Map<String, JsonPath>>) new TypeLiteral<Map<String, JsonPath>>() {}.getRawType())
+                                              (Class<Map<String, String>>) new TypeLiteral<Map<String, String>>() {}.getRawType(),
+                                              (Class<Map<String, JsonPath>>) new TypeLiteral<Map<String, JsonPath>>() {}.getRawType())
                 .transform(inputMap -> inputMap
                         .entrySet().stream()
                         .collect(toMap(Map.Entry::getKey, e -> JsonPath.compile(e.getValue()))))
