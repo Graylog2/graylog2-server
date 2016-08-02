@@ -87,6 +87,17 @@ const Routes = {
       },
     },
   },
+  search_with_query: (query, rangeType, timeRange) => {
+    const route = new URI(Routes.SEARCH);
+    const queryParams = {
+      q: query,
+    };
+    if (rangeType && timeRange) {
+      queryParams[rangeType] = timeRange;
+    }
+    route.query(queryParams);
+    return route.resource();
+  },
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,
   stream_edit: (streamId) => `/streams/${streamId}/edit`,
   stream_edit_example: (streamId, index, messageId) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
@@ -104,8 +115,17 @@ const Routes = {
   local_input_extractors: (nodeId, inputId) => `/system/inputs/${nodeId}/${inputId}/extractors`,
   export_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/export`,
   import_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/import`,
-  new_extractor: (nodeId, inputId) => {
-    return `/system/inputs/${nodeId}/${inputId}/extractors/new`;
+  new_extractor: (nodeId, inputId, extractorType, fieldName, index, messageId) => {
+    const route = new URI(`/system/inputs/${nodeId}/${inputId}/extractors/new`);
+    const queryParams = {
+      extractor_type: extractorType,
+      field: fieldName,
+      example_index: index,
+      example_id: messageId,
+    };
+    route.search(queryParams);
+
+    return route.resource();
   },
   edit_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
 

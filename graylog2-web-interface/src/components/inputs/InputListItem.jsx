@@ -7,7 +7,6 @@ import { EntityListItem, IfPermitted, LinkToNode, Spinner } from 'components/com
 import { ConfigurationWell } from 'components/configurationforms';
 
 import PermissionsMixin from 'util/PermissionsMixin';
-import ApiRoutes from 'routing/ApiRoutes';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -61,7 +60,7 @@ const InputListItem = React.createClass({
     if (this.isPermitted(this.props.permissions, ['searches:relative'])) {
       actions.push(
         <LinkContainer key={`received-messages-${this.props.input.id}`}
-                       to={ApiRoutes.SearchController.index(`gl2_source_input:${this.props.input.id}`, 'relative', 28800).url}>
+                       to={Routes.search_with_query(`gl2_source_input:${this.props.input.id}`, 'relative', 28800)}>
           <Button bsStyle="info">Show received messages</Button>
         </LinkContainer>
       );

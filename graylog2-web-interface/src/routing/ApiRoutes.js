@@ -285,32 +285,13 @@ const ApiRoutes = {
   ExtractorsController: {
     create: (inputId) => { return { url: `/system/inputs/${inputId}/extractors` }; },
     delete: (inputId, extractorId) => { return { url: `/system/inputs/${inputId}/extractors/${extractorId}` }; },
-    newExtractor: (nodeId, inputId, extractorType, fieldName, index, messageId) => {
-      return { url: `/system/inputs/${nodeId}/${inputId}/extractors/new?extractor_type=${extractorType}&field=${fieldName}&example_index=${index}&example_id=${messageId}` };
-    },
     order: (inputId) => { return { url: `/system/inputs/${inputId}/extractors/order` }; },
     update: (inputId, extractorId) => { return { url: `/system/inputs/${inputId}/extractors/${extractorId}` }; },
   },
   MessagesController: {
     analyze: (index, string) => { return { url: `/messages/${index}/analyze?string=${string}` }; },
-    parse: () => { return { url: `/messages/parse` }; },
+    parse: () => { return { url: '/messages/parse' }; },
     single: (index, messageId) => { return { url: `/messages/${index}/${messageId}` }; },
-  },
-  NodesController: {
-    node: (nodeId) => { return { url: `/system/nodes/${nodeId}` }; },
-  },
-  SearchController: {
-    index: (query, rangetype, timerange) => {
-      let route;
-      if (query && rangetype && timerange) {
-        route = { url: `/search?q=${query}&${rangetype}=${timerange}` };
-      } else {
-        route = { url: '/search' };
-      }
-
-      return route;
-    },
-    showMessage: (index, messageId) => { return { url: `/messages/${index}/${messageId}` }; },
   },
 };
 
