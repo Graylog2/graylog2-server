@@ -21,10 +21,10 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.ImmutableSet;
 import org.assertj.core.api.Assertions;
+import org.graylog2.plugin.Tools;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
-import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.util.List;
@@ -42,8 +42,8 @@ public class SyslogSeverityMapperDecoratorTest {
         final SyslogSeverityMapperDecorator mapperDecorator = new SyslogSeverityMapperDecorator(decorator);
 
         final IndexRangeSummary indexRangeSummary = IndexRangeSummary.create("graylog_0",
-                DateTime.now().minusDays(1),
-                DateTime.now(),
+                Tools.nowUTC().minusDays(1),
+                Tools.nowUTC(),
                 null,
                 100);
 
@@ -68,8 +68,8 @@ public class SyslogSeverityMapperDecoratorTest {
                 .fields(ImmutableSet.of("level"))
                 .time(100L)
                 .totalResults(messages.size())
-                .from(DateTime.now().minusHours(1))
-                .to(DateTime.now())
+                .from(Tools.nowUTC().minusHours(1))
+                .to(Tools.nowUTC())
                 .build();
 
         final SearchResponse response = mapperDecorator.apply(searchResponse);

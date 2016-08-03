@@ -17,6 +17,7 @@
 package org.graylog2.grok;
 
 import com.google.common.eventbus.EventBus;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import oi.thekraken.grok.api.Grok;
 import oi.thekraken.grok.api.exception.GrokException;
 import org.hamcrest.Matchers;
@@ -55,7 +56,7 @@ public class GrokPatternRegistryTest {
     @Before
     public void setUp() {
         eventBus = new EventBus("Test");
-        executor = Executors.newSingleThreadScheduledExecutor();
+        executor = Executors.newSingleThreadScheduledExecutor(new ThreadFactoryBuilder().setNameFormat("updater-%d").build());
         when(grokPatternService.loadAll()).thenReturn(GROK_PATTERNS);
         grokPatternRegistry = new GrokPatternRegistry(eventBus, grokPatternService, executor);
     }
