@@ -23,6 +23,8 @@ import org.graylog2.rest.models.messages.responses.DecorationStats;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchDecorationStats;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.HashSet;
@@ -34,6 +36,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DecoratorProcessorImpl implements DecoratorProcessor {
+    private static final Logger LOG = LoggerFactory.getLogger(DecoratorProcessorImpl.class);
+
     private final DecoratorResolver decoratorResolver;
 
     @Inject
@@ -43,40 +47,44 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
 
     @Override
     public SearchResponse decorate(SearchResponse searchResponse, Optional<String> streamId) {
-        final List<SearchResponseDecorator> searchResponseDecorators = streamId.isPresent() ?
-            decoratorResolver.searchResponseDecoratorsForStream(streamId.get()) : decoratorResolver.searchResponseDecoratorsForGlobal();
-        final Optional<SearchResponseDecorator> metaDecorator = searchResponseDecorators.stream()
-            .reduce((f, g) -> (v) -> g.apply(f.apply(v)));
-        if (metaDecorator.isPresent()) {
-            final Map<String, ResultMessageSummary> originalMessages = searchResponse.messages()
-                .stream()
-                .collect(Collectors.toMap(message -> message.message().get("_id").toString(), Function.identity()));
-            final SearchResponse newSearchResponse = metaDecorator.get().apply(searchResponse);
-            final Set<String> newFields = extractFields(newSearchResponse.messages());
-            final Set<String> addedFields = Sets.difference(newFields, searchResponse.fields())
-                .stream()
-                .filter(field -> !Message.RESERVED_FIELDS.contains(field) && !field.equals("streams"))
-                .collect(Collectors.toSet());
+        try {
+            final List<SearchResponseDecorator> searchResponseDecorators = streamId.isPresent() ?
+                    decoratorResolver.searchResponseDecoratorsForStream(streamId.get()) : decoratorResolver.searchResponseDecoratorsForGlobal();
+            final Optional<SearchResponseDecorator> metaDecorator = searchResponseDecorators.stream()
+                    .reduce((f, g) -> (v) -> g.apply(f.apply(v)));
+            if (metaDecorator.isPresent()) {
+                final Map<String, ResultMessageSummary> originalMessages = searchResponse.messages()
+                        .stream()
+                        .collect(Collectors.toMap(message -> message.message().get("_id").toString(), Function.identity()));
+                final SearchResponse newSearchResponse = metaDecorator.get().apply(searchResponse);
+                final Set<String> newFields = extractFields(newSearchResponse.messages());
+                final Set<String> addedFields = Sets.difference(newFields, searchResponse.fields())
+                        .stream()
+                        .filter(field -> !Message.RESERVED_FIELDS.contains(field) && !field.equals("streams"))
+                        .collect(Collectors.toSet());
 
-            final List<ResultMessageSummary> decoratedMessages = newSearchResponse.messages()
-                .stream()
-                .map(resultMessage -> {
-                    final ResultMessageSummary originalMessage = originalMessages.get(resultMessage.message().get("_id").toString());
-                    if (originalMessage != null) {
-                        return resultMessage
-                            .toBuilder()
-                            .decorationStats(DecorationStats.create(originalMessage.message(), resultMessage.message()))
-                            .build();
-                    }
-                    return resultMessage;
-                })
-                .collect(Collectors.toList());
-            return newSearchResponse
-                .toBuilder()
-                .messages(decoratedMessages)
-                .fields(newFields)
-                .decorationStats(SearchDecorationStats.create(addedFields))
-                .build();
+                final List<ResultMessageSummary> decoratedMessages = newSearchResponse.messages()
+                        .stream()
+                        .map(resultMessage -> {
+                            final ResultMessageSummary originalMessage = originalMessages.get(resultMessage.message().get("_id").toString());
+                            if (originalMessage != null) {
+                                return resultMessage
+                                        .toBuilder()
+                                        .decorationStats(DecorationStats.create(originalMessage.message(), resultMessage.message()))
+                                        .build();
+                            }
+                            return resultMessage;
+                        })
+                        .collect(Collectors.toList());
+                return newSearchResponse
+                        .toBuilder()
+                        .messages(decoratedMessages)
+                        .fields(newFields)
+                        .decorationStats(SearchDecorationStats.create(addedFields))
+                        .build();
+            }
+        } catch (Exception e) {
+            LOG.error("Error decorating search response", e);
         }
 
         return searchResponse;

@@ -18,6 +18,8 @@ package org.graylog2.decorators;
 
 import com.google.inject.Singleton;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -28,6 +30,8 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class DecoratorResolver {
+    private static final Logger LOG = LoggerFactory.getLogger(DecoratorResolver.class);
+
     private final DecoratorService decoratorService;
     private final Map<String, SearchResponseDecorator.Factory> searchResponseDecoratorsMap;
 
@@ -60,7 +64,11 @@ public class DecoratorResolver {
     private SearchResponseDecorator instantiateSearchResponseDecorator(Decorator decorator) {
         final SearchResponseDecorator.Factory factory = this.searchResponseDecoratorsMap.get(decorator.type());
         if (factory != null) {
-            return factory.create(decorator);
+            try {
+                return factory.create(decorator);
+            } catch(Exception e) {
+                LOG.error("Unable to create <{}> decorator", factory.getDescriptor().getName(), e);
+            }
         }
         return null;
     }
