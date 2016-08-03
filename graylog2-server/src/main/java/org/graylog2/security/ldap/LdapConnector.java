@@ -275,7 +275,7 @@ public class LdapConnector {
 
                         for (Value<?> member : members) {
                             LOG.trace("DN {} == {} member?", dn, member.getString());
-                            if (dn.equalsIgnoreCase(normalizedDn(member.getString()))) {
+                            if (dn != null && dn.equalsIgnoreCase(normalizedDn(member.getString()))) {
                                 groups.add(groupId);
                             } else {
                                 // The posixGroup object class is using the memberUid attribute for group members.
