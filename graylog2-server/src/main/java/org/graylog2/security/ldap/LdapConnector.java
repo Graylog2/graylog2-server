@@ -273,7 +273,7 @@ public class LdapConnector {
 
                         for (Value<?> member : members) {
                             LOG.trace("DN {} == {} member?", dn, member.getString());
-                            if (dn.equalsIgnoreCase(normalizedDn(member.getString()))) {
+                            if (dn != null && dn.equalsIgnoreCase(normalizedDn(member.getString()))) {
                                 groups.add(groupId);
                             } else {
                                 // The posixGroup object class is using the memberUid attribute for group members.
@@ -300,12 +300,22 @@ public class LdapConnector {
     }
 
     /**
-     * Makes sure the given DN string is normalized so it can be used in string comparison.
+     * When the given string is a DN, the method ensures that the DN gets normalized so it can be used in string
+     * comparison.
      *
-     * Example:
+     * If the string is not a DN, the method just returns it.
      *
+     * Examples:
+     *
+     * String is a DN:
      *   input  = "cn=John Doe, ou=groups, ou=system"
      *   output = "cn=John Doe,ou=groups,ou=system"
+     *
+     * String is not a DN:
+     *   input  = "john"
+     *   output = "john"
+     *
+     * This behavior is needed because for some values we don't know if the value is a DN or not. (i.e. group member values)
      *
      * See: https://github.com/Graylog2/graylog2-server/issues/1790
      *
@@ -320,7 +330,7 @@ public class LdapConnector {
             try {
                 return new Dn(dn).getNormName();
             } catch (LdapInvalidDnException e) {
-                LOG.warn("Invalid DN", e);
+                LOG.debug("Invalid DN", e);
                 return dn;
             }
         }
