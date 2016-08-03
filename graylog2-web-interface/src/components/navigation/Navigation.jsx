@@ -7,10 +7,9 @@ import naturalSort from 'javascript-natural-sort';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
-import StoreProvider from 'injection/StoreProvider';
-
 import URLUtils from 'util/URLUtils';
 
+import StoreProvider from 'injection/StoreProvider';
 const NotificationsStore = StoreProvider.getStore('Notifications');
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -216,8 +215,6 @@ const Navigation = React.createClass({
               </LinkContainer>
               }
               {pluginSystemNavigations}
-              <MenuItem divider/>
-              <MenuItem href={URLUtils.qualifyUrl('api-browser')} target="_blank">REST API Browser</MenuItem>
             </NavDropdown>
           </Nav>
 
