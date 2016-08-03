@@ -12,7 +12,7 @@ const NodeMaintenanceDropdown = React.createClass({
     node: PropTypes.object.isRequired,
   },
   render() {
-    const apiBrowserURI = new URI(`${this.props.node.transport_address}/api-browser`).normalizePathname();
+    const apiBrowserURI = new URI(`${this.props.node.transport_address}/api-browser`).normalizePathname().toString();
     return (
       <ButtonGroup>
         <DropdownButton bsStyle="info" bsSize="lg" title="Actions" id="node-maintenance-actions" pullRight>
