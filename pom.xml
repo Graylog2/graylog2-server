@@ -93,8 +93,8 @@
         <jersey.version>2.22.1</jersey.version>
         <!-- The HK2 version should match the version being used by Jersey -->
         <glassfish-hk2.version>2.4.0-b31</glassfish-hk2.version>
-        <apache-directory-version>1.0.0-M31</apache-directory-version>
-        <apacheds-server.version>2.0.0-M20</apacheds-server.version>
+        <apache-directory-version>1.0.0-RC1</apache-directory-version>
+        <apacheds-server.version>2.0.0-M23</apacheds-server.version>
         <surefire.version>2.19.1</surefire.version>
         <guice.version>4.1.0</guice.version>
         <drools.version>6.4.0.Final</drools.version>

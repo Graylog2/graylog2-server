@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.MessageFormat;
 import java.util.Collections;
@@ -114,14 +115,14 @@ public class LdapConnector {
 
     @Nullable
     public LdapEntry search(LdapNetworkConnection connection,
-                                          String searchBase,
-                                          String searchPattern,
-                                          String displayNameAttribute,
-                                          String principal,
-                                          boolean activeDirectory,
-                                          String groupSearchBase,
-                                          String groupIdAttribute,
-                                          String groupSearchPattern) throws LdapException, CursorException {
+                            String searchBase,
+                            String searchPattern,
+                            String displayNameAttribute,
+                            String principal,
+                            boolean activeDirectory,
+                            String groupSearchBase,
+                            String groupIdAttribute,
+                            String groupSearchPattern) throws LdapException, CursorException {
         final LdapEntry ldapEntry = new LdapEntry();
         final Set<String> groupDns = Sets.newHashSet();
 
@@ -130,12 +131,12 @@ public class LdapConnector {
             LOG.trace("Search {} for {}, starting at {}",
                       activeDirectory ? "ActiveDirectory" : "LDAP", filter, searchBase);
         }
-        EntryCursor entryCursor = null;
-        try {
-            entryCursor = connection.search(searchBase,
-                                            filter,
-                                            SearchScope.SUBTREE,
-                                            groupIdAttribute, displayNameAttribute, "dn", "uid", "userPrincipalName", "mail", "rfc822Mailbox", "memberOf", "isMemberOf");
+
+        try (final EntryCursor entryCursor = connection.search(searchBase,
+                filter,
+                SearchScope.SUBTREE,
+                groupIdAttribute, displayNameAttribute, "dn", "uid", "userPrincipalName", "mail", "rfc822Mailbox", "memberOf", "isMemberOf")
+        ) {
             final Iterator<Entry> it = entryCursor.iterator();
             if (it.hasNext()) {
                 final Entry e = it.next();
@@ -212,10 +213,9 @@ public class LdapConnector {
                 }
             }
             return ldapEntry;
-        } finally {
-            if (entryCursor != null) {
-                entryCursor.close();
-            }
+        } catch (IOException e) {
+            LOG.debug("Error while closing cursor", e);
+            return null;
         }
     }
 
@@ -226,13 +226,11 @@ public class LdapConnector {
                                   @Nullable LdapEntry ldapEntry) {
         final Set<String> groups = Sets.newHashSet();
 
-        EntryCursor groupSearch = null;
-        try {
-            groupSearch = connection.search(
-                    groupSearchBase,
-                    groupSearchPattern,
-                    SearchScope.SUBTREE,
-                    "objectClass", ATTRIBUTE_UNIQUE_MEMBER, ATTRIBUTE_MEMBER, ATTRIBUTE_MEMBER_UID, groupIdAttribute);
+        try (final EntryCursor groupSearch = connection.search(
+                groupSearchBase,
+                groupSearchPattern,
+                SearchScope.SUBTREE,
+                "objectClass", ATTRIBUTE_UNIQUE_MEMBER, ATTRIBUTE_MEMBER, ATTRIBUTE_MEMBER_UID, groupIdAttribute)) {
             LOG.trace("LDAP search for groups: {} starting at {}", groupSearchPattern, groupSearchBase);
             for (Entry e : groupSearch) {
                 if (LOG.isTraceEnabled()) {
@@ -296,10 +294,6 @@ public class LdapConnector {
                             "LDAP referrals at the moment. Please see " +
                             DocsHelper.PAGE_LDAP_TROUBLESHOOTING.toString() + " for more information.",
                     ExceptionUtils.getRootCause(e));
-        } finally {
-            if (groupSearch != null) {
-                groupSearch.close();
-            }
         }
 
         return groups;
