@@ -326,7 +326,7 @@ public class LdapConnector {
             try {
                 return new Dn(dn).getNormName();
             } catch (LdapInvalidDnException e) {
-                LOG.warn("Invalid DN", e);
+                LOG.debug("Invalid DN", e);
                 return dn;
             }
         }
