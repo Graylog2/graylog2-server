@@ -19,10 +19,8 @@ package org.graylog2.inputs.extractors;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
-import oi.thekraken.grok.api.Grok;
-import oi.thekraken.grok.api.Match;
-import oi.thekraken.grok.api.exception.GrokException;
 import org.graylog2.ConfigurationException;
+import org.graylog2.grok.GrokMatch;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
@@ -32,11 +30,13 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GrokExtractor extends Extractor {
     private static final Logger log = LoggerFactory.getLogger(GrokExtractor.class);
+    private final org.graylog2.grok.Grok grok;
 
-    private final Grok grok = new Grok();
+//    private final Grok grok = new Grok();
 
     public GrokExtractor(MetricRegistry metricRegistry,
                          Set<GrokPattern> grokPatterns,
@@ -72,12 +72,15 @@ public class GrokExtractor extends Extractor {
 
         try {
             // TODO we should really share this somehow, but unfortunately the extractors are reloaded every second.
-            for (final GrokPattern grokPattern : grokPatterns) {
-                grok.addPattern(grokPattern.name, grokPattern.pattern);
-            }
+//            for (final GrokPattern grokPattern : grokPatterns) {
+//                grok.addPattern(grokPattern.name, grokPattern.pattern);
+//            }
 
-            grok.compile((String) extractorConfig.get("grok_pattern"), namedCapturesOnly);
-        } catch (GrokException e) {
+            final Map<String, String> patterns = grokPatterns.stream().collect(Collectors.toMap(GrokPattern::name,
+                                                                                               GrokPattern::pattern));
+            grok = new org.graylog2.grok.Grok(patterns, (String) extractorConfig.get("grok_pattern"), namedCapturesOnly);
+//            grok.compile((String) extractorConfig.get("grok_pattern"), namedCapturesOnly);
+        } catch (Exception e) {
             log.error("Unable to parse grok patterns", e);
             throw new ConfigurationException("Unable to parse grok patterns");
         }
@@ -87,9 +90,9 @@ public class GrokExtractor extends Extractor {
     protected Result[] run(String value) {
 
         // the extractor instance is rebuilt every second anyway
-        final Match match = grok.match(value);
-        match.captures();
-        final Map<String, Object> matches = match.toMap();
+        final GrokMatch match = grok.match(value);
+//        match.captures();
+        final Map<String, Object> matches = match.captures();
         final List<Result> results = Lists.newArrayListWithCapacity(matches.size());
 
         for (final Map.Entry<String, Object> entry : matches.entrySet()) {
