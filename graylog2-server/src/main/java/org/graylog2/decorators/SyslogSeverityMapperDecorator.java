@@ -33,7 +33,8 @@ import java.util.stream.Collectors;
 import static java.util.Objects.requireNonNull;
 
 public class SyslogSeverityMapperDecorator implements SearchResponseDecorator {
-    private static final String CK_FIELD_NAME = "field_name";
+    private static final String CK_SOURCE_FIELD = "source_field";
+    private static final String CK_TARGET_FIELD = "target_field";
 
     // Map of numerical Syslog severities to names. See: https://tools.ietf.org/html/rfc3164#section-4.1.1
     private static final Map<String, String> SYSLOG_MAPPING = ImmutableMap.<String, String>builder()
@@ -48,7 +49,8 @@ public class SyslogSeverityMapperDecorator implements SearchResponseDecorator {
             .build();
 
 
-    private final String fieldName;
+    private final String sourceField;
+    private final String targetField;
 
     public interface Factory extends SearchResponseDecorator.Factory {
         @Override
@@ -67,10 +69,16 @@ public class SyslogSeverityMapperDecorator implements SearchResponseDecorator {
             return new ConfigurationRequest() {
                 {
                     addField(new TextField(
-                            CK_FIELD_NAME,
-                            "Field name",
+                            CK_SOURCE_FIELD,
+                            "Source field",
                             "level",
-                            "The message field which includes the Syslog severity. The value will be replaced with the mapped severity name."
+                            "The message field which includes the numeric Syslog severity."
+                    ));
+                    addField(new TextField(
+                            CK_TARGET_FIELD,
+                            "Target field",
+                            "severity",
+                            "The message field that will be created with the mapped severity value."
                     ));
                 }
             };
@@ -85,21 +93,29 @@ public class SyslogSeverityMapperDecorator implements SearchResponseDecorator {
 
     @Inject
     public SyslogSeverityMapperDecorator(@Assisted Decorator decorator) {
-        this.fieldName = (String) requireNonNull(decorator.config().get(CK_FIELD_NAME), "field name cannot be null");
+        this.sourceField = (String) requireNonNull(decorator.config().get(CK_SOURCE_FIELD), CK_SOURCE_FIELD + " cannot be null");
+        this.targetField = (String) requireNonNull(decorator.config().get(CK_TARGET_FIELD), CK_TARGET_FIELD + " cannot be null");
     }
 
     public SearchResponse apply(SearchResponse searchResponse) {
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
                 .map(summary -> {
                     // Do not touch the message if the field does not exist.
-                    if (!summary.message().containsKey(fieldName)) {
+                    if (!summary.message().containsKey(sourceField)) {
                         return summary;
                     }
 
-                    final String level = String.valueOf(summary.message().get(fieldName));
+                    final String level = String.valueOf(summary.message().get(sourceField));
+                    final String severity = SYSLOG_MAPPING.get(level);
+
+                    // If we cannot map the severity we do not touch the message.
+                    if (severity == null) {
+                        return summary;
+                    }
+
                     final Message message = new Message(ImmutableMap.copyOf(summary.message()));
 
-                    message.addField(fieldName, SYSLOG_MAPPING.getOrDefault(level, level));
+                    message.addField(targetField, severity);
 
                     return summary.toBuilder().message(message.getFields()).build();
                 })

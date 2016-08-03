@@ -35,7 +35,7 @@ public class SyslogSeverityMapperDecoratorTest {
     public void testDecorator() throws Exception {
         final DecoratorImpl decorator = DecoratorImpl.create("id",
                 SyslogSeverityMapperDecorator.class.getCanonicalName(),
-                ImmutableMap.of("field_name", "level"),
+                ImmutableMap.of("source_field", "level", "target_field", "severity"),
                 Optional.empty(),
                 1);
 
@@ -76,27 +76,48 @@ public class SyslogSeverityMapperDecoratorTest {
 
         // Returns the value if the value cannot be mapped to a Syslog severity
         Assertions.assertThat(response.messages().get(0).message().get("level")).isEqualTo("80");
+        Assertions.assertThat(response.messages().get(0).message().get("severity")).isNull();
 
         // Check that the mapping works correctly
-        Assertions.assertThat(response.messages().get(1).message().get("level")).isEqualTo("Emergency (0)");
-        Assertions.assertThat(response.messages().get(2).message().get("level")).isEqualTo("Alert (1)");
-        Assertions.assertThat(response.messages().get(3).message().get("level")).isEqualTo("Critical (2)");
-        Assertions.assertThat(response.messages().get(4).message().get("level")).isEqualTo("Error (3)");
-        Assertions.assertThat(response.messages().get(5).message().get("level")).isEqualTo("Warning (4)");
-        Assertions.assertThat(response.messages().get(6).message().get("level")).isEqualTo("Notice (5)");
-        Assertions.assertThat(response.messages().get(7).message().get("level")).isEqualTo("Informational (6)");
-        Assertions.assertThat(response.messages().get(8).message().get("level")).isEqualTo("Debug (7)");
+        Assertions.assertThat(response.messages().get(1).message().get("level")).isEqualTo("0");
+        Assertions.assertThat(response.messages().get(1).message().get("severity")).isEqualTo("Emergency (0)");
+        Assertions.assertThat(response.messages().get(2).message().get("level")).isEqualTo("1");
+        Assertions.assertThat(response.messages().get(2).message().get("severity")).isEqualTo("Alert (1)");
+        Assertions.assertThat(response.messages().get(3).message().get("level")).isEqualTo("2");
+        Assertions.assertThat(response.messages().get(3).message().get("severity")).isEqualTo("Critical (2)");
+        Assertions.assertThat(response.messages().get(4).message().get("level")).isEqualTo("3");
+        Assertions.assertThat(response.messages().get(4).message().get("severity")).isEqualTo("Error (3)");
+        Assertions.assertThat(response.messages().get(5).message().get("level")).isEqualTo("4");
+        Assertions.assertThat(response.messages().get(5).message().get("severity")).isEqualTo("Warning (4)");
+        Assertions.assertThat(response.messages().get(6).message().get("level")).isEqualTo("5");
+        Assertions.assertThat(response.messages().get(6).message().get("severity")).isEqualTo("Notice (5)");
+        Assertions.assertThat(response.messages().get(7).message().get("level")).isEqualTo("6");
+        Assertions.assertThat(response.messages().get(7).message().get("severity")).isEqualTo("Informational (6)");
+        Assertions.assertThat(response.messages().get(8).message().get("level")).isEqualTo("7");
+        Assertions.assertThat(response.messages().get(8).message().get("severity")).isEqualTo("Debug (7)");
 
-        // If the message does not have a fieldName field, we do not touch it
+        // If the message does not have a source field, we do not touch it
         Assertions.assertThat(response.messages().get(9).message().get("level")).isNull();
+        Assertions.assertThat(response.messages().get(9).message().get("severity")).isNull();
         Assertions.assertThat(response.messages().get(9).message().get("foo")).isEqualTo("1");
     }
 
     @Test(expected = NullPointerException.class)
-    public void testNullFieldName() throws Exception {
+    public void testNullSourceField() throws Exception {
         final DecoratorImpl decorator = DecoratorImpl.create("id",
                 SyslogSeverityMapperDecorator.class.getCanonicalName(),
-                ImmutableMap.of(), // No field name config option present
+                ImmutableMap.of("target_field", "severity"),
+                Optional.empty(),
+                1);
+
+        new SyslogSeverityMapperDecorator(decorator);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testNullTargetField() throws Exception {
+        final DecoratorImpl decorator = DecoratorImpl.create("id",
+                SyslogSeverityMapperDecorator.class.getCanonicalName(),
+                ImmutableMap.of("source_field", "level"),
                 Optional.empty(),
                 1);
 
