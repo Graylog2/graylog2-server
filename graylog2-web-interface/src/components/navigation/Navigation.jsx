@@ -7,6 +7,7 @@ import naturalSort from 'javascript-natural-sort';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
+import URLUtils from 'util/URLUtils';
 
 import StoreProvider from 'injection/StoreProvider';
 const NotificationsStore = StoreProvider.getStore('Notifications');
