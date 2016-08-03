@@ -21,7 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.Configuration;
-import org.joda.time.Period;
 
 /**
  * List of configuration values that are safe to return, i.e. do not include any sensitive
@@ -64,24 +63,6 @@ public abstract class ExposedConfiguration {
     @JsonProperty("allow_leading_wildcard_searches")
     public abstract boolean allowLeadingWildcardSearches();
 
-    @JsonProperty("rotation_strategy")
-    public abstract String rotationStrategy();
-
-    @JsonProperty("retention_strategy")
-    public abstract String retentionStrategy();
-
-    @JsonProperty("elasticsearch_max_docs_per_index")
-    public abstract int maxDocsPerIndex();
-
-    @JsonProperty("elasticsearch_max_size_per_index")
-    public abstract long maxSizePerIndex();
-
-    @JsonProperty("elasticsearch_max_time_per_index")
-    public abstract Period maxTimePerIndex();
-
-    @JsonProperty("elasticsearch_max_number_of_indices")
-    public abstract int maxNumberOfIndices();
-
     @JsonProperty("elasticsearch_shards")
     public abstract int shards();
 
@@ -122,12 +103,6 @@ public abstract class ExposedConfiguration {
                 configuration.getNodeIdFile(),
                 configuration.isAllowHighlighting(),
                 configuration.isAllowLeadingWildcardSearches(),
-                esConfiguration.getRotationStrategy(),
-                esConfiguration.getRetentionStrategy(),
-                esConfiguration.getMaxDocsPerIndex(),
-                esConfiguration.getMaxSizePerIndex(),
-                esConfiguration.getMaxTimePerIndex(),
-                esConfiguration.getMaxNumberOfIndices(),
                 esConfiguration.getShards(),
                 esConfiguration.getReplicas(),
                 configuration.getStreamProcessingTimeout(),
@@ -152,12 +127,6 @@ public abstract class ExposedConfiguration {
             @JsonProperty("node_id_file") String nodeIdFile,
             @JsonProperty("allow_highlighting") boolean allowHighlighting,
             @JsonProperty("allow_leading_wildcard_searches") boolean allowLeadingWildcardSearches,
-            @JsonProperty("rotation_strategy") String rotationStrategy,
-            @JsonProperty("retention_strategy") String retentionStrategy,
-            @JsonProperty("elasticsearch_max_docs_per_index") int maxDocsPerIndex,
-            @JsonProperty("elasticsearch_max_size_per_index") long maxSizePerIndex,
-            @JsonProperty("elasticsearch_max_time_per_index") Period maxTimePerIndex,
-            @JsonProperty("elasticsearch_max_number_of_indices") int maxNumberOfIndices,
             @JsonProperty("elasticsearch_shards") int shards,
             @JsonProperty("elasticsearch_replicas") int replicas,
             @JsonProperty("stream_processing_timeout") long streamProcessingTimeout,
@@ -179,12 +148,6 @@ public abstract class ExposedConfiguration {
                 nodeIdFile,
                 allowHighlighting,
                 allowLeadingWildcardSearches,
-                rotationStrategy,
-                retentionStrategy,
-                maxDocsPerIndex,
-                maxSizePerIndex,
-                maxTimePerIndex,
-                maxNumberOfIndices,
                 shards,
                 replicas,
                 streamProcessingTimeout,

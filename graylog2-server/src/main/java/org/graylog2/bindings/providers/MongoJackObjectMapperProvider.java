@@ -48,7 +48,7 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
      * (one of my many useless talents is finding corner cases).
      * </p>
      */
-    public static class PreserveLeadingUnderscoreStrategy extends PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy {
+    public static class PreserveLeadingUnderscoreStrategy extends PropertyNamingStrategy.SnakeCaseStrategy {
         @Override
         public String translate(String input) {
             String translated = super.translate(input);

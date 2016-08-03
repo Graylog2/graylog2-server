@@ -55,7 +55,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
                 .disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE)
-                .setPropertyNamingStrategy(new PropertyNamingStrategy.LowerCaseWithUnderscoresStrategy())
+                .setPropertyNamingStrategy(new PropertyNamingStrategy.SnakeCaseStrategy())
                 .setTypeFactory(typeFactory)
                 .registerModule(new GuavaModule())
                 .registerModule(new JodaModule())

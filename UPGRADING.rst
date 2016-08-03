@@ -62,6 +62,27 @@ Removed resources
 +-----------------------------+--------------------------------------------------------+ 
 
 
+Removed index rotation/retention settings from "/system/configuration"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The index rotation and retention settings have been moved to MongoDB in Graylog 2.0.0 but the representation of the old configuration options was still present in the ``/system/configuration`` resource.
+
+In order to stay in sync with the actual configuration file, the following values have been removed:
+
+* ``rotation_strategy``
+* ``retention_strategy``
+* ``elasticsearch_max_docs_per_index``
+* ``elasticsearch_max_size_per_index``
+* ``elasticsearch_max_time_per_index``
+* ``elasticsearch_max_number_of_indices``
+
+
+The retention and rotation configuration settings can be retrieved using the following resources:
+
+* ``/system/indices/rotation/config``
+* ``/system/indices/retention/config``
+
+
 For Plugin Authors
 ------------------
 

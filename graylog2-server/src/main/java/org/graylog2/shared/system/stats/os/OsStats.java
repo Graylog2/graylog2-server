@@ -28,6 +28,7 @@ public abstract class OsStats {
     public static final double[] EMPTY_LOAD = new double[0];
 
     @JsonProperty
+    @SuppressWarnings("mutable")
     public abstract double[] loadAverage();
 
     @JsonProperty
