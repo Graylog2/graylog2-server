@@ -24,6 +24,7 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.jboss.netty.handler.ipfilter.IpSubnet;
@@ -50,10 +51,10 @@ public class Configuration extends BaseConfiguration {
     @Parameter(value = "password_secret", required = true, validator = StringNotBlankValidator.class)
     private String passwordSecret;
 
-    @Parameter(value = "rest_listen_uri", required = true)
+    @Parameter(value = "rest_listen_uri", required = true, validator = URIAbsoluteValidator.class)
     private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_PORT + "/");
 
-    @Parameter(value = "web_listen_uri", required = true)
+    @Parameter(value = "web_listen_uri", required = true, validator = URIAbsoluteValidator.class)
     private URI webListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_WEB_PORT + "/web");
 
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)

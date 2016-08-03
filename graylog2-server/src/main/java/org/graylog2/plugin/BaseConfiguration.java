@@ -23,6 +23,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
+import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.lmax.disruptor.BlockingWaitStrategy;
@@ -34,9 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
-import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,7 +49,7 @@ public abstract class BaseConfiguration {
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
 
-    @Parameter(value = "rest_transport_uri")
+    @Parameter(value = "rest_transport_uri", validator = URIAbsoluteValidator.class)
     private URI restTransportUri;
 
     @Parameter(value = "processbuffer_processors", required = true, validator = PositiveIntegerValidator.class)
@@ -134,7 +133,7 @@ public abstract class BaseConfiguration {
     @Parameter(value = "web_enable")
     private boolean webEnable = true;
 
-    @Parameter(value = "web_endpoint_uri")
+    @Parameter(value = "web_endpoint_uri", validator = URIAbsoluteValidator.class)
     private URI webEndpointUri;
 
     @Parameter(value = "web_enable_cors")

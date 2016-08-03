@@ -358,4 +358,42 @@ public class BaseConfigurationTest {
 
         new JadConfig(new InMemoryRepository(validProperties), new Configuration()).process();
     }
+
+    @Test
+    public void testRestTransportUriIsRelativeURI() throws RepositoryException, ValidationException {
+        validProperties.put("rest_transport_uri", "/foo");
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Parameter rest_transport_uri should be an absolute URI (found /foo)");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testWebEndpointUriIsRelativeURI() throws RepositoryException, ValidationException {
+        validProperties.put("web_endpoint_uri", "/foo");
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Parameter web_endpoint_uri should be an absolute URI (found /foo)");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testRestTransportUriIsAbsoluteURI() throws RepositoryException, ValidationException {
+        validProperties.put("rest_transport_uri", "http://www.example.com:12900/foo");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testWebEndpointUriIsAbsoluteURI() throws RepositoryException, ValidationException {
+        validProperties.put("web_endpoint_uri", "http://www.example.com:12900/foo");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
 }
