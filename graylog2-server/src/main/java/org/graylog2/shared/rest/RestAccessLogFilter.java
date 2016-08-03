@@ -55,6 +55,7 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
                 final Date requestDate = requestContext.getDate();
                 final String userName = RestTools.getUserNameFromRequest(requestContext);
                 final String remoteAddress = RestTools.getRemoteAddrFromRequest(response.getRequest(), trustedProxies);
+                final String userAgent = requestContext.getHeaderString(HttpHeaders.USER_AGENT);
 
                 LOG.debug("{} {} [{}] \"{} {}{}\" {} {} {}",
                         remoteAddress,
@@ -63,7 +64,7 @@ public class RestAccessLogFilter implements ContainerResponseFilter {
                         requestContext.getMethod(),
                         requestContext.getUriInfo().getPath(),
                         (rawQuery == null ? "" : "?" + rawQuery),
-                        requestContext.getHeaderString(HttpHeaders.USER_AGENT),
+                        (userAgent == null ? "-" : userAgent),
                         responseContext.getStatus(),
                         responseContext.getLength());
             } catch (Exception e) {
