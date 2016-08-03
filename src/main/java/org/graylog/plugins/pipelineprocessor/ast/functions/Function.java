@@ -35,6 +35,11 @@ public interface Function<T> {
         }
 
         @Override
+        public void preprocessArgs(FunctionArgs args) {
+            // intentionally left blank
+        }
+
+        @Override
         public FunctionDescriptor<Void> descriptor() {
             return FunctionDescriptor.<Void>builder()
                     .name("__unresolved_function")
