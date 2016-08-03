@@ -48,16 +48,16 @@ java.net.URL#getPath()
 java.net.URL#getFile()
 
 @defaultMessage Use java.nio.file instead of java.io.File API
-java.util.jar.JarFile
-java.util.zip.ZipFile
-java.io.File
-java.io.FileInputStream
-java.io.FileOutputStream
+# java.util.jar.JarFile
+# java.util.zip.ZipFile
+# java.io.File
+# java.io.FileInputStream
+# java.io.FileOutputStream
 java.io.PrintStream#<init>(java.lang.String,java.lang.String)
 java.io.PrintWriter#<init>(java.lang.String,java.lang.String)
 java.util.Formatter#<init>(java.lang.String,java.lang.String,java.util.Locale)
 java.io.RandomAccessFile
-java.nio.file.Path#toFile()
+# java.nio.file.Path#toFile()
 
 @defaultMessage Specify a location for the temp file/directory instead.
 java.nio.file.Files#createTempDirectory(java.lang.String,java.nio.file.attribute.FileAttribute[])
@@ -77,9 +77,13 @@ java.net.InetAddress#getCanonicalHostName()
 
 java.net.InetSocketAddress#getHostName() @ Use getHostString() instead, which avoids a DNS lookup
 
-@defaultMessage use NetworkAddress format/formatAddress to print IP or IP+ports
-java.net.InetAddress#toString()
-java.net.InetAddress#getHostAddress()
-java.net.Inet4Address#getHostAddress()
-java.net.Inet6Address#getHostAddress()
-java.net.InetSocketAddress#toString()
+@defaultMessage Avoid unchecked warnings by using Collections#empty(List|Map|Set) methods
+java.util.Collections#EMPTY_LIST
+java.util.Collections#EMPTY_MAP
+java.util.Collections#EMPTY_SET
+
+java.util.Collections#shuffle(java.util.List) @ Use java.util.Collections#shuffle(java.util.List, java.util.Random) with a reproducible source of randomness
+
+edu.emory.mathcs.backport.java.util.** @ Use java.util.*
+
+com.google.common.base.Charsets @ Use java.nio.charset.StandardCharsets

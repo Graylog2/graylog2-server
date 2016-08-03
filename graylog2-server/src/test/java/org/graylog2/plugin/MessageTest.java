@@ -337,7 +337,7 @@ public class MessageTest {
         assertEquals("wat", object.get("field1"));
         assertEquals("that", object.get("field2"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
-        assertEquals(Collections.EMPTY_LIST, object.get("streams"));
+        assertEquals(Collections.emptyList(), object.get("streams"));
     }
 
     @Test
@@ -353,7 +353,7 @@ public class MessageTest {
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
-        assertEquals(Collections.EMPTY_LIST, object.get("streams"));
+        assertEquals(Collections.emptyList(), object.get("streams"));
     }
 
     @Test

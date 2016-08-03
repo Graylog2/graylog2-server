@@ -26,8 +26,10 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.streams.matchers.StreamRuleMock;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -59,6 +61,7 @@ public class StreamRouterEngineTest {
         when(streamFaultManager.getStreamProcessingTimeout()).thenReturn(250L);
     }
 
+    @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     private StreamRouterEngine newEngine(List<Stream> streams) {
         return new StreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics);
     }
@@ -698,6 +701,6 @@ public class StreamRouterEngineTest {
     }
 
     private Message getMessage() {
-        return new Message("test message", "localhost", new DateTime());
+        return new Message("test message", "localhost", new DateTime(DateTimeZone.UTC));
     }
 }

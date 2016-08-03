@@ -28,6 +28,7 @@ import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 
 public class ServerHelper {
     private static final int HTTP_TIMEOUT = 1000;
@@ -43,7 +44,7 @@ public class ServerHelper {
             connection.setRequestMethod("GET");
 
             if (uri.getUserInfo() != null) {
-                String encodedUserInfo = Base64.encodeBase64String(uri.getUserInfo().getBytes());
+                String encodedUserInfo = Base64.encodeBase64String(uri.getUserInfo().getBytes(StandardCharsets.UTF_8));
                 connection.setRequestProperty("Authorization", "Basic " + encodedUserInfo);
             }
 

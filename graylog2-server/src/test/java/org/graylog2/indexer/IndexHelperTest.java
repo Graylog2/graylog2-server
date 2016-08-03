@@ -22,15 +22,14 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.indexer.ranges.MongoIndexRange;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
-import org.joda.time.Duration;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
@@ -104,10 +103,10 @@ public class IndexHelperTest {
 
     @Test
     public void determineAffectedIndicesWithRangesIncludesDeflectorTarget() throws Exception {
-        final DateTime now = DateTime.now();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
         final MongoIndexRange indexRange0 = MongoIndexRange.create("graylog_0", now, now.plusDays(1), now, 0);
         final MongoIndexRange indexRange1 = MongoIndexRange.create("graylog_1", now.plusDays(1), now.plusDays(2), now, 0);
-        final MongoIndexRange indexRangeLatest = MongoIndexRange.create("graylog_2", new DateTime(0L), new DateTime(0L), now, 0);
+        final MongoIndexRange indexRangeLatest = MongoIndexRange.create("graylog_2", new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), now, 0);
         final SortedSet<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR)
             .add(indexRange0)
             .add(indexRange1)
@@ -132,7 +131,7 @@ public class IndexHelperTest {
 
     @Test
     public void determineAffectedIndicesWithRangesDoesNotIncludesDeflectorTargetIfMissing() throws Exception {
-        final DateTime now = DateTime.now();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
         final MongoIndexRange indexRange0 = MongoIndexRange.create("graylog_0", now, now.plusDays(1), now, 0);
         final MongoIndexRange indexRange1 = MongoIndexRange.create("graylog_1", now.plusDays(1), now.plusDays(2), now, 0);
         final SortedSet<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR)
@@ -157,10 +156,10 @@ public class IndexHelperTest {
 
     @Test
     public void determineAffectedIndicesIncludesDeflectorTarget() throws Exception {
-        final DateTime now = DateTime.now();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
         final MongoIndexRange indexRange0 = MongoIndexRange.create("graylog_0", now, now.plusDays(1), now, 0);
         final MongoIndexRange indexRange1 = MongoIndexRange.create("graylog_1", now.plusDays(1), now.plusDays(2), now, 0);
-        final MongoIndexRange indexRangeLatest = MongoIndexRange.create("graylog_2", new DateTime(0L), new DateTime(0L), now, 0);
+        final MongoIndexRange indexRangeLatest = MongoIndexRange.create("graylog_2", new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), now, 0);
         final SortedSet<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR)
             .add(indexRange0)
             .add(indexRange1)
@@ -185,7 +184,7 @@ public class IndexHelperTest {
 
     @Test
     public void determineAffectedIndicesDoesNotIncludesDeflectorTargetIfMissing() throws Exception {
-        final DateTime now = DateTime.now();
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
         final MongoIndexRange indexRange0 = MongoIndexRange.create("graylog_0", now, now.plusDays(1), now, 0);
         final MongoIndexRange indexRange1 = MongoIndexRange.create("graylog_1", now.plusDays(1), now.plusDays(2), now, 0);
         final SortedSet<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR)

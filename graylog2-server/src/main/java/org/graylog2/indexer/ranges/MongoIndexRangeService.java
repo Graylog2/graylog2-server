@@ -134,7 +134,10 @@ public class MongoIndexRangeService implements IndexRangeService {
 
     @Override
     public IndexRange createUnknownRange(String index) {
-        return MongoIndexRange.create(index, new DateTime(0L), new DateTime(0L), DateTime.now(), 0);
+        final DateTime begin = new DateTime(0L, DateTimeZone.UTC);
+        final DateTime end = new DateTime(0L, DateTimeZone.UTC);
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        return MongoIndexRange.create(index, begin, end, now, 0);
     }
 
     @Override

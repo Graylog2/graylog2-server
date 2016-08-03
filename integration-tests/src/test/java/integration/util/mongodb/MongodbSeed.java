@@ -25,6 +25,7 @@ import integration.IntegrationTestsConfig;
 
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.List;
@@ -42,7 +43,7 @@ public class MongodbSeed {
         mongoDatabase.dropDatabase();
     }
 
-    private Map<String, List<DBObject>> parseDatabaseDump(URL seedUrl) throws IOException {
+    private Map<String, List<DBObject>> parseDatabaseDump(URI seedUrl) throws IOException {
         final DumpReader dumpReader;
         if (seedUrl.getPath().endsWith(".json")) {
             dumpReader = new JsonReader(seedUrl);
@@ -85,8 +86,8 @@ public class MongodbSeed {
         return collections;
     }
 
-    public void loadDataset(URL dbPath, String nodeId) throws IOException {
-        Map<String, List<DBObject>> collections = parseDatabaseDump(dbPath);
+    public void loadDataset(URL dbPath, String nodeId) throws IOException, URISyntaxException {
+        Map<String, List<DBObject>> collections = parseDatabaseDump(dbPath.toURI());
         collections = updateNodeIdFirstNode(collections, nodeId);
         collections = updateNodeIdInputs(collections, nodeId);
 

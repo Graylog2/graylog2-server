@@ -894,7 +894,7 @@ public class ExtractorTest {
     }
 
     private Message createMessage(String message) {
-        return new Message(message, "localhost", DateTime.now().withZone(UTC));
+        return new Message(message, "localhost", DateTime.now(UTC));
     }
 
     private static class TestExtractor extends Extractor {

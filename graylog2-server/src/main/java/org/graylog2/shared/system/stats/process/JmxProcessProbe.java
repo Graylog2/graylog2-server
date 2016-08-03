@@ -16,6 +16,8 @@
  */
 package org.graylog2.shared.system.stats.process;
 
+import org.graylog2.shared.SuppressForbidden;
+
 import javax.inject.Singleton;
 import java.lang.management.ManagementFactory;
 import java.lang.management.OperatingSystemMXBean;
@@ -30,6 +32,7 @@ public class JmxProcessProbe implements ProcessProbe {
             findMethod("getMaxFileDescriptorCount", operatingSystemMXBean.getClass());
     private static final long pid = findPid();
 
+    @SuppressForbidden("Reflection necessary")
     private static Method findMethod(final String methodName, final Class<?> clazz) {
         try {
             final Method method = clazz.getDeclaredMethod(methodName);
@@ -52,7 +55,7 @@ public class JmxProcessProbe implements ProcessProbe {
     @SuppressWarnings("unchecked")
     private static <T> T invokeMethod(final Method method, Object object, T defaultValue) {
         try {
-            return (T) openFileDescriptorCountMethod.invoke(operatingSystemMXBean);
+            return (T) method.invoke(object);
         } catch (Exception e) {
             return defaultValue;
         }

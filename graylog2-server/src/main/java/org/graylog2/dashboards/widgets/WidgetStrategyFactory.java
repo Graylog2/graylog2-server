@@ -20,6 +20,7 @@ import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.inject.Inject;
+import java.util.Locale;
 import java.util.Map;
 
 public class WidgetStrategyFactory {
@@ -36,8 +37,9 @@ public class WidgetStrategyFactory {
             return factory.create(config, timeRange, widgetId);
         }
 
-        if (widgetStrategyFactories.containsKey(typeName.toUpperCase())) {
-            final WidgetStrategy.Factory<? extends WidgetStrategy> factory = widgetStrategyFactories.get(typeName.toUpperCase());
+        final String upperCaseTypeName = typeName.toUpperCase(Locale.ENGLISH);
+        if (widgetStrategyFactories.containsKey(upperCaseTypeName)) {
+            final WidgetStrategy.Factory<? extends WidgetStrategy> factory = widgetStrategyFactories.get(upperCaseTypeName);
             return factory.create(config, timeRange, widgetId);
         }
 

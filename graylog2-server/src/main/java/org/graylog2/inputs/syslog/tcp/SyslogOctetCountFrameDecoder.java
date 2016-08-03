@@ -16,11 +16,12 @@
  */
 package org.graylog2.inputs.syslog.tcp;
 
-import com.google.common.base.Charsets;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.frame.FrameDecoder;
+
+import java.nio.charset.StandardCharsets;
 
 /**
  * Implements a Netty {@link FrameDecoder} for the Syslog octet counting framing. (RFC6587)
@@ -40,7 +41,7 @@ public class SyslogOctetCountFrameDecoder extends FrameDecoder {
         }
 
         // Convert the frame length value bytes into an integer without mutating the buffer reader index.
-        final String lengthString = buffer.slice(buffer.readerIndex(), frameSizeValueLength).toString(Charsets.UTF_8);
+        final String lengthString = buffer.slice(buffer.readerIndex(), frameSizeValueLength).toString(StandardCharsets.UTF_8);
         final int length = Integer.parseInt(lengthString);
         final int skipLength = frameSizeValueLength + 1; // Frame length value bytes and the whitespace that follows it.
 

@@ -32,6 +32,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.util.Locale;
 
 @RequiresAuthentication
 @Api(value = "System/GettingStartedGuides", description = "Getting Started guide")
@@ -69,7 +70,7 @@ public class GettingStartedResource extends RestResource {
     }
 
     private static String currentMinorVersionString() {
-        return String.format("%d.%d",
+        return String.format(Locale.ENGLISH, "%d.%d",
                              Version.CURRENT_CLASSPATH.major,
                              Version.CURRENT_CLASSPATH.minor);
     }

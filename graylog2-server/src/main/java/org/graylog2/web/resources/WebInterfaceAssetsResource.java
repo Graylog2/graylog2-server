@@ -152,8 +152,7 @@ public class WebInterfaceAssetsResource {
 
         switch (resourceUrl.getProtocol()) {
             case "file": {
-                String fileName = resourceUrl.getFile();
-                final File file = new File(fileName);
+                final File file = new File(resourceUrl.toURI());
                 lastModified = new Date(file.lastModified());
                 stream = new FileInputStream(file);
                 hashCode = Files.hash(file, Hashing.sha256());

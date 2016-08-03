@@ -24,6 +24,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -33,6 +34,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -259,6 +261,7 @@ public class SyslogCodecTest {
     }
 
     @Test
+    @SuppressForbidden("Deliberate invocation")
     public void rfc5424_section6_5_messages() {
         // See https://tools.ietf.org/html/rfc5424#section-6.5
         final Map<String, Map<String, Object>> rfc3164messages = ImmutableMap.of(
@@ -318,6 +321,6 @@ public class SyslogCodecTest {
     }
 
     private RawMessage buildRawMessage(String message) {
-        return new RawMessage(message.getBytes(), new InetSocketAddress(5140));
+        return new RawMessage(message.getBytes(StandardCharsets.UTF_8), new InetSocketAddress(5140));
     }
 }

@@ -24,6 +24,7 @@ import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -52,7 +53,7 @@ public class OrderedMessageProcessorsTest {
     }
 
     private ClusterConfigChangedEvent getClusterConfigChangedEvent() {
-        return ClusterConfigChangedEvent.create(DateTime.now(), "node-id", MessageProcessorsConfig.class.getCanonicalName());
+        return ClusterConfigChangedEvent.create(DateTime.now(DateTimeZone.UTC), "node-id", MessageProcessorsConfig.class.getCanonicalName());
     }
 
     @Test

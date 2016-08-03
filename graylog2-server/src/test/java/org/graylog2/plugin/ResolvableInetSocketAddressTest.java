@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin;
 
+import org.graylog2.shared.SuppressForbidden;
 import org.junit.Test;
 
 import java.net.Inet4Address;
@@ -40,6 +41,7 @@ public class ResolvableInetSocketAddressTest {
     }
 
     @Test
+    @SuppressForbidden("Intentional invocation of InetSocketAddress#getHostName()")
     public void testReverseLookup() throws Exception {
         final InetSocketAddress inetSocketAddress = new InetSocketAddress(Inet4Address.getLoopbackAddress(), 12345);
         final ResolvableInetSocketAddress address = new ResolvableInetSocketAddress(inetSocketAddress);
@@ -94,6 +96,7 @@ public class ResolvableInetSocketAddressTest {
     }
 
     @Test
+    @SuppressForbidden("Intentional invocation of InetSocketAddress#getHostName()")
     public void testGetHostName() throws Exception {
         final InetSocketAddress inetSocketAddress = new InetSocketAddress(Inet4Address.getLoopbackAddress(), 12345);
         final ResolvableInetSocketAddress address = new ResolvableInetSocketAddress(inetSocketAddress);

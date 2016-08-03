@@ -24,6 +24,7 @@ import com.google.common.collect.Iterables;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.shared.SuppressForbidden;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +68,7 @@ public class PluginLoader {
         return ServiceLoader.load(Plugin.class);
     }
 
+    @SuppressForbidden("Deliberate invocation of URL#getFile()")
     private Iterable<Plugin> loadJarPlugins() {
         if (!pluginDir.exists()) {
             LOG.warn("Plugin directory {} does not exist, not loading plugins.", pluginDir.getAbsolutePath());

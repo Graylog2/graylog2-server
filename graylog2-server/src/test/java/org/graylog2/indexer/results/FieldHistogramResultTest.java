@@ -46,7 +46,7 @@ public class FieldHistogramResultTest {
     @SuppressWarnings("unchecked")
     public void getResultsWorksWithZeroBuckets() throws Exception {
         final Histogram dateHistogram = mock(Histogram.class);
-        when(dateHistogram.getBuckets()).thenReturn(Collections.EMPTY_LIST);
+        when(dateHistogram.getBuckets()).thenReturn(Collections.emptyList());
         final FieldHistogramResult fieldHistogramResult = new FieldHistogramResult(
                 dateHistogram,
                 "",

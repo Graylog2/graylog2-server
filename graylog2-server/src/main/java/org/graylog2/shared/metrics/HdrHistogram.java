@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.UnsupportedEncodingException;
 
 public class HdrHistogram extends com.codahale.metrics.Histogram {
     private static final Logger log = LoggerFactory.getLogger(HdrHistogram.class);
@@ -87,7 +88,13 @@ public class HdrHistogram extends com.codahale.metrics.Histogram {
 
             @Override
             public void dump(OutputStream output) {
-                copy.outputPercentileDistribution(new PrintStream(output), 1d);
+                final PrintStream printStream;
+                try {
+                    printStream = new PrintStream(output, false, "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+                copy.outputPercentileDistribution(printStream, 1d);
             }
         };
     }

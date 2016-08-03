@@ -21,6 +21,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -158,6 +159,7 @@ public class ServerStatus {
         return startedAt;
     }
 
+    @SuppressForbidden("Deliberate invocation")
     public DateTimeZone getTimezone() {
         return DateTimeZone.getDefault();
     }

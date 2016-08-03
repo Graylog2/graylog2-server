@@ -125,7 +125,7 @@ public class LdapConnector {
         final LdapEntry ldapEntry = new LdapEntry();
         final Set<String> groupDns = Sets.newHashSet();
 
-        final String filter = MessageFormat.format(searchPattern, sanitizePrincipal(principal));
+        final String filter = new MessageFormat(searchPattern, Locale.ENGLISH).format(new Object[]{sanitizePrincipal(principal)});
         if (LOG.isTraceEnabled()) {
             LOG.trace("Search {} for {}, starting at {}",
                       activeDirectory ? "ActiveDirectory" : "LDAP", filter, searchBase);
