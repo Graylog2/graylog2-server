@@ -24,5 +24,9 @@ public class DecoratorBindings extends Graylog2Module {
     @Override
     protected void configure() {
         Multibinder<SearchResponseDecorator> searchResponseDecoratorMultibinder = Multibinder.newSetBinder(binder(), SearchResponseDecorator.class);
+
+        installSearchResponseDecorator(searchResponseDecoratorBinder(),
+                SyslogSeverityMapperDecorator.class,
+                SyslogSeverityMapperDecorator.Factory.class);
     }
 }
