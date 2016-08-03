@@ -1,6 +1,7 @@
 import React, {PropTypes} from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
+import URI from 'urijs';
 
 import { IfPermitted } from 'components/common';
 
@@ -11,6 +12,7 @@ const NodeMaintenanceDropdown = React.createClass({
     node: PropTypes.object.isRequired,
   },
   render() {
+    const apiBrowserURI = new URI(`${this.props.node.transport_address}/api-browser`).normalizePathname();
     return (
       <ButtonGroup>
         <DropdownButton bsStyle="info" bsSize="lg" title="Actions" id="node-maintenance-actions" pullRight>
@@ -30,7 +32,7 @@ const NodeMaintenanceDropdown = React.createClass({
             </LinkContainer>
           </IfPermitted>
 
-          <MenuItem href={`${this.props.node.transport_address}api-browser`} target="_blank">
+          <MenuItem href={apiBrowserURI} target="_blank">
             API Browser <i className="fa fa-external-link"/>
           </MenuItem>
         </DropdownButton>
