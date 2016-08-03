@@ -464,11 +464,23 @@ public final class Tools {
 
         try {
             if (uri.getPort() == -1) {
+                final int realPort;
+                switch (uri.getScheme()) {
+                    case "http":
+                        realPort = 80;
+                        break;
+                    case "https":
+                        realPort = 443;
+                        break;
+                    default:
+                        realPort = port;
+                }
+
                 return new URI(
                         uri.getScheme(),
                         uri.getUserInfo(),
                         uri.getHost(),
-                        port,
+                        realPort,
                         uri.getPath(),
                         uri.getQuery(),
                         uri.getFragment());

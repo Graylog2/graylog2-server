@@ -44,10 +44,14 @@ public class ToolsTest {
     @Test
     public void testGetUriWithPort() throws Exception {
         final URI uriWithPort = new URI("http://example.com:12345");
-        final URI uriWithoutPort = new URI("http://example.com");
+        final URI httpUriWithoutPort = new URI("http://example.com");
+        final URI httpsUriWithoutPort = new URI("https://example.com");
+        final URI uriWithUnknownSchemeAndWithoutPort = new URI("foobar://example.com");
 
         assertEquals(Tools.getUriWithPort(uriWithPort, 1).getPort(), 12345);
-        assertEquals(Tools.getUriWithPort(uriWithoutPort, 1).getPort(), 1);
+        assertEquals(Tools.getUriWithPort(httpUriWithoutPort, 1).getPort(), 80);
+        assertEquals(Tools.getUriWithPort(httpsUriWithoutPort, 1).getPort(), 443);
+        assertEquals(Tools.getUriWithPort(uriWithUnknownSchemeAndWithoutPort, 1).getPort(), 1);
     }
 
     @Test
