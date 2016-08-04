@@ -22,8 +22,8 @@ import org.graylog2.Configuration;
 import org.graylog2.initializers.BufferSynchronizerService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.initializers.InputSetupService;
+import org.graylog2.shared.initializers.JerseyService;
 import org.graylog2.shared.initializers.PeriodicalsService;
-import org.graylog2.shared.initializers.RestApiService;
 import org.graylog2.shared.journal.JournalReader;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -44,7 +44,7 @@ public class GracefulShutdown implements Runnable {
     private final InputSetupService inputSetupService;
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
-    private final RestApiService restApiService;
+    private final JerseyService jerseyService;
     private final JournalReader journalReader;
 
     @Inject
@@ -54,7 +54,7 @@ public class GracefulShutdown implements Runnable {
                             BufferSynchronizerService bufferSynchronizerService,
                             PeriodicalsService periodicalsService,
                             InputSetupService inputSetupService,
-                            RestApiService restApiService,
+                            JerseyService jerseyService,
                             JournalReader journalReader) {
         this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
@@ -62,7 +62,7 @@ public class GracefulShutdown implements Runnable {
         this.bufferSynchronizerService = bufferSynchronizerService;
         this.periodicalsService = periodicalsService;
         this.inputSetupService = inputSetupService;
-        this.restApiService = restApiService;
+        this.jerseyService = jerseyService;
         this.journalReader = journalReader;
     }
 
@@ -94,12 +94,12 @@ public class GracefulShutdown implements Runnable {
         Uninterruptibles.sleepUninterruptibly(SLEEP_SECS, TimeUnit.SECONDS);
 
         // Stop REST API service to avoid changes from outside.
-        restApiService.stopAsync();
+        jerseyService.stopAsync();
 
         // stop all inputs so no new messages can come in
         inputSetupService.stopAsync();
 
-        restApiService.awaitTerminated();
+        jerseyService.awaitTerminated();
         inputSetupService.awaitTerminated();
 
         journalReader.stopAsync().awaitTerminated();

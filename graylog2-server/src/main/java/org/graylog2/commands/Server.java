@@ -35,7 +35,6 @@ import org.graylog2.bindings.PasswordAlgorithmBindings;
 import org.graylog2.bindings.PeriodicalBindings;
 import org.graylog2.bindings.PersistenceServicesBindings;
 import org.graylog2.bindings.ServerBindings;
-import org.graylog2.bindings.WebInterfaceModule;
 import org.graylog2.bindings.WidgetStrategyBindings;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
@@ -115,10 +114,6 @@ public class Server extends ServerBootstrap {
             new DashboardBindings(),
             new DecoratorBindings()
         );
-
-        if (configuration.isWebEnable() && !configuration.isRestAndWebOnSamePort()) {
-            modules.add(new WebInterfaceModule());
-        }
 
         return modules.build();
     }
