@@ -133,7 +133,7 @@ public abstract class BaseConfiguration {
     @Parameter(value = "web_enable")
     private boolean webEnable = true;
 
-    @Parameter(value = "web_endpoint_uri", validator = URIAbsoluteValidator.class)
+    @Parameter(value = "web_endpoint_uri")
     private URI webEndpointUri;
 
     @Parameter(value = "web_enable_cors")
