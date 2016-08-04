@@ -158,6 +158,21 @@ public class ConfigurationTest {
 
         expectedException.expect(ParameterException.class);
         expectedException.expectMessage("Required parameter \"password_secret\" not found.");
+    }
+
+    @Test
+    public void testApiListenerOnRootAndWebListenerOnSubPath() throws ValidationException, RepositoryException {
+        validProperties.put("rest_listen_uri", "http://0.0.0.0:12900/");
+        validProperties.put("web_listen_uri", "http://0.0.0.0:12900/web");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testWebListenerOnRootAndApiListenerOnSubPath() throws ValidationException, RepositoryException {
+        validProperties.put("rest_listen_uri", "http://0.0.0.0:9000/api");
+        validProperties.put("web_listen_uri", "http://0.0.0.0:9000/");
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();

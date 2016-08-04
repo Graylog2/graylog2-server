@@ -457,14 +457,6 @@ public abstract class BaseConfiguration {
 
     @ValidatorMethod
     @SuppressWarnings("unused")
-    public void validateWebHasPathPrefixIfOnSamePort() throws ValidationException {
-        if (isRestAndWebOnSamePort() && (Strings.isNullOrEmpty(getWebPrefix()) || getWebPrefix().equals("/"))) {
-            throw new ValidationException("If REST and Web Interface are served on the same host/port, the web interface must have a path prefix!");
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
     public void validateWebAndRestHaveSameProtocolIfOnSamePort() throws ValidationException {
         if (isRestAndWebOnSamePort() && !getWebListenUri().getScheme().equals(getRestListenUri().getScheme())) {
             throw new ValidationException("If REST and Web interface are served on the same host/port, the protocols must be identical!");
