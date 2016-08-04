@@ -42,6 +42,25 @@ Previous versions of Graylog included a (long deprecated) metrics reporter for w
 This feature has been removed completely and can be optionally pulled in by using the `Graylog Metrics Reporter Plugins <https://github.com/Graylog2/graylog-plugin-metrics-reporter>`_.
 
 
+Configuration file changes
+--------------------------
+
+Network settings
+^^^^^^^^^^^^^^^^
+
+The network settings in the Graylog configuration file (``rest_listen_uri``, ``rest_transport_uri``, and ``web_listen_uri``) are now using the default ports for the HTTP (80) and HTTPS (443) if no custom port was given. Previously those settings were using the custom ports 12900 (Graylog REST API) and 9000 (Graylog web interface) if no explicit port was given.
+
+Examples:
+
++-----------------------------------------------+------------------------------+-----------------------------+
+| Configurastion setting                        | Old effective URI            | New effective URI           |
++===============================================+==============================+=============================+
+| ``rest_listen_uri = http://127.0.0.1:12900/`` | ``http://127.0.0.1:12900/``  | ``http://127.0.0.1:12900/`` |
+| ``rest_listen_uri = http://127.0.0.1/``       | ``http://127.0.0.1:12900/``  | ``http://127.0.0.1:80/``    |
+| ``rest_listen_uri = https://127.0.0.1/``      | ``https://127.0.0.1:12900/`` | ``https://127.0.0.1:443/``  |
++-----------------------------------------------+------------------------------+-----------------------------+
+
+
 Graylog REST API
 ----------------
 

@@ -21,6 +21,7 @@ import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
+import org.graylog2.Configuration;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -395,5 +396,25 @@ public class BaseConfigurationTest {
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testRestTransportUriWithHttpDefaultPort() throws RepositoryException, ValidationException {
+        validProperties.put("rest_transport_uri", "http://example.com/");
+
+        org.graylog2.Configuration configuration = new org.graylog2.Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getRestTransportUri()).hasPort(80);
+    }
+
+    @Test
+    public void testRestTransportUriWithCustomPort() throws RepositoryException, ValidationException {
+        validProperties.put("rest_transport_uri", "http://example.com:12900/");
+
+        org.graylog2.Configuration configuration = new org.graylog2.Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getRestTransportUri()).hasPort(12900);
     }
 }

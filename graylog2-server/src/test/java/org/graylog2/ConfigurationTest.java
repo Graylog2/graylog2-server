@@ -28,6 +28,8 @@ import org.junit.rules.ExpectedException;
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 public class ConfigurationTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
@@ -80,5 +82,45 @@ public class ConfigurationTest {
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testRestListenUriWithHttpDefaultPort() throws RepositoryException, ValidationException {
+        validProperties.put("rest_listen_uri", "http://example.com/");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getRestListenUri()).hasPort(80);
+    }
+
+    @Test
+    public void testRestListenUriWithCustomPort() throws RepositoryException, ValidationException {
+        validProperties.put("rest_listen_uri", "http://example.com:12900/");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getRestListenUri()).hasPort(12900);
+    }
+
+    @Test
+    public void testWebListenUriWithHttpDefaultPort() throws RepositoryException, ValidationException {
+        validProperties.put("web_listen_uri", "http://example.com/");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getWebListenUri()).hasPort(80);
+    }
+
+    @Test
+    public void testWebListenUriWithCustomPort() throws RepositoryException, ValidationException {
+        validProperties.put("web_listen_uri", "http://example.com:9000/");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getWebListenUri()).hasPort(9000);
     }
 }
