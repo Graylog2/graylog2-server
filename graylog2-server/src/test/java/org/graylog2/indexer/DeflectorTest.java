@@ -249,7 +249,6 @@ public class DeflectorTest {
         indexNameAliases.put("graylog_3", Collections.singleton("graylog_deflector"));
         indexNameAliases.put("foobar", Collections.singleton("graylog_deflector"));
 
-        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final Deflector deflector = new Deflector(systemJobManager,
                 "graylog",
                 activityWriter,
