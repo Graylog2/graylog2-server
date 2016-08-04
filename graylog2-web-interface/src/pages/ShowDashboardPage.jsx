@@ -32,6 +32,8 @@ const ShowDashboardPage = React.createClass({
     this.loadData();
     this.listenTo(WidgetsStore, this.removeWidget);
     this.loadInterval = setInterval(this.loadData, 2000);
+    // eslint-disable-next-line react/no-did-mount-set-state
+    this.setState({ forceUpdateInBackground: this.state.currentUser.preferences.updateUnfocussed });
   },
   componentWillUnmount() {
     if (this.loadInterval) {
@@ -56,11 +58,8 @@ const ShowDashboardPage = React.createClass({
         }
       });
   },
-  updateUnFocussed() {
-    return this.state.currentUser.preferences.updateUnfocussed;
-  },
   shouldUpdate() {
-    return Boolean(this.updateUnFocussed() || this.state.forceUpdateInBackground || this.state.focus);
+    return Boolean(this.state.forceUpdateInBackground || this.state.focus);
   },
   removeWidget(props) {
     if (props.delete) {
