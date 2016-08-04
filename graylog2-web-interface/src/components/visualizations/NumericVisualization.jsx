@@ -1,4 +1,5 @@
 import React from 'react';
+import deepEqual from 'deep-equal';
 
 import NumberUtils from 'util/NumberUtils';
 
@@ -25,8 +26,12 @@ const NumericVisualization = React.createClass({
     const state = this._normalizeStateFromProps(this.props.data);
     this.setState(state);
   },
-  componentWillReceiveProps(newProps) {
-    const state = this._normalizeStateFromProps(newProps.data);
+  componentWillReceiveProps(nextProps) {
+    if (deepEqual(this.props, nextProps)) {
+      return;
+    }
+
+    const state = this._normalizeStateFromProps(nextProps.data);
     this.setState(state);
   },
   DEFAULT_VALUE_FONT_SIZE: '70px',

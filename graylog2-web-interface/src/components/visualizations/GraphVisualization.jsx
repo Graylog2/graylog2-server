@@ -4,7 +4,9 @@ import numeral from 'numeral';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
+// eslint-disable-next-line no-unused-vars
 import jQuery from 'jquery';
+import deepEqual from 'deep-equal';
 
 import DateTime from 'logic/datetimes/DateTime';
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
@@ -93,6 +95,10 @@ const GraphVisualization = React.createClass({
     this._updateData(this.props.data, this.props.config);
   },
   componentWillReceiveProps(nextProps) {
+    if (deepEqual(this.props, nextProps)) {
+      return;
+    }
+
     if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
       this._resizeVisualization(nextProps.width, nextProps.height);
     }
