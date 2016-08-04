@@ -39,10 +39,20 @@ function PluginWebpackConfig(fqcn, _options, additionalConfig) {
         { test: /\.js(x)?$/, loader: 'babel-loader', exclude: /node_modules|\.node_cache/ },
       ],
     },
+    devtool: 'source-map',
     plugins: [
       new HtmlWebpackPlugin({ filename: `${getPluginFullName(fqcn)}.module.json`, template: moduleJsonTemplate }),
       new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
       new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.web_src_path }),
+      new webpack.optimize.UglifyJsPlugin({
+        minimize: true,
+        sourceMap: true,
+        compress: {
+          warnings: false,
+        },
+      }),
+      new webpack.optimize.DedupePlugin(),
+      new webpack.optimize.OccurenceOrderPlugin(),
     ],
     resolve: {
       root: [path.resolve(options.web_src_path, 'src')],
