@@ -387,6 +387,8 @@ public class BaseConfigurationTest {
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertEquals(URI.create("http://www.example.com:12900/foo"), configuration.getRestTransportUri());
     }
 
     @Test
@@ -395,6 +397,8 @@ public class BaseConfigurationTest {
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertEquals(URI.create("http://www.example.com:12900/foo"), configuration.getWebEndpointUri());
     }
 
     @Test
