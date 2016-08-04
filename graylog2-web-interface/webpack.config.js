@@ -28,7 +28,6 @@ const webpackConfig = {
     ],
     loaders: [
       { test: /\.json$/, loader: 'json-loader' },
-      { test: /\.js(x)?$/, loaders: ['react-hot', 'babel-loader'], exclude: /node_modules|\.node_cache/ },
       { test: /\.ts$/, loader: 'babel-loader!ts-loader', exclude: /node_modules|\.node_cache/ },
       { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, loader: 'file-loader' },
       { test: /\.png$/, loader: 'url-loader' },
@@ -44,7 +43,7 @@ const webpackConfig = {
   eslint: {
     configFile: '.eslintrc',
   },
-  devtool: 'eval',
+  devtool: 'source-map',
   plugins: [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: ROOT_PATH }),
     new HtmlWebpackPlugin({
@@ -74,6 +73,18 @@ const commonConfigs = {
     ],
   },
 };
+
+// We use the react-hot loader when running "start" for development.
+// Any other target does not use it.
+if (TARGET === 'start') {
+  webpackConfig.module.loaders.unshift(
+    { test: /\.js(x)?$/, loaders: ['react-hot', 'babel-loader'], exclude: /node_modules|\.node_cache/ }
+  );
+} else {
+  webpackConfig.module.loaders.unshift(
+    { test: /\.js(x)?$/, loaders: ['babel-loader'], exclude: /node_modules|\.node_cache/ }
+  );
+}
 
 if (TARGET === 'start') {
   console.log('Running in development mode');
@@ -105,7 +116,7 @@ if (TARGET === 'build') {
     plugins: [
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
-        sourceMap: false,
+        sourceMap: true,
         compress: {
           warnings: false,
         },
