@@ -16,6 +16,7 @@
  */
 package org.graylog2.security;
 
+import org.apache.shiro.subject.support.DefaultSubjectContext;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
@@ -92,7 +93,7 @@ public class MongoDbSession extends PersistedImpl {
         if (attributes == null) {
             return Optional.empty();
         }
-        return Optional.ofNullable(String.valueOf(attributes.get("username")));
+        return Optional.ofNullable(String.valueOf(attributes.get(DefaultSubjectContext.PRINCIPALS_SESSION_KEY)));
     }
 
     public String getHost() {
