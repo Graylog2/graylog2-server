@@ -50,6 +50,9 @@ function PluginWebpackConfig(fqcn, _options, additionalConfig) {
         compress: {
           warnings: false,
         },
+        mangle: {
+          except: ['$super', '$', 'exports', 'require'],
+        },
       }),
       new webpack.optimize.DedupePlugin(),
       new webpack.optimize.OccurenceOrderPlugin(),
