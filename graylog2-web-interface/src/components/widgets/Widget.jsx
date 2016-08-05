@@ -63,7 +63,7 @@ const Widget = React.createClass({
     return ReactDOM.findDOMNode(this.refs.widget);
   },
   _loadValue() {
-    if (this.state.result !== undefined && !this.props.shouldUpdate) {
+    if (this.state.deleted || (this.state.result !== undefined && !this.props.shouldUpdate)) {
       return;
     }
 
