@@ -120,6 +120,9 @@ if (TARGET === 'build') {
         compress: {
           warnings: false,
         },
+        mangle: {
+          except: ['$super', '$', 'exports', 'require'],
+        },
       }),
       new webpack.optimize.DedupePlugin(),
       new webpack.optimize.OccurenceOrderPlugin(),
