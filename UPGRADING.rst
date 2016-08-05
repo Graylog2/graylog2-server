@@ -53,7 +53,7 @@ The network settings in the Graylog configuration file (``rest_listen_uri``, ``r
 Examples:
 
 +-----------------------------------------------+------------------------------+-----------------------------+
-| Configurastion setting                        | Old effective URI            | New effective URI           |
+| Configuration setting                         | Old effective URI            | New effective URI           |
 +===============================================+==============================+=============================+
 | ``rest_listen_uri = http://127.0.0.1:12900/`` | ``http://127.0.0.1:12900/``  | ``http://127.0.0.1:12900/`` |
 | ``rest_listen_uri = http://127.0.0.1/``       | ``http://127.0.0.1:12900/``  | ``http://127.0.0.1:80/``    |
