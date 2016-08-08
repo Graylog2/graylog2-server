@@ -44,6 +44,12 @@ The third (optional) parameter for the `PluginWebpackConfig` constructor is an o
 
 Feel free to contribute to this collection of helpers by forking the repository and submitting a pull request. Thanks!
 
+## Release a new version
+
+    $ npm version [<newversion> | major | minor | patch]
+    $ git push origin master && git push --tags
+    $ npm publish
+
 ## Release History
 * 0.0.21 Add optimizations for production builds.
 * 0.0.20 Add plugin fqdn as prefix of built `module.json`.
