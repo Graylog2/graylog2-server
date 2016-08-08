@@ -242,6 +242,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         final Message message = evaluateRule(rule, new Message(json, "test", Tools.nowUTC()));
 
         assertThat(message.hasField("author_first")).isTrue();
+        assertThat(message.getField("author_first")).isEqualTo("Nigel Rees");
         assertThat(message.hasField("author_last")).isTrue();
 
     }
