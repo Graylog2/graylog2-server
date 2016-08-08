@@ -36,6 +36,7 @@ import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.Configuration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
 import org.graylog2.shared.rest.NotAuthorizedResponseFilter;
@@ -265,7 +266,8 @@ public class JerseyService extends AbstractIdleService {
                         RestAccessLogFilter.class,
                         NodeIdResponseFilter.class,
                         XHRFilter.class,
-                        NotAuthorizedResponseFilter.class)
+                        NotAuthorizedResponseFilter.class,
+                        WebAppNotFoundResponseFilter.class)
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override
                     public ObjectMapper getContext(Class<?> type) {
