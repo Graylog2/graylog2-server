@@ -1,0 +1,12 @@
+rule "kv"
+when true
+then
+    set_fields(key_value(
+        value: "dup_first=1 dup_first=2",
+        allow_dup_keys: false
+    ));
+    set_fields(key_value(
+        value: "dup_last=",
+        ignore_empty_values: false
+    ));
+end

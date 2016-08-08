@@ -1,0 +1,23 @@
+rule "kv"
+when true
+then
+    set_fields(key_value(
+            value: "a='1' <b>=2  \n 'c'=3 [d]=44 a=4 \"e\"=4 [f=1][[g]:3] h=",
+            delimiters: " \t\n\r[",
+            kv_delimiters: "=:",
+            ignore_empty_values: true,
+            trim_key_chars: "\"[]<>'",
+            trim_value_chars: "']",
+            allow_dup_keys: true, // the default
+            handle_dup_keys: ","  // meaning concat, default "take_first"
+    ));
+
+    set_fields(key_value(
+        value: "dup_first=1 dup_first=2",
+        handle_dup_keys: "take_first"
+    ));
+    set_fields(key_value(
+        value: "dup_last=1 dup_last=2",
+        handle_dup_keys: "take_last"
+    ));
+end

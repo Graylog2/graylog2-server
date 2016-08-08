@@ -60,6 +60,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
+import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
@@ -149,6 +150,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Swapcase.NAME, new Swapcase());
         functions.put(Uncapitalize.NAME, new Uncapitalize());
         functions.put(Uppercase.NAME, new Uppercase());
+        functions.put(KeyValue.NAME, new KeyValue());
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
@@ -310,9 +312,9 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(actionsTriggered.get()).isTrue();
         assertThat(message).isNotNull();
         assertThat(message.getField("has_xyz")).isInstanceOf(Boolean.class);
-        assertThat((boolean)message.getField("has_xyz")).isFalse();
+        assertThat((boolean) message.getField("has_xyz")).isFalse();
         assertThat(message.getField("string_literal")).isInstanceOf(String.class);
-        assertThat((String)message.getField("string_literal")).isEqualTo("abcd\\.e\tfg\u03a9\363");
+        assertThat((String) message.getField("string_literal")).isEqualTo("abcd\\.e\tfg\u03a9\363");
     }
 
     @Test
@@ -381,9 +383,11 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("user_info")).isEqualTo("admin:s3cr31");
         assertThat(message.getField("host")).isEqualTo("some.host.with.lots.of.subdomains.com");
         assertThat(message.getField("port")).isEqualTo(9999);
-        assertThat(message.getField("file")).isEqualTo("/path1/path2/three?q1=something&with_spaces=hello%20graylog&equal=can=containanotherone");
+        assertThat(message.getField("file")).isEqualTo(
+                "/path1/path2/three?q1=something&with_spaces=hello%20graylog&equal=can=containanotherone");
         assertThat(message.getField("fragment")).isEqualTo("anchorstuff");
-        assertThat(message.getField("query")).isEqualTo("q1=something&with_spaces=hello%20graylog&equal=can=containanotherone");
+        assertThat(message.getField("query")).isEqualTo(
+                "q1=something&with_spaces=hello%20graylog&equal=can=containanotherone");
         assertThat(message.getField("q1")).isEqualTo("something");
         assertThat(message.getField("with_spaces")).isEqualTo("hello graylog");
         assertThat(message.getField("equal")).isEqualTo("can=containanotherone");
@@ -523,6 +527,37 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("pre_field2")).isEqualTo("8");
         assertThat(message.getField("field1_suff")).isEqualTo("9");
         assertThat(message.getField("field2_suff")).isEqualTo("10");
+    }
 
+    public void keyValue() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+
+        final EvaluationContext context = contextForRuleEval(rule, new Message("", "", Tools.nowUTC()));
+
+        assertThat(context).isNotNull();
+        assertThat(context.evaluationErrors()).isEmpty();
+        final Message message = context.currentMessage();
+        assertThat(message).isNotNull();
+
+
+        assertThat(message.getField("a")).isEqualTo("1,4");
+        assertThat(message.getField("b")).isEqualTo("2");
+        assertThat(message.getField("c")).isEqualTo("3");
+        assertThat(message.getField("d")).isEqualTo("44");
+        assertThat(message.getField("e")).isEqualTo("4");
+        assertThat(message.getField("f")).isEqualTo("1");
+        assertThat(message.getField("g")).isEqualTo("3");
+        assertThat(message.hasField("h")).isFalse();
+
+        assertThat(message.getField("dup_first")).isEqualTo("1");
+        assertThat(message.getField("dup_last")).isEqualTo("2");
+    }
+
+    @Test
+    public void keyValueFailure() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final EvaluationContext context = contextForRuleEval(rule, new Message("", "", Tools.nowUTC()));
+
+        assertThat(context.hasEvaluationErrors()).isTrue();
     }
 }

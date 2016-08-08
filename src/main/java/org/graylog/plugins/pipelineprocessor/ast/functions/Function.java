@@ -57,6 +57,9 @@ public interface Function<T> {
                 if (value != null) {
                     //noinspection unchecked
                     final ParameterDescriptor<Object, Object> param = (ParameterDescriptor<Object, Object>) args.param(name);
+                    if (param == null) {
+                        throw new IllegalStateException("Unknown parameter " + name + "! Cannot continue.");
+                    }
                     args.setPreComputedValue(name, param.transform().apply(value));
                 }
             } catch (Exception exception) {

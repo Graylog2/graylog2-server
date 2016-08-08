@@ -53,6 +53,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
+import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
@@ -103,6 +104,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(Uncapitalize.NAME, Uncapitalize.class);
         addMessageProcessorFunction(Uppercase.NAME, Uppercase.class);
         addMessageProcessorFunction(Concat.NAME, Concat.class);
+        addMessageProcessorFunction(KeyValue.NAME, KeyValue.class);
 
         // json
         addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);
