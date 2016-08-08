@@ -16,43 +16,14 @@
  */
 package org.graylog2.auditlog;
 
-import com.google.common.collect.ImmutableSet;
-
-import javax.inject.Inject;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
-import java.util.Set;
 
-public class AuditLogger {
-    private final Collection<AuditLogAppender> appenders;
+public interface AuditLogger {
+    void success(String subject, String action, String object);
 
-    @Inject
-    public AuditLogger(Set<AuditLogAppender> appenders) {
-        this.appenders = ImmutableSet.copyOf(appenders);
-    }
+    void success(String subject, String action, String object, Map<String, Object> context);
 
-    public void success(String subject, String action, String object) {
-        success(subject, action, object, Collections.emptyMap());
-    }
+    void failure(String subject, String action, String object);
 
-    public void success(String subject, String action, String object, Map<String, Object> context) {
-        log(SuccessStatus.SUCCESS, subject, action, object, context);
-    }
-
-    public void failure(String subject, String action, String object) {
-        failure(subject, action, object, Collections.emptyMap());
-    }
-
-    public void failure(String subject, String action, String object, Map<String, Object> context) {
-        log(SuccessStatus.FAILURE, subject, action, object, context);
-    }
-
-    public void log(SuccessStatus successStatus, String subject, String action, String object, Map<String, Object> context) {
-        for (AuditLogAppender appender : appenders) {
-            if (appender.enabled()) {
-                appender.write(successStatus, subject, action, object, context);
-            }
-        }
-    }
+    void failure(String subject, String action, String object, Map<String, Object> context);
 }
