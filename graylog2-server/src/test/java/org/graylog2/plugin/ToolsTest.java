@@ -266,4 +266,38 @@ public class ToolsTest {
         assertTrue(Tools.dateTimeFromDouble(1381079085.6).toString().startsWith("2013-10-06T"));
         assertTrue(Tools.dateTimeFromDouble(1381079085.06).toString().startsWith("2013-10-06T"));
     }
+
+    @Test
+    public void uriWithTrailingSlashReturnsNullIfURIIsNull() {
+        assertNull(Tools.uriWithTrailingSlash(null));
+    }
+
+    @Test
+    public void uriWithTrailingSlashReturnsURIWithTrailingSlashIfTrailingSlashIsMissing() throws URISyntaxException {
+        final String uri = "http://example.com/api/";
+        assertEquals(URI.create(uri), Tools.uriWithTrailingSlash(URI.create("http://example.com/api")));
+    }
+
+    @Test
+    public void uriWithTrailingSlashReturnsURIIfTrailingSlashIsPresent() {
+        final URI uri = URI.create("http://example.com/api/");
+        assertEquals(uri, Tools.uriWithTrailingSlash(uri));
+    }
+
+    @Test
+    public void normalizeURIAddsSchemaAndPortAndPathWithTrailingSlash() {
+        final URI uri = URI.create("foobar://example.com");
+        assertEquals(URI.create("quux://example.com:1234/foobar/"), Tools.normalizeURI(uri, "quux", 1234, "/foobar"));
+    }
+
+    @Test
+    public void normalizeURIReturnsNormalizedURI() {
+        final URI uri = URI.create("foobar://example.com//foo/////bar");
+        assertEquals(URI.create("quux://example.com:1234/foo/bar/"), Tools.normalizeURI(uri, "quux", 1234, "/baz"));
+    }
+
+    @Test
+    public void normalizeURIReturnsNullIfURIIsNull() {
+        assertNull(Tools.normalizeURI(null, "http", 1234, "/baz"));
+    }
 }

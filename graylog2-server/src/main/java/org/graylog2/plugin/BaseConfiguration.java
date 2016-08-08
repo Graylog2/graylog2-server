@@ -25,7 +25,6 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -36,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -183,7 +183,7 @@ public abstract class BaseConfiguration {
             LOG.warn("\"{}\" is not a valid setting for \"rest_transport_uri\". Using default [{}].", restTransportUri, getDefaultRestTransportUri());
             return getDefaultRestTransportUri();
         } else {
-            return Tools.getUriWithPort(restTransportUri, GRAYLOG_DEFAULT_PORT);
+            return Tools.normalizeURI(restTransportUri, getRestUriScheme(), GRAYLOG_DEFAULT_PORT, "/");
         }
     }
 
@@ -209,8 +209,19 @@ public abstract class BaseConfiguration {
                 throw new RuntimeException("No rest_transport_uri.", e);
             }
 
-            transportUri = Tools.getUriWithPort(
-                    URI.create("http://" + guessedAddress.getHostAddress() + ":" + listenUri.getPort()), GRAYLOG_DEFAULT_PORT);
+            try {
+                transportUri = new URI(
+                        listenUri.getScheme(),
+                        listenUri.getUserInfo(),
+                        guessedAddress.getHostAddress(),
+                        listenUri.getPort(),
+                        listenUri.getPath(),
+                        listenUri.getQuery(),
+                        listenUri.getFragment()
+                );
+            } catch (URISyntaxException e) {
+                throw new RuntimeException("Invalid rest_transport_uri.", e);
+            }
         } else {
             transportUri = listenUri;
         }

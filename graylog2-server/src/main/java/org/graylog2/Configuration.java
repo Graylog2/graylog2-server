@@ -38,9 +38,7 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
 
-import static org.graylog2.plugin.Tools.getUriWithDefaultPath;
-import static org.graylog2.plugin.Tools.getUriWithPort;
-import static org.graylog2.plugin.Tools.getUriWithScheme;
+import static org.graylog2.plugin.Tools.normalizeURI;
 
 /**
  * Helper class to hold configuration of Graylog
@@ -208,12 +206,12 @@ public class Configuration extends BaseConfiguration {
 
     @Override
     public URI getRestListenUri() {
-        return getUriWithDefaultPath(getUriWithPort(getUriWithScheme(restListenUri, getRestUriScheme()), GRAYLOG_DEFAULT_PORT), "/");
+        return normalizeURI(restListenUri, getRestUriScheme(), GRAYLOG_DEFAULT_PORT, "/");
     }
 
     @Override
     public URI getWebListenUri() {
-        return getUriWithDefaultPath(getUriWithPort(getUriWithScheme(webListenUri, getWebUriScheme()), GRAYLOG_DEFAULT_WEB_PORT), "/");
+        return normalizeURI(webListenUri, getWebUriScheme(), GRAYLOG_DEFAULT_WEB_PORT, "/");
     }
 
     public String getRootUsername() {

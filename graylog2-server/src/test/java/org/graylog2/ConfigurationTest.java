@@ -87,7 +87,7 @@ public class ConfigurationTest {
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
-        assertThat(configuration.getWebListenUri()).isEqualTo(URI.create("http://www.example.com:12900/web"));
+        assertThat(configuration.getWebListenUri()).isEqualTo(URI.create("http://www.example.com:12900/web/"));
     }
 
     @Test
@@ -158,24 +158,33 @@ public class ConfigurationTest {
 
         expectedException.expect(ParameterException.class);
         expectedException.expectMessage("Required parameter \"password_secret\" not found.");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
     }
 
     @Test
     public void testApiListenerOnRootAndWebListenerOnSubPath() throws ValidationException, RepositoryException {
         validProperties.put("rest_listen_uri", "http://0.0.0.0:12900/");
-        validProperties.put("web_listen_uri", "http://0.0.0.0:12900/web");
+        validProperties.put("web_listen_uri", "http://0.0.0.0:12900/web/");
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getRestListenUri()).isEqualTo(URI.create("http://0.0.0.0:12900/"));
+        assertThat(configuration.getWebListenUri()).isEqualTo(URI.create("http://0.0.0.0:12900/web/"));
     }
 
     @Test
     public void testWebListenerOnRootAndApiListenerOnSubPath() throws ValidationException, RepositoryException {
-        validProperties.put("rest_listen_uri", "http://0.0.0.0:9000/api");
+        validProperties.put("rest_listen_uri", "http://0.0.0.0:9000/api/");
         validProperties.put("web_listen_uri", "http://0.0.0.0:9000/");
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getRestListenUri()).isEqualTo(URI.create("http://0.0.0.0:9000/api/"));
+        assertThat(configuration.getWebListenUri()).isEqualTo(URI.create("http://0.0.0.0:9000/"));
     }
 
     @Test

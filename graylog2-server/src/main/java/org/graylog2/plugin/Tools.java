@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin;
 
+import com.google.common.base.Optional;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Doubles;
@@ -29,6 +30,7 @@ import org.joda.time.format.DateTimeParser;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
 
+import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +54,7 @@ import java.util.UUID;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
@@ -457,7 +460,8 @@ public final class Tools {
         return InetAddress.getLoopbackAddress();
     }
 
-    public static URI getUriWithPort(final URI uri, final int port) {
+    @Nullable
+    public static URI getUriWithPort(@Nullable final URI uri, final int port) {
         if (uri == null) {
             return null;
         }
@@ -492,7 +496,8 @@ public final class Tools {
         }
     }
 
-    public static URI getUriWithScheme(final URI uri, final String scheme) {
+    @Nullable
+    public static URI getUriWithScheme(@Nullable final URI uri, final String scheme) {
         if (uri == null) {
             return null;
         }
@@ -511,7 +516,8 @@ public final class Tools {
         }
     }
 
-    public static URI getUriWithDefaultPath(final URI uri, final String path) {
+    @Nullable
+    public static URI getUriWithDefaultPath(@Nullable final URI uri, final String path) {
         if (uri == null) {
             return null;
         }
@@ -528,6 +534,42 @@ public final class Tools {
         } catch (URISyntaxException e) {
             throw new RuntimeException("Could not parse URI.", e);
         }
+    }
+
+    @Nullable
+    public static URI uriWithTrailingSlash(@Nullable final URI uri) {
+        if (uri == null) {
+            return null;
+        }
+
+        final String path = firstNonNull(uri.getPath(), "/");
+        if(path.endsWith("/")) {
+            return uri;
+        } else {
+            try {
+                return new URI(
+                        uri.getScheme(),
+                        uri.getUserInfo(),
+                        uri.getHost(),
+                        uri.getPort(),
+                        path + "/",
+                        uri.getQuery(),
+                        uri.getFragment());
+            } catch (URISyntaxException e) {
+                throw new RuntimeException("Could not parse URI.", e);
+            }
+        }
+    }
+
+    @Nullable
+    public static URI normalizeURI(@Nullable final URI uri, String scheme, int port, String path) {
+        return Optional.fromNullable(uri)
+                .transform(u -> getUriWithScheme(u, scheme))
+                .transform(u -> getUriWithPort(u, port))
+                .transform(u -> getUriWithDefaultPath(u, path))
+                .transform(Tools::uriWithTrailingSlash)
+                .transform(URI::normalize)
+                .orNull();
     }
 
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
