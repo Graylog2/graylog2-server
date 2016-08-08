@@ -45,6 +45,7 @@ The third (optional) parameter for the `PluginWebpackConfig` constructor is an o
 Feel free to contribute to this collection of helpers by forking the repository and submitting a pull request. Thanks!
 
 ## Release History
+* 0.0.21 Add optimizations for production builds.
 * 0.0.20 Add plugin fqdn as prefix of built `module.json`.
 * 0.0.19 Add webpack config to compile typescript code in plugins.
 * 0.0.18 Removing now unneeded shared bundle.
