@@ -22,6 +22,6 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface RemoteLoadBalancerStatusResource {
-    @PUT("/system/lbstatus/override/{status}")
+    @PUT("system/lbstatus/override/{status}")
     Call<Void> override(@Path("status") String status);
 }

@@ -24,12 +24,12 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface RemoteSystemResource {
-    @GET("/system")
+    @GET("system")
     Call<SystemOverviewResponse> system();
 
-    @GET("/system/jvm")
+    @GET("system/jvm")
     Call<SystemJVMResponse> jvm();
 
-    @GET("/system/threaddump")
+    @GET("system/threaddump")
     Call<SystemThreadDumpResponse> threadDump();
 }

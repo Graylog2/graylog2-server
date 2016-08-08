@@ -29,12 +29,12 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 
 public interface RemoteMetricsResource {
-    @GET("/system/metrics/names")
+    @GET("system/metrics/names")
     Call<MetricNamesResponse> metricNames();
 
-    @POST("/system/metrics/multiple")
+    @POST("system/metrics/multiple")
     Call<MetricsSummaryResponse> multipleMetrics(@Body @Valid @NotNull MetricsReadRequest request);
 
-    @GET("/system/metrics/namespace/{namespace}")
+    @GET("system/metrics/namespace/{namespace}")
     Call<MetricsSummaryResponse> byNamespace(@Path("namespace") String namespace);
 }

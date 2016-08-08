@@ -22,6 +22,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface RemoteJournalResource {
-    @GET("/system/journal")
+    @GET("system/journal")
     Call<JournalSummaryResponse> get();
 }

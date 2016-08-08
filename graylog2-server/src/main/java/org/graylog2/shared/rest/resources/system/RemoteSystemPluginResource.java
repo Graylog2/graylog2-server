@@ -22,6 +22,6 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 
 public interface RemoteSystemPluginResource {
-    @GET("/system/plugins")
+    @GET("system/plugins")
     Call<PluginList> list();
 }
