@@ -102,13 +102,11 @@ public class WebInterfaceAssetsResource {
     public Response get(@Context Request request,
                         @PathParam("plugin") String pluginName,
                         @PathParam("filename") String filename) {
-        final Optional<Plugin> plugin = getPluginForName(pluginName);
-        if (!plugin.isPresent()) {
-            throw new NotFoundException("Couldn't find plugin " + pluginName);
-        }
+        final Plugin plugin = getPluginForName(pluginName)
+                .orElseThrow(() -> new NotFoundException("Couldn't find plugin " + pluginName));
 
         try {
-            final URL resourceUrl = getResourceUri(true, filename, plugin.get().metadata().getClass());
+            final URL resourceUrl = getResourceUri(true, filename, plugin.metadata().getClass());
             return getResponse(request, filename, resourceUrl, true);
         } catch (URISyntaxException | IOException e) {
             throw new NotFoundException("Couldn't find " + filename + " in plugin " + pluginName, e);
@@ -119,7 +117,7 @@ public class WebInterfaceAssetsResource {
         return this.plugins.stream().filter(plugin -> plugin.metadata().getUniqueId().equals(pluginName)).findFirst();
     }
 
-    @Path("{filename: .*}")
+    @Path("assets/{filename: .*}")
     @GET
     public Response get(@Context Request request,
                         @PathParam("filename") String filename) {
@@ -132,6 +130,12 @@ public class WebInterfaceAssetsResource {
         } catch (IOException | URISyntaxException e) {
             return getDefaultResponse();
         }
+    }
+
+    @GET
+    @Path("index.html")
+    public Response getIndex() {
+        return getDefaultResponse();
     }
 
     @GET
@@ -151,27 +155,23 @@ public class WebInterfaceAssetsResource {
         final HashCode hashCode;
 
         switch (resourceUrl.getProtocol()) {
-            case "file": {
+            case "file":
                 final File file = new File(resourceUrl.toURI());
                 lastModified = new Date(file.lastModified());
                 stream = new FileInputStream(file);
                 hashCode = Files.hash(file, Hashing.sha256());
                 break;
-            }
-            case "jar": {
+            case "jar":
                 final URI uri = resourceUrl.toURI();
                 final FileSystem fileSystem = fileSystemCache.getUnchecked(uri);
-                final java.nio.file.Path path = fileSystem.getPath(pluginPrefixFilename(fromPlugin,
-                                                                                        filename
-                ));
+                final java.nio.file.Path path = fileSystem.getPath(pluginPrefixFilename(fromPlugin, filename));
                 final FileTime lastModifiedTime = java.nio.file.Files.getLastModifiedTime(path);
                 lastModified = new Date(lastModifiedTime.toMillis());
                 stream = resourceUrl.openStream();
                 hashCode = Resources.asByteSource(resourceUrl).hash(Hashing.sha256());
                 break;
-            }
             default:
-                throw new IllegalArgumentException("Not a jar or file");
+                throw new IllegalArgumentException("Not a JAR or local file: " + resourceUrl);
         }
 
         final EntityTag entityTag = new EntityTag(hashCode.toString());
@@ -181,8 +181,7 @@ public class WebInterfaceAssetsResource {
             return response.build();
         }
 
-        final String contentType = firstNonNull(mimeTypes.getContentType(filename),
-                                                MediaType.APPLICATION_OCTET_STREAM);
+        final String contentType = firstNonNull(mimeTypes.getContentType(filename), MediaType.APPLICATION_OCTET_STREAM);
         final CacheControl cacheControl = new CacheControl();
         cacheControl.setMaxAge((int) TimeUnit.DAYS.toSeconds(365));
         cacheControl.setNoCache(false);
