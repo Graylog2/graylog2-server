@@ -20,7 +20,7 @@ function getPluginFullName(fqcn) {
 function PluginWebpackConfig(fqcn, _options, additionalConfig) {
   const options = merge(defaultOptions, _options);
   const moduleJsonTemplate = path.resolve(module.parent.filename, '../templates/module.json.template');
-  const config = {
+  let config = {
     entry: {
     },
     output: {
@@ -39,23 +39,10 @@ function PluginWebpackConfig(fqcn, _options, additionalConfig) {
         { test: /\.js(x)?$/, loader: 'babel-loader', exclude: /node_modules|\.node_cache/ },
       ],
     },
-    devtool: 'source-map',
     plugins: [
       new HtmlWebpackPlugin({ filename: `${getPluginFullName(fqcn)}.module.json`, template: moduleJsonTemplate }),
       new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
       new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.web_src_path }),
-      new webpack.optimize.UglifyJsPlugin({
-        minimize: true,
-        sourceMap: true,
-        compress: {
-          warnings: false,
-        },
-        mangle: {
-          except: ['$super', '$', 'exports', 'require'],
-        },
-      }),
-      new webpack.optimize.DedupePlugin(),
-      new webpack.optimize.OccurenceOrderPlugin(),
     ],
     resolve: {
       root: [path.resolve(options.web_src_path, 'src')],
@@ -67,7 +54,24 @@ function PluginWebpackConfig(fqcn, _options, additionalConfig) {
   config.entry[getPluginFullName(fqcn)] = options.entry_path;
 
   if (TARGET === 'build') {
-    config.plugins.push(new WebpackCleanupPlugin({}));
+    config = merge(config, {
+      devtool: 'source-map',
+      plugins: [
+        new webpack.optimize.UglifyJsPlugin({
+          minimize: true,
+          sourceMap: true,
+          compress: {
+            warnings: false,
+          },
+          mangle: {
+            except: ['$super', '$', 'exports', 'require'],
+          },
+        }),
+        new webpack.optimize.DedupePlugin(),
+        new webpack.optimize.OccurenceOrderPlugin(),
+        new WebpackCleanupPlugin({}),
+      ],
+    });
   }
 
   if (additionalConfig) {
