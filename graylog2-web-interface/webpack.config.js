@@ -110,6 +110,27 @@ if (TARGET === 'start') {
   });
 }
 
+if (TARGET === 'start-nohmr') {
+  console.log('Running in development (no HMR) mode');
+  module.exports = merge(webpackConfig, {
+    devtool: 'eval',
+    devServer: {
+      historyApiFallback: true,
+      hot: false,
+      inline: true,
+      progress: true,
+    },
+    output: {
+      path: BUILD_PATH,
+      filename: '[name].js',
+      publicPath: '/',
+    },
+    plugins: [
+      new webpack.DefinePlugin({DEVELOPMENT: true}),
+    ],
+  });
+}
+
 if (TARGET === 'build') {
   console.log('Running in production mode');
   module.exports = merge(webpackConfig, {
