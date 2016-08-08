@@ -17,6 +17,7 @@
 package org.graylog2;
 
 import com.github.joschi.jadconfig.JadConfig;
+import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
@@ -122,5 +123,48 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         assertThat(configuration.getWebListenUri()).hasPort(9000);
+    }
+
+    @Test
+    public void testPasswordSecretIsTooShort() throws ValidationException, RepositoryException {
+        validProperties.put("password_secret", "too short");
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("The minimum length for \"password_secret\" is 16 characters.");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testPasswordSecretIsEmpty() throws ValidationException, RepositoryException {
+        validProperties.put("password_secret", "");
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Parameter password_secret should not be blank");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testPasswordSecretIsNull() throws ValidationException, RepositoryException {
+        validProperties.put("password_secret", null);
+
+        expectedException.expect(ParameterException.class);
+        expectedException.expectMessage("Required parameter \"password_secret\" not found.");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testPasswordSecretIsValid() throws ValidationException, RepositoryException {
+        validProperties.put("password_secret", "abcdefghijklmnopqrstuvwxyz");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getPasswordSecret()).isEqualTo("abcdefghijklmnopqrstuvwxyz");
     }
 }

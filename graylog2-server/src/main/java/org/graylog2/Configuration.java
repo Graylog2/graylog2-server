@@ -17,6 +17,8 @@
 package org.graylog2;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.DirectoryPathReadableValidator;
@@ -316,5 +318,13 @@ public class Configuration extends BaseConfiguration {
 
     public int getLoadBalancerRequestThrottleJournalUsage() {
         return loadBalancerThrottleThresholdPercentage;
+    }
+
+    @ValidatorMethod
+    public void validatePasswordSecret() throws ValidationException {
+        final String passwordSecret = getPasswordSecret();
+        if (passwordSecret == null || passwordSecret.length() < 16) {
+            throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
+        }
     }
 }
