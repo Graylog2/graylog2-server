@@ -1,0 +1,40 @@
+rule "prefixsuffix"
+when true
+then
+    // plain set field
+    set_field("field", "1");
+    // both prefix and suffix, doesn't touch the above
+    set_field("field", "2", "prae_", "_sueff");
+
+    // combinations of optional prefix, suffix
+    set_field(field: "field", value: "3", suffix: "_sueff");
+    set_field(field: "field", value: "4", prefix: "prae_");
+
+    // set multiple fields with the same prefix
+    set_fields(
+        fields: {
+          field1: "5",
+          field2: "6"
+        },
+        prefix: "pre_",
+        suffix: "_suff"
+    );
+
+    // set multiple fields with the same prefix, suffix optional
+    set_fields(
+        fields: {
+          field1: "7",
+          field2: "8"
+        },
+        prefix: "pre_"
+    );
+    // set multiple fields with the same suffix, prefix optional
+    set_fields(
+        fields: {
+          field1: "9",
+          field2: "10"
+        },
+        suffix: "_suff"
+    );
+end
+

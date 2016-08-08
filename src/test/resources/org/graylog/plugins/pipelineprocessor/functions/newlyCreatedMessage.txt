@@ -3,10 +3,10 @@ when true
 then
   let x = create_message("new", "synthetic", now());
 
-  set_field("removed_again", "foo", x);
-  set_field("only_in", "new message", x);
-  set_fields({ multi: "new message" }, x);
-  set_field("has_source", has_field("source", x), x);
+  set_field(field: "removed_again", value: "foo", message: x);
+  set_field(field: "only_in", value: "new message", message: x);
+  set_fields(fields: { multi: "new message" }, message: x);
+  set_field(field: "has_source", value: has_field("source", x), message: x);
   route_to_stream(name: "some stream", message: x);
   remove_field("removed_again", x);
 end

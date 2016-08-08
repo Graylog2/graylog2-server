@@ -24,19 +24,25 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog2.plugin.Message;
 
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
 public class SetFields extends AbstractFunction<Void> {
 
     public static final String NAME = "set_fields";
-    public static final String FIELDS = "fields";
+
     private final ParameterDescriptor<Map, Map> fieldsParam;
+    private final ParameterDescriptor<String, String> prefixParam;
+    private final ParameterDescriptor<String, String> suffixParam;
     private final ParameterDescriptor<Message, Message> messageParam;
 
     public SetFields() {
-        fieldsParam = ParameterDescriptor.type(FIELDS, Map.class).build();
+        fieldsParam = type("fields", Map.class).build();
+        prefixParam = string("prefix").optional().build();
+        suffixParam = string("suffix").optional().build();
         messageParam = type("message", Message.class).optional().build();
     }
 
@@ -45,7 +51,20 @@ public class SetFields extends AbstractFunction<Void> {
         //noinspection unchecked
         final Map<String, Object> fields = fieldsParam.required(args, context);
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
-        message.addFields(fields);
+        final Optional<String> prefix = prefixParam.optional(args, context);
+        final Optional<String> suffix = suffixParam.optional(args, context);
+
+        if (fields != null) {
+            fields.forEach((field, value) -> {
+                if (prefix.isPresent()) {
+                    field = prefix.get() + field;
+                }
+                if (suffix.isPresent()) {
+                    field = field + suffix.get();
+                }
+                message.addField(field, value);
+            });
+        }
         return null;
     }
 
@@ -54,7 +73,7 @@ public class SetFields extends AbstractFunction<Void> {
         return FunctionDescriptor.<Void>builder()
                 .name(NAME)
                 .returnType(Void.class)
-                .params(of(fieldsParam, messageParam))
+                .params(of(fieldsParam, prefixParam, suffixParam, messageParam))
                 .build();
     }
 

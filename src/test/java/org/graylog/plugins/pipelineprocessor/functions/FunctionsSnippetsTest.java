@@ -504,4 +504,25 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("ip_4")).isEqualTo(new IpAddress(InetAddresses.forString("::1")));
 
     }
+
+    @Test
+    public void fieldPrefixSuffix() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+
+        assertThat(message.getField("field")).isEqualTo("1");
+        assertThat(message.getField("prae_field_sueff")).isEqualTo("2");
+        assertThat(message.getField("field_sueff")).isEqualTo("3");
+        assertThat(message.getField("prae_field")).isEqualTo("4");
+        assertThat(message.getField("pre_field1_suff")).isEqualTo("5");
+        assertThat(message.getField("pre_field2_suff")).isEqualTo("6");
+        assertThat(message.getField("pre_field1")).isEqualTo("7");
+        assertThat(message.getField("pre_field2")).isEqualTo("8");
+        assertThat(message.getField("field1_suff")).isEqualTo("9");
+        assertThat(message.getField("field2_suff")).isEqualTo("10");
+
+    }
 }
