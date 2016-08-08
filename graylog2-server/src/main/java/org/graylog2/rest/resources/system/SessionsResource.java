@@ -129,7 +129,6 @@ public class SessionsResource extends RestResource {
             final User user = userService.load(createRequest.username());
             if (user != null) {
                 long timeoutInMillis = user.getSessionTimeoutMs();
-                s.setAttribute("username", user.getName());
                 s.setTimeout(timeoutInMillis);
             } else {
                 // set a sane default. really we should be able to load the user from above.
