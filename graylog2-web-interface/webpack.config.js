@@ -95,6 +95,9 @@ if (TARGET === 'start') {
       hot: true,
       inline: true,
       progress: true,
+      watchOptions: {
+        ignored: /node_modules/,
+      },
     },
     output: {
       path: BUILD_PATH,
@@ -119,6 +122,9 @@ if (TARGET === 'start-nohmr') {
       hot: false,
       inline: true,
       progress: true,
+      watchOptions: {
+        ignored: /node_modules/,
+      },
     },
     output: {
       path: BUILD_PATH,
