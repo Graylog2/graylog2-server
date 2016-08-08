@@ -23,8 +23,8 @@ Web Interface Listener
 ----------------------
 
 Graylog 2.0.x has been using separate listeners for the REST API and the web interface by default. The Graylog REST API on ``http://127.0.0.1:12900``, the Graylog web interface on ``http://127.0.0.1:9000``.
-Beginning with Graylog 2.1.0 it is possible to run both the REST API and the web interface on the same host/port-combination and this is now the default. This means that the REST API is still running on ``http://127.0.0.1:12900`` per default, but the web interface is now running on ``http://127.0.0.1:12900/web``.
-Furthermore, all requests going to ``http://127.0.0.1:12900/`` requesting a content-type of ``text/html`` or ``application/xhtml+xml`` are redirected to the web interface, therefore making it even easier to set up Graylog and use it behind proxies, expose it externally etc.
+Beginning with Graylog 2.1.0 it is possible to run both the REST API and the web interface on the same host/port-combination and this is now the default. This means that the REST API is now running on ``http://127.0.0.1:9000/api/`` by default and the web interface is now running on ``http://127.0.0.1:9000/``.
+Furthermore, all requests going to ``http://127.0.0.1:9000/api/`` requesting a content-type of ``text/html`` or ``application/xhtml+xml`` are redirected to the web interface, therefore making it even easier to set up Graylog and use it behind proxies, expose it externally etc.
 
 Please take not that you can still run the REST API and the web interface on two separate listeners. If you are running a Graylog 2.0.x configuration specifying ``web_listen_uri`` explicitly and you want to keep that, you do not have to change anything.
 

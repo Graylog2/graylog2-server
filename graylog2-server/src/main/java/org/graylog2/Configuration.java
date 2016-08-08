@@ -52,10 +52,10 @@ public class Configuration extends BaseConfiguration {
     private String passwordSecret;
 
     @Parameter(value = "rest_listen_uri", required = true, validator = URIAbsoluteValidator.class)
-    private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_PORT + "/");
+    private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_PORT + "/api/");
 
     @Parameter(value = "web_listen_uri", required = true, validator = URIAbsoluteValidator.class)
-    private URI webListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_WEB_PORT + "/web");
+    private URI webListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_WEB_PORT + "/");
 
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBatchSize = 500;

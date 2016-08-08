@@ -45,7 +45,7 @@ public class BaseConfigurationTest {
 
     private class Configuration extends BaseConfiguration {
         @Parameter(value = "rest_listen_uri", required = true)
-        private URI restListenUri = URI.create("http://127.0.0.1:12900/");
+        private URI restListenUri = URI.create("http://127.0.0.1:9000/api/");
 
         @Parameter(value = "web_listen_uri", required = true)
         private URI webListenUri = URI.create("http://127.0.0.1:9000/");
