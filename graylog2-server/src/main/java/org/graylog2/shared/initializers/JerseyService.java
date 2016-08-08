@@ -21,7 +21,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -33,9 +32,9 @@ import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.EncodingFilter;
-import org.glassfish.jersey.server.internal.scanning.PackageNamesScanner;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.Configuration;
+import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
@@ -50,8 +49,6 @@ import org.graylog2.shared.rest.exceptionmappers.JsonProcessingExceptionMapper;
 import org.graylog2.shared.rest.exceptionmappers.WebApplicationExceptionMapper;
 import org.graylog2.shared.security.tls.KeyStoreUtils;
 import org.graylog2.shared.security.tls.PemKeyStore;
-import org.graylog2.web.resources.AppConfigResource;
-import org.graylog2.web.resources.WebInterfaceAssetsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,8 +66,12 @@ import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.KeyStore;
 import java.security.cert.CertificateException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -82,8 +83,9 @@ import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class JerseyService extends AbstractIdleService {
-    private static final Logger LOG = LoggerFactory.getLogger(JerseyService.class);
     public static final String PLUGIN_PREFIX = "/plugins";
+    private static final Logger LOG = LoggerFactory.getLogger(JerseyService.class);
+    private static final String RESOURCE_PACKAGE_WEB = "org.graylog2.web.resources";
 
     private final Configuration configuration;
     private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
@@ -129,14 +131,17 @@ public class JerseyService extends AbstractIdleService {
     }
 
     private void startUpWeb() throws Exception {
-        final String[] resources = new String[]{"org.graylog2.web.resources"};
+        final String[] resources = new String[]{RESOURCE_PACKAGE_WEB};
+
+        final SSLEngineConfigurator sslEngineConfigurator = configuration.isWebEnableTls() ?
+                buildSslEngineConfigurator(
+                        configuration.getWebTlsCertFile(),
+                        configuration.getWebTlsKeyFile(),
+                        configuration.getWebTlsKeyPassword()) : null;
 
         webHttpServer = setUp("web",
                 configuration.getWebListenUri(),
-                configuration.isWebEnableTls(),
-                configuration.getWebTlsCertFile(),
-                configuration.getWebTlsKeyFile(),
-                configuration.getWebTlsKeyPassword(),
+                sslEngineConfigurator,
                 configuration.getWebThreadPoolSize(),
                 configuration.getWebMaxInitialLineLength(),
                 configuration.getWebMaxHeaderSize(),
@@ -152,45 +157,60 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void shutDown() throws Exception {
-        if (apiHttpServer != null && apiHttpServer.isStarted()) {
-            LOG.info("Shutting down REST API at <{}>", configuration.getRestListenUri());
-            apiHttpServer.shutdownNow();
-        }
+        shutdownHttpServer(apiHttpServer, configuration.getRestListenUri());
+        shutdownHttpServer(webHttpServer, configuration.getWebListenUri());
+    }
 
-        if (webHttpServer != null && webHttpServer.isStarted()) {
-            LOG.info("Shutting down Web Interface at <{}>", configuration.getWebListenUri());
-            webHttpServer.shutdownNow();
+    private void shutdownHttpServer(HttpServer httpServer, URI listenUri) {
+        if (httpServer != null && httpServer.isStarted()) {
+            LOG.info("Shutting down HTTP listener at <{}>", listenUri);
+            httpServer.shutdownNow();
         }
     }
 
     private void startUpApi() throws Exception {
-        final ImmutableSet.Builder<Resource> additionalResourcesBuilder = ImmutableSet.<Resource>builder()
-                .addAll(prefixPluginResources(PLUGIN_PREFIX, pluginRestResources));
+        final boolean startWebInterface = configuration.isWebEnable() && configuration.isRestAndWebOnSamePort();
+        final List<String> resourcePackages = new ArrayList<>(Arrays.asList(restControllerPackages));
 
-        if (configuration.isWebEnable() && configuration.isRestAndWebOnSamePort()) {
-            additionalResourcesBuilder
-                    .addAll(prefixResources(configuration.getWebPrefix(), ImmutableSet.of(WebInterfaceAssetsResource.class, AppConfigResource.class)));
+        if (startWebInterface) {
+            resourcePackages.add(RESOURCE_PACKAGE_WEB);
         }
 
+        final Set<Resource> pluginResources = prefixPluginResources(PLUGIN_PREFIX, pluginRestResources);
+
+        final SSLEngineConfigurator sslEngineConfigurator = configuration.isRestEnableTls() ?
+                buildSslEngineConfigurator(
+                        configuration.getRestTlsCertFile(),
+                        configuration.getRestTlsKeyFile(),
+                        configuration.getRestTlsKeyPassword()) : null;
+
+        final URI restListenUri = configuration.getRestListenUri();
+        final URI listenUri = new URI(
+                restListenUri.getScheme(),
+                restListenUri.getUserInfo(),
+                restListenUri.getHost(),
+                restListenUri.getPort(),
+                null,
+                null,
+                null
+        );
+
         apiHttpServer = setUp("rest",
-                configuration.getRestListenUri(),
-                configuration.isRestEnableTls(),
-                configuration.getRestTlsCertFile(),
-                configuration.getRestTlsKeyFile(),
-                configuration.getRestTlsKeyPassword(),
+                listenUri,
+                sslEngineConfigurator,
                 configuration.getRestThreadPoolSize(),
                 configuration.getRestMaxInitialLineLength(),
                 configuration.getRestMaxHeaderSize(),
                 configuration.isRestEnableGzip(),
                 configuration.isRestEnableCors(),
-                additionalResourcesBuilder.build(),
-                restControllerPackages);
+                pluginResources,
+                resourcePackages.toArray(new String[0]));
 
         apiHttpServer.start();
 
-        LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
+        LOG.info("Started REST API at <{}>", listenUri);
 
-        if (configuration.isWebEnable() && configuration.isRestAndWebOnSamePort()) {
+        if (startWebInterface) {
             LOG.info("Started Web Interface at <{}>", configuration.getWebListenUri());
         }
     }
@@ -221,33 +241,39 @@ public class JerseyService extends AbstractIdleService {
     }
 
 
-    @SuppressWarnings("unchecked")
     private ResourceConfig buildResourceConfig(final boolean enableGzip,
                                                final boolean enableCors,
                                                final Set<Resource> additionalResources,
                                                final String[] controllerPackages) {
+        final Map<String, String> packagePrefixes = new HashMap<>();
+        for (String resourcePackage : controllerPackages) {
+            packagePrefixes.put(resourcePackage, configuration.getRestListenUri().getPath());
+        }
+        packagePrefixes.put(RESOURCE_PACKAGE_WEB, configuration.getWebListenUri().getPath());
+
         final ResourceConfig rc = new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
+                .register(new PrefixAddingModelProcessor(packagePrefixes))
                 .registerClasses(
                         JacksonJaxbJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
                         JacksonPropertyExceptionMapper.class,
                         AnyExceptionClassMapper.class,
                         WebApplicationExceptionMapper.class,
-                        BadRequestExceptionMapper.class)
+                        BadRequestExceptionMapper.class,
+                        RestAccessLogFilter.class,
+                        NodeIdResponseFilter.class,
+                        XHRFilter.class,
+                        NotAuthorizedResponseFilter.class)
                 .register(new ContextResolver<ObjectMapper>() {
                     @Override
                     public ObjectMapper getContext(Class<?> type) {
                         return objectMapper;
                     }
                 })
-                .registerFinder(new PackageNamesScanner(controllerPackages, true))
-                .registerResources(additionalResources)
-                .register(RestAccessLogFilter.class)
-                .register(NodeIdResponseFilter.class)
-                .register(XHRFilter.class)
-                .register(NotAuthorizedResponseFilter.class);
+                .packages(true, controllerPackages)
+                .registerResources(additionalResources);
 
         exceptionMappers.forEach(rc::registerClasses);
         dynamicFeatures.forEach(rc::registerClasses);
@@ -260,21 +286,26 @@ public class JerseyService extends AbstractIdleService {
 
         if (enableCors) {
             LOG.info("Enabling CORS for HTTP endpoint");
-            rc.register(CORSFilter.class);
+            rc.registerClasses(CORSFilter.class);
         }
 
         if (LOG.isDebugEnabled()) {
-            rc.register(PrintModelProcessor.class);
+            rc.registerClasses(PrintModelProcessor.class);
         }
 
         return rc;
     }
 
-    private HttpServer setUp(String namePrefix, URI listenUri,
-                               boolean enableTls, Path tlsCertFile, Path tlsKeyFile, String tlsKeyPassword,
-                               int threadPoolSize, int maxInitialLineLength, int maxHeaderSize,
-                               boolean enableGzip, boolean enableCors,
-                               Set<Resource> additionalResources, String[] controllerPackages)
+    private HttpServer setUp(String namePrefix,
+                             URI listenUri,
+                             SSLEngineConfigurator sslEngineConfigurator,
+                             int threadPoolSize,
+                             int maxInitialLineLength,
+                             int maxHeaderSize,
+                             boolean enableGzip,
+                             boolean enableCors,
+                             Set<Resource> additionalResources,
+                             String[] controllerPackages)
             throws GeneralSecurityException, IOException {
         final ResourceConfig resourceConfig = buildResourceConfig(
                 enableGzip,
@@ -283,10 +314,11 @@ public class JerseyService extends AbstractIdleService {
                 controllerPackages
         );
 
-        final SSLEngineConfigurator sslEngineConfigurator = enableTls ?
-                buildSslEngineConfigurator(tlsCertFile, tlsKeyFile, tlsKeyPassword) : null;
-
-        final HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(listenUri, resourceConfig, enableTls, sslEngineConfigurator);
+        final HttpServer httpServer = GrizzlyHttpServerFactory.createHttpServer(
+                listenUri,
+                resourceConfig,
+                sslEngineConfigurator != null,
+                sslEngineConfigurator);
 
         final NetworkListener listener = httpServer.getListener("grizzly");
         listener.setMaxHttpHeaderSize(maxInitialLineLength);
@@ -323,7 +355,6 @@ public class JerseyService extends AbstractIdleService {
 
         return new SSLEngineConfigurator(sslContext.createSSLContext(), false, false, false);
     }
-
 
     private ExecutorService instrumentedExecutor(final String executorName,
                                                  final String threadNameFormat,
