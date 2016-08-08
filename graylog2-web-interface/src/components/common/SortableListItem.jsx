@@ -92,7 +92,7 @@ const SortableListItem = React.createClass({
   },
   render() {
     const { text, isDragging, isOver, connectDragSource, connectDropTarget } = this.props;
-    const classes = [SortableListItemStyle.inlineFlex, SortableListItemStyle.fullWidth];
+    const classes = [SortableListItemStyle.listGroupItem];
     if (isDragging) {
       classes.push('dragging');
     }
@@ -103,7 +103,10 @@ const SortableListItem = React.createClass({
     return connectDragSource(connectDropTarget(
       <div className="sortable-list-item">
         <ListGroupItem className={classes.join(' ')}>
-          <div><i className={`fa fa-sort ${SortableListItemStyle.itemHandle}`}/> {text}</div>
+          <div>
+            <span className={SortableListItemStyle.itemHandle}><i className="fa fa-sort" /></span>
+            {text}
+          </div>
         </ListGroupItem>
       </div>
     ));

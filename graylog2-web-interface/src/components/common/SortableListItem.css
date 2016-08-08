@@ -1,11 +1,9 @@
-:local(.fullWidth) {
+:local(.listGroupItem) {
+    display: inline-block;
     width: 100%;
 }
 
-:local(.inlineFlex) {
-    display: inline-flex;
-}
-
 :local(.itemHandle) {
+    float: left;
     margin-right: 10px;
 }
