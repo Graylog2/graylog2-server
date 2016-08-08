@@ -32,6 +32,8 @@ import javax.inject.Inject;
 import java.util.Map;
 import java.util.SortedMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.shared.metrics.MetricUtils.filterSingleMetric;
@@ -40,6 +42,15 @@ public class ThroughputCalculator extends Periodical {
     private static final Logger log = LoggerFactory.getLogger(ThroughputCalculator.class);
 
     private final MetricRegistry metricRegistry;
+
+    protected static final Pattern incomingMessagesPattern = Pattern.compile("org\\.graylog2\\.plugin\\.streams\\.Stream\\..*?\\.incomingMessages");
+    protected static final MetricFilter streamMetricFilter = new MetricFilter() {
+        @Override
+        public boolean matches(String name, Metric metric) {
+            Matcher matcher = incomingMessagesPattern.matcher(name);
+            return matcher.matches();
+        }
+    };
 
     private ConcurrentMap<String, CounterSample> sampledCounters = Maps.newConcurrentMap();
 
@@ -99,12 +110,7 @@ public class ThroughputCalculator extends Periodical {
         );
 
         // StreamMetrics isn't accessible here, so we need to use a metrics filter instead.
-        final SortedMap<String, ? extends Counting> streamMeters = metricRegistry.getMeters(new MetricFilter() {
-            @Override
-            public boolean matches(String name, Metric metric) {
-                return name.matches("org\\.graylog2\\.plugin\\.streams\\.Stream\\..*?\\.incomingMessages");
-            }
-        });
+        final SortedMap<String, ? extends Counting> streamMeters = metricRegistry.getMeters(streamMetricFilter);
 
         final Iterable<Map.Entry<String, ? extends Counting>> entries = Iterables.concat(counters.entrySet(),
                                                                                          inputCounters.entrySet(),
