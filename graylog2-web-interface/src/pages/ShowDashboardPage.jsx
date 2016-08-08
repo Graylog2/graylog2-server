@@ -2,6 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
+import deepEqual from 'deep-equal';
 
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -31,6 +32,8 @@ const ShowDashboardPage = React.createClass({
     this.loadData();
     this.listenTo(WidgetsStore, this.removeWidget);
     this.loadInterval = setInterval(this.loadData, 2000);
+    // eslint-disable-next-line react/no-did-mount-set-state
+    this.setState({ forceUpdateInBackground: this.state.currentUser.preferences.updateUnfocussed });
   },
   componentWillUnmount() {
     if (this.loadInterval) {
@@ -43,16 +46,20 @@ const ShowDashboardPage = React.createClass({
   loadData() {
     DashboardsStore.get(this.props.params.dashboardId)
       .then((dashboard) => {
-        if (this.isMounted()) {
-          this.setState({dashboard: dashboard});
+        if (!this.isMounted()) {
+          return;
+        }
+
+        // Compare dashboard in state with the one received, need to sort widgets to avoid that they come in
+        // a different order, affecting the comparison.
+        dashboard.widgets.sort((w1, w2) => w1.id.localeCompare(w2.id));
+        if (!this.state.dashboard || !deepEqual(this.state.dashboard, dashboard)) {
+          this.setState({ dashboard: dashboard });
         }
       });
   },
-  updateUnFocussed() {
-    return this.state.currentUser.preferences.updateUnfocussed;
-  },
   shouldUpdate() {
-    return Boolean(this.updateUnFocussed() || this.state.forceUpdateInBackground || this.state.focus);
+    return Boolean(this.state.forceUpdateInBackground || this.state.focus);
   },
   removeWidget(props) {
     if (props.delete) {

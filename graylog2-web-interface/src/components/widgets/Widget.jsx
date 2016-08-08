@@ -63,13 +63,18 @@ const Widget = React.createClass({
     return ReactDOM.findDOMNode(this.refs.widget);
   },
   _loadValue() {
-    if (!this.props.shouldUpdate) {
+    if (this.state.deleted || (this.state.result !== undefined && !this.props.shouldUpdate)) {
       return;
     }
 
     const width = this.refs.widget.clientWidth;
 
     WidgetsStore.loadValue(this.props.dashboardId, this.props.widget.id, width).then((value) => {
+      // Avoid updating state if the result didn't change
+      if (value.calculated_at === this.state.calculatedAt) {
+        return;
+      }
+
       const newState = {
         result: value.result,
         calculatedAt: value.calculated_at,

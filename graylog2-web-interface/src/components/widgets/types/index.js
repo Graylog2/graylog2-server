@@ -48,7 +48,7 @@ PluginStore.register(new PluginManifest({}, {
       type: 'SEARCH_RESULT_CHART',
       displayName: 'Search result graph',
       defaultHeight: 1,
-      defaultWidth: 1,
+      defaultWidth: 2,
       visualizationComponent: HistogramVisualization,
     },
     {

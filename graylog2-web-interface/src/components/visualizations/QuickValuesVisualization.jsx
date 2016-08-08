@@ -4,6 +4,7 @@ import {Panel, ListGroup, ListGroupItem} from 'react-bootstrap';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
+import deepEqual from 'deep-equal';
 
 const D3Utils = require('../../util/D3Utils');
 const StringUtils = require('../../util/StringUtils');
@@ -47,9 +48,13 @@ const QuickValuesVisualization = React.createClass({
     this._renderDataTable();
     this._renderPieChart();
   },
-  componentWillReceiveProps(newProps) {
-    this._resizeVisualization(newProps.width, newProps.height, newProps.config.show_data_table);
-    this._formatProps(newProps);
+  componentWillReceiveProps(nextProps) {
+    if (deepEqual(this.props, nextProps)) {
+      return;
+    }
+
+    this._resizeVisualization(nextProps.width, nextProps.height, nextProps.config.show_data_table);
+    this._formatProps(nextProps);
   },
   NUMBER_OF_TOP_VALUES: 5,
   DEFAULT_PIE_CHART_SIZE: 200,

@@ -4,6 +4,7 @@ import Immutable from 'immutable';
 import numeral from 'numeral';
 import c3 from 'c3';
 import d3 from 'd3';
+import deepEqual from 'deep-equal';
 
 import D3Utils from 'util/D3Utils';
 import DateTime from 'logic/datetimes/DateTime';
@@ -34,6 +35,10 @@ const StackedGraphVisualization = React.createClass({
     this.drawData();
   },
   componentWillReceiveProps(nextProps) {
+    if (deepEqual(this.props, nextProps)) {
+      return;
+    }
+
     if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
       this._resizeVisualization(nextProps.width, nextProps.height);
     }
