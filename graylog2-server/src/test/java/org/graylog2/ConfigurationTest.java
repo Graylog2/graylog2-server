@@ -26,6 +26,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -75,14 +76,18 @@ public class ConfigurationTest {
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getRestListenUri()).isEqualTo(URI.create("http://www.example.com:12900/"));
     }
 
     @Test
     public void testWebListenUriIsAbsoluteURI() throws RepositoryException, ValidationException {
-        validProperties.put("rest_listen_uri", "http://www.example.com:12900/web");
+        validProperties.put("web_listen_uri", "http://www.example.com:12900/web");
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getWebListenUri()).isEqualTo(URI.create("http://www.example.com:12900/web"));
     }
 
     @Test

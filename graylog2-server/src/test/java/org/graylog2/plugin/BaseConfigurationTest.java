@@ -375,11 +375,10 @@ public class BaseConfigurationTest {
     public void testWebEndpointUriIsRelativeURI() throws RepositoryException, ValidationException {
         validProperties.put("web_endpoint_uri", "/foo");
 
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Parameter web_endpoint_uri should be an absolute URI (found /foo)");
-
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertEquals(URI.create("/foo"), configuration.getWebEndpointUri());
     }
 
     @Test
@@ -388,6 +387,8 @@ public class BaseConfigurationTest {
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertEquals(URI.create("http://www.example.com:12900/foo"), configuration.getRestTransportUri());
     }
 
     @Test
@@ -396,6 +397,8 @@ public class BaseConfigurationTest {
 
         Configuration configuration = new Configuration();
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertEquals(URI.create("http://www.example.com:12900/foo"), configuration.getWebEndpointUri());
     }
 
     @Test
