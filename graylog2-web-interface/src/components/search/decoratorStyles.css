@@ -8,12 +8,12 @@
 }
 
 :local(.addDecoratorButtonContainer) {
-    margin: 4px;
-    display: flex;
+    margin-bottom: 10px;
 }
 
 :local(.addDecoratorSelect) {
-    width: 80%;
+    margin-right: 5px;
+    width: 100%;
 }
 
 :local(.helpLink) {

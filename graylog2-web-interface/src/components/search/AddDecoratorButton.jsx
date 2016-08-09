@@ -2,6 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import jQuery from 'jquery';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
+import { Button, Col, Input, Row } from 'react-bootstrap';
 
 import { ConfigurationForm } from 'components/configurationforms';
 import { Select, Spinner } from 'components/common';
@@ -66,21 +67,16 @@ const AddDecoratorButton = React.createClass({
                          typeName={this.state.typeName} includeTitleField={false}
                          submitAction={this._handleSubmit} cancelAction={this._handleCancel} /> : null);
     return (
-      <div className={`form-inline ${DecoratorStyles.addDecoratorButtonContainer}`}>
-        <div className={`form-group ${DecoratorStyles.decoratorBox} ${DecoratorStyles.fullWidth}`}>
-          <div className={`form-group ${DecoratorStyles.addDecoratorSelect}`}>
-            <Select ref="select"
-                    placeholder="Select decorator"
-                    onValueChange={this._onTypeChange}
-                    options={decoratorTypes}
-                    matchProp="label"
-                    value={this.state.typeName} />
-          </div>
-          {' '}
-          <button className="btn btn-success form-control" disabled={!this.state.typeName}
-                  onClick={this._openModal}>Add</button>
-
+      <div className={`${DecoratorStyles.decoratorBox} ${DecoratorStyles.addDecoratorButtonContainer}`}>
+        <div className={DecoratorStyles.addDecoratorSelect}>
+          <Select ref="select"
+                  placeholder="Select decorator"
+                  onValueChange={this._onTypeChange}
+                  options={decoratorTypes}
+                  matchProp="label"
+                  value={this.state.typeName} />
         </div>
+        <Button bsStyle="success" disabled={!this.state.typeName} onClick={this._openModal}>Apply</Button>
         {this.state.typeName && configurationForm}
       </div>
     );
