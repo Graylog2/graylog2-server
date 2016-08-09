@@ -33,6 +33,7 @@ import org.graylog2.plugin.buffers.MessageEvent;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.MultiMessageCodec;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.journal.Journal;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,17 +59,20 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     private final Map<String, Codec.Factory<? extends Codec>> codecFactory;
     private final ServerStatus serverStatus;
     private final MetricRegistry metricRegistry;
+    private final Journal journal;
     private final Timer parseTime;
 
     @AssistedInject
     public DecodingProcessor(Map<String, Codec.Factory<? extends Codec>> codecFactory,
                              final ServerStatus serverStatus,
                              final MetricRegistry metricRegistry,
+                             final Journal journal,
                              @Assisted("decodeTime") Timer decodeTime,
                              @Assisted("parseTime") Timer parseTime) {
         this.codecFactory = codecFactory;
         this.serverStatus = serverStatus;
         this.metricRegistry = metricRegistry;
+        this.journal = journal;
 
         // these metrics are global to all processors, thus they are passed in directly to avoid relying on the class name
         this.parseTime = parseTime;
@@ -82,6 +86,9 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
             processMessage(event);
         } catch (Exception e) {
             LOG.error("Error processing message " + event.getRaw(), ExceptionUtils.getRootCause(e));
+
+            // Mark message as processed to avoid keeping it in the journal.
+            journal.markJournalOffsetCommitted(event.getRaw().getJournalOffset());
 
             // always clear the event fields, even if they are null, to avoid later stages to process old messages.
             // basically this will make sure old messages are cleared out early.
