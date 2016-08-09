@@ -59,6 +59,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
+import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.events.StreamsChangedEvent;
@@ -66,8 +67,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -101,8 +100,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @Api(value = "Streams", description = "Manage streams")
 @Path("/streams")
 public class StreamResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(StreamResource.class);
-
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
@@ -370,19 +367,18 @@ public class StreamResource extends RestResource {
         final String id = streamService.save(stream);
 
         final List<StreamRule> sourceStreamRules = streamRuleService.loadForStream(sourceStream);
-        if (sourceStreamRules.size() > 0) {
-            for (StreamRule streamRule : sourceStreamRules) {
-                Map<String, Object> streamRuleData = Maps.newHashMap();
+        for (StreamRule streamRule : sourceStreamRules) {
+            final Map<String, Object> streamRuleData = Maps.newHashMapWithExpectedSize(6);
 
-                streamRuleData.put("type", streamRule.getType().toInteger());
-                streamRuleData.put("field", streamRule.getField());
-                streamRuleData.put("value", streamRule.getValue());
-                streamRuleData.put("inverted", streamRule.getInverted());
-                streamRuleData.put("stream_id", new ObjectId(id));
+            streamRuleData.put(StreamRuleImpl.FIELD_TYPE, streamRule.getType().toInteger());
+            streamRuleData.put(StreamRuleImpl.FIELD_FIELD, streamRule.getField());
+            streamRuleData.put(StreamRuleImpl.FIELD_VALUE, streamRule.getValue());
+            streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, streamRule.getInverted());
+            streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(id));
+            streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, streamRule.getDescription());
 
-                StreamRule newStreamRule = streamRuleService.create(streamRuleData);
-                streamRuleService.save(newStreamRule);
-            }
+            final StreamRule newStreamRule = streamRuleService.create(streamRuleData);
+            streamRuleService.save(newStreamRule);
         }
 
         for (AlertCondition alertCondition : streamService.getAlertConditions(sourceStream)) {
