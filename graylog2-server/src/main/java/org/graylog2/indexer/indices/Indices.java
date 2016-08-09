@@ -92,6 +92,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -360,12 +361,8 @@ public class Indices {
     }
 
     public boolean isReopened(String indexName) {
-        ClusterState clusterState = c.admin().cluster().state(new ClusterStateRequest()).actionGet().getState();
-        IndexMetaData metaData = clusterState.getMetaData().getIndices().get(indexName);
-
-        if (metaData == null) {
-            return false;
-        }
+        final ClusterState clusterState = c.admin().cluster().state(new ClusterStateRequest()).actionGet().getState();
+        final IndexMetaData metaData = clusterState.getMetaData().getIndices().get(indexName);
 
         return checkForReopened(metaData);
     }
@@ -374,12 +371,15 @@ public class Indices {
         final ClusterStateResponse clusterState = c.admin().cluster().prepareState().all().get();
         final ImmutableOpenMap<String, IndexMetaData> indicesMetaData = clusterState.getState().getMetaData().getIndices();
         return indices.stream().collect(
-            Collectors.toMap((index) -> index, (index) -> checkForReopened(indicesMetaData.get(index)))
+            Collectors.toMap(index -> index, index -> checkForReopened(indicesMetaData.get(index)))
         );
     }
 
-    protected Boolean checkForReopened(IndexMetaData metaData) {
-        return metaData.getSettings().getAsBoolean("index." + REOPENED_INDEX_SETTING, false);
+    private boolean checkForReopened(@Nullable IndexMetaData metaData) {
+        return Optional.ofNullable(metaData)
+                .map(IndexMetaData::getSettings)
+                .map(settings -> settings.getAsBoolean("index." + REOPENED_INDEX_SETTING, false))
+                .orElse(false);
     }
 
     public Set<String> getClosedIndices() {
