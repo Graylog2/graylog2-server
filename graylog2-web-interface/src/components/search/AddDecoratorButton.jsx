@@ -2,7 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import jQuery from 'jquery';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
-import { Button, Col, Input, Row } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 import { ConfigurationForm } from 'components/configurationforms';
 import { Select, Spinner } from 'components/common';

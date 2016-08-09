@@ -6,7 +6,6 @@ import App from 'routing/App';
 import AppWithSearchBar from 'routing/AppWithSearchBar';
 import AppWithoutSearchBar from 'routing/AppWithoutSearchBar';
 import history from 'util/History';
-import AppConfig from 'util/AppConfig';
 import URLUtils from 'util/URLUtils';
 
 import Routes from 'routing/Routes';
