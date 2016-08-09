@@ -7,6 +7,10 @@
     justify-content: space-between;
 }
 
+:local(.decoratorType) {
+    line-height: 1.5;
+}
+
 :local(.addDecoratorButtonContainer) {
     margin-bottom: 10px;
 }

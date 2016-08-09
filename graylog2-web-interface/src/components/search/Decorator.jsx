@@ -1,7 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 
-import { Button } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
@@ -49,12 +49,12 @@ const Decorator = React.createClass({
     return (
       <span className={DecoratorStyles.fullWidth}>
         <div className={DecoratorStyles.decoratorBox}>
-          <strong>{decoratorType.name}</strong>
-          <span>
-            <Button bsStyle="primary" bsSize="xsmall" onClick={this._handleDeleteClick}>Delete</Button>
-            {' '}
-            <Button bsStyle="info" bsSize="xsmall" onClick={this._handleEditClick}>Edit</Button>
-          </span>
+          <h6 className={DecoratorStyles.decoratorType}>{decoratorType.name}</h6>
+          <DropdownButton id={`decorator-${decorator._id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions" pullRight>
+            <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
+            <MenuItem divider/>
+            <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
+          </DropdownButton>
         </div>
         <ConfigurationWell key={`configuration-well-decorator-${decorator._id}`}
                            id={decorator._id}
