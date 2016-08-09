@@ -55,7 +55,7 @@ const DropdownField = React.createClass({
 
         <select id={field.title} value={this.state.value}
                 className="input-xlarge form-control" onChange={this.handleChange}
-                autoFocus={this.props.autoFocus} disabled={this.props.disabled}>
+                autoFocus={this.props.autoFocus} disabled={this.props.disabled} required={!field.is_optional}>
           {options}
         </select>
         <p className="help-block">{field.description}</p>
