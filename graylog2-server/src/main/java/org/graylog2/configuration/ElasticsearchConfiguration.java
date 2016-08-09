@@ -122,7 +122,7 @@ public class ElasticsearchConfiguration {
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "retention_strategy", required = true)
-    private String retentionStrategy = "delete";
+    private String retentionStrategy = "noop";
 
     @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "rotation_strategy")

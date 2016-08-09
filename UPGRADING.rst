@@ -101,6 +101,7 @@ The retention and rotation configuration settings can be retrieved using the fol
 * ``/system/indices/rotation/config``
 * ``/system/indices/retention/config``
 
+The retention strategy defaults to "Do nothing" unless an other strategy was explicitly configured. Please check the setting after upgrading.
 
 For Plugin Authors
 ------------------
