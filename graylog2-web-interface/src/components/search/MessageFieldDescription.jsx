@@ -50,25 +50,31 @@ const MessageFieldDescription = React.createClass({
 
     return termsMarkup;
   },
+  _getFormattedFieldActions() {
+    if (this.props.disableFieldActions) {
+      return null;
+    }
+
+    let fieldActions;
+    if (this.props.customFieldActions) {
+      fieldActions = React.cloneElement(this.props.customFieldActions, {fieldName: this.props.fieldName, message: this.props.message});
+    } else {
+      fieldActions = (
+        <MessageFieldSearchActions fieldName={this.props.fieldName}
+                                   message={this.props.message}
+                                   onAddFieldToSearchBar={this.addFieldToSearchBar}
+                                   onLoadTerms={this.loadTerms}/>
+      );
+    }
+
+    return fieldActions;
+  },
   render() {
     const className = this.props.fieldName === 'message' || this.props.fieldName === 'full_message' ? 'message-field' : '';
-    let fieldActions;
-    if (!this.props.disableFieldActions) {
-      if (this.props.customFieldActions) {
-        fieldActions = React.cloneElement(this.props.customFieldActions, {fieldName: this.props.fieldName, message: this.props.message});
-      } else {
-        fieldActions = (
-          <MessageFieldSearchActions fieldName={this.props.fieldName}
-                                     message={this.props.message}
-                                     onAddFieldToSearchBar={this.addFieldToSearchBar}
-                                     onLoadTerms={this.loadTerms}/>
-        );
-      }
-    }
 
     return (
       <dd className={className} key={this.props.fieldName + 'dd'}>
-        {fieldActions}
+        {this._getFormattedFieldActions()}
         <div className="field-value">{this.props.possiblyHighlight(this.props.fieldName)}</div>
         {this._shouldShowTerms() &&
         <Alert bsStyle="info" onDismiss={() => this.setState({messageTerms: Immutable.Map()})}>

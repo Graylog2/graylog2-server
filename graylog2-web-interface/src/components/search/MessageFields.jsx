@@ -18,11 +18,19 @@ const MessageFields = React.createClass({
   },
 
   _formatFields(fields, showDecoration) {
-    if (!showDecoration || !this.props.message.decoration_stats) {
-      return Object.keys(fields).sort().map(key => <MessageField key={key} {...this.props} fieldName={key} value={fields[key]} />);
-    }
-
     const decorationStats = this.props.message.decoration_stats;
+
+    if (!showDecoration || !decorationStats) {
+      const decoratedFields = decorationStats ? Object.keys(decorationStats.changed_fields) : [];
+      return Object.keys(fields)
+        .sort()
+        .map(key => {
+          return (
+            <MessageField key={key} {...this.props} fieldName={key} value={fields[key]}
+                               disableFieldActions={decoratedFields.indexOf(key) !== -1} />
+          );
+        });
+    }
 
     const allKeys = Object.keys(decorationStats.removed_fields).concat(Object.keys(fields)).sort();
 
