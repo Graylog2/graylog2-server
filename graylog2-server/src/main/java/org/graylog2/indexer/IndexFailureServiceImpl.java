@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
+import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
@@ -44,7 +45,10 @@ public class IndexFailureServiceImpl extends PersistedServiceImpl implements Ind
                     .add("size", 52428800) // 50MB max size.
                     .get();
 
-            mongoConnection.getDatabase().createCollection(collectionName, options);
+            final DBCollection collection = mongoConnection.getDatabase().createCollection(collectionName, options);
+
+            collection.createIndex(new BasicDBObject("timestamp", 1));
+            collection.createIndex(new BasicDBObject("letter_id", 1));
         }
     }
 

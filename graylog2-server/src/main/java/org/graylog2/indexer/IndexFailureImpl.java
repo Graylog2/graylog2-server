@@ -43,7 +43,6 @@ public class IndexFailureImpl extends PersistedImpl implements IndexFailure {
         return ImmutableMap.<String, Object>builder()
                 .put("timestamp", Tools.getISO8601String((DateTime) fields.get("timestamp")))
                 .put("letter_id", fields.get("letter_id"))
-                .put("written", fields.get("written"))
                 .put("message", fields.get("message"))
                 .put("index", fields.get("index"))
                 .put("type", fields.get("type"))
