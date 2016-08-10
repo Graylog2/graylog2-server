@@ -12,6 +12,8 @@ const MessagesActions = ActionsProvider.getActions('Messages');
 
 import MessageFieldSearchActions from './MessageFieldSearchActions';
 
+import { DecoratedMessageFieldMarker } from 'components/search';
+
 const MessageFieldDescription = React.createClass({
   propTypes: {
     message: PropTypes.object.isRequired,
@@ -20,6 +22,7 @@ const MessageFieldDescription = React.createClass({
     possiblyHighlight: PropTypes.func.isRequired,
     disableFieldActions: PropTypes.bool,
     customFieldActions: PropTypes.node,
+    isDecorated: PropTypes.bool,
   },
   getInitialState() {
     return {
@@ -77,10 +80,11 @@ const MessageFieldDescription = React.createClass({
         {this._getFormattedFieldActions()}
         <div className="field-value">{this.props.possiblyHighlight(this.props.fieldName)}</div>
         {this._shouldShowTerms() &&
-        <Alert bsStyle="info" onDismiss={() => this.setState({messageTerms: Immutable.Map()})}>
+        <Alert bsStyle="info" onDismiss={() => this.setState({ messageTerms: Immutable.Map() })}>
           Field terms: &nbsp;{this._getFormattedTerms()}
         </Alert>
-          }
+        }
+        {this.props.isDecorated && <DecoratedMessageFieldMarker />}
       </dd>
     );
   },

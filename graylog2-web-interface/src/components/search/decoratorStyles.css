@@ -29,3 +29,18 @@
 :local(.helpPopover) {
     font-size: 12px;
 }
+
+:local(.decoratorMarker) {
+    color: #AAA;
+    font-weight: normal;
+}
+
+:local(.decoratorFieldWrapper) {
+    display: inline-block;
+}
+
+:local(.decoratorMarkerSidebar) {
+    margin-left: 5px;
+    top: 3px;
+    position: relative;
+}
