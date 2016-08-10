@@ -21,6 +21,7 @@ import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
 import org.joda.time.YearMonth;
 import org.junit.Test;
 
@@ -104,6 +105,27 @@ public class DateConverterTest {
         final Converter c = new DateConverter(config("YYYY-MM-dd HH:mm:ss", "TEST"));
         final DateTime dateOnly = (DateTime) c.convert("2014-03-12 10:00:00");
         assertThat(dateOnly.getZone()).isEqualTo(DateTimeZone.forID("Etc/UTC"));
+    }
+
+    /**
+     * Test case for <a href="https://github.com/Graylog2/graylog2-server/issues/2648">#2648</a>.
+     */
+    @Test
+    public void issue2648() throws Exception {
+        final Converter utc = new DateConverter(config("YYYY-MM-dd HH:mm:ss", "UTC"));
+        final DateTime utcDate = (DateTime) utc.convert("2016-08-10 12:00:00");
+        assertThat(utcDate.getZone()).isEqualTo(DateTimeZone.UTC);
+        assertThat(utcDate.getZone().getOffsetFromLocal(0L)).isEqualTo(0);
+
+        final Converter cet = new DateConverter(config("YYYY-MM-dd HH:mm:ss", "CET"));
+        final DateTime cetDate = (DateTime) cet.convert("2016-08-10 12:00:00");
+        assertThat(cetDate.getZone()).isEqualTo(DateTimeZone.forID("CET"));
+        assertThat(cetDate.getZone().getOffsetFromLocal(0L)).isEqualTo((int) Duration.standardHours(1L).getMillis());
+
+        final Converter berlin = new DateConverter(config("YYYY-MM-dd HH:mm:ss", "Europe/Berlin"));
+        final DateTime berlinDate = (DateTime) berlin.convert("2016-08-10 12:00:00");
+        assertThat(berlinDate.getZone()).isEqualTo(DateTimeZone.forID("Europe/Berlin"));
+        assertThat(berlinDate.getZone().getOffsetFromLocal(0L)).isEqualTo((int) Duration.standardHours(1L).getMillis());
     }
 
     private Map<String, Object> config(final String dateFormat, final String timeZone) {
