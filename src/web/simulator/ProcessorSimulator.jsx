@@ -22,11 +22,11 @@ const ProcessorSimulator = React.createClass({
     };
   },
 
-  _onMessageLoad(message) {
+  _onMessageLoad(message, options) {
     this.setState({ message: message, simulation: undefined, loading: true, error: undefined });
 
     SimulatorActions.simulate
-      .triggerPromise(this.props.stream, message.fields)
+      .triggerPromise(this.props.stream, message.fields, options.inputId)
       .then(
         response => {
           this.setState({ simulation: response, loading: false });
@@ -47,7 +47,7 @@ const ProcessorSimulator = React.createClass({
               Build an example message that will be used in the simulation.{' '}
               <strong>No real messages stored in Graylog will be changed. All actions are purely simulated on the temporary input you provide below.</strong>
             </p>
-            <RawMessageLoader onMessageLoaded={this._onMessageLoad} />
+            <RawMessageLoader onMessageLoaded={this._onMessageLoad} inputIdSelector />
           </Col>
         </Row>
         <SimulationResults stream={this.props.stream}

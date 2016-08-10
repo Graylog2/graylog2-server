@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @AutoValue
@@ -32,16 +33,22 @@ public abstract class SimulationRequest {
     @JsonProperty
     public abstract Map<String, Object> message();
 
+    @JsonProperty
+    @Nullable
+    public abstract String inputId();
+
     public static Builder builder() {
         return new AutoValue_SimulationRequest.Builder();
     }
 
     @JsonCreator
     public static SimulationRequest create (@JsonProperty("stream_id") String streamId,
-                                            @JsonProperty("message") Map<String, Object> message) {
+                                            @JsonProperty("message") Map<String, Object> message,
+                                            @JsonProperty("input_id") @Nullable String inputId) {
         return builder()
                 .streamId(streamId)
                 .message(message)
+                .inputId(inputId)
                 .build();
     }
 
@@ -52,5 +59,7 @@ public abstract class SimulationRequest {
         public abstract Builder streamId(String streamId);
 
         public abstract Builder message(Map<String, Object> message);
+
+        public abstract Builder inputId(String inputId);
     }
 }

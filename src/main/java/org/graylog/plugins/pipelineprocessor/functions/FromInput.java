@@ -72,7 +72,7 @@ public class FromInput extends AbstractFunction<Boolean> {
 
         }
         return input != null
-                && context.currentMessage().getSourceInputId().equals(input.getId());
+                && input.getId().equals(context.currentMessage().getSourceInputId());
     }
 
     @Override

@@ -12,11 +12,12 @@ const urlPrefix = '/plugins/org.graylog.plugins.pipelineprocessor';
 const SimulatorStore = Reflux.createStore({
   listenables: [SimulatorActions],
 
-  simulate(stream, messageFields) {
+  simulate(stream, messageFields, inputId) {
     const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/simulate`);
     const simulation = {
       stream_id: stream.id,
       message: messageFields,
+      input_id: inputId,
     };
 
     let promise = fetch('POST', url, simulation);
