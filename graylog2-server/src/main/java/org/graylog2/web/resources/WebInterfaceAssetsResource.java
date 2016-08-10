@@ -97,7 +97,7 @@ public class WebInterfaceAssetsResource {
                 });
     }
 
-    @Path("plugin/{plugin}/{filename}")
+    @Path("assets/plugin/{plugin}/{filename}")
     @GET
     public Response get(@Context Request request,
                         @PathParam("plugin") String pluginName,
