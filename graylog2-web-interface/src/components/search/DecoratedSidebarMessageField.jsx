@@ -1,6 +1,10 @@
 import React from 'react';
 import { Input } from 'react-bootstrap';
 
+import { DecoratedMessageFieldMarker } from 'components/search';
+
+import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
+
 const DecoratedSidebarMessageField = React.createClass({
   propTypes: {
     field: React.PropTypes.object,
@@ -10,9 +14,6 @@ const DecoratedSidebarMessageField = React.createClass({
   render() {
     const label = (<span>
       {this.props.field.name}
-      {' '}
-      <i className="fa fa-pencil"
-         title="This field was added to the search result by a decorator and is not stored in any index. Therefore you cannot analyze it." />
     </span>);
     return (
       <li>
@@ -21,8 +22,10 @@ const DecoratedSidebarMessageField = React.createClass({
         <div className="field-selector">
           <Input type="checkbox"
                  label={label}
+                 groupClassName={DecoratorStyles.decoratorFieldWrapper}
                  checked={this.props.selected}
                  onChange={() => this.props.onToggled(this.props.field.name)}/>
+          <DecoratedMessageFieldMarker className={DecoratorStyles.decoratorMarkerSidebar}/>
         </div>
       </li>
     );

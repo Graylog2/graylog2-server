@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { DecoratedMessageFieldMarker, MessageFieldDescription } from 'components/search';
+import { MessageFieldDescription } from 'components/search';
 
 const MessageField = React.createClass({
   propTypes: {
@@ -12,17 +12,6 @@ const MessageField = React.createClass({
     value: React.PropTypes.any.isRequired,
   },
   SPECIAL_FIELDS: ['full_message', 'level'],
-  _decorationMarker(key) {
-    if (this._isAdded(key)) {
-      return <DecoratedMessageFieldMarker title="This field was added by a decorator. It was not present in the original message, so you cannot search for it." />;
-    }
-
-    if (this._isChanged(key)) {
-      return (<DecoratedMessageFieldMarker title="This field was modified by a decorator for the search result.." />);
-    }
-
-    return null;
-  },
   _isAdded(key) {
     const decorationStats = this.props.message.decoration_stats;
     return decorationStats && decorationStats.added_fields && decorationStats.added_fields[key] !== undefined;
@@ -30,6 +19,9 @@ const MessageField = React.createClass({
   _isChanged(key) {
     const decorationStats = this.props.message.decoration_stats;
     return decorationStats && decorationStats.changed_fields && decorationStats.changed_fields[key] !== undefined;
+  },
+  _isDecorated(key) {
+    return this._isAdded(key) || this._isChanged(key);
   },
   render() {
     let innerValue = this.props.value;
@@ -40,14 +32,15 @@ const MessageField = React.createClass({
 
     return (
       <span>
-        <dt key={`${key}Title`}>{key} {this._decorationMarker(key)}</dt>
+        <dt key={`${key}Title`}>{key}</dt>
         <MessageFieldDescription key={`${key}Description`}
                                  message={this.props.message}
                                  fieldName={key}
                                  fieldValue={innerValue}
                                  possiblyHighlight={this.props.possiblyHighlight}
                                  disableFieldActions={this._isAdded(key) || this.props.disableFieldActions}
-                                 customFieldActions={this.props.customFieldActions}/>
+                                 customFieldActions={this.props.customFieldActions}
+                                 isDecorated={this._isDecorated(key)} />
       </span>
     );
   },

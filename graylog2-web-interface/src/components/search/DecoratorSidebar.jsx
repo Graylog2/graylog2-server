@@ -1,16 +1,18 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Well } from 'react-bootstrap';
+import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 
-import { Spinner } from 'components/common';
+import { SortableList, Spinner } from 'components/common';
 import { AddDecoratorButton, Decorator } from 'components/search';
-import { SortableList } from 'components/common';
+import DocsHelper from 'util/DocsHelper';
 
 import StoreProvider from 'injection/StoreProvider';
 const DecoratorsStore = StoreProvider.getStore('Decorators');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const DecoratorsActions = ActionsProvider.getActions('Decorators');
+
+import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
 const DecoratorSidebar = React.createClass({
   propTypes: {
@@ -24,7 +26,7 @@ const DecoratorSidebar = React.createClass({
                                                    typeDefinition={typeDefinition} /> });
   },
   _updateOrder(decorators) {
-    decorators.map((item, idx) => {
+    decorators.forEach((item, idx) => {
       const decorator = this.state.decorators.find((i) => i._id === item.id);
       decorator.order = idx;
       DecoratorsActions.update(decorator._id, decorator);
@@ -39,22 +41,28 @@ const DecoratorSidebar = React.createClass({
       .sort((d1, d2) => d1.order - d2.order);
     const nextDecoratorOrder = decorators.length > 0 ? decorators[decorators.length - 1].order + 1 : 0;
     const decoratorItems = decorators.map(this._formatDecorator);
+    const popoverHelp = (
+      <Popover id="decorators-help" className={DecoratorStyles.helpPopover}>
+        <p className="description">
+          Decorators can modify messages shown in the search results on the fly. These changes are not stored, but only
+          shown in the search results. Decorator config is stored <strong>per stream</strong>.
+        </p>
+        <p className="description">
+          Use drag and drop to modify the order in which decorators are processed.
+        </p>
+        <p>
+          Read more about message decorators in the <a href={DocsHelper.toString('decorators.html')}>documentation</a>.
+        </p>
+      </Popover>
+    );
     return (
-      <span>
+      <div>
+        <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
+          <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators? <i className="fa fa-question-circle" /></Button>
+        </OverlayTrigger>
         <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder}/>
         <SortableList items={decoratorItems} onMoveItem={this._updateOrder} />
-
-        <Well style={{ marginTop: '10px' }}>
-          <p className="description">
-            Decorators can modify messages shown in the search results on the fly. These changes are not stored, but only
-            shown in the search results. Decorator config is stored <strong>per stream</strong>.
-          </p>
-          <p className="description">
-            Decorators are processed in order, from top to bottom. If you want to change the order in which decorators are
-            processed, you can reorder them using drag and drop.
-          </p>
-        </Well>
-      </span>
+      </div>
     );
   },
 });

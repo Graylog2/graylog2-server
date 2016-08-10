@@ -87,12 +87,12 @@ const SortableListItem = React.createClass({
     isDragging: PropTypes.bool.isRequired,
     isOver: PropTypes.bool.isRequired,
     id: PropTypes.any.isRequired,
-    text: PropTypes.string.isRequired,
+    content: PropTypes.any.isRequired,
     moveItem: PropTypes.func.isRequired,
   },
   render() {
-    const { text, isDragging, isOver, connectDragSource, connectDropTarget } = this.props;
-    const classes = [SortableListItemStyle.inlineFlex, SortableListItemStyle.fullWidth];
+    const { content, isDragging, isOver, connectDragSource, connectDropTarget } = this.props;
+    const classes = [SortableListItemStyle.listGroupItem];
     if (isDragging) {
       classes.push('dragging');
     }
@@ -103,7 +103,10 @@ const SortableListItem = React.createClass({
     return connectDragSource(connectDropTarget(
       <div className="sortable-list-item">
         <ListGroupItem className={classes.join(' ')}>
-          <div><i className={`fa fa-sort ${SortableListItemStyle.itemHandle}`}/> {text}</div>
+          <div>
+            <span className={SortableListItemStyle.itemHandle}><i className="fa fa-sort" /></span>
+            {content}
+          </div>
         </ListGroupItem>
       </div>
     ));

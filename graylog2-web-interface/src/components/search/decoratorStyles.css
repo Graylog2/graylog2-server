@@ -7,11 +7,40 @@
     justify-content: space-between;
 }
 
+:local(.decoratorType) {
+    line-height: 1.5;
+}
+
 :local(.addDecoratorButtonContainer) {
-    margin: 4px;
-    display: flex;
+    margin-bottom: 10px;
 }
 
 :local(.addDecoratorSelect) {
-    width: 80%;
+    margin-right: 5px;
+    width: 100%;
+}
+
+:local(.helpLink) {
+    font-size: 12px;
+    padding-left: 0;
+    padding-right: 0;
+}
+
+:local(.helpPopover) {
+    font-size: 12px;
+}
+
+:local(.decoratorMarker) {
+    color: #AAA;
+    font-weight: normal;
+}
+
+:local(.decoratorFieldWrapper) {
+    display: inline-block;
+}
+
+:local(.decoratorMarkerSidebar) {
+    margin-left: 5px;
+    top: 3px;
+    position: relative;
 }

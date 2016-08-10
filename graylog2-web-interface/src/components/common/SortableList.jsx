@@ -31,7 +31,7 @@ const SortableList = React.createClass({
   render() {
     const formattedItems = this.state.items.map((item, idx) => {
       return (
-        <SortableListItem key={`sortable-list-item-${item.id}`} index={idx} id={item.id} text={item.title}
+        <SortableListItem key={`sortable-list-item-${item.id}`} index={idx} id={item.id} content={item.title}
                           moveItem={this._moveItem}/>
       );
     });

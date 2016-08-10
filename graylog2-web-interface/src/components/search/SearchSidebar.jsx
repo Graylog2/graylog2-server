@@ -174,14 +174,13 @@ const SearchSidebar = React.createClass({
       </BootstrapModalWrapper>
     );
 
-    const addedFields = this.props.result.decoration_stats && this.props.result.decoration_stats.added_fields ?
-      this.props.result.decoration_stats.added_fields : [];
+    const decorationStats = this.props.result.decoration_stats;
+    const decoratedFields = decorationStats ? [].concat(decorationStats.added_fields || [], decorationStats.changed_fields || []) : [];
     const messageFields = this.props.fields
       .filter((field) => field.name.indexOf(this.state.fieldFilter) !== -1)
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((field) => {
-
-        return (addedFields.includes(field.name) ?
+        return (decoratedFields.includes(field.name) ?
             <DecoratedSidebarMessageField key={field.name}
                                           field={field}
                                           onToggled={this.props.onFieldToggled}
