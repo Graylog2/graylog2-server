@@ -43,7 +43,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.shared.initializers.RestApiService.PLUGIN_PREFIX;
+import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 
 @Api(value = "Documentation", description = "Documentation of this API in JSON format.")
 @Path("/api-docs")

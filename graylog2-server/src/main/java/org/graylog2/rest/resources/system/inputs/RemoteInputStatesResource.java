@@ -26,12 +26,12 @@ import retrofit2.http.PUT;
 import retrofit2.http.Path;
 
 public interface RemoteInputStatesResource {
-    @GET("/system/inputstates")
+    @GET("system/inputstates")
     Call<InputStatesList> list();
 
-    @PUT("/system/inputstates/{inputId}")
+    @PUT("system/inputstates/{inputId}")
     Call<InputCreated> start(@Path("inputId") String inputId);
 
-    @DELETE("/system/inputstates/{inputId}")
+    @DELETE("system/inputstates/{inputId}")
     Call<InputDeleted> stop(@Path("inputId") String inputId);
 }

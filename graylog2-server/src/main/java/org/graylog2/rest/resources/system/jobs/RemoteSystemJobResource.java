@@ -29,15 +29,15 @@ import java.util.List;
 import java.util.Map;
 
 public interface RemoteSystemJobResource {
-    @GET("/system/jobs")
+    @GET("system/jobs")
     Call<Map<String, List<SystemJobSummary>>> list();
 
-    @GET("/system/jobs/{jobId}")
+    @GET("system/jobs/{jobId}")
     Call<SystemJobSummary> get(@Path("jobId") String jobId);
 
-    @DELETE("/system/jobs/{jobId}")
+    @DELETE("system/jobs/{jobId}")
     Call<SystemJobSummary> delete(@Path("jobId") String jobId);
 
-    @POST("/system/jobs")
+    @POST("system/jobs")
     Call trigger(@Body TriggerRequest tr);
 }

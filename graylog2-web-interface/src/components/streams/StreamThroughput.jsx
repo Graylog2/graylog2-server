@@ -29,7 +29,7 @@ const StreamThroughput = React.createClass({
         const metricDefinition = this.state.metrics[nodeId][this._metricName()];
         return metricDefinition !== undefined ? metricDefinition.metric.value : 0;
       })
-      .reduce((throughput1, throughput2) => throughput1 + throughput2);
+      .reduce((throughput1, throughput2) => throughput1 + throughput2, 0);
   },
   render() {
     if (!this.state.metrics) {

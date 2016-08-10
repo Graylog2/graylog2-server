@@ -25,7 +25,6 @@ import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.base.Strings;
 import com.lmax.disruptor.BlockingWaitStrategy;
 import com.lmax.disruptor.BusySpinWaitStrategy;
 import com.lmax.disruptor.SleepingWaitStrategy;
@@ -36,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.net.InetAddress;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -43,8 +43,8 @@ import java.nio.file.Path;
 @SuppressWarnings("FieldMayBeFinal")
 public abstract class BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
-    protected static final int GRAYLOG_DEFAULT_PORT = 12900;
-    protected static final int GRAYLOG_DEFAULT_WEB_PORT = 12900;
+    protected static final int GRAYLOG_DEFAULT_PORT = 9000;
+    protected static final int GRAYLOG_DEFAULT_WEB_PORT = 9000;
 
     @Parameter(value = "shutdown_timeout", validator = PositiveIntegerValidator.class)
     protected int shutdownTimeout = 30000;
@@ -183,7 +183,7 @@ public abstract class BaseConfiguration {
             LOG.warn("\"{}\" is not a valid setting for \"rest_transport_uri\". Using default [{}].", restTransportUri, getDefaultRestTransportUri());
             return getDefaultRestTransportUri();
         } else {
-            return Tools.getUriWithPort(restTransportUri, GRAYLOG_DEFAULT_PORT);
+            return Tools.normalizeURI(restTransportUri, getRestUriScheme(), GRAYLOG_DEFAULT_PORT, "/");
         }
     }
 
@@ -209,8 +209,19 @@ public abstract class BaseConfiguration {
                 throw new RuntimeException("No rest_transport_uri.", e);
             }
 
-            transportUri = Tools.getUriWithPort(
-                    URI.create("http://" + guessedAddress.getHostAddress() + ":" + listenUri.getPort()), GRAYLOG_DEFAULT_PORT);
+            try {
+                transportUri = new URI(
+                        listenUri.getScheme(),
+                        listenUri.getUserInfo(),
+                        guessedAddress.getHostAddress(),
+                        listenUri.getPort(),
+                        listenUri.getPath(),
+                        listenUri.getQuery(),
+                        listenUri.getFragment()
+                );
+            } catch (URISyntaxException e) {
+                throw new RuntimeException("Invalid rest_transport_uri.", e);
+            }
         } else {
             transportUri = listenUri;
         }
@@ -452,14 +463,6 @@ public abstract class BaseConfiguration {
             if (getRestListenUri().getPath().equals(getWebListenUri().getPath())) {
                 throw new ValidationException("If REST and Web interface are served on the same host/port, the path must be different!");
             }
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateWebHasPathPrefixIfOnSamePort() throws ValidationException {
-        if (isRestAndWebOnSamePort() && (Strings.isNullOrEmpty(getWebPrefix()) || getWebPrefix().equals("/"))) {
-            throw new ValidationException("If REST and Web Interface are served on the same host/port, the web interface must have a path prefix!");
         }
     }
 
