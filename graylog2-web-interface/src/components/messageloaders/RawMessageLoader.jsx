@@ -8,18 +8,27 @@ import { BooleanField, DropdownField, NumberField, TextField } from 'components/
 import ActionsProvider from 'injection/ActionsProvider';
 const MessagesActions = ActionsProvider.getActions('Messages');
 const CodecTypesActions = ActionsProvider.getActions('CodecTypes');
+const InputsActions = ActionsProvider.getActions('Inputs');
 
 import StoreProvider from 'injection/StoreProvider';
 // eslint-disable-next-line no-unused-vars
 const MessagesStore = StoreProvider.getStore('Messages');
 const CodecTypesStore = StoreProvider.getStore('CodecTypes');
+const InputsStore = StoreProvider.getStore('Inputs');
 
 const RawMessageLoader = React.createClass({
   propTypes: {
     onMessageLoaded: React.PropTypes.func.isRequired,
+    inputIdSelector: React.PropTypes.bool,
   },
 
-  mixins: [Reflux.connect(CodecTypesStore)],
+  mixins: [Reflux.connect(CodecTypesStore), Reflux.connect(InputsStore)],
+
+  getDefaultProps() {
+    return {
+      inputIdSelector: false,
+    };
+  },
 
   getInitialState() {
     return {
@@ -28,17 +37,21 @@ const RawMessageLoader = React.createClass({
       remoteAddress: '',
       codec: '',
       codecConfiguration: {},
+      inputId: undefined,
     };
   },
 
   componentDidMount() {
     CodecTypesActions.list();
+    if (this.props.inputIdSelector) {
+      InputsActions.list();
+    }
   },
 
   _loadMessage(event) {
     event.preventDefault();
 
-    const { message, remoteAddress, codec, codecConfiguration } = this.state;
+    const { message, remoteAddress, codec, codecConfiguration, inputId } = this.state;
     this.setState({ loading: true });
     const promise = MessagesActions.loadRawMessage.triggerPromise(message, remoteAddress, codec, codecConfiguration);
     promise.then(loadedMessage => {
@@ -49,6 +62,7 @@ const RawMessageLoader = React.createClass({
           remoteAddress: remoteAddress,
           codec: codec,
           codecConfiguration: codecConfiguration,
+          inputId: inputId,
         });
     });
     promise.finally(() => this.setState({ loading: false }));
@@ -80,9 +94,32 @@ const RawMessageLoader = React.createClass({
       .sort((codecA, codecB) => codecA.label.toLowerCase().localeCompare(codecB.label.toLowerCase()));
   },
 
+  _formatInputSelectOptions() {
+    if (!this.state.inputs) {
+      return [{ value: 'none', label: 'Loading inputs...', disabled: true }];
+    }
+
+    const inputIds = Object.keys(this.state.inputs);
+    if (inputIds.length === 0) {
+      return [{ value: 'none', label: 'No inputs available' }];
+    }
+
+    return inputIds
+      .map(id => {
+        const inputId = this.state.inputs[id].id;
+        const label = `${inputId} / ${this.state.inputs[id].title} / ${this.state.inputs[id].name}`;
+        return { value: inputId, label: label };
+      })
+      .sort((inputA, inputB) => inputA.label.toLowerCase().localeCompare(inputB.label.toLowerCase()));
+  },
+
   _onCodecSelect(selectedCodec) {
     this._bindValue({ target: { name: 'codec', value: selectedCodec } });
     this.setState({ codecConfiguration: {} });
+  },
+
+  _onInputSelect(selectedInput) {
+    this.setState({ inputId: selectedInput });
   },
 
   _onCodecConfigurationChange(field, value) {
@@ -127,6 +164,20 @@ const RawMessageLoader = React.createClass({
         .map(key => this._formatConfigField(key, codecConfiguration[key]));
     }
 
+    let inputIdSelector;
+    if (this.props.inputIdSelector) {
+      inputIdSelector = (
+        <fieldset>
+          <legend>Message Input ID</legend>
+          <Input id="input" name="input" label="Message input"
+                 help="Select the message input ID that should be assigned to the parsed message.">
+            <Select id="input" placeholder="Select input" options={this._formatInputSelectOptions()}
+                    matchProp="label" onValueChange={this._onInputSelect} value={this.state.inputId} />
+          </Input>
+        </fieldset>
+      );
+    }
+
     return (
       <Row>
         <Col md={7}>
@@ -138,6 +189,7 @@ const RawMessageLoader = React.createClass({
                      help="Remote IP address to use as message source."
                      value={this.state.remoteAddress} onChange={this._bindValue} />
             </fieldset>
+            {inputIdSelector}
             <fieldset>
               <legend>Codec configuration</legend>
               <Input id="codec" name="codec" label="Message codec"
