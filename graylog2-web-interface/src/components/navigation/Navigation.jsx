@@ -8,6 +8,7 @@ import naturalSort from 'javascript-natural-sort';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 import URLUtils from 'util/URLUtils';
+import AppConfig from 'util/AppConfig';
 
 import StoreProvider from 'injection/StoreProvider';
 const NotificationsStore = StoreProvider.getStore('Notifications');
@@ -236,7 +237,7 @@ const Navigation = React.createClass({
             </li>
             <HelpMenu active={this._isActive(Routes.GETTING_STARTED)}/>
             <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
-            {typeof(DEVELOPMENT) !== 'undefined' && DEVELOPMENT ?
+            {AppConfig.gl2DevMode() ?
               <NavItem className="notification-badge-link">
               <span className="badge" style={{backgroundColor: '#ff3b00'}}>DEV</span>
               </NavItem>
