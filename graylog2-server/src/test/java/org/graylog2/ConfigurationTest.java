@@ -196,4 +196,28 @@ public class ConfigurationTest {
 
         assertThat(configuration.getPasswordSecret()).isEqualTo("abcdefghijklmnopqrstuvwxyz");
     }
+
+    @Test
+    public void testRestApiListeningOnWildcardOnSamePortAsWebInterface() throws ValidationException, RepositoryException {
+        validProperties.put("rest_listen_uri", "http://0.0.0.0:9000/api/");
+        validProperties.put("web_listen_uri", "http://127.0.0.1:9000/");
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Wildcard IP addresses cannot be used if the Graylog REST API and web interface listen on the same port.");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
+
+    @Test
+    public void testWebInterfaceListeningOnWildcardOnSamePortAsRestApi() throws ValidationException, RepositoryException {
+        validProperties.put("rest_listen_uri", "http://127.0.0.1:9000/api/");
+        validProperties.put("web_listen_uri", "http://0.0.0.0:9000/");
+
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Wildcard IP addresses cannot be used if the Graylog REST API and web interface listen on the same port.");
+
+        Configuration configuration = new Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+    }
 }
