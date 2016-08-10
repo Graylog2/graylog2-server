@@ -251,6 +251,7 @@ public class JerseyService extends AbstractIdleService {
             packagePrefixes.put(resourcePackage, configuration.getRestListenUri().getPath());
         }
         packagePrefixes.put(RESOURCE_PACKAGE_WEB, configuration.getWebListenUri().getPath());
+        packagePrefixes.put("", configuration.getRestListenUri().getPath());
 
         final ResourceConfig rc = new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
