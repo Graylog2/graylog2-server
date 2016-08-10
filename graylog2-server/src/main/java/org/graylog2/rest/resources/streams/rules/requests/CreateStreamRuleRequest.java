@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class CreateStreamRuleRequest {
@@ -37,6 +39,7 @@ public abstract class CreateStreamRuleRequest {
     public abstract boolean inverted();
 
     @JsonProperty
+    @Nullable
     public abstract String description();
 
     @JsonCreator
@@ -44,7 +47,7 @@ public abstract class CreateStreamRuleRequest {
                                                  @JsonProperty("value") String value,
                                                  @JsonProperty("field") String field,
                                                  @JsonProperty("inverted") boolean inverted,
-                                                 @JsonProperty("description") String description) {
+                                                 @JsonProperty("description") @Nullable String description) {
         return new AutoValue_CreateStreamRuleRequest(type, value, field, inverted, description);
     }
 }
