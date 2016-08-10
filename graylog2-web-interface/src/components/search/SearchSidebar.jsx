@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button, DropdownButton, Input, MenuItem, Modal, Tab, Tabs } from 'react-bootstrap';
+import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'react-bootstrap';
 import { AutoAffix } from 'react-overlays';
 import numeral from 'numeral';
 import URI from 'urijs';
@@ -10,10 +10,9 @@ const SessionStore = StoreProvider.getStore('Session');
 const SearchStore = StoreProvider.getStore('Search');
 
 import { AddSearchCountToDashboard,
-  DecoratedSidebarMessageField,
   DecoratorSidebar,
+  FieldAnalyzersSidebar,
   SavedSearchControls,
-  SidebarMessageField,
   ShowQueryModal } from 'components/search';
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 
@@ -41,80 +40,41 @@ const SearchSidebar = React.createClass({
     togglePageFields: React.PropTypes.func,
     toggleShouldHighlight: React.PropTypes.func,
   },
+
   getInitialState() {
     return {
-      fieldFilter: '',
-      maxFieldsHeight: 1000,
+      availableHeight: 1000,
     };
   },
 
   componentDidMount() {
     this._updateHeight();
     window.addEventListener('resize', this._resizeCallback);
-    window.addEventListener('scroll', this._updateHeight);
   },
-  componentWillReceiveProps(newProps) {
-    // update max-height of fields when we toggle per page/all fields
-    if (this.props.showAllFields !== newProps.showAllFields) {
-      this._updateHeight();
-    }
-  },
+
   componentWillUnmount() {
     window.removeEventListener('resize', this._resizeCallback);
-    window.removeEventListener('scroll', this._updateHeight);
   },
 
   eventsThrottler: new EventHandlersThrottler(),
-  MINIMUM_FIELDS_HEIGHT: 50,
-  TABS_DEFAULT_HEIGHT: 37,
+  SIDEBAR_MARGIN_BOTTOM: 10,
 
   _resizeCallback() {
     this.eventsThrottler.throttle(() => this._updateHeight());
   },
 
   _updateHeight() {
-    const header = ReactDOM.findDOMNode(this.refs.header);
-
-    const footer = ReactDOM.findDOMNode(this.refs.footer);
+    const viewPortHeight = window.innerHeight;
 
     const sidebar = ReactDOM.findDOMNode(this.refs.sidebar);
-    const sidebarTop = sidebar.getBoundingClientRect().top;
-    const sidebarCss = window.getComputedStyle(ReactDOM.findDOMNode(this.refs.sidebar));
-    const sidebarPaddingTop = parseFloat(sidebarCss.getPropertyValue('padding-top'));
+    const sidebarCss = window.getComputedStyle(ReactDOM.findDOMNode(sidebar));
     const sidebarPaddingBottom = parseFloat(sidebarCss.getPropertyValue('padding-bottom'));
 
-    const fieldsFilter = ReactDOM.findDOMNode(this.refs.fieldsFilter);
+    const maxHeight = viewPortHeight - sidebarPaddingBottom - this.SIDEBAR_MARGIN_BOTTOM;
 
-    const tabsContainer = ReactDOM.findDOMNode(this.refs.tabsContainer);
-    const tabs = tabsContainer.getElementsByClassName('nav-tabs')[0];
-    const tabsHeight = (tabs ? tabs.offsetHeight : this.TABS_DEFAULT_HEIGHT);
-
-    const viewPortHeight = window.innerHeight;
-    const maxHeight =
-      viewPortHeight -
-      header.offsetHeight - footer.offsetHeight -
-      sidebarTop - sidebarPaddingTop - sidebarPaddingBottom -
-      fieldsFilter.offsetHeight - tabsHeight -
-      45; // for good measure™
-
-    this.setState({ maxFieldsHeight: Math.max(maxHeight, this.MINIMUM_FIELDS_HEIGHT) });
+    this.setState({ availableHeight: maxHeight });
   },
 
-  _updateFieldSelection(setName) {
-    this.props.predefinedFieldSelection(setName);
-  },
-  _showAllFields(event) {
-    event.preventDefault();
-    if (!this.props.showAllFields) {
-      this.props.togglePageFields();
-    }
-  },
-  _showPageFields(event) {
-    event.preventDefault();
-    if (this.props.showAllFields) {
-      this.props.togglePageFields();
-    }
-  },
   _showIndicesModal(event) {
     event.preventDefault();
     this.refs.indicesModal.open();
@@ -140,18 +100,7 @@ const SearchSidebar = React.createClass({
   _showQueryModalOpen() {
     this.refs.showQueryModal.open();
   },
-  _filterFields(event) {
-    this.setState({ fieldFilter: event.target.value });
-  },
-  _updateFieldSelectionToDefault() {
-    this._updateFieldSelection('default');
-  },
-  _updateFieldSelectionToAll() {
-    this._updateFieldSelection('all');
-  },
-  _updateFieldSelectionToNone() {
-    this._updateFieldSelection('none');
-  },
+
   render() {
     const indicesModal = (
       <BootstrapModalWrapper ref="indicesModal">
@@ -174,25 +123,6 @@ const SearchSidebar = React.createClass({
       </BootstrapModalWrapper>
     );
 
-    const decorationStats = this.props.result.decoration_stats;
-    const decoratedFields = decorationStats ? [].concat(decorationStats.added_fields || [], decorationStats.changed_fields || []) : [];
-    const messageFields = this.props.fields
-      .filter((field) => field.name.indexOf(this.state.fieldFilter) !== -1)
-      .sort((a, b) => a.name.localeCompare(b.name))
-      .map((field) => {
-        return (decoratedFields.includes(field.name) ?
-            <DecoratedSidebarMessageField key={field.name}
-                                          field={field}
-                                          onToggled={this.props.onFieldToggled}
-                                          selected={this.props.selectedFields.contains(field.name)}/> :
-            <SidebarMessageField key={field.name}
-                                 field={field}
-                                 fieldAnalyzers={this.props.fieldAnalyzers}
-                                 onToggled={this.props.onFieldToggled}
-                                 onFieldAnalyzer={this.props.onFieldAnalyzer}
-                                 selected={this.props.selectedFields.contains(field.name)}/>
-        );
-      });
     let searchTitle = null;
     const moreActions = [
       <MenuItem key="export" href={this._getURLForExportAsCSV()}>Export as CSV</MenuItem>,
@@ -211,7 +141,7 @@ const SearchSidebar = React.createClass({
     return (
       <AutoAffix affixClassName="affix">
         <div className="content-col" ref="sidebar" style={{ top: undefined, position: undefined }}>
-          <div ref="header">
+          <div>
             <h2>
               {searchTitle}
             </h2>
@@ -240,46 +170,21 @@ const SearchSidebar = React.createClass({
 
             <hr />
           </div>
-          <Tabs ref="tabsContainer" animation={false}>
+          <Tabs animation={false}>
             <Tab eventKey={1} title={<h4>Fields</h4>}>
-              <div ref="fieldsFilter" className="input-group input-group-sm" style={{ marginTop: 5, marginBottom: 5 }}>
-                <span className="input-group-btn">
-                  <button type="button" className="btn btn-default"
-                          onClick={this._updateFieldSelectionToDefault}>Default
-                  </button>
-                  <button type="button" className="btn btn-default"
-                          onClick={this._updateFieldSelectionToAll}>All
-                  </button>
-                  <button type="button" className="btn btn-default"
-                          onClick={this._updateFieldSelectionToNone}>None
-                  </button>
-                </span>
-                <input type="text" className="form-control" placeholder="Filter fields"
-                       onChange={this._filterFields}
-                       value={this.state.fieldFilter}/>
-              </div>
-              <div ref="fields" style={{ maxHeight: this.state.maxFieldsHeight, overflowY: 'scroll' }}>
-                <ul className="search-result-fields">
-                  {messageFields}
-                </ul>
-              </div>
-              <div ref="footer">
-                <div style={{ marginTop: 13, marginBottom: 0 }}>
-                  List <span className="message-result-fields-range"> fields of&nbsp;
-                  <a href="#" style={{ fontWeight: this.props.showAllFields ? 'normal' : 'bold' }}
-                     onClick={this._showPageFields}>current page</a> or <a href="#"
-                                                                           style={{ fontWeight: this.props.showAllFields ? 'bold' : 'normal' }}
-                                                                           onClick={this._showAllFields}>all
-                    fields</a>.
-                      </span>
-                  <br/>
-                  { this.props.showHighlightToggle &&
-                  <Input type="checkbox" bsSize="small" checked={this.props.shouldHighlight}
-                         onChange={this.props.toggleShouldHighlight} label="Highlight results"
-                         groupClassName="result-highlight-control"/>
-                  }
-                </div>
-              </div>
+              <FieldAnalyzersSidebar fields={this.props.fields}
+                                     fieldAnalyzers={this.props.fieldAnalyzers}
+                                     onFieldAnalyzer={this.props.onFieldAnalyzer}
+                                     onFieldToggled={this.props.onFieldToggled}
+                                     maximumHeight={this.state.availableHeight}
+                                     predefinedFieldSelection={this.props.predefinedFieldSelection}
+                                     result={this.props.result}
+                                     selectedFields={this.props.selectedFields}
+                                     shouldHighlight={this.props.shouldHighlight}
+                                     showAllFields={this.props.showAllFields}
+                                     showHighlightToggle={this.props.showHighlightToggle}
+                                     togglePageFields={this.props.togglePageFields}
+                                     toggleShouldHighlight={this.props.toggleShouldHighlight} />
             </Tab>
 
             <Tab eventKey={2} title={<h4>Decorators</h4>}>
