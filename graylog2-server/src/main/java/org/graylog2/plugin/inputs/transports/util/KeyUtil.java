@@ -64,7 +64,7 @@ import java.util.regex.Pattern;
 public class KeyUtil {
     private static final Logger LOG = LoggerFactory.getLogger(KeyUtil.class);
     private static final Joiner JOINER = Joiner.on(",").skipNulls();
-    private static final Pattern KEY_PATTERN = Pattern.compile("-{5}BEGIN (?:(RSA|DSA)? )?(ENCRYPTED )?PRIVATE KEY-{5}\\r?\\n([A-Z0-9a-z+/\\r\\n]+={0,2})\\r?\\n-{5}END (?:(?:RSA|DSA)? )?(?:ENCRYPTED )?PRIVATE KEY-{5}\\r?\\n$", Pattern.MULTILINE);
+    private static final Pattern KEY_PATTERN = Pattern.compile("-{5}BEGIN (?:(RSA|DSA|EC)? )?(ENCRYPTED )?PRIVATE KEY-{5}\\r?\\n([A-Z0-9a-z+/\\r\\n]+={0,2})\\r?\\n-{5}END (?:(?:RSA|DSA|EC)? )?(?:ENCRYPTED )?PRIVATE KEY-{5}\\r?\\n$", Pattern.MULTILINE);
 
     public static TrustManager[] initTrustStore(File tlsClientAuthCertFile)
             throws KeyStoreException, CertificateException, NoSuchAlgorithmException, IOException {
@@ -146,17 +146,20 @@ public class KeyUtil {
 
             final EncodedKeySpec keySpec = createKeySpec(encoded, password);
             if (keySpec == null) {
-                throw new IllegalArgumentException("Unsupported key type");
+                throw new IllegalArgumentException("Unsupported key type: " + file);
             }
 
-            try {
-                final KeyFactory RSAkf = KeyFactory.getInstance("RSA");
-                return RSAkf.generatePrivate(keySpec);
-            } catch (InvalidKeySpecException e) {
-                LOG.debug("Loading RSA private key failed, attempting DSA next", e);
-                final KeyFactory DSAkf = KeyFactory.getInstance("DSA");
-                return DSAkf.generatePrivate(keySpec);
+            final String[] keyAlgorithms = {"RSA", "DSA", "EC"};
+            for(String keyAlgorithm : keyAlgorithms) {
+                try {
+                    final KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm);
+                    return keyFactory.generatePrivate(keySpec);
+                } catch (InvalidKeySpecException e) {
+                    LOG.debug("Loading {} private key from \"{}\" failed", keyAlgorithm, file, e);
+                }
             }
+
+            throw new IllegalArgumentException("Unsupported key type: " + file);
         }
     }
 
