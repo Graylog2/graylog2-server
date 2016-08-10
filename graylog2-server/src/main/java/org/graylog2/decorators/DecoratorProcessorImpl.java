@@ -98,9 +98,11 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
 
         decoratedMessages.forEach(message -> {
             final DecorationStats decorationStats = message.decorationStats();
-            addedFields.addAll(decorationStats.addedFields().keySet());
-            changedFields.addAll(decorationStats.changedFields().keySet());
-            removedFields.addAll(decorationStats.removedFields().keySet());
+            if (decoratedMessages != null) {
+                addedFields.addAll(decorationStats.addedFields().keySet());
+                changedFields.addAll(decorationStats.changedFields().keySet());
+                removedFields.addAll(decorationStats.removedFields().keySet());
+            }
         });
 
         return SearchDecorationStats.create(addedFields, changedFields, removedFields);
