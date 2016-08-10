@@ -140,8 +140,19 @@ public class JerseyService extends AbstractIdleService {
                         configuration.getWebTlsKeyFile(),
                         configuration.getWebTlsKeyPassword()) : null;
 
+        final URI webListenUri = configuration.getWebListenUri();
+        final URI listenUri = new URI(
+                webListenUri.getScheme(),
+                webListenUri.getUserInfo(),
+                webListenUri.getHost(),
+                webListenUri.getPort(),
+                null,
+                null,
+                null
+        );
+
         webHttpServer = setUp("web",
-                configuration.getWebListenUri(),
+                listenUri,
                 sslEngineConfigurator,
                 configuration.getWebThreadPoolSize(),
                 configuration.getWebMaxInitialLineLength(),
