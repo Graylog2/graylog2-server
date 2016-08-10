@@ -220,7 +220,7 @@ public class JerseyService extends AbstractIdleService {
 
         apiHttpServer.start();
 
-        LOG.info("Started REST API at <{}>", listenUri);
+        LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
 
         if (startWebInterface) {
             LOG.info("Started Web Interface at <{}>", configuration.getWebListenUri());
