@@ -319,10 +319,24 @@ public class Configuration extends BaseConfiguration {
     }
 
     @ValidatorMethod
+    @SuppressWarnings("unused")
     public void validatePasswordSecret() throws ValidationException {
         final String passwordSecret = getPasswordSecret();
         if (passwordSecret == null || passwordSecret.length() < 16) {
             throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
+        }
+    }
+
+    @ValidatorMethod
+    @SuppressWarnings("unused")
+    public void validateNetworkInterfaces() throws ValidationException {
+        final URI restListenUri = getRestListenUri();
+        final URI webListenUri = getWebListenUri();
+
+        if ((restListenUri.getPort() == webListenUri.getPort()) &&
+                !restListenUri.getHost().equals(webListenUri.getHost()) &&
+                ("0.0.0.0".equals(restListenUri.getHost()) || "0.0.0.0".equals(webListenUri.getHost()))) {
+            throw new ValidationException("Wildcard IP addresses cannot be used if the Graylog REST API and web interface listen on the same port.");
         }
     }
 }
