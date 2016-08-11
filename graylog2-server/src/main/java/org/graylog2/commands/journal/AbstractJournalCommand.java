@@ -21,11 +21,13 @@ import org.graylog2.Configuration;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bootstrap.CmdLineTool;
 import org.graylog2.plugin.KafkaJournalConfiguration;
+import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.graylog2.shared.journal.KafkaJournalModule;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,6 +74,11 @@ public abstract class AbstractJournalCommand extends CmdLineTool {
         return true;
     }
 
+    @Override
+    protected Set<Plugin> loadPlugins(String pluginPath, ChainingClassLoader chainingClassLoader) {
+        // these commands do not need plugins, which could cause problems because of not loaded config beans
+        return Collections.emptySet();
+    }
 
     @Override
     protected void startCommand() {
