@@ -44,6 +44,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class WebAppNotFoundResponseFilterTest {
+    private static final String CK_METHOD_GET = "GET";
+
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -82,6 +84,7 @@ public class WebAppNotFoundResponseFilterTest {
         final UriInfo uriInfo = mock(UriInfo.class);
         final List<MediaType> mediaTypes = Collections.singletonList(MediaType.APPLICATION_JSON_TYPE);
         when(uriInfo.getAbsolutePath()).thenReturn(URI.create("/web/search"));
+        when(requestContext.getMethod()).thenReturn(CK_METHOD_GET);
         when(requestContext.getUriInfo()).thenReturn(uriInfo);
         when(requestContext.getAcceptableMediaTypes()).thenReturn(mediaTypes);
         when(responseContext.getStatusInfo()).thenReturn(Response.Status.NOT_FOUND);
@@ -96,6 +99,7 @@ public class WebAppNotFoundResponseFilterTest {
         final UriInfo uriInfo = mock(UriInfo.class);
         final List<MediaType> mediaTypes = Collections.singletonList(MediaType.TEXT_HTML_TYPE);
         when(uriInfo.getAbsolutePath()).thenReturn(URI.create("/web/search"));
+        when(requestContext.getMethod()).thenReturn(CK_METHOD_GET);
         when(requestContext.getUriInfo()).thenReturn(uriInfo);
         when(requestContext.getAcceptableMediaTypes()).thenReturn(mediaTypes);
         when(responseContext.getStatusInfo()).thenReturn(Response.Status.NOT_FOUND);
@@ -110,6 +114,7 @@ public class WebAppNotFoundResponseFilterTest {
         final UriInfo uriInfo = mock(UriInfo.class);
         final List<MediaType> mediaTypes = Collections.singletonList(MediaType.APPLICATION_XHTML_XML_TYPE);
         when(uriInfo.getAbsolutePath()).thenReturn(URI.create("/web/search"));
+        when(requestContext.getMethod()).thenReturn(CK_METHOD_GET);
         when(requestContext.getUriInfo()).thenReturn(uriInfo);
         when(requestContext.getAcceptableMediaTypes()).thenReturn(mediaTypes);
         when(responseContext.getStatusInfo()).thenReturn(Response.Status.NOT_FOUND);
@@ -124,6 +129,7 @@ public class WebAppNotFoundResponseFilterTest {
         final UriInfo uriInfo = mock(UriInfo.class);
         final List<MediaType> mediaTypes = Collections.singletonList(MediaType.TEXT_HTML_TYPE);
         when(uriInfo.getAbsolutePath()).thenReturn(URI.create("/api/search"));
+        when(requestContext.getMethod()).thenReturn(CK_METHOD_GET);
         when(requestContext.getUriInfo()).thenReturn(uriInfo);
         when(requestContext.getAcceptableMediaTypes()).thenReturn(mediaTypes);
         when(responseContext.getStatusInfo()).thenReturn(Response.Status.NOT_FOUND);
@@ -138,6 +144,7 @@ public class WebAppNotFoundResponseFilterTest {
         final UriInfo uriInfo = mock(UriInfo.class);
         final List<MediaType> mediaTypes = Collections.singletonList(MediaType.TEXT_HTML_TYPE);
         when(uriInfo.getAbsolutePath()).thenReturn(URI.create("/web/search"));
+        when(requestContext.getMethod()).thenReturn(CK_METHOD_GET);
         when(requestContext.getUriInfo()).thenReturn(uriInfo);
         when(requestContext.getAcceptableMediaTypes()).thenReturn(mediaTypes);
         when(responseContext.getStatusInfo()).thenReturn(Response.Status.OK);
@@ -152,6 +159,7 @@ public class WebAppNotFoundResponseFilterTest {
         final UriInfo uriInfo = mock(UriInfo.class);
         final List<MediaType> mediaTypes = Collections.singletonList(MediaType.TEXT_HTML_TYPE);
         when(uriInfo.getAbsolutePath()).thenReturn(URI.create("/web/search"));
+        when(requestContext.getMethod()).thenReturn(CK_METHOD_GET);
         when(requestContext.getUriInfo()).thenReturn(uriInfo);
         when(requestContext.getAcceptableMediaTypes()).thenReturn(mediaTypes);
         when(responseContext.getStatusInfo()).thenReturn(Response.Status.NOT_FOUND);
