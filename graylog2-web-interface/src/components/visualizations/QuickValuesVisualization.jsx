@@ -1,6 +1,6 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Immutable from 'immutable';
-import {Panel, ListGroup, ListGroupItem} from 'react-bootstrap';
+import { Panel, ListGroup, ListGroupItem } from 'react-bootstrap';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
@@ -30,7 +30,7 @@ const QuickValuesVisualization = React.createClass({
     this.filters = [];
     this.triggerRender = true;
     this.shouldUpdateData = true;
-    this.dcGroupName = 'quickvalue-' + this.props.id;
+    this.dcGroupName = `quickvalue-${this.props.id}`;
     this.quickValuesData = crossfilter();
     this.dimension = this.quickValuesData.dimension((d) => d.term);
     this.group = this.dimension.group().reduceSum((d) => d.count);
@@ -106,7 +106,7 @@ const QuickValuesVisualization = React.createClass({
           colourBadge = `<span class="datatable-badge" style="background-color: ${colour}"></span>`;
         }
 
-        return colourBadge + ' ' + d.term;
+        return `${colourBadge} ${d.term}`;
       },
       (d) => {
         return NumberUtils.formatPercentage(d.percentage);
@@ -138,6 +138,7 @@ const QuickValuesVisualization = React.createClass({
       .on('renderlet', (table) => {
         table.selectAll('.dc-table-group').classed('info', true);
         table.selectAll('td.dc-table-column button').on('click', () => {
+          // noinspection Eslint
           const term = $(d3.event.target).closest('button').data('term');
           SearchStore.addSearchTerm(this.props.id, term);
         });
@@ -152,6 +153,17 @@ const QuickValuesVisualization = React.createClass({
     this.pieChart
       .dimension(this.dimension)
       .group(this.group)
+      .othersGrouper((topRows) => {
+        const chart = this.pieChart;
+        const allRows = chart.group().all();
+        const allKeys = allRows.map(chart.keyAccessor());
+        const topKeys = topRows.map(chart.keyAccessor());
+        const topSet = d3.set(topKeys);
+        const topRowsSum = d3.sum(topRows, dc.pluck('value'));
+        const otherCount = this.state.total - this.state.missing - topRowsSum;
+
+        return topRows.concat([{ others: allKeys.filter((d) => !topSet.has(d)), key: 'Others', value: otherCount }]);
+      })
       .renderLabel(false)
       .renderTitle(false)
       .slicesCap(this.NUMBER_OF_TOP_VALUES)
@@ -162,12 +174,13 @@ const QuickValuesVisualization = React.createClass({
 
     D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
 
+    // noinspection Eslint
     $(graphDomNode).tooltip({
-      'selector': '[rel="tooltip"]',
-      'container': 'body',
-      'placement': 'auto',
-      'delay': {show: 300, hide: 100},
-      'html': true,
+      selector: '[rel="tooltip"]',
+      container: 'body',
+      placement: 'auto',
+      delay: { show: 300, hide: 100 },
+      html: true,
     });
 
     this.pieChart.render();
@@ -246,7 +259,7 @@ const QuickValuesVisualization = React.createClass({
       analysisInformation.push(` and <em>${NumberUtils.formatNumber(this.state.others)}</em> other values`);
     }
 
-    return <span dangerouslySetInnerHTML={{__html: analysisInformation.join(',') + '.'}}/>;
+    return <span dangerouslySetInnerHTML={{ __html: `${analysisInformation.join(',')}.` }}/>;
   },
   render() {
     let pieChartClassName;
@@ -294,10 +307,10 @@ const QuickValuesVisualization = React.createClass({
     }
 
     return (
-      <div id={'visualization-' + this.props.id} className="quickvalues-visualization"
-           style={{height: this.props.height}}>
+      <div id={`visualization-${this.props.id}`} className="quickvalues-visualization"
+           style={{ height: this.props.height }}>
         <div className="container-fluid">
-          <div className="row" style={{marginBottom: 0}}>
+          <div className="row" style={{ marginBottom: 0 }}>
             <div className={pieChartClassName} style={pieChartStyle}>
               {pieChart}
             </div>
@@ -306,11 +319,11 @@ const QuickValuesVisualization = React.createClass({
                 <table ref="table" className="table table-condensed table-hover">
                   <thead>
                   <tr>
-                    <th style={{width: '60%'}}>Value</th>
+                    <th style={{ width: '60%' }}>Value</th>
                     <th>%</th>
                     <th>Count</th>
                     {this.props.displayAddToSearchButton &&
-                    <th style={{width: 30}}>&nbsp;</th>
+                    <th style={{ width: 30 }}>&nbsp;</th>
                       }
                   </tr>
                   </thead>
