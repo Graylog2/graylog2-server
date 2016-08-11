@@ -195,8 +195,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 .put(LogConfig.RetentionBytesProp(), retentionSize.toBytes())
                 // retentionMs: The age approximate maximum age of the last segment that is retained
                 .put(LogConfig.RetentionMsProp(), retentionAge.getMillis())
-                // maxMessageSize: The maximum size of a message in the log
-                .put(LogConfig.MaxMessageBytesProp(), Integer.MAX_VALUE)
+                // maxMessageSize: The maximum size of a message in the log (ensure that it's not larger than the max segment size)
+                .put(LogConfig.MaxMessageBytesProp(), Math.min(Ints.saturatedCast(segmentSize.toBytes()), Integer.MAX_VALUE))
                 // maxIndexSize: The maximum size of an index file
                 .put(LogConfig.SegmentIndexBytesProp(), Ints.saturatedCast(Size.megabytes(1L).toBytes()))
                 // indexInterval: The approximate number of bytes between index entries
