@@ -89,10 +89,10 @@ const DecoratorSidebar = React.createClass({
     );
     return (
       <div>
+        <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder}/>
         <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
           <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators? <i className="fa fa-question-circle" /></Button>
         </OverlayTrigger>
-        <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder}/>
         <div ref="decoratorsContainer" className={DecoratorStyles.decoratorListContainer} style={{ maxHeight: this.state.maxDecoratorsHeight }}>
           <SortableList items={decoratorItems} onMoveItem={this._updateOrder} />
         </div>
