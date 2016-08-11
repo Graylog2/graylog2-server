@@ -31,7 +31,7 @@ import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-@Priority(Priorities.USER)
+@Priority(Priorities.ENTITY_CODER)
 public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
     private final String webAppPrefix;
     private final IndexHtmlGenerator indexHtmlGenerator;
@@ -48,8 +48,10 @@ public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
         final String requestPath = requestContext.getUriInfo().getAbsolutePath().getPath();
         final List<MediaType> acceptableMediaTypes = requestContext.getAcceptableMediaTypes();
         final boolean acceptsHtml = acceptableMediaTypes.contains(MediaType.TEXT_HTML_TYPE) || acceptableMediaTypes.contains(MediaType.APPLICATION_XHTML_XML_TYPE);
+        final boolean isGetRequest = requestContext.getMethod().equalsIgnoreCase("get");
 
-        if (responseStatus == Response.Status.NOT_FOUND
+        if (isGetRequest
+                && responseStatus == Response.Status.NOT_FOUND
                 && acceptsHtml
                 && requestPath.startsWith(webAppPrefix)) {
             final String entity = indexHtmlGenerator.get();
