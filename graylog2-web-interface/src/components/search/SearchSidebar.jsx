@@ -126,11 +126,9 @@ const SearchSidebar = React.createClass({
     const fields = this.props.selectedFields;
     const timeRange = SearchStore.rangeType === 'relative' ? { range: SearchStore.rangeParams.get('relative') } : SearchStore.rangeParams.toJS();
 
-    const url = new URI(URLUtils.qualifyUrl(
+    const url = URLUtils.qualifyUrl(
       ApiRoutes.UniversalSearchApiController.export(SearchStore.rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
-    ))
-      .username(SessionStore.getSessionId())
-      .password('session');
+    );
 
     return url.toString();
   },
