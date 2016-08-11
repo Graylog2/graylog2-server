@@ -179,6 +179,38 @@ public class KafkaJournalTest {
     }
 
     @Test
+    public void maxSegmentSize() throws Exception {
+        final Size segmentSize = Size.kilobytes(1L);
+        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+                scheduler,
+                segmentSize,
+                Duration.standardHours(1),
+                Size.kilobytes(10L),
+                Duration.standardDays(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                100,
+                new MetricRegistry(),
+                serverStatus);
+
+        long size = 0L;
+        long maxSize = segmentSize.toBytes();
+        final List<Journal.Entry> list = Lists.newArrayList();
+
+        while (size <= maxSize) {
+            final byte[] idBytes = ("the1-id").getBytes(UTF_8);
+            final byte[] messageBytes = ("the1-message").getBytes(UTF_8);
+
+            size += idBytes.length + messageBytes.length;
+
+            list.add(journal.createEntry(idBytes, messageBytes));
+        }
+
+        // Make sure all messages have been written
+        assertThat(journal.write(list)).isEqualTo(list.size() - 1);
+    }
+
+    @Test
     public void segmentRotation() throws Exception {
         final Size segmentSize = Size.kilobytes(1L);
         final KafkaJournal journal = new KafkaJournal(journalDirectory,
