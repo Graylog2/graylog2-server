@@ -394,7 +394,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
                 // If adding the new message to the message set would overflow the max segment size, flush the current
                 // list of message to avoid a MessageSetSizeTooLargeException.
-                if ((messageSetSize + newMessageSize) >= maxSegmentSize) {
+                if ((messageSetSize + newMessageSize) > maxSegmentSize) {
                     if (LOG.isDebugEnabled()) {
                         LOG.debug("Flushing {} bytes message set with {} messages to avoid overflowing segment with max size of {} bytes",
                                 messageSetSize, messages.size(), maxSegmentSize);
@@ -423,6 +423,13 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     }
 
     private long flushMessages(List<Message> messages, long payloadSize) {
+        if (messages.isEmpty()) {
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("No messages to flush, not trying to write an empty message set.");
+            }
+            return -1L;
+        }
+
         final ByteBufferMessageSet messageSet = new ByteBufferMessageSet(JavaConversions.asScalaBuffer(messages).toSeq());
 
         if (LOG.isDebugEnabled()) {
