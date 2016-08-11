@@ -24,7 +24,6 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.junit.Test;
-import org.mockito.Matchers;
 
 import java.util.Map;
 
@@ -32,6 +31,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -156,7 +156,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
     protected void fieldStatsShouldReturn(FieldStatsResult fieldStatsResult) {
         try {
             when(searches.fieldStats(anyString(),
-                Matchers.eq("*"),
+                eq("*"),
                 anyString(),
                 any(RelativeRange.class),
                 anyBoolean(),
