@@ -21,7 +21,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.github.joschi.jadconfig.util.Size;
-import com.google.common.base.Charsets;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterables;
@@ -398,7 +397,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
                 if (newMessageSize > maxMessageSize) {
                     LOG.warn("Message with ID <{}> is too large to store in journal, skipping! (size: {} bytes / max: {} bytes)",
-                            new String(idBytes, Charsets.UTF_8), newMessageSize, maxMessageSize);
+                            new String(idBytes, StandardCharsets.UTF_8), newMessageSize, maxMessageSize);
                     payloadSize = 0;
                     continue;
                 }
