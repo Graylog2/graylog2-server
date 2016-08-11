@@ -142,6 +142,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final RecoveryCheckpointFlusher recoveryCheckpointFlusher;
     private final LogRetentionCleaner logRetentionCleaner;
     private final long maxSegmentSize;
+    private final int maxMessageSize;
 
     private long nextReadOffset = 0L;
     private ScheduledFuture<?> checkpointFlusherFuture;
@@ -170,6 +171,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         this.throttleThresholdPercentage = intRange(throttleThresholdPercentage, 0, 100);
         this.serverStatus = serverStatus;
         this.maxSegmentSize = segmentSize.toBytes();
+        // Max message size should not be bigger than max segment size.
+        this.maxMessageSize = Math.min(Ints.saturatedCast(maxSegmentSize), Integer.MAX_VALUE);
 
         this.writtenMessages = metricRegistry.meter(name(this.getClass(), "writtenMessages"));
         this.readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
@@ -196,7 +199,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 // retentionMs: The age approximate maximum age of the last segment that is retained
                 .put(LogConfig.RetentionMsProp(), retentionAge.getMillis())
                 // maxMessageSize: The maximum size of a message in the log (ensure that it's not larger than the max segment size)
-                .put(LogConfig.MaxMessageBytesProp(), Math.min(Ints.saturatedCast(segmentSize.toBytes()), Integer.MAX_VALUE))
+                .put(LogConfig.MaxMessageBytesProp(), maxMessageSize)
                 // maxIndexSize: The maximum size of an index file
                 .put(LogConfig.SegmentIndexBytesProp(), Ints.saturatedCast(Size.megabytes(1L).toBytes()))
                 // indexInterval: The approximate number of bytes between index entries
@@ -391,6 +394,13 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 final Message newMessage = new Message(messageBytes, idBytes);
                 // Calculate the size of the new message in the message set by including the overhead for the log entry.
                 final int newMessageSize = MessageSet.entrySize(newMessage);
+
+                if (newMessageSize > maxMessageSize) {
+                    LOG.warn("Message with ID <{}> is too large to store in journal, skipping! (size: {} bytes / max: {} bytes)",
+                            new String(idBytes), newMessageSize, maxMessageSize);
+                    payloadSize = 0;
+                    continue;
+                }
 
                 // If adding the new message to the message set would overflow the max segment size, flush the current
                 // list of message to avoid a MessageSetSizeTooLargeException.

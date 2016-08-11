@@ -25,6 +25,8 @@ import com.google.common.io.Files;
 import com.google.common.primitives.Ints;
 import kafka.common.KafkaException;
 import kafka.log.LogSegment;
+import kafka.message.Message;
+import kafka.message.MessageSet;
 import kafka.utils.FileLock;
 import org.graylog2.Configuration;
 import org.graylog2.plugin.InstantMillisProvider;
@@ -58,6 +60,7 @@ import static org.apache.commons.io.filefilter.FileFilterUtils.directoryFileFilt
 import static org.apache.commons.io.filefilter.FileFilterUtils.fileFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.nameFileFilter;
 import static org.apache.commons.io.filefilter.FileFilterUtils.suffixFileFilter;
+import static org.apache.commons.lang.RandomStringUtils.randomAlphanumeric;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -208,6 +211,46 @@ public class KafkaJournalTest {
 
         // Make sure all messages have been written
         assertThat(journal.write(list)).isEqualTo(list.size() - 1);
+    }
+
+    @Test
+    public void maxMessageSize() throws Exception {
+        final Size segmentSize = Size.kilobytes(1L);
+        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+                scheduler,
+                segmentSize,
+                Duration.standardHours(1),
+                Size.kilobytes(10L),
+                Duration.standardDays(1),
+                1_000_000,
+                Duration.standardMinutes(1),
+                100,
+                new MetricRegistry(),
+                serverStatus);
+
+        long size = 0L;
+        long maxSize = segmentSize.toBytes();
+        final List<Journal.Entry> list = Lists.newArrayList();
+
+        final String largeMessage1 = randomAlphanumeric(Ints.saturatedCast(segmentSize.toBytes() * 2));
+        list.add(journal.createEntry(randomAlphanumeric(6).getBytes(UTF_8), largeMessage1.getBytes(UTF_8)));
+
+        final byte[] idBytes0 = randomAlphanumeric(6).getBytes(UTF_8);
+        // Build a message that has exactly the max segment size
+        final String largeMessage2 = randomAlphanumeric(Ints.saturatedCast(segmentSize.toBytes() - MessageSet.LogOverhead() - Message.MessageOverhead() - idBytes0.length));
+        list.add(journal.createEntry(idBytes0, largeMessage2.getBytes(UTF_8)));
+
+        while (size <= maxSize) {
+            final byte[] idBytes = randomAlphanumeric(6).getBytes(UTF_8);
+            final byte[] messageBytes = "the-message".getBytes(UTF_8);
+
+            size += idBytes.length + messageBytes.length;
+
+            list.add(journal.createEntry(idBytes, messageBytes));
+        }
+
+        // Make sure all messages but the large one have been written
+        assertThat(journal.write(list)).isEqualTo(list.size() - 2);
     }
 
     @Test
