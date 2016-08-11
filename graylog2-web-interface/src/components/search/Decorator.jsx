@@ -37,7 +37,7 @@ const Decorator = React.createClass({
   },
   _decoratorTypeNotPresent() {
     return {
-      name: <strong>Unknown decorator type</strong>,
+      name: 'Unknown decorator type',
     };
   },
   render() {
