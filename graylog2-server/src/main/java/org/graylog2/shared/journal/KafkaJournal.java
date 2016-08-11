@@ -390,7 +390,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
                 final Message newMessage = new Message(messageBytes, idBytes);
                 // Calculate the size of the new message in the message set by including the overhead for the log entry.
-                final int newMessageSize = newMessage.size() + MessageSet.LogOverhead();
+                final int newMessageSize = MessageSet.entrySize(newMessage);
 
                 // If adding the new message to the message set would overflow the max segment size, flush the current
                 // list of message to avoid a MessageSetSizeTooLargeException.
