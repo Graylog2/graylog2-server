@@ -45,6 +45,7 @@ import static org.mockito.Mockito.when;
 
 public class WebAppNotFoundResponseFilterTest {
     private static final String CK_METHOD_GET = "GET";
+    private static final String CK_METHOD_POST = "POST";
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -169,4 +170,18 @@ public class WebAppNotFoundResponseFilterTest {
         assertThat(responseHeaders).containsEntry("X-UA-Compatible", Collections.singletonList("IE=edge"));
     }
 
+    @Test
+    public void filterDoesNotFilterPostRequests() throws Exception {
+        final UriInfo uriInfo = mock(UriInfo.class);
+        final List<MediaType> mediaTypes = Collections.singletonList(MediaType.TEXT_HTML_TYPE);
+        when(uriInfo.getAbsolutePath()).thenReturn(URI.create("/web/nonexisting"));
+        when(requestContext.getMethod()).thenReturn(CK_METHOD_POST);
+        when(requestContext.getUriInfo()).thenReturn(uriInfo);
+        when(requestContext.getAcceptableMediaTypes()).thenReturn(mediaTypes);
+        when(responseContext.getStatusInfo()).thenReturn(Response.Status.NOT_FOUND);
+
+        filter.filter(requestContext, responseContext);
+
+        verify(responseContext, never()).setEntity("index.html", new Annotation[0], MediaType.TEXT_HTML_TYPE);
+    }
 }
