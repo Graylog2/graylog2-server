@@ -33,7 +33,11 @@ const Decorator = React.createClass({
     this.refs.editForm.open();
   },
   _handleSubmit(data) {
-    DecoratorsActions.update(this.props.decorator._id, { type: data.type, config: data.configuration });
+    DecoratorsActions.update(this.props.decorator._id, {
+      type: data.type,
+      config: data.configuration,
+      order: this.props.decorator.order,
+    });
   },
   _decoratorTypeNotPresent() {
     return {
