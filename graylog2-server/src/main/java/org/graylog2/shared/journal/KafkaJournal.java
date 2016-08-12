@@ -172,7 +172,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         this.serverStatus = serverStatus;
         this.maxSegmentSize = segmentSize.toBytes();
         // Max message size should not be bigger than max segment size.
-        this.maxMessageSize = Math.min(Ints.saturatedCast(maxSegmentSize), Integer.MAX_VALUE);
+        this.maxMessageSize = Ints.saturatedCast(maxSegmentSize);
 
         this.writtenMessages = metricRegistry.meter(name(this.getClass(), "writtenMessages"));
         this.readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
