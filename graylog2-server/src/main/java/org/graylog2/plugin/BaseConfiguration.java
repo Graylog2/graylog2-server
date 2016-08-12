@@ -71,7 +71,7 @@ public abstract class BaseConfiguration {
     private boolean restEnableCors = true;
 
     @Parameter(value = "rest_enable_gzip")
-    private boolean restEnableGzip = false;
+    private boolean restEnableGzip = true;
 
     @Parameter(value = "rest_max_initial_line_length", required = true, validator = PositiveIntegerValidator.class)
     private int restMaxInitialLineLength = 4096;
