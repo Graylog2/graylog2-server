@@ -16,6 +16,7 @@
  */
 package org.graylog2.decorators;
 
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.rest.models.messages.responses.DecorationStats;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
@@ -87,8 +88,14 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
 
     private Set<String> extractFields(List<ResultMessageSummary> messages) {
         return messages.stream()
-            .map(message -> message.message().keySet())
-            .reduce(new HashSet<>(), (set1, set2) -> { set1.addAll(set2); return set1; });
+                .map(message -> message.message().keySet())
+                .reduce(new HashSet<>(), (set1, set2) -> {
+                    set1.addAll(set2);
+                    return set1;
+                })
+                .stream()
+                .filter(field -> !Message.RESERVED_FIELDS.contains(field))
+                .collect(Collectors.toSet());
     }
 
     private SearchDecorationStats getSearchDecoratorStats(List<ResultMessageSummary> decoratedMessages) {
