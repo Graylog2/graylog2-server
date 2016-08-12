@@ -53,9 +53,11 @@ const Decorator = React.createClass({
 
     configKeys.forEach(key => {
       const configValues = (typeConfig[key] ? typeConfig[key].additional_info.values : undefined);
-      if (typeof configValues === 'object' && !Array.isArray(configValues)) {
-        const originalValue = config[key];
-        resolvedConfig[key] = configValues[originalValue] ? configValues[originalValue] : originalValue;
+      const originalValue = config[key];
+      if (configValues) {
+        if (configValues[originalValue]) {
+          resolvedConfig[key] = configValues[originalValue];
+        }
       }
     });
 
