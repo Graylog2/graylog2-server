@@ -10,7 +10,6 @@ const StreamRuleList = React.createClass({
     onDelete: React.PropTypes.func,
     permissions: React.PropTypes.array.isRequired,
     stream: React.PropTypes.object.isRequired,
-    streamRule: React.PropTypes.object.isRequired,
     streamRuleTypes: React.PropTypes.array.isRequired,
   },
 
