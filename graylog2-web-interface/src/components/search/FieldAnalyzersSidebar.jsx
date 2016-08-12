@@ -4,7 +4,7 @@ import { Input } from 'react-bootstrap';
 
 import { DecoratedSidebarMessageField, SidebarMessageField } from 'components/search';
 
-const FieldAnalizersSidebar = React.createClass({
+const FieldAnalyzersSidebar = React.createClass({
   propTypes: {
     fields: React.PropTypes.array,
     fieldAnalyzers: React.PropTypes.array,
@@ -176,4 +176,4 @@ const FieldAnalizersSidebar = React.createClass({
   },
 });
 
-export default FieldAnalizersSidebar;
+export default FieldAnalyzersSidebar;
