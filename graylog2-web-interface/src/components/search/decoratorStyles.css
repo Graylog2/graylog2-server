@@ -44,3 +44,8 @@
     top: 3px;
     position: relative;
 }
+
+:local(.decoratorListContainer) {
+    overflow-y: scroll;
+    padding-bottom: 20px;
+}

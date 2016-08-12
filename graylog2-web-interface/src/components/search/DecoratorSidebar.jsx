@@ -46,7 +46,7 @@ const DecoratorSidebar = React.createClass({
 
   _updateHeight() {
     const decoratorsContainer = ReactDOM.findDOMNode(this.refs.decoratorsContainer);
-    const maxHeight = this.props.maximumHeight - decoratorsContainer.getBoundingClientRect().top - 20;
+    const maxHeight = this.props.maximumHeight - decoratorsContainer.getBoundingClientRect().top;
 
     this.setState({ maxDecoratorsHeight: Math.max(maxHeight, this.MINIMUM_DECORATORS_HEIGHT) });
   },
@@ -93,7 +93,7 @@ const DecoratorSidebar = React.createClass({
           <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators? <i className="fa fa-question-circle" /></Button>
         </OverlayTrigger>
         <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder}/>
-        <div ref="decoratorsContainer" style={{ maxHeight: this.state.maxDecoratorsHeight, overflowY: 'scroll' }}>
+        <div ref="decoratorsContainer" className={DecoratorStyles.decoratorListContainer} style={{ maxHeight: this.state.maxDecoratorsHeight }}>
           <SortableList items={decoratorItems} onMoveItem={this._updateOrder} />
         </div>
       </div>
