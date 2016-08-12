@@ -188,7 +188,8 @@ const SearchSidebar = React.createClass({
             </Tab>
 
             <Tab eventKey={2} title={<h4>Decorators</h4>}>
-              <DecoratorSidebar stream={this.props.searchInStream ? this.props.searchInStream.id : undefined} />
+              <DecoratorSidebar stream={this.props.searchInStream ? this.props.searchInStream.id : undefined}
+                                maximumHeight={this.state.availableHeight} />
             </Tab>
           </Tabs>
         </div>
