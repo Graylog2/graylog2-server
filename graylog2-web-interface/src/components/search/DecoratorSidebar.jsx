@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 
@@ -17,8 +18,39 @@ import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 const DecoratorSidebar = React.createClass({
   propTypes: {
     stream: React.PropTypes.string,
+    maximumHeight: React.PropTypes.number,
   },
   mixins: [Reflux.connect(DecoratorsStore)],
+  getInitialState() {
+    return {
+      maxDecoratorsHeight: 1000,
+    };
+  },
+
+  componentDidMount() {
+    this._updateHeight();
+    window.addEventListener('scroll', this._updateHeight);
+  },
+
+  componentDidUpdate(prevProps) {
+    if (this.props.maximumHeight !== prevProps.maximumHeight) {
+      this._updateHeight();
+    }
+  },
+
+  componentWillUnmount() {
+    window.removeEventListener('scroll', this._updateHeight);
+  },
+
+  MINIMUM_DECORATORS_HEIGHT: 50,
+
+  _updateHeight() {
+    const decoratorsContainer = ReactDOM.findDOMNode(this.refs.decoratorsContainer);
+    const maxHeight = this.props.maximumHeight - decoratorsContainer.getBoundingClientRect().top;
+
+    this.setState({ maxDecoratorsHeight: Math.max(maxHeight, this.MINIMUM_DECORATORS_HEIGHT) });
+  },
+
   _formatDecorator(decorator) {
     const typeDefinition = this.state.types[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
     return ({ id: decorator._id, title: <Decorator key={`decorator-${decorator._id}`}
@@ -61,7 +93,9 @@ const DecoratorSidebar = React.createClass({
           <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators? <i className="fa fa-question-circle" /></Button>
         </OverlayTrigger>
         <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder}/>
-        <SortableList items={decoratorItems} onMoveItem={this._updateOrder} />
+        <div ref="decoratorsContainer" className={DecoratorStyles.decoratorListContainer} style={{ maxHeight: this.state.maxDecoratorsHeight }}>
+          <SortableList items={decoratorItems} onMoveItem={this._updateOrder} />
+        </div>
       </div>
     );
   },

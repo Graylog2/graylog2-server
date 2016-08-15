@@ -33,18 +33,42 @@ const Decorator = React.createClass({
     this.refs.editForm.open();
   },
   _handleSubmit(data) {
-    DecoratorsActions.update(this.props.decorator._id, { type: data.type, config: data.configuration });
+    DecoratorsActions.update(this.props.decorator._id, {
+      type: data.type,
+      config: data.configuration,
+      order: this.props.decorator.order,
+    });
   },
   _decoratorTypeNotPresent() {
     return {
-      name: <strong>Unknown decorator type</strong>,
+      name: 'Unknown decorator type',
     };
+  },
+  // Attempts to resolve ID values in the decorator configuration against the type definition.
+  // This allows users to see actual names for entities in drop-downs, instead of their IDs.
+  _resolveConfigurationIds(config) {
+    const typeConfig = this.props.typeDefinition.requested_configuration;
+    const resolvedConfig = {};
+    const configKeys = Object.keys(config);
+
+    configKeys.forEach(key => {
+      const configValues = (typeConfig[key] ? typeConfig[key].additional_info.values : undefined);
+      const originalValue = config[key];
+      if (configValues) {
+        if (configValues[originalValue]) {
+          resolvedConfig[key] = configValues[originalValue];
+        }
+      }
+    });
+
+    return Object.assign({}, config, resolvedConfig);
   },
   render() {
     if (!this.state.types) {
       return <Spinner />;
     }
     const decorator = this.props.decorator;
+    const config = this._resolveConfigurationIds(decorator.config);
     const decoratorType = this.state.types[decorator.type] || this._decoratorTypeNotPresent();
     return (
       <span className={DecoratorStyles.fullWidth}>
@@ -58,7 +82,7 @@ const Decorator = React.createClass({
         </div>
         <ConfigurationWell key={`configuration-well-decorator-${decorator._id}`}
                            id={decorator._id}
-                           configuration={decorator.config}
+                           configuration={config}
                            typeDefinition={this.props.typeDefinition}/>
         <ConfigurationForm ref="editForm"
                            key="configuration-form-decorator"
