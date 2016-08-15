@@ -28,7 +28,7 @@ public @interface AuditEvent {
 
     String action();
 
-    String[] excludeFields() default "";
+    String[] excludeFields() default {};
 
     boolean captureRequestContext() default true;
 
