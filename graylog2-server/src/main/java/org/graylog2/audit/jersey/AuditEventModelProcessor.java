@@ -29,6 +29,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.core.Configuration;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.Locale;
 
 /**
  * Checks all POST, PUT and DELETE resource methods for {@link AuditEvent} annotations and reports missing ones.
@@ -53,13 +54,15 @@ public class AuditEventModelProcessor implements ModelProcessor {
     }
 
     private void checkResources(List<Resource> resources) {
+
         for (Resource resource : resources) {
             for (ResourceMethod method : resource.getResourceMethods()) {
                 final Method m = method.getInvocable().getDefinitionMethod();
 
                 if (m.isAnnotationPresent(POST.class) || m.isAnnotationPresent(PUT.class) || m.isAnnotationPresent(DELETE.class)) {
                     if (!m.isAnnotationPresent(AuditEvent.class) && !m.isAnnotationPresent(NoAuditEvent.class)) {
-                        LOG.warn("Missing @AuditEvent annotation: {}#{}", m.getDeclaringClass().getCanonicalName(), m.getName());
+                        LOG.warn("REST endpoint not included in audit trail: {}", String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)));
+                        LOG.debug("Missing @AuditEvent or @NoAuditEvent annotation: {}#{}", m.getDeclaringClass().getCanonicalName(), m.getName());
                     }
                 }
             }
@@ -67,5 +70,21 @@ public class AuditEventModelProcessor implements ModelProcessor {
             // Make sure to also check all child resources! Otherwise some resources will not be checked.
             checkResources(resource.getChildResources());
         }
+    }
+
+    private String getPath(Resource resource) {
+        String path = resource.getPath();
+        Resource parent = resource.getParent();
+
+        while (parent != null) {
+            if (!path.startsWith("/")) {
+                path = "/" + path;
+            }
+
+            path = parent.getPath() + path;
+            parent = parent.getParent();
+        }
+
+        return path;
     }
 }
