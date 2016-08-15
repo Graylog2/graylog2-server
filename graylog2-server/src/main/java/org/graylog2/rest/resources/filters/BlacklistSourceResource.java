@@ -22,7 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.filters.events.FilterDescriptionUpdateEvent;
 import org.graylog2.plugin.database.ValidationException;
@@ -74,7 +74,7 @@ public class BlacklistSourceResource extends RestResource {
     @ApiOperation(value = "Create a blacklist filter", notes = "It can take up to a second until the change is applied")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.BLACKLIST_FILTER_CREATE)
+    @AuditEvent(action = AuditActions.BLACKLIST_FILTER_CREATE)
     public Response create(@ApiParam(name = "filterEntry", required = true)
                            @Valid @NotNull FilterDescription filterDescription) throws ValidationException {
         checkPermission(RestPermissions.BLACKLISTENTRY_CREATE);
@@ -127,7 +127,7 @@ public class BlacklistSourceResource extends RestResource {
     @Path("/{filterId}")
     @ApiOperation(value = "Update an existing blacklist filter", notes = "It can take up to a second until the change is applied")
     @Consumes(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.BLACKLIST_FILTER_UPDATE)
+    @AuditEvent(action = AuditActions.BLACKLIST_FILTER_UPDATE)
     public void update(@ApiParam(name = "filterId", required = true)
                        @PathParam("filterId") String filterId,
                        @ApiParam(name = "filterEntry", required = true) FilterDescription filterEntry) throws org.graylog2.database.NotFoundException, ValidationException {
@@ -156,7 +156,7 @@ public class BlacklistSourceResource extends RestResource {
     @Timed
     @ApiOperation(value = "Remove the existing blacklist filter", notes = "It can take up to a second until the change is applied")
     @Path("/{filterId}")
-    @AuditLog(action = AuditActions.BLACKLIST_FILTER_DELETE)
+    @AuditEvent(action = AuditActions.BLACKLIST_FILTER_DELETE)
     public void delete(@ApiParam(name = "filterId", required = true)
                        @PathParam("filterId") String filterId) {
         if (filterService.delete(filterId) == 0) {

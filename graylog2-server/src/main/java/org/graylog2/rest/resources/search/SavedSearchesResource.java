@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.searches.Searches;
@@ -78,7 +78,7 @@ public class SavedSearchesResource extends SearchResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponse(code = 400, message = "Validation error")
-    @AuditLog(action = AuditActions.SAVED_SEARCH_CREATE)
+    @AuditEvent(action = AuditActions.SAVED_SEARCH_CREATE)
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid CreateSavedSearchRequest cr) throws ValidationException {
         if (!isTitleTaken("", cr.title())) {
@@ -125,7 +125,7 @@ public class SavedSearchesResource extends SearchResource {
             @ApiResponse(code = 400, message = "Invalid ObjectId."),
             @ApiResponse(code = 400, message = "Validation error")
     })
-    @AuditLog(action = AuditActions.SAVED_SEARCH_UPDATE)
+    @AuditEvent(action = AuditActions.SAVED_SEARCH_UPDATE)
     public Map<String, Object> update(@ApiParam(name = "searchId", required = true)
                                       @PathParam("searchId") String searchId,
                                       @ApiParam(name = "JSON body", required = true)
@@ -164,7 +164,7 @@ public class SavedSearchesResource extends SearchResource {
             @ApiResponse(code = 404, message = "Saved search not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    @AuditLog(action = AuditActions.SAVED_SEARCH_DELETE)
+    @AuditEvent(action = AuditActions.SAVED_SEARCH_DELETE)
     public void delete(@ApiParam(name = "searchId", required = true)
                        @PathParam("searchId") String searchId) throws NotFoundException {
         checkPermission(RestPermissions.SAVEDSEARCHES_EDIT, searchId);

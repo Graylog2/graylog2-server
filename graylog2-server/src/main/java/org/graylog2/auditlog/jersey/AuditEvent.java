@@ -23,7 +23,7 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface AuditLog {
+public @interface AuditEvent {
     String actor() default "";
 
     String action();

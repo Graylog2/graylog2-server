@@ -21,7 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.plugin.ProcessingPauseLockedException;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -54,7 +54,7 @@ public class SystemProcessingResource extends RestResource {
             notes = "If the message journal is enabled, incoming messages will be spooled on disk, if it is disabled, " +
                     "you might lose messages from inputs which cannot buffer themselves, like AMQP or Kafka-based inputs.")
     @Path("pause")
-    @AuditLog(action = AuditActions.MESSAGE_PROCESSING_STOP)
+    @AuditEvent(action = AuditActions.MESSAGE_PROCESSING_STOP)
     public void pauseProcessing() {
         checkPermission(RestPermissions.PROCESSING_CHANGESTATE, serverStatus.getNodeId().toString());
         serverStatus.pauseMessageProcessing(false);
@@ -66,7 +66,7 @@ public class SystemProcessingResource extends RestResource {
     @Timed
     @ApiOperation(value = "Resume message processing")
     @Path("resume")
-    @AuditLog(action = AuditActions.MESSAGE_PROCESSING_START)
+    @AuditEvent(action = AuditActions.MESSAGE_PROCESSING_START)
     public void resumeProcessing() {
         checkPermission(RestPermissions.PROCESSING_CHANGESTATE, serverStatus.getNodeId().toString());
 
@@ -83,7 +83,7 @@ public class SystemProcessingResource extends RestResource {
     @PUT
     @Timed
     @Path("pause/unlock")
-    @AuditLog(action = AuditActions.MESSAGE_PROCESSING_UNLOCK)
+    @AuditEvent(action = AuditActions.MESSAGE_PROCESSING_UNLOCK)
     public void unlockProcessingPause() {
         /*
          * This is meant to be only used in exceptional cases, when something that locked the processing pause

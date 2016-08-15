@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidget;
@@ -91,7 +91,7 @@ public class DashboardWidgetsResource extends RestResource {
             @ApiResponse(code = 400, message = "Validation error."),
             @ApiResponse(code = 400, message = "No such widget type."),
     })
-    @AuditLog(action = AuditActions.DASHBOARD_WIDGET_CREATE)
+    @AuditEvent(action = AuditActions.DASHBOARD_WIDGET_CREATE)
     public Response addWidget(
             @ApiParam(name = "dashboardId", required = true)
             @PathParam("dashboardId") String dashboardId,
@@ -164,7 +164,7 @@ public class DashboardWidgetsResource extends RestResource {
             @ApiResponse(code = 404, message = "Widget not found."),
     })
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.DASHBOARD_WIDGET_DELETE)
+    @AuditEvent(action = AuditActions.DASHBOARD_WIDGET_DELETE)
     public void remove(
             @ApiParam(name = "dashboardId", required = true)
             @PathParam("dashboardId") String dashboardId,
@@ -220,7 +220,7 @@ public class DashboardWidgetsResource extends RestResource {
             @ApiResponse(code = 404, message = "Widget not found."),
     })
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.DASHBOARD_WIDGET_UPDATE)
+    @AuditEvent(action = AuditActions.DASHBOARD_WIDGET_UPDATE)
     public void updateWidget(@ApiParam(name = "dashboardId", required = true)
                              @PathParam("dashboardId") String dashboardId,
                              @ApiParam(name = "widgetId", required = true)
@@ -269,7 +269,7 @@ public class DashboardWidgetsResource extends RestResource {
             @ApiResponse(code = 404, message = "Widget not found."),
     })
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.DASHBOARD_WIDGET_UPDATE)
+    @AuditEvent(action = AuditActions.DASHBOARD_WIDGET_UPDATE)
     public void updateDescription(@ApiParam(name = "dashboardId", required = true)
                                   @PathParam("dashboardId") String dashboardId,
                                   @ApiParam(name = "widgetId", required = true)
@@ -302,7 +302,7 @@ public class DashboardWidgetsResource extends RestResource {
             @ApiResponse(code = 404, message = "Widget not found."),
     })
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.DASHBOARD_WIDGET_UPDATE)
+    @AuditEvent(action = AuditActions.DASHBOARD_WIDGET_UPDATE)
     public void updateCacheTime(@ApiParam(name = "dashboardId", required = true)
                                 @PathParam("dashboardId") String dashboardId,
                                 @ApiParam(name = "widgetId", required = true)

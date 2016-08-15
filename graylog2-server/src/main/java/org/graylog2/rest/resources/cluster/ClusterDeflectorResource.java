@@ -21,7 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -57,7 +57,7 @@ public class ClusterDeflectorResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "Finds master node and triggers deflector cycle")
     @Path("/cycle")
-    @AuditLog(action = AuditActions.ES_WRITE_INDEX_UPDATE)
+    @AuditEvent(action = AuditActions.ES_WRITE_INDEX_UPDATE)
     public void cycle() throws IOException {
         final Optional<Node> master = nodeService.allActive().values().stream().filter(Node::isMaster).findFirst();
         if (!master.isPresent()) {

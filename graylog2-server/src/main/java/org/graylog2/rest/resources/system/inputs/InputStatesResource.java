@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.inputs.InputService;
 import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -100,7 +100,7 @@ public class InputStatesResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node."),
     })
-    @AuditLog(action = AuditActions.MESSAGE_INPUT_START)
+    @AuditEvent(action = AuditActions.MESSAGE_INPUT_START)
     public InputCreated start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         inputService.find(inputId);
         final InputCreated result = InputCreated.create(inputId);
@@ -116,7 +116,7 @@ public class InputStatesResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node."),
     })
-    @AuditLog(action = AuditActions.MESSAGE_INPUT_STOP)
+    @AuditEvent(action = AuditActions.MESSAGE_INPUT_STOP)
     public InputDeleted stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         inputService.find(inputId);
         final InputDeleted result = InputDeleted.create(inputId);

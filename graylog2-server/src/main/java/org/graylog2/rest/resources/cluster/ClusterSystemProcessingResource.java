@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -75,7 +75,7 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
             notes = "If the message journal is enabled, incoming messages will be spooled on disk, if it is disabled, " +
                     "you might lose messages from inputs which cannot buffer themselves, like AMQP or Kafka-based inputs.")
     @Path("pause")
-    @AuditLog(action = AuditActions.MESSAGE_PROCESSING_STOP)
+    @AuditEvent(action = AuditActions.MESSAGE_PROCESSING_STOP)
     public void pause(@ApiParam(name = "nodeId", value = "The id of the node where processing will be paused.", required = true)
                       @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).pause().execute();
@@ -89,7 +89,7 @@ public class ClusterSystemProcessingResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "Resume message processing on node")
     @Path("resume")
-    @AuditLog(action = AuditActions.MESSAGE_PROCESSING_START)
+    @AuditEvent(action = AuditActions.MESSAGE_PROCESSING_START)
     public void resume(@ApiParam(name = "nodeId", value = "The id of the node where processing will be resumed.", required = true)
                        @PathParam("nodeId") String nodeId) throws IOException, NodeNotFoundException {
         final Response response = this.getRemoteSystemProcessingResource(nodeId).resume().execute();

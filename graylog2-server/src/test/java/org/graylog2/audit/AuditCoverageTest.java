@@ -17,7 +17,7 @@
 package org.graylog2.audit;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.junit.Test;
 import org.reflections.Reflections;
@@ -49,7 +49,7 @@ public class AuditCoverageTest {
         methods.addAll(reflections.getMethodsAnnotatedWith(DELETE.class));
 
         for (Method method : methods.build()) {
-            if (!method.isAnnotationPresent(AuditLog.class) && !method.isAnnotationPresent(NoAuditEvent.class)) {
+            if (!method.isAnnotationPresent(AuditEvent.class) && !method.isAnnotationPresent(NoAuditEvent.class)) {
                 missing.add(method);
             }
         }

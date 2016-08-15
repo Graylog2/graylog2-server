@@ -23,7 +23,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.security.AuthenticationConfig;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -70,7 +70,7 @@ public class AuthenticationResource extends RestResource {
     @Path("config")
     @ApiOperation("Update authentication providers configuration")
     @RequiresPermissions({CLUSTER_CONFIG_ENTRY_READ, AUTHENTICATION_EDIT})
-    @AuditLog(action = AuditActions.AUTHENTICATION_PROVIDER_CONFIGURATION_UPDATE)
+    @AuditEvent(action = AuditActions.AUTHENTICATION_PROVIDER_CONFIGURATION_UPDATE)
     public AuthenticationConfig create(@ApiParam(name = "config", required = true) final AuthenticationConfig config) {
         clusterConfigService.write(config);
         return clusterConfigService.getOrDefault(AuthenticationConfig.class, config);

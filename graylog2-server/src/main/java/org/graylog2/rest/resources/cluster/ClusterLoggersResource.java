@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -84,7 +84,7 @@ public class ClusterLoggersResource extends ProxiedResource {
     @ApiResponses(value = {
         @ApiResponse(code = 404, message = "No such subsystem.")
     })
-    @AuditLog(action = AuditActions.LOG_LEVEL_UPDATE)
+    @AuditEvent(action = AuditActions.LOG_LEVEL_UPDATE)
     public void setSubsystemLoggerLevel(
         @ApiParam(name = "nodeId", required = true) @PathParam("nodeId") @NotEmpty String nodeId,
         @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,

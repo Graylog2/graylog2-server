@@ -31,7 +31,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 
 /**
- * Checks all POST, PUT and DELETE resource methods for {@link AuditLog} annotations and reports missing ones.
+ * Checks all POST, PUT and DELETE resource methods for {@link AuditEvent} annotations and reports missing ones.
  *
  * It does not report methods which have a {@link NoAuditEvent} annotation.
  */
@@ -58,7 +58,7 @@ public class AuditEventModelProcessor implements ModelProcessor {
                 final Method m = method.getInvocable().getDefinitionMethod();
 
                 if (m.isAnnotationPresent(POST.class) || m.isAnnotationPresent(PUT.class) || m.isAnnotationPresent(DELETE.class)) {
-                    if (!m.isAnnotationPresent(AuditLog.class) && !m.isAnnotationPresent(NoAuditEvent.class)) {
+                    if (!m.isAnnotationPresent(AuditEvent.class) && !m.isAnnotationPresent(NoAuditEvent.class)) {
                         LOG.warn("Missing @AuditEvent annotation: {}#{}", m.getDeclaringClass().getCanonicalName(), m.getName());
                     }
                 }

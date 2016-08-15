@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
@@ -82,7 +82,7 @@ public class StreamRuleResource extends RestResource {
     @ApiOperation(value = "Create a stream rule")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.STREAM_RULE_CREATE)
+    @AuditEvent(action = AuditActions.STREAM_RULE_CREATE)
     public Response create(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
                            @PathParam("streamid") String streamId,
                            @ApiParam(name = "JSON body", required = true)
@@ -114,7 +114,7 @@ public class StreamRuleResource extends RestResource {
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.STREAM_RULE_UPDATE)
+    @AuditEvent(action = AuditActions.STREAM_RULE_UPDATE)
     public SingleStreamRuleSummaryResponse update(@ApiParam(name = "streamid", value = "The stream id this rule belongs to.", required = true)
                                                   @PathParam("streamid") String streamid,
                                                   @ApiParam(name = "streamRuleId", value = "The stream rule id we are updating", required = true)
@@ -153,7 +153,7 @@ public class StreamRuleResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.STREAM_RULE_UPDATE)
+    @AuditEvent(action = AuditActions.STREAM_RULE_UPDATE)
     @Deprecated
     public SingleStreamRuleSummaryResponse updateDeprecated(@PathParam("streamid") String streamid,
                                                             @PathParam("streamRuleId") String streamRuleId,
@@ -195,7 +195,7 @@ public class StreamRuleResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream rule not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    @AuditLog(action = AuditActions.STREAM_RULE_DELETE)
+    @AuditEvent(action = AuditActions.STREAM_RULE_DELETE)
     public void delete(@ApiParam(name = "streamid", value = "The stream id this new rule belongs to.", required = true)
                        @PathParam("streamid") String streamid,
                        @ApiParam(name = "streamRuleId", required = true)

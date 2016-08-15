@@ -23,7 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPattern;
@@ -94,7 +94,7 @@ public class GrokResource extends RestResource {
     @POST
     @Timed
     @ApiOperation(value = "Add a new named pattern", response = GrokPatternSummary.class)
-    @AuditLog(action = AuditActions.GROK_PATTERN_CREATE)
+    @AuditEvent(action = AuditActions.GROK_PATTERN_CREATE)
     public Response createPattern(@ApiParam(name = "pattern", required = true)
                                       @Valid @NotNull GrokPatternSummary pattern) throws ValidationException {
         checkPermission(RestPermissions.INPUTS_CREATE);
@@ -111,7 +111,7 @@ public class GrokResource extends RestResource {
     @PUT
     @Timed
     @ApiOperation("Add a list of new patterns")
-    @AuditLog(action = AuditActions.GROK_PATTERN_IMPORT)
+    @AuditEvent(action = AuditActions.GROK_PATTERN_IMPORT)
     public Response bulkUpdatePatterns(@ApiParam(name = "patterns", required = true) @NotNull GrokPatternList patternList,
                                        @ApiParam(name = "replace", value = "Replace all patterns with the new ones.")
                                        @QueryParam("replace") @DefaultValue("false") boolean replace) throws ValidationException {
@@ -134,7 +134,7 @@ public class GrokResource extends RestResource {
     @Timed
     @Path("/{patternId}")
     @ApiOperation("Update an existing pattern")
-    @AuditLog(action = AuditActions.GROK_PATTERN_UPDATE)
+    @AuditEvent(action = AuditActions.GROK_PATTERN_UPDATE)
     public GrokPattern updatePattern(@ApiParam(name = "patternId", required = true)
                                      @PathParam("patternId") String patternId,
                                      @ApiParam(name = "pattern", required = true)
@@ -157,7 +157,7 @@ public class GrokResource extends RestResource {
     @Timed
     @Path("/{patternId}")
     @ApiOperation("Remove an existing pattern by id")
-    @AuditLog(action = AuditActions.GROK_PATTERN_DELETE)
+    @AuditEvent(action = AuditActions.GROK_PATTERN_DELETE)
     public void removePattern(@PathParam("patternId") String patternId) throws NotFoundException {
         checkPermission(RestPermissions.INPUTS_EDIT);
         final GrokPattern pattern = grokPatternService.load(patternId);

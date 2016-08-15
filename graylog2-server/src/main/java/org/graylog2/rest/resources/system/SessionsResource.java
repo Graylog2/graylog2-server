@@ -33,7 +33,7 @@ import org.apache.shiro.util.ThreadContext;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.AuditLogger;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RestTools;
@@ -204,7 +204,7 @@ public class SessionsResource extends RestResource {
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication
-    @AuditLog(action = AuditActions.SESSION_DELETE)
+    @AuditEvent(action = AuditActions.SESSION_DELETE)
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);

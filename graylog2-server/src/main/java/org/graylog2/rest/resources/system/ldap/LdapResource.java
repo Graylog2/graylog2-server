@@ -28,7 +28,7 @@ import org.apache.directory.ldap.client.api.LdapNetworkConnection;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.system.ldap.requests.LdapSettingsRequest;
@@ -212,7 +212,7 @@ public class LdapResource extends RestResource {
     @ApiOperation("Update the LDAP configuration")
     @Path("/settings")
     @Consumes(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.LDAP_CONFIGURATION_UPDATE, excludeFields = "system_password")
+    @AuditEvent(action = AuditActions.LDAP_CONFIGURATION_UPDATE, excludeFields = "system_password")
     public void updateLdapSettings(@ApiParam(name = "JSON body", required = true)
                                    @Valid @NotNull LdapSettingsRequest request) throws ValidationException {
         // load the existing config, or create a new one. we only support having one, currently
@@ -243,7 +243,7 @@ public class LdapResource extends RestResource {
     @RequiresPermissions(RestPermissions.LDAP_EDIT)
     @ApiOperation("Remove the LDAP configuration")
     @Path("/settings")
-    @AuditLog(action = AuditActions.LDAP_CONFIGURATION_DELETE)
+    @AuditEvent(action = AuditActions.LDAP_CONFIGURATION_DELETE)
     public void deleteLdapSettings() {
         ldapSettingsService.delete();
     }
@@ -263,7 +263,7 @@ public class LdapResource extends RestResource {
     @ApiOperation(value = "Update the LDAP group to Graylog role mapping", notes = "Corresponds directly to the output of GET /system/ldap/settings/groups")
     @Path("/settings/groups")
     @Consumes(MediaType.APPLICATION_JSON)
-    @AuditLog(action = AuditActions.LDAP_GROUP_MAPPING_UPDATE)
+    @AuditEvent(action = AuditActions.LDAP_GROUP_MAPPING_UPDATE)
     public Response updateGroupMappingSettings(@ApiParam(name = "JSON body", required = true, value = "A hash in which the keys are the LDAP group names and values is the Graylog role name.")
                                    @NotNull Map<String, String> groupMapping) throws ValidationException {
         final LdapSettings ldapSettings = firstNonNull(ldapSettingsService.load(), ldapSettingsFactory.createEmpty());

@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -70,7 +70,7 @@ public class ClusterLoadBalancerStatusResource extends ProxiedResource {
     @ApiOperation(value = "Override load balancer status of this graylog-server node. Next lifecycle " +
             "change will override it again to its default. Set to ALIVE, DEAD, or THROTTLED.")
     @Path("/override/{status}")
-    @AuditLog(action = AuditActions.LOAD_BALANCER_STATUS_UPDATE)
+    @AuditEvent(action = AuditActions.LOAD_BALANCER_STATUS_UPDATE)
     public void override(@ApiParam(name = "nodeId", value = "The id of the node whose LB status will be changed", required = true)
                          @PathParam("nodeId") String nodeId,
                          @ApiParam(name = "status") @PathParam("status") String status) throws IOException, NodeNotFoundException {
