@@ -20,7 +20,7 @@ package org.graylog2.indexer.rotation.strategies;
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.index.store.StoreStats;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
@@ -50,7 +50,7 @@ public class SizeBasedRotationStrategyTest {
     private Indices indices;
 
     @Mock
-    private AuditLogger auditLogger;
+    private AuditEventSender auditEventSender;
 
     @Test
     public void testRotate() throws Exception {
@@ -62,7 +62,7 @@ public class SizeBasedRotationStrategyTest {
         when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService, auditLogger);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService, auditEventSender);
 
         strategy.rotate();
         verify(deflector, times(1)).cycle();
@@ -80,7 +80,7 @@ public class SizeBasedRotationStrategyTest {
         when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100000L));
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService, auditLogger);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService, auditEventSender);
 
         strategy.rotate();
         verify(deflector, never()).cycle();
@@ -94,7 +94,7 @@ public class SizeBasedRotationStrategyTest {
         when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100));
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService, auditLogger);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService, auditEventSender);
 
         strategy.rotate();
         verify(deflector, never()).cycle();

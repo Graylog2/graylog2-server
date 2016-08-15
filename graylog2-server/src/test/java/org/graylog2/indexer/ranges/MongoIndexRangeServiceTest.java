@@ -25,7 +25,7 @@ import org.assertj.jodatime.api.Assertions;
 import org.bson.types.ObjectId;
 import org.elasticsearch.ElasticsearchTimeoutException;
 import org.elasticsearch.index.IndexNotFoundException;
-import org.graylog2.auditlog.NullAuditLogger;
+import org.graylog2.auditlog.NullAuditEventSender;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
@@ -72,7 +72,7 @@ public class MongoIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         localEventBus = new EventBus("local-event-bus");
-        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, NullAuditLogger::new, localEventBus);
+        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, NullAuditEventSender::new, localEventBus);
     }
 
     @Test

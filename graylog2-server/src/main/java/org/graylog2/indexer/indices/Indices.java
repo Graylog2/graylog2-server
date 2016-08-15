@@ -76,7 +76,7 @@ import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -112,10 +112,10 @@ public class Indices {
     private final ElasticsearchConfiguration configuration;
     private final IndexMapping indexMapping;
     private final Messages messages;
-    private final Provider<AuditLogger> auditLoggerProvider;
+    private final Provider<AuditEventSender> auditLoggerProvider;
 
     @Inject
-    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages, Provider<AuditLogger> auditLoggerProvider) {
+    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages, Provider<AuditEventSender> auditLoggerProvider) {
         this.c = client;
         this.configuration = configuration;
         this.indexMapping = indexMapping;

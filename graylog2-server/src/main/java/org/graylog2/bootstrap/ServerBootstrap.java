@@ -23,7 +23,7 @@ import com.google.inject.Module;
 import com.google.inject.ProvisionException;
 import io.airlift.airline.Option;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -91,12 +91,12 @@ public abstract class ServerBootstrap extends CmdLineTool {
 
     @Override
     protected void startCommand() {
-        final AuditLogger auditLogger = injector.getInstance(AuditLogger.class);
+        final AuditEventSender auditEventSender = injector.getInstance(AuditEventSender.class);
         final Map<String, Object> auditLogContext = ImmutableMap.of(
             "version", version,
             "java", Tools.getSystemInformation()
         );
-        auditLogger.success("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
+        auditEventSender.success("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
 
         final OS os = OS.getOs();
 
@@ -119,12 +119,12 @@ public abstract class ServerBootstrap extends CmdLineTool {
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);
             annotateProvisionException(e);
-            auditLogger.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
+            auditEventSender.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
             System.exit(-1);
             return;
         } catch (Exception e) {
             LOG.error("Unexpected exception", e);
-            auditLogger.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
+            auditEventSender.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
             System.exit(-1);
             return;
         }
@@ -146,14 +146,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 LOG.error("Unable to shutdown properly on time. {}", serviceManager.servicesByState());
             }
             LOG.error("Graylog startup failed. Exiting. Exception was:", e);
-            auditLogger.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
+            auditEventSender.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
             System.exit(-1);
         }
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         activityWriter.write(new Activity("Started up.", Main.class));
         LOG.info("Graylog " + commandName + " up and running.");
-        auditLogger.success("<system>", AuditActions.NODE_STARTUP_COMPLETE, auditLogContext);
+        auditEventSender.success("<system>", AuditActions.NODE_STARTUP_COMPLETE, auditLogContext);
 
         // Block forever.
         try {

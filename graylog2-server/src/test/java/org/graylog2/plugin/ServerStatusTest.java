@@ -17,7 +17,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.eventbus.EventBus;
-import org.graylog2.auditlog.NullAuditLogger;
+import org.graylog2.auditlog.NullAuditEventSender;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;
@@ -62,7 +62,7 @@ public class ServerStatusTest {
 
         when(config.getNodeIdFile()).thenReturn(tempFile.getPath());
 
-        status = new ServerStatus(config, Collections.singleton(ServerStatus.Capability.MASTER), eventBus, NullAuditLogger::new);
+        status = new ServerStatus(config, Collections.singleton(ServerStatus.Capability.MASTER), eventBus, NullAuditEventSender::new);
     }
 
     @Test

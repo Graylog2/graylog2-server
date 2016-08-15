@@ -17,7 +17,7 @@
 
 package org.graylog2.indexer.rotation.strategies;
 
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.Indices;
@@ -46,7 +46,7 @@ public class MessageCountRotationStrategyTest {
     private Indices indices;
 
     @Mock
-    private AuditLogger auditLogger;
+    private AuditEventSender auditEventSender;
 
     @Test
     public void testRotate() throws Exception {
@@ -54,7 +54,7 @@ public class MessageCountRotationStrategyTest {
         when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService, auditLogger);
+        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService, auditEventSender);
 
         strategy.rotate();
         verify(deflector, times(1)).cycle();
@@ -67,7 +67,7 @@ public class MessageCountRotationStrategyTest {
         when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService, auditLogger);
+        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService, auditEventSender);
 
         strategy.rotate();
         verify(deflector, never()).cycle();
@@ -81,7 +81,7 @@ public class MessageCountRotationStrategyTest {
         when(deflector.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(MessageCountRotationStrategyConfig.class)).thenReturn(MessageCountRotationStrategyConfig.create(5));
 
-        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService ,auditLogger);
+        final MessageCountRotationStrategy strategy = new MessageCountRotationStrategy(indices, deflector, clusterConfigService , auditEventSender);
 
         strategy.rotate();
         verify(deflector, never()).cycle();

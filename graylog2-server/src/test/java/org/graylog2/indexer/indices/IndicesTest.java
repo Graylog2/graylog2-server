@@ -40,7 +40,7 @@ import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.compress.CompressedXContent;
 import org.elasticsearch.index.IndexNotFoundException;
-import org.graylog2.auditlog.NullAuditLogger;
+import org.graylog2.auditlog.NullAuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.messages.Messages;
@@ -94,7 +94,7 @@ public class IndicesTest {
 
     @Before
     public void setUp() throws Exception {
-        indices = new Indices(client, CONFIG, new IndexMapping(), new Messages(client, CONFIG, new MetricRegistry()), NullAuditLogger::new);
+        indices = new Indices(client, CONFIG, new IndexMapping(), new Messages(client, CONFIG, new MetricRegistry()), NullAuditEventSender::new);
     }
 
     @Test

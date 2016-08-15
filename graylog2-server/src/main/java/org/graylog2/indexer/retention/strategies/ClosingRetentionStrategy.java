@@ -17,7 +17,7 @@
 package org.graylog2.indexer.retention.strategies;
 
 import com.google.common.base.Stopwatch;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -41,8 +41,8 @@ public class ClosingRetentionStrategy extends AbstractIndexCountBasedRetentionSt
                                     Indices indices,
                                     ActivityWriter activityWriter,
                                     ClusterConfigService clusterConfigService,
-                                    AuditLogger auditLogger) {
-        super(deflector, indices, activityWriter, auditLogger);
+                                    AuditEventSender auditEventSender) {
+        super(deflector, indices, activityWriter, auditEventSender);
         this.indices = indices;
         this.clusterConfigService = clusterConfigService;
     }

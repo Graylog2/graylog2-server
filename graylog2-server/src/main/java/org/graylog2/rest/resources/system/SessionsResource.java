@@ -32,7 +32,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.auditlog.jersey.AuditEvent;
 import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
@@ -83,7 +83,7 @@ public class SessionsResource extends RestResource {
     private final UserService userService;
     private final DefaultSecurityManager securityManager;
     private final ShiroAuthenticationFilter authenticationFilter;
-    private final AuditLogger auditLogger;
+    private final AuditEventSender auditEventSender;
     private final Set<IpSubnet> trustedSubnets;
     private final Request grizzlyRequest;
 
@@ -92,13 +92,13 @@ public class SessionsResource extends RestResource {
     public SessionsResource(UserService userService,
                             DefaultSecurityManager securityManager,
                             ShiroAuthenticationFilter authenticationFilter,
-                            AuditLogger auditLogger,
+                            AuditEventSender auditEventSender,
                             @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
                             @Context Request grizzlyRequest) {
         this.userService = userService;
         this.securityManager = securityManager;
         this.authenticationFilter = authenticationFilter;
-        this.auditLogger = auditLogger;
+        this.auditEventSender = auditEventSender;
         this.trustedSubnets = trustedSubnets;
         this.grizzlyRequest = grizzlyRequest;
     }
@@ -155,7 +155,7 @@ public class SessionsResource extends RestResource {
                     "session_id", id,
                     "remote_address", remoteAddrFromRequest
             );
-            auditLogger.success(createRequest.username(), AuditActions.SESSION_CREATE, auditLogContext);
+            auditEventSender.success(createRequest.username(), AuditActions.SESSION_CREATE, auditLogContext);
 
             // TODO is the validUntil attribute even used by anyone yet?
             return SessionResponse.create(new DateTime(s.getLastAccessTime(), DateTimeZone.UTC).plus(s.getTimeout()).toDate(),
@@ -164,7 +164,7 @@ public class SessionsResource extends RestResource {
             final Map<String, Object> auditLogContext = ImmutableMap.of(
                     "remote_address", remoteAddrFromRequest
             );
-            auditLogger.failure(createRequest.username(), AuditActions.SESSION_CREATE, auditLogContext);
+            auditEventSender.failure(createRequest.username(), AuditActions.SESSION_CREATE, auditLogContext);
 
             throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
         }

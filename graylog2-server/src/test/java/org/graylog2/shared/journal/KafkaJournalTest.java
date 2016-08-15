@@ -27,7 +27,7 @@ import kafka.common.KafkaException;
 import kafka.log.LogSegment;
 import kafka.utils.FileLock;
 import org.graylog2.Configuration;
-import org.graylog2.auditlog.NullAuditLogger;
+import org.graylog2.auditlog.NullAuditEventSender;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;
@@ -91,7 +91,7 @@ public class KafkaJournalTest {
                 return nodeId.getAbsolutePath();
             }
         };
-        serverStatus = new ServerStatus(configuration, EnumSet.of(ServerStatus.Capability.MASTER), new EventBus("KafkaJournalTest"), NullAuditLogger::new);
+        serverStatus = new ServerStatus(configuration, EnumSet.of(ServerStatus.Capability.MASTER), new EventBus("KafkaJournalTest"), NullAuditEventSender::new);
     }
 
     @After

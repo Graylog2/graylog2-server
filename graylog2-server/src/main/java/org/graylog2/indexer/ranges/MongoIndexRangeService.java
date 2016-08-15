@@ -33,7 +33,7 @@ import com.mongodb.BasicDBObjectBuilder;
 import org.bson.types.ObjectId;
 import org.elasticsearch.indices.IndexClosedException;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -61,14 +61,14 @@ public class MongoIndexRangeService implements IndexRangeService {
     private static final String COLLECTION_NAME = "index_ranges";
 
     private final Indices indices;
-    private final Provider<AuditLogger> auditLoggerProvider;
+    private final Provider<AuditEventSender> auditLoggerProvider;
     private final JacksonDBCollection<MongoIndexRange, ObjectId> collection;
 
     @Inject
     public MongoIndexRangeService(MongoConnection mongoConnection,
                                   MongoJackObjectMapperProvider objectMapperProvider,
                                   Indices indices,
-                                  Provider<AuditLogger> auditLoggerProvider,
+                                  Provider<AuditEventSender> auditLoggerProvider,
                                   EventBus eventBus) {
         this.indices = indices;
         this.auditLoggerProvider = auditLoggerProvider;

@@ -21,7 +21,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
@@ -41,13 +41,13 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     private static final Logger LOG = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     private final NodeId nodeId;
-    private final AuditLogger auditLogger;
+    private final AuditEventSender auditEventSender;
 
     @Inject
-    public NotificationServiceImpl(NodeId nodeId, MongoConnection mongoConnection, AuditLogger auditLogger) {
+    public NotificationServiceImpl(NodeId nodeId, MongoConnection mongoConnection, AuditEventSender auditEventSender) {
         super(mongoConnection);
         this.nodeId = checkNotNull(nodeId);
-        this.auditLogger = auditLogger;
+        this.auditEventSender = auditEventSender;
     }
 
     @Override
@@ -117,11 +117,11 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         }
         try {
             save(notification);
-            auditLogger.success("<system>", AuditActions.SYSTEM_NOTIFICATION_CREATE, notification.asMap());
+            auditEventSender.success("<system>", AuditActions.SYSTEM_NOTIFICATION_CREATE, notification.asMap());
         } catch(ValidationException e) {
             // We have no validations, but just in case somebody adds some...
             LOG.error("Validating user warning failed.", e);
-            auditLogger.failure("<system>", AuditActions.SYSTEM_NOTIFICATION_CREATE, notification.asMap());
+            auditEventSender.failure("<system>", AuditActions.SYSTEM_NOTIFICATION_CREATE, notification.asMap());
             return false;
         }
 

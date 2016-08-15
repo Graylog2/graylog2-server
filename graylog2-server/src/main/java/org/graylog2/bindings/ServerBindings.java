@@ -29,7 +29,7 @@ import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.alerts.types.FieldContentValueAlertCondition;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
-import org.graylog2.auditlog.NullAuditLogger;
+import org.graylog2.auditlog.NullAuditEventSender;
 import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
@@ -118,7 +118,7 @@ public class ServerBindings extends Graylog2Module {
         bindSearchResponseDecorators();
 
         // make sure there is a default binding
-        auditLoggerBinder().setDefault().to(NullAuditLogger.class);
+        auditLoggerBinder().setDefault().to(NullAuditEventSender.class);
     }
 
     private void bindProviders() {

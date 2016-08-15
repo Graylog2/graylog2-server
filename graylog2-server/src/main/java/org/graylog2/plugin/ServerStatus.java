@@ -21,7 +21,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Provider;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
@@ -53,7 +53,7 @@ public class ServerStatus {
 
     private final EventBus eventBus;
     private final NodeId nodeId;
-    private final Provider<AuditLogger> auditLoggerProvider;
+    private final Provider<AuditEventSender> auditLoggerProvider;
     private final String clusterId;
     private final DateTime startedAt;
     private final Set<Capability> capabilitySet;
@@ -66,7 +66,7 @@ public class ServerStatus {
     private volatile Lifecycle lifecycle = Lifecycle.UNINITIALIZED;
 
     @Inject
-    public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus, Provider<AuditLogger> auditLoggerProvider) {
+    public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus, Provider<AuditEventSender> auditLoggerProvider) {
         this.eventBus = eventBus;
         this.nodeId = new NodeId(configuration.getNodeIdFile());
         this.auditLoggerProvider = auditLoggerProvider;

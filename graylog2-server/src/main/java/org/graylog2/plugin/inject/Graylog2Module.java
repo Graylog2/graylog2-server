@@ -26,7 +26,7 @@ import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import org.apache.shiro.realm.AuthenticatingRealm;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.auditlog.PluginAuditActions;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
@@ -336,8 +336,8 @@ public abstract class Graylog2Module extends AbstractModule {
         searchResponseDecoratorBinder.addBinding(searchResponseDecoratorClass.getCanonicalName()).to(searchResponseDecoratorFactoryClass);
     }
 
-    protected OptionalBinder<AuditLogger> auditLoggerBinder() {
-        return OptionalBinder.newOptionalBinder(binder(), AuditLogger.class);
+    protected OptionalBinder<AuditEventSender> auditLoggerBinder() {
+        return OptionalBinder.newOptionalBinder(binder(), AuditEventSender.class);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}

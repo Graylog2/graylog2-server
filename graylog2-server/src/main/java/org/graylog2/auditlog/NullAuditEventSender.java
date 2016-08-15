@@ -18,12 +18,20 @@ package org.graylog2.auditlog;
 
 import java.util.Map;
 
-public interface AuditLogger {
-    void success(String actor, String action);
+public class NullAuditEventSender implements AuditEventSender {
+    @Override
+    public void success(String actor, String action) {
+    }
 
-    void success(String actor, String action, Map<String, Object> context);
+    @Override
+    public void success(String actor, String action, Map<String, Object> context) {
+    }
 
-    void failure(String actor, String action);
+    @Override
+    public void failure(String actor, String action) {
+    }
 
-    void failure(String actor, String action, Map<String, Object> context);
+    @Override
+    public void failure(String actor, String action, Map<String, Object> context) {
+    }
 }

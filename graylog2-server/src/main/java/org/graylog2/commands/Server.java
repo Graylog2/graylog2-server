@@ -26,7 +26,7 @@ import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
 import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bindings.InitializerBindings;
@@ -172,15 +172,15 @@ public class Server extends ServerBootstrap {
         private final ActivityWriter activityWriter;
         private final ServiceManager serviceManager;
         private final GracefulShutdown gracefulShutdown;
-        private final AuditLogger auditLogger;
+        private final AuditEventSender auditEventSender;
 
         @Inject
         public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager,
-                            GracefulShutdown gracefulShutdown, AuditLogger auditLogger) {
+                            GracefulShutdown gracefulShutdown, AuditEventSender auditEventSender) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
             this.gracefulShutdown = gracefulShutdown;
-            this.auditLogger = auditLogger;
+            this.auditEventSender = auditEventSender;
         }
 
         @Override
@@ -189,7 +189,7 @@ public class Server extends ServerBootstrap {
             LOG.info(msg);
             activityWriter.write(new Activity(msg, Main.class));
 
-            auditLogger.success("<system>", AuditActions.NODE_SHUTDOWN_INITIATE);
+            auditEventSender.success("<system>", AuditActions.NODE_SHUTDOWN_INITIATE);
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();

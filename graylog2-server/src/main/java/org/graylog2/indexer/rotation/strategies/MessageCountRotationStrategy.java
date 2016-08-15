@@ -17,7 +17,7 @@
 
 package org.graylog2.indexer.rotation.strategies;
 
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.auditlog.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.indices.Indices;
@@ -39,8 +39,8 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
 
     @Inject
     public MessageCountRotationStrategy(Indices indices, Deflector deflector,
-                                        ClusterConfigService clusterConfigService, AuditLogger auditLogger) {
-        super(deflector, auditLogger);
+                                        ClusterConfigService clusterConfigService, AuditEventSender auditEventSender) {
+        super(deflector, auditEventSender);
         this.indices = indices;
         this.clusterConfigService = clusterConfigService;
     }
