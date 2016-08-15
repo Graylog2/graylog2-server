@@ -24,15 +24,15 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface AuditLog {
-    String subject() default "";
+    String actor() default "";
 
-    String action() default "";
+    String action();
 
-    String object();
+    String[] excludeFields() default "";
 
     boolean captureRequestContext() default true;
 
-    boolean captureRequestEntity() default false;
+    boolean captureRequestEntity() default true;
 
-    boolean captureResponseEntity() default false;
+    boolean captureResponseEntity() default true;
 }

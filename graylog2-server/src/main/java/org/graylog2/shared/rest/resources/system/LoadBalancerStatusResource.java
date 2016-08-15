@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.LoadBalancerStatus;
@@ -90,7 +91,7 @@ public class LoadBalancerStatusResource extends RestResource {
     @ApiOperation(value = "Override load balancer status of this Graylog server node. Next lifecycle " +
             "change will override it again to its default. Set to ALIVE, DEAD, or THROTTLED.")
     @Path("/override/{status}")
-    @AuditLog(object = "load balancer status")
+    @AuditLog(action = AuditActions.LOAD_BALANCER_STATUS_UPDATE)
     public void override(@ApiParam(name = "status") @PathParam("status") String status) {
         final LoadBalancerStatus lbStatus;
         try {

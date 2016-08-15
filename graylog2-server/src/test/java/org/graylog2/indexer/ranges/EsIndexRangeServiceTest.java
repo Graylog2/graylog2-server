@@ -25,6 +25,7 @@ import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
+import org.graylog2.auditlog.NullAuditLogger;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.Deflector;
@@ -83,7 +84,7 @@ public class EsIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         final Messages messages = new Messages(client, ELASTICSEARCH_CONFIGURATION, new MetricRegistry());
-        indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(), messages);
+        indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(), messages, NullAuditLogger::new);
         final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION.getIndexPrefix(), new NullActivityWriter(),
             indices, null, null);
         indexRangeService = new EsIndexRangeService(client, deflector, localEventBus, new MetricRegistry());

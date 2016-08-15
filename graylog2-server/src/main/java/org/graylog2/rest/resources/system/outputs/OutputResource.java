@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.outputs.MessageOutputFactory;
@@ -125,7 +126,7 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid output specification in input.", response = OutputSummary.class)
     })
-    @AuditLog(object = "message output", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditLog(action = AuditActions.MESSAGE_OUTPUT_CREATE)
     public Response create(@ApiParam(name = "JSON body", required = true) CreateOutputRequest csor) throws ValidationException {
         checkPermission(RestPermissions.OUTPUTS_CREATE);
         final AvailableOutputSummary outputSummary = messageOutputFactory.getAvailableOutputs().get(csor.type());
@@ -169,7 +170,7 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
     })
-    @AuditLog(object = "message output")
+    @AuditLog(action = AuditActions.MESSAGE_OUTPUT_DELETE)
     public void delete(@ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
                        @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
         checkPermission(RestPermissions.OUTPUTS_TERMINATE);
@@ -196,7 +197,7 @@ public class OutputResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such output on this node.")
     })
-    @AuditLog(object = "message output", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditLog(action = AuditActions.MESSAGE_OUTPUT_UPDATE)
     public Output update(@ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
                            @PathParam("outputId") String outputId,
                            @ApiParam(name = "JSON body", required = true) Map<String, Object> deltas) throws ValidationException, NotFoundException {

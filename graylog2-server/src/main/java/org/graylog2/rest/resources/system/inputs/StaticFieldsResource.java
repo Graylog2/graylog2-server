@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
@@ -77,7 +78,7 @@ public class StaticFieldsResource extends RestResource {
             @ApiResponse(code = 400, message = "Field/Key is reserved."),
             @ApiResponse(code = 400, message = "Missing or invalid configuration.")
     })
-    @AuditLog(object = "static field", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditLog(action = AuditActions.STATIC_FIELD_CREATE)
     public Response create(@ApiParam(name = "inputId", required = true)
                            @PathParam("inputId") String inputId,
                            @ApiParam(name = "JSON body", required = true)
@@ -131,7 +132,7 @@ public class StaticFieldsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such static field.")
     })
     @Path("/{key}")
-    @AuditLog(object = "static field")
+    @AuditLog(action = AuditActions.STATIC_FIELD_DELETE)
     public void delete(@ApiParam(name = "Key", required = true)
                        @PathParam("key") String key,
                        @ApiParam(name = "inputId", required = true)

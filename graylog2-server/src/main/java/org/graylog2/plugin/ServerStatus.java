@@ -19,6 +19,9 @@ package org.graylog2.plugin;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.Uninterruptibles;
+import com.google.inject.Provider;
+import org.graylog2.auditlog.AuditActions;
+import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
@@ -50,6 +53,7 @@ public class ServerStatus {
 
     private final EventBus eventBus;
     private final NodeId nodeId;
+    private final Provider<AuditLogger> auditLoggerProvider;
     private final String clusterId;
     private final DateTime startedAt;
     private final Set<Capability> capabilitySet;
@@ -62,9 +66,10 @@ public class ServerStatus {
     private volatile Lifecycle lifecycle = Lifecycle.UNINITIALIZED;
 
     @Inject
-    public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus) {
+    public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus, Provider<AuditLogger> auditLoggerProvider) {
         this.eventBus = eventBus;
         this.nodeId = new NodeId(configuration.getNodeIdFile());
+        this.auditLoggerProvider = auditLoggerProvider;
         this.clusterId = "";
         this.startedAt = Tools.nowUTC();
         this.capabilitySet = Sets.newHashSet(capabilities); // copy, because we support adding more capabilities later
@@ -192,7 +197,11 @@ public class ServerStatus {
 
     public void pauseMessageProcessing(boolean locked) {
         // Never override pause lock if already locked.
-        processingPauseLocked.compareAndSet(false, locked);
+        if (processingPauseLocked.compareAndSet(false, locked) && locked) {
+            auditLoggerProvider.get().success("<system>", AuditActions.MESSAGE_PROCESSING_LOCK);
+        } else if (locked) {
+            auditLoggerProvider.get().failure("<system>", AuditActions.MESSAGE_PROCESSING_LOCK);
+        }
         isProcessing.set(false);
 
         publishLifecycle(Lifecycle.PAUSED);

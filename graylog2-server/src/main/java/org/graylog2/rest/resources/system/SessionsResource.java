@@ -31,6 +31,7 @@ import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.glassfish.grizzly.http.server.Request;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.plugin.database.users.User;
@@ -152,7 +153,7 @@ public class SessionsResource extends RestResource {
                     "session_id", id,
                     "remote_address", remoteAddrFromRequest
             );
-            auditLogger.success(createRequest.username(), "create", "session", auditLogContext);
+            auditLogger.success(createRequest.username(), AuditActions.SESSION_CREATE, auditLogContext);
 
             // TODO is the validUntil attribute even used by anyone yet?
             return SessionResponse.create(new DateTime(s.getLastAccessTime(), DateTimeZone.UTC).plus(s.getTimeout()).toDate(),
@@ -161,7 +162,7 @@ public class SessionsResource extends RestResource {
             final Map<String, Object> auditLogContext = ImmutableMap.of(
                     "remote_address", remoteAddrFromRequest
             );
-            auditLogger.failure(createRequest.username(), "create", "session", auditLogContext);
+            auditLogger.failure(createRequest.username(), AuditActions.SESSION_CREATE, auditLogContext);
 
             throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
         }
@@ -201,7 +202,7 @@ public class SessionsResource extends RestResource {
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication
-    @AuditLog(object = "session")
+    @AuditLog(action = AuditActions.SESSION_DELETE)
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);

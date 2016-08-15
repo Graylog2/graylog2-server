@@ -20,6 +20,8 @@ import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.auditlog.AuditActions;
+import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
@@ -39,11 +41,13 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     private static final Logger LOG = LoggerFactory.getLogger(NotificationServiceImpl.class);
 
     private final NodeId nodeId;
+    private final AuditLogger auditLogger;
 
     @Inject
-    public NotificationServiceImpl(NodeId nodeId, MongoConnection mongoConnection) {
+    public NotificationServiceImpl(NodeId nodeId, MongoConnection mongoConnection, AuditLogger auditLogger) {
         super(mongoConnection);
         this.nodeId = checkNotNull(nodeId);
+        this.auditLogger = auditLogger;
     }
 
     @Override
@@ -113,9 +117,11 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         }
         try {
             save(notification);
+            auditLogger.success("<system>", AuditActions.SYSTEM_NOTIFICATION_CREATE, notification.asMap());
         } catch(ValidationException e) {
             // We have no validations, but just in case somebody adds some...
             LOG.error("Validating user warning failed.", e);
+            auditLogger.failure("<system>", AuditActions.SYSTEM_NOTIFICATION_CREATE, notification.asMap());
             return false;
         }
 

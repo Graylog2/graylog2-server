@@ -21,16 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 public class AuditActions implements PluginAuditActions {
-    /* Audit action strings are a URN with the following format:
-     *
-     * urn:graylog:<type>:<system>:audit:action:<action>
-     *
-     * Examples:
-     *
-     * urn:graylog:core:server:audit:action:input.create
-     * urn:graylog:plugin:archive:audit:action:archive.create
-     */
-    private static final String URN_PREFIX = "urn:graylog:core:server:audit:action:";
+    private static final String URN_PREFIX = "urn:graylog:server:";
 
     public static final String ALARM_CALLBACK_CREATE = URN_PREFIX + "alarm_callback.create";
     public static final String ALARM_CALLBACK_DELETE = URN_PREFIX + "alarm_callback.delete";
@@ -57,7 +48,7 @@ public class AuditActions implements PluginAuditActions {
     public static final String DASHBOARD_UPDATE = URN_PREFIX + "dashboard.update";
     public static final String DASHBOARD_WIDGET_CREATE = URN_PREFIX + "dashboard_widget.create";
     public static final String DASHBOARD_WIDGET_DELETE = URN_PREFIX + "dashboard_widget.delete";
-    // public static final String DASHBOARD_WIDGET_POSITION_UPDATE = URN_PREFIX + "dashboard_widget_position.update"; //  update enough?
+    public static final String DASHBOARD_WIDGET_POSITIONS_UPDATE = URN_PREFIX + "dashboard_widget_positions.update";
     public static final String DASHBOARD_WIDGET_UPDATE = URN_PREFIX + "dashboard_widget.update";
     public static final String ES_INDEX_CLOSE = URN_PREFIX + "es_index.close";
     public static final String ES_INDEX_CREATE = URN_PREFIX + "es_index.create";
@@ -122,17 +113,18 @@ public class AuditActions implements PluginAuditActions {
     public static final String STATIC_FIELD_CREATE = URN_PREFIX + "static_field.create";
     public static final String STATIC_FIELD_DELETE = URN_PREFIX + "static_field.delete";
     public static final String STATIC_FIELD_UPDATE = URN_PREFIX + "static_field.update";
-    // public static final String STREAM_CLONE = URN_PREFIX + "stream.clone"; //  basically create
     public static final String STREAM_CREATE = URN_PREFIX + "stream.create";
     public static final String STREAM_DELETE = URN_PREFIX + "stream.delete";
+    public static final String STREAM_OUTPUT_ASSIGNMENT_CREATE = URN_PREFIX + "stream_output_assignment.create";
+    public static final String STREAM_OUTPUT_ASSIGNMENT_DELETE = URN_PREFIX + "stream_output_assignment.delete";
     public static final String STREAM_RULE_CREATE = URN_PREFIX + "stream_rule.create";
     public static final String STREAM_RULE_DELETE = URN_PREFIX + "stream_rule.delete";
     public static final String STREAM_RULE_UPDATE = URN_PREFIX + "stream_rule.update";
     public static final String STREAM_START = URN_PREFIX + "stream.start";
     public static final String STREAM_STOP = URN_PREFIX + "stream.stop";
     public static final String STREAM_UPDATE = URN_PREFIX + "stream.update";
-    public static final String SYSTEM_JOB_CANCEL = URN_PREFIX + "system_job.cancel";
     public static final String SYSTEM_JOB_START = URN_PREFIX + "system_job.start";
+    public static final String SYSTEM_JOB_STOP = URN_PREFIX + "system_job.stop";
     public static final String SYSTEM_NOTIFICATION_CREATE = URN_PREFIX + "system_notification.create";
     public static final String SYSTEM_NOTIFICATION_DELETE = URN_PREFIX + "system_notification.delete";
     public static final String USER_ACCESS_TOKEN_CREATE = URN_PREFIX + "user_access_token.create";
@@ -142,6 +134,7 @@ public class AuditActions implements PluginAuditActions {
     public static final String USER_DELETE = URN_PREFIX + "user.delete";
     public static final String USER_PASSWORD_UPDATE = URN_PREFIX + "user_password.update";
     public static final String USER_PERMISSIONS_UPDATE = URN_PREFIX + "user_permissions.update";
+    public static final String USER_PERMISSIONS_DELETE = URN_PREFIX + "user_permissions.delete";
     public static final String USER_PREFERENCES_UPDATE = URN_PREFIX + "user_preferences.update";
     public static final String USER_UPDATE = URN_PREFIX + "user.update";
 
@@ -171,7 +164,7 @@ public class AuditActions implements PluginAuditActions {
             .add(DASHBOARD_UPDATE)
             .add(DASHBOARD_WIDGET_CREATE)
             .add(DASHBOARD_WIDGET_DELETE)
-            //.add(DASHBOARD_WIDGET_POSITION_UPDATE)
+            .add(DASHBOARD_WIDGET_POSITIONS_UPDATE)
             .add(DASHBOARD_WIDGET_UPDATE)
             .add(ES_INDEX_CLOSE)
             .add(ES_INDEX_CREATE)
@@ -236,17 +229,18 @@ public class AuditActions implements PluginAuditActions {
             .add(STATIC_FIELD_CREATE)
             .add(STATIC_FIELD_DELETE)
             .add(STATIC_FIELD_UPDATE)
-            //.add(STREAM_CLONE)
             .add(STREAM_CREATE)
             .add(STREAM_DELETE)
+            .add(STREAM_OUTPUT_ASSIGNMENT_CREATE)
+            .add(STREAM_OUTPUT_ASSIGNMENT_DELETE)
             .add(STREAM_RULE_CREATE)
             .add(STREAM_RULE_DELETE)
             .add(STREAM_RULE_UPDATE)
             .add(STREAM_START)
             .add(STREAM_STOP)
             .add(STREAM_UPDATE)
-            .add(SYSTEM_JOB_CANCEL)
             .add(SYSTEM_JOB_START)
+            .add(SYSTEM_JOB_STOP)
             .add(SYSTEM_NOTIFICATION_CREATE)
             .add(SYSTEM_NOTIFICATION_DELETE)
             .add(USER_ACCESS_TOKEN_CREATE)
@@ -256,6 +250,7 @@ public class AuditActions implements PluginAuditActions {
             .add(USER_DELETE)
             .add(USER_PASSWORD_UPDATE)
             .add(USER_PERMISSIONS_UPDATE)
+            .add(USER_PERMISSIONS_DELETE)
             .add(USER_PREFERENCES_UPDATE)
             .add(USER_UPDATE)
             .build();

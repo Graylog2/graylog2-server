@@ -21,7 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.auditlog.Actions;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
@@ -98,7 +98,7 @@ public class ClusterSystemJobResource extends ProxiedResource {
     @Timed
     @ApiOperation(value = "Cancel job with the given ID")
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(action = Actions.CANCEL, object = "system job")
+    @AuditLog(action = AuditActions.SYSTEM_JOB_STOP)
     public SystemJobSummary cancelJob(@ApiParam(name = "jobId", required = true) @PathParam("jobId") @NotEmpty String jobId) throws IOException {
         final Optional<Response<SystemJobSummary>> summaryResponse = nodeService.allActive().entrySet().stream()
                 .map(entry -> {

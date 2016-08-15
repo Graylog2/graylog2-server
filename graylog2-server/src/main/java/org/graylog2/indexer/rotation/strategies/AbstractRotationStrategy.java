@@ -18,6 +18,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import com.google.common.collect.ImmutableMap;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -26,8 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
-import java.util.Collections;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -59,7 +58,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
             indexName = deflector.getNewestTargetName();
         } catch (NoTargetIndexException e) {
             final ImmutableMap<String, Object> auditLogContext = ImmutableMap.of("rotation_strategy", strategyName);
-            auditLogger.failure("<system>", "initiated", "index rotation", auditLogContext);
+            auditLogger.failure("<system>", AuditActions.ES_INDEX_ROTATION_INITIATE, auditLogContext);
 
             LOG.error("Could not find current deflector target. Aborting.", e);
             return;
@@ -72,14 +71,14 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         if (rotate == null) {
             LOG.error("Cannot perform rotation at this moment.");
 
-            auditLogger.failure("<system>", "initiated", "index rotation", auditLogContext);
+            auditLogger.failure("<system>", AuditActions.ES_INDEX_ROTATION_INITIATE, auditLogContext);
             return;
         }
         LOG.debug("Rotation strategy result: {}", rotate.getDescription());
         if (rotate.shouldRotate()) {
             LOG.info("Deflector index <{}> should be rotated, Pointing deflector to new index now!", indexName);
             deflector.cycle();
-            auditLogger.success("<system>", "completed", "index rotation", auditLogContext);
+            auditLogger.success("<system>", AuditActions.ES_INDEX_ROTATION_COMPLETE, auditLogContext);
         } else {
             LOG.debug("Deflector index <{}> should not be rotated. Not doing anything.", indexName);
         }

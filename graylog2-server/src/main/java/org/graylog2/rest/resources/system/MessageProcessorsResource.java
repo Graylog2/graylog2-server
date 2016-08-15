@@ -21,6 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.messageprocessors.MessageProcessorsConfig;
 import org.graylog2.messageprocessors.MessageProcessorsConfigWithDescriptors;
@@ -74,7 +75,7 @@ public class MessageProcessorsResource extends RestResource {
     @Timed
     @ApiOperation(value = "Update message processor configuration")
     @Path("config")
-    @AuditLog(object = "message processor", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditLog(action = AuditActions.MESSAGE_PROCESSOR_CONFIGURATION_UPDATE)
     public MessageProcessorsConfigWithDescriptors updateConfig(@ApiParam(name = "config", required = true) final MessageProcessorsConfigWithDescriptors configWithDescriptors) {
         checkPermission(RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT);
         final MessageProcessorsConfig config = configWithDescriptors.toConfig();

@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableIterator;
+import com.google.inject.Provider;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
@@ -74,6 +75,8 @@ import org.elasticsearch.search.aggregations.metrics.max.Max;
 import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortParseElement;
+import org.graylog2.auditlog.AuditActions;
+import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -109,13 +112,15 @@ public class Indices {
     private final ElasticsearchConfiguration configuration;
     private final IndexMapping indexMapping;
     private final Messages messages;
+    private final Provider<AuditLogger> auditLoggerProvider;
 
     @Inject
-    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages) {
+    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages, Provider<AuditLogger> auditLoggerProvider) {
         this.c = client;
         this.configuration = configuration;
         this.indexMapping = indexMapping;
         this.messages = messages;
+        this.auditLoggerProvider = auditLoggerProvider;
     }
 
     public void move(String source, String target) {
@@ -298,7 +303,13 @@ public class Indices {
                 .setSettings(settings)
                 .request();
 
-        return c.admin().indices().create(cir).actionGet().isAcknowledged();
+        final boolean acknowledged = c.admin().indices().create(cir).actionGet().isAcknowledged();
+        if (acknowledged) {
+            auditLoggerProvider.get().success("<system>", AuditActions.ES_INDEX_CREATE);
+        } else {
+            auditLoggerProvider.get().failure("<system>", AuditActions.ES_INDEX_CREATE);
+        }
+        return acknowledged;
     }
 
     public Set<String> getAllMessageFields() {

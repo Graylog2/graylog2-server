@@ -23,6 +23,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -99,7 +100,7 @@ public class RotationStrategyResource extends RestResource {
     @Timed
     @ApiOperation(value = "Configuration of the current rotation strategy",
             notes = "This resource stores the configuration of the currently used rotation strategy.")
-    @AuditLog(object = "rotation strategy configuration", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditLog(action = AuditActions.ES_INDEX_ROTATION_STRATEGY_UPDATE)
     public RotationStrategySummary config(@ApiParam(value = "The description of the rotation strategy and its configuration", required = true)
                        @Valid @NotNull RotationStrategySummary rotationStrategySummary) {
         if (!rotationStrategies.containsKey(rotationStrategySummary.strategy())) {

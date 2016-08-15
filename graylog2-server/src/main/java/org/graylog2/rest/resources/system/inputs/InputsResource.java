@@ -24,7 +24,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.auditlog.Actions;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
@@ -122,7 +122,7 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 400, message = "Type is exclusive and already has input running")
     })
     @RequiresPermissions(RestPermissions.INPUTS_CREATE)
-    @AuditLog(object = "message input", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditLog(action = AuditActions.MESSAGE_INPUT_CREATE)
     public Response create(@ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull InputCreateRequest lr) throws ValidationException {
         try {
@@ -154,7 +154,7 @@ public class InputsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
-    @AuditLog(object = "message input")
+    @AuditLog(action = AuditActions.MESSAGE_INPUT_DELETE)
     public void terminate(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
         final Input input = inputService.find(inputId);
         inputService.destroy(input);
@@ -171,7 +171,7 @@ public class InputsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node."),
             @ApiResponse(code = 400, message = "Missing or invalid input configuration.")
     })
-    @AuditLog(object = "message input", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditLog(action = AuditActions.MESSAGE_INPUT_UPDATE)
     public Response update(@ApiParam(name = "JSON body", required = true) @Valid @NotNull InputCreateRequest lr,
                            @ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException, NoSuchInputTypeException, ConfigurationException, ValidationException {
         checkPermission(RestPermissions.INPUTS_EDIT, inputId);

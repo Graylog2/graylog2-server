@@ -22,6 +22,7 @@ import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.graylog2.auditlog.NullAuditLogger;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
@@ -56,7 +57,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
             }
 
             final Messages messages = new Messages(client, config, new MetricRegistry());
-            final Indices indices = new Indices(client, config, new IndexMapping(), messages);
+            final Indices indices = new Indices(client, config, new IndexMapping(), messages, NullAuditLogger::new);
 
             if (!indices.create(index)) {
                 throw new IllegalStateException("Couldn't create index " + index);

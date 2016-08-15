@@ -25,6 +25,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.MoreMediaTypes;
@@ -104,7 +105,7 @@ public class ClusterConfigResource extends RestResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Update configuration in database")
     @RequiresPermissions({RestPermissions.CLUSTER_CONFIG_ENTRY_CREATE, RestPermissions.CLUSTER_CONFIG_ENTRY_EDIT})
-    @AuditLog(object = "configuration", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditLog(action = AuditActions.CLUSTER_CONFIGURATION_UPDATE)
     public Response update(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
                            @PathParam("configClass") @NotBlank String configClass,
                            @ApiParam(name = "body", value = "The payload of the cluster configuration", required = true)
@@ -139,7 +140,7 @@ public class ClusterConfigResource extends RestResource {
     @ApiOperation(value = "Delete configuration settings from database")
     @Timed
     @RequiresPermissions(RestPermissions.CLUSTER_CONFIG_ENTRY_DELETE)
-    @AuditLog(object = "configuration")
+    @AuditLog(action = AuditActions.CLUSTER_CONFIGURATION_DELETE)
     public void delete(@ApiParam(name = "configClass", value = "The name of the cluster configuration class", required = true)
                        @PathParam("configClass") @NotBlank String configClass) {
         final Class<?> cls = classFromName(configClass);

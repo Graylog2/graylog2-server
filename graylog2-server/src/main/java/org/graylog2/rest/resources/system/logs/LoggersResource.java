@@ -35,6 +35,7 @@ import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
 import org.apache.logging.log4j.core.impl.ThrowableProxy;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.log4j.MemoryAppender;
 import org.graylog2.rest.models.system.loggers.responses.InternalLogMessage;
@@ -169,7 +170,7 @@ public class LoggersResource extends RestResource {
             @ApiResponse(code = 404, message = "No such subsystem.")
     })
     @Path("/subsystems/{subsystem}/level/{level}")
-    @AuditLog(object = "subsystem log level")
+    @AuditLog(action = AuditActions.LOG_LEVEL_UPDATE)
     public void setSubsystemLoggerLevel(
         @ApiParam(name = "subsystem", required = true) @PathParam("subsystem") @NotEmpty String subsystemTitle,
         @ApiParam(name = "level", required = true) @PathParam("level") @NotEmpty String level) {
@@ -192,7 +193,7 @@ public class LoggersResource extends RestResource {
     @ApiOperation(value = "Set the loglevel of a single logger",
             notes = "Provided level is falling back to DEBUG if it does not exist")
     @Path("/{loggerName}/level/{level}")
-    @AuditLog(object = "log level")
+    @AuditLog(action = AuditActions.LOG_LEVEL_UPDATE)
     public void setSingleLoggerLevel(
         @ApiParam(name = "loggerName", required = true) @PathParam("loggerName") @NotEmpty String loggerName,
         @ApiParam(name = "level", required = true) @NotEmpty @PathParam("level") String level) {

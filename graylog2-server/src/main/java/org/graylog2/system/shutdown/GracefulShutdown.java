@@ -17,8 +17,9 @@
 package org.graylog2.system.shutdown;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import javax.inject.Inject;
 import org.graylog2.Configuration;
+import org.graylog2.auditlog.AuditActions;
+import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.initializers.BufferSynchronizerService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.initializers.InputSetupService;
@@ -30,6 +31,7 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.concurrent.TimeUnit;
 
@@ -45,6 +47,7 @@ public class GracefulShutdown implements Runnable {
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
     private final JerseyService jerseyService;
+    private final AuditLogger auditLogger;
     private final JournalReader journalReader;
 
     @Inject
@@ -55,6 +58,7 @@ public class GracefulShutdown implements Runnable {
                             PeriodicalsService periodicalsService,
                             InputSetupService inputSetupService,
                             JerseyService jerseyService,
+                            AuditLogger auditLogger,
                             JournalReader journalReader) {
         this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
@@ -63,6 +67,7 @@ public class GracefulShutdown implements Runnable {
         this.periodicalsService = periodicalsService;
         this.inputSetupService = inputSetupService;
         this.jerseyService = jerseyService;
+        this.auditLogger = auditLogger;
         this.journalReader = journalReader;
     }
 
@@ -109,6 +114,8 @@ public class GracefulShutdown implements Runnable {
 
         // stop all maintenance tasks
         periodicalsService.stopAsync().awaitTerminated();
+
+        auditLogger.success("<system>", AuditActions.NODE_SHUTDOWN_COMPLETE);
 
         // Shut down hard with no shutdown hooks running.
         LOG.info("Goodbye.");

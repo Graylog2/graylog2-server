@@ -20,18 +20,18 @@ import java.util.Map;
 
 public class NullAuditLogger implements AuditLogger {
     @Override
-    public void success(String subject, String action, String object) {
+    public void success(String actor, String action) {
     }
 
     @Override
-    public void success(String subject, String action, String object, Map<String, Object> context) {
+    public void success(String actor, String action, Map<String, Object> context) {
     }
 
     @Override
-    public void failure(String subject, String action, String object) {
+    public void failure(String actor, String action) {
     }
 
     @Override
-    public void failure(String subject, String action, String object, Map<String, Object> context) {
+    public void failure(String actor, String action, Map<String, Object> context) {
     }
 }

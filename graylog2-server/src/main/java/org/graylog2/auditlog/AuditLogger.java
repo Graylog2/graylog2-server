@@ -19,11 +19,11 @@ package org.graylog2.auditlog;
 import java.util.Map;
 
 public interface AuditLogger {
-    void success(String subject, String action, String object);
+    void success(String actor, String action);
 
-    void success(String subject, String action, String object, Map<String, Object> context);
+    void success(String actor, String action, Map<String, Object> context);
 
-    void failure(String subject, String action, String object);
+    void failure(String actor, String action);
 
-    void failure(String subject, String action, String object, Map<String, Object> context);
+    void failure(String actor, String action, Map<String, Object> context);
 }
