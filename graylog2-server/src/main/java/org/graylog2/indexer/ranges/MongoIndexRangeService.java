@@ -49,6 +49,7 @@ import org.joda.time.DateTimeZone;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
+import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,8 +160,10 @@ public class MongoIndexRangeService implements IndexRangeService {
     public void handleIndexDeletion(IndicesDeletedEvent event) {
         for (String index : event.indices()) {
             LOG.debug("Index \"{}\" has been deleted. Removing index range.");
-            collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
-            auditEventSenderProvider.get().success(AuditActor.system(), AuditActions.ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
+            final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+            if (remove.getN() > 0) {
+                auditEventSenderProvider.get().success(AuditActor.system(), AuditActions.ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
+            }
         }
     }
 
@@ -169,8 +172,10 @@ public class MongoIndexRangeService implements IndexRangeService {
     public void handleIndexClosing(IndicesClosedEvent event) {
         for (String index : event.indices()) {
             LOG.debug("Index \"{}\" has been closed. Removing index range.");
-            collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
-            auditEventSenderProvider.get().success(AuditActor.system(), AuditActions.ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
+            final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+            if (remove.getN() > 0) {
+                auditEventSenderProvider.get().success(AuditActor.system(), AuditActions.ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
+            }
         }
     }
 
