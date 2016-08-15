@@ -17,6 +17,7 @@ export { default as PageErrorOverview } from './PageErrorOverview';
 export { default as PageHeader } from './PageHeader';
 export { default as PaginatedList } from './PaginatedList';
 export { default as Pluralize } from './Pluralize';
+export { default as SearchForm } from './SearchForm';
 export { default as Select } from './Select';
 export { default as SelectableList } from './SelectableList';
 export { default as SortableList } from './SortableList';
