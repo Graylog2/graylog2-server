@@ -80,6 +80,8 @@ public class AuditEventModelProcessor implements ModelProcessor {
                             if (!auditActions.contains(annotation.action())) {
                                 LOG.warn("REST endpoint does not use a registered audit action: {} (action: \"{}\")",
                                         String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)), annotation.action());
+                                LOG.debug("Make sure the audit actions are registered in a class that implements PluginAuditActions: {}#{}",
+                                        m.getDeclaringClass().getCanonicalName(), m.getName());
                             }
                         }
                     }
