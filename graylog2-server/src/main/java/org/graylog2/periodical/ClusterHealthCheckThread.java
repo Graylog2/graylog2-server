@@ -16,7 +16,6 @@
  */
 package org.graylog2.periodical;
 
-import javax.inject.Inject;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -25,6 +24,8 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.inject.Inject;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
@@ -100,7 +101,9 @@ public class ClusterHealthCheckThread extends Periodical {
 
     @Override
     public int getInitialDelaySeconds() {
-        return 0;
+        // Wait some time until all inputs have been started otherwise this will trigger a notification on every
+        // startup of the server.
+        return 120;
     }
 
     @Override
