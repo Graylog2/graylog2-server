@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -77,7 +78,11 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
             qry.put("node_id", node.getNodeId());
         }
 
-        return destroyAll(NotificationImpl.class, qry) > 0;
+        final boolean removed = destroyAll(NotificationImpl.class, qry) > 0;
+        if (removed) {
+            auditEventSender.success(AuditActor.system(), AuditActions.SYSTEM_NOTIFICATION_DELETE, Collections.singletonMap("notification_type", type.getClass().getCanonicalName()));
+        }
+        return removed;
     }
 
     @Override
