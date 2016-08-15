@@ -32,6 +32,7 @@ public class AuditActions implements PluginAuditActions {
     public static final String ALERT_RECEIVER_CREATE = URN_PREFIX + "alert_receiver.create";
     public static final String ALERT_RECEIVER_DELETE = URN_PREFIX + "alert_receiver.delete";
     public static final String ALERT_RECEIVER_UPDATE = URN_PREFIX + "alert_receiver.update";
+    public static final String AUTHENTICATION_PROVIDER_CONFIGURATION_UPDATE = URN_PREFIX + "authentication_provider_configuration.update";
     public static final String BLACKLIST_FILTER_CREATE = URN_PREFIX + "blacklist_filter.create";
     public static final String BLACKLIST_FILTER_DELETE = URN_PREFIX + "blacklist_filter.delete";
     public static final String BLACKLIST_FILTER_UPDATE = URN_PREFIX + "blacklist_filter.update";
@@ -70,6 +71,7 @@ public class AuditActions implements PluginAuditActions {
     public static final String EXTRACTOR_IMPORT = URN_PREFIX + "extractor.import";
     public static final String EXTRACTOR_ORDER_UPDATE = URN_PREFIX + "extractor_order.update";
     public static final String EXTRACTOR_UPDATE = URN_PREFIX + "extractor.update";
+    public static final String GETTING_STARTED_GUIDE_OPT_OUT_CREATE = URN_PREFIX + "getting_started_guide_opt_out.create";
     public static final String GROK_PATTERN_CREATE = URN_PREFIX + "grok_pattern.create";
     public static final String GROK_PATTERN_DELETE = URN_PREFIX + "grok_pattern.delete";
     public static final String GROK_PATTERN_EXPORT = URN_PREFIX + "grok_pattern.export";
@@ -83,6 +85,9 @@ public class AuditActions implements PluginAuditActions {
     public static final String LDAP_GROUP_MAPPING_UPDATE = URN_PREFIX + "ldap_group_mapping.update";
     public static final String LOAD_BALANCER_STATUS_UPDATE = URN_PREFIX + "load_balancer_status.update";
     public static final String LOG_LEVEL_UPDATE = URN_PREFIX + "log_level.update";
+    public static final String MESSAGE_DECORATOR_CREATE = URN_PREFIX + "message_decorator.create";
+    public static final String MESSAGE_DECORATOR_DELETE = URN_PREFIX + "message_decorator.delete";
+    public static final String MESSAGE_DECORATOR_UPDATE = URN_PREFIX + "message_decorator.update";
     public static final String MESSAGE_INPUT_CREATE = URN_PREFIX + "message_input.create";
     public static final String MESSAGE_INPUT_DELETE = URN_PREFIX + "message_input.delete";
     public static final String MESSAGE_INPUT_START = URN_PREFIX + "message_input.start";
@@ -107,6 +112,9 @@ public class AuditActions implements PluginAuditActions {
     public static final String ROLE_MEMBERSHIP_DELETE = URN_PREFIX + "role_membership.delete";
     public static final String ROLE_MEMBERSHIP_UPDATE = URN_PREFIX + "role_membership.update";
     public static final String ROLE_UPDATE = URN_PREFIX + "role.update";
+    public static final String SAVED_SEARCH_CREATE = URN_PREFIX + "saved_search.create";
+    public static final String SAVED_SEARCH_DELETE = URN_PREFIX + "saved_search.delete";
+    public static final String SAVED_SEARCH_UPDATE = URN_PREFIX + "saved_search.update";
     public static final String SESSION_CREATE = URN_PREFIX + "session.create";
     public static final String SESSION_DELETE = URN_PREFIX + "session.delete";
     public static final String SESSION_UPDATE = URN_PREFIX + "session.update";
@@ -148,6 +156,7 @@ public class AuditActions implements PluginAuditActions {
             .add(ALERT_RECEIVER_CREATE)
             .add(ALERT_RECEIVER_DELETE)
             .add(ALERT_RECEIVER_UPDATE)
+            .add(AUTHENTICATION_PROVIDER_CONFIGURATION_UPDATE)
             .add(BLACKLIST_FILTER_CREATE)
             .add(BLACKLIST_FILTER_DELETE)
             .add(BLACKLIST_FILTER_UPDATE)
@@ -186,6 +195,7 @@ public class AuditActions implements PluginAuditActions {
             .add(EXTRACTOR_IMPORT)
             .add(EXTRACTOR_ORDER_UPDATE)
             .add(EXTRACTOR_UPDATE)
+            .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
             .add(GROK_PATTERN_CREATE)
             .add(GROK_PATTERN_DELETE)
             .add(GROK_PATTERN_EXPORT)
@@ -199,6 +209,9 @@ public class AuditActions implements PluginAuditActions {
             .add(LDAP_GROUP_MAPPING_UPDATE)
             .add(LOAD_BALANCER_STATUS_UPDATE)
             .add(LOG_LEVEL_UPDATE)
+            .add(MESSAGE_DECORATOR_CREATE)
+            .add(MESSAGE_DECORATOR_DELETE)
+            .add(MESSAGE_DECORATOR_UPDATE)
             .add(MESSAGE_INPUT_CREATE)
             .add(MESSAGE_INPUT_DELETE)
             .add(MESSAGE_INPUT_START)
@@ -223,6 +236,9 @@ public class AuditActions implements PluginAuditActions {
             .add(ROLE_MEMBERSHIP_DELETE)
             .add(ROLE_MEMBERSHIP_UPDATE)
             .add(ROLE_UPDATE)
+            .add(SAVED_SEARCH_CREATE)
+            .add(SAVED_SEARCH_DELETE)
+            .add(SAVED_SEARCH_UPDATE)
             .add(SESSION_CREATE)
             .add(SESSION_DELETE)
             .add(SESSION_UPDATE)

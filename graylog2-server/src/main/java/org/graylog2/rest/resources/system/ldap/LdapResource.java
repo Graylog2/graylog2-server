@@ -29,6 +29,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.system.ldap.requests.LdapSettingsRequest;
 import org.graylog2.rest.models.system.ldap.requests.LdapTestConfigRequest;
@@ -123,6 +124,7 @@ public class LdapResource extends RestResource {
     @Path("/test")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("only used to test LDAP configuration")
     public LdapTestConfigResponse testLdapConfiguration(@ApiParam(name = "Configuration to test", required = true)
                                                         @Valid @NotNull LdapTestConfigRequest request) {
         final LdapConnectionConfig config = new LdapConnectionConfig();

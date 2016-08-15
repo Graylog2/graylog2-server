@@ -35,6 +35,7 @@ import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Message;
@@ -305,6 +306,7 @@ public class StreamResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
     })
+    @NoAuditEvent("only used for testing stream matches")
     public TestMatchResponse testMatch(@ApiParam(name = "streamId", required = true)
                                        @PathParam("streamId") String streamId,
                                        @ApiParam(name = "JSON body", required = true)

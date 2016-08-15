@@ -22,6 +22,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
+import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.inputs.extractors.RegexReplaceExtractor;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
@@ -61,6 +62,7 @@ public class RegexReplaceTesterResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("only used to test regex replace extractor")
     public RegexReplaceTesterResponse testRegex(@Valid @NotNull RegexReplaceTestRequest r) {
         return testRegexReplaceExtractor(r.string(), r.regex(), r.replacement(), r.replaceAll());
     }

@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -91,6 +92,7 @@ public class ClusterNodeMetricsResource extends ProxiedResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Malformed body")
     })
+    @NoAuditEvent("only used to get multiple metric values")
     public MetricsSummaryResponse multipleMetrics(@ApiParam(name = "nodeId", value = "The id of the node whose metrics we want.", required = true)
                                                   @PathParam("nodeId") String nodeId,
                                                   @ApiParam(name = "Requested metrics", required = true)

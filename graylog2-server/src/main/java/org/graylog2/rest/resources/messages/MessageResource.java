@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.index.IndexNotFoundException;
+import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;
@@ -135,6 +136,7 @@ public class MessageResource extends RestResource {
             @ApiResponse(code = 404, message = "Specified codec does not exist."),
             @ApiResponse(code = 400, message = "Could not decode message.")
     })
+    @NoAuditEvent("only used to parse a test message")
     public ResultMessage parse(@ApiParam(name = "JSON body", required = true) MessageParseRequest request) {
         Codec codec;
         try {

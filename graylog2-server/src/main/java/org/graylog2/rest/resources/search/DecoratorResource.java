@@ -21,6 +21,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.auditlog.AuditActions;
+import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
@@ -88,6 +90,7 @@ public class DecoratorResource extends RestResource {
     @POST
     @Timed
     @ApiOperation(value = "Creates a message decoration configuration")
+    @AuditLog(action = AuditActions.MESSAGE_DECORATOR_CREATE)
     public Decorator create(@ApiParam(name = "JSON body", required = true) DecoratorImpl decorator) {
         checkPermission(RestPermissions.DECORATORS_CREATE);
         if (decorator.stream().isPresent()) {
@@ -100,6 +103,7 @@ public class DecoratorResource extends RestResource {
     @Path("/{decoratorId}")
     @Timed
     @ApiOperation(value = "Create a decorator")
+    @AuditLog(action = AuditActions.MESSAGE_DECORATOR_DELETE)
     public void delete(@ApiParam(name = "decorator id", required = true) @PathParam("decoratorId") final String decoratorId) throws NotFoundException {
         checkPermission(RestPermissions.DECORATORS_EDIT);
         final Decorator decorator = this.decoratorService.findById(decoratorId);
@@ -114,6 +118,7 @@ public class DecoratorResource extends RestResource {
     @Path("/{decoratorId}")
     @Timed
     @ApiOperation(value = "Update a decorator")
+    @AuditLog(action = AuditActions.MESSAGE_DECORATOR_UPDATE)
     public Decorator update(@ApiParam(name = "decorator id", required = true) @PathParam("decoratorId") final String decoratorId,
                             @ApiParam(name = "JSON body", required = true) DecoratorImpl decorator) throws NotFoundException {
         final Decorator originalDecorator = decoratorService.findById(decoratorId);

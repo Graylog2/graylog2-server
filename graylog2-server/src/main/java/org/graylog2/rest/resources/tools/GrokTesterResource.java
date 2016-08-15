@@ -22,6 +22,7 @@ import oi.thekraken.grok.api.Grok;
 import oi.thekraken.grok.api.Match;
 import oi.thekraken.grok.api.exception.GrokException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.rest.models.tools.requests.GrokTestRequest;
@@ -69,6 +70,7 @@ public class GrokTesterResource extends RestResource {
     @Timed
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("only used to test Grok patterns")
     public GrokTesterResponse testGrok(@Valid @NotNull GrokTestRequest grokTestRequest) throws GrokException {
         return doTestGrok(grokTestRequest.string(), grokTestRequest.pattern(), grokTestRequest.namedCapturesOnly());
     }

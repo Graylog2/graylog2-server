@@ -28,6 +28,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
@@ -117,6 +118,7 @@ public class IndicesResource extends RestResource {
     @Path("/multiple")
     @ApiOperation(value = "Get information of all specified indices and their shards.")
     @Produces(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("only used to request index information")
     public Map<String, IndexInfo> multiple(@ApiParam(name = "Requested indices", required = true)
                                            @Valid @NotNull IndicesReadRequest request) {
         if (request.indices() != null) {

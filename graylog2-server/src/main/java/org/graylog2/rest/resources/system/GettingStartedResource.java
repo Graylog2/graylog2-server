@@ -20,6 +20,8 @@ import com.google.common.collect.Sets;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.auditlog.AuditActions;
+import org.graylog2.auditlog.jersey.AuditLog;
 import org.graylog2.gettingstarted.GettingStartedState;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -61,6 +63,7 @@ public class GettingStartedResource extends RestResource {
     @POST
     @Path("dismiss")
     @ApiOperation("Dismiss auto-showing getting started guide for this version")
+    @AuditLog(action = AuditActions.GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
     public void dismissGettingStarted() {
         final GettingStartedState gettingStartedState = clusterConfigService.getOrDefault(GettingStartedState.class,
                                                                                 GettingStartedState.create(Sets.<String>newHashSet()));

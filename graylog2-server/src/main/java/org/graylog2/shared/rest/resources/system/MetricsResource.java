@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.rest.models.system.metrics.requests.MetricsReadRequest;
 import org.graylog2.rest.models.system.metrics.responses.MetricNamesResponse;
 import org.graylog2.rest.models.system.metrics.responses.MetricsSummaryResponse;
@@ -111,6 +112,7 @@ public class MetricsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Malformed body")
     })
+    @NoAuditEvent("only used to retrieve multiple metrics")
     public MetricsSummaryResponse multipleMetrics(@ApiParam(name = "Requested metrics", required = true)
                                   @Valid @NotNull MetricsReadRequest request) {
         final Map<String, Metric> metrics = metricRegistry.getMetrics();

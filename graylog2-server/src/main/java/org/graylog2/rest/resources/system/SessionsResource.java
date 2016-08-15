@@ -34,6 +34,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.auditlog.AuditActions;
 import org.graylog2.auditlog.AuditLogger;
 import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.requests.SessionCreateRequest;
@@ -104,6 +105,7 @@ public class SessionsResource extends RestResource {
 
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
+    @NoAuditEvent("dispatches audit events in the method body")
     public SessionResponse newSession(@Context ContainerRequestContext requestContext,
                                       @ApiParam(name = "Login request", value = "Username and credentials", required = true)
                                       @Valid @NotNull SessionCreateRequest createRequest) {

@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.auditlog.jersey.NoAuditEvent;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -64,6 +65,7 @@ public class ClusterMetricsResource extends ProxiedResource {
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Malformed body")
     })
+    @NoAuditEvent("only used to retrieve metrics of all nodes")
     public Map<String, Optional<MetricsSummaryResponse>> multipleMetricsAllNodes(@ApiParam(name = "Requested metrics", required = true)
                                                                                  @Valid @NotNull MetricsReadRequest request) throws IOException, NodeNotFoundException {
         return getForAllNodes(remoteMetricsResource -> remoteMetricsResource.multipleMetrics(request), createRemoteInterfaceProvider(RemoteMetricsResource.class));
