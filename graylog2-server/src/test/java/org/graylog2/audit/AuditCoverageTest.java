@@ -29,6 +29,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import java.lang.reflect.Method;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -38,10 +39,12 @@ public class AuditCoverageTest {
         final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forPackage("org.graylog2"))
                 .setScanners(new MethodAnnotationsScanner());
+        final Set<String> auditActions = new AuditActions().auditActions();
         final Reflections reflections = new Reflections(configurationBuilder);
 
         final ImmutableSet.Builder<Method> methods = ImmutableSet.builder();
         final ImmutableSet.Builder<Method> missing = ImmutableSet.builder();
+        final ImmutableSet.Builder<Method> unregisteredAction = ImmutableSet.builder();
 
 
         methods.addAll(reflections.getMethodsAnnotatedWith(POST.class));
@@ -51,11 +54,23 @@ public class AuditCoverageTest {
         for (Method method : methods.build()) {
             if (!method.isAnnotationPresent(AuditEvent.class) && !method.isAnnotationPresent(NoAuditEvent.class)) {
                 missing.add(method);
+            } else {
+                if (method.isAnnotationPresent(AuditEvent.class)) {
+                    final AuditEvent annotation = method.getAnnotation(AuditEvent.class);
+
+                    if (!auditActions.contains(annotation.action())) {
+                        unregisteredAction.add(method);
+                    }
+                }
             }
         }
 
         assertThat(missing.build())
-                .describedAs("Check that are no POST, PUT and DELETE resources which do not have the @AuditEvent annotation")
+                .describedAs("Check that there are no POST, PUT and DELETE resources which do not have the @AuditEvent annotation")
+                .isEmpty();
+
+        assertThat(unregisteredAction.build())
+                .describedAs("Check that there are no @AuditEvent annotations with unregistered actions")
                 .isEmpty();
     }
 }

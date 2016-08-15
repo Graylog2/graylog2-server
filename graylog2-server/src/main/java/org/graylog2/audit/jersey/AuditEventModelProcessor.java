@@ -20,6 +20,7 @@ import org.glassfish.jersey.server.model.ModelProcessor;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.model.ResourceModel;
+import org.graylog2.audit.PluginAuditActions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,8 @@ import javax.ws.rs.core.Configuration;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Checks all POST, PUT and DELETE resource methods for {@link AuditEvent} annotations and reports missing ones.
@@ -38,6 +41,13 @@ import java.util.Locale;
  */
 public class AuditEventModelProcessor implements ModelProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(AuditEventModelProcessor.class);
+    private final Set<String> auditActions;
+
+    public AuditEventModelProcessor(final Set<PluginAuditActions> auditActions) {
+        this.auditActions = auditActions.stream()
+                .flatMap(actions -> actions.auditActions().stream())
+                .collect(Collectors.toSet());
+    }
 
     @Override
     public ResourceModel processResourceModel(ResourceModel resourceModel, Configuration configuration) {
@@ -63,6 +73,15 @@ public class AuditEventModelProcessor implements ModelProcessor {
                     if (!m.isAnnotationPresent(AuditEvent.class) && !m.isAnnotationPresent(NoAuditEvent.class)) {
                         LOG.warn("REST endpoint not included in audit trail: {}", String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)));
                         LOG.debug("Missing @AuditEvent or @NoAuditEvent annotation: {}#{}", m.getDeclaringClass().getCanonicalName(), m.getName());
+                    } else {
+                        if (m.isAnnotationPresent(AuditEvent.class)) {
+                            final AuditEvent annotation = m.getAnnotation(AuditEvent.class);
+
+                            if (!auditActions.contains(annotation.action())) {
+                                LOG.warn("REST endpoint does not use a registered audit action: {} (action: \"{}\")",
+                                        String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)), annotation.action());
+                            }
+                        }
                     }
                 }
             }
