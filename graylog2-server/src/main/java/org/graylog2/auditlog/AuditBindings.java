@@ -18,7 +18,7 @@ package org.graylog2.auditlog;
 
 import org.graylog2.plugin.PluginModule;
 
-public class AuditEventBindings extends PluginModule {
+public class AuditBindings extends PluginModule {
     @Override
     protected void configure() {
         addAuditActions(AuditActions.class);
