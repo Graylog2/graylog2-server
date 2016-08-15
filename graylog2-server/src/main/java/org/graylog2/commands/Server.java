@@ -27,6 +27,7 @@ import io.airlift.airline.Option;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActions;
 import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditBindings;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.ConfigurationModule;
@@ -114,7 +115,8 @@ public class Server extends ServerBootstrap {
             new PasswordAlgorithmBindings(),
             new WidgetStrategyBindings(),
             new DashboardBindings(),
-            new DecoratorBindings()
+            new DecoratorBindings(),
+            new AuditBindings()
         );
 
         return modules.build();
