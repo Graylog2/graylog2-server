@@ -48,12 +48,15 @@ const RawMessageLoader = React.createClass({
     }
   },
 
+  DEFAULT_REMOTE_ADDRESS: '127.0.0.1',
+
   _loadMessage(event) {
     event.preventDefault();
 
     const { message, remoteAddress, codec, codecConfiguration, inputId } = this.state;
     this.setState({ loading: true });
-    const promise = MessagesActions.loadRawMessage.triggerPromise(message, remoteAddress, codec, codecConfiguration);
+    const promise = MessagesActions.loadRawMessage.triggerPromise(message, remoteAddress || this.DEFAULT_REMOTE_ADDRESS,
+      codec, codecConfiguration);
     promise.then(loadedMessage => {
       this.props.onMessageLoaded(
         loadedMessage,
@@ -152,7 +155,7 @@ const RawMessageLoader = React.createClass({
   },
 
   _isSubmitDisabled() {
-    return !this.state.message || !this.state.remoteAddress || !this.state.codec || this.state.loading;
+    return !this.state.message || !this.state.codec || this.state.loading;
   },
 
   render() {
@@ -167,14 +170,11 @@ const RawMessageLoader = React.createClass({
     let inputIdSelector;
     if (this.props.inputIdSelector) {
       inputIdSelector = (
-        <fieldset>
-          <legend>Message Input ID</legend>
-          <Input id="input" name="input" label="Message input"
-                 help="Select the message input ID that should be assigned to the parsed message.">
-            <Select id="input" placeholder="Select input" options={this._formatInputSelectOptions()}
-                    matchProp="label" onValueChange={this._onInputSelect} value={this.state.inputId} />
-          </Input>
-        </fieldset>
+        <Input id="input" name="input" label={<span>Message input <small>(optional)</small></span>}
+               help="Select the message input ID that should be assigned to the parsed message.">
+          <Select id="input" placeholder="Select input" options={this._formatInputSelectOptions()}
+                  matchProp="label" onValueChange={this._onInputSelect} value={this.state.inputId} />
+        </Input>
       );
     }
 
@@ -184,16 +184,17 @@ const RawMessageLoader = React.createClass({
           <form onSubmit={this._loadMessage}>
             <fieldset>
               <Input id="message" name="message" type="textarea" label="Raw message"
-                     value={this.state.message} onChange={this._bindValue} rows={3} />
-              <Input id="remoteAddress" name="remoteAddress" type="text" label="Source IP address"
-                     help="Remote IP address to use as message source."
+                     value={this.state.message} onChange={this._bindValue} rows={3} required />
+              <Input id="remoteAddress" name="remoteAddress" type="text"
+                     label={<span>Source IP address <small>(optional)</small></span>}
+                     help={`Remote IP address to use as message source. Graylog will use ${this.DEFAULT_REMOTE_ADDRESS} by default.`}
                      value={this.state.remoteAddress} onChange={this._bindValue} />
             </fieldset>
             {inputIdSelector}
             <fieldset>
               <legend>Codec configuration</legend>
               <Input id="codec" name="codec" label="Message codec"
-                     help="Select the codec that should be used to decode the message.">
+                     help="Select the codec that should be used to decode the message." required>
                 <Select id="codec" placeholder="Select codec" options={this._formatSelectOptions()}
                         matchProp="label" onValueChange={this._onCodecSelect} value={this.state.codec} />
               </Input>
