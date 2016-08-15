@@ -34,6 +34,7 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.Configuration;
+import org.graylog2.auditlog.jersey.AuditEventModelProcessor;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
@@ -268,6 +269,7 @@ public class JerseyService extends AbstractIdleService {
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .register(new PrefixAddingModelProcessor(packagePrefixes))
+                .register(new AuditEventModelProcessor())
                 .registerClasses(
                         JacksonJaxbJsonProvider.class,
                         JsonProcessingExceptionMapper.class,
