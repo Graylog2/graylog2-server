@@ -21,6 +21,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
@@ -117,11 +118,11 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         }
         try {
             save(notification);
-            auditEventSender.success("<system>", AuditActions.SYSTEM_NOTIFICATION_CREATE, notification.asMap());
+            auditEventSender.success(AuditActor.system(), AuditActions.SYSTEM_NOTIFICATION_CREATE, notification.asMap());
         } catch(ValidationException e) {
             // We have no validations, but just in case somebody adds some...
             LOG.error("Validating user warning failed.", e);
-            auditEventSender.failure("<system>", AuditActions.SYSTEM_NOTIFICATION_CREATE, notification.asMap());
+            auditEventSender.failure(AuditActor.system(), AuditActions.SYSTEM_NOTIFICATION_CREATE, notification.asMap());
             return false;
         }
 

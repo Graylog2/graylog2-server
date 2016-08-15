@@ -26,6 +26,7 @@ import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.ConfigurationModule;
@@ -189,7 +190,7 @@ public class Server extends ServerBootstrap {
             LOG.info(msg);
             activityWriter.write(new Activity(msg, Main.class));
 
-            auditEventSender.success("<system>", AuditActions.NODE_SHUTDOWN_INITIATE);
+            auditEventSender.success(AuditActor.system(), AuditActions.NODE_SHUTDOWN_INITIATE);
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();

@@ -19,6 +19,7 @@ package org.graylog2.indexer.rotation.strategies;
 
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
@@ -58,7 +59,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
             indexName = deflector.getNewestTargetName();
         } catch (NoTargetIndexException e) {
             final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of("rotation_strategy", strategyName);
-            auditEventSender.failure("<system>", AuditActions.ES_INDEX_ROTATION_INITIATE, auditEventContext);
+            auditEventSender.failure(AuditActor.system(), AuditActions.ES_INDEX_ROTATION_INITIATE, auditEventContext);
 
             LOG.error("Could not find current deflector target. Aborting.", e);
             return;
@@ -71,14 +72,14 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         if (rotate == null) {
             LOG.error("Cannot perform rotation at this moment.");
 
-            auditEventSender.failure("<system>", AuditActions.ES_INDEX_ROTATION_INITIATE, auditEventContext);
+            auditEventSender.failure(AuditActor.system(), AuditActions.ES_INDEX_ROTATION_INITIATE, auditEventContext);
             return;
         }
         LOG.debug("Rotation strategy result: {}", rotate.getDescription());
         if (rotate.shouldRotate()) {
             LOG.info("Deflector index <{}> should be rotated, Pointing deflector to new index now!", indexName);
             deflector.cycle();
-            auditEventSender.success("<system>", AuditActions.ES_INDEX_ROTATION_COMPLETE, auditEventContext);
+            auditEventSender.success(AuditActor.system(), AuditActions.ES_INDEX_ROTATION_COMPLETE, auditEventContext);
         } else {
             LOG.debug("Deflector index <{}> should not be rotated. Not doing anything.", indexName);
         }
