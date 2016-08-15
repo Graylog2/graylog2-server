@@ -57,28 +57,28 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         try {
             indexName = deflector.getNewestTargetName();
         } catch (NoTargetIndexException e) {
-            final ImmutableMap<String, Object> auditLogContext = ImmutableMap.of("rotation_strategy", strategyName);
-            auditEventSender.failure("<system>", AuditActions.ES_INDEX_ROTATION_INITIATE, auditLogContext);
+            final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of("rotation_strategy", strategyName);
+            auditEventSender.failure("<system>", AuditActions.ES_INDEX_ROTATION_INITIATE, auditEventContext);
 
             LOG.error("Could not find current deflector target. Aborting.", e);
             return;
         }
 
-        final Map<String, Object> auditLogContext = ImmutableMap.of(
+        final Map<String, Object> auditEventContext = ImmutableMap.of(
             "index_name", indexName,
             "rotation_strategy", strategyName);
         final Result rotate = shouldRotate(indexName);
         if (rotate == null) {
             LOG.error("Cannot perform rotation at this moment.");
 
-            auditEventSender.failure("<system>", AuditActions.ES_INDEX_ROTATION_INITIATE, auditLogContext);
+            auditEventSender.failure("<system>", AuditActions.ES_INDEX_ROTATION_INITIATE, auditEventContext);
             return;
         }
         LOG.debug("Rotation strategy result: {}", rotate.getDescription());
         if (rotate.shouldRotate()) {
             LOG.info("Deflector index <{}> should be rotated, Pointing deflector to new index now!", indexName);
             deflector.cycle();
-            auditEventSender.success("<system>", AuditActions.ES_INDEX_ROTATION_COMPLETE, auditLogContext);
+            auditEventSender.success("<system>", AuditActions.ES_INDEX_ROTATION_COMPLETE, auditEventContext);
         } else {
             LOG.debug("Deflector index <{}> should not be rotated. Not doing anything.", indexName);
         }

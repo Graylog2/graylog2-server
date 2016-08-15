@@ -112,15 +112,15 @@ public class Indices {
     private final ElasticsearchConfiguration configuration;
     private final IndexMapping indexMapping;
     private final Messages messages;
-    private final Provider<AuditEventSender> auditLoggerProvider;
+    private final Provider<AuditEventSender> auditEventSenderProvider;
 
     @Inject
-    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages, Provider<AuditEventSender> auditLoggerProvider) {
+    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages, Provider<AuditEventSender> auditEventSenderProvider) {
         this.c = client;
         this.configuration = configuration;
         this.indexMapping = indexMapping;
         this.messages = messages;
-        this.auditLoggerProvider = auditLoggerProvider;
+        this.auditEventSenderProvider = auditEventSenderProvider;
     }
 
     public void move(String source, String target) {
@@ -305,9 +305,9 @@ public class Indices {
 
         final boolean acknowledged = c.admin().indices().create(cir).actionGet().isAcknowledged();
         if (acknowledged) {
-            auditLoggerProvider.get().success("<system>", AuditActions.ES_INDEX_CREATE);
+            auditEventSenderProvider.get().success("<system>", AuditActions.ES_INDEX_CREATE);
         } else {
-            auditLoggerProvider.get().failure("<system>", AuditActions.ES_INDEX_CREATE);
+            auditEventSenderProvider.get().failure("<system>", AuditActions.ES_INDEX_CREATE);
         }
         return acknowledged;
     }

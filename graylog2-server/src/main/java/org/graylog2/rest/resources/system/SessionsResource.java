@@ -151,20 +151,20 @@ public class SessionsResource extends RestResource {
         if (subject.isAuthenticated()) {
             id = s.getId();
 
-            final Map<String, Object> auditLogContext = ImmutableMap.of(
+            final Map<String, Object> auditEventContext = ImmutableMap.of(
                     "session_id", id,
                     "remote_address", remoteAddrFromRequest
             );
-            auditEventSender.success(createRequest.username(), AuditActions.SESSION_CREATE, auditLogContext);
+            auditEventSender.success(createRequest.username(), AuditActions.SESSION_CREATE, auditEventContext);
 
             // TODO is the validUntil attribute even used by anyone yet?
             return SessionResponse.create(new DateTime(s.getLastAccessTime(), DateTimeZone.UTC).plus(s.getTimeout()).toDate(),
                     id.toString());
         } else {
-            final Map<String, Object> auditLogContext = ImmutableMap.of(
+            final Map<String, Object> auditEventContext = ImmutableMap.of(
                     "remote_address", remoteAddrFromRequest
             );
-            auditEventSender.failure(createRequest.username(), AuditActions.SESSION_CREATE, auditLogContext);
+            auditEventSender.failure(createRequest.username(), AuditActions.SESSION_CREATE, auditEventContext);
 
             throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
         }

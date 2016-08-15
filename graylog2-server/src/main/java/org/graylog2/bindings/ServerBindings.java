@@ -118,7 +118,7 @@ public class ServerBindings extends Graylog2Module {
         bindSearchResponseDecorators();
 
         // make sure there is a default binding
-        auditLoggerBinder().setDefault().to(NullAuditEventSender.class);
+        auditEventSenderBinder().setDefault().to(NullAuditEventSender.class);
     }
 
     private void bindProviders() {

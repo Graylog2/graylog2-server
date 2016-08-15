@@ -336,7 +336,7 @@ public abstract class Graylog2Module extends AbstractModule {
         searchResponseDecoratorBinder.addBinding(searchResponseDecoratorClass.getCanonicalName()).to(searchResponseDecoratorFactoryClass);
     }
 
-    protected OptionalBinder<AuditEventSender> auditLoggerBinder() {
+    protected OptionalBinder<AuditEventSender> auditEventSenderBinder() {
         return OptionalBinder.newOptionalBinder(binder(), AuditEventSender.class);
     }
 

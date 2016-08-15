@@ -92,11 +92,11 @@ public abstract class ServerBootstrap extends CmdLineTool {
     @Override
     protected void startCommand() {
         final AuditEventSender auditEventSender = injector.getInstance(AuditEventSender.class);
-        final Map<String, Object> auditLogContext = ImmutableMap.of(
+        final Map<String, Object> auditEventContext = ImmutableMap.of(
             "version", version,
             "java", Tools.getSystemInformation()
         );
-        auditEventSender.success("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
+        auditEventSender.success("<system>", AuditActions.NODE_STARTUP_INITIATE, auditEventContext);
 
         final OS os = OS.getOs();
 
@@ -119,12 +119,12 @@ public abstract class ServerBootstrap extends CmdLineTool {
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);
             annotateProvisionException(e);
-            auditEventSender.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
+            auditEventSender.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditEventContext);
             System.exit(-1);
             return;
         } catch (Exception e) {
             LOG.error("Unexpected exception", e);
-            auditEventSender.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
+            auditEventSender.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditEventContext);
             System.exit(-1);
             return;
         }
@@ -146,14 +146,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 LOG.error("Unable to shutdown properly on time. {}", serviceManager.servicesByState());
             }
             LOG.error("Graylog startup failed. Exiting. Exception was:", e);
-            auditEventSender.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditLogContext);
+            auditEventSender.failure("<system>", AuditActions.NODE_STARTUP_INITIATE, auditEventContext);
             System.exit(-1);
         }
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         activityWriter.write(new Activity("Started up.", Main.class));
         LOG.info("Graylog " + commandName + " up and running.");
-        auditEventSender.success("<system>", AuditActions.NODE_STARTUP_COMPLETE, auditLogContext);
+        auditEventSender.success("<system>", AuditActions.NODE_STARTUP_COMPLETE, auditEventContext);
 
         // Block forever.
         try {

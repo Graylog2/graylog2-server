@@ -53,7 +53,7 @@ public class ServerStatus {
 
     private final EventBus eventBus;
     private final NodeId nodeId;
-    private final Provider<AuditEventSender> auditLoggerProvider;
+    private final Provider<AuditEventSender> auditEventSenderProvider;
     private final String clusterId;
     private final DateTime startedAt;
     private final Set<Capability> capabilitySet;
@@ -66,10 +66,10 @@ public class ServerStatus {
     private volatile Lifecycle lifecycle = Lifecycle.UNINITIALIZED;
 
     @Inject
-    public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus, Provider<AuditEventSender> auditLoggerProvider) {
+    public ServerStatus(BaseConfiguration configuration, Set<Capability> capabilities, EventBus eventBus, Provider<AuditEventSender> auditEventSenderProvider) {
         this.eventBus = eventBus;
         this.nodeId = new NodeId(configuration.getNodeIdFile());
-        this.auditLoggerProvider = auditLoggerProvider;
+        this.auditEventSenderProvider = auditEventSenderProvider;
         this.clusterId = "";
         this.startedAt = Tools.nowUTC();
         this.capabilitySet = Sets.newHashSet(capabilities); // copy, because we support adding more capabilities later
@@ -198,9 +198,9 @@ public class ServerStatus {
     public void pauseMessageProcessing(boolean locked) {
         // Never override pause lock if already locked.
         if (processingPauseLocked.compareAndSet(false, locked) && locked) {
-            auditLoggerProvider.get().success("<system>", AuditActions.MESSAGE_PROCESSING_LOCK);
+            auditEventSenderProvider.get().success("<system>", AuditActions.MESSAGE_PROCESSING_LOCK);
         } else if (locked) {
-            auditLoggerProvider.get().failure("<system>", AuditActions.MESSAGE_PROCESSING_LOCK);
+            auditEventSenderProvider.get().failure("<system>", AuditActions.MESSAGE_PROCESSING_LOCK);
         }
         isProcessing.set(false);
 

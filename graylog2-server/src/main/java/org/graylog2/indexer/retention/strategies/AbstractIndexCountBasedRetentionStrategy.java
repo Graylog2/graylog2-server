@@ -80,8 +80,8 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         LOG.info(msg);
         activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
-        final ImmutableMap<String, Object> auditLogContext = ImmutableMap.of("retention_strategy", this.getClass().getCanonicalName());
-        auditEventSender.success("<system>", AuditActions.ES_INDEX_RETENTION_INITIATE, auditLogContext);
+        final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of("retention_strategy", this.getClass().getCanonicalName());
+        auditEventSender.success("<system>", AuditActions.ES_INDEX_RETENTION_INITIATE, auditEventContext);
 
         runRetention(deflectorIndices, removeCount);
     }
@@ -111,10 +111,10 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
             // Sorry if this should ever go mad. Run retention strategy!
             retain(indexName);
 
-            final ImmutableMap<String, Object> auditLogContext = ImmutableMap.of(
+            final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of(
                 "index_name", indexName,
                 "retention_strategy", strategyName);
-            auditEventSender.success("<system>", AuditActions.ES_INDEX_RETENTION_COMPLETE, auditLogContext);
+            auditEventSender.success("<system>", AuditActions.ES_INDEX_RETENTION_COMPLETE, auditEventContext);
         }
     }
 }
