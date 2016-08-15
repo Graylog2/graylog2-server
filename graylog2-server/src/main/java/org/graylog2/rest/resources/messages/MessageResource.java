@@ -27,7 +27,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.index.IndexNotFoundException;
-import org.graylog2.auditlog.jersey.NoAuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.results.ResultMessage;

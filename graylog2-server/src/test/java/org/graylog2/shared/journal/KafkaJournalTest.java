@@ -27,7 +27,7 @@ import kafka.common.KafkaException;
 import kafka.log.LogSegment;
 import kafka.utils.FileLock;
 import org.graylog2.Configuration;
-import org.graylog2.auditlog.NullAuditEventSender;
+import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.lifecycles.Lifecycle;

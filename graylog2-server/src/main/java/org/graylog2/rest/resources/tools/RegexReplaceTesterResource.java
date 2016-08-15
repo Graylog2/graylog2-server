@@ -22,7 +22,7 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
-import org.graylog2.auditlog.jersey.NoAuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.inputs.extractors.RegexReplaceExtractor;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;

@@ -29,7 +29,7 @@ import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.alerts.types.FieldContentValueAlertCondition;
 import org.graylog2.alerts.types.FieldValueAlertCondition;
 import org.graylog2.alerts.types.MessageCountAlertCondition;
-import org.graylog2.auditlog.NullAuditEventSender;
+import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;

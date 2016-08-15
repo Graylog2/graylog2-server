@@ -17,7 +17,7 @@
 package org.graylog2.plugin;
 
 import com.google.common.eventbus.EventBus;
-import org.graylog2.auditlog.NullAuditEventSender;
+import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTimeZone;

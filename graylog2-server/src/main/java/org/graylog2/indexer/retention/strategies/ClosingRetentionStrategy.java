@@ -17,7 +17,7 @@
 package org.graylog2.indexer.retention.strategies;
 
 import com.google.common.base.Stopwatch;
-import org.graylog2.auditlog.AuditEventSender;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.cluster.ClusterConfigService;

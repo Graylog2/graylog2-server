@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.auditlog.jersey;
+package org.graylog2.audit;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.graylog2.plugin.PluginModule;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
-public @interface NoAuditEvent {
-    String value();
+public class AuditBindings extends PluginModule {
+    @Override
+    protected void configure() {
+        addAuditActions(AuditActions.class);
+    }
 }

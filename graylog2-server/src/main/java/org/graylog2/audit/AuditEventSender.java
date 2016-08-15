@@ -14,13 +14,16 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.auditlog;
+package org.graylog2.audit;
 
-import org.graylog2.plugin.PluginModule;
+import java.util.Map;
 
-public class AuditBindings extends PluginModule {
-    @Override
-    protected void configure() {
-        addAuditActions(AuditActions.class);
-    }
+public interface AuditEventSender {
+    void success(String actor, String action);
+
+    void success(String actor, String action, Map<String, Object> context);
+
+    void failure(String actor, String action);
+
+    void failure(String actor, String action, Map<String, Object> context);
 }

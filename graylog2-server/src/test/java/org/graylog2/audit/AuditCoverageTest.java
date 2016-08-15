@@ -17,8 +17,8 @@
 package org.graylog2.audit;
 
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.auditlog.jersey.AuditEvent;
-import org.graylog2.auditlog.jersey.NoAuditEvent;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.junit.Test;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;

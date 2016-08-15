@@ -14,16 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.auditlog;
+package org.graylog2.audit;
 
 import java.util.Map;
 
-public interface AuditEventSender {
-    void success(String actor, String action);
+public class NullAuditEventSender implements AuditEventSender {
+    @Override
+    public void success(String actor, String action) {
+    }
 
-    void success(String actor, String action, Map<String, Object> context);
+    @Override
+    public void success(String actor, String action, Map<String, Object> context) {
+    }
 
-    void failure(String actor, String action);
+    @Override
+    public void failure(String actor, String action) {
+    }
 
-    void failure(String actor, String action, Map<String, Object> context);
+    @Override
+    public void failure(String actor, String action, Map<String, Object> context) {
+    }
 }

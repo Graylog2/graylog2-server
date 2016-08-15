@@ -18,8 +18,8 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.AuditEventSender;
+import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;

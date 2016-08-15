@@ -18,8 +18,8 @@ package org.graylog2.system.shutdown;
 
 import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.Configuration;
-import org.graylog2.auditlog.AuditActions;
-import org.graylog2.auditlog.AuditEventSender;
+import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.initializers.BufferSynchronizerService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.initializers.InputSetupService;
