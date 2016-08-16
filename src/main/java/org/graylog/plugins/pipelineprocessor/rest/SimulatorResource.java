@@ -82,6 +82,8 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
         for (Message processedMessage : processedMessages) {
             simulationResults.add(ResultMessageSummary.create(null, processedMessage.getFields(), ""));
         }
+
+        pipelineInterpreter.stop();
         return SimulationResponse.create(simulationResults,
                                          pipelineInterpreterTracer.getExecutionTrace(),
                                          pipelineInterpreterTracer.took());

@@ -85,6 +85,7 @@ public class PipelineInterpreter implements MessageProcessor {
     private final MetricRegistry metricRegistry;
     private final ScheduledExecutorService scheduler;
     private final Meter filteredOutMessages;
+    private EventBus serverEventBus;
 
     private final AtomicReference<ImmutableMap<String, Pipeline>> currentPipelines = new AtomicReference<>(ImmutableMap.of());
     private final AtomicReference<ImmutableSetMultimap<String, Pipeline>> streamPipelineConnections = new AtomicReference<>(ImmutableSetMultimap.of());
@@ -107,11 +108,20 @@ public class PipelineInterpreter implements MessageProcessor {
         this.metricRegistry = metricRegistry;
         this.scheduler = scheduler;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
+        this.serverEventBus = serverEventBus;
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
 
         reload();
+    }
+
+    /*
+     * Allow to unregister PipelineInterpreter from the event bus, allowing the object to be garbage collected.
+     * This is needed in some classes, when new PipelineInterpreter instances are created per request.
+     */
+    public void stop() {
+        serverEventBus.unregister(this);
     }
 
     // this should not run in parallel
