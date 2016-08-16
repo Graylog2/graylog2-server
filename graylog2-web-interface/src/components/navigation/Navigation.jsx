@@ -100,9 +100,14 @@ const Navigation = React.createClass({
 
     if (this.state.total > 0) {
       notificationBadge = (
-        <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
-          <span className="badge" style={{backgroundColor: '#ff3b00'}} id="notification-badge">{this.state.total}</span>
-        </LinkContainer>
+        <Nav navbar>
+          <NavItem className="notification-badge-link">
+            <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
+              <span className="badge" style={{ backgroundColor: '#ff3b00' }}
+                    id="notification-badge">{this.state.total}</span>
+            </LinkContainer>
+          </NavItem>
+        </Nav>
       );
     }
 
@@ -219,11 +224,7 @@ const Navigation = React.createClass({
             </NavDropdown>
           </Nav>
 
-          <Nav navbar>
-            <NavItem className="notification-badge-link">
-              {notificationBadge}
-            </NavItem>
-          </Nav>
+          {notificationBadge}
 
           <Nav navbar pullRight>
             {/* Needed to replace NavItem with `li` and `a` elements to avoid LinkContainer setting NavItem as active */}
