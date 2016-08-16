@@ -22,6 +22,7 @@ import com.google.common.net.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import org.graylog2.cluster.Node;
+import org.graylog2.security.realm.SessionAuthenticator;
 import retrofit2.Retrofit;
 import retrofit2.converter.jackson.JacksonConverterFactory;
 
@@ -48,7 +49,11 @@ public class RemoteInterfaceProvider {
                             .method(original.method(), original.body());
 
                     if (authorizationToken != null) {
-                        builder = builder.header(HttpHeaders.AUTHORIZATION, authorizationToken);
+                        builder = builder
+                                // forward the authentication information of the current user
+                                .header(HttpHeaders.AUTHORIZATION, authorizationToken)
+                                // do not extend the users session with proxied requests
+                                .header(SessionAuthenticator.X_GRAYLOG_NO_SESSION_EXTENSION, "true");
                     }
 
                     return chain.proceed(builder.build());
