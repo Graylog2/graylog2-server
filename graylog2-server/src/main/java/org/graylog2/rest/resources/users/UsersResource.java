@@ -442,7 +442,8 @@ public class UsersResource extends RestResource {
     @AuditLog(object = "user access token")
     public Token generateNewToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
-            @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name) {
+            @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
+            @ApiParam(name = "JSON Body", value = "Placeholder because POST requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body) {
         final User user = _tokensCheckAndLoadUser(username);
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
 

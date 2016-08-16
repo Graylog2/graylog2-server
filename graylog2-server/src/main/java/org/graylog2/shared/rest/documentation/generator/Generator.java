@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
@@ -65,6 +66,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static com.google.common.base.Strings.nullToEmpty;
 
 /**
@@ -308,6 +310,19 @@ public class Generator {
                     param.setDescription(apiParam.value());
                     param.setIsRequired(apiParam.required());
                     param.setType(method.getGenericParameterTypes()[i]);
+
+                    if (!isNullOrEmpty(apiParam.defaultValue())) {
+                        param.setDefaultValue(apiParam.defaultValue());
+                    }
+                }
+
+                if (annotation instanceof DefaultValue) {
+                    final DefaultValue defaultValueAnnotation = (DefaultValue) annotation;
+
+                    // Only set if empty to make sure ApiParam's defaultValue has precedence!
+                    if (isNullOrEmpty(param.getDefaultValue()) && !isNullOrEmpty(defaultValueAnnotation.value())) {
+                        param.setDefaultValue(defaultValueAnnotation.value());
+                    }
                 }
 
                 if (annotation instanceof QueryParam) {
@@ -398,6 +413,7 @@ public class Generator {
         private boolean isRequired;
         private Class type;
         private Kind kind;
+        private String defaultValue;
 
         public void setName(String name) {
             this.name = name;
@@ -460,6 +476,15 @@ public class Generator {
         @JsonProperty("paramType")
         public String getKind() {
             return kind.toString().toLowerCase(Locale.ENGLISH);
+        }
+
+        public void setDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+        }
+
+        @JsonProperty("defaultValue")
+        public String getDefaultValue() {
+            return this.defaultValue;
         }
 
         public enum Kind {
