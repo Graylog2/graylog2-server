@@ -136,6 +136,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final KafkaScheduler kafkaScheduler;
     private final Meter writtenMessages;
     private final Meter readMessages;
+    private final Meter writeDiscardedMessages;
 
     private final OffsetFileFlusher offsetFlusher;
     private final DirtyLogFlusher dirtyLogFlusher;
@@ -176,6 +177,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
         this.writtenMessages = metricRegistry.meter(name(this.getClass(), "writtenMessages"));
         this.readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
+        this.writeDiscardedMessages = metricRegistry.meter(name(this.getClass(), "writeDiscardedMessages"));
 
         registerUncommittedGauge(metricRegistry, name(this.getClass(), "uncommittedMessages"));
 
@@ -396,6 +398,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 final int newMessageSize = MessageSet.entrySize(newMessage);
 
                 if (newMessageSize > maxMessageSize) {
+                    writeDiscardedMessages.mark();
                     LOG.warn("Message with ID <{}> is too large to store in journal, skipping! (size: {} bytes / max: {} bytes)",
                             new String(idBytes, StandardCharsets.UTF_8), newMessageSize, maxMessageSize);
                     payloadSize = 0;
