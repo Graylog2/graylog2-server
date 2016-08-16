@@ -105,13 +105,11 @@ const UserList = React.createClass({
       </OverlayTrigger>);
     }
 
-    const roleBadges = user.roles.map((role) => <span key={role}
-                                                      className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
+    const roleBadges = user.roles.map((role) => <span key={role} className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
 
     let actions = null;
     if (user.read_only) {
-      const tooltip = <Tooltip id="system-user">System users can only be modified in the Graylog configuration
-        file.</Tooltip>;
+      const tooltip = <Tooltip id="system-user">System users can only be modified in the Graylog configuration file.</Tooltip>;
       actions = (
         <OverlayTrigger placement="left" overlay={tooltip}>
           <span className={UserListStyle.help}>
