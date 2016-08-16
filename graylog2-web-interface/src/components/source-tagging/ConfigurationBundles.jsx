@@ -77,10 +77,15 @@ const ConfigurationBundles = React.createClass({
     reader.onload = (evt) => {
       const request = evt.target.result;
       ConfigurationBundlesActions.create.triggerPromise(request)
-        .then(() => {
-          UserNotification.success('Bundle added successfully', 'Success!');
-          ConfigurationBundlesActions.list();
-        });
+        .then(
+          () => {
+            UserNotification.success('Content pack imported successfully', 'Success!');
+            ConfigurationBundlesActions.list();
+          },
+          () => {
+            UserNotification.error('Error importing content pack, please ensure it is a valid JSON file. Check your ' +
+              'Graylog logs for more information.', 'Could not import content pack');
+          });
     };
 
     reader.readAsText(this.refs.uploadedFile.files[0]);
