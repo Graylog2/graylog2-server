@@ -103,8 +103,8 @@ const PipelineDetailsPage = React.createClass({
           </span>
 
           <span>
-            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_OVERVIEW')}>
-              <Button bsStyle="info">Manage pipelines</Button>
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
+              <Button bsStyle="info">Manage connections</Button>
             </LinkContainer>
             {' '}
             <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>

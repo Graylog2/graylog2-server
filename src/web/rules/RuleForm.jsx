@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react';
-import { Row, Col, Button, Input } from 'react-bootstrap';
+import React from 'react';
+import { FormControls, Row, Col, Button, Input } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import AceEditor from 'react-ace';
 import brace from 'brace';
@@ -9,9 +10,12 @@ import 'brace/theme/chrome';
 
 import Routes from 'routing/Routes';
 
+import RuleFormStyle from './RuleForm.css';
+
 const RuleForm = React.createClass({
   propTypes: {
-    rule: PropTypes.object,
+    rule: React.PropTypes.object,
+    usedInPipelines: React.PropTypes.array,
     create: React.PropTypes.bool,
     onSave: React.PropTypes.func.isRequired,
     validateRule: React.PropTypes.func.isRequired,
@@ -119,13 +123,42 @@ const RuleForm = React.createClass({
     this._save();
   },
 
+  _formatPipelinesUsingRule() {
+    if (this.props.usedInPipelines.length === 0) {
+      return 'This rule is not being used in any pipelines.';
+    }
+
+    const formattedPipelines = this.props.usedInPipelines.map(pipeline => {
+      return (
+        <li>
+          <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')(pipeline.id)}>
+            <a>{pipeline.title}</a>
+          </LinkContainer>
+        </li>
+      );
+    });
+
+    return <ul className={RuleFormStyle.usedInPipelines}>{formattedPipelines}</ul>;
+  },
+
   render() {
+    let pipelinesUsingRule;
+    if (!this.props.create) {
+      pipelinesUsingRule = (
+        <Input label="Used in pipelines" help="Pipelines that use this rule in one or more of their stages.">
+          <div className="form-control-static">
+            {this._formatPipelinesUsingRule()}
+          </div>
+        </Input>
+      );
+    }
+
     return (
       <form ref="form" onSubmit={this._submit}>
         <fieldset>
-          <Input type="static"
-                 label="Title"
-                 value="You can set the rule title in the rule source. See the quick reference for more information." />
+          <FormControls.Static type="static"
+                               label="Title"
+                               value="You can set the rule title in the rule source. See the quick reference for more information." />
 
           <Input type="textarea"
                  id={this._getId('description')}
@@ -134,6 +167,8 @@ const RuleForm = React.createClass({
                  autoFocus
                  help="Rule description (optional)."
                  value={this.state.rule.description} />
+
+          {pipelinesUsingRule}
 
           <Input label="Rule source" help="Rule source, see quick reference for more information.">
             <div style={{ border: '1px solid lightgray', borderRadius: 5 }}>
@@ -144,7 +179,7 @@ const RuleForm = React.createClass({
                 fontSize={11}
                 height="14em"
                 width="100%"
-                editorProps={{ $blockScrolling: 'Infinity'}}
+                editorProps={{ $blockScrolling: 'Infinity' }}
                 value={this.state.rule.source}
                 onLoad={this._onLoad}
                 onChange={this._onSourceChange}

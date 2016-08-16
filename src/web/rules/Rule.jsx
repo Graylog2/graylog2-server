@@ -15,6 +15,7 @@ import Routes from 'routing/Routes';
 const Rule = React.createClass({
   propTypes: {
     rule: React.PropTypes.object,
+    usedInPipelines: React.PropTypes.array,
     create: React.PropTypes.bool,
     onSave: React.PropTypes.func.isRequired,
     validateRule: React.PropTypes.func.isRequired,
@@ -44,8 +45,8 @@ const Rule = React.createClass({
           </span>
 
           <span>
-            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>
-              <Button bsStyle="info">Manage rules</Button>
+            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
+              <Button bsStyle="info">Manage connections</Button>
             </LinkContainer>
             &nbsp;
             <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_OVERVIEW')}>
@@ -56,8 +57,8 @@ const Rule = React.createClass({
 
         <Row className="content">
           <Col md={6}>
-            <RuleForm rule={this.props.rule} create={this.props.create} onSave={this.props.onSave}
-                      validateRule={this.props.validateRule} history={this.props.history} />
+            <RuleForm rule={this.props.rule} usedInPipelines={this.props.usedInPipelines} create={this.props.create}
+                      onSave={this.props.onSave} validateRule={this.props.validateRule} history={this.props.history} />
           </Col>
           <Col md={5} mdOffset={1}>
             <RuleHelper />

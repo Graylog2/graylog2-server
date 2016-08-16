@@ -1,10 +1,12 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { EntityList, TypeAheadDataFilter } from 'components/common';
 import Connection from './Connection';
 import ConnectionForm from './ConnectionForm';
+import Routes from 'routing/Routes';
 
 const PipelineConnections = React.createClass({
   propTypes: {
@@ -50,6 +52,28 @@ const PipelineConnections = React.createClass({
       });
 
     const filteredStreams = this.props.streams.filter(s => !this.props.connections.some(c => c.stream_id === s.id && this._isConnectionWithPipelines(c)));
+    const pipelinesNo = this.props.pipelines.length;
+    let noItemsText;
+    if (pipelinesNo === 0) {
+      noItemsText = (
+        <span>
+          There are no pipeline connections. You can start by creating your{' '}
+          <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>
+            <a>pipeline rules</a>
+          </LinkContainer>{' '}
+          and then putting them together in a{' '}
+          <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_OVERVIEW')}>
+            <a>pipeline</a>
+          </LinkContainer>!
+        </span>
+      );
+    } else {
+      noItemsText = (
+        <span>
+          There are no pipeline connections. Click on "Add new connection" to connect your pipelines to a stream.
+        </span>
+      );
+    }
 
     return (
       <div>
@@ -68,7 +92,7 @@ const PipelineConnections = React.createClass({
             </div>
           </Col>
         </Row>
-        <EntityList bsNoItemsStyle="info" noItemsText="There are no pipeline connections."
+        <EntityList bsNoItemsStyle="info" noItemsText={noItemsText}
                     items={formattedConnections} />
       </div>
     );

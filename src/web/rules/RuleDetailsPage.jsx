@@ -7,6 +7,9 @@ import Rule from './Rule';
 import RulesStore from './RulesStore';
 import RulesActions from './RulesActions';
 
+import PipelinesActions from '../pipelines/PipelinesActions';
+import PipelinesStore from '../pipelines/PipelinesStore';
+
 function filterRules(state) {
   return state.rules ? state.rules.filter(r => r.id === this.props.params.ruleId)[0] : undefined;
 }
@@ -17,10 +20,11 @@ const RuleDetailsPage = React.createClass({
     history: React.PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connectFilter(RulesStore, 'rule', filterRules)],
+  mixins: [Reflux.connectFilter(RulesStore, 'rule', filterRules), Reflux.connect(PipelinesStore)],
 
   componentDidMount() {
     if (this.props.params.ruleId !== 'new') {
+      PipelinesActions.list();
       RulesActions.get(this.props.params.ruleId);
     }
   },
@@ -40,7 +44,7 @@ const RuleDetailsPage = React.createClass({
   },
 
   _isLoading() {
-    return this.props.params.ruleId !== 'new' && !this.state.rule;
+    return this.props.params.ruleId !== 'new' && !(this.state.rule && this.state.pipelines);
   },
 
   render() {
@@ -48,9 +52,13 @@ const RuleDetailsPage = React.createClass({
       return <Spinner />;
     }
 
+    const pipelinesUsingRule = this.props.params.ruleId === 'new' ? [] : this.state.pipelines.filter(pipeline => {
+      return pipeline.stages.some(stage => stage.rules.indexOf(this.state.rule.title) !== -1);
+    });
+
     return (
-      <Rule rule={this.state.rule} create={this.props.params.ruleId === 'new'} onSave={this._save}
-            validateRule={this._validateRule} history={this.props.history} />
+      <Rule rule={this.state.rule} usedInPipelines={pipelinesUsingRule} create={this.props.params.ruleId === 'new'}
+            onSave={this._save} validateRule={this._validateRule} history={this.props.history} />
     );
   },
 });

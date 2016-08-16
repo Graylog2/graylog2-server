@@ -21,7 +21,7 @@ const SimulationResults = React.createClass({
 
   getInitialState() {
     return {
-      viewOption: this.VIEW_OPTIONS.SIMULATION_PREVIEW,
+      viewOption: this.VIEW_OPTIONS.SIMULATION_SUMMARY,
     };
   },
 
@@ -98,7 +98,8 @@ const SimulationResults = React.createClass({
                      streams={streams}
                      disableTestAgainstStream
                      disableSurroundingSearch
-                     disableFieldActions />
+                     disableFieldActions
+                     disableMessageActions />
       );
     }
 

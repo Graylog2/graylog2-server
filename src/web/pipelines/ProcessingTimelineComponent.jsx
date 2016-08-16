@@ -101,7 +101,7 @@ const ProcessingTimelineComponent = React.createClass({
     }
 
     const addNewPipelineButton = (
-      <div className="text-right">
+      <div className="pull-right">
         <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')('new')}>
           <Button bsStyle="success">Add new pipeline</Button>
         </LinkContainer>
