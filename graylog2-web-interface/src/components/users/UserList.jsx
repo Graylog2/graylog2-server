@@ -1,6 +1,6 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, Label, OverlayTrigger, Popover, Tooltip } from 'react-bootstrap';
+import { Button, OverlayTrigger, Popover, Tooltip } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
@@ -66,6 +66,21 @@ const UserList = React.createClass({
       case '':
         formattedHeaderCell = <th className="user-type">{header}</th>;
         break;
+      case 'client address': {
+        const popover = (<Popover id="decorators-help" className={UserListStyle.sessionBadgeDetails}>
+          <p className="description">
+            The address of the client used to initially establish the session, not necessarily its current address.
+          </p>
+        </Popover>);
+
+        formattedHeaderCell = (<th>
+          {header}
+          <OverlayTrigger trigger="click" rootClose placement="top" overlay={popover}>
+            <Button bsStyle="link" className={UserListStyle.helpHeaderRow}><i className="fa fa-fw fa-question-circle"/></Button>
+          </OverlayTrigger>
+        </th>);
+        break;
+      }
       case 'actions':
         formattedHeaderCell = <th className="actions">{header}</th>;
         break;
@@ -81,7 +96,7 @@ const UserList = React.createClass({
     if (user.session_active) {
       const popover = (
         <Popover id="session-badge-details" title="Logged in" className={UserListStyle.sessionBadgeDetails}>
-          <div>Last activity: <Timestamp dateTime={user.last_activity} relative /></div>
+          <div>Last activity: <Timestamp dateTime={user.last_activity} relative/></div>
           <div>Client address: {user.client_address}</div>
         </Popover>
       );
@@ -90,11 +105,13 @@ const UserList = React.createClass({
       </OverlayTrigger>);
     }
 
-    const roleBadges = user.roles.map((role) => <span key={role} className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`} >{role}</span>);
+    const roleBadges = user.roles.map((role) => <span key={role}
+                                                      className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
 
     let actions = null;
     if (user.read_only) {
-      const tooltip = <Tooltip id="system-user">System users can only be modified in the Graylog configuration file.</Tooltip>;
+      const tooltip = <Tooltip id="system-user">System users can only be modified in the Graylog configuration
+        file.</Tooltip>;
       actions = (
         <OverlayTrigger placement="left" overlay={tooltip}>
           <span className={UserListStyle.help}>

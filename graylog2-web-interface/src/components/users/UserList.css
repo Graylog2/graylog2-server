@@ -20,3 +20,9 @@
 :local(.help) {
     cursor: help;
 }
+
+:local(.helpHeaderRow) {
+    cursor: help;
+    padding: 0 0 0 2px;
+    display: inline-flex;
+}
