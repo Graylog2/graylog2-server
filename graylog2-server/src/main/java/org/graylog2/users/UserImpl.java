@@ -35,6 +35,7 @@ import org.graylog2.database.validators.ListValidator;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.security.PasswordAlgorithm;
+import org.graylog2.rest.models.users.requests.Startpage;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.shared.security.Permissions;
 import org.joda.time.DateTimeZone;
@@ -194,9 +195,7 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
-    public Map<String, String> getStartpage() {
-        final Map<String, String> startpage = new HashMap<>();
-
+    public Startpage getStartpage() {
         if (fields.containsKey(STARTPAGE)) {
             @SuppressWarnings("unchecked")
             final Map<String, String> obj = (Map<String, String>) fields.get(STARTPAGE);
@@ -204,12 +203,11 @@ public class UserImpl extends PersistedImpl implements User {
             final String id = obj.get("id");
 
             if (type != null && id != null) {
-                startpage.put("type", type);
-                startpage.put("id", id);
+                return Startpage.create(type, id);
             }
         }
 
-        return startpage;
+        return null;
     }
 
     @Override
@@ -317,14 +315,19 @@ public class UserImpl extends PersistedImpl implements User {
 
     @Override
     public void setStartpage(final String type, final String id) {
-        final Map<String, String> startpage = new HashMap<>();
-
         if (type != null && id != null) {
-            startpage.put("type", type);
-            startpage.put("id", id);
+            this.setStartpage(Startpage.create(type, id));
         }
+    }
 
-        this.fields.put(STARTPAGE, startpage);
+    @Override
+    public void setStartpage(Startpage startpage) {
+        final HashMap<String, String> startpageMap = new HashMap<>();
+        if (startpage != null) {
+            startpageMap.put("type", startpage.type());
+            startpageMap.put("id", startpage.id());
+        }
+        this.fields.put(STARTPAGE, startpageMap);
     }
 
     public static class LocalAdminUser extends UserImpl {
