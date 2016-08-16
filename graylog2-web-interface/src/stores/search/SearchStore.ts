@@ -365,7 +365,7 @@ class SearchStore {
         fields: originalParams.fields,
       };
 
-      URLUtils.openLink(this.searchBaseLocation('index') + '?' + Qs.stringify(params))
+      return this.searchBaseLocation('index') + '?' + Qs.stringify(params);
     }
 }
 

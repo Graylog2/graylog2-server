@@ -37,15 +37,11 @@ const SurroundingSearchButton = React.createClass({
     return fields;
   },
 
-  _onClick(range) {
-    return (e) => {
-      e.preventDefault();
+  _searchLink(range) {
+    const fromTime = moment.unix(this.props.timestamp - Number(range)).toISOString();
+    const toTime = moment.unix(this.props.timestamp + Number(range)).toISOString();
 
-      const fromTime = moment.unix(this.props.timestamp - Number(range)).toISOString();
-      const toTime = moment.unix(this.props.timestamp + Number(range)).toISOString();
-
-      SearchStore.searchSurroundingMessages(this.props.id, fromTime, toTime, this._buildFilterFields());
-    };
+    return SearchStore.searchSurroundingMessages(this.props.id, fromTime, toTime, this._buildFilterFields());
   },
 
   render() {
@@ -54,7 +50,7 @@ const SurroundingSearchButton = React.createClass({
       .sort((a, b) => naturalSort(a, b))
       .map((key, idx) => {
         return (
-          <MenuItem key={idx} onClick={this._onClick(key)}>{timeRangeOptions[key]}</MenuItem>
+          <MenuItem key={idx} href={this._searchLink(key)}>{timeRangeOptions[key]}</MenuItem>
         );
       });
 
