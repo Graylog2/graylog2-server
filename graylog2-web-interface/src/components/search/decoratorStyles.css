@@ -12,7 +12,8 @@
 }
 
 :local(.addDecoratorButtonContainer) {
-    margin-bottom: 10px;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 :local(.addDecoratorSelect) {
@@ -22,8 +23,9 @@
 
 :local(.helpLink) {
     font-size: 12px;
-    padding-left: 0;
-    padding-right: 0;
+    padding-top: 0px;
+    padding-right: 0px;
+    float: right;
 }
 
 :local(.helpPopover) {
@@ -47,5 +49,6 @@
 
 :local(.decoratorListContainer) {
     overflow-y: scroll;
+    display: inline;
     padding-bottom: 20px;
 }
