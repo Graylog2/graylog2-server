@@ -27,7 +27,7 @@ const MessageFields = React.createClass({
         .map(key => {
           return (
             <MessageField key={key} {...this.props} fieldName={key} value={fields[key]}
-                               disableFieldActions={decoratedFields.indexOf(key) !== -1} />
+                               disableFieldActions={this.props.disableFieldActions || decoratedFields.indexOf(key) !== -1} />
           );
         });
     }
