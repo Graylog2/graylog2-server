@@ -27,11 +27,6 @@ import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.KeywordRange;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
-import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
@@ -41,6 +36,8 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
 import org.graylog2.shared.inputs.InputLauncher;
@@ -55,7 +52,6 @@ import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.graylog2.timeranges.TimeRangeFactory;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +63,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.plugin.inputs.Extractor.Type.GROK;
+import static org.graylog2.plugin.inputs.Extractor.Type.JSON;
 
 public class BundleImporter {
     private static final Logger LOG = LoggerFactory.getLogger(BundleImporter.class);
@@ -294,6 +292,18 @@ public class BundleImporter {
         return messageInput;
     }
 
+    private void validateExtractor(final Extractor extractorDescription) throws ValidationException {
+        if (extractorDescription.getSourceField().isEmpty()) {
+            throw new ValidationException("Missing parameter source_field in extractor " + extractorDescription.getTitle());
+        }
+
+        if (extractorDescription.getType() != GROK &&
+                extractorDescription.getType() != JSON &&
+                extractorDescription.getTargetField().isEmpty()) {
+            throw new ValidationException("Missing parameter target_field in extractor " + extractorDescription.getTitle());
+        }
+    }
+
     private void addExtractors(final MessageInput messageInput, final List<Extractor> extractors, final String userName)
             throws org.graylog2.plugin.inputs.Extractor.ReservedFieldException, org.graylog2.ConfigurationException,
             ExtractorFactory.NoSuchExtractorException, NotFoundException, ValidationException {
@@ -309,9 +319,7 @@ public class BundleImporter {
             final String userName)
             throws NotFoundException, ValidationException, org.graylog2.ConfigurationException,
             ExtractorFactory.NoSuchExtractorException, org.graylog2.plugin.inputs.Extractor.ReservedFieldException {
-        if (extractorDescription.getSourceField().isEmpty() || extractorDescription.getTargetField().isEmpty()) {
-            throw new ValidationException("Missing parameters source_field or target_field.");
-        }
+        this.validateExtractor(extractorDescription);
 
         final String extractorId = UUID.randomUUID().toString();
         final org.graylog2.plugin.inputs.Extractor extractor = extractorFactory.factory(
