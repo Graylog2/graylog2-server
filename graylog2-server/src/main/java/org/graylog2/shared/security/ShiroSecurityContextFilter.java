@@ -50,8 +50,6 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
     private Provider<Request> grizzlyRequestProvider;
     private final Set<IpSubnet> trustedProxies;
 
-    public static final String X_GRAYLOG_REMOTE_ADDRESS = "x-graylog-remote-address";
-
     @Inject
     public ShiroSecurityContextFilter(DefaultSecurityManager securityManager,
                                       Provider<Request> grizzlyRequestProvider,
