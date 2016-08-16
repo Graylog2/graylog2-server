@@ -20,18 +20,18 @@ import java.util.Map;
 
 public class NullAuditEventSender implements AuditEventSender {
     @Override
-    public void success(String actor, String type) {
+    public void success(AuditActor actor, String type) {
     }
 
     @Override
-    public void success(String actor, String type, Map<String, Object> context) {
+    public void success(AuditActor actor, String type, Map<String, Object> context) {
     }
 
     @Override
-    public void failure(String actor, String type) {
+    public void failure(AuditActor actor, String type) {
     }
 
     @Override
-    public void failure(String actor, String type, Map<String, Object> context) {
+    public void failure(AuditActor actor, String type, Map<String, Object> context) {
     }
 }

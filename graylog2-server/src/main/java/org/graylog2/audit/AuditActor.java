@@ -16,6 +16,7 @@
  */
 package org.graylog2.audit;
 
+import com.google.auto.value.AutoValue;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.annotation.Nonnull;
@@ -23,18 +24,21 @@ import javax.annotation.Nonnull;
 import static java.util.Objects.requireNonNull;
 import static org.elasticsearch.common.Strings.isNullOrEmpty;
 
-public class AuditActor {
+@AutoValue
+public abstract class AuditActor {
     private static final String URN_GRAYLOG_SERVER = "urn:graylog:server:";
     private static final String URN_GRAYLOG_USER = "urn:graylog:user:";
 
-    public static String user(@Nonnull String username) {
+    public abstract String urn();
+
+    public static AuditActor user(@Nonnull String username) {
         if (isNullOrEmpty(username)) {
             throw new IllegalArgumentException("username must not be null or empty");
         }
-        return URN_GRAYLOG_USER + username;
+        return new AutoValue_AuditActor(URN_GRAYLOG_USER + username);
     }
 
-    public static String system(@Nonnull NodeId nodeId) {
-        return URN_GRAYLOG_SERVER + requireNonNull(nodeId, "nodeId must not be null").toString();
+    public static AuditActor system(@Nonnull NodeId nodeId) {
+        return new AutoValue_AuditActor(URN_GRAYLOG_SERVER + requireNonNull(nodeId, "nodeId must not be null").toString());
     }
 }
