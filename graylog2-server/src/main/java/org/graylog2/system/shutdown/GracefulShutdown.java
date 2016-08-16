@@ -116,7 +116,7 @@ public class GracefulShutdown implements Runnable {
         // stop all maintenance tasks
         periodicalsService.stopAsync().awaitTerminated();
 
-        auditEventSender.success(AuditActor.system(), AuditEventTypes.NODE_SHUTDOWN_COMPLETE);
+        auditEventSender.success(AuditActor.system(serverStatus.getNodeId()), AuditEventTypes.NODE_SHUTDOWN_COMPLETE);
 
         // Shut down hard with no shutdown hooks running.
         LOG.info("Goodbye.");

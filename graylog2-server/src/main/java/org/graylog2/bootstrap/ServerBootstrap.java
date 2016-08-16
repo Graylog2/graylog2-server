@@ -29,6 +29,7 @@ import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.GenericInitializerBindings;
 import org.graylog2.shared.bindings.MessageInputBindings;
@@ -93,11 +94,12 @@ public abstract class ServerBootstrap extends CmdLineTool {
     @Override
     protected void startCommand() {
         final AuditEventSender auditEventSender = injector.getInstance(AuditEventSender.class);
+        final NodeId nodeId = injector.getInstance(NodeId.class);
         final Map<String, Object> auditEventContext = ImmutableMap.of(
             "version", version,
             "java", Tools.getSystemInformation()
         );
-        auditEventSender.success(AuditActor.system(), AuditEventTypes.NODE_STARTUP_INITIATE, auditEventContext);
+        auditEventSender.success(AuditActor.system(nodeId), AuditEventTypes.NODE_STARTUP_INITIATE, auditEventContext);
 
         final OS os = OS.getOs();
 
@@ -120,12 +122,12 @@ public abstract class ServerBootstrap extends CmdLineTool {
         } catch (ProvisionException e) {
             LOG.error("Guice error", e);
             annotateProvisionException(e);
-            auditEventSender.failure(AuditActor.system(), AuditEventTypes.NODE_STARTUP_INITIATE, auditEventContext);
+            auditEventSender.failure(AuditActor.system(nodeId), AuditEventTypes.NODE_STARTUP_INITIATE, auditEventContext);
             System.exit(-1);
             return;
         } catch (Exception e) {
             LOG.error("Unexpected exception", e);
-            auditEventSender.failure(AuditActor.system(), AuditEventTypes.NODE_STARTUP_INITIATE, auditEventContext);
+            auditEventSender.failure(AuditActor.system(nodeId), AuditEventTypes.NODE_STARTUP_INITIATE, auditEventContext);
             System.exit(-1);
             return;
         }
@@ -147,14 +149,14 @@ public abstract class ServerBootstrap extends CmdLineTool {
                 LOG.error("Unable to shutdown properly on time. {}", serviceManager.servicesByState());
             }
             LOG.error("Graylog startup failed. Exiting. Exception was:", e);
-            auditEventSender.failure(AuditActor.system(), AuditEventTypes.NODE_STARTUP_INITIATE, auditEventContext);
+            auditEventSender.failure(AuditActor.system(nodeId), AuditEventTypes.NODE_STARTUP_INITIATE, auditEventContext);
             System.exit(-1);
         }
         LOG.info("Services started, startup times in ms: {}", serviceManager.startupTimes());
 
         activityWriter.write(new Activity("Started up.", Main.class));
         LOG.info("Graylog " + commandName + " up and running.");
-        auditEventSender.success(AuditActor.system(), AuditEventTypes.NODE_STARTUP_COMPLETE, auditEventContext);
+        auditEventSender.success(AuditActor.system(nodeId), AuditEventTypes.NODE_STARTUP_COMPLETE, auditEventContext);
 
         // Block forever.
         try {

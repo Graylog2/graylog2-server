@@ -22,6 +22,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,9 +41,10 @@ public class ClosingRetentionStrategy extends AbstractIndexCountBasedRetentionSt
     public ClosingRetentionStrategy(Deflector deflector,
                                     Indices indices,
                                     ActivityWriter activityWriter,
+                                    NodeId nodeId,
                                     ClusterConfigService clusterConfigService,
                                     AuditEventSender auditEventSender) {
-        super(deflector, indices, activityWriter, auditEventSender);
+        super(deflector, indices, nodeId, activityWriter, auditEventSender);
         this.indices = indices;
         this.clusterConfigService = clusterConfigService;
     }

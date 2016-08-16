@@ -199,9 +199,9 @@ public class ServerStatus {
     public void pauseMessageProcessing(boolean locked) {
         // Never override pause lock if already locked.
         if (processingPauseLocked.compareAndSet(false, locked) && locked) {
-            auditEventSenderProvider.get().success(AuditActor.system(), AuditEventTypes.MESSAGE_PROCESSING_LOCK);
+            auditEventSenderProvider.get().success(AuditActor.system(nodeId), AuditEventTypes.MESSAGE_PROCESSING_LOCK);
         } else if (locked) {
-            auditEventSenderProvider.get().failure(AuditActor.system(), AuditEventTypes.MESSAGE_PROCESSING_LOCK);
+            auditEventSenderProvider.get().failure(AuditActor.system(nodeId), AuditEventTypes.MESSAGE_PROCESSING_LOCK);
         }
         isProcessing.set(false);
 

@@ -33,6 +33,7 @@ import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.NullActivityWriter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -51,6 +52,7 @@ import java.util.SortedSet;
 import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class EsIndexRangeServiceTest {
@@ -84,7 +86,7 @@ public class EsIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         final Messages messages = new Messages(client, ELASTICSEARCH_CONFIGURATION, new MetricRegistry());
-        indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(), messages, NullAuditEventSender::new);
+        indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(), messages, mock(NodeId.class), NullAuditEventSender::new);
         final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION.getIndexPrefix(), new NullActivityWriter(),
             indices, null, null);
         indexRangeService = new EsIndexRangeService(client, deflector, localEventBus, new MetricRegistry());

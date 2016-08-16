@@ -44,6 +44,7 @@ import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.DBCursor;
@@ -64,6 +65,7 @@ public class MongoIndexRangeService implements IndexRangeService {
 
     private final Indices indices;
     private final Provider<AuditEventSender> auditEventSenderProvider;
+    private final NodeId nodeId;
     private final JacksonDBCollection<MongoIndexRange, ObjectId> collection;
 
     @Inject
@@ -71,9 +73,11 @@ public class MongoIndexRangeService implements IndexRangeService {
                                   MongoJackObjectMapperProvider objectMapperProvider,
                                   Indices indices,
                                   Provider<AuditEventSender> auditEventSenderProvider,
+                                  NodeId nodeId,
                                   EventBus eventBus) {
         this.indices = indices;
         this.auditEventSenderProvider = auditEventSenderProvider;
+        this.nodeId = nodeId;
         this.collection = JacksonDBCollection.wrap(
             mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
             MongoIndexRange.class,
@@ -162,7 +166,7 @@ public class MongoIndexRangeService implements IndexRangeService {
             LOG.debug("Index \"{}\" has been deleted. Removing index range.");
             final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
             if (remove.getN() > 0) {
-                auditEventSenderProvider.get().success(AuditActor.system(), AuditEventTypes.ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
+                auditEventSenderProvider.get().success(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }
         }
     }
@@ -174,7 +178,7 @@ public class MongoIndexRangeService implements IndexRangeService {
             LOG.debug("Index \"{}\" has been closed. Removing index range.");
             final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
             if (remove.getN() > 0) {
-                auditEventSenderProvider.get().success(AuditActor.system(), AuditEventTypes.ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
+                auditEventSenderProvider.get().success(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }
         }
     }
@@ -196,15 +200,15 @@ public class MongoIndexRangeService implements IndexRangeService {
             final IndexRange indexRange;
             try {
                 indexRange = retryer.call(() -> calculateRange(index));
-                auditEventSenderProvider.get().success(AuditActor.system(), AuditEventTypes.ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
+                auditEventSenderProvider.get().success(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
             } catch (Exception e) {
                 if (e.getCause() instanceof IndexClosedException) {
                     LOG.debug("Couldn't calculate index range for closed index \"" + index + "\"", e.getCause());
-                    auditEventSenderProvider.get().failure(AuditActor.system(), AuditEventTypes.ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
+                    auditEventSenderProvider.get().failure(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
                     return;
                 }
                 LOG.error("Couldn't calculate index range for index \"" + index + "\"", e.getCause());
-                auditEventSenderProvider.get().failure(AuditActor.system(), AuditEventTypes.ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
+                auditEventSenderProvider.get().failure(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
                 throw new RuntimeException("Couldn't calculate index range for index \"" + index + "\"", e);
             }
 

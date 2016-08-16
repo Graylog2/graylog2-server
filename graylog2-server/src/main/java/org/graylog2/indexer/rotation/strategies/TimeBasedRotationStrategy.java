@@ -24,6 +24,7 @@ import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeField;
 import org.joda.time.DateTimeFieldType;
@@ -56,9 +57,9 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private DateTime anchor;
 
     @Inject
-    public TimeBasedRotationStrategy(Indices indices, Deflector deflector,
+    public TimeBasedRotationStrategy(Indices indices, Deflector deflector, NodeId nodeId,
                                      ClusterConfigService clusterConfigService, AuditEventSender auditEventSender) {
-        super(deflector, auditEventSender);
+        super(deflector, auditEventSender, nodeId);
         this.clusterConfigService = clusterConfigService;
         this.anchor = null;
         this.lastRotation = null;

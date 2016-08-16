@@ -24,6 +24,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +43,12 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
 
     private final Deflector deflector;
     private final AuditEventSender auditEventSender;
+    private final NodeId nodeId;
 
-    public AbstractRotationStrategy(Deflector deflector, AuditEventSender auditEventSender) {
+    public AbstractRotationStrategy(Deflector deflector, AuditEventSender auditEventSender, NodeId nodeId) {
         this.deflector = requireNonNull(deflector);
         this.auditEventSender = requireNonNull(auditEventSender);
+        this.nodeId = nodeId;
     }
 
     @Nullable
@@ -59,7 +62,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
             indexName = deflector.getNewestTargetName();
         } catch (NoTargetIndexException e) {
             final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of("rotation_strategy", strategyName);
-            auditEventSender.failure(AuditActor.system(), AuditEventTypes.ES_INDEX_ROTATION_INITIATE, auditEventContext);
+            auditEventSender.failure(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_ROTATION_INITIATE, auditEventContext);
 
             LOG.error("Could not find current deflector target. Aborting.", e);
             return;
@@ -72,14 +75,14 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         if (rotate == null) {
             LOG.error("Cannot perform rotation at this moment.");
 
-            auditEventSender.failure(AuditActor.system(), AuditEventTypes.ES_INDEX_ROTATION_INITIATE, auditEventContext);
+            auditEventSender.failure(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_ROTATION_INITIATE, auditEventContext);
             return;
         }
         LOG.debug("Rotation strategy result: {}", rotate.getDescription());
         if (rotate.shouldRotate()) {
             LOG.info("Deflector index <{}> should be rotated, Pointing deflector to new index now!", indexName);
             deflector.cycle();
-            auditEventSender.success(AuditActor.system(), AuditEventTypes.ES_INDEX_ROTATION_COMPLETE, auditEventContext);
+            auditEventSender.success(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_ROTATION_COMPLETE, auditEventContext);
         } else {
             LOG.debug("Deflector index <{}> should not be rotated. Not doing anything.", indexName);
         }

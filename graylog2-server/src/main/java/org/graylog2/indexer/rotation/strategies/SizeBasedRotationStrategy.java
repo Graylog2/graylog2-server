@@ -23,6 +23,7 @@ import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
+import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,8 +42,9 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
     public SizeBasedRotationStrategy(Indices indices,
                                      Deflector deflector,
                                      ClusterConfigService clusterConfigService,
+                                     NodeId nodeId,
                                      AuditEventSender auditEventSender) {
-        super(deflector, auditEventSender);
+        super(deflector, auditEventSender, nodeId);
         this.indices = indices;
         this.clusterConfigService = clusterConfigService;
     }

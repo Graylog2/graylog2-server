@@ -83,6 +83,7 @@ import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -113,14 +114,16 @@ public class Indices {
     private final ElasticsearchConfiguration configuration;
     private final IndexMapping indexMapping;
     private final Messages messages;
+    private final NodeId nodeId;
     private final Provider<AuditEventSender> auditEventSenderProvider;
 
     @Inject
-    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages, Provider<AuditEventSender> auditEventSenderProvider) {
+    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages, NodeId nodeId, Provider<AuditEventSender> auditEventSenderProvider) {
         this.c = client;
         this.configuration = configuration;
         this.indexMapping = indexMapping;
         this.messages = messages;
+        this.nodeId = nodeId;
         this.auditEventSenderProvider = auditEventSenderProvider;
     }
 
@@ -306,9 +309,9 @@ public class Indices {
 
         final boolean acknowledged = c.admin().indices().create(cir).actionGet().isAcknowledged();
         if (acknowledged) {
-            auditEventSenderProvider.get().success(AuditActor.system(), AuditEventTypes.ES_INDEX_CREATE);
+            auditEventSenderProvider.get().success(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_CREATE);
         } else {
-            auditEventSenderProvider.get().failure(AuditActor.system(), AuditEventTypes.ES_INDEX_CREATE);
+            auditEventSenderProvider.get().failure(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_CREATE);
         }
         return acknowledged;
     }

@@ -56,6 +56,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
@@ -174,14 +175,16 @@ public class Server extends ServerBootstrap {
     private static class ShutdownHook implements Runnable {
         private final ActivityWriter activityWriter;
         private final ServiceManager serviceManager;
+        private final NodeId nodeId;
         private final GracefulShutdown gracefulShutdown;
         private final AuditEventSender auditEventSender;
 
         @Inject
-        public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager,
+        public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager, NodeId nodeId,
                             GracefulShutdown gracefulShutdown, AuditEventSender auditEventSender) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
+            this.nodeId = nodeId;
             this.gracefulShutdown = gracefulShutdown;
             this.auditEventSender = auditEventSender;
         }
@@ -192,7 +195,7 @@ public class Server extends ServerBootstrap {
             LOG.info(msg);
             activityWriter.write(new Activity(msg, Main.class));
 
-            auditEventSender.success(AuditActor.system(), AuditEventTypes.NODE_SHUTDOWN_INITIATE);
+            auditEventSender.success(AuditActor.system(nodeId), AuditEventTypes.NODE_SHUTDOWN_INITIATE);
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();

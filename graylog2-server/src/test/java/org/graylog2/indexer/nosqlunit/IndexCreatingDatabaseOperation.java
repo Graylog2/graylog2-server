@@ -27,6 +27,7 @@ import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.messages.Messages;
+import org.graylog2.plugin.system.NodeId;
 
 import java.io.InputStream;
 import java.util.Set;
@@ -57,7 +58,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
             }
 
             final Messages messages = new Messages(client, config, new MetricRegistry());
-            final Indices indices = new Indices(client, config, new IndexMapping(), messages, NullAuditEventSender::new);
+            final Indices indices = new Indices(client, config, new IndexMapping(), messages, new NodeId(""), NullAuditEventSender::new);
 
             if (!indices.create(index)) {
                 throw new IllegalStateException("Couldn't create index " + index);
