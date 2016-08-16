@@ -135,7 +135,7 @@ public class BundleImporter {
             createStreams(bundleId, bundle.getStreams(), userName);
             createDashboards(bundleId, bundle.getDashboards(), userName);
         } catch (Exception e) {
-            LOG.error("Error while creating dashboards. Starting rollback.", e);
+            LOG.error("Error while creating entities in content pack. Starting rollback.", e);
             if (!rollback()) {
                 LOG.error("Rollback unsuccessful.");
             }
