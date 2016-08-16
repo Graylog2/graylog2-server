@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertService;
-import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -85,7 +85,7 @@ public class StreamAlertConditionResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    @AuditEvent(action = AuditActions.ALERT_CONDITION_CREATE)
+    @AuditEvent(type = AuditEventTypes.ALERT_CONDITION_CREATE)
     public Response create(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
                            @PathParam("streamId") String streamid,
                            @ApiParam(name = "JSON body", required = true)
@@ -119,7 +119,7 @@ public class StreamAlertConditionResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    @AuditEvent(action = AuditActions.ALERT_CONDITION_UPDATE)
+    @AuditEvent(type = AuditEventTypes.ALERT_CONDITION_UPDATE)
     public void update(@ApiParam(name = "streamId", value = "The stream id the alert condition belongs to.", required = true)
                        @PathParam("streamId") String streamid,
                        @ApiParam(name = "conditionId", value = "The alert condition id.", required = true)
@@ -178,7 +178,7 @@ public class StreamAlertConditionResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    @AuditEvent(action = AuditActions.ALERT_CONDITION_DELETE)
+    @AuditEvent(type = AuditEventTypes.ALERT_CONDITION_DELETE)
     public void delete(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
                        @PathParam("streamId") String streamid,
                        @ApiParam(name = "conditionId", value = "The stream id this new alert condition belongs to.", required = true)

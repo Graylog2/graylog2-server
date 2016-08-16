@@ -18,6 +18,6 @@ package org.graylog2.audit;
 
 import java.util.Set;
 
-public interface PluginAuditActions {
-    Set<String> auditActions();
+public interface PluginAuditEventTypes {
+    Set<String> auditEventTypes();
 }

@@ -39,7 +39,7 @@ public class AuditCoverageTest {
         final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forPackage("org.graylog2"))
                 .setScanners(new MethodAnnotationsScanner());
-        final Set<String> auditActions = new AuditActions().auditActions();
+        final Set<String> auditEventTypes = new AuditEventTypes().auditEventTypes();
         final Reflections reflections = new Reflections(configurationBuilder);
 
         final ImmutableSet.Builder<Method> methods = ImmutableSet.builder();
@@ -58,7 +58,7 @@ public class AuditCoverageTest {
                 if (method.isAnnotationPresent(AuditEvent.class)) {
                     final AuditEvent annotation = method.getAnnotation(AuditEvent.class);
 
-                    if (!auditActions.contains(annotation.action())) {
+                    if (!auditEventTypes.contains(annotation.type())) {
                         unregisteredAction.add(method);
                     }
                 }
@@ -70,7 +70,7 @@ public class AuditCoverageTest {
                 .isEmpty();
 
         assertThat(unregisteredAction.build())
-                .describedAs("Check that there are no @AuditEvent annotations with unregistered actions")
+                .describedAs("Check that there are no @AuditEvent annotations with unregistered event types")
                 .isEmpty();
     }
 }

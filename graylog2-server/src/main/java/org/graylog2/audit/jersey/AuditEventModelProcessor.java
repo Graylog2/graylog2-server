@@ -20,7 +20,7 @@ import org.glassfish.jersey.server.model.ModelProcessor;
 import org.glassfish.jersey.server.model.Resource;
 import org.glassfish.jersey.server.model.ResourceMethod;
 import org.glassfish.jersey.server.model.ResourceModel;
-import org.graylog2.audit.PluginAuditActions;
+import org.graylog2.audit.PluginAuditEventTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,11 +41,11 @@ import java.util.stream.Collectors;
  */
 public class AuditEventModelProcessor implements ModelProcessor {
     private static final Logger LOG = LoggerFactory.getLogger(AuditEventModelProcessor.class);
-    private final Set<String> auditActions;
+    private final Set<String> auditEventTypes;
 
-    public AuditEventModelProcessor(final Set<PluginAuditActions> auditActions) {
-        this.auditActions = auditActions.stream()
-                .flatMap(actions -> actions.auditActions().stream())
+    public AuditEventModelProcessor(final Set<PluginAuditEventTypes> auditEventTypes) {
+        this.auditEventTypes = auditEventTypes.stream()
+                .flatMap(types -> types.auditEventTypes().stream())
                 .collect(Collectors.toSet());
     }
 
@@ -77,10 +77,10 @@ public class AuditEventModelProcessor implements ModelProcessor {
                         if (m.isAnnotationPresent(AuditEvent.class)) {
                             final AuditEvent annotation = m.getAnnotation(AuditEvent.class);
 
-                            if (!auditActions.contains(annotation.action())) {
-                                LOG.warn("REST endpoint does not use a registered audit action: {} (action: \"{}\")",
-                                        String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)), annotation.action());
-                                LOG.debug("Make sure the audit actions are registered in a class that implements PluginAuditActions: {}#{}",
+                            if (!auditEventTypes.contains(annotation.type())) {
+                                LOG.warn("REST endpoint does not use a registered audit type: {} (type: \"{}\")",
+                                        String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)), annotation.type());
+                                LOG.debug("Make sure the audit event types are registered in a class that implements PluginAuditEventTypes: {}#{}",
                                         m.getDeclaringClass().getCanonicalName(), m.getName());
                             }
                         }

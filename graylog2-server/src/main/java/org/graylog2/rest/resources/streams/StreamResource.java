@@ -33,7 +33,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
-import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -130,7 +130,7 @@ public class StreamResource extends RestResource {
     @RequiresPermissions(RestPermissions.STREAMS_CREATE)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(action = AuditActions.STREAM_CREATE)
+    @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
     public Response create(@ApiParam(name = "JSON body", required = true) final CreateStreamRequest cr) throws ValidationException {
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
@@ -213,7 +213,7 @@ public class StreamResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    @AuditEvent(action = AuditActions.STREAM_UPDATE)
+    @AuditEvent(type = AuditEventTypes.STREAM_UPDATE)
     public StreamResponse update(@ApiParam(name = "streamId", required = true)
                                  @PathParam("streamId") String streamId,
                                  @ApiParam(name = "JSON body", required = true)
@@ -252,7 +252,7 @@ public class StreamResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    @AuditEvent(action = AuditActions.STREAM_DELETE)
+    @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
     public void delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
 
@@ -270,7 +270,7 @@ public class StreamResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
     })
-    @AuditEvent(action = AuditActions.STREAM_STOP)
+    @AuditEvent(type = AuditEventTypes.STREAM_STOP)
     public void pause(@ApiParam(name = "streamId", required = true)
                       @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
@@ -288,7 +288,7 @@ public class StreamResource extends RestResource {
         @ApiResponse(code = 404, message = "Stream not found."),
         @ApiResponse(code = 400, message = "Invalid or missing Stream id.")
     })
-    @AuditEvent(action = AuditActions.STREAM_START)
+    @AuditEvent(type = AuditEventTypes.STREAM_START)
     public void resume(@ApiParam(name = "streamId", required = true)
                        @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
@@ -349,7 +349,7 @@ public class StreamResource extends RestResource {
     })
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(action = AuditActions.STREAM_CREATE)
+    @AuditEvent(type = AuditEventTypes.STREAM_CREATE)
     public Response cloneStream(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId,
                                 @ApiParam(name = "JSON body", required = true) @Valid @NotNull CloneStreamRequest cr) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.STREAMS_CREATE);

@@ -25,7 +25,7 @@ import com.mongodb.MongoException;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
-import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditBindings;
 import org.graylog2.audit.AuditEventSender;
@@ -192,7 +192,7 @@ public class Server extends ServerBootstrap {
             LOG.info(msg);
             activityWriter.write(new Activity(msg, Main.class));
 
-            auditEventSender.success(AuditActor.system(), AuditActions.NODE_SHUTDOWN_INITIATE);
+            auditEventSender.success(AuditActor.system(), AuditEventTypes.NODE_SHUTDOWN_INITIATE);
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();

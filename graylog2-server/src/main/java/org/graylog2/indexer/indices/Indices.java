@@ -75,7 +75,7 @@ import org.elasticsearch.search.aggregations.metrics.max.Max;
 import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortParseElement;
-import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
@@ -306,9 +306,9 @@ public class Indices {
 
         final boolean acknowledged = c.admin().indices().create(cir).actionGet().isAcknowledged();
         if (acknowledged) {
-            auditEventSenderProvider.get().success(AuditActor.system(), AuditActions.ES_INDEX_CREATE);
+            auditEventSenderProvider.get().success(AuditActor.system(), AuditEventTypes.ES_INDEX_CREATE);
         } else {
-            auditEventSenderProvider.get().failure(AuditActor.system(), AuditActions.ES_INDEX_CREATE);
+            auditEventSenderProvider.get().failure(AuditActor.system(), AuditEventTypes.ES_INDEX_CREATE);
         }
         return acknowledged;
     }

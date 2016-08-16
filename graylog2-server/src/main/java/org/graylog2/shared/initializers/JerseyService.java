@@ -34,7 +34,7 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.Configuration;
-import org.graylog2.audit.PluginAuditActions;
+import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -98,7 +98,7 @@ public class JerseyService extends AbstractIdleService {
     private final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters;
     private final Set<Class<? extends ExceptionMapper>> exceptionMappers;
     private final Set<Class> additionalComponents;
-    private final Set<PluginAuditActions> pluginAuditActions;
+    private final Set<PluginAuditEventTypes> pluginAuditEventTypes;
     private final ObjectMapper objectMapper;
     private final MetricRegistry metricRegistry;
 
@@ -113,7 +113,7 @@ public class JerseyService extends AbstractIdleService {
                          @Named("additionalJerseyComponents") final Set<Class> additionalComponents,
                          final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
                          @Named("RestControllerPackages") final String[] restControllerPackages,
-                         Set<PluginAuditActions> pluginAuditActions,
+                         Set<PluginAuditEventTypes> pluginAuditEventTypes,
                          ObjectMapper objectMapper,
                          MetricRegistry metricRegistry) {
         this.configuration = configuration;
@@ -123,7 +123,7 @@ public class JerseyService extends AbstractIdleService {
         this.additionalComponents = additionalComponents;
         this.pluginRestResources = pluginRestResources;
         this.restControllerPackages = restControllerPackages;
-        this.pluginAuditActions = pluginAuditActions;
+        this.pluginAuditEventTypes = pluginAuditEventTypes;
         this.objectMapper = objectMapper;
         this.metricRegistry = metricRegistry;
     }
@@ -273,7 +273,7 @@ public class JerseyService extends AbstractIdleService {
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
                 .property(ServerProperties.WADL_FEATURE_DISABLE, true)
                 .register(new PrefixAddingModelProcessor(packagePrefixes))
-                .register(new AuditEventModelProcessor(pluginAuditActions))
+                .register(new AuditEventModelProcessor(pluginAuditEventTypes))
                 .registerClasses(
                         JacksonJaxbJsonProvider.class,
                         JsonProcessingExceptionMapper.class,

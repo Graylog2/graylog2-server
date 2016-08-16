@@ -27,7 +27,7 @@ import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.PluginAuditActions;
+import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -284,13 +284,13 @@ public abstract class Graylog2Module extends AbstractModule {
         classMultibinder.addBinding().to(permissionsClass);
     }
 
-    protected Multibinder<PluginAuditActions> auditActionsBinder() {
-        return Multibinder.newSetBinder(binder(), PluginAuditActions.class);
+    protected Multibinder<PluginAuditEventTypes> auditEventTypesBinder() {
+        return Multibinder.newSetBinder(binder(), PluginAuditEventTypes.class);
     }
 
-    protected void installAuditActions(Multibinder<PluginAuditActions> classMultibinder,
-                                       Class<? extends PluginAuditActions> auditActionsClass) {
-        classMultibinder.addBinding().to(auditActionsClass);
+    protected void installAuditEventTypes(Multibinder<PluginAuditEventTypes> classMultibinder,
+                                          Class<? extends PluginAuditEventTypes> auditEventTypesClass) {
+        classMultibinder.addBinding().to(auditEventTypesClass);
     }
 
     @Nonnull

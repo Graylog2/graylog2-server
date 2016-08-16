@@ -31,7 +31,7 @@ import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.glassfish.grizzly.http.server.Request;
-import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -155,7 +155,7 @@ public class SessionsResource extends RestResource {
                     "session_id", id,
                     "remote_address", remoteAddrFromRequest
             );
-            auditEventSender.success(createRequest.username(), AuditActions.SESSION_CREATE, auditEventContext);
+            auditEventSender.success(createRequest.username(), AuditEventTypes.SESSION_CREATE, auditEventContext);
 
             // TODO is the validUntil attribute even used by anyone yet?
             return SessionResponse.create(new DateTime(s.getLastAccessTime(), DateTimeZone.UTC).plus(s.getTimeout()).toDate(),
@@ -164,7 +164,7 @@ public class SessionsResource extends RestResource {
             final Map<String, Object> auditEventContext = ImmutableMap.of(
                     "remote_address", remoteAddrFromRequest
             );
-            auditEventSender.failure(createRequest.username(), AuditActions.SESSION_CREATE, auditEventContext);
+            auditEventSender.failure(createRequest.username(), AuditEventTypes.SESSION_CREATE, auditEventContext);
 
             throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
         }
@@ -204,7 +204,7 @@ public class SessionsResource extends RestResource {
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication
-    @AuditEvent(action = AuditActions.SESSION_DELETE)
+    @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);

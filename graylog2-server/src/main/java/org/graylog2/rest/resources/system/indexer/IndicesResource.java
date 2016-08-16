@@ -26,7 +26,7 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
-import org.graylog2.audit.AuditActions;
+import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.Deflector;
@@ -202,7 +202,7 @@ public class IndicesResource extends RestResource {
     @Path("/{index}/reopen")
     @ApiOperation(value = "Reopen a closed index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(action = AuditActions.ES_INDEX_OPEN)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_OPEN)
     public void reopen(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
@@ -223,7 +223,7 @@ public class IndicesResource extends RestResource {
     @ApiResponses(value = {
         @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
     })
-    @AuditEvent(action = AuditActions.ES_INDEX_CLOSE)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_CLOSE)
     public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
@@ -249,7 +249,7 @@ public class IndicesResource extends RestResource {
     @ApiResponses(value = {
         @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
     })
-    @AuditEvent(action = AuditActions.ES_INDEX_DELETE)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_DELETE)
     public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 

@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 public @interface AuditEvent {
     String actor() default "";
 
-    String action();
+    String type();
 
     String[] excludeFields() default {};
 
