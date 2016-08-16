@@ -164,7 +164,7 @@ public class UsersResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 400, message = "Missing or invalid user details.")
     })
-    @AuditEvent(type = AuditEventTypes.USER_CREATE, excludeFields = {"password"})
+    @AuditEvent(type = AuditEventTypes.USER_CREATE)
     public Response create(@ApiParam(name = "JSON body", value = "Must contain username, full_name, email, password and a list of permissions.", required = true)
                            @Valid @NotNull CreateUserRequest cr) throws ValidationException {
         if (userService.load(cr.username()) != null) {
@@ -369,7 +369,7 @@ public class UsersResource extends RestResource {
             @ApiResponse(code = 403, message = "The requesting user has insufficient privileges to update the password for the given user."),
             @ApiResponse(code = 404, message = "User does not exist.")
     })
-    @AuditEvent(type = AuditEventTypes.USER_PASSWORD_UPDATE, excludeFields = {"old_password", "password"})
+    @AuditEvent(type = AuditEventTypes.USER_PASSWORD_UPDATE)
     public void changePassword(
             @ApiParam(name = "username", value = "The name of the user whose password to change.", required = true)
             @PathParam("username") String username,
@@ -440,7 +440,7 @@ public class UsersResource extends RestResource {
     @Path("{username}/tokens/{name}")
     @RequiresPermissions(RestPermissions.USERS_TOKENCREATE)
     @ApiOperation("Generates a new access token for a user")
-    @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_CREATE, excludeFields = "token")
+    @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_CREATE)
     public Token generateNewToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,

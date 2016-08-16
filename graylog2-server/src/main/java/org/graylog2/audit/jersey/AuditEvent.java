@@ -28,8 +28,6 @@ public @interface AuditEvent {
 
     String type();
 
-    String[] excludeFields() default {};
-
     boolean captureRequestContext() default true;
 
     boolean captureRequestEntity() default true;

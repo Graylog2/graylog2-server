@@ -212,7 +212,7 @@ public class LdapResource extends RestResource {
     @ApiOperation("Update the LDAP configuration")
     @Path("/settings")
     @Consumes(MediaType.APPLICATION_JSON)
-    @AuditEvent(type = AuditEventTypes.LDAP_CONFIGURATION_UPDATE, excludeFields = "system_password")
+    @AuditEvent(type = AuditEventTypes.LDAP_CONFIGURATION_UPDATE)
     public void updateLdapSettings(@ApiParam(name = "JSON body", required = true)
                                    @Valid @NotNull LdapSettingsRequest request) throws ValidationException {
         // load the existing config, or create a new one. we only support having one, currently
