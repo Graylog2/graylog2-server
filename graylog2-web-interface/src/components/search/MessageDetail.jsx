@@ -133,14 +133,14 @@ const MessageDetail = React.createClass({
       );
     }
 
-    let showOriginal = null;
+    let showChanges = null;
     if (this.props.message.decoration_stats) {
-      showOriginal = <Button onClick={this._toggleShowOriginal} active={this.state.showOriginal}>Show Original</Button>;
+      showChanges = <Button onClick={this._toggleShowOriginal} active={this.state.showOriginal}>Show changes</Button>;
     }
 
     return (
       <ButtonGroup className="pull-right" bsSize="small">
-        {showOriginal}
+        {showChanges}
         <Button href={messageUrl}>Permalink</Button>
 
         <ClipboardButton title="Copy ID" text={this.props.message.id} />
