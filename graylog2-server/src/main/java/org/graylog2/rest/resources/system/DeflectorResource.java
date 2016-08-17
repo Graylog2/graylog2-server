@@ -76,7 +76,7 @@ public class DeflectorResource extends RestResource {
     @ApiOperation(value = "Get current deflector status")
     @RequiresPermissions(RestPermissions.DEFLECTOR_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public DeflectorSummary deflector() throws ClassNotFoundException, TooManyAliasesException {
+    public DeflectorSummary deflector() throws TooManyAliasesException {
         return DeflectorSummary.create(deflector.isUp(), deflector.getCurrentActualTargetIndex());
     }
 
