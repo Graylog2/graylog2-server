@@ -20,7 +20,9 @@ import com.google.common.util.concurrent.Service;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
+import org.graylog2.audit.formatter.AuditEventFormatter;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -160,5 +162,9 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addAuditEventTypes(Class<? extends PluginAuditEventTypes> auditEventTypesClass) {
         installAuditEventTypes(auditEventTypesBinder(), auditEventTypesClass);
+    }
+
+    protected void addAuditEventFormatter(AuditEventType auditEventType, Class<? extends AuditEventFormatter> auditEventFormatterClass) {
+        installAuditEventFormatter(auditEventFormatterMapBinder(), auditEventType, auditEventFormatterClass);
     }
 }
