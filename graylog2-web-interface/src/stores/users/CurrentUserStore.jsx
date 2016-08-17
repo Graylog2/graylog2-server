@@ -21,7 +21,7 @@ const CurrentUserStore = Reflux.createStore({
   },
 
   getInitialState() {
-    return {currentUser: this.currentUser};
+    return { currentUser: this.currentUser };
   },
 
   get() {
@@ -32,6 +32,9 @@ const CurrentUserStore = Reflux.createStore({
     if (sessionInfo.sessionId && sessionInfo.username) {
       const username = sessionInfo.username;
       this.update(username);
+    } else {
+      this.currentUser = undefined;
+      this.trigger({ currentUser: this.currentUser });
     }
   },
 
@@ -45,7 +48,7 @@ const CurrentUserStore = Reflux.createStore({
     fetch('GET', URLUtils.qualifyUrl(this.sourceUrl + '/' + username))
       .then((resp) => {
         this.currentUser = resp;
-        this.trigger({currentUser: this.currentUser});
+        this.trigger({ currentUser: this.currentUser });
       });
   },
 });
