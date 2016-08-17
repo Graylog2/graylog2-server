@@ -89,7 +89,6 @@ import org.graylog2.system.shutdown.GracefulShutdown;
 import org.graylog2.system.stats.ClusterStatsModule;
 import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
-import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
 
 import javax.ws.rs.container.DynamicFeature;
@@ -208,7 +207,6 @@ public class ServerBindings extends Graylog2Module {
         bind(InputEventListener.class).asEagerSingleton();
         bind(LocalDebugEventListener.class).asEagerSingleton();
         bind(ClusterDebugEventListener.class).asEagerSingleton();
-        bind(StartPageCleanupListener.class).asEagerSingleton();
     }
 
     private void bindSearchResponseDecorators() {

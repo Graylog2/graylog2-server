@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.rest.models.users.requests.Startpage;
 
 import javax.annotation.Nullable;
 import java.util.Date;
@@ -68,7 +67,7 @@ public abstract class UserSummary {
 
     @JsonProperty
     @Nullable
-    public abstract Startpage startpage();
+    public abstract Map<String, String> startpage();
 
     @JsonProperty
     @Nullable
@@ -96,7 +95,7 @@ public abstract class UserSummary {
                                      @JsonProperty("session_timeout_ms") @Nullable Long sessionTimeoutMs,
                                      @JsonProperty("read_only") boolean readOnly,
                                      @JsonProperty("external") boolean external,
-                                     @JsonProperty("startpage") @Nullable Startpage startpage,
+                                     @JsonProperty("startpage") @Nullable Map<String, String> startpage,
                                      @JsonProperty("roles") @Nullable Set<String> roles,
                                      @JsonProperty("session_active") boolean sessionActive,
                                      @JsonProperty("last_activity") @Nullable Date lastActivity,

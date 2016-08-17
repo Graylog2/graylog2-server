@@ -17,7 +17,6 @@
 package org.graylog2.plugin.database.users;
 
 import org.graylog2.plugin.database.Persisted;
-import org.graylog2.rest.models.users.requests.Startpage;
 import org.joda.time.DateTimeZone;
 
 import javax.annotation.Nonnull;
@@ -48,7 +47,7 @@ public interface User extends Persisted {
 
     Map<String, Object> getPreferences();
 
-    Startpage getStartpage();
+    Map<String, String> getStartpage();
 
     long getSessionTimeoutMs();
 
@@ -79,8 +78,6 @@ public interface User extends Persisted {
     void setExternal(boolean external);
 
     void setStartpage(String type, String id);
-
-    void setStartpage(Startpage startpage);
 
     boolean isLocalAdmin();
 

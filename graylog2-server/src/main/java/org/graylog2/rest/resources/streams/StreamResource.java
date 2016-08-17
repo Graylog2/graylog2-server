@@ -62,7 +62,6 @@ import org.graylog2.streams.StreamRouterEngine;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.events.StreamDeletedEvent;
 import org.graylog2.streams.events.StreamsChangedEvent;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
@@ -258,7 +257,6 @@ public class StreamResource extends RestResource {
         final Stream stream = streamService.load(streamId);
         streamService.destroy(stream);
         clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
-        clusterEventBus.post(StreamDeletedEvent.create(stream.getId()));
     }
 
     @POST

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 
 import { Spinner } from 'components/common';
@@ -15,9 +15,9 @@ const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 const StartPage = React.createClass({
   propTypes: {
-    history: React.PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.listenTo(CurrentUserStore, 'onCurrentUserUpdate'), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
+  mixins: [Reflux.connect(CurrentUserStore), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
   getInitialState() {
     return {
       gettingStarted: undefined,
@@ -25,7 +25,6 @@ const StartPage = React.createClass({
   },
   componentDidMount() {
     GettingStartedActions.getStatus();
-    CurrentUserStore.reload();
   },
   componentDidUpdate() {
     if (!this._isLoading()) {
@@ -33,10 +32,7 @@ const StartPage = React.createClass({
     }
   },
   onGettingStartedUpdate(state) {
-    this.setState({ gettingStarted: state.status });
-  },
-  onCurrentUserUpdate(state) {
-    this.setState({ currentUser: state.currentUser });
+    this.setState({gettingStarted: state.status});
   },
   _redirect(page) {
     this.props.history.pushState(null, page);
