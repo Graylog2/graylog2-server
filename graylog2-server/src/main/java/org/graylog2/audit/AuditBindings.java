@@ -16,7 +16,11 @@
  */
 package org.graylog2.audit;
 
+import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.audit.formatter.FormattedAuditEvent;
 import org.graylog2.plugin.PluginModule;
+
+import java.util.Map;
 
 public class AuditBindings extends PluginModule {
     @Override
@@ -25,5 +29,15 @@ public class AuditBindings extends PluginModule {
         auditEventSenderBinder().setDefault().to(NullAuditEventSender.class);
 
         addAuditEventTypes(AuditEventTypes.class);
+
+        // Needed to avoid binding errors when there are no implementations of AuditEventFormatter.
+        addAuditEventFormatter(AuditEventType.create("__ignore__:__ignore__:__ignore__"), NullAuditEventFormatter.class);
+    }
+
+    private static class NullAuditEventFormatter implements AuditEventFormatter {
+        @Override
+        public FormattedAuditEvent format(AuditActor actor, AuditEventType type, Map<String, Object> context) {
+            return null;
+        }
     }
 }
