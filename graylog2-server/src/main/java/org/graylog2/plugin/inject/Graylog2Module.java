@@ -305,6 +305,11 @@ public abstract class Graylog2Module extends AbstractModule {
         auditEventFormatterMapBinder.addBinding(auditEventType).to(auditEventFormatter);
     }
 
+    protected OptionalBinder<AuditEventSender> auditEventSenderBinder() {
+        return OptionalBinder.newOptionalBinder(binder(), AuditEventSender.class);
+    }
+
+
     @Nonnull
     protected Multibinder<Class<? extends DynamicFeature>> jerseyDynamicFeatureBinder() {
         return Multibinder.newSetBinder(binder(), new DynamicFeatureType());
@@ -346,10 +351,6 @@ public abstract class Graylog2Module extends AbstractModule {
                                            Class<? extends SearchResponseDecorator.Factory> searchResponseDecoratorFactoryClass) {
         install(new FactoryModuleBuilder().implement(SearchResponseDecorator.class, searchResponseDecoratorClass).build(searchResponseDecoratorFactoryClass));
         searchResponseDecoratorBinder.addBinding(searchResponseDecoratorClass.getCanonicalName()).to(searchResponseDecoratorFactoryClass);
-    }
-
-    protected OptionalBinder<AuditEventSender> auditEventSenderBinder() {
-        return OptionalBinder.newOptionalBinder(binder(), AuditEventSender.class);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}
