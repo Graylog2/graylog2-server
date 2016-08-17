@@ -77,7 +77,14 @@ public interface FormattedAuditEvent {
     /**
      * The format string that will be used to present the audit event to humans.
      *
-     * All data in {@link #attributes()} can be used as variables.
+     * All data in {@link #attributes()} as well as the following fields can be used as variables.
+     *
+     * <ul>
+     *     <li>actor</li>
+     *     <li>namespace</li>
+     *     <li>object</li>
+     *     <li>action</li>
+     * </ul>
      *
      * Examples:
      *
