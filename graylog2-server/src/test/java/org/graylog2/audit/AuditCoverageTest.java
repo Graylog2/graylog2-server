@@ -79,20 +79,29 @@ public class AuditCoverageTest {
     @Test
     public void testAuditEventTypeFormat() throws Exception {
         final Field[] fields = AuditEventTypes.class.getFields();
-        final ImmutableList.Builder<String> errors = ImmutableList.builder();
+        final ImmutableList.Builder<String> invalidErrors = ImmutableList.builder();
+        final ImmutableList.Builder<String> missingErrors = ImmutableList.builder();
+
+        final Set<String> auditEventTypes = new AuditEventTypes().auditEventTypes();
 
         for (Field field : fields) {
             String type = "";
             try {
                 type = (String) field.get(field.getType().newInstance());
+                if (!auditEventTypes.contains(type)) {
+                    missingErrors.add(field.getName() + "=" + type);
+                }
                 AuditEventType.create(type);
             } catch (Exception e) {
-                errors.add(field.getName() + "=" + type);
+                invalidErrors.add(field.getName() + "=" + type);
             }
         }
 
-        assertThat(errors.build())
+        assertThat(invalidErrors.build())
                 .describedAs("Check that there are no invalid AuditEventType strings")
+                .isEmpty();
+        assertThat(missingErrors.build())
+                .describedAs("Check that there are no AuditEventType strings missing in the exported list")
                 .isEmpty();
     }
 }
