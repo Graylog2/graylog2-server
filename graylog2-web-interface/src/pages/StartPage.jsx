@@ -17,7 +17,7 @@ const StartPage = React.createClass({
   propTypes: {
     history: React.PropTypes.object.isRequired,
   },
-  mixins: [Reflux.listenTo(CurrentUserStore, 'onCurrentUserUpdate'), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
+  mixins: [Reflux.connect(CurrentUserStore), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
   getInitialState() {
     return {
       gettingStarted: undefined,
@@ -34,9 +34,6 @@ const StartPage = React.createClass({
   },
   onGettingStartedUpdate(state) {
     this.setState({ gettingStarted: state.status });
-  },
-  onCurrentUserUpdate(state) {
-    this.setState({ currentUser: state.currentUser });
   },
   _redirect(page) {
     this.props.history.pushState(null, page);
