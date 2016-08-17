@@ -12,6 +12,7 @@ const WidgetsStore = StoreProvider.getStore('Widgets');
 
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
+import Routes from 'routing/Routes';
 
 import { GridsterContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -21,6 +22,9 @@ import Widget from 'components/widgets/Widget';
 
 const ShowDashboardPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
+  propTypes: {
+    history: React.PropTypes.object.isRequired,
+  },
 
   getInitialState() {
     return {
@@ -44,7 +48,8 @@ const ShowDashboardPage = React.createClass({
   DEFAULT_HEIGHT: 1,
   DEFAULT_WIDTH: 2,
   loadData() {
-    DashboardsStore.get(this.props.params.dashboardId)
+    const dashboardId = this.props.params.dashboardId;
+    DashboardsStore.get(dashboardId)
       .then((dashboard) => {
         if (!this.isMounted()) {
           return;
@@ -55,6 +60,11 @@ const ShowDashboardPage = React.createClass({
         dashboard.widgets.sort((w1, w2) => w1.id.localeCompare(w2.id));
         if (!this.state.dashboard || !deepEqual(this.state.dashboard, dashboard)) {
           this.setState({ dashboard: dashboard });
+        }
+      }, (response) => {
+        if (response.additional && response.additional.status === 404) {
+          UserNotification.error(`Unable to find a dashboard with the id <${dashboardId}>. Maybe it was deleted in the mean time.`);
+          this.props.history.pushState(null, Routes.DASHBOARDS);
         }
       });
   },
@@ -79,7 +89,7 @@ const ShowDashboardPage = React.createClass({
     );
   },
   _defaultWidgetDimensions(widget) {
-    const dimensions = {col: 0, row: 0};
+    const dimensions = { col: 0, row: 0 };
 
     const widgetPlugin = PluginStore.exports('widgets').filter(plugin => plugin.type.toUpperCase() === widget.type.toUpperCase())[0];
     if (widgetPlugin) {
@@ -139,11 +149,11 @@ const ShowDashboardPage = React.createClass({
   },
   _unlockDashboard(event) {
     event.preventDefault();
-    this.setState({locked: false});
+    this.setState({ locked: false });
   },
   _onUnlock() {
     const locked = !this.state.locked;
-    this.setState({locked: locked});
+    this.setState({ locked: locked });
 
     if (locked) {
       this.refs.gridsterContainer.lockGrid();
@@ -168,9 +178,8 @@ const ShowDashboardPage = React.createClass({
   },
   _toggleUpdateInBackground() {
     const forceUpdate = !this.state.forceUpdateInBackground;
-    this.setState({forceUpdateInBackground: forceUpdate});
-    UserNotification.success('Graphs will be updated ' + (forceUpdate ? 'even' : 'only')
-      + ' when the browser is in the ' + (forceUpdate ? 'background' : 'foreground'), '');
+    this.setState({ forceUpdateInBackground: forceUpdate });
+    UserNotification.success(`Graphs will be updated ${forceUpdate ? 'even' : 'only'} when the browser is in the ${forceUpdate ? 'background' : 'foreground'}`, '');
   },
   render() {
     if (!this.state.dashboard) {
@@ -208,15 +217,16 @@ const ShowDashboardPage = React.createClass({
       );
     }
 
+    const editDashboardTrigger = !this.state.locked && !this._dashboardIsEmpty(dashboard) ?
+      <EditDashboardModalTrigger id={dashboard.id} action="edit" title={dashboard.title}
+                                 description={dashboard.description} buttonClass="btn-info btn-xs">
+        <i className="fa fa-pencil"/>
+      </EditDashboardModalTrigger> : null;
     const dashboardTitle = (
       <span>
         <span data-dashboard-id={dashboard.id} className="dashboard-title">{dashboard.title}</span>
         &nbsp;
-        {!this.state.locked && !this._dashboardIsEmpty(dashboard) &&
-        <EditDashboardModalTrigger id={dashboard.id} action="edit" title={dashboard.title}
-                                   description={dashboard.description} buttonClass="btn-info btn-xs">
-          <i className="fa fa-pencil"/>
-        </EditDashboardModalTrigger>}
+        {editDashboardTrigger}
       </span>
     );
     return (
