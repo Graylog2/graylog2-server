@@ -111,6 +111,9 @@ const UserForm = React.createClass({
       if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
         this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }
+      if (this.props.user.username === this.state.currentUser.username) {
+        CurrentUserStore.reload();
+      }
     }, () => {
       UserNotification.error('Could not update the user. Please check your logs for more information.', 'Updating user failed');
     });
