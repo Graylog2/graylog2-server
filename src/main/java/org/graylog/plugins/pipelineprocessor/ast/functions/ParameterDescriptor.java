@@ -16,6 +16,9 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.functions;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
@@ -24,17 +27,27 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
+@JsonAutoDetect
 public abstract class ParameterDescriptor<T, R> {
 
+    @JsonProperty
     public abstract Class<? extends T> type();
 
+    @JsonProperty
     public abstract Class<? extends R> transformedType();
 
+    @JsonProperty
     public abstract String name();
 
+    @JsonProperty
     public abstract boolean optional();
 
+    @JsonIgnore
     public abstract java.util.function.Function<T, R> transform();
+
+    @JsonProperty
+    @Nullable
+    public abstract String description();
 
     public static <T,R> Builder<T, R> param() {
         return new AutoValue_ParameterDescriptor.Builder<T, R>().optional(false);
@@ -115,6 +128,8 @@ public abstract class ParameterDescriptor<T, R> {
         public Builder<T, R> optional() {
             return optional(true);
         }
+
+        public abstract Builder<T, R> description(String description);
 
         abstract ParameterDescriptor<T, R> autoBuild();
         public ParameterDescriptor<T, R> build() {

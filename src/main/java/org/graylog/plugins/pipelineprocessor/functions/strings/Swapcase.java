@@ -18,7 +18,6 @@ package org.graylog.plugins.pipelineprocessor.functions.strings;
 
 import org.apache.commons.lang3.StringUtils;
 
-import javax.annotation.Nullable;
 import java.util.Locale;
 
 public class Swapcase extends StringUtilsFunction {
@@ -28,6 +27,11 @@ public class Swapcase extends StringUtilsFunction {
     @Override
     protected String getName() {
         return NAME;
+    }
+
+    @Override
+    protected String description() {
+        return "Swaps the case of a String changing upper and title case to lower case, and lower case to upper case.";
     }
 
     @Override

@@ -22,14 +22,16 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
+import java.util.Locale;
+
 import static com.google.common.collect.ImmutableList.of;
 
-public abstract class SingleArgStringFunction extends AbstractFunction<String> {
+abstract class SingleArgStringFunction extends AbstractFunction<String> {
 
     private final ParameterDescriptor<String, String> valueParam;
 
-    public SingleArgStringFunction() {
-        valueParam = ParameterDescriptor.string("value").build();
+    SingleArgStringFunction() {
+        valueParam = ParameterDescriptor.string("value").description("The value to hash").build();
     }
 
     @Override
@@ -42,6 +44,10 @@ public abstract class SingleArgStringFunction extends AbstractFunction<String> {
 
     protected abstract String getName();
 
+    protected String description() {
+        return getName().toUpperCase(Locale.ENGLISH) + " hash of the string";
+    }
+
     @Override
     public FunctionDescriptor<String> descriptor() {
         return FunctionDescriptor.<String>builder()
@@ -50,6 +56,7 @@ public abstract class SingleArgStringFunction extends AbstractFunction<String> {
                 .params(of(
                         valueParam)
                 )
+                .description(description())
                 .build();
     }
 }

@@ -45,9 +45,9 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
     public GrokMatch(GrokPatternRegistry grokPatternRegistry) {
         this.grokPatternRegistry = grokPatternRegistry;
 
-        valueParam = ParameterDescriptor.string("value").build();
-        patternParam = ParameterDescriptor.string("pattern").build();
-        namedOnly = ParameterDescriptor.bool("only_named_captures").optional().build();
+        valueParam = ParameterDescriptor.string("value").description("The string to apply the Grok pattern against").build();
+        patternParam = ParameterDescriptor.string("pattern").description("The Grok pattern").build();
+        namedOnly = ParameterDescriptor.bool("only_named_captures").optional().description("Whether to only use explicitly named groups in the patterns").build();
     }
 
     @Override
@@ -73,6 +73,7 @@ public class GrokMatch extends AbstractFunction<GrokMatch.GrokResult> {
                 .name(NAME)
                 .returnType(GrokResult.class)
                 .params(of(patternParam, valueParam, namedOnly))
+                .description("Applies a Grok pattern to a string")
                 .build();
     }
 

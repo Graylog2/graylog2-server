@@ -33,6 +33,11 @@ public class Now extends TimezoneAwareFunction {
     }
 
     @Override
+    protected String description() {
+        return "Returns the current time";
+    }
+
+    @Override
     protected String getName() {
         return NAME;
     }

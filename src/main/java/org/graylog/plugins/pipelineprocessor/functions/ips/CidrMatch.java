@@ -43,8 +43,8 @@ public class CidrMatch extends AbstractFunction<Boolean> {
             } catch (UnknownHostException e) {
                 throw new IllegalArgumentException(e);
             }
-        }).build();
-        ipParam = ParameterDescriptor.type(IP, IpAddress.class).build();
+        }).description("The CIDR subnet mask").build();
+        ipParam = ParameterDescriptor.type(IP, IpAddress.class).description("The parsed IP address to match against the CIDR mask").build();
     }
 
     @Override
@@ -65,6 +65,7 @@ public class CidrMatch extends AbstractFunction<Boolean> {
                 .params(of(
                         cidrParam,
                         ipParam))
+                .description("Checks if an IP address matches a CIDR subnet mask")
                 .build();
     }
 }

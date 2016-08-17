@@ -35,9 +35,9 @@ public class RenameField extends AbstractFunction<Void> {
     private final ParameterDescriptor<Message, Message> messageParam;
 
     public RenameField() {
-        oldFieldParam = string("old_field").build();
-        newFieldParam = string("new_field").build();
-        messageParam = type("message", Message.class).optional().build();
+        oldFieldParam = string("old_field").description("The old name of the field").build();
+        newFieldParam = string("new_field").description("The new name of the field").build();
+        messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
     }
 
     @Override
@@ -65,6 +65,7 @@ public class RenameField extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(oldFieldParam, newFieldParam, messageParam)
+                .description("Rename a message field")
                 .build();
     }
 }

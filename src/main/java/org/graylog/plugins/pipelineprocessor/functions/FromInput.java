@@ -43,8 +43,8 @@ public class FromInput extends AbstractFunction<Boolean> {
     @Inject
     public FromInput(InputRegistry inputRegistry) {
         this.inputRegistry = inputRegistry;
-        idParam = string(ID_ARG).optional().build();
-        nameParam = string(NAME_ARG).optional().build();
+        idParam = string(ID_ARG).optional().description("The input's ID, this is much faster than 'name'").build();
+        nameParam = string(NAME_ARG).optional().description("The input's name").build();
     }
 
     @Override
@@ -83,6 +83,7 @@ public class FromInput extends AbstractFunction<Boolean> {
                 .params(of(
                         idParam,
                         nameParam))
+                .description("Checks if a message arrived on a given input")
                 .build();
     }
 }

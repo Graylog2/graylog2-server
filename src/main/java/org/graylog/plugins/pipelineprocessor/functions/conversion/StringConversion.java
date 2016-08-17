@@ -52,8 +52,8 @@ public class StringConversion extends AbstractFunction<String> {
                 };
             }
         };
-        valueParam = object("value").build();
-        defaultParam = string("default").optional().build();
+        valueParam = object("value").description("Value to convert").build();
+        defaultParam = string("default").optional().description("Used when 'value' is null, defaults to \"\"").build();
     }
 
     @Override
@@ -102,6 +102,7 @@ public class StringConversion extends AbstractFunction<String> {
                         valueParam,
                         defaultParam
                 ))
+                .description("Converts a value to its string representation")
                 .build();
     }
 }

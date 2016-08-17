@@ -38,8 +38,8 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
     private final ParameterDescriptor<String, String> defaultParam;
 
     public IpAddressConversion() {
-        ipParam = ParameterDescriptor.object("ip").build();
-        defaultParam = ParameterDescriptor.string("default").optional().build();
+        ipParam = ParameterDescriptor.object("ip").description("Value to convert").build();
+        defaultParam = ParameterDescriptor.string("default").optional().description("Used when 'ip' is null or malformed, defaults to '0.0.0.0'").build();
     }
 
     @Override
@@ -72,6 +72,7 @@ public class IpAddressConversion extends AbstractFunction<IpAddress> {
                         ipParam,
                         defaultParam
                 ))
+                .description("Converts a value to an IPAddress using its string representation")
                 .build();
     }
 }

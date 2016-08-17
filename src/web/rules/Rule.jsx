@@ -60,7 +60,7 @@ const Rule = React.createClass({
             <RuleForm rule={this.props.rule} usedInPipelines={this.props.usedInPipelines} create={this.props.create}
                       onSave={this.props.onSave} validateRule={this.props.validateRule} history={this.props.history} />
           </Col>
-          <Col md={5} mdOffset={1}>
+          <Col md={6}>
             <RuleHelper />
           </Col>
         </Row>

@@ -30,6 +30,11 @@ public class Capitalize extends StringUtilsFunction {
     }
 
     @Override
+    protected String description() {
+        return "Capitalizes a String changing the first letter to title case from lower case";
+    }
+
+    @Override
     protected boolean isLocaleAware() {
         return false;
     }

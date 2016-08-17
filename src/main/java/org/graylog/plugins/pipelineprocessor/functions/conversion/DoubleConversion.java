@@ -38,8 +38,8 @@ public class DoubleConversion extends AbstractFunction<Double> {
     private final ParameterDescriptor<Double, Double> defaultParam;
 
     public DoubleConversion() {
-        valueParam = object(VALUE).build();
-        defaultParam = floating(DEFAULT).optional().build();
+        valueParam = object(VALUE).description("Value to convert").build();
+        defaultParam = floating(DEFAULT).optional().description("Used when 'value' is null, defaults to 0").build();
     }
 
     @Override
@@ -62,6 +62,7 @@ public class DoubleConversion extends AbstractFunction<Double> {
                         valueParam,
                         defaultParam
                 ))
+                .description("Converts a value to a double value using its string representation")
                 .build();
     }
 }

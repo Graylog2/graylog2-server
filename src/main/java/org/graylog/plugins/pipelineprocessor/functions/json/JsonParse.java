@@ -42,7 +42,7 @@ public class JsonParse extends AbstractFunction<JsonNode> {
     @Inject
     public JsonParse(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
-        valueParam = ParameterDescriptor.string("value").build();
+        valueParam = ParameterDescriptor.string("value").description("The string to parse as a JSON tree").build();
     }
 
     @Override
@@ -64,6 +64,7 @@ public class JsonParse extends AbstractFunction<JsonNode> {
                 .params(of(
                         valueParam
                 ))
+                .description("Parses a string as a JSON tree")
                 .build();
     }
 }

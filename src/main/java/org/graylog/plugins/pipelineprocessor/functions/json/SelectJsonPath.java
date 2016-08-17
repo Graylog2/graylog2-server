@@ -52,7 +52,7 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
                 .jsonProvider(new JacksonJsonNodeJsonProvider(objectMapper))
                 .build();
 
-        jsonParam = ParameterDescriptor.type("json", JsonNode.class).build();
+        jsonParam = ParameterDescriptor.type("json", JsonNode.class).description("A parsed JSON tree").build();
         // sigh generics and type erasure
         //noinspection unchecked
         pathsParam = ParameterDescriptor.type("paths",
@@ -61,6 +61,7 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
                 .transform(inputMap -> inputMap
                         .entrySet().stream()
                         .collect(toMap(Map.Entry::getKey, e -> JsonPath.compile(e.getValue()))))
+                .description("A map of names to a JsonPath expression, see http://jsonpath.com")
                 .build();
     }
 
@@ -120,6 +121,7 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
                         jsonParam,
                         pathsParam
                 ))
+                .description("Selects a map of fields containing the result of their JsonPath expressions")
                 .build();
     }
 

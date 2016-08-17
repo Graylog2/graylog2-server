@@ -40,10 +40,10 @@ public class SetFields extends AbstractFunction<Void> {
     private final ParameterDescriptor<Message, Message> messageParam;
 
     public SetFields() {
-        fieldsParam = type("fields", Map.class).build();
-        prefixParam = string("prefix").optional().build();
-        suffixParam = string("suffix").optional().build();
-        messageParam = type("message", Message.class).optional().build();
+        fieldsParam = type("fields", Map.class).description("The map of new fields to set").build();
+        prefixParam = string("prefix").optional().description("The prefix for the field names").build();
+        suffixParam = string("suffix").optional().description("The suffix for the field names").build();
+        messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
     }
 
     @Override
@@ -74,6 +74,7 @@ public class SetFields extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(of(fieldsParam, prefixParam, suffixParam, messageParam))
+                .description("Sets new fields in a message")
                 .build();
     }
 

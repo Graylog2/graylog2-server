@@ -27,7 +27,7 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 public class SyslogPriorityConversion extends AbstractFunction<SyslogPriority> {
     public static final String NAME = "expand_syslog_priority";
 
-    private final ParameterDescriptor<Object, Object> valueParam = object("value").build();
+    private final ParameterDescriptor<Object, Object> valueParam = object("value").description("Value to convert").build();
 
     @Override
     public SyslogPriority evaluate(FunctionArgs args, EvaluationContext context) {
@@ -45,6 +45,7 @@ public class SyslogPriorityConversion extends AbstractFunction<SyslogPriority> {
                 .name(NAME)
                 .returnType(SyslogPriority.class)
                 .params(valueParam)
+                .description("Converts a syslog priority number to its level and facility")
                 .build();
     }
 }

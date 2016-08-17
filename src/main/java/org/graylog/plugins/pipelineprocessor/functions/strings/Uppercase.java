@@ -30,6 +30,11 @@ public class Uppercase extends StringUtilsFunction {
     }
 
     @Override
+    protected String description() {
+        return "Uppercases a string";
+    }
+
+    @Override
     protected boolean isLocaleAware() {
         return true;
     }

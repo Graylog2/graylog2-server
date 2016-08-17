@@ -30,8 +30,8 @@ public class UrlConversion extends AbstractFunction<URL> {
 
     public static final String NAME = "to_url";
 
-    private final ParameterDescriptor<Object, Object> urlParam = ParameterDescriptor.object("url").build();
-    private final ParameterDescriptor<String, String> defaultParam = ParameterDescriptor.string("default").optional().build();
+    private final ParameterDescriptor<Object, Object> urlParam = ParameterDescriptor.object("url").description("Value to convert").build();
+    private final ParameterDescriptor<String, String> defaultParam = ParameterDescriptor.string("default").optional().description("Used when 'url' is null or malformed").build();
 
     @Override
     public URL evaluate(FunctionArgs args, EvaluationContext context) {
@@ -61,6 +61,7 @@ public class UrlConversion extends AbstractFunction<URL> {
                 .returnType(URL.class)
                 .params(urlParam,
                         defaultParam)
+                .description("Converts a value to a valid URL using its string representation")
                 .build();
     }
 }

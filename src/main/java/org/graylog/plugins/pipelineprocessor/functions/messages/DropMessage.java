@@ -33,7 +33,7 @@ public class DropMessage extends AbstractFunction<Void> {
     private final ParameterDescriptor<Message, Message> messageParam;
 
     public DropMessage() {
-        messageParam = type(MESSAGE_ARG, Message.class).optional().build();
+        messageParam = type(MESSAGE_ARG, Message.class).optional().description("The message to drop, defaults to '$message'").build();
     }
 
     @Override
@@ -52,6 +52,7 @@ public class DropMessage extends AbstractFunction<Void> {
                 .params(ImmutableList.of(
                         messageParam
                 ))
+                .description("Discards a message from further processing")
                 .build();
     }
 }

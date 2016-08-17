@@ -11,9 +11,10 @@ const urlPrefix = '/plugins/org.graylog.plugins.pipelineprocessor';
 const RulesStore = Reflux.createStore({
   listenables: [RulesActions],
   rules: undefined,
+  functionDescriptors: undefined,
 
   getInitialState() {
-    return { rules: this.rules };
+    return { rules: this.rules, functionDescriptors: this.functionDescriptors };
   },
 
   _updateRulesState(rule) {
@@ -27,7 +28,14 @@ const RulesStore = Reflux.createStore({
         this.rules.push(rule);
       }
     }
-    this.trigger({ rules: this.rules });
+    this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
+  },
+
+  _updateFunctionDescriptors(functions) {
+    if (functions) {
+      this.functionDescriptors = functions;
+    }
+    this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
   },
 
   list() {
@@ -39,7 +47,7 @@ const RulesStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/rule');
     return fetch('GET', url).then((response) => {
       this.rules = response;
-      this.trigger({ rules: response });
+      this.trigger({ rules: response, functionDescriptors: this.functionDescriptors });
     }, failCallback);
   },
 
@@ -106,7 +114,7 @@ const RulesStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/rule/${rule.id}`);
     return fetch('DELETE', url).then(() => {
       this.rules = this.rules.filter((el) => el.id !== rule.id);
-      this.trigger({ rules: this.rules });
+      this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
       UserNotification.success(`Rule "${rule.title}" was deleted successfully`);
     }, failCallback);
   },
@@ -137,6 +145,14 @@ const RulesStore = Reflux.createStore({
     promise.then(callback);
 
     return promise;
+  },
+  loadFunctions() {
+    if (this.functionDescriptors) {
+      return;
+    }
+    const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/rule/functions`);
+    return fetch('GET', url)
+      .then(this._updateFunctionDescriptors);
   },
 });
 

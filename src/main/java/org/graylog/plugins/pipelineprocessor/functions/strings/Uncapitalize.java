@@ -30,6 +30,11 @@ public class Uncapitalize extends StringUtilsFunction {
     }
 
     @Override
+    protected String description() {
+        return "Uncapitalizes a String changing the first letter to lower case from title case";
+    }
+
+    @Override
     protected boolean isLocaleAware() {
         return false;
     }

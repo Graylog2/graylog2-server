@@ -23,9 +23,11 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
+import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
+import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.database.NotFoundException;
@@ -64,14 +66,17 @@ public class RuleResource extends RestResource implements PluginRestResource {
     private final RuleService ruleService;
     private final PipelineRuleParser pipelineRuleParser;
     private final EventBus clusterBus;
+    private final FunctionRegistry functionRegistry;
 
     @Inject
     public RuleResource(RuleService ruleService,
                         PipelineRuleParser pipelineRuleParser,
-                        ClusterEventBus clusterBus) {
+                        ClusterEventBus clusterBus,
+                        FunctionRegistry functionRegistry) {
         this.ruleService = ruleService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.clusterBus = clusterBus;
+        this.functionRegistry = functionRegistry;
     }
 
 
@@ -187,6 +192,16 @@ public class RuleResource extends RestResource implements PluginRestResource {
 
         // TODO determine which pipelines could change because of this deleted rule, causing them to recompile
         clusterBus.post(RulesChangedEvent.deletedRuleId(id));
+    }
+
+
+    @ApiOperation("Get function descriptors")
+    @Path("/functions")
+    @GET
+    public Collection<Object> functionDescriptors() {
+        return functionRegistry.all().stream()
+                .map(Function::descriptor)
+                .collect(Collectors.toList());
     }
 
 }

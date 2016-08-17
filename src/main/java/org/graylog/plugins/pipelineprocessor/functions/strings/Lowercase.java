@@ -30,6 +30,11 @@ public class Lowercase extends StringUtilsFunction {
     }
 
     @Override
+    protected String description() {
+        return "Lowercases a string";
+    }
+
+    @Override
     protected boolean isLocaleAware() {
         return true;
     }

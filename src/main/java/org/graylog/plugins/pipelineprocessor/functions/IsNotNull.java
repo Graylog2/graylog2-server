@@ -30,7 +30,7 @@ public class IsNotNull extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Object, Object> valueParam;
 
     public IsNotNull() {
-        valueParam = ParameterDescriptor.type("value", Object.class).build();
+        valueParam = ParameterDescriptor.type("value", Object.class).description("The value to check").build();
     }
 
     @Override
@@ -49,6 +49,7 @@ public class IsNotNull extends AbstractFunction<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(of(valueParam))
+                .description("Checks whether a value is not 'null'")
                 .build();
     }
 }

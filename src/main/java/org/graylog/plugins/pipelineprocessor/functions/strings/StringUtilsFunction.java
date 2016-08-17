@@ -33,9 +33,12 @@ public abstract class StringUtilsFunction extends AbstractFunction<String> {
     private final ParameterDescriptor<String, Locale> localeParam;
 
     public StringUtilsFunction() {
-        valueParam = ParameterDescriptor.string(VALUE).build();
-        localeParam = ParameterDescriptor.string(LOCALE,
-                                                 Locale.class).optional().transform(Locale::forLanguageTag).build();
+        valueParam = ParameterDescriptor.string(VALUE).description("The input string").build();
+        localeParam = ParameterDescriptor.string(LOCALE, Locale.class)
+                .optional()
+                .transform(Locale::forLanguageTag)
+                .description("The locale to use, defaults to English")
+                .build();
     }
 
     @Override
@@ -59,10 +62,13 @@ public abstract class StringUtilsFunction extends AbstractFunction<String> {
                 .name(getName())
                 .returnType(String.class)
                 .params(params.build())
+                .description(description())
                 .build();
     }
 
     protected abstract String getName();
+
+    protected abstract String description();
 
     protected abstract boolean isLocaleAware();
 

@@ -1,11 +1,36 @@
 import React from 'react';
-import { Row, Col, Panel, Tabs, Tab } from 'react-bootstrap';
+import { Row, Col, Panel, Table, Tabs, Tab } from 'react-bootstrap';
+
+import Reflux from 'reflux';
+
+import RulesStore from './RulesStore';
+import RulesActions from './RulesActions';
+import ObjectUtils from 'util/ObjectUtils';
 
 import DocumentationLink from 'components/support/DocumentationLink';
+import { PaginatedList, Spinner } from 'components/common';
 
 import DocsHelper from 'util/DocsHelper';
 
 const RuleHelper = React.createClass({
+  mixins: [
+    Reflux.connect(RulesStore),
+  ],
+
+  getInitialState() {
+    return {
+      expanded: {},
+      paginatedEntries: undefined,
+      filteredEntries: undefined,
+      currentPage: 1,
+      pageSize: 10,
+    };
+  },
+
+  componentDidMount() {
+    RulesActions.loadFunctions();
+  },
+
   ruleTemplate: `rule "function howto"
 when
   has_field("transaction_date")
@@ -15,7 +40,77 @@ then
   set_field("transaction_year", new_date.year);
 end`,
 
+  _niceType(typeName) {
+    return typeName.replace(/^.*\.(.*?)$/, '$1');
+  },
+
+  _toggleFunctionDetail(functionName) {
+    const newState = ObjectUtils.clone(this.state.expanded);
+    newState[functionName] = !newState[functionName];
+    this.setState({ expanded: newState });
+  },
+
+  _functionSignature(descriptor) {
+    const args = descriptor.params.map(p => { return p.optional ? `[${p.name}]` : p.name; });
+    return <code>{`${descriptor.name}(${args.join(', ')}) : ${this._niceType(descriptor.return_type)}`}</code>;
+  },
+
+  _parameters(descriptor) {
+    return descriptor.params.map(p => {
+      return (
+        <tr key={p.name}>
+          <td style={{ width: '1%' }}>{p.name}</td>
+          <td style={{ width: '1%' }}>{this._niceType(p.type)}</td>
+          <td style={{ width: '1%', textAlign: 'center' }}>{p.optional ? null : <i className="fa fa-check"/>}</td>
+          <td>{p.description}</td>
+        </tr>);
+    });
+  },
+
+  _renderFunctions(descriptors) {
+    if (!descriptors) return [];
+    return descriptors.map((d) => {
+      let details = null;
+      if (this.state.expanded[d.name]) {
+        details = (<tr>
+          <td colSpan="2">
+            <Table condensed striped hover>
+              <thead>
+                <tr>
+                  <th>Parameter</th>
+                  <th>Type</th>
+                  <th>Required</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+              {this._parameters(d)}
+              </tbody>
+            </Table>
+          </td>
+        </tr>);
+      }
+      return (<tbody key={d.name} onClick={() => this._toggleFunctionDetail(d.name)} style={{ cursor: 'pointer' }}>
+        <tr>
+          <td style={{ width: 300 }}>{this._functionSignature(d)}</td>
+          <td>{d.description}</td>
+        </tr>
+        {details}
+      </tbody>);
+    });
+  },
+
+  _onPageChange(newPage, pageSize) {
+    this.setState({ currentPage: newPage, pageSize: pageSize });
+  },
+
   render() {
+    if (!this.state.functionDescriptors) {
+      return <Spinner />;
+    }
+
+    const pagedEntries = this.state.functionDescriptors.slice((this.state.currentPage - 1) * this.state.pageSize, (this.state.currentPage * this.state.pageSize) - 1);
+
     return (
       <Panel header="Rules quick reference">
         <Row className="row-sm">
@@ -30,121 +125,27 @@ end`,
         <Row className="row-sm">
           <Col md={12}>
             <Tabs defaultActiveKey={1} animation={false}>
-              <Tab eventKey={1} title="Example">
-                <pre style={{ marginTop: 10, whiteSpace: 'pre-wrap' }}>
-                  {this.ruleTemplate}
-                </pre>
-              </Tab>
-              <Tab eventKey={2} title="Functions">
+              <Tab eventKey={1} title="Functions">
                 <div className="table-responsive" style={{ marginTop: 10 }}>
-                  <table className="table">
-                    <thead>
-                    <tr>
-                      <th>Function</th>
-                      <th>Description</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                      <td><code>to_bool(any)</code></td>
-                      <td>Converts the single parameter to a boolean value using its string value.</td>
-                    </tr>
-                    <tr>
-                      <td><code>to_double(any, [default: double])</code></td>
-                      <td>Converts the first parameter to a double floating point value.</td>
-                    </tr>
-                    <tr>
-                      <td><code>to_long(any, [default: long])</code></td>
-                      <td>Converts the first parameter to a long integer value.</td>
-                    </tr>
-                    <tr>
-                      <td><code>to_string(any, [default: string])</code></td>
-                      <td>Converts the first parameter to its string representation.</td>
-                    </tr>
-                    <tr>
-                      <td><code>capitalize(value: string)</code></td>
-                      <td>Capitalizes a String changing the first letter to title case.</td>
-                    </tr>
-                    <tr>
-                      <td><code>uppercase(value: string, [locale: string])</code></td>
-                      <td>Converts a String to upper case.</td>
-                    </tr>
-                    <tr>
-                      <td><code>lowercase(value: string, [locale: string])</code></td>
-                      <td>Converts a String to lower case.</td>
-                    </tr>
-                    <tr>
-                      <td><code>contains(value: string, search: string, [ignore_case: boolean])</code></td>
-                      <td>Checks if a string contains another string.</td>
-                    </tr>
-                    <tr>
-                      <td><code>substring(value: string, start: long, [end: long])</code></td>
-                      <td>Returns a substring of <code><span>value</span></code> with the given start and end offsets.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><code>regex(pattern: string, value: string, [group_names: array[string])</code></td>
-                      <td>Match a regular expression against a string, with matcher groups.</td>
-                    </tr>
-                    <tr>
-                      <td><code>parse_date(value: string, pattern: string, [timezone: string])</code></td>
-                      <td>Parses a date and time from the given string, according to a strict pattern.</td>
-                    </tr>
-                    <tr>
-                      <td><code>flex_parse_date(value: string, [default: DateTime], [timezone: string])</code></td>
-                      <td>Attempts to parse a date and time using the Natty date parser.</td>
-                    </tr>
-                    <tr>
-                      <td><code>format_date(value: DateTime, format: string, [timezone: string])</code></td>
-                      <td>Formats a date and time according to a given formatter pattern.</td>
-                    </tr>
-                    <tr>
-                      <td><code>parse_json(value: string)</code></td>
-                      <td>Parse a string into a JSON tree.</td>
-                    </tr>
-                    <tr>
-                      <td><code>to_ip(ip: string)</code></td>
-                      <td>Converts the given string to an IP object.</td>
-                    </tr>
-                    <tr>
-                      <td><code>cidr_match(cidr: string, ip: IpAddress)</code></td>
-                      <td>Checks whether the given IP matches a CIDR pattern.</td>
-                    </tr>
-                    <tr>
-                      <td><code>from_input(id: string | name: string)</code></td>
-                      <td>Checks whether the current message was received by the given input.</td>
-                    </tr>
-                    <tr>
-                      <td><code>route_to_stream(id: string | name: string, [message: Message])</code></td>
-                      <td>Assigns the current message to the specified stream.</td>
-                    </tr>
-                    <tr>
-                      <td><code>drop_message(message: Message)</code></td>
-                      <td>This currently processed message will be removed from the processing pipeline after the rule
-                        finishes.
-                      </td>
-                    </tr>
-                    <tr>
-                      <td><code>has_field(field: string, [message: Message])</code></td>
-                      <td>Checks whether the currently processed message contains the named field.</td>
-                    </tr>
-                    <tr>
-                      <td><code>remove_field(field: string, [message: Message])</code></td>
-                      <td>Removes the named field from the currently processed message.</td>
-                    </tr>
-                    <tr>
-                      <td><code>set_field(field: string, value: any, [message: Message])</code></td>
-                      <td>Sets the name field to the given value in the currently processed message.</td>
-                    </tr>
-                    <tr>
-                      <td><code>set_fields(fields: Map&lt;string, any&gt;, [message: Message])</code></td>
-                      <td>Sets multiple fields to the given values in the currently processed message.</td>
-                    </tr>
-                    </tbody>
-                  </table>
+                  <PaginatedList totalItems={this.state.functionDescriptors.length} pageSize={this.state.pageSize} pageSizes={[10]} onChange={this._onPageChange}>
+                    <Table condensed>
+                      <thead>
+                        <tr>
+                          <th>Function</th>
+                          <th>Description</th>
+                        </tr>
+                      </thead>
+                      {this._renderFunctions(pagedEntries)}
+                    </Table>
+                  </PaginatedList>
                 </div>
                 <p>See all functions in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_FUNCTIONS}
                                                                text="documentation" />.</p>
+              </Tab>
+              <Tab eventKey={2} title="Example">
+                <pre style={{ marginTop: 10, whiteSpace: 'pre-wrap' }}>
+                  {this.ruleTemplate}
+                </pre>
               </Tab>
             </Tabs>
           </Col>

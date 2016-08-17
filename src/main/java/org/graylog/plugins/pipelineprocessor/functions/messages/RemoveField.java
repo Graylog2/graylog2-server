@@ -34,8 +34,8 @@ public class RemoveField extends AbstractFunction<Void> {
     private final ParameterDescriptor<Message, Message> messageParam;
 
     public RemoveField() {
-        fieldParam = ParameterDescriptor.string(FIELD).build();
-        messageParam = type("message", Message.class).optional().build();
+        fieldParam = ParameterDescriptor.string(FIELD).description("The field to remove").build();
+        messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
     }
 
     @Override
@@ -53,6 +53,7 @@ public class RemoveField extends AbstractFunction<Void> {
                 .name(NAME)
                 .returnType(Void.class)
                 .params(ImmutableList.of(fieldParam, messageParam))
+                .description("Removes a field from a message")
                 .build();
     }
 }

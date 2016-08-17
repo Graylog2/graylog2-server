@@ -19,7 +19,9 @@ package org.graylog.plugins.pipelineprocessor.parser;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FunctionRegistry {
 
@@ -41,5 +43,9 @@ public class FunctionRegistry {
             return Function.ERROR_FUNCTION;
         }
         return function;
+    }
+
+    public Collection<Function<?>> all() {
+        return functions.values().stream().collect(Collectors.toList());
     }
 }

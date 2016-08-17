@@ -37,8 +37,8 @@ public class FlexParseDate extends TimezoneAwareFunction {
     private final ParameterDescriptor<DateTime, DateTime> defaultParam;
 
     public FlexParseDate() {
-        valueParam = ParameterDescriptor.string(VALUE).build();
-        defaultParam = ParameterDescriptor.type(DEFAULT, DateTime.class).optional().build();
+        valueParam = ParameterDescriptor.string(VALUE).description("Date string to parse").build();
+        defaultParam = ParameterDescriptor.type(DEFAULT, DateTime.class).optional().description("Used when 'value' could not be parsed, 'null' otherwise").build();
     }
 
     @Override
@@ -55,6 +55,11 @@ public class FlexParseDate extends TimezoneAwareFunction {
             return null;
         }
         return new DateTime(dates.get(0).getDates().get(0), timezone);
+    }
+
+    @Override
+    protected String description() {
+        return "Parses a date string using natural language (see http://natty.joestelmach.com/)";
     }
 
     @Override

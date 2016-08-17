@@ -39,8 +39,8 @@ public class LongConversion extends AbstractFunction<Long> {
     private final ParameterDescriptor<Long, Long> defaultParam;
 
     public LongConversion() {
-        valueParam = object(VALUE).build();
-        defaultParam = integer(DEFAULT).optional().build();
+        valueParam = object(VALUE).description("Value to convert").build();
+        defaultParam = integer(DEFAULT).optional().description("Used when 'value' is null, defaults to 0").build();
     }
 
     @Override
@@ -60,6 +60,7 @@ public class LongConversion extends AbstractFunction<Long> {
                         valueParam,
                         defaultParam
                 ))
+                .description("Converts a value to a long value using its string representation")
                 .build();
     }
 }

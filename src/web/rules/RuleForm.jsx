@@ -130,7 +130,7 @@ const RuleForm = React.createClass({
 
     const formattedPipelines = this.props.usedInPipelines.map(pipeline => {
       return (
-        <li>
+        <li key={pipeline.id}>
           <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')(pipeline.id)}>
             <a>{pipeline.title}</a>
           </LinkContainer>

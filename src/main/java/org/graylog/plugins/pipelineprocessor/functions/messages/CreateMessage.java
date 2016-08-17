@@ -43,9 +43,9 @@ public class CreateMessage extends AbstractFunction<Message> {
     private final ParameterDescriptor<DateTime, DateTime> timestampParam;
 
     public CreateMessage() {
-        messageParam = string(MESSAGE_ARG).optional().build();
-        sourceParam = string(SOURCE_ARG).optional().build();
-        timestampParam = type(TIMESTAMP_ARG, DateTime.class).optional().build();
+        messageParam = string(MESSAGE_ARG).optional().description("The 'message' field of the new message, defaults to '$message.message'").build();
+        sourceParam = string(SOURCE_ARG).optional().description("The 'source' field of the new message, defaults to '$message.source'").build();
+        timestampParam = type(TIMESTAMP_ARG, DateTime.class).optional().description("The 'timestamp' field of the message, defaults to 'now'").build();
     }
 
     @Override
@@ -76,6 +76,7 @@ public class CreateMessage extends AbstractFunction<Message> {
                         sourceParam,
                         timestampParam
                 ))
+                .description("Creates a new message")
                 .build();
     }
 }

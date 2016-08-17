@@ -31,8 +31,8 @@ public class Concat extends AbstractFunction<String> {
     private final ParameterDescriptor<String, String> secondParam;
 
     public Concat() {
-        firstParam = ParameterDescriptor.string("first").build();
-        secondParam = ParameterDescriptor.string("second").build();
+        firstParam = ParameterDescriptor.string("first").description("First string").build();
+        secondParam = ParameterDescriptor.string("second").description("Second string").build();
     }
 
     @Override
@@ -49,6 +49,7 @@ public class Concat extends AbstractFunction<String> {
                 .name(NAME)
                 .returnType(String.class)
                 .params(of(firstParam, secondParam))
+                .description("Concatenates two strings")
                 .build();
     }
 }

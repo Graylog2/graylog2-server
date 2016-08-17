@@ -34,8 +34,8 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
 
 
     public BooleanConversion() {
-        valueParam = object("value").build();
-        defaultParam = bool("default").optional().build();
+        valueParam = object("value").description("Value to convert").build();
+        defaultParam = bool("default").optional().description("Used when 'value' is null, defaults to false").build();
     }
 
     @Override
@@ -53,6 +53,7 @@ public class BooleanConversion extends AbstractFunction<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(of(valueParam, defaultParam))
+                .description("Converts a value to a boolean value using its string representation")
                 .build();
     }
 }

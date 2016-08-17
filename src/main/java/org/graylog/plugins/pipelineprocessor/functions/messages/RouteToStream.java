@@ -48,9 +48,9 @@ public class RouteToStream extends AbstractFunction<Void> {
         this.streamService = streamService;
         streamService.loadAllEnabled();
 
-        messageParam = type("message", Message.class).optional().build();
-        nameParam = string(NAME_ARG).optional().build();
-        idParam = string(ID_ARG).optional().build();
+        messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
+        nameParam = string(NAME_ARG).optional().description("The name of the stream to route the message to, must match exactly").build();
+        idParam = string(ID_ARG).optional().description("The ID of the stream, this is much faster than using 'name'").build();
     }
 
     @Override
@@ -78,7 +78,6 @@ public class RouteToStream extends AbstractFunction<Void> {
                 return null;
             }
         }
-        // TODO needs message stack in context to pick message
         if (!stream.isPaused()) {
             final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
             message.addStream(stream);
@@ -95,6 +94,7 @@ public class RouteToStream extends AbstractFunction<Void> {
                         nameParam,
                         idParam,
                         messageParam))
+                .description("Routes a message to a stream")
                 .build();
     }
 }

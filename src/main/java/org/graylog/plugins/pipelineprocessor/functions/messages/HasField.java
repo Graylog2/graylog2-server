@@ -34,8 +34,8 @@ public class HasField extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Message, Message> messageParam;
 
     public HasField() {
-        fieldParam = ParameterDescriptor.string(FIELD).build();
-        messageParam = type("message", Message.class).optional().build();
+        fieldParam = ParameterDescriptor.string(FIELD).description("The field to check").build();
+        messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
     }
 
     @Override
@@ -52,6 +52,7 @@ public class HasField extends AbstractFunction<Boolean> {
                 .name(NAME)
                 .returnType(Boolean.class)
                 .params(ImmutableList.of(fieldParam, messageParam))
+                .description("Checks whether a message contains a value for a field")
                 .build();
     }
 }

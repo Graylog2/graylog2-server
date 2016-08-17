@@ -33,9 +33,9 @@ public class Contains extends AbstractFunction<Boolean> {
     private final ParameterDescriptor<Boolean, Boolean> ignoreCaseParam;
 
     public Contains() {
-        valueParam = ParameterDescriptor.string("value").build();
-        searchParam = ParameterDescriptor.string("search").build();
-        ignoreCaseParam = ParameterDescriptor.bool("ignore_case").optional().build();
+        valueParam = ParameterDescriptor.string("value").description("The string to check").build();
+        searchParam = ParameterDescriptor.string("search").description("The substring to find").build();
+        ignoreCaseParam = ParameterDescriptor.bool("ignore_case").optional().description("Whether to search case insensitive, defaults to false").build();
     }
 
     @Override
@@ -60,6 +60,7 @@ public class Contains extends AbstractFunction<Boolean> {
                         searchParam,
                         ignoreCaseParam
                 ))
+                .description("Checks if a string contains a substring")
                 .build();
     }
 }

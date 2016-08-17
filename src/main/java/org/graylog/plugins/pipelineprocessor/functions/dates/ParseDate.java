@@ -34,8 +34,8 @@ public class ParseDate extends TimezoneAwareFunction {
     private final ParameterDescriptor<String, String> patternParam;
 
     public ParseDate() {
-        valueParam = ParameterDescriptor.string(VALUE).build();
-        patternParam = ParameterDescriptor.string(PATTERN).build();
+        valueParam = ParameterDescriptor.string(VALUE).description("Date string to parse").build();
+        patternParam = ParameterDescriptor.string(PATTERN).description("The pattern to parse the date with, see http://www.joda.org/joda-time/apidocs/org/joda/time/format/DateTimeFormat.html").build();
     }
 
     @Override
@@ -61,5 +61,10 @@ public class ParseDate extends TimezoneAwareFunction {
         final DateTimeFormatter formatter = DateTimeFormat.forPattern(pattern).withZone(timezone);
 
         return formatter.parseDateTime(dateString);
+    }
+
+    @Override
+    protected String description() {
+        return "Parses a date string using the given date format";
     }
 }

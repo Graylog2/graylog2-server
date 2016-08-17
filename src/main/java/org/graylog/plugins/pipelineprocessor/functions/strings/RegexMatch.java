@@ -42,9 +42,9 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
     private final ParameterDescriptor<List, List> optionalGroupNames;
 
     public RegexMatch() {
-        pattern = ParameterDescriptor.string("pattern", Pattern.class).transform(Pattern::compile).build();
-        value = ParameterDescriptor.string("value").build();
-        optionalGroupNames = ParameterDescriptor.type("group_names", List.class).optional().build();
+        pattern = ParameterDescriptor.string("pattern", Pattern.class).transform(Pattern::compile).description("The regular expression to match against 'value', uses Java regex syntax").build();
+        value = ParameterDescriptor.string("value").description("The string to match the pattern against").build();
+        optionalGroupNames = ParameterDescriptor.type("group_names", List.class).optional().description("List of names to use for matcher groups").build();
     }
 
     @Override
@@ -77,6 +77,7 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
                         value,
                         optionalGroupNames
                 ))
+                .description("Match a string with a regular expression (Java syntax)")
                 .build();
     }
 

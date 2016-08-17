@@ -29,7 +29,7 @@ import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescr
 public class SyslogLevelConversion extends AbstractFunction<String> {
     public static final String NAME = "syslog_level";
 
-    private final ParameterDescriptor<Object, Object> valueParam = object("value").build();
+    private final ParameterDescriptor<Object, Object> valueParam = object("value").description("Value to convert").build();
 
     @Override
     public String evaluate(FunctionArgs args, EvaluationContext context) {
@@ -45,6 +45,7 @@ public class SyslogLevelConversion extends AbstractFunction<String> {
                 .name(NAME)
                 .returnType(String.class)
                 .params(valueParam)
+                .description("Converts a syslog level number to its string representation")
                 .build();
     }
 }
