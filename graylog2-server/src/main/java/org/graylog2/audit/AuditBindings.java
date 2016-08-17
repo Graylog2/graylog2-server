@@ -21,6 +21,9 @@ import org.graylog2.plugin.PluginModule;
 public class AuditBindings extends PluginModule {
     @Override
     protected void configure() {
+        // Make sure there is a default binding
+        auditEventSenderBinder().setDefault().to(NullAuditEventSender.class);
+
         addAuditEventTypes(AuditEventTypes.class);
     }
 }
