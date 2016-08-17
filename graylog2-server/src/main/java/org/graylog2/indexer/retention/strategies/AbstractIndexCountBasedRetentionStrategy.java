@@ -18,9 +18,9 @@
 package org.graylog2.indexer.retention.strategies;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventType;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.indices.Indices;
@@ -37,6 +37,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RETENTION_COMPLETE;
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RETENTION_INITIATE;
 
 public abstract class AbstractIndexCountBasedRetentionStrategy implements RetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIndexCountBasedRetentionStrategy.class);
@@ -85,7 +87,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
         final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of("retention_strategy", this.getClass().getCanonicalName());
-        auditEventSender.success(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_RETENTION_INITIATE, auditEventContext);
+        auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_RETENTION_INITIATE), auditEventContext);
 
         runRetention(deflectorIndices, removeCount);
     }
@@ -118,7 +120,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
             final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of(
                 "index_name", indexName,
                 "retention_strategy", strategyName);
-            auditEventSender.success(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_RETENTION_COMPLETE, auditEventContext);
+            auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_RETENTION_COMPLETE), auditEventContext);
         }
     }
 }

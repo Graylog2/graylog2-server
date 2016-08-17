@@ -75,9 +75,9 @@ import org.elasticsearch.search.aggregations.metrics.max.Max;
 import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortParseElement;
-import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventType;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -104,6 +104,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
 
 @Singleton
 public class Indices {
@@ -309,9 +310,9 @@ public class Indices {
 
         final boolean acknowledged = c.admin().indices().create(cir).actionGet().isAcknowledged();
         if (acknowledged) {
-            auditEventSenderProvider.get().success(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_CREATE);
+            auditEventSenderProvider.get().success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_CREATE));
         } else {
-            auditEventSenderProvider.get().failure(AuditActor.system(nodeId), AuditEventTypes.ES_INDEX_CREATE);
+            auditEventSenderProvider.get().failure(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_CREATE));
         }
         return acknowledged;
     }
