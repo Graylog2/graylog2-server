@@ -29,7 +29,7 @@ const IfPermitted = React.createClass({
     return this.isPermitted(this.state.currentUser.permissions, this.props.permissions);
   },
   render() {
-    if (this._checkPermissions()) {
+    if (this.state.currentUser && this._checkPermissions()) {
       return React.Children.count(this.props.children) > 1 ? <span>{this.props.children}</span> : this.props.children;
     }
 
