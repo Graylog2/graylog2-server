@@ -16,6 +16,7 @@
  */
 package org.graylog2.audit;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -28,6 +29,7 @@ import org.reflections.util.ConfigurationBuilder;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Set;
 
@@ -71,6 +73,26 @@ public class AuditCoverageTest {
 
         assertThat(unregisteredAction.build())
                 .describedAs("Check that there are no @AuditEvent annotations with unregistered event types")
+                .isEmpty();
+    }
+
+    @Test
+    public void testAuditEventTypeFormat() throws Exception {
+        final Field[] fields = AuditEventTypes.class.getFields();
+        final ImmutableList.Builder<String> errors = ImmutableList.builder();
+
+        for (Field field : fields) {
+            String type = "";
+            try {
+                type = (String) field.get(field.getType().newInstance());
+                AuditEventType.create(type);
+            } catch (Exception e) {
+                errors.add(field.getName() + "=" + type);
+            }
+        }
+
+        assertThat(errors.build())
+                .describedAs("Check that there are no invalid AuditEventType strings")
                 .isEmpty();
     }
 }
