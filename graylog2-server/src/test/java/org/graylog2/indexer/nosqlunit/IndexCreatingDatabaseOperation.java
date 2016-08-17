@@ -32,6 +32,8 @@ import org.graylog2.plugin.system.NodeId;
 import java.io.InputStream;
 import java.util.Set;
 
+import static org.mockito.Mockito.mock;
+
 public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client> {
     private final DatabaseOperation<Client> databaseOperation;
     private final ElasticsearchConfiguration config;
@@ -58,7 +60,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
             }
 
             final Messages messages = new Messages(client, config, new MetricRegistry());
-            final Indices indices = new Indices(client, config, new IndexMapping(), messages, new NodeId(""), NullAuditEventSender::new);
+            final Indices indices = new Indices(client, config, new IndexMapping(), messages, mock(NodeId.class), NullAuditEventSender::new);
 
             if (!indices.create(index)) {
                 throw new IllegalStateException("Couldn't create index " + index);
