@@ -58,6 +58,7 @@ public class ToolsTest {
     public void testGetUriWithScheme() throws Exception {
         assertEquals(Tools.getUriWithScheme(new URI("http://example.com"), "gopher").getScheme(), "gopher");
         assertNull(Tools.getUriWithScheme(new URI("http://example.com"), null).getScheme());
+        assertNull(Tools.getUriWithScheme(null, "http"));
     }
 
     @Test

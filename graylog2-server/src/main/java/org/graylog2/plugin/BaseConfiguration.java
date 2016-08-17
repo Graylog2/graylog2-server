@@ -183,7 +183,7 @@ public abstract class BaseConfiguration {
             LOG.warn("\"{}\" is not a valid setting for \"rest_transport_uri\". Using default [{}].", restTransportUri, getDefaultRestTransportUri());
             return getDefaultRestTransportUri();
         } else {
-            return Tools.normalizeURI(restTransportUri, getRestUriScheme(), GRAYLOG_DEFAULT_PORT, "/");
+            return Tools.normalizeURI(restTransportUri, restTransportUri.getScheme(), GRAYLOG_DEFAULT_PORT, "/");
         }
     }
 
