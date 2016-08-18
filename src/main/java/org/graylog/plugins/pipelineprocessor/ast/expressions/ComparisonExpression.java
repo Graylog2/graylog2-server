@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.joda.time.DateTime;
 
 public class ComparisonExpression extends BinaryExpression implements LogicalExpression {
     private final String operator;
@@ -42,11 +43,15 @@ public class ComparisonExpression extends BinaryExpression implements LogicalExp
 
         final Object leftValue = this.left.evaluateUnsafe(context);
         final Object rightValue = this.right.evaluateUnsafe(context);
+        if (leftValue instanceof DateTime && rightValue instanceof DateTime) {
+            return compareDateTimes(operator, (DateTime) leftValue, (DateTime) rightValue);
+        }
+
         if (leftValue instanceof Double || rightValue instanceof Double) {
             return compareDouble(operator, (double) leftValue, (double) rightValue);
-        } else {
-            return compareLong(operator, (long) leftValue, (long) rightValue);
         }
+
+        return compareLong(operator, (long) leftValue, (long) rightValue);
     }
 
     @SuppressWarnings("Duplicates")
@@ -76,6 +81,21 @@ public class ComparisonExpression extends BinaryExpression implements LogicalExp
                 return left < right;
             case "<=":
                 return left <= right;
+            default:
+                return false;
+        }
+    }
+
+    private boolean compareDateTimes(String operator, DateTime left, DateTime right) {
+        switch (operator) {
+            case ">":
+                return left.isAfter(right);
+            case ">=":
+                return !left.isBefore(right);
+            case "<":
+                return left.isBefore(right);
+            case "<=":
+                return !left.isAfter(right);
             default:
                 return false;
         }
