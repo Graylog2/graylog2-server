@@ -34,6 +34,8 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 /**
  * Checks all POST, PUT and DELETE resource methods for {@link AuditEvent} annotations and reports missing ones.
  *
@@ -82,6 +84,13 @@ public class AuditEventModelProcessor implements ModelProcessor {
                                         String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)), annotation.type());
                                 LOG.debug("Make sure the audit event types are registered in a class that implements PluginAuditEventTypes: {}#{}",
                                         m.getDeclaringClass().getCanonicalName(), m.getName());
+                            }
+                        } else if (m.isAnnotationPresent(NoAuditEvent.class)) {
+                            final NoAuditEvent annotation = m.getAnnotation(NoAuditEvent.class);
+
+                            if (isNullOrEmpty(annotation.value())) {
+                                LOG.warn("REST endpoint uses @NoAuditEvent annotation with an empty value: {}",
+                                        String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)));
                             }
                         }
                     }
