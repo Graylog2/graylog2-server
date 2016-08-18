@@ -35,6 +35,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.rest.RestTools.getPathFromResource;
 
 /**
  * Checks all POST, PUT and DELETE resource methods for {@link AuditEvent} annotations and reports missing ones.
@@ -73,7 +74,7 @@ public class AuditEventModelProcessor implements ModelProcessor {
 
                 if (m.isAnnotationPresent(POST.class) || m.isAnnotationPresent(PUT.class) || m.isAnnotationPresent(DELETE.class)) {
                     if (!m.isAnnotationPresent(AuditEvent.class) && !m.isAnnotationPresent(NoAuditEvent.class)) {
-                        LOG.warn("REST endpoint not included in audit trail: {}", String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)));
+                        LOG.warn("REST endpoint not included in audit trail: {}", String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPathFromResource(resource)));
                         LOG.debug("Missing @AuditEvent or @NoAuditEvent annotation: {}#{}", m.getDeclaringClass().getCanonicalName(), m.getName());
                     } else {
                         if (m.isAnnotationPresent(AuditEvent.class)) {
@@ -81,7 +82,7 @@ public class AuditEventModelProcessor implements ModelProcessor {
 
                             if (!auditEventTypes.contains(annotation.type())) {
                                 LOG.warn("REST endpoint does not use a registered audit type: {} (type: \"{}\")",
-                                        String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)), annotation.type());
+                                        String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPathFromResource(resource)), annotation.type());
                                 LOG.debug("Make sure the audit event types are registered in a class that implements PluginAuditEventTypes: {}#{}",
                                         m.getDeclaringClass().getCanonicalName(), m.getName());
                             }
@@ -90,7 +91,7 @@ public class AuditEventModelProcessor implements ModelProcessor {
 
                             if (isNullOrEmpty(annotation.value())) {
                                 LOG.warn("REST endpoint uses @NoAuditEvent annotation with an empty value: {}",
-                                        String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPath(resource)));
+                                        String.format(Locale.US, "%6s %s", method.getHttpMethod(), getPathFromResource(resource)));
                             }
                         }
                     }
@@ -100,21 +101,5 @@ public class AuditEventModelProcessor implements ModelProcessor {
             // Make sure to also check all child resources! Otherwise some resources will not be checked.
             checkResources(resource.getChildResources());
         }
-    }
-
-    private String getPath(Resource resource) {
-        String path = resource.getPath();
-        Resource parent = resource.getParent();
-
-        while (parent != null) {
-            if (!path.startsWith("/")) {
-                path = "/" + path;
-            }
-
-            path = parent.getPath() + path;
-            parent = parent.getParent();
-        }
-
-        return path;
     }
 }
