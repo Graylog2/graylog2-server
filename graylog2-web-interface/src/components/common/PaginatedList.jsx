@@ -8,34 +8,39 @@ const PaginatedList = React.createClass({
     pageSize: React.PropTypes.number,
     pageSizes: React.PropTypes.arrayOf(React.PropTypes.number),
     totalItems: React.PropTypes.number.isRequired,
+    showPageSizeSelect: React.PropTypes.bool,
   },
   getDefaultProps() {
     const defaultPageSizes = [10, 50, 100];
     return {
       pageSizes: defaultPageSizes,
       pageSize: defaultPageSizes[0],
+      showPageSizeSelect: true,
     };
   },
   getInitialState() {
-    return {currentPage: 1, pageSize: this.props.pageSize};
+    return { currentPage: 1, pageSize: this.props.pageSize };
   },
   _onChangePageSize(event) {
     event.preventDefault();
     const pageSize = Number(event.target.value);
-    this.setState({pageSize: pageSize});
+    this.setState({ pageSize: pageSize });
     this.props.onChange(this.state.currentPage, pageSize);
   },
   _onChangePage(event, selectedEvent) {
     event.preventDefault();
     const pageNo = Number(selectedEvent.eventKey);
-    this.setState({currentPage: pageNo});
+    this.setState({ currentPage: pageNo });
     this.props.onChange(pageNo, this.state.pageSize);
   },
   _pageSizeSelect() {
+    if (!this.props.showPageSizeSelect) {
+      return null;
+    }
     return (
-      <div className="form-inline page-size" style={{float: 'right'}}>
+      <div className="form-inline page-size" style={{ float: 'right' }}>
         <Input type="select" bsSize="small" label="Show:" value={this.state.pageSize} onChange={this._onChangePageSize}>
-          {this.props.pageSizes.map((size) => <option key={'option-' + size} value={size}>{size}</option>)}
+          {this.props.pageSizes.map((size) => <option key={`option-${size}`} value={size}>{size}</option>)}
         </Input>
       </div>
     );
@@ -56,7 +61,7 @@ const PaginatedList = React.createClass({
           <Pagination bsSize="small" items={numberPages} maxButtons={10}
                       activePage={this.state.currentPage}
                       onSelect={this._onChangePage}
-                      prev next first last/>
+                      prev next first last />
         </div>
       </span>
     );
