@@ -12,6 +12,8 @@ import { PaginatedList, Spinner } from 'components/common';
 
 import DocsHelper from 'util/DocsHelper';
 
+import RuleHelperStyle from './RuleHelper.css';
+
 const RuleHelper = React.createClass({
   mixins: [
     Reflux.connect(RulesStore),
@@ -59,9 +61,9 @@ end`,
     return descriptor.params.map(p => {
       return (
         <tr key={p.name}>
-          <td style={{ width: '1%' }}>{p.name}</td>
-          <td style={{ width: '1%' }}>{this._niceType(p.type)}</td>
-          <td style={{ width: '1%', textAlign: 'center' }}>{p.optional ? null : <i className="fa fa-check"/>}</td>
+          <td className={RuleHelperStyle.adjustedTableCellWidth}>{p.name}</td>
+          <td className={RuleHelperStyle.adjustedTableCellWidth}>{this._niceType(p.type)}</td>
+          <td className={`${RuleHelperStyle.adjustedTableCellWidth} text-centered`}>{p.optional ? null : <i className="fa fa-check"/>}</td>
           <td>{p.description}</td>
         </tr>);
     });
@@ -90,9 +92,9 @@ end`,
           </td>
         </tr>);
       }
-      return (<tbody key={d.name} onClick={() => this._toggleFunctionDetail(d.name)} style={{ cursor: 'pointer' }}>
-        <tr>
-          <td style={{ width: 300 }}>{this._functionSignature(d)}</td>
+      return (<tbody key={d.name}>
+        <tr onClick={() => this._toggleFunctionDetail(d.name)} className={RuleHelperStyle.clickableRow}>
+          <td className={RuleHelperStyle.functionTableCell}>{this._functionSignature(d)}</td>
           <td>{d.description}</td>
         </tr>
         {details}
@@ -115,7 +117,7 @@ end`,
       <Panel header="Rules quick reference">
         <Row className="row-sm">
           <Col md={12}>
-            <p style={{ marginTop: 5 }}>
+            <p className={RuleHelperStyle.marginQuickReferenceText}>
               Read the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
                                                  text="full documentation" />{' '}
               to gain a better understanding of how Graylog pipeline rules work.
@@ -126,8 +128,12 @@ end`,
           <Col md={12}>
             <Tabs defaultActiveKey={1} animation={false}>
               <Tab eventKey={1} title="Functions">
-                <div className="table-responsive" style={{ marginTop: 10 }}>
-                  <PaginatedList totalItems={this.state.functionDescriptors.length} pageSize={this.state.pageSize} pageSizes={[10]} onChange={this._onPageChange}>
+                <p className={RuleHelperStyle.marginTab}>
+                  This is a list of all available functions in pipeline rules. Click on a row to see more information
+                  about the function parameters.
+                </p>
+                <div className={`table-responsive ${RuleHelperStyle.marginTab}`}>
+                  <PaginatedList totalItems={this.state.functionDescriptors.length} pageSize={this.state.pageSize} onChange={this._onPageChange} showPageSizeSelect={false}>
                     <Table condensed>
                       <thead>
                         <tr>
@@ -139,11 +145,12 @@ end`,
                     </Table>
                   </PaginatedList>
                 </div>
-                <p>See all functions in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_FUNCTIONS}
-                                                               text="documentation" />.</p>
               </Tab>
               <Tab eventKey={2} title="Example">
-                <pre style={{ marginTop: 10, whiteSpace: 'pre-wrap' }}>
+                <p className={RuleHelperStyle.marginTab}>
+                  Do you want to see how a pipeline rule looks like? Take a look at this example:
+                </p>
+                <pre className={`${RuleHelperStyle.marginTab} ${RuleHelperStyle.exampleFunction}`}>
                   {this.ruleTemplate}
                 </pre>
               </Tab>
