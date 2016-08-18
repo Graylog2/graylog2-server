@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Alert, Col, Row } from 'react-bootstrap';
+import { Alert, Col, Row, Panel } from 'react-bootstrap';
 import numeral from 'numeral';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -39,26 +39,62 @@ const IndicesPage = React.createClass({
   _totalIndexCount() {
     return Object.keys(this.state.indexerOverview.indices).length;
   },
+  _renderElasticsearchUnavailableInformation() {
+    return (
+      <Row className="content">
+        <Col md={8} mdOffset={2}>
+          <div className="top-margin">
+            <Panel bsStyle="danger"
+                   header={<span><i className="fa fa-exclamation-triangle" /> Indices overview unavailable</span>}>
+              <p>
+                We could not get the indices overview information. This usually means there was a problem
+                connecting to Elasticsearch, and <strong>you should ensure Elasticsearch is up and reachable from
+                Graylog</strong>.
+              </p>
+              <p>
+                Graylog will continue storing your messages in its journal, but you will not be able to search on them
+                until Elasticsearch is reachable again.
+              </p>
+            </Panel>
+          </div>
+        </Col>
+      </Row>
+    );
+  },
   render() {
+    const pageHeader = (
+      <PageHeader title="Indices">
+        <span>
+          This is an overview of all indices (message stores) Graylog is currently taking in account
+          for searches and analysis.
+        </span>
+
+        <span>
+          You can learn more about the index model in the{' '}
+          <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
+        </span>
+
+        <IndicesMaintenanceDropdown />
+      </PageHeader>
+    );
+
+    if (this.state.indexerOverviewError) {
+      return (
+        <span>
+          {pageHeader}
+          {this._renderElasticsearchUnavailableInformation()}
+        </span>
+      );
+    }
+
     if (!this.state.indexerOverview || !this.state.indexDetails.closedIndices) {
       return <Spinner />;
     }
+
     const deflectorInfo = this.state.indexerOverview.deflector;
     return (
       <span>
-        <PageHeader title="Indices">
-          <span>
-            This is an overview of all indices (message stores) Graylog is currently taking in account
-            for searches and analysis.
-          </span>
-
-          <span>
-            You can learn more about the index model in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
-          </span>
-
-          <IndicesMaintenanceDropdown />
-        </PageHeader>
+        {pageHeader}
 
         <Row className="content">
           <Col md={12}>

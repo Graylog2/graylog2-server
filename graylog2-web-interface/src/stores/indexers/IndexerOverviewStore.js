@@ -12,9 +12,18 @@ const IndexerOverviewStore = Reflux.createStore({
   list() {
     const url = URLUtils.qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list().url);
     const promise = fetch('GET', url);
-    promise.then((response) => {
-      this.trigger({ indexerOverview: response });
-    });
+    promise.then(
+      (response) => {
+        this.trigger({ indexerOverview: response, indexerOverviewError: undefined });
+      },
+      (error) => {
+        if (error.additional && error.additional.status === 503) {
+          const errorMessage = (error.additional.body && error.additional.body.message ?
+            error.additional.body.message :
+            'Elasticsearch is unavailable. Check your configuration and logs for more information.');
+          this.trigger({ indexerOverviewError: errorMessage });
+        }
+      });
 
     IndexerOverviewActions.list.promise(promise);
 
