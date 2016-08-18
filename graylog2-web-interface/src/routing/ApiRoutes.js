@@ -30,6 +30,7 @@ const ApiRoutes = {
     total: () => { return { url: '/count/total' }; },
   },
   ClusterApiResource: {
+    list: () => { return { url: '/system/cluster/nodes' }; },
     node: () => { return { url: '/system/cluster/node' }; },
   },
   DashboardsApiController: {

@@ -5,13 +5,15 @@ import fetch from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 const NodesActions = ActionsProvider.getActions('Nodes');
 
+import ApiRoutes from 'routing/ApiRoutes';
+
 const NodesStore = Reflux.createStore({
   listenables: [NodesActions],
-  sourceUrl: '/system/cluster',
   nodes: undefined,
   clusterId: undefined,
   nodeCount: 0,
   INTERVAL: 5000, // 5 seconds
+  promises: {},
 
   init() {
     if (this.nodes === undefined) {
@@ -29,7 +31,7 @@ const NodesStore = Reflux.createStore({
   },
 
   list() {
-    const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, 'nodes')))
+    const promise = this.promises.list || fetch('GET', URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
       .then(response => {
         this.nodes = {};
         response.nodes.forEach((node) => {
@@ -38,7 +40,10 @@ const NodesStore = Reflux.createStore({
         this.clusterId = this._clusterId();
         this.nodeCount = this._nodeCount();
         this._propagateState();
-      });
+      })
+      .finally(() => delete this.promises.list);
+
+    this.promises.list = promise;
 
     NodesActions.list.promise(promise);
   },

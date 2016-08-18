@@ -10,6 +10,7 @@ const NotificationsActions = ActionsProvider.getActions('Notifications');
 const NotificationsStore = Reflux.createStore({
   listenables: [NotificationsActions],
   notifications: undefined,
+  promises: {},
 
   init() {
     this.list();
@@ -23,11 +24,14 @@ const NotificationsStore = Reflux.createStore({
   },
   list() {
     const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.list().url);
-    const promise = new Builder('GET', url)
-      .authenticated()
-      .setHeader('X-Graylog-No-Session-Extension', 'true')
-      .json()
-      .build();
+    const promise = this.promises.list || new Builder('GET', url)
+        .authenticated()
+        .setHeader('X-Graylog-No-Session-Extension', 'true')
+        .json()
+        .build()
+        .finally(() => delete this.promises.list);
+
+    this.promises.list = promise;
 
     NotificationsActions.list.promise(promise);
   },
