@@ -96,7 +96,7 @@ public class IndicesTest {
 
     @Before
     public void setUp() throws Exception {
-        indices = new Indices(client, CONFIG, new IndexMapping(), new Messages(client, CONFIG, new MetricRegistry()), mock(NodeId.class), NullAuditEventSender::new);
+        indices = new Indices(client, CONFIG, new IndexMapping(), new Messages(client, CONFIG, new MetricRegistry()), mock(NodeId.class), new NullAuditEventSender());
     }
 
     @Test

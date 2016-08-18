@@ -74,7 +74,7 @@ public class MongoIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         localEventBus = new EventBus("local-event-bus");
-        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, NullAuditEventSender::new, mock(NodeId.class), localEventBus);
+        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, new NullAuditEventSender(), mock(NodeId.class), localEventBus);
     }
 
     @Test

@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableIterator;
-import com.google.inject.Provider;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
@@ -116,16 +115,16 @@ public class Indices {
     private final IndexMapping indexMapping;
     private final Messages messages;
     private final NodeId nodeId;
-    private final Provider<AuditEventSender> auditEventSenderProvider;
+    private final AuditEventSender auditEventSender;
 
     @Inject
-    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages, NodeId nodeId, Provider<AuditEventSender> auditEventSenderProvider) {
+    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages, NodeId nodeId, AuditEventSender auditEventSender) {
         this.c = client;
         this.configuration = configuration;
         this.indexMapping = indexMapping;
         this.messages = messages;
         this.nodeId = nodeId;
-        this.auditEventSenderProvider = auditEventSenderProvider;
+        this.auditEventSender = auditEventSender;
     }
 
     public void move(String source, String target) {
@@ -310,9 +309,9 @@ public class Indices {
 
         final boolean acknowledged = c.admin().indices().create(cir).actionGet().isAcknowledged();
         if (acknowledged) {
-            auditEventSenderProvider.get().success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_CREATE));
+            auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_CREATE));
         } else {
-            auditEventSenderProvider.get().failure(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_CREATE));
+            auditEventSender.failure(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_CREATE));
         }
         return acknowledged;
     }

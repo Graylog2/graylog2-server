@@ -60,7 +60,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
             }
 
             final Messages messages = new Messages(client, config, new MetricRegistry());
-            final Indices indices = new Indices(client, config, new IndexMapping(), messages, mock(NodeId.class), NullAuditEventSender::new);
+            final Indices indices = new Indices(client, config, new IndexMapping(), messages, mock(NodeId.class), new NullAuditEventSender());
 
             if (!indices.create(index)) {
                 throw new IllegalStateException("Couldn't create index " + index);
