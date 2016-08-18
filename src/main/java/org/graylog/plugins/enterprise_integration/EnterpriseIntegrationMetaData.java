@@ -50,7 +50,7 @@ public class EnterpriseIntegrationMetaData implements PluginMetaData {
 
     @Override
     public Version getVersion() {
-        return new Version(1, 1, 0, "beta.3");
+        return new Version(1, 1, 0, "beta.4");
     }
 
     @Override
