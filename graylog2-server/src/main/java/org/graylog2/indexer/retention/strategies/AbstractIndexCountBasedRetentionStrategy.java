@@ -18,12 +18,14 @@
 package org.graylog2.indexer.retention.strategies;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
@@ -34,21 +36,25 @@ import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RETENTION_COMPLETE;
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RETENTION_INITIATE;
 
 public abstract class AbstractIndexCountBasedRetentionStrategy implements RetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIndexCountBasedRetentionStrategy.class);
 
     private final Deflector deflector;
     private final Indices indices;
+    private final NodeId nodeId;
     private final ActivityWriter activityWriter;
-    private final AuditLogger auditLogger;
+    private final AuditEventSender auditEventSender;
 
-    public AbstractIndexCountBasedRetentionStrategy(Deflector deflector, Indices indices,
-                                                    ActivityWriter activityWriter, AuditLogger auditLogger) {
+    public AbstractIndexCountBasedRetentionStrategy(Deflector deflector, Indices indices, NodeId nodeId,
+                                                    ActivityWriter activityWriter, AuditEventSender auditEventSender) {
         this.deflector = requireNonNull(deflector);
         this.indices = requireNonNull(indices);
+        this.nodeId = nodeId;
         this.activityWriter = requireNonNull(activityWriter);
-        this.auditLogger = requireNonNull(auditLogger);
+        this.auditEventSender = requireNonNull(auditEventSender);
     }
 
     protected abstract Optional<Integer> getMaxNumberOfIndices();
@@ -79,8 +85,8 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         LOG.info(msg);
         activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
-        final ImmutableMap<String, Object> auditLogContext = ImmutableMap.of("retention_strategy", this.getClass().getCanonicalName());
-        auditLogger.success("<system>", "initiated", "index retention", auditLogContext);
+        final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of("retention_strategy", this.getClass().getCanonicalName());
+        auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RETENTION_INITIATE, auditEventContext);
 
         runRetention(deflectorIndices, removeCount);
     }
@@ -110,10 +116,10 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
             // Sorry if this should ever go mad. Run retention strategy!
             retain(indexName);
 
-            final ImmutableMap<String, Object> auditLogContext = ImmutableMap.of(
+            final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of(
                 "index_name", indexName,
                 "retention_strategy", strategyName);
-            auditLogger.success("<system>", "completed", "index retention", auditLogContext);
+            auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RETENTION_COMPLETE, auditEventContext);
         }
     }
 }

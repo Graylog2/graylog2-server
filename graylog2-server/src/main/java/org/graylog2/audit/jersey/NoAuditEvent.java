@@ -14,16 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.auditlog;
+package org.graylog2.audit.jersey;
 
-import java.util.Map;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface AuditLogger {
-    void success(String subject, String action, String object);
-
-    void success(String subject, String action, String object, Map<String, Object> context);
-
-    void failure(String subject, String action, String object);
-
-    void failure(String subject, String action, String object, Map<String, Object> context);
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface NoAuditEvent {
+    String value();
 }

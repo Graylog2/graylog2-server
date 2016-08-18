@@ -29,7 +29,8 @@ import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -140,7 +141,7 @@ public class AlarmCallbackResource extends RestResource {
             response = CreateAlarmCallbackResponse.class)
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(object = "alarm callback", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditEvent(type = AuditEventTypes.ALARM_CALLBACK_CREATE)
     public Response create(@ApiParam(name = "streamid", value = "The stream id this new alarm callback belongs to.", required = true)
                            @PathParam("streamid") String streamid,
                            @ApiParam(name = "JSON body", required = true) CreateAlarmCallbackRequest cr) throws NotFoundException {
@@ -196,7 +197,7 @@ public class AlarmCallbackResource extends RestResource {
             @ApiResponse(code = 404, message = "Alarm callback not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    @AuditLog(object = "alarm callback")
+    @AuditEvent(type = AuditEventTypes.ALARM_CALLBACK_DELETE)
     public void delete(@ApiParam(name = "streamid", value = "The stream id this alarm callback belongs to.", required = true)
                        @PathParam("streamid") String streamid,
                        @ApiParam(name = "alarmCallbackId", required = true)
@@ -222,7 +223,7 @@ public class AlarmCallbackResource extends RestResource {
     @ApiOperation(value = "Update an alarm callback")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(object = "alarm callback", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditEvent(type = AuditEventTypes.ALARM_CALLBACK_UPDATE)
     public void update(@ApiParam(name = "streamid", value = "The stream id this alarm callback belongs to.", required = true)
                        @PathParam("streamid") String streamid,
                        @ApiParam(name = "alarmCallbackId", required = true)

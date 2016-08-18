@@ -17,11 +17,12 @@
 
 package org.graylog2.indexer.rotation.strategies;
 
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -54,7 +55,10 @@ public class TimeBasedRotationStrategyTest {
     private Indices indices;
 
     @Mock
-    private AuditLogger auditLogger;
+    private NodeId nodeId;
+
+    @Mock
+    private AuditEventSender auditEventSender;
 
     @After
     public void resetTimeProvider() {
@@ -124,7 +128,7 @@ public class TimeBasedRotationStrategyTest {
         when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(5)));
         when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(TimeBasedRotationStrategyConfig.create(period));
 
-        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(indices, deflector, clusterConfigService, auditLogger);
+        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(indices, deflector, nodeId, clusterConfigService, auditEventSender);
 
         // Should not rotate the first index.
         when(deflector.getNewestTargetName()).thenReturn("ignored");
@@ -160,7 +164,7 @@ public class TimeBasedRotationStrategyTest {
         when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(11)));
         when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(TimeBasedRotationStrategyConfig.create(period));
 
-        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(indices, deflector, clusterConfigService, auditLogger);
+        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(indices, deflector, nodeId, clusterConfigService, auditEventSender);
 
         // Should rotate the first index.
         // time is 01:55:00, index was created at 01:44:00, so we missed one period, and should rotate

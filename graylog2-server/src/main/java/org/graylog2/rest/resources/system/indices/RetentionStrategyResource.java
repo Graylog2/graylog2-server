@@ -23,7 +23,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
@@ -107,7 +108,7 @@ public class RetentionStrategyResource extends RestResource {
     @Timed
     @ApiOperation(value = "Configuration of the current retention strategy",
             notes = "This resource stores the configuration of the currently used retention strategy.")
-    @AuditLog(object = "retention strategy configuration", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_RETENTION_STRATEGY_UPDATE)
     public RetentionStrategySummary config(@ApiParam(value = "The description of the retention strategy and its configuration", required = true)
                        @Valid @NotNull RetentionStrategySummary retentionStrategySummary) {
         if (!retentionStrategies.containsKey(retentionStrategySummary.strategy())) {

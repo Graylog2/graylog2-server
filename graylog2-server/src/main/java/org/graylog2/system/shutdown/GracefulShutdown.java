@@ -17,8 +17,9 @@
 package org.graylog2.system.shutdown;
 
 import com.google.common.util.concurrent.Uninterruptibles;
-import javax.inject.Inject;
 import org.graylog2.Configuration;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.initializers.BufferSynchronizerService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.initializers.InputSetupService;
@@ -30,8 +31,11 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.concurrent.TimeUnit;
+
+import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_COMPLETE;
 
 @Singleton
 public class GracefulShutdown implements Runnable {
@@ -45,6 +49,7 @@ public class GracefulShutdown implements Runnable {
     private final ServerStatus serverStatus;
     private final ActivityWriter activityWriter;
     private final JerseyService jerseyService;
+    private final AuditEventSender auditEventSender;
     private final JournalReader journalReader;
 
     @Inject
@@ -55,6 +60,7 @@ public class GracefulShutdown implements Runnable {
                             PeriodicalsService periodicalsService,
                             InputSetupService inputSetupService,
                             JerseyService jerseyService,
+                            AuditEventSender auditEventSender,
                             JournalReader journalReader) {
         this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
@@ -63,6 +69,7 @@ public class GracefulShutdown implements Runnable {
         this.periodicalsService = periodicalsService;
         this.inputSetupService = inputSetupService;
         this.jerseyService = jerseyService;
+        this.auditEventSender = auditEventSender;
         this.journalReader = journalReader;
     }
 
@@ -109,6 +116,8 @@ public class GracefulShutdown implements Runnable {
 
         // stop all maintenance tasks
         periodicalsService.stopAsync().awaitTerminated();
+
+        auditEventSender.success(AuditActor.system(serverStatus.getNodeId()), NODE_SHUTDOWN_COMPLETE);
 
         // Shut down hard with no shutdown hooks running.
         LOG.info("Goodbye.");

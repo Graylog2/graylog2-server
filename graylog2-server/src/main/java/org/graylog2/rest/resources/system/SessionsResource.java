@@ -31,8 +31,11 @@ import org.apache.shiro.session.UnknownSessionException;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.glassfish.grizzly.http.server.Request;
-import org.graylog2.auditlog.AuditLogger;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.RestTools;
 import org.graylog2.rest.models.system.sessions.requests.SessionCreateRequest;
@@ -71,6 +74,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static org.graylog2.audit.AuditEventTypes.SESSION_CREATE;
+
 @Path("/system/sessions")
 @Api(value = "System/Sessions", description = "Login for interactive user sessions")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -81,7 +86,7 @@ public class SessionsResource extends RestResource {
     private final UserService userService;
     private final DefaultSecurityManager securityManager;
     private final ShiroAuthenticationFilter authenticationFilter;
-    private final AuditLogger auditLogger;
+    private final AuditEventSender auditEventSender;
     private final Set<IpSubnet> trustedSubnets;
     private final Request grizzlyRequest;
 
@@ -90,19 +95,20 @@ public class SessionsResource extends RestResource {
     public SessionsResource(UserService userService,
                             DefaultSecurityManager securityManager,
                             ShiroAuthenticationFilter authenticationFilter,
-                            AuditLogger auditLogger,
+                            AuditEventSender auditEventSender,
                             @Named("trusted_proxies") Set<IpSubnet> trustedSubnets,
                             @Context Request grizzlyRequest) {
         this.userService = userService;
         this.securityManager = securityManager;
         this.authenticationFilter = authenticationFilter;
-        this.auditLogger = auditLogger;
+        this.auditEventSender = auditEventSender;
         this.trustedSubnets = trustedSubnets;
         this.grizzlyRequest = grizzlyRequest;
     }
 
     @POST
     @ApiOperation(value = "Create a new session", notes = "This request creates a new session for a user or reactivates an existing session: the equivalent of logging in.")
+    @NoAuditEvent("dispatches audit events in the method body")
     public SessionResponse newSession(@Context ContainerRequestContext requestContext,
                                       @ApiParam(name = "Login request", value = "Username and credentials", required = true)
                                       @Valid @NotNull SessionCreateRequest createRequest) {
@@ -148,20 +154,20 @@ public class SessionsResource extends RestResource {
         if (subject.isAuthenticated()) {
             id = s.getId();
 
-            final Map<String, Object> auditLogContext = ImmutableMap.of(
+            final Map<String, Object> auditEventContext = ImmutableMap.of(
                     "session_id", id,
                     "remote_address", remoteAddrFromRequest
             );
-            auditLogger.success(createRequest.username(), "create", "session", auditLogContext);
+            auditEventSender.success(AuditActor.user(createRequest.username()), SESSION_CREATE, auditEventContext);
 
             // TODO is the validUntil attribute even used by anyone yet?
             return SessionResponse.create(new DateTime(s.getLastAccessTime(), DateTimeZone.UTC).plus(s.getTimeout()).toDate(),
                     id.toString());
         } else {
-            final Map<String, Object> auditLogContext = ImmutableMap.of(
+            final Map<String, Object> auditEventContext = ImmutableMap.of(
                     "remote_address", remoteAddrFromRequest
             );
-            auditLogger.failure(createRequest.username(), "create", "session", auditLogContext);
+            auditEventSender.failure(AuditActor.user(createRequest.username()), SESSION_CREATE, auditEventContext);
 
             throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
         }
@@ -201,7 +207,7 @@ public class SessionsResource extends RestResource {
     @ApiOperation(value = "Terminate an existing session", notes = "Destroys the session with the given ID: the equivalent of logging out.")
     @Path("/{sessionId}")
     @RequiresAuthentication
-    @AuditLog(object = "session")
+    @AuditEvent(type = AuditEventTypes.SESSION_DELETE)
     public void terminateSession(@ApiParam(name = "sessionId", required = true) @PathParam("sessionId") String sessionId) {
         final Subject subject = getSubject();
         securityManager.logout(subject);

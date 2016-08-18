@@ -21,6 +21,7 @@ import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.StopStrategies;
 import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
@@ -30,6 +31,8 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import org.bson.types.ObjectId;
 import org.elasticsearch.indices.IndexClosedException;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -39,11 +42,13 @@ import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.DBCursor;
 import org.mongojack.DBQuery;
 import org.mongojack.JacksonDBCollection;
+import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,19 +57,28 @@ import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
 
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_CREATE;
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_DELETE;
+
 public class MongoIndexRangeService implements IndexRangeService {
     private static final Logger LOG = LoggerFactory.getLogger(MongoIndexRangeService.class);
     private static final String COLLECTION_NAME = "index_ranges";
 
     private final Indices indices;
+    private final AuditEventSender auditEventSender;
+    private final NodeId nodeId;
     private final JacksonDBCollection<MongoIndexRange, ObjectId> collection;
 
     @Inject
     public MongoIndexRangeService(MongoConnection mongoConnection,
                                   MongoJackObjectMapperProvider objectMapperProvider,
                                   Indices indices,
+                                  AuditEventSender auditEventSender,
+                                  NodeId nodeId,
                                   EventBus eventBus) {
         this.indices = indices;
+        this.auditEventSender = auditEventSender;
+        this.nodeId = nodeId;
         this.collection = JacksonDBCollection.wrap(
             mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
             MongoIndexRange.class,
@@ -151,7 +165,10 @@ public class MongoIndexRangeService implements IndexRangeService {
     public void handleIndexDeletion(IndicesDeletedEvent event) {
         for (String index : event.indices()) {
             LOG.debug("Index \"{}\" has been deleted. Removing index range.");
-            collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+            final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+            if (remove.getN() > 0) {
+                auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
+            }
         }
     }
 
@@ -160,7 +177,10 @@ public class MongoIndexRangeService implements IndexRangeService {
     public void handleIndexClosing(IndicesClosedEvent event) {
         for (String index : event.indices()) {
             LOG.debug("Index \"{}\" has been closed. Removing index range.");
-            collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+            final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+            if (remove.getN() > 0) {
+                auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
+            }
         }
     }
 
@@ -181,12 +201,15 @@ public class MongoIndexRangeService implements IndexRangeService {
             final IndexRange indexRange;
             try {
                 indexRange = retryer.call(() -> calculateRange(index));
+                auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
             } catch (Exception e) {
                 if (e.getCause() instanceof IndexClosedException) {
                     LOG.debug("Couldn't calculate index range for closed index \"" + index + "\"", e.getCause());
+                    auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
                     return;
                 }
                 LOG.error("Couldn't calculate index range for index \"" + index + "\"", e.getCause());
+                auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
                 throw new RuntimeException("Couldn't calculate index range for index \"" + index + "\"", e);
             }
 

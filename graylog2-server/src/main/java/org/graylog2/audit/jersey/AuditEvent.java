@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.auditlog.jersey;
+package org.graylog2.audit.jersey;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,16 +23,14 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface AuditLog {
-    String subject() default "";
+public @interface AuditEvent {
+    String actor() default "";
 
-    String action() default "";
-
-    String object();
+    String type();
 
     boolean captureRequestContext() default true;
 
-    boolean captureRequestEntity() default false;
+    boolean captureRequestEntity() default true;
 
-    boolean captureResponseEntity() default false;
+    boolean captureResponseEntity() default true;
 }

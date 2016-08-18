@@ -25,7 +25,9 @@ import com.mongodb.MongoException;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
-import org.graylog2.auditlog.AuditLogger;
+import org.graylog2.audit.AuditActor;
+import org.graylog2.audit.AuditBindings;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bindings.InitializerBindings;
@@ -53,6 +55,7 @@ import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.UI;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
@@ -69,6 +72,8 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import static org.graylog2.audit.AuditEventTypes.NODE_SHUTDOWN_INITIATE;
 
 @Command(name = "server", description = "Start the Graylog server")
 public class Server extends ServerBootstrap {
@@ -112,7 +117,8 @@ public class Server extends ServerBootstrap {
             new PasswordAlgorithmBindings(),
             new WidgetStrategyBindings(),
             new DashboardBindings(),
-            new DecoratorBindings()
+            new DecoratorBindings(),
+            new AuditBindings()
         );
 
         return modules.build();
@@ -170,16 +176,18 @@ public class Server extends ServerBootstrap {
     private static class ShutdownHook implements Runnable {
         private final ActivityWriter activityWriter;
         private final ServiceManager serviceManager;
+        private final NodeId nodeId;
         private final GracefulShutdown gracefulShutdown;
-        private final AuditLogger auditLogger;
+        private final AuditEventSender auditEventSender;
 
         @Inject
-        public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager,
-                            GracefulShutdown gracefulShutdown, AuditLogger auditLogger) {
+        public ShutdownHook(ActivityWriter activityWriter, ServiceManager serviceManager, NodeId nodeId,
+                            GracefulShutdown gracefulShutdown, AuditEventSender auditEventSender) {
             this.activityWriter = activityWriter;
             this.serviceManager = serviceManager;
+            this.nodeId = nodeId;
             this.gracefulShutdown = gracefulShutdown;
-            this.auditLogger = auditLogger;
+            this.auditEventSender = auditEventSender;
         }
 
         @Override
@@ -188,7 +196,7 @@ public class Server extends ServerBootstrap {
             LOG.info(msg);
             activityWriter.write(new Activity(msg, Main.class));
 
-            auditLogger.success("<system>", "initiated", "shutdown");
+            auditEventSender.success(AuditActor.system(nodeId), NODE_SHUTDOWN_INITIATE);
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();

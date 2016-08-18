@@ -38,7 +38,9 @@ import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertImpl;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.types.DummyAlertCondition;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -225,7 +227,7 @@ public class StreamAlertResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    @AuditLog(object = "alert receiver")
+    @AuditEvent(type = AuditEventTypes.ALERT_RECEIVER_CREATE)
     public Response addReceiver(
             @ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
             @PathParam("streamId") String streamId,
@@ -268,7 +270,7 @@ public class StreamAlertResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
-    @AuditLog(object = "alert receiver")
+    @AuditEvent(type = AuditEventTypes.ALERT_RECEIVER_DELETE)
     public void removeReceiver(
             @ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamId,
             @ApiParam(name = "entity", value = "Name/ID of user or email address to remove from alert receivers.", required = true) @QueryParam("entity") String entity,
@@ -293,6 +295,7 @@ public class StreamAlertResource extends RestResource {
             @ApiResponse(code = 404, message = "Stream not found."),
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
+    @NoAuditEvent("only used to test alert emails")
     public void sendDummyAlert(@ApiParam(name = "streamId", value = "The stream id the dummy alert should be sent for.", required = true)
                                @PathParam("streamId") String streamId)
             throws TransportConfigurationException, EmailException, NotFoundException {

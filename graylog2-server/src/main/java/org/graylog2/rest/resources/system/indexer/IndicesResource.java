@@ -26,7 +26,9 @@ import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
@@ -116,6 +118,7 @@ public class IndicesResource extends RestResource {
     @Path("/multiple")
     @ApiOperation(value = "Get information of all specified indices and their shards.")
     @Produces(MediaType.APPLICATION_JSON)
+    @NoAuditEvent("only used to request index information")
     public Map<String, IndexInfo> multiple(@ApiParam(name = "Requested indices", required = true)
                                            @Valid @NotNull IndicesReadRequest request) {
         if (request.indices() != null) {
@@ -199,7 +202,7 @@ public class IndicesResource extends RestResource {
     @Path("/{index}/reopen")
     @ApiOperation(value = "Reopen a closed index. This will also trigger an index ranges rebuild job.")
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(action = "reopened", object = "index")
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_OPEN)
     public void reopen(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
@@ -220,7 +223,7 @@ public class IndicesResource extends RestResource {
     @ApiResponses(value = {
         @ApiResponse(code = 403, message = "You cannot close the current deflector target index.")
     })
-    @AuditLog(action = "closed", object = "index")
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_CLOSE)
     public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
@@ -246,7 +249,7 @@ public class IndicesResource extends RestResource {
     @ApiResponses(value = {
         @ApiResponse(code = 403, message = "You cannot delete the current deflector target index.")
     })
-    @AuditLog(object = "index")
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_DELETE)
     public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 

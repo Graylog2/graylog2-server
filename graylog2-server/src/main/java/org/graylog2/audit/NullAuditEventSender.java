@@ -14,21 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.auditlog;
+package org.graylog2.audit;
 
-public class Actions {
-    private Actions() {
-        // Prevent instantiation
+import java.util.Map;
+
+public class NullAuditEventSender implements AuditEventSender {
+    @Override
+    public void success(AuditActor actor, AuditEventType type) {
     }
 
-    public static final String CREATE = "created";
-    public static final String READ = "read";
-    public static final String UPDATE = "updated";
-    public static final String DELETE = "deleted";
-    public static final String START = "started";
-    public static final String STOP = "stopped";
-    public static final String CANCEL = "cancelled";
-    public static final String APPLY = "applied";
-    public static final String EXPORT = "exported";
-    public static final String SHUTDOWN = "shutdown";
+    @Override
+    public void success(AuditActor actor, AuditEventType type, Map<String, Object> context) {
+    }
+
+    @Override
+    public void failure(AuditActor actor, AuditEventType type) {
+    }
+
+    @Override
+    public void failure(AuditActor actor, AuditEventType type, Map<String, Object> context) {
+    }
 }

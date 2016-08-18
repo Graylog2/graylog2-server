@@ -21,7 +21,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.TooManyAliasesException;
@@ -86,7 +87,7 @@ public class DeflectorResource extends RestResource {
     @RequiresPermissions(RestPermissions.DEFLECTOR_CYCLE)
     @Path("/cycle")
     @RestrictToMaster
-    @AuditLog(action = "cycled", object = "deflector alias")
+    @AuditEvent(type = AuditEventTypes.ES_WRITE_INDEX_UPDATE)
     public void cycle() {
         final String msg = "Cycling deflector. Reason: REST request.";
         LOG.info(msg);

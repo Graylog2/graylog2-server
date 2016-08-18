@@ -40,11 +40,13 @@ import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.compress.CompressedXContent;
 import org.elasticsearch.index.IndexNotFoundException;
+import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -64,6 +66,7 @@ import java.util.concurrent.TimeUnit;
 import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 @RunWith(MockitoJUnitRunner.class)
 public class IndicesTest {
@@ -93,7 +96,7 @@ public class IndicesTest {
 
     @Before
     public void setUp() throws Exception {
-        indices = new Indices(client, CONFIG, new IndexMapping(), new Messages(client, CONFIG, new MetricRegistry()));
+        indices = new Indices(client, CONFIG, new IndexMapping(), new Messages(client, CONFIG, new MetricRegistry()), mock(NodeId.class), new NullAuditEventSender());
     }
 
     @Test

@@ -24,8 +24,8 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.assertj.jodatime.api.Assertions;
 import org.bson.types.ObjectId;
 import org.elasticsearch.ElasticsearchTimeoutException;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.index.IndexNotFoundException;
+import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
@@ -34,6 +34,7 @@ import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -51,6 +52,7 @@ import java.util.SortedSet;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -72,7 +74,7 @@ public class MongoIndexRangeServiceTest {
     @Before
     public void setUp() throws Exception {
         localEventBus = new EventBus("local-event-bus");
-        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, localEventBus);
+        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, new NullAuditEventSender(), mock(NodeId.class), localEventBus);
     }
 
     @Test

@@ -14,24 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.auditlog;
+package org.graylog2.audit;
 
-import java.util.Map;
+import java.util.Set;
 
-public class NullAuditLogger implements AuditLogger {
-    @Override
-    public void success(String subject, String action, String object) {
-    }
-
-    @Override
-    public void success(String subject, String action, String object, Map<String, Object> context) {
-    }
-
-    @Override
-    public void failure(String subject, String action, String object) {
-    }
-
-    @Override
-    public void failure(String subject, String action, String object, Map<String, Object> context) {
-    }
+public interface PluginAuditEventTypes {
+    Set<String> auditEventTypes();
 }

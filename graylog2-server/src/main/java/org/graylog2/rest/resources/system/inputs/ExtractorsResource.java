@@ -26,8 +26,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.ConfigurationException;
-import org.graylog2.auditlog.Actions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
@@ -109,7 +109,7 @@ public class ExtractorsResource extends RestResource {
             @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
             @ApiResponse(code = 400, message = "Missing or invalid configuration.")
     })
-    @AuditLog(object = "extractor", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditEvent(type = AuditEventTypes.EXTRACTOR_CREATE)
     public Response create(@ApiParam(name = "inputId", required = true)
                            @PathParam("inputId") String inputId,
                            @ApiParam(name = "JSON body", required = true)
@@ -153,7 +153,7 @@ public class ExtractorsResource extends RestResource {
             @ApiResponse(code = 400, message = "Field the extractor should write on is reserved."),
             @ApiResponse(code = 400, message = "Missing or invalid configuration.")
     })
-    @AuditLog(object = "extractor", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditEvent(type = AuditEventTypes.EXTRACTOR_UPDATE)
     public ExtractorSummary update(@ApiParam(name = "inputId", required = true)
                                       @PathParam("inputId") String inputId,
                                       @ApiParam(name = "extractorId", required = true)
@@ -239,7 +239,7 @@ public class ExtractorsResource extends RestResource {
             @ApiResponse(code = 404, message = "Extractor not found.")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditLog(object = "extractor")
+    @AuditEvent(type = AuditEventTypes.EXTRACTOR_DELETE)
     public void terminate(
             @ApiParam(name = "inputId", required = true)
             @PathParam("inputId") String inputId,
@@ -272,7 +272,7 @@ public class ExtractorsResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node.")
     })
     @Path("order")
-    @AuditLog(action = Actions.UPDATE, object = "extractor order", captureRequestEntity = true, captureResponseEntity = true)
+    @AuditEvent(type = AuditEventTypes.EXTRACTOR_ORDER_UPDATE)
     public void order(@ApiParam(name = "inputId", value = "Persist ID (!) of input.", required = true)
                       @PathParam("inputId") String inputPersistId,
                       @ApiParam(name = "JSON body", required = true) OrderExtractorsRequest oer) throws NotFoundException {

@@ -24,8 +24,8 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.auditlog.Actions;
-import org.graylog2.auditlog.jersey.AuditLog;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
 import org.graylog2.rest.RemoteInterfaceProvider;
@@ -78,7 +78,7 @@ public class ClusterInputStatesResource extends ProxiedResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input."),
     })
-    @AuditLog(action = Actions.START, object = "input")
+    @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_START)
     public Map<String, Optional<InputCreated>> start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         return getForAllNodes(remoteResource -> remoteResource.start(inputId), createRemoteInterfaceProvider(RemoteInputStatesResource.class));
     }
@@ -90,7 +90,7 @@ public class ClusterInputStatesResource extends ProxiedResource {
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such input."),
     })
-    @AuditLog(action = Actions.STOP, object = "input")
+    @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)
     public Map<String, Optional<InputDeleted>> stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
         return getForAllNodes(remoteResource -> remoteResource.stop(inputId), createRemoteInterfaceProvider(RemoteInputStatesResource.class));
     }
