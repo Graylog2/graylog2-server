@@ -22,7 +22,6 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import com.google.inject.Provider;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.AuditEventType;
 import org.graylog2.plugin.lifecycles.Lifecycle;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.SuppressForbidden;
@@ -201,9 +200,9 @@ public class ServerStatus {
     public void pauseMessageProcessing(boolean locked) {
         // Never override pause lock if already locked.
         if (processingPauseLocked.compareAndSet(false, locked) && locked) {
-            auditEventSenderProvider.get().success(AuditActor.system(nodeId), AuditEventType.create(MESSAGE_PROCESSING_LOCK));
+            auditEventSenderProvider.get().success(AuditActor.system(nodeId), MESSAGE_PROCESSING_LOCK);
         } else if (locked) {
-            auditEventSenderProvider.get().failure(AuditActor.system(nodeId), AuditEventType.create(MESSAGE_PROCESSING_LOCK));
+            auditEventSenderProvider.get().failure(AuditActor.system(nodeId), MESSAGE_PROCESSING_LOCK);
         }
         isProcessing.set(false);
 

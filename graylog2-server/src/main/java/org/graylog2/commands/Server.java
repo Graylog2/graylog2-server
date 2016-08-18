@@ -28,7 +28,6 @@ import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditBindings;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.AuditEventType;
 import org.graylog2.bindings.AlarmCallbackBindings;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bindings.InitializerBindings;
@@ -197,7 +196,7 @@ public class Server extends ServerBootstrap {
             LOG.info(msg);
             activityWriter.write(new Activity(msg, Main.class));
 
-            auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(NODE_SHUTDOWN_INITIATE));
+            auditEventSender.success(AuditActor.system(nodeId), NODE_SHUTDOWN_INITIATE);
 
             gracefulShutdown.runWithoutExit();
             serviceManager.stopAsync().awaitStopped();

@@ -33,7 +33,6 @@ import org.bson.types.ObjectId;
 import org.elasticsearch.indices.IndexClosedException;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.AuditEventType;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -168,7 +167,7 @@ public class MongoIndexRangeService implements IndexRangeService {
             LOG.debug("Index \"{}\" has been deleted. Removing index range.");
             final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
             if (remove.getN() > 0) {
-                auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_RANGE_DELETE), ImmutableMap.of("index_name", index));
+                auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }
         }
     }
@@ -180,7 +179,7 @@ public class MongoIndexRangeService implements IndexRangeService {
             LOG.debug("Index \"{}\" has been closed. Removing index range.");
             final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
             if (remove.getN() > 0) {
-                auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_RANGE_DELETE), ImmutableMap.of("index_name", index));
+                auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }
         }
     }
@@ -202,15 +201,15 @@ public class MongoIndexRangeService implements IndexRangeService {
             final IndexRange indexRange;
             try {
                 indexRange = retryer.call(() -> calculateRange(index));
-                auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_RANGE_CREATE), ImmutableMap.of("index_name", index));
+                auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
             } catch (Exception e) {
                 if (e.getCause() instanceof IndexClosedException) {
                     LOG.debug("Couldn't calculate index range for closed index \"" + index + "\"", e.getCause());
-                    auditEventSender.failure(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_RANGE_CREATE), ImmutableMap.of("index_name", index));
+                    auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
                     return;
                 }
                 LOG.error("Couldn't calculate index range for index \"" + index + "\"", e.getCause());
-                auditEventSender.failure(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_RANGE_CREATE), ImmutableMap.of("index_name", index));
+                auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
                 throw new RuntimeException("Couldn't calculate index range for index \"" + index + "\"", e);
             }
 

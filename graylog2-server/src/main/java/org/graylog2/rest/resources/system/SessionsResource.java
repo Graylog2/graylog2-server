@@ -33,7 +33,6 @@ import org.apache.shiro.util.ThreadContext;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -159,7 +158,7 @@ public class SessionsResource extends RestResource {
                     "session_id", id,
                     "remote_address", remoteAddrFromRequest
             );
-            auditEventSender.success(AuditActor.user(createRequest.username()), AuditEventType.create(SESSION_CREATE), auditEventContext);
+            auditEventSender.success(AuditActor.user(createRequest.username()), SESSION_CREATE, auditEventContext);
 
             // TODO is the validUntil attribute even used by anyone yet?
             return SessionResponse.create(new DateTime(s.getLastAccessTime(), DateTimeZone.UTC).plus(s.getTimeout()).toDate(),
@@ -168,7 +167,7 @@ public class SessionsResource extends RestResource {
             final Map<String, Object> auditEventContext = ImmutableMap.of(
                     "remote_address", remoteAddrFromRequest
             );
-            auditEventSender.failure(AuditActor.user(createRequest.username()), AuditEventType.create(SESSION_CREATE), auditEventContext);
+            auditEventSender.failure(AuditActor.user(createRequest.username()), SESSION_CREATE, auditEventContext);
 
             throw new NotAuthorizedException("Invalid username or password", "Basic realm=\"Graylog Server session\"");
         }

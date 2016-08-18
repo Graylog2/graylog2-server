@@ -20,7 +20,6 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import org.graylog2.Configuration;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.AuditEventType;
 import org.graylog2.initializers.BufferSynchronizerService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.initializers.InputSetupService;
@@ -118,7 +117,7 @@ public class GracefulShutdown implements Runnable {
         // stop all maintenance tasks
         periodicalsService.stopAsync().awaitTerminated();
 
-        auditEventSender.success(AuditActor.system(serverStatus.getNodeId()), AuditEventType.create(NODE_SHUTDOWN_COMPLETE));
+        auditEventSender.success(AuditActor.system(serverStatus.getNodeId()), NODE_SHUTDOWN_COMPLETE);
 
         // Shut down hard with no shutdown hooks running.
         LOG.info("Goodbye.");

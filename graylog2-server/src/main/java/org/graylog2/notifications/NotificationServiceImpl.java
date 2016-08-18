@@ -22,7 +22,6 @@ import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.AuditEventType;
 import org.graylog2.cluster.Node;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
@@ -82,7 +81,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
         final boolean removed = destroyAll(NotificationImpl.class, qry) > 0;
         if (removed) {
-            auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(SYSTEM_NOTIFICATION_DELETE), Collections.singletonMap("notification_type", type.getClass().getCanonicalName()));
+            auditEventSender.success(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_DELETE, Collections.singletonMap("notification_type", type.getClass().getCanonicalName()));
         }
         return removed;
     }
@@ -125,11 +124,11 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         }
         try {
             save(notification);
-            auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(SYSTEM_NOTIFICATION_CREATE), notification.asMap());
+            auditEventSender.success(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_CREATE, notification.asMap());
         } catch(ValidationException e) {
             // We have no validations, but just in case somebody adds some...
             LOG.error("Validating user warning failed.", e);
-            auditEventSender.failure(AuditActor.system(nodeId), AuditEventType.create(SYSTEM_NOTIFICATION_CREATE), notification.asMap());
+            auditEventSender.failure(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_CREATE, notification.asMap());
             return false;
         }
 

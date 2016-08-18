@@ -76,7 +76,6 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.AuditEventType;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -309,9 +308,9 @@ public class Indices {
 
         final boolean acknowledged = c.admin().indices().create(cir).actionGet().isAcknowledged();
         if (acknowledged) {
-            auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_CREATE));
+            auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE);
         } else {
-            auditEventSender.failure(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_CREATE));
+            auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE);
         }
         return acknowledged;
     }

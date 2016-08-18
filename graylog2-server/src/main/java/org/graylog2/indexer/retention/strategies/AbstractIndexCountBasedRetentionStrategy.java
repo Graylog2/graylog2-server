@@ -20,7 +20,6 @@ package org.graylog2.indexer.retention.strategies;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.AuditEventType;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.indices.Indices;
@@ -87,7 +86,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
         final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of("retention_strategy", this.getClass().getCanonicalName());
-        auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_RETENTION_INITIATE), auditEventContext);
+        auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RETENTION_INITIATE, auditEventContext);
 
         runRetention(deflectorIndices, removeCount);
     }
@@ -120,7 +119,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
             final ImmutableMap<String, Object> auditEventContext = ImmutableMap.of(
                 "index_name", indexName,
                 "retention_strategy", strategyName);
-            auditEventSender.success(AuditActor.system(nodeId), AuditEventType.create(ES_INDEX_RETENTION_COMPLETE), auditEventContext);
+            auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RETENTION_COMPLETE, auditEventContext);
         }
     }
 }
