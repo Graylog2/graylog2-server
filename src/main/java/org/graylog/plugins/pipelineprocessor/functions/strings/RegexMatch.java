@@ -60,7 +60,7 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
                 (List<String>) optionalGroupNames.optional(args, context).orElse(Collections.emptyList());
 
         final Matcher matcher = regex.matcher(value);
-        final boolean matches = matcher.matches();
+        final boolean matches = matcher.find();
 
         return new RegexMatchResult(matches, matcher.toMatchResult(), groupNames);
 
