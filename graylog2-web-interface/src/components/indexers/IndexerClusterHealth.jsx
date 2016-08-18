@@ -12,6 +12,11 @@ import { IndexerClusterHealthSummary } from 'components/indexers';
 
 const IndexerClusterHealth = React.createClass({
   mixins: [Reflux.connect(IndexerClusterStore)],
+
+  componentDidMount() {
+    IndexerClusterStore.update();
+  },
+
   render() {
     const health = this.state.health;
 
