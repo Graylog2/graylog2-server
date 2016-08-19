@@ -29,7 +29,7 @@ public interface FormattedAuditEvent {
      * Examples:
      *
      *    {@code urn:graylog:user:jane}
-     *    {@code urn:graylog:server:28164cbe-4ad9-4c9c-a76e-088655aa7889}
+     *    {@code urn:graylog:node:28164cbe-4ad9-4c9c-a76e-088655aa7889}
      *
      * @return the actor URN
      */

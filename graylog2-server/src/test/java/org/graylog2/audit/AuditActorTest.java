@@ -47,7 +47,7 @@ public class AuditActorTest {
         when(nodeId.toString()).thenReturn("28164cbe-4ad9-4c9c-a76e-088655aa78892");
         final AuditActor actor = AuditActor.system(nodeId);
 
-        assertThat(actor.urn()).isEqualTo("urn:graylog:server:28164cbe-4ad9-4c9c-a76e-088655aa78892");
+        assertThat(actor.urn()).isEqualTo("urn:graylog:node:28164cbe-4ad9-4c9c-a76e-088655aa78892");
     }
 
     @Test(expected = NullPointerException.class)
