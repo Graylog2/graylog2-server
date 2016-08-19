@@ -431,4 +431,15 @@ public class BaseConfigurationTest {
 
         assertThat(configuration.getRestTransportUri()).hasPort(12900);
     }
+
+    @Test
+    public void testRestTransportUriWithCustomScheme() throws RepositoryException, ValidationException {
+        validProperties.put("rest_transport_uri", "https://example.com:12900/");
+        validProperties.put("rest_enable_tls", "false");
+
+        org.graylog2.Configuration configuration = new org.graylog2.Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getRestTransportUri()).hasScheme("https");
+    }
 }
