@@ -1,6 +1,6 @@
 # CEFInput Plugin for Graylog
 
-[![Build Status](https://travis-ci.org/https://github.com/Graylog2/graylog-plugin-cef.svg?branch=master)](https://travis-ci.org/https://github.com/Graylog2/graylog-plugin-cef)
+[![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-cef.svg?branch=master)](https://travis-ci.org/https://github.com/Graylog2/graylog-plugin-cef)
 
 __Use this paragraph to enter a description of your plugin.__
 
