@@ -122,7 +122,10 @@ public class CEFFieldsParser {
 
                     // All standard strings.
                     default:
-                        resultBuilder.put(field.getKey(), field.getValue());
+                        // Add all standard strings but never the custom fields/extension field labels.
+                        if(!field.getKey().endsWith("Label")) {
+                            resultBuilder.put(field.getKey(), field.getValue());
+                        }
                         break;
                 }
             } catch (Exception e) {

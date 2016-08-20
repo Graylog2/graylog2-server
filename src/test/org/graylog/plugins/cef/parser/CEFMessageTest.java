@@ -3,6 +3,8 @@ package org.graylog.plugins.cef.parser;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.*;
 
 public class CEFMessageTest {
@@ -17,6 +19,7 @@ public class CEFMessageTest {
                 .deviceVersion("2.1.0")
                 .deviceEventClassId("12345")
                 .name("Some Event")
+                .fields(new HashMap<String, Object>())
                 .build();
     }
 
