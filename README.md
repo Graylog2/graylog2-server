@@ -1,4 +1,4 @@
-# CEFInput Plugin for Graylog
+# Graylog CEF message input
 
 [![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-cef.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-cef)
 
