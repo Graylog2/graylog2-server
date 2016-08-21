@@ -28,7 +28,7 @@
         <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-cef.git</developerConnection>
         <url>https://github.com/Graylog2/graylog-plugin-cef</url>
         <tag>1.0.0</tag>
-    </scm>g
+    </scm>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
