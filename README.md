@@ -2,7 +2,11 @@
 
 [![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-cef.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-cef)
 
-__Use this paragraph to enter a description of your plugin.__
+Graylog input plugin to receive CEF logs via UDP or TCP. Install the plugin and launch a new CEF input from `System -> Inputs` in your Graylog Web Interface.
+
+This plugin is strictly following the CEF standard and will probably not work with non-compliant messages. Please open an issue in this repository in case of any problems.
+
+![](https://github.com/Graylog2/graylog-plugin-cef/blob/master/screenshot.png)
 
 **Required Graylog version:** 2.0 and later
 
@@ -15,17 +19,6 @@ is the `plugins/` folder relative from your `graylog-server` directory by defaul
 and can be configured in your `graylog.conf` file.
 
 Restart `graylog-server` and you are done.
-
-Development
------------
-
-You can improve your development experience for the web interface part of your plugin
-dramatically by making use of hot reloading. To do this, do the following:
-
-* `git clone https://github.com/Graylog2/graylog2-server.git`
-* `cd graylog2-server/graylog2-web-interface`
-* `ln -s $YOURPLUGIN plugin/`
-* `npm install && npm start`
 
 Usage
 -----
@@ -42,7 +35,7 @@ This project is using Maven 3 and requires Java 8 or higher.
 * Run `mvn package` to build a JAR file.
 * Optional: Run `mvn jdeb:jdeb` and `mvn rpm:rpm` to create a DEB and RPM package respectively.
 * Copy generated JAR file in target directory to your Graylog plugin directory.
-* Restart the Graylog.
+* Restart Graylog.
 
 Plugin Release
 --------------
