@@ -1,4 +1,5 @@
 import React from 'react';
+import { Button } from 'react-bootstrap';
 
 const WidgetFooter = React.createClass({
   propTypes: {
@@ -28,18 +29,14 @@ const WidgetFooter = React.createClass({
     const lockedActions = (
       <div className="actions">
         <div className="widget-replay">
-          <button className="btn btn-mini btn-link btn-text"
-                  title="Replay search"
-                  onClick={this._replaySearch}>
+          <Button bsStyle="link" className="btn-text" title="Replay search" onClick={this._replaySearch}>
             <i className="fa fa-play"/>
-          </button>
+          </Button>
         </div>
         <div className="widget-info">
-          <button className="btn btn-mini btn-link btn-text"
-                  title="Show widget configuration"
-                  onClick={this._showConfig}>
+          <Button bsStyle="link" className="btn-text" title="Show widget configuration" onClick={this._showConfig}>
             <i className="fa fa-info-circle"/>
-          </button>
+          </Button>
         </div>
       </div>
     );
@@ -47,18 +44,14 @@ const WidgetFooter = React.createClass({
     const unlockedActions = (
       <div className="actions">
         <div className="widget-delete">
-          <button className="btn btn-mini btn-link btn-text"
-                  title="Delete widget"
-                  onClick={this._delete}>
+          <Button bsStyle="link" className="btn-text" title="Delete widget" onClick={this._delete}>
             <i className="fa fa-trash"/>
-          </button>
+          </Button>
         </div>
         <div className="widget-edit">
-          <button className="btn btn-mini btn-link btn-text"
-                  title="Edit widget"
-                  onClick={this._editConfig}>
+          <Button bsStyle="link" className="btn-text" title="Edit widget" onClick={this._editConfig}>
             <i className="fa fa-pencil"/>
-          </button>
+          </Button>
         </div>
       </div>
     );
