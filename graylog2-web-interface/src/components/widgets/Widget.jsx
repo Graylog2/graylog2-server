@@ -177,9 +177,6 @@ const Widget = React.createClass({
 
     return URLUtils.appPrefixed(path + '?' + queryString);
   },
-  _replaySearch(e) {
-    URLUtils.openLink(this.replayUrl(), e.metaKey || e.ctrlKey);
-  },
   _showConfig() {
     this.refs.configModal.open();
   },
@@ -226,10 +223,10 @@ const Widget = React.createClass({
 
         <WidgetFooter ref="widgetFooter"
                       locked={this.props.locked}
-                      onReplaySearch={this._replaySearch}
                       onShowConfig={this._showConfig}
                       onEditConfig={this._showEditConfig}
-                      onDelete={this.deleteWidget}/>
+                      onDelete={this.deleteWidget}
+                      replayHref={this.replayUrl()}/>
         {this.props.locked ? showConfigModal : editConfigModal}
       </div>
     );

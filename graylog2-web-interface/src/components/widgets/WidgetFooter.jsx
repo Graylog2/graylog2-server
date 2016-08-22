@@ -6,12 +6,8 @@ const WidgetFooter = React.createClass({
     locked: React.PropTypes.bool.isRequired,
     onDelete: React.PropTypes.func.isRequired,
     onEditConfig: React.PropTypes.func.isRequired,
-    onReplaySearch: React.PropTypes.func.isRequired,
     onShowConfig: React.PropTypes.func.isRequired,
-  },
-  _replaySearch(e) {
-    e.preventDefault();
-    this.props.onReplaySearch(e);
+    replayHref: React.PropTypes.string.isRequired,
   },
   _showConfig(e) {
     e.preventDefault();
@@ -29,7 +25,7 @@ const WidgetFooter = React.createClass({
     const lockedActions = (
       <div className="actions">
         <div className="widget-replay">
-          <Button bsStyle="link" className="btn-text" title="Replay search" onClick={this._replaySearch}>
+          <Button bsStyle="link" className="btn-text" title="Replay search" href={this.props.replayHref}>
             <i className="fa fa-play"/>
           </Button>
         </div>
