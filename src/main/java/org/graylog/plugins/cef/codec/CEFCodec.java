@@ -148,7 +148,7 @@ public class CEFCodec implements Codec {
                     CK_TIMEZONE,
                     "Timezone",
                     DateTimeZone.getDefault().getID(),
-                    "Timezone of the timestamps in the CEF messages we'l receive. Set this to the local timezone if in doubt.(CEF messages do not include timezone information) Format example: +01:00 or America/Chicago",
+                    "Timezone of the timestamps in the CEF messages we'l receive. Set this to the local timezone if in doubt. (CEF messages do not include timezone information) Format example: +01:00 or America/Chicago",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
 
