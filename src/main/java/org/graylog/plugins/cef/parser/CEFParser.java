@@ -18,18 +18,21 @@ public class CEFParser {
     private static final Pattern HEADER_PATTERN = Pattern.compile("^<\\d+>([a-zA-Z]{3} \\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}) CEF:(\\d+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)(?:$|(msg=.+))", Pattern.DOTALL);
     private static final DateTimeFormatter TIMESTAMP_PATTERN = DateTimeFormat.forPattern("MMM dd HH:mm:ss");
 
-    private static final DateTimeZone LOCAL_TZ = DateTimeZone.getDefault();
-
     private static final CEFFieldsParser FIELDS_PARSER = new CEFFieldsParser();
+
+    private final DateTimeZone timezone;
+
+    public CEFParser(DateTimeZone timezone) {
+        this.timezone = timezone;
+    }
 
     public CEFMessage parse(String x) throws ParserException {
         Matcher m = HEADER_PATTERN.matcher(x);
 
         if(m.find()) {
-            // Parse timestamp in local TZ. CEF does not provide TZ information. /shrug
             DateTime timestamp = DateTime.parse(m.group(1), TIMESTAMP_PATTERN)
-                    .withYear(DateTime.now(LOCAL_TZ).getYear())
-                    .withZone(LOCAL_TZ);
+                    .withYear(DateTime.now(timezone).getYear())
+                    .withZoneRetainFields(timezone);
 
             // Build the message with all CEF headers.
             CEFMessage.Builder builder = CEFMessage.builder();
