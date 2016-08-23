@@ -141,7 +141,7 @@ public class IndexRangesResource extends RestResource {
             @ApiResponse(code = 202, message = "Rebuild/sync systemjob triggered.")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuild() {
         final SystemJob rebuildJob = rebuildIndexRangesJobFactory.create(this.deflector);
         try {
@@ -166,7 +166,7 @@ public class IndexRangesResource extends RestResource {
             @ApiResponse(code = 202, message = "Rebuild/sync system job triggered.")
     })
     @Produces(MediaType.APPLICATION_JSON)
-    @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE)
+    @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuildIndex(
             @ApiParam(name = "index", value = "The name of the Graylog-managed Elasticsearch index", required = true)
             @PathParam("index") @NotEmpty String index) {

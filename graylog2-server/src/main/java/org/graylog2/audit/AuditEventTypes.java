@@ -57,7 +57,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String ES_INDEX_OPEN = NAMESPACE + "es_index:open";
     public static final String ES_INDEX_RANGE_CREATE = NAMESPACE + "es_index_range:create";
     public static final String ES_INDEX_RANGE_DELETE = NAMESPACE + "es_index_range:delete";
-    public static final String ES_INDEX_RANGE_UPDATE = NAMESPACE + "es_index_range:update";
+    public static final String ES_INDEX_RANGE_UPDATE_JOB = NAMESPACE + "es_index_range_update_job:start";
     public static final String ES_INDEX_RETENTION_COMPLETE = NAMESPACE + "es_index_retention:complete";
     public static final String ES_INDEX_RETENTION_INITIATE = NAMESPACE + "es_index_retention:initiate";
     public static final String ES_INDEX_RETENTION_STRATEGY_UPDATE = NAMESPACE + "es_index_retention_strategy:update";
@@ -65,6 +65,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String ES_INDEX_ROTATION_INITIATE = NAMESPACE + "es_index_rotation:initiate";
     public static final String ES_INDEX_ROTATION_STRATEGY_UPDATE = NAMESPACE + "es_index_rotation_strategy:update";
     public static final String ES_WRITE_INDEX_UPDATE = NAMESPACE + "es_write_index:update";
+    public static final String ES_WRITE_INDEX_UPDATE_JOB_START = NAMESPACE + "es_write_index_update_job:start";
     public static final String EXTRACTOR_CREATE = NAMESPACE + "extractor:create";
     public static final String EXTRACTOR_DELETE = NAMESPACE + "extractor:delete";
     public static final String EXTRACTOR_EXPORT = NAMESPACE + "extractor:export";
@@ -181,7 +182,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(ES_INDEX_OPEN)
             .add(ES_INDEX_RANGE_CREATE)
             .add(ES_INDEX_RANGE_DELETE)
-            .add(ES_INDEX_RANGE_UPDATE)
+            .add(ES_INDEX_RANGE_UPDATE_JOB)
             .add(ES_INDEX_RETENTION_COMPLETE)
             .add(ES_INDEX_RETENTION_INITIATE)
             .add(ES_INDEX_RETENTION_STRATEGY_UPDATE)
@@ -189,6 +190,7 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(ES_INDEX_ROTATION_INITIATE)
             .add(ES_INDEX_ROTATION_STRATEGY_UPDATE)
             .add(ES_WRITE_INDEX_UPDATE)
+            .add(ES_WRITE_INDEX_UPDATE_JOB_START)
             .add(EXTRACTOR_CREATE)
             .add(EXTRACTOR_DELETE)
             .add(EXTRACTOR_EXPORT)

@@ -87,7 +87,7 @@ public class DeflectorResource extends RestResource {
     @RequiresPermissions(RestPermissions.DEFLECTOR_CYCLE)
     @Path("/cycle")
     @RestrictToMaster
-    @AuditEvent(type = AuditEventTypes.ES_WRITE_INDEX_UPDATE)
+    @AuditEvent(type = AuditEventTypes.ES_WRITE_INDEX_UPDATE_JOB_START)
     public void cycle() {
         final String msg = "Cycling deflector. Reason: REST request.";
         LOG.info(msg);

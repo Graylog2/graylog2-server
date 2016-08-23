@@ -18,6 +18,7 @@ package org.graylog2.indexer.indices;
 
 import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -308,9 +309,9 @@ public class Indices {
 
         final boolean acknowledged = c.admin().indices().create(cir).actionGet().isAcknowledged();
         if (acknowledged) {
-            auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE);
+            auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         } else {
-            auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE);
+            auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         }
         return acknowledged;
     }

@@ -22,10 +22,12 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.system.activities.SystemMessageActivityWriter;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.junit.Before;
@@ -62,6 +64,10 @@ public class DeflectorTest {
     private SetIndexReadOnlyAndCalculateRangeJob.Factory setIndexReadOnlyAndCalculateRangeJobFactory;
     @Mock
     private Indices indices;
+    @Mock
+    private AuditEventSender auditEventSender;
+    @Mock
+    private NodeId nodeId;
     private Deflector deflector;
 
     @Mock
@@ -74,6 +80,8 @@ public class DeflectorTest {
             activityWriter,
             indices,
             indexRangeService,
+            auditEventSender,
+            nodeId,
             setIndexReadOnlyAndCalculateRangeJobFactory);
     }
 
@@ -185,6 +193,8 @@ public class DeflectorTest {
             activityWriter,
             indices,
             indexRangeService,
+            auditEventSender,
+            nodeId,
             setIndexReadOnlyAndCalculateRangeJobFactory);
 
         final int number = deflector.getNewestTargetNumber();
@@ -207,6 +217,8 @@ public class DeflectorTest {
             activityWriter,
             indices,
             indexRangeService,
+            auditEventSender,
+            nodeId,
             setIndexReadOnlyAndCalculateRangeJobFactory);
 
         final String[] allGraylogIndexNames = deflector.getAllGraylogIndexNames();
@@ -230,6 +242,8 @@ public class DeflectorTest {
             activityWriter,
             indices,
             indexRangeService,
+            auditEventSender,
+            nodeId,
             setIndexReadOnlyAndCalculateRangeJobFactory);
 
         final Map<String, Set<String>> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
@@ -254,6 +268,8 @@ public class DeflectorTest {
                 activityWriter,
                 indices,
                 indexRangeService,
+                auditEventSender,
+                nodeId,
                 setIndexReadOnlyAndCalculateRangeJobFactory);
 
         deflector.cleanupAliases(Sets.newHashSet("graylog_2", "graylog_3", "foobar"));
