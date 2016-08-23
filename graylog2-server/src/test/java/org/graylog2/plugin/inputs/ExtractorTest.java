@@ -893,6 +893,32 @@ public class ExtractorTest {
         assertThat(extractor.getConverterExceptionCount()).isEqualTo(1);
     }
 
+    @Test
+    public void testConvertersWithMultipleFieldsAndNull() throws Exception {
+        final Converter converter = new TestConverter.Builder()
+                .multiple(true)
+                .callback(new Function<Object, Object>() {
+                    @Nullable
+                    @Override
+                    public Object apply(Object input) {
+                        return null;
+                    }
+                })
+                .build();
+
+        final TestExtractor extractor = new TestExtractor.Builder()
+                .converters(Collections.singletonList(converter))
+                .callback(() -> new Result[]{new Result("1", -1, -1)})
+                .build();
+
+        final Message msg = createMessage("the message");
+
+        extractor.runExtractor(msg);
+
+        assertThat(msg.getField("message")).isEqualTo("the message");
+        assertThat(extractor.getConverterExceptionCount()).isEqualTo(0L);
+    }
+
     private Message createMessage(String message) {
         return new Message(message, "localhost", DateTime.now(UTC));
     }

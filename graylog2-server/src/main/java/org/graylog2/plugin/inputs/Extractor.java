@@ -239,15 +239,14 @@ public abstract class Extractor implements EmbeddedPersistable {
                     continue;
                 }
 
+                final Object convertedValue = converter.convert((String) msg.getField(targetField));
                 if (!converter.buildsMultipleFields()) {
-                    final Object converted = converter.convert((String) msg.getField(targetField));
-
                     // We have arrived here if no exception was thrown and can safely replace the original field.
                     msg.removeField(targetField);
-                    msg.addField(targetField, converted);
-                } else {
+                    msg.addField(targetField, convertedValue);
+                } else if (convertedValue instanceof Map) {
                     @SuppressWarnings("unchecked")
-                    final Map<String, Object> additionalFields = new HashMap<>((Map<String, Object>) converter.convert((String) msg.getField(targetField)));
+                    final Map<String, Object> additionalFields = new HashMap<>((Map<String, Object>) convertedValue);
                     for (final String reservedField : Message.RESERVED_FIELDS) {
                         if (additionalFields.containsKey(reservedField)) {
                             if (LOG.isDebugEnabled()) {
