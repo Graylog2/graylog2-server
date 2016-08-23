@@ -17,10 +17,11 @@ const PluginList = React.createClass({
   ENTERPRISE_PLUGINS: {
     ArchivePlugin: 'Archive plugin',
     LicensePlugin: 'License plugin',
+    'graylog-plugin-auditlog': 'Audit log plugin',
   },
 
   _formatPlugin(pluginName) {
-    const plugin = PluginStore.get().filter(plugin => plugin.metadata.name === pluginName)[0];
+    const plugin = PluginStore.get().filter(p => p.metadata.name === pluginName)[0];
     return (
       <li key={pluginName} className={plugin ? 'text-success' : 'text-danger'}>
         <i className={`fa fa-${plugin ? 'check-circle' : 'minus-circle'}`}/>&nbsp;
