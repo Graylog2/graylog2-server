@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor;
 
+import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnectionsResource;
@@ -50,5 +51,7 @@ public class PipelineProcessorModule extends PluginModule {
         installSearchResponseDecorator(searchResponseDecoratorBinder(),
                 PipelineProcessorMessageDecorator.class,
                 PipelineProcessorMessageDecorator.Factory.class);
+
+        addAuditEventTypes(PipelineProcessorAuditEventTypes.class);
     }
 }

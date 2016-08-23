@@ -23,9 +23,11 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -72,6 +74,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     @ApiOperation(value = "Connect processing pipelines to a stream", notes = "")
     @POST
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CONNECTION_UPDATE)
     public PipelineConnections connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
         final String streamId = connection.streamId();
         // the default stream doesn't exist as an entity

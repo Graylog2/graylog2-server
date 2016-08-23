@@ -24,12 +24,15 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -83,6 +86,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Create a processing rule from source", notes = "")
     @POST
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_CREATE)
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_CREATE)
     public RuleSource createFromParser(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
         final Rule rule;
         try {
@@ -107,6 +111,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Parse a processing rule without saving it", notes = "")
     @POST
     @Path("/parse")
+    @NoAuditEvent("only used to parse a rule, no changes made in the system")
     public RuleSource parse(@ApiParam(name = "rule", required = true) @NotNull RuleSource ruleSource) throws ParseException {
         final Rule rule;
         try {
@@ -145,6 +150,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation("Retrieve the named processing rules in bulk")
     @Path("/multiple")
     @POST
+    @NoAuditEvent("only used to get multiple pipeline rules")
     public Collection<RuleSource> getBulk(@ApiParam("rules") BulkRuleRequest rules) {
         Collection<RuleDao> ruleDaos = ruleService.loadNamed(rules.rules());
 
@@ -157,6 +163,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Modify a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @PUT
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_UPDATE)
     public RuleSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "rule", required = true) @NotNull RuleSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_EDIT, id);
@@ -185,6 +192,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Delete a processing rule", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @DELETE
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.RULE_DELETE)
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_RULE_DELETE, id);
         ruleService.load(id);

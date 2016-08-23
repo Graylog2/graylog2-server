@@ -24,11 +24,14 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
+import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -78,6 +81,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @ApiOperation(value = "Create a processing pipeline from source", notes = "")
     @POST
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CREATE)
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CREATE)
     public PipelineSource createFromParser(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         final Pipeline pipeline;
         try {
@@ -101,6 +105,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @ApiOperation(value = "Parse a processing pipeline without saving it", notes = "")
     @POST
     @Path("/parse")
+    @NoAuditEvent("only used to parse a pipeline, no changes made in the system")
     public PipelineSource parse(@ApiParam(name = "pipeline", required = true) @NotNull PipelineSource pipelineSource) throws ParseException {
         final Pipeline pipeline;
         try {
@@ -143,6 +148,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @ApiOperation(value = "Modify a processing pipeline", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @PUT
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_UPDATE)
     public PipelineSource update(@ApiParam(name = "id") @PathParam("id") String id,
                              @ApiParam(name = "pipeline", required = true) @NotNull PipelineSource update) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_EDIT, id);
@@ -169,6 +175,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
     @ApiOperation(value = "Delete a processing pipeline", notes = "It can take up to a second until the change is applied")
     @Path("/{id}")
     @DELETE
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_DELETE)
     public void delete(@ApiParam(name = "id") @PathParam("id") String id) throws NotFoundException {
         checkPermission(PipelineRestPermissions.PIPELINE_DELETE, id);
 

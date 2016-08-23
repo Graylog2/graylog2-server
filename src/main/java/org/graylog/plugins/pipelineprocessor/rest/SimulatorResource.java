@@ -24,6 +24,7 @@ import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.common.Strings;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.simulator.PipelineInterpreterTracer;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.rest.PluginRestResource;
@@ -62,6 +63,7 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
     @ApiOperation(value = "Simulate the execution of the pipeline message processor")
     @POST
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_RULE_READ)
+    @NoAuditEvent("only used to test pipelines, no changes made in the system")
     public SimulationResponse simulate(@ApiParam(name = "simulation", required = true) @NotNull SimulationRequest request) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, request.streamId());
 
