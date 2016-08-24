@@ -458,7 +458,7 @@ public class UsersResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_DELETE)
     public void revokeToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
-            @ApiParam(name = "access token", required = true) @PathParam("token") String token) {
+            @ApiParam(name = "token", required = true) @PathParam("token") String token) {
         final User user = _tokensCheckAndLoadUser(username);
         final AccessToken accessToken = accessTokenService.load(token);
 
