@@ -115,7 +115,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String SESSION_DELETE = PREFIX + "session:delete";
     public static final String STATIC_FIELD_CREATE = PREFIX + "static_field:create";
     public static final String STATIC_FIELD_DELETE = PREFIX + "static_field:delete";
-    public static final String STATIC_FIELD_UPDATE = PREFIX + "static_field:update";
     public static final String STREAM_CREATE = PREFIX + "stream:create";
     public static final String STREAM_DELETE = PREFIX + "stream:delete";
     public static final String STREAM_OUTPUT_ASSIGNMENT_CREATE = PREFIX + "stream_output_assignment:create";
@@ -233,7 +232,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(SESSION_DELETE)
             .add(STATIC_FIELD_CREATE)
             .add(STATIC_FIELD_DELETE)
-            .add(STATIC_FIELD_UPDATE)
             .add(STREAM_CREATE)
             .add(STREAM_DELETE)
             .add(STREAM_OUTPUT_ASSIGNMENT_CREATE)
