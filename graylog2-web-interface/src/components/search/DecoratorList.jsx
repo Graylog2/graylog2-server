@@ -26,7 +26,7 @@ const DecoratorList = React.createClass({
       );
     }
     return (
-      <SortableList items={this.props.decorators} onMoveItem={this._onReorder} disableDragging={this.props.disableDragging}/>
+      <SortableList items={this.props.decorators} onMoveItem={this._onReorderWrapper} disableDragging={this.props.disableDragging}/>
     );
   },
 });
