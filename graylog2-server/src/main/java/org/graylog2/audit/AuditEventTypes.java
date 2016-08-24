@@ -68,8 +68,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String ES_WRITE_INDEX_UPDATE_JOB_START = NAMESPACE + "es_write_index_update_job:start";
     public static final String EXTRACTOR_CREATE = NAMESPACE + "extractor:create";
     public static final String EXTRACTOR_DELETE = NAMESPACE + "extractor:delete";
-    public static final String EXTRACTOR_EXPORT = NAMESPACE + "extractor:export";
-    public static final String EXTRACTOR_IMPORT = NAMESPACE + "extractor:import";
     public static final String EXTRACTOR_ORDER_UPDATE = NAMESPACE + "extractor_order:update";
     public static final String EXTRACTOR_UPDATE = NAMESPACE + "extractor:update";
     public static final String GETTING_STARTED_GUIDE_OPT_OUT_CREATE = NAMESPACE + "getting_started_guide_opt_out:create";
@@ -193,8 +191,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(ES_WRITE_INDEX_UPDATE_JOB_START)
             .add(EXTRACTOR_CREATE)
             .add(EXTRACTOR_DELETE)
-            .add(EXTRACTOR_EXPORT)
-            .add(EXTRACTOR_IMPORT)
             .add(EXTRACTOR_ORDER_UPDATE)
             .add(EXTRACTOR_UPDATE)
             .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
