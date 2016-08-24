@@ -8,9 +8,12 @@ import { ConfigurationForm, ConfigurationWell } from 'components/configurationfo
 
 import StoreProvider from 'injection/StoreProvider';
 const DecoratorsStore = StoreProvider.getStore('Decorators');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const DecoratorsActions = ActionsProvider.getActions('Decorators');
+
+import PermissionsMixin from 'util/PermissionsMixin';
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
@@ -19,7 +22,7 @@ const Decorator = React.createClass({
     decorator: React.PropTypes.object.isRequired,
     typeDefinition: React.PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(DecoratorsStore)],
+  mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
   componentDidMount() {
     DecoratorsActions.available();
   },
@@ -63,22 +66,32 @@ const Decorator = React.createClass({
 
     return Object.assign({}, config, resolvedConfig);
   },
+  _formatActionsMenu() {
+    const permissions = this.state.currentUser.permissions;
+    const decorator = this.props.decorator;
+    const editPermission = this.isPermitted(permissions, `decorators:edit:${decorator.stream}`);
+    return (
+      <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions" pullRight>
+        <MenuItem onSelect={this._handleEditClick} disabled={!editPermission}>Edit</MenuItem>
+        <MenuItem divider/>
+        <MenuItem onSelect={this._handleDeleteClick} disabled={!editPermission}>Delete</MenuItem>
+      </DropdownButton>
+    );
+  },
   render() {
-    if (!this.state.types) {
+    if (!this.state.types || !this.state.currentUser) {
       return <Spinner />;
     }
     const decorator = this.props.decorator;
     const config = this._resolveConfigurationIds(decorator.config);
     const decoratorType = this.state.types[decorator.type] || this._decoratorTypeNotPresent();
+
+    const decoratorActionsMenu = this._formatActionsMenu();
     return (
       <span className={DecoratorStyles.fullWidth}>
         <div className={DecoratorStyles.decoratorBox}>
           <h6 className={DecoratorStyles.decoratorType}>{decoratorType.name}</h6>
-          <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions" pullRight>
-            <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
-            <MenuItem divider/>
-            <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
-          </DropdownButton>
+          {decoratorActionsMenu}
         </div>
         <ConfigurationWell key={`configuration-well-decorator-${decorator.id}`}
                            id={decorator.id}

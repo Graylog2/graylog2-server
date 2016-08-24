@@ -3,12 +3,14 @@ import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
 import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 
-import { SortableList, Spinner } from 'components/common';
-import { AddDecoratorButton, Decorator } from 'components/search';
+import { Spinner } from 'components/common';
+import { AddDecoratorButton, Decorator, DecoratorList } from 'components/search';
 import DocsHelper from 'util/DocsHelper';
+import PermissionsMixin from 'util/PermissionsMixin';
 
 import StoreProvider from 'injection/StoreProvider';
 const DecoratorsStore = StoreProvider.getStore('Decorators');
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const DecoratorsActions = ActionsProvider.getActions('Decorators');
@@ -20,7 +22,7 @@ const DecoratorSidebar = React.createClass({
     stream: React.PropTypes.string,
     maximumHeight: React.PropTypes.number,
   },
-  mixins: [Reflux.connect(DecoratorsStore)],
+  mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
   getInitialState() {
     return {
       maxDecoratorsHeight: 1000,
@@ -87,14 +89,16 @@ const DecoratorSidebar = React.createClass({
         </p>
       </Popover>
     );
+
+    const editPermissions = this.isPermitted(this.state.currentUser.permissions, `decorators:edit:${this.props.stream}`);
     return (
       <div>
-        <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder}/>
+        <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder} disabled={!editPermissions}/>
         <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
           <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
         </OverlayTrigger>
         <div ref="decoratorsContainer" className={DecoratorStyles.decoratorListContainer} style={{ maxHeight: this.state.maxDecoratorsHeight }}>
-          <SortableList items={decoratorItems} onMoveItem={this._updateOrder} />
+          <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} disableDragging={!editPermissions}/>
         </div>
       </div>
     );

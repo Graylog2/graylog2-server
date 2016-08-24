@@ -17,9 +17,16 @@ import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
 const AddDecoratorButton = React.createClass({
   propTypes: {
-    nextOrder: React.PropTypes.number,
-    stream: React.PropTypes.string,
+    nextOrder: React.PropTypes.number.isRequired,
+    stream: React.PropTypes.string.isRequired,
+    disabled: React.PropTypes.bool,
   },
+  getDefaultProps() {
+    return {
+      disabled: false,
+    };
+  },
+
   mixins: [Reflux.connect(DecoratorsStore), PureRenderMixin],
   getInitialState() {
     return {
@@ -74,9 +81,10 @@ const AddDecoratorButton = React.createClass({
                   onValueChange={this._onTypeChange}
                   options={decoratorTypes}
                   matchProp="label"
+                  disabled={this.props.disabled}
                   value={this.state.typeName} />
         </div>
-        <Button bsStyle="success" disabled={!this.state.typeName} onClick={this._openModal}>Apply</Button>
+        <Button bsStyle="success" disabled={!this.state.typeName || this.props.disabled} onClick={this._openModal}>Apply</Button>
         {this.state.typeName && configurationForm}
       </div>
     );

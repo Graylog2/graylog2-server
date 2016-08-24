@@ -4,6 +4,7 @@ export { default as ChangedMessageField } from './ChangedMessageField';
 export { default as DecoratedMessageFieldMarker } from './DecoratedMessageFieldMarker';
 export { default as DecoratedSidebarMessageField } from './DecoratedSidebarMessageField';
 export { default as Decorator } from './Decorator';
+export { default as DecoratorList } from './DecoratorList';
 export { default as DecoratorSidebar } from './DecoratorSidebar';
 export { default as FieldAnalyzersSidebar } from './FieldAnalyzersSidebar';
 export { default as LegacyHistogram } from './LegacyHistogram';

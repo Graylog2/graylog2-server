@@ -52,3 +52,7 @@
     display: inline;
     padding-bottom: 20px;
 }
+
+:local(.noDecoratorsAlert) {
+    margin-top: 2em;
+}
