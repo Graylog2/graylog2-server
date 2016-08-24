@@ -27,13 +27,14 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackResult;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
 import org.joda.time.DateTime;
+import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 @AutoValue
 @JsonAutoDetect
 @CollectionName("alarmcallbackhistory")
 public abstract class AlarmCallbackHistoryImpl implements AlarmCallbackHistory {
-    static final String FIELD_ID = "_id";
+    static final String FIELD_ID = "id";
     static final String FIELD_ALARMCALLBACKCONFIGURATION = "alarmcallbackconfiguration";
     static final String FIELD_ALERTID = "alert_id";
     static final String FIELD_ALERTCONDITIONID = "alertcondition_id";
@@ -41,6 +42,7 @@ public abstract class AlarmCallbackHistoryImpl implements AlarmCallbackHistory {
     static final String FIELD_CREATED_AT = "created_at";
 
     @JsonProperty(FIELD_ID)
+    @Id
     @ObjectId
     @Override
     public abstract String id();
@@ -66,7 +68,7 @@ public abstract class AlarmCallbackHistoryImpl implements AlarmCallbackHistory {
     public abstract DateTime createdAt();
 
     @JsonCreator
-    public static AlarmCallbackHistoryImpl create(@JsonProperty(FIELD_ID) String id,
+    public static AlarmCallbackHistoryImpl create(@JsonProperty(FIELD_ID) @Id @ObjectId String id,
                                               @JsonProperty(FIELD_ALARMCALLBACKCONFIGURATION) AlarmCallbackSummary alarmcallbackConfiguration,
                                               @JsonProperty(FIELD_ALERTID) String alertId,
                                               @JsonProperty(FIELD_ALERTCONDITIONID) String alertConditionId,
