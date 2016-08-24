@@ -21,7 +21,8 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Set;
 
 public class AuditEventTypes implements PluginAuditEventTypes {
-    private static final String NAMESPACE = "server:";
+    public static final String PREFIX = "server";
+    private static final String NAMESPACE = PREFIX + ":";
 
     public static final String ALARM_CALLBACK_CREATE = NAMESPACE + "alarm_callback:create";
     public static final String ALARM_CALLBACK_DELETE = NAMESPACE + "alarm_callback:delete";
