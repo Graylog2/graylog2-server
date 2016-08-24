@@ -111,7 +111,7 @@ public class GrokResource extends RestResource {
     @PUT
     @Timed
     @ApiOperation("Add a list of new patterns")
-    @AuditEvent(type = AuditEventTypes.GROK_PATTERN_IMPORT)
+    @AuditEvent(type = AuditEventTypes.GROK_PATTERN_IMPORT_CREATE)
     public Response bulkUpdatePatterns(@ApiParam(name = "patterns", required = true) @NotNull GrokPatternList patternList,
                                        @ApiParam(name = "replace", value = "Replace all patterns with the new ones.")
                                        @QueryParam("replace") @DefaultValue("false") boolean replace) throws ValidationException {

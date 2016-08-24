@@ -26,7 +26,7 @@ import static org.elasticsearch.common.Strings.isNullOrEmpty;
 
 @AutoValue
 public abstract class AuditActor {
-    private static final String URN_GRAYLOG_SERVER = "urn:graylog:server:";
+    private static final String URN_GRAYLOG_NODE = "urn:graylog:node:";
     private static final String URN_GRAYLOG_USER = "urn:graylog:user:";
 
     public abstract String urn();
@@ -39,6 +39,6 @@ public abstract class AuditActor {
     }
 
     public static AuditActor system(@Nonnull NodeId nodeId) {
-        return new AutoValue_AuditActor(URN_GRAYLOG_SERVER + requireNonNull(nodeId, "nodeId must not be null").toString());
+        return new AutoValue_AuditActor(URN_GRAYLOG_NODE + requireNonNull(nodeId, "nodeId must not be null").toString());
     }
 }

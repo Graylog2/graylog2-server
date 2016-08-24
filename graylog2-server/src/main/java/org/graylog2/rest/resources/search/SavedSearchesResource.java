@@ -93,7 +93,7 @@ public class SavedSearchesResource extends SearchResource {
                 .path("{searchId}")
                 .build(id);
 
-        return Response.created(searchUri).build();
+        return Response.created(searchUri).entity(ImmutableMap.of("search_id", id)).build();
     }
 
     @GET
