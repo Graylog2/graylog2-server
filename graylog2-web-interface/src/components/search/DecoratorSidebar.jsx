@@ -53,15 +53,15 @@ const DecoratorSidebar = React.createClass({
 
   _formatDecorator(decorator) {
     const typeDefinition = this.state.types[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
-    return ({ id: decorator._id, title: <Decorator key={`decorator-${decorator._id}`}
+    return ({ id: decorator.id, title: <Decorator key={`decorator-${decorator.id}`}
                                                    decorator={decorator}
                                                    typeDefinition={typeDefinition} /> });
   },
   _updateOrder(decorators) {
     decorators.forEach((item, idx) => {
-      const decorator = this.state.decorators.find((i) => i._id === item.id);
+      const decorator = this.state.decorators.find((i) => i.id === item.id);
       decorator.order = idx;
-      DecoratorsActions.update(decorator._id, decorator);
+      DecoratorsActions.update(decorator.id, decorator);
     });
   },
   render() {
