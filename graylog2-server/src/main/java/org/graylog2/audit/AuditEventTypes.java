@@ -75,11 +75,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String GROK_PATTERN_DELETE = NAMESPACE + "grok_pattern:delete";
     public static final String GROK_PATTERN_IMPORT_CREATE = NAMESPACE + "grok_pattern_import:create";
     public static final String GROK_PATTERN_UPDATE = NAMESPACE + "grok_pattern:update";
-    public static final String LDAP_CONFIGURATION_CREATE = NAMESPACE + "ldap_configuration:create";
     public static final String LDAP_CONFIGURATION_DELETE = NAMESPACE + "ldap_configuration:delete";
     public static final String LDAP_CONFIGURATION_UPDATE = NAMESPACE + "ldap_configuration:update";
-    public static final String LDAP_GROUP_MAPPING_CREATE = NAMESPACE + "ldap_group_mapping:create";
-    public static final String LDAP_GROUP_MAPPING_DELETE = NAMESPACE + "ldap_group_mapping:delete";
     public static final String LDAP_GROUP_MAPPING_UPDATE = NAMESPACE + "ldap_group_mapping:update";
     public static final String LOAD_BALANCER_STATUS_UPDATE = NAMESPACE + "load_balancer_status:update";
     public static final String LOG_LEVEL_UPDATE = NAMESPACE + "log_level:update";
@@ -197,11 +194,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(GROK_PATTERN_DELETE)
             .add(GROK_PATTERN_IMPORT_CREATE)
             .add(GROK_PATTERN_UPDATE)
-            .add(LDAP_CONFIGURATION_CREATE)
             .add(LDAP_CONFIGURATION_DELETE)
             .add(LDAP_CONFIGURATION_UPDATE)
-            .add(LDAP_GROUP_MAPPING_CREATE)
-            .add(LDAP_GROUP_MAPPING_DELETE)
             .add(LDAP_GROUP_MAPPING_UPDATE)
             .add(LOAD_BALANCER_STATUS_UPDATE)
             .add(LOG_LEVEL_UPDATE)
