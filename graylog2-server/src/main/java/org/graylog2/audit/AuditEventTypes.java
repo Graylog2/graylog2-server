@@ -113,7 +113,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String SAVED_SEARCH_UPDATE = PREFIX + "saved_search:update";
     public static final String SESSION_CREATE = PREFIX + "session:create";
     public static final String SESSION_DELETE = PREFIX + "session:delete";
-    public static final String SESSION_UPDATE = PREFIX + "session:update";
     public static final String STATIC_FIELD_CREATE = PREFIX + "static_field:create";
     public static final String STATIC_FIELD_DELETE = PREFIX + "static_field:delete";
     public static final String STATIC_FIELD_UPDATE = PREFIX + "static_field:update";
@@ -232,7 +231,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(SAVED_SEARCH_UPDATE)
             .add(SESSION_CREATE)
             .add(SESSION_DELETE)
-            .add(SESSION_UPDATE)
             .add(STATIC_FIELD_CREATE)
             .add(STATIC_FIELD_DELETE)
             .add(STATIC_FIELD_UPDATE)
