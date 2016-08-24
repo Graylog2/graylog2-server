@@ -170,7 +170,7 @@ public class SystemJobResource extends RestResource {
             throw new ForbiddenException("Maximum concurrency level of this job reached", e);
         }
 
-        return Response.accepted().build();
+        return Response.accepted().entity(ImmutableMap.of("system_job_id", job.getId())).build();
     }
 
     @DELETE
