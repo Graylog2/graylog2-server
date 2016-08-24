@@ -73,7 +73,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String GETTING_STARTED_GUIDE_OPT_OUT_CREATE = NAMESPACE + "getting_started_guide_opt_out:create";
     public static final String GROK_PATTERN_CREATE = NAMESPACE + "grok_pattern:create";
     public static final String GROK_PATTERN_DELETE = NAMESPACE + "grok_pattern:delete";
-    public static final String GROK_PATTERN_EXPORT = NAMESPACE + "grok_pattern:export";
     public static final String GROK_PATTERN_IMPORT = NAMESPACE + "grok_pattern:import";
     public static final String GROK_PATTERN_UPDATE = NAMESPACE + "grok_pattern:update";
     public static final String LDAP_CONFIGURATION_CREATE = NAMESPACE + "ldap_configuration:create";
@@ -196,7 +195,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(GETTING_STARTED_GUIDE_OPT_OUT_CREATE)
             .add(GROK_PATTERN_CREATE)
             .add(GROK_PATTERN_DELETE)
-            .add(GROK_PATTERN_EXPORT)
             .add(GROK_PATTERN_IMPORT)
             .add(GROK_PATTERN_UPDATE)
             .add(LDAP_CONFIGURATION_CREATE)
