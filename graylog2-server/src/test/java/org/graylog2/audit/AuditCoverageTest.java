@@ -85,6 +85,10 @@ public class AuditCoverageTest {
         final Set<String> auditEventTypes = new AuditEventTypes().auditEventTypes();
 
         for (Field field : fields) {
+            // Skip public NAMESPACE field, which is meant to identify server audit events
+            if (field.getName().equals("NAMESPACE")) {
+                continue;
+            }
             String type = "";
             try {
                 type = (String) field.get(field.getType().newInstance());
