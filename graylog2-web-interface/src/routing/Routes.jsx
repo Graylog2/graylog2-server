@@ -98,12 +98,33 @@ const Routes = {
     route.query(queryParams);
     return route.resource();
   },
+  _common_search_url: (resource, query, timeRange, resolution) => {
+    const route = new URI(resource);
+    const queryParams = {
+      q: query,
+      interval: resolution,
+    };
+
+    if (timeRange) {
+      Object.keys(timeRange).forEach(key => {
+        queryParams[key] = timeRange[key];
+      });
+    }
+
+    route.query(queryParams);
+    return route.resource();
+  },
+  search: (query, timeRange, resolution) => {
+    return Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution);
+  },
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,
   stream_edit: (streamId) => `/streams/${streamId}/edit`,
   stream_edit_example: (streamId, index, messageId) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
   stream_outputs: (streamId) => `/streams/${streamId}/outputs`,
   stream_alerts: (streamId) => `/streams/${streamId}/alerts`,
-  stream_search: (streamId) => `/streams/${streamId}/search`,
+  stream_search: (streamId, query, timeRange, resolution) => {
+    return Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution);
+  },
   legacy_stream_search: (streamId) => `/streams/${streamId}/messages`,
 
   dashboard_show: (dashboardId) => `/dashboards/${dashboardId}`,

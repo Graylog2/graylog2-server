@@ -1,10 +1,7 @@
 import React, {PropTypes} from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
-import Qs from 'qs';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-
-import URLUtils from 'util/URLUtils';
 
 import { WidgetConfigModal, WidgetEditConfigModal, WidgetFooter, WidgetHeader, WidgetVisualizationNotFound } from 'components/widgets';
 
@@ -13,6 +10,8 @@ const WidgetsStore = StoreProvider.getStore('Widgets');
 
 import ActionsProvider from 'injection/ActionsProvider';
 const WidgetsActions = ActionsProvider.getActions('Widgets');
+
+import Routes from 'routing/Routes';
 
 const Widget = React.createClass({
   propTypes: {
@@ -137,48 +136,37 @@ const Widget = React.createClass({
       computationTimeRange: this.state.computationTimeRange,
     });
   },
-  _getUrlPath() {
-    if (this._isBoundToStream()) {
-      return `/streams/${this.props.widget.config.stream_id}/search`;
-    }
-
-    return '/search';
-  },
-  _getUrlQueryString() {
+  _getTimeRange() {
     const config = this.props.widget.config;
     const rangeType = config.timerange.type;
 
-    const query = {
-      q: config.query,
+    const timeRange = {
       rangetype: rangeType,
-      interval: config.interval,
     };
     switch (rangeType) {
       case 'relative':
-        query[rangeType] = config.timerange.range;
+        timeRange[rangeType] = config.timerange.range;
         break;
       case 'absolute':
-        query.from = config.timerange.from;
-        query.to = config.timerange.to;
+        timeRange.from = config.timerange.from;
+        timeRange.to = config.timerange.to;
         break;
       case 'keyword':
-        query[rangeType] = config.timerange.keyword;
+        timeRange[rangeType] = config.timerange.keyword;
         break;
       default:
-        // do nothing
+      // do nothing
     }
 
-    return Qs.stringify(query);
+    return timeRange;
   },
   replayUrl() {
-    // TODO: replace with react router link
-    const path = this._getUrlPath();
-    const queryString = this._getUrlQueryString();
+    const config = this.props.widget.config;
+    if (this._isBoundToStream()) {
+      return Routes.stream_search(this.props.widget.config.stream_id, config.query, this._getTimeRange(), config.interval);
+    }
 
-    return URLUtils.appPrefixed(path + '?' + queryString);
-  },
-  _replaySearch(e) {
-    URLUtils.openLink(this.replayUrl(), e.metaKey || e.ctrlKey);
+    return Routes.search(config.query, this._getTimeRange(), config.interval);
   },
   _showConfig() {
     this.refs.configModal.open();
@@ -226,10 +214,10 @@ const Widget = React.createClass({
 
         <WidgetFooter ref="widgetFooter"
                       locked={this.props.locked}
-                      onReplaySearch={this._replaySearch}
                       onShowConfig={this._showConfig}
                       onEditConfig={this._showEditConfig}
-                      onDelete={this.deleteWidget}/>
+                      onDelete={this.deleteWidget}
+                      replayHref={this.replayUrl()}/>
         {this.props.locked ? showConfigModal : editConfigModal}
       </div>
     );
