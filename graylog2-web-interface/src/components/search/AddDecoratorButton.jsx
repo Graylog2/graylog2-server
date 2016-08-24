@@ -18,16 +18,15 @@ import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 const AddDecoratorButton = React.createClass({
   propTypes: {
     nextOrder: React.PropTypes.number.isRequired,
-    stream: React.PropTypes.string.isRequired,
+    stream: React.PropTypes.string,
     disabled: React.PropTypes.bool,
   },
+  mixins: [Reflux.connect(DecoratorsStore), PureRenderMixin],
   getDefaultProps() {
     return {
       disabled: false,
     };
   },
-
-  mixins: [Reflux.connect(DecoratorsStore), PureRenderMixin],
   getInitialState() {
     return {
       typeDefinition: {},
