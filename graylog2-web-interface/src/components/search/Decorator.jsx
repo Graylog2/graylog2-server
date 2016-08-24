@@ -26,14 +26,14 @@ const Decorator = React.createClass({
 
   _handleDeleteClick() {
     if (window.confirm('Do you really want to delete this decorator?')) {
-      DecoratorsActions.remove(this.props.decorator._id);
+      DecoratorsActions.remove(this.props.decorator.id);
     }
   },
   _handleEditClick() {
     this.refs.editForm.open();
   },
   _handleSubmit(data) {
-    DecoratorsActions.update(this.props.decorator._id, {
+    DecoratorsActions.update(this.props.decorator.id, {
       type: data.type,
       config: data.configuration,
       order: this.props.decorator.order,
@@ -74,14 +74,14 @@ const Decorator = React.createClass({
       <span className={DecoratorStyles.fullWidth}>
         <div className={DecoratorStyles.decoratorBox}>
           <h6 className={DecoratorStyles.decoratorType}>{decoratorType.name}</h6>
-          <DropdownButton id={`decorator-${decorator._id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions" pullRight>
+          <DropdownButton id={`decorator-${decorator.id}-actions`} bsStyle="default" bsSize="xsmall" title="Actions" pullRight>
             <MenuItem onSelect={this._handleEditClick}>Edit</MenuItem>
             <MenuItem divider/>
             <MenuItem onSelect={this._handleDeleteClick}>Delete</MenuItem>
           </DropdownButton>
         </div>
-        <ConfigurationWell key={`configuration-well-decorator-${decorator._id}`}
-                           id={decorator._id}
+        <ConfigurationWell key={`configuration-well-decorator-${decorator.id}`}
+                           id={decorator.id}
                            configuration={config}
                            typeDefinition={this.props.typeDefinition}/>
         <ConfigurationForm ref="editForm"
