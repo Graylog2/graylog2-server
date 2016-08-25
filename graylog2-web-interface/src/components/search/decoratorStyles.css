@@ -52,8 +52,8 @@
 }
 
 :local(.decoratorListContainer) {
-    overflow-y: scroll;
-    display: inline;
+    display: inline-block;
+    overflow-y: auto;
 }
 
 :local(.noDecoratorsAlert) {
