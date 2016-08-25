@@ -33,7 +33,9 @@ import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.dashboards.widgets.WidgetResultCache;
+import org.graylog2.dashboards.widgets.events.WidgetUpdatedEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.rest.models.dashboards.requests.CreateDashboardRequest;
@@ -71,17 +73,17 @@ public class DashboardsResource extends RestResource {
 
     private final DashboardService dashboardService;
     private final ActivityWriter activityWriter;
-    private final WidgetResultCache widgetResultCache;
+    private final ClusterEventBus clusterEventBus;
     private final EventBus serverEventBus;
 
     @Inject
     public DashboardsResource(DashboardService dashboardService,
                               ActivityWriter activityWriter,
-                              WidgetResultCache widgetResultCache,
+                              ClusterEventBus clusterEventBus,
                               EventBus serverEventBus) {
         this.dashboardService = dashboardService;
         this.activityWriter = activityWriter;
-        this.widgetResultCache = widgetResultCache;
+        this.clusterEventBus = clusterEventBus;
         this.serverEventBus = serverEventBus;
     }
 
@@ -148,7 +150,7 @@ public class DashboardsResource extends RestResource {
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         final Dashboard dashboard = dashboardService.load(dashboardId);
-        dashboard.getWidgets().values().stream().forEach((this.widgetResultCache::invalidate));
+        dashboard.getWidgets().values().forEach((widget) -> this.clusterEventBus.post(WidgetUpdatedEvent.create(widget)));
         dashboardService.destroy(dashboard);
 
         final String msg = "Deleted dashboard <" + dashboard.getId() + ">. Reason: REST request.";
