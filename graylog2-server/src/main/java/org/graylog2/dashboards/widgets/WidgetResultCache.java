@@ -66,8 +66,7 @@ public class WidgetResultCache {
     }
 
     public void invalidate(final DashboardWidget dashboardWidget) {
-        this.cache.remove(dashboardWidget.getId());
-        this.counter.dec();
+        this.invalidate(dashboardWidget.getId());
     }
 
     public void invalidate(final String widgetId) {
