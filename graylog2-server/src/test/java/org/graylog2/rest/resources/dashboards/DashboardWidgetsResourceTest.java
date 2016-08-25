@@ -26,7 +26,6 @@ import org.graylog2.dashboards.widgets.events.WidgetUpdatedEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.rest.models.dashboards.requests.AddWidgetRequest;
 import org.graylog2.rest.models.dashboards.requests.UpdateWidgetRequest;
-import org.graylog2.rest.resources.RestResourceBaseTest;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,13 +35,12 @@ import org.mockito.MockitoAnnotations;
 
 import java.util.Collections;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class DashboardWidgetsResourceTest extends RestResourceBaseTest {
+public class DashboardWidgetsResourceTest {
     private DashboardWidgetsResource dashboardWidgetsResource;
     @Mock
     private DashboardWidgetCreator dashboardWidgetCreator;
