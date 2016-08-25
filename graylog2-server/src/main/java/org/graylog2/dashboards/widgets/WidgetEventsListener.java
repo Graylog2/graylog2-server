@@ -16,9 +16,9 @@
  */
 package org.graylog2.dashboards.widgets;
 
+import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import org.graylog2.dashboards.widgets.events.WidgetUpdatedEvent;
-import org.graylog2.events.ClusterEventBus;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,12 +31,13 @@ public class WidgetEventsListener {
 
     @Inject
     public WidgetEventsListener(WidgetResultCache widgetResultCache,
-                                ClusterEventBus clusterEventBus) {
+                                EventBus eventBus) {
         this.widgetResultCache = widgetResultCache;
-        clusterEventBus.register(this);
+        eventBus.register(this);
     }
 
     @Subscribe
+    @SuppressWarnings("unused")
     public void invalidateWidgetResultCacheForWidgetUpdated(WidgetUpdatedEvent widgetUpdatedEvent) {
         LOG.debug("Invalidating widget <" + widgetUpdatedEvent.widgetId() + "> from WidgetResultCache due to WidgetUpdatedEvent");
         this.widgetResultCache.invalidate(widgetUpdatedEvent.widgetId());
