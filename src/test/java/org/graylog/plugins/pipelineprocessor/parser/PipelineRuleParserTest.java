@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.parser;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
@@ -31,17 +32,21 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.dates.TimezoneAwareFunction;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
+import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidFunctionArgument;
 import org.graylog.plugins.pipelineprocessor.parser.errors.NonIndexableType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMustBeNamed;
+import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -253,6 +258,27 @@ public class PipelineRuleParserTest extends BaseParserTest {
         functions.put(SetField.NAME, new SetField());
         functions.put(HasField.NAME, new HasField());
         functions.put(RegexMatch.NAME, new RegexMatch());
+        functions.put("now_in_tz", new TimezoneAwareFunction() {
+            @Override
+            protected DateTime evaluate(FunctionArgs args, EvaluationContext context, DateTimeZone timezone) {
+                return DateTime.now(timezone);
+            }
+
+            @Override
+            protected String description() {
+                return "Now in the given timezone";
+            }
+
+            @Override
+            protected String getName() {
+                return "now_in_tz";
+            }
+
+            @Override
+            protected ImmutableList<ParameterDescriptor> params() {
+                return ImmutableList.of();
+            }
+        });
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -464,6 +490,18 @@ public class PipelineRuleParserTest extends BaseParserTest {
         } catch (ParseException e) {
             assertEquals(1, e.getErrors().size());
             assertEquals(IncompatibleIndexType.class, Iterables.getOnlyElement(e.getErrors()).getClass());
+        }
+    }
+
+    @Test
+    public void invalidArgumentValue() {
+        try {
+            parser.parseRule(ruleForTest(), false);
+        } catch (ParseException e) {
+            assertEquals(1, e.getErrors().size());
+            final ParseError parseError = Iterables.getOnlyElement(e.getErrors());
+            assertEquals("Unable to pre-compute value for 1st argument timezone in call to function now_in_tz: The datetime zone id '123' is not recognised", parseError.toString());
+            assertEquals(InvalidFunctionArgument.class, parseError.getClass());
         }
     }
 

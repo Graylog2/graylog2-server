@@ -1,0 +1,4 @@
+rule "invalid arg"
+when now_in_tz("123")  // this isn't a valid tz
+then
+end

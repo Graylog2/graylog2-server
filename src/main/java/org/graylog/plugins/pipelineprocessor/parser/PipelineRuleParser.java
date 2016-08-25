@@ -36,6 +36,7 @@ import org.apache.mina.util.IdentityHashSet;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
+import org.graylog.plugins.pipelineprocessor.ast.exceptions.PrecomputeFailure;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ArrayLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BinaryExpression;
@@ -68,6 +69,7 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentT
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleTypes;
+import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidFunctionArgument;
 import org.graylog.plugins.pipelineprocessor.parser.errors.MissingRequiredParam;
 import org.graylog.plugins.pipelineprocessor.parser.errors.NonIndexableType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMustBeNamed;
@@ -357,9 +359,15 @@ public class PipelineRuleParser {
                 }
             }
 
-            final FunctionExpression expr = new FunctionExpression(
-                    ctx.getStart(), new FunctionArgs(functionRegistry.resolveOrError(name), argsMap)
-            );
+            FunctionExpression expr;
+            try {
+                expr = new FunctionExpression(
+                        ctx.getStart(), new FunctionArgs(functionRegistry.resolveOrError(name), argsMap)
+                );
+            } catch (PrecomputeFailure precomputeFailure) {
+                parseContext.addError(new InvalidFunctionArgument(ctx, function, precomputeFailure));
+                expr = new FunctionExpression(ctx.getStart(), new FunctionArgs(Function.ERROR_FUNCTION, argsMap));
+            }
 
             log.trace("FUNC: ctx {} => {}", ctx, expr);
             exprs.put(ctx, expr);

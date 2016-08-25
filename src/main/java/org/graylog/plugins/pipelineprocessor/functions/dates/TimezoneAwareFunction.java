@@ -33,7 +33,7 @@ public abstract class TimezoneAwareFunction extends AbstractFunction<DateTime> {
     public TimezoneAwareFunction() {
         timeZoneParam = ParameterDescriptor
                 .string(TIMEZONE, DateTimeZone.class)
-                .transform(DateTimeZone::forID)
+                .transform(id -> DateTimeZone.forID(id.toUpperCase()))
                 .optional()
                 .description("The timezone to apply to the date, defaults to UTC")
                 .build();

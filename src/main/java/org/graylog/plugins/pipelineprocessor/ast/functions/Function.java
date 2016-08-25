@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+import org.graylog.plugins.pipelineprocessor.ast.exceptions.PrecomputeFailure;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,8 +64,8 @@ public interface Function<T> {
                     args.setPreComputedValue(name, param.transform().apply(value));
                 }
             } catch (Exception exception) {
-                log.warn("Unable to precompute argument value for " + name, exception);
-                throw exception;
+                log.debug("Unable to precompute argument value for " + name, exception);
+                throw new PrecomputeFailure(name, exception);
             }
         }
 
