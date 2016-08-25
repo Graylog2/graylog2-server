@@ -54,6 +54,7 @@
 :local(.decoratorListContainer) {
     display: inline-block;
     overflow-y: auto;
+    width: 100%;
 }
 
 :local(.noDecoratorsAlert) {
