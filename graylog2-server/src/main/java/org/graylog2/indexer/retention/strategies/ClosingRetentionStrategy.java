@@ -17,6 +17,8 @@
 package org.graylog2.indexer.retention.strategies;
 
 import com.google.common.base.Stopwatch;
+import com.google.common.collect.ImmutableMap;
+import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
@@ -31,11 +33,15 @@ import javax.inject.Inject;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
+import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RETENTION_CLOSE;
+
 public class ClosingRetentionStrategy extends AbstractIndexCountBasedRetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(ClosingRetentionStrategy.class);
 
     private final Indices indices;
+    private final NodeId nodeId;
     private final ClusterConfigService clusterConfigService;
+    private final AuditEventSender auditEventSender;
 
     @Inject
     public ClosingRetentionStrategy(Deflector deflector,
@@ -44,9 +50,11 @@ public class ClosingRetentionStrategy extends AbstractIndexCountBasedRetentionSt
                                     NodeId nodeId,
                                     ClusterConfigService clusterConfigService,
                                     AuditEventSender auditEventSender) {
-        super(deflector, indices, nodeId, activityWriter, auditEventSender);
+        super(deflector, indices, activityWriter);
         this.indices = indices;
+        this.nodeId = nodeId;
         this.clusterConfigService = clusterConfigService;
+        this.auditEventSender = auditEventSender;
     }
 
     @Override
@@ -65,6 +73,10 @@ public class ClosingRetentionStrategy extends AbstractIndexCountBasedRetentionSt
         final Stopwatch sw = Stopwatch.createStarted();
 
         indices.close(indexName);
+        auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RETENTION_CLOSE, ImmutableMap.of(
+                "index_name", indexName,
+                "retention_strategy", this.getClass().getCanonicalName()
+        ));
 
         LOG.info("Finished index retention strategy [close] for index <{}> in {}ms.", indexName,
                 sw.stop().elapsed(TimeUnit.MILLISECONDS));

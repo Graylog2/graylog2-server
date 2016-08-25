@@ -59,8 +59,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String ES_INDEX_RANGE_CREATE = PREFIX + "es_index_range:create";
     public static final String ES_INDEX_RANGE_DELETE = PREFIX + "es_index_range:delete";
     public static final String ES_INDEX_RANGE_UPDATE_JOB = PREFIX + "es_index_range_update_job:start";
-    public static final String ES_INDEX_RETENTION_COMPLETE = PREFIX + "es_index_retention:complete";
-    public static final String ES_INDEX_RETENTION_INITIATE = PREFIX + "es_index_retention:initiate";
+    public static final String ES_INDEX_RETENTION_CLOSE = PREFIX + "es_index_retention:close";
+    public static final String ES_INDEX_RETENTION_DELETE = PREFIX + "es_index_retention:delete";
     public static final String ES_INDEX_RETENTION_STRATEGY_UPDATE = PREFIX + "es_index_retention_strategy:update";
     public static final String ES_INDEX_ROTATION_COMPLETE = PREFIX + "es_index_rotation:complete";
     public static final String ES_INDEX_ROTATION_INITIATE = PREFIX + "es_index_rotation:initiate";
@@ -175,8 +175,8 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(ES_INDEX_RANGE_CREATE)
             .add(ES_INDEX_RANGE_DELETE)
             .add(ES_INDEX_RANGE_UPDATE_JOB)
-            .add(ES_INDEX_RETENTION_COMPLETE)
-            .add(ES_INDEX_RETENTION_INITIATE)
+            .add(ES_INDEX_RETENTION_CLOSE)
+            .add(ES_INDEX_RETENTION_DELETE)
             .add(ES_INDEX_RETENTION_STRATEGY_UPDATE)
             .add(ES_INDEX_ROTATION_COMPLETE)
             .add(ES_INDEX_ROTATION_INITIATE)
