@@ -94,9 +94,11 @@ const DecoratorSidebar = React.createClass({
     return (
       <div>
         <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder} disabled={!editPermissions}/>
-        <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
-          <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
-        </OverlayTrigger>
+        <div className={DecoratorStyles.helpLinkContainer}>
+          <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
+            <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
+          </OverlayTrigger>
+        </div>
         <div ref="decoratorsContainer" className={DecoratorStyles.decoratorListContainer} style={{ maxHeight: this.state.maxDecoratorsHeight }}>
           <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} disableDragging={!editPermissions}/>
         </div>
