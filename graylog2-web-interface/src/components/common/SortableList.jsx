@@ -7,9 +7,16 @@ import SortableListItem from './SortableListItem';
 
 const SortableList = React.createClass({
   propTypes: {
+    disableDragging: React.PropTypes.bool,
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
     onMoveItem: PropTypes.func,
   },
+  getDefaultProps() {
+    return {
+      disableDragging: false,
+    };
+  },
+
   getInitialState() {
     return {
       items: this.props.items,
@@ -31,13 +38,17 @@ const SortableList = React.createClass({
   render() {
     const formattedItems = this.state.items.map((item, idx) => {
       return (
-        <SortableListItem key={`sortable-list-item-${item.id}`} index={idx} id={item.id} content={item.title}
+        <SortableListItem key={`sortable-list-item-${item.id}`}
+                          disableDragging={this.props.disableDragging}
+                          index={idx}
+                          id={item.id}
+                          content={item.title}
                           moveItem={this._moveItem}/>
       );
     });
 
     return (
-      <ListGroup className="sortable-list">
+      <ListGroup className={ this.props.disableDragging ? "sortable-list" : "sortable-list sortable-list-cursor"}>
         {formattedItems}
       </ListGroup>
     );
