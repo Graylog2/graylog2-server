@@ -63,7 +63,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String ES_INDEX_RETENTION_DELETE = PREFIX + "es_index_retention:delete";
     public static final String ES_INDEX_RETENTION_STRATEGY_UPDATE = PREFIX + "es_index_retention_strategy:update";
     public static final String ES_INDEX_ROTATION_COMPLETE = PREFIX + "es_index_rotation:complete";
-    public static final String ES_INDEX_ROTATION_INITIATE = PREFIX + "es_index_rotation:initiate";
     public static final String ES_INDEX_ROTATION_STRATEGY_UPDATE = PREFIX + "es_index_rotation_strategy:update";
     public static final String ES_WRITE_INDEX_UPDATE = PREFIX + "es_write_index:update";
     public static final String ES_WRITE_INDEX_UPDATE_JOB_START = PREFIX + "es_write_index_update_job:start";
@@ -179,7 +178,6 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(ES_INDEX_RETENTION_DELETE)
             .add(ES_INDEX_RETENTION_STRATEGY_UPDATE)
             .add(ES_INDEX_ROTATION_COMPLETE)
-            .add(ES_INDEX_ROTATION_INITIATE)
             .add(ES_INDEX_ROTATION_STRATEGY_UPDATE)
             .add(ES_WRITE_INDEX_UPDATE)
             .add(ES_WRITE_INDEX_UPDATE_JOB_START)
