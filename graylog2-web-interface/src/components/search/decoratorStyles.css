@@ -47,10 +47,14 @@
     position: relative;
 }
 
+:local(.helpLinkContainer) {
+    height: 20px;
+}
+
 :local(.decoratorListContainer) {
-    overflow-y: scroll;
-    display: inline;
-    padding-bottom: 20px;
+    display: inline-block;
+    overflow-y: auto;
+    width: 100%;
 }
 
 :local(.noDecoratorsAlert) {
