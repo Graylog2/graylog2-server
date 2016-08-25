@@ -26,7 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-public final class DashboardWidget implements EmbeddedPersistable {
+public class DashboardWidget implements EmbeddedPersistable {
     public static final String FIELD_ID = "id";
     public static final String FIELD_TYPE = "type";
     public static final String FIELD_DESCRIPTION = "description";
@@ -119,7 +119,7 @@ public final class DashboardWidget implements EmbeddedPersistable {
 
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         DashboardWidget that = (DashboardWidget) o;
