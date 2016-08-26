@@ -102,7 +102,7 @@ public class DashboardWidgetsResourceTest {
     public void updateWidgetMustSendUpdatedWidgetEvent() throws Exception {
         final DashboardWidget updatedWidget = mock(DashboardWidget.class);
         when(updatedWidget.getId()).thenReturn(widgetId);
-        final AddWidgetRequest addWidgetRequest = AddWidgetRequest.create("new description", "new type", 60, Collections.EMPTY_MAP);
+        final AddWidgetRequest addWidgetRequest = AddWidgetRequest.create("new description", "new type", 60, Collections.emptyMap());
 
         when(dashboardWidgetCreator.fromRequest(eq(widgetId), eq(addWidgetRequest), eq(creatorUserId))).thenReturn(updatedWidget);
 
