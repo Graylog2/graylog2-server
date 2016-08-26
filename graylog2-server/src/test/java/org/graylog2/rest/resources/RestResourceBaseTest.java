@@ -30,6 +30,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public class RestResourceBaseTest {
@@ -37,6 +38,11 @@ public class RestResourceBaseTest {
     public void setUpInjector() throws Exception {
         // The list of modules is empty for now so only JIT injection will be used.
         GuiceInjectorHolder.createInjector(Collections.emptyList());
+    }
+
+    public <T extends RestResource> T stubRestResource(T resourceClass) {
+        final T resource = spy(resourceClass);
+        return resource;
     }
 
     @Test
