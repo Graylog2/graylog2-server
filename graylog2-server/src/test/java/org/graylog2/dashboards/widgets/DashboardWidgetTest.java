@@ -26,6 +26,7 @@ public class DashboardWidgetTest {
     public void equals() throws Exception {
         EqualsVerifier.forClass(DashboardWidget.class)
             .suppress(Warning.NONFINAL_FIELDS)
+            .suppress(Warning.STRICT_INHERITANCE)
             .verify();
     }
 }
