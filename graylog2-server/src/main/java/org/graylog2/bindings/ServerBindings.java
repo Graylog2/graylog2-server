@@ -43,6 +43,7 @@ import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
+import org.graylog2.dashboards.widgets.WidgetEventsListener;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.filters.FilterService;
@@ -205,6 +206,7 @@ public class ServerBindings extends Graylog2Module {
         bind(LocalDebugEventListener.class).asEagerSingleton();
         bind(ClusterDebugEventListener.class).asEagerSingleton();
         bind(StartPageCleanupListener.class).asEagerSingleton();
+        bind(WidgetEventsListener.class).asEagerSingleton();
     }
 
     private void bindSearchResponseDecorators() {

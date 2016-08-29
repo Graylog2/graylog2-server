@@ -49,7 +49,7 @@ public class WidgetResultCache {
     public ComputationResult getComputationResultForDashboardWidget(final DashboardWidget dashboardWidget) throws InvalidWidgetConfigurationException {
         final String widgetId = dashboardWidget.getId();
         if (!this.cache.containsKey(widgetId)) {
-            final WidgetStrategy widgetStrategy = this.widgetStrategyFactory.getWidgetForType(dashboardWidget.getType().toString(),
+            final WidgetStrategy widgetStrategy = this.widgetStrategyFactory.getWidgetForType(dashboardWidget.getType(),
                     dashboardWidget.getConfig(), dashboardWidget.getTimeRange(), widgetId);
             final Supplier<ComputationResult> supplier = this.cache.putIfAbsent(widgetId, Suppliers.memoizeWithExpiration(
                     new ComputationResultSupplier(metricRegistry, dashboardWidget, widgetStrategy),
@@ -65,9 +65,9 @@ public class WidgetResultCache {
         return this.cache.get(widgetId).get();
     }
 
-    public void invalidate(final DashboardWidget dashboardWidget) {
-        this.cache.remove(dashboardWidget.getId());
-        counter.dec();
+    public void invalidate(final String widgetId) {
+        this.cache.remove(widgetId);
+        this.counter.dec();
     }
 
     private static class ComputationResultSupplier implements Supplier<ComputationResult> {
