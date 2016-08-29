@@ -118,7 +118,6 @@ const JSONExtractorConfiguration = React.createClass({
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
                defaultValue={this.state.configuration.key_prefix}
-               required
                onChange={this._onChange('key_prefix')}
                help="Text to prepend to each key extracted from the JSON object."/>
 
