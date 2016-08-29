@@ -121,7 +121,7 @@ public class DashboardWidget implements EmbeddedPersistable {
     @Override
     public final boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || !DashboardWidget.class.isAssignableFrom(o.getClass())) return false;
+        if (!(o instanceof DashboardWidget)) return false;
         DashboardWidget that = (DashboardWidget) o;
         return cacheTime == that.cacheTime &&
             Objects.equals(type, that.type) &&
