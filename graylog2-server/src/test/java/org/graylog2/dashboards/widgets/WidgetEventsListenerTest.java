@@ -19,45 +19,40 @@ package org.graylog2.dashboards.widgets;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.dashboards.widgets.events.WidgetUpdatedEvent;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class WidgetEventsListenerTest {
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
     @Mock
     private WidgetResultCache widgetResultCache;
-    @Mock
-    private EventBus eventBus;
-
     private WidgetEventsListener widgetEventsListener;
 
     @Before
     public void setUp() throws Exception {
-        MockitoAnnotations.initMocks(this);
-        this.widgetEventsListener = new WidgetEventsListener(this.widgetResultCache, eventBus);
-        verify(eventBus).register(any());
+        widgetEventsListener = new WidgetEventsListener(widgetResultCache, new EventBus("Test"));
     }
 
     @Test
     public void invalidateWidgetResultCacheForWidgetUpdatedMustInvalidateWidgetResultCacheForWidgetId() throws Exception {
         final String widgetId = "mockedId";
-        final WidgetUpdatedEvent widgetUpdatedEvent = mock(WidgetUpdatedEvent.class);
-        when(widgetUpdatedEvent.widgetId()).thenReturn(widgetId);
+        final WidgetUpdatedEvent widgetUpdatedEvent = WidgetUpdatedEvent.create(widgetId);
 
-        this.widgetEventsListener.invalidateWidgetResultCacheForWidgetUpdated(widgetUpdatedEvent);
+        widgetEventsListener.invalidateWidgetResultCacheForWidgetUpdated(widgetUpdatedEvent);
 
         final ArgumentCaptor<String> widgetIdCaptor = ArgumentCaptor.forClass(String.class);
 
-        verify(this.widgetResultCache).invalidate(widgetIdCaptor.capture());
-
-        assert(widgetIdCaptor.getValue()).equals(widgetId);
+        verify(widgetResultCache).invalidate(widgetIdCaptor.capture());
+        assertThat(widgetIdCaptor.getValue()).isEqualTo(widgetId);
     }
 
 }
