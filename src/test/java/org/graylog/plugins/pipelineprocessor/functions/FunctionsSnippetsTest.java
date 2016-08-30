@@ -530,6 +530,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("field2_suff")).isEqualTo("10");
     }
 
+    @Test
     public void keyValue() {
         final Rule rule = parser.parseRule(ruleForTest(), true);
 
