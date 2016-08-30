@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
 
@@ -11,7 +10,6 @@ import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import { IfPermitted, PageHeader } from 'components/common';
-import DocumentationLink from 'components/support/DocumentationLink';
 import UserList from 'components/users/UserList';
 
 const UsersPage = React.createClass({
