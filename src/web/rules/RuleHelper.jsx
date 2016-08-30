@@ -111,7 +111,7 @@ end`,
       return <Spinner />;
     }
 
-    const pagedEntries = this.state.functionDescriptors.slice((this.state.currentPage - 1) * this.state.pageSize, (this.state.currentPage * this.state.pageSize) - 1);
+    const pagedEntries = this.state.functionDescriptors.slice((this.state.currentPage - 1) * this.state.pageSize, this.state.currentPage * this.state.pageSize);
 
     return (
       <Panel header="Rules quick reference">
