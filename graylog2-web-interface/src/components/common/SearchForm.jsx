@@ -17,6 +17,10 @@ const SearchForm = React.createClass({
     resetButtonLabel: React.PropTypes.string,
     loadingLabel: React.PropTypes.string,
     useLoadingState: React.PropTypes.bool,
+    children: React.PropTypes.oneOfType([
+      React.PropTypes.arrayOf(React.PropTypes.element),
+      React.PropTypes.element,
+    ]),
   },
 
   getDefaultProps() {
@@ -98,6 +102,7 @@ const SearchForm = React.createClass({
               </Button>
             </div>
           }
+          {this.props.children}
         </form>
       </div>
     );
