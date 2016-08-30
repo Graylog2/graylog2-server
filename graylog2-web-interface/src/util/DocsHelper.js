@@ -8,6 +8,7 @@ class DocsHelper {
     COLLECTOR_SIDECAR: 'collector_sidecar.html',
     CONFIGURING_ES: 'configuration/elasticsearch.html',
     DASHBOARDS: 'dashboards.html',
+    DECORATORS: 'queries.html#decorators',
     ES_CLUSTER_STATUS_RED: 'configuration/elasticsearch.html#cluster-status-explained',
     ES_CLUSTER_UNAVAILABLE: 'configuration/elasticsearch.html#configuration',
     ES_OPEN_FILE_LIMITS: 'configuration/elasticsearch.html#open-file-limits',

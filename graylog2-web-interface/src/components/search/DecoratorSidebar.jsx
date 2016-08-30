@@ -5,6 +5,7 @@ import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
 import { AddDecoratorButton, Decorator, DecoratorList } from 'components/search';
+import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
 
@@ -85,7 +86,7 @@ const DecoratorSidebar = React.createClass({
           Use drag and drop to modify the order in which decorators are processed.
         </p>
         <p>
-          Read more about message decorators in the <a href={DocsHelper.toString('decorators.html')}>documentation</a>.
+          Read more about message decorators in the <DocumentationLink page={DocsHelper.PAGES.DECORATORS} text="documentation"/>.
         </p>
       </Popover>
     );
