@@ -63,7 +63,7 @@ public class KeyValue extends AbstractFunction<Map<String, String>> {
         trimValueCharactersParam = string("trim_value_chars", CharMatcher.class)
                 .transform(CharMatcher::anyOf)
                 .optional()
-                .description("The characters to trim from keys, default is not to trim")
+                .description("The characters to trim from values, default is not to trim")
                 .build();
     }
 
