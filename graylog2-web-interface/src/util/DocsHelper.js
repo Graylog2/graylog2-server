@@ -6,6 +6,7 @@ class DocsHelper {
     CLUSTER_STATUS_EXPLAINED: 'configuration/elasticsearch.html#cluster-status-explained',
     COLLECTOR: 'collector.html',
     COLLECTOR_SIDECAR: 'collector_sidecar.html',
+    COLLECTOR_STATUS: 'collector_sidecar.html#sidecar-status',
     CONFIGURING_ES: 'configuration/elasticsearch.html',
     DASHBOARDS: 'dashboards.html',
     DECORATORS: 'queries.html#decorators',
