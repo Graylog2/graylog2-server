@@ -1,4 +1,5 @@
 import request from 'superagent-bluebird-promise';
+import BluebirdPromise from 'bluebird';
 
 import StoreProvider from 'injection/StoreProvider';
 
@@ -98,7 +99,7 @@ export default function fetch(method, url, body) {
   const SessionStore = StoreProvider.getStore('Session');
 
   if (!SessionStore.isLoggedIn()) {
-    return new Promise((resolve, reject) => {
+    return new BluebirdPromise((resolve, reject) => {
       const SessionActions = ActionsProvider.getActions('Session');
       SessionActions.login.completed.listen(() => {
         promise().then(resolve, reject);
