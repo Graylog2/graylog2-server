@@ -215,7 +215,7 @@ public class IndicesTest {
             "_source", ImmutableMap.of("enabled", false),
             "properties", ImmutableMap.of("message",
                 ImmutableMap.of(
-                    "type", "binary",
+                    "type", "string",
                     "index", "not_analyzed")));
         assertThat(client.preparePutTemplate(templateName)
                 .setTemplate(indices.allIndicesAlias())
