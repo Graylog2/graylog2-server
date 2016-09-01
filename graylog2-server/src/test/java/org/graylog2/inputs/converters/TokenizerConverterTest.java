@@ -141,6 +141,17 @@ public class TokenizerConverterTest {
     }
 
     @Test
+    public void testFilterWithNewlineBetweenKV() {
+        final TokenizerConverter f = new TokenizerConverter(new HashMap<>());
+        @SuppressWarnings("unchecked")
+        final Map<String, String> result = (Map<String, String>) f.convert("otters in k1 = v1\nk2= v2 more otters");
+
+        assertEquals(2, result.size());
+        assertEquals("v1", result.get("k1"));
+        assertEquals("v2", result.get("k2"));
+    }
+
+    @Test
     public void testFilterWithQuotedValue() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
         @SuppressWarnings("unchecked")
