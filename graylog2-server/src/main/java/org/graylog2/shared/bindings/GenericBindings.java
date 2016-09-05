@@ -35,6 +35,7 @@ import org.graylog2.shared.bindings.providers.EventBusProvider;
 import org.graylog2.shared.bindings.providers.MetricRegistryProvider;
 import org.graylog2.shared.bindings.providers.NodeIdProvider;
 import org.graylog2.shared.bindings.providers.OkHttpClientProvider;
+import org.graylog2.shared.bindings.providers.ProxiedRequestsExecutorService;
 import org.graylog2.shared.bindings.providers.ServiceManagerProvider;
 import org.graylog2.shared.bindings.providers.SystemOkHttpClientProvider;
 import org.graylog2.shared.buffers.InputBufferImpl;
@@ -44,6 +45,7 @@ import org.graylog2.shared.inputs.InputRegistry;
 import org.jboss.netty.util.HashedWheelTimer;
 
 import javax.activation.MimetypesFileTypeMap;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
 
 public class GenericBindings extends AbstractModule {
@@ -77,5 +79,7 @@ public class GenericBindings extends AbstractModule {
         bind(OkHttpClient.class).annotatedWith(Names.named("systemHttpClient")).toProvider(SystemOkHttpClientProvider.class).asEagerSingleton();
 
         bind(MimetypesFileTypeMap.class).toInstance(new MimetypesFileTypeMap());
+
+        bind(ExecutorService.class).annotatedWith(Names.named("proxiedRequestsExecutorService")).toProvider(ProxiedRequestsExecutorService.class).asEagerSingleton();
     }
 }

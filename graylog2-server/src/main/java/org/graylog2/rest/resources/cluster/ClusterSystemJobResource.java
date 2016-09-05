@@ -36,6 +36,7 @@ import org.slf4j.LoggerFactory;
 import retrofit2.Response;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -49,6 +50,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 @RequiresAuthentication
 @Api(value = "Cluster/Jobs", description = "Cluster-wide System Jobs")
@@ -59,8 +61,9 @@ public class ClusterSystemJobResource extends ProxiedResource {
     @Inject
     public ClusterSystemJobResource(NodeService nodeService,
                                     RemoteInterfaceProvider remoteInterfaceProvider,
-                                    @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
-        super(httpHeaders, nodeService, remoteInterfaceProvider);
+                                    @Context HttpHeaders httpHeaders,
+                                    @Named("proxiedRequestsExecutorService") ExecutorService executorService) throws NodeNotFoundException {
+        super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
     }
 
     @GET

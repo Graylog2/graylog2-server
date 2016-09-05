@@ -163,6 +163,10 @@ public abstract class BaseConfiguration {
     @Parameter(value = "web_tls_key_password")
     private String webTlsKeyPassword;
 
+    @Parameter(value = "proxied_requests_max_threads", required = true, validator = PositiveIntegerValidator.class)
+    // TODO: this is a totally abitrary number. this needs a better default based on ... something.
+    private int proxiedRequestsMaxThreads = 64;
+
     public String getRestUriScheme() {
         return getUriScheme(isRestEnableTls());
     }

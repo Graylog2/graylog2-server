@@ -38,6 +38,7 @@ import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
@@ -50,6 +51,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 @RequiresAuthentication
 @Api(value = "Cluster/InputState", description = "Cluster-wide input states")
@@ -59,8 +61,9 @@ public class ClusterInputStatesResource extends ProxiedResource {
     @Inject
     public ClusterInputStatesResource(NodeService nodeService,
                                       RemoteInterfaceProvider remoteInterfaceProvider,
-                                      @Context HttpHeaders httpHeaders) throws NodeNotFoundException {
-        super(httpHeaders, nodeService, remoteInterfaceProvider);
+                                      @Context HttpHeaders httpHeaders,
+                                      @Named("proxiedRequestsExecutorService") ExecutorService executorService) throws NodeNotFoundException {
+        super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
     }
 
     @GET

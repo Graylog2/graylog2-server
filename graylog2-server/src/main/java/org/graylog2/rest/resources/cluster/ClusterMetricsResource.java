@@ -33,6 +33,7 @@ import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteMetricsResource;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.POST;
@@ -44,6 +45,7 @@ import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 
 @RequiresAuthentication
 @Api(value = "Cluster/Metrics", description = "Cluster-wide Internal Graylog metrics")
@@ -54,8 +56,9 @@ public class ClusterMetricsResource extends ProxiedResource {
     @Inject
     public ClusterMetricsResource(NodeService nodeService,
                                   RemoteInterfaceProvider remoteInterfaceProvider,
-                                  @Context HttpHeaders httpHeaders) {
-        super(httpHeaders, nodeService, remoteInterfaceProvider);
+                                  @Context HttpHeaders httpHeaders,
+                                  @Named("proxiedRequestsExecutorService") ExecutorService executorService) {
+        super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
     }
 
     @POST

@@ -51,10 +51,11 @@ public abstract class ProxiedResource extends RestResource {
 
     protected ProxiedResource(@Context HttpHeaders httpHeaders,
                               NodeService nodeService,
-                              RemoteInterfaceProvider remoteInterfaceProvider) {
+                              RemoteInterfaceProvider remoteInterfaceProvider,
+                              ExecutorService executorService) {
         this.nodeService = nodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
-        this.executor = Executors.newCachedThreadPool();
+        this.executor = executorService;
         final List<String> authenticationTokens = httpHeaders.getRequestHeader("Authorization");
         if (authenticationTokens != null && authenticationTokens.size() >= 1) {
             this.authenticationToken = authenticationTokens.get(0);
