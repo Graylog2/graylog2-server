@@ -17,6 +17,7 @@
 
 package org.graylog2.shared.rest.resources;
 
+import org.apache.commons.lang3.concurrent.ConcurrentUtils;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -32,6 +33,10 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,10 +47,14 @@ public abstract class ProxiedResource extends RestResource {
     protected final NodeService nodeService;
 
     protected final RemoteInterfaceProvider remoteInterfaceProvider;
+    private final ExecutorService executor;
 
-    protected ProxiedResource(@Context HttpHeaders httpHeaders, NodeService nodeService, RemoteInterfaceProvider remoteInterfaceProvider) {
+    protected ProxiedResource(@Context HttpHeaders httpHeaders,
+                              NodeService nodeService,
+                              RemoteInterfaceProvider remoteInterfaceProvider) {
         this.nodeService = nodeService;
         this.remoteInterfaceProvider = remoteInterfaceProvider;
+        this.executor = Executors.newCachedThreadPool();
         final List<String> authenticationTokens = httpHeaders.getRequestHeader("Authorization");
         if (authenticationTokens != null && authenticationTokens.size() >= 1) {
             this.authenticationToken = authenticationTokens.get(0);
@@ -59,25 +68,38 @@ public abstract class ProxiedResource extends RestResource {
     }
 
     protected <RemoteInterfaceType, FinalResponseType, RemoteCallResponseType> Map<String, Optional<FinalResponseType>> getForAllNodes(Function<RemoteInterfaceType, Call<RemoteCallResponseType>> fn, Function<String, Optional<RemoteInterfaceType>> interfaceProvider, Function<RemoteCallResponseType, FinalResponseType> transformer) {
-        return this.nodeService.allActive()
+        final Map<String, Future<Optional<FinalResponseType>>> futures = this.nodeService.allActive()
             .entrySet()
             .stream()
             .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                 final Optional<RemoteInterfaceType> remoteInterface = interfaceProvider.apply(entry.getKey());
                 if (!remoteInterface.isPresent()) {
-                    return Optional.empty();
+                    return ConcurrentUtils.constantFuture(Optional.empty());
                 }
-                final Call<RemoteCallResponseType> call = fn.apply(remoteInterface.get());
-                try {
-                    final Response<RemoteCallResponseType> response = call.execute();
-                    if (response.isSuccessful()) {
-                        return Optional.of(transformer.apply(response.body()));
-                    } else {
-                        LOG.warn("Unable to call " + call.request().url().toString() + " on node <" + entry.getKey() + ">, result: " + response.message());
+                return this.executor.submit(() -> {
+                    final Call<RemoteCallResponseType> call = fn.apply(remoteInterface.get());
+                    try {
+                        final Response<RemoteCallResponseType> response = call.execute();
+                        if (response.isSuccessful()) {
+                            return Optional.of(transformer.apply(response.body()));
+                        } else {
+                            LOG.warn("Unable to call " + call.request().url().toString() + " on node <" + entry.getKey() + ">, result: " + response.message());
+                            return Optional.empty();
+                        }
+                    } catch (IOException e) {
+                        LOG.warn("Unable to call " + call.request().url().toString() + " on node <" + entry.getKey() + ">, caught exception: {} ({})", e.getMessage(), e.getClass());
                         return Optional.empty();
                     }
-                } catch (IOException e) {
-                    LOG.warn("Unable to call " + call.request().url().toString() + " on node <" + entry.getKey() + ">, caught exception: {} ({})", e.getMessage(), e.getClass());
+                });
+            }));
+
+        return futures
+            .entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                try {
+                    return entry.getValue().get();
+                } catch (InterruptedException | ExecutionException e) {
                     return Optional.empty();
                 }
             }));
