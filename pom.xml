@@ -110,6 +110,7 @@
         <forbiddenapis.version>2.2</forbiddenapis.version>
         <nosqlunit.version>0.10.0</nosqlunit.version>
         <commons-io.version>2.5</commons-io.version>
+        <okhttp.version>3.4.1</okhttp.version>
     </properties>
 
     <repositories>
@@ -261,7 +262,7 @@
             <dependency>
                 <groupId>com.squareup.okhttp3</groupId>
                 <artifactId>okhttp</artifactId>
-                <version>3.4.1</version>
+                <version>${okhttp.version}</version>
             </dependency>
 
             <dependency>
@@ -768,6 +769,12 @@
                 <groupId>com.github.stefanbirkner</groupId>
                 <artifactId>system-rules</artifactId>
                 <version>1.16.0</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup.okhttp3</groupId>
+                <artifactId>mockwebserver</artifactId>
+                <version>${okhttp.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
