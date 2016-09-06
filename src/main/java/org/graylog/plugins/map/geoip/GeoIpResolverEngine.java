@@ -40,6 +40,7 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class GeoIpResolverEngine {
     private static final Logger LOG = LoggerFactory.getLogger(GeoIpResolverEngine.class);
+    private static final String INTERNAL_FIELD_PREFIX = "gl2_";
 
     private final Timer resolveTime;
     private DatabaseReader databaseReader;
@@ -70,10 +71,13 @@ public class GeoIpResolverEngine {
         }
 
         for (Map.Entry<String, Object> field : message.getFields().entrySet()) {
-            String key = field.getKey() + "_geolocation";
-            final Optional<Coordinates> coordinates = extractGeoLocationInformation(field.getValue());
-            // We will store the coordinates as a "lat,long" string
-            coordinates.ifPresent(c -> message.addField(key, c.latitude() + "," + c.longitude()));
+            final String key = field.getKey();
+            if (!key.startsWith(INTERNAL_FIELD_PREFIX)) {
+                final String geoLocationKey = key + "_geolocation";
+                final Optional<Coordinates> coordinates = extractGeoLocationInformation(field.getValue());
+                // We will store the coordinates as a "lat,long" string
+                coordinates.ifPresent(c -> message.addField(geoLocationKey, c.latitude() + "," + c.longitude()));
+            }
         }
 
         return false;
