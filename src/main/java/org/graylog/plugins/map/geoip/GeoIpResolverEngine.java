@@ -73,7 +73,7 @@ public class GeoIpResolverEngine {
             String key = field.getKey() + "_geolocation";
             final Optional<Coordinates> coordinates = extractGeoLocationInformation(field.getValue());
             // We will store the coordinates as a "lat,long" string
-            coordinates.ifPresent(c -> message.addField(key, c.latitude() + "" + c.longitude()));
+            coordinates.ifPresent(c -> message.addField(key, c.latitude() + "," + c.longitude()));
         }
 
         return false;

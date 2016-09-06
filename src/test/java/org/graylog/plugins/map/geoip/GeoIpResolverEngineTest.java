@@ -28,9 +28,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import java.net.URISyntaxException;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.testng.Assert.assertEquals;
@@ -134,6 +132,8 @@ public class GeoIpResolverEngineTest {
         assertNull(message.getField("source_geolocation"), "Should not have resolved private IP");
         assertNull(message.getField("message_geolocation"), "Should have resolved public IP inside message");
         assertNotNull(message.getField("extracted_ip_geolocation"), "Should have resolved public IP inside extracted_ip");
+        assertTrue(((String) message.getField("extracted_ip_geolocation")).contains(","), "Should include a comma");
         assertNotNull(message.getField("ipv6_geolocation"), "Should have resolved public IPv6 inside ipv6");
+        assertTrue(((String) message.getField("ipv6_geolocation")).contains(","), "Should include a comma");
     }
 }
