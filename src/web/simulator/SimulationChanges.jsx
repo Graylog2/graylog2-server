@@ -29,7 +29,7 @@ const SimulationChanges = React.createClass({
 
   _formatFieldValue(field, value, isAdded, isRemoved) {
     const className = (isAdded ? 'added-field' : (isRemoved ? 'removed-field' : ''));
-    return <dd key={`${field}-value`} className={`field-value ${className}`}>{value}</dd>;
+    return <dd key={`${field}-value`} className={`field-value ${className}`}>{String(value)}</dd>;
   },
 
   _formatAddedFields(originalMessage, processedMessage) {
