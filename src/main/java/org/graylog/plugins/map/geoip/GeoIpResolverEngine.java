@@ -18,7 +18,7 @@ package org.graylog.plugins.map.geoip;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.collect.Lists;
+import com.google.auto.value.AutoValue;
 import com.google.common.net.InetAddresses;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
@@ -32,8 +32,8 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.nio.file.Files;
-import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -71,42 +71,35 @@ public class GeoIpResolverEngine {
 
         for (Map.Entry<String, Object> field : message.getFields().entrySet()) {
             String key = field.getKey() + "_geolocation";
-            final List coordinates = extractGeoLocationInformation(field.getValue());
-            if (coordinates.size() == 2) {
-                // We will store the coordinates as a "lat,long" string
-                final String stringGeoPoint = coordinates.get(1) + "," + coordinates.get(0);
-                message.addField(key, stringGeoPoint);
-            }
+            final Optional<Coordinates> coordinates = extractGeoLocationInformation(field.getValue());
+            // We will store the coordinates as a "lat,long" string
+            coordinates.ifPresent(c -> message.addField(key, c.latitude() + "" + c.longitude()));
         }
 
         return false;
     }
 
-    protected List<Double> extractGeoLocationInformation(Object fieldValue) {
-        final List<Double> coordinates = Lists.newArrayList();
-
+    protected Optional<Coordinates> extractGeoLocationInformation(Object fieldValue) {
         if (!(fieldValue instanceof String) || isNullOrEmpty((String) fieldValue)) {
-            return coordinates;
+            return Optional.empty();
         }
 
         final String stringFieldValue = (String) fieldValue;
         final InetAddress ipAddress = this.getIpFromFieldValue(stringFieldValue);
         if (ipAddress == null) {
-            return coordinates;
+            return Optional.empty();
         }
 
         try {
             try (Timer.Context ignored = resolveTime.time()) {
                 final CityResponse response = databaseReader.city(ipAddress);
                 final Location location = response.getLocation();
-                coordinates.add(location.getLongitude());
-                coordinates.add(location.getLatitude());
+                return Optional.of(Coordinates.create(location.getLatitude(), location.getLongitude()));
             }
         } catch (Exception e) {
             LOG.debug("Could not get location from IP {}", ipAddress.getHostAddress(), e);
+            return Optional.empty();
         }
-
-        return coordinates;
     }
 
     protected InetAddress getIpFromFieldValue(String fieldValue) {
@@ -117,5 +110,16 @@ public class GeoIpResolverEngine {
         }
 
         return null;
+    }
+
+    @AutoValue
+    static abstract class Coordinates {
+        public abstract double latitude();
+
+        public abstract double longitude();
+
+        public static Coordinates create(double latitude, double longitude) {
+            return new AutoValue_GeoIpResolverEngine_Coordinates(latitude, longitude);
+        }
     }
 }

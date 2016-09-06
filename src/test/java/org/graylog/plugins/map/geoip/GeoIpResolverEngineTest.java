@@ -30,12 +30,14 @@ import org.testng.annotations.Test;
 import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertNotNull;
 import static org.testng.Assert.assertNull;
+import static org.testng.Assert.assertTrue;
 
 public class GeoIpResolverEngineTest {
 
@@ -88,10 +90,10 @@ public class GeoIpResolverEngineTest {
     public void extractGeoLocationInformation() throws Exception {
         final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
 
-        List<Double> coordinates = resolver.extractGeoLocationInformation("1.2.3.4");
-        assertEquals(coordinates.size(), 2, "Should extract geo location information from public addresses");
-        List<Double> coordinates2 = resolver.extractGeoLocationInformation("192.168.0.1");
-        assertEquals(coordinates2.size(), 0, "Should not extract geo location information from private addresses");
+        Optional<GeoIpResolverEngine.Coordinates> coordinates = resolver.extractGeoLocationInformation("1.2.3.4");
+        assertTrue(coordinates.isPresent(), "Should extract geo location information from public addresses");
+        Optional<GeoIpResolverEngine.Coordinates> coordinates2 = resolver.extractGeoLocationInformation("192.168.0.1");
+        assertFalse(coordinates2.isPresent(), "Should not extract geo location information from private addresses");
     }
 
     @Test
