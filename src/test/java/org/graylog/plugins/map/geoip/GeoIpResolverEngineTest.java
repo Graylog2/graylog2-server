@@ -90,10 +90,10 @@ public class GeoIpResolverEngineTest {
     public void extractGeoLocationInformation() throws Exception {
         final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
 
-        Optional<GeoIpResolverEngine.Coordinates> coordinates = resolver.extractGeoLocationInformation("1.2.3.4");
-        assertTrue(coordinates.isPresent(), "Should extract geo location information from public addresses");
-        Optional<GeoIpResolverEngine.Coordinates> coordinates2 = resolver.extractGeoLocationInformation("192.168.0.1");
-        assertFalse(coordinates2.isPresent(), "Should not extract geo location information from private addresses");
+        assertTrue(resolver.extractGeoLocationInformation("1.2.3.4").isPresent(), "Should extract geo location information from public addresses");
+        assertFalse(resolver.extractGeoLocationInformation("192.168.0.1").isPresent(), "Should not extract geo location information from private addresses");
+        assertFalse(resolver.extractGeoLocationInformation(42).isPresent(), "Should not extract geo location information numeric fields");
+        assertTrue(resolver.extractGeoLocationInformation(InetAddresses.forString("1.2.3.4")).isPresent(), "Should extract geo location information IP address fields");
     }
 
     @Test
