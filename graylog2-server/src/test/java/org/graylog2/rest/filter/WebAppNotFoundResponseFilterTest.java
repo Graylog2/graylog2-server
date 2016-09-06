@@ -126,6 +126,21 @@ public class WebAppNotFoundResponseFilterTest {
     }
 
     @Test
+    public void filterDoesFilterCompatibleAcceptMimeTypes() throws Exception {
+        final UriInfo uriInfo = mock(UriInfo.class);
+        final List<MediaType> mediaTypes = Collections.singletonList(MediaType.WILDCARD_TYPE);
+        when(uriInfo.getAbsolutePath()).thenReturn(URI.create("/web/search"));
+        when(requestContext.getMethod()).thenReturn(CK_METHOD_GET);
+        when(requestContext.getUriInfo()).thenReturn(uriInfo);
+        when(requestContext.getAcceptableMediaTypes()).thenReturn(mediaTypes);
+        when(responseContext.getStatusInfo()).thenReturn(Response.Status.NOT_FOUND);
+
+        filter.filter(requestContext, responseContext);
+
+        verify(responseContext, times(1)).setEntity("index.html", new Annotation[0], MediaType.TEXT_HTML_TYPE);
+    }
+
+    @Test
     public void filterDoesNotFilterRestApiPrefix() throws Exception {
         final UriInfo uriInfo = mock(UriInfo.class);
         final List<MediaType> mediaTypes = Collections.singletonList(MediaType.TEXT_HTML_TYPE);
