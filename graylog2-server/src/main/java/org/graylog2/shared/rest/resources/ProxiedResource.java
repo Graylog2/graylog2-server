@@ -17,7 +17,6 @@
 
 package org.graylog2.shared.rest.resources;
 
-import org.apache.commons.lang3.concurrent.ConcurrentUtils;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -33,6 +32,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -74,7 +74,7 @@ public abstract class ProxiedResource extends RestResource {
             .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                 final Optional<RemoteInterfaceType> remoteInterface = interfaceProvider.apply(entry.getKey());
                 if (!remoteInterface.isPresent()) {
-                    return ConcurrentUtils.constantFuture(Optional.empty());
+                    return CompletableFuture.completedFuture(Optional.empty());
                 }
                 return this.executor.submit(() -> {
                     final Call<RemoteCallResponseType> call = fn.apply(remoteInterface.get());
