@@ -27,11 +27,12 @@ const StreamRuleForm = React.createClass({
     return this.props.streamRule;
   },
   FIELD_PRESENCE_RULE_TYPE: 5,
+  ALWAYS_MATCH_RULE_TYPE: 7,
   _resetValues() {
     this.setState(this.props.streamRule);
   },
   _onSubmit() {
-    if (this.state.type === this.FIELD_PRESENCE_RULE_TYPE) {
+    if (this.state.type === this.FIELD_PRESENCE_RULE_TYPE || this.state.type === this.ALWAYS_MATCH_RULE_TYPE) {
       this.state.value = '';
     }
     this.props.onSubmit(this.props.streamRule.id, this.state);
@@ -78,8 +79,7 @@ const StreamRuleForm = React.createClass({
             <p>
               <strong>Result:</strong>
               {' '}
-              Field <HumanReadableStreamRule streamRule={this.state}
-                                             streamRuleTypes={this.props.streamRuleTypes}/>
+              <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={this.props.streamRuleTypes}/>
             </p>
           </Col>
           <Col md={4}>

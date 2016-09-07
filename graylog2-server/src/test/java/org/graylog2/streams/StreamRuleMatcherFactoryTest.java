@@ -18,33 +18,23 @@ package org.graylog2.streams;
 
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.streams.matchers.AlwaysMatcher;
-import org.graylog2.streams.matchers.ContainsMatcher;
 import org.graylog2.streams.matchers.ExactMatcher;
 import org.graylog2.streams.matchers.FieldPresenceMatcher;
 import org.graylog2.streams.matchers.GreaterMatcher;
 import org.graylog2.streams.matchers.RegexMatcher;
 import org.graylog2.streams.matchers.SmallerMatcher;
-import org.graylog2.streams.matchers.StreamRuleMatcher;
+import org.junit.Test;
 
-public class StreamRuleMatcherFactory {
-    public static StreamRuleMatcher build(StreamRuleType ruleType) throws InvalidStreamRuleTypeException {
-        switch (ruleType) {
-            case EXACT:
-                return new ExactMatcher();
-            case REGEX:
-                return new RegexMatcher();
-            case GREATER:
-                return new GreaterMatcher();
-            case SMALLER:
-                return new SmallerMatcher();
-            case PRESENCE:
-                return new FieldPresenceMatcher();
-            case CONTAINS:
-                return new ContainsMatcher();
-            case ALWAYS_MATCH:
-                return new AlwaysMatcher();
-            default:
-                throw new InvalidStreamRuleTypeException();
-        }
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class StreamRuleMatcherFactoryTest {
+    @Test
+    public void buildReturnsCorrectStreamRuleMatcher() throws Exception {
+        assertThat(StreamRuleMatcherFactory.build(StreamRuleType.EXACT)).isInstanceOf(ExactMatcher.class);
+        assertThat(StreamRuleMatcherFactory.build(StreamRuleType.REGEX)).isInstanceOf(RegexMatcher.class);
+        assertThat(StreamRuleMatcherFactory.build(StreamRuleType.GREATER)).isInstanceOf(GreaterMatcher.class);
+        assertThat(StreamRuleMatcherFactory.build(StreamRuleType.SMALLER)).isInstanceOf(SmallerMatcher.class);
+        assertThat(StreamRuleMatcherFactory.build(StreamRuleType.PRESENCE)).isInstanceOf(FieldPresenceMatcher.class);
+        assertThat(StreamRuleMatcherFactory.build(StreamRuleType.ALWAYS_MATCH)).isInstanceOf(AlwaysMatcher.class);
     }
 }

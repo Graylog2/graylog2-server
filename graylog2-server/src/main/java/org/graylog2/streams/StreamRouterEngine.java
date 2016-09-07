@@ -52,7 +52,7 @@ import java.util.concurrent.TimeUnit;
 public class StreamRouterEngine {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouterEngine.class);
 
-    private final EnumSet<StreamRuleType> ruleTypesNotNeedingFieldPresence = EnumSet.of(StreamRuleType.PRESENCE, StreamRuleType.EXACT, StreamRuleType.REGEX);
+    private final EnumSet<StreamRuleType> ruleTypesNotNeedingFieldPresence = EnumSet.of(StreamRuleType.PRESENCE, StreamRuleType.EXACT, StreamRuleType.REGEX, StreamRuleType.ALWAYS_MATCH);
     private final List<Stream> streams;
     private final StreamFaultManager streamFaultManager;
     private final StreamMetrics streamMetrics;
@@ -78,6 +78,7 @@ public class StreamRouterEngine {
         this.streamProcessingTimeout = streamFaultManager.getStreamProcessingTimeout();
         this.fingerprint = new StreamListFingerprint(streams).getFingerprint();
 
+        final List<Rule> alwaysMatchRules = Lists.newArrayList();
         final List<Rule> presenceRules = Lists.newArrayList();
         final List<Rule> exactRules = Lists.newArrayList();
         final List<Rule> greaterRules = Lists.newArrayList();
@@ -95,6 +96,9 @@ public class StreamRouterEngine {
                     continue;
                 }
                 switch (streamRule.getType()) {
+                    case ALWAYS_MATCH:
+                        alwaysMatchRules.add(rule);
+                        break;
                     case PRESENCE:
                         presenceRules.add(rule);
                         break;
@@ -117,8 +121,9 @@ public class StreamRouterEngine {
             }
         }
 
-        final int size = presenceRules.size() + exactRules.size() + greaterRules.size() + smallerRules.size() + containsRules.size() + regexRules.size();
+        final int size = alwaysMatchRules.size() + presenceRules.size() + exactRules.size() + greaterRules.size() + smallerRules.size() + containsRules.size() + regexRules.size();
         this.rulesList = Lists.newArrayListWithCapacity(size);
+        this.rulesList.addAll(alwaysMatchRules);
         this.rulesList.addAll(presenceRules);
         this.rulesList.addAll(exactRules);
         this.rulesList.addAll(greaterRules);
