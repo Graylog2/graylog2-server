@@ -28,6 +28,7 @@ import org.graylog2.shared.rest.resources.ProxiedResource;
 import org.graylog2.shared.rest.resources.system.RemoteDeflectorResource;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -38,6 +39,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
 import java.util.function.Function;
 
 @RequiresAuthentication
@@ -48,8 +50,9 @@ public class ClusterDeflectorResource extends ProxiedResource {
     @Inject
     public ClusterDeflectorResource(@Context HttpHeaders httpHeaders,
                                     NodeService nodeService,
-                                    RemoteInterfaceProvider remoteInterfaceProvider) {
-        super(httpHeaders, nodeService, remoteInterfaceProvider);
+                                    RemoteInterfaceProvider remoteInterfaceProvider,
+                                    @Named("proxiedRequestsExecutorService") ExecutorService executorService) {
+        super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
     }
 
     @POST

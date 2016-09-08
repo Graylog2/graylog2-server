@@ -38,6 +38,7 @@ import org.graylog2.shared.security.RestPermissions;
 import retrofit2.Response;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
@@ -50,6 +51,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;
+import java.util.concurrent.ExecutorService;
 
 import static javax.ws.rs.core.Response.Status.BAD_GATEWAY;
 
@@ -61,8 +63,9 @@ public class ClusterNodeMetricsResource extends ProxiedResource {
     @Inject
     public ClusterNodeMetricsResource(NodeService nodeService,
                                       RemoteInterfaceProvider remoteInterfaceProvider,
-                                      @Context HttpHeaders httpHeaders) {
-        super(httpHeaders, nodeService, remoteInterfaceProvider);
+                                      @Context HttpHeaders httpHeaders,
+                                      @Named("proxiedRequestsExecutorService") ExecutorService executorService) {
+        super(httpHeaders, nodeService, remoteInterfaceProvider, executorService);
     }
 
     private RemoteMetricsResource getResourceForNode(String nodeId) throws NodeNotFoundException {
