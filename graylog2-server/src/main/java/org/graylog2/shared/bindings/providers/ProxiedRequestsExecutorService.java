@@ -33,7 +33,7 @@ public class ProxiedRequestsExecutorService implements Provider<ExecutorService>
     private final int proxiedRequestsMaxThreads;
 
     @Inject
-    public ProxiedRequestsExecutorService(@Named("proxied_requests_max_threads") int proxiedRequestsMaxThreads) {
+    public ProxiedRequestsExecutorService(@Named("proxied_requests_thread_pool_size") int proxiedRequestsMaxThreads) {
         this.proxiedRequestsMaxThreads = proxiedRequestsMaxThreads;
     }
 
