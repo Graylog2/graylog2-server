@@ -1,6 +1,6 @@
 class CombinedProvider {
   constructor() {
-    /* eslint-disable import/no-require */
+    /* eslint-disable import/no-require, global-require */
     this.actions = {
       AlarmCallbacks: () => require('actions/alarmcallbacks/AlarmCallbacksActions'),
       AlertConditions: () => require('actions/alertconditions/AlertConditionsActions'),
@@ -109,7 +109,7 @@ class CombinedProvider {
       Users: () => require('stores/users/UsersStore'),
       Widgets: () => require('stores/widgets/WidgetsStore'),
     };
-    /* eslint-enable import/no-require */
+    /* eslint-enable import/no-require, global-require */
   }
 
   get(name) {
