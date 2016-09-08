@@ -2,6 +2,7 @@ import React from 'react';
 import Immutable from 'immutable';
 import { Col, Row } from 'react-bootstrap';
 
+import { Spinner } from 'components/common';
 import { LegacyHistogram, NoSearchResults, ResultTable, SearchSidebar } from 'components/search';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -23,6 +24,7 @@ const SearchResult = React.createClass({
     nodes: React.PropTypes.instanceOf(Immutable.Map),
     permissions: React.PropTypes.array.isRequired,
     searchConfig: React.PropTypes.object.isRequired,
+    loadingSearch: React.PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -142,6 +144,12 @@ const SearchResult = React.createClass({
                          permissions={this.props.permissions} searchInStream={this.props.searchInStream} />
       );
     }
+
+    let loadingIndicator;
+    if (this.props.loadingSearch) {
+      loadingIndicator = <div className="loading-indicator"><Spinner text="Updating search results..."/></div>;
+    }
+
     return (
       <Row id="main-content-search">
         <Col ref="opa" md={3} sm={12} id="sidebar">
@@ -169,7 +177,7 @@ const SearchResult = React.createClass({
           <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                            histogram={this.props.histogram}
                            permissions={this.props.permissions}
-                           stream={this.props.searchInStream}/>
+                           stream={this.props.searchInStream} />
 
           {this._fieldAnalyzerComponents((analyzer) => this._shouldRenderBelowHistogram(analyzer))}
 
@@ -183,11 +191,12 @@ const SearchResult = React.createClass({
                        streams={this.props.streams}
                        nodes={this.props.nodes}
                        highlight={this.state.shouldHighlight}
-                       searchConfig={this.props.searchConfig}
-          />
+                       searchConfig={this.props.searchConfig} />
 
+          {loadingIndicator}
         </Col>
-      </Row>);
+      </Row>
+    );
   },
 });
 
