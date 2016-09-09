@@ -9,13 +9,6 @@ const URLUtils = {
   appPrefixed(url) {
     return this.concatURLPath(AppConfig.gl2AppPathPrefix(), url);
   },
-  openLink(url, newWindow) {
-    if (newWindow) {
-      window.open(url);
-    } else {
-      window.location = url;
-    }
-  },
   getParsedSearch(location) {
     let search = {};
     let query = location.search;

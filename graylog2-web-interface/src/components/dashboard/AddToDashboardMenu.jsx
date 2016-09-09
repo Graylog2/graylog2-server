@@ -47,7 +47,6 @@ const AddToDashboardMenu = React.createClass({
 
   componentDidMount() {
     this._initializeDashboards();
-    this._setOriginalSearchParams();
   },
   _initializeDashboards() {
     DashboardsStore.addOnWritableDashboardsChangedCallback(dashboards => {
@@ -68,16 +67,13 @@ const AddToDashboardMenu = React.createClass({
   _updateDashboards(newDashboards) {
     this.setState({dashboards: newDashboards});
   },
-  _setOriginalSearchParams() {
-    this.searchParams = SearchStore.getOriginalSearchParams();
-  },
   _selectDashboard(event, dashboardId) {
     this.setState({selectedDashboard: dashboardId});
     this.refs.widgetModal.open();
   },
   _saveWidget(title, configuration) {
     let widgetConfig = Immutable.Map(this.props.configuration);
-    let searchParams = Immutable.Map(this.searchParams);
+    let searchParams = Immutable.Map(SearchStore.getOriginalSearchParams());
     if (searchParams.has('range_type')) {
       switch (searchParams.get('range_type')) {
         case 'relative':
