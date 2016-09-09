@@ -65,7 +65,7 @@ const MessageTableEntry = React.createClass({
     }
   },
   _toggleDetail() {
-    this.props.toggleDetail(this.props.message.id);
+    this.props.toggleDetail(`${this.props.message.index}-${this.props.message.id}`);
   },
   render() {
     const colSpanFixup = this.props.selectedFields.size + 1;
