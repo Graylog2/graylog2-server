@@ -2,6 +2,8 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Row, Input, ButtonInput, Alert } from 'react-bootstrap';
 
+import LoadingPage from './LoadingPage';
+
 import StoreProvider from 'injection/StoreProvider';
 const SessionStore = StoreProvider.getStore('Session');
 import ActionsProvider from 'injection/ActionsProvider';
@@ -62,6 +64,12 @@ const LoginPage = React.createClass({
     this.setState({lastError: undefined});
   },
   render() {
+    if (this.state.validatingSession) {
+      return (
+        <LoadingPage />
+      );
+    }
+
     const alert = this.formatLastError(this.state.lastError);
     return (
       <div>
