@@ -2,7 +2,7 @@ import React from 'react';
 import Immutable from 'immutable';
 import { Col, Row } from 'react-bootstrap';
 
-import { Spinner } from 'components/common';
+import { LoadingIndicator } from 'components/common';
 import { LegacyHistogram, NoSearchResults, ResultTable, SearchSidebar } from 'components/search';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -147,7 +147,7 @@ const SearchResult = React.createClass({
 
     let loadingIndicator;
     if (this.props.loadingSearch) {
-      loadingIndicator = <div className="loading-indicator"><Spinner text="Updating search results..."/></div>;
+      loadingIndicator = <LoadingIndicator text="Updating search results..." />;
     }
 
     return (
