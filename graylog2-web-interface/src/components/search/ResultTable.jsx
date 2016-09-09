@@ -78,7 +78,7 @@ const ResultTable = React.createClass({
     const expandedChangeRatio = (this.props.messages.length - this.state.expandedMessages.size) / 100;
     const renderLoadingIndicator = expandedChangeRatio > 0.3;
 
-    const newSet = Immutable.Set(this.props.messages.map((message) => message.id));
+    const newSet = Immutable.Set(this.props.messages.map((message) => `${message.index}-${message.id}`));
     this.setState({ expandedMessages: newSet, expandAllRenderAsync: renderLoadingIndicator });
   },
   collapseAll() {
@@ -160,11 +160,11 @@ const ResultTable = React.createClass({
                 </thead>
                 {this.props.messages.map((message) => {
                   return (
-                    <MessageTableEntry key={message.id}
+                    <MessageTableEntry key={`${message.index}-${message.id}`}
                                        message={message}
                                        showMessageRow={this.props.selectedFields.contains('message')}
                                        selectedFields={selectedColumns}
-                                       expanded={this.state.expandedMessages.contains(message.id)}
+                                       expanded={this.state.expandedMessages.contains(`${message.index}-${message.id}`)}
                                        toggleDetail={this._toggleMessageDetail}
                                        inputs={this.props.inputs}
                                        streams={this.props.streams}
