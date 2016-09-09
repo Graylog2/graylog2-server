@@ -16,7 +16,7 @@ process.env.BABEL_ENV = TARGET;
 const webpackConfig = {
   entry: {
     app: APP_PATH,
-    polyfill: ['babel-core/polyfill'],
+    polyfill: ['babel-polyfill'],
   },
   output: {
     path: BUILD_PATH,
