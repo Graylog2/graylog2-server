@@ -68,11 +68,11 @@ const webpackConfig = {
 };
 
 const commonConfigs = {
-  module: {
+/*  module: {
     loaders: [
       { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache|ServerUnavailablePage/ },
     ],
-  },
+  },*/
 };
 
 // We use the react-hot loader when running "start" for development.
