@@ -1,2 +1,2 @@
-export Notification from './Notification';
-export NotificationsList from './NotificationsList';
+export { default as Notification } from './Notification';
+export { default as NotificationsList } from './NotificationsList';
