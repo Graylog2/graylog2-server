@@ -34,6 +34,8 @@ const SearchPage = React.createClass({
     return {
       selectedFields: ['message', 'source'],
       error: undefined,
+      updatingSearch: false,
+      updatingHistogram: false,
     };
   },
   componentDidMount() {
@@ -77,6 +79,7 @@ const SearchPage = React.createClass({
   _refreshData() {
     const query = this._getEffectiveQuery();
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
+    this.setState({ updatingSearch: true });
     UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
       .then(
         response => {
@@ -86,9 +89,10 @@ const SearchPage = React.createClass({
 
           const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
 
-          UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId).then((histogram) => {
-            this.setState({ histogram: histogram });
-          });
+          this.setState({ updatingHistogram: true });
+          UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId)
+            .then((histogram) => this.setState({ histogram: histogram }))
+            .finally(() => this.setState({ updatingHistogram: false }));
         },
         error => {
           // Treat searches with a malformed query
@@ -96,7 +100,8 @@ const SearchPage = React.createClass({
             this.setState({ error: error.additional.body });
           }
         }
-      );
+      )
+      .finally(() => this.setState({ updatingSearch: false }));
   },
   _formatInputs(state) {
     const inputs = InputsStore.inputsAsMap(state.inputs);
@@ -195,7 +200,8 @@ const SearchPage = React.createClass({
                     formattedHistogram={this.state.histogram.histogram}
                     streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
                     searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions}
-                    searchConfig={this.props.searchConfig} />
+                    searchConfig={this.props.searchConfig}
+                    loadingSearch={this.state.updatingSearch || this.state.updatingHistogram} />
     );
   },
 });

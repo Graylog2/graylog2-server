@@ -85,7 +85,7 @@ const SavedSearchesStore = Reflux.createStore({
       url = Routes.SEARCH;
     }
     url = `${url}?${Qs.stringify(searchQuery)}`;
-    URLUtils.openLink(url, false);
+    SearchStore.executeSearch(url);
   },
 
   _createOrUpdate(title, searchId) {

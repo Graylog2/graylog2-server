@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import { Input, Button, ButtonToolbar, DropdownButton, MenuItem, Alert } from 'react-bootstrap';
+import URI from 'urijs';
 
 import { ChosenSelectInput, DatePicker } from 'components/common';
 import { RefreshControls, QueryInput } from 'components/search';
@@ -48,8 +49,7 @@ const SearchBar = React.createClass({
   componentDidMount() {
     SearchStore.onParamsChanged = (newParams) => this.setState(newParams);
     SearchStore.onSubmitSearch = () => {
-      this._prepareSearch();
-      ReactDOM.findDOMNode(this.refs.searchForm).submit();
+      this._performSearch();
     };
     SearchStore.onAddQueryTerm = this._animateQueryChange;
     this._initializeSearchQueryInput();
@@ -175,7 +175,11 @@ const SearchBar = React.createClass({
       return false;
     }
   },
-  _prepareSearch() {
+  _performSearch(event) {
+    if (event) {
+      event.preventDefault();
+    }
+
     // Convert from and to values to UTC
     if (this.state.rangeType === 'absolute') {
       const fromInput = this.refs.fromFormatted.getValue();
@@ -188,6 +192,11 @@ const SearchBar = React.createClass({
     this.refs.fields.getInputDOMNode().value = SearchStore.fields.join(',');
     this.refs.width.getInputDOMNode().value = SearchStore.width;
     this.refs.highlightMessage.getInputDOMNode().value = SearchStore.highlightMessage;
+
+    const searchForm = this.refs.searchForm;
+    const searchQuery = $(searchForm).serialize();
+    const searchURI = new URI(searchForm.action).search(searchQuery);
+    SearchStore.executeSearch(searchURI.resource());
   },
   _savedSearchSelected() {
     const selectedSavedSearch = this.refs.savedSearchesSelector.getValue();
@@ -365,7 +374,7 @@ const SearchBar = React.createClass({
                     className="universalsearch-form"
                     action={SearchStore.searchBaseLocation('index')}
                     method="GET"
-                    onSubmit={this._prepareSearch}>
+                    onSubmit={this._performSearch}>
                 <Input type="hidden" name="rangetype" value={this.state.rangeType} />
                 <Input type="hidden" ref="fields" name="fields" value="" />
                 <Input type="hidden" ref="width" name="width" value="" />

@@ -11,6 +11,7 @@ const Routes = require('routing/Routes');
 var Qs = require('qs');
 const URLUtils = require('util/URLUtils');
 const moment = require('moment');
+const history = require('util/History');
 
 class SearchStore {
     static NOT_OPERATOR = "NOT";
@@ -332,14 +333,18 @@ class SearchStore {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.set("width", this.width);
         searchURLParams = searchURLParams.set(param, value);
-        URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()), false);
+        this.executeSearch(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()));
     }
 
     _reloadSearchWithNewParams(newParams: Immutable.Map<string, any>) {
         var searchURLParams = this.getOriginalSearchURLParams();
         searchURLParams = searchURLParams.set("width", this.width);
         searchURLParams = searchURLParams.merge(newParams);
-        URLUtils.openLink(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()), false);
+        this.executeSearch(this.searchBaseLocation("index") + "?" + Qs.stringify(searchURLParams.toJS()));
+    }
+
+    executeSearch(url) {
+        history.pushState(null, url);
     }
 
     getCsvExportURL(): string {
