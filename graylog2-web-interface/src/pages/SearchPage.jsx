@@ -56,6 +56,9 @@ const SearchPage = React.createClass({
     const nextLocation = nextProps.location || {};
 
     if ((currentLocation !== nextLocation) || (currentLocation.search !== nextLocation.search)) {
+      if (this.promise) {
+        this.promise.cancel();
+      }
       this._refreshData();
     }
   },
@@ -79,8 +82,11 @@ const SearchPage = React.createClass({
   _refreshData() {
     const query = this._getEffectiveQuery();
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
+    if (this.promise && !this.promise.isCancelled()) {
+      return this.promise;
+    }
     this.setState({ updatingSearch: true });
-    UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
+    this.promise = UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
       .then(
         response => {
           if (this.isMounted()) {
@@ -101,7 +107,10 @@ const SearchPage = React.createClass({
           }
         }
       )
-      .finally(() => this.setState({ updatingSearch: false }));
+      .finally(() => {
+        this.setState({ updatingSearch: false });
+        this.promise = undefined;
+      });
   },
   _formatInputs(state) {
     const inputs = InputsStore.inputsAsMap(state.inputs);
