@@ -50,6 +50,7 @@ const webpackConfig = {
       title: 'Graylog',
       favicon: 'public/images/favicon.png',
       filename: 'index.html',
+      inject: false,
       template: 'templates/index.html.template',
       chunksSortMode: (c1, c2) => {
         // Render the polyfill chunk first
@@ -62,7 +63,7 @@ const webpackConfig = {
         return c2.id - c1.id;
       },
     }),
-    new HtmlWebpackPlugin({filename: 'module.json', template: 'templates/module.json.template', excludeChunks: ['config']}),
+    new HtmlWebpackPlugin({filename: 'module.json', inject: false, template: 'templates/module.json.template', excludeChunks: ['config']}),
   ],
 };
 
