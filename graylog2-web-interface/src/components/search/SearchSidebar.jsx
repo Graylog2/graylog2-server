@@ -84,10 +84,25 @@ const SearchSidebar = React.createClass({
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
     const query = searchParams.get('q') === '' ? '*' : searchParams.get('q');
     const fields = this.props.selectedFields;
-    const timeRange = SearchStore.rangeType === 'relative' ? { range: SearchStore.rangeParams.get('relative') } : SearchStore.rangeParams.toJS();
+    const rangeType = searchParams.get('rangetype');
+    const timeRange = {};
+    switch (rangeType) {
+      case 'relative':
+        timeRange.range = searchParams.get('relative');
+        break;
+      case 'absolute':
+        timeRange.from = searchParams.get('from');
+        timeRange.to = searchParams.get('to');
+        break;
+      case 'keyword':
+        timeRange.keyword = searchParams.get('keyword');
+        break;
+      default:
+        // Nothing to do here
+    }
 
     const url = new URI(URLUtils.qualifyUrl(
-      ApiRoutes.UniversalSearchApiController.export(SearchStore.rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
+      ApiRoutes.UniversalSearchApiController.export(rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
     ))
       .username(SessionStore.getSessionId())
       .password('session');
