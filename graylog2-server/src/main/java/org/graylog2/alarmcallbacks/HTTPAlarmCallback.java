@@ -69,27 +69,29 @@ public class HTTPAlarmCallback implements AlarmCallback {
         event.put("stream", stream);
         event.put("check_result", result);
 
-        final Response r;
+        final byte[] body;
         try {
-            final byte[] body = objectMapper.writeValueAsBytes(event);
-            final URL url = new URL(configuration.getString(CK_URL));
-            final Request request = new Request.Builder()
-                    .url(url)
-                    .post(RequestBody.create(CONTENT_TYPE, body))
-                    .build();
-            r = httpClient.newCall(request).execute();
-            r.body().close();
+            body = objectMapper.writeValueAsBytes(event);
         } catch (JsonProcessingException e) {
             throw new AlarmCallbackException("Unable to serialize alarm", e);
+        }
+
+        final Request request = new Request.Builder()
+                .url(configuration.getString(CK_URL))
+                .post(RequestBody.create(CONTENT_TYPE, body))
+                .build();
+        try (final Response r = httpClient.newCall(request).execute()) {
+            if (!r.isSuccessful()) {
+                throw new AlarmCallbackException("Expected successful HTTP response [2xx] but got [" + r.code() + "].");
+            }
+        } catch (JsonProcessingException e) {
         } catch (MalformedURLException e) {
             throw new AlarmCallbackException("Malformed URL", e);
         } catch (IOException e) {
             throw new AlarmCallbackException(e.getMessage(), e);
         }
 
-        if (!r.isSuccessful()) {
-            throw new AlarmCallbackException("Expected successful HTTP response [2xx] but got [" + r.code() + "].");
-        }
+
     }
 
     @Override
