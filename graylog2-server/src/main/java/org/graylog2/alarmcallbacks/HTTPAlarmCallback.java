@@ -19,6 +19,7 @@ package org.graylog2.alarmcallbacks;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
+import okhttp3.HttpUrl;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -69,26 +70,29 @@ public class HTTPAlarmCallback implements AlarmCallback {
         event.put("stream", stream);
         event.put("check_result", result);
 
-        final Response r;
+        final byte[] body;
         try {
-            final byte[] body = objectMapper.writeValueAsBytes(event);
-            final URL url = new URL(configuration.getString(CK_URL));
-            final Request request = new Request.Builder()
-                    .url(url)
-                    .post(RequestBody.create(CONTENT_TYPE, body))
-                    .build();
-            r = httpClient.newCall(request).execute();
-            r.body().close();
+            body = objectMapper.writeValueAsBytes(event);
         } catch (JsonProcessingException e) {
             throw new AlarmCallbackException("Unable to serialize alarm", e);
-        } catch (MalformedURLException e) {
-            throw new AlarmCallbackException("Malformed URL", e);
-        } catch (IOException e) {
-            throw new AlarmCallbackException(e.getMessage(), e);
         }
 
-        if (!r.isSuccessful()) {
-            throw new AlarmCallbackException("Expected successful HTTP response [2xx] but got [" + r.code() + "].");
+        final String url = configuration.getString(CK_URL);
+        final HttpUrl httpUrl = HttpUrl.parse(url);
+        if (httpUrl == null) {
+            throw new AlarmCallbackException("Malformed URL: " + url);
+        }
+
+        final Request request = new Request.Builder()
+                .url(httpUrl)
+                .post(RequestBody.create(CONTENT_TYPE, body))
+                .build();
+        try (final Response r = httpClient.newCall(request).execute()) {
+            if (!r.isSuccessful()) {
+                throw new AlarmCallbackException("Expected successful HTTP response [2xx] but got [" + r.code() + "].");
+            }
+        } catch (IOException e) {
+            throw new AlarmCallbackException(e.getMessage(), e);
         }
     }
 

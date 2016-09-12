@@ -155,14 +155,12 @@ public class IndexerSetupService extends AbstractIdleService {
                     final URI esUri = URI.create("http://" + HostAndPort.fromString(host).getHostText() + ":9200/");
 
                     LOG.info("Checking Elasticsearch HTTP API at {}", esUri);
-                    try {
-                        // Try the HTTP API endpoint
-                        final Request request = new Request.Builder()
-                                .get()
-                                .url(esUri.resolve("/_nodes").toString())
-                                .build();
-                        final Response response = httpClient.newCall(request).execute();
-
+                    // Try the HTTP API endpoint
+                    final Request request = new Request.Builder()
+                            .get()
+                            .url(esUri.resolve("/_nodes").toString())
+                            .build();
+                    try (final Response response = httpClient.newCall(request).execute()) {
                         if (response.isSuccessful()) {
                             final JsonNode resultTree = objectMapper.readTree(response.body().byteStream());
                             final JsonNode nodesList = resultTree.get("nodes");
