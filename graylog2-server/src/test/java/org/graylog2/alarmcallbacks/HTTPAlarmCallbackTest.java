@@ -190,7 +190,7 @@ public class HTTPAlarmCallbackTest {
         );
 
         expectedException.expect(AlarmCallbackException.class);
-        expectedException.expectMessage("Malformed URL");
+        expectedException.expectMessage("Malformed URL: !FOOBAR");
 
         alarmCallback.call(stream, checkResult);
     }
