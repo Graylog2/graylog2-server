@@ -31,12 +31,6 @@
     <url>https://www.graylog.org/</url>
     <inceptionYear>2012</inceptionYear>
 
-    <parent>
-        <groupId>org.sonatype.oss</groupId>
-        <artifactId>oss-parent</artifactId>
-        <version>9</version>
-    </parent>
-
     <modules>
         <module>graylog2-server</module>
         <module>integration-tests</module>
