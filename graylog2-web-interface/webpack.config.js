@@ -27,6 +27,8 @@ const webpackConfig = {
       // { test: /\.js(x)?$/, loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
     ],
     loaders: [
+      { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache|ServerUnavailablePage/ },
+      { test: /\.js(x)?$/, loaders: ['babel-loader'], exclude: /node_modules|\.node_cache/ },
       { test: /\.json$/, loader: 'json-loader' },
       { test: /\.ts$/, loader: 'babel-loader!ts-loader', exclude: /node_modules|\.node_cache/ },
       { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, loader: 'file-loader' },
@@ -67,29 +69,12 @@ const webpackConfig = {
   ],
 };
 
-const commonConfigs = {
-  module: {
-    loaders: [
-      { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache|ServerUnavailablePage/ },
-    ],
-  },
-};
-
-// We use the react-hot loader when running "start" for development.
-// Any other target does not use it.
-if (TARGET === 'start') {
-  webpackConfig.module.loaders.unshift(
-    { test: /\.js(x)?$/, loaders: ['react-hot', 'babel-loader'], exclude: /node_modules|\.node_cache/ }
-  );
-} else {
-  webpackConfig.module.loaders.unshift(
-    { test: /\.js(x)?$/, loaders: ['babel-loader'], exclude: /node_modules|\.node_cache/ }
-  );
-}
-
 if (TARGET === 'start') {
   console.log('Running in development mode');
   module.exports = merge(webpackConfig, {
+    entry: {
+      reacthot: 'react-hot-loader/patch',
+    },
     devtool: 'eval',
     devServer: {
       historyApiFallback: true,
@@ -167,10 +152,6 @@ if (TARGET === 'test') {
       ],
     },
   });
-}
-
-if (TARGET === 'start' || TARGET === 'build') {
-  module.exports = merge(module.exports, commonConfigs);
 }
 
 if (Object.keys(module.exports).length === 0) {
