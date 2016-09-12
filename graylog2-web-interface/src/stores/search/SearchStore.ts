@@ -347,12 +347,6 @@ class SearchStore {
         history.pushState(null, url);
     }
 
-    getCsvExportURL(): string {
-        var searchURLParams = this.getOriginalSearchURLParams();
-        searchURLParams = searchURLParams.delete('page');
-        return this.searchBaseLocation("exportAsCsv") + "?" + Qs.stringify(searchURLParams.toJS());
-    }
-
     searchSurroundingMessages(messageId: string, fromTime: string, toTime: string, filter: any) {
       var originalParams = this.getOriginalSearchParamsWithFields().toJS();
 
