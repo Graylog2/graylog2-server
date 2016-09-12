@@ -123,6 +123,8 @@ public class VersionCheckThread extends Periodical {
             } catch (IOException e) {
                 LOG.error("Couldn't parse version check response", e);
                 return;
+            } finally {
+                response.close();
             }
 
             final VersionResponse version = versionCheckResponse.version;
