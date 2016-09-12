@@ -108,41 +108,31 @@ public class VersionCheckThread extends Periodical {
                 .url(versionCheckUri.toString())
                 .build();
 
-        final Response response;
-        try {
-            response = httpClient.newCall(request).execute();
+        try (final Response response = httpClient.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                final VersionCheckResponse versionCheckResponse = objectMapper.readValue(response.body().byteStream(), VersionCheckResponse.class);
+
+                final VersionResponse version = versionCheckResponse.version;
+                final com.github.zafarkhaja.semver.Version reportedVersion = com.github.zafarkhaja.semver.Version.forIntegers(version.major, version.minor, version.patch);
+
+                LOG.debug("Version check reports current version: " + versionCheckResponse);
+                if (reportedVersion.greaterThan(ServerVersion.VERSION.getVersion())) {
+                    LOG.debug("Reported version is higher than ours ({}). Writing notification.", ServerVersion.VERSION);
+
+                    Notification notification = notificationService.buildNow()
+                            .addSeverity(Notification.Severity.NORMAL)
+                            .addType(Notification.Type.OUTDATED_VERSION)
+                            .addDetail("current_version", versionCheckResponse.toString());
+                    notificationService.publishIfFirst(notification);
+                } else {
+                    LOG.debug("Reported version is not higher than ours ({}).", ServerVersion.VERSION);
+                    notificationService.fixed(Notification.Type.OUTDATED_VERSION);
+                }
+            } else {
+                LOG.error("Version check unsuccessful (response code {}).", response.code());
+            }
         } catch (IOException e) {
             LOG.error("Couldn't perform version check", e);
-            return;
-        }
-
-        if (response.isSuccessful()) {
-            final VersionCheckResponse versionCheckResponse;
-            try {
-                versionCheckResponse = objectMapper.readValue(response.body().byteStream(), VersionCheckResponse.class);
-            } catch (IOException e) {
-                LOG.error("Couldn't parse version check response", e);
-                return;
-            }
-
-            final VersionResponse version = versionCheckResponse.version;
-            final com.github.zafarkhaja.semver.Version reportedVersion = com.github.zafarkhaja.semver.Version.forIntegers(version.major, version.minor, version.patch);
-
-            LOG.debug("Version check reports current version: " + versionCheckResponse);
-            if (reportedVersion.greaterThan(ServerVersion.VERSION.getVersion())) {
-                LOG.debug("Reported version is higher than ours ({}). Writing notification.", ServerVersion.VERSION);
-
-                Notification notification = notificationService.buildNow()
-                        .addSeverity(Notification.Severity.NORMAL)
-                        .addType(Notification.Type.OUTDATED_VERSION)
-                        .addDetail("current_version", versionCheckResponse.toString());
-                notificationService.publishIfFirst(notification);
-            } else {
-                LOG.debug("Reported version is not higher than ours ({}).", ServerVersion.VERSION);
-                notificationService.fixed(Notification.Type.OUTDATED_VERSION);
-            }
-        } else {
-            LOG.error("Version check unsuccessful (response code {}).", response.code());
         }
     }
 
