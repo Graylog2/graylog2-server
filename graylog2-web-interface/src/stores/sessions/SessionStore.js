@@ -13,6 +13,7 @@ const SessionStore = Reflux.createStore({
   sourceUrl: '/system/sessions',
   sessionId: undefined,
   username: undefined,
+  validatingSession: false,
 
   init() {
     this.validate();
@@ -47,16 +48,23 @@ const SessionStore = Reflux.createStore({
   validate() {
     const sessionId = Store.get('sessionId');
     const username = Store.get('username');
-    this._validateSession(sessionId).then((response) => {
-      if (response.is_valid) {
-        SessionActions.login.completed({
-          sessionId: sessionId || response.session_id,
-          username: username || response.username,
-        });
-      } else {
-        this._removeSession();
-      }
-    });
+    this.validatingSession = true;
+    this._propagateState();
+    this._validateSession(sessionId)
+      .then((response) => {
+        if (response.is_valid) {
+          SessionActions.login.completed({
+            sessionId: sessionId || response.session_id,
+            username: username || response.username,
+          });
+        } else {
+          this._removeSession();
+        }
+      })
+      .finally(() => {
+        this.validatingSession = false;
+        this._propagateState();
+      });
   },
   _validateSession(sessionId) {
     return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
@@ -91,7 +99,7 @@ const SessionStore = Reflux.createStore({
     return this.sessionId;
   },
   getSessionInfo() {
-    return { sessionId: this.sessionId, username: this.username };
+    return { sessionId: this.sessionId, username: this.username, validatingSession: this.validatingSession };
   },
 });
 
