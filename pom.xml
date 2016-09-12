@@ -65,9 +65,6 @@
             <unsubscribe>graylog2+unsubscribe@googlegroups.com</unsubscribe>
             <post>graylog2@googlegroups.com</post>
             <archive>https://groups.google.com/forum/#!forum/graylog2</archive>
-            <otherArchives>
-                <otherArchive>http://dir.gmane.org/gmane.comp.sysutils.graylog2.general</otherArchive>
-            </otherArchives>
         </mailingList>
     </mailingLists>
 
