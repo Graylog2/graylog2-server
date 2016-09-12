@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import LoginPage from 'react-proxy?name=LoginPage!pages/LoginPage';
+import LoadingPage from 'react-proxy?name=LoadingPage!pages/LoadingPage';
 import LoggedInPage from 'react-proxy?name=LoggedInPage!pages/LoggedInPage';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 
@@ -35,8 +36,11 @@ const AppFacade = React.createClass({
     if (!this.state.server.up) {
       return <ServerUnavailablePage server={this.state.server} />;
     }
-    if (!this.state.sessionId || !this.state.currentUser) {
+    if (!this.state.sessionId) {
       return <LoginPage />;
+    }
+    if (!this.state.currentUser) {
+      return <LoadingPage text="We are preparing Graylog for you..."/>;
     }
     return <LoggedInPage />;
   },
