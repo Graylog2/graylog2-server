@@ -40,6 +40,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.GeneralSecurityException;
@@ -86,20 +87,24 @@ public class KeyUtil {
     @VisibleForTesting
     protected static void loadCertificates(KeyStore trustStore, File certFile, CertificateFactory cf)
             throws CertificateException, KeyStoreException, IOException {
-        if (certFile.isFile()) {
-            final Collection<? extends Certificate> certificates = cf.generateCertificates(new FileInputStream(certFile));
-            int i = 0;
-            for (Certificate cert : certificates) {
-                final String alias = certFile.getAbsolutePath() + "_" + i;
-                trustStore.setCertificateEntry(alias, cert);
-                i++;
-                LOG.debug("Added certificate with alias {} to trust store: {}", alias, cert);
+            if (certFile.isFile()) {
+                try (FileInputStream fis = new FileInputStream(certFile);) {
+                    final Collection<? extends Certificate> certificates = cf.generateCertificates(fis);
+                    int i = 0;
+                    for (Certificate cert : certificates) {
+                        final String alias = certFile.getAbsolutePath() + "_" + i;
+                        trustStore.setCertificateEntry(alias, cert);
+                        i++;
+                        LOG.debug("Added certificate with alias {} to trust store: {}", alias, cert);
+                    }
+                }
+            } else if (certFile.isDirectory()) {
+                try(DirectoryStream<Path> ds = Files.newDirectoryStream(certFile.toPath());) {
+                    for (Path f : ds) {
+                        loadCertificates(trustStore, f.toFile(), cf);
+                    }
+                }
             }
-        } else if (certFile.isDirectory()) {
-            for (Path f : Files.newDirectoryStream(certFile.toPath())) {
-                loadCertificates(trustStore, f.toFile(), cf);
-            }
-        }
     }
 
     public static KeyManager[] initKeyStore(File tlsKeyFile, File tlsCertFile, String tlsKeyPassword)
