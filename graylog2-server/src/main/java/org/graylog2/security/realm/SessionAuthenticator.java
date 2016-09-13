@@ -19,7 +19,6 @@ package org.graylog2.security.realm;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authc.SimpleAccount;
 import org.apache.shiro.authc.credential.AllowAllCredentialsMatcher;
 import org.apache.shiro.realm.AuthenticatingRealm;
@@ -42,12 +41,10 @@ public class SessionAuthenticator extends AuthenticatingRealm {
     public static final String X_GRAYLOG_NO_SESSION_EXTENSION = "X-Graylog-No-Session-Extension";
 
     private final UserService userService;
-    private final LdapUserAuthenticator ldapAuthenticator;
 
     @Inject
-    SessionAuthenticator(UserService userService, LdapUserAuthenticator ldapAuthenticator) {
+    SessionAuthenticator(UserService userService) {
         this.userService = userService;
-        this.ldapAuthenticator = ldapAuthenticator;
         // this realm either rejects a session, or allows the associated user implicitly
         setCredentialsMatcher(new AllowAllCredentialsMatcher());
         setAuthenticationTokenClass(SessionIdToken.class);
@@ -69,9 +66,6 @@ public class SessionAuthenticator extends AuthenticatingRealm {
         if (user == null) {
             LOG.debug("No user named {} found for session {}", username, sessionIdToken.getSessionId());
             return null;
-        }
-        if (user.isExternalUser() && !ldapAuthenticator.isEnabled()) {
-            throw new LockedAccountException("LDAP authentication is currently disabled.");
         }
 
         if (LOG.isDebugEnabled()) {
