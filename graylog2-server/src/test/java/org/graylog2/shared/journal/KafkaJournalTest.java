@@ -153,7 +153,7 @@ public class KafkaJournalTest {
 
     private int createBulkChunks(KafkaJournal journal, Size segmentSize, int bulkCount) {
         // Magic numbers deduced by magic…
-        int bulkSize = Ints.saturatedCast(segmentSize.toBytes() / (2L * 16L));
+        int bulkSize = Ints.saturatedCast(segmentSize.toBytes() / (2L * 32L));
         // perform multiple writes to make multiple segments
         for (int currentBulk = 0; currentBulk < bulkCount; currentBulk++) {
             final List<Journal.Entry> entries = Lists.newArrayListWithExpectedSize(bulkSize);
@@ -377,7 +377,7 @@ public class KafkaJournalTest {
     public void serverStatusThrottledIfJournalUtilizationIsHigherThanThreshold() throws Exception {
         serverStatus.running();
 
-        final Size segmentSize = Size.kilobytes(1L);
+        final Size segmentSize = Size.kilobytes(2L);
         final KafkaJournal journal = new KafkaJournal(journalDirectory,
             scheduler,
             segmentSize,
