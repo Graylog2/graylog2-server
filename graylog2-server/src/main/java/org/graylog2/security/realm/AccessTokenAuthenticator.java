@@ -37,15 +37,12 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
 
     private final AccessTokenService accessTokenService;
     private final UserService userService;
-    private final LdapUserAuthenticator ldapAuthenticator;
 
     @Inject
     AccessTokenAuthenticator(AccessTokenService accessTokenService,
-                             UserService userService,
-                             LdapUserAuthenticator ldapAuthenticator) {
+                             UserService userService) {
         this.accessTokenService = accessTokenService;
         this.userService = userService;
-        this.ldapAuthenticator = ldapAuthenticator;
         setAuthenticationTokenClass(AccessTokenAuthToken.class);
         setCachingEnabled(false);
         // the presence of a valid access token is enough, we don't have any other credentials
@@ -63,9 +60,6 @@ public class AccessTokenAuthenticator extends AuthenticatingRealm {
         final User user = userService.load(accessToken.getUserName());
         if (user == null) {
             return null;
-        }
-        if (user.isExternalUser() && !ldapAuthenticator.isEnabled()) {
-            throw new LockedAccountException("LDAP authentication is currently disabled.");
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Found user {} for access token.", user);
