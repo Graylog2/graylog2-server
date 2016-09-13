@@ -17,6 +17,8 @@
 package org.graylog.plugins.pipelineprocessor.functions.dates;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -25,15 +27,20 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.Locale;
+
 public abstract class TimezoneAwareFunction extends AbstractFunction<DateTime> {
 
-    public static final String TIMEZONE = "timezone";
+    private static final String TIMEZONE = "timezone";
+    private static final ImmutableMap<String, String> UPPER_ZONE_MAP = Maps.uniqueIndex(
+            DateTimeZone.getAvailableIDs(),
+            input -> input != null ? input.toUpperCase(Locale.ENGLISH) : "UTC");
     private final ParameterDescriptor<String, DateTimeZone> timeZoneParam;
 
-    public TimezoneAwareFunction() {
+    protected TimezoneAwareFunction() {
         timeZoneParam = ParameterDescriptor
                 .string(TIMEZONE, DateTimeZone.class)
-                .transform(id -> DateTimeZone.forID(id.toUpperCase()))
+                .transform(id -> DateTimeZone.forID(UPPER_ZONE_MAP.get(id)))
                 .optional()
                 .description("The timezone to apply to the date, defaults to UTC")
                 .build();

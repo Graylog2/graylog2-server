@@ -1,0 +1,11 @@
+// now() is fixed, test uses different millisprovider!
+
+rule "timezones"
+when
+  now("CET") == now("UTC") &&
+  now("utc") == now("UTC") &&
+  now("Europe/Moscow") == now("europe/moscow") &&
+  now("europe/MoSCOw") == now("msk")
+then
+  trigger_test();
+end
