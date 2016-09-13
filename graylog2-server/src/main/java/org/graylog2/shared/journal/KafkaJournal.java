@@ -437,9 +437,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
 
     private long flushMessages(List<Message> messages, long payloadSize) {
         if (messages.isEmpty()) {
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("No messages to flush, not trying to write an empty message set.");
-            }
+            LOG.debug("No messages to flush, not trying to write an empty message set.");
             return -1L;
         }
 
