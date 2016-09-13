@@ -100,6 +100,22 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
 
     @Override
     public <T> T get(Class<T> type) {
+        final Object payload = getPayload(type);
+
+        if (payload == null) {
+            return null;
+        }
+
+        T result = extractPayload(payload, type);
+        if (result == null) {
+            LOG.error("Couldn't extract payload from cluster config (type: {})", type.getCanonicalName());
+        }
+
+        return result;
+    }
+
+    @Override
+    public <T> Object getPayload(Class<T> type) {
         ClusterConfig config = dbCollection.findOne(DBQuery.is("type", type.getCanonicalName()));
 
         if (config == null) {
@@ -107,12 +123,7 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
             return null;
         }
 
-        T result = extractPayload(config.payload(), type);
-        if (result == null) {
-            LOG.error("Couldn't extract payload from cluster config (type: {})", type.getCanonicalName());
-        }
-
-        return result;
+        return config.payload();
     }
 
     @Override

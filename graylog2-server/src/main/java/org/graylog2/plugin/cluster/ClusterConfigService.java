@@ -32,6 +32,17 @@ public interface ClusterConfigService {
     <T> T get(Class<T> type);
 
     /**
+     * Retrieve config payload of a certain type from the cluster configuration.
+     *
+     * Useful for custom handling of the config payload.
+     *
+     * @param type The {@link Class} of the Java configuration bean to retrieve.
+     * @param <T>  The type of the Java configuration bean.
+     * @return The payload of the requested type or {@code null} if it couldn't be retrieved.
+     */
+    <T> Object getPayload(Class<T> type);
+
+    /**
      * Retrieve Java class of a certain type from the cluster configuration or return a default value
      * in case that failed.
      *
