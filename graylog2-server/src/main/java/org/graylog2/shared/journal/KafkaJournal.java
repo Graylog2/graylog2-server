@@ -136,11 +136,14 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private final KafkaScheduler kafkaScheduler;
     private final Meter writtenMessages;
     private final Meter readMessages;
+    private final Meter writeDiscardedMessages;
 
     private final OffsetFileFlusher offsetFlusher;
     private final DirtyLogFlusher dirtyLogFlusher;
     private final RecoveryCheckpointFlusher recoveryCheckpointFlusher;
     private final LogRetentionCleaner logRetentionCleaner;
+    private final long maxSegmentSize;
+    private final int maxMessageSize;
 
     private long nextReadOffset = 0L;
     private ScheduledFuture<?> checkpointFlusherFuture;
@@ -168,9 +171,13 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
         this.scheduler = scheduler;
         this.throttleThresholdPercentage = intRange(throttleThresholdPercentage, 0, 100);
         this.serverStatus = serverStatus;
+        this.maxSegmentSize = segmentSize.toBytes();
+        // Max message size should not be bigger than max segment size.
+        this.maxMessageSize = Ints.saturatedCast(maxSegmentSize);
 
         this.writtenMessages = metricRegistry.meter(name(this.getClass(), "writtenMessages"));
         this.readMessages = metricRegistry.meter(name(this.getClass(), "readMessages"));
+        this.writeDiscardedMessages = metricRegistry.meter(name(this.getClass(), "writeDiscardedMessages"));
 
         registerUncommittedGauge(metricRegistry, name(this.getClass(), "uncommittedMessages"));
 
@@ -193,8 +200,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 .put(LogConfig.RetentionBytesProp(), retentionSize.toBytes())
                 // retentionMs: The age approximate maximum age of the last segment that is retained
                 .put(LogConfig.RetentionMsProp(), retentionAge.getMillis())
-                // maxMessageSize: The maximum size of a message in the log
-                .put(LogConfig.MaxMessageBytesProp(), Integer.MAX_VALUE)
+                // maxMessageSize: The maximum size of a message in the log (ensure that it's not larger than the max segment size)
+                .put(LogConfig.MaxMessageBytesProp(), maxMessageSize)
                 // maxIndexSize: The maximum size of an index file
                 .put(LogConfig.SegmentIndexBytesProp(), Ints.saturatedCast(Size.megabytes(1L).toBytes()))
                 // indexInterval: The approximate number of bytes between index entries
@@ -376,6 +383,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     public long write(List<Entry> entries) {
         try (Timer.Context ignored = writeTime.time()) {
             long payloadSize = 0L;
+            long messageSetSize = 0L;
+            long lastWriteOffset = 0L;
 
             final List<Message> messages = new ArrayList<>(entries.size());
             for (final Entry entry : entries) {
@@ -383,22 +392,71 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                 final byte[] idBytes = entry.getIdBytes();
 
                 payloadSize += messageBytes.length;
-                messages.add(new Message(messageBytes, idBytes));
+
+                final Message newMessage = new Message(messageBytes, idBytes);
+                // Calculate the size of the new message in the message set by including the overhead for the log entry.
+                final int newMessageSize = MessageSet.entrySize(newMessage);
+
+                if (newMessageSize > maxMessageSize) {
+                    writeDiscardedMessages.mark();
+                    LOG.warn("Message with ID <{}> is too large to store in journal, skipping! (size: {} bytes / max: {} bytes)",
+                            new String(idBytes, StandardCharsets.UTF_8), newMessageSize, maxMessageSize);
+                    payloadSize = 0;
+                    continue;
+                }
+
+                // If adding the new message to the message set would overflow the max segment size, flush the current
+                // list of message to avoid a MessageSetSizeTooLargeException.
+                if ((messageSetSize + newMessageSize) > maxSegmentSize) {
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Flushing {} bytes message set with {} messages to avoid overflowing segment with max size of {} bytes",
+                                messageSetSize, messages.size(), maxSegmentSize);
+                    }
+                    lastWriteOffset = flushMessages(messages, payloadSize);
+                    // Reset the messages list and size counters to start a new batch.
+                    messages.clear();
+                    messageSetSize = 0;
+                    payloadSize = 0;
+                }
+                messages.add(newMessage);
+                messageSetSize += newMessageSize;
 
                 if (LOG.isTraceEnabled()) {
                     LOG.trace("Message {} contains bytes {}", bytesToHex(idBytes), bytesToHex(messageBytes));
                 }
             }
 
-            final ByteBufferMessageSet messageSet = new ByteBufferMessageSet(JavaConversions.asScalaBuffer(messages).toSeq());
+            // Flush the rest of the messages.
+            if (messages.size() > 0) {
+                lastWriteOffset = flushMessages(messages, payloadSize);
+            }
 
-            final LogAppendInfo appendInfo = kafkaLog.append(messageSet, true);
-            long lastWriteOffset = appendInfo.lastOffset();
-            LOG.debug("Wrote {} messages to journal: {} bytes, log position {} to {}",
-                    entries.size(), payloadSize, appendInfo.firstOffset(), lastWriteOffset);
-            writtenMessages.mark(entries.size());
             return lastWriteOffset;
         }
+    }
+
+    private long flushMessages(List<Message> messages, long payloadSize) {
+        if (messages.isEmpty()) {
+            LOG.debug("No messages to flush, not trying to write an empty message set.");
+            return -1L;
+        }
+
+        final ByteBufferMessageSet messageSet = new ByteBufferMessageSet(JavaConversions.asScalaBuffer(messages).toSeq());
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Trying to write ByteBufferMessageSet with size of {} bytes to journal", messageSet.sizeInBytes());
+        }
+
+        final LogAppendInfo appendInfo = kafkaLog.append(messageSet, true);
+        long lastWriteOffset = appendInfo.lastOffset();
+
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Wrote {} messages to journal: {} bytes (payload {} bytes), log position {} to {}",
+                    messages.size(), messageSet.sizeInBytes(), payloadSize, appendInfo.firstOffset(), lastWriteOffset);
+        }
+        writtenMessages.mark(messages.size());
+
+        return lastWriteOffset;
     }
 
     /**
