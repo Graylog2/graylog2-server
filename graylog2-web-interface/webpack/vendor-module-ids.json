@@ -1,5 +1,5 @@
 {
-  "nextFreeModuleId": 1413,
+  "nextFreeModuleId": 1422,
   "modules": {
     "byIdentifier": {
       "node_modules/react/react.js": 1,
@@ -1414,7 +1414,16 @@
       "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.set-proto.js": 1409,
       "node_modules/react-bootstrap/node_modules/core-js/library/modules/es6.object.assign.js": 1410,
       "node_modules/react-bootstrap/node_modules/core-js/library/modules/es6.object.keys.js": 1411,
-      "node_modules/react-bootstrap/node_modules/core-js/library/modules/es6.object.set-prototype-of.js": 1412
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/es6.object.set-prototype-of.js": 1412,
+      "node_modules/react-bootstrap/lib/CarouselCaption.js": 1413,
+      "node_modules/react-bootstrap/lib/Clearfix.js": 1414,
+      "node_modules/react-bootstrap/lib/Media.js": 1415,
+      "node_modules/react-bootstrap/lib/MediaBody.js": 1416,
+      "node_modules/react-bootstrap/lib/MediaHeading.js": 1417,
+      "node_modules/react-bootstrap/lib/MediaLeft.js": 1418,
+      "node_modules/react-bootstrap/lib/MediaList.js": 1419,
+      "node_modules/react-bootstrap/lib/MediaListItem.js": 1420,
+      "node_modules/react-bootstrap/lib/MediaRight.js": 1421
     }
   },
   "nextFreeChunkId": 1,
