@@ -31,6 +31,7 @@
     "eslint": "^2.13.1",
     "eslint-config-graylog": "^1.0.2",
     "history": "^1.17.0",
+    "javascript-natural-sort": "^0.7.1",
     "react": "^0.14.5",
     "react-bootstrap": "^0.28.1",
     "react-dom": "^0.14.5",
