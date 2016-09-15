@@ -13,6 +13,9 @@ const VENDOR_MANIFEST = require(VENDOR_MANIFEST_PATH);
 const TARGET = process.env.npm_lifecycle_event;
 process.env.BABEL_ENV = TARGET;
 
+const BABELRC = path.resolve(ROOT_PATH, '.babelrc');
+const BABELLOADER = 'babel-loader?cacheDirectory&extends=' + BABELRC;
+
 const webpackConfig = {
   entry: {
     app: APP_PATH,
@@ -28,13 +31,13 @@ const webpackConfig = {
     ],
     loaders: [
       { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache|ServerUnavailablePage/ },
-      { test: /\.js(x)?$/, loaders: ['babel-loader'], exclude: /node_modules|\.node_cache/ },
-      { test: /\.json$/, loader: 'json-loader' },
-      { test: /\.ts$/, loader: 'babel-loader!ts-loader', exclude: /node_modules|\.node_cache/ },
-      { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, loader: 'file-loader' },
-      { test: /\.png$/, loader: 'url-loader' },
-      { test: /\.less$/, loader: 'style!css!less' },
-      { test: /\.css$/, loader: 'style!css' },
+      { test: /\.js(x)?$/, loader: BABELLOADER, exclude: /node_modules|\.node_cache/ },
+      { test: /\.json$/, loader: 'json' },
+      { test: /\.ts$/, loaders: [BABELLOADER, 'ts'], exclude: /node_modules|\.node_cache/ },
+      { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, loader: 'file' },
+      { test: /\.png$/, loader: 'url' },
+      { test: /\.less$/, loaders: ['style', 'css', 'less'] },
+      { test: /\.css$/, loaders: ['style', 'css'] },
     ],
   },
   resolve: {
@@ -42,6 +45,7 @@ const webpackConfig = {
     extensions: ['', '.js', '.json', '.jsx', '.ts'],
     modulesDirectories: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
   },
+  resolveLoader: { root: path.join(ROOT_PATH, 'node_modules') },
   eslint: {
     configFile: '.eslintrc',
   },
@@ -50,10 +54,10 @@ const webpackConfig = {
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: ROOT_PATH }),
     new HtmlWebpackPlugin({
       title: 'Graylog',
-      favicon: 'public/images/favicon.png',
+      favicon: path.resolve(ROOT_PATH, 'public/images/favicon.png'),
       filename: 'index.html',
       inject: false,
-      template: 'templates/index.html.template',
+      template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
       chunksSortMode: (c1, c2) => {
         // Render the polyfill chunk first
         if (c1.names[0] === 'polyfill') {
@@ -65,7 +69,7 @@ const webpackConfig = {
         return c2.id - c1.id;
       },
     }),
-    new HtmlWebpackPlugin({filename: 'module.json', inject: false, template: 'templates/module.json.template', excludeChunks: ['config']}),
+    new HtmlWebpackPlugin({ filename: 'module.json', inject: false, template: path.resolve(ROOT_PATH, 'templates/module.json.template'), excludeChunks: ['config'] }),
   ],
 };
 
