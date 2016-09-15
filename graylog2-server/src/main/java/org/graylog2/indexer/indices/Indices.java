@@ -66,6 +66,7 @@ import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.shard.DocsStats;
 import org.elasticsearch.indices.IndexClosedException;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
@@ -186,7 +187,9 @@ public class Indices {
             throw new IndexNotFoundException("Couldn't find index " + indexName);
         }
 
-        return index.getPrimaries().getDocs().getCount();
+        final DocsStats docsStats = index.getPrimaries().getDocs();
+
+        return docsStats == null ? 0L : docsStats.getCount();
     }
 
     public Map<String, IndexStats> getAll() {
