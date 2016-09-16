@@ -13,7 +13,7 @@ This plugin is strictly following the CEF standard and will probably not work wi
 Installation
 ------------
 
-[Download the plugin](https://github.com/https://github.com/Graylog2/graylog-plugin-cef/releases)
+[Download the plugin](https://github.com/Graylog2/graylog-plugin-cef/releases)
 and place the `.jar` file in your Graylog plugin directory. The plugin directory
 is the `plugins/` folder relative from your `graylog-server` directory by default
 and can be configured in your `graylog.conf` file.
