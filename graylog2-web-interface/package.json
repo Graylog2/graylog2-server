@@ -17,7 +17,7 @@
     "prepare-dev": "./tools/prepare-dev"
   },
   "dependencies": {
-    "bluebird": "^2.10.2",
+    "bluebird": "^3.4.0",
     "c3": "^0.4.11-rc4",
     "classnames": "^2.2.0",
     "clipboard": "^1.5.5",
@@ -55,8 +55,8 @@
     "rickshaw": "^1.5.1",
     "sockjs-client": "1.1.x",
     "string": "^3.3.1",
-    "superagent": "^1.4.0",
-    "superagent-bluebird-promise": "^2.1.0",
+    "superagent": "^2.2.0",
+    "superagent-bluebird-promise": "^3.0.0",
     "toastr": "^2.1.2",
     "typeahead.js": "^0.11.1",
     "urijs": "^1.17.0"
