@@ -40,6 +40,7 @@ const NodesStore = Reflux.createStore({
         this.clusterId = this._clusterId();
         this.nodeCount = this._nodeCount();
         this._propagateState();
+        return response;
       })
       .finally(() => delete this.promises.list);
 
