@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const merge = require('webpack-merge');
 const path = require('path');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 const defaultRootPath = path.resolve(module.parent.parent.filename, '../');
 const defaultOptions = {
@@ -19,6 +20,7 @@ function PluginWebpackConfig(fqcn, _options, additionalConfig) {
 
   const plugins = [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: options.root_path }),
+    new HtmlWebpackPlugin({ filename: getPluginFullName(fqcn) + '.module.json', inject: false, template: path.resolve(_options.web_src_path, 'templates', 'module.json.template') }),
   ];
 
   const config = merge.smart(
