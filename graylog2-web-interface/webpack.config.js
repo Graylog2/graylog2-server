@@ -10,7 +10,7 @@ const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
 const VENDOR_MANIFEST = require(VENDOR_MANIFEST_PATH);
-const TARGET = process.env.npm_lifecycle_event;
+const TARGET = process.env.npm_lifecycle_event || '';
 process.env.BABEL_ENV = TARGET;
 
 const BABELRC = path.resolve(ROOT_PATH, '.babelrc');
@@ -52,26 +52,29 @@ const webpackConfig = {
   devtool: 'source-map',
   plugins: [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: ROOT_PATH }),
-    new HtmlWebpackPlugin({
-      title: 'Graylog',
-      favicon: path.resolve(ROOT_PATH, 'public/images/favicon.png'),
-      filename: 'index.html',
-      inject: false,
-      template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
-      chunksSortMode: (c1, c2) => {
-        // Render the polyfill chunk first
-        if (c1.names[0] === 'polyfill') {
-          return -1;
-        }
-        if (c2.names[0] === 'polyfill') {
-          return 1;
-        }
-        return c2.id - c1.id;
-      },
-    }),
     new HtmlWebpackPlugin({ filename: 'module.json', inject: false, template: path.resolve(ROOT_PATH, 'templates/module.json.template'), excludeChunks: ['config'] }),
   ],
 };
+
+if (TARGET.startsWith('start')) {
+  webpackConfig.plugins.unshift(new HtmlWebpackPlugin({
+    title: 'Graylog',
+    favicon: path.resolve(ROOT_PATH, 'public/images/favicon.png'),
+    filename: 'index.html',
+    inject: false,
+    template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
+    chunksSortMode: (c1, c2) => {
+      // Render the polyfill chunk first
+      if (c1.names[0] === 'polyfill') {
+        return -1;
+      }
+      if (c2.names[0] === 'polyfill') {
+        return 1;
+      }
+      return c2.id - c1.id;
+    },
+  }));
+}
 
 if (TARGET === 'start') {
   console.log('Running in development mode');
@@ -128,9 +131,15 @@ if (TARGET === 'start-nohmr') {
 }
 
 if (TARGET === 'build') {
+  process.env.NODE_ENV = 'production';
   console.log('Running in production mode');
   module.exports = merge(webpackConfig, {
     plugins: [
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('production'),
+        },
+      }),
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
         sourceMap: true,
@@ -141,7 +150,6 @@ if (TARGET === 'build') {
           except: ['$super', '$', 'exports', 'require'],
         },
       }),
-      new webpack.optimize.DedupePlugin(),
       new webpack.optimize.OccurenceOrderPlugin(),
     ],
   });
