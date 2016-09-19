@@ -141,6 +141,34 @@ public class ClusterConfigServiceImplTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void getWithKeyReturnsExistingConfig() throws Exception {
+        DBObject dbObject = new BasicDBObjectBuilder()
+                .add("type", "foo")
+                .add("payload", Collections.singletonMap("text", "TEST"))
+                .add("last_updated", TIME.toString())
+                .add("last_updated_by", "ID")
+                .get();
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        collection.save(dbObject);
+
+        assertThat(collection.count()).isEqualTo(1L);
+
+        CustomConfig customConfig = clusterConfigService.get("foo", CustomConfig.class);
+        assertThat(customConfig).isInstanceOf(CustomConfig.class);
+        assertThat(customConfig.text).isEqualTo("TEST");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
+    public void getWithKeyReturnsNullOnNonExistingConfig() throws Exception {
+        final DBCollection collection = mongoConnection.getDatabase().getCollection(COLLECTION_NAME);
+        assertThat(collection.count()).isEqualTo(0L);
+
+        assertThat(clusterConfigService.get("foo", CustomConfig.class)).isNull();
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void getOrDefaultReturnsExistingConfig() throws Exception {
         DBObject dbObject = new BasicDBObjectBuilder()
                 .add("type", CustomConfig.class.getCanonicalName())

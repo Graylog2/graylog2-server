@@ -99,20 +99,25 @@ public class ClusterConfigServiceImpl implements ClusterConfigService {
     }
 
     @Override
-    public <T> T get(Class<T> type) {
-        ClusterConfig config = dbCollection.findOne(DBQuery.is("type", type.getCanonicalName()));
+    public <T> T get(String key, Class<T> type) {
+        ClusterConfig config = dbCollection.findOne(DBQuery.is("type", key));
 
         if (config == null) {
-            LOG.debug("Couldn't find cluster config of type {}", type.getCanonicalName());
+            LOG.debug("Couldn't find cluster config of type {}", key);
             return null;
         }
 
         T result = extractPayload(config.payload(), type);
         if (result == null) {
-            LOG.error("Couldn't extract payload from cluster config (type: {})", type.getCanonicalName());
+            LOG.error("Couldn't extract payload from cluster config (type: {})", key);
         }
 
         return result;
+    }
+
+    @Override
+    public <T> T get(Class<T> type) {
+        return get(type.getCanonicalName(), type);
     }
 
     @Override

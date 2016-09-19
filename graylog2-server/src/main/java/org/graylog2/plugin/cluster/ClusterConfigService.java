@@ -32,6 +32,16 @@ public interface ClusterConfigService {
     <T> T get(Class<T> type);
 
     /**
+     * Retrieve Java class of a certain type for the given key from the cluster configuration.
+     *
+     * @param key  The key that is used to find the cluster config object in the database.
+     * @param type The {@link Class} of the Java configuration bean to retrieve.
+     * @param <T>  The type of the Java configuration bean.
+     * @return An instance of the requested type or {@code null} if it couldn't be retrieved.
+     */
+    <T> T get(String key, Class<T> type);
+
+    /**
      * Retrieve Java class of a certain type from the cluster configuration or return a default value
      * in case that failed.
      *
