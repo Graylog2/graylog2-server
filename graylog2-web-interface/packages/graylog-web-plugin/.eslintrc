@@ -1,0 +1,11 @@
+{
+  "parser": "babel-eslint",
+  "ecmaFeatures": {
+    "classes": true,
+    "jsx": true,
+  },
+  "extends": [
+    "graylog",
+  ],
+}
+
