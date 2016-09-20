@@ -17,16 +17,22 @@
 package org.graylog2.shared.bindings.providers;
 
 import javax.inject.Provider;
+import javax.inject.Singleton;
 import javax.validation.Validation;
 import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
 
+@Singleton
 public class ValidatorProvider implements Provider<Validator> {
+    // Validator instances are thread-safe and can be reused.
+    // See: http://hibernate.org/validator/documentation/getting-started/
+    //
+    // The Validator instance creation is quite expensive.
+    // Making this a Singleton reduced the CPU load by 50% and reduced the GC load from 5 GCs per second to 2 GCs
+    // per second when running a load test of the collector registration endpoint.
+    private final Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+
     @Override
     public Validator get() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        Validator validator = factory.getValidator();
-
         return validator;
     }
 }

@@ -24,6 +24,6 @@ import javax.validation.Validator;
 public class ValidatorModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(Validator.class).toProvider(ValidatorProvider.class);
+        bind(Validator.class).toProvider(ValidatorProvider.class).asEagerSingleton();
     }
 }
