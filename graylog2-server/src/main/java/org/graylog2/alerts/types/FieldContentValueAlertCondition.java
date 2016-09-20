@@ -27,6 +27,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Message;
@@ -53,8 +54,8 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
     private final String field;
     private final String value;
 
-    public interface Factory {
-        FieldContentValueAlertCondition createAlertCondition(Stream stream,
+    public interface Factory extends AlertCondition.Factory {
+        FieldContentValueAlertCondition create(Stream stream,
                                                              @Assisted("id") String id,
                                                              DateTime createdAt,
                                                              @Assisted("userid") String creatorUserId,
@@ -71,7 +72,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
                                            @Assisted("userid") String creatorUserId,
                                            @Assisted Map<String, Object> parameters,
                                            @Assisted("title") @Nullable String title) {
-        super(stream, id, Type.FIELD_CONTENT_VALUE, createdAt, creatorUserId, parameters, title);
+        super(stream, id, Type.FIELD_CONTENT_VALUE.toString(), createdAt, creatorUserId, parameters, title);
         this.searches = searches;
         this.configuration = configuration;
         this.field = (String) parameters.get("field");

@@ -27,7 +27,7 @@ public class DummyAlertCondition extends AbstractAlertCondition {
     final String description = "Dummy alert to test notifications";
 
     public DummyAlertCondition(Stream stream, String id, DateTime createdAt, String creatorUserId, Map<String, Object> parameters, String title) {
-        super(stream, id, Type.DUMMY, createdAt, creatorUserId, parameters, title);
+        super(stream, id, Type.DUMMY.toString(), createdAt, creatorUserId, parameters, title);
     }
 
     @Override

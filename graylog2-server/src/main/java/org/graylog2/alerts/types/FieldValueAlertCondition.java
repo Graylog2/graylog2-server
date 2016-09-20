@@ -24,6 +24,7 @@ import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Message;
@@ -56,8 +57,8 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         LOWER, HIGHER
     }
 
-    public interface Factory {
-        FieldValueAlertCondition createAlertCondition(Stream stream,
+    public interface Factory extends AlertCondition.Factory {
+        FieldValueAlertCondition create(Stream stream,
                                                       @Assisted("id") String id,
                                                       DateTime createdAt,
                                                       @Assisted("userid") String creatorUserId,
@@ -81,7 +82,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                                     @Assisted("userid") String creatorUserId,
                                     @Assisted Map<String, Object> parameters,
                                     @Assisted("title") @Nullable String title) {
-        super(stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters, title);
+        super(stream, id, Type.FIELD_VALUE.toString(), createdAt, creatorUserId, parameters, title);
         this.searches = searches;
 
         this.decimalFormat = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));

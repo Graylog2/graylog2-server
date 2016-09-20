@@ -26,6 +26,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -49,8 +50,8 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         MORE, LESS
     }
 
-    public interface Factory {
-        MessageCountAlertCondition createAlertCondition(Stream stream,
+    public interface Factory extends AlertCondition.Factory {
+        MessageCountAlertCondition create(Stream stream,
                                                         @Assisted("id") String id,
                                                         DateTime createdAt,
                                                         @Assisted("userid") String creatorUserId,
@@ -71,7 +72,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                                       @Assisted("userid") String creatorUserId,
                                       @Assisted Map<String, Object> parameters,
                                       @Nullable @Assisted("title") String title) {
-        super(stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters, title);
+        super(stream, id, Type.MESSAGE_COUNT.toString(), createdAt, creatorUserId, parameters, title);
 
         this.searches = searches;
         this.time = getNumber(parameters.get("time")).orElse(0).intValue();
