@@ -132,7 +132,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) {
         final String type = (String)fields.get("type");
 
-        return createAlertCondition(type,
+        return createAlertCondition(type.toString(),
             stream,
             (String) fields.get("id"),
             DateTime.parse((String) fields.get("created_at")),
