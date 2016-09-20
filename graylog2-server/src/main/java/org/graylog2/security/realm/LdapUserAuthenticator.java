@@ -87,12 +87,12 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         // safe, we only handle this type
         final UsernamePasswordToken token = (UsernamePasswordToken) authtoken;
 
-        final LdapConnectionConfig config = new LdapConnectionConfig();
         final LdapSettings ldapSettings = ldapSettingsService.load();
         if (ldapSettings == null || !ldapSettings.isEnabled()) {
             LOG.trace("LDAP is disabled, skipping");
             return null;
         }
+        final LdapConnectionConfig config = new LdapConnectionConfig();
         config.setLdapHost(ldapSettings.getUri().getHost());
         config.setLdapPort(ldapSettings.getUri().getPort());
         config.setUseSsl(ldapSettings.getUri().getScheme().startsWith("ldaps"));
