@@ -18,7 +18,7 @@ class DocsHelper {
     FLEXIBLE_DATE_CONVERTER: 'extractors.html#the-flexible-date-converter',
     INDEXER_FAILURES: 'indexer_failures.html',
     INDEX_MODEL: 'index_model.html',
-    LOAD_BALANCERS: 'load_balancers.html',
+    LOAD_BALANCERS: 'configuration/load_balancers.html',
     PAGE_FLEXIBLE_DATE_CONVERTER: 'extractors.html#the-flexible-date-converter',
     PAGE_STANDARD_DATE_CONVERTER: 'extractors.html#the-standard-date-converter',
     PIPELINE_FUNCTIONS: 'pipelines/functions.html',
