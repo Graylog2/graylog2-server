@@ -82,6 +82,9 @@ public abstract class BaseConfiguration {
     @Parameter(value = "rest_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int restThreadPoolSize = 16;
 
+    @Parameter(value = "rest_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
+    private int restSelectorRunnersCount = 1;
+
     @Parameter(value = "rest_enable_tls")
     private boolean restEnableTls = false;
 
@@ -153,6 +156,9 @@ public abstract class BaseConfiguration {
 
     @Parameter(value = "web_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
     private int webThreadPoolSize = 16;
+
+    @Parameter(value = "web_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
+    private int webSelectorRunnersCount = 1;
 
     @Parameter(value = "web_tls_cert_file")
     private Path webTlsCertFile;
@@ -289,6 +295,10 @@ public abstract class BaseConfiguration {
         return restThreadPoolSize;
     }
 
+    public int getRestSelectorRunnersCount() {
+        return restSelectorRunnersCount;
+    }
+
     public boolean isRestEnableTls() {
         return restEnableTls;
     }
@@ -405,6 +415,10 @@ public abstract class BaseConfiguration {
 
     public int getWebThreadPoolSize() {
         return webThreadPoolSize;
+    }
+
+    public int getWebSelectorRunnersCount() {
+        return webSelectorRunnersCount;
     }
 
     public Path getWebTlsCertFile() {
