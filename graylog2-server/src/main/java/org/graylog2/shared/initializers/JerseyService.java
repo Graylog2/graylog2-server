@@ -160,6 +160,7 @@ public class JerseyService extends AbstractIdleService {
                 listenUri,
                 sslEngineConfigurator,
                 configuration.getWebThreadPoolSize(),
+                configuration.getWebSelectorRunnersCount(),
                 configuration.getWebMaxInitialLineLength(),
                 configuration.getWebMaxHeaderSize(),
                 configuration.isWebEnableGzip(),
@@ -216,6 +217,7 @@ public class JerseyService extends AbstractIdleService {
                 listenUri,
                 sslEngineConfigurator,
                 configuration.getRestThreadPoolSize(),
+                configuration.getRestSelectorRunnersCount(),
                 configuration.getRestMaxInitialLineLength(),
                 configuration.getRestMaxHeaderSize(),
                 configuration.isRestEnableGzip(),
@@ -320,6 +322,7 @@ public class JerseyService extends AbstractIdleService {
                              URI listenUri,
                              SSLEngineConfigurator sslEngineConfigurator,
                              int threadPoolSize,
+                             int selectorRunnersCount,
                              int maxInitialLineLength,
                              int maxHeaderSize,
                              boolean enableGzip,
@@ -338,7 +341,8 @@ public class JerseyService extends AbstractIdleService {
                 listenUri,
                 resourceConfig,
                 sslEngineConfigurator != null,
-                sslEngineConfigurator);
+                sslEngineConfigurator,
+                false);
 
         final NetworkListener listener = httpServer.getListener("grizzly");
         listener.setMaxHttpHeaderSize(maxInitialLineLength);
@@ -349,6 +353,11 @@ public class JerseyService extends AbstractIdleService {
                 namePrefix + "-worker-%d",
                 threadPoolSize);
         listener.getTransport().setWorkerThreadPool(workerThreadPoolExecutor);
+
+        // The Grizzly default value is equal to `Runtime.getRuntime().availableProcessors()` which doesn't make
+        // sense for Graylog because we are not mainly a web server.
+        // See "Selector runners count" at https://grizzly.java.net/bestpractices.html for details.
+        listener.getTransport().setSelectorRunnersCount(selectorRunnersCount);
 
         return httpServer;
     }
