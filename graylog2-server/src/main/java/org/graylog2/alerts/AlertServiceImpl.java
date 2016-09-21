@@ -130,14 +130,9 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
 
     @Override
     public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
-        AbstractAlertCondition.Type type;
-        try {
-            type = AbstractAlertCondition.Type.valueOf(((String) fields.get("type")).toUpperCase(Locale.ENGLISH));
-        } catch (IllegalArgumentException e) {
-            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + fields.get("type") + "]");
-        }
+        final String type = (String)fields.get("type");
 
-        return createAlertCondition(type.toString(),
+        return createAlertCondition(type,
             stream,
             (String) fields.get("id"),
             DateTime.parse((String) fields.get("created_at")),
