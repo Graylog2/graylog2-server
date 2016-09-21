@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.indices;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -60,12 +61,15 @@ import static java.util.Objects.requireNonNull;
 @RequiresAuthentication
 public class RotationStrategyResource extends RestResource {
     private final Map<String, Provider<RotationStrategy>> rotationStrategies;
+    private final ObjectMapper objectMapper;
     private final ClusterConfigService clusterConfigService;
 
     @Inject
     public RotationStrategyResource(Map<String, Provider<RotationStrategy>> rotationStrategies,
+                                    ObjectMapper objectMapper,
                                     ClusterConfigService clusterConfigService) {
         this.rotationStrategies = requireNonNull(rotationStrategies);
+        this.objectMapper = objectMapper;
         this.clusterConfigService = requireNonNull(clusterConfigService);
     }
 

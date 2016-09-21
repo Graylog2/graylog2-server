@@ -17,6 +17,7 @@
 package org.graylog2.shared.rest.resources.documentation;
 
 import com.codahale.metrics.annotation.Timed;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -50,15 +51,18 @@ import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 public class DocumentationResource extends RestResource {
 
     private BaseConfiguration configuration;
+    private final ObjectMapper objectMapper;
     private final Set<String> restControllerPackages = new HashSet<>();
     private final Map<Class<?>, String> pluginRestControllerMapping = new HashMap<>();
 
     @Inject
     public DocumentationResource(BaseConfiguration configuration,
                                  @Named("RestControllerPackages") String[] restControllerPackages,
+                                 ObjectMapper objectMapper,
                                  PluginRestResourceClasses pluginRestResourceClasses) {
 
         this.configuration = configuration;
+        this.objectMapper = objectMapper;
 
         this.restControllerPackages.addAll(Arrays.asList(restControllerPackages));
 
