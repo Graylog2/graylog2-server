@@ -52,11 +52,11 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
 
     public interface Factory extends AlertCondition.Factory {
         MessageCountAlertCondition create(Stream stream,
-                                                        @Assisted("id") String id,
-                                                        DateTime createdAt,
-                                                        @Assisted("userid") String creatorUserId,
-                                                        Map<String, Object> parameters,
-                                                        @Assisted("title") @Nullable String title);
+                                          @Assisted("id") String id,
+                                          DateTime createdAt,
+                                          @Assisted("userid") String creatorUserId,
+                                          Map<String, Object> parameters,
+                                          @Assisted("title") @Nullable String title);
     }
 
     private final int time;
@@ -83,9 +83,9 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     @Override
     public String getDescription() {
         return "time: " + time
-                + ", threshold_type: " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
-                + ", threshold: " + threshold
-                + ", grace: " + grace;
+            + ", threshold_type: " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
+            + ", threshold: " + threshold
+            + ", grace: " + grace;
     }
 
     @Override
@@ -121,7 +121,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                 final List<MessageSummary> summaries = Lists.newArrayList();
                 if (getBacklog() > 0) {
                     final SearchResult backlogResult = searches.search("*", filter,
-                            range, getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
+                        range, getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
                     for (ResultMessage resultMessage : backlogResult.getResults()) {
                         final Message msg = resultMessage.getMessage();
                         summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
@@ -129,8 +129,8 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                 }
 
                 final String resultDescription = "Stream had " + count + " messages in the last " + time
-                        + " minutes with trigger condition " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
-                        + " than " + threshold + " messages. " + "(Current grace time: " + grace + " minutes)";
+                    + " minutes with trigger condition " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
+                    + " than " + threshold + " messages. " + "(Current grace time: " + grace + " minutes)";
                 return new CheckResult(true, this, resultDescription, Tools.nowUTC(), summaries);
             } else {
                 return new NegativeCheckResult(this);

@@ -56,11 +56,11 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
 
     public interface Factory extends AlertCondition.Factory {
         FieldContentValueAlertCondition create(Stream stream,
-                                                             @Assisted("id") String id,
-                                                             DateTime createdAt,
-                                                             @Assisted("userid") String creatorUserId,
-                                                             Map<String, Object> parameters,
-                                                             @Assisted("title") @Nullable String title);
+                                               @Assisted("id") String id,
+                                               DateTime createdAt,
+                                               @Assisted("userid") String creatorUserId,
+                                               Map<String, Object> parameters,
+                                               @Assisted("title") @Nullable String title);
     }
 
     @AssistedInject
@@ -97,12 +97,12 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
 
         try {
             SearchResult result = searches.search(
-                    query,
-                    filter,
-                    RelativeRange.create(configuration.getAlertCheckInterval()),
-                    searchLimit,
-                    0,
-                    new Sorting("timestamp", Sorting.Direction.DESC)
+                query,
+                filter,
+                RelativeRange.create(configuration.getAlertCheckInterval()),
+                searchLimit,
+                0,
+                new Sorting("timestamp", Sorting.Direction.DESC)
             );
 
             final List<MessageSummary> summaries;
@@ -119,7 +119,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
             final long count = result.getTotalResults();
 
             final String resultDescription = "Stream received messages matching <" + query + "> "
-                    + "(Current grace time: " + grace + " minutes)";
+                + "(Current grace time: " + grace + " minutes)";
 
             if (count > 0) {
                 LOG.debug("Alert check <{}> found [{}] messages.", id, count);

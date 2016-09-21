@@ -59,11 +59,11 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
     public interface Factory extends AlertCondition.Factory {
         FieldValueAlertCondition create(Stream stream,
-                                                      @Assisted("id") String id,
-                                                      DateTime createdAt,
-                                                      @Assisted("userid") String creatorUserId,
-                                                      Map<String, Object> parameters,
-                                                      @Assisted("title") @Nullable String title);
+                                        @Assisted("id") String id,
+                                        DateTime createdAt,
+                                        @Assisted("userid") String creatorUserId,
+                                        Map<String, Object> parameters,
+                                        @Assisted("title") @Nullable String title);
     }
 
     private final int time;
@@ -99,11 +99,11 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     @Override
     public String getDescription() {
         return "time: " + time
-                + ", field: " + field
-                + ", check type: " + type.toString().toLowerCase(Locale.ENGLISH)
-                + ", threshold_type: " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
-                + ", threshold: " + decimalFormat.format(threshold)
-                + ", grace: " + grace;
+            + ", field: " + field
+            + ", check type: " + type.toString().toLowerCase(Locale.ENGLISH)
+            + ", threshold_type: " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
+            + ", threshold: " + decimalFormat.format(threshold)
+            + ", grace: " + grace;
     }
 
 
@@ -113,7 +113,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             final String filter = "streams:" + stream.getId();
             // TODO we don't support cardinality yet
             final FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter,
-                                                                          RelativeRange.create(time * 60), false, true, false);
+                RelativeRange.create(time * 60), false, true, false);
 
             if (fieldStatsResult.getCount() == 0) {
                 LOG.debug("Alert check <{}> did not match any messages. Returning not triggered.", type);
@@ -164,9 +164,9 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
             if (triggered) {
                 final String resultDescription = "Field " + field + " had a " + type + " of "
-                        + decimalFormat.format(result) + " in the last " + time + " minutes with trigger condition "
-                        + thresholdType + " than " + decimalFormat.format(threshold) + ". "
-                        + "(Current grace time: " + grace + " minutes)";
+                    + decimalFormat.format(result) + " in the last " + time + " minutes with trigger condition "
+                    + thresholdType + " than " + decimalFormat.format(threshold) + ". "
+                    + "(Current grace time: " + grace + " minutes)";
 
                 final List<MessageSummary> summaries;
                 if (getBacklog() > 0) {
