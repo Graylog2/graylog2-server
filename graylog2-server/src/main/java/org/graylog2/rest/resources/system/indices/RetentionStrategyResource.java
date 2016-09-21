@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system.indices;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -66,12 +67,15 @@ public class RetentionStrategyResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(RetentionStrategyResource.class);
 
     private final Map<String, Provider<RetentionStrategy>> retentionStrategies;
+    private final ObjectMapper objectMapper;
     private final ClusterConfigService clusterConfigService;
 
     @Inject
     public RetentionStrategyResource(Map<String, Provider<RetentionStrategy>> retentionStrategies,
+                                     ObjectMapper objectMapper,
                                      ClusterConfigService clusterConfigService) {
         this.retentionStrategies = requireNonNull(retentionStrategies);
+        this.objectMapper = objectMapper;
         this.clusterConfigService = requireNonNull(clusterConfigService);
     }
 

@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.system;
 
 import com.codahale.metrics.annotation.Timed;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.fasterxml.jackson.module.jsonSchema.factories.SchemaFactoryWrapper;
 import io.swagger.annotations.Api;
@@ -64,14 +65,18 @@ import static java.util.Objects.requireNonNull;
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterConfigResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigResource.class);
-    
+
     private final ClusterConfigService clusterConfigService;
     private final ChainingClassLoader chainingClassLoader;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public ClusterConfigResource(ClusterConfigService clusterConfigService, ChainingClassLoader chainingClassLoader) {
+    public ClusterConfigResource(ClusterConfigService clusterConfigService,
+                                 ChainingClassLoader chainingClassLoader,
+                                 ObjectMapper objectMapper) {
         this.clusterConfigService = requireNonNull(clusterConfigService);
         this.chainingClassLoader = chainingClassLoader;
+        this.objectMapper = objectMapper;
     }
 
     @GET

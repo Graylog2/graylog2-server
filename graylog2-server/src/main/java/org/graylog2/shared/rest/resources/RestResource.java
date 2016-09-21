@@ -17,7 +17,6 @@
 package org.graylog2.shared.rest.resources;
 
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
@@ -47,9 +46,6 @@ import java.util.Arrays;
 
 public abstract class RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
-
-    @Inject
-    protected ObjectMapper objectMapper;
 
     @Inject
     protected UserService userService;
