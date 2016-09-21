@@ -24,10 +24,10 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.configuration.ConfigurableTypeInfo;
 import org.graylog2.decorators.Decorator;
 import org.graylog2.decorators.DecoratorImpl;
 import org.graylog2.decorators.DecoratorService;
-import org.graylog2.decorators.DecoratorTypeInfo;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -76,10 +76,10 @@ public class DecoratorResource extends RestResource {
     @Path("/available")
     @ApiOperation(value = "Returns all available message decorations",
         notes = "")
-    public Map<String, DecoratorTypeInfo> getAvailable() {
+    public Map<String, ConfigurableTypeInfo> getAvailable() {
         return this.searchResponseDecorators.entrySet().stream()
             .collect(Collectors.toMap(
-                Map.Entry::getKey, entry -> DecoratorTypeInfo.create(
+                Map.Entry::getKey, entry -> ConfigurableTypeInfo.create(
                     entry.getKey(),
                     entry.getValue().getDescriptor(),
                     entry.getValue().getConfig().getRequestedConfiguration()

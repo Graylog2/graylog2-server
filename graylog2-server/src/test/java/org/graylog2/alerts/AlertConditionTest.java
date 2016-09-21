@@ -47,6 +47,18 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public abstract class AlertConditionTest {
+    private abstract class TestAlertConditionFactory implements AlertCondition.Factory {
+        @Override
+        public AlertCondition.Config config() {
+            throw new RuntimeException("This method is not implements.");
+        }
+
+        @Override
+        public AlertCondition.Descriptor descriptor() {
+            throw new RuntimeException("This method is not implements.");
+        }
+    }
+
     protected static final String alertConditionTitle = "Alert Condition for Testing";
 
     protected Stream stream;
@@ -68,7 +80,7 @@ public abstract class AlertConditionTest {
         // TODO use injection please. this sucks so bad
         final Map<String, AlertCondition.Factory> alertConditionBinder = ImmutableMap.of(
             AbstractAlertCondition.Type.FIELD_VALUE.toString(),
-            new FieldValueAlertCondition.Factory() {
+            new TestAlertConditionFactory() {
                 @Override
                 public FieldValueAlertCondition create(Stream stream,
                                                                      String id,
@@ -80,7 +92,7 @@ public abstract class AlertConditionTest {
                 }
             },
             AbstractAlertCondition.Type.MESSAGE_COUNT.toString(),
-            new MessageCountAlertCondition.Factory() {
+            new TestAlertConditionFactory() {
                 @Override
                 public MessageCountAlertCondition create(Stream stream,
                                                                        String id,
@@ -90,9 +102,10 @@ public abstract class AlertConditionTest {
                                                                        String title) {
                     return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters, title);
                 }
+
             },
             AbstractAlertCondition.Type.FIELD_CONTENT_VALUE.toString(),
-            new FieldContentValueAlertCondition.Factory() {
+            new TestAlertConditionFactory() {
                 @Override
                 public FieldContentValueAlertCondition create(Stream stream,
                                                                             String id,

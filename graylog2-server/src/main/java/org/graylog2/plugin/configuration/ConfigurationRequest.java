@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
 import java.util.Map;
 
 public class ConfigurationRequest {
@@ -48,11 +49,15 @@ public class ConfigurationRequest {
         return fields.get(fieldName);
     }
 
-    public boolean removeField(String fieldName) {
-        return fields.remove(fieldName) != null;
-    }
     public Map<String, ConfigurationField> getFields() {
         return fields;
+    }
+
+    public static ConfigurationRequest createWithFields(ConfigurationField... fields) {
+        final ConfigurationRequest configurationRequest = new ConfigurationRequest();
+        Arrays.stream(fields).forEach(configurationRequest::addField);
+
+        return configurationRequest;
     }
 
     @JsonValue

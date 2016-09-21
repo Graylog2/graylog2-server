@@ -26,28 +26,46 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
-import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.DropdownField;
+import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class MessageCountAlertCondition extends AbstractAlertCondition {
     private static final Logger LOG = LoggerFactory.getLogger(MessageCountAlertCondition.class);
 
-    public enum ThresholdType {
-        MORE, LESS
+    private enum ThresholdType {
+
+        MORE("more than"),
+        LESS("less than");
+
+        private final String description;
+
+        ThresholdType(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 
     public interface Factory extends AlertCondition.Factory {
@@ -57,6 +75,34 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                                           @Assisted("userid") String creatorUserId,
                                           Map<String, Object> parameters,
                                           @Assisted("title") @Nullable String title);
+        Config config();
+        Descriptor descriptor();
+    }
+
+    public static class Config implements AlertCondition.Config {
+        public Config() {
+        }
+
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            return ConfigurationRequest.createWithFields(
+                new NumberField("time", "Time Range", 0, "Time span in seconds to check", ConfigurationField.Optional.NOT_OPTIONAL),
+                new NumberField("threshold", "Threshold", 0.0, "Value which triggers an alert if crossed", ConfigurationField.Optional.NOT_OPTIONAL),
+                new DropdownField(
+                    "threshold_type",
+                    "Threshold Type",
+                    MessageCountAlertCondition.ThresholdType.MORE.toString(),
+                    Arrays.stream(MessageCountAlertCondition.ThresholdType.values()).collect(Collectors.toMap(Enum::toString, ThresholdType::getDescription)),
+                    ConfigurationField.Optional.NOT_OPTIONAL),
+                new NumberField("grace", "Grace Period", 0, "Time span in seconds defining how long alerting is paused after alert is triggered", ConfigurationField.Optional.NOT_OPTIONAL)
+            );
+        }
+    }
+
+    public static class Descriptor extends AlertCondition.Descriptor {
+        public Descriptor() {
+            super(Type.MESSAGE_COUNT.toString(), "http://www.graylog.rog", "Message Count Alert Condition");
+        }
     }
 
     private final int time;

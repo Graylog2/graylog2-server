@@ -31,19 +31,19 @@ public class NumberField extends AbstractConfigurationField {
         IS_PORT_NUMBER
     }
 
-    private int defaultValue;
+    private Number defaultValue;
 
     private final List<String> attributes;
 
-    public NumberField(String name, String humanName, int defaultValue, String description, Optional isOptional) {
+    public NumberField(String name, String humanName, Number defaultValue, String description, Optional isOptional) {
         this(name, humanName, defaultValue, description, isOptional, new Attribute[0]);
     }
 
-    public NumberField(String name, String humanName, int defaultValue, String description, Attribute... attributes) {
+    public NumberField(String name, String humanName, Number defaultValue, String description, Attribute... attributes) {
         this(name, humanName, defaultValue, description, Optional.NOT_OPTIONAL, attributes);
     }
 
-    public NumberField(String name, String humanName, int defaultValue, String description, Optional isOptional, Attribute... attrs) {
+    public NumberField(String name, String humanName, Number defaultValue, String description, Optional isOptional, Attribute... attrs) {
         super(FIELD_TYPE, name, humanName, description, isOptional);
         this.defaultValue = defaultValue;
 
@@ -62,8 +62,8 @@ public class NumberField extends AbstractConfigurationField {
 
     @Override
     public void setDefaultValue(Object defaultValue) {
-        if (defaultValue instanceof Integer) {
-            this.defaultValue = (int) defaultValue;
+        if (defaultValue instanceof Number) {
+            this.defaultValue = (Number) defaultValue;
         }
     }
 

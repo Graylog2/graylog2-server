@@ -24,12 +24,17 @@ import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Searches;
-import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
-import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.DropdownField;
+import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.configuration.fields.TextField;
+import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
+import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -38,10 +43,12 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -49,21 +56,69 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class FieldValueAlertCondition extends AbstractAlertCondition {
     private static final Logger LOG = LoggerFactory.getLogger(FieldValueAlertCondition.class);
 
-    public enum CheckType {
-        MEAN, MIN, MAX, SUM, STDDEV
+    private enum CheckType {
+        MEAN("mean value"), MIN("min value"), MAX("max value"), SUM("sum"), STDDEV("standard deviation");
+
+        private final String description;
+
+        CheckType(String description) {
+            this.description = description;
+        }
+
+        public String getDescription() {
+            return description;
+        }
     }
 
-    public enum ThresholdType {
+    private enum ThresholdType {
         LOWER, HIGHER
     }
 
     public interface Factory extends AlertCondition.Factory {
+        @Override
         FieldValueAlertCondition create(Stream stream,
                                         @Assisted("id") String id,
                                         DateTime createdAt,
                                         @Assisted("userid") String creatorUserId,
                                         Map<String, Object> parameters,
                                         @Assisted("title") @Nullable String title);
+        @Override
+        Config config();
+        @Override
+        Descriptor descriptor();
+    }
+
+    public static class Config implements AlertCondition.Config {
+        public Config() {
+        }
+
+        @Override
+        public ConfigurationRequest getRequestedConfiguration() {
+            return ConfigurationRequest.createWithFields(
+                new TextField("field", "Field", "", "Field name that should be checked", ConfigurationField.Optional.NOT_OPTIONAL),
+                new NumberField("time", "Time Range", 0, "Time span in seconds to check", ConfigurationField.Optional.NOT_OPTIONAL),
+                new NumberField("threshold", "Threshold", 0.0, "Value which triggers an alert if crossed", ConfigurationField.Optional.NOT_OPTIONAL),
+                new NumberField("grace", "Grace Period", 0, "Time span in seconds defining how long alerting is paused after alert is triggered", ConfigurationField.Optional.NOT_OPTIONAL),
+                new DropdownField(
+                    "threshold_type",
+                    "Threshold Type",
+                    ThresholdType.HIGHER.toString(),
+                    Arrays.stream(ThresholdType.values()).collect(Collectors.toMap(Enum::toString, thresholdType -> thresholdType.toString().toLowerCase(Locale.ENGLISH))),
+                    ConfigurationField.Optional.NOT_OPTIONAL),
+                new DropdownField(
+                    "type",
+                    "Check Type",
+                    CheckType.MAX.toString(),
+                    Arrays.stream(CheckType.values()).collect(Collectors.toMap(Enum::toString, CheckType::getDescription)),
+                    ConfigurationField.Optional.NOT_OPTIONAL)
+            );
+        }
+    }
+
+    public static class Descriptor extends AlertCondition.Descriptor {
+        public Descriptor() {
+            super(Type.FIELD_VALUE.toString(), "http://www.graylog.rog", "Field Value Alert Condition");
+        }
     }
 
     private final int time;

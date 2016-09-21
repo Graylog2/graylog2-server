@@ -14,18 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.decorators;
+package org.graylog2.plugin.configuration;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
-import org.graylog2.plugin.decorators.SearchResponseDecorator;
+import org.graylog2.plugin.DescriptorWithHumanName;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class DecoratorTypeInfo {
+public abstract class ConfigurableTypeInfo {
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_NAME = "name";
     private static final String FIELD_HUMAN_NAME = "human_name";
@@ -44,15 +43,15 @@ public abstract class DecoratorTypeInfo {
     public abstract String linkToDocs();
 
     @JsonCreator
-    public static DecoratorTypeInfo create(@JsonProperty(FIELD_TYPE) String type,
-                                           @JsonProperty(FIELD_NAME) String name,
-                                           @JsonProperty(FIELD_HUMAN_NAME) String humanName,
-                                           @JsonProperty(FIELD_REQUESTED_CONFIGURATION) ConfigurationRequest requestedConfiguration,
-                                           @JsonProperty(FIELD_LINK_TO_DOCS) String linkToDocs) {
-        return new AutoValue_DecoratorTypeInfo(type, name, humanName, requestedConfiguration, linkToDocs);
+    public static ConfigurableTypeInfo create(@JsonProperty(FIELD_TYPE) String type,
+                                              @JsonProperty(FIELD_NAME) String name,
+                                              @JsonProperty(FIELD_HUMAN_NAME) String humanName,
+                                              @JsonProperty(FIELD_REQUESTED_CONFIGURATION) ConfigurationRequest requestedConfiguration,
+                                              @JsonProperty(FIELD_LINK_TO_DOCS) String linkToDocs) {
+        return new AutoValue_ConfigurableTypeInfo(type, name, humanName, requestedConfiguration, linkToDocs);
     }
 
-    public static DecoratorTypeInfo create(String type, SearchResponseDecorator.Descriptor descriptor, ConfigurationRequest requestedConfiguration) {
+    public static ConfigurableTypeInfo create(String type, DescriptorWithHumanName descriptor, ConfigurationRequest requestedConfiguration) {
         return create(type, descriptor.getName(), descriptor.getHumanName(), requestedConfiguration, descriptor.getLinkToDocs());
     }
 }
