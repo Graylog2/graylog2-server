@@ -83,6 +83,7 @@ public class StreamRouterEngine {
         final List<Rule> greaterRules = Lists.newArrayList();
         final List<Rule> smallerRules = Lists.newArrayList();
         final List<Rule> regexRules = Lists.newArrayList();
+        final List<Rule> containsRules = Lists.newArrayList();
 
         for (Stream stream : streams) {
             for (StreamRule streamRule : stream.getStreamRules()) {
@@ -109,17 +110,21 @@ public class StreamRouterEngine {
                     case REGEX:
                         regexRules.add(rule);
                         break;
+                    case CONTAINS:
+                        containsRules.add(rule);
+                        break;
                 }
             }
         }
 
-        final int size = presenceRules.size() + exactRules.size() + greaterRules.size() + smallerRules.size() + regexRules.size();
+        final int size = presenceRules.size() + exactRules.size() + greaterRules.size() + smallerRules.size() + regexRules.size() + containsRules.size();
         this.rulesList = Lists.newArrayListWithCapacity(size);
         this.rulesList.addAll(presenceRules);
         this.rulesList.addAll(exactRules);
         this.rulesList.addAll(greaterRules);
         this.rulesList.addAll(smallerRules);
         this.rulesList.addAll(regexRules);
+        this.rulesList.addAll(containsRules);
     }
 
     /**

@@ -126,6 +126,33 @@ public class StreamRouterEngineTest {
     }
 
     @Test
+    public void testContainsMatch() throws Exception {
+        final StreamMock stream = getStreamMock("test");
+        final StreamRuleMock rule = new StreamRuleMock(ImmutableMap.of(
+                "_id", new ObjectId(),
+                "field", "testfield",
+                "value", "testvalue",
+                "type", StreamRuleType.CONTAINS.toInteger(),
+                "stream_id", stream.getId()
+        ));
+
+        stream.setStreamRules(Lists.newArrayList(rule));
+
+        final StreamRouterEngine engine = newEngine(Lists.newArrayList(stream));
+        final Message message = getMessage();
+
+        // With wrong value for field.
+        message.addField("testfield", "no-foobar");
+
+        assertTrue(engine.match(message).isEmpty());
+
+        // With matching value for field.
+        message.addField("testfield", "hello testvalue");
+
+        assertEquals(engine.match(message), Lists.newArrayList(stream));
+    }
+
+    @Test
     public void testGreaterMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
         final StreamRuleMock rule = new StreamRuleMock(ImmutableMap.of(
