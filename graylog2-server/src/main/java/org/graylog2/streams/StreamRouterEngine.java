@@ -117,14 +117,14 @@ public class StreamRouterEngine {
             }
         }
 
-        final int size = presenceRules.size() + exactRules.size() + greaterRules.size() + smallerRules.size() + regexRules.size() + containsRules.size();
+        final int size = presenceRules.size() + exactRules.size() + greaterRules.size() + smallerRules.size() + containsRules.size() + regexRules.size();
         this.rulesList = Lists.newArrayListWithCapacity(size);
         this.rulesList.addAll(presenceRules);
         this.rulesList.addAll(exactRules);
         this.rulesList.addAll(greaterRules);
         this.rulesList.addAll(smallerRules);
-        this.rulesList.addAll(regexRules);
         this.rulesList.addAll(containsRules);
+        this.rulesList.addAll(regexRules);
     }
 
     /**
