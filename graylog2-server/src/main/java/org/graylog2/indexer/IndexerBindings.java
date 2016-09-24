@@ -14,14 +14,14 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin.indexer.retention;
+package org.graylog2.indexer;
 
-import org.graylog2.indexer.IndexSet;
+import org.graylog2.plugin.inject.Graylog2Module;
 
-public interface RetentionStrategy {
-    void retain(IndexSet indexSet);
-
-    Class<? extends RetentionStrategyConfig> configurationClass();
-
-    RetentionStrategyConfig defaultConfiguration();
+public class IndexerBindings extends Graylog2Module {
+    @Override
+    protected void configure() {
+        bind(IndexSetRegistry.class).to(LegacyDeflectorRegistry.class);
+        bind(IndexSet.class).to(LegacyDeflectorIndexSet.class);
+    }
 }

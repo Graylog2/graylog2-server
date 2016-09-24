@@ -18,7 +18,7 @@ package org.graylog2.indexer.ranges;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,15 +30,15 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     private final String indexName;
 
     public interface Factory {
-        CreateNewSingleIndexRangeJob create(Deflector deflector, String indexName);
+        CreateNewSingleIndexRangeJob create(IndexSetRegistry indexSetRegistry, String indexName);
     }
 
     @AssistedInject
-    public CreateNewSingleIndexRangeJob(@Assisted Deflector deflector,
+    public CreateNewSingleIndexRangeJob(@Assisted IndexSetRegistry indexSetRegistry,
                                         @Assisted String indexName,
                                         ActivityWriter activityWriter,
                                         IndexRangeService indexRangeService) {
-        super(deflector, activityWriter, indexRangeService);
+        super(indexSetRegistry, activityWriter, indexRangeService);
         this.indexName = checkNotNull(indexName);
     }
 

@@ -30,7 +30,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.client.ClusterAdminClient;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.cluster.node.DiscoveryNode;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.esplugin.ClusterStateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,24 +47,25 @@ import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+
 @Singleton
 public class Cluster {
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
 
     private final Client c;
-    private final Deflector deflector;
+    private final IndexSetRegistry indexSetRegistry;
     private final ScheduledExecutorService scheduler;
     private final Duration requestTimeout;
     private final AtomicReference<Map<String, DiscoveryNode>> nodes = new AtomicReference<>();
 
     @Inject
     public Cluster(Client client,
-                   Deflector deflector,
+                   IndexSetRegistry indexSetRegistry,
                    @Named("daemonScheduler") ScheduledExecutorService scheduler,
                    @Named("elasticsearch_request_timeout") Duration requestTimeout) {
         this.scheduler = scheduler;
         this.c = client;
-        this.deflector = deflector;
+        this.indexSetRegistry = indexSetRegistry;
         this.requestTimeout = requestTimeout;
         // unfortunately we can't use guice here, because elasticsearch and graylog2 use different injectors and we can't
         // get to the instance to bridge.
@@ -77,7 +78,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public ClusterHealthResponse health() {
-        ClusterHealthRequest request = new ClusterHealthRequest(deflector.getDeflectorWildcard());
+        ClusterHealthRequest request = new ClusterHealthRequest(indexSetRegistry.getWriteIndexWildcards());
         return c.admin().cluster().health(request).actionGet();
     }
 
@@ -90,7 +91,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public ClusterHealthResponse deflectorHealth() {
-        ClusterHealthRequest request = new ClusterHealthRequest(deflector.getName());
+        ClusterHealthRequest request = new ClusterHealthRequest(indexSetRegistry.getWriteIndexNames());
         return c.admin().cluster().health(request).actionGet();
     }
 
@@ -163,13 +164,13 @@ public class Cluster {
 
     /**
      * Check if the cluster health status is not {@link ClusterHealthStatus#RED} and that the
-     * {@link org.graylog2.indexer.Deflector#isUp() deflector is up}.
+     * {@link IndexSetRegistry#isUp() deflector is up}.
      *
      * @return {@code true} if the the cluster is healthy and the deflector is up, {@code false} otherwise
      */
     public boolean isHealthy() {
         try {
-            return health().getStatus() != ClusterHealthStatus.RED && deflector.isUp();
+            return health().getStatus() != ClusterHealthStatus.RED && indexSetRegistry.isUp();
         } catch (ElasticsearchException e) {
             LOG.trace("Couldn't determine Elasticsearch health properly", e);
             return false;
@@ -178,13 +179,13 @@ public class Cluster {
 
     /**
      * Check if the deflector (write index) health status is not {@link ClusterHealthStatus#RED} and that the
-     * {@link org.graylog2.indexer.Deflector#isUp() deflector is up}.
+     * {@link IndexSetRegistry#isUp() deflector is up}.
      *
      * @return {@code true} if the deflector is healthy and up, {@code false} otherwise
      */
     public boolean isDeflectorHealthy() {
         try {
-            return deflectorHealth().getStatus() != ClusterHealthStatus.RED && deflector.isUp();
+            return deflectorHealth().getStatus() != ClusterHealthStatus.RED && indexSetRegistry.isUp();
         } catch (ElasticsearchException e) {
             LOG.trace("Couldn't determine deflector index health properly", e);
             return false;

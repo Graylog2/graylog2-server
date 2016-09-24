@@ -21,7 +21,7 @@ import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.index.store.StoreStats;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -45,7 +45,7 @@ public class SizeBasedRotationStrategyTest {
     private ClusterConfigService clusterConfigService;
 
     @Mock
-    private Deflector deflector;
+    private IndexSet indexSet;
 
     @Mock
     private Indices indices;
@@ -63,14 +63,14 @@ public class SizeBasedRotationStrategyTest {
         final IndexStatistics stats = IndexStatistics.create("name", commonStats, commonStats, Collections.<ShardRouting>emptyList());
 
         when(indices.getIndexStats("name")).thenReturn(stats);
-        when(deflector.getNewestTargetName()).thenReturn("name");
+        when(indexSet.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService, nodeId, auditEventSender);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, clusterConfigService, nodeId, auditEventSender);
 
-        strategy.rotate();
-        verify(deflector, times(1)).cycle();
-        reset(deflector);
+        strategy.rotate(indexSet);
+        verify(indexSet, times(1)).cycle();
+        reset(indexSet);
     }
 
 
@@ -81,27 +81,27 @@ public class SizeBasedRotationStrategyTest {
         final IndexStatistics stats = IndexStatistics.create("name", commonStats, commonStats, Collections.<ShardRouting>emptyList());
 
         when(indices.getIndexStats("name")).thenReturn(stats);
-        when(deflector.getNewestTargetName()).thenReturn("name");
+        when(indexSet.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100000L));
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService, nodeId, auditEventSender);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, clusterConfigService, nodeId, auditEventSender);
 
-        strategy.rotate();
-        verify(deflector, never()).cycle();
-        reset(deflector);
+        strategy.rotate(indexSet);
+        verify(indexSet, never()).cycle();
+        reset(indexSet);
     }
 
 
     @Test
     public void testRotateFailed() throws Exception {
         when(indices.getIndexStats("name")).thenReturn(null);
-        when(deflector.getNewestTargetName()).thenReturn("name");
+        when(indexSet.getNewestTargetName()).thenReturn("name");
         when(clusterConfigService.get(SizeBasedRotationStrategyConfig.class)).thenReturn(SizeBasedRotationStrategyConfig.create(100));
 
-        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, deflector, clusterConfigService, nodeId, auditEventSender);
+        final SizeBasedRotationStrategy strategy = new SizeBasedRotationStrategy(indices, clusterConfigService, nodeId, auditEventSender);
 
-        strategy.rotate();
-        verify(deflector, never()).cycle();
-        reset(deflector);
+        strategy.rotate(indexSet);
+        verify(indexSet, never()).cycle();
+        reset(indexSet);
     }
 }

@@ -31,7 +31,7 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.metrics.CacheStatsSet;
 import org.graylog2.shared.metrics.MetricUtils;
@@ -55,15 +55,15 @@ public class EsIndexRangeService implements IndexRangeService {
 
     private final LoadingCache<String, IndexRange> cache;
     private final Client client;
-    private final Deflector deflector;
+    private final IndexSetRegistry indexSetRegistry;
 
     @Inject
     public EsIndexRangeService(Client client,
-                               Deflector deflector,
+                               IndexSetRegistry indexSetRegistry,
                                EventBus eventBus,
                                MetricRegistry metricRegistry) {
         this.client = requireNonNull(client);
-        this.deflector = requireNonNull(deflector);
+        this.indexSetRegistry = requireNonNull(indexSetRegistry);
 
         final CacheLoader<String, IndexRange> cacheLoader = new CacheLoader<String, IndexRange>() {
             @Override
@@ -157,7 +157,7 @@ public class EsIndexRangeService implements IndexRangeService {
     @Override
     public SortedSet<IndexRange> findAll() {
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
-        for (String index : deflector.getAllGraylogIndexNames()) {
+        for (String index : indexSetRegistry.getAllGraylogIndexNames()) {
             try {
                 indexRanges.add(cache.get(index));
             } catch (ExecutionException e) {

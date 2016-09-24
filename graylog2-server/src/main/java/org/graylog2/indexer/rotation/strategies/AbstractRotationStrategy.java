@@ -20,8 +20,8 @@ package org.graylog2.indexer.rotation.strategies;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.NoTargetIndexException;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -40,12 +40,10 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         boolean shouldRotate();
     }
 
-    private final Deflector deflector;
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
 
-    public AbstractRotationStrategy(Deflector deflector, AuditEventSender auditEventSender, NodeId nodeId) {
-        this.deflector = requireNonNull(deflector);
+    public AbstractRotationStrategy(AuditEventSender auditEventSender, NodeId nodeId) {
         this.auditEventSender = requireNonNull(auditEventSender);
         this.nodeId = nodeId;
     }
@@ -54,11 +52,11 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
     protected abstract Result shouldRotate(String indexName);
 
     @Override
-    public void rotate() {
+    public void rotate(IndexSet indexSet) {
         final String strategyName = this.getClass().getCanonicalName();
         final String indexName;
         try {
-            indexName = deflector.getNewestTargetName();
+            indexName = indexSet.getNewestTargetName();
         } catch (NoTargetIndexException e) {
             LOG.error("Could not find current deflector target. Aborting.", e);
             return;
@@ -72,7 +70,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         LOG.debug("Rotation strategy result: {}", rotate.getDescription());
         if (rotate.shouldRotate()) {
             LOG.info("Deflector index <{}> should be rotated, Pointing deflector to new index now!", indexName);
-            deflector.cycle();
+            indexSet.cycle();
             auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_ROTATION_COMPLETE, ImmutableMap.of(
                     "index_name", indexName,
                     "rotation_strategy", strategyName

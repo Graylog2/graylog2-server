@@ -21,7 +21,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.primitives.Ints;
 import com.google.inject.name.Named;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -46,19 +46,19 @@ public class IndexRangesCleanupPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangesCleanupPeriodical.class);
 
     private final Cluster cluster;
-    private final Deflector deflector;
+    private final IndexSetRegistry indexSetRegistry;
     private final IndexRangeService indexRangeService;
     private final EventBus eventBus;
     private final int periodSeconds;
 
     @Inject
     public IndexRangesCleanupPeriodical(final Cluster cluster,
-                                        final Deflector deflector,
+                                        final IndexSetRegistry indexSetRegistry,
                                         final IndexRangeService indexRangeService,
                                         final EventBus eventBus,
                                         @Named("index_ranges_cleanup_interval") final Duration indexRangesCleanupInterval) {
         this.cluster = requireNonNull(cluster);
-        this.deflector = requireNonNull(deflector);
+        this.indexSetRegistry = requireNonNull(indexSetRegistry);
         this.indexRangeService = requireNonNull(indexRangeService);
         this.eventBus = requireNonNull(eventBus);
         this.periodSeconds = Ints.saturatedCast(indexRangesCleanupInterval.toSeconds());
@@ -72,7 +72,7 @@ public class IndexRangesCleanupPeriodical extends Periodical {
             return;
         }
 
-        final Set<String> indexNames = ImmutableSet.copyOf(deflector.getAllGraylogIndexNames());
+        final Set<String> indexNames = ImmutableSet.copyOf(indexSetRegistry.getAllGraylogIndexNames());
         final SortedSet<IndexRange> indexRanges = indexRangeService.findAll();
 
         final Set<String> removedIndices = new HashSet<>();

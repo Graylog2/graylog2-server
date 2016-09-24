@@ -20,7 +20,6 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
@@ -44,13 +43,12 @@ public class DeletionRetentionStrategy extends AbstractIndexCountBasedRetentionS
     private final AuditEventSender auditEventSender;
 
     @Inject
-    public DeletionRetentionStrategy(Deflector deflector,
-                                     Indices indices,
+    public DeletionRetentionStrategy(Indices indices,
                                      ActivityWriter activityWriter,
                                      ClusterConfigService clusterConfigService,
                                      NodeId nodeId,
                                      AuditEventSender auditEventSender) {
-        super(deflector, indices, activityWriter);
+        super(indices, activityWriter);
         this.indices = indices;
         this.clusterConfigService = clusterConfigService;
         this.nodeId = nodeId;
@@ -59,6 +57,7 @@ public class DeletionRetentionStrategy extends AbstractIndexCountBasedRetentionS
 
     @Override
     protected Optional<Integer> getMaxNumberOfIndices() {
+        // TODO 2.2: Retention strategy config is per write target, not global.
         final DeletionRetentionStrategyConfig config = clusterConfigService.get(DeletionRetentionStrategyConfig.class);
 
         if (config != null) {

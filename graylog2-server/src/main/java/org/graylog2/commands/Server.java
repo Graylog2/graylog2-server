@@ -48,6 +48,7 @@ import org.graylog2.configuration.MongoDbConfiguration;
 import org.graylog2.configuration.VersionCheckConfiguration;
 import org.graylog2.dashboards.DashboardBindings;
 import org.graylog2.decorators.DecoratorBindings;
+import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.messageprocessors.MessageProcessorModule;
@@ -120,7 +121,8 @@ public class Server extends ServerBootstrap {
             new DashboardBindings(),
             new DecoratorBindings(),
             new AuditBindings(),
-            new AlertConditionBindings()
+            new AlertConditionBindings(),
+            new IndexerBindings()
         );
 
         return modules.build();

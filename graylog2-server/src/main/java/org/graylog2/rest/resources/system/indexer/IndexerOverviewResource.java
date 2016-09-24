@@ -21,7 +21,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.elasticsearch.action.admin.indices.stats.IndexStats;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
@@ -54,23 +54,24 @@ public class IndexerOverviewResource extends RestResource {
     private final IndexerClusterResource indexerClusterResource;
     private final IndexRangesResource indexRangesResource;
     private final CountResource countResource;
-    private final Deflector deflector;
+    private final IndexSetRegistry indexSetRegistry;
     private final Indices indices;
     private final Cluster cluster;
 
+    // TODO 2.2: Resource needs to be adjusted to return overview for a specific write target
     @Inject
     public IndexerOverviewResource(DeflectorResource deflectorResource,
                                    IndexerClusterResource indexerClusterResource,
                                    IndexRangesResource indexRangesResource,
                                    CountResource countResource,
-                                   Deflector deflector,
+                                   IndexSetRegistry indexSetRegistry,
                                    Indices indices,
                                    Cluster cluster) {
         this.deflectorResource = deflectorResource;
         this.indexerClusterResource = indexerClusterResource;
         this.indexRangesResource = indexRangesResource;
         this.countResource = countResource;
-        this.deflector = deflector;
+        this.indexSetRegistry = indexSetRegistry;
         this.indices = indices;
         this.cluster = cluster;
     }
@@ -87,7 +88,7 @@ public class IndexerOverviewResource extends RestResource {
         final DeflectorSummary deflectorSummary = deflectorResource.deflector();
         final List<IndexRangeSummary> indexRanges = indexRangesResource.list().ranges();
         final Map<String, IndexStats> allDocCounts = indices.getAllDocCounts().entrySet().stream()
-                .filter(entry -> deflector.isGraylogIndex(entry.getKey()))
+                .filter(entry -> indexSetRegistry.isGraylogIndex(entry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         final Map<String, Boolean> areReopened = indices.areReopened(allDocCounts.keySet());
         final Map<String, IndexSummary> indicesSummaries = allDocCounts.values()

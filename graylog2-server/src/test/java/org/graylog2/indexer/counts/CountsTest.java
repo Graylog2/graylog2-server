@@ -26,7 +26,8 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.unit.TimeValue;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.LegacyDeflectorRegistry;
+import org.graylog2.indexer.IndexSet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -58,7 +59,7 @@ public class CountsTest {
     private Client client;
 
     @Mock
-    private Deflector deflector;
+    private IndexSet indexSet;
     private Counts counts;
 
     @Before
@@ -81,9 +82,9 @@ public class CountsTest {
                 .get();
         assumeTrue(clusterHealthResponse.getStatus() == ClusterHealthStatus.GREEN);
 
-        when(deflector.getAllGraylogIndexNames()).thenReturn(new String[]{INDEX_NAME});
+        when(indexSet.getAllGraylogIndexNames()).thenReturn(new String[]{INDEX_NAME});
 
-        counts = new Counts(client, deflector);
+        counts = new Counts(client, new LegacyDeflectorRegistry(indexSet));
     }
 
     @After
