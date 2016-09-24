@@ -128,7 +128,7 @@ public class SearchesTest {
     public void setUp() throws Exception {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         metricRegistry = new MetricRegistry();
-        searches = new Searches(new Configuration(), deflector, indexRangeService, client, metricRegistry);
+        searches = new Searches(new Configuration(), indexRangeService, client, metricRegistry);
     }
 
     @Test
