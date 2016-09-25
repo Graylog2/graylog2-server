@@ -72,7 +72,11 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
 
     @Override
     public void deleteAll() {
-        databaseOperation.deleteAll();
+        try {
+            databaseOperation.deleteAll();
+        } catch (Exception e) {
+            // ignore
+        }
     }
 
     @Override
