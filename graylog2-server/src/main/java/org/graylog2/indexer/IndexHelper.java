@@ -86,9 +86,8 @@ public class IndexHelper {
     }
 
     public static Set<String> determineAffectedIndices(IndexRangeService indexRangeService,
-                                                       Deflector deflector,
                                                        TimeRange range) {
-        final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(indexRangeService, deflector, range);
+        final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(indexRangeService, range);
         final ImmutableSet.Builder<String> indices = ImmutableSet.builder();
         for (IndexRange indexRange : indexRanges) {
             indices.add(indexRange.indexName());
@@ -98,7 +97,6 @@ public class IndexHelper {
     }
 
     public static Set<IndexRange> determineAffectedIndicesWithRanges(IndexRangeService indexRangeService,
-                                                                     Deflector deflector,
                                                                      TimeRange range) {
         final ImmutableSortedSet.Builder<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         for (IndexRange indexRange : indexRangeService.find(range.getFrom(), range.getTo())) {
