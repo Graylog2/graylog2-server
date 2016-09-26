@@ -11,6 +11,27 @@ const AlertConditionsActions = ActionsProvider.getActions('AlertConditions');
 const AlertConditionsStore = Reflux.createStore({
   listenables: AlertConditionsActions,
 
+  init() {
+    this.available();
+  },
+
+  getInitialState() {
+    return {
+      types: this.types,
+    };
+  },
+
+  available() {
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.available().url);
+    const promise = fetch('GET', url).then((response) => {
+      this.types = response;
+      this.trigger(this.getInitialState());
+    });
+
+    AlertConditionsActions.available.promise(promise);
+    return promise;
+  },
+
   delete(streamId, alertConditionId) {
     const failCallback = (error) => {
       UserNotification.error('Removing Alert Condition failed with status: ' + error,

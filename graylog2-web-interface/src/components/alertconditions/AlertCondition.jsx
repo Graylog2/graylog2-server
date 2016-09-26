@@ -13,27 +13,16 @@ const AlertCondition = React.createClass({
   propTypes: {
     alertCondition: React.PropTypes.object.isRequired,
   },
-  getInitialState() {
-    return {
-      edit: false,
-    };
-  },
   _onEdit() {
-    this.setState({ edit: !this.state.edit });
+    this.refs.updateForm.open();
   },
   _onDelete() {
     if (window.confirm('Really delete alarm condition?')) {
       AlertConditionsActions.delete(this.props.alertCondition.stream_id, this.props.alertCondition.id);
     }
   },
-  _onUpdate(event) {
-    event.preventDefault();
-    const request = this.refs.updateForm.getValue();
-    request.type = this.props.alertCondition.type;
-    AlertConditionsActions.update.triggerPromise(this.props.alertCondition.stream_id, this.props.alertCondition.id, request)
-    .then(() => {
-      this.setState({ edit: false });
-    });
+  _onUpdate(request) {
+    AlertConditionsActions.update.triggerPromise(this.props.alertCondition.stream_id, this.props.alertCondition.id, request);
   },
   _formatTitle() {
     const alertCondition = this.props.alertCondition;
@@ -47,25 +36,24 @@ const AlertCondition = React.createClass({
       </span>
     );
   },
+  alertConditionsFactory: new AlertConditionsFactory(),
   render() {
     const alertCondition = this.props.alertCondition;
-    const alertConditionType = new AlertConditionsFactory().get(alertCondition.type);
-    if (!alertConditionType) {
+    const alertConditionType = this.alertConditionsFactory.get(alertCondition.type);
+    if (!alertConditionType || alertConditionType.length === 0) {
       return <UnknownAlertCondition alertCondition={alertCondition} />;
     }
+    const alertConditionSummary = alertConditionType[0].summary;
     return (
       <span>
         <Row className="alert-condition" data-condition-id={alertCondition.id}>
           <Col md={9}>
             <h3>{this._formatTitle()}</h3>
-            <alertConditionType.summary alertCondition={alertCondition} />
-            {' '}
-            {this.state.edit &&
-            <form onSubmit={this._onUpdate}>
-              <AlertConditionForm ref="updateForm" type={alertCondition.type} alertCondition={alertCondition} />
-              {' '}
-              <Button bsStyle="info" type="submit">Save</Button>
-            </form>}
+            <alertConditionSummary alertCondition={alertCondition} />
+            <AlertConditionForm ref="updateForm"
+                                type={alertCondition.type}
+                                alertCondition={alertCondition}
+                                onSubmit={this._onUpdate}/>
           </Col>
 
           <Col md={3} style={{ textAlign: 'right' }}>

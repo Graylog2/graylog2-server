@@ -10,7 +10,7 @@ const AlertConditionsList = React.createClass({
     if (this.props.alertConditions.length === 0) {
       return (
         <div
-          style={{marginTop: 10}}
+          style={{ marginTop: 10 }}
           className="alert alert-info">
           No configured alarm conditions.
         </div>
@@ -18,10 +18,10 @@ const AlertConditionsList = React.createClass({
     }
 
     return (
-      <ul style={{padding: 0}}>
+      <ul style={{ padding: 0 }}>
         {this.props.alertConditions.map((alertCondition) => {
           return (
-            <li key={'alertCondition-' + alertCondition.id} className="alert-condition-item">
+            <li key={`alertCondition-${alertCondition.id}`} className="alert-condition-item">
               <AlertCondition alertCondition={alertCondition}/>
             </li>
           );
