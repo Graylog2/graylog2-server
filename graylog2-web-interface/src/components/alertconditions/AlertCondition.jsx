@@ -24,9 +24,7 @@ const AlertCondition = React.createClass({
   _onUpdate(request) {
     AlertConditionsActions.update.triggerPromise(this.props.alertCondition.stream_id, this.props.alertCondition.id, request);
   },
-  _formatTitle() {
-    const alertCondition = this.props.alertCondition;
-    const alertConditionType = new AlertConditionsFactory().get(alertCondition.type);
+  _formatTitle(alertCondition, alertConditionType) {
     const title = alertCondition.title ? alertCondition.title : 'Untitled';
     const subtitle = `(${alertConditionType.title} condition)`;
     const badge = alertCondition.in_grace && <Badge className="badge-info">in grace period</Badge>;
@@ -39,17 +37,17 @@ const AlertCondition = React.createClass({
   alertConditionsFactory: new AlertConditionsFactory(),
   render() {
     const alertCondition = this.props.alertCondition;
-    const alertConditionType = this.alertConditionsFactory.get(alertCondition.type);
-    if (!alertConditionType || alertConditionType.length === 0) {
+    const alertConditionTypes = this.alertConditionsFactory.get(alertCondition.type);
+    const alertConditionType = alertConditionTypes && alertConditionTypes.length > 0 && alertConditionTypes[0];
+    if (!alertConditionType) {
       return <UnknownAlertCondition alertCondition={alertCondition} />;
     }
-    const alertConditionSummary = alertConditionType[0].summary;
     return (
       <span>
         <Row className="alert-condition" data-condition-id={alertCondition.id}>
           <Col md={9}>
-            <h3>{this._formatTitle()}</h3>
-            <alertConditionSummary alertCondition={alertCondition} />
+            <h3>{this._formatTitle(alertCondition, alertConditionType)}</h3>
+            <alertConditionType.summary alertCondition={alertCondition} />
             <AlertConditionForm ref="updateForm"
                                 type={alertCondition.type}
                                 alertCondition={alertCondition}
