@@ -98,7 +98,6 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                 new TextField("field", "Field", "", "Field name that should be checked", ConfigurationField.Optional.NOT_OPTIONAL),
                 new NumberField("time", "Time Range", 0, "Time span in seconds to check", ConfigurationField.Optional.NOT_OPTIONAL),
                 new NumberField("threshold", "Threshold", 0.0, "Value which triggers an alert if crossed", ConfigurationField.Optional.NOT_OPTIONAL),
-                new NumberField("grace", "Grace Period", 0, "Time span in seconds defining how long alerting is paused after alert is triggered", ConfigurationField.Optional.NOT_OPTIONAL),
                 new DropdownField(
                     "threshold_type",
                     "Threshold Type",
@@ -111,7 +110,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                     CheckType.MAX.toString(),
                     Arrays.stream(CheckType.values()).collect(Collectors.toMap(Enum::toString, CheckType::getDescription)),
                     ConfigurationField.Optional.NOT_OPTIONAL)
-            );
+            ).addFields(AbstractAlertCondition.getDefaultConfigurationFields());
         }
     }
 

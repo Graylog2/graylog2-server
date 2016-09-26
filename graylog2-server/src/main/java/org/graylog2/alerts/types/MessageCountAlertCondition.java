@@ -93,9 +93,8 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                     "Threshold Type",
                     MessageCountAlertCondition.ThresholdType.MORE.toString(),
                     Arrays.stream(MessageCountAlertCondition.ThresholdType.values()).collect(Collectors.toMap(Enum::toString, ThresholdType::getDescription)),
-                    ConfigurationField.Optional.NOT_OPTIONAL),
-                new NumberField("grace", "Grace Period", 0, "Time span in seconds defining how long alerting is paused after alert is triggered", ConfigurationField.Optional.NOT_OPTIONAL)
-            );
+                    ConfigurationField.Optional.NOT_OPTIONAL)
+            ).addFields(AbstractAlertCondition.getDefaultConfigurationFields());
         }
     }
 

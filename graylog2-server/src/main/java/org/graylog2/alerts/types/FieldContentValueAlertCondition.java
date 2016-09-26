@@ -78,9 +78,8 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
         public ConfigurationRequest getRequestedConfiguration() {
             return ConfigurationRequest.createWithFields(
                 new TextField("field", "Field", "", "Field name that should be checked", ConfigurationField.Optional.NOT_OPTIONAL),
-                new TextField("value", "Value", "", "Value that the field should be checked against", ConfigurationField.Optional.NOT_OPTIONAL),
-                new NumberField("grace", "Grace Period", 0, "Time span in seconds defining how long alerting is paused after alert is triggered", ConfigurationField.Optional.NOT_OPTIONAL)
-            );
+                new TextField("value", "Value", "", "Value that the field should be checked against", ConfigurationField.Optional.NOT_OPTIONAL)
+            ).addFields(AbstractAlertCondition.getDefaultConfigurationFields());
         }
     }
 
