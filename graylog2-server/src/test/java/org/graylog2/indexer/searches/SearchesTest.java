@@ -106,6 +106,16 @@ public class SearchesTest {
         public String getIndexPrefix() {
             return "graylog";
         }
+
+        @Override
+        public int getShards() {
+            return 1;
+        }
+
+        @Override
+        public int getReplicas() {
+            return 0;
+        }
     };
 
     @Mock
