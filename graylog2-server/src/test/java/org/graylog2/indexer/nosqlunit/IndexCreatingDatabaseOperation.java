@@ -22,6 +22,7 @@ import com.lordofthejars.nosqlunit.core.DatabaseOperation;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
@@ -49,6 +50,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
 
     @Override
     public void insert(InputStream dataScript) {
+        waitForGreenStatus();
         final IndicesAdminClient indicesAdminClient = client.admin().indices();
         for (String index : indexes) {
             final IndicesExistsResponse indicesExistsResponse = indicesAdminClient.prepareExists(index)
@@ -72,7 +74,15 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
 
     @Override
     public void deleteAll() {
+        waitForGreenStatus();
         databaseOperation.deleteAll();
+    }
+
+    private void waitForGreenStatus() {
+        client.admin().cluster().prepareHealth()
+                .setTimeout(TimeValue.timeValueSeconds(15L))
+                .setWaitForGreenStatus()
+                .get();
     }
 
     @Override
