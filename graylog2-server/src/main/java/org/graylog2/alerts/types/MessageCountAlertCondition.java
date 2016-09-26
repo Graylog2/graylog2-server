@@ -89,7 +89,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     }
 
     @Override
-    protected CheckResult runCheck() {
+    public CheckResult runCheck() {
         try {
             // Create an absolute range from the relative range to make sure it doesn't change during the two
             // search requests. (count and find messages)

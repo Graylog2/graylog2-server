@@ -83,7 +83,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
     }
 
     @Override
-    protected CheckResult runCheck() {
+    public CheckResult runCheck() {
         String filter = "streams:" + stream.getId();
         String query = field + ":\"" + value + "\"";
         Integer backlogSize = getBacklog();

@@ -108,7 +108,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
 
     @Override
-    protected CheckResult runCheck() {
+    public CheckResult runCheck() {
         try {
             final String filter = "streams:" + stream.getId();
             // TODO we don't support cardinality yet

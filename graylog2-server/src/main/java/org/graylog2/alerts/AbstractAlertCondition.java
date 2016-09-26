@@ -76,8 +76,6 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         this.grace = getNumber(this.parameters.get("grace")).orElse(0).intValue();
     }
 
-    protected abstract AlertCondition.CheckResult runCheck();
-
     @Override
     public String getId() {
         return id;

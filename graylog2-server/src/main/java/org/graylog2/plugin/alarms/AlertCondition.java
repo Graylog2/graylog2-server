@@ -50,6 +50,8 @@ public interface AlertCondition {
 
     String getTitle();
 
+    AlertCondition.CheckResult runCheck();
+
     interface CheckResult {
         boolean isTriggered();
         String getResultDescription();
