@@ -129,7 +129,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     }
 
     @Override
-    public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
+    public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) {
         final String type = (String)fields.get("type");
 
         return createAlertCondition(type,
@@ -147,7 +147,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
                                                 DateTime createdAt,
                                                 String creatorId,
                                                 Map<String, Object> parameters,
-                                                String title) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
+                                                String title) {
 
         final AlertCondition.Factory factory = this.alertConditionMap.get(type);
         checkArgument(factory != null, "Unknown alert condition type: " + type);
@@ -156,17 +156,15 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     }
 
     @Override
-    public AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
+    public AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) {
         final String type = ccr.type();
-        if (type == null) {
-            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Missing alert condition type");
-        }
+        checkArgument(type != null, "Milling alert condition type");
 
         return createAlertCondition(type, stream, null, Tools.nowUTC(), userId, ccr.parameters(), ccr.title());
     }
 
     @Override
-    public AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
+    public AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) {
         final String type = ((AbstractAlertCondition) alertCondition).getType();
 
         final Map<String, Object> parameters = ccr.parameters();

@@ -236,12 +236,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
             for (BasicDBObject conditionFields : (List<BasicDBObject>) stream.getFields().get(StreamImpl.EMBEDDED_ALERT_CONDITIONS)) {
                 try {
                     conditions.add(alertService.fromPersisted(conditionFields, stream));
-                } catch (AbstractAlertCondition.NoSuchAlertConditionTypeException e) {
-                    LOG.error("Skipping unknown alert condition type.", e);
-                    continue;
                 } catch (Exception e) {
                     LOG.error("Skipping alert condition.", e);
-                    continue;
                 }
             }
         }
@@ -257,12 +253,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                     if (conditionFields.get("id").equals(conditionId)) {
                         return alertService.fromPersisted(conditionFields, stream);
                     }
-                } catch (AbstractAlertCondition.NoSuchAlertConditionTypeException e) {
-                    LOG.error("Skipping unknown alert condition type.", e);
-                    continue;
                 } catch (Exception e) {
                     LOG.error("Skipping alert condition.", e);
-                    continue;
                 }
             }
         }

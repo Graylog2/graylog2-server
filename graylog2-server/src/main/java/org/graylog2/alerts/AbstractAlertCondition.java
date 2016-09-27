@@ -144,12 +144,6 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         return grace;
     }
 
-    public static class NoSuchAlertConditionTypeException extends Exception {
-        public NoSuchAlertConditionTypeException(String msg) {
-            super(msg);
-        }
-    }
-
     public static class CheckResult implements AlertCondition.CheckResult {
 
         private final boolean isTriggered;

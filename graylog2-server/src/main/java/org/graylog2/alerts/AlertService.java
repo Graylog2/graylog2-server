@@ -39,10 +39,10 @@ public interface AlertService extends PersistedService {
     long totalCount();
     long totalCountForStream(String streamId);
 
-    AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException;
-    AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) throws AbstractAlertCondition.NoSuchAlertConditionTypeException;
+    AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream);
+    AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId);
 
-    AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws AbstractAlertCondition.NoSuchAlertConditionTypeException;
+    AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr);
 
     boolean inGracePeriod(AlertCondition alertCondition);
 
