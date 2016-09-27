@@ -41,11 +41,13 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
+import java.util.stream.StreamSupport;
 
 @RequiresAuthentication
 @Api(value = "System/Deflector", description = "Index deflector management")
@@ -80,7 +82,10 @@ public class DeflectorResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public DeflectorSummary deflector() throws TooManyAliasesException {
         // TODO 2.2: Resource needs to be adjusted to support multiple write targets
-        final IndexSet indexSet = indexSetRegistry.getAllIndexSets().get(0);
+        final IndexSet indexSet = indexSetRegistry.getAllIndexSets().stream()
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException("Unable to find current deflector alias"));
+
         return DeflectorSummary.create(indexSet.isUp(), indexSet.getCurrentActualTargetIndex());
     }
 
@@ -97,6 +102,6 @@ public class DeflectorResource extends RestResource {
         activityWriter.write(new Activity(msg, DeflectorResource.class));
 
         // TODO 2.2: Resource needs to be adjusted to support multiple write targets
-        indexSetRegistry.getAllIndexSets().get(0).cycle();
+        indexSetRegistry.getAllIndexSets().forEach(IndexSet::cycle);
     }
 }

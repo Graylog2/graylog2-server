@@ -19,6 +19,7 @@ package org.graylog2.indexer;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public interface IndexSetRegistry extends Iterable<IndexSet> {
@@ -27,7 +28,7 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
      *
      * @return list of index sets
      */
-    List<IndexSet> getAllIndexSets();
+    Set<IndexSet> getAllIndexSets();
 
     /**
      * Returns a list of all Graylog managed indices.

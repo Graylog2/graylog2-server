@@ -234,7 +234,7 @@ public class IndicesResource extends RestResource {
             throw new NotFoundException(msg);
         }
 
-        if (index.equals(indexSetRegistry.getAllIndexSets().get(0).getCurrentActualTargetIndex())) {
+        if (indexSetRegistry.isCurrentWriteIndex(index)) {
             throw new ForbiddenException("The current deflector target index (" + index + ") cannot be closed");
         }
 
@@ -260,7 +260,7 @@ public class IndicesResource extends RestResource {
             throw new NotFoundException(msg);
         }
 
-        if (index.equals(indexSetRegistry.getAllIndexSets().get(0).getCurrentActualTargetIndex())) {
+        if (indexSetRegistry.isCurrentWriteIndex(index)) {
             throw new ForbiddenException("The current deflector target index (" + index + ") cannot be deleted");
         }
 

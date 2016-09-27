@@ -22,7 +22,7 @@ import org.graylog2.indexer.indices.TooManyAliasesException;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.function.Consumer;
@@ -38,8 +38,8 @@ public class LegacyDeflectorRegistry implements IndexSetRegistry {
     }
 
     @Override
-    public List<IndexSet> getAllIndexSets() {
-        return Collections.singletonList(indexSet);
+    public Set<IndexSet> getAllIndexSets() {
+        return Collections.singleton(indexSet);
     }
 
     @Override
