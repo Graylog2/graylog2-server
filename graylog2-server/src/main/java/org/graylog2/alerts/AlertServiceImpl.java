@@ -158,7 +158,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     @Override
     public AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) {
         final String type = ccr.type();
-        checkArgument(type != null, "Milling alert condition type");
+        checkArgument(type != null, "Missing alert condition type");
 
         return createAlertCondition(type, stream, null, Tools.nowUTC(), userId, ccr.parameters(), ccr.title());
     }
