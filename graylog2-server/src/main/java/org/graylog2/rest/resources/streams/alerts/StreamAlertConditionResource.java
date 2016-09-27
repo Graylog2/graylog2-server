@@ -93,13 +93,7 @@ public class StreamAlertConditionResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         final Stream stream = streamService.load(streamid);
-        final AlertCondition alertCondition;
-        try {
-            alertCondition = alertService.fromRequest(ccr, stream, getCurrentUser().getName());
-        } catch (AbstractAlertCondition.NoSuchAlertConditionTypeException e) {
-            LOG.error("Invalid alarm condition type.", e);
-            throw new BadRequestException(e);
-        }
+        final AlertCondition alertCondition = alertService.fromRequest(ccr, stream, getCurrentUser().getName());
 
         streamService.addAlertCondition(stream, alertCondition);
 
@@ -131,13 +125,7 @@ public class StreamAlertConditionResource extends RestResource {
         final Stream stream = streamService.load(streamid);
         AlertCondition alertCondition = streamService.getAlertCondition(stream, conditionid);
 
-        final AlertCondition updatedCondition;
-        try {
-            updatedCondition = alertService.updateFromRequest(alertCondition, ccr);
-        } catch (AbstractAlertCondition.NoSuchAlertConditionTypeException e) {
-            LOG.error("Invalid alarm condition type.", e);
-            throw new BadRequestException(e);
-        }
+        final AlertCondition updatedCondition = alertService.updateFromRequest(alertCondition, ccr);
 
         streamService.updateAlertCondition(stream, updatedCondition);
     }

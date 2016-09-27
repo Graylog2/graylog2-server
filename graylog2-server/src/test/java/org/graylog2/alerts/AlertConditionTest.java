@@ -16,6 +16,7 @@
  */
 package org.graylog2.alerts;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.alerts.types.FieldContentValueAlertCondition;
@@ -65,10 +66,11 @@ public abstract class AlertConditionTest {
         searches = mock(Searches.class);
         mongoConnection = mock(MongoConnection.class);
         // TODO use injection please. this sucks so bad
-        alertService = spy(new AlertServiceImpl(mongoConnection,
+        final Map<String, AlertCondition.Factory> alertConditionBinder = ImmutableMap.of(
+            AbstractAlertCondition.Type.FIELD_VALUE.toString(),
             new FieldValueAlertCondition.Factory() {
                 @Override
-                public FieldValueAlertCondition createAlertCondition(Stream stream,
+                public FieldValueAlertCondition create(Stream stream,
                                                                      String id,
                                                                      DateTime createdAt,
                                                                      @Assisted("userid") String creatorUserId,
@@ -77,9 +79,10 @@ public abstract class AlertConditionTest {
                     return new FieldValueAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters, title);
                 }
             },
+            AbstractAlertCondition.Type.MESSAGE_COUNT.toString(),
             new MessageCountAlertCondition.Factory() {
                 @Override
-                public MessageCountAlertCondition createAlertCondition(Stream stream,
+                public MessageCountAlertCondition create(Stream stream,
                                                                        String id,
                                                                        DateTime createdAt,
                                                                        @Assisted("userid") String creatorUserId,
@@ -88,9 +91,10 @@ public abstract class AlertConditionTest {
                     return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters, title);
                 }
             },
+            AbstractAlertCondition.Type.FIELD_CONTENT_VALUE.toString(),
             new FieldContentValueAlertCondition.Factory() {
                 @Override
-                public FieldContentValueAlertCondition createAlertCondition(Stream stream,
+                public FieldContentValueAlertCondition create(Stream stream,
                                                                             String id,
                                                                             DateTime createdAt,
                                                                             @Assisted("userid") String creatorUserId,
@@ -98,7 +102,9 @@ public abstract class AlertConditionTest {
                                                                             String title) {
                     return new FieldContentValueAlertCondition(searches, null, stream, id, createdAt, creatorUserId, parameters, title);
                 }
-            }));
+            }
+        );
+        alertService = spy(new AlertServiceImpl(mongoConnection, alertConditionBinder));
 
     }
 

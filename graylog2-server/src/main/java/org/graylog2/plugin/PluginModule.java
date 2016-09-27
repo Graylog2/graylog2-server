@@ -23,6 +23,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.filters.MessageFilter;
@@ -166,5 +167,11 @@ public abstract class PluginModule extends Graylog2Module {
 
     protected void addAuditEventFormatter(AuditEventType auditEventType, Class<? extends AuditEventFormatter> auditEventFormatterClass) {
         installAuditEventFormatter(auditEventFormatterMapBinder(), auditEventType, auditEventFormatterClass);
+    }
+
+    protected void addAlertCondition(String name,
+                                     Class<? extends AlertCondition> alertConditionClass,
+                                     Class<? extends AlertCondition.Factory> alertConditionFactoryClass) {
+        installAlertConditionWithCustomName(alertConditionBinder(), name, alertConditionClass, alertConditionFactoryClass);
     }
 }

@@ -27,6 +27,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Message;
@@ -53,13 +54,13 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
     private final String field;
     private final String value;
 
-    public interface Factory {
-        FieldContentValueAlertCondition createAlertCondition(Stream stream,
-                                                             @Assisted("id") String id,
-                                                             DateTime createdAt,
-                                                             @Assisted("userid") String creatorUserId,
-                                                             Map<String, Object> parameters,
-                                                             @Assisted("title") @Nullable String title);
+    public interface Factory extends AlertCondition.Factory {
+        FieldContentValueAlertCondition create(Stream stream,
+                                               @Assisted("id") String id,
+                                               DateTime createdAt,
+                                               @Assisted("userid") String creatorUserId,
+                                               Map<String, Object> parameters,
+                                               @Assisted("title") @Nullable String title);
     }
 
     @AssistedInject
@@ -71,7 +72,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
                                            @Assisted("userid") String creatorUserId,
                                            @Assisted Map<String, Object> parameters,
                                            @Assisted("title") @Nullable String title) {
-        super(stream, id, Type.FIELD_CONTENT_VALUE, createdAt, creatorUserId, parameters, title);
+        super(stream, id, Type.FIELD_CONTENT_VALUE.toString(), createdAt, creatorUserId, parameters, title);
         this.searches = searches;
         this.configuration = configuration;
         this.field = (String) parameters.get("field");
@@ -82,7 +83,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
     }
 
     @Override
-    protected CheckResult runCheck() {
+    public CheckResult runCheck() {
         String filter = "streams:" + stream.getId();
         String query = field + ":\"" + value + "\"";
         Integer backlogSize = getBacklog();
@@ -96,12 +97,12 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
 
         try {
             SearchResult result = searches.search(
-                    query,
-                    filter,
-                    RelativeRange.create(configuration.getAlertCheckInterval()),
-                    searchLimit,
-                    0,
-                    new Sorting("timestamp", Sorting.Direction.DESC)
+                query,
+                filter,
+                RelativeRange.create(configuration.getAlertCheckInterval()),
+                searchLimit,
+                0,
+                new Sorting("timestamp", Sorting.Direction.DESC)
             );
 
             final List<MessageSummary> summaries;
@@ -118,7 +119,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
             final long count = result.getTotalResults();
 
             final String resultDescription = "Stream received messages matching <" + query + "> "
-                    + "(Current grace time: " + grace + " minutes)";
+                + "(Current grace time: " + grace + " minutes)";
 
             if (count > 0) {
                 LOG.debug("Alert check <{}> found [{}] messages.", id, count);

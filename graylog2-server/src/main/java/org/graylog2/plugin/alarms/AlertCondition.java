@@ -21,6 +21,7 @@ import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
@@ -49,6 +50,8 @@ public interface AlertCondition {
 
     String getTitle();
 
+    AlertCondition.CheckResult runCheck();
+
     interface CheckResult {
         boolean isTriggered();
         String getResultDescription();
@@ -61,5 +64,14 @@ public interface AlertCondition {
          * @return list of message summaries
          */
         List<MessageSummary> getMatchingMessages();
+    }
+
+    interface Factory {
+        AlertCondition create(Stream stream,
+                              String id,
+                              DateTime createdAt,
+                              String creatorUserId,
+                              Map<String, Object> parameters,
+                              @Nullable String title);
     }
 }

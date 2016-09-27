@@ -24,6 +24,7 @@ import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
 import org.graylog2.plugin.Message;
@@ -56,13 +57,13 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         LOWER, HIGHER
     }
 
-    public interface Factory {
-        FieldValueAlertCondition createAlertCondition(Stream stream,
-                                                      @Assisted("id") String id,
-                                                      DateTime createdAt,
-                                                      @Assisted("userid") String creatorUserId,
-                                                      Map<String, Object> parameters,
-                                                      @Assisted("title") @Nullable String title);
+    public interface Factory extends AlertCondition.Factory {
+        FieldValueAlertCondition create(Stream stream,
+                                        @Assisted("id") String id,
+                                        DateTime createdAt,
+                                        @Assisted("userid") String creatorUserId,
+                                        Map<String, Object> parameters,
+                                        @Assisted("title") @Nullable String title);
     }
 
     private final int time;
@@ -81,7 +82,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                                     @Assisted("userid") String creatorUserId,
                                     @Assisted Map<String, Object> parameters,
                                     @Assisted("title") @Nullable String title) {
-        super(stream, id, Type.FIELD_VALUE, createdAt, creatorUserId, parameters, title);
+        super(stream, id, Type.FIELD_VALUE.toString(), createdAt, creatorUserId, parameters, title);
         this.searches = searches;
 
         this.decimalFormat = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
@@ -98,21 +99,21 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     @Override
     public String getDescription() {
         return "time: " + time
-                + ", field: " + field
-                + ", check type: " + type.toString().toLowerCase(Locale.ENGLISH)
-                + ", threshold_type: " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
-                + ", threshold: " + decimalFormat.format(threshold)
-                + ", grace: " + grace;
+            + ", field: " + field
+            + ", check type: " + type.toString().toLowerCase(Locale.ENGLISH)
+            + ", threshold_type: " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
+            + ", threshold: " + decimalFormat.format(threshold)
+            + ", grace: " + grace;
     }
 
 
     @Override
-    protected CheckResult runCheck() {
+    public CheckResult runCheck() {
         try {
             final String filter = "streams:" + stream.getId();
             // TODO we don't support cardinality yet
             final FieldStatsResult fieldStatsResult = searches.fieldStats(field, "*", filter,
-                                                                          RelativeRange.create(time * 60), false, true, false);
+                RelativeRange.create(time * 60), false, true, false);
 
             if (fieldStatsResult.getCount() == 0) {
                 LOG.debug("Alert check <{}> did not match any messages. Returning not triggered.", type);
@@ -163,9 +164,9 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
             if (triggered) {
                 final String resultDescription = "Field " + field + " had a " + type + " of "
-                        + decimalFormat.format(result) + " in the last " + time + " minutes with trigger condition "
-                        + thresholdType + " than " + decimalFormat.format(threshold) + ". "
-                        + "(Current grace time: " + grace + " minutes)";
+                    + decimalFormat.format(result) + " in the last " + time + " minutes with trigger condition "
+                    + thresholdType + " than " + decimalFormat.format(threshold) + ". "
+                    + "(Current grace time: " + grace + " minutes)";
 
                 final List<MessageSummary> summaries;
                 if (getBacklog() > 0) {

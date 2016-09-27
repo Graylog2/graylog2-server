@@ -44,22 +44,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 public class AlertServiceImpl extends PersistedServiceImpl implements AlertService {
     private static final Logger LOG = LoggerFactory.getLogger(AlertServiceImpl.class);
 
-    private final FieldValueAlertCondition.Factory fieldValueAlertFactory;
-    private final MessageCountAlertCondition.Factory messageCountAlertFactory;
-    private final FieldContentValueAlertCondition.Factory fieldContentValueAlertFactory;
+    private final Map<String, AlertCondition.Factory> alertConditionMap;
 
     @Inject
     public AlertServiceImpl(MongoConnection mongoConnection,
-                            FieldValueAlertCondition.Factory fieldValueAlertFactory,
-                            MessageCountAlertCondition.Factory messageCountAlertFactory,
-                            FieldContentValueAlertCondition.Factory fieldContentValueAlertFactory) {
+                            Map<String, AlertCondition.Factory> alertConditionMap) {
         super(mongoConnection);
-        this.fieldValueAlertFactory = fieldValueAlertFactory;
-        this.messageCountAlertFactory = messageCountAlertFactory;
-        this.fieldContentValueAlertFactory = fieldContentValueAlertFactory;
+        this.alertConditionMap = alertConditionMap;
     }
 
     @Override
@@ -133,13 +129,8 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     }
 
     @Override
-    public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
-        AbstractAlertCondition.Type type;
-        try {
-            type = AbstractAlertCondition.Type.valueOf(((String) fields.get("type")).toUpperCase(Locale.ENGLISH));
-        } catch (IllegalArgumentException e) {
-            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + fields.get("type") + "]");
-        }
+    public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) {
+        final String type = (String)fields.get("type");
 
         return createAlertCondition(type,
             stream,
@@ -150,45 +141,31 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
             (String) fields.get("title"));
     }
 
-    private AbstractAlertCondition createAlertCondition(AbstractAlertCondition.Type type,
-                                                        Stream stream,
-                                                        String id,
-                                                        DateTime createdAt,
-                                                        String creatorId,
-                                                        Map<String, Object> parameters,
-                                                        String title) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
-        switch (type) {
-            case MESSAGE_COUNT:
-                return messageCountAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters, title);
-            case FIELD_VALUE:
-                return fieldValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters, title);
-            case FIELD_CONTENT_VALUE:
-                return fieldContentValueAlertFactory.createAlertCondition(stream, id, createdAt, creatorId, parameters, title);
-            default:
-                throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Unhandled alert condition type: " + type);
-        }
+    private AlertCondition createAlertCondition(String type,
+                                                Stream stream,
+                                                String id,
+                                                DateTime createdAt,
+                                                String creatorId,
+                                                Map<String, Object> parameters,
+                                                String title) {
+
+        final AlertCondition.Factory factory = this.alertConditionMap.get(type);
+        checkArgument(factory != null, "Unknown alert condition type: " + type);
+
+        return factory.create(stream, id, createdAt, creatorId, parameters, title);
     }
 
     @Override
-    public AbstractAlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
+    public AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) {
         final String type = ccr.type();
-        if (type == null) {
-            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("Missing alert condition type");
-        }
+        checkArgument(type != null, "Milling alert condition type");
 
-        final AbstractAlertCondition.Type alertConditionType;
-        try {
-            alertConditionType = AbstractAlertCondition.Type.valueOf(type.toUpperCase(Locale.ENGLISH));
-        } catch (IllegalArgumentException e) {
-            throw new AbstractAlertCondition.NoSuchAlertConditionTypeException("No such alert condition type: [" + type + "]");
-        }
-
-        return createAlertCondition(alertConditionType, stream, null, Tools.nowUTC(), userId, ccr.parameters(), ccr.title());
+        return createAlertCondition(type, stream, null, Tools.nowUTC(), userId, ccr.parameters(), ccr.title());
     }
 
     @Override
-    public AbstractAlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws AbstractAlertCondition.NoSuchAlertConditionTypeException {
-        final AbstractAlertCondition.Type type = ((AbstractAlertCondition) alertCondition).getType();
+    public AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) {
+        final String type = ((AbstractAlertCondition) alertCondition).getType();
 
         final Map<String, Object> parameters = ccr.parameters();
         for (Map.Entry<String, Object> stringObjectEntry : alertCondition.getParameters().entrySet()) {

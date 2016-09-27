@@ -25,6 +25,7 @@ import com.mongodb.MongoException;
 import io.airlift.airline.Command;
 import io.airlift.airline.Option;
 import org.graylog2.Configuration;
+import org.graylog2.alerts.AlertConditionBindings;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditBindings;
 import org.graylog2.audit.AuditEventSender;
@@ -118,7 +119,8 @@ public class Server extends ServerBootstrap {
             new WidgetStrategyBindings(),
             new DashboardBindings(),
             new DecoratorBindings(),
-            new AuditBindings()
+            new AuditBindings(),
+            new AlertConditionBindings()
         );
 
         return modules.build();

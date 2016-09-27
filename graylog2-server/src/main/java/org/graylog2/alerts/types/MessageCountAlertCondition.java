@@ -26,6 +26,7 @@ import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -49,13 +50,13 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         MORE, LESS
     }
 
-    public interface Factory {
-        MessageCountAlertCondition createAlertCondition(Stream stream,
-                                                        @Assisted("id") String id,
-                                                        DateTime createdAt,
-                                                        @Assisted("userid") String creatorUserId,
-                                                        Map<String, Object> parameters,
-                                                        @Assisted("title") @Nullable String title);
+    public interface Factory extends AlertCondition.Factory {
+        MessageCountAlertCondition create(Stream stream,
+                                          @Assisted("id") String id,
+                                          DateTime createdAt,
+                                          @Assisted("userid") String creatorUserId,
+                                          Map<String, Object> parameters,
+                                          @Assisted("title") @Nullable String title);
     }
 
     private final int time;
@@ -71,7 +72,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                                       @Assisted("userid") String creatorUserId,
                                       @Assisted Map<String, Object> parameters,
                                       @Nullable @Assisted("title") String title) {
-        super(stream, id, Type.MESSAGE_COUNT, createdAt, creatorUserId, parameters, title);
+        super(stream, id, Type.MESSAGE_COUNT.toString(), createdAt, creatorUserId, parameters, title);
 
         this.searches = searches;
         this.time = getNumber(parameters.get("time")).orElse(0).intValue();
@@ -82,13 +83,13 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
     @Override
     public String getDescription() {
         return "time: " + time
-                + ", threshold_type: " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
-                + ", threshold: " + threshold
-                + ", grace: " + grace;
+            + ", threshold_type: " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
+            + ", threshold: " + threshold
+            + ", grace: " + grace;
     }
 
     @Override
-    protected CheckResult runCheck() {
+    public CheckResult runCheck() {
         try {
             // Create an absolute range from the relative range to make sure it doesn't change during the two
             // search requests. (count and find messages)
@@ -120,7 +121,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                 final List<MessageSummary> summaries = Lists.newArrayList();
                 if (getBacklog() > 0) {
                     final SearchResult backlogResult = searches.search("*", filter,
-                            range, getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
+                        range, getBacklog(), 0, new Sorting("timestamp", Sorting.Direction.DESC));
                     for (ResultMessage resultMessage : backlogResult.getResults()) {
                         final Message msg = resultMessage.getMessage();
                         summaries.add(new MessageSummary(resultMessage.getIndex(), msg));
@@ -128,8 +129,8 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                 }
 
                 final String resultDescription = "Stream had " + count + " messages in the last " + time
-                        + " minutes with trigger condition " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
-                        + " than " + threshold + " messages. " + "(Current grace time: " + grace + " minutes)";
+                    + " minutes with trigger condition " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
+                    + " than " + threshold + " messages. " + "(Current grace time: " + grace + " minutes)";
                 return new CheckResult(true, this, resultDescription, Tools.nowUTC(), summaries);
             } else {
                 return new NegativeCheckResult(this);

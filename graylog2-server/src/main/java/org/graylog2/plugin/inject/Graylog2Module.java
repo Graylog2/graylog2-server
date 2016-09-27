@@ -30,6 +30,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -351,6 +352,25 @@ public abstract class Graylog2Module extends AbstractModule {
                                            Class<? extends SearchResponseDecorator.Factory> searchResponseDecoratorFactoryClass) {
         install(new FactoryModuleBuilder().implement(SearchResponseDecorator.class, searchResponseDecoratorClass).build(searchResponseDecoratorFactoryClass));
         searchResponseDecoratorBinder.addBinding(searchResponseDecoratorClass.getCanonicalName()).to(searchResponseDecoratorFactoryClass);
+    }
+
+    protected MapBinder<String, AlertCondition.Factory> alertConditionBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, AlertCondition.Factory.class);
+    }
+
+    protected void installAlertCondition(MapBinder<String, AlertCondition.Factory> alertConditionBinder,
+                                         Class<? extends AlertCondition> alertConditionClass,
+                                         Class<? extends AlertCondition.Factory> alertConditionFactoryClass) {
+        install(new FactoryModuleBuilder().implement(AlertCondition.class, alertConditionClass).build(alertConditionFactoryClass));
+        alertConditionBinder.addBinding(alertConditionClass.getCanonicalName()).to(alertConditionFactoryClass);
+    }
+
+    protected void installAlertConditionWithCustomName(MapBinder<String, AlertCondition.Factory> alertConditionBinder,
+                                                       String identifier,
+                                                       Class<? extends AlertCondition> alertConditionClass,
+                                                       Class<? extends AlertCondition.Factory> alertConditionFactoryClass) {
+        install(new FactoryModuleBuilder().implement(AlertCondition.class, alertConditionClass).build(alertConditionFactoryClass));
+        alertConditionBinder.addBinding(identifier).to(alertConditionFactoryClass);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}
