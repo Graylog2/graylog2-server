@@ -446,7 +446,8 @@ public class StreamResource extends RestResource {
                 usersAlertReceivers == null ? Collections.emptyList() : usersAlertReceivers
             ),
             stream.getTitle(),
-            stream.getContentPack()
+            stream.getContentPack(),
+            stream.isDefaultStream()
         );
     }
 

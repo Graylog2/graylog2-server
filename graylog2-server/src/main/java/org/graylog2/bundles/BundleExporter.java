@@ -222,6 +222,7 @@ public class BundleExporter {
         streamDescription.setMatchingType(stream.getMatchingType());
         streamDescription.setOutputs(exportOutputReferences(stream.getOutputs()));
         streamDescription.setStreamRules(exportStreamRules(stream.getStreamRules()));
+        streamDescription.setDefaultStream(stream.isDefaultStream());
 
         return streamDescription;
     }

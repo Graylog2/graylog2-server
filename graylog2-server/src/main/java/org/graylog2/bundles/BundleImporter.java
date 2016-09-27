@@ -56,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,7 +79,6 @@ public class BundleImporter {
     private final DashboardService dashboardService;
     private final DashboardWidgetCreator dashboardWidgetCreator;
     private final ServerStatus serverStatus;
-    private final Searches searches;
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
     private final GrokPatternService grokPatternService;
@@ -102,7 +102,6 @@ public class BundleImporter {
                           final DashboardService dashboardService,
                           final DashboardWidgetCreator dashboardWidgetCreator,
                           final ServerStatus serverStatus,
-                          final Searches searches,
                           final MessageInputFactory messageInputFactory,
                           final InputLauncher inputLauncher,
                           final GrokPatternService grokPatternService,
@@ -116,7 +115,6 @@ public class BundleImporter {
         this.dashboardService = dashboardService;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
         this.serverStatus = serverStatus;
-        this.searches = searches;
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
         this.grokPatternService = grokPatternService;
@@ -185,7 +183,7 @@ public class BundleImporter {
         for (String grokPatternName : createdGrokPatterns.keySet()) {
             final org.graylog2.grok.GrokPattern grokPattern = grokPatternService.load(grokPatternName);
 
-            if(grokPattern.id != null) {
+            if (grokPattern.id != null) {
                 LOG.debug("Deleting grok pattern \"{}\" from database", grokPatternName);
                 grokPatternService.delete(grokPattern.id.toHexString());
             } else {
@@ -463,8 +461,18 @@ public class BundleImporter {
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userName);
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
         streamData.put(StreamImpl.FIELD_CONTENT_PACK, bundleId);
+        streamData.put(StreamImpl.FIELD_DEFAULT_STREAM, streamDescription.isDefaultStream());
 
-        final org.graylog2.plugin.streams.Stream stream = streamService.create(streamData.build());
+        final org.graylog2.plugin.streams.Stream stream;
+        if (streamDescription.isDefaultStream()) {
+            stream = new StreamImpl(
+                    new ObjectId(org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID),
+                    streamData.build(),
+                    Collections.emptyList(),
+                    Collections.emptySet());
+        } else {
+            stream = streamService.create(streamData.build());
+        }
         final String streamId = streamService.save(stream);
 
         if (streamDescription.getStreamRules() != null) {

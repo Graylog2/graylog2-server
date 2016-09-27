@@ -42,7 +42,6 @@ import java.util.Map;
  */
 public class DefaultStreamMigrationPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultStreamMigrationPeriodical.class);
-    private static final String STREAM_ID = "000000000000000000000001";
 
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
@@ -56,7 +55,7 @@ public class DefaultStreamMigrationPeriodical extends Periodical {
 
     @Override
     public void doRun() {
-        final ObjectId id = new ObjectId(STREAM_ID);
+        final ObjectId id = new ObjectId(Stream.DEFAULT_STREAM_ID);
         final Map<String, Object> fields = ImmutableMap.<String, Object>builder()
                 .put(StreamImpl.FIELD_TITLE, "All messages")
                 .put(StreamImpl.FIELD_DESCRIPTION, "Stream containing all messages")
@@ -64,6 +63,7 @@ public class DefaultStreamMigrationPeriodical extends Periodical {
                 .put(StreamImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC))
                 .put(StreamImpl.FIELD_CREATOR_USER_ID, "local:admin")
                 .put(StreamImpl.FIELD_MATCHING_TYPE, StreamImpl.MatchingType.DEFAULT.name())
+                .put(StreamImpl.FIELD_DEFAULT_STREAM, true)
                 .build();
         final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet());
         final StreamRule streamRule = new StreamRuleImpl(
@@ -101,7 +101,7 @@ public class DefaultStreamMigrationPeriodical extends Periodical {
     @Override
     public boolean startOnThisNode() {
         try {
-            return streamService.load(STREAM_ID) == null;
+            return streamService.load(Stream.DEFAULT_STREAM_ID) == null;
         } catch (NotFoundException e) {
             return true;
         }

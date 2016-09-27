@@ -29,6 +29,8 @@ import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import javax.annotation.Nullable;
 import java.util.Collection;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 @AutoValue
 @JsonAutoDetect
 public abstract class StreamResponse {
@@ -70,6 +72,10 @@ public abstract class StreamResponse {
     @Nullable
     public abstract String contentPack();
 
+    @JsonProperty("is_default")
+    @Nullable
+    public abstract Boolean isDefault();
+
     @JsonCreator
     public static StreamResponse create(@JsonProperty("id") String id,
                                         @JsonProperty("creator_user_id") String creatorUserId,
@@ -82,8 +88,9 @@ public abstract class StreamResponse {
                                         @JsonProperty("alert_conditions") Collection<AlertConditionSummary> alertConditions,
                                         @JsonProperty("alert_receivers") AlertReceivers alertReceivers,
                                         @JsonProperty("title") String title,
-                                        @JsonProperty("content_pack") @Nullable String contentPack) {
+                                        @JsonProperty("content_pack") @Nullable String contentPack,
+                                        @JsonProperty("is_default") @Nullable Boolean isDefault) {
         return new AutoValue_StreamResponse(id, creatorUserId, outputs, matchingType, description, createdAt, disabled,
-            rules, alertConditions, alertReceivers, title, contentPack);
+            rules, alertConditions, alertReceivers, title, contentPack, firstNonNull(isDefault, false));
     }
 }

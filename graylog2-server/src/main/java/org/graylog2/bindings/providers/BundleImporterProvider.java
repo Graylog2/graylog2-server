@@ -20,7 +20,6 @@ import org.graylog2.bundles.BundleImporter;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.grok.GrokPatternService;
-import org.graylog2.indexer.searches.Searches;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.ServerStatus;
@@ -46,7 +45,6 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     private final DashboardService dashboardService;
     private final DashboardWidgetCreator dashboardWidgetCreator;
     private final ServerStatus serverStatus;
-    private final Searches searches;
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
     private final GrokPatternService grokPatternService;
@@ -62,7 +60,6 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
                                   final DashboardService dashboardService,
                                   final DashboardWidgetCreator dashboardWidgetCreator,
                                   final ServerStatus serverStatus,
-                                  final Searches searches,
                                   final MessageInputFactory messageInputFactory,
                                   final InputLauncher inputLauncher,
                                   final GrokPatternService grokPatternService,
@@ -76,7 +73,6 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         this.dashboardService = dashboardService;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
         this.serverStatus = serverStatus;
-        this.searches = searches;
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
         this.grokPatternService = grokPatternService;
@@ -87,7 +83,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     public BundleImporter get() {
         return new BundleImporter(inputService, inputRegistry, extractorFactory,
                 streamService, streamRuleService, outputService, dashboardService,
-                dashboardWidgetCreator, serverStatus, searches,
-                messageInputFactory, inputLauncher, grokPatternService, timeRangeFactory);
+                dashboardWidgetCreator, serverStatus, messageInputFactory,
+                inputLauncher, grokPatternService, timeRangeFactory);
     }
 }
