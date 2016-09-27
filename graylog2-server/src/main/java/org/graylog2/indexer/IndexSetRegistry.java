@@ -21,20 +21,13 @@ import org.graylog2.indexer.indices.TooManyAliasesException;
 import java.util.List;
 import java.util.function.Consumer;
 
-public interface IndexSetRegistry {
+public interface IndexSetRegistry extends Iterable<IndexSet> {
     /**
      * Returns a list of all {@link IndexSet} instances.
      *
      * @return list of index sets
      */
     List<IndexSet> getAllIndexSets();
-
-    /**
-     * Executes the given consumer function for every {@link IndexSet}.
-     *
-     * @param action the consumer function
-     */
-    void forEach(Consumer<IndexSet> action);
 
     /**
      * Returns a list of all Graylog managed indices.

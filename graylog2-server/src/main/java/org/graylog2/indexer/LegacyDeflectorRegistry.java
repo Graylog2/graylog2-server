@@ -16,34 +16,45 @@
  */
 package org.graylog2.indexer;
 
-import com.google.common.collect.Lists;
+import com.google.common.collect.Iterators;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import javax.inject.Inject;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Consumer;
 
 import static java.util.Objects.requireNonNull;
 
 public class LegacyDeflectorRegistry implements IndexSetRegistry {
     private final IndexSet indexSet;
-    private final List<IndexSet> indexSetRegistry;
 
     @Inject
     public LegacyDeflectorRegistry(IndexSet indexSet) {
         this.indexSet = requireNonNull(indexSet);
-        this.indexSetRegistry = Lists.newArrayList(indexSet);
     }
 
     @Override
     public List<IndexSet> getAllIndexSets() {
-        return indexSetRegistry;
+        return Collections.singletonList(indexSet);
     }
 
     @Override
-    public void forEach(Consumer<IndexSet> action) {
-        requireNonNull(action);
-        indexSetRegistry.forEach(action);
+    public Iterator<IndexSet> iterator() {
+        return Iterators.singletonIterator(indexSet);
+    }
+
+    @Override
+    public void forEach(Consumer<? super IndexSet> action) {
+        action.accept(indexSet);
+    }
+
+    @Override
+    public Spliterator<IndexSet> spliterator() {
+        return Spliterators.spliterator(iterator(), 1, Spliterator.SIZED | Spliterator.NONNULL | Spliterator.IMMUTABLE);
     }
 
     @Override
