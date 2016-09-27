@@ -36,7 +36,7 @@ public interface IndexSet {
 
     boolean isUp();
 
-    boolean isDeflectorAlias(String indexName);
+    boolean isDeflectorAlias(String index);
 
     boolean isGraylogIndex(String index);
 

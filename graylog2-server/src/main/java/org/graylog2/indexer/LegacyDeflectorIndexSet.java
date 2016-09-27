@@ -67,8 +67,8 @@ public class LegacyDeflectorIndexSet implements IndexSet {
     }
 
     @Override
-    public boolean isDeflectorAlias(String indexName) {
-        return deflector.getName().equals(indexName);
+    public boolean isDeflectorAlias(String index) {
+        return deflector.getName().equals(index);
     }
 
     @Override
