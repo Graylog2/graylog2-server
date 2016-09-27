@@ -88,11 +88,6 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     }
 
     @Override
-    public String getTypeString() {
-        return type;
-    }
-
-    @Override
     public String getTitle() {
         return title;
     }

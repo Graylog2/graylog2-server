@@ -424,7 +424,7 @@ public class StreamResource extends RestResource {
             .stream()
             .map((alertCondition) -> AlertConditionSummary.create(
                 alertCondition.getId(),
-                alertCondition.getTypeString(),
+                alertCondition.getType(),
                 alertCondition.getCreatorUserId(),
                 alertCondition.getCreatedAt().toDate(),
                 alertCondition.getParameters(),

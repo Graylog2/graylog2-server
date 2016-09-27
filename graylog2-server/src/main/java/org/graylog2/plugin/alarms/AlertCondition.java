@@ -47,8 +47,7 @@ public interface AlertCondition {
     @JsonIgnore
     int getGrace();
 
-    @JsonIgnore
-    String getTypeString();
+    String getType();
 
     String getTitle();
 
