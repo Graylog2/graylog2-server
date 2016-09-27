@@ -35,7 +35,7 @@ public class Counts {
     }
 
     public long total() {
-        final SearchRequest request = c.prepareSearch(indexSetRegistry.getAllGraylogIndexNames())
+        final SearchRequest request = c.prepareSearch(indexSetRegistry.getManagedIndicesNames())
                 .setSize(0)
                 .request();
         return c.search(request).actionGet().getHits().totalHits();

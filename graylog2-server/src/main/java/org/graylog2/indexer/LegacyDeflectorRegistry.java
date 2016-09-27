@@ -58,13 +58,13 @@ public class LegacyDeflectorRegistry implements IndexSetRegistry {
     }
 
     @Override
-    public String[] getAllGraylogIndexNames() {
-        return indexSet.getAllGraylogIndexNames();
+    public String[] getManagedIndicesNames() {
+        return indexSet.getManagedIndicesNames();
     }
 
     @Override
-    public boolean isGraylogIndex(String indexName) {
-        return indexSet.isGraylogIndex(indexName);
+    public boolean isManagedIndex(String indexName) {
+        return indexSet.isManagedIndex(indexName);
     }
 
     @Override

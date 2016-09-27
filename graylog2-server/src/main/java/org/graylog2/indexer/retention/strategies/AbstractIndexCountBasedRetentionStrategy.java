@@ -50,7 +50,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
 
     @Override
     public void retain(IndexSet indexSet) {
-        final Map<String, Set<String>> deflectorIndices = indexSet.getAllGraylogDeflectorIndices();
+        final Map<String, Set<String>> deflectorIndices = indexSet.getAllDeflectorAliases();
         final int indexCount = deflectorIndices.size();
         final Optional<Integer> maxIndices = getMaxNumberOfIndices();
 

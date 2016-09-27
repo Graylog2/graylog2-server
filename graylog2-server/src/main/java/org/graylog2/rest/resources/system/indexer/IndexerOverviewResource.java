@@ -88,7 +88,7 @@ public class IndexerOverviewResource extends RestResource {
         final DeflectorSummary deflectorSummary = deflectorResource.deflector();
         final List<IndexRangeSummary> indexRanges = indexRangesResource.list().ranges();
         final Map<String, IndexStats> allDocCounts = indices.getAllDocCounts().entrySet().stream()
-                .filter(entry -> indexSetRegistry.isGraylogIndex(entry.getKey()))
+                .filter(entry -> indexSetRegistry.isManagedIndex(entry.getKey()))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         final Map<String, Boolean> areReopened = indices.areReopened(allDocCounts.keySet());
         final Map<String, IndexSummary> indicesSummaries = allDocCounts.values()

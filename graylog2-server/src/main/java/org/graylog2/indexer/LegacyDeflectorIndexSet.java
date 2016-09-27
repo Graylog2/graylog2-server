@@ -32,7 +32,7 @@ public class LegacyDeflectorIndexSet implements IndexSet {
     }
 
     @Override
-    public String[] getAllGraylogIndexNames() {
+    public String[] getManagedIndicesNames() {
         return deflector.getAllGraylogIndexNames();
     }
 
@@ -57,7 +57,7 @@ public class LegacyDeflectorIndexSet implements IndexSet {
     }
 
     @Override
-    public Map<String,Set<String>> getAllGraylogDeflectorIndices() {
+    public Map<String,Set<String>> getAllDeflectorAliases() {
         return deflector.getAllGraylogDeflectorIndices();
     }
 
@@ -72,7 +72,7 @@ public class LegacyDeflectorIndexSet implements IndexSet {
     }
 
     @Override
-    public boolean isGraylogIndex(String index) {
+    public boolean isManagedIndex(String index) {
         return deflector.isGraylogIndex(index);
     }
 

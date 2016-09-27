@@ -92,7 +92,7 @@ public class IndicesResource extends RestResource {
     public IndexInfo single(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_READ, index);
 
-        if (!indexSetRegistry.isGraylogIndex(index)) {
+        if (!indexSetRegistry.isManagedIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
@@ -124,7 +124,7 @@ public class IndicesResource extends RestResource {
                                            @Valid @NotNull IndicesReadRequest request) {
         if (request.indices() != null) {
             return request.indices().stream()
-                    .filter(indexSetRegistry::isGraylogIndex)
+                    .filter(indexSetRegistry::isManagedIndex)
                     .collect(Collectors.toMap(Function.identity(), this::single));
         }
 
@@ -139,7 +139,7 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo open() {
         final Set<IndexStatistics> indicesStats = indices.getIndicesStats().stream()
-                .filter(indexStats -> indexSetRegistry.isGraylogIndex(indexStats.indexName()))
+                .filter(indexStats -> indexSetRegistry.isManagedIndex(indexStats.indexName()))
                 .collect(Collectors.toSet());
 
         final Map<String, IndexInfo> indexInfos = new HashMap<>();
@@ -170,7 +170,7 @@ public class IndicesResource extends RestResource {
     public ClosedIndices closed() {
         final Set<String> closedIndices = indices.getClosedIndices()
             .stream()
-            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isGraylogIndex(indexName))
+            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
             .collect(Collectors.toSet());
 
         return ClosedIndices.create(closedIndices, closedIndices.size());
@@ -184,7 +184,7 @@ public class IndicesResource extends RestResource {
     public ClosedIndices reopened() {
         final Set<String> reopenedIndices = indices.getReopenedIndices()
             .stream()
-            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isGraylogIndex(indexName))
+            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
             .collect(Collectors.toSet());
 
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
@@ -207,7 +207,7 @@ public class IndicesResource extends RestResource {
     public void reopen(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
-        if (!indexSetRegistry.isGraylogIndex(index)) {
+        if (!indexSetRegistry.isManagedIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
@@ -228,7 +228,7 @@ public class IndicesResource extends RestResource {
     public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
-        if (!indexSetRegistry.isGraylogIndex(index)) {
+        if (!indexSetRegistry.isManagedIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
@@ -254,7 +254,7 @@ public class IndicesResource extends RestResource {
     public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 
-        if (!indexSetRegistry.isGraylogIndex(index)) {
+        if (!indexSetRegistry.isManagedIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);

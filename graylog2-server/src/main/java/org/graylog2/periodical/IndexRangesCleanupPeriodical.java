@@ -72,7 +72,7 @@ public class IndexRangesCleanupPeriodical extends Periodical {
             return;
         }
 
-        final Set<String> indexNames = ImmutableSet.copyOf(indexSetRegistry.getAllGraylogIndexNames());
+        final Set<String> indexNames = ImmutableSet.copyOf(indexSetRegistry.getManagedIndicesNames());
         final SortedSet<IndexRange> indexRanges = indexRangeService.findAll();
 
         final Set<String> removedIndices = new HashSet<>();

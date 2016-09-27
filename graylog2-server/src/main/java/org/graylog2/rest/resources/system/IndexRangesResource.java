@@ -114,7 +114,7 @@ public class IndexRangesResource extends RestResource {
     public IndexRangeSummary show(
             @ApiParam(name = "index", value = "The name of the Graylog-managed Elasticsearch index", required = true)
             @PathParam("index") @NotEmpty String index) throws NotFoundException {
-        if (!indexSetRegistry.isGraylogIndex(index)) {
+        if (!indexSetRegistry.isManagedIndex(index)) {
             throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");
         }
         checkPermission(RestPermissions.INDEXRANGES_READ, index);
@@ -170,7 +170,7 @@ public class IndexRangesResource extends RestResource {
     public Response rebuildIndex(
             @ApiParam(name = "index", value = "The name of the Graylog-managed Elasticsearch index", required = true)
             @PathParam("index") @NotEmpty String index) {
-        if (!indexSetRegistry.isGraylogIndex(index)) {
+        if (!indexSetRegistry.isManagedIndex(index)) {
             throw new BadRequestException(index + " is not a Graylog-managed Elasticsearch index.");
         }
         checkPermission(RestPermissions.INDEXRANGES_REBUILD, index);

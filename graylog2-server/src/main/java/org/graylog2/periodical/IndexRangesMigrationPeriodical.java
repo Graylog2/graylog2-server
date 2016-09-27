@@ -87,7 +87,7 @@ public class IndexRangesMigrationPeriodical extends Periodical {
             Uninterruptibles.sleepUninterruptibly(5, TimeUnit.SECONDS);
         }
 
-        final Set<String> indexNames = ImmutableSet.copyOf(indexSetRegistry.getAllGraylogIndexNames());
+        final Set<String> indexNames = ImmutableSet.copyOf(indexSetRegistry.getManagedIndicesNames());
 
         // Migrate old MongoDB index ranges
         final SortedSet<IndexRange> mongoIndexRanges = legacyMongoIndexRangeService.findAll();

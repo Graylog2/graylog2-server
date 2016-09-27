@@ -82,7 +82,7 @@ public class CountsTest {
                 .get();
         assumeTrue(clusterHealthResponse.getStatus() == ClusterHealthStatus.GREEN);
 
-        when(indexSet.getAllGraylogIndexNames()).thenReturn(new String[]{INDEX_NAME});
+        when(indexSet.getManagedIndicesNames()).thenReturn(new String[]{INDEX_NAME});
 
         counts = new Counts(client, new LegacyDeflectorRegistry(indexSet));
     }

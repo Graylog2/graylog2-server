@@ -18,9 +18,7 @@ package org.graylog2.indexer;
 
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
-import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public interface IndexSetRegistry extends Iterable<IndexSet> {
     /**
@@ -31,11 +29,11 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
     Set<IndexSet> getAllIndexSets();
 
     /**
-     * Returns a list of all Graylog managed indices.
+     * Returns a list with the names of all managed indices.
      *
-     * @return list of managed indices
+     * @return list with names of managed indices
      */
-    String[] getAllGraylogIndexNames();
+    String[] getManagedIndicesNames();
 
     /**
      * Checks if the given index name is managed by Graylog.
@@ -43,7 +41,7 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
      * @param indexName the index name to check
      * @return true when index is managed by Graylog, false otherwise
      */
-    boolean isGraylogIndex(String indexName);
+    boolean isManagedIndex(String indexName);
 
     /**
      * Returns the list of all write index wildcards.

@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.Set;
 
 public interface IndexSet {
-    String[] getAllGraylogIndexNames();
+    String[] getManagedIndicesNames();
 
     String getWriteIndexAlias();
 
@@ -32,13 +32,13 @@ public interface IndexSet {
 
     String getCurrentActualTargetIndex() throws TooManyAliasesException;
 
-    Map<String,Set<String>> getAllGraylogDeflectorIndices();
+    Map<String,Set<String>> getAllDeflectorAliases();
 
     boolean isUp();
 
     boolean isDeflectorAlias(String index);
 
-    boolean isGraylogIndex(String index);
+    boolean isManagedIndex(String index);
 
     void setUp();
 
