@@ -1,5 +1,6 @@
 import React from 'react';
 import jQuery from 'jquery';
+import { Well } from 'react-bootstrap';
 
 import {Pluralize, TypeAheadFieldInput} from 'components/common';
 import GracePeriodInput from 'components/alertconditions/GracePeriodInput';
@@ -28,11 +29,13 @@ const FieldValueConditionForm = React.createClass({
   },
   getValue() {
     return jQuery.extend({
-      field: this.state.field,
-      time: Number(this.refs.time.value),
-      threshold: parseFloat(this.refs.threshold.value),
-      threshold_type: this.state.thresholdType,
-      type: this.refs.check_type.value,
+      configuration: {
+        field: this.state.field,
+        time: Number(this.refs.time.value),
+        threshold: parseFloat(this.refs.threshold.value),
+        threshold_type: this.state.thresholdType,
+        type: this.refs.check_type.value,
+      },
     }, this.refs.gracePeriod.getValue());
   },
   checkTypes: {
@@ -75,7 +78,7 @@ const FieldValueConditionForm = React.createClass({
   render() {
     const alertCondition = this.props.alertCondition;
     return (
-      <span>
+      <Well className="alert-type-form alert-type-form-message-count form-inline well-sm">
         Trigger alert when the field
         {' '}
         <TypeAheadFieldInput ref="fieldInput"
@@ -97,7 +100,7 @@ const FieldValueConditionForm = React.createClass({
         <Pluralize singular="minute" plural="minutes" value={this.state.time}/>
         {' '}
         <GracePeriodInput ref="gracePeriod" alertCondition={alertCondition}/>
-      </span>
+      </Well>
     );
   },
 });

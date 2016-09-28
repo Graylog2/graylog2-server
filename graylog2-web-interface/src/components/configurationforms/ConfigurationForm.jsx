@@ -144,8 +144,8 @@ const ConfigurationForm = React.createClass({
                           submitButtonText="Save">
         <fieldset>
           <input type="hidden" name="type" value={typeName} />
-          {titleElement}
           {this.props.children}
+          {titleElement}
           {configFields}
         </fieldset>
       </BootstrapModalForm>

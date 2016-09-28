@@ -35,6 +35,7 @@ const CreateAlertConditionInput = React.createClass({
   },
   _formatConditionForm(type) {
     return (<AlertConditionForm ref="configurationForm"
+                                onCancel={this._resetForm}
                                 onSubmit={this._onSubmit}
                                 type={type} />);
 
@@ -64,8 +65,12 @@ const CreateAlertConditionInput = React.createClass({
               {' '}
               <Button onClick={this._openForm} disabled={this.state.type === this.PLACEHOLDER || this.props.disabled}
                       bsStyle="success" className="form-control add-alert">
-                Create new alert condition
+                Add alert condition
               </Button>
+              &nbsp;
+              <a href="https://marketplace.graylog.org/" target="_blank" className="btn btn-info form-control">
+                <i className="fa fa-external-link"/>&nbsp; Find more conditions
+              </a>
             </div>
           </form>
         </Col>

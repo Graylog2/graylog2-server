@@ -1,5 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
+import { Well } from 'react-bootstrap';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationForm } from 'components/configurationforms';
@@ -12,13 +13,14 @@ import AlertConditionsFactory from 'logic/alertconditions/AlertConditionsFactory
 const AlertConditionForm = React.createClass({
   propTypes: {
     alertCondition: React.PropTypes.object,
+    onCancel: React.PropTypes.func,
     onSubmit: React.PropTypes.func.isRequired,
     type: React.PropTypes.string.isRequired,
   },
   mixins: [Reflux.connect(AlertConditionsStore)],
   getDefaultProps() {
     return {
-      alertCondition: {},
+      onCanceL: () => {},
       onSubmit: () => {},
     };
   },
@@ -32,13 +34,18 @@ const AlertConditionForm = React.createClass({
   open() {
     this.refs.configurationForm.open();
   },
-  _closeModal() {
-    this.ref.modal.close();
+  _onCancel() {
+    this.props.onCancel();
   },
   _onSubmit() {
     const request = this.getValue();
     request.type = this.props.type;
     this.props.onSubmit(request);
+  },
+  _formatTitle(alertCondition, name) {
+    const activity = alertCondition ? 'Update' : 'Create new';
+    const conditionName = alertCondition ? `"${alertCondition.title}"` : '';
+    return `${activity} ${name} ${conditionName}`;
   },
   alertConditionsFactory: new AlertConditionsFactory(),
   render() {
@@ -51,16 +58,19 @@ const AlertConditionForm = React.createClass({
       return (<ConfigurationForm ref="configurationForm"
                                  key="configuration-form-alert-condition"
                                  configFields={typeDefinition.requested_configuration}
-                                 title={`Create new ${typeDefinition.name}`}
+                                 title={this._formatTitle(alertCondition, typeDefinition.name)}
                                  typeName={type}
                                  submitAction={this._onSubmit}
-                                 cancelAction={this._handleCancel}
-                                 titleValue={alertCondition.title}
-                                 values={alertCondition.parameters}/>);
+                                 cancelAction={this._onCancel}
+                                 titleValue={alertCondition ? alertCondition.title : ''}
+                                 values={alertCondition ? alertCondition.parameters : {}}>
+        <Well>{typeDefinition.human_name}</Well>
+      </ConfigurationForm>);
     }
 
     return (<BootstrapModalForm ref="configurationForm"
-                                onCancel={this._closeModal}
+                                title={this._formatTitle(alertCondition, typeDefinition.name)}
+                                onCancel={this._onCancel}
                                 onSubmitForm={this._onSubmit}
                                 submitButtonText="Save">
       <fieldset>
