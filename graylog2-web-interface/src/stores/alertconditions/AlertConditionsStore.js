@@ -1,4 +1,5 @@
 import Reflux from 'reflux';
+import _ from 'lodash';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
@@ -34,7 +35,7 @@ const AlertConditionsStore = Reflux.createStore({
 
   delete(streamId, alertConditionId) {
     const failCallback = (error) => {
-      UserNotification.error('Removing Alert Condition failed with status: ' + error,
+      UserNotification.error(`Removing Alert Condition failed with status: ${error}`,
         'Could not remove Alert Conditions');
     };
 
@@ -43,20 +44,22 @@ const AlertConditionsStore = Reflux.createStore({
       AlertConditionsActions.list(streamId);
     }, failCallback);
     AlertConditionsActions.delete.promise(promise);
+    return promise;
   },
   list(streamId) {
     const failCallback = (error) => {
-      UserNotification.error('Fetching Alert Conditions failed with status: ' + error,
+      UserNotification.error(`Fetching Alert Conditions failed with status: ${error}`,
         'Could not retrieve Alert Conditions');
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.list(streamId).url);
     const promise = fetch('GET', url).then((response) => {
       const conditions = response.conditions.map((condition) => {
-        condition.stream_id = streamId;
-        return condition;
+        const cond = _.clone(condition);
+        cond.stream_id = streamId;
+        return cond;
       });
-      this.trigger({alertConditions: conditions});
+      this.trigger({ alertConditions: conditions });
       return conditions;
     }, failCallback);
 
@@ -65,7 +68,7 @@ const AlertConditionsStore = Reflux.createStore({
   },
   save(streamId, alertCondition) {
     const failCallback = (error) => {
-      UserNotification.error('Saving Alert Condition failed with status: ' + error,
+      UserNotification.error(`Saving Alert Condition failed with status: ${error}`,
         'Could not save Alert Condition');
     };
 
@@ -75,10 +78,11 @@ const AlertConditionsStore = Reflux.createStore({
     }, failCallback);
 
     AlertConditionsActions.save.promise(promise);
+    return promise;
   },
   update(streamId, alertConditionId, request) {
     const failCallback = (error) => {
-      UserNotification.error('Saving Alert Condition failed with status: ' + error,
+      UserNotification.error(`Saving Alert Condition failed with status: ${error}`,
         'Could not save Alert Condition');
     };
 
@@ -88,6 +92,7 @@ const AlertConditionsStore = Reflux.createStore({
     }, failCallback);
 
     AlertConditionsActions.update.promise(promise);
+    return promise;
   },
 });
 
