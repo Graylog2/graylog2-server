@@ -17,6 +17,7 @@
 package org.graylog2.periodical;
 
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -24,6 +25,7 @@ import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.events.StreamsChangedEvent;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,10 +50,12 @@ public class DefaultStreamMigrationPeriodicalTest {
     private StreamService streamService;
     @Mock
     private StreamRuleService streamRuleService;
+    @Mock
+    private ClusterEventBus clusterEventBus;
 
     @Before
     public void setUpService() throws Exception {
-        periodical = new DefaultStreamMigrationPeriodical(streamService, streamRuleService);
+        periodical = new DefaultStreamMigrationPeriodical(streamService, streamRuleService, clusterEventBus);
     }
 
     @Test
@@ -76,12 +80,31 @@ public class DefaultStreamMigrationPeriodicalTest {
     }
 
     @Test
+    public void doRunPostsStreamsChangedEvent() throws Exception {
+        final ArgumentCaptor<StreamsChangedEvent> argumentCaptor = ArgumentCaptor.forClass(StreamsChangedEvent.class);
+        periodical.doRun();
+        verify(clusterEventBus).post(argumentCaptor.capture());
+
+        final StreamsChangedEvent streamsChangedEvent = argumentCaptor.getValue();
+        assertThat(streamsChangedEvent.streamIds()).containsOnly(Stream.DEFAULT_STREAM_ID);
+    }
+
+    @Test
     public void doRunDoesNotCreateStreamRuleIfStreamCreationFails() throws Exception {
         when(streamService.save(any(Stream.class))).thenThrow(ValidationException.class);
 
         periodical.doRun();
 
         verifyNoMoreInteractions(streamRuleService);
+    }
+
+    @Test
+    public void doRunDoesNotPostStreamsChangedEventIfStreamCreationFails() throws Exception {
+        when(streamService.save(any(Stream.class))).thenThrow(ValidationException.class);
+
+        periodical.doRun();
+
+        verifyNoMoreInteractions(clusterEventBus);
     }
 
     @Test
@@ -131,5 +154,4 @@ public class DefaultStreamMigrationPeriodicalTest {
     public void getLoggerReturnsClassLogger() throws Exception {
         assertThat(periodical.getLogger().getName()).isEqualTo(DefaultStreamMigrationPeriodical.class.getCanonicalName());
     }
-
 }
