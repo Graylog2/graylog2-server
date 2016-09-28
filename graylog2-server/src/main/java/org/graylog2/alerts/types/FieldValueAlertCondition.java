@@ -116,7 +116,11 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
     public static class Descriptor extends AlertCondition.Descriptor {
         public Descriptor() {
-            super(Type.FIELD_VALUE.toString(), "http://www.graylog.rog", "Field Value Alert Condition");
+            super(
+                "Field Value Alert Condition",
+                "http://www.graylog.rog",
+                "This condition is triggered when the content of messages is equal to a defined value."
+            );
         }
     }
 

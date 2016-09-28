@@ -33,7 +33,6 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
-import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
 import org.graylog2.plugin.indexer.searches.timeranges.RelativeRange;
@@ -85,7 +84,12 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
 
     public static class Descriptor extends AlertCondition.Descriptor {
         public Descriptor() {
-            super(Type.FIELD_CONTENT_VALUE.toString(), "http://www.graylog.rog", "Field Content Value Alert Condition");
+            super(
+                "Field Content Value Alert Condition",
+                "http://www.graylog.rog",
+                "This condition is triggered when the value of a defined field in a defined time interval has a "
+                + "mean/mininum/maximum value/standard deviation which is higher/lower than a defined threshold."
+            );
         }
     }
 

@@ -42,7 +42,7 @@ const CreateAlertConditionInput = React.createClass({
   render() {
     const conditionForm = (this.state.type !== this.PLACEHOLDER ? this._formatConditionForm(this.state.type) : null);
     const availableTypes = jQuery.map(this.state.types, (definition, value) => {
-      return <option key={`type-option-${value}`} value={value}>{definition.human_name}</option>;
+      return <option key={`type-option-${value}`} value={value}>{definition.name}</option>;
     });
     return (
       <Row className="content input-new">

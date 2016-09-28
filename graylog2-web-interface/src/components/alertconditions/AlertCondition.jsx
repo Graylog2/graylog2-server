@@ -1,18 +1,21 @@
 import React from 'react';
+import Reflux from 'reflux';
 import { Row, Col, Badge, Button } from 'react-bootstrap';
 
 import AlertConditionsFactory from 'logic/alertconditions/AlertConditionsFactory';
 
-import ActionsProvider from 'injection/ActionsProvider';
-const AlertConditionsActions = ActionsProvider.getActions('AlertConditions');
+import CombinedProvider from 'injection/CombinedProvider';
+const { AlertConditionsActions, AlertConditionsStore } = CombinedProvider.get('AlertConditions');
 
 import UnknownAlertCondition from 'components/alertconditions/UnknownAlertCondition';
 import AlertConditionForm from 'components/alertconditions/AlertConditionForm';
+import GenericAlertConditionSummary from 'components/alertconditions/GenericAlertConditionSummary';
 
 const AlertCondition = React.createClass({
   propTypes: {
     alertCondition: React.PropTypes.object.isRequired,
   },
+  mixins: [Reflux.connect(AlertConditionsStore)],
   _onEdit() {
     this.refs.updateForm.open();
   },
@@ -24,9 +27,9 @@ const AlertCondition = React.createClass({
   _onUpdate(request) {
     AlertConditionsActions.update.triggerPromise(this.props.alertCondition.stream_id, this.props.alertCondition.id, request);
   },
-  _formatTitle(alertCondition, alertConditionType) {
+  _formatTitle(alertCondition, typeTitle) {
     const title = alertCondition.title ? alertCondition.title : 'Untitled';
-    const subtitle = `(${alertConditionType.title} condition)`;
+    const subtitle = `(${typeTitle})`;
     const badge = alertCondition.in_grace && <Badge className="badge-info">in grace period</Badge>;
     return (
       <span>
@@ -36,18 +39,21 @@ const AlertCondition = React.createClass({
   },
   alertConditionsFactory: new AlertConditionsFactory(),
   render() {
+    const type = this.props.alertCondition.type;
     const alertCondition = this.props.alertCondition;
+    const typeDefinition = this.state.types[type];
     const alertConditionTypes = this.alertConditionsFactory.get(alertCondition.type);
     const alertConditionType = alertConditionTypes && alertConditionTypes.length > 0 && alertConditionTypes[0];
-    if (!alertConditionType) {
+    if (!typeDefinition) {
       return <UnknownAlertCondition alertCondition={alertCondition} />;
     }
+    const SummaryComponent = alertConditionType.summary || GenericAlertConditionSummary;
     return (
       <span>
         <Row className="alert-condition" data-condition-id={alertCondition.id}>
           <Col md={9}>
-            <h3>{this._formatTitle(alertCondition, alertConditionType)}</h3>
-            <alertConditionType.summary alertCondition={alertCondition} />
+            <h3>{this._formatTitle(alertCondition, typeDefinition.name)}</h3>
+            <SummaryComponent alertCondition={alertCondition} />
             <AlertConditionForm ref="updateForm"
                                 type={alertCondition.type}
                                 alertCondition={alertCondition}
