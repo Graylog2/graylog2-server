@@ -18,6 +18,7 @@ package org.graylog2.periodical;
 
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -25,6 +26,7 @@ import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.config.DefaultStreamCreated;
 import org.graylog2.streams.events.StreamsChangedEvent;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +38,6 @@ import org.mockito.junit.MockitoRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -52,10 +53,12 @@ public class DefaultStreamMigrationPeriodicalTest {
     private StreamRuleService streamRuleService;
     @Mock
     private ClusterEventBus clusterEventBus;
+    @Mock
+    private ClusterConfigService clusterConfigService;
 
     @Before
     public void setUpService() throws Exception {
-        periodical = new DefaultStreamMigrationPeriodical(streamService, streamRuleService, clusterEventBus);
+        periodical = new DefaultStreamMigrationPeriodical(streamService, streamRuleService, clusterEventBus, clusterConfigService);
     }
 
     @Test
@@ -90,6 +93,14 @@ public class DefaultStreamMigrationPeriodicalTest {
     }
 
     @Test
+    public void doRunPostsSavesDefaultStreamCreatedClusterConfig() throws Exception {
+        final ArgumentCaptor<DefaultStreamCreated> argumentCaptor = ArgumentCaptor.forClass(DefaultStreamCreated.class);
+        periodical.doRun();
+        verify(clusterConfigService).write(argumentCaptor.capture());
+        verifyNoMoreInteractions(clusterConfigService);
+    }
+
+    @Test
     public void doRunDoesNotCreateStreamRuleIfStreamCreationFails() throws Exception {
         when(streamService.save(any(Stream.class))).thenThrow(ValidationException.class);
 
@@ -108,6 +119,15 @@ public class DefaultStreamMigrationPeriodicalTest {
     }
 
     @Test
+    public void doRunDoesNotSaveDefaultStreamCreatedClusterConfigIfStreamCreationFails() throws Exception {
+        when(streamService.save(any(Stream.class))).thenThrow(ValidationException.class);
+
+        periodical.doRun();
+
+        verifyNoMoreInteractions(clusterConfigService);
+    }
+
+    @Test
     public void runsForeverReturnsTrue() throws Exception {
         assertThat(periodical.runsForever()).isTrue();
     }
@@ -123,9 +143,8 @@ public class DefaultStreamMigrationPeriodicalTest {
     }
 
     @Test
-    public void startOnThisNodeReturnsFalseIfStreamExists() throws Exception {
-        final Stream stream = mock(Stream.class);
-        when(streamService.load("000000000000000000000001")).thenReturn(stream);
+    public void startOnThisNodeReturnsFalseIfDefaultStreamHasBeenCreatedBefore() throws Exception {
+        when(clusterConfigService.get(DefaultStreamCreated.class)).thenReturn(DefaultStreamCreated.create());
         assertThat(periodical.startOnThisNode()).isFalse();
     }
 
