@@ -34,6 +34,10 @@
         <tag>HEAD</tag>
     </scm>
 
+    <properties>
+        <graylog.version>${project.parent.version}</graylog.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.graylog2</groupId>
