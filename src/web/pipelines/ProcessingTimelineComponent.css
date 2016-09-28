@@ -24,3 +24,9 @@
     white-space: nowrap;
     width: 300px;
 }
+
+.stream-list {
+    max-width: 150px;
+    width: 150px;
+    word-wrap: break-word;
+}

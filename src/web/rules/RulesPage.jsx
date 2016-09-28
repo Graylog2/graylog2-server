@@ -39,10 +39,6 @@ const RulesPage = React.createClass({
 
           <span>
             <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
-              <Button bsStyle="info">Manage connections</Button>
-            </LinkContainer>
-            &nbsp;
-            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_OVERVIEW')}>
               <Button bsStyle="info">Manage pipelines</Button>
             </LinkContainer>
           </span>

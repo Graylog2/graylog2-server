@@ -12,11 +12,23 @@ import ObjectUtils from 'util/ObjectUtils';
 import PipelinesActions from 'pipelines/PipelinesActions';
 import PipelinesStore from 'pipelines/PipelinesStore';
 import RulesStore from 'rules/RulesStore';
+import PipelineConnectionsActions from './PipelineConnectionsActions';
+import PipelineConnectionsStore from './PipelineConnectionsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
 
 import Routes from 'routing/Routes';
 
 function filterPipeline(state) {
   return state.pipelines ? state.pipelines.filter(p => p.id === this.props.params.pipelineId)[0] : undefined;
+}
+
+function filterConnections(state) {
+  if (!state.connections) {
+    return undefined;
+  }
+  return state.connections.filter(c => c.pipeline_ids && c.pipeline_ids.includes(this.props.params.pipelineId));
 }
 
 const PipelineDetailsPage = React.createClass({
@@ -25,19 +37,34 @@ const PipelineDetailsPage = React.createClass({
     history: React.PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connectFilter(PipelinesStore, 'pipeline', filterPipeline)],
+  mixins: [Reflux.connectFilter(PipelinesStore, 'pipeline', filterPipeline), Reflux.connectFilter(PipelineConnectionsStore, 'connections', filterConnections)],
 
   componentDidMount() {
     if (!this._isNewPipeline(this.props.params.pipelineId)) {
       PipelinesActions.get(this.props.params.pipelineId);
     }
     RulesStore.list();
+    PipelineConnectionsActions.list();
+
+    StreamsStore.listStreams().then((streams) => {
+      streams.push({
+        id: 'default',
+        title: 'Default',
+        description: 'Stream used by default for messages not matching another stream.',
+      });
+      this.setState({ streams });
+    });
   },
 
   componentWillReceiveProps(nextProps) {
     if (!this._isNewPipeline(nextProps.params.pipelineId)) {
       PipelinesActions.get(nextProps.params.pipelineId);
     }
+  },
+
+  _onConnectionsChange(updatedConnections, callback) {
+    PipelineConnectionsActions.connectToPipeline(updatedConnections);
+    callback();
   },
 
   _onStagesChange(newStages, callback) {
@@ -69,7 +96,7 @@ const PipelineDetailsPage = React.createClass({
   },
 
   _isLoading() {
-    return !this._isNewPipeline(this.props.params.pipelineId) && !this.state.pipeline;
+    return !this._isNewPipeline(this.props.params.pipelineId) && !this.state.pipeline || !this.state.connections || !this.state.streams;
   },
 
   render() {
@@ -88,7 +115,11 @@ const PipelineDetailsPage = React.createClass({
     if (this._isNewPipeline(this.props.params.pipelineId)) {
       content = <NewPipeline onChange={this._savePipeline} history={this.props.history} />;
     } else {
-      content = <Pipeline pipeline={this.state.pipeline} rules={this.state.rules} onStagesChange={this._onStagesChange} onPipelineChange={this._savePipeline} />;
+      content = (
+        <Pipeline pipeline={this.state.pipeline} connections={this.state.connections} streams={this.state.streams}
+                  rules={this.state.rules} onConnectionsChange={this._onConnectionsChange}
+                  onStagesChange={this._onStagesChange} onPipelineChange={this._savePipeline} />
+      );
     }
 
     return (
@@ -104,7 +135,7 @@ const PipelineDetailsPage = React.createClass({
 
           <span>
             <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
-              <Button bsStyle="info">Manage connections</Button>
+              <Button bsStyle="info">Manage pipelines</Button>
             </LinkContainer>
             {' '}
             <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>

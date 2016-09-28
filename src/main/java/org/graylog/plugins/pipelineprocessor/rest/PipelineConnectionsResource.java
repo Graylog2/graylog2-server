@@ -34,6 +34,8 @@ import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.constraints.NotNull;
@@ -54,6 +56,7 @@ import java.util.stream.Collectors;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class PipelineConnectionsResource extends RestResource implements PluginRestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(PipelineConnectionsResource.class);
 
     private final PipelineStreamConnectionsService connectionsService;
     private final PipelineService pipelineService;
@@ -73,6 +76,7 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
 
     @ApiOperation(value = "Connect processing pipelines to a stream", notes = "")
     @POST
+    @Path("/to_stream")
     @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CONNECTION_UPDATE)
     public PipelineConnections connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
@@ -87,9 +91,65 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
             checkPermission(PipelineRestPermissions.PIPELINE_READ, s);
             pipelineService.load(s);
         }
-        final PipelineConnections save = connectionsService.save(connection);
-        clusterBus.post(PipelineConnectionsChangedEvent.create(save.streamId(), save.pipelineIds()));
-        return save;
+        return savePipelineConnections(connection);
+    }
+
+    @ApiOperation(value = "Connect streams to a processing pipeline", notes = "")
+    @POST
+    @Path("/to_pipeline")
+    @RequiresPermissions(PipelineRestPermissions.PIPELINE_CONNECTION_EDIT)
+    @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CONNECTION_UPDATE)
+    public Set<PipelineConnections> connectStreams(@ApiParam(name = "Json body", required = true) @NotNull PipelineReverseConnections connection) throws NotFoundException {
+        final String pipelineId = connection.pipelineId();
+        final Set<PipelineConnections> updatedConnections = Sets.newHashSet();
+
+        // verify the pipeline exists
+        checkPermission(PipelineRestPermissions.PIPELINE_READ, pipelineId);
+        pipelineService.load(pipelineId);
+
+        // get all connections where the pipeline was present
+        final Set<PipelineConnections> pipelineConnections = connectionsService.loadAll().stream()
+                .filter(p -> p.pipelineIds().contains(pipelineId))
+                .collect(Collectors.toSet());
+
+        // remove deleted pipeline connections
+        for (PipelineConnections pipelineConnection : pipelineConnections) {
+            if (!connection.streamIds().contains(pipelineConnection.streamId())) {
+                final Set<String> pipelines = pipelineConnection.pipelineIds();
+                pipelines.remove(connection.pipelineId());
+                pipelineConnection.toBuilder().pipelineIds(pipelines).build();
+
+                updatedConnections.add(pipelineConnection);
+                savePipelineConnections(pipelineConnection);
+                LOG.debug("Deleted stream {} connection with pipeline {}", pipelineConnection.streamId(), pipelineId);
+            }
+        }
+
+        // update pipeline connections
+        for (String streamId : connection.streamIds()) {
+            // verify the stream exist
+            if (!streamId.equalsIgnoreCase("default")) {
+                checkPermission(RestPermissions.STREAMS_READ, streamId);
+                streamService.load(streamId);
+            }
+
+            PipelineConnections updatedConnection;
+            try {
+                updatedConnection = connectionsService.load(streamId);
+            } catch (NotFoundException e) {
+                updatedConnection = PipelineConnections.create(null, streamId, Sets.newHashSet());
+            }
+
+            final Set<String> pipelines = updatedConnection.pipelineIds();
+            pipelines.add(pipelineId);
+            updatedConnection.toBuilder().pipelineIds(pipelines).build();
+
+            updatedConnections.add(updatedConnection);
+            savePipelineConnections(updatedConnection);
+            LOG.debug("Added stream {} connection with pipeline {}", streamId, pipelineId);
+        }
+
+        return updatedConnections;
     }
 
     @ApiOperation("Get pipeline connections for the given stream")
@@ -140,6 +200,12 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
             filteredConnections.add(PipelineConnections.create(null, "default", Collections.emptySet()));
         }
         return filteredConnections;
+    }
+
+    private PipelineConnections savePipelineConnections(PipelineConnections connection) {
+        final PipelineConnections save = connectionsService.save(connection);
+        clusterBus.post(PipelineConnectionsChangedEvent.create(save.streamId(), save.pipelineIds()));
+        return save;
     }
 
 }

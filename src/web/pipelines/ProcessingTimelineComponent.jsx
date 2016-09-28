@@ -6,18 +6,34 @@ import naturalSort from 'javascript-natural-sort';
 
 import { DataTable, Spinner } from 'components/common';
 import { MetricContainer, CounterRate } from 'components/metrics';
+import PipelineConnectionsList from './PipelineConnectionsList';
 
 import PipelinesActions from 'pipelines/PipelinesActions';
 import PipelinesStore from 'pipelines/PipelinesStore';
+import PipelineConnectionsActions from './PipelineConnectionsActions';
+import PipelineConnectionsStore from './PipelineConnectionsStore';
+
+import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
 
 import Routes from 'routing/Routes';
 
 const ProcessingTimelineComponent = React.createClass({
-  mixins: [Reflux.connect(PipelinesStore)],
+  mixins: [Reflux.connect(PipelinesStore), Reflux.connect(PipelineConnectionsStore)],
 
   componentDidMount() {
     this.style.use();
     PipelinesActions.list();
+    PipelineConnectionsActions.list();
+
+    StreamsStore.listStreams().then((streams) => {
+      streams.push({
+        id: 'default',
+        title: 'Default',
+        description: 'Stream used by default for messages not matching another stream.',
+      });
+      this.setState({ streams });
+    });
   },
 
   componentWillUnmount() {
@@ -43,6 +59,10 @@ const ProcessingTimelineComponent = React.createClass({
     }
 
     return <th className={className}>{header}</th>;
+  },
+
+  _formatConnectedStreams(streams) {
+    return streams.map(s => s.title).join(', ');
   },
 
   _formatStages(pipeline, stages) {
@@ -75,6 +95,11 @@ const ProcessingTimelineComponent = React.createClass({
             <CounterRate prefix="Throughput:" suffix="msg/s" />
           </MetricContainer>
         </td>
+        <td className="stream-list">
+          <PipelineConnectionsList pipeline={pipeline} connections={this.state.connections} streams={this.state.streams}
+                                   streamsFormatter={this._formatConnectedStreams}
+                                   noConnectionsMessage={<em>Not connected</em>} />
+        </td>
         <td>{this._formatStages(pipeline, pipeline.stages)}</td>
         <td>
           <Button bsStyle="primary" bsSize="xsmall" onClick={this._deletePipeline(pipeline)}>Delete</Button>
@@ -95,8 +120,12 @@ const ProcessingTimelineComponent = React.createClass({
     };
   },
 
+  _isLoading() {
+    return !this.state.pipelines || !this.state.streams || !this.state.connections;
+  },
+
   render() {
-    if (!this.state.pipelines) {
+    if (this._isLoading()) {
       return <Spinner />;
     }
 
@@ -121,7 +150,7 @@ const ProcessingTimelineComponent = React.createClass({
 
     this.usedStages = this._calculateUsedStages(this.state.pipelines);
 
-    const headers = ['Pipeline', 'Processing Timeline', 'Actions'];
+    const headers = ['Pipeline', 'Connected to Streams', 'Processing Timeline', 'Actions'];
     return (
       <div>
         {addNewPipelineButton}

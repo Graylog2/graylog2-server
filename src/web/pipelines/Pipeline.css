@@ -14,3 +14,11 @@ dl.pipeline-dl > dt:after {
 dl.pipeline-dl > dd {
     margin-left: 100px;
 }
+
+.row-margin-top {
+    margin-top: 10px;
+}
+
+.description-margin-top {
+    margin-top: 5px;
+}

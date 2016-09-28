@@ -1,16 +1,24 @@
-import React, { PropTypes } from 'react';
-import { Row, Col } from 'react-bootstrap';
+import React from 'react';
+import { Button, Row, Col } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
-import { EntityList } from 'components/common';
+import { EntityList, Pluralize } from 'components/common';
 import Stage from './Stage';
 import StageForm from './StageForm';
 import PipelineDetails from './PipelineDetails';
+import PipelineConnectionsForm from './PipelineConnectionsForm';
+import PipelineConnectionsList from './PipelineConnectionsList';
+
+import Routes from 'routing/Routes';
 
 const Pipeline = React.createClass({
   propTypes: {
-    pipeline: PropTypes.object.isRequired,
-    onStagesChange: PropTypes.func.isRequired,
-    onPipelineChange: PropTypes.func.isRequired,
+    pipeline: React.PropTypes.object.isRequired,
+    connections: React.PropTypes.array.isRequired,
+    streams: React.PropTypes.array.isRequired,
+    onConnectionsChange: React.PropTypes.func.isRequired,
+    onStagesChange: React.PropTypes.func.isRequired,
+    onPipelineChange: React.PropTypes.func.isRequired,
   },
 
   componentDidMount() {
@@ -46,6 +54,18 @@ const Pipeline = React.createClass({
     };
   },
 
+  _formatConnectedStreams(streams) {
+    const formattedStreams = streams.map(s => `"${s.title}"`);
+    const streamList = streams.length > 1 ? [formattedStreams.slice(0, -1).join(', '), formattedStreams.slice(-1)].join(' and ') : formattedStreams[0];
+    return (
+      <span>
+        This pipeline is processing messages from the{' '}
+        <Pluralize singular="stream" plural="streams" value={streams.length} />{' '}
+        {streamList}.
+      </span>
+    );
+  },
+
   _formatStage(stage, maxStage) {
     return (
       <Stage key={`stage-${stage.stage}`} pipeline={this.props.pipeline} stage={stage} isLastStage={stage.stage === maxStage}
@@ -55,6 +75,7 @@ const Pipeline = React.createClass({
 
   render() {
     const pipeline = this.props.pipeline;
+
     const maxStage = pipeline.stages.reduce((max, currentStage) => Math.max(max, currentStage.stage), -Infinity);
     const formattedStages = pipeline.stages
       .sort((s1, s2) => s1.stage - s2.stage)
@@ -62,14 +83,33 @@ const Pipeline = React.createClass({
 
     return (
       <div>
-        <PipelineDetails pipeline={this.props.pipeline} onChange={this.props.onPipelineChange} />
-        <Row className="row-sm" style={{ marginTop: 10 }}>
+        <PipelineDetails pipeline={pipeline} onChange={this.props.onPipelineChange} />
+        <Row className="row-sm row-margin-top">
+          <Col md={12}>
+            <div className="pull-right">
+              <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_SIMULATE')}>
+                <Button bsStyle="info">Simulate processing</Button>
+              </LinkContainer>
+              &nbsp;
+              <PipelineConnectionsForm pipeline={pipeline} connections={this.props.connections}
+                                       streams={this.props.streams} save={this.props.onConnectionsChange} />
+            </div>
+            <h2>Pipeline connections</h2>
+            <p className="description-margin-top">
+              <PipelineConnectionsList pipeline={pipeline} connections={this.props.connections}
+                                       streams={this.props.streams} streamsFormatter={this._formatConnectedStreams}
+                                       noConnectionsMessage="Select streams that will be processed by this pipeline."/>
+            </p>
+            <hr/>
+          </Col>
+        </Row>
+        <Row className="row-sm row-margin-top">
           <Col md={12}>
             <div className="pull-right">
               <StageForm create save={this._saveStage} />
             </div>
             <h2>Pipeline Stages</h2>
-            <p style={{ marginTop: 5 }}>
+            <p className="description-margin-top">
               Stages are groups of conditions and actions which need to run in order, and provide the necessary{' '}
               control flow to decide whether or not to run the rest of a pipeline.
             </p>
