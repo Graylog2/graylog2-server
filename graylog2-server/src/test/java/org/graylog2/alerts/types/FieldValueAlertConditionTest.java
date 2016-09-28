@@ -128,12 +128,12 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         }
     }
 
-    protected Map<String, Object> getParametersMap(Integer grace,
-                                                   Integer time,
-                                                   FieldValueAlertCondition.ThresholdType threshold_type,
-                                                   FieldValueAlertCondition.CheckType check_type,
-                                                   Number threshold,
-                                                   String field) {
+    private Map<String, Object> getParametersMap(Integer grace,
+                                                 Integer time,
+                                                 FieldValueAlertCondition.ThresholdType threshold_type,
+                                                 FieldValueAlertCondition.CheckType check_type,
+                                                 Number threshold,
+                                                 String field) {
         Map<String, Object> parameters = super.getParametersMap(grace, time, threshold);
         parameters.put("threshold_type", threshold_type.toString());
         parameters.put("field", field);
@@ -142,7 +142,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         return parameters;
     }
 
-    protected FieldValueAlertCondition getFieldValueAlertCondition(Map<String, Object> parameters, String title) {
+    private FieldValueAlertCondition getFieldValueAlertCondition(Map<String, Object> parameters, String title) {
         return new FieldValueAlertCondition(
             searches,
             stream,
@@ -153,7 +153,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
             title);
     }
 
-    protected void fieldStatsShouldReturn(FieldStatsResult fieldStatsResult) {
+    private void fieldStatsShouldReturn(FieldStatsResult fieldStatsResult) {
         try {
             when(searches.fieldStats(anyString(),
                 eq("*"),
@@ -167,7 +167,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         }
     }
 
-    protected FieldStatsResult getFieldStatsResult(FieldValueAlertCondition.CheckType type, Number retValue) {
+    private FieldStatsResult getFieldStatsResult(FieldValueAlertCondition.CheckType type, Number retValue) {
         final Double value = (Double) retValue;
         final FieldStatsResult fieldStatsResult = mock(FieldStatsResult.class);
 

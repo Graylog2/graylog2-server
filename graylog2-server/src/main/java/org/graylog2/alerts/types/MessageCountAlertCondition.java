@@ -52,7 +52,7 @@ import java.util.stream.Collectors;
 public class MessageCountAlertCondition extends AbstractAlertCondition {
     private static final Logger LOG = LoggerFactory.getLogger(MessageCountAlertCondition.class);
 
-    private enum ThresholdType {
+    enum ThresholdType {
 
         MORE("more than"),
         LESS("less than");

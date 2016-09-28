@@ -56,7 +56,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class FieldValueAlertCondition extends AbstractAlertCondition {
     private static final Logger LOG = LoggerFactory.getLogger(FieldValueAlertCondition.class);
 
-    private enum CheckType {
+    enum CheckType {
         MEAN("mean value"), MIN("min value"), MAX("max value"), SUM("sum"), STDDEV("standard deviation");
 
         private final String description;
@@ -70,7 +70,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         }
     }
 
-    private enum ThresholdType {
+    enum ThresholdType {
         LOWER, HIGHER
     }
 
