@@ -33,6 +33,7 @@
         <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.site.skip>true</maven.site.skip>
+        <graylog.version>${project.parent.version}</graylog.version>
     </properties>
 
     <dependencies>
