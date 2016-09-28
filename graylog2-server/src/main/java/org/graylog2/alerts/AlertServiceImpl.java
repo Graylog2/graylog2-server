@@ -217,7 +217,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     public Map<String, Object> asMap(final AlertCondition alertCondition) {
         ImmutableMap.Builder<String, Object> builder = ImmutableMap.<String, Object>builder()
             .put("id", alertCondition.getId())
-            .put("type", alertCondition.getType().toLowerCase(Locale.ENGLISH))
+            .put("type", alertCondition.getType())
             .put("creator_user_id", alertCondition.getCreatorUserId())
             .put("created_at", Tools.getISO8601String(alertCondition.getCreatedAt()))
             .put("parameters", alertCondition.getParameters())

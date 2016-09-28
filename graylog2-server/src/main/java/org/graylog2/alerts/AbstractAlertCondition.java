@@ -128,7 +128,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     public Map<String, Object> getPersistedFields() {
         return ImmutableMap.<String, Object>builder()
                 .put("id", id)
-                .put("type", type.toLowerCase(Locale.ENGLISH))
+                .put("type", type)
                 .put("creator_user_id", creatorUserId)
                 .put("created_at", Tools.getISO8601String(createdAt))
                 .put("parameters", parameters)
