@@ -141,7 +141,7 @@
         <junit.version>4.12</junit.version>
         <nosqlunit.version>0.10.0</nosqlunit.version>
         <restassured.version>2.9.0</restassured.version>
-        <system-rules.version>1.16.0</system-rules.version>
+        <system-rules.version>1.16.1</system-rules.version>
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v4.4.3</nodejs.version>
