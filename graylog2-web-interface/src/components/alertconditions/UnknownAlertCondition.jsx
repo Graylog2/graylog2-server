@@ -1,9 +1,17 @@
 import React from 'react';
-import { Row, Col, Badge } from 'react-bootstrap';
+import { Row, Col, Badge, Button } from 'react-bootstrap';
+
+import CombinedProvider from 'injection/CombinedProvider';
+const { AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
 const UnknownAlertCondition = React.createClass({
   propTypes: {
     alertCondition: React.PropTypes.object.isRequired,
+  },
+  _onDelete() {
+    if (window.confirm('Really delete alarm condition?')) {
+      AlertConditionsActions.delete(this.props.alertCondition.stream_id, this.props.alertCondition.id);
+    }
   },
   render() {
     const alertCondition = this.props.alertCondition;
@@ -15,6 +23,7 @@ const UnknownAlertCondition = React.createClass({
           </Col>
 
           <Col md={3} style={{textAlign: 'right'}}>
+            <Button bsStyle="danger" onClick={this._onDelete}>Delete condition</Button>
           </Col>
         </Row>
         <hr />
