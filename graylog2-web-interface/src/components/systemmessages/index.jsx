@@ -1,3 +1,3 @@
-export SystemMessage from './SystemMessage';
-export SystemMessagesComponent from './SystemMessagesComponent';
-export SystemMessagesList from './SystemMessagesList';
+export { default as SystemMessage } from './SystemMessage';
+export { default as SystemMessagesComponent } from './SystemMessagesComponent';
+export { default as SystemMessagesList } from './SystemMessagesList';
