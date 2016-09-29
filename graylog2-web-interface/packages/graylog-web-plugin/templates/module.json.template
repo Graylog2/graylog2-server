@@ -1,0 +1,3 @@
+{
+    "files": {%# JSON.stringify(o.htmlWebpackPlugin.files) %}
+}
