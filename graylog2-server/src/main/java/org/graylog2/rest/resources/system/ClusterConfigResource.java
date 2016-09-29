@@ -32,6 +32,8 @@ import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotBlank;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -58,6 +60,9 @@ import static java.util.Objects.requireNonNull;
 @Path("/system/cluster_config")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterConfigResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(ClusterConfigResource.class);
+
+
     private final ClusterConfigService clusterConfigService;
     private final ChainingClassLoader chainingClassLoader;
 
@@ -107,10 +112,14 @@ public class ClusterConfigResource extends RestResource {
             throw new NotFoundException("Couldn't find configuration class \"" + configClass + "\"");
         }
 
-        final Object o = objectMapper.readValue(body, cls);
-        clusterConfigService.write(o);
-
-        return Response.accepted(o).build();
+        try {
+            final Object o = objectMapper.readValue(body, cls);
+            clusterConfigService.write(o);
+            return Response.accepted(o).build();
+        }catch(Exception e) {
+            LOG.error("Could not write new cluster config.", e);
+            return Response.status(400).build();
+        }
     }
 
     @DELETE
