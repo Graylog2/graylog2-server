@@ -21,7 +21,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
@@ -30,19 +29,18 @@ import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
 import org.graylog2.database.validators.OptionalStringValidator;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
 
 /**
  * Representing a single stream from the streams collection. Also provides method
@@ -60,6 +58,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_CREATED_AT = "created_at";
     public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
     public static final String FIELD_MATCHING_TYPE = "matching_type";
+    public static final String FIELD_DEFAULT_STREAM = "is_default_stream";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
 
     private final List<StreamRule> streamRules;
@@ -207,7 +206,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
 
     @Override
     public MatchingType getMatchingType() {
-        final String matchingTypeString = (String)fields.get(FIELD_MATCHING_TYPE);
+        final String matchingTypeString = (String) fields.get(FIELD_MATCHING_TYPE);
 
         if (matchingTypeString == null) {
             return MatchingType.AND;
@@ -220,5 +219,15 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public void setMatchingType(MatchingType matchingType) {
         Preconditions.checkNotNull(matchingType);
         fields.put(FIELD_MATCHING_TYPE, matchingType.toString());
+    }
+
+    @Override
+    public boolean isDefaultStream() {
+        return (boolean) firstNonNull(fields.get(FIELD_DEFAULT_STREAM), false);
+    }
+
+    @Override
+    public void setDefaultStream(boolean defaultStream) {
+        fields.put(FIELD_DEFAULT_STREAM, defaultStream);
     }
 }

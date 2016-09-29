@@ -44,6 +44,8 @@ public class Stream {
     @JsonProperty
     @NotNull
     private Set<String> outputs = Collections.emptySet();
+    @JsonProperty
+    private boolean defaultStream = false;
 
     public String getId() {
         return id;
@@ -99,5 +101,13 @@ public class Stream {
 
     public void setOutputs(Set<String> outputs) {
         this.outputs = outputs;
+    }
+
+    public boolean isDefaultStream() {
+        return defaultStream;
+    }
+
+    public void setDefaultStream(boolean defaultStream) {
+        this.defaultStream = defaultStream;
     }
 }

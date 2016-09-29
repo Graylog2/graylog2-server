@@ -26,6 +26,8 @@ import java.util.Set;
 import static com.google.common.base.Strings.emptyToNull;
 
 public interface Stream extends Persisted {
+    String DEFAULT_STREAM_ID = "000000000000000000000001";
+
     enum MatchingType {
         AND,
         OR;
@@ -67,4 +69,8 @@ public interface Stream extends Persisted {
     Set<Output> getOutputs();
 
     MatchingType getMatchingType();
+
+    boolean isDefaultStream();
+
+    void setDefaultStream(boolean defaultStream);
 }

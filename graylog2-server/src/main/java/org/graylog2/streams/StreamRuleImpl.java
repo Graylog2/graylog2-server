@@ -31,6 +31,7 @@ import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Map;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -125,11 +126,14 @@ public class StreamRuleImpl extends PersistedImpl implements StreamRule {
     public Map<String, Validator> getValidations() {
         final ImmutableMap.Builder<String, Validator> validators = ImmutableMap.builder();
         validators.put(FIELD_TYPE, new IntegerValidator());
-        validators.put(FIELD_FIELD, new FilledStringValidator());
         validators.put(FIELD_STREAM_ID, new ObjectIdValidator());
         validators.put(FIELD_CONTENT_PACK, new OptionalStringValidator());
 
-        if (!this.getType().equals(StreamRuleType.PRESENCE)) {
+        if (!EnumSet.of(StreamRuleType.ALWAYS_MATCH).contains(this.getType())) {
+            validators.put(FIELD_FIELD, new FilledStringValidator());
+        }
+
+        if (!EnumSet.of(StreamRuleType.PRESENCE, StreamRuleType.ALWAYS_MATCH).contains(this.getType())) {
             validators.put(FIELD_VALUE, new FilledStringValidator());
         }
 

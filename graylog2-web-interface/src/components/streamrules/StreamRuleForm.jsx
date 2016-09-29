@@ -27,11 +27,15 @@ const StreamRuleForm = React.createClass({
     return this.props.streamRule;
   },
   FIELD_PRESENCE_RULE_TYPE: 5,
+  ALWAYS_MATCH_RULE_TYPE: 7,
   _resetValues() {
     this.setState(this.props.streamRule);
   },
   _onSubmit() {
-    if (this.state.type === this.FIELD_PRESENCE_RULE_TYPE) {
+    if (this.state.type === this.ALWAYS_MATCH_RULE_TYPE) {
+      this.state.field = '';
+    }
+    if (this.state.type === this.FIELD_PRESENCE_RULE_TYPE || this.state.type === this.ALWAYS_MATCH_RULE_TYPE) {
       this.state.value = '';
     }
     this.props.onSubmit(this.props.streamRule.id, this.state);
@@ -52,7 +56,9 @@ const StreamRuleForm = React.createClass({
   },
   render() {
     const streamRuleTypes = this.props.streamRuleTypes.map(this._formatStreamRuleType);
-    const valueBox = (String(this.state.type) !== String(this.FIELD_PRESENCE_RULE_TYPE) ?
+    const fieldBox = (String(this.state.type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
+      <TypeAheadFieldInput ref="fieldInput" type="text" required label="Field" valueLink={this.linkState('field')} autoFocus /> : '');
+    const valueBox = (String(this.state.type) !== String(this.FIELD_PRESENCE_RULE_TYPE) && String(this.state.type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
       <Input type="text" required label="Value" valueLink={this.linkState('value')}/> : '');
     return (
       <BootstrapModalForm ref="modal"
@@ -61,12 +67,7 @@ const StreamRuleForm = React.createClass({
                           submitButtonText="Save">
         <div>
           <Col md={8}>
-            <TypeAheadFieldInput ref="fieldInput"
-                                 type="text"
-                                 required
-                                 label="Field"
-                                 valueLink={this.linkState('field')}
-                                 autoFocus />
+            {fieldBox}
             <Input type="select" required label="Type" valueLink={this.linkState('type')}>
               {streamRuleTypes}
             </Input>
@@ -78,8 +79,7 @@ const StreamRuleForm = React.createClass({
             <p>
               <strong>Result:</strong>
               {' '}
-              Field <HumanReadableStreamRule streamRule={this.state}
-                                             streamRuleTypes={this.props.streamRuleTypes}/>
+              <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={this.props.streamRuleTypes}/>
             </p>
           </Col>
           <Col md={4}>
