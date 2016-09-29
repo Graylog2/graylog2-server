@@ -68,16 +68,18 @@ const AlertConditionForm = React.createClass({
       </ConfigurationForm>);
     }
 
-    return (<BootstrapModalForm ref="configurationForm"
-                                title={this._formatTitle(alertCondition, typeDefinition.name)}
-                                onCancel={this._onCancel}
-                                onSubmitForm={this._onSubmit}
-                                submitButtonText="Save">
-      <fieldset>
-        <input type="hidden" name="type" value={type} />
-        <alertConditionType.configuration_form ref="customConfigurationForm" alertCondition={alertCondition} />
-      </fieldset>
-    </BootstrapModalForm>);
+    return (
+      <BootstrapModalForm ref="configurationForm"
+                          title={this._formatTitle(alertCondition, typeDefinition.name)}
+                          onCancel={this._onCancel}
+                          onSubmitForm={this._onSubmit}
+                          submitButtonText="Save">
+        <fieldset>
+          <input type="hidden" name="type" value={type} />
+          <alertConditionType.configuration_form ref="customConfigurationForm" alertCondition={alertCondition} />
+        </fieldset>
+      </BootstrapModalForm>
+    );
   },
 });
 
