@@ -33,7 +33,7 @@ const GrokPatternsStore = {
         "Could not save Grok pattern");
     };
 
-    const requestPatterb = {
+    const requestPattern = {
       id: pattern.id,
       pattern: pattern.pattern,
       name: pattern.name,
@@ -48,7 +48,7 @@ const GrokPatternsStore = {
       url += '/' + pattern.id;
       method = 'PUT';
     }
-    fetch(method, url, requestPatterb).then(() => {
+    fetch(method, url, requestPattern).then(() => {
       callback();
       var action = pattern.id === "" ? "created" : "updated";
       var message = "Grok pattern \"" + pattern.name + "\" successfully " + action;
@@ -73,7 +73,7 @@ const GrokPatternsStore = {
         "Could not load Grok patterns");
     };
 
-    const promise = fetch('PUT', this.URL, {patterns: patterns});
+    const promise = fetch('PUT', `${this.URL}?replace=${replaceAll}`, {patterns: patterns});
 
     promise.catch(failCallback);
 
