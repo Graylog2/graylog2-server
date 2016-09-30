@@ -1,0 +1,40 @@
+{
+  "name": "graylog-web-plugin",
+  "version": "0.0.21",
+  "description": "Helper code for streamlining Graylog web interface plugin development",
+  "main": "index.js",
+  "scripts": {
+    "test": "eslint src/*",
+    "compile": "babel -d lib/ src/",
+    "prepublish": "npm run compile"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Graylog2/graylog-web-plugin.git"
+  },
+  "keywords": [
+    "graylog",
+    "web",
+    "plugin"
+  ],
+  "author": "Graylog, Inc. <hello@graylog.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Graylog2/graylog-web-plugin/issues"
+  },
+  "homepage": "https://github.com/Graylog2/graylog-web-plugin#readme",
+  "dependencies": {
+    "babel-core": "^5.8.25",
+    "babel-loader": "^5.3.2",
+    "html-webpack-plugin": "^1.7.0",
+    "webpack": "^1.12.9",
+    "webpack-cleanup-plugin": "^0.1.1",
+    "webpack-merge": "^0.7.1"
+  },
+  "devDependencies": {
+    "babel": "^5.8.34",
+    "babel-eslint": "^6.1.0",
+    "eslint": "^2.13.1",
+    "eslint-config-graylog": "^1.0.2"
+  }
+}
