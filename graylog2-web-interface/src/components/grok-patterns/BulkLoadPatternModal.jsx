@@ -12,11 +12,16 @@ const BulkLoadPatternModal = React.createClass({
   propTypes: {
     onSuccess: React.PropTypes.func.isRequired,
   },
+  getInitialState() {
+    return {
+      replacePatterns: false,
+    };
+  },
+
   _onSubmit(evt) {
     evt.preventDefault();
 
     const reader = new FileReader();
-    const replaceAll = this.refs['replace-patterns'].checked;
 
     reader.onload = (loaded) => {
       const request = loaded.target.result.split('\n').map((line) => {
@@ -27,7 +32,7 @@ const BulkLoadPatternModal = React.createClass({
           }
         }
       }).filter((elem) => elem !== undefined);
-      GrokPatternsStore.bulkImport(request, replaceAll).then(() => {
+      GrokPatternsStore.bulkImport(request, this.state.replacePatterns).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
         this.refs.modal.close();
         this.props.onSuccess();
@@ -52,9 +57,10 @@ const BulkLoadPatternModal = React.createClass({
                    help="A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace."
                    required />
             <Input type="checkbox"
-                   ref="replace-patterns"
                    name="replace"
-                   label="Replace all existing patterns?" />
+                   label="Replace all existing patterns?"
+                   onChange={(e) => this.setState({ replacePatterns: e.target.checked })}
+            />
           </BootstrapModalForm>
       </span>
     );
