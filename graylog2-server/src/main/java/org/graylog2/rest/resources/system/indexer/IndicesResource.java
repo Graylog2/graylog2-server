@@ -29,7 +29,7 @@ import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
@@ -74,13 +74,14 @@ public class IndicesResource extends RestResource {
 
     private final Indices indices;
     private final Cluster cluster;
-    private final Deflector deflector;
+    private final IndexSetRegistry indexSetRegistry;
 
+    // TODO 2.2: Resource needs to be adjusted to handle a specific write target
     @Inject
-    public IndicesResource(Indices indices, Cluster cluster, Deflector deflector) {
+    public IndicesResource(Indices indices, Cluster cluster, IndexSetRegistry indexSetRegistry) {
         this.indices = indices;
         this.cluster = cluster;
-        this.deflector = deflector;
+        this.indexSetRegistry = indexSetRegistry;
     }
 
     @GET
@@ -91,7 +92,7 @@ public class IndicesResource extends RestResource {
     public IndexInfo single(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_READ, index);
 
-        if (!deflector.isGraylogIndex(index)) {
+        if (!indexSetRegistry.isManagedIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
@@ -123,7 +124,7 @@ public class IndicesResource extends RestResource {
                                            @Valid @NotNull IndicesReadRequest request) {
         if (request.indices() != null) {
             return request.indices().stream()
-                    .filter(deflector::isGraylogIndex)
+                    .filter(indexSetRegistry::isManagedIndex)
                     .collect(Collectors.toMap(Function.identity(), this::single));
         }
 
@@ -138,7 +139,7 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo open() {
         final Set<IndexStatistics> indicesStats = indices.getIndicesStats().stream()
-                .filter(indexStats -> deflector.isGraylogIndex(indexStats.indexName()))
+                .filter(indexStats -> indexSetRegistry.isManagedIndex(indexStats.indexName()))
                 .collect(Collectors.toSet());
 
         final Map<String, IndexInfo> indexInfos = new HashMap<>();
@@ -169,7 +170,7 @@ public class IndicesResource extends RestResource {
     public ClosedIndices closed() {
         final Set<String> closedIndices = indices.getClosedIndices()
             .stream()
-            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && deflector.isGraylogIndex(indexName))
+            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
             .collect(Collectors.toSet());
 
         return ClosedIndices.create(closedIndices, closedIndices.size());
@@ -183,7 +184,7 @@ public class IndicesResource extends RestResource {
     public ClosedIndices reopened() {
         final Set<String> reopenedIndices = indices.getReopenedIndices()
             .stream()
-            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && deflector.isGraylogIndex(indexName))
+            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
             .collect(Collectors.toSet());
 
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
@@ -206,7 +207,7 @@ public class IndicesResource extends RestResource {
     public void reopen(@ApiParam(name = "index") @PathParam("index") String index) {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
-        if (!deflector.isGraylogIndex(index)) {
+        if (!indexSetRegistry.isManagedIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
@@ -227,13 +228,13 @@ public class IndicesResource extends RestResource {
     public void close(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
         checkPermission(RestPermissions.INDICES_CHANGESTATE, index);
 
-        if (!deflector.isGraylogIndex(index)) {
+        if (!indexSetRegistry.isManagedIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
         }
 
-        if (index.equals(deflector.getCurrentActualTargetIndex())) {
+        if (indexSetRegistry.isCurrentWriteIndex(index)) {
             throw new ForbiddenException("The current deflector target index (" + index + ") cannot be closed");
         }
 
@@ -253,13 +254,13 @@ public class IndicesResource extends RestResource {
     public void delete(@ApiParam(name = "index") @PathParam("index") @NotNull String index) throws TooManyAliasesException {
         checkPermission(RestPermissions.INDICES_DELETE, index);
 
-        if (!deflector.isGraylogIndex(index)) {
+        if (!indexSetRegistry.isManagedIndex(index)) {
             final String msg = "Index [" + index + "] doesn't look like an index managed by Graylog.";
             LOG.info(msg);
             throw new NotFoundException(msg);
         }
 
-        if (index.equals(deflector.getCurrentActualTargetIndex())) {
+        if (indexSetRegistry.isCurrentWriteIndex(index)) {
             throw new ForbiddenException("The current deflector target index (" + index + ") cannot be deleted");
         }
 

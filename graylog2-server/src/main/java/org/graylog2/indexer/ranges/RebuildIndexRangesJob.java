@@ -19,19 +19,18 @@ package org.graylog2.indexer.ranges;
 import com.google.common.base.Stopwatch;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class RebuildIndexRangesJob extends SystemJob {
     public interface Factory {
-        RebuildIndexRangesJob create(Deflector deflector);
+        RebuildIndexRangesJob create(IndexSetRegistry indexSetRegistry);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RebuildIndexRangesJob.class);
@@ -41,15 +40,15 @@ public class RebuildIndexRangesJob extends SystemJob {
     private volatile int indicesToCalculate = 0;
     private volatile int indicesCalculated = 0;
 
-    protected final Deflector deflector;
+    protected final IndexSetRegistry indexSetRegistry;
     private final ActivityWriter activityWriter;
     protected final IndexRangeService indexRangeService;
 
     @AssistedInject
-    public RebuildIndexRangesJob(@Assisted Deflector deflector,
+    public RebuildIndexRangesJob(@Assisted IndexSetRegistry indexSetRegistry,
                                  ActivityWriter activityWriter,
                                  IndexRangeService indexRangeService) {
-        this.deflector = deflector;
+        this.indexSetRegistry = indexSetRegistry;
         this.activityWriter = activityWriter;
         this.indexRangeService = indexRangeService;
     }
@@ -78,7 +77,7 @@ public class RebuildIndexRangesJob extends SystemJob {
     public void execute() {
         info("Re-calculating index ranges.");
 
-        String[] indices = deflector.getAllGraylogIndexNames();
+        String[] indices = indexSetRegistry.getManagedIndicesNames();
         if (indices == null || indices.length == 0) {
             info("No indices, nothing to calculate.");
             return;
@@ -86,9 +85,8 @@ public class RebuildIndexRangesJob extends SystemJob {
         indicesToCalculate = indices.length;
 
         Stopwatch sw = Stopwatch.createStarted();
-        final String deflectorIndexName = deflector.getName();
         for (String index : indices) {
-            if (deflectorIndexName.equals(index)) {
+            if (indexSetRegistry.isCurrentWriteIndexAlias(index)) {
                 continue;
             }
             if (cancelRequested) {

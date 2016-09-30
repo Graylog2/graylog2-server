@@ -17,8 +17,8 @@
 
 package org.graylog2.indexer.retention.strategies;
 
-import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexHelper;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.periodical.IndexRetentionThread;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -36,13 +36,11 @@ import static java.util.Objects.requireNonNull;
 public abstract class AbstractIndexCountBasedRetentionStrategy implements RetentionStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(AbstractIndexCountBasedRetentionStrategy.class);
 
-    private final Deflector deflector;
     private final Indices indices;
     private final ActivityWriter activityWriter;
 
-    public AbstractIndexCountBasedRetentionStrategy(Deflector deflector, Indices indices,
+    public AbstractIndexCountBasedRetentionStrategy(Indices indices,
                                                     ActivityWriter activityWriter) {
-        this.deflector = requireNonNull(deflector);
         this.indices = requireNonNull(indices);
         this.activityWriter = requireNonNull(activityWriter);
     }
@@ -51,8 +49,8 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
     protected abstract void retain(String indexName);
 
     @Override
-    public void retain() {
-        final Map<String, Set<String>> deflectorIndices = deflector.getAllGraylogDeflectorIndices();
+    public void retain(IndexSet indexSet) {
+        final Map<String, Set<String>> deflectorIndices = indexSet.getAllDeflectorAliases();
         final int indexCount = deflectorIndices.size();
         final Optional<Integer> maxIndices = getMaxNumberOfIndices();
 
@@ -75,13 +73,13 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         LOG.info(msg);
         activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
-        runRetention(deflectorIndices, removeCount);
+        runRetention(indexSet, deflectorIndices, removeCount);
     }
 
-    private void runRetention(Map<String, Set<String>> deflectorIndices, int removeCount) {
+    private void runRetention(IndexSet indexSet, Map<String, Set<String>> deflectorIndices, int removeCount) {
         for (String indexName : IndexHelper.getOldestIndices(deflectorIndices.keySet(), removeCount)) {
             // Never run against the current deflector target.
-            if (deflectorIndices.get(indexName).contains(deflector.getName())) {
+            if (deflectorIndices.get(indexName).contains(indexSet.getWriteIndexAlias())) {
                 LOG.info("Not running retention against current deflector target <{}>.", indexName);
                 continue;
             }

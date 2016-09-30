@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.util.concurrent.Uninterruptibles;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.ranges.EsIndexRangeService;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -51,7 +51,7 @@ public class IndexRangesMigrationPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRangesMigrationPeriodical.class);
 
     private final Cluster cluster;
-    private final Deflector deflector;
+    private final IndexSetRegistry indexSetRegistry;
     private final IndexRangeService indexRangeService;
     private final NotificationService notificationService;
     private final LegacyMongoIndexRangeService legacyMongoIndexRangeService;
@@ -60,14 +60,14 @@ public class IndexRangesMigrationPeriodical extends Periodical {
 
     @Inject
     public IndexRangesMigrationPeriodical(final Cluster cluster,
-                                          final Deflector deflector,
+                                          final IndexSetRegistry indexSetRegistry,
                                           final IndexRangeService indexRangeService,
                                           final NotificationService notificationService,
                                           final LegacyMongoIndexRangeService legacyMongoIndexRangeService,
                                           final EsIndexRangeService esIndexRangeService,
                                           final ClusterConfigService clusterConfigService) {
         this.cluster = checkNotNull(cluster);
-        this.deflector = checkNotNull(deflector);
+        this.indexSetRegistry = checkNotNull(indexSetRegistry);
         this.indexRangeService = checkNotNull(indexRangeService);
         this.notificationService = checkNotNull(notificationService);
         this.legacyMongoIndexRangeService = checkNotNull(legacyMongoIndexRangeService);
@@ -87,7 +87,7 @@ public class IndexRangesMigrationPeriodical extends Periodical {
             Uninterruptibles.sleepUninterruptibly(5, TimeUnit.SECONDS);
         }
 
-        final Set<String> indexNames = ImmutableSet.copyOf(deflector.getAllGraylogIndexNames());
+        final Set<String> indexNames = ImmutableSet.copyOf(indexSetRegistry.getManagedIndicesNames());
 
         // Migrate old MongoDB index ranges
         final SortedSet<IndexRange> mongoIndexRanges = legacyMongoIndexRangeService.findAll();

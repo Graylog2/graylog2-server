@@ -17,6 +17,7 @@
 package org.graylog2.periodical;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.notifications.Notification;
@@ -38,6 +39,7 @@ public class IndexRetentionThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexRetentionThread.class);
 
     private final ElasticsearchConfiguration configuration;
+    private final IndexSetRegistry indexSetRegistry;
     private final Cluster cluster;
     private final ClusterConfigService clusterConfigService;
     private final NodeId nodeId;
@@ -46,12 +48,14 @@ public class IndexRetentionThread extends Periodical {
 
     @Inject
     public IndexRetentionThread(ElasticsearchConfiguration configuration,
+                                IndexSetRegistry indexSetRegistry,
                                 Cluster cluster,
                                 ClusterConfigService clusterConfigService,
                                 NodeId nodeId,
                                 NotificationService notificationService,
                                 Map<String, Provider<RetentionStrategy>> retentionStrategyMap) {
         this.configuration = configuration;
+        this.indexSetRegistry = indexSetRegistry;
         this.cluster = cluster;
         this.clusterConfigService = clusterConfigService;
         this.nodeId = nodeId;
@@ -66,6 +70,7 @@ public class IndexRetentionThread extends Periodical {
             return;
         }
 
+        // TODO 2.2: Retention strategy config is per write target, not global.
         final IndexManagementConfig config = clusterConfigService.get(IndexManagementConfig.class);
 
         if (config == null) {
@@ -86,7 +91,7 @@ public class IndexRetentionThread extends Periodical {
 
         final RetentionStrategy retentionStrategy = retentionStrategyProvider.get();
 
-        retentionStrategy.retain();
+        indexSetRegistry.forEach(retentionStrategy::retain);
     }
 
     private void retentionProblemNotification(String title, String description) {

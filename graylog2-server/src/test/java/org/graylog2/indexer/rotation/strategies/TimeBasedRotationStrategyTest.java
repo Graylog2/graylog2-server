@@ -18,7 +18,7 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -49,7 +49,7 @@ public class TimeBasedRotationStrategyTest {
     private ClusterConfigService clusterConfigService;
 
     @Mock
-    private Deflector deflector;
+    private IndexSet indexSet;
 
     @Mock
     private Indices indices;
@@ -81,7 +81,7 @@ public class TimeBasedRotationStrategyTest {
         assertEquals(hourAnchor.getSecondOfMinute(), 0);
 
         // should snap to 14:45:00
-        period = Period.minutes(5);
+        period = minutes(5);
         final DateTime fiveMins = TimeBasedRotationStrategy.determineRotationPeriodAnchor(null, period);
         assertEquals(fiveMins.getHourOfDay(), 14);
         assertEquals(fiveMins.getMinuteOfHour(), 45);
@@ -125,89 +125,89 @@ public class TimeBasedRotationStrategyTest {
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
 
-        when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(5)));
+        when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(minutes(5)));
         when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(TimeBasedRotationStrategyConfig.create(period));
 
-        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(indices, deflector, nodeId, clusterConfigService, auditEventSender);
+        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(indices, nodeId, clusterConfigService, auditEventSender);
 
         // Should not rotate the first index.
-        when(deflector.getNewestTargetName()).thenReturn("ignored");
-        hourlyRotation.rotate();
-        verify(deflector, never()).cycle();
-        reset(deflector);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+        hourlyRotation.rotate(indexSet);
+        verify(indexSet, never()).cycle();
+        reset(indexSet);
 
         clock.tick(seconds(2));
 
         // Crossed rotation period.
-        when(deflector.getNewestTargetName()).thenReturn("ignored");
-        hourlyRotation.rotate();
-        verify(deflector, times(1)).cycle();
-        reset(deflector);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+        hourlyRotation.rotate(indexSet);
+        verify(indexSet, times(1)).cycle();
+        reset(indexSet);
 
         clock.tick(seconds(2));
 
         // Did not cross rotation period.
-        when(deflector.getNewestTargetName()).thenReturn("ignored");
-        hourlyRotation.rotate();
-        verify(deflector, never()).cycle();
-        reset(deflector);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+        hourlyRotation.rotate(indexSet);
+        verify(indexSet, never()).cycle();
+        reset(indexSet);
     }
 
     @Test
     public void shouldRotateNonIntegralPeriod() throws Exception {
         // start 5 minutes before full hour
         final DateTime initialTime = new DateTime(2014, 1, 1, 1, 55, 0, 0, DateTimeZone.UTC);
-        final Period period = Period.minutes(10);
+        final Period period = minutes(10);
 
         final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
         DateTimeUtils.setCurrentMillisProvider(clock);
-        when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(Period.minutes(11)));
+        when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(minutes(11)));
         when(clusterConfigService.get(TimeBasedRotationStrategyConfig.class)).thenReturn(TimeBasedRotationStrategyConfig.create(period));
 
-        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(indices, deflector, nodeId, clusterConfigService, auditEventSender);
+        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(indices, nodeId, clusterConfigService, auditEventSender);
 
         // Should rotate the first index.
         // time is 01:55:00, index was created at 01:44:00, so we missed one period, and should rotate
-        when(deflector.getNewestTargetName()).thenReturn("ignored");
-        tenMinRotation.rotate();
-        verify(deflector, times(1)).cycle();
-        reset(deflector);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+        tenMinRotation.rotate(indexSet);
+        verify(indexSet, times(1)).cycle();
+        reset(indexSet);
 
         // advance time to 01:55:01
         clock.tick(seconds(1));
 
         // Did not cross rotation period.
-        when(deflector.getNewestTargetName()).thenReturn("ignored");
-        tenMinRotation.rotate();
-        verify(deflector, never()).cycle();
-        reset(deflector);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+        tenMinRotation.rotate(indexSet);
+        verify(indexSet, never()).cycle();
+        reset(indexSet);
 
         // advance time to 02:00:00
         clock.tick(minutes(4).withSeconds(59));
 
         // Crossed rotation period.
-        when(deflector.getNewestTargetName()).thenReturn("ignored");
-        tenMinRotation.rotate();
-        verify(deflector, times(1)).cycle();
-        reset(deflector);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+        tenMinRotation.rotate(indexSet);
+        verify(indexSet, times(1)).cycle();
+        reset(indexSet);
 
         // advance time multiple rotation periods into the future
         // to time 02:51:00
         clock.tick(minutes(51));
 
         // Crossed multiple rotation periods.
-        when(deflector.getNewestTargetName()).thenReturn("ignored");
-        tenMinRotation.rotate();
-        verify(deflector, times(1)).cycle();
-        reset(deflector);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+        tenMinRotation.rotate(indexSet);
+        verify(indexSet, times(1)).cycle();
+        reset(indexSet);
 
         // move time to 2:52:00
         // this should not cycle again, because next valid rotation time is 3:00:00
         clock.tick(minutes(1));
-        when(deflector.getNewestTargetName()).thenReturn("ignored");
-        tenMinRotation.rotate();
-        verify(deflector, never()).cycle();
-        reset(deflector);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+        tenMinRotation.rotate(indexSet);
+        verify(indexSet, never()).cycle();
+        reset(indexSet);
     }
 
 }

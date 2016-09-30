@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.retention.strategies;
 
-import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -30,8 +29,8 @@ public class NoopRetentionStrategy extends AbstractIndexCountBasedRetentionStrat
     private static final Logger LOG = LoggerFactory.getLogger(NoopRetentionStrategy.class);
 
     @Inject
-    public NoopRetentionStrategy(Deflector deflector, Indices indices, ActivityWriter activityWriter) {
-        super(deflector, indices, activityWriter);
+    public NoopRetentionStrategy(Indices indices, ActivityWriter activityWriter) {
+        super(indices, activityWriter);
     }
 
     @Override

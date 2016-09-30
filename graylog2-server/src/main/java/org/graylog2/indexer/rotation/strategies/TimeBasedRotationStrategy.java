@@ -19,7 +19,6 @@ package org.graylog2.indexer.rotation.strategies;
 
 import com.google.common.base.MoreObjects;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -57,9 +56,9 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private DateTime anchor;
 
     @Inject
-    public TimeBasedRotationStrategy(Indices indices, Deflector deflector, NodeId nodeId,
+    public TimeBasedRotationStrategy(Indices indices, NodeId nodeId,
                                      ClusterConfigService clusterConfigService, AuditEventSender auditEventSender) {
-        super(deflector, auditEventSender, nodeId);
+        super(auditEventSender, nodeId);
         this.clusterConfigService = clusterConfigService;
         this.anchor = null;
         this.lastRotation = null;
@@ -138,6 +137,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     @Nullable
     @Override
     protected Result shouldRotate(String index) {
+        // TODO 2.2: Rotation strategy config is per write target, not global.
         final TimeBasedRotationStrategyConfig config = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
 
         if (config == null) {

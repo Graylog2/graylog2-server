@@ -17,7 +17,7 @@
 package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.SetIndexReadOnlyJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.system.jobs.SystemJob;
@@ -31,17 +31,17 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
 
     private final SetIndexReadOnlyJob.Factory setIndexReadOnlyJobFactory;
     private final CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory;
-    private final Deflector deflector;
+    private final IndexSetRegistry indexSetRegistry;
     private final String indexName;
 
     @Inject
     public SetIndexReadOnlyAndCalculateRangeJob(SetIndexReadOnlyJob.Factory setIndexReadOnlyJobFactory,
                                                 CreateNewSingleIndexRangeJob.Factory createNewSingleIndexRangeJobFactory,
-                                                Deflector deflector,
+                                                IndexSetRegistry indexSetRegistry,
                                                 @Assisted String indexName) {
         this.setIndexReadOnlyJobFactory = setIndexReadOnlyJobFactory;
         this.createNewSingleIndexRangeJobFactory = createNewSingleIndexRangeJobFactory;
-        this.deflector = deflector;
+        this.indexSetRegistry = indexSetRegistry;
         this.indexName = indexName;
     }
 
@@ -49,7 +49,7 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
     public void execute() {
         final SystemJob setIndexReadOnlyJob = setIndexReadOnlyJobFactory.create(indexName);
         setIndexReadOnlyJob.execute();
-        final SystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(deflector, indexName);
+        final SystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(indexSetRegistry, indexName);
         createNewSingleIndexRangeJob.execute();
 
     }

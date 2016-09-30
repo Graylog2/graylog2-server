@@ -18,7 +18,8 @@ package org.graylog2.indexer.healing;
 
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.buffers.Buffers;
-import org.graylog2.indexer.Deflector;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -37,7 +38,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
     private static final Logger LOG = LoggerFactory.getLogger(FixDeflectorByMoveJob.class);
 
     public static final int MAX_CONCURRENCY = 1;
-    private final Deflector deflector;
+    private final IndexSetRegistry indexSetRegistry;
     private final ServerStatus serverStatus;
     private final Indices indices;
     private final ActivityWriter activityWriter;
@@ -47,13 +48,13 @@ public class FixDeflectorByMoveJob extends SystemJob {
     private int progress = 0;
 
     @AssistedInject
-    public FixDeflectorByMoveJob(Deflector deflector,
+    public FixDeflectorByMoveJob(IndexSetRegistry indexSetRegistry,
                                  Indices indices,
                                  ServerStatus serverStatus,
                                  ActivityWriter activityWriter,
                                  Buffers bufferSynchronizer,
                                  NotificationService notificationService) {
-        this.deflector = deflector;
+        this.indexSetRegistry = indexSetRegistry;
         this.indices = indices;
         this.serverStatus = serverStatus;
         this.activityWriter = activityWriter;
@@ -63,8 +64,12 @@ public class FixDeflectorByMoveJob extends SystemJob {
 
     @Override
     public void execute() {
-        if (deflector.isUp() || !indices.exists(deflector.getName())) {
-            LOG.error("There is no index <{}>. No need to run this job. Aborting.", deflector.getName());
+        indexSetRegistry.forEach(this::doExecute);
+    }
+
+    public void doExecute(IndexSet indexSet) {
+        if (indexSet.isUp() || !indices.exists(indexSet.getWriteIndexAlias())) {
+            LOG.error("There is no index <{}>. No need to run this job. Aborting.", indexSet.getWriteIndexAlias());
             return;
         }
 
@@ -83,11 +88,11 @@ public class FixDeflectorByMoveJob extends SystemJob {
             // Copy messages to new index.
             String newTarget = null;
             try {
-                newTarget = deflector.getNewestTargetName();
+                newTarget = indexSet.getNewestTargetName();
 
-                LOG.info("Starting to move <{}> to <{}>.", deflector.getName(), newTarget);
-                indices.move(deflector.getName(), newTarget);
-            } catch(Exception e) {
+                LOG.info("Starting to move <{}> to <{}>.", indexSet.getWriteIndexAlias(), newTarget);
+                indices.move(indexSet.getWriteIndexAlias(), newTarget);
+            } catch (Exception e) {
                 LOG.error("Moving index failed. Rolling back.", e);
                 if (newTarget != null) {
                     indices.delete(newTarget);
@@ -100,12 +105,12 @@ public class FixDeflectorByMoveJob extends SystemJob {
             progress = 85;
 
             // Delete deflector index.
-            LOG.info("Deleting <{}> index.", deflector.getName());
-            indices.delete(deflector.getName());
+            LOG.info("Deleting <{}> index.", indexSet.getWriteIndexAlias());
+            indices.delete(indexSet.getWriteIndexAlias());
             progress = 90;
 
             // Set up deflector.
-            deflector.setUp();
+            indexSet.setUp();
             progress = 95;
         } finally {
             // Start message processing again.
