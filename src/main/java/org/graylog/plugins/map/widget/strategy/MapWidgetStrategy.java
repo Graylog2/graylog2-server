@@ -16,7 +16,7 @@
  */
 package org.graylog.plugins.map.widget.strategy;
 
-import com.google.api.client.util.Maps;
+import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.indexer.results.TermsResult;
