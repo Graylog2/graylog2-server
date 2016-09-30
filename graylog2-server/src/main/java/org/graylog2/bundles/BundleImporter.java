@@ -183,9 +183,9 @@ public class BundleImporter {
         for (String grokPatternName : createdGrokPatterns.keySet()) {
             final org.graylog2.grok.GrokPattern grokPattern = grokPatternService.load(grokPatternName);
 
-            if (grokPattern.id != null) {
+            if (grokPattern.id() != null) {
                 LOG.debug("Deleting grok pattern \"{}\" from database", grokPatternName);
-                grokPatternService.delete(grokPattern.id.toHexString());
+                grokPatternService.delete(grokPattern.id());
             } else {
                 LOG.debug("Couldn't find grok pattern \"{}\" in database", grokPatternName);
             }
@@ -235,10 +235,7 @@ public class BundleImporter {
     }
 
     private org.graylog2.grok.GrokPattern createGrokPattern(String bundleId, GrokPattern grokPattern) throws ValidationException {
-        final org.graylog2.grok.GrokPattern pattern = new org.graylog2.grok.GrokPattern();
-        pattern.name = grokPattern.name();
-        pattern.pattern = grokPattern.pattern();
-        pattern.contentPack = bundleId;
+        final org.graylog2.grok.GrokPattern pattern = org.graylog2.grok.GrokPattern.create(null, grokPattern.name(), grokPattern.pattern(), bundleId);
 
         return grokPatternService.save(pattern);
     }

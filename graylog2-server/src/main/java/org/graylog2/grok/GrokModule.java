@@ -14,28 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest.models.system.responses;
+package org.graylog2.grok;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.google.inject.AbstractModule;
 
-@JsonAutoDetect
-public class GrokPatternSummary {
-
-    public String id;
-
-    public String name;
-
-    public String pattern;
-
-    public String contentPack;
-
+public class GrokModule extends AbstractModule {
     @Override
-    public String toString() {
-        return "GrokPatternSummary{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", pattern='" + pattern + '\'' +
-                ", contentPack='" + contentPack + '\'' +
-                '}';
+    protected void configure() {
+        bind(GrokPatternService.class).to(MongoDbGrokPatternService.class);
     }
 }

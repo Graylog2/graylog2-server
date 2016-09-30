@@ -46,17 +46,9 @@ public class GrokExtractorTest {
     public void setUp() throws Exception {
         patternSet = Sets.newHashSet();
 
-        final GrokPattern baseNum = new GrokPattern();
-        baseNum.name = "BASE10NUM";
-        baseNum.pattern = "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))";
-
-        final GrokPattern number = new GrokPattern();
-        number.name = "NUMBER";
-        number.pattern = "(?:%{BASE10NUM:UNWANTED})";
-
-        final GrokPattern data = new GrokPattern();
-        data.name = "GREEDY";
-        data.pattern = ".*";
+        final GrokPattern baseNum = GrokPattern.create("BASE10NUM", "(?<![0-9.+-])(?>[+-]?(?:(?:[0-9]+(?:\\.[0-9]+)?)|(?:\\.[0-9]+)))");
+        final GrokPattern number = GrokPattern.create("NUMBER", "(?:%{BASE10NUM:UNWANTED})");
+        final GrokPattern data = GrokPattern.create("GREEDY", ".*");
 
         patternSet.add(baseNum);
         patternSet.add(number);
@@ -95,9 +87,7 @@ public class GrokExtractorTest {
     public void testNamedCapturesOnly() throws Exception {
         final Map<String, Object> config = new HashMap<>();
 
-        final GrokPattern mynumber = new GrokPattern();
-        mynumber.name = "MYNUMBER";
-        mynumber.pattern = "(?:%{BASE10NUM})";
+        final GrokPattern mynumber = GrokPattern.create("MYNUMBER", "(?:%{BASE10NUM})");
 
         patternSet.add(mynumber);
 

@@ -80,7 +80,7 @@ public class GrokTesterResource extends RestResource {
 
         final Grok grok = new Grok();
         for (GrokPattern grokPattern : grokPatterns) {
-            grok.addPattern(grokPattern.name, grokPattern.pattern);
+            grok.addPattern(grokPattern.name(), grokPattern.pattern());
         }
 
         grok.compile(pattern, namedCapturesOnly);

@@ -26,9 +26,6 @@ import org.elasticsearch.node.Node;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.FormattedEmailAlertSender;
-import org.graylog2.alerts.types.FieldContentValueAlertCondition;
-import org.graylog2.alerts.types.FieldValueAlertCondition;
-import org.graylog2.alerts.types.MessageCountAlertCondition;
 import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
@@ -48,6 +45,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.FilterServiceImpl;
+import org.graylog2.grok.GrokModule;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.indexer.SetIndexReadOnlyJob;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
@@ -116,6 +114,7 @@ public class ServerBindings extends Graylog2Module {
         bindEventBusListeners();
         install(new AuthenticatingRealmModule());
         bindSearchResponseDecorators();
+        install(new GrokModule());
     }
 
     private void bindProviders() {

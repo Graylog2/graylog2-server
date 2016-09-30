@@ -73,7 +73,7 @@ public class GrokExtractor extends Extractor {
         try {
             // TODO we should really share this somehow, but unfortunately the extractors are reloaded every second.
             for (final GrokPattern grokPattern : grokPatterns) {
-                grok.addPattern(grokPattern.name, grokPattern.pattern);
+                grok.addPattern(grokPattern.name(), grokPattern.pattern());
             }
 
             grok.compile((String) extractorConfig.get("grok_pattern"), namedCapturesOnly);

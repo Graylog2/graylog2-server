@@ -115,7 +115,7 @@ public class GrokPatternRegistry {
         public Grok load(@Nonnull String pattern) throws Exception {
             final Grok grok = new Grok();
             for (GrokPattern grokPattern : patterns()) {
-                grok.addPattern(grokPattern.name, grokPattern.pattern);
+                grok.addPattern(grokPattern.name(), grokPattern.pattern());
             }
             grok.compile(pattern, namedCapturesOnly);
             return grok;
