@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.google.common.base.MoreObjects;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -46,21 +45,11 @@ public abstract class GrokPattern {
     @Nullable
     public abstract String contentPack();
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("id", id())
-                .add("name", name())
-                .add("pattern", pattern())
-                .add("contentPack", contentPack())
-                .toString();
-    }
-
     @JsonCreator
     public static GrokPattern create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
                                      @JsonProperty("name") String name,
                                      @JsonProperty("pattern") String pattern,
-                                     @JsonProperty("contentPack") @Nullable String contentPack) {
+                                     @JsonProperty("content_pack") @Nullable String contentPack) {
         return builder()
                 .id(id)
                 .name(name)

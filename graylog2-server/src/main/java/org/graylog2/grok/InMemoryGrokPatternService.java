@@ -28,8 +28,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.PatternSyntaxException;
 import java.util.stream.Collectors;
@@ -40,7 +40,7 @@ public class InMemoryGrokPatternService implements GrokPatternService {
     // poor man's id generator
     private AtomicLong idGen = new AtomicLong(0);
 
-    private final Map<String, GrokPattern> store = new MapMaker().makeMap();
+    private final ConcurrentMap<String, GrokPattern> store = new MapMaker().makeMap();
 
     @Override
     public GrokPattern load(String patternId) throws NotFoundException {
