@@ -109,7 +109,7 @@ public class BundleExporter {
             return null;
         }
 
-        return GrokPattern.create(grokPattern.name, grokPattern.pattern);
+        return GrokPattern.create(grokPattern.name(), grokPattern.pattern());
     }
 
     private Set<Input> exportInputs(final Set<String> inputs) {

@@ -17,66 +17,67 @@
 package org.graylog2.grok;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.google.common.base.MoreObjects;
-import org.bson.types.ObjectId;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
-import java.util.Objects;
+import javax.annotation.Nullable;
 
+@AutoValue
 @JsonAutoDetect
-public final class GrokPattern {
+public abstract class GrokPattern {
+
+    @JsonProperty("id")
+    @Nullable
     @Id
-    @org.mongojack.ObjectId
-    public ObjectId id;
-    public String name;
-    public String pattern;
-    public String contentPack;
+    @ObjectId
+    public abstract String id();
 
-    public String name() {
-        return name;
-    }
+    @JsonProperty
+    public abstract String name();
 
-    public String pattern() {
-        return pattern;
-    }
+    @JsonProperty
+    public abstract String pattern();
 
-    public String contentPack() {
-        return contentPack;
-    }
+    @JsonProperty
+    @Nullable
+    public abstract String contentPack();
 
-    @Override
-    public String toString() {
-        return MoreObjects.toStringHelper(this)
-                .add("id", id)
-                .add("name", name)
-                .add("pattern", pattern)
-                .add("contentPack", contentPack)
-                .toString();
+    @JsonCreator
+    public static GrokPattern create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
+                                     @JsonProperty("name") String name,
+                                     @JsonProperty("pattern") String pattern,
+                                     @JsonProperty("content_pack") @Nullable String contentPack) {
+        return builder()
+                .id(id)
+                .name(name)
+                .pattern(pattern)
+                .contentPack(contentPack)
+                .build();
     }
 
     public static GrokPattern create(String name, String pattern) {
         return create(null, name, pattern, null);
     }
-    public static GrokPattern create(ObjectId id, String name, String pattern, String contentPack) {
-        final GrokPattern grokPattern = new GrokPattern();
-        grokPattern.id = id;
-        grokPattern.name = name;
-        grokPattern.pattern = pattern;
-        grokPattern.contentPack = contentPack;
-        return grokPattern;
+
+    public static Builder builder() {
+        return new AutoValue_GrokPattern.Builder();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public abstract Builder toBuilder();
 
-        final GrokPattern that = (GrokPattern) o;
-        return Objects.equals(this.name, that.name) && Objects.equals(this.pattern, that.pattern);
-    }
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder id(String id);
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, pattern);
+        public abstract Builder name(String name);
+
+        public abstract Builder pattern(String pattern);
+
+        public abstract Builder contentPack(String contentPack);
+
+        public abstract GrokPattern build();
     }
 }

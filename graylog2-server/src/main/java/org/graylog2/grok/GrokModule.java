@@ -16,15 +16,11 @@
  */
 package org.graylog2.grok;
 
-import nl.jqno.equalsverifier.EqualsVerifier;
-import nl.jqno.equalsverifier.Warning;
-import org.junit.Test;
+import com.google.inject.AbstractModule;
 
-public class GrokPatternTest {
-    @Test
-    public void testEquals() throws Exception {
-        EqualsVerifier.forClass(GrokPattern.class)
-            .suppress(Warning.NONFINAL_FIELDS, Warning.ALL_FIELDS_SHOULD_BE_USED)
-            .verify();
+public class GrokModule extends AbstractModule {
+    @Override
+    protected void configure() {
+        bind(GrokPatternService.class).to(MongoDbGrokPatternService.class);
     }
 }

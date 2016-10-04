@@ -40,14 +40,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.PatternSyntaxException;
 
-public class GrokPatternServiceImpl implements GrokPatternService {
+public class MongoDbGrokPatternService implements GrokPatternService {
     public static final String GROK_PATTERNS = "grok_patterns";
-    private static final Logger log = LoggerFactory.getLogger(GrokPatternServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(MongoDbGrokPatternService.class);
     private final JacksonDBCollection<GrokPattern, ObjectId> dbCollection;
 
     @Inject
-    protected GrokPatternServiceImpl(MongoConnection mongoConnection,
-                                     MongoJackObjectMapperProvider mapper) {
+    protected MongoDbGrokPatternService(MongoConnection mongoConnection,
+                                        MongoJackObjectMapperProvider mapper) {
 
         dbCollection = JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(GROK_PATTERNS),
@@ -99,15 +99,15 @@ public class GrokPatternServiceImpl implements GrokPatternService {
 
     @Override
     public boolean validate(GrokPattern pattern) {
-        final boolean fieldsMissing = !(Strings.isNullOrEmpty(pattern.name) || Strings.isNullOrEmpty(pattern.pattern));
+        final boolean fieldsMissing = !(Strings.isNullOrEmpty(pattern.name()) || Strings.isNullOrEmpty(pattern.pattern()));
         try {
             final Grok grok = new Grok();
-            grok.addPattern(pattern.name, pattern.pattern);
-            grok.compile("%{" + pattern.name + "}");
+            grok.addPattern(pattern.name(), pattern.pattern());
+            grok.compile("%{" + pattern.name() + "}");
         } catch (GrokException ignored) {
             // this only checks for null or empty again.
         } catch (PatternSyntaxException e) {
-            log.warn("Invalid regular expression syntax for '" + pattern.name + "' with pattern " + pattern.pattern, e);
+            log.warn("Invalid regular expression syntax for '" + pattern.name() + "' with pattern " + pattern.pattern(), e);
             return false;
         }
         return fieldsMissing;
