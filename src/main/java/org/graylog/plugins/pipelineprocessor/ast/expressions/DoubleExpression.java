@@ -43,17 +43,12 @@ public class DoubleExpression extends ConstantExpression implements NumericExpre
     }
 
     @Override
-    public boolean isFloatingPoint() {
-        return true;
-    }
-
-    @Override
-    public long longValue() {
+    public long evaluateLong(EvaluationContext context) {
         return (long) value;
     }
 
     @Override
-    public double doubleValue() {
+    public double evaluateDouble(EvaluationContext context) {
         return value;
     }
 }

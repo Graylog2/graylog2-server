@@ -38,6 +38,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
+import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleTypes;
 import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidFunctionArgument;
 import org.graylog.plugins.pipelineprocessor.parser.errors.NonIndexableType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMustBeNamed;
@@ -502,6 +503,25 @@ public class PipelineRuleParserTest extends BaseParserTest {
             final ParseError parseError = Iterables.getOnlyElement(e.getErrors());
             assertEquals("Unable to pre-compute value for 1st argument timezone in call to function now_in_tz: The datetime zone id '123' is not recognised", parseError.toString());
             assertEquals(InvalidFunctionArgument.class, parseError.getClass());
+        }
+    }
+
+    @Test
+    public void arithmetic() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        evaluateRule(rule);
+
+        assertTrue(actionsTriggered.get());
+    }
+
+    @Test
+    public void mismatchedNumericTypes() {
+        try {
+            parser.parseRule(ruleForTest(), false);
+            fail("Should have thrown parse exception");
+        } catch (ParseException e) {
+            assertEquals(1, e.getErrors().size());
+            assertEquals(IncompatibleTypes.class, Iterables.getOnlyElement(e.getErrors()).getClass());
         }
     }
 

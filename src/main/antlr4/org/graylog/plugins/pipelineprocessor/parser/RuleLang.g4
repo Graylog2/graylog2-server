@@ -84,11 +84,10 @@ expression
     |   fieldSet=expression '.' field=expression                        # Nested
     |   array=expression '[' index=expression ']'                       # IndexedAccess
     |   functionCall                                                    # Func
-    |   not=Not expression                                              # Not
-//    |   ('+'|'-') expression                                            # SignedExpression
-//    |   ('~'|'!') expression                                            # BitwiseNot
-//    |   expression ('*'|'/'|'%') expression                             # Multiplication
-//    |   expression ('+'|'-') expression                                 # Addition
+    |   sign=('+'|'-') expr=expression                                  # SignedExpression
+    |   Not expression                                                  # Not
+    |   left=expression mult=('*'|'/'|'%') right=expression             # Multiplication
+    |   left=expression add=('+'|'-') right=expression                  # Addition
     |   left=expression comparison=('<=' | '>=' | '>' | '<') right=expression # Comparison
     |   left=expression equality=('==' | '!=') right=expression         # Equality
     |   left=expression and=And right=expression                        # And

@@ -10,6 +10,7 @@
         <Logger name="org.graylog" level="info"/>
         <Logger name="org.graylog.plugins.pipelineprocessor" level="info"/>
         <Logger name="org.graylog.plugins.pipelineprocessor.ast.expressions" level="trace"/>
+        <Logger name="org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser" level="trace"/>
         <Root level="warn">
             <AppenderRef ref="STDOUT"/>
         </Root>

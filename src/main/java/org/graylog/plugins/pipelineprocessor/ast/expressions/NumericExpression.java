@@ -16,13 +16,13 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import org.graylog.plugins.pipelineprocessor.EvaluationContext;
+
 public interface NumericExpression extends Expression {
 
     boolean isIntegral();
 
-    boolean isFloatingPoint();
+    long evaluateLong(EvaluationContext context);
 
-    long longValue();
-
-    double doubleValue();
+    double evaluateDouble(EvaluationContext context);
 }

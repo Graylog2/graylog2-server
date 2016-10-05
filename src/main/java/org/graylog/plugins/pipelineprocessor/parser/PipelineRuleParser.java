@@ -37,6 +37,7 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.exceptions.PrecomputeFailure;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.AdditionExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ArrayLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BinaryExpression;
@@ -54,8 +55,10 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LongExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.MapLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.MessageRefExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.MultiplicationExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.NotExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.OrExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.SignedExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.StringExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.VarRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
@@ -532,6 +535,38 @@ public class PipelineRuleParser {
         }
 
         @Override
+        public void exitSignedExpression(RuleLangParser.SignedExpressionContext ctx) {
+            final Expression right = exprs.get(ctx.expr);
+            final boolean isPlus = ctx.sign.getText().equals("+");
+
+            final SignedExpression expr = new SignedExpression(ctx.getStart(), right, isPlus);
+            log.trace("SIGN: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitAddition(RuleLangParser.AdditionContext ctx) {
+            final Expression left = exprs.get(ctx.left);
+            final Expression right = exprs.get(ctx.right);
+            final boolean isPlus = ctx.add.getText().equals("+");
+
+            final AdditionExpression expr = new AdditionExpression(ctx.getStart(), left, right, isPlus);
+            log.trace("ADD: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
+        public void exitMultiplication(RuleLangParser.MultiplicationContext ctx) {
+            final Expression left = exprs.get(ctx.left);
+            final Expression right = exprs.get(ctx.right);
+            final char operator = ctx.mult.getText().charAt(0);
+
+            final MultiplicationExpression expr = new MultiplicationExpression(ctx.getStart(), left, right, operator);
+            log.trace("MULT: ctx {} => {}", ctx, expr);
+            exprs.put(ctx, expr);
+        }
+
+        @Override
         public void enterMessageRef(RuleLangParser.MessageRefContext ctx) {
             // nested field access is ok, these are not rule variables
             isIdIsFieldAccess.push(true);
@@ -612,6 +647,36 @@ public class PipelineRuleParser {
                 varRefExpression.setType(expression.getType());
             }
         }
+
+        @Override
+        public void exitAddition(RuleLangParser.AdditionContext ctx) {
+            final AdditionExpression expr = (AdditionExpression) parseContext.expressions().get(ctx);
+            final Class leftType = expr.left().getType();
+            final Class rightType = expr.right().getType();
+
+            if (leftType.equals(rightType)) {
+                // propagate left type
+                expr.setType(leftType);
+            } else {
+                // this will be detected as an error later
+                expr.setType(Void.class);
+            }
+        }
+
+        @Override
+        public void exitMultiplication(RuleLangParser.MultiplicationContext ctx) {
+            final MultiplicationExpression expr = (MultiplicationExpression) parseContext.expressions().get(ctx);
+            final Class leftType = expr.left().getType();
+            final Class rightType = expr.right().getType();
+
+            if (leftType.equals(rightType)) {
+                // propagate left type
+                expr.setType(leftType);
+            } else {
+                // this will be detected as an error later
+                expr.setType(Void.class);
+            }
+        }
     }
 
     private class RuleTypeChecker extends RuleLangBaseListener {
@@ -643,9 +708,18 @@ public class PipelineRuleParser {
         }
 
         @Override
+        public void exitAddition(RuleLangParser.AdditionContext ctx) {
+            checkBinaryExpression(ctx);
+        }
+
+        @Override
+        public void exitMultiplication(RuleLangParser.MultiplicationContext ctx) {
+            checkBinaryExpression(ctx);
+        }
+
+        @Override
         public void exitEquality(RuleLangParser.EqualityContext ctx) {
             // TODO equality allows arbitrary types, in the future optimize by using specialized operators
-//            checkBinaryExpression(ctx, true);
         }
 
         private void checkBinaryExpression(RuleLangParser.ExpressionContext ctx) {
@@ -653,7 +727,7 @@ public class PipelineRuleParser {
             final Class leftType = binaryExpr.left().getType();
             final Class rightType = binaryExpr.right().getType();
 
-            if (!leftType.equals(rightType)) {
+            if (!leftType.equals(rightType) || Void.class.equals(leftType) || Void.class.equals(rightType)) {
                 parseContext.addError(new IncompatibleTypes(ctx, binaryExpr));
             }
         }
