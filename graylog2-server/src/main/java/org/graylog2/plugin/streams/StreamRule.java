@@ -17,13 +17,10 @@
 package org.graylog2.plugin.streams;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.graylog2.plugin.database.Persisted;
-
-import java.util.Map;
+import org.graylog2.streams.StreamRuleImpl;
 
 @JsonAutoDetect
-public interface StreamRule extends Persisted {
-    @Override
+public interface StreamRule {
     String getId();
 
     StreamRuleType getType();
@@ -40,18 +37,16 @@ public interface StreamRule extends Persisted {
 
     String getDescription();
 
-    void setType(StreamRuleType type);
+    Builder toBuilder();
 
-    void setField(String field);
-
-    void setValue(String value);
-
-    void setInverted(Boolean inverted);
-
-    void setContentPack(String contentPack);
-
-    void setDescription(String description);
-
-    @Override
-    Map<String, Object> asMap();
+    interface Builder {
+        Builder type(StreamRuleType type);
+        Builder field(String field);
+        Builder value(String value);
+        Builder inverted(Boolean inverted);
+        Builder streamId(String streamId);
+        Builder contentPack(String contentPack);
+        Builder description(String description);
+        StreamRule build();
+    }
 }

@@ -1,164 +1,144 @@
-/**
- * This file is part of Graylog.
- *
- * Graylog is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * Graylog is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
- */
 package org.graylog2.streams;
 
-import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import org.bson.types.ObjectId;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import org.graylog2.database.CollectionName;
-import org.graylog2.database.PersistedImpl;
-import org.graylog2.database.validators.FilledStringValidator;
-import org.graylog2.database.validators.IntegerValidator;
-import org.graylog2.database.validators.ObjectIdValidator;
-import org.graylog2.database.validators.OptionalStringValidator;
-import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
+import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.Map;
+import javax.annotation.Nullable;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Preconditions.checkArgument;
+import static org.graylog2.plugin.streams.StreamRuleType.ALWAYS_MATCH;
 
-/**
- * Representing the rules of a single stream.
- */
+@AutoValue
+@JsonAutoDetect
 @CollectionName("streamrules")
-public class StreamRuleImpl extends PersistedImpl implements StreamRule {
-    public static final String FIELD_TYPE = "type";
-    public static final String FIELD_VALUE = "value";
-    public static final String FIELD_FIELD = "field";
-    public static final String FIELD_INVERTED = "inverted";
-    public static final String FIELD_STREAM_ID = "stream_id";
-    public static final String FIELD_CONTENT_PACK = "content_pack";
-    public static final String FIELD_DESCRIPTION = "description";
+public abstract class StreamRuleImpl implements StreamRule {
+    static final String FIELD_ID = "id";
+    static final String FIELD_TYPE = "type";
+    static final String FIELD_VALUE = "value";
+    static final String FIELD_FIELD = "field";
+    static final String FIELD_INVERTED = "inverted";
+    static final String FIELD_STREAM_ID = "stream_id";
+    static final String FIELD_CONTENT_PACK = "content_pack";
+    static final String FIELD_DESCRIPTION = "description";
 
-    public StreamRuleImpl(Map<String, Object> fields) {
-        super(fields);
-    }
+    @Override
+    @JsonProperty(FIELD_ID)
+    @Id
+    @ObjectId
+    @Nullable
+    public abstract String getId();
 
-    protected StreamRuleImpl(ObjectId id, Map<String, Object> fields) {
-        super(id, fields);
+    @Override
+    @JsonIgnore
+    public abstract StreamRuleType getType();
+
+    @JsonProperty(FIELD_TYPE)
+    @SuppressWarnings("unused")
+    public int getNumericType() {
+        return getType().toInteger();
     }
 
     @Override
-    public StreamRuleType getType() {
-        return StreamRuleType.fromInteger((Integer) fields.get(FIELD_TYPE));
-    }
+    @JsonProperty(FIELD_FIELD)
+    public abstract String getField();
 
     @Override
-    public void setType(StreamRuleType type) {
-        fields.put(FIELD_TYPE, type.toInteger());
-    }
+    @JsonProperty(FIELD_VALUE)
+    @Nullable
+    public abstract String getValue();
 
     @Override
-    public String getValue() {
-        return (String) fields.get(FIELD_VALUE);
-    }
+    @JsonProperty(FIELD_INVERTED)
+    public abstract Boolean getInverted();
 
     @Override
-    public void setValue(String value) {
-        fields.put(FIELD_VALUE, value);
-    }
+    @JsonProperty(FIELD_STREAM_ID)
+    @ObjectId
+    public abstract String getStreamId();
 
     @Override
-    public String getField() {
-        return (String) fields.get(FIELD_FIELD);
-    }
+    @JsonProperty(FIELD_CONTENT_PACK)
+    @Nullable
+    public abstract String getContentPack();
 
     @Override
-    public void setField(String field) {
-        fields.put(FIELD_FIELD, field);
-    }
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Nullable
+    public abstract String getDescription();
 
     @Override
-    public Boolean getInverted() {
-        return (Boolean) firstNonNull(fields.get(FIELD_INVERTED), false);
+    public abstract Builder toBuilder();
+
+    static Builder builder() {
+        return new AutoValue_StreamRuleImpl.Builder().inverted(false);
     }
 
-    @Override
-    public void setInverted(Boolean inverted) {
-        fields.put(FIELD_INVERTED, inverted);
+    @JsonCreator
+    public static StreamRuleImpl create(@JsonProperty(FIELD_ID) @ObjectId @Id String id,
+                                        @JsonProperty(FIELD_TYPE) int type,
+                                        @JsonProperty(FIELD_FIELD) String field,
+                                        @JsonProperty(FIELD_VALUE) @Nullable String value,
+                                        @JsonProperty(FIELD_INVERTED) Boolean inverted,
+                                        @JsonProperty(FIELD_STREAM_ID) @ObjectId String streamId,
+                                        @JsonProperty(FIELD_CONTENT_PACK) @Nullable String contentPack,
+                                        @JsonProperty(FIELD_DESCRIPTION) @Nullable String description) {
+        final StreamRuleType streamRuleType = StreamRuleType.fromInteger(type);
+        checkArgument(streamRuleType != null, "Invalid numeric stream rule type: " + type);
+        checkArgument(value != null || streamRuleType.equals(ALWAYS_MATCH), "Value can only be null for " + ALWAYS_MATCH + " rule type.");
+
+        return builder()
+            .id(id)
+            .type(streamRuleType)
+            .field(field)
+            .value(value)
+            .inverted(inverted)
+            .streamId(streamId)
+            .contentPack(contentPack)
+            .description(description)
+            .build();
     }
 
-    @Override
-    public String getStreamId() {
-        return ((ObjectId) fields.get(FIELD_STREAM_ID)).toHexString();
+    public static StreamRule create(String streamId, CreateStreamRuleRequest createStreamRuleRequest) {
+        final StreamRuleType streamRuleType = StreamRuleType.fromInteger(createStreamRuleRequest.type());
+        checkArgument(streamRuleType != null, "Invalid stream rule type: " + createStreamRuleRequest.type());
+        checkArgument(createStreamRuleRequest.value() != null || streamRuleType.equals(ALWAYS_MATCH), "Value can only be null for " + ALWAYS_MATCH + " rule type.");
+        return builder()
+            .type(streamRuleType)
+            .field(createStreamRuleRequest.field())
+            .value(createStreamRuleRequest.value())
+            .inverted(createStreamRuleRequest.inverted())
+            .streamId(streamId)
+            .description(createStreamRuleRequest.description())
+            .build();
     }
 
-    @Override
-    public String getContentPack() {
-        return (String) fields.get(FIELD_CONTENT_PACK);
-    }
-
-    @Override
-    public void setContentPack(String contentPack) {
-        fields.put(FIELD_CONTENT_PACK, contentPack);
-    }
-
-    @Override
-    public String getDescription() {
-        return (String) fields.get(FIELD_DESCRIPTION);
-    }
-
-    @Override
-    public void setDescription(String description) {
-        fields.put(FIELD_DESCRIPTION, description);
-    }
-
-    @Override
-    public Map<String, Validator> getValidations() {
-        final ImmutableMap.Builder<String, Validator> validators = ImmutableMap.builder();
-        validators.put(FIELD_TYPE, new IntegerValidator());
-        validators.put(FIELD_STREAM_ID, new ObjectIdValidator());
-        validators.put(FIELD_CONTENT_PACK, new OptionalStringValidator());
-
-        if (!EnumSet.of(StreamRuleType.ALWAYS_MATCH).contains(this.getType())) {
-            validators.put(FIELD_FIELD, new FilledStringValidator());
-        }
-
-        if (!EnumSet.of(StreamRuleType.PRESENCE, StreamRuleType.ALWAYS_MATCH).contains(this.getType())) {
-            validators.put(FIELD_VALUE, new FilledStringValidator());
-        }
-
-        return validators.build();
-    }
-
-    @Override
-    public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Collections.emptyMap();
-    }
-
-    @JsonValue
-    @Override
-    public Map<String, Object> asMap() {
-        // We work on the result a bit to allow correct JSON serializing.
-        Map<String, Object> result = Maps.newHashMap(fields);
-        result.remove("_id");
-        result.put("id", getId());
-        result.put(FIELD_STREAM_ID, getStreamId());
-
-        return result;
-    }
-
-    @Override
-    public String toString() {
-        return ("StreamRuleImpl: <" + this.fields.toString() + ">");
+    @AutoValue.Builder
+    abstract static class Builder implements StreamRule.Builder {
+        abstract Builder id(String id);
+        @Override
+        public abstract Builder type(StreamRuleType type);
+        @Override
+        public abstract Builder field(String field);
+        @Override
+        public abstract Builder value(String value);
+        @Override
+        public abstract Builder inverted(Boolean inverted);
+        @Override
+        public abstract Builder streamId(String streamId);
+        @Override
+        public abstract Builder contentPack(String contentPack);
+        @Override
+        public abstract Builder description(String description);
+        @Override
+        public abstract StreamRuleImpl build();
     }
 }

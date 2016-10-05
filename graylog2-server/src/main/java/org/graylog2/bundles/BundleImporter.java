@@ -26,7 +26,6 @@ import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPatternService;
-import org.graylog2.indexer.searches.Searches;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
@@ -47,7 +46,6 @@ import org.graylog2.shared.inputs.NoSuchInputTypeException;
 import org.graylog2.streams.OutputImpl;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.graylog2.timeranges.TimeRangeFactory;
@@ -473,18 +471,17 @@ public class BundleImporter {
         final String streamId = streamService.save(stream);
 
         if (streamDescription.getStreamRules() != null) {
-            for (StreamRule streamRule : streamDescription.getStreamRules()) {
-                final ImmutableMap.Builder<String, Object> streamRuleData = ImmutableMap.builder();
-                streamRuleData.put(StreamRuleImpl.FIELD_TYPE, streamRule.getType().toInteger());
-                streamRuleData.put(StreamRuleImpl.FIELD_VALUE, streamRule.getValue());
-                streamRuleData.put(StreamRuleImpl.FIELD_FIELD, streamRule.getField());
-                streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, streamRule.isInverted());
-                streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamId));
-                streamRuleData.put(StreamRuleImpl.FIELD_CONTENT_PACK, bundleId);
-                streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, streamRule.getDescription());
-
-                streamRuleService.save(new StreamRuleImpl(streamRuleData.build()));
-            }
+            streamDescription.getStreamRules().stream()
+                .map((streamRule) -> streamRuleService.builder()
+                    .type(streamRule.getType())
+                    .value(streamRule.getValue())
+                    .field(streamRule.getField())
+                    .inverted(streamRule.isInverted())
+                    .streamId(streamId)
+                    .contentPack(bundleId)
+                    .description(streamRule.getDescription())
+                    .build())
+                .forEach(streamRuleService::save);
         }
 
         for (final String outputId : streamDescription.getOutputs()) {

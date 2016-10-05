@@ -26,7 +26,6 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.shared.SuppressForbidden;
-import org.graylog2.streams.matchers.StreamRuleMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -66,6 +65,10 @@ public class StreamRouterEngineTest {
         return new StreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics);
     }
 
+    private StreamRule.Builder streamRuleBuilder() {
+        return StreamRuleImpl.builder().id(new ObjectId().toHexString());
+    }
+
     @Test
     public void testGetStreams() throws Exception {
         final StreamMock stream = getStreamMock("test");
@@ -77,12 +80,11 @@ public class StreamRouterEngineTest {
     @Test
     public void testPresenceMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
-        final StreamRuleMock rule = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield",
-                "type", StreamRuleType.PRESENCE.toInteger(),
-                "stream_id", stream.getId()
-        ));
+        final StreamRule rule = streamRuleBuilder()
+            .field("testfield")
+            .type(StreamRuleType.PRESENCE)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule));
 
@@ -101,13 +103,12 @@ public class StreamRouterEngineTest {
     @Test
     public void testExactMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
-        final StreamRuleMock rule = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield",
-                "value", "testvalue",
-                "type", StreamRuleType.EXACT.toInteger(),
-                "stream_id", stream.getId()
-        ));
+        final StreamRule rule = streamRuleBuilder()
+            .field("testfield")
+            .value("testvalue")
+            .type(StreamRuleType.EXACT)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule));
 
@@ -128,13 +129,12 @@ public class StreamRouterEngineTest {
     @Test
     public void testContainsMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
-        final StreamRuleMock rule = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield",
-                "value", "testvalue",
-                "type", StreamRuleType.CONTAINS.toInteger(),
-                "stream_id", stream.getId()
-        ));
+        final StreamRule rule = streamRuleBuilder()
+            .field("testfield")
+            .value("testvalue")
+            .type(StreamRuleType.CONTAINS)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule));
 
@@ -155,13 +155,12 @@ public class StreamRouterEngineTest {
     @Test
     public void testGreaterMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
-        final StreamRuleMock rule = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield",
-                "value", "1",
-                "type", StreamRuleType.GREATER.toInteger(),
-                "stream_id", stream.getId()
-        ));
+        final StreamRule rule = streamRuleBuilder()
+            .field("testfield")
+            .value("1")
+            .type(StreamRuleType.GREATER)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule));
 
@@ -182,13 +181,12 @@ public class StreamRouterEngineTest {
     @Test
     public void testSmallerMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
-        final StreamRuleMock rule = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield",
-                "value", "5",
-                "type", StreamRuleType.SMALLER.toInteger(),
-                "stream_id", stream.getId()
-        ));
+        final StreamRule rule = streamRuleBuilder()
+            .field("testfield")
+            .value("5")
+            .type(StreamRuleType.SMALLER)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule));
 
@@ -209,13 +207,12 @@ public class StreamRouterEngineTest {
     @Test
     public void testRegexMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
-        final StreamRuleMock rule = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield",
-                "value", "^test",
-                "type", StreamRuleType.REGEX.toInteger(),
-                "stream_id", stream.getId()
-        ));
+        final StreamRule rule = streamRuleBuilder()
+            .field("testfield")
+            .value("^test")
+            .type(StreamRuleType.REGEX)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule));
 
@@ -236,19 +233,17 @@ public class StreamRouterEngineTest {
     @Test
     public void testMultipleRulesMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
-        final StreamRuleMock rule1 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield1",
-                "type", StreamRuleType.PRESENCE.toInteger(),
-                "stream_id", stream.getId()
-        ));
-        final StreamRuleMock rule2 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield2",
-                "value", "^test",
-                "type", StreamRuleType.REGEX.toInteger(),
-                "stream_id", stream.getId()
-        ));
+        final StreamRule rule1 = streamRuleBuilder()
+            .field("testfield1")
+            .type(StreamRuleType.PRESENCE)
+            .streamId(stream.getId())
+            .build();
+        final StreamRule rule2 = streamRuleBuilder()
+            .field("testfield2")
+            .value("^test")
+            .type(StreamRuleType.REGEX)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule1, rule2));
 
@@ -279,26 +274,23 @@ public class StreamRouterEngineTest {
         final StreamMock stream1 = getStreamMock("test1");
         final StreamMock stream2 = getStreamMock("test2");
 
-        final StreamRuleMock rule1 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield1",
-                "type", StreamRuleType.PRESENCE.toInteger(),
-                "stream_id", stream1.getId()
-        ));
-        final StreamRuleMock rule2 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield2",
-                "value", "^test",
-                "type", StreamRuleType.REGEX.toInteger(),
-                "stream_id", stream1.getId()
-        ));
-        final StreamRuleMock rule3 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield3",
-                "value", "testvalue3",
-                "type", StreamRuleType.EXACT.toInteger(),
-                "stream_id", stream2.getId()
-        ));
+        final StreamRule rule1 = streamRuleBuilder()
+            .field("testfield1")
+            .type(StreamRuleType.PRESENCE)
+            .streamId(stream1.getId())
+            .build();
+        final StreamRule rule2 = streamRuleBuilder()
+            .field("testfield2")
+            .value("^test")
+            .type(StreamRuleType.REGEX)
+            .streamId(stream1.getId())
+            .build();
+        final StreamRule rule3 = streamRuleBuilder()
+            .field("testfield3")
+            .value("testvalue3")
+            .type(StreamRuleType.EXACT)
+            .streamId(stream2.getId())
+            .build();
 
         stream1.setStreamRules(Lists.newArrayList(rule1, rule2));
         stream2.setStreamRules(Lists.newArrayList(rule3));
@@ -339,20 +331,18 @@ public class StreamRouterEngineTest {
     @Test
     public void testInvertedRulesMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
-        final StreamRuleMock rule1 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield1",
-                "value", "1",
-                "type", StreamRuleType.PRESENCE.toInteger(),
-                "stream_id", stream.getId()
-        ));
-        final StreamRuleMock rule2 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield2",
-                "inverted", true,
-                "type", StreamRuleType.PRESENCE.toInteger(),
-                "stream_id", stream.getId()
-        ));
+        final StreamRule rule1 = streamRuleBuilder()
+            .field("testfield1")
+            .value("1")
+            .type(StreamRuleType.PRESENCE)
+            .streamId(stream.getId())
+            .build();
+        final StreamRule rule2 = streamRuleBuilder()
+            .field("testfield2")
+            .inverted(true)
+            .type(StreamRuleType.PRESENCE)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule1, rule2));
 
@@ -386,19 +376,17 @@ public class StreamRouterEngineTest {
     @Test
     public void testTestMatch() throws Exception {
         final StreamMock stream = getStreamMock("test");
-        final StreamRuleMock rule1 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield1",
-                "type", StreamRuleType.PRESENCE.toInteger(),
-                "stream_id", stream.getId()
-        ));
-        final StreamRuleMock rule2 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield2",
-                "value", "^test",
-                "type", StreamRuleType.REGEX.toInteger(),
-                "stream_id", stream.getId()
-        ));
+        final StreamRule rule1 = streamRuleBuilder()
+            .field("testfield1")
+            .type(StreamRuleType.PRESENCE)
+            .streamId(stream.getId())
+            .build();
+        final StreamRule rule2 = streamRuleBuilder()
+            .field("testfield2")
+            .value("^test")
+            .type(StreamRuleType.REGEX)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule1, rule2));
 
@@ -443,19 +431,17 @@ public class StreamRouterEngineTest {
     @Test
     public void testOrTestMatch() throws Exception {
         final StreamMock stream = getStreamMock("test", Stream.MatchingType.OR);
-        final StreamRuleMock rule1 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield1",
-                "type", StreamRuleType.PRESENCE.toInteger(),
-                "stream_id", stream.getId()
-        ));
-        final StreamRuleMock rule2 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield2",
-                "value", "^test",
-                "type", StreamRuleType.REGEX.toInteger(),
-                "stream_id", stream.getId()
-        ));
+        final StreamRule rule1 = streamRuleBuilder()
+            .field("testfield1")
+            .type(StreamRuleType.PRESENCE)
+            .streamId(stream.getId())
+            .build();
+        final StreamRule rule2 = streamRuleBuilder()
+            .field("testfield2")
+            .value("^test")
+            .type(StreamRuleType.REGEX)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule1, rule2));
 
@@ -500,30 +486,27 @@ public class StreamRouterEngineTest {
     @Test
     public void testGetFingerprint() {
         final StreamMock stream1 = getStreamMock("test");
-        final StreamRuleMock rule1 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield1",
-                "type", StreamRuleType.PRESENCE.toInteger(),
-                "stream_id", stream1.getId()
-        ));
-        final StreamRuleMock rule2 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield2",
-                "value", "^test",
-                "type", StreamRuleType.REGEX.toInteger(),
-                "stream_id", stream1.getId()
-        ));
+        final StreamRule rule1 = streamRuleBuilder()
+            .field("testfield1")
+            .type(StreamRuleType.PRESENCE)
+            .streamId(stream1.getId())
+            .build();
+        final StreamRule rule2 = streamRuleBuilder()
+            .field("testfield2")
+            .value("^test")
+            .type(StreamRuleType.REGEX)
+            .streamId(stream1.getId())
+            .build();
 
         stream1.setStreamRules(Lists.newArrayList(rule1, rule2));
 
         final StreamMock stream2 = getStreamMock("test");
-        final StreamRuleMock rule3 = new StreamRuleMock(ImmutableMap.of(
-                "_id", new ObjectId(),
-                "field", "testfield",
-                "value", "^test",
-                "type", StreamRuleType.REGEX.toInteger(),
-                "stream_id", stream2.getId()
-        ));
+        final StreamRule rule3 = streamRuleBuilder()
+            .field("testfield")
+            .value("^test")
+            .type(StreamRuleType.REGEX)
+            .streamId(stream2.getId())
+            .build();
 
         stream2.setStreamRules(Lists.newArrayList(rule3));
 
@@ -542,8 +525,8 @@ public class StreamRouterEngineTest {
 
         final Stream stream = mock(Stream.class);
         when(stream.getMatchingType()).thenReturn(Stream.MatchingType.OR);
-        final StreamRule streamRule1 = getStreamRuleMock("StreamRule1Id", StreamRuleType.EXACT, dummyField, dummyValue);
-        final StreamRule streamRule2 = getStreamRuleMock("StreamRule2Id", StreamRuleType.EXACT, dummyField, "not" + dummyValue);
+        final StreamRule streamRule1 = getStreamRule("StreamRule1Id", StreamRuleType.EXACT, dummyField, dummyValue);
+        final StreamRule streamRule2 = getStreamRule("StreamRule2Id", StreamRuleType.EXACT, dummyField, "not" + dummyValue);
 
         when(stream.getStreamRules()).thenReturn(Lists.newArrayList(streamRule1, streamRule2));
 
@@ -565,8 +548,8 @@ public class StreamRouterEngineTest {
 
         final Stream stream = mock(Stream.class);
         when(stream.getMatchingType()).thenReturn(Stream.MatchingType.OR);
-        final StreamRule streamRule1 = getStreamRuleMock("StreamRule1Id", StreamRuleType.EXACT, dummyField, "not" + dummyValue);
-        final StreamRule streamRule2 = getStreamRuleMock("StreamRule2Id", StreamRuleType.EXACT, dummyField, "alsoNot" + dummyValue);
+        final StreamRule streamRule1 = getStreamRule("StreamRule1Id", StreamRuleType.EXACT, dummyField, "not" + dummyValue);
+        final StreamRule streamRule2 = getStreamRule("StreamRule2Id", StreamRuleType.EXACT, dummyField, "alsoNot" + dummyValue);
 
         when(stream.getStreamRules()).thenReturn(Lists.newArrayList(streamRule1, streamRule2));
 
@@ -585,8 +568,8 @@ public class StreamRouterEngineTest {
         final String dummyField = "dummyField";
         final String dummyValue = "dummyValue";
 
-        final StreamRule streamRule1 = getStreamRuleMock("StreamRule1Id", StreamRuleType.EXACT, dummyField, dummyValue);
-        final StreamRule streamRule2 = getStreamRuleMock("StreamRule2Id", StreamRuleType.EXACT, dummyField, "not" + dummyValue);
+        final StreamRule streamRule1 = getStreamRule("StreamRule1Id", StreamRuleType.EXACT, dummyField, dummyValue);
+        final StreamRule streamRule2 = getStreamRule("StreamRule2Id", StreamRuleType.EXACT, dummyField, "not" + dummyValue);
 
         final Stream stream1 = mock(Stream.class);
         when(stream1.getId()).thenReturn("Stream1Id");
@@ -615,8 +598,8 @@ public class StreamRouterEngineTest {
         final String dummyField = "dummyField";
         final String dummyValue = "dummyValue";
 
-        final StreamRule streamRule1 = getStreamRuleMock("StreamRule1Id", StreamRuleType.EXACT, dummyField, dummyValue);
-        final StreamRule streamRule2 = getStreamRuleMock("StreamRule2Id", StreamRuleType.EXACT, dummyField, dummyValue);
+        final StreamRule streamRule1 = getStreamRule("StreamRule1Id", StreamRuleType.EXACT, dummyField, dummyValue);
+        final StreamRule streamRule2 = getStreamRule("StreamRule2Id", StreamRuleType.EXACT, dummyField, dummyValue);
 
         final Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("Stream1Id");
@@ -654,24 +637,18 @@ public class StreamRouterEngineTest {
         final StreamMock stream = getStreamMock("GitHub issue #1396");
         stream.setMatchingType(Stream.MatchingType.AND);
 
-        final StreamRuleMock rule1 = new StreamRuleMock(ImmutableMap.<String, Object>builder()
-                .put("_id", new ObjectId())
-                .put("field", "custom1")
-                .put("value", "value1")
-                .put("type", StreamRuleType.EXACT.toInteger())
-                .put("inverted", false)
-                .put("stream_id", stream.getId())
-                .build()
-        );
-        final StreamRuleMock rule2 = new StreamRuleMock(ImmutableMap.<String, Object>builder()
-                .put("_id", new ObjectId())
-                .put("field", "custom2")
-                .put("value", "value2")
-                .put("type", StreamRuleType.EXACT.toInteger())
-                .put("inverted", false)
-                .put("stream_id", stream.getId())
-                .build()
-        );
+        final StreamRule rule1 = streamRuleBuilder()
+            .field("custom1")
+            .value("value1")
+            .type(StreamRuleType.EXACT)
+            .streamId(stream.getId())
+            .build();
+        final StreamRule rule2 = streamRuleBuilder()
+            .field("custom2")
+            .value("value2")
+            .type(StreamRuleType.EXACT)
+            .streamId(stream.getId())
+            .build();
 
         stream.setStreamRules(Lists.newArrayList(rule1, rule2));
 
@@ -701,7 +678,7 @@ public class StreamRouterEngineTest {
         return new StreamMock(ImmutableMap.of("_id", new ObjectId(), "title", title, "matching_type", matchingType));
     }
 
-    private StreamRule getStreamRuleMock(String id, StreamRuleType type, String field, String value) {
+    private StreamRule getStreamRule(String id, StreamRuleType type, String field, String value) {
         final StreamRule result = mock(StreamRule.class);
         when(result.getId()).thenReturn(id);
         when(result.getType()).thenReturn(type);

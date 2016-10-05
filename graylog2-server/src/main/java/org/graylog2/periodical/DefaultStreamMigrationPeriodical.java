@@ -26,7 +26,6 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.config.DefaultStreamCreated;
@@ -75,14 +74,14 @@ public class DefaultStreamMigrationPeriodical extends Periodical {
                 .put(StreamImpl.FIELD_DEFAULT_STREAM, true)
                 .build();
         final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet());
-        final StreamRule streamRule = new StreamRuleImpl(
-                ImmutableMap.<String, Object>builder()
-                        .put(StreamRuleImpl.FIELD_TYPE, StreamRuleType.ALWAYS_MATCH.getValue())
-                        .put(StreamRuleImpl.FIELD_FIELD, "timestamp")
-                        .put(StreamRuleImpl.FIELD_INVERTED, false)
-                        .put(StreamRuleImpl.FIELD_STREAM_ID, id)
-                        .put(StreamRuleImpl.FIELD_DESCRIPTION, "Match all messages")
-                        .build());
+        final StreamRule streamRule = this.streamRuleService.builder()
+            .streamId(id.toString())
+            .type(StreamRuleType.ALWAYS_MATCH)
+            .field("timestamp")
+            .inverted(false)
+            .description("Match all messages")
+            .build();
+
         try {
             streamService.save(stream);
             streamRuleService.save(streamRule);

@@ -52,13 +52,13 @@ public class ExactMatcherTest extends MatcherTest {
     @Test
     public void testInvertedMatch() {
         StreamRule rule = getSampleRule();
-        rule.setInverted(true);
+        final StreamRule invertedRule = rule.toBuilder().inverted(true).build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "nonono");
 
-        StreamRuleMatcher matcher = getMatcher(rule);
-        assertTrue(matcher.match(msg, rule));
+        StreamRuleMatcher matcher = getMatcher(invertedRule);
+        assertTrue(matcher.match(msg, invertedRule));
     }
 
     @Test
@@ -74,8 +74,9 @@ public class ExactMatcherTest extends MatcherTest {
 
     @Test
     public void testNonExistantFieldInverted() {
-        StreamRule rule = getSampleRule();
-        rule.setInverted(true);
+        StreamRule rule = getSampleRule().toBuilder()
+            .inverted(true)
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("someother", "foo");
@@ -87,8 +88,7 @@ public class ExactMatcherTest extends MatcherTest {
     @Test
     public void testNullFieldShouldNotMatch() {
         final String fieldName = "nullfield";
-        final StreamRule rule = getSampleRule();
-        rule.setField(fieldName);
+        final StreamRule rule = getSampleRule().toBuilder().field(fieldName).build();
 
         final Message msg = getSampleMessage();
         msg.addField(fieldName, null);
@@ -100,9 +100,10 @@ public class ExactMatcherTest extends MatcherTest {
     @Test
     public void testInvertedNullFieldShouldMatch() {
         final String fieldName = "nullfield";
-        final StreamRule rule = getSampleRule();
-        rule.setField(fieldName);
-        rule.setInverted(true);
+        final StreamRule rule = getSampleRule().toBuilder()
+            .field(fieldName)
+            .inverted(true)
+            .build();
 
         final Message msg = getSampleMessage();
         msg.addField(fieldName, null);
@@ -112,11 +113,10 @@ public class ExactMatcherTest extends MatcherTest {
     }
 
     protected StreamRule getSampleRule() {
-        StreamRule rule = super.getSampleRule();
-        rule.setType(StreamRuleType.EXACT);
-        rule.setValue("foo");
-
-        return rule;
+        return super.getSampleRuleBuilder()
+            .type(StreamRuleType.EXACT)
+            .value("foo")
+            .build();
     }
 
     protected StreamRuleMatcher getMatcher(StreamRule rule) {

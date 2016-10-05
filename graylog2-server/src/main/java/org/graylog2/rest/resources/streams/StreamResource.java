@@ -29,7 +29,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.bson.types.ObjectId;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
@@ -60,7 +59,6 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRouterEngine;
-import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.events.StreamDeletedEvent;
@@ -372,16 +370,10 @@ public class StreamResource extends RestResource {
 
         final List<StreamRule> sourceStreamRules = streamRuleService.loadForStream(sourceStream);
         for (StreamRule streamRule : sourceStreamRules) {
-            final Map<String, Object> streamRuleData = Maps.newHashMapWithExpectedSize(6);
-
-            streamRuleData.put(StreamRuleImpl.FIELD_TYPE, streamRule.getType().toInteger());
-            streamRuleData.put(StreamRuleImpl.FIELD_FIELD, streamRule.getField());
-            streamRuleData.put(StreamRuleImpl.FIELD_VALUE, streamRule.getValue());
-            streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, streamRule.getInverted());
-            streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(id));
-            streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, streamRule.getDescription());
-
-            final StreamRule newStreamRule = streamRuleService.create(streamRuleData);
+            final StreamRule newStreamRule = streamRuleService.clone(streamRule)
+                .toBuilder()
+                .streamId(id)
+                .build();
             streamRuleService.save(newStreamRule);
         }
 

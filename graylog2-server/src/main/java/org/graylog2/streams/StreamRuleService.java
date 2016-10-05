@@ -25,14 +25,14 @@ import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleReques
 import java.util.List;
 import java.util.Map;
 
-public interface StreamRuleService extends PersistedService {
+public interface StreamRuleService {
     StreamRule load(String id) throws NotFoundException;
 
     List<StreamRule> loadForStream(Stream stream) throws NotFoundException;
 
-    StreamRule create(Map<String, Object> data);
-
     StreamRule create(String streamid, CreateStreamRuleRequest request);
+
+    StreamRule.Builder builder();
 
     List<StreamRule> loadForStreamId(String streamId) throws NotFoundException;
 
@@ -51,4 +51,10 @@ public interface StreamRuleService extends PersistedService {
      * @return the number of stream rules grouped by stream
      */
     Map<String, Long> streamRuleCountByStream();
+
+    String save(StreamRule streamRule);
+
+    void destroy(StreamRule streamRule);
+
+    StreamRule clone(StreamRule streamRule);
 }

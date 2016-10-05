@@ -91,7 +91,7 @@ public class StreamRuleResource extends RestResource {
 
         final Stream stream = streamService.load(streamId);
         final StreamRule streamRule = streamRuleService.create(streamId, cr);
-        final String id = streamService.save(streamRule);
+        final String id = streamRuleService.save(streamRule);
 
         clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
 
@@ -135,13 +135,15 @@ public class StreamRuleResource extends RestResource {
             throw new BadRequestException("Unknown stream rule type " + cr.type());
         }
 
-        streamRule.setField(cr.field());
-        streamRule.setType(streamRuleType);
-        streamRule.setInverted(cr.inverted());
-        streamRule.setValue(cr.value());
-        streamRule.setDescription(cr.description());
+        final StreamRule updatedStreamRule = streamRule.toBuilder()
+            .field(cr.field())
+            .type(streamRuleType)
+            .inverted(cr.inverted())
+            .value(cr.value())
+            .description(cr.description())
+            .build();
 
-        streamRuleService.save(streamRule);
+        streamRuleService.save(updatedStreamRule);
         clusterEventBus.post(StreamsChangedEvent.create(streamid));
 
         return SingleStreamRuleSummaryResponse.create(streamRule.getId());

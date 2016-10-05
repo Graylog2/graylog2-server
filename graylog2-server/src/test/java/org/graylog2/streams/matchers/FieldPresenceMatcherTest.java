@@ -30,10 +30,11 @@ import static org.junit.Assert.assertTrue;
 public class FieldPresenceMatcherTest extends MatcherTest {
     @Test
     public void testBasicMatch() throws Exception {
-        StreamRule rule = getSampleRule();
-        rule.setField("message");
-        rule.setType(StreamRuleType.PRESENCE);
-        rule.setInverted(false);
+        StreamRule rule = getSampleRuleBuilder()
+            .field("message")
+            .type(StreamRuleType.PRESENCE)
+            .inverted(false)
+            .build();
 
         Message message = getSampleMessage();
 
@@ -45,10 +46,11 @@ public class FieldPresenceMatcherTest extends MatcherTest {
 
     @Test
     public void testBasicNonMatch() throws Exception {
-        StreamRule rule = getSampleRule();
-        rule.setField("nonexistentField");
-        rule.setType(StreamRuleType.PRESENCE);
-        rule.setInverted(false);
+        StreamRule rule = getSampleRuleBuilder()
+            .field("nonexistentField")
+            .type(StreamRuleType.PRESENCE)
+            .inverted(false)
+            .build();
 
         Message message = getSampleMessage();
 
@@ -60,10 +62,11 @@ public class FieldPresenceMatcherTest extends MatcherTest {
 
     @Test
     public void testInvertedBasicMatch() throws Exception {
-        StreamRule rule = getSampleRule();
-        rule.setField("message");
-        rule.setType(StreamRuleType.PRESENCE);
-        rule.setInverted(true);
+        StreamRule rule = getSampleRuleBuilder()
+            .field("message")
+            .type(StreamRuleType.PRESENCE)
+            .inverted(true)
+            .build();
 
         Message message = getSampleMessage();
 
@@ -75,10 +78,11 @@ public class FieldPresenceMatcherTest extends MatcherTest {
 
     @Test
     public void testInvertedBasicNonMatch() throws Exception {
-        StreamRule rule = getSampleRule();
-        rule.setField("nonexistentField");
-        rule.setType(StreamRuleType.PRESENCE);
-        rule.setInverted(true);
+        StreamRule rule = getSampleRuleBuilder()
+            .field("nonexistentField")
+            .type(StreamRuleType.PRESENCE)
+            .inverted(true)
+            .build();
 
         Message message = getSampleMessage();
 
@@ -91,10 +95,11 @@ public class FieldPresenceMatcherTest extends MatcherTest {
     @Test
     public void testNulledFieldNonMatch() throws Exception {
         String fieldName = "sampleField";
-        StreamRule rule = getSampleRule();
-        rule.setField(fieldName);
-        rule.setType(StreamRuleType.PRESENCE);
-        rule.setInverted(false);
+        StreamRule rule = getSampleRuleBuilder()
+            .field(fieldName)
+            .type(StreamRuleType.PRESENCE)
+            .inverted(false)
+            .build();
 
         Message message = getSampleMessage();
         message.addField(fieldName, null);
@@ -108,10 +113,11 @@ public class FieldPresenceMatcherTest extends MatcherTest {
     @Test
     public void testInvertedNulledFieldMatch() throws Exception {
         String fieldName = "sampleField";
-        StreamRule rule = getSampleRule();
-        rule.setField(fieldName);
-        rule.setType(StreamRuleType.PRESENCE);
-        rule.setInverted(true);
+        StreamRule rule = getSampleRuleBuilder()
+            .field(fieldName)
+            .type(StreamRuleType.PRESENCE)
+            .inverted(true)
+            .build();
 
         Message message = getSampleMessage();
         message.addField(fieldName, null);
@@ -125,10 +131,11 @@ public class FieldPresenceMatcherTest extends MatcherTest {
     @Test
     public void testEmptyStringFieldNonMatch() throws Exception {
         String fieldName = "sampleField";
-        StreamRule rule = getSampleRule();
-        rule.setField(fieldName);
-        rule.setType(StreamRuleType.PRESENCE);
-        rule.setInverted(false);
+        StreamRule rule = getSampleRuleBuilder()
+            .field(fieldName)
+            .type(StreamRuleType.PRESENCE)
+            .inverted(false)
+            .build();
 
         Message message = getSampleMessage();
         message.addField(fieldName, "");
@@ -142,10 +149,11 @@ public class FieldPresenceMatcherTest extends MatcherTest {
     @Test
     public void testInvertedEmptyStringFieldMatch() throws Exception {
         String fieldName = "sampleField";
-        StreamRule rule = getSampleRule();
-        rule.setField(fieldName);
-        rule.setType(StreamRuleType.PRESENCE);
-        rule.setInverted(true);
+        StreamRule rule = getSampleRuleBuilder()
+            .field(fieldName)
+            .type(StreamRuleType.PRESENCE)
+            .inverted(true)
+            .build();
 
         Message message = getSampleMessage();
         message.addField(fieldName, "");
@@ -160,10 +168,11 @@ public class FieldPresenceMatcherTest extends MatcherTest {
     public void testRandomNumberFieldNonMatch() throws Exception {
         String fieldName = "sampleField";
         Integer randomNumber = 4;
-        StreamRule rule = getSampleRule();
-        rule.setField(fieldName);
-        rule.setType(StreamRuleType.PRESENCE);
-        rule.setInverted(false);
+        StreamRule rule = getSampleRuleBuilder()
+            .field(fieldName)
+            .type(StreamRuleType.PRESENCE)
+            .inverted(false)
+            .build();
 
         Message message = getSampleMessage();
         message.addField(fieldName, randomNumber);
@@ -178,10 +187,11 @@ public class FieldPresenceMatcherTest extends MatcherTest {
     public void testInvertedRandomNumberFieldMatch() throws Exception {
         String fieldName = "sampleField";
         Integer randomNumber = 4;
-        StreamRule rule = getSampleRule();
-        rule.setField(fieldName);
-        rule.setType(StreamRuleType.PRESENCE);
-        rule.setInverted(true);
+        StreamRule rule = getSampleRuleBuilder()
+            .field(fieldName)
+            .type(StreamRuleType.PRESENCE)
+            .inverted(true)
+            .build();
 
         Message message = getSampleMessage();
         message.addField(fieldName, randomNumber);

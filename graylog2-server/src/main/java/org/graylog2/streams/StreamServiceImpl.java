@@ -187,7 +187,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     @Override
     public void destroy(Stream stream) throws NotFoundException {
         for (StreamRule streamRule : streamRuleService.loadForStream(stream)) {
-            super.destroy(streamRule);
+            this.streamRuleService.destroy(streamRule);
         }
         for (Notification notification : notificationService.all()) {
             Object rawValue = notification.getDetail("stream_id");

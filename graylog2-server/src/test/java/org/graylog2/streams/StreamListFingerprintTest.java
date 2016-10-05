@@ -24,6 +24,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
+import org.graylog2.plugin.streams.StreamRuleType;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Test;
@@ -78,9 +79,12 @@ public class StreamListFingerprintTest {
     }
 
     private static StreamRule makeStreamRule(int id, String field) {
-        final HashMap<String, Object> fields = Maps.newHashMap();
-        fields.put(StreamRuleImpl.FIELD_FIELD, field);
-        return new StreamRuleImpl(new ObjectId(String.format(Locale.ENGLISH, "%024d", id)), fields);
+        return StreamRuleImpl.builder()
+            .id(String.format(Locale.ENGLISH, "%024d", id))
+            .field(field)
+            .type(StreamRuleType.ALWAYS_MATCH)
+            .streamId(String.format(Locale.ENGLISH, "%024d", id))
+            .build();
     }
 
     private static Output makeOutput(int id, String title) {
@@ -100,7 +104,7 @@ public class StreamListFingerprintTest {
 
         // The fingerprint depends on the hashCode of each stream and stream rule and might change if the underlying
         // implementation changed.
-        assertEquals("d669c1037a49c956ef8f25033abc065c2fb259d4", fingerprint.getFingerprint());
+        assertEquals("e4c81a4853e81ff5ccdf8125bd551ea5fadd268d", fingerprint.getFingerprint());
     }
 
     @Test

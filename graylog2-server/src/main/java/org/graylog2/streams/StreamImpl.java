@@ -148,13 +148,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public Map<String, Object> asMap(List<StreamRule> streamRules) {
         Map<String, Object> result = asMap();
 
-        List<Map<String, Object>> streamRulesMap = Lists.newArrayList();
-
-        for (StreamRule streamRule : streamRules) {
-            streamRulesMap.add(streamRule.asMap());
-        }
-
-        result.put(FIELD_RULES, streamRulesMap);
+        result.put(FIELD_RULES, streamRules);
 
         return result;
     }

@@ -28,8 +28,9 @@ import static org.junit.Assert.assertTrue;
 public class SmallerMatcherTest extends MatcherTest {
     @Test
     public void testSuccessfulMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("100");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("100")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "20");
@@ -40,8 +41,9 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfulDoubleMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("100");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("100")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "20.45");
@@ -52,9 +54,10 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfulInvertedMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("100");
-        rule.setInverted(true);
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("100")
+            .inverted(true)
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "200");
@@ -65,8 +68,9 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfulMatchWithNegativeValue() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("-54354");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("-54354")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "-90000");
@@ -77,8 +81,9 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfulDoubleMatchWithNegativeValue() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("-54354.42");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("-54354.42")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "-90000.12");
@@ -89,9 +94,10 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfulInvertedMatchWithNegativeValue() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("-54354");
-        rule.setInverted(true);
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("-54354")
+            .inverted(true)
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "-9000");
@@ -102,8 +108,9 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("25");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("25")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "27");
@@ -114,8 +121,9 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedDoubleMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("25");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("25")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "27.45");
@@ -126,9 +134,10 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedInvertedMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("25");
-        rule.setInverted(true);
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("25")
+            .inverted(true)
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "23");
@@ -139,8 +148,9 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedMatchWithEqualValues() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("-9001");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("-9001")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "-9001");
@@ -151,8 +161,9 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedDoubleMatchWithEqualValues() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("-9001.23");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("-9001.23")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "-9001.23");
@@ -163,9 +174,10 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfullInvertedMatchWithEqualValues() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("-9001");
-        rule.setInverted(true);
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("-9001")
+            .inverted(true)
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "-9001");
@@ -176,8 +188,9 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedMatchWithInvalidValue() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("LOL I AM NOT EVEN A NUMBER");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("LOL I AM NOT EVEN A NUMBER")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "-9001");
@@ -188,8 +201,9 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedDoubleMatchWithInvalidValue() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("LOL I AM NOT EVEN A NUMBER");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("LOL I AM NOT EVEN A NUMBER")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "-9001.42");
@@ -200,8 +214,9 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedMatchWithMissingField() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("42");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("42")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("someother", "23");
@@ -212,9 +227,10 @@ public class SmallerMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedInvertedMatchWithMissingField() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("23");
-        rule.setInverted(true);
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("23")
+            .inverted(true)
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("someother", "42");
@@ -224,10 +240,9 @@ public class SmallerMatcherTest extends MatcherTest {
     }
 
     protected StreamRule getSampleRule() {
-        StreamRule rule = super.getSampleRule();
-        rule.setType(StreamRuleType.SMALLER);
-
-        return rule;
+        return super.getSampleRuleBuilder()
+            .type(StreamRuleType.SMALLER)
+            .build();
     }
 
     protected StreamRuleMatcher getMatcher(StreamRule rule) {

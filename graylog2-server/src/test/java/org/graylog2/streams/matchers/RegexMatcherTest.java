@@ -29,8 +29,9 @@ public class RegexMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfulMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("^foo");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("^foo")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "foobar");
@@ -41,9 +42,10 @@ public class RegexMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfulInvertedMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("^foo");
-        rule.setInverted(true);
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("^foo")
+            .inverted(true)
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "zomg");
@@ -54,8 +56,9 @@ public class RegexMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("^foo");
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("^foo")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "zomg");
@@ -66,9 +69,10 @@ public class RegexMatcherTest extends MatcherTest {
 
     @Test
     public void testMissedInvertedMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setValue("^foo");
-        rule.setInverted(true);
+        StreamRule rule = getSampleRule().toBuilder()
+            .value("^foo")
+            .inverted(true)
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("something", "foobar");
@@ -79,9 +83,10 @@ public class RegexMatcherTest extends MatcherTest {
 
     @Test
     public void testMissingFieldShouldNotMatch() throws Exception {
-        final StreamRule rule = getSampleRule();
-        rule.setField("nonexistingfield");
-        rule.setValue("^foo");
+        final StreamRule rule = getSampleRule().toBuilder()
+            .field("nonexistingfield")
+            .value("^foo")
+            .build();
 
         final Message msg = getSampleMessage();
 
@@ -91,10 +96,11 @@ public class RegexMatcherTest extends MatcherTest {
 
     @Test
     public void testInvertedMissingFieldShouldMatch() throws Exception {
-        final StreamRule rule = getSampleRule();
-        rule.setField("nonexistingfield");
-        rule.setValue("^foo");
-        rule.setInverted(true);
+        final StreamRule rule = getSampleRule().toBuilder()
+            .field("nonexistingfield")
+            .value("^foo")
+            .inverted(true)
+            .build();
 
         final Message msg = getSampleMessage();
 
@@ -105,9 +111,10 @@ public class RegexMatcherTest extends MatcherTest {
     @Test
     public void testNullFieldShouldNotMatch() throws Exception {
         final String fieldName = "nullfield";
-        final StreamRule rule = getSampleRule();
-        rule.setField(fieldName);
-        rule.setValue("^foo");
+        final StreamRule rule = getSampleRule().toBuilder()
+            .field(fieldName)
+            .value("^foo")
+            .build();
 
         final Message msg = getSampleMessage();
         msg.addField(fieldName, null);
@@ -119,10 +126,11 @@ public class RegexMatcherTest extends MatcherTest {
     @Test
     public void testInvertedNullFieldShouldMatch() throws Exception {
         final String fieldName = "nullfield";
-        final StreamRule rule = getSampleRule();
-        rule.setField(fieldName);
-        rule.setValue("^foo");
-        rule.setInverted(true);
+        final StreamRule rule = getSampleRule().toBuilder()
+            .field(fieldName)
+            .value("^foo")
+            .inverted(true)
+            .build();
 
         final Message msg = getSampleMessage();
         msg.addField(fieldName, null);
@@ -133,9 +141,10 @@ public class RegexMatcherTest extends MatcherTest {
 
     @Test
     public void testSuccessfulComplexRegexMatch() {
-        StreamRule rule = getSampleRule();
-        rule.setField("some_field");
-        rule.setValue("foo=^foo|bar\\d.+wat");
+        StreamRule rule = getSampleRule().toBuilder()
+            .field("some_field")
+            .value("foo=^foo|bar\\d.+wat")
+            .build();
 
         Message msg = getSampleMessage();
         msg.addField("some_field", "bar1foowat");
@@ -145,10 +154,9 @@ public class RegexMatcherTest extends MatcherTest {
     }
 
     protected StreamRule getSampleRule() {
-        StreamRule rule = super.getSampleRule();
-        rule.setType(StreamRuleType.REGEX);
-
-        return rule;
+        return super.getSampleRuleBuilder()
+            .type(StreamRuleType.REGEX)
+            .build();
     }
 
     protected StreamRuleMatcher getMatcher(StreamRule rule) {

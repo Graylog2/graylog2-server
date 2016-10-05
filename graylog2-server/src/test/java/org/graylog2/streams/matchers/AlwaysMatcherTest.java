@@ -17,13 +17,13 @@
 package org.graylog2.streams.matchers;
 
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.streams.StreamRule;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Test;
 
-import java.util.Collections;
-
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 public class AlwaysMatcherTest {
     @Test
@@ -32,7 +32,7 @@ public class AlwaysMatcherTest {
         assertThat(matcher.match(null, null)).isTrue();
         assertThat(matcher.match(
                 new Message("Test", "source", new DateTime(2016, 9, 7, 0, 0, DateTimeZone.UTC)),
-                new StreamRuleMock(Collections.singletonMap("_id", "stream-rule-id"))))
+                mock(StreamRule.class)))
                 .isTrue();
     }
 

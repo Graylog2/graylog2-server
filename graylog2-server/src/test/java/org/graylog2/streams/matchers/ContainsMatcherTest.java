@@ -54,12 +54,12 @@ public class ContainsMatcherTest extends MatcherTest {
 
     @Test
     public void testInvertedMatch() {
-        rule.setInverted(true);
+        final StreamRule invertedRule = rule.toBuilder().inverted(true).build();
 
         msg.addField("something", "nonono");
 
-        StreamRuleMatcher matcher = getMatcher(rule);
-        assertTrue(matcher.match(msg, rule));
+        StreamRuleMatcher matcher = getMatcher(invertedRule);
+        assertTrue(matcher.match(msg, invertedRule));
     }
 
     @Test
@@ -72,41 +72,44 @@ public class ContainsMatcherTest extends MatcherTest {
 
     @Test
     public void testNonExistentFieldInverted() {
-        rule.setInverted(true);
+        final StreamRule invertedRule = rule.toBuilder().inverted(true).build();
 
         msg.addField("someother", "hello foo");
 
-        StreamRuleMatcher matcher = getMatcher(rule);
-        assertTrue(matcher.match(msg, rule));
+        StreamRuleMatcher matcher = getMatcher(invertedRule);
+        assertTrue(matcher.match(msg, invertedRule));
     }
 
     @Test
     public void testNullFieldShouldNotMatch() {
         final String fieldName = "nullfield";
-        rule.setField(fieldName);
+        final StreamRule nullFieldRule = rule.toBuilder().field(fieldName).build();
 
         msg.addField(fieldName, null);
 
-        final StreamRuleMatcher matcher = getMatcher(rule);
-        assertFalse(matcher.match(msg, rule));
+        final StreamRuleMatcher matcher = getMatcher(nullFieldRule);
+        assertFalse(matcher.match(msg, nullFieldRule));
     }
 
     @Test
     public void testInvertedNullFieldShouldMatch() {
         final String fieldName = "nullfield";
-        rule.setField(fieldName);
-        rule.setInverted(true);
+        final StreamRule invertedNullFieldRule = rule.toBuilder()
+            .field(fieldName)
+            .inverted(true)
+            .build();
 
         msg.addField(fieldName, null);
 
-        final StreamRuleMatcher matcher = getMatcher(rule);
-        assertTrue(matcher.match(msg, rule));
+        final StreamRuleMatcher matcher = getMatcher(invertedNullFieldRule);
+        assertTrue(matcher.match(msg, invertedNullFieldRule));
     }
 
     protected StreamRule getSampleRule() {
-        final StreamRule rule = super.getSampleRule();
-        rule.setType(StreamRuleType.CONTAINS);
-        rule.setValue("foo");
+        final StreamRule rule = super.getSampleRuleBuilder()
+            .type(StreamRuleType.CONTAINS)
+            .value("foo")
+            .build();
 
         return rule;
     }
