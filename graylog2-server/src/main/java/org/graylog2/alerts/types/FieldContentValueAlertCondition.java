@@ -86,7 +86,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
         public Descriptor() {
             super(
                 "Field Content Value Alert Condition",
-                "http://www.graylog.rog",
+                "http://www.graylog.org",
                 "This condition is triggered when the value of a defined field in a defined time interval has a "
                 + "mean/mininum/maximum value/standard deviation which is higher/lower than a defined threshold."
             );

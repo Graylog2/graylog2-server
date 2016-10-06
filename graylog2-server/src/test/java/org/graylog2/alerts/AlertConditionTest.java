@@ -50,12 +50,12 @@ public abstract class AlertConditionTest {
     private abstract class TestAlertConditionFactory implements AlertCondition.Factory {
         @Override
         public AlertCondition.Config config() {
-            throw new RuntimeException("This method is not implements.");
+            throw new UnsupportedOperationException ("This method is not implemented.");
         }
 
         @Override
         public AlertCondition.Descriptor descriptor() {
-            throw new RuntimeException("This method is not implements.");
+            throw new UnsupportedOperationException ("This method is not implemented.");
         }
     }
 
