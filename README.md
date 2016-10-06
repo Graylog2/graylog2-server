@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-beats.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-beats)
 
-**Required Graylog version:** 2.0.0 and later
+**Required Graylog version:** 2.2.0 and later
 
 This plugin provides an input for the [Elastic Beats (formerly Lumberjack) protocol](https://github.com/logstash-plugins/logstash-input-beats/blob/v2.0.0/PROTOCOL.md) in Graylog which can be used to receive data by log shippers from the logstash-forwards and the Beats family, like Filebeat, Topbeat, Packetbeat, or Winlogbeat.
 
