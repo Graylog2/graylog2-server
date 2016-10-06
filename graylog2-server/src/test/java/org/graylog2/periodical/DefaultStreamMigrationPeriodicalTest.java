@@ -28,6 +28,7 @@ import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamRuleServiceImpl;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.StreamTestHelpers;
 import org.graylog2.streams.config.DefaultStreamCreated;
 import org.graylog2.streams.events.StreamsChangedEvent;
 import org.junit.Before;
@@ -60,6 +61,7 @@ public class DefaultStreamMigrationPeriodicalTest {
 
     @Before
     public void setUpService() throws Exception {
+        when(streamRuleService.builder()).thenReturn(StreamTestHelpers.streamRuleBuilder());
         periodical = new DefaultStreamMigrationPeriodical(streamService, streamRuleService, clusterEventBus, clusterConfigService);
     }
 
@@ -108,6 +110,7 @@ public class DefaultStreamMigrationPeriodicalTest {
 
         periodical.doRun();
 
+        verify(streamRuleService).builder();
         verifyNoMoreInteractions(streamRuleService);
     }
 
