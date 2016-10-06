@@ -75,6 +75,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String GROK_PATTERN_DELETE = PREFIX + "grok_pattern:delete";
     public static final String GROK_PATTERN_IMPORT_CREATE = PREFIX + "grok_pattern_import:create";
     public static final String GROK_PATTERN_UPDATE = PREFIX + "grok_pattern:update";
+    public static final String INDEX_SET_CREATE = PREFIX + "index_set:create";
+    public static final String INDEX_SET_DELETE= PREFIX + "index_set:delete";
+    public static final String INDEX_SET_UPDATE = PREFIX + "index_set:update";
     public static final String LDAP_CONFIGURATION_DELETE = PREFIX + "ldap_configuration:delete";
     public static final String LDAP_CONFIGURATION_UPDATE = PREFIX + "ldap_configuration:update";
     public static final String LDAP_GROUP_MAPPING_UPDATE = PREFIX + "ldap_group_mapping:update";
@@ -190,6 +193,9 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(GROK_PATTERN_DELETE)
             .add(GROK_PATTERN_IMPORT_CREATE)
             .add(GROK_PATTERN_UPDATE)
+            .add(INDEX_SET_CREATE)
+            .add(INDEX_SET_DELETE)
+            .add(INDEX_SET_UPDATE)
             .add(LDAP_CONFIGURATION_DELETE)
             .add(LDAP_CONFIGURATION_UPDATE)
             .add(LDAP_GROUP_MAPPING_UPDATE)
