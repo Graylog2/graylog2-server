@@ -25,7 +25,7 @@
     </prerequisites>
 
     <modules>
-        <module>../graylog-plugin-web-parent</module>
+        <module>graylog-plugin-web-parent</module>
     </modules>
 
     <parent>
