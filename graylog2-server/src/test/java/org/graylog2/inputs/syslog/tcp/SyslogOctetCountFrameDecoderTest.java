@@ -110,4 +110,26 @@ public class SyslogOctetCountFrameDecoderTest {
 
         embedder.offer(buf1);
     }
+
+    @Test
+    public void testDecodeSupportsMessagesLongerThan1024Bytes() throws Exception {
+        // All transport receiver
+        // implementations SHOULD be able to accept messages of up to and
+        // including 2048 octets in length.  Transport receivers MAY receive
+        // messages larger than 2048 octets in length.
+        // -- https://tools.ietf.org/html/rfc5424#section-6.1
+        final byte[] bytes = new byte[2048];
+        for (int i = 0; i < bytes.length; i++) {
+            bytes[i] = (byte) ('A' + (i % 26));
+        }
+        final String longString = new String(bytes, StandardCharsets.UTF_8);
+        final ChannelBuffer buffer = ChannelBuffers.copiedBuffer("2111 <45>1 2014-10-21T10:21:09+00:00 c4dc57ba1ebb syslog-ng 7120 - " + longString + "\n", StandardCharsets.UTF_8);
+
+        assertTrue(embedder.offer(buffer));
+        embedder.finish();
+
+        assertEquals(embedder.poll().toString(StandardCharsets.UTF_8), "<45>1 2014-10-21T10:21:09+00:00 c4dc57ba1ebb syslog-ng 7120 - " + longString + "\n");
+
+        assertNull(embedder.poll());
+    }
 }
