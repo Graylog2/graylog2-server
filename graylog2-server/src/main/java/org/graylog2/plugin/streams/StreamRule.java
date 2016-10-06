@@ -17,7 +17,6 @@
 package org.graylog2.plugin.streams;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import org.graylog2.streams.StreamRuleImpl;
 
 @JsonAutoDetect
 public interface StreamRule {
