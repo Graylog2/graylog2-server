@@ -20,7 +20,7 @@ const AlertConditionForm = React.createClass({
   mixins: [Reflux.connect(AlertConditionsStore)],
   getDefaultProps() {
     return {
-      onCanceL: () => {},
+      onCancel: () => {},
       onSubmit: () => {},
     };
   },
