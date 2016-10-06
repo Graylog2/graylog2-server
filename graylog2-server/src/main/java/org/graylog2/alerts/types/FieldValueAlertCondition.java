@@ -102,7 +102,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                     "threshold_type",
                     "Threshold Type",
                     ThresholdType.HIGHER.toString(),
-                    Arrays.stream(ThresholdType.values()).collect(Collectors.toMap(Enum::toString, thresholdType -> thresholdType.toString().toLowerCase(Locale.ENGLISH))),
+                    DropdownField.ValueTemplates.valueMapFromEnum(ThresholdType.class, thresholdType -> thresholdType.name().toLowerCase(Locale.ENGLISH)),
                     ConfigurationField.Optional.NOT_OPTIONAL),
                 new DropdownField(
                     "type",
