@@ -33,9 +33,14 @@ THE POSSIBILITY OF SUCH DAMAGE.
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>org.graylog.benchmarks</groupId>
+    <parent>
+        <groupId>org.graylog.plugins</groupId>
+        <artifactId>graylog-plugin-pipeline-processor-parent</artifactId>
+        <version>1.2.0-SNAPSHOT</version>
+    </parent>
+
     <artifactId>pipeline-benchmarks</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Message processing benchmarks</name>
@@ -53,8 +58,14 @@ THE POSSIBILITY OF SUCH DAMAGE.
         </dependency>
         <dependency>
             <groupId>org.graylog.plugins</groupId>
-            <artifactId>pipeline-processor</artifactId>
-            <version>1.0.0-SNAPSHOT</version>
+            <artifactId>graylog-plugin-pipeline-processor</artifactId>
+            <version>1.2.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.moandjiezana.toml</groupId>
+            <artifactId>toml4j</artifactId>
+            <version>0.7.1</version>
         </dependency>
 
         <dependency>
@@ -65,7 +76,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-core</artifactId>
-            <version>2.0.40-beta</version>
+            <version>2.0.86-beta</version>
         </dependency>
 
         <!-- jmh -->
@@ -84,22 +95,31 @@ THE POSSIBILITY OF SUCH DAMAGE.
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jmh.version>1.11.3</jmh.version>
+        <jmh.version>1.14.1</jmh.version>
         <javac.target>1.8</javac.target>
         <uberjar.name>pipeline-benchmarks</uberjar.name>
-        <graylog.version>2.0.0-alpha.5-SNAPSHOT</graylog.version>
+        <graylog.version>2.2.0-SNAPSHOT</graylog.version>
     </properties>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
                 <configuration>
                     <compilerVersion>${javac.target}</compilerVersion>
                     <source>${javac.target}</source>
                     <target>${javac.target}</target>
+                    <!-- this seems to be necessary because one of the graylog parent modules explicitly sets the processors -->
+                    <annotationProcessors>
+                        <annotationProcessor>org.openjdk.jmh.generators.BenchmarkProcessor</annotationProcessor>
+                    </annotationProcessors>
                 </configuration>
             </plugin>
             <plugin>
@@ -109,7 +129,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.2</version>
+                <version>2.4.3</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -147,39 +167,39 @@ THE POSSIBILITY OF SUCH DAMAGE.
             <plugins>
                 <plugin>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>2.5</version>
+                    <version>2.6.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.8.1</version>
+                    <version>2.8.2</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-install-plugin</artifactId>
-                    <version>2.5.1</version>
+                    <version>2.5.2</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.4</version>
+                    <version>3.0.2</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.9.1</version>
+                    <version>2.10.4</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.6</version>
+                    <version>3.0.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>3.3</version>
+                    <version>3.5.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.2.1</version>
+                    <version>3.0.1</version>
                 </plugin>
                 <plugin>
                     <artifactId>maven-surefire-plugin</artifactId>
-                    <version>2.17</version>
+                    <version>2.19.1</version>
                 </plugin>
                 <plugin>
                     <groupId>com.mycila</groupId>

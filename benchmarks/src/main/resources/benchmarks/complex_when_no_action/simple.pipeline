@@ -1,0 +1,4 @@
+pipeline "simple"
+stage 0 match all
+  rule "match everything"
+end

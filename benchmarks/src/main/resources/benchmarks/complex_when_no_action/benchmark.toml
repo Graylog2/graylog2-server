@@ -1,0 +1,12 @@
+name = "Simple match all"
+
+[[streams]]
+    name = "default"
+    description = "All incoming messages"
+    pipelines = ["simple"]
+
+[[streams]]
+    name = "unused"
+    description = "A stream that never contains messages"
+    pipelines = []
+
