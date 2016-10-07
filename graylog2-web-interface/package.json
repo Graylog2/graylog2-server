@@ -25,7 +25,7 @@
     "d3": "<=3.5.0",
     "dc": "2.0.0-beta.19",
     "deep-equal": "^1.0.1",
-    "graylog-web-plugin": "latest",
+    "graylog-web-plugin": "file:packages/graylog-web-plugin",
     "history": "^1.17.0",
     "immutable": "^3.7.5",
     "javascript-natural-sort": "^0.7.1",

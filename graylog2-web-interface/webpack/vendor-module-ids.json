@@ -1,5 +1,5 @@
 {
-  "nextFreeModuleId": 1390,
+  "nextFreeModuleId": 1413,
   "modules": {
     "byIdentifier": {
       "node_modules/react/react.js": 1,
@@ -1391,7 +1391,30 @@
       "node_modules/moment/locale/tlh.js": 1386,
       "node_modules/moment/locale/x-pseudo.js": 1387,
       "node_modules/react-overlays/node_modules/react-prop-types/lib/componentOrElement.js": 1388,
-      "node_modules/react-overlays/node_modules/react-prop-types/lib/utils/createChainableTypeChecker.js": 1389
+      "node_modules/react-overlays/node_modules/react-prop-types/lib/utils/createChainableTypeChecker.js": 1389,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.core.js": 1390,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.export.js": 1391,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.js": 1392,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.ctx.js": 1393,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.fails.js": 1394,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.is-object.js": 1395,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.to-object.js": 1396,
+      "node_modules/react-bootstrap/node_modules/core-js/library/fn/object/assign.js": 1397,
+      "node_modules/react-bootstrap/node_modules/core-js/library/fn/object/create.js": 1398,
+      "node_modules/react-bootstrap/node_modules/core-js/library/fn/object/keys.js": 1399,
+      "node_modules/react-bootstrap/node_modules/core-js/library/fn/object/set-prototype-of.js": 1400,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.a-function.js": 1401,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.an-object.js": 1402,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.cof.js": 1403,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.defined.js": 1404,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.global.js": 1405,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.iobject.js": 1406,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.object-assign.js": 1407,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.object-sap.js": 1408,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/$.set-proto.js": 1409,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/es6.object.assign.js": 1410,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/es6.object.keys.js": 1411,
+      "node_modules/react-bootstrap/node_modules/core-js/library/modules/es6.object.set-prototype-of.js": 1412
     }
   },
   "nextFreeChunkId": 1,
