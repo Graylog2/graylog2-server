@@ -118,7 +118,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         public Descriptor() {
             super(
                 "Field Value Alert Condition",
-                "http://www.graylog.rog",
+                "https://www.graylog.org/",
                 "This condition is triggered when the content of messages is equal to a defined value."
             );
         }

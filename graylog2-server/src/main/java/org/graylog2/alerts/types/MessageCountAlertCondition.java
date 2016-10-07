@@ -102,7 +102,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         public Descriptor() {
             super(
                 "Message Count Alert Condition",
-                "http://www.graylog.rog",
+                "https://www.graylog.org/",
                 "This condition is triggered when the number of messages in a defined time interval is higher or lower a defined threshold."
             );
         }

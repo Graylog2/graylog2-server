@@ -86,7 +86,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
         public Descriptor() {
             super(
                 "Field Content Value Alert Condition",
-                "http://www.graylog.org",
+                "https://www.graylog.org/",
                 "This condition is triggered when the aggregated value of a field is higher/lower than a defined "
                 + "threshold for a given time range."
             );
