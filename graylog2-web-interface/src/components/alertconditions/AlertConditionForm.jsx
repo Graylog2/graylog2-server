@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import { Well } from 'react-bootstrap';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { ConfigurationForm } from 'components/configurationforms';
+import { ConfigurationForm, TitleField } from 'components/configurationforms';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertConditionsStore } = CombinedProvider.get('AlertConditions');
@@ -24,15 +24,24 @@ const AlertConditionForm = React.createClass({
       onSubmit: () => {},
     };
   },
+  getInitialState() {
+    return {
+      title: this.props.alertCondition && this.props.alertCondition.title,
+    };
+  },
+
   getValue() {
     const values = this.refs.customConfigurationForm ? this.refs.customConfigurationForm.getValue() : this.refs.configurationForm.getValue();
     return {
-      title: values.title,
+      title: this.state.title,
       parameters: values.configuration,
     };
   },
   open() {
     this.refs.configurationForm.open();
+  },
+  _handleTitleChange(field, value) {
+    this.setState({ title: value });
   },
   _onCancel() {
     this.props.onCancel();
@@ -41,6 +50,7 @@ const AlertConditionForm = React.createClass({
     const request = this.getValue();
     request.type = this.props.type;
     this.props.onSubmit(request);
+    this.refs.configurationForm.close();
   },
   _formatTitle(alertCondition, name) {
     const activity = alertCondition ? 'Update' : 'Create new';
@@ -76,7 +86,8 @@ const AlertConditionForm = React.createClass({
                           submitButtonText="Save">
         <fieldset>
           <input type="hidden" name="type" value={type} />
-          <alertConditionType.configuration_form ref="customConfigurationForm" alertCondition={alertCondition} />
+          <TitleField typeName={type} value={this.state.title} onChange={this._handleTitleChange} />
+          <alertConditionType.configuration_form ref="customConfigurationForm" alertCondition={alertCondition} typeDefinition={typeDefinition} />
         </fieldset>
       </BootstrapModalForm>
     );
