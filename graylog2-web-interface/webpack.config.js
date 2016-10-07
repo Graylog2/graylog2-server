@@ -141,7 +141,6 @@ if (TARGET === 'build') {
           except: ['$super', '$', 'exports', 'require'],
         },
       }),
-      new webpack.optimize.DedupePlugin(),
       new webpack.optimize.OccurenceOrderPlugin(),
     ],
   });
