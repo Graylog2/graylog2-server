@@ -23,6 +23,8 @@ import com.google.common.collect.Lists;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
@@ -71,7 +73,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         this.type = type;
         this.createdAt = createdAt;
         this.creatorUserId = creatorUserId;
-        this.parameters = parameters;
+        this.parameters = ImmutableMap.copyOf(parameters);
 
         this.grace = getNumber(this.parameters.get("grace")).orElse(0).intValue();
     }
@@ -83,11 +85,6 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
 
     public String getType() {
         return type;
-    }
-
-    @Override
-    public String getTypeString() {
-        return type.toString();
     }
 
     @Override
@@ -131,7 +128,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     public Map<String, Object> getPersistedFields() {
         return ImmutableMap.<String, Object>builder()
                 .put("id", id)
-                .put("type", type.toString().toLowerCase(Locale.ENGLISH))
+                .put("type", type)
                 .put("creator_user_id", creatorUserId)
                 .put("created_at", Tools.getISO8601String(createdAt))
                 .put("parameters", parameters)
@@ -208,5 +205,12 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         } catch (NumberFormatException e) {
             return Optional.empty();
         }
+    }
+
+    public static List<ConfigurationField> getDefaultConfigurationFields() {
+        return Lists.newArrayList(
+            new NumberField("grace", "Grace Period", 0, "Time span in seconds defining how long alerting is paused after alert is triggered", ConfigurationField.Optional.NOT_OPTIONAL),
+            new NumberField("backlog", "Message Backlog", 0, "The number of messages to be included in alert notification", ConfigurationField.Optional.NOT_OPTIONAL)
+        );
     }
 }

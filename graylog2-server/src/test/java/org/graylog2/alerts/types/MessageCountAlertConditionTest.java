@@ -38,7 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class MessageCountAlertConditionTest extends AlertConditionTest {
-    protected final int threshold = 100;
+    private final int threshold = 100;
 
     @Test
     public void testConstructor() throws Exception {
@@ -138,16 +138,16 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         assertNotTriggered(resultTriggeredAgo);
     }
 
-    protected MessageCountAlertCondition getConditionWithParameters(MessageCountAlertCondition.ThresholdType type, Integer threshold) {
+    private MessageCountAlertCondition getConditionWithParameters(MessageCountAlertCondition.ThresholdType type, Integer threshold) {
         Map<String, Object> parameters = simplestParameterMap(type, threshold);
         return getMessageCountAlertCondition(parameters, alertConditionTitle);
     }
 
-    protected Map<String, Object> simplestParameterMap(MessageCountAlertCondition.ThresholdType type, Integer threshold) {
+    private Map<String, Object> simplestParameterMap(MessageCountAlertCondition.ThresholdType type, Integer threshold) {
         return getParametersMap(0, 0, type, threshold);
     }
 
-    protected void searchCountShouldReturn(long count) {
+    private void searchCountShouldReturn(long count) {
         final CountResult countResult = mock(CountResult.class);
         when(countResult.count()).thenReturn(count);
 
@@ -158,7 +158,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
         }
     }
 
-    protected MessageCountAlertCondition getMessageCountAlertCondition(Map<String, Object> parameters, String title) {
+    private MessageCountAlertCondition getMessageCountAlertCondition(Map<String, Object> parameters, String title) {
         return new MessageCountAlertCondition(
             searches,
             stream,
@@ -169,7 +169,7 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
             title);
     }
 
-    protected Map<String, Object> getParametersMap(Integer grace, Integer time, MessageCountAlertCondition.ThresholdType type, Number threshold) {
+    private Map<String, Object> getParametersMap(Integer grace, Integer time, MessageCountAlertCondition.ThresholdType type, Number threshold) {
         Map<String, Object> parameters = super.getParametersMap(grace, time, threshold);
         parameters.put("threshold_type", type.toString());
 

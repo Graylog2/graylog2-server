@@ -147,7 +147,7 @@ public class StreamAlertConditionResource extends RestResource {
         final List<AlertConditionSummary> conditionSummaries = alertConditions
             .stream()
             .map((condition) -> AlertConditionSummary.create(condition.getId(),
-                condition.getTypeString().toLowerCase(Locale.ENGLISH),
+                condition.getType(),
                 condition.getCreatorUserId(),
                 condition.getCreatedAt().toDate(),
                 condition.getParameters(),

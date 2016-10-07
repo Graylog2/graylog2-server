@@ -158,7 +158,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     @Override
     public AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) {
         final String type = ccr.type();
-        checkArgument(type != null, "Milling alert condition type");
+        checkArgument(type != null, "Missing alert condition type");
 
         return createAlertCondition(type, stream, null, Tools.nowUTC(), userId, ccr.parameters(), ccr.title());
     }
@@ -217,7 +217,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     public Map<String, Object> asMap(final AlertCondition alertCondition) {
         ImmutableMap.Builder<String, Object> builder = ImmutableMap.<String, Object>builder()
             .put("id", alertCondition.getId())
-            .put("type", alertCondition.getTypeString().toLowerCase(Locale.ENGLISH))
+            .put("type", alertCondition.getType())
             .put("creator_user_id", alertCondition.getCreatorUserId())
             .put("created_at", Tools.getISO8601String(alertCondition.getCreatedAt()))
             .put("parameters", alertCondition.getParameters())

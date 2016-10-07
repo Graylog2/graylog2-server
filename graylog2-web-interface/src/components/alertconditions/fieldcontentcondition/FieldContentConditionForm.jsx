@@ -1,52 +1,55 @@
 import React from 'react';
+import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import jQuery from 'jquery';
+import { Well } from 'react-bootstrap';
 
-import {TypeAheadFieldInput} from 'components/common';
+import { TypeAheadFieldInput } from 'components/common';
 import GracePeriodInput from 'components/alertconditions/GracePeriodInput';
 
 const FieldContentConditionForm = React.createClass({
   propTypes: {
     alertCondition: React.PropTypes.object,
+    typeDefinition: React.PropTypes.object.isRequired,
   },
-  getDefaultProps() {
-    return {
-      alertCondition: {
-        field: '',
-        value: '',
-      },
-    };
-  },
+  mixins: [LinkedStateMixin],
   getInitialState() {
-    return {
-      field: this.props.alertCondition.field,
-    };
+    if (this.props.alertCondition) {
+      return this.props.alertCondition.parameters;
+    }
+    const defaultValues = {};
+    jQuery.map(this.props.typeDefinition.requested_configuration,
+      (definition, field) => {
+        defaultValues[field] = definition.default_value;
+      });
+    return defaultValues;
   },
   getValue() {
-    return jQuery.extend({
-      field: this.state.field,
-      value: this.refs.value.value,
-    }, this.refs.gracePeriod.getValue());
+    return {
+      configuration: jQuery.extend(this.state, this.refs.gracePeriod.getValue()),
+    };
   },
-  _onFieldChange(event) {
-    this.setState({field: event.target.value});
+  _onChange(event) {
+    const state = {};
+    state[event.target.name] = event.target.value;
+    this.setState(state);
   },
   render() {
-    const alertCondition = this.props.alertCondition;
     return (
-      <span>
+      <Well className="alert-type-form alert-type-form-message-count form-inline well-sm">
         Trigger alert when a message arrives that has the field{' '}
         <TypeAheadFieldInput ref="fieldInput"
+                             name="field"
                              type="text"
                              autoComplete="off"
-                             defaultValue={alertCondition.field}
-                             onChange={this._onFieldChange}
+                             valueLink={this.linkState('field')}
                              required />
         <br />
         set to{' '}
-        <input ref="value" type="text" className="form-control" autoComplete="off" required defaultValue={alertCondition.value}/>
+        <input ref="value" name="value" type="text" className="form-control" autoComplete="off" required
+               value={this.state.value} onChange={this._onChange}/>
         {' '}
-        <GracePeriodInput ref="gracePeriod" alertCondition={alertCondition}/>
-      </span>
+        <GracePeriodInput ref="gracePeriod" parameters={{ grace: this.state.grace, backlog: this.state.backlog }}/>
+      </Well>
     );
   },
 });

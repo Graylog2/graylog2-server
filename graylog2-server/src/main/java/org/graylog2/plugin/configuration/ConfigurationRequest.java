@@ -17,12 +17,15 @@
 package org.graylog2.plugin.configuration;
 
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.configuration.fields.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 public class ConfigurationRequest {
@@ -32,12 +35,19 @@ public class ConfigurationRequest {
 
     public ConfigurationRequest() {}
 
-    public void putAll(Map<String, ConfigurationField> fields) {
+    public ConfigurationRequest putAll(Map<String, ConfigurationField> fields) {
         this.fields.putAll(fields);
+        return this;
     }
 
-    public void addField(ConfigurationField f) {
+    public ConfigurationRequest addField(ConfigurationField f) {
         fields.put(f.getName(), f);
+        return this;
+    }
+
+    public ConfigurationRequest addFields(List<ConfigurationField> fields) {
+        fields.forEach(this::addField);
+        return this;
     }
 
     public boolean containsField(String fieldName) {
@@ -48,11 +58,15 @@ public class ConfigurationRequest {
         return fields.get(fieldName);
     }
 
-    public boolean removeField(String fieldName) {
-        return fields.remove(fieldName) != null;
-    }
     public Map<String, ConfigurationField> getFields() {
         return fields;
+    }
+
+    public static ConfigurationRequest createWithFields(ConfigurationField... fields) {
+        final ConfigurationRequest configurationRequest = new ConfigurationRequest();
+        configurationRequest.addFields(Lists.newArrayList(fields));
+
+        return configurationRequest;
     }
 
     @JsonValue

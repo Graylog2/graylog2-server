@@ -160,7 +160,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final AbstractAlertCondition.CheckResult result = alertCondition.runCheck();
     }
 
-    protected FieldContentValueAlertCondition getCondition(Map<String, Object> parameters, String title) {
+    private FieldContentValueAlertCondition getCondition(Map<String, Object> parameters, String title) {
         return new FieldContentValueAlertCondition(
             searches,
             mock(Configuration.class),
@@ -172,7 +172,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
             title);
     }
 
-    protected Map<String, Object> getParametersMap(Integer grace, String field, String value) {
+    private Map<String, Object> getParametersMap(Integer grace, String field, String value) {
         Map<String, Object> parameters = new HashMap<>();
 
         parameters.put("grace", grace);

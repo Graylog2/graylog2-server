@@ -140,6 +140,7 @@ const ApiRoutes = {
     validate: () => { return { url: '/system/sessions' }; },
   },
   StreamAlertsApiController: {
+    available: () => { return { url: '/alerts/conditions/types' }; },
     create: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
     delete: (streamId, alertConditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
     list: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },

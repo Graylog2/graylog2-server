@@ -2,7 +2,7 @@ import $ from 'jquery';
 import React from 'react';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
+import { BooleanField, DropdownField, NumberField, TextField, TitleField } from 'components/configurationforms';
 
 const ConfigurationForm = React.createClass({
   propTypes: {
@@ -117,13 +117,12 @@ const ConfigurationForm = React.createClass({
     const typeName = this.props.typeName;
     const title = this.props.title;
     const helpBlock = this.props.helpBlock;
-    const titleField = { is_optional: false, attributes: [], human_name: 'Title', description: helpBlock };
 
     let shouldAutoFocus = true;
     let titleElement;
     if (this.props.includeTitleField) {
-      titleElement = (<TextField key={`${typeName}-title`} typeName={typeName} title="title" field={titleField}
-                                 value={this.state.titleValue} onChange={this._handleTitleChange} autoFocus />);
+      titleElement = (<TitleField key={`${typeName}-title`} typeName={typeName} value={this.state.titleValue}
+                                  onChange={this._handleTitleChange} helpBlock={helpBlock} />);
       shouldAutoFocus = false;
     }
 
@@ -144,8 +143,8 @@ const ConfigurationForm = React.createClass({
                           submitButtonText="Save">
         <fieldset>
           <input type="hidden" name="type" value={typeName} />
-          {titleElement}
           {this.props.children}
+          {titleElement}
           {configFields}
         </fieldset>
       </BootstrapModalForm>

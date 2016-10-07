@@ -17,7 +17,9 @@
 package org.graylog2.plugin.alarms;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.graylog2.plugin.DescriptorWithHumanName;
 import org.graylog2.plugin.MessageSummary;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 
@@ -45,8 +47,7 @@ public interface AlertCondition {
     @JsonIgnore
     int getGrace();
 
-    @JsonIgnore
-    String getTypeString();
+    String getType();
 
     String getTitle();
 
@@ -73,5 +74,17 @@ public interface AlertCondition {
                               String creatorUserId,
                               Map<String, Object> parameters,
                               @Nullable String title);
+        Config config();
+        Descriptor descriptor();
+    }
+
+    abstract class Descriptor extends DescriptorWithHumanName {
+        public Descriptor(String name, String linkToDocs, String humanName) {
+            super(name, false, linkToDocs, humanName);
+        }
+    }
+
+    interface Config {
+        ConfigurationRequest getRequestedConfiguration();
     }
 }
