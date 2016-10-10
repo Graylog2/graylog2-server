@@ -7,8 +7,7 @@
     "url": "graylog-plugin-pipeline-processor"
   },
   "scripts": {
-    "start": "./node_modules/.bin/webpack-dev-server",
-    "build": "./node_modules/.bin/webpack"
+    "build": "webpack --bail -p"
   },
   "keywords": [
     "graylog"
@@ -17,31 +16,9 @@
   "license": "GPL-3.0",
   "dependencies": {
     "brace": "^0.7.0",
-    "history": "^1.17.0",
-    "javascript-natural-sort": "^0.7.1",
-    "react": "0.14.x",
-    "react-ace": "^3.1.0",
-    "react-bootstrap": "^0.28.1",
-    "react-dom": "^0.14.5",
-    "react-router": "~1.0.0",
-    "react-router-bootstrap": "^0.19.0",
-    "reflux": "^0.2.12"
+    "react-ace": "^3.1.0"
   },
   "devDependencies": {
-    "babel-core": "^5.8.25",
-    "babel-eslint": "^4.1.6",
-    "babel-loader": "^5.3.2",
-    "css-loader": "^0.23.1",
-    "eslint": "^2.10.2",
-    "eslint-config-graylog": "^1.0.0",
-    "eslint-loader": "^1.0.0",
-    "estraverse-fb": "^1.3.1",
-    "graylog-web-manifests": "^2.0.0-alpha.3",
-    "graylog-web-plugin": "latest",
-    "json-loader": "^0.5.4",
-    "react-hot-loader": "^1.3.0",
-    "style-loader": "^0.13.0",
-    "ts-loader": "^0.8.2",
-    "webpack": "^1.12.2"
+    "graylog-web-plugin": "file:../../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin"
   }
 }
