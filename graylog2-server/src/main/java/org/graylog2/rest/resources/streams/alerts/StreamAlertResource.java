@@ -35,7 +35,6 @@ import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.Alert;
-import org.graylog2.alerts.AlertImpl;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.types.DummyAlertCondition;
 import org.graylog2.audit.AuditEventTypes;
@@ -92,7 +91,7 @@ public class StreamAlertResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(StreamAlertResource.class);
     private static final String CACHE_KEY_BASE = "alerts";
     private static final Cache<String, Map<String, Object>> CACHE = CacheBuilder.newBuilder()
-            .expireAfterWrite(AlertImpl.REST_CHECK_CACHE_SECONDS, TimeUnit.SECONDS)
+            .expireAfterWrite(Alert.REST_CHECK_CACHE_SECONDS, TimeUnit.SECONDS)
             .build();
 
     private final StreamService streamService;
@@ -116,7 +115,7 @@ public class StreamAlertResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get the " + AlertImpl.MAX_LIST_COUNT + " most recent alarms of this stream.")
+    @ApiOperation(value = "Get the " + Alert.MAX_LIST_COUNT + " most recent alarms of this stream.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
@@ -159,7 +158,7 @@ public class StreamAlertResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
         if (limit == 0) {
-            limit = AlertImpl.MAX_LIST_COUNT;
+            limit = Alert.MAX_LIST_COUNT;
         }
 
         final Stream stream = streamService.load(streamId);
@@ -171,7 +170,7 @@ public class StreamAlertResource extends RestResource {
     @GET
     @Timed
     @Path("check")
-    @ApiOperation(value = "Check for triggered alert conditions of this streams. Results cached for " + AlertImpl.REST_CHECK_CACHE_SECONDS + " seconds.")
+    @ApiOperation(value = "Check for triggered alert conditions of this streams. Results cached for " + Alert.REST_CHECK_CACHE_SECONDS + " seconds.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),

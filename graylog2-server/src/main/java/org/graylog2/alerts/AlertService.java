@@ -19,6 +19,7 @@ package org.graylog2.alerts;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.PersistedService;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.joda.time.DateTime;
@@ -29,7 +30,7 @@ import java.util.Map;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public interface AlertService extends PersistedService {
+public interface AlertService {
     Alert factory(AlertCondition.CheckResult checkResult);
 
     List<Alert> loadRecentOfStream(String streamId, DateTime since);
@@ -54,4 +55,7 @@ public interface AlertService extends PersistedService {
 
     List<Alert> listForStreamId(String streamId, int skip, int limit);
     Alert load(String alertId, String streamId) throws NotFoundException;
+    String save(Alert alert) throws ValidationException;
+
+    Alert.Builder builder();
 }

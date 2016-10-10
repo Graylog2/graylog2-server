@@ -17,122 +17,116 @@
 package org.graylog2.alerts;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
-import com.mongodb.QueryBuilder;
-import org.bson.types.ObjectId;
-import org.graylog2.alerts.types.FieldContentValueAlertCondition;
-import org.graylog2.alerts.types.FieldValueAlertCondition;
-import org.graylog2.alerts.types.MessageCountAlertCondition;
+import com.mongodb.DBCollection;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
+import org.mongojack.DBQuery;
+import org.mongojack.DBSort;
+import org.mongojack.JacksonDBCollection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class AlertServiceImpl extends PersistedServiceImpl implements AlertService {
+public class AlertServiceImpl implements AlertService {
     private static final Logger LOG = LoggerFactory.getLogger(AlertServiceImpl.class);
-
-    private final Map<String, AlertCondition.Factory> alertConditionMap;
+    private final JacksonDBCollection<AlertImpl, String> coll;
+    private final AlertConditionFactory alertConditionFactory;
 
     @Inject
     public AlertServiceImpl(MongoConnection mongoConnection,
-                            Map<String, AlertCondition.Factory> alertConditionMap) {
-        super(mongoConnection);
-        this.alertConditionMap = alertConditionMap;
+                            MongoJackObjectMapperProvider mapperProvider,
+                            AlertConditionFactory alertConditionFactory) {
+        this.alertConditionFactory = alertConditionFactory;
+        final String collectionName = AlertImpl.class.getAnnotation(CollectionName.class).value();
+        final DBCollection dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
+        this.coll = JacksonDBCollection.wrap(dbCollection, AlertImpl.class, String.class, mapperProvider.get());
+    }
+
+    @Override
+    public Alert.Builder builder() {
+        return AlertImpl.builder();
     }
 
     @Override
     public Alert factory(AlertCondition.CheckResult checkResult) {
-        if (!checkResult.isTriggered()) {
-            throw new RuntimeException("Tried to create alert from not triggered alert condition result.");
-        }
-
-        Map<String, Object> fields = Maps.newHashMap();
-        fields.put("triggered_at", checkResult.getTriggeredAt());
-        fields.put("condition_id", checkResult.getTriggeredCondition().getId());
-        fields.put("stream_id", checkResult.getTriggeredCondition().getStream().getId());
-        fields.put("description", checkResult.getResultDescription());
-        fields.put("condition_parameters", checkResult.getTriggeredCondition().getParameters());
-
-        return new AlertImpl(fields);
+        return builder()
+            .streamId(checkResult.getTriggeredCondition().getStream().getId())
+            .conditionId(checkResult.getTriggeredCondition().getId())
+            .description(checkResult.getResultDescription())
+            .conditionParameters(ImmutableMap.copyOf(checkResult.getTriggeredCondition().getParameters()))
+            .triggeredAt(checkResult.getTriggeredAt())
+            .build();
     }
 
     @Override
     public List<Alert> loadRecentOfStream(String streamId, DateTime since) {
-        QueryBuilder qb = QueryBuilder.start("stream_id").is(streamId);
-
-        if (since != null) {
-            qb.and("triggered_at").greaterThanEquals(since.toDate());
-        }
-
-        BasicDBObject sort = new BasicDBObject("triggered_at", -1);
-
-        final List<DBObject> alertObjects = query(AlertImpl.class,
-            qb.get(),
-            sort,
-            AlertImpl.MAX_LIST_COUNT,
-            0
-        );
-
-        List<Alert> alerts = Lists.newArrayList();
-
-        for (DBObject alertObj : alertObjects) {
-            alerts.add(new AlertImpl(new ObjectId(alertObj.get("_id").toString()), alertObj.toMap()));
-        }
-
-        return alerts;
+        return this.coll.find(
+            DBQuery.and(
+                DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId),
+                DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, since.toDate())
+            )
+        )
+            .limit(Alert.MAX_LIST_COUNT)
+            .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
+            .toArray()
+            .stream()
+            .collect(Collectors.toList());
     }
 
     @Override
     public int triggeredSecondsAgo(String streamId, String conditionId) {
-        DBObject query = QueryBuilder.start("stream_id").is(streamId)
-            .and("condition_id").is(conditionId).get();
-        BasicDBObject sort = new BasicDBObject("triggered_at", -1);
+        final List<Alert> mostRecentAlerts = this.coll.find(
+            DBQuery.and(
+                DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId),
+                DBQuery.is(AlertImpl.FIELD_CONDITION_ID, conditionId)
+            )
+        )
+            .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
+            .limit(1)
+            .toArray()
+            .stream()
+            .collect(Collectors.toList());
 
-        DBObject alert = findOne(AlertImpl.class, query, sort);
-
-        if (alert == null) {
+        if (mostRecentAlerts == null || mostRecentAlerts.size() == 0) {
             return -1;
         }
 
-        DateTime triggeredAt = new DateTime(alert.get("triggered_at"), DateTimeZone.UTC);
+        final Alert mostRecentAlert = mostRecentAlerts.get(0);
 
-        return Seconds.secondsBetween(triggeredAt, Tools.nowUTC()).getSeconds();
+        return Seconds.secondsBetween(mostRecentAlert.getTriggeredAt(), Tools.nowUTC()).getSeconds();
     }
 
     @Override
     public long totalCount() {
-        return collection(AlertImpl.class).count();
+        return this.coll.count();
     }
 
     @Override
     public long totalCountForStream(String streamId) {
-        DBObject qry = new BasicDBObject("stream_id", streamId);
-        return collection(AlertImpl.class).count(qry);
+        return this.coll.count(new BasicDBObject(AlertImpl.FIELD_STREAM_ID, streamId));
     }
 
     @Override
     public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) {
         final String type = (String)fields.get("type");
 
-        return createAlertCondition(type,
+        return this.alertConditionFactory.createAlertCondition(type,
             stream,
             (String) fields.get("id"),
             DateTime.parse((String) fields.get("created_at")),
@@ -141,40 +135,23 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
             (String) fields.get("title"));
     }
 
-    private AlertCondition createAlertCondition(String type,
-                                                Stream stream,
-                                                String id,
-                                                DateTime createdAt,
-                                                String creatorId,
-                                                Map<String, Object> parameters,
-                                                String title) {
-
-        final AlertCondition.Factory factory = this.alertConditionMap.get(type);
-        checkArgument(factory != null, "Unknown alert condition type: " + type);
-
-        return factory.create(stream, id, createdAt, creatorId, parameters, title);
-    }
-
     @Override
     public AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) {
         final String type = ccr.type();
         checkArgument(type != null, "Missing alert condition type");
 
-        return createAlertCondition(type, stream, null, Tools.nowUTC(), userId, ccr.parameters(), ccr.title());
+        return this.alertConditionFactory.createAlertCondition(type, stream, null, Tools.nowUTC(), userId, ccr.parameters(), ccr.title());
     }
 
     @Override
     public AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) {
-        final String type = ((AbstractAlertCondition) alertCondition).getType();
+        final Map<String, Object> parameters = ImmutableMap.<String, Object>builder()
+            .putAll(alertCondition.getParameters())
+            .putAll(ccr.parameters())
+            .build();
 
-        final Map<String, Object> parameters = ccr.parameters();
-        for (Map.Entry<String, Object> stringObjectEntry : alertCondition.getParameters().entrySet()) {
-            if (!parameters.containsKey(stringObjectEntry.getKey())) {
-                parameters.put(stringObjectEntry.getKey(), stringObjectEntry.getValue());
-            }
-        }
-
-        return createAlertCondition(type,
+        return this.alertConditionFactory.createAlertCondition(
+            alertCondition.getType(),
             alertCondition.getStream(),
             alertCondition.getId(),
             alertCondition.getCreatedAt(),
@@ -198,7 +175,7 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
     @Override
     public AlertCondition.CheckResult triggeredNoGrace(AlertCondition alertCondition) {
         LOG.debug("Checking alert condition [{}] and not accounting grace time.", this);
-        return ((AbstractAlertCondition) alertCondition).runCheck();
+        return alertCondition.runCheck();
     }
 
     @Override
@@ -210,64 +187,34 @@ public class AlertServiceImpl extends PersistedServiceImpl implements AlertServi
             return new AbstractAlertCondition.NegativeCheckResult(alertCondition);
         }
 
-        return ((AbstractAlertCondition) alertCondition).runCheck();
+        return alertCondition.runCheck();
     }
 
     @Override
-    public Map<String, Object> asMap(final AlertCondition alertCondition) {
-        ImmutableMap.Builder<String, Object> builder = ImmutableMap.<String, Object>builder()
-            .put("id", alertCondition.getId())
-            .put("type", alertCondition.getType())
-            .put("creator_user_id", alertCondition.getCreatorUserId())
-            .put("created_at", Tools.getISO8601String(alertCondition.getCreatedAt()))
-            .put("parameters", alertCondition.getParameters())
-            .put("in_grace", inGracePeriod(alertCondition));
-
-        if (alertCondition.getTitle() != null) {
-            builder = builder.put("title", alertCondition.getTitle());
-        }
-
-        return builder.build();
+    public Map<String, Object> asMap(AlertCondition alertCondition) {
+        return null;
     }
 
     @Override
     public List<Alert> listForStreamId(String streamId, int skip, int limit) {
-        QueryBuilder qb = QueryBuilder.start("stream_id").is(streamId);
-
-        BasicDBObject sort = new BasicDBObject("triggered_at", -1);
-
-        final List<DBObject> alertObjects = query(AlertImpl.class,
-            qb.get(),
-            sort,
-            limit,
-            skip
-        );
-
-        final List<Alert> alerts = Lists.newArrayListWithCapacity(alertObjects.size());
-
-        for (DBObject alertObj : alertObjects) {
-            alerts.add(new AlertImpl(new ObjectId(alertObj.get("_id").toString()), alertObj.toMap()));
-        }
-
-        return alerts;
+        return this.coll.find(DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId))
+            .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
+            .skip(skip)
+            .limit(limit)
+            .toArray()
+            .stream()
+            .collect(Collectors.toList());
     }
 
     @Override
     public Alert load(String alertId, String streamId) throws NotFoundException {
-        final DBObject query = QueryBuilder.start("stream_id").is(streamId).and("_id").is(new ObjectId(alertId)).get();
+        return this.coll.findOneById(alertId);
+    }
 
-        final List<DBObject> alertObjects = query(AlertImpl.class, query);
+    @Override
+    public String save(Alert alert) throws ValidationException {
+        checkArgument(alert instanceof AlertImpl, "Supplied argument must be of type " + AlertImpl.class + ", and not " + alert.getClass());
 
-        if (alertObjects.size() == 0) {
-            throw new NotFoundException("Alert with id " + alertId + " not found for Stream " + streamId + ".");
-        }
-
-        if (alertObjects.size() > 1) {
-            throw new NotFoundException("Multiple Alerts with id " + alertId + " found for Stream " + streamId + ".");
-        }
-
-        final DBObject alertObj = alertObjects.get(0);
-
-        return new AlertImpl(new ObjectId(alertObj.get("_id").toString()), alertObj.toMap());
+        return this.coll.save((AlertImpl)alert).getSavedId();
     }
 }

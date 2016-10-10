@@ -16,12 +16,8 @@
  */
 package org.graylog2.alerts;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
-import com.google.inject.assistedinject.Assisted;
-import org.graylog2.alerts.types.FieldContentValueAlertCondition;
-import org.graylog2.alerts.types.FieldValueAlertCondition;
-import org.graylog2.alerts.types.MessageCountAlertCondition;
+import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
@@ -29,8 +25,12 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.Rule;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.mockito.stubbing.Answer;
 
 import java.util.Map;
@@ -42,28 +42,24 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public abstract class AlertConditionTest {
-    private abstract class TestAlertConditionFactory implements AlertCondition.Factory {
-        @Override
-        public AlertCondition.Config config() {
-            throw new UnsupportedOperationException ("This method is not implemented.");
-        }
-
-        @Override
-        public AlertCondition.Descriptor descriptor() {
-            throw new UnsupportedOperationException ("This method is not implemented.");
-        }
-    }
-
     protected static final String alertConditionTitle = "Alert Condition for Testing";
 
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Mock
     protected Stream stream;
+    @Mock
     protected Searches searches;
+    @Mock
     protected MongoConnection mongoConnection;
+    @Mock
+    protected MongoJackObjectMapperProvider mongoJackObjectMapperProvider;
+    @Mock
+    protected AlertConditionFactory alertConditionFactory;
     protected AlertService alertService;
 
     protected final String STREAM_ID = "STREAMMOCKID";
@@ -72,53 +68,9 @@ public abstract class AlertConditionTest {
 
     @Before
     public void setUp() throws Exception {
-        stream = mock(Stream.class);
         when(stream.getId()).thenReturn(STREAM_ID);
 
-        searches = mock(Searches.class);
-        mongoConnection = mock(MongoConnection.class);
-        // TODO use injection please. this sucks so bad
-        final Map<String, AlertCondition.Factory> alertConditionBinder = ImmutableMap.of(
-            AbstractAlertCondition.Type.FIELD_VALUE.toString(),
-            new TestAlertConditionFactory() {
-                @Override
-                public FieldValueAlertCondition create(Stream stream,
-                                                                     String id,
-                                                                     DateTime createdAt,
-                                                                     @Assisted("userid") String creatorUserId,
-                                                                     Map<String, Object> parameters,
-                                                                     String title) {
-                    return new FieldValueAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters, title);
-                }
-            },
-            AbstractAlertCondition.Type.MESSAGE_COUNT.toString(),
-            new TestAlertConditionFactory() {
-                @Override
-                public MessageCountAlertCondition create(Stream stream,
-                                                                       String id,
-                                                                       DateTime createdAt,
-                                                                       @Assisted("userid") String creatorUserId,
-                                                                       Map<String, Object> parameters,
-                                                                       String title) {
-                    return new MessageCountAlertCondition(searches, stream, id, createdAt, creatorUserId, parameters, title);
-                }
-
-            },
-            AbstractAlertCondition.Type.FIELD_CONTENT_VALUE.toString(),
-            new TestAlertConditionFactory() {
-                @Override
-                public FieldContentValueAlertCondition create(Stream stream,
-                                                                            String id,
-                                                                            DateTime createdAt,
-                                                                            @Assisted("userid") String creatorUserId,
-                                                                            Map<String, Object> parameters,
-                                                                            String title) {
-                    return new FieldContentValueAlertCondition(searches, null, stream, id, createdAt, creatorUserId, parameters, title);
-                }
-            }
-        );
-        alertService = spy(new AlertServiceImpl(mongoConnection, alertConditionBinder));
-
+        alertService = spy(new AlertServiceImpl(mongoConnection, mongoJackObjectMapperProvider, alertConditionFactory));
     }
 
     protected void assertTriggered(AlertCondition alertCondition, AlertCondition.CheckResult result) {
