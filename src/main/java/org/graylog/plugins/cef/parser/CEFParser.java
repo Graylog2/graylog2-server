@@ -30,7 +30,7 @@ public class CEFParser {
         Matcher m = HEADER_PATTERN.matcher(x);
 
         if(m.find()) {
-            DateTime timestamp = DateTime.parse(m.group(1), TIMESTAMP_PATTERN)
+            DateTime timestamp = DateTime.parse(m.group(1).replaceAll("\\s+", " "), TIMESTAMP_PATTERN)
                     .withYear(DateTime.now(timezone).getYear())
                     .withZoneRetainFields(timezone);
 
