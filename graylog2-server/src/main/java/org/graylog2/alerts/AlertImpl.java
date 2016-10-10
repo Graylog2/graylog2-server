@@ -89,12 +89,18 @@ public abstract class AlertImpl implements Alert {
     @AutoValue.Builder
     public interface Builder extends Alert.Builder {
         Builder id(String id);
+        @Override
         Builder streamId(String streamId);
+        @Override
         Builder conditionId(String conditionId);
+        @Override
         Builder triggeredAt(DateTime triggeredAt);
+        @Override
         Builder description(String description);
+        @Override
         Builder conditionParameters(Map<String, Object> conditionParameters);
 
+        @Override
         AlertImpl build();
     }
 }
