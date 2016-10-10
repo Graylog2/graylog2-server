@@ -15,7 +15,7 @@ public class CEFParser {
      *   - benchmark regex
      */
 
-    private static final Pattern HEADER_PATTERN = Pattern.compile("^<\\d+>([a-zA-Z]{3} \\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}) CEF:(\\d+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)(?:$|(msg=.+))", Pattern.DOTALL);
+    private static final Pattern HEADER_PATTERN = Pattern.compile("^<\\d+>([a-zA-Z]{3}\\s+\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2}) CEF:(\\d+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)(?:$|(msg=.+))", Pattern.DOTALL);
     private static final DateTimeFormatter TIMESTAMP_PATTERN = DateTimeFormat.forPattern("MMM dd HH:mm:ss");
 
     private static final CEFFieldsParser FIELDS_PARSER = new CEFFieldsParser();
