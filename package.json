@@ -7,8 +7,7 @@
     "url": "https://github.com/Graylog2/graylog-plugin-enterprise-integration"
   },
   "scripts": {
-    "start": "./node_modules/.bin/webpack-dev-server",
-    "build": "./node_modules/.bin/webpack"
+    "build": "webpack --bail -p"
   },
   "keywords": [
     "graylog"
@@ -16,34 +15,8 @@
   "author": "Edmundo Alvarez <edmundo@graylog.com>",
   "license": "GPL-3.0",
   "dependencies": {
-    "history": "^1.17.0",
-    "react": "0.14.x",
-    "react-bootstrap": "^0.28.1",
-    "react-dom": "^0.14.5",
-    "react-router": "~1.0.0",
-    "react-router-bootstrap": "^0.19.0",
-    "reflux": "^0.2.12"
   },
   "devDependencies": {
-    "babel-core": "^5.8.25",
-    "babel-eslint": "^4.1.6",
-    "babel-loader": "^5.3.2",
-    "css-loader": "^0.23.1",
-    "eslint": "^2.10.2",
-    "eslint-config-graylog": "^1.0.0",
-    "eslint-loader": "^1.0.0",
-    "estraverse-fb": "^1.3.1",
-    "file-loader": "^0.9.0",
-    "graylog-web-plugin": "~0.0.17",
-    "graylog-web-manifests": "*",
-    "json-loader": "^0.5.4",
-    "less": "^2.5.3",
-    "less-loader": "^2.2.1",
-    "react-hot-loader": "^1.3.0",
-    "react-proxy-loader": "^0.3.4",
-    "style-loader": "^0.13.0",
-    "ts-loader": "^0.8.2",
-    "url-loader": "^0.5.6",
-    "webpack": "^1.12.2"
+    "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin"
   }
 }
