@@ -1,27 +1,4 @@
 {
-  "stage": 0,
-  "env": {
-    "start": {
-      "plugins": [
-        "react-auto-display-name",
-        "react-transform"
-      ],
-      "extra": {
-        "react-transform": {
-          "transforms": [
-            {
-              "transform": "react-transform-hmr",
-              "imports": ["react"],
-              "locals": ["module"]
-            }
-          ]
-        }
-      }
-    },
-    "start-nohmr": {
-      "plugins": [
-        "react-auto-display-name"
-      ]
-    }
-  }
+  "presets": ["es2015", "react", "stage-0"],
+  "plugins": ["add-module-exports", "react-hot-loader/babel"]
 }
