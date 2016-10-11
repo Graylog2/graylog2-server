@@ -33,8 +33,6 @@ import org.joda.time.Seconds;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -44,7 +42,6 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Preconditions.checkArgument;
 
 public class AlertServiceImpl implements AlertService {
-    private static final Logger LOG = LoggerFactory.getLogger(AlertServiceImpl.class);
     private final JacksonDBCollection<AlertImpl, String> coll;
     private final AlertConditionFactory alertConditionFactory;
 
@@ -170,29 +167,6 @@ public class AlertServiceImpl implements AlertService {
         }
 
         return lastAlertSecondsAgo < alertCondition.getGrace() * 60;
-    }
-
-    @Override
-    public AlertCondition.CheckResult triggeredNoGrace(AlertCondition alertCondition) {
-        LOG.debug("Checking alert condition [{}] and not accounting grace time.", this);
-        return alertCondition.runCheck();
-    }
-
-    @Override
-    public AlertCondition.CheckResult triggered(AlertCondition alertCondition) {
-        LOG.debug("Checking alert condition [{}]", this);
-
-        if (inGracePeriod(alertCondition)) {
-            LOG.debug("Alert condition [{}] is in grace period. Not triggered.", this);
-            return new AbstractAlertCondition.NegativeCheckResult(alertCondition);
-        }
-
-        return alertCondition.runCheck();
-    }
-
-    @Override
-    public Map<String, Object> asMap(AlertCondition alertCondition) {
-        return null;
     }
 
     @Override

@@ -98,9 +98,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
             .thenReturn(searchResult);
         final FieldContentValueAlertCondition condition = getCondition(getParametersMap(0, "message", "something"), "Alert Condition for testing");
 
-        alertLastTriggered(-1);
-
-        final AlertCondition.CheckResult result = alertService.triggered(condition);
+        final AlertCondition.CheckResult result = condition.runCheck();
 
         assertTriggered(condition, result);
     }
@@ -129,9 +127,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
             .thenReturn(searchResult);
         final FieldContentValueAlertCondition condition = getCondition(getParametersMap(0, "message", "something"), alertConditionTitle);
 
-        alertLastTriggered(-1);
-
-        final AlertCondition.CheckResult result = alertService.triggered(condition);
+        final AlertCondition.CheckResult result = condition.runCheck();
 
         assertNotTriggered(result);
     }

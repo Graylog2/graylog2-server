@@ -44,29 +44,6 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
     }
 
     @Test
-    @Ignore
-    public void testInGracePeriod() throws Exception {
-        alertLastTriggered(-1);
-        assertFalse("Should not be in grace period because alert was never fired", alertService.inGracePeriod(alertCondition));
-        alertLastTriggered(0);
-        assertTrue("Should be in grace period because alert was just fired", alertService.inGracePeriod(alertCondition));
-        alertLastTriggered(grace * 60 - 1);
-        assertTrue("Should be in grace period because alert was fired during grace period", alertService.inGracePeriod(alertCondition));
-        alertLastTriggered(grace * 60 + 1);
-        assertFalse("Should not be in grace period because alert was fired after grace period has passed", alertService.inGracePeriod(alertCondition));
-        alertLastTriggered(Integer.MAX_VALUE);
-        assertFalse("Should not be in grace period because alert was fired after grace period has passed", alertService.inGracePeriod(alertCondition));
-
-        final AlertCondition alertConditionZeroGrace = getDummyAlertCondition(getParametersMap(0, time, 0));
-        alertLastTriggered(0);
-        assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
-        alertLastTriggered(-1);
-        assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
-        alertLastTriggered(Integer.MAX_VALUE);
-        assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
-    }
-
-    @Test
     public void testDifferingTypesForNumericalParameters() throws Exception {
         final AlertCondition alertConditionWithDouble = getDummyAlertCondition(ImmutableMap.of("grace", 3.0));
         assertEquals(alertConditionWithDouble.getGrace(), 3);

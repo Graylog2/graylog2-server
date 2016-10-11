@@ -191,9 +191,9 @@ public class StreamAlertResource extends RestResource {
                 final List<Map<String, Object>> results = new ArrayList<>(alertConditions.size());
                 for (AlertCondition alertCondition : alertConditions) {
                     final Map<String, Object> conditionResult = new HashMap<>();
-                    conditionResult.put("condition", alertService.asMap(alertCondition));
+                    conditionResult.put("condition", alertCondition);
 
-                    final AlertCondition.CheckResult checkResult = alertService.triggeredNoGrace(alertCondition);
+                    final AlertCondition.CheckResult checkResult = alertCondition.runCheck();
                     conditionResult.put("triggered", checkResult.isTriggered());
 
                     if (checkResult.isTriggered()) {

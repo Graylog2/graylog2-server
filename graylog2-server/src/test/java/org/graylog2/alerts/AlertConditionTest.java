@@ -17,6 +17,8 @@
 package org.graylog2.alerts;
 
 import com.google.common.collect.Maps;
+import com.mongodb.DB;
+import com.mongodb.DBCollection;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.searches.Searches;
@@ -40,8 +42,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
@@ -54,13 +58,6 @@ public abstract class AlertConditionTest {
     protected Stream stream;
     @Mock
     protected Searches searches;
-    @Mock
-    protected MongoConnection mongoConnection;
-    @Mock
-    protected MongoJackObjectMapperProvider mongoJackObjectMapperProvider;
-    @Mock
-    protected AlertConditionFactory alertConditionFactory;
-    protected AlertService alertService;
 
     protected final String STREAM_ID = "STREAMMOCKID";
     protected final String STREAM_CREATOR = "MOCKUSER";
@@ -69,8 +66,6 @@ public abstract class AlertConditionTest {
     @Before
     public void setUp() throws Exception {
         when(stream.getId()).thenReturn(STREAM_ID);
-
-        alertService = spy(new AlertServiceImpl(mongoConnection, mongoJackObjectMapperProvider, alertConditionFactory));
     }
 
     protected void assertTriggered(AlertCondition alertCondition, AlertCondition.CheckResult result) {
@@ -79,7 +74,6 @@ public abstract class AlertConditionTest {
         assertEquals("AlertCondition of result is not the same we created!", result.getTriggeredCondition(), alertCondition);
         long difference = Tools.nowUTC().getMillis() - result.getTriggeredAt().getMillis();
         assertTrue("AlertCondition should be triggered about now", difference < 1000);
-        assertFalse("Alert was triggered, so we should not be in grace period!", alertService.inGracePeriod(alertCondition));
     }
 
     protected void assertNotTriggered(AlertCondition.CheckResult result) {
@@ -94,22 +88,6 @@ public abstract class AlertConditionTest {
         parameters.put("time", time);
         parameters.put("threshold", threshold);
         return parameters;
-    }
-
-    protected void alertLastTriggered(int seconds) {
-        // turn it around to avoid actually accessing the database
-        doReturn(seconds).when(alertService).triggeredSecondsAgo(STREAM_ID, CONDITION_ID);
-        // override the mocked object if the condition has not triggered, test code expects null not a mock
-        doAnswer(new Answer() {
-            @Override
-            public AlertCondition.CheckResult answer(InvocationOnMock invocation) throws Throwable {
-                final AlertCondition.CheckResult result = (AlertCondition.CheckResult) invocation.callRealMethod();
-                if (result.isTriggered()) {
-                    return result;
-                }
-                return new AbstractAlertCondition.CheckResult(false, null, result.getResultDescription(), result.getTriggeredAt(), result.getMatchingMessages());
-            }
-        }).when(alertService).triggered(ArgumentMatchers.any());
     }
 
     protected <T extends AbstractAlertCondition> T getTestInstance(Class<T> klazz, Map<String, Object> parameters, String title) {
