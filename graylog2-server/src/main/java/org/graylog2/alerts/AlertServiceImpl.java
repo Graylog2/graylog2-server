@@ -79,7 +79,7 @@ public class AlertServiceImpl implements AlertService {
                 DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, since.toDate())
             )
         )
-            .limit(Alert.MAX_LIST_COUNT)
+            .limit(MAX_LIST_COUNT)
             .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
             .toArray()
             .stream()

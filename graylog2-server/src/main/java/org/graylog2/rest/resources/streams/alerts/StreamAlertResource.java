@@ -87,11 +87,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 @Api(value = "Stream/Alerts", description = "Manage stream alerts for a given stream")
 @Path("/streams/{streamId}/alerts")
 public class StreamAlertResource extends RestResource {
+    private static final int REST_CHECK_CACHE_SECONDS = 30;
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamAlertResource.class);
     private static final String CACHE_KEY_BASE = "alerts";
     private static final Cache<String, Map<String, Object>> CACHE = CacheBuilder.newBuilder()
-            .expireAfterWrite(Alert.REST_CHECK_CACHE_SECONDS, TimeUnit.SECONDS)
+            .expireAfterWrite(REST_CHECK_CACHE_SECONDS, TimeUnit.SECONDS)
             .build();
 
     private final StreamService streamService;
@@ -115,7 +116,7 @@ public class StreamAlertResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get the " + Alert.MAX_LIST_COUNT + " most recent alarms of this stream.")
+    @ApiOperation(value = "Get the " + AlertService.MAX_LIST_COUNT + " most recent alarms of this stream.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
@@ -158,7 +159,7 @@ public class StreamAlertResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
         if (limit == 0) {
-            limit = Alert.MAX_LIST_COUNT;
+            limit = AlertService.MAX_LIST_COUNT;
         }
 
         final Stream stream = streamService.load(streamId);
@@ -170,7 +171,7 @@ public class StreamAlertResource extends RestResource {
     @GET
     @Timed
     @Path("check")
-    @ApiOperation(value = "Check for triggered alert conditions of this streams. Results cached for " + Alert.REST_CHECK_CACHE_SECONDS + " seconds.")
+    @ApiOperation(value = "Check for triggered alert conditions of this streams. Results cached for " + REST_CHECK_CACHE_SECONDS + " seconds.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),

@@ -60,7 +60,7 @@ public class AlertResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get the " + Alert.MAX_LIST_COUNT + " most recent alarms of all streams.")
+    @ApiOperation(value = "Get the " + AlertService.MAX_LIST_COUNT + " most recent alarms of all streams.")
     @RequiresPermissions(RestPermissions.STREAMS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
@@ -78,7 +78,7 @@ public class AlertResource extends RestResource {
         List<AlertSummary> alerts = streamService.loadAll().stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
                 .flatMap(stream -> alertService.loadRecentOfStream(stream.getId(), since).stream())
-                .limit(Alert.MAX_LIST_COUNT)
+                .limit(AlertService.MAX_LIST_COUNT)
                 .map(alert -> AlertSummary.create(alert.getId(), alert.getConditionId(), alert.getStreamId(), alert.getDescription(), alert.getConditionParameters(), alert.getTriggeredAt()))
                 .collect(Collectors.toList());
 

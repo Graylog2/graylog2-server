@@ -24,9 +24,6 @@ import java.util.Map;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface Alert {
-    public static final int MAX_LIST_COUNT = 300;
-    public static final int REST_CHECK_CACHE_SECONDS = 30;
-
     String getId();
     String getStreamId();
     String getConditionId();
