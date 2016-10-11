@@ -19,6 +19,8 @@ package org.graylog2.periodical;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.management.IndexManagementConfig;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.ClosingRetentionStrategyConfig;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
@@ -75,8 +77,15 @@ public class ConfigurationManagementPeriodical extends Periodical {
         }
 
         // All default retention strategy settings
+        final NoopRetentionStrategyConfig noopRetentionStrategyConfig = clusterConfigService.get(NoopRetentionStrategyConfig.class);
         final ClosingRetentionStrategyConfig closingRetentionStrategyConfig = clusterConfigService.get(ClosingRetentionStrategyConfig.class);
         final DeletionRetentionStrategyConfig deletionRetentionStrategyConfig = clusterConfigService.get(DeletionRetentionStrategyConfig.class);
+
+        if (noopRetentionStrategyConfig == null) {
+            final NoopRetentionStrategyConfig noopConfig = NoopRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
+            clusterConfigService.write(noopConfig);
+            LOG.info("Migrated \"{}\" setting: {}", "elasticsearch_max_number_of_indices", noopConfig);
+        }
 
         if (closingRetentionStrategyConfig == null) {
             final ClosingRetentionStrategyConfig closingConfig = ClosingRetentionStrategyConfig.create(elasticsearchConfiguration.getMaxNumberOfIndices());
@@ -117,9 +126,12 @@ public class ConfigurationManagementPeriodical extends Periodical {
                 case "delete":
                     retentionStrategyClass = DeletionRetentionStrategy.class;
                     break;
+                case "noop":
+                    retentionStrategyClass = NoopRetentionStrategy.class;
+                    break;
                 default:
                     LOG.warn("Unknown retention strategy \"{}\"", elasticsearchConfiguration.getRetentionStrategy());
-                    retentionStrategyClass = DeletionRetentionStrategy.class;
+                    retentionStrategyClass = NoopRetentionStrategy.class;
             }
 
             final IndexManagementConfig config = IndexManagementConfig.create(
