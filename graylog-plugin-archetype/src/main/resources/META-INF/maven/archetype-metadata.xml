@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<archetype-descriptor xmlns="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xsi:schemaLocation="http://maven.apache.org/plugins/maven-archetype-plugin/archetype-descriptor/1.0.0 http://maven.apache.org/xsd/archetype-descriptor-1.0.0.xsd"
+                      name="graylog-plugin" partial="false">
+    <requiredProperties>
+        <requiredProperty key="pluginClassName">
+            <defaultValue/>
+        </requiredProperty>
+
+        <requiredProperty key="version">
+            <defaultValue>1.0.0-SNAPSHOT</defaultValue>
+        </requiredProperty>
+
+        <requiredProperty key="githubRepo">
+            <defaultValue/>
+        </requiredProperty>
+
+        <requiredProperty key="ownerName">
+            <defaultValue/>
+        </requiredProperty>
+
+        <requiredProperty key="ownerEmail">
+            <defaultValue/>
+        </requiredProperty>
+
+        <requiredProperty key="serverCheckoutPath">
+            <defaultValue>../graylog2-server</defaultValue>
+        </requiredProperty>
+    </requiredProperties>
+
+    <fileSets>
+        <fileSet filtered="true" packaged="true" encoding="UTF-8">
+            <directory>src/main/java</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true"  encoding="UTF-8">
+            <directory>src/main/resources</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true"  encoding="UTF-8">
+            <directory>src/deb</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true"  encoding="UTF-8">
+            <directory>src/web</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true"  encoding="UTF-8">
+            <directory>templates</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+        </fileSet>
+
+        <fileSet filtered="true" encoding="UTF-8">
+            <directory></directory>
+            <includes>
+                <include>.gitignore</include>
+                <include>.travis.yml</include>
+                <include>README.md</include>
+                <include>GETTING-STARTED.md</include>
+                <include>package.json</include>
+                <include>webpack.config.js</include>
+                <include>build.config.js</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</archetype-descriptor>
