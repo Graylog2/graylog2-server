@@ -19,29 +19,16 @@ package org.graylog2.alerts;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class AbstractAlertConditionTest extends AlertConditionTest {
-    protected AlertCondition alertCondition;
-    final protected int grace = 10;
     final protected int time = 10;
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        alertCondition = getDummyAlertCondition(getParametersMap(grace, time, 0));
-    }
 
     @Test
     public void testDifferingTypesForNumericalParameters() throws Exception {
@@ -81,7 +68,7 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
         assertEquals(optionalForNull.orElse(1).doubleValue(), 1.0, 0.0);
     }
 
-    protected AlertCondition getDummyAlertCondition(Map<String, Object> parameters) {
+    private AlertCondition getDummyAlertCondition(Map<String, Object> parameters) {
         return new AbstractAlertCondition(stream, CONDITION_ID, null, Tools.nowUTC(), STREAM_CREATOR, parameters, "Dummy Alert Condition") {
             @Override
             public String getDescription() {

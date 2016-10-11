@@ -17,10 +17,6 @@
 package org.graylog2.alerts;
 
 import com.google.common.collect.Maps;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
-import org.graylog2.database.MongoConnection;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -28,12 +24,9 @@ import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
-import org.mockito.stubbing.Answer;
 
 import java.util.Map;
 
@@ -42,11 +35,6 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 
 public abstract class AlertConditionTest {
@@ -59,7 +47,7 @@ public abstract class AlertConditionTest {
     @Mock
     protected Searches searches;
 
-    protected final String STREAM_ID = "STREAMMOCKID";
+    private final String STREAM_ID = "STREAMMOCKID";
     protected final String STREAM_CREATOR = "MOCKUSER";
     protected final String CONDITION_ID = "CONDITIONMOCKID";
 
