@@ -88,7 +88,7 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public int triggeredSecondsAgo(String streamId, String conditionId) {
-        final List<Alert> mostRecentAlerts = this.coll.find(
+        final List<AlertImpl> mostRecentAlerts = this.coll.find(
             DBQuery.and(
                 DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId),
                 DBQuery.is(AlertImpl.FIELD_CONDITION_ID, conditionId)
@@ -96,9 +96,7 @@ public class AlertServiceImpl implements AlertService {
         )
             .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
             .limit(1)
-            .toArray()
-            .stream()
-            .collect(Collectors.toList());
+            .toArray();
 
         if (mostRecentAlerts == null || mostRecentAlerts.size() == 0) {
             return -1;
