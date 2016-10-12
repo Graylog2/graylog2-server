@@ -10,10 +10,10 @@
   },
   "readme": "../README.md",
   "scripts": {
-    "start": "./node_modules/.bin/webpack --config webpack.vendor.js && ./node_modules/.bin/webpack-dev-server --config webpack.combined.config.js",
-    "start-nohmr": "./node_modules/.bin/webpack --config webpack.vendor.js && ./node_modules/.bin/webpack-dev-server --watch --config webpack.combined.config.js",
-    "build": "./node_modules/.bin/webpack -p --config webpack.vendor.js && ./node_modules/.bin/webpack",
-    "test": "./node_modules/.bin/webpack --config webpack.vendor.js && ./node_modules/karma/bin/karma start karma.ci.conf.js",
+    "start": "webpack --config webpack.vendor.js && webpack-dev-server --config webpack.combined.config.js",
+    "start-nohmr": "webpack --config webpack.vendor.js && webpack-dev-server --watch --config webpack.combined.config.js",
+    "build": "webpack -p --config webpack.vendor.js && webpack -p",
+    "test": "webpack --config webpack.vendor.js && karma start karma.ci.conf.js",
     "prepare-dev": "./tools/prepare-dev"
   },
   "dependencies": {
