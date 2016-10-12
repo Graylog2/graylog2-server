@@ -1,0 +1,14 @@
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+target/
+dependency-reduced-pom.xml
+node_modules
+node
+build
+build.config.js.sample
+
