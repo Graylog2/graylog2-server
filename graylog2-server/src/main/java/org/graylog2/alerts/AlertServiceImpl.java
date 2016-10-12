@@ -62,6 +62,7 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public Alert factory(AlertCondition.CheckResult checkResult) {
+        checkArgument(checkResult.isTriggered(), "Unable to create alert for CheckResult which is not triggered.");
         return builder()
             .streamId(checkResult.getTriggeredCondition().getStream().getId())
             .conditionId(checkResult.getTriggeredCondition().getId())

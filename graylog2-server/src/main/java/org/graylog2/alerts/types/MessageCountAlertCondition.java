@@ -182,7 +182,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                     + " than " + threshold + " messages. " + "(Current grace time: " + grace + " minutes)";
                 return new CheckResult(true, this, resultDescription, Tools.nowUTC(), summaries);
             } else {
-                return new NegativeCheckResult(this);
+                return new NegativeCheckResult();
             }
         } catch (InvalidRangeParametersException e) {
             // cannot happen lol

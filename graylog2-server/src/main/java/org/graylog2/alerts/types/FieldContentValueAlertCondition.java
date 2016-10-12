@@ -156,7 +156,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
                 return new CheckResult(true, this, resultDescription, Tools.nowUTC(), summaries);
             } else {
                 LOG.debug("Alert check <{}> returned no results.", id);
-                return new NegativeCheckResult(this);
+                return new NegativeCheckResult();
             }
         } catch (InvalidRangeParametersException e) {
             // cannot happen lol

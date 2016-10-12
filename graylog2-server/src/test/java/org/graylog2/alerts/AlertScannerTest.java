@@ -77,7 +77,7 @@ public class AlertScannerTest {
         final AlertCondition alertCondition = mock(AlertCondition.class);
         final Stream stream = mock(Stream.class);
         when(alertService.inGracePeriod(eq(alertCondition))).thenReturn(false);
-        when(alertCondition.runCheck()).thenReturn(new AbstractAlertCondition.NegativeCheckResult(alertCondition));
+        when(alertCondition.runCheck()).thenReturn(new AbstractAlertCondition.NegativeCheckResult());
 
         assertThat(this.alertScanner.checkAlertCondition(stream, alertCondition)).isFalse();
         verify(alertCondition, times(1)).runCheck();

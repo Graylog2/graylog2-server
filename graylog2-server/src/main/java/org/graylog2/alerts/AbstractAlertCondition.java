@@ -190,7 +190,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     }
 
     public static class NegativeCheckResult extends CheckResult {
-        public NegativeCheckResult(AlertCondition alertCondition) {
+        public NegativeCheckResult() {
             super(false, null, null, null, null);
         }
     }
