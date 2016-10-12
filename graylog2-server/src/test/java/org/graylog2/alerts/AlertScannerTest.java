@@ -114,7 +114,7 @@ public class AlertScannerTest {
         verify(alarmCallbackHistoryService, times(1)).success(alarmCallbackConfigurationCaptor.capture(), alertCaptor.capture(), alertConditionCaptor.capture());
 
         assertThat(alarmCallbackConfigurationCaptor.getValue()).isEqualTo(alarmCallbackConfiguration);
-        assertThat(alert).isEqualTo(alert);
+        assertThat(alertCaptor.getValue()).isEqualTo(alert);
         assertThat(alertConditionCaptor.getValue()).isEqualTo(alertCondition);
     }
 }
