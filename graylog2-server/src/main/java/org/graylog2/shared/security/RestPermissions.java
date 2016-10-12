@@ -31,7 +31,7 @@ public class RestPermissions implements PluginPermissions {
     private static final Logger LOG = LoggerFactory.getLogger(RestPermissions.class);
 
     /**
-     *These should all be in the form of "group:action", because {@link Permissions#allPermissionsMap()} below depends on it.
+     * These should all be in the form of "group:action", because {@link Permissions#allPermissionsMap()} below depends on it.
      * Should this ever change, you need to adapt the code below, too.
      */
     public static final String AUTHENTICATION_EDIT = "authentication:edit";
@@ -62,6 +62,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String INDEXERCLUSTER_READ = "indexercluster:read";
     public static final String INDEXRANGES_READ = "indexranges:read";
     public static final String INDEXRANGES_REBUILD = "indexranges:rebuild";
+    public static final String INDEXSETS_CREATE = "indexsets:create";
+    public static final String INDEXSETS_DELETE = "indexsets:delete";
+    public static final String INDEXSETS_EDIT = "indexsets:edit";
+    public static final String INDEXSETS_READ = "indexsets:read";
     public static final String INDICES_CHANGESTATE = "indices:changestate";
     public static final String INDICES_DELETE = "indices:delete";
     public static final String INDICES_FAILURES = "indices:failures";
@@ -159,6 +163,10 @@ public class RestPermissions implements PluginPermissions {
         .add(create(INDEXERCLUSTER_READ, ""))
         .add(create(INDEXRANGES_READ, ""))
         .add(create(INDEXRANGES_REBUILD, ""))
+        .add(create(INDEXSETS_CREATE, ""))
+        .add(create(INDEXSETS_DELETE, ""))
+        .add(create(INDEXSETS_EDIT, ""))
+        .add(create(INDEXSETS_READ, ""))
         .add(create(INDICES_CHANGESTATE, ""))
         .add(create(INDICES_DELETE, ""))
         .add(create(INDICES_FAILURES, ""))

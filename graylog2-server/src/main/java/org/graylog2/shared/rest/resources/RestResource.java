@@ -105,7 +105,7 @@ public abstract class RestResource {
 
     protected void checkPermission(String permission, String instanceId) {
         if (!isPermitted(permission, instanceId)) {
-            throw new ForbiddenException("Not authorized to access resource id " + instanceId);
+            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">");
         }
     }
 
@@ -133,7 +133,7 @@ public abstract class RestResource {
 
     protected void checkAnyPermission(String permissions[], String instanceId) {
         if (!isAnyPermitted(permissions, instanceId)) {
-            throw new ForbiddenException("Not authorized to access resource id " + instanceId);
+            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">");
         }
     }
 
