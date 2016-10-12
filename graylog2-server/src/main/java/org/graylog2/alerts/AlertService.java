@@ -30,11 +30,9 @@ import java.util.Map;
  * @author Dennis Oelkers <dennis@torch.sh>
  */
 public interface AlertService {
-    int MAX_LIST_COUNT = 300;
-
     Alert factory(AlertCondition.CheckResult checkResult);
 
-    List<Alert> loadRecentOfStream(String streamId, DateTime since);
+    List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit);
 
     int triggeredSecondsAgo(String streamId, String conditionId);
 

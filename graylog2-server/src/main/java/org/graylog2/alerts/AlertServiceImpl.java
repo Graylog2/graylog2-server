@@ -72,14 +72,14 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    public List<Alert> loadRecentOfStream(String streamId, DateTime since) {
+    public List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit) {
         return this.coll.find(
             DBQuery.and(
                 DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId),
                 DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, since.toDate())
             )
         )
-            .limit(MAX_LIST_COUNT)
+            .limit(limit)
             .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
             .toArray()
             .stream()

@@ -36,6 +36,8 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
 import javax.inject.Inject;
+import javax.validation.constraints.Min;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -48,6 +50,7 @@ import java.util.stream.Collectors;
 @Api(value = "Alerts", description = "Manage stream alerts for all streams")
 @Path("/streams/alerts")
 public class AlertResource extends RestResource {
+    private static final int DEFAULT_MAX_LIST_COUNT = 300;
     private final StreamService streamService;
     private final AlertService alertService;
 
@@ -60,25 +63,22 @@ public class AlertResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get the " + AlertService.MAX_LIST_COUNT + " most recent alarms of all streams.")
+    @ApiOperation(value = "Get the most recent alarms of all streams.")
     @RequiresPermissions(RestPermissions.STREAMS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     public AlertListSummary listAll(@ApiParam(name = "since", value = "Optional parameter to define a lower date boundary. (UNIX timestamp)", required = false)
-                                    @QueryParam("since") int sinceTs) throws NotFoundException {
-        final DateTime since;
-        if (sinceTs > 0) {
-            since = new DateTime(sinceTs * 1000L, DateTimeZone.UTC);
-        } else {
-            since = null;
-        }
+                                    @QueryParam("since") @DefaultValue("0") @Min(0) int sinceTs,
+                                    @ApiParam(name = "limit", value = "Maximum number of alerts to return.", required = false)
+                                    @QueryParam("limit") @DefaultValue("300") @Min(1) int limit) throws NotFoundException {
+        final DateTime since = new DateTime(sinceTs * 1000L, DateTimeZone.UTC);
 
-        List<AlertSummary> alerts = streamService.loadAll().stream()
+        final List<AlertSummary> alerts = streamService.loadAll().stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
-                .flatMap(stream -> alertService.loadRecentOfStream(stream.getId(), since).stream())
-                .limit(AlertService.MAX_LIST_COUNT)
+                .flatMap(stream -> alertService.loadRecentOfStream(stream.getId(), since, limit).stream())
+                .limit(limit)
                 .map(alert -> AlertSummary.create(alert.getId(), alert.getConditionId(), alert.getStreamId(), alert.getDescription(), alert.getConditionParameters(), alert.getTriggeredAt()))
                 .collect(Collectors.toList());
 

@@ -59,6 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.constraints.Min;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -116,7 +117,7 @@ public class StreamAlertResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get the " + AlertService.MAX_LIST_COUNT + " most recent alarms of this stream.")
+    @ApiOperation(value = "Get the most recent alarms of this stream.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
@@ -125,18 +126,15 @@ public class StreamAlertResource extends RestResource {
     public AlertListSummary list(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
                                  @PathParam("streamId") String streamId,
                                  @ApiParam(name = "since", value = "Optional parameter to define a lower date boundary. (UNIX timestamp)")
-                                 @QueryParam("since") int sinceTs) throws NotFoundException {
+                                 @QueryParam("since") @DefaultValue("0") @Min(0) int sinceTs,
+                                 @ApiParam(name = "limit", value = "Maximum number of alerts to return.", required = false)
+                                 @QueryParam("limit") @DefaultValue("300") @Min(1) int limit) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
-        final DateTime since;
-        if (sinceTs > 0) {
-            since = new DateTime(sinceTs * 1000L, DateTimeZone.UTC);
-        } else {
-            since = null;
-        }
+        final DateTime since = new DateTime(sinceTs * 1000L, DateTimeZone.UTC);
 
         final Stream stream = streamService.load(streamId);
-        final List<AlertSummary> conditions = toSummaryList(alertService.loadRecentOfStream(stream.getId(), since));
+        final List<AlertSummary> conditions = toSummaryList(alertService.loadRecentOfStream(stream.getId(), since, limit));
 
         return AlertListSummary.create(alertService.totalCountForStream(streamId), conditions);
     }
