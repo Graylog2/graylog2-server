@@ -27,7 +27,8 @@
         "backlog": 10,
         "time": 1
       },
-      "condition_id": "57cf1342-14f3-477c-90b9-109f1e2fc9dc"
+      "condition_id": "57cf1342-14f3-477c-90b9-109f1e2fc9dc",
+      "description": "Mock alert for integration tests"
     }
   ]
 }

@@ -63,9 +63,8 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
                 alertConditionTitle);
 
             fieldStatsShouldReturn(getFieldStatsResult(checkType, higherThanThreshold));
-            alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition);
+            AlertCondition.CheckResult result = fieldValueAlertCondition.runCheck();
 
             assertTriggered(fieldValueAlertCondition, result);
         }
@@ -82,9 +81,8 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
                 alertConditionTitle);
 
             fieldStatsShouldReturn(getFieldStatsResult(checkType, lowerThanThreshold));
-            alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition);
+            AlertCondition.CheckResult result = fieldValueAlertCondition.runCheck();
 
             assertNotTriggered(result);
         }
@@ -101,9 +99,8 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
                 alertConditionTitle);
 
             fieldStatsShouldReturn(getFieldStatsResult(checkType, lowerThanThreshold));
-            alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition);
+            AlertCondition.CheckResult result = fieldValueAlertCondition.runCheck();
 
             assertTriggered(fieldValueAlertCondition, result);
         }
@@ -120,9 +117,8 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
                 alertConditionTitle);
 
             fieldStatsShouldReturn(getFieldStatsResult(checkType, higherThanThreshold));
-            alertLastTriggered(-1);
 
-            AlertCondition.CheckResult result = alertService.triggered(fieldValueAlertCondition);
+            AlertCondition.CheckResult result = fieldValueAlertCondition.runCheck();
 
             assertNotTriggered(result);
         }

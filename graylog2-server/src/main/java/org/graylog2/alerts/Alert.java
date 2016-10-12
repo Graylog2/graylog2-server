@@ -16,7 +16,6 @@
  */
 package org.graylog2.alerts;
 
-import org.graylog2.plugin.database.Persisted;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -24,10 +23,21 @@ import java.util.Map;
 /**
  * @author Dennis Oelkers <dennis@torch.sh>
  */
-public interface Alert extends Persisted {
+public interface Alert {
+    String getId();
     String getStreamId();
     String getConditionId();
     DateTime getTriggeredAt();
     String getDescription();
     Map<String, Object> getConditionParameters();
+
+    interface Builder {
+        Builder streamId(String streamId);
+        Builder conditionId(String conditionId);
+        Builder triggeredAt(DateTime triggeredAt);
+        Builder description(String description);
+        Builder conditionParameters(Map<String, Object> conditionParameters);
+
+        Alert build();
+    }
 }

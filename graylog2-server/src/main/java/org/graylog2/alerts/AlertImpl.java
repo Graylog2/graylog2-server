@@ -16,89 +16,91 @@
  */
 package org.graylog2.alerts;
 
-import com.google.common.collect.Maps;
-import org.bson.types.ObjectId;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import org.graylog2.database.CollectionName;
-import org.graylog2.database.PersistedImpl;
-import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.mongojack.Id;
+import org.mongojack.ObjectId;
 
-import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 
+@AutoValue
+@JsonAutoDetect
 @CollectionName("alerts")
-public class AlertImpl extends PersistedImpl implements Alert {
-    private static final String FIELD_ID = "_id";
-    private static final String FIELD_CONDITION_ID = "condition_id";
-    private static final String FIELD_STREAM_ID = "stream_id";
-    private static final String FIELD_DESCRIPTION = "description";
-    private static final String FIELD_CONDITION_PARAMETERS = "condition_parameters";
-    private static final String FIELD_TRIGGERED_AT = "triggered_at";
+public abstract class AlertImpl implements Alert {
+    static final String FIELD_ID = "_id";
+    static final String FIELD_CONDITION_ID = "condition_id";
+    static final String FIELD_STREAM_ID = "stream_id";
+    static final String FIELD_DESCRIPTION = "description";
+    static final String FIELD_CONDITION_PARAMETERS = "condition_parameters";
+    static final String FIELD_TRIGGERED_AT = "triggered_at";
 
-    private static final Logger LOG = LoggerFactory.getLogger(AlertImpl.class);
-
-    public static final int MAX_LIST_COUNT = 300;
-    public static final int REST_CHECK_CACHE_SECONDS = 30;
-
-    protected AlertImpl(Map<String, Object> fields) {
-        super(fields);
-    }
-
-    protected AlertImpl(ObjectId id, Map<String, Object> fields) {
-        super(id, fields);
-    }
-
-    public Map<String,Object> toMap() {
-        Map<String, Object> map = Maps.newHashMap();
-
-        DateTime triggeredAt = new DateTime(fields.get(FIELD_TRIGGERED_AT), DateTimeZone.UTC);
-
-        map.put("id", fields.get(FIELD_ID).toString());
-        map.put(FIELD_CONDITION_ID, fields.get(FIELD_CONDITION_ID));
-        map.put(FIELD_STREAM_ID, fields.get(FIELD_STREAM_ID));
-        map.put(FIELD_DESCRIPTION, fields.get(FIELD_DESCRIPTION));
-        map.put(FIELD_CONDITION_PARAMETERS, fields.get(FIELD_CONDITION_PARAMETERS));
-        map.put(FIELD_TRIGGERED_AT, Tools.getISO8601String(triggeredAt));
-
-        return map;
-    }
-
+    @JsonProperty(FIELD_ID)
     @Override
-    public Map<String, Validator> getValidations() {
-        return Collections.emptyMap();
+    @ObjectId
+    @Id
+    public abstract String getId();
+
+    @JsonProperty(FIELD_STREAM_ID)
+    @Override
+    public abstract String getStreamId();
+
+    @JsonProperty(FIELD_CONDITION_ID)
+    @Override
+    public abstract String getConditionId();
+
+    @JsonProperty(FIELD_TRIGGERED_AT)
+    @Override
+    public abstract DateTime getTriggeredAt();
+
+    @JsonProperty(FIELD_DESCRIPTION)
+    @Override
+    public abstract String getDescription();
+
+    @JsonProperty(FIELD_CONDITION_PARAMETERS)
+    @Override
+    public abstract Map<String, Object> getConditionParameters();
+
+    static Builder builder() {
+        return new AutoValue_AlertImpl.Builder();
     }
 
-    @Override
-    public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Collections.emptyMap();
+    @JsonCreator
+    public static AlertImpl create(@JsonProperty(FIELD_ID) @ObjectId @Id String id,
+                                   @JsonProperty(FIELD_STREAM_ID) String streamId,
+                                   @JsonProperty(FIELD_CONDITION_ID) String conditionId,
+                                   @JsonProperty(FIELD_TRIGGERED_AT) Date triggeredAt,
+                                   @JsonProperty(FIELD_DESCRIPTION) String description,
+                                   @JsonProperty(FIELD_CONDITION_PARAMETERS) Map<String, Object> conditionParameters) {
+        return builder()
+            .id(id)
+            .streamId(streamId)
+            .conditionId(conditionId)
+            .triggeredAt(new DateTime(triggeredAt))
+            .description(description)
+            .conditionParameters(conditionParameters)
+            .build();
     }
 
-    @Override
-    public String getStreamId() {
-        return (String) fields.get(FIELD_STREAM_ID);
-    }
+    @AutoValue.Builder
+    public interface Builder extends Alert.Builder {
+        Builder id(String id);
+        @Override
+        Builder streamId(String streamId);
+        @Override
+        Builder conditionId(String conditionId);
+        @Override
+        Builder triggeredAt(DateTime triggeredAt);
+        @Override
+        Builder description(String description);
+        @Override
+        Builder conditionParameters(Map<String, Object> conditionParameters);
 
-    @Override
-    public String getConditionId() {
-        return (String) fields.get(FIELD_CONDITION_ID);
-    }
-
-    @Override
-    public DateTime getTriggeredAt() {
-        return (DateTime) fields.get(FIELD_TRIGGERED_AT);
-    }
-
-    @Override
-    public String getDescription() {
-        return (String) fields.get(FIELD_DESCRIPTION);
-    }
-
-    @Override
-    public Map<String, Object> getConditionParameters() {
-        return (Map<String, Object>) fields.get(FIELD_CONDITION_PARAMETERS);
+        @Override
+        AlertImpl build();
     }
 }

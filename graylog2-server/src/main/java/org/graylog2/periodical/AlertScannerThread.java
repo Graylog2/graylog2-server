@@ -17,17 +17,13 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Configuration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
-import org.graylog2.alarmcallbacks.AlarmCallbackHistory;
 import org.graylog2.alarmcallbacks.AlarmCallbackHistoryService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
-import org.graylog2.alerts.Alert;
+import org.graylog2.alerts.AlertScanner;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.initializers.IndexerSetupService;
-import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
@@ -48,6 +44,7 @@ public class AlertScannerThread extends Periodical {
     private final AlertService alertService;
     private final Configuration configuration;
     private final AlarmCallbackHistoryService alarmCallbackHistoryService;
+    private final AlertScanner alertScanner;
 
     @Inject
     public AlertScannerThread(final AlertService alertService,
@@ -57,7 +54,8 @@ public class AlertScannerThread extends Periodical {
                               final EmailAlarmCallback emailAlarmCallback,
                               final IndexerSetupService indexerSetupService,
                               final Configuration configuration,
-                              final AlarmCallbackHistoryService alarmCallbackHistoryService) {
+                              final AlarmCallbackHistoryService alarmCallbackHistoryService,
+                              final AlertScanner alertScanner) {
         this.alertService = alertService;
         this.streamService = streamService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
@@ -66,6 +64,7 @@ public class AlertScannerThread extends Periodical {
         this.indexerSetupService = indexerSetupService;
         this.configuration = configuration;
         this.alarmCallbackHistoryService = alarmCallbackHistoryService;
+        this.alertScanner = alertScanner;
     }
 
     @Override
@@ -90,58 +89,7 @@ public class AlertScannerThread extends Periodical {
             }
 
             // Check if a threshold is reached.
-            for (AlertCondition alertCondition : streamService.getAlertConditions(stream)) {
-                try {
-                    final AlertCondition.CheckResult result = alertService.triggered(alertCondition);
-                    if (result.isTriggered()) {
-                        // Alert is triggered!
-                        LOG.debug("Alert condition [{}] is triggered. Sending alerts.", alertCondition);
-
-                        // Persist alert.
-                        final Alert alert = alertService.factory(result);
-                        alertService.save(alert);
-
-                        final List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);
-
-                        // Checking if alarm callbacks have been defined
-                        if (callConfigurations.size() > 0)
-                            for (AlarmCallbackConfiguration configuration : callConfigurations) {
-                                AlarmCallbackHistory alarmCallbackHistory;
-                                AlarmCallback alarmCallback = null;
-                                try {
-                                    alarmCallback = alarmCallbackFactory.create(configuration);
-                                    alarmCallback.call(stream, result);
-                                    alarmCallbackHistory = alarmCallbackHistoryService.success(configuration, alert, alertCondition);
-                                } catch (Exception e) {
-                                    if (alarmCallback != null) {
-                                        LOG.warn("Alarm callback <" + alarmCallback.getName() + "> failed. Skipping.", e);
-                                    } else {
-                                        LOG.warn("Alarm callback with id " + configuration.getId() + " failed. Skipping.", e);
-                                    }
-                                    alarmCallbackHistory = alarmCallbackHistoryService.error(configuration, alert, alertCondition, e.getMessage());
-                                }
-
-                                try {
-                                    alarmCallbackHistoryService.save(alarmCallbackHistory);
-                                } catch (Exception e) {
-                                    LOG.warn("Unable to save history of alarm callback run: ", e);
-                                }
-                            }
-                        else {
-                            /* Using e-mail alarm callback per default if there are no alarm callbacks configured explicitly.
-                               This way we are supporting users who have upgraded from an old version where alarm callbacks
-                               were non-existent. It also helps for users who forgot to set up alarm callbacks for newly
-                               created alert conditions. */
-                            emailAlarmCallback.call(stream, result);
-                        }
-                    } else {
-                        // Alert not triggered.
-                        LOG.debug("Alert condition [{}] is not triggered.", alertCondition);
-                    }
-                } catch(Exception e) {
-                    LOG.error("Skipping alert check that threw an exception.", e);
-                }
-            }
+            streamService.getAlertConditions(stream).forEach(alertCondition -> alertScanner.checkAlertCondition(stream, alertCondition));
         }
     }
 

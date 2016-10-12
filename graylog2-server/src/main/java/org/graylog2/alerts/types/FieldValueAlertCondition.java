@@ -175,7 +175,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
             if (fieldStatsResult.getCount() == 0) {
                 LOG.debug("Alert check <{}> did not match any messages. Returning not triggered.", type);
-                return new NegativeCheckResult(this);
+                return new NegativeCheckResult();
             }
 
             final double result;
@@ -197,7 +197,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
                     break;
                 default:
                     LOG.error("No such field value check type: [{}]. Returning not triggered.", type);
-                    return new NegativeCheckResult(this);
+                    return new NegativeCheckResult();
             }
 
             LOG.debug("Alert check <{}> result: [{}]", id, result);
@@ -205,7 +205,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             if (Double.isInfinite(result)) {
                 // This happens when there are no ES results/docs.
                 LOG.debug("Infinite value. Returning not triggered.");
-                return new NegativeCheckResult(this);
+                return new NegativeCheckResult();
             }
 
             final boolean triggered;
@@ -240,7 +240,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
                 return new CheckResult(true, this, resultDescription, Tools.nowUTC(), summaries);
             } else {
-                return new NegativeCheckResult(this);
+                return new NegativeCheckResult();
             }
         } catch (InvalidRangeParametersException e) {
             // cannot happen lol
@@ -252,7 +252,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             return null;
         } catch (Searches.FieldTypeException e) {
             LOG.debug("Field [{}] seems not to have a numerical type or doesn't even exist at all. Returning not triggered.", field, e);
-            return new NegativeCheckResult(this);
+            return new NegativeCheckResult();
         }
     }
 }

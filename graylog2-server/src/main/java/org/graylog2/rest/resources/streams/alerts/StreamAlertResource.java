@@ -35,7 +35,6 @@ import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.Alert;
-import org.graylog2.alerts.AlertImpl;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.alerts.types.DummyAlertCondition;
 import org.graylog2.audit.AuditEventTypes;
@@ -60,6 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.constraints.Min;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -88,11 +88,12 @@ import static com.google.common.base.Preconditions.checkArgument;
 @Api(value = "Stream/Alerts", description = "Manage stream alerts for a given stream")
 @Path("/streams/{streamId}/alerts")
 public class StreamAlertResource extends RestResource {
+    private static final int REST_CHECK_CACHE_SECONDS = 30;
 
     private static final Logger LOG = LoggerFactory.getLogger(StreamAlertResource.class);
     private static final String CACHE_KEY_BASE = "alerts";
     private static final Cache<String, Map<String, Object>> CACHE = CacheBuilder.newBuilder()
-            .expireAfterWrite(AlertImpl.REST_CHECK_CACHE_SECONDS, TimeUnit.SECONDS)
+            .expireAfterWrite(REST_CHECK_CACHE_SECONDS, TimeUnit.SECONDS)
             .build();
 
     private final StreamService streamService;
@@ -116,7 +117,7 @@ public class StreamAlertResource extends RestResource {
 
     @GET
     @Timed
-    @ApiOperation(value = "Get the " + AlertImpl.MAX_LIST_COUNT + " most recent alarms of this stream.")
+    @ApiOperation(value = "Get the most recent alarms of this stream.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
@@ -125,18 +126,15 @@ public class StreamAlertResource extends RestResource {
     public AlertListSummary list(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
                                  @PathParam("streamId") String streamId,
                                  @ApiParam(name = "since", value = "Optional parameter to define a lower date boundary. (UNIX timestamp)")
-                                 @QueryParam("since") int sinceTs) throws NotFoundException {
+                                 @QueryParam("since") @DefaultValue("0") @Min(0) int sinceTs,
+                                 @ApiParam(name = "limit", value = "Maximum number of alerts to return.", required = false)
+                                 @QueryParam("limit") @DefaultValue("300") @Min(1) int limit) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
-        final DateTime since;
-        if (sinceTs > 0) {
-            since = new DateTime(sinceTs * 1000L, DateTimeZone.UTC);
-        } else {
-            since = null;
-        }
+        final DateTime since = new DateTime(sinceTs * 1000L, DateTimeZone.UTC);
 
         final Stream stream = streamService.load(streamId);
-        final List<AlertSummary> conditions = toSummaryList(alertService.loadRecentOfStream(stream.getId(), since));
+        final List<AlertSummary> conditions = toSummaryList(alertService.loadRecentOfStream(stream.getId(), since, limit));
 
         return AlertListSummary.create(alertService.totalCountForStream(streamId), conditions);
     }
@@ -155,12 +153,8 @@ public class StreamAlertResource extends RestResource {
                                           @ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
                                           @QueryParam("skip") @DefaultValue("0") int skip,
                                           @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
-                                          @QueryParam("limit") @DefaultValue("0") int limit) throws NotFoundException {
+                                          @QueryParam("limit") @DefaultValue("300") int limit) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
-
-        if (limit == 0) {
-            limit = AlertImpl.MAX_LIST_COUNT;
-        }
 
         final Stream stream = streamService.load(streamId);
         final List<AlertSummary> conditions = toSummaryList(alertService.listForStreamId(stream.getId(), skip, limit));
@@ -171,7 +165,7 @@ public class StreamAlertResource extends RestResource {
     @GET
     @Timed
     @Path("check")
-    @ApiOperation(value = "Check for triggered alert conditions of this streams. Results cached for " + AlertImpl.REST_CHECK_CACHE_SECONDS + " seconds.")
+    @ApiOperation(value = "Check for triggered alert conditions of this streams. Results cached for " + REST_CHECK_CACHE_SECONDS + " seconds.")
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
@@ -192,9 +186,9 @@ public class StreamAlertResource extends RestResource {
                 final List<Map<String, Object>> results = new ArrayList<>(alertConditions.size());
                 for (AlertCondition alertCondition : alertConditions) {
                     final Map<String, Object> conditionResult = new HashMap<>();
-                    conditionResult.put("condition", alertService.asMap(alertCondition));
+                    conditionResult.put("condition", alertCondition);
 
-                    final AlertCondition.CheckResult checkResult = alertService.triggeredNoGrace(alertCondition);
+                    final AlertCondition.CheckResult checkResult = alertCondition.runCheck();
                     conditionResult.put("triggered", checkResult.isTriggered());
 
                     if (checkResult.isTriggered()) {

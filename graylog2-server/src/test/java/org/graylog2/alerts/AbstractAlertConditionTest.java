@@ -19,52 +19,16 @@ package org.graylog2.alerts;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
-import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 public class AbstractAlertConditionTest extends AlertConditionTest {
-    protected AlertCondition alertCondition;
-    final protected int grace = 10;
     final protected int time = 10;
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        alertCondition = getDummyAlertCondition(getParametersMap(grace, time, 0));
-    }
-
-    @Test
-    @Ignore
-    public void testInGracePeriod() throws Exception {
-        alertLastTriggered(-1);
-        assertFalse("Should not be in grace period because alert was never fired", alertService.inGracePeriod(alertCondition));
-        alertLastTriggered(0);
-        assertTrue("Should be in grace period because alert was just fired", alertService.inGracePeriod(alertCondition));
-        alertLastTriggered(grace * 60 - 1);
-        assertTrue("Should be in grace period because alert was fired during grace period", alertService.inGracePeriod(alertCondition));
-        alertLastTriggered(grace * 60 + 1);
-        assertFalse("Should not be in grace period because alert was fired after grace period has passed", alertService.inGracePeriod(alertCondition));
-        alertLastTriggered(Integer.MAX_VALUE);
-        assertFalse("Should not be in grace period because alert was fired after grace period has passed", alertService.inGracePeriod(alertCondition));
-
-        final AlertCondition alertConditionZeroGrace = getDummyAlertCondition(getParametersMap(0, time, 0));
-        alertLastTriggered(0);
-        assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
-        alertLastTriggered(-1);
-        assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
-        alertLastTriggered(Integer.MAX_VALUE);
-        assertFalse("Should not be in grace period because grace is zero", alertService.inGracePeriod(alertConditionZeroGrace));
-    }
 
     @Test
     public void testDifferingTypesForNumericalParameters() throws Exception {
@@ -104,7 +68,7 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
         assertEquals(optionalForNull.orElse(1).doubleValue(), 1.0, 0.0);
     }
 
-    protected AlertCondition getDummyAlertCondition(Map<String, Object> parameters) {
+    private AlertCondition getDummyAlertCondition(Map<String, Object> parameters) {
         return new AbstractAlertCondition(stream, CONDITION_ID, null, Tools.nowUTC(), STREAM_CREATOR, parameters, "Dummy Alert Condition") {
             @Override
             public String getDescription() {
