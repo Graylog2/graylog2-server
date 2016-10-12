@@ -155,12 +155,8 @@ public class StreamAlertResource extends RestResource {
                                           @ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
                                           @QueryParam("skip") @DefaultValue("0") int skip,
                                           @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
-                                          @QueryParam("limit") @DefaultValue("0") int limit) throws NotFoundException {
+                                          @QueryParam("limit") @DefaultValue("300") int limit) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
-
-        if (limit == 0) {
-            limit = AlertService.MAX_LIST_COUNT;
-        }
 
         final Stream stream = streamService.load(streamId);
         final List<AlertSummary> conditions = toSummaryList(alertService.listForStreamId(stream.getId(), skip, limit));
