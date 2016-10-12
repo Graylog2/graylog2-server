@@ -48,8 +48,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -72,16 +72,10 @@ public class IndexSetsResource extends RestResource {
             @ApiResponse(code = 403, message = "Unauthorized"),
     })
     public IndexSetResponse list() {
-        final Set<IndexSetConfig> all = indexSetService.findAll();
-        final Set<IndexSetSummary> indexSets = new HashSet<>(all.size());
-        for (IndexSetConfig indexSetConfig : all) {
-            if (!isPermitted(RestPermissions.INDEXSETS_READ, indexSetConfig.id())) {
-                continue;
-            }
-            final IndexSetSummary indexSet = IndexSetSummary.fromIndexSetConfig(indexSetConfig);
-            indexSets.add(indexSet);
-        }
-
+        final Set<IndexSetSummary> indexSets = indexSetService.findAll().stream()
+                .filter(indexSetConfig -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetConfig.id()))
+                .map(IndexSetSummary::fromIndexSetConfig)
+                .collect(Collectors.toSet());
         return IndexSetResponse.create(indexSets.size(), indexSets);
     }
 
