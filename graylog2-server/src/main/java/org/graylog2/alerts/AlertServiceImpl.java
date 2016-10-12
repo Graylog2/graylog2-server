@@ -36,6 +36,7 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -76,7 +77,7 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit) {
-        return this.coll.find(
+        return Collections.unmodifiableList(this.coll.find(
             DBQuery.and(
                 DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId),
                 DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, since.toDate())
@@ -84,9 +85,7 @@ public class AlertServiceImpl implements AlertService {
         )
             .limit(limit)
             .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
-            .toArray()
-            .stream()
-            .collect(Collectors.toList());
+            .toArray();
     }
 
     @Override
@@ -172,13 +171,11 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public List<Alert> listForStreamId(String streamId, int skip, int limit) {
-        return this.coll.find(DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId))
+        return Collections.unmodifiableList(this.coll.find(DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId))
             .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
             .skip(skip)
             .limit(limit)
-            .toArray()
-            .stream()
-            .collect(Collectors.toList());
+            .toArray());
     }
 
     @Override
