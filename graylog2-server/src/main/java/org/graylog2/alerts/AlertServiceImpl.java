@@ -85,7 +85,7 @@ public class AlertServiceImpl implements AlertService {
         )
             .limit(limit)
             .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
-            .toArray();
+            .toArray());
     }
 
     @Override
