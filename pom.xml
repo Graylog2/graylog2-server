@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>graylog-plugin-map-widget</artifactId>
-    <version>2.2.0-SNAPSHOT</version>
+    <version>2.2.0-alpha.1</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -31,7 +31,7 @@
         <connection>scm:git:git@github.com:Graylog2/graylog-plugin-map-widget.git</connection>
         <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-map-widget.git</developerConnection>
         <url>https://github.com/Graylog2/graylog-plugin-map-widget</url>
-        <tag>HEAD</tag>
+        <tag>2.2.0-alpha.1</tag>
     </scm>
 
     <distributionManagement>
@@ -130,7 +130,7 @@
                         </goals>
                         <configuration>
                             <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
                             </transformers>
                         </configuration>
                     </execution>
