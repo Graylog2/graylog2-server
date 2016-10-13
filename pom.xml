@@ -13,7 +13,7 @@
     </parent>
 
     <artifactId>graylog-plugin-pipeline-processor-parent</artifactId>
-    <version>2.2.0-alpha.1</version>
+    <version>2.2.0-alpha.2-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>Graylog Pipeline Plugin Parent</name>
@@ -35,7 +35,7 @@
         <connection>scm:git:git@github.com:Graylog2/graylog-plugin-pipeline-processor.git</connection>
         <developerConnection>scm:git:git@github.com:Graylog2/graylog-plugin-pipeline-processor.git</developerConnection>
         <url>https://github.com/Graylog2/graylog-plugin-pipeline-processor</url>
-        <tag>2.2.0-alpha.1</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <distributionManagement>
