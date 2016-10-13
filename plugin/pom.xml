@@ -42,7 +42,7 @@
         <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.site.skip>true</maven.site.skip>
-        <graylog.version>${project.plugin.parent}</graylog.version>
+        <graylog.version>2.2.0-SNAPSHOT</graylog.version>
         <graylog.plugin-dir>/usr/share/graylog-server/plugin</graylog.plugin-dir>
         <antlr.version>4.5.1</antlr.version>
         <slf4j.version>1.7.21</slf4j.version>
