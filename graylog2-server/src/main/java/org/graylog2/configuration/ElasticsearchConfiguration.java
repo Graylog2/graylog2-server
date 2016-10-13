@@ -86,6 +86,7 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_config_file", validator = FilePathReadableValidator.class)
     private Path configFile;
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_index_prefix", required = true)
     private String indexPrefix = "graylog";
 
@@ -105,9 +106,11 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_max_time_per_index", required = true)
     private Period maxTimePerIndex = Period.days(1);
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_shards", validator = PositiveIntegerValidator.class, required = true)
     private int shards = 4;
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_replicas", validator = PositiveIntegerValidator.class, required = true)
     private int replicas = 0;
 
@@ -197,6 +200,7 @@ public class ElasticsearchConfiguration {
         return configFile;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public String getIndexPrefix() {
         return indexPrefix.toLowerCase(Locale.ENGLISH);
     }
@@ -221,10 +225,12 @@ public class ElasticsearchConfiguration {
         return maxTimePerIndex;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public int getShards() {
         return shards;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public int getReplicas() {
         return replicas;
     }
