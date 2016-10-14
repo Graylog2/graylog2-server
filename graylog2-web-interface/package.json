@@ -12,7 +12,7 @@
   "scripts": {
     "start": "webpack --config webpack.vendor.js && webpack-dev-server --config webpack.combined.config.js",
     "start-nohmr": "webpack --config webpack.vendor.js && webpack-dev-server --watch --config webpack.combined.config.js",
-    "build": "webpack -p --config webpack.vendor.js && webpack -p",
+    "build": "webpack -p --config webpack.vendor.js && webpack",
     "test": "webpack --config webpack.vendor.js && karma start karma.ci.conf.js",
     "prepare-dev": "./tools/prepare-dev"
   },
