@@ -1,0 +1,9 @@
+// from bug report https://github.com/Graylog2/graylog2-server/issues/2952
+rule "SymantecParseKeyValue"
+when
+  has_field("message")
+then
+  // Try to parse message
+  let split_message = key_value(to_string($message.message), ",", ":", true, true, ",", " ", " ");
+  set_fields(split_message);
+end
