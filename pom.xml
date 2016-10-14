@@ -122,7 +122,6 @@
         <kafka.version>0.9.0.1</kafka.version>
         <log4j.version>2.7</log4j.version>
         <metrics.version>3.1.2</metrics.version>
-        <mockito.version>2.1.0</mockito.version>
         <mongodb-driver.version>3.3.0</mongodb-driver.version>
         <mongojack.version>2.6.1</mongojack.version>
         <natty.version>0.12</natty.version>
@@ -153,6 +152,7 @@
         <fongo.version>2.0.9</fongo.version>
         <jukito.version>1.4.1</jukito.version>
         <junit.version>4.12</junit.version>
+        <mockito.version>2.2.1</mockito.version>
         <nosqlunit.version>0.10.0</nosqlunit.version>
         <restassured.version>2.9.0</restassured.version>
         <system-rules.version>1.16.1</system-rules.version>
