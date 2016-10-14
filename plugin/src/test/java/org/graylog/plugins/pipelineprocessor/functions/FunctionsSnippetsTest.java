@@ -87,7 +87,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.Map;
@@ -576,31 +575,5 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }
-    }
-
-    @Test
-    @Ignore("Pending bug fix")
-    public void keyValueIssue2952() {
-        final Rule rule = parser.parseRule(ruleForTest(), true);
-        Message msg = new Message(
-                "SymantecServer: Virus found,IP Address: 192.168.5.234,Computer name: PC-NAME-HERE," +
-                        "Source: Real Time Scan,Risk name: Trojan.Kotver!lnk,Occurrences: 1," +
-                        "C:\\Users\\Admin123$\\AppData\\Local\\a2c40b\\65ac9c.lnk,'',Actual action: Left alone," +
-                        "Requested action: Cleaned,Secondary action: Quarantined,Event time: 2016-10-12 02:25:35," +
-                        "Inserted: 2016-10-12 02:27:43,End: 2016-10-12 02:26:41,Last update time: 2016-10-12 02:27:43," +
-                        "Domain: Default,Group: My Company\\Company Users,Server: SERVER-NAME,User: Admin123$," +
-                        "Source computer: ,Source IP: ,Disposition: Reputation was not used in this detection.," +
-                        "Download site: ,Web domain: ,Downloaded by: ," +
-                        "Prevalence: Reputation was not used in this detection.," +
-                        "Confidence: Reputation was not used in this detection.," +
-                        "URL Tracking Status: Off,,First Seen: Reputation was not used in this detection.," +
-                        "Sensitivity: ,MDS," +
-                        "Application hash: AF27F66565846C179788FB4ABCAE6A3B328AEA7B7EC78191B25AC21CF4924D71," +
-                        "Hash type: SHA2,Company name: ,Application name: 65ac9c.lnk,Application version: ," +
-                        "Application type: 127,File size (bytes): 880,Category set: Malware,Category type: Virus",
-                "SERVER-NAME",
-                Tools.nowUTC());
-        final Message message = evaluateRule(rule, msg);
-        assertThat(message.hasField("C")).isFalse();
     }
 }
