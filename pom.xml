@@ -94,7 +94,7 @@
         <commons-codec.version>1.10</commons-codec.version>
         <commons-email.version>1.4</commons-email.version>
         <commons-io.version>2.5</commons-io.version>
-        <disruptor.version>3.3.5</disruptor.version>
+        <disruptor.version>3.3.6</disruptor.version>
         <drools.version>6.4.0.Final</drools.version>
         <elasticsearch.version>2.4.1</elasticsearch.version>
         <gelfclient.version>1.4.0</gelfclient.version>
