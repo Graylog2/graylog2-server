@@ -80,7 +80,7 @@ public class AlertServiceImpl implements AlertService {
         return Collections.unmodifiableList(this.coll.find(
             DBQuery.and(
                 DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId),
-                DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, since.toDate())
+                DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, since)
             )
         )
             .limit(limit)
