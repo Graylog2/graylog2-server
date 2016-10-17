@@ -1,7 +1,7 @@
 #!/bin/bash
 
 JAR=${uberjar.name}-${git.commit.id.describe}.jar
-DEFAULT_JAVA_OPTS="-Xms512m -Xmx512g -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow"
+DEFAULT_JAVA_OPTS="-Xms512m -Xmx512m -server -XX:+ResizeTLAB -XX:+UseConcMarkSweepGC -XX:+CMSConcurrentMTEnabled -XX:+CMSClassUnloadingEnabled -XX:+UseParNewGC -XX:-OmitStackTraceInFastThrow"
 JAVA_OPTS="${JAVA_OPTS:="$DEFAULT_JAVA_OPTS"}"
 
 # default java

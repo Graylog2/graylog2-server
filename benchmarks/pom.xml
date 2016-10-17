@@ -127,9 +127,6 @@ THE POSSIBILITY OF SUCH DAMAGE.
                         </goals>
                     </execution>
                 </executions>
-                <configuration>
-                    <verbose>true</verbose>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
