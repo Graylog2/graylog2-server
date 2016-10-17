@@ -64,7 +64,7 @@ public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackCon
 
     @Override
     public AlarmCallbackConfiguration create(String streamId, CreateAlarmCallbackRequest request, String userId) {
-        return AlarmCallbackConfigurationAVImpl.create(new ObjectId().toHexString(), streamId, request.type, request.configuration, new Date(), userId);
+        return AlarmCallbackConfigurationAVImpl.create(new ObjectId().toHexString(), streamId, request.type(), request.configuration(), new Date(), userId);
     }
 
     @Override

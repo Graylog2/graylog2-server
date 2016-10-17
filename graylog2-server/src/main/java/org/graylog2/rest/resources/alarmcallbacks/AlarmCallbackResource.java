@@ -144,11 +144,11 @@ public class AlarmCallbackResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ALARM_CALLBACK_CREATE)
     public Response create(@ApiParam(name = "streamid", value = "The stream id this new alarm callback belongs to.", required = true)
                            @PathParam("streamid") String streamid,
-                           @ApiParam(name = "JSON body", required = true) CreateAlarmCallbackRequest cr) throws NotFoundException {
+                           @ApiParam(name = "JSON body", required = true) CreateAlarmCallbackRequest originalCr) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         // make sure the values are correctly converted to the declared configuration types
-        cr.configuration = convertConfigurationValues(cr);
+        final CreateAlarmCallbackRequest cr = CreateAlarmCallbackRequest.create(originalCr.type(), convertConfigurationValues(originalCr));
 
         final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackConfigurationService.create(streamid, cr, getCurrentUser().getName());
 
@@ -256,16 +256,16 @@ public class AlarmCallbackResource extends RestResource {
     private Map<String, Object> convertConfigurationValues(final CreateAlarmCallbackRequest alarmCallbackRequest) {
         final ConfigurationRequest requestedConfiguration;
         try {
-            final AlarmCallback alarmCallback = alarmCallbackFactory.create(alarmCallbackRequest.type);
+            final AlarmCallback alarmCallback = alarmCallbackFactory.create(alarmCallbackRequest.type());
             requestedConfiguration = alarmCallback.getRequestedConfiguration();
         } catch (ClassNotFoundException e) {
-            throw new BadRequestException("Unable to load alarm callback of type " + alarmCallbackRequest.type, e);
+            throw new BadRequestException("Unable to load alarm callback of type " + alarmCallbackRequest.type(), e);
         }
 
         // coerce the configuration to their correct types according to the alarmcallback's requested config
         final Map<String, Object> configuration;
         try {
-            configuration = ConfigurationMapConverter.convertValues(alarmCallbackRequest.configuration,
+            configuration = ConfigurationMapConverter.convertValues(alarmCallbackRequest.configuration(),
                                                                     requestedConfiguration);
         } catch (ValidationException e) {
             throw new BadRequestException("Invalid configuration map", e);
