@@ -28,6 +28,8 @@ import java.util.Set;
  * Implement the PluginMetaData interface here.
  */
 public class EnterpriseIntegrationMetaData implements PluginMetaData {
+    private static final String PLUGIN_PROPERTIES = "org.graylog.plugins.graylog-plugin-enterprise-integration/graylog-plugin.properties";
+
     @Override
     public String getUniqueId() {
         return "org.graylog.plugins.enterprise_integration.EnterpriseIntegrationPlugin";
@@ -50,7 +52,7 @@ public class EnterpriseIntegrationMetaData implements PluginMetaData {
 
     @Override
     public Version getVersion() {
-        return new Version(2, 2, 0, "alpha.1");
+        return Version.fromPluginProperties(this.getClass(), PLUGIN_PROPERTIES, "version", Version.from(0, 0, 0, "unknown"));
     }
 
     @Override
@@ -60,7 +62,7 @@ public class EnterpriseIntegrationMetaData implements PluginMetaData {
 
     @Override
     public Version getRequiredVersion() {
-        return new Version(2, 1, 0);
+        return Version.fromPluginProperties(this.getClass(), PLUGIN_PROPERTIES, "graylog.version", Version.CURRENT_CLASSPATH);
     }
 
     @Override

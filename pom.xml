@@ -12,6 +12,7 @@
         <relativePath>../graylog2-server/graylog-plugin-parent/graylog-plugin-web-parent</relativePath>
     </parent>
 
+    <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-enterprise-integration</artifactId>
     <version>2.2.0-alpha.2-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -45,17 +46,44 @@
             <name>Nexus Release Repository</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-		</distributionManagement>
+    </distributionManagement>
+
+    <repositories>
+        <!-- to make our snapshot releases work with Travis et al -->
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sonatype-nexus-releases</id>
+            <name>Sonatype Nexus Releases</name>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
     <properties>
-        <graylog.version>${project.parent.version}</graylog.version>
+        <maven.deploy.skip>true</maven.deploy.skip>
+        <graylog.version>2.2.0-alpha.2-SNAPSHOT</graylog.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.graylog2</groupId>
             <artifactId>graylog2-server</artifactId>
-            <version>${project.parent.version}</version>
+            <version>${graylog.version}</version>
             <scope>provided</scope>
         </dependency>
 
@@ -68,12 +96,12 @@
 
     <build>
         <resources>
-            <resource><directory>build</directory></resource>
             <resource>
-              <directory>src/main/resources</directory>
-              <excludes>
-                <exclude>**/*.properties</exclude>
-              </excludes>
+                <directory>build</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
             </resource>
         </resources>
         <plugins>
@@ -81,6 +109,17 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <skipAssembly>true</skipAssembly>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Graylog-Plugin-Properties-Path>${project.groupId}.${project.artifactId}</Graylog-Plugin-Properties-Path>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
             </plugin>
             <plugin>
