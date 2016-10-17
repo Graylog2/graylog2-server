@@ -12,6 +12,7 @@
         <relativePath>../graylog2-server/graylog-plugin-parent/graylog-plugin-web-parent</relativePath>
     </parent>
 
+    <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-pipeline-processor-parent</artifactId>
     <version>2.2.0-alpha.2-SNAPSHOT</version>
     <packaging>pom</packaging>
@@ -49,7 +50,34 @@
             <name>Nexus Release Repository</name>
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
-		</distributionManagement>
+    </distributionManagement>
+
+    <repositories>
+        <!-- to make our snapshot releases work with Travis et al -->
+        <repository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>sonatype-nexus-releases</id>
+            <name>Sonatype Nexus Releases</name>
+            <url>https://oss.sonatype.org/content/repositories/releases</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
 
     <build>
         <plugins>

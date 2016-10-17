@@ -11,6 +11,7 @@
         <version>2.2.0-alpha.2-SNAPSHOT</version>
     </parent>
 
+    <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-pipeline-processor</artifactId>
     <version>2.2.0-alpha.2-SNAPSHOT</version>
     <packaging>jar</packaging>
@@ -40,13 +41,14 @@
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.useIncrementalCompilation>false</maven.compiler.useIncrementalCompilation>
         <maven.install.skip>true</maven.install.skip>
-        <maven.deploy.skip>true</maven.deploy.skip>
+        <maven.deploy.skip>false</maven.deploy.skip>
         <maven.site.skip>true</maven.site.skip>
-        <graylog.version>2.2.0-alpha.2-SNAPSHOT</graylog.version>
+
         <graylog.plugin-dir>/usr/share/graylog-server/plugin</graylog.plugin-dir>
+        <graylog.version>2.2.0-alpha.2-SNAPSHOT</graylog.version>
+
         <antlr.version>4.5.1</antlr.version>
-        <slf4j.version>1.7.21</slf4j.version>
-        <log4j.version>2.6.2</log4j.version>
+        <jool.version>0.9.9</jool.version>
     </properties>
 
     <dependencyManagement>
@@ -59,29 +61,29 @@
             <dependency>
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value</artifactId>
-                <version>1.2</version>
+                <version>${auto-value.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
-                <version>4.12</version>
+                <version>${junit.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.mockito</groupId>
                 <artifactId>mockito-core</artifactId>
-                <version>2.0.95-beta</version>
+                <version>${mockito.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>
                 <artifactId>assertj-core</artifactId>
-                <version>3.5.2</version>
+                <version>${assertj-core.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
                 <artifactId>jool</artifactId>
-                <version>0.9.9</version>
+                <version>${jool.version}</version>
             </dependency>
 
             <dependency>
@@ -212,7 +214,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.5.1</version>
                     <configuration>
                         <annotationProcessors>
                             <annotationProcessor>com.google.auto.value.processor.AutoValueProcessor</annotationProcessor>
@@ -227,7 +228,6 @@
                 <plugin>
                     <groupId>com.mycila</groupId>
                     <artifactId>license-maven-plugin</artifactId>
-                    <version>2.11</version>
                     <configuration>
                         <header>com/mycila/maven/plugin/license/templates/GPL-3.txt</header>
                         <properties>
@@ -247,28 +247,12 @@
                         </execution>
                     </executions>
                 </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>findbugs-maven-plugin</artifactId>
-                    <version>3.0.4</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-pmd-plugin</artifactId>
-                    <version>3.6</version>
-                </plugin>
-                <plugin>
-                    <groupId>org.codehaus.mojo</groupId>
-                    <artifactId>cobertura-maven-plugin</artifactId>
-                    <version>2.7</version>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -290,7 +274,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.3</version>
                 <configuration>
                     <minimizeJar>false</minimizeJar>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
@@ -312,66 +295,12 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <mavenExecutorId>forked-path</mavenExecutorId>
                     <tagNameFormat>@{project.version}</tagNameFormat>
                     <preparationGoals>clean test</preparationGoals>
                     <goals>package</goals>
-                </configuration>
-            </plugin>
-            <plugin>
-                <artifactId>jdeb</artifactId>
-                <groupId>org.vafer</groupId>
-                <version>1.4</version>
-                <configuration>
-                    <deb>${project.build.directory}/${project.artifactId}-${project.version}.deb</deb>
-                    <dataSet>
-                        <data>
-                            <src>${project.build.directory}/${project.build.finalName}.jar</src>
-                            <type>file</type>
-                            <mapper>
-                                <type>perm</type>
-                                <prefix>${graylog.plugin-dir}</prefix>
-                                <filemode>644</filemode>
-                                <user>root</user>
-                                <group>root</group>
-                            </mapper>
-                        </data>
-                    </dataSet>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>rpm-maven-plugin</artifactId>
-                <version>2.1.5</version>
-                <configuration>
-                    <group>Application/Internet</group>
-                    <prefixes>
-                        <prefix>/usr</prefix>
-                    </prefixes>
-                    <defineStatements>
-                        <defineStatement>_unpackaged_files_terminate_build 0</defineStatement>
-                        <defineStatement>_binaries_in_noarch_packages_terminate_build 0</defineStatement>
-                    </defineStatements>
-                    <defaultFilemode>644</defaultFilemode>
-                    <defaultDirmode>755</defaultDirmode>
-                    <defaultUsername>root</defaultUsername>
-                    <defaultGroupname>root</defaultGroupname>
-                    <mappings>
-                        <mapping>
-                            <directory>${graylog.plugin-dir}</directory>
-                            <sources>
-                                <source>
-                                    <location>${project.build.directory}/</location>
-                                    <includes>
-                                        <include>${project.build.finalName}.jar</include>
-                                    </includes>
-                                </source>
-                            </sources>
-                        </mapping>
-                    </mappings>
                 </configuration>
             </plugin>
             <plugin>
@@ -389,59 +318,6 @@
         </plugins>
     </build>
     <profiles>
-        <profile>
-            <id>web-interface-build</id>
-            <activation>
-                <property>
-                    <name>!skip.web.build</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>com.github.eirslett</groupId>
-                        <artifactId>frontend-maven-plugin</artifactId>
-                        <version>1.0</version>
-                        <configuration>
-                            <skip>false</skip>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>install node and npm</id>
-                                <goals>
-                                    <goal>install-node-and-npm</goal>
-                                </goals>
-                                <configuration>
-                                    <nodeVersion>v4.4.3</nodeVersion>
-                                    <npmVersion>3.8.6</npmVersion>
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>npm install</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <!-- Optional configuration which provides for running any npm command -->
-                                <configuration>
-                                    <arguments>install</arguments>
-                                </configuration>
-                            </execution>
-
-                            <execution>
-                                <id>npm run build</id>
-                                <goals>
-                                    <goal>npm</goal>
-                                </goals>
-                                <configuration>
-                                    <arguments>run build</arguments>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
         <profile>
             <!--
              Why the strange name? Glad you've asked! It's just so that yours truly
