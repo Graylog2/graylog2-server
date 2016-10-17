@@ -16,6 +16,7 @@
  */
 package org.graylog2.periodical;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
@@ -150,7 +151,8 @@ public class EmailAlarmCallbackMigrationPeriodical extends Periodical {
         return Optional.empty();
     }
 
-    private Map<String, Object> getDefaultEmailAlarmCallbackConfig() {
+    @VisibleForTesting
+    Map<String, Object> getDefaultEmailAlarmCallbackConfig() {
         final ConfigurationRequest configurationRequest = this.emailAlarmCallback.getRequestedConfiguration();
 
         return configurationRequest.getFields().entrySet()
