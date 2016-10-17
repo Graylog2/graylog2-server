@@ -28,6 +28,11 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.moandjiezana.toml.Toml;
+import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DefaultParser;
+import org.apache.commons.cli.HelpFormatter;
+import org.apache.commons.cli.Option;
+import org.apache.commons.cli.ParseException;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
@@ -79,11 +84,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -100,6 +102,7 @@ public class PipelinePerformanceBenchmarks {
 
     private static final String BENCHMARKS_RESOURCE_DIRECTORY = "/benchmarks";
     private static final Message MESSAGE = new Message("hallo welt", "127.0.0.1", Tools.nowUTC());
+    private static String benchmarkDir = System.getProperty("benchmarkDir", "benchmarks");
 
     @State(Scope.Benchmark)
     public static class PipelineConfig {
@@ -137,7 +140,7 @@ public class PipelinePerformanceBenchmarks {
                     });
 
             // resolve types of benchmark configuration, to be loaded into the various services.
-            final Path path = getResourcePath();
+            Path path = Paths.get(benchmarkDir);
             Multimap<Type, File> configFiles = MultimapBuilder
                     .enumKeys(Type.class)
                     .arrayListValues()
@@ -200,8 +203,9 @@ public class PipelinePerformanceBenchmarks {
                 LOG.debug("Read and saved pipeline {} with Id {}", saved.title(), saved.id());
             });
             final ImmutableMap<String, PipelineDao> pipelineTitleIndex = Maps.uniqueIndex(pipelineService.loadAll(),
-                                                                                                     PipelineDao::title);
-            final PipelineStreamConnectionsService connectionsService = injector.getInstance(PipelineStreamConnectionsService.class);
+                                                                                          PipelineDao::title);
+            final PipelineStreamConnectionsService connectionsService = injector.getInstance(
+                    PipelineStreamConnectionsService.class);
             final StreamService streamService = injector.getInstance(StreamService.class);
             if (config.streams == null || config.streams.isEmpty()) {
                 LOG.info("No streams defined, this benchmark won't match any messages!");
@@ -448,49 +452,90 @@ public class PipelinePerformanceBenchmarks {
     }
 
     public static void main(String[] args) throws RunnerException, URISyntaxException, IOException {
-        boolean fork = System.getProperty("profile") == null;
 
-        final String singleBenchmarkName = System.getProperty("benchmark.name");
-        final String[] values = singleBenchmarkName != null ?
-                new String[] {singleBenchmarkName} :
-                loadBenchmarkNames().toArray(new String[]{});
+        final org.apache.commons.cli.Options options = new org.apache.commons.cli.Options();
+        new Option("b", "benchmarks", true, "Benchmark directory (default: 'benchmarks')").setRequired(false);
+        options.addOption(Option.builder("b")
+                                  .hasArg(true)
+                                  .argName("directory")
+                                  .longOpt("benchmarks")
+                                  .desc("Benchmark directory (default: 'benchmarks')")
+                                  .required(false)
+                                  .build());
+        options.addOption(new Option("f", "Number of forks (default 1). Set to 0 to allow attaching a debugger/profiler"));
+        options.addOption(Option.builder("n")
+                                  .longOpt("name")
+                                  .desc("Only run benchmark with the given name")
+                                  .required(false)
+                                  .argName("name")
+                                  .hasArg(true)
+                                  .build());
+        options.addOption("h", "help");
+        options.addOption("w", true, "Warmup iterations (default 5)");
+        options.addOption("i", true, "Iterations (default 20)");
+
+        String[] benchmarkParams = {};
+        String benchmarkDir = "benchmarks";
+        int forks = 1;
+        int warmupIterations = 5;
+        int iterations = 20;
+        try {
+            CommandLine line = new DefaultParser().parse(options, args);
+
+            if (line.hasOption('h')) {
+                HelpFormatter formatter = new HelpFormatter();
+                formatter.printHelp("benchmark.sh", options);
+                return;
+            }
+
+            benchmarkDir = line.getOptionValue('b', "benchmarks");
+            benchmarkParams = loadBenchmarkNames(benchmarkDir).toArray(new String[]{});
+
+            if (line.hasOption('n')) {
+                benchmarkParams = new String[]{line.getOptionValue('n')};
+            }
+
+            if (line.hasOption('f')) {
+                forks = Integer.parseInt(line.getOptionValue('f', "1"));;
+            }
+
+            if (line.hasOption('w')) {
+                warmupIterations = Integer.parseInt(line.getOptionValue('w', "5"));
+            }
+            if (line.hasOption('i')) {
+                iterations = Integer.parseInt(line.getOptionValue('i', "20"));
+            }
+        } catch (ParseException e) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp("benchmark.sh", options);
+            System.exit(-2);
+        }
 
         Options opt = new OptionsBuilder()
                 .include(PipelinePerformanceBenchmarks.class.getSimpleName())
-                .warmupIterations(1)
+                .warmupIterations(warmupIterations)
                 .warmupTime(TimeValue.seconds(5))
-                .measurementIterations(10)
+                .measurementIterations(iterations)
                 .measurementTime(TimeValue.seconds(20))
                 .threads(1)
-                .forks(fork ? 1 : 0)
-                .param("directoryName", values)
+                .forks(forks)
+                .param("directoryName", benchmarkParams)
+                .jvmArgsAppend("-DbenchmarkDir="+benchmarkDir)
                 .build();
 
         new Runner(opt).run();
     }
 
 
-    private static List<String> loadBenchmarkNames() throws URISyntaxException, IOException {
-        Path benchmarksPath = getResourcePath();
+    private static List<String> loadBenchmarkNames(String benchmarkDir) throws URISyntaxException, IOException {
+        Path benchmarksPath = Paths.get(benchmarkDir);
 
         return Files.list(benchmarksPath)
-                .map(Path::getFileName)
-                .map(Path::toString)
+                .map(Path::toFile)
+                .filter(file -> !file.isHidden())
+                .map(File::getName)
                 .sorted()
                 .collect(Collectors.toList());
     }
 
-    private static Path getResourcePath() throws URISyntaxException, IOException {
-        final URI benchmarks = PipelinePerformanceBenchmarks.class.getResource(BENCHMARKS_RESOURCE_DIRECTORY).toURI();
-
-        Path benchmarksPath;
-        if (benchmarks.getScheme().equals("jar")) {
-            FileSystem fileSystem = FileSystems.newFileSystem(benchmarks, Collections.emptyMap());
-            benchmarksPath = fileSystem.getPath(BENCHMARKS_RESOURCE_DIRECTORY);
-            fileSystem.close();
-        } else {
-            benchmarksPath = Paths.get(benchmarks);
-        }
-        return benchmarksPath;
-    }
 }
