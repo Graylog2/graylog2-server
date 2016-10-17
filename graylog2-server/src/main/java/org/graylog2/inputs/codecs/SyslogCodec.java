@@ -234,7 +234,7 @@ public class SyslogCodec extends AbstractCodec {
                             CK_FORCE_RDNS,
                             "Force rDNS?",
                             false,
-                            "Force rDNS resolution of hostname? Use if hostname cannot be parsed."
+                            "Force rDNS resolution of hostname? Use if hostname cannot be parsed. (Be careful if you are sending DNS logs into this input because it can cause a feedback loop.)"
                     )
             );
 
