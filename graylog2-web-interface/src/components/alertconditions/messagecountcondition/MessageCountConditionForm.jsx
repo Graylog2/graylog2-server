@@ -39,13 +39,13 @@ const MessageCountConditionForm = React.createClass({
         <span className="threshold-type">
             <label className="radio-inline">
               <input ref="threshold_type" type="radio" name="threshold_type" onChange={this._onChange} value="more"
-                     checked={this.state.thresholdType === 'more'}/>
+                     checked={this.state.threshold_type.toLowerCase() === 'more'}/>
               more
             </label>
 
             <label className="radio-inline">
               <input ref="threshold_type" type="radio" name="threshold_type" onChange={this._onChange} value="less"
-                     checked={this.state.thresholdType === 'less'}/>
+                     checked={this.state.threshold_type.toLowerCase() === 'less'}/>
               less
             </label>
           </span>
