@@ -185,6 +185,7 @@ public class PipelineInterpreter implements MessageProcessor {
                     })
                     .collect(Collectors.toList());
             stage.setRules(resolvedRules);
+            stage.setPipeline(pipeline);
             stage.registerMetrics(metricRegistry, pipeline.id());
         });
 
@@ -314,10 +315,9 @@ public class PipelineInterpreter implements MessageProcessor {
         // iterate through all stages for all matching pipelines, per "stage slice" instead of per pipeline.
         // pipeline execution ordering is not guaranteed
         while (stages.hasNext()) {
-            final Set<Tuple2<Stage, Pipeline>> stageSet = stages.next();
-            for (Tuple2<Stage, Pipeline> pair : stageSet) {
-                final Stage stage = pair.v1();
-                final Pipeline pipeline = pair.v2();
+            final List<Stage> stageSet = stages.next();
+            for (final Stage stage : stageSet) {
+                final Pipeline pipeline = stage.getPipeline();
                 if (pipelinesToSkip.contains(pipeline)) {
                     log.debug("[{}] previous stage result prevents further processing of pipeline `{}`",
                              msgId,

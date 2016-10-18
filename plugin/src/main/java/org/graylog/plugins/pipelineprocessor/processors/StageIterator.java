@@ -17,47 +17,61 @@
 package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.google.common.collect.AbstractIterator;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.PeekingIterator;
+import com.google.common.collect.ArrayListMultimap;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
-import org.jooq.lambda.tuple.Tuple;
-import org.jooq.lambda.tuple.Tuple2;
 
-import java.util.OptionalInt;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import static com.google.common.collect.Iterators.peekingIterator;
+public class StageIterator extends AbstractIterator<List<Stage>> {
 
-public class StageIterator extends AbstractIterator<Set<Tuple2<Stage, Pipeline>>> {
+    // first and last stage for the given pipelines
+    private final int[] extent = new int[]{Integer.MAX_VALUE, Integer.MIN_VALUE};
 
-    private final ImmutableList<Tuple2<PeekingIterator<Stage>, Pipeline>> stageIterators;
+    // the currentStage is always one before the next one to be returned
+    private int currentStage;
+
+    private final ArrayListMultimap<Integer, Stage> stageMultimap = ArrayListMultimap.create();
+
 
     public StageIterator(Set<Pipeline> pipelines) {
-        stageIterators = ImmutableList.copyOf(pipelines.stream()
-                                                     .map(p -> Tuple.tuple(peekingIterator(p.stages().iterator()), p))
-                                                     .iterator());
+        if (pipelines.isEmpty()) {
+            currentStage = extent[0] = extent[1] = 0;
+            return;
+        }
+        pipelines.forEach(pipeline -> {
+            // skip pipelines without any stages, they don't contribute any rules to run
+            if (pipeline.stages().isEmpty()) {
+                return;
+            }
+            extent[0] = Math.min(extent[0], pipeline.stages().first().stage());
+            extent[1] = Math.max(extent[1], pipeline.stages().last().stage());
+        });
+
+        // map each stage number to the corresponding stages
+        pipelines.stream()
+                .flatMap(pipeline -> pipeline.stages().stream())
+                .forEach(stage -> stageMultimap.put(stage.stage(), stage));
+
+        if (extent[0] == Integer.MIN_VALUE) {
+            throw new IllegalArgumentException("First stage cannot be at " + Integer.MIN_VALUE);
+        }
+        // the stage before the first stage.
+        currentStage = extent[0] - 1;
     }
 
     @Override
-    protected Set<Tuple2<Stage, Pipeline>> computeNext() {
-        final OptionalInt min = stageIterators.stream()
-                .filter(pair ->  pair.v1().hasNext())       // only iterators that have remaining elements
-                .mapToInt(pair -> pair.v1().peek().stage()) // get the stage of each remaining element
-                .min();                                     // we want the minimum stage number of them all
-
-        if (!min.isPresent()) {
+    protected List<Stage> computeNext() {
+        if (currentStage == extent[1]) {
             return endOfData();
-
         }
-        final int currStage = min.getAsInt();
-
-        return stageIterators.stream()
-                .filter(pair ->  pair.v1().hasNext())                  // only iterators that have remaining elements
-                .filter(pair -> pair.v1().peek().stage() == currStage) // only elements for the current stage
-                .map(pair -> Tuple.tuple(pair.v1().next(), pair.v2()))
-                .collect(Collectors.toSet());
-
+        do {
+            currentStage++;
+            if (currentStage > extent[1]) {
+                return endOfData();
+            }
+        } while (!stageMultimap.containsKey(currentStage));
+        return stageMultimap.get(currentStage);
     }
 }
