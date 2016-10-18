@@ -38,3 +38,5 @@ dependency-reduced-pom.xml
 
 /graylog2-server/src/main/resources/web-interface/assets/**/*
 
+**/hs_err_pid*.log
+
