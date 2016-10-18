@@ -16,7 +16,11 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.Sets;
 import org.antlr.v4.runtime.CommonToken;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
@@ -25,9 +29,21 @@ import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 
 @AutoValue
 public abstract class Rule {
+
+    private transient Set<String> metricNames = Sets.newHashSet();
+
+    private transient Meter globalExecuted;
+    private transient Meter localExecuted;
+    private transient Meter globalFailed;
+    private transient Meter localFailed;
+    private transient Meter globalMatched;
+    private transient Meter localMatched;
+    private transient Meter globalNotMatched;
+    private transient Meter localNotMatched;
 
     @Nullable
     public abstract String id();
@@ -51,6 +67,85 @@ public abstract class Rule {
     public static Rule alwaysFalse(String name) {
         return builder().name(name).when(new BooleanExpression(new CommonToken(-1), false)).then(Collections.emptyList()).build();
     }
+
+    /**
+     * Register the metrics attached to this pipeline.
+     *
+     * @param metricRegistry the registry to add the metrics to
+     */
+    public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId) {
+        if (id() != null) {
+            globalExecuted = registerGlobalMeter(metricRegistry, "executed");
+            localExecuted = registerLocalMeter(metricRegistry, pipelineId, stageId, "executed");
+
+            globalFailed = registerGlobalMeter(metricRegistry, "failed");
+            localFailed = registerLocalMeter(metricRegistry, pipelineId, stageId, "failed");
+
+            globalMatched = registerGlobalMeter(metricRegistry, "matched");
+            localMatched = registerLocalMeter(metricRegistry, pipelineId, stageId, "matched");
+
+            globalNotMatched = registerGlobalMeter(metricRegistry, "not-matched");
+            localNotMatched = registerLocalMeter(metricRegistry, pipelineId, stageId, "not-matched");
+
+        }
+    }
+
+    private Meter registerGlobalMeter(MetricRegistry metricRegistry, String type) {
+        final String name = MetricRegistry.name(Rule.class, id(), type);
+        metricNames.add(name);
+        return metricRegistry.meter(name);
+    }
+
+    private Meter registerLocalMeter(MetricRegistry metricRegistry,
+                                     String pipelineId,
+                                     String stageId, String type) {
+        final String name = MetricRegistry.name(Rule.class, id(), pipelineId, stageId, type);
+        metricNames.add(name);
+        return metricRegistry.meter(name);
+    }
+
+    /**
+     * The metric filter matching all metrics that have been registered by this pipeline.
+     * Commonly used to remove the relevant metrics from the registry upon deletion of the pipeline.
+     *
+     * @return the filter matching this pipeline's metrics
+     */
+    public MetricFilter metricsFilter() {
+        if (id() == null) {
+            return (name, metric) -> false;
+        }
+        return (name, metric) -> metricNames.contains(name);
+
+    }
+
+    public void markExecution() {
+        if (id() != null) {
+            globalExecuted.mark();
+            localExecuted.mark();
+        }
+    }
+
+    public void markMatch() {
+        if (id() != null) {
+            globalMatched.mark();
+            localMatched.mark();
+        }
+    }
+
+    public void markNonMatch() {
+        if (id() != null) {
+            globalNotMatched.mark();
+            localNotMatched.mark();
+        }
+    }
+
+    public void markFailure() {
+        if (id() != null) {
+            globalFailed.mark();
+            localFailed.mark();
+        }
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
 
