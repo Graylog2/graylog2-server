@@ -21,7 +21,6 @@ import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
-import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -46,6 +45,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class StreamServiceImpl extends PersistedServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
@@ -138,13 +138,18 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         }
 
         List<DBObject> results = query(StreamImpl.class, query);
+        List<String> streamIds = results.stream()
+            .map(o -> o.get("_id").toString())
+            .collect(Collectors.toList());
+
+        Map<String, List<StreamRule>> allStreamRules = streamRuleService.loadForStreamIds(streamIds);
+
         for (DBObject o : results) {
             String id = o.get("_id").toString();
-            List<StreamRule> streamRules = null;
-            try {
-                streamRules = streamRuleService.loadForStreamId(id);
-            } catch (NotFoundException e) {
-                LOG.info("Exception while loading stream rules: " + e);
+
+            final List<StreamRule> streamRules = allStreamRules.getOrDefault(id, Collections.emptyList());
+            if (streamRules.size() == 0) {
+                LOG.info("No rules found for Stream {}", id);
             }
 
             final Set<Output> outputs = loadOutputsForRawStream(o);
@@ -164,6 +169,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         return loadAll(queryOpts);
     }
 
+    @SuppressWarnings("unchecked")
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
         List<ObjectId> outputIds = (List<ObjectId>) stream.get(StreamImpl.FIELD_OUTPUTS);
 
