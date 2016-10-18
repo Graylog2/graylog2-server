@@ -38,9 +38,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-/**
- * @
- */
 public class EmailAlarmCallbackMigrationPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(EmailAlarmCallbackMigrationPeriodical.class);
     private final ClusterConfigService clusterConfigService;
