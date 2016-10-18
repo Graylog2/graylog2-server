@@ -7,7 +7,7 @@
     "url": "graylog-plugin-pipeline-processor"
   },
   "scripts": {
-    "build": "webpack --bail -p"
+    "build": "webpack --bail"
   },
   "keywords": [
     "graylog"
