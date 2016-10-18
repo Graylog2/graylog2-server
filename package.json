@@ -7,7 +7,7 @@
     "url": "https://github.com/graylog-plugin-map-widget"
   },
   "scripts": {
-    "build": "webpack --bail -p"
+    "build": "webpack --bail"
   },
   "keywords": [
     "graylog"
