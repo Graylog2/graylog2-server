@@ -245,7 +245,7 @@ public class PipelineInterpreter implements MessageProcessor {
                     log.debug("[{}] running pipelines {} for streams {}", msgId, pipelinesToRun, streamsIds);
                 }
 
-                toProcess.addAll(processForPipelines(message, msgId, pipelinesToRun.stream().map(Pipeline::id).collect(Collectors.toSet()), interpreterListener));
+                toProcess.addAll(processForResolvedPipelines(message, msgId, pipelinesToRun, interpreterListener));
 
                 boolean addedStreams = false;
                 // 5. add each message-stream combination to the blacklist set
@@ -291,7 +291,10 @@ public class PipelineInterpreter implements MessageProcessor {
         return processForResolvedPipelines(message, msgId, pipelinesToRun, interpreterListener);
     }
 
-    public List<Message> processForResolvedPipelines(Message message, String msgId, Set<Pipeline> pipelines, InterpreterListener interpreterListener) {
+    private List<Message> processForResolvedPipelines(Message message,
+                                                      String msgId,
+                                                      Set<Pipeline> pipelines,
+                                                      InterpreterListener interpreterListener) {
         final List<Message> result = new ArrayList<>();
         // record execution of pipeline in metrics
         pipelines.forEach(pipeline -> metricRegistry.counter(name(Pipeline.class, pipeline.id(), "executed")).inc());
