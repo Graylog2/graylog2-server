@@ -146,7 +146,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
                 message = codec.decode(raw);
             }
         } catch (RuntimeException e) {
-            LOG.error("Unable to decode raw message on input <{}>.", raw, inputIdOnCurrentNode);
+            LOG.error("Unable to decode raw message {} on input <{}>.", raw, inputIdOnCurrentNode);
             metricRegistry.meter(name(baseMetricName, "failures")).mark();
             throw e;
         } finally {
