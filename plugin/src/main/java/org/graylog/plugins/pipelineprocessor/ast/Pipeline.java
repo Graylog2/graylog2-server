@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.ast;
 
 import com.google.auto.value.AutoValue;
+import com.google.auto.value.extension.memoized.Memoized;
 import com.google.common.collect.Sets;
 
 import javax.annotation.Nullable;
@@ -43,6 +44,9 @@ public abstract class Pipeline {
     public Pipeline withId(String id) {
         return toBuilder().id(id).build();
     }
+
+    @Memoized
+    public abstract int hashCode();
 
     @AutoValue.Builder
     public abstract static class Builder {
