@@ -7,7 +7,7 @@
     "url": "https://github.com/Graylog2/graylog-plugin-enterprise-integration"
   },
   "scripts": {
-    "build": "webpack --bail -p"
+    "build": "webpack --bail"
   },
   "keywords": [
     "graylog"
