@@ -23,6 +23,7 @@ import org.graylog.plugins.pipelineprocessor.ast.Stage;
 
 import java.util.List;
 import java.util.Set;
+import java.util.SortedSet;
 
 public class StageIterator extends AbstractIterator<List<Stage>> {
 
@@ -42,17 +43,14 @@ public class StageIterator extends AbstractIterator<List<Stage>> {
         }
         pipelines.forEach(pipeline -> {
             // skip pipelines without any stages, they don't contribute any rules to run
-            if (pipeline.stages().isEmpty()) {
+            final SortedSet<Stage> stages = pipeline.stages();
+            if (stages.isEmpty()) {
                 return;
             }
-            extent[0] = Math.min(extent[0], pipeline.stages().first().stage());
-            extent[1] = Math.max(extent[1], pipeline.stages().last().stage());
+            extent[0] = Math.min(extent[0], stages.first().stage());
+            extent[1] = Math.max(extent[1], stages.last().stage());
+            stages.forEach(stage -> stageMultimap.put(stage.stage(), stage));
         });
-
-        // map each stage number to the corresponding stages
-        pipelines.stream()
-                .flatMap(pipeline -> pipeline.stages().stream())
-                .forEach(stage -> stageMultimap.put(stage.stage(), stage));
 
         if (extent[0] == Integer.MIN_VALUE) {
             throw new IllegalArgumentException("First stage cannot be at " + Integer.MIN_VALUE);
