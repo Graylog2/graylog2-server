@@ -74,6 +74,7 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.TearDown;
 import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.results.RunResult;
+import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
 import org.openjdk.jmh.runner.options.Options;
@@ -524,6 +525,7 @@ public class PipelinePerformanceBenchmarks {
                 .forks(forks)
                 .param("directoryName", benchmarkParams)
                 .jvmArgsAppend("-DbenchmarkDir="+benchmarkDir)
+                .resultFormat(ResultFormatType.CSV)
                 .build();
 
         final Runner runner = new Runner(opt);
