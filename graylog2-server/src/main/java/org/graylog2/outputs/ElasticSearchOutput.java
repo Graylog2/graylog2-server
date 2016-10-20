@@ -24,6 +24,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.indexer.messages.IndexAndMessage;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
@@ -38,6 +39,7 @@ import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -87,8 +89,12 @@ public class ElasticSearchOutput implements MessageOutput {
 
     @Override
     public void write(List<Message> messageList) throws Exception {
+        throw new UnsupportedOperationException("Method not supported!");
+    }
+
+    public void writeIndexAndMessages(List<IndexAndMessage> messageList) throws Exception {
         if (LOG.isTraceEnabled()) {
-            final List<String> sortedIds = Ordering.natural().sortedCopy(Lists.transform(messageList,
+            final List<String> sortedIds = Ordering.natural().sortedCopy(Lists.transform(messageList.stream().map(iam -> iam.message).collect(Collectors.toList()),
                                                                                          Message.ID_FUNCTION));
             LOG.trace("Writing message ids to [{}]: <{}>", NAME, Joiner.on(", ").join(sortedIds));
         }
@@ -97,8 +103,8 @@ public class ElasticSearchOutput implements MessageOutput {
         try (final Timer.Context ignored = processTime.time()) {
             messages.bulkIndex(messageList);
         }
-        for (final Message message : messageList) {
-            journal.markJournalOffsetCommitted(message.getJournalOffset());
+        for (final IndexAndMessage messageAndIndex : messageList) {
+            journal.markJournalOffsetCommitted(messageAndIndex.message.getJournalOffset());
         }
     }
 

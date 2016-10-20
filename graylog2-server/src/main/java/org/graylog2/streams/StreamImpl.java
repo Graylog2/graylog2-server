@@ -28,6 +28,7 @@ import org.graylog2.database.validators.DateValidator;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.database.validators.MapValidator;
 import org.graylog2.database.validators.OptionalStringValidator;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
@@ -63,24 +64,28 @@ public class StreamImpl extends PersistedImpl implements Stream {
 
     private final List<StreamRule> streamRules;
     private final Set<Output> outputs;
+    private final Set<IndexSet> indexSets;
 
     public StreamImpl(Map<String, Object> fields) {
         super(fields);
         this.streamRules = null;
         this.outputs = null;
+        this.indexSets = null;
     }
 
     protected StreamImpl(ObjectId id, Map<String, Object> fields) {
         super(id, fields);
         this.streamRules = null;
         this.outputs = null;
+        this.indexSets = null;
     }
 
-    public StreamImpl(ObjectId id, Map<String, Object> fields, List<StreamRule> streamRules, Set<Output> outputs) {
+    public StreamImpl(ObjectId id, Map<String, Object> fields, List<StreamRule> streamRules, Set<Output> outputs, Set<IndexSet> indexSets) {
         super(id, fields);
 
         this.streamRules = streamRules;
         this.outputs = outputs;
+        this.indexSets = indexSets;
     }
 
     @Override
@@ -229,5 +234,10 @@ public class StreamImpl extends PersistedImpl implements Stream {
     @Override
     public void setDefaultStream(boolean defaultStream) {
         fields.put(FIELD_DEFAULT_STREAM, defaultStream);
+    }
+
+    @Override
+    public Set<IndexSet> getIndexSets() {
+        return indexSets;
     }
 }

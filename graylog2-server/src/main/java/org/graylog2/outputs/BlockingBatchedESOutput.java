@@ -23,7 +23,9 @@ import com.codahale.metrics.Timer;
 import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.messages.IndexAndMessage;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
@@ -51,7 +53,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     private final Meter bufferFlushes;
     private final Meter bufferFlushesRequested;
 
-    private volatile List<Message> buffer;
+    private volatile List<IndexAndMessage> buffer;
 
     private static final AtomicInteger activeFlushThreads = new AtomicInteger(0);
     private final AtomicLong lastFlushTime = new AtomicLong();
@@ -89,9 +91,15 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
 
     @Override
     public void write(Message message) throws Exception {
-        List<Message> flushBatch = null;
+        for (IndexSet indexSet : message.getIndexSets()) {
+            writeIndexAndMessage(new IndexAndMessage(indexSet.getWriteIndexAlias(), message));
+        }
+    }
+
+    public void writeIndexAndMessage(IndexAndMessage indexAndMessage) throws Exception {
+        List<IndexAndMessage> flushBatch = null;
         synchronized (this) {
-            buffer.add(message);
+            buffer.add(indexAndMessage);
 
             if (buffer.size() >= maxBufferSize) {
                 flushBatch = buffer;
@@ -106,7 +114,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
         }
     }
 
-    private void flush(List<Message> messages) {
+    private void flush(List<IndexAndMessage> messages) {
         if (!cluster.isConnected() || !cluster.isDeflectorHealthy()) {
             try {
                 cluster.waitForConnectedAndDeflectorHealthy();
@@ -125,7 +133,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
 
         try (Timer.Context ignored = processTime.time()) {
             lastFlushTime.set(System.nanoTime());
-            write(messages);
+            writeIndexAndMessages(messages);
             batchSize.update(messages.size());
             bufferFlushes.mark();
         } catch (Exception e) {
@@ -148,7 +156,7 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
                     return;
                 }
         // flip buffer quickly and initiate flush
-        final List<Message> flushBatch;
+        final List<IndexAndMessage> flushBatch;
         synchronized (this) {
             flushBatch = buffer;
             buffer = Lists.newArrayListWithCapacity(maxBufferSize);

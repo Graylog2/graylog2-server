@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.messages.IndexAndMessage;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -70,10 +71,10 @@ public class BlockingBatchedESOutputTest {
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
-        final List<Message> messageList = buildMessages(config.getOutputBatchSize());
+        final List<IndexAndMessage> messageList = buildMessages(config.getOutputBatchSize());
 
-        for (Message message : messageList) {
-            output.write(message);
+        for (IndexAndMessage indexAndMessage : messageList) {
+            output.writeIndexAndMessage(indexAndMessage);
         }
 
         verify(messages, times(1)).bulkIndex(eq(messageList));
@@ -87,11 +88,11 @@ public class BlockingBatchedESOutputTest {
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
-        final List<Message> messageList = buildMessages(config.getOutputBatchSize());
+        final List<IndexAndMessage> messageList = buildMessages(config.getOutputBatchSize());
 
-        for (Message message : messageList) {
+        for (IndexAndMessage indexAndMessage : messageList) {
             try {
-                output.write(message);
+                output.writeIndexAndMessage(indexAndMessage);
             } catch(RuntimeException ignore) {
             }
         }
@@ -108,11 +109,11 @@ public class BlockingBatchedESOutputTest {
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
-        final List<Message> messageList = buildMessages(config.getOutputBatchSize());
+        final List<IndexAndMessage> messageList = buildMessages(config.getOutputBatchSize());
 
-        for (Message message : messageList) {
+        for (IndexAndMessage indexAndMessage : messageList) {
             try {
-                output.write(message);
+                output.writeIndexAndMessage(indexAndMessage);
             } catch(RuntimeException ignore) {
             }
         }
@@ -127,10 +128,10 @@ public class BlockingBatchedESOutputTest {
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
-        final List<Message> messageList = buildMessages(config.getOutputBatchSize() - 1);
+        final List<IndexAndMessage> messageList = buildMessages(config.getOutputBatchSize() - 1);
 
-        for (Message message : messageList) {
-            output.write(message);
+        for (IndexAndMessage indexAndMessage : messageList) {
+            output.writeIndexAndMessage(indexAndMessage);
         }
 
         // Should flush the buffer even though the batch size is not reached yet
@@ -139,10 +140,10 @@ public class BlockingBatchedESOutputTest {
         verify(messages, times(1)).bulkIndex(eq(messageList));
     }
 
-    private List<Message> buildMessages(final int count) {
-        final ImmutableList.Builder<Message> builder = ImmutableList.builder();
+    private List<IndexAndMessage> buildMessages(final int count) {
+        final ImmutableList.Builder<IndexAndMessage> builder = ImmutableList.builder();
         for (int i = 0; i < count; i++) {
-            builder.add(new Message("message" + i, "test", Tools.nowUTC()));
+            builder.add(new IndexAndMessage("graylog_0", new Message("message" + i, "test", Tools.nowUTC())));
         }
 
         return builder.build();

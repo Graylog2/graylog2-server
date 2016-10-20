@@ -29,6 +29,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -116,6 +117,7 @@ public class Message implements Messages {
 
     private final Map<String, Object> fields = Maps.newHashMap();
     private Set<Stream> streams = Sets.newHashSet();
+    private Set<IndexSet> indexSets = Sets.newHashSet();
     private String sourceInputId;
 
     // Used for drools to filter out messages.
@@ -423,6 +425,7 @@ public class Message implements Messages {
      * @param stream the stream to route this message into
      */
     public void addStream(Stream stream) {
+        indexSets.addAll(stream.getIndexSets());
         streams.add(stream);
     }
 
@@ -431,7 +434,9 @@ public class Message implements Messages {
      * @param newStreams an iterable of Stream objects
      */
     public void addStreams(Iterable<Stream> newStreams) {
-        Iterables.addAll(streams, newStreams);
+        for (final Stream stream : newStreams) {
+            addStream(stream);
+        }
     }
 
     /**
@@ -440,7 +445,25 @@ public class Message implements Messages {
      * @return <tt>true</tt> if this message was assigned to the stream
      */
     public boolean removeStream(Stream stream) {
-        return streams.remove(stream);
+        final boolean removed = streams.remove(stream);
+
+        if (removed) {
+            indexSets.clear();
+            for (Stream s : streams) {
+                indexSets.addAll(s.getIndexSets());
+            }
+        }
+
+        return removed;
+    }
+
+    /**
+     * Return the index sets for this message based on the assigned streams.
+     *
+     * @return index sets
+     */
+    public Set<IndexSet> getIndexSets() {
+        return ImmutableSet.copyOf(this.indexSets);
     }
 
     public List<String> getStreamIds() {

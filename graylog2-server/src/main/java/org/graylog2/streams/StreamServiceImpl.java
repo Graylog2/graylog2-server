@@ -26,6 +26,8 @@ import org.graylog2.alerts.AlertService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.LegacyDeflectorIndexSet;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Tools;
@@ -53,6 +55,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final StreamRuleService streamRuleService;
     private final AlertService alertService;
     private final OutputService outputService;
+    private final Set<IndexSet> indexSets;
     private final NotificationService notificationService;
 
     @Inject
@@ -60,11 +63,13 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              StreamRuleService streamRuleService,
                              AlertService alertService,
                              OutputService outputService,
+                             LegacyDeflectorIndexSet indexSet,
                              NotificationService notificationService) {
         super(mongoConnection);
         this.streamRuleService = streamRuleService;
         this.alertService = alertService;
         this.outputService = outputService;
+        this.indexSets = Collections.singleton(indexSet);
         this.notificationService = notificationService;
     }
 
@@ -81,7 +86,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
         @SuppressWarnings("unchecked")
         final Map<String, Object> fields = o.toMap();
-        return new StreamImpl((ObjectId) o.get("_id"), fields, streamRules, outputs);
+        // TODO 2.2: Needs to load the index sets from the database!
+        return new StreamImpl((ObjectId) o.get("_id"), o.toMap(), streamRules, outputs, indexSets);
     }
 
     @Override
@@ -147,7 +153,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
             @SuppressWarnings("unchecked")
             final Map<String, Object> fields = o.toMap();
 
-            streams.add(new StreamImpl(objectId, fields, streamRules, outputs));
+            // TODO 2.2: Needs to load the index sets from the database!
+            streams.add(new StreamImpl((ObjectId) o.get("_id"), o.toMap(), streamRules, outputs, indexSets));
         }
 
         return streams.build();
