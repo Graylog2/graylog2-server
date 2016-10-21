@@ -18,13 +18,11 @@ package org.graylog.plugins.pipelineprocessor.processors;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -33,19 +31,8 @@ import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
-import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
-import org.graylog.plugins.pipelineprocessor.db.PipelineService;
-import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.db.RuleDao;
-import org.graylog.plugins.pipelineprocessor.db.RuleService;
-import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
-import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
-import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
-import org.graylog.plugins.pipelineprocessor.parser.ParseException;
-import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
@@ -57,16 +44,10 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -78,43 +59,40 @@ public class PipelineInterpreter implements MessageProcessor {
 
     public static final String GL2_PROCESSING_ERROR = "gl2_processing_error";
 
-    private final RuleService ruleService;
-    private final PipelineService pipelineService;
-    private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
-    private final PipelineRuleParser pipelineRuleParser;
     private final Journal journal;
-    private final MetricRegistry metricRegistry;
-    private final ScheduledExecutorService scheduler;
     private final Meter filteredOutMessages;
     private EventBus serverEventBus;
 
-    private final AtomicReference<ImmutableMap<String, Pipeline>> currentPipelines = new AtomicReference<>(ImmutableMap.of());
-    private final AtomicReference<ImmutableSetMultimap<String, Pipeline>> streamPipelineConnections = new AtomicReference<>(ImmutableSetMultimap.of());
+    /**
+     * The current pipeline/stage/rule configuration of the system, including the stream-pipeline connections
+     */
+    private final AtomicReference<State> state = new AtomicReference<>(null);
 
     @Inject
-    public PipelineInterpreter(RuleService ruleService,
-                               PipelineService pipelineService,
-                               PipelineStreamConnectionsService pipelineStreamConnectionsService,
-                               PipelineRuleParser pipelineRuleParser,
-                               Journal journal,
+    public PipelineInterpreter(Journal journal,
                                MetricRegistry metricRegistry,
-                               @Named("daemonScheduler") ScheduledExecutorService scheduler,
-                               EventBus serverEventBus) {
-        this.ruleService = ruleService;
-        this.pipelineService = pipelineService;
-        this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
-        this.pipelineRuleParser = pipelineRuleParser;
+                               EventBus serverEventBus,
+                               ConfigurationStateUpdater stateUpdater) {
 
         this.journal = journal;
-        this.metricRegistry = metricRegistry;
-        this.scheduler = scheduler;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
         this.serverEventBus = serverEventBus;
 
-        // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
-        serverEventBus.register(this);
+        /*
+         * get around the initialization race between state updater and the interpreter instances:
+         * the updater loads the config and posts an event on the bus, but the interpreters haven't registered yet.
+         * once the updater is constructed, it has loaded a state so we can get it once it has been injected
+         */
+        state.set(stateUpdater.getLatestState());
 
-        reload();
+        // listens to state changes
+        serverEventBus.register(this);
+    }
+
+    @Subscribe
+    public void handleStateUpdate(State newState) {
+        log.debug("Updated pipeline state to {}", newState);
+        state.set(newState);
     }
 
     /*
@@ -125,84 +103,28 @@ public class PipelineInterpreter implements MessageProcessor {
         serverEventBus.unregister(this);
     }
 
-    // this should not run in parallel
-    private synchronized void reload() {
-        // read all rules and compile them
-        Map<String, Rule> ruleNameMap = Maps.newHashMap();
-        for (RuleDao ruleDao : ruleService.loadAll()) {
-            Rule rule;
-            try {
-                rule = pipelineRuleParser.parseRule(ruleDao.id(), ruleDao.source(), false);
-            } catch (ParseException e) {
-                rule = Rule.alwaysFalse("Failed to parse rule: " + ruleDao.id());
-            }
-            ruleNameMap.put(rule.name(), rule);
-        }
-
-        Map<String, Pipeline> pipelineIdMap = Maps.newHashMap();
-        // read all pipelines and compile them
-        for (PipelineDao pipelineDao : pipelineService.loadAll()) {
-            Pipeline pipeline;
-            try {
-                pipeline =  pipelineRuleParser.parsePipeline(pipelineDao.id(), pipelineDao.source());
-            } catch (ParseException e) {
-                pipeline = Pipeline.empty("Failed to parse pipeline" + pipelineDao.id());
-            }
-            pipelineIdMap.put(pipelineDao.id(), resolvePipeline(pipeline, ruleNameMap));
-        }
-
-        currentPipelines.set(ImmutableMap.copyOf(pipelineIdMap));
-
-        // read all stream connections of those pipelines to allow processing messages through them
-        final HashMultimap<String, Pipeline> connections = HashMultimap.create();
-        for (PipelineConnections streamConnection : pipelineStreamConnectionsService.loadAll()) {
-            streamConnection.pipelineIds().stream()
-                    .map(pipelineIdMap::get)
-                    .filter(Objects::nonNull)
-                    .forEach(pipeline -> connections.put(streamConnection.streamId(), pipeline));
-        }
-        streamPipelineConnections.set(ImmutableSetMultimap.copyOf(connections));
-
-    }
-
-    @Nonnull
-    private Pipeline resolvePipeline(Pipeline pipeline, Map<String, Rule> ruleNameMap) {
-        log.debug("Resolving pipeline {}", pipeline.name());
-
-        pipeline.stages().forEach(stage -> {
-            final List<Rule> resolvedRules = stage.ruleReferences().stream()
-                    .map(ref -> {
-                        Rule rule = ruleNameMap.get(ref);
-                        if (rule == null) {
-                            rule = Rule.alwaysFalse("Unresolved rule " + ref);
-                        }
-                        // make a copy so that the metrics match up (we don't share actual objects between stages)
-                        rule = rule.toBuilder().build();
-                        log.debug("Resolved rule `{}` to {}", ref, rule);
-                        // include back reference to stage
-                        rule.registerMetrics(metricRegistry, pipeline.id(), String.valueOf(stage.stage()));
-                        return rule;
-                    })
-                    .collect(Collectors.toList());
-            stage.setRules(resolvedRules);
-            stage.setPipeline(pipeline);
-            stage.registerMetrics(metricRegistry, pipeline.id());
-        });
-
-        pipeline.registerMetrics(metricRegistry);
-        return pipeline;
-    }
-
     /**
      * @param messages messages to process
      * @return messages to pass on to the next stage
      */
     @Override
     public Messages process(Messages messages) {
-        return process(messages, new NoopInterpreterListener());
+        return process(messages, new NoopInterpreterListener(), this.state.get());
     }
 
-    public Messages process(Messages messages, InterpreterListener interpreterListener) {
+    /**
+     * Evaluates all pipelines that apply to the given messages, based on the current stream routing of the messages.
+     *
+     * The processing loops on each single message (passed in or created by pipelines) until the set of streams does
+     * not change anymore.
+     * No cycle detection is performed.
+     *
+     * @param messages the messages to process through the pipelines
+     * @param interpreterListener a listener which gets called for each processing stage (e.g. to trace execution)
+     * @param state the pipeline/stage/rule/stream connection state to use during processing
+     * @return the processed messages
+     */
+    public Messages process(Messages messages, InterpreterListener interpreterListener, State state) {
         interpreterListener.startProcessing();
         // message id + stream id
         final Set<Tuple2<String, String>> processingBlacklist = Sets.newHashSet();
@@ -225,7 +147,7 @@ public class PipelineInterpreter implements MessageProcessor {
                 // this makes a copy of the list!
                 final Set<String> initialStreamIds = message.getStreams().stream().map(Stream::getId).collect(Collectors.toSet());
 
-                final ImmutableSetMultimap<String, Pipeline> streamConnection = streamPipelineConnections.get();
+                final ImmutableSetMultimap<String, Pipeline> streamConnection = state.getStreamPipelineConnections();
 
                 if (initialStreamIds.isEmpty()) {
                     if (processingBlacklist.contains(tuple(msgId, "default"))) {
@@ -291,10 +213,14 @@ public class PipelineInterpreter implements MessageProcessor {
         return new MessageCollection(fullyProcessed);
     }
 
-    public List<Message> processForPipelines(Message message, String msgId, Set<String> pipelines, InterpreterListener interpreterListener) {
+    public List<Message> processForPipelines(Message message,
+                                             String msgId,
+                                             Set<String> pipelines,
+                                             InterpreterListener interpreterListener,
+                                             State state) {
         final ImmutableSet<Pipeline> pipelinesToRun = ImmutableSet.copyOf(pipelines
                 .stream()
-                .map(pipelineId -> this.currentPipelines.get().get(pipelineId))
+                .map(pipelineId -> state.getCurrentPipelines().get(pipelineId))
                 .filter(pipeline -> pipeline != null)
                 .collect(Collectors.toSet()));
 
@@ -420,36 +346,6 @@ public class PipelineInterpreter implements MessageProcessor {
         }
     }
 
-    @Subscribe
-    public void handleRuleChanges(RulesChangedEvent event) {
-        event.deletedRuleIds().forEach(id -> {
-            log.debug("Invalidated rule {}", id);
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(Rule.class, id)));
-        });
-        event.updatedRuleIds().forEach(id -> {
-            log.debug("Refreshing rule {}", id);
-        });
-        scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
-    }
-
-    @Subscribe
-    public void handlePipelineChanges(PipelinesChangedEvent event) {
-        event.deletedPipelineIds().forEach(id -> {
-            log.debug("Invalidated pipeline {}", id);
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(Pipeline.class, id)));
-        });
-        event.updatedPipelineIds().forEach(id -> {
-            log.debug("Refreshing pipeline {}", id);
-        });
-        scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
-    }
-
-    @Subscribe
-    public void handlePipelineConnectionChanges(PipelineConnectionsChangedEvent event) {
-        log.debug("Pipeline stream connection changed: {}", event);
-        scheduler.schedule((Runnable) this::reload, 0, TimeUnit.SECONDS);
-    }
-
     public static class Descriptor implements MessageProcessor.Descriptor {
         @Override
         public String name() {
@@ -462,4 +358,22 @@ public class PipelineInterpreter implements MessageProcessor {
         }
     }
 
+    public static class State {
+        private final ImmutableMap<String, Pipeline> currentPipelines;
+        private final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections;
+
+        public State(ImmutableMap<String, Pipeline> currentPipelines,
+                     ImmutableSetMultimap<String, Pipeline> streamPipelineConnections) {
+            this.currentPipelines = currentPipelines;
+            this.streamPipelineConnections = streamPipelineConnections;
+        }
+
+        public ImmutableMap<String, Pipeline> getCurrentPipelines() {
+            return currentPipelines;
+        }
+
+        public ImmutableSetMultimap<String, Pipeline> getStreamPipelineConnections() {
+            return streamPipelineConnections;
+        }
+    }
 }

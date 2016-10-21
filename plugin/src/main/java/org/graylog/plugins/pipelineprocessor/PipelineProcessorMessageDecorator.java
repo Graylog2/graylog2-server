@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
+import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
 import org.graylog2.decorators.Decorator;
@@ -43,6 +44,7 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
     private static final String CONFIG_FIELD_PIPELINE = "pipeline";
 
     private final PipelineInterpreter pipelineInterpreter;
+    private final ConfigurationStateUpdater pipelineStateUpdater;
     private final ImmutableSet<String> pipelines;
 
     public interface Factory extends SearchResponseDecorator.Factory {
@@ -88,8 +90,10 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
 
     @Inject
     public PipelineProcessorMessageDecorator(PipelineInterpreter pipelineInterpreter,
+                                             ConfigurationStateUpdater pipelineStateUpdater,
                                              @Assisted Decorator decorator) {
         this.pipelineInterpreter = pipelineInterpreter;
+        this.pipelineStateUpdater = pipelineStateUpdater;
         final String pipelineId = (String)decorator.config().get(CONFIG_FIELD_PIPELINE);
         if (Strings.isNullOrEmpty(pipelineId)) {
             this.pipelines = ImmutableSet.of();
@@ -109,7 +113,8 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
             final List<Message> additionalCreatedMessages = pipelineInterpreter.processForPipelines(message,
                     message.getId(),
                     pipelines,
-                    new NoopInterpreterListener());
+                    new NoopInterpreterListener(),
+                    pipelineStateUpdater.getLatestState());
 
             results.add(ResultMessageSummary.create(inMessage.highlightRanges(), message.getFields(), inMessage.index()));
             additionalCreatedMessages.forEach((additionalMessage) -> {

@@ -24,18 +24,19 @@ import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
-import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
-import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
-import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbPipelineStreamConnectionsService;
+import org.graylog.plugins.pipelineprocessor.db.mongodb.MongoDbRuleService;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.Configuration;
@@ -134,16 +135,19 @@ public class FilterchainVsPipeline {
 
             final PipelineRuleParser parser = setupParser(functions);
 
+            final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
+                                                                                         pipelineService,
+                                                                                         pipelineStreamConnectionsService,
+                                                                                         parser,
+                                                                                         new MetricRegistry(),
+                                                                                         Executors.newScheduledThreadPool(1),
+                                                                                         mock(EventBus.class));
             final MetricRegistry metricRegistry = new MetricRegistry();
             interpreter = new PipelineInterpreter(
-                    ruleService,
-                    pipelineService,
-                    pipelineStreamConnectionsService,
-                    parser,
                     mock(Journal.class),
                     metricRegistry,
-                    Executors.newScheduledThreadPool(1),
-                    mock(EventBus.class)
+                    mock(EventBus.class),
+                    stateUpdater
             );
         }
 

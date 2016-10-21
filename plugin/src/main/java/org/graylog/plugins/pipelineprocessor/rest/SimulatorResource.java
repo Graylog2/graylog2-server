@@ -22,6 +22,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.elasticsearch.common.Strings;
+import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.simulator.PipelineInterpreterTracer;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -50,13 +51,16 @@ import java.util.List;
 @Produces(MediaType.APPLICATION_JSON)
 @RequiresAuthentication
 public class SimulatorResource extends RestResource implements PluginRestResource {
+    private final ConfigurationStateUpdater pipelineStateUpdater;
     private final StreamService streamService;
     private final PipelineInterpreter pipelineInterpreter;
 
     @Inject
     public SimulatorResource(PipelineInterpreter pipelineInterpreter,
+                             ConfigurationStateUpdater pipelineStateUpdater,
                              StreamService streamService) {
         this.pipelineInterpreter = pipelineInterpreter;
+        this.pipelineStateUpdater = pipelineStateUpdater;
         this.streamService = streamService;
     }
 
@@ -80,7 +84,8 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
         final PipelineInterpreterTracer pipelineInterpreterTracer = new PipelineInterpreterTracer();
 
         org.graylog2.plugin.Messages processedMessages = pipelineInterpreter.process(message,
-                                                                                     pipelineInterpreterTracer.getSimulatorInterpreterListener());
+                                                                                     pipelineInterpreterTracer.getSimulatorInterpreterListener(),
+                                                                                     pipelineStateUpdater.getLatestState());
         for (Message processedMessage : processedMessages) {
             simulationResults.add(ResultMessageSummary.create(null, processedMessage.getFields(), ""));
         }
