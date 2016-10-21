@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.parser;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -85,14 +86,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.Stack;
 
+import static com.google.common.collect.ImmutableSortedSet.orderedBy;
+import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.toList;
 
 public class PipelineRuleParser {
@@ -905,7 +906,7 @@ public class PipelineRuleParser {
             final Pipeline.Builder builder = Pipeline.builder();
 
             builder.name(unquote(ctx.name.getText(), '"'));
-            SortedSet<Stage> stages = Sets.newTreeSet(Comparator.comparingInt(Stage::stage));
+            final ImmutableSortedSet.Builder<Stage> stages = orderedBy(comparingInt(Stage::stage));
 
             for (RuleLangParser.StageDeclarationContext stage : ctx.stageDeclaration()) {
                 final Stage.Builder stageBuilder = Stage.builder();
@@ -942,7 +943,7 @@ public class PipelineRuleParser {
                 stages.add(stageBuilder.build());
             }
 
-            builder.stages(stages);
+            builder.stages(stages.build());
             parseContext.pipelines.add(builder.build());
         }
 
