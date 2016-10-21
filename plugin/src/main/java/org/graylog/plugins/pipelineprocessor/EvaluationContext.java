@@ -19,11 +19,13 @@ package org.graylog.plugins.pipelineprocessor;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog2.plugin.EmptyMessages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
@@ -43,22 +45,27 @@ public class EvaluationContext {
         }
     };
 
+    @Nonnull
     private final Message message;
+    @Nullable
     private Map<String, TypedValue> ruleVars;
-    private List<Message> createdMessages = Lists.newArrayList();
+    @Nullable
+    private List<Message> createdMessages;
+    @Nullable
     private List<EvalError> evalErrors;
 
     private EvaluationContext() {
         this(new Message("__dummy", "__dummy", DateTime.parse("2010-07-30T16:03:25Z"))); // first Graylog release
     }
 
-    public EvaluationContext(Message message) {
+    public EvaluationContext(@Nonnull Message message) {
         this.message = message;
-        ruleVars = Maps.newHashMap();
-        evalErrors = Lists.newArrayList();
     }
 
     public void define(String identifier, Class type, Object value) {
+        if (ruleVars == null) {
+            ruleVars = Maps.newHashMap();
+        }
         ruleVars.put(identifier, new TypedValue(type, value));
     }
 
@@ -67,19 +74,30 @@ public class EvaluationContext {
     }
 
     public TypedValue get(String identifier) {
+        if (ruleVars == null) {
+            throw new IllegalStateException("Use of undeclared variable " + identifier);
+        }
         return ruleVars.get(identifier);
     }
 
     public Messages createdMessages() {
+        if (createdMessages == null) {
+            return new EmptyMessages();
+        }
         return new MessageCollection(createdMessages);
     }
 
     public void addCreatedMessage(Message newMessage) {
+        if (createdMessages == null) {
+            createdMessages = Lists.newArrayList();
+        }
         createdMessages.add(newMessage);
     }
 
     public void clearCreatedMessages() {
-        createdMessages.clear();
+        if (createdMessages != null) {
+            createdMessages.clear();
+        }
     }
 
     public static EvaluationContext emptyContext() {
@@ -87,15 +105,18 @@ public class EvaluationContext {
     }
 
     public void addEvaluationError(int line, int charPositionInLine, @Nullable FunctionDescriptor descriptor, Throwable e) {
+        if (evalErrors == null) {
+            evalErrors = Lists.newArrayList();
+        }
         evalErrors.add(new EvalError(line, charPositionInLine, descriptor, e));
     }
 
     public boolean hasEvaluationErrors() {
-        return evalErrors.size() > 0;
+        return evalErrors != null;
     }
 
     public List<EvalError> evaluationErrors() {
-        return Collections.unmodifiableList(evalErrors);
+        return evalErrors == null ? Collections.emptyList() : Collections.unmodifiableList(evalErrors);
     }
 
     public class TypedValue {
