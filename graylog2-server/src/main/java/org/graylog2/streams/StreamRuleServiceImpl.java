@@ -30,11 +30,14 @@ import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleReques
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class StreamRuleServiceImpl extends PersistedServiceImpl implements StreamRuleService {
+
     @Inject
     public StreamRuleServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
@@ -62,13 +65,13 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     }
 
     @Override
-    public StreamRule create(String streamid, CreateStreamRuleRequest cr) {
+    public StreamRule create(String streamId, CreateStreamRuleRequest cr) {
         Map<String, Object> streamRuleData = Maps.newHashMap();
         streamRuleData.put(StreamRuleImpl.FIELD_TYPE, cr.type());
         streamRuleData.put(StreamRuleImpl.FIELD_VALUE, cr.value());
         streamRuleData.put(StreamRuleImpl.FIELD_FIELD, cr.field());
         streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, cr.inverted());
-        streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamid));
+        streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamId));
         streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, cr.description());
 
         return new StreamRuleImpl(streamRuleData);
@@ -77,16 +80,32 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     @Override
     public List<StreamRule> loadForStreamId(String streamId) throws NotFoundException {
         ObjectId id = new ObjectId(streamId);
-        final List<StreamRule> streamRules = new ArrayList<StreamRule>();
+        final List<StreamRule> streamRules = new ArrayList<>();
         final List<DBObject> respStreamRules = query(StreamRuleImpl.class,
                 new BasicDBObject(StreamRuleImpl.FIELD_STREAM_ID, id)
         );
 
         for (DBObject streamRule : respStreamRules) {
-            streamRules.add(load(streamRule.get("_id").toString()));
+            streamRules.add(toStreamRule(streamRule));
         }
 
         return streamRules;
+    }
+
+    @Override
+    public Map<String, List<StreamRule>> loadForStreamIds(Collection<String> streamIds)
+    {
+        final List<ObjectId> objectIds = streamIds.stream()
+            .map(ObjectId::new)
+            .collect(Collectors.toList());
+
+        final List<DBObject> respStreamRules = query(StreamRuleImpl.class,
+            new BasicDBObject(StreamRuleImpl.FIELD_STREAM_ID, new BasicDBObject("$in", objectIds))
+        );
+
+        return respStreamRules.stream()
+            .map(this::toStreamRule)
+            .collect(Collectors.groupingBy(StreamRule::getStreamId));
     }
 
     @Override
@@ -114,5 +133,12 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
         }
 
         return streamRules;
+    }
+
+    @SuppressWarnings("unchecked")
+    private StreamRule toStreamRule(DBObject dbObject)
+    {
+        final Map<String, Object> fields = dbObject.toMap();
+        return new StreamRuleImpl((ObjectId) dbObject.get("_id"), fields);
     }
 }
