@@ -119,7 +119,7 @@ const UserList = React.createClass({
       );
     } else {
       const deleteAction = (
-        <Button id="delete-user" bsStyle="primary" bsSize="xs" title="Delete user"
+        <Button id={`delete-user-${user.username}`} bsStyle="primary" bsSize="xs" title="Delete user"
                 onClick={this._deleteUserFunction(user.username)}>
           Delete
         </Button>
