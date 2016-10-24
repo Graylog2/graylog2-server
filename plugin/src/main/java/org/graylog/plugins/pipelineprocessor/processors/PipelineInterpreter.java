@@ -142,61 +142,28 @@ public class PipelineInterpreter implements MessageProcessor {
 
                 // 1. for each message, determine which pipelines are supposed to be executed, based on their streams
                 //    null is the default stream, the other streams are identified by their id
-                final ImmutableSet<Pipeline> pipelinesToRun;
 
-                // this makes a copy of the list!
+                // this makes a copy of the list, which is mutated later in updateStreamBlacklist
+                // it serves as a worklist, to keep track of which <msg, stream> tuples need to be re-run again
                 final Set<String> initialStreamIds = message.getStreams().stream().map(Stream::getId).collect(Collectors.toSet());
 
-                final ImmutableSetMultimap<String, Pipeline> streamConnection = state.getStreamPipelineConnections();
-
-                if (initialStreamIds.isEmpty()) {
-                    if (processingBlacklist.contains(tuple(msgId, "default"))) {
-                        // already processed default pipeline for this message
-                        pipelinesToRun = ImmutableSet.of();
-                        log.debug("[{}] already processed default stream, skipping", msgId);
-                    } else {
-                        // get the default stream pipeline connections for this message
-                        pipelinesToRun = streamConnection.get("default");
-                        interpreterListener.processDefaultStream(message, pipelinesToRun);
-                        if (log.isDebugEnabled()) {
-                            log.debug("[{}] running default stream pipelines: [{}]",
-                                      msgId,
-                                      pipelinesToRun.stream().map(Pipeline::name).toArray());
-                        }
-                    }
-                } else {
-                    // 2. if a message-stream combination has already been processed (is in the set), skip that execution
-                    final Set<String> streamsIds = initialStreamIds.stream()
-                            .filter(streamId -> !processingBlacklist.contains(tuple(msgId, streamId)))
-                            .filter(streamConnection::containsKey)
-                            .collect(Collectors.toSet());
-                    pipelinesToRun = ImmutableSet.copyOf(streamsIds.stream()
-                            .flatMap(streamId -> streamConnection.get(streamId).stream())
-                            .collect(Collectors.toSet()));
-                    interpreterListener.processStreams(message, pipelinesToRun, streamsIds);
-                    log.debug("[{}] running pipelines {} for streams {}", msgId, pipelinesToRun, streamsIds);
-                }
+                final ImmutableSet<Pipeline> pipelinesToRun = selectPipelines(interpreterListener,
+                                                                              processingBlacklist,
+                                                                              message,
+                                                                              initialStreamIds,
+                                                                              state.getStreamPipelineConnections());
 
                 toProcess.addAll(processForResolvedPipelines(message, msgId, pipelinesToRun, interpreterListener));
 
-                boolean addedStreams = false;
-                // 5. add each message-stream combination to the blacklist set
-                for (Stream stream : message.getStreams()) {
-                    if (!initialStreamIds.remove(stream.getId())) {
-                        addedStreams = true;
-                    } else {
-                        // only add pre-existing streams to blacklist, this has the effect of only adding already processed streams,
-                        // not newly added ones.
-                        processingBlacklist.add(tuple(msgId, stream.getId()));
-                    }
-                }
-                if (message.getFilterOut()) {
-                    log.debug("[{}] marked message to be discarded. Dropping message.",
-                              msgId);
-                    filteredOutMessages.mark();
-                    journal.markJournalOffsetCommitted(message.getJournalOffset());
-                }
-                // 6. go to 1 and iterate over all messages again until no more streams are being assigned
+                // add each processed message-stream combination to the blacklist set and figure out if the processing
+                // has added a stream to the message, in which case we need to cycle and determine whether to process
+                // its pipeline connections, too
+                boolean addedStreams = updateStreamBlacklist(processingBlacklist,
+                                                             message,
+                                                             initialStreamIds);
+                potentiallyDropFilteredMessage(message);
+
+                // go to 1 and iterate over all messages again until no more streams are being assigned
                 if (!addedStreams || message.getFilterOut()) {
                     log.debug("[{}] no new streams matches or dropped message, not running again", msgId);
                     fullyProcessed.add(message);
@@ -213,18 +180,96 @@ public class PipelineInterpreter implements MessageProcessor {
         return new MessageCollection(fullyProcessed);
     }
 
+    private void potentiallyDropFilteredMessage(Message message) {
+        if (message.getFilterOut()) {
+            log.debug("[{}] marked message to be discarded. Dropping message.", message.getId());
+            filteredOutMessages.mark();
+            journal.markJournalOffsetCommitted(message.getJournalOffset());
+        }
+    }
+
+    // given the initial streams the message was on before the processing and its current state, update the set of
+    // <msgid, stream> that should not be run again (which prevents re-running pipelines over and over again)
+    private boolean updateStreamBlacklist(Set<Tuple2<String, String>> processingBlacklist,
+                                          Message message,
+                                          Set<String> initialStreamIds) {
+        boolean addedStreams = false;
+        for (Stream stream : message.getStreams()) {
+            if (!initialStreamIds.remove(stream.getId())) {
+                addedStreams = true;
+            } else {
+                // only add pre-existing streams to blacklist, this has the effect of only adding already processed streams,
+                // not newly added ones.
+                processingBlacklist.add(tuple(message.getId(), stream.getId()));
+            }
+        }
+        return addedStreams;
+    }
+
+    // determine which pipelines should be executed give the stream-pipeline connections and the current message
+    // the initialStreamIds are not mutated, but are begin passed for efficiency, as they are being used later in #process()
+    private ImmutableSet<Pipeline> selectPipelines(InterpreterListener interpreterListener,
+                                                   Set<Tuple2<String, String>> processingBlacklist,
+                                                   Message message,
+                                                   Set<String> initialStreamIds,
+                                                   ImmutableSetMultimap<String, Pipeline> streamConnection) {
+        final String msgId = message.getId();
+        ImmutableSet<Pipeline> pipelinesToRun;
+        if (initialStreamIds.isEmpty()) {
+            if (processingBlacklist.contains(tuple(msgId, "default"))) {
+                // already processed default pipeline for this message
+                pipelinesToRun = ImmutableSet.of();
+                log.debug("[{}] already processed default stream, skipping", msgId);
+            } else {
+                // get the default stream pipeline connections for this message
+                pipelinesToRun = streamConnection.get("default");
+                interpreterListener.processDefaultStream(message, pipelinesToRun);
+                if (log.isDebugEnabled()) {
+                    log.debug("[{}] running default stream pipelines: [{}]",
+                              msgId,
+                              pipelinesToRun.stream().map(Pipeline::name).toArray());
+                }
+            }
+        } else {
+            // 2. if a message-stream combination has already been processed (is in the set), skip that execution
+            final Set<String> streamsIds = initialStreamIds.stream()
+                    .filter(streamId -> !processingBlacklist.contains(tuple(msgId, streamId)))
+                    .filter(streamConnection::containsKey)
+                    .collect(Collectors.toSet());
+            pipelinesToRun = ImmutableSet.copyOf(streamsIds.stream()
+                    .flatMap(streamId -> streamConnection.get(streamId).stream())
+                    .collect(Collectors.toSet()));
+            interpreterListener.processStreams(message, pipelinesToRun, streamsIds);
+            log.debug("[{}] running pipelines {} for streams {}", msgId, pipelinesToRun, streamsIds);
+        }
+        return pipelinesToRun;
+    }
+
+    /**
+     * Given a set of pipeline ids, process the given message according to the passed state.
+     *
+     * This method returns the list of messages produced by the configuration in state, it does not look at the database
+     * or any other external resource besides what is being passed as parameters.
+     *
+     * This can be used to simulate pipelines without having to store them in the database.
+     *
+     * @param message the message to process
+     * @param pipelineIds the ids of the pipelines to resolve and run the message through
+     * @param interpreterListener the listener tracing the execution
+     * @param state the pipeline/stage/rule state to interpret
+     * @return the list of messages created during the interpreter run
+     */
     public List<Message> processForPipelines(Message message,
-                                             String msgId,
-                                             Set<String> pipelines,
+                                             Set<String> pipelineIds,
                                              InterpreterListener interpreterListener,
                                              State state) {
-        final ImmutableSet<Pipeline> pipelinesToRun = ImmutableSet.copyOf(pipelines
+        final ImmutableSet<Pipeline> pipelinesToRun = ImmutableSet.copyOf(pipelineIds
                 .stream()
                 .map(pipelineId -> state.getCurrentPipelines().get(pipelineId))
                 .filter(pipeline -> pipeline != null)
                 .collect(Collectors.toSet()));
 
-        return processForResolvedPipelines(message, msgId, pipelinesToRun, interpreterListener);
+        return processForResolvedPipelines(message, message.getId(), pipelinesToRun, interpreterListener);
     }
 
     private List<Message> processForResolvedPipelines(Message message,
@@ -242,99 +287,140 @@ public class PipelineInterpreter implements MessageProcessor {
         // pipeline execution ordering is not guaranteed
         while (stages.hasNext()) {
             final List<Stage> stageSet = stages.next();
-            for (final Stage stage : stageSet) {
-                final Pipeline pipeline = stage.getPipeline();
-                if (pipelinesToSkip.contains(pipeline)) {
-                    log.debug("[{}] previous stage result prevents further processing of pipeline `{}`",
-                             msgId,
-                             pipeline.name());
-                    continue;
-                }
-                stage.markExecution();
-                interpreterListener.enterStage(stage);
-                log.debug("[{}] evaluating rule conditions in stage {}: match {}",
-                         msgId,
-                         stage.stage(),
-                         stage.matchAll() ? "all" : "either");
-
-                // TODO the message should be decorated to allow layering changes and isolate stages
-                final EvaluationContext context = new EvaluationContext(message);
-
-                // 3. iterate over all the stages in these pipelines and execute them in order
-                final ArrayList<Rule> rulesToRun = Lists.newArrayListWithCapacity(stage.getRules().size());
-                boolean anyRulesMatched = false;
-                for (Rule rule : stage.getRules()) {
-                    interpreterListener.evaluateRule(rule, pipeline);
-                    if (rule.when().evaluateBool(context)) {
-                        anyRulesMatched = true;
-                        rule.markMatch();
-
-                        if (context.hasEvaluationErrors()) {
-                            final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-                            appendProcessingError(rule, message, lastError.toString());
-                            interpreterListener.failEvaluateRule(rule, pipeline);
-                            log.debug("Encountered evaluation error during condition, skipping rule actions: {}",
-                                      lastError);
-                            continue;
-                        }
-                        interpreterListener.satisfyRule(rule, pipeline);
-                        log.debug("[{}] rule `{}` matches, scheduling to run", msgId, rule.name());
-                        rulesToRun.add(rule);
-                    } else {
-                        rule.markNonMatch();
-                        interpreterListener.dissatisfyRule(rule, pipeline);
-                        log.debug("[{}] rule `{}` does not match", msgId, rule.name());
-                    }
-                }
-                RULES:
-                for (Rule rule : rulesToRun) {
-                    rule.markExecution();
-                    interpreterListener.executeRule(rule, pipeline);
-                    log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
-                    for (Statement statement : rule.then()) {
-                        statement.evaluate(context);
-                        if (context.hasEvaluationErrors()) {
-                            // if the last statement resulted in an error, do not continue to execute this rules
-                            final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
-                            appendProcessingError(rule, message, lastError.toString());
-                            interpreterListener.failExecuteRule(rule, pipeline);
-                            log.debug("Encountered evaluation error, skipping rest of the rule: {}",
-                                      lastError);
-                            rule.markFailure();
-                            break RULES;
-                        }
-                    }
-                }
-                // stage needed to match all rule conditions to enable the next stage,
-                // record that it is ok to proceed with this pipeline
-                // OR
-                // any rule could match, but at least one had to,
-                // record that it is ok to proceed with the pipeline
-                if ((stage.matchAll() && (rulesToRun.size() == stage.getRules().size()))
-                        || (rulesToRun.size() > 0 && anyRulesMatched)) {
-                    interpreterListener.continuePipelineExecution(pipeline, stage);
-                    log.debug("[{}] stage {} for pipeline `{}` required match: {}, ok to proceed with next stage",
-                             msgId, stage.stage(), pipeline.name(), stage.matchAll() ? "all" : "either");
-                } else {
-                    // no longer execute stages from this pipeline, the guard prevents it
-                    interpreterListener.stopPipelineExecution(pipeline, stage);
-                    log.debug("[{}] stage {} for pipeline `{}` required match: {}, NOT ok to proceed with next stage",
-                              msgId, stage.stage(), pipeline.name(), stage.matchAll() ? "all" : "either");
-                    pipelinesToSkip.add(pipeline);
-                }
-
-                // 4. after each complete stage run, merge the processing changes, stages are isolated from each other
-                // TODO message changes become visible immediately for now
-
-                // 4a. also add all new messages from the context to the toProcess work list
-                Iterables.addAll(result, context.createdMessages());
-                context.clearCreatedMessages();
-                interpreterListener.exitStage(stage);
-            }
+            for (final Stage stage : stageSet)
+                evaluateStage(stage, message, msgId, result, pipelinesToSkip, interpreterListener);
         }
 
         // 7. return the processed messages
         return result;
+    }
+
+    private void evaluateStage(Stage stage,
+                               Message message,
+                               String msgId,
+                               List<Message> result,
+                               Set<Pipeline> pipelinesToSkip,
+                               InterpreterListener interpreterListener) {
+        final Pipeline pipeline = stage.getPipeline();
+        if (pipelinesToSkip.contains(pipeline)) {
+            log.debug("[{}] previous stage result prevents further processing of pipeline `{}`",
+                     msgId,
+                     pipeline.name());
+            return;
+        }
+        stage.markExecution();
+        interpreterListener.enterStage(stage);
+        log.debug("[{}] evaluating rule conditions in stage {}: match {}",
+                 msgId,
+                 stage.stage(),
+                 stage.matchAll() ? "all" : "either");
+
+        // TODO the message should be decorated to allow layering changes and isolate stages
+        final EvaluationContext context = new EvaluationContext(message);
+
+        // 3. iterate over all the stages in these pipelines and execute them in order
+        final ArrayList<Rule> rulesToRun = Lists.newArrayListWithCapacity(stage.getRules().size());
+        boolean anyRulesMatched = false;
+        for (Rule rule : stage.getRules()) {
+            anyRulesMatched |= evaluateRuleCondition(rule, message, msgId, pipeline, context, rulesToRun, interpreterListener);
+        }
+
+        for (Rule rule : rulesToRun)
+            if (!executeRuleActions(rule, message, msgId, pipeline, context, interpreterListener)) {
+                // if any of the rules raise an error, skip the rest of the rules
+                break;
+            }
+        // stage needed to match all rule conditions to enable the next stage,
+        // record that it is ok to proceed with this pipeline
+        // OR
+        // any rule could match, but at least one had to,
+        // record that it is ok to proceed with the pipeline
+        if ((stage.matchAll() && (rulesToRun.size() == stage.getRules().size()))
+                || (rulesToRun.size() > 0 && anyRulesMatched)) {
+            interpreterListener.continuePipelineExecution(pipeline, stage);
+            log.debug("[{}] stage {} for pipeline `{}` required match: {}, ok to proceed with next stage",
+                     msgId, stage.stage(), pipeline.name(), stage.matchAll() ? "all" : "either");
+        } else {
+            // no longer execute stages from this pipeline, the guard prevents it
+            interpreterListener.stopPipelineExecution(pipeline, stage);
+            log.debug("[{}] stage {} for pipeline `{}` required match: {}, NOT ok to proceed with next stage",
+                      msgId, stage.stage(), pipeline.name(), stage.matchAll() ? "all" : "either");
+            pipelinesToSkip.add(pipeline);
+        }
+
+        // 4. after each complete stage run, merge the processing changes, stages are isolated from each other
+        // TODO message changes become visible immediately for now
+
+        // 4a. also add all new messages from the context to the toProcess work list
+        Iterables.addAll(result, context.createdMessages());
+        context.clearCreatedMessages();
+        interpreterListener.exitStage(stage);
+    }
+
+    private boolean executeRuleActions(Rule rule,
+                                       Message message,
+                                       String msgId,
+                                       Pipeline pipeline,
+                                       EvaluationContext context,
+                                       InterpreterListener interpreterListener) {
+        rule.markExecution();
+        interpreterListener.executeRule(rule, pipeline);
+        log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
+        for (Statement statement : rule.then()) {
+            if (!evaluateStatement(message, interpreterListener, pipeline, context, rule, statement)) {
+                // statement raised an error, skip the rest of the rule
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private boolean evaluateStatement(Message message,
+                                      InterpreterListener interpreterListener,
+                                      Pipeline pipeline,
+                                      EvaluationContext context, Rule rule, Statement statement) {
+        statement.evaluate(context);
+        if (context.hasEvaluationErrors()) {
+            // if the last statement resulted in an error, do not continue to execute this rules
+            final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+            appendProcessingError(rule, message, lastError.toString());
+            interpreterListener.failExecuteRule(rule, pipeline);
+            log.debug("Encountered evaluation error, skipping rest of the rule: {}",
+                      lastError);
+            rule.markFailure();
+            return false;
+        }
+        return true;
+    }
+
+    private boolean evaluateRuleCondition(Rule rule,
+                                          Message message,
+                                          String msgId,
+                                          Pipeline pipeline,
+                                          EvaluationContext context,
+                                          ArrayList<Rule> rulesToRun, InterpreterListener interpreterListener) {
+        interpreterListener.evaluateRule(rule, pipeline);
+        if (rule.when().evaluateBool(context)) {
+            rule.markMatch();
+
+            if (context.hasEvaluationErrors()) {
+                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+                appendProcessingError(rule, message, lastError.toString());
+                interpreterListener.failEvaluateRule(rule, pipeline);
+                log.debug("Encountered evaluation error during condition, skipping rule actions: {}",
+                          lastError);
+                return false;
+            }
+            interpreterListener.satisfyRule(rule, pipeline);
+            log.debug("[{}] rule `{}` matches, scheduling to run", msgId, rule.name());
+            rulesToRun.add(rule);
+            return true;
+        } else {
+            rule.markNonMatch();
+            interpreterListener.dissatisfyRule(rule, pipeline);
+            log.debug("[{}] rule `{}` does not match", msgId, rule.name());
+        }
+        return false;
     }
 
     private void appendProcessingError(Rule rule, Message message, String errorString) {

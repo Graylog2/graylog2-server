@@ -111,7 +111,6 @@ public class PipelineProcessorMessageDecorator implements SearchResponseDecorato
         searchResponse.messages().forEach((inMessage) -> {
             final Message message = new Message(inMessage.message());
             final List<Message> additionalCreatedMessages = pipelineInterpreter.processForPipelines(message,
-                    message.getId(),
                     pipelines,
                     new NoopInterpreterListener(),
                     pipelineStateUpdater.getLatestState());
