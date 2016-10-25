@@ -19,12 +19,15 @@ package org.graylog2.plugin.configuration;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.graylog2.plugin.configuration.fields.*;
+import org.graylog2.plugin.configuration.fields.BooleanField;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.DropdownField;
+import org.graylog2.plugin.configuration.fields.NumberField;
+import org.graylog2.plugin.configuration.fields.TextField;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -35,19 +38,16 @@ public class ConfigurationRequest {
 
     public ConfigurationRequest() {}
 
-    public ConfigurationRequest putAll(Map<String, ConfigurationField> fields) {
+    public void putAll(Map<String, ConfigurationField> fields) {
         this.fields.putAll(fields);
-        return this;
     }
 
-    public ConfigurationRequest addField(ConfigurationField f) {
+    public void addField(ConfigurationField f) {
         fields.put(f.getName(), f);
-        return this;
     }
 
-    public ConfigurationRequest addFields(List<ConfigurationField> fields) {
+    public void addFields(List<ConfigurationField> fields) {
         fields.forEach(this::addField);
-        return this;
     }
 
     public boolean containsField(String fieldName) {
@@ -60,6 +60,11 @@ public class ConfigurationRequest {
 
     public Map<String, ConfigurationField> getFields() {
         return fields;
+    }
+
+    @Deprecated
+    public boolean removeField(String fieldName) {
+        return fields.remove(fieldName) != null;
     }
 
     public static ConfigurationRequest createWithFields(ConfigurationField... fields) {

@@ -85,16 +85,19 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
 
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            return ConfigurationRequest.createWithFields(
-                new NumberField("time", "Time Range", 0, "Time span in seconds to check", ConfigurationField.Optional.NOT_OPTIONAL),
-                new NumberField("threshold", "Threshold", 0.0, "Value which triggers an alert if crossed", ConfigurationField.Optional.NOT_OPTIONAL),
-                new DropdownField(
-                    "threshold_type",
-                    "Threshold Type",
-                    MessageCountAlertCondition.ThresholdType.MORE.toString(),
-                    Arrays.stream(MessageCountAlertCondition.ThresholdType.values()).collect(Collectors.toMap(Enum::toString, ThresholdType::getDescription)),
-                    ConfigurationField.Optional.NOT_OPTIONAL)
-            ).addFields(AbstractAlertCondition.getDefaultConfigurationFields());
+            final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(
+                    new NumberField("time", "Time Range", 0, "Time span in seconds to check", ConfigurationField.Optional.NOT_OPTIONAL),
+                    new NumberField("threshold", "Threshold", 0.0, "Value which triggers an alert if crossed", ConfigurationField.Optional.NOT_OPTIONAL),
+                    new DropdownField(
+                            "threshold_type",
+                            "Threshold Type",
+                            ThresholdType.MORE.toString(),
+                            Arrays.stream(ThresholdType.values()).collect(Collectors.toMap(Enum::toString, ThresholdType::getDescription)),
+                            ConfigurationField.Optional.NOT_OPTIONAL)
+            );
+            configurationRequest.addFields(AbstractAlertCondition.getDefaultConfigurationFields());
+
+            return configurationRequest;
         }
     }
 
