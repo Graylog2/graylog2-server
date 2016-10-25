@@ -94,23 +94,26 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            return ConfigurationRequest.createWithFields(
-                new TextField("field", "Field", "", "Field name that should be checked", ConfigurationField.Optional.NOT_OPTIONAL),
-                new NumberField("time", "Time Range", 0, "Time span in seconds to check", ConfigurationField.Optional.NOT_OPTIONAL),
-                new NumberField("threshold", "Threshold", 0.0, "Value which triggers an alert if crossed", ConfigurationField.Optional.NOT_OPTIONAL),
-                new DropdownField(
-                    "threshold_type",
-                    "Threshold Type",
-                    ThresholdType.HIGHER.toString(),
-                    DropdownField.ValueTemplates.valueMapFromEnum(ThresholdType.class, thresholdType -> thresholdType.name().toLowerCase(Locale.ENGLISH)),
-                    ConfigurationField.Optional.NOT_OPTIONAL),
-                new DropdownField(
-                    "type",
-                    "Check Type",
-                    CheckType.MAX.toString(),
-                    Arrays.stream(CheckType.values()).collect(Collectors.toMap(Enum::toString, CheckType::getDescription)),
-                    ConfigurationField.Optional.NOT_OPTIONAL)
-            ).addFields(AbstractAlertCondition.getDefaultConfigurationFields());
+            final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(
+                    new TextField("field", "Field", "", "Field name that should be checked", ConfigurationField.Optional.NOT_OPTIONAL),
+                    new NumberField("time", "Time Range", 0, "Time span in seconds to check", ConfigurationField.Optional.NOT_OPTIONAL),
+                    new NumberField("threshold", "Threshold", 0.0, "Value which triggers an alert if crossed", ConfigurationField.Optional.NOT_OPTIONAL),
+                    new DropdownField(
+                            "threshold_type",
+                            "Threshold Type",
+                            ThresholdType.HIGHER.toString(),
+                            DropdownField.ValueTemplates.valueMapFromEnum(ThresholdType.class, thresholdType -> thresholdType.name().toLowerCase(Locale.ENGLISH)),
+                            ConfigurationField.Optional.NOT_OPTIONAL),
+                    new DropdownField(
+                            "type",
+                            "Check Type",
+                            CheckType.MAX.toString(),
+                            Arrays.stream(CheckType.values()).collect(Collectors.toMap(Enum::toString, CheckType::getDescription)),
+                            ConfigurationField.Optional.NOT_OPTIONAL)
+            );
+            configurationRequest.addFields(AbstractAlertCondition.getDefaultConfigurationFields());
+
+            return configurationRequest;
         }
     }
 

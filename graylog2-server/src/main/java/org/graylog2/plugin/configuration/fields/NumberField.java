@@ -35,21 +35,37 @@ public class NumberField extends AbstractConfigurationField {
 
     private final List<String> attributes;
 
-    public NumberField(String name, String humanName, Number defaultValue, String description, Optional isOptional) {
+    public NumberField(String name, String humanName, int defaultValue, String description, Optional isOptional) {
         this(name, humanName, defaultValue, description, isOptional, new Attribute[0]);
     }
 
-    public NumberField(String name, String humanName, Number defaultValue, String description, Attribute... attributes) {
+    public NumberField(String name, String humanName, double defaultValue, String description, Optional isOptional) {
+        this(name, humanName, defaultValue, description, isOptional, new Attribute[0]);
+    }
+
+    public NumberField(String name, String humanName, int defaultValue, String description, Attribute... attributes) {
         this(name, humanName, defaultValue, description, Optional.NOT_OPTIONAL, attributes);
     }
 
-    public NumberField(String name, String humanName, Number defaultValue, String description, Optional isOptional, Attribute... attrs) {
+    public NumberField(String name, String humanName, double defaultValue, String description, Attribute... attributes) {
+        this(name, humanName, defaultValue, description, Optional.NOT_OPTIONAL, attributes);
+    }
+
+    public NumberField(String name, String humanName, int defaultValue, String description, Optional isOptional, Attribute... attributes) {
+        this(name, humanName, (Number) defaultValue, description, isOptional, attributes);
+    }
+
+    public NumberField(String name, String humanName, double defaultValue, String description, Optional isOptional, Attribute... attributes) {
+        this(name, humanName, (Number) defaultValue, description, isOptional, attributes);
+    }
+
+    private NumberField(String name, String humanName, Number defaultValue, String description, Optional isOptional, Attribute... attributes) {
         super(FIELD_TYPE, name, humanName, description, isOptional);
         this.defaultValue = defaultValue;
 
         this.attributes = Lists.newArrayList();
-        if (attrs != null) {
-            for (Attribute attribute : attrs) {
+        if (attributes != null) {
+            for (Attribute attribute : attributes) {
                 this.attributes.add(attribute.toString().toLowerCase(Locale.ENGLISH));
             }
         }

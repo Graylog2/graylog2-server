@@ -75,10 +75,13 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
 
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
-            return ConfigurationRequest.createWithFields(
-                new TextField("field", "Field", "", "Field name that should be checked", ConfigurationField.Optional.NOT_OPTIONAL),
-                new TextField("value", "Value", "", "Value that the field should be checked against", ConfigurationField.Optional.NOT_OPTIONAL)
-            ).addFields(AbstractAlertCondition.getDefaultConfigurationFields());
+            final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(
+                    new TextField("field", "Field", "", "Field name that should be checked", ConfigurationField.Optional.NOT_OPTIONAL),
+                    new TextField("value", "Value", "", "Value that the field should be checked against", ConfigurationField.Optional.NOT_OPTIONAL)
+            );
+            configurationRequest.addFields(AbstractAlertCondition.getDefaultConfigurationFields());
+
+            return configurationRequest;
         }
     }
 
