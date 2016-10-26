@@ -19,6 +19,8 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
+import java.util.Collections;
+
 public class BooleanValuedFunctionWrapper extends BaseExpression implements LogicalExpression {
     private final Expression expr;
 
@@ -51,8 +53,17 @@ public class BooleanValuedFunctionWrapper extends BaseExpression implements Logi
         return expr.getType();
     }
 
+    public Expression expression() {
+        return expr;
+    }
+
     @Override
     public String toString() {
         return expr.toString();
+    }
+
+    @Override
+    public Iterable<Expression> children() {
+        return Collections.singleton(expr);
     }
 }

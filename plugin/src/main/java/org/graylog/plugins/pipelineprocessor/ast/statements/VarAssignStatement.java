@@ -35,6 +35,14 @@ public class VarAssignStatement implements Statement {
         return null;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public Expression getValueExpression() {
+        return expr;
+    }
+
     @Override
     public String toString() {
         return "let " + name + " = " + expr.toString();

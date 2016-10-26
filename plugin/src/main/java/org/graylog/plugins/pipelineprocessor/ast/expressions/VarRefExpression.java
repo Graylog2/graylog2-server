@@ -21,6 +21,8 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
+
 public class VarRefExpression extends BaseExpression {
     private static final Logger log = LoggerFactory.getLogger(VarRefExpression.class);
     private final String identifier;
@@ -62,5 +64,10 @@ public class VarRefExpression extends BaseExpression {
 
     public void setType(Class type) {
         this.type = type;
+    }
+
+    @Override
+    public Iterable<Expression> children() {
+        return Collections.emptySet();
     }
 }

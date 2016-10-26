@@ -19,6 +19,8 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
+import java.util.Collections;
+
 public class FieldRefExpression extends BaseExpression {
     private final String variableName;
 
@@ -45,5 +47,14 @@ public class FieldRefExpression extends BaseExpression {
     @Override
     public String toString() {
         return variableName;
+    }
+
+    public String fieldName() {
+        return variableName;
+    }
+
+    @Override
+    public Iterable<Expression> children() {
+        return Collections.emptySet();
     }
 }

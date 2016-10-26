@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import com.google.common.collect.ImmutableList;
+
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -71,5 +73,18 @@ public class FieldAccessExpression extends BaseExpression {
     @Override
     public String toString() {
         return object.toString() + "." + field.toString();
+    }
+
+    public Expression object() {
+        return object;
+    }
+
+    public Expression field() {
+        return field;
+    }
+
+    @Override
+    public Iterable<Expression> children() {
+        return ImmutableList.of(object, field);
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.primitives.Ints;
 import org.antlr.v4.runtime.Token;
@@ -84,5 +85,10 @@ public class IndexedAccessExpression extends BaseExpression {
 
     public Expression getIndex() {
         return index;
+    }
+
+    @Override
+    public Iterable<Expression> children() {
+        return ImmutableList.of(indexableObject, index);
     }
 }

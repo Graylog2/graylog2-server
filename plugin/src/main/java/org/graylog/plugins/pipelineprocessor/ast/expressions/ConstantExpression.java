@@ -18,6 +18,8 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import org.antlr.v4.runtime.Token;
 
+import java.util.Collections;
+
 public abstract class ConstantExpression extends BaseExpression {
 
     private final Class type;
@@ -37,4 +39,8 @@ public abstract class ConstantExpression extends BaseExpression {
         return type;
     }
 
+    @Override
+    public Iterable<Expression> children() {
+        return Collections.emptySet();
+    }
 }

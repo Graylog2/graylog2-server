@@ -19,6 +19,8 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
+import java.util.Collections;
+
 public class MessageRefExpression extends BaseExpression {
     private final Expression fieldExpr;
 
@@ -53,5 +55,10 @@ public class MessageRefExpression extends BaseExpression {
 
     public Expression getFieldExpr() {
         return fieldExpr;
+    }
+
+    @Override
+    public Iterable<Expression> children() {
+        return Collections.singleton(fieldExpr);
     }
 }

@@ -17,6 +17,8 @@
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 
@@ -37,7 +39,7 @@ public class ArrayLiteralExpression extends BaseExpression {
     }
 
     @Override
-    public Object evaluateUnsafe(EvaluationContext context) {
+    public List evaluateUnsafe(EvaluationContext context) {
         return  elements.stream()
                 .map(expression -> expression.evaluateUnsafe(context))
                 .collect(Collectors.toList());
@@ -51,5 +53,10 @@ public class ArrayLiteralExpression extends BaseExpression {
     @Override
     public String toString() {
         return "[" + Joiner.on(", ").join(elements) + "]";
+    }
+
+    @Override
+    public Iterable<Expression> children() {
+        return ImmutableList.copyOf(elements);
     }
 }

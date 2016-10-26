@@ -18,9 +18,11 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import org.antlr.v4.runtime.Token;
 
+import java.util.Collections;
+
 public abstract class UnaryExpression extends BaseExpression {
 
-    protected final Expression right;
+    protected Expression right;
 
     public UnaryExpression(Token start, Expression right) {
         super(start);
@@ -39,5 +41,14 @@ public abstract class UnaryExpression extends BaseExpression {
 
     public Expression right() {
         return right;
+    }
+
+    public void right(Expression right) {
+        this.right = right;
+    }
+
+    @Override
+    public Iterable<Expression> children() {
+        return Collections.singleton(right);
     }
 }

@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.base.Joiner;
+
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.exceptions.FunctionEvaluationException;
@@ -24,6 +25,9 @@ import org.graylog.plugins.pipelineprocessor.ast.exceptions.LocationAwareEvalExc
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class FunctionExpression extends BaseExpression {
     private final FunctionArgs args;
@@ -82,5 +86,10 @@ public class FunctionExpression extends BaseExpression {
                                   .iterator());
         }
         return descriptor.name() + "(" + argsString + ")";
+    }
+
+    @Override
+    public Iterable<Expression> children() {
+        return args.getArgs().entrySet().stream().map(Map.Entry::getValue).collect(Collectors.toList());
     }
 }

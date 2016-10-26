@@ -17,6 +17,8 @@
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.jooq.lambda.Seq;
@@ -39,7 +41,7 @@ public class MapLiteralExpression extends BaseExpression {
     }
 
     @Override
-    public Object evaluateUnsafe(EvaluationContext context) {
+    public Map evaluateUnsafe(EvaluationContext context) {
         // evaluate all values for each key and return the resulting map
         return Seq.seq(map)
                 .map(entry -> entry.map2(value -> value.evaluateUnsafe(context)))
@@ -54,5 +56,10 @@ public class MapLiteralExpression extends BaseExpression {
     @Override
     public String toString() {
         return "{" + Joiner.on(", ").withKeyValueSeparator(":").join(map) + "}";
+    }
+
+    @Override
+    public Iterable<Expression> children() {
+        return ImmutableList.copyOf(map.values());
     }
 }

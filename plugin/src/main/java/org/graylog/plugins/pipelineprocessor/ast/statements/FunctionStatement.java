@@ -32,6 +32,10 @@ public class FunctionStatement implements Statement {
         return functionExpression.evaluate(context);
     }
 
+    public Expression getFunctionExpression() {
+        return functionExpression;
+    }
+
     @Override
     public String toString() {
         return functionExpression.toString();

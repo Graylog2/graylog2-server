@@ -16,11 +16,13 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import com.google.common.collect.ImmutableList;
+
 import org.antlr.v4.runtime.Token;
 
 public abstract class BinaryExpression extends UnaryExpression {
 
-    protected final Expression left;
+    protected Expression left;
 
     public BinaryExpression(Token start, Expression left, Expression right) {
         super(start, right);
@@ -34,5 +36,13 @@ public abstract class BinaryExpression extends UnaryExpression {
 
     public Expression left() {
         return left;
+    }
+
+    public void left(Expression left) {
+        this.left = left;
+    }
+    @Override
+    public Iterable<Expression> children() {
+        return ImmutableList.of(left, right);
     }
 }
