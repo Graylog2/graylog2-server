@@ -87,6 +87,12 @@ const SearchBar = React.createClass({
       $(queryDOMElement).off('typeahead:change');
     }
   },
+  _closeSearchQueryAutoCompletion() {
+    if (this.props.userPreferences.enableSmartSearch) {
+      const queryDOMElement = ReactDOM.findDOMNode(this.refs.query.getInputDOMNode());
+      $(queryDOMElement).typeahead('close');
+    }
+  },
   _animateQueryChange() {
     UIUtils.scrollToHint(ReactDOM.findDOMNode(this.refs.universalSearch));
     $(ReactDOM.findDOMNode(this.refs.query)).effect('bounce');
@@ -179,6 +185,8 @@ const SearchBar = React.createClass({
     if (event) {
       event.preventDefault();
     }
+
+    this._closeSearchQueryAutoCompletion();
 
     // Convert from and to values to UTC
     if (this.state.rangeType === 'absolute') {
