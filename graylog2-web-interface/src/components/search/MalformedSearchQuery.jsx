@@ -44,20 +44,22 @@ const MalformedSearchQuery = React.createClass({
   },
 
   render() {
+    const error = this.props.error.body;
+
     let explanation;
-    if (this._isGenericError(this.props.error)) {
+    if (this._isGenericError(error)) {
       explanation = (
         <div>
           <p>The given query was malformed, and executing it caused the following error:</p>
-          {this._getFormattedErrorDescription(this.props.error)}
+          {this._getFormattedErrorDescription(error)}
         </div>
       );
     } else {
       explanation = (
         <div>
           <p>The given query was malformed at the following position:</p>
-          <pre>{this._highlightQueryError(this.props.error)}</pre>
-          {this._getFormattedErrorDescription(this.props.error)}
+          <pre>{this._highlightQueryError(error)}</pre>
+          {this._getFormattedErrorDescription(error)}
         </div>
       );
     }
