@@ -5,6 +5,9 @@ import { AutoAffix } from 'react-overlays';
 import numeral from 'numeral';
 import URI from 'urijs';
 
+import { Timestamp } from 'components/common';
+import DateTime from 'logic/datetimes/DateTime';
+
 import StoreProvider from 'injection/StoreProvider';
 const SessionStore = StoreProvider.getStore('Session');
 const SearchStore = StoreProvider.getStore('Search');
@@ -39,17 +42,25 @@ const SearchSidebar = React.createClass({
     showHighlightToggle: React.PropTypes.bool,
     togglePageFields: React.PropTypes.func,
     toggleShouldHighlight: React.PropTypes.func,
+    loadingSearch: React.PropTypes.bool,
   },
 
   getInitialState() {
     return {
       availableHeight: 1000,
+      lastResultsUpdate: DateTime.now().toISOString(),
     };
   },
 
   componentDidMount() {
     this._updateHeight();
     window.addEventListener('resize', this._resizeCallback);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (this.props.loadingSearch && !nextProps.loadingSearch) {
+      this.setState({ lastResultsUpdate: DateTime.now().toISOString() });
+    }
   },
 
   componentWillUnmount() {
@@ -162,12 +173,14 @@ const SearchSidebar = React.createClass({
             </h2>
 
             <p style={{ marginTop: 3 }}>
-              Found <strong>{numeral(this.props.result.total_results).format('0,0')} messages</strong>&nbsp;
+              Found <strong>{numeral(this.props.result.total_results).format('0,0')} messages</strong>{' '}
               in {numeral(this.props.result.time).format('0,0')} ms, searched in&nbsp;
               <a href="#" onClick={this._showIndicesModal}>
                 {this.props.result.used_indices.length}&nbsp;{this.props.result.used_indices.length === 1 ? 'index' : 'indices'}
               </a>.
               {indicesModal}
+              <br/>
+              Results retrieved at <Timestamp dateTime={this.state.lastResultsUpdate} format={DateTime.Formats.DATETIME}/>.
             </p>
 
             <div className="actions">
