@@ -1,4 +1,5 @@
 import React from 'react';
+import { Alert } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
 
@@ -16,7 +17,7 @@ const LoadingIndicator = React.createClass({
   },
 
   render() {
-    return <div className={loadingIndicatorStyle.loadingIndicator}><Spinner text={this.props.text}/></div>;
+    return <Alert bsStyle="info" className={loadingIndicatorStyle.loadingIndicator}><Spinner text={this.props.text}/></Alert>;
   },
 });
 
