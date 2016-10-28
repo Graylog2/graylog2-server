@@ -104,16 +104,25 @@ const SearchResult = React.createClass({
   },
 
   _fieldAnalyzerComponents(filter) {
+    // Get params used in the last executed search.
+    const searchParams = SearchStore.getOriginalSearchURLParams().toJS();
+    const rangeParams = {};
+    ['relative', 'from', 'to', 'keyword'].forEach(param => {
+      if (searchParams[param]) {
+        rangeParams[param] = searchParams[param];
+      }
+    });
+
     return this._fieldAnalyzers(filter)
       .map((analyzer, idx) => {
         return React.createElement(analyzer.component, {
           key: idx,
           ref: analyzer.refId,
           permissions: this.props.permissions,
-          query: SearchStore.query,
-          page: SearchStore.page,
-          rangeType: SearchStore.rangeType,
-          rangeParams: SearchStore.rangeParams.toJS(),
+          query: searchParams.q,
+          page: searchParams.page,
+          rangeType: searchParams.rangetype,
+          rangeParams: rangeParams,
           stream: this.props.searchInStream,
           resolution: this.props.histogram.interval,
           from: this.props.histogram.histogram_boundaries.from,
