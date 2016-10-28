@@ -6,8 +6,9 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Promise from 'bluebird';
 import Reflux from 'reflux';
-import { AppContainer } from 'react-hot-loader'
+import { AppContainer } from 'react-hot-loader';
 
+Promise.config({ cancellation: true });
 Reflux.setPromiseFactory((handlers) => new Promise(handlers));
 
 function renderAppContainer(appContainer) {
