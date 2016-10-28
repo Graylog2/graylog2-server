@@ -296,7 +296,8 @@ export const FieldChart = {
       opts.field,
       opts.interval,
       timeRangeParams,
-      opts.streamid
+      opts.streamid,
+      opts.valuetype === 'cardinality'
     ).url;
 
     return fetch('GET', URLUtils.qualifyUrl(url))
