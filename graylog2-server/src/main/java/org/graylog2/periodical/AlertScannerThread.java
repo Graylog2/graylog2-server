@@ -37,13 +37,8 @@ public class AlertScannerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(AlertScannerThread.class);
 
     private final StreamService streamService;
-    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
-    private final AlarmCallbackFactory alarmCallbackFactory;
-    private final EmailAlarmCallback emailAlarmCallback;
     private final IndexerSetupService indexerSetupService;
-    private final AlertService alertService;
     private final Configuration configuration;
-    private final AlarmCallbackHistoryService alarmCallbackHistoryService;
     private final AlertScanner alertScanner;
 
     @Inject
@@ -56,14 +51,9 @@ public class AlertScannerThread extends Periodical {
                               final Configuration configuration,
                               final AlarmCallbackHistoryService alarmCallbackHistoryService,
                               final AlertScanner alertScanner) {
-        this.alertService = alertService;
         this.streamService = streamService;
-        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
-        this.alarmCallbackFactory = alarmCallbackFactory;
-        this.emailAlarmCallback = emailAlarmCallback;
         this.indexerSetupService = indexerSetupService;
         this.configuration = configuration;
-        this.alarmCallbackHistoryService = alarmCallbackHistoryService;
         this.alertScanner = alertScanner;
     }
 
