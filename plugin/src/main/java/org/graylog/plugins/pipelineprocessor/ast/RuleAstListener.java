@@ -166,4 +166,8 @@ public interface RuleAstListener {
     void enterEveryExpression(Expression expr);
 
     void exitEveryExpression(Expression expr);
+
+    void enterFunctionArg(FunctionExpression functionExpression, Expression expression);
+
+    void exitFunctionArg(Expression expression);
 }

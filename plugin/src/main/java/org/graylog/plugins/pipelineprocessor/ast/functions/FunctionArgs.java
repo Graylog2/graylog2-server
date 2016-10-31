@@ -17,14 +17,16 @@
 package org.graylog.plugins.pipelineprocessor.ast.functions;
 
 import com.google.common.collect.Maps;
+
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 

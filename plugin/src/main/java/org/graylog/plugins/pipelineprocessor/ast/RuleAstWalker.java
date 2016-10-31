@@ -115,7 +115,14 @@ public class RuleAstWalker {
                 break;
             case FUNCTION:
                 listener.enterFunctionCall((FunctionExpression) expr);
-                visitChildren(listener, expr);
+                // special case, we want to wrap each function argument's expressing into its own
+                // callback, so we can generate statements for them.
+                expr.children().forEach(expression -> {
+                    listener.enterFunctionArg((FunctionExpression) expr, expression);
+                    walkExpression(listener, expression);
+                    listener.exitFunctionArg(expression);
+                });
+
                 listener.exitFunctionCall((FunctionExpression) expr);
                 break;
             case INDEXED_ACCESS:

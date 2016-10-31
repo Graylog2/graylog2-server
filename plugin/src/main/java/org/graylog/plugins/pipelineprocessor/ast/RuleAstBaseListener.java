@@ -361,4 +361,14 @@ public class RuleAstBaseListener implements RuleAstListener {
     public void exitEveryExpression(Expression expr) {
 
     }
+
+    @Override
+    public void enterFunctionArg(FunctionExpression functionExpression, Expression expression) {
+
+    }
+
+    @Override
+    public void exitFunctionArg(Expression expression) {
+
+    }
 }

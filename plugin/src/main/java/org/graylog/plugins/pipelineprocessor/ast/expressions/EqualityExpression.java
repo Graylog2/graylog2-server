@@ -77,6 +77,10 @@ public class EqualityExpression extends BinaryExpression implements LogicalExpre
                   checkEquality == equals, this.left, this.right, left, right);
     }
 
+    public boolean isCheckEquality() {
+        return checkEquality;
+    }
+
     @Override
     public String toString() {
         return left.toString() + (checkEquality ? " == " : " != ") + right.toString();
