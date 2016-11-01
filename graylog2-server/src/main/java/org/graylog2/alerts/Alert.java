@@ -28,6 +28,7 @@ public interface Alert {
     String getStreamId();
     String getConditionId();
     DateTime getTriggeredAt();
+    DateTime getResolvedAt();
     String getDescription();
     Map<String, Object> getConditionParameters();
 
@@ -35,6 +36,7 @@ public interface Alert {
         Builder streamId(String streamId);
         Builder conditionId(String conditionId);
         Builder triggeredAt(DateTime triggeredAt);
+        Builder resolvedAt(DateTime resolvedAt);
         Builder description(String description);
         Builder conditionParameters(Map<String, Object> conditionParameters);
 

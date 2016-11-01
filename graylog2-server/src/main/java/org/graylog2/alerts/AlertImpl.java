@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.Map;
 
@@ -38,6 +39,7 @@ public abstract class AlertImpl implements Alert {
     static final String FIELD_DESCRIPTION = "description";
     static final String FIELD_CONDITION_PARAMETERS = "condition_parameters";
     static final String FIELD_TRIGGERED_AT = "triggered_at";
+    static final String FIELD_RESOLVED_AT = "resolved_at";
 
     @JsonProperty(FIELD_ID)
     @Override
@@ -57,6 +59,11 @@ public abstract class AlertImpl implements Alert {
     @Override
     public abstract DateTime getTriggeredAt();
 
+    @JsonProperty(FIELD_RESOLVED_AT)
+    @Override
+    @Nullable
+    public abstract DateTime getResolvedAt();
+
     @JsonProperty(FIELD_DESCRIPTION)
     @Override
     public abstract String getDescription();
@@ -74,6 +81,7 @@ public abstract class AlertImpl implements Alert {
                                    @JsonProperty(FIELD_STREAM_ID) String streamId,
                                    @JsonProperty(FIELD_CONDITION_ID) String conditionId,
                                    @JsonProperty(FIELD_TRIGGERED_AT) Date triggeredAt,
+                                   @JsonProperty(FIELD_RESOLVED_AT) Date resolvedAt,
                                    @JsonProperty(FIELD_DESCRIPTION) String description,
                                    @JsonProperty(FIELD_CONDITION_PARAMETERS) Map<String, Object> conditionParameters) {
         return builder()
@@ -81,6 +89,7 @@ public abstract class AlertImpl implements Alert {
             .streamId(streamId)
             .conditionId(conditionId)
             .triggeredAt(new DateTime(triggeredAt))
+            .resolvedAt(resolvedAt == null ? null : new DateTime(resolvedAt))
             .description(description)
             .conditionParameters(conditionParameters)
             .build();
@@ -95,6 +104,8 @@ public abstract class AlertImpl implements Alert {
         Builder conditionId(String conditionId);
         @Override
         Builder triggeredAt(DateTime triggeredAt);
+        @Override
+        Builder resolvedAt(DateTime resolvedAt);
         @Override
         Builder description(String description);
         @Override
