@@ -15,7 +15,15 @@ const StreamSearchPage = React.createClass({
     };
   },
   componentDidMount() {
-    StreamsStore.get(this.props.params.streamId, (stream) => this.setState({stream: stream}));
+    this._fetchStream(this.props.params.streamId);
+  },
+  componentWillReceiveProps(nextProps) {
+    if (this.props.params.streamId !== nextProps.params.streamId) {
+      this._fetchStream(nextProps.params.streamId);
+    }
+  },
+  _fetchStream(streamId) {
+    StreamsStore.get(streamId, (stream) => this.setState({stream: stream}));
   },
   render() {
     if (!this.state.stream) {
