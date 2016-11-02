@@ -15,6 +15,10 @@ import UserNotification from 'util/UserNotification';
 const FieldStatistics = React.createClass({
   propTypes: {
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+    query: React.PropTypes.string.isRequired,
+    rangeType: React.PropTypes.string.isRequired,
+    rangeParams: React.PropTypes.object.isRequired,
+    stream: PropTypes.object,
   },
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
 
@@ -25,6 +29,16 @@ const FieldStatistics = React.createClass({
       sortBy: 'field',
       sortDescending: false,
     };
+  },
+
+  componentWillReceiveProps(nextProps) {
+    // Reload values when executed search changes
+    if (this.props.query !== nextProps.query ||
+        this.props.rangeType !== nextProps.rangeType ||
+        JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams) ||
+        this.props.stream !== nextProps.stream) {
+      this._reloadAllStatistics();
+    }
   },
 
   WIDGET_TYPE: 'STATS_COUNT',

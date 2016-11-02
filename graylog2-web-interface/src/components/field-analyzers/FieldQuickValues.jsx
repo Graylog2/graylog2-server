@@ -15,6 +15,10 @@ const RefreshStore = StoreProvider.getStore('Refresh');
 const FieldQuickValues = React.createClass({
   propTypes: {
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+    query: React.PropTypes.string.isRequired,
+    rangeType: React.PropTypes.string.isRequired,
+    rangeParams: React.PropTypes.object.isRequired,
+    stream: PropTypes.object,
   },
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
   getInitialState() {
@@ -26,6 +30,15 @@ const FieldQuickValues = React.createClass({
 
   componentDidMount() {
     this._loadQuickValuesData();
+  },
+  componentWillReceiveProps(nextProps) {
+    // Reload values when executed search changes
+    if (this.props.query !== nextProps.query ||
+        this.props.rangeType !== nextProps.rangeType ||
+        JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams) ||
+        this.props.stream !== nextProps.stream) {
+      this._loadQuickValuesData();
+    }
   },
   componentDidUpdate(oldProps, oldState) {
     if (this.state.field !== oldState.field) {
