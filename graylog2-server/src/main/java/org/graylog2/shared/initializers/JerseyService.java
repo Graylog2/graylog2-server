@@ -23,15 +23,14 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.base.Strings;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
-import org.glassfish.jersey.message.GZipEncoder;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
-import org.glassfish.jersey.server.filter.EncodingFilter;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.Configuration;
 import org.graylog2.audit.PluginAuditEventTypes;
@@ -258,8 +257,7 @@ public class JerseyService extends AbstractIdleService {
     }
 
 
-    private ResourceConfig buildResourceConfig(final boolean enableGzip,
-                                               final boolean enableCors,
+    private ResourceConfig buildResourceConfig(final boolean enableCors,
                                                final Set<Resource> additionalResources,
                                                final String[] controllerPackages) {
         final Map<String, String> packagePrefixes = new HashMap<>();
@@ -300,10 +298,6 @@ public class JerseyService extends AbstractIdleService {
         containerResponseFilters.forEach(rc::registerClasses);
         additionalComponents.forEach(rc::registerClasses);
 
-        if (enableGzip) {
-            EncodingFilter.enableFor(rc, GZipEncoder.class);
-        }
-
         if (enableCors) {
             LOG.info("Enabling CORS for HTTP endpoint");
             rc.registerClasses(CORSFilter.class);
@@ -328,7 +322,6 @@ public class JerseyService extends AbstractIdleService {
                              String[] controllerPackages)
             throws GeneralSecurityException, IOException {
         final ResourceConfig resourceConfig = buildResourceConfig(
-                enableGzip,
                 enableCors,
                 additionalResources,
                 controllerPackages
@@ -349,6 +342,12 @@ public class JerseyService extends AbstractIdleService {
                 namePrefix + "-worker-%d",
                 threadPoolSize);
         listener.getTransport().setWorkerThreadPool(workerThreadPoolExecutor);
+
+        if(enableGzip) {
+            final CompressionConfig compressionConfig = listener.getCompressionConfig();
+            compressionConfig.setCompressionMode(CompressionConfig.CompressionMode.ON);
+            compressionConfig.setCompressionMinSize(512);
+        }
 
         return httpServer;
     }
