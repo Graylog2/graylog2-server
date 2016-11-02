@@ -55,11 +55,11 @@ const SearchPage = React.createClass({
     const currentLocation = this.props.location || {};
     const nextLocation = nextProps.location || {};
 
-    if ((currentLocation !== nextLocation) || (currentLocation.search !== nextLocation.search)) {
+    if (currentLocation.search !== nextLocation.search || this.props.searchInStream !== nextProps.searchInStream) {
       if (this.promise) {
         this.promise.cancel();
       }
-      this._refreshData();
+      this._refreshData(nextProps.searchInStream);
     }
   },
   componentWillUnmount() {
@@ -79,9 +79,10 @@ const SearchPage = React.createClass({
   _getEffectiveQuery() {
     return SearchStore.query.length > 0 ? SearchStore.query : '*';
   },
-  _refreshData() {
+  _refreshData(searchInStream) {
     const query = this._getEffectiveQuery();
-    const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
+    const stream = searchInStream || this.props.searchInStream || {};
+    const streamId = stream.id;
     if (this.promise && !this.promise.isCancelled()) {
       return this.promise;
     }
