@@ -77,13 +77,13 @@ ruleDeclaration
 expression
     :   '(' expression ')'                                              # ParenExpr
     |   literal                                                         # LiteralPrimary
+    |   functionCall                                                    # Func
     |   Identifier                                                      # Identifier
     |   '[' (expression (',' expression)*)* ']'                         # ArrayLiteralExpr
     |   '{' (propAssignment (',' propAssignment)*)* '}'                 # MapLiteralExpr
     |   MessageRef '.' field=expression                                 # MessageRef
     |   fieldSet=expression '.' field=expression                        # Nested
     |   array=expression '[' index=expression ']'                       # IndexedAccess
-    |   functionCall                                                    # Func
     |   sign=('+'|'-') expr=expression                                  # SignedExpression
     |   Not expression                                                  # Not
     |   left=expression mult=('*'|'/'|'%') right=expression             # Multiplication
