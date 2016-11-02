@@ -142,7 +142,7 @@ export const FieldChart = {
     lines.push(JSON.stringify(opts));
     $graphContainer.attr('data-lines', lines);
 
-    jQuery('.type-description', $graphContainer).text('[' + GraphVisualization.getReadableFieldChartStatisticalFunction(opts.valuetype) + '] ' + opts.field + ', ');
+    this._updateStatisticalFunctionText($graphContainer, opts);
 
     // Do not add from time when we search in all messages
     const from = $graphContainer.data('from') !== undefined ? data.from : undefined;
@@ -375,6 +375,10 @@ export const FieldChart = {
     );
   },
 
+  _updateStatisticalFunctionText($graphContainer, graphOptions) {
+    jQuery('.type-description', $graphContainer).text(`[${GraphVisualization.getReadableFieldChartStatisticalFunction(graphOptions.valuetype)}] ${graphOptions.field}, `);
+  },
+
   renderNewFieldChart(options, graphContainer) {
     this.renderFieldChart(options, graphContainer, {newGraph: true});
   },
@@ -414,11 +418,12 @@ export const FieldChart = {
     this.updateFieldChartData(graphOptions.chartid, graphOptions, graphOptions.chartid);
   },
 
-  changeStatisticalFunction(graphContainer, statisticalFunction) {
-    const graphOptions = this._chartOptionsFromContainer(graphContainer);
+  changeStatisticalFunction($graphContainer, statisticalFunction) {
+    const graphOptions = this._chartOptionsFromContainer($graphContainer);
     graphOptions.valuetype = statisticalFunction;
-    this._changeGraphConfig(graphContainer, 'valuetype', statisticalFunction);
+    this._changeGraphConfig($graphContainer, 'valuetype', statisticalFunction);
     this.updateFieldChartData(graphOptions.chartid, graphOptions, graphOptions.chartid);
+    this._updateStatisticalFunctionText($graphContainer, graphOptions);
   },
 
   _mergeCharts(targetId, draggedId) {
