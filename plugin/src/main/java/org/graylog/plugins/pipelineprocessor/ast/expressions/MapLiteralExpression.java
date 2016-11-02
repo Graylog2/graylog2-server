@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import org.antlr.v4.runtime.Token;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -56,6 +57,10 @@ public class MapLiteralExpression extends BaseExpression {
     @Override
     public String toString() {
         return "{" + Joiner.on(", ").withKeyValueSeparator(":").join(map) + "}";
+    }
+
+    public Iterable<Map.Entry<String, Expression>> entries() {
+        return ImmutableSet.copyOf(map.entrySet());
     }
 
     @Override

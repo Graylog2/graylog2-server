@@ -1,7 +1,10 @@
 package org.graylog.plugins.pipelineprocessor.codegen;
 
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Iterators;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
@@ -22,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.RuleAstBaseListener;
 import org.graylog.plugins.pipelineprocessor.ast.RuleAstWalker;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.ArrayLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanValuedFunctionWrapper;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ConstantExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.EqualityExpression;
@@ -29,25 +33,31 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldAccessExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FunctionExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.MapLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.MessageRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.NotExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.OrExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.StringExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.VarRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
+import org.graylog.plugins.pipelineprocessor.ast.statements.VarAssignStatement;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.beans.FeatureDescriptor;
 import java.beans.PropertyDescriptor;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
 import javax.lang.model.element.Modifier;
@@ -72,6 +82,10 @@ public class CodeGenerator {
         private JavaFile generatedFile;
         private MethodSpec.Builder when;
         private MethodSpec.Builder then;
+
+        // points to either when or then
+        private MethodSpec.Builder currentMethod;
+
         /**
          * the unique set of function references in this rule
          */
@@ -129,6 +143,7 @@ public class CodeGenerator {
                     .addAnnotation(Override.class)
                     .returns(boolean.class)
                     .addParameter(EvaluationContext.class, "context", Modifier.FINAL);
+            currentMethod = when;
         }
 
         @Override
@@ -137,6 +152,8 @@ public class CodeGenerator {
             when.addStatement("return $L", result);
 
             classFile.addMethod(when.build());
+            // sanity to catch errors earlier
+            currentMethod = null;
         }
 
         @Override
@@ -145,11 +162,14 @@ public class CodeGenerator {
                     .addModifiers(Modifier.PUBLIC)
                     .addAnnotation(Override.class)
                     .addParameter(EvaluationContext.class, "context", Modifier.FINAL);
+            currentMethod = then;
         }
 
         @Override
         public void exitThen(Rule rule) {
             classFile.addMethod(then.build());
+            // sanity to catch errors earlier
+            currentMethod = null;
         }
 
         @Override
@@ -222,18 +242,24 @@ public class CodeGenerator {
             final FunctionArgs args = expr.getArgs();
             final CodeBlock.Builder argAssignment = CodeBlock.builder();
             args.getArgs().forEach((name, argExpr) -> {
-                final CodeBlock varRef = codeSnippet.get(argExpr);
+                final Object varRef = blockOrMissing(codeSnippet.get(argExpr), argExpr);
+
                 argAssignment.addStatement("$L.setAndTransform$$$L($L)",
                         mangledFuncArgsHolder,
                         name,
                         varRef);
             });
-            when.addCode(argAssignment.build());
+            currentMethod.addCode(argAssignment.build());
 
             // actually invoke the function
             CodeBlock functionInvocation = CodeBlock.of("$L.evaluate($L, context)", mangledFunctionName, mangledFuncArgsHolder);
 
-            when.addStatement("$T $L = $L", ClassName.get(function.returnType()), functionValueVarName, functionInvocation);
+            // don't create intermediate values for void functions (set_fields et al)
+            if (Void.class.equals(function.returnType())) {
+                currentMethod.addStatement("$L", functionInvocation);
+            } else {
+                currentMethod.addStatement("$T $L = $L", ClassName.get(function.returnType()), functionValueVarName, functionInvocation);
+            }
             functionMembers.add(
                     FieldSpec.builder(expr.getFunction().getClass(), mangledFunctionName, Modifier.PRIVATE)
                             .build());
@@ -338,7 +364,7 @@ public class CodeGenerator {
             } else {
                 statement = "boolean $L = !$T.equals($L, $L)";
             }
-            when.addStatement(statement,
+            currentMethod.addStatement(statement,
                     intermediateName,
                     ClassName.get(Objects.class),
                     blockOrMissing(leftBlock, expr.left()),
@@ -370,6 +396,65 @@ public class CodeGenerator {
             final Object field = blockOrMissing(codeSnippet.get(expr.getFieldExpr()), expr.getFieldExpr());
 
             codeSnippet.putIfAbsent(expr, CodeBlock.of("context.currentMessage().getField($S)", field));
+        }
+
+        @Override
+        public void exitVariableAssignStatement(VarAssignStatement assign) {
+            final Object value = blockOrMissing(codeSnippet.get(assign.getValueExpression()), assign.getValueExpression());
+            final Class type = assign.getValueExpression().getType();
+
+            // potentially annotate the value with the type width, if we assign a constant
+            String suffix = "";
+            final boolean constantValue = assign.getValueExpression().isConstant();
+            if (constantValue) {
+                if (type.equals(Long.class)) {
+                    suffix = "L";
+                } else if (type.equals(Double.class)) {
+                    suffix = "D";
+                }
+            }
+            currentMethod.addStatement("$T var$$$L = $L" + suffix,
+                    type,
+                    assign.getName(),
+                    value);
+        }
+
+        @Override
+        public void exitVariableReference(VarRefExpression expr) {
+            codeSnippet.putIfAbsent(expr, CodeBlock.of("var$$$L", expr.varName()));
+        }
+
+        @Override
+        public void exitMapLiteral(MapLiteralExpression expr) {
+            // we need an intermediate value for creating the map
+            final String mapName = "mapLiteral$" + subExpressionName();
+            currentMethod.addStatement("$T $L = $T.newHashMap()", Map.class, mapName, Maps.class);
+
+            expr.entries().forEach(entry -> {
+                currentMethod.addStatement("$L.put($S, $L)",
+                        mapName,
+                        entry.getKey(),
+                        blockOrMissing(codeSnippet.get(entry.getValue()), entry.getValue()));
+            });
+            // add the reference to the map we created
+            codeSnippet.putIfAbsent(expr, CodeBlock.of("$L", mapName));
+        }
+
+        @Override
+        public void exitArrayLiteral(ArrayLiteralExpression expr) {
+            final String listName = "arrayLiteral$" + subExpressionName();
+
+            final ImmutableList.Builder<Object> elementsBuilder = ImmutableList.builder();
+            expr.children().forEach(expression -> elementsBuilder.add(blockOrMissing(codeSnippet.get(expression), expression)));
+            final ImmutableList<Object> elements = elementsBuilder.build();
+
+            final String format = "$T $L = $T.newArrayList(" + Stream.generate(() -> "$L").limit(elements.size()).reduce(Joiner.on(", ")::join).orElseGet(() -> "$") + ")";
+            // sigh java varargs
+            List<Object> args = Lists.newArrayList(ArrayList.class, listName, Lists.class);
+            args.addAll(elements);
+            currentMethod.addStatement(format,
+                    args.toArray());
+            codeSnippet.putIfAbsent(expr, CodeBlock.of("$L", listName));
         }
 
         @Nonnull
