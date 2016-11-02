@@ -23,10 +23,12 @@ import java.util.Collections;
 
 public class FieldRefExpression extends BaseExpression {
     private final String variableName;
+    private final Expression fieldExpr;
 
-    public FieldRefExpression(Token start, String variableName) {
+    public FieldRefExpression(Token start, String variableName, Expression fieldExpr) {
         super(start);
         this.variableName = variableName;
+        this.fieldExpr = fieldExpr;
     }
 
     @Override

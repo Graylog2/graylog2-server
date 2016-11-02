@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -85,12 +86,13 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+
+import javax.inject.Inject;
 
 import static com.google.common.collect.ImmutableSortedSet.orderedBy;
 import static java.util.Comparator.comparingInt;
@@ -594,10 +596,10 @@ public class PipelineRuleParser {
             String type;
             // if the identifier is also a declared variable name prefer the variable
             if (isIdIsFieldAccess.peek() && !definedVars.contains(identifierName)) {
-                expr = new FieldRefExpression(ctx.getStart(), identifierName);
+                expr = new FieldRefExpression(ctx.getStart(), identifierName, parseContext.getDefinedVar(identifierName));
                 type = "FIELDREF";
             } else {
-                expr = new VarRefExpression(ctx.getStart(), identifierName);
+                expr = new VarRefExpression(ctx.getStart(), identifierName, parseContext.getDefinedVar(identifierName));
                 type = "VARREF";
             }
             log.trace("{}: ctx {} => {}", type, ctx, expr);

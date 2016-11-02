@@ -26,16 +26,18 @@ import java.util.Collections;
 public class VarRefExpression extends BaseExpression {
     private static final Logger log = LoggerFactory.getLogger(VarRefExpression.class);
     private final String identifier;
+    private final Expression varExpr;
     private Class type = Object.class;
 
-    public VarRefExpression(Token start, String identifier) {
+    public VarRefExpression(Token start, String identifier, Expression varExpr) {
         super(start);
         this.identifier = identifier;
+        this.varExpr = varExpr;
     }
 
     @Override
     public boolean isConstant() {
-        return false;
+        return varExpr != null && varExpr.isConstant();
     }
 
     @Override
@@ -61,6 +63,8 @@ public class VarRefExpression extends BaseExpression {
     public String varName() {
         return identifier;
     }
+
+    public Expression varExpr() { return varExpr; }
 
     public void setType(Class type) {
         this.type = type;
