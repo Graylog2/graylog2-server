@@ -252,11 +252,12 @@ const ApiRoutes = {
 
       return { url: this._buildUrl(url, queryString) };
     },
-    fieldHistogram(type, query, field, resolution, timerange, streamId) {
+    fieldHistogram(type, query, field, resolution, timerange, streamId, includeCardinality) {
       const url = `/search/universal/${type}/fieldhistogram`;
       const queryString = this._buildBaseQueryString(query, timerange, streamId);
       queryString.interval = resolution;
       queryString.field = field;
+      queryString.cardinality = includeCardinality;
       return { url: this._buildUrl(url, queryString) };
     },
     fieldStats(type, query, field, timerange, streamId) {
