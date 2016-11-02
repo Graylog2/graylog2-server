@@ -134,8 +134,8 @@ public class GELFMessage {
             if (first == ZLIB.first()) {
                 // zlib's second byte is for flags and a checksum -
                 // make sure it is positive.
-                int secondInt = ZLIB.second();
-                if (second < 0) {
+                int secondInt = second;
+                if (secondInt < 0) {
                     secondInt += 256;
                 }
                 // the second byte is not constant for zlib, it
