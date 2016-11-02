@@ -15,7 +15,7 @@ const { SearchStore } = CombinedProvider.get('Search');
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
 import { Spinner } from 'components/common';
-import { MalformedSearchQuery, SearchResult } from 'components/search';
+import { MalformedSearchQuery, SearchExecutionError, SearchResult } from 'components/search';
 
 const SearchPage = React.createClass({
   propTypes: {
@@ -102,8 +102,10 @@ const SearchPage = React.createClass({
         },
         error => {
           // Treat searches with a malformed query
-          if (error.additional && error.additional.status === 400) {
-            this.setState({ error: error.additional.body });
+          if (error.additional) {
+            if (error.additional.status) {
+              this.setState({ error: error.additional });
+            }
           }
         }
       )
@@ -194,7 +196,12 @@ const SearchPage = React.createClass({
 
   render() {
     if (this.state.error) {
-      return <MalformedSearchQuery error={this.state.error} />;
+      switch (this.state.error.status) {
+        case 400:
+          return <MalformedSearchQuery error={this.state.error} />;
+        default:
+          return <SearchExecutionError error={this.state.error} />;
+      }
     }
 
     if (this._isLoading()) {
