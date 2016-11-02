@@ -90,9 +90,11 @@ public class CodeGenerator {
          * the unique set of function references in this rule
          */
         private Set<FieldSpec> functionMembers = Sets.newHashSet();
+        private Set<FieldSpec> hoistedExpressionMembers = Sets.newHashSet();
         private Set<TypeSpec> functionArgsHolderTypes = Sets.newHashSet();
         private MethodSpec.Builder constructorBuilder;
         private CodeBlock.Builder lateConstructorBlock;
+        private CodeBlock.Builder hoistedConstantExpressions;
         private Set<CodeBlock> functionReferences = Sets.newHashSet();
 
         public String getSource() {
@@ -120,19 +122,27 @@ public class CodeGenerator {
                     .addModifiers(Modifier.PUBLIC)
                     .addParameter(FunctionRegistry.class, "functionRegistry");
             lateConstructorBlock = CodeBlock.builder();
+            hoistedConstantExpressions = CodeBlock.builder();
         }
 
         @Override
         public void exitRule(Rule rule) {
             // create fields for each used function
             classFile.addFields(functionMembers);
+            // create fields for hoisted constant expressions
+            classFile.addFields(hoistedExpressionMembers);
             // TODO these can be shared and should potentially created by an AnnotationProcessor for each defined function instead of every rule
             classFile.addTypes(functionArgsHolderTypes);
 
             // resolve functions (but only do so once for each function)
+            constructorBuilder.addStatement("// resolve used functions");
             functionReferences.forEach(block -> constructorBuilder.addStatement("$L", block));
             // add initializers for fields that depend on the functions being set
+            constructorBuilder.addStatement("// function parameters");
             constructorBuilder.addCode(lateConstructorBlock.build());
+            // all the expressions/statements that are constant at compile time
+            constructorBuilder.addStatement("// constant expressions");
+            constructorBuilder.addCode(hoistedConstantExpressions.build());
 
 
             classFile.addMethod(constructorBuilder.build());
@@ -248,8 +258,9 @@ public class CodeGenerator {
             final CodeBlock.Builder argAssignment = CodeBlock.builder();
             args.getArgs().forEach((name, argExpr) -> {
                 final Object varRef = blockOrMissing(codeSnippet.get(argExpr), argExpr);
-
-                argAssignment.addStatement("$L.setAndTransform$$$L($L)",
+                // hoist constant argument evaluation
+                CodeBlock.Builder target = argExpr.isConstant() ? hoistedConstantExpressions : argAssignment;
+                target.addStatement("$L.setAndTransform$$$L($L)",
                         mangledFuncArgsHolder,
                         name,
                         varRef);
@@ -419,10 +430,17 @@ public class CodeGenerator {
                     suffix = "D";
                 }
             }
-            currentMethod.addStatement("$T var$$$L = $L" + suffix,
-                    type,
-                    assign.getName(),
-                    value);
+            // always hoist declaration
+            hoistedExpressionMembers.add(FieldSpec.builder(type, "var$" + assign.getName(), Modifier.PRIVATE).build());
+            if (assign.getValueExpression().isConstant()) {
+                // also hoist the assignment
+                hoistedConstantExpressions.addStatement("var$$$L = $L" + suffix,
+                        assign.getName(), value);
+            } else {
+                currentMethod.addStatement("var$$$L = $L" + suffix,
+                        assign.getName(),
+                        value);
+            }
         }
 
         @Override
@@ -434,13 +452,25 @@ public class CodeGenerator {
         public void exitMapLiteral(MapLiteralExpression expr) {
             // we need an intermediate value for creating the map
             final String mapName = "mapLiteral$" + subExpressionName();
-            currentMethod.addStatement("$T $L = $T.newHashMap()", Map.class, mapName, Maps.class);
+            final boolean constantMap = expr.isConstant();
+            if (constantMap) {
+                // we can hoist both the declaration, as well as the definition of the map
+                hoistedExpressionMembers.add(FieldSpec.builder(Map.class, mapName, Modifier.PRIVATE, Modifier.FINAL).build());
+                hoistedConstantExpressions.addStatement("$L = $T.newHashMap()", mapName, Maps.class);
+            } else {
+                currentMethod.addStatement("$T $L = $T.newHashMap()", Map.class, mapName, Maps.class);
+            }
 
             expr.entries().forEach(entry -> {
-                currentMethod.addStatement("$L.put($S, $L)",
-                        mapName,
-                        entry.getKey(),
-                        blockOrMissing(codeSnippet.get(entry.getValue()), entry.getValue()));
+                final String code = "$L.put($S, $L)";
+                final Object[] args = {mapName, entry.getKey(), blockOrMissing(codeSnippet.get(entry.getValue()), entry.getValue())};
+                // TODO convert to code block
+                // hoist only completely constant maps (otherwise we would need to regenerate the non-constant ones per evaluation)
+                if (constantMap) {
+                    hoistedConstantExpressions.addStatement(code, args);
+                } else {
+                    currentMethod.addStatement(code, args);
+                }
             });
             // add the reference to the map we created
             codeSnippet.putIfAbsent(expr, CodeBlock.of("$L", mapName));
@@ -449,17 +479,28 @@ public class CodeGenerator {
         @Override
         public void exitArrayLiteral(ArrayLiteralExpression expr) {
             final String listName = "arrayLiteral$" + subExpressionName();
+            final boolean constantList = expr.isConstant();
 
             final ImmutableList.Builder<Object> elementsBuilder = ImmutableList.builder();
             expr.children().forEach(expression -> elementsBuilder.add(blockOrMissing(codeSnippet.get(expression), expression)));
             final ImmutableList<Object> elements = elementsBuilder.build();
 
-            final String format = "$T $L = $T.newArrayList(" + Stream.generate(() -> "$L").limit(elements.size()).reduce(Joiner.on(", ")::join).orElseGet(() -> "$") + ")";
+            // if possible hoist decl to constructor
+            if (constantList) {
+                hoistedExpressionMembers.add(FieldSpec.builder(List.class, listName, Modifier.PRIVATE, Modifier.FINAL).build());
+            }
+            final String assignmentFormat = "$L = $T.newArrayList("
+                    + Stream.generate(() -> "$L").limit(elements.size()).reduce(Joiner.on(", ")::join).orElseGet(() -> "$")
+                    + ")";
             // sigh java varargs
             List<Object> args = Lists.newArrayList(ArrayList.class, listName, Lists.class);
             args.addAll(elements);
-            currentMethod.addStatement(format,
-                    args.toArray());
+            // if constant, initialize completely in constructor
+            if (constantList) {
+                hoistedConstantExpressions.addStatement(assignmentFormat, args.subList(1, args.size()).toArray());
+            } else {
+                currentMethod.addStatement("$T " + assignmentFormat, args.toArray());
+            }
             codeSnippet.putIfAbsent(expr, CodeBlock.of("$L", listName));
         }
 

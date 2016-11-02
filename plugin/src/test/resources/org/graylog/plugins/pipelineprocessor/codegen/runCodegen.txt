@@ -6,6 +6,6 @@ then
     let number = 1;
     let string = "sadfasdf";
     let fields = {some_identifier: 1, `something with spaces`: "some expression"};
-    let ary = [1,3,4,5,"object"];
+    let ary = [1,3,4,5,"object", string];
     set_fields(fields);
 end
