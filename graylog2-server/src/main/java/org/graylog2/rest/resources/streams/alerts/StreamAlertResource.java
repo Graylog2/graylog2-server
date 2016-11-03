@@ -322,7 +322,9 @@ public class StreamAlertResource extends RestResource {
                         alert.getStreamId(),
                         alert.getDescription(),
                         alert.getConditionParameters(),
-                        alert.getTriggeredAt()))
+                        alert.getTriggeredAt(),
+                        alert.getResolvedAt(),
+                        alert.isInterval()))
                 .collect(Collectors.toList());
     }
 }

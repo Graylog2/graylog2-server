@@ -22,6 +22,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 
 @AutoValue
@@ -45,13 +46,22 @@ public abstract class AlertSummary {
     @JsonProperty("triggered_at")
     public abstract DateTime triggeredAt();
 
+    @JsonProperty("resolved_at")
+    @Nullable
+    public abstract DateTime resolvedAt();
+
+    @JsonProperty("is_interval")
+    public abstract boolean isInterval();
+
     @JsonCreator
     public static AlertSummary create(@JsonProperty("id") String id,
                                       @JsonProperty("condition_id") String conditionId,
                                       @JsonProperty("stream_id") String streamId,
                                       @JsonProperty("description") String description,
                                       @JsonProperty("condition_parameters") Map<String, Object> conditionParameters,
-                                      @JsonProperty("triggered_at") DateTime triggeredAt) {
-        return new AutoValue_AlertSummary(id, conditionId, streamId, description, conditionParameters, triggeredAt);
+                                      @JsonProperty("triggered_at") DateTime triggeredAt,
+                                      @JsonProperty("resolved_at") DateTime resolvedAt,
+                                      @JsonProperty("is_interval") boolean isInterval) {
+        return new AutoValue_AlertSummary(id, conditionId, streamId, description, conditionParameters, triggeredAt, resolvedAt, isInterval);
     }
 }

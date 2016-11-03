@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.rest.models.streams.alerts.AlertListSummary;
@@ -78,7 +77,15 @@ public class AlertResource extends RestResource {
         final List<AlertSummary> alerts = streamService.loadAll().stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
                 .flatMap(stream -> alertService.loadRecentOfStream(stream.getId(), since, limit).stream())
-                .map(alert -> AlertSummary.create(alert.getId(), alert.getConditionId(), alert.getStreamId(), alert.getDescription(), alert.getConditionParameters(), alert.getTriggeredAt()))
+                .map(alert -> AlertSummary.create(
+                        alert.getId(),
+                        alert.getConditionId(),
+                        alert.getStreamId(),
+                        alert.getDescription(),
+                        alert.getConditionParameters(),
+                        alert.getTriggeredAt(),
+                        alert.getResolvedAt(),
+                        alert.isInterval()))
                 .collect(Collectors.toList());
 
         return AlertListSummary.create(alerts.size(), alerts);
