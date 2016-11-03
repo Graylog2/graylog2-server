@@ -104,7 +104,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
         <jmh.version>1.14.1</jmh.version>
         <javac.target>1.8</javac.target>
         <uberjar.name>pipeline-benchmarks-${git.commit.id.describe}</uberjar.name>
-        <graylog.version>2.2.0-alpha.4-SNAPSHOT</graylog.version>
+        <graylog.version>2.2.0-alpha.5-SNAPSHOT</graylog.version>
     </properties>
 
     <build>
