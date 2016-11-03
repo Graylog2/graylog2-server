@@ -98,6 +98,7 @@ public class PipelineInterpreter implements MessageProcessor {
     public void handleStateUpdate(State newState) {
         log.debug("Updated pipeline state to {}", newState);
         state.set(newState);
+        StageIterator.clearCache();
     }
 
     /*
