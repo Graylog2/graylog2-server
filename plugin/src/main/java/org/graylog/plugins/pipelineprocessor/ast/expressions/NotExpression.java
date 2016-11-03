@@ -26,7 +26,7 @@ public class NotExpression extends UnaryExpression implements LogicalExpression 
 
     @Override
     public Object evaluateUnsafe(EvaluationContext context) {
-        return !evaluateBool(context);
+        return evaluateBool(context);
     }
 
     @Override

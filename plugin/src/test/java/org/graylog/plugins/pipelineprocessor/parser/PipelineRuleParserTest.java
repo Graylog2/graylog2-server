@@ -62,6 +62,7 @@ import java.util.Optional;
 import static com.google.common.collect.ImmutableList.of;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -523,6 +524,14 @@ public class PipelineRuleParserTest extends BaseParserTest {
             assertEquals(1, e.getErrors().size());
             assertEquals(IncompatibleTypes.class, Iterables.getOnlyElement(e.getErrors()).getClass());
         }
+    }
+
+    @Test
+    public void booleanNot() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        evaluateRule(rule);
+
+        assertFalse(actionsTriggered.get());
     }
 
     public static class CustomObject {
