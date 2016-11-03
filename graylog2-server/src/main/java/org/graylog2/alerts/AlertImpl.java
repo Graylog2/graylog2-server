@@ -55,11 +55,9 @@ public abstract class AlertImpl implements Alert {
     @Override
     public abstract String getConditionId();
 
-    @JsonProperty(FIELD_TRIGGERED_AT)
     @Override
     public abstract DateTime getTriggeredAt();
 
-    @JsonProperty(FIELD_RESOLVED_AT)
     @Override
     @Nullable
     public abstract DateTime getResolvedAt();
@@ -72,6 +70,17 @@ public abstract class AlertImpl implements Alert {
     @Override
     public abstract Map<String, Object> getConditionParameters();
 
+    @JsonProperty(FIELD_TRIGGERED_AT)
+    private Date getTriggeredAtDate() {
+        return getTriggeredAt().toDate();
+    }
+
+    @JsonProperty(FIELD_RESOLVED_AT)
+    @Nullable
+    private Date getResolvedAtDate() {
+        return getResolvedAt() == null ? null : getResolvedAt().toDate();
+    }
+
     static Builder builder() {
         return new AutoValue_AlertImpl.Builder();
     }
@@ -80,16 +89,28 @@ public abstract class AlertImpl implements Alert {
     public static AlertImpl create(@JsonProperty(FIELD_ID) @ObjectId @Id String id,
                                    @JsonProperty(FIELD_STREAM_ID) String streamId,
                                    @JsonProperty(FIELD_CONDITION_ID) String conditionId,
-                                   @JsonProperty(FIELD_TRIGGERED_AT) Date triggeredAt,
-                                   @JsonProperty(FIELD_RESOLVED_AT) Date resolvedAt,
+                                   @JsonProperty(FIELD_TRIGGERED_AT) Date triggeredAtDate,
+                                   @JsonProperty(FIELD_RESOLVED_AT) Date resolvedAtDate,
                                    @JsonProperty(FIELD_DESCRIPTION) String description,
                                    @JsonProperty(FIELD_CONDITION_PARAMETERS) Map<String, Object> conditionParameters) {
+        final DateTime triggeredAt = new DateTime(triggeredAtDate);
+        final DateTime resolvedAt = resolvedAtDate == null ? null : new DateTime(resolvedAtDate);
+        return create(id, streamId, conditionId, triggeredAt, resolvedAt, description, conditionParameters);
+    }
+
+    public static AlertImpl create(String id,
+                                   String streamId,
+                                   String conditionId,
+                                   DateTime triggeredAt,
+                                   DateTime resolvedAt,
+                                   String description,
+                                   Map<String, Object> conditionParameters) {
         return builder()
             .id(id)
             .streamId(streamId)
             .conditionId(conditionId)
-            .triggeredAt(new DateTime(triggeredAt))
-            .resolvedAt(resolvedAt == null ? null : new DateTime(resolvedAt))
+            .triggeredAt(triggeredAt)
+            .resolvedAt(resolvedAt)
             .description(description)
             .conditionParameters(conditionParameters)
             .build();
