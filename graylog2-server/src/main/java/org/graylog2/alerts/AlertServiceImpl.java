@@ -40,7 +40,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -73,6 +72,7 @@ public class AlertServiceImpl implements AlertService {
             .description(checkResult.getResultDescription())
             .conditionParameters(ImmutableMap.copyOf(checkResult.getTriggeredCondition().getParameters()))
             .triggeredAt(checkResult.getTriggeredAt())
+            .interval(true)
             .build();
     }
 

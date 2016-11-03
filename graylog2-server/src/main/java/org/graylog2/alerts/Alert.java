@@ -31,6 +31,7 @@ public interface Alert {
     DateTime getResolvedAt();
     String getDescription();
     Map<String, Object> getConditionParameters();
+    boolean isInterval();
 
     interface Builder {
         Builder streamId(String streamId);
@@ -39,6 +40,7 @@ public interface Alert {
         Builder resolvedAt(DateTime resolvedAt);
         Builder description(String description);
         Builder conditionParameters(Map<String, Object> conditionParameters);
+        Builder interval(boolean isInterval);
 
         Alert build();
     }

@@ -40,6 +40,7 @@ public abstract class AlertImpl implements Alert {
     static final String FIELD_CONDITION_PARAMETERS = "condition_parameters";
     static final String FIELD_TRIGGERED_AT = "triggered_at";
     static final String FIELD_RESOLVED_AT = "resolved_at";
+    static final String FIELD_IS_INTERVAL = "is_interval";
 
     @JsonProperty(FIELD_ID)
     @Override
@@ -70,6 +71,10 @@ public abstract class AlertImpl implements Alert {
     @Override
     public abstract Map<String, Object> getConditionParameters();
 
+    @JsonProperty(FIELD_IS_INTERVAL)
+    @Override
+    public abstract boolean isInterval();
+
     @JsonProperty(FIELD_TRIGGERED_AT)
     private Date getTriggeredAtDate() {
         return getTriggeredAt().toDate();
@@ -92,10 +97,11 @@ public abstract class AlertImpl implements Alert {
                                    @JsonProperty(FIELD_TRIGGERED_AT) Date triggeredAtDate,
                                    @JsonProperty(FIELD_RESOLVED_AT) Date resolvedAtDate,
                                    @JsonProperty(FIELD_DESCRIPTION) String description,
-                                   @JsonProperty(FIELD_CONDITION_PARAMETERS) Map<String, Object> conditionParameters) {
+                                   @JsonProperty(FIELD_CONDITION_PARAMETERS) Map<String, Object> conditionParameters,
+                                   @JsonProperty(FIELD_IS_INTERVAL) boolean isInterval) {
         final DateTime triggeredAt = new DateTime(triggeredAtDate);
         final DateTime resolvedAt = resolvedAtDate == null ? null : new DateTime(resolvedAtDate);
-        return create(id, streamId, conditionId, triggeredAt, resolvedAt, description, conditionParameters);
+        return create(id, streamId, conditionId, triggeredAt, resolvedAt, description, conditionParameters, isInterval);
     }
 
     public static AlertImpl create(String id,
@@ -105,6 +111,17 @@ public abstract class AlertImpl implements Alert {
                                    DateTime resolvedAt,
                                    String description,
                                    Map<String, Object> conditionParameters) {
+        return create(id, streamId, conditionId, triggeredAt, resolvedAt, description, conditionParameters, true);
+    }
+
+    public static AlertImpl create(String id,
+                                   String streamId,
+                                   String conditionId,
+                                   DateTime triggeredAt,
+                                   DateTime resolvedAt,
+                                   String description,
+                                   Map<String, Object> conditionParameters,
+                                   boolean isInterval) {
         return builder()
             .id(id)
             .streamId(streamId)
@@ -113,6 +130,7 @@ public abstract class AlertImpl implements Alert {
             .resolvedAt(resolvedAt)
             .description(description)
             .conditionParameters(conditionParameters)
+            .interval(isInterval)
             .build();
     }
 
@@ -131,6 +149,8 @@ public abstract class AlertImpl implements Alert {
         Builder description(String description);
         @Override
         Builder conditionParameters(Map<String, Object> conditionParameters);
+        @Override
+        Builder interval(boolean isInterval);
 
         @Override
         AlertImpl build();
