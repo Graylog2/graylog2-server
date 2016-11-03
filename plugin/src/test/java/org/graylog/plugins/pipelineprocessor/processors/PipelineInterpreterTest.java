@@ -16,14 +16,17 @@
  */
 package org.graylog.plugins.pipelineprocessor.processors;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
+
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.codegen.CodeGenerator;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
@@ -221,7 +224,7 @@ public class PipelineInterpreterTest {
 
     private PipelineRuleParser setupParser(Map<String, Function<?>> functions) {
         final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
-        return new PipelineRuleParser(functionRegistry);
+        return new PipelineRuleParser(functionRegistry, new CodeGenerator(functionRegistry));
     }
 
     private Message messageInDefaultStream(String message, String source) {

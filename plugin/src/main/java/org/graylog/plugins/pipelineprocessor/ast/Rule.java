@@ -16,20 +16,24 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast;
 
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.Sets;
+
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.Sets;
+
 import org.antlr.v4.runtime.CommonToken;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
+import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+
+import javax.annotation.Nullable;
 
 @AutoValue
 public abstract class Rule {
@@ -54,6 +58,9 @@ public abstract class Rule {
 
     public abstract Collection<Statement> then();
 
+    @Nullable
+    public abstract GeneratedRule generatedRule();
+
     public static Builder builder() {
         return new AutoValue_Rule.Builder();
     }
@@ -62,6 +69,11 @@ public abstract class Rule {
 
     public Rule withId(String id) {
         return toBuilder().id(id).build();
+    }
+
+    public Rule withGeneratedRule(GeneratedRule generated) {
+        // TODO this instance should not be shared across rule instances (but currently is)!
+        return toBuilder().generatedRule(generated).build();
     }
 
     public static Rule alwaysFalse(String name) {
@@ -74,6 +86,9 @@ public abstract class Rule {
      * @param metricRegistry the registry to add the metrics to
      */
     public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId) {
+        if (id() == null) {
+            throw new IllegalStateException();
+        }
         if (id() != null) {
             globalExecuted = registerGlobalMeter(metricRegistry, "executed");
             localExecuted = registerLocalMeter(metricRegistry, pipelineId, stageId, "executed");
@@ -153,6 +168,7 @@ public abstract class Rule {
         public abstract Builder name(String name);
         public abstract Builder when(LogicalExpression condition);
         public abstract Builder then(Collection<Statement> actions);
+        public abstract Builder generatedRule(@Nullable GeneratedRule generatedRule);
 
         public abstract Rule build();
     }

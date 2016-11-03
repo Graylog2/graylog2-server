@@ -26,6 +26,7 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.NotExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.OrExpression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
+import org.graylog.plugins.pipelineprocessor.codegen.CodeGenerator;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -126,7 +127,7 @@ public class PrecedenceTest extends BaseParserTest {
     }
 
     private static Rule parseRule(String rule) {
-        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry);
+        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry, new CodeGenerator(functionRegistry));
         return parser.parseRule(rule, true);
     }
 }

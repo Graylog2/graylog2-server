@@ -101,6 +101,10 @@ public class ComparisonExpression extends BinaryExpression implements LogicalExp
         }
     }
 
+    public String getOperator() {
+        return operator;
+    }
+
     @Override
     public String toString() {
         return left.toString() + " " + operator + " " + right.toString();

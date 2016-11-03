@@ -1,0 +1,6 @@
+name = "Grok extraction benchmark"
+
+[[streams]]
+    name = "default"
+    description = "All incoming messages"
+    pipelines = ["grok"]

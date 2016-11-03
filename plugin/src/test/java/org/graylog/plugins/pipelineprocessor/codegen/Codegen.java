@@ -62,9 +62,9 @@ public class Codegen extends BaseParserTest {
 
     @Test
     public void runCodegen() throws IOException {
-        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Rule rule = parser.parseRule(ruleForTest(), true).withId("1");
 
-        final String sourceCode = CodeGenerator.codeForRule(rule);
+        final String sourceCode = CodeGenerator.sourceCodeForRule(rule);
         Files.write(sourceCode,
                 OUTFILE.toFile(),
                 StandardCharsets.UTF_8);

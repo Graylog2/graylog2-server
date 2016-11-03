@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.parser;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -70,6 +71,8 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.FunctionStatement;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.ast.statements.VarAssignStatement;
+import org.graylog.plugins.pipelineprocessor.codegen.CodeGenerator;
+import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleType;
@@ -83,9 +86,12 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
+import org.reflections.ReflectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -101,14 +107,26 @@ import static java.util.stream.Collectors.toList;
 public class PipelineRuleParser {
 
     private final FunctionRegistry functionRegistry;
+    private final CodeGenerator codeGenerator;
+
+    private static boolean allowCodeGeneration = false;
 
     @Inject
-    public PipelineRuleParser(FunctionRegistry functionRegistry) {
+    public PipelineRuleParser(FunctionRegistry functionRegistry, CodeGenerator codeGenerator) {
         this.functionRegistry = functionRegistry;
+        this.codeGenerator = codeGenerator;
     }
 
     private static final Logger log = LoggerFactory.getLogger(PipelineRuleParser.class);
     public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
+
+    public static boolean isAllowCodeGeneration() {
+        return allowCodeGeneration;
+    }
+
+    public static void setAllowCodeGeneration(boolean allowCodeGeneration) {
+        PipelineRuleParser.allowCodeGeneration = allowCodeGeneration;
+    }
 
 
     public Rule parseRule(String rule, boolean silent) throws ParseException {
@@ -142,8 +160,22 @@ public class PipelineRuleParser {
         WALKER.walk(new RuleTypeChecker(parseContext), ruleDeclaration);
 
         if (parseContext.getErrors().isEmpty()) {
-            final Rule parsedRule = parseContext.getRules().get(0);
-            return parsedRule.withId(id);
+            Rule parsedRule = parseContext.getRules().get(0).withId(id);
+            if (allowCodeGeneration) {
+                final Class<? extends GeneratedRule> generatedClass = codeGenerator.generateCompiledRule(parsedRule);
+                if (generatedClass != null) {
+                    try {
+                        //noinspection unchecked
+                        final Set<Constructor> constructors = ReflectionUtils.getConstructors(generatedClass);
+                        final Constructor onlyElement = Iterables.getOnlyElement(constructors);
+                        final GeneratedRule instance = (GeneratedRule) onlyElement.newInstance(functionRegistry);
+                        return parsedRule.withGeneratedRule(instance);
+                    } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                        log.warn("Unable to generate code for rule {}: {}", parsedRule, e);
+                    }
+                }
+            }
+            return parsedRule;
         }
         throw new ParseException(parseContext.getErrors());
     }

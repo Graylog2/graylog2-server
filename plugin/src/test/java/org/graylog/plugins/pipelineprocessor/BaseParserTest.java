@@ -18,12 +18,14 @@ package org.graylog.plugins.pipelineprocessor;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
+
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
+import org.graylog.plugins.pipelineprocessor.codegen.CodeGenerator;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.plugin.Message;
@@ -31,7 +33,6 @@ import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.rules.TestName;
 
-import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -40,6 +41,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.annotation.Nullable;
 
 import static com.google.common.collect.ImmutableList.of;
 
@@ -74,7 +77,7 @@ public class BaseParserTest {
 
     @Before
     public void setup() {
-        parser = new PipelineRuleParser(functionRegistry);
+        parser = new PipelineRuleParser(functionRegistry, new CodeGenerator(functionRegistry));
         // initialize before every test!
         actionsTriggered.set(false);
     }

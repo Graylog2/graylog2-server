@@ -16,8 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor.processors;
 
-import com.codahale.metrics.Meter;
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -26,11 +24,17 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
+import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
+import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
 import org.graylog2.plugin.Message;
@@ -44,12 +48,13 @@ import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
+
+import javax.inject.Inject;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -346,10 +351,27 @@ public class PipelineInterpreter implements MessageProcessor {
         rule.markExecution();
         interpreterListener.executeRule(rule, pipeline);
         log.debug("[{}] rule `{}` matched running actions", msgId, rule.name());
-        for (Statement statement : rule.then()) {
-            if (!evaluateStatement(message, interpreterListener, pipeline, context, rule, statement)) {
-                // statement raised an error, skip the rest of the rule
+        final GeneratedRule generatedRule = rule.generatedRule();
+        if (generatedRule != null) {
+            try {
+                generatedRule.then(context);
+                return true;
+            } catch (Exception ignored) {
+                final EvaluationContext.EvalError lastError = Iterables.getLast(context.evaluationErrors());
+                appendProcessingError(rule, message, lastError.toString());
+                log.debug("Encountered evaluation error, skipping rest of the rule: {}", lastError);
+                rule.markFailure();
                 return false;
+            }
+        } else {
+            if (PipelineRuleParser.isAllowCodeGeneration()) {
+                throw new IllegalStateException("Should have generated code and not interpreted the tree");
+            }
+            for (Statement statement : rule.then()) {
+                if (!evaluateStatement(message, interpreterListener, pipeline, context, rule, statement)) {
+                    // statement raised an error, skip the rest of the rule
+                    return false;
+                }
             }
         }
         return true;
@@ -380,7 +402,9 @@ public class PipelineInterpreter implements MessageProcessor {
                                           EvaluationContext context,
                                           ArrayList<Rule> rulesToRun, InterpreterListener interpreterListener) {
         interpreterListener.evaluateRule(rule, pipeline);
-        if (rule.when().evaluateBool(context)) {
+        final GeneratedRule generatedRule = rule.generatedRule();
+        boolean matched = generatedRule != null ? generatedRule.when(context) : rule.when().evaluateBool(context);
+        if (matched) {
             rule.markMatch();
 
             if (context.hasEvaluationErrors()) {
