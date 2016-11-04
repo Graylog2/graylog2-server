@@ -47,6 +47,7 @@ const AppWithSearchBar = React.createClass({
   componentWillUnmount() {
     SearchStore.unload();
   },
+  forceFetch: false,
   _loadStream(streamId) {
     if (streamId) {
       StreamsStore.get(streamId, (stream) => this.setState({ stream: stream }, this._updateSearchParams));
@@ -65,13 +66,18 @@ const AppWithSearchBar = React.createClass({
     return !this.state.savedSearches || !this.state.searchesClusterConfig || (this.props.params.streamId && !this.state.stream);
   },
   _decorateChildren(children) {
-    return React.Children.map(children, (child) => {
-      return React.cloneElement(child, { searchConfig: this.state.searchesClusterConfig });
+    const decoratedChildren = React.Children.map(children, (child) => {
+      return React.cloneElement(child, { searchConfig: this.state.searchesClusterConfig, forceFetch: this.forceFetch });
     });
+    this.forceFetch = false;
+    return decoratedChildren;
   },
   _searchBarShouldDisplayRefreshControls() {
     // Hide refresh controls on sources page
     return this.props.location.pathname !== Routes.SOURCES;
+  },
+  _onExecuteSearch() {
+    this.forceFetch = true;
   },
   render() {
     if (this._isLoading()) {
@@ -87,7 +93,8 @@ const AppWithSearchBar = React.createClass({
         <SearchBar ref="searchBar" userPreferences={this.state.currentUser.preferences}
                    savedSearches={this.state.savedSearches}
                    config={this.state.searchesClusterConfig}
-                   displayRefreshControls={this._searchBarShouldDisplayRefreshControls()} />
+                   displayRefreshControls={this._searchBarShouldDisplayRefreshControls()}
+                   onExecuteSearch={this._onExecuteSearch} />
         <Row id="main-row">
           <Col md={12} id="main-content">
             {this._decorateChildren(this.props.children)}
