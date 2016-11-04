@@ -28,6 +28,7 @@ const SearchBar = React.createClass({
     savedSearches: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
     config: React.PropTypes.object,
     displayRefreshControls: React.PropTypes.bool,
+    onExecuteSearch: React.PropTypes.func,
   },
 
   getDefaultProps() {
@@ -204,7 +205,12 @@ const SearchBar = React.createClass({
     const searchForm = this.refs.searchForm;
     const searchQuery = $(searchForm).serialize();
     const searchURI = new URI(searchForm.action).search(searchQuery);
-    SearchStore.executeSearch(searchURI.resource());
+    const resource = searchURI.resource();
+
+    SearchStore.executeSearch(resource);
+    if (typeof this.props.onExecuteSearch === 'function') {
+      this.props.onExecuteSearch(resource);
+    }
   },
   _savedSearchSelected() {
     const selectedSavedSearch = this.refs.savedSearchesSelector.getValue();

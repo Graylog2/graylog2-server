@@ -25,6 +25,7 @@ const SearchResult = React.createClass({
     permissions: React.PropTypes.array.isRequired,
     searchConfig: React.PropTypes.object.isRequired,
     loadingSearch: React.PropTypes.bool,
+    forceFetch: React.PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -127,6 +128,7 @@ const SearchResult = React.createClass({
           resolution: this.props.histogram.interval,
           from: this.props.histogram.histogram_boundaries.from,
           to: this.props.histogram.histogram_boundaries.to,
+          forceFetch: this.props.forceFetch,
         });
       });
   },
