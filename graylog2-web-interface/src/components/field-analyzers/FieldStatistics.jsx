@@ -19,6 +19,7 @@ const FieldStatistics = React.createClass({
     rangeType: React.PropTypes.string.isRequired,
     rangeParams: React.PropTypes.object.isRequired,
     stream: PropTypes.object,
+    forceFetch: React.PropTypes.bool,
   },
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
 
@@ -36,7 +37,8 @@ const FieldStatistics = React.createClass({
     if (this.props.query !== nextProps.query ||
         this.props.rangeType !== nextProps.rangeType ||
         JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams) ||
-        this.props.stream !== nextProps.stream) {
+        this.props.stream !== nextProps.stream ||
+        nextProps.forceFetch) {
       this._reloadAllStatistics();
     }
   },

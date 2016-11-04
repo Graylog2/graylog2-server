@@ -22,6 +22,7 @@ const SearchPage = React.createClass({
     location: PropTypes.object.isRequired,
     searchConfig: PropTypes.object.isRequired,
     searchInStream: PropTypes.object,
+    forceFetch: PropTypes.bool,
   },
   mixins: [
     Reflux.connect(NodesStore),
@@ -55,7 +56,7 @@ const SearchPage = React.createClass({
     const currentLocation = this.props.location || {};
     const nextLocation = nextProps.location || {};
 
-    if (currentLocation.search !== nextLocation.search || this.props.searchInStream !== nextProps.searchInStream) {
+    if (currentLocation.search !== nextLocation.search || this.props.searchInStream !== nextProps.searchInStream || nextProps.forceFetch) {
       if (this.promise) {
         this.promise.cancel();
       }
@@ -218,7 +219,8 @@ const SearchPage = React.createClass({
                     streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
                     searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions}
                     searchConfig={this.props.searchConfig}
-                    loadingSearch={this.state.updatingSearch || this.state.updatingHistogram} />
+                    loadingSearch={this.state.updatingSearch || this.state.updatingHistogram}
+                    forceFetch={this.props.forceFetch} />
     );
   },
 });
