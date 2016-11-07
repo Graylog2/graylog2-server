@@ -28,6 +28,7 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -64,10 +65,11 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit) {
+        final DateTime effectiveSince = (since == null ? new DateTime(0L, DateTimeZone.UTC) : since);
         return Collections.unmodifiableList(this.coll.find(
             DBQuery.and(
                 DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId),
-                DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, since)
+                DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, effectiveSince.toDate())
             )
         )
             .limit(limit)
