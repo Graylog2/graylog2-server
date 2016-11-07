@@ -138,14 +138,15 @@ public class FilterchainVsPipeline {
 
             final PipelineRuleParser parser = setupParser(functions);
 
-            final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
-                                                                                         pipelineService,
-                                                                                         pipelineStreamConnectionsService,
-                                                                                         parser,
-                                                                                         new MetricRegistry(),
-                                                                                         Executors.newScheduledThreadPool(1),
-                                                                                         mock(EventBus.class));
             final MetricRegistry metricRegistry = new MetricRegistry();
+            final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
+                    pipelineService,
+                    pipelineStreamConnectionsService,
+                    parser,
+                    new MetricRegistry(),
+                    Executors.newScheduledThreadPool(1),
+                    mock(EventBus.class),
+                    (currentPipelines, streamPipelineConnections) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, metricRegistry, 1, true));
             interpreter = new PipelineInterpreter(
                     mock(Journal.class),
                     metricRegistry,

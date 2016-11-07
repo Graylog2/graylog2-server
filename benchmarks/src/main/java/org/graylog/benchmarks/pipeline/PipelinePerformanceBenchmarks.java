@@ -28,6 +28,8 @@ import com.google.common.io.LineProcessor;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+import com.google.inject.name.Names;
 
 import au.com.bytecode.opencsv.CSVParser;
 
@@ -142,6 +144,9 @@ public class PipelinePerformanceBenchmarks {
         @Param({"false", "true"})
         private String codeGenerator;
 
+        @Param({"false", "true"})
+        private String cachedStageIterators;
+
         private PipelineInterpreter interpreter;
         private BenchmarkConfig config;
         private Injector injector;
@@ -169,6 +174,9 @@ public class PipelinePerformanceBenchmarks {
                             bind(StreamService.class).toInstance(new DummyStreamService());
                             bind(GrokPatternService.class).to(InMemoryGrokPatternService.class);
                             bind(MetricRegistry.class).toProvider(MetricRegistryProvider.class);
+                            bindConstant().annotatedWith(Names.named("processbuffer_processors")).to(1);
+                            bindConstant().annotatedWith(Names.named("cached_stageiterators")).to(Boolean.valueOf(cachedStageIterators));
+                            install(new FactoryModuleBuilder().build(PipelineInterpreter.State.Factory.class));
                         }
                     });
 
@@ -313,7 +321,6 @@ public class PipelinePerformanceBenchmarks {
                     .outputTo(new PrintStream("/tmp/bench-" + directoryName + ".txt"))
                     .build();
             reporter.report();
-
         }
 
         private String readFile(File file) {
@@ -629,8 +636,9 @@ public class PipelinePerformanceBenchmarks {
                 .forks(forks)
                 .param("directoryName", benchmarkParams)
 //                .param("codeGenerator", "false")
+//                .param("cachedStageIterators", "false")
                 .jvmArgsAppend("-DbenchmarkDir=" + benchmarkDir)
-                .resultFormat(ResultFormatType.CSV)
+                .resultFormat(ResultFormatType.JSON)
                 .addProfiler(GCProfiler.class)
                 .addProfiler(MetricsProfiler.class)
                 .build();
@@ -668,6 +676,9 @@ public class PipelinePerformanceBenchmarks {
                                                            IterationParams iterationParams,
                                                            IterationResult result) {
             final ArrayList<Result> results = Lists.newArrayList();
+            if (metricRegistry == null) {
+                return results;
+            }
             final SortedMap<String, Meter> counters = metricRegistry.getMeters((name, metric) -> {
                 return name.startsWith(MetricRegistry.name(Rule.class)) || name.startsWith(MetricRegistry.name(Pipeline.class));
             });

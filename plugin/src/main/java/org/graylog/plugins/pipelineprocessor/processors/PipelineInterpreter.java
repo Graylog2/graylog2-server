@@ -16,6 +16,9 @@
  */
 package org.graylog.plugins.pipelineprocessor.processors;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSetMultimap;
@@ -24,7 +27,10 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
 
+import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 
@@ -44,6 +50,7 @@ import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,10 +58,13 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.jooq.lambda.tuple.Tuple.tuple;
@@ -155,7 +165,7 @@ public class PipelineInterpreter implements MessageProcessor {
                                                                               initialStreamIds,
                                                                               state.getStreamPipelineConnections());
 
-                toProcess.addAll(processForResolvedPipelines(message, msgId, pipelinesToRun, interpreterListener));
+                toProcess.addAll(processForResolvedPipelines(message, msgId, pipelinesToRun, interpreterListener, state));
 
                 // add each processed message-stream combination to the blacklist set and figure out if the processing
                 // has added a stream to the message, in which case we need to cycle and determine whether to process
@@ -254,18 +264,19 @@ public class PipelineInterpreter implements MessageProcessor {
                 .filter(pipeline -> pipeline != null)
                 .collect(Collectors.toSet()));
 
-        return processForResolvedPipelines(message, message.getId(), pipelinesToRun, interpreterListener);
+        return processForResolvedPipelines(message, message.getId(), pipelinesToRun, interpreterListener, state);
     }
 
     private List<Message> processForResolvedPipelines(Message message,
                                                       String msgId,
                                                       Set<Pipeline> pipelines,
-                                                      InterpreterListener interpreterListener) {
+                                                      InterpreterListener interpreterListener,
+                                                      State state) {
         final List<Message> result = new ArrayList<>();
         // record execution of pipeline in metrics
         pipelines.forEach(Pipeline::markExecution);
 
-        final StageIterator stages = new StageIterator(pipelines);
+        final StageIterator stages = state.getStageIterator(pipelines);
         final Set<Pipeline> pipelinesToSkip = Sets.newHashSet();
 
         // iterate through all stages for all matching pipelines, per "stage slice" instead of per pipeline.
@@ -449,13 +460,42 @@ public class PipelineInterpreter implements MessageProcessor {
     }
 
     public static class State {
+        private static final Logger LOG = LoggerFactory.getLogger(State.class);
+
         private final ImmutableMap<String, Pipeline> currentPipelines;
         private final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections;
+        private final LoadingCache<Set<Pipeline>, StageIterator.Configuration> cache;
+        private final boolean cachedIterators;
 
-        public State(ImmutableMap<String, Pipeline> currentPipelines,
-                     ImmutableSetMultimap<String, Pipeline> streamPipelineConnections) {
+        @AssistedInject
+        public State(@Assisted ImmutableMap<String, Pipeline> currentPipelines,
+                     @Assisted ImmutableSetMultimap<String, Pipeline> streamPipelineConnections,
+                     MetricRegistry metricRegistry,
+                     @Named("processbuffer_processors") int processorCount,
+                     @Named("cached_stageiterators") boolean cachedIterators) {
             this.currentPipelines = currentPipelines;
             this.streamPipelineConnections = streamPipelineConnections;
+            this.cachedIterators = cachedIterators;
+
+            cache = CacheBuilder.newBuilder()
+                    .concurrencyLevel(processorCount)
+                    .recordStats()
+                    .build(new CacheLoader<Set<Pipeline>, StageIterator.Configuration>() {
+                        @Override
+                        public StageIterator.Configuration load(@Nonnull Set<Pipeline> pipelines) throws Exception {
+                            return new StageIterator.Configuration(pipelines);
+                        }
+                    });
+
+            metricRegistry.register(name(State.class, "stage-cache", "hit-count"), (Gauge<Long>) () -> cache.stats().hitCount());
+            metricRegistry.register(name(State.class, "stage-cache", "hit-rate"), (Gauge<Double>) () -> cache.stats().hitRate());
+            metricRegistry.register(name(State.class, "stage-cache", "miss-count"), (Gauge<Long>) () -> cache.stats().missCount());
+            metricRegistry.register(name(State.class, "stage-cache", "miss-rate"), (Gauge<Double>) () -> cache.stats().missRate());
+            metricRegistry.register(name(State.class, "stage-cache", "load-count"), (Gauge<Long>) () -> cache.stats().loadCount());
+            metricRegistry.register(name(State.class, "stage-cache", "total-load-time"), (Gauge<Long>) () -> cache.stats().totalLoadTime());
+            metricRegistry.register(name(State.class, "stage-cache", "eviction-count"), (Gauge<Long>) () -> cache.stats().evictionCount());
+            metricRegistry.register(name(State.class, "stage-cache", "average-load-penalty"), (Gauge<Double>) () -> cache.stats().averageLoadPenalty());
+            metricRegistry.register(name(State.class, "stage-cache", "load-exception-count"), (Gauge<Long>) () -> cache.stats().loadExceptionCount());
         }
 
         public ImmutableMap<String, Pipeline> getCurrentPipelines() {
@@ -464,6 +504,25 @@ public class PipelineInterpreter implements MessageProcessor {
 
         public ImmutableSetMultimap<String, Pipeline> getStreamPipelineConnections() {
             return streamPipelineConnections;
+        }
+
+        public StageIterator getStageIterator(Set<Pipeline> pipelines) {
+            try {
+                if (cachedIterators) {
+                    return new StageIterator(cache.get(pipelines));
+                } else {
+                    return new StageIterator(pipelines);
+                }
+            } catch (ExecutionException e) {
+                LOG.error("Unable to get StageIterator from cache, this should not happen.", ExceptionUtils.getRootCause(e));
+                return new StageIterator(pipelines);
+            }
+        }
+
+
+        public interface Factory {
+            State newState(ImmutableMap<String, Pipeline> currentPipelines,
+                           ImmutableSetMultimap<String, Pipeline> streamPipelineConnections);
         }
     }
 }

@@ -108,12 +108,13 @@ public class PipelineInterpreterTest {
         final PipelineRuleParser parser = setupParser(functions);
 
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
-                                                                                     pipelineService,
-                                                                                     pipelineStreamConnectionsService,
-                                                                                     parser,
-                                                                                     new MetricRegistry(),
-                                                                                     Executors.newScheduledThreadPool(1),
-                                                                                     mock(EventBus.class));
+                pipelineService,
+                pipelineStreamConnectionsService,
+                parser,
+                new MetricRegistry(),
+                Executors.newScheduledThreadPool(1),
+                mock(EventBus.class),
+                (currentPipelines, streamPipelineConnections) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, new MetricRegistry(), 1, true));
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(Journal.class),
                 new MetricRegistry(),
@@ -165,12 +166,12 @@ public class PipelineInterpreterTest {
 
         final MetricRegistry metricRegistry = new MetricRegistry();
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
-                                                                                     pipelineService,
-                                                                                     pipelineStreamConnectionsService,
-                                                                                     parser,
-                                                                                     metricRegistry,
-                                                                                     Executors.newScheduledThreadPool(1),
-                                                                                     mock(EventBus.class));
+                pipelineService,
+                pipelineStreamConnectionsService,
+                parser,
+                metricRegistry,
+                Executors.newScheduledThreadPool(1),
+                mock(EventBus.class), (currentPipelines, streamPipelineConnections) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, new MetricRegistry(), 1, true));
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(Journal.class),
                 metricRegistry,

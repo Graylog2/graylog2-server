@@ -16,6 +16,8 @@
  */
 package org.graylog.plugins.pipelineprocessor;
 
+import com.google.inject.assistedinject.FactoryModuleBuilder;
+
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.periodical.LegacyDefaultStreamMigration;
@@ -54,6 +56,8 @@ public class PipelineProcessorModule extends PluginModule {
         installSearchResponseDecorator(searchResponseDecoratorBinder(),
                 PipelineProcessorMessageDecorator.class,
                 PipelineProcessorMessageDecorator.Factory.class);
+
+        install(new FactoryModuleBuilder().build(PipelineInterpreter.State.Factory.class));
 
         addAuditEventTypes(PipelineProcessorAuditEventTypes.class);
     }

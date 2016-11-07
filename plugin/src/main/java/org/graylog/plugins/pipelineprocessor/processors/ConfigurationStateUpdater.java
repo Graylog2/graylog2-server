@@ -48,6 +48,7 @@ public class ConfigurationStateUpdater {
     private final MetricRegistry metricRegistry;
     private final ScheduledExecutorService scheduler;
     private final EventBus serverEventBus;
+    private final PipelineInterpreter.State.Factory stateFactory;
     /**
      * non-null if the update has successfully loaded a state
      */
@@ -60,7 +61,8 @@ public class ConfigurationStateUpdater {
                                      PipelineRuleParser pipelineRuleParser,
                                      MetricRegistry metricRegistry,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
-                                     EventBus serverEventBus) {
+                                     EventBus serverEventBus,
+                                     PipelineInterpreter.State.Factory stateFactory) {
         this.ruleService = ruleService;
         this.pipelineService = pipelineService;
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
@@ -68,6 +70,7 @@ public class ConfigurationStateUpdater {
         this.metricRegistry = metricRegistry;
         this.scheduler = scheduler;
         this.serverEventBus = serverEventBus;
+        this.stateFactory = stateFactory;
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
@@ -122,7 +125,7 @@ public class ConfigurationStateUpdater {
         }
         ImmutableSetMultimap<String, Pipeline> streamPipelineConnections = ImmutableSetMultimap.copyOf(connections);
 
-        return new PipelineInterpreter.State(currentPipelines, streamPipelineConnections);
+        return stateFactory.newState(currentPipelines, streamPipelineConnections);
     }
 
     /**
