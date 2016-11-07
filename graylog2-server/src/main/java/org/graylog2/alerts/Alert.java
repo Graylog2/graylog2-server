@@ -20,9 +20,6 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface Alert {
     String getId();
     String getStreamId();
@@ -32,16 +29,4 @@ public interface Alert {
     String getDescription();
     Map<String, Object> getConditionParameters();
     boolean isInterval();
-
-    interface Builder {
-        Builder streamId(String streamId);
-        Builder conditionId(String conditionId);
-        Builder triggeredAt(DateTime triggeredAt);
-        Builder resolvedAt(DateTime resolvedAt);
-        Builder description(String description);
-        Builder conditionParameters(Map<String, Object> conditionParameters);
-        Builder interval(boolean isInterval);
-
-        Alert build();
-    }
 }

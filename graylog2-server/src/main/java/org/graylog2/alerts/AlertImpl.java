@@ -20,7 +20,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
 import org.graylog2.database.CollectionName;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -104,6 +106,17 @@ public abstract class AlertImpl implements Alert {
         return create(id, streamId, conditionId, triggeredAt, resolvedAt, description, conditionParameters, isInterval);
     }
 
+    public static AlertImpl fromCheckResult(AlertCondition.CheckResult checkResult) {
+        return create(new org.bson.types.ObjectId().toHexString(),
+                checkResult.getTriggeredCondition().getStream().getId(),
+                checkResult.getTriggeredCondition().getId(),
+                checkResult.getTriggeredAt(),
+                null,
+                checkResult.getResultDescription(),
+                ImmutableMap.copyOf(checkResult.getTriggeredCondition().getParameters()),
+                true);
+    }
+
     public static AlertImpl create(String id,
                                    String streamId,
                                    String conditionId,
@@ -135,24 +148,23 @@ public abstract class AlertImpl implements Alert {
     }
 
     @AutoValue.Builder
-    public interface Builder extends Alert.Builder {
+    public interface Builder {
         Builder id(String id);
-        @Override
+
         Builder streamId(String streamId);
-        @Override
+
         Builder conditionId(String conditionId);
-        @Override
+
         Builder triggeredAt(DateTime triggeredAt);
-        @Override
+
         Builder resolvedAt(DateTime resolvedAt);
-        @Override
+
         Builder description(String description);
-        @Override
+
         Builder conditionParameters(Map<String, Object> conditionParameters);
-        @Override
+
         Builder interval(boolean isInterval);
 
-        @Override
         AlertImpl build();
     }
 }

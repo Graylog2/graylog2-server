@@ -26,9 +26,6 @@ import org.joda.time.DateTime;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface AlertService {
     Alert factory(AlertCondition.CheckResult checkResult);
 
@@ -50,5 +47,4 @@ public interface AlertService {
     Alert load(String alertId, String streamId) throws NotFoundException;
     String save(Alert alert) throws ValidationException;
 
-    Alert.Builder builder();
 }

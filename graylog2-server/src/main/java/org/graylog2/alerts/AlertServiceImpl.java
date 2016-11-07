@@ -16,10 +16,8 @@
  */
 package org.graylog2.alerts;
 
-import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
-import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
@@ -58,22 +56,9 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    public Alert.Builder builder() {
-        return AlertImpl.builder()
-            .id(new ObjectId().toHexString());
-    }
-
-    @Override
     public Alert factory(AlertCondition.CheckResult checkResult) {
         checkArgument(checkResult.isTriggered(), "Unable to create alert for CheckResult which is not triggered.");
-        return builder()
-            .streamId(checkResult.getTriggeredCondition().getStream().getId())
-            .conditionId(checkResult.getTriggeredCondition().getId())
-            .description(checkResult.getResultDescription())
-            .conditionParameters(ImmutableMap.copyOf(checkResult.getTriggeredCondition().getParameters()))
-            .triggeredAt(checkResult.getTriggeredAt())
-            .interval(true)
-            .build();
+        return AlertImpl.fromCheckResult(checkResult);
     }
 
     @Override
