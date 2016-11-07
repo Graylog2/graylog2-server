@@ -61,6 +61,13 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
+    @UsingDataSet(locations = "multiple-alerts.json")
+    public void loadRecentOfStreamLimitsResults() throws Exception {
+        final List<Alert> alerts = alertService.loadRecentOfStreams(new DateTime(0L, DateTimeZone.UTC), 1);
+        assertThat(alerts.size()).isEqualTo(1);
+    }
+
+    @Test
     @UsingDataSet(locations = "unresolved-alert.json")
     public void triggeredSecondsAgoOnExistingAlert() throws Exception {
         final Alert alert = alertService.load(ALERT_ID, STREAM_ID);

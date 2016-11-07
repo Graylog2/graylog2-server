@@ -30,6 +30,7 @@ import java.util.Optional;
 public interface AlertService {
     Alert factory(AlertCondition.CheckResult checkResult);
 
+    List<Alert> loadRecentOfStreams(DateTime since, int limit);
     List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit);
 
     int triggeredSecondsAgo(String streamId, String conditionId);

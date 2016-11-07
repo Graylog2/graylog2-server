@@ -42,6 +42,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class AlertServiceImpl implements AlertService {
     private final JacksonDBCollection<AlertImpl, String> coll;
@@ -64,14 +65,20 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
+    public List<Alert> loadRecentOfStreams(DateTime since, int limit) {
+        return loadRecentOfStream("", since, limit);
+    }
+
+    @Override
     public List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit) {
         final DateTime effectiveSince = (since == null ? new DateTime(0L, DateTimeZone.UTC) : since);
-        return Collections.unmodifiableList(this.coll.find(
-            DBQuery.and(
-                DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId),
-                DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, effectiveSince.toDate())
-            )
-        )
+        DBQuery.Query query = DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, effectiveSince.toDate());
+
+        if (!isNullOrEmpty(streamId)) {
+            query = DBQuery.and(DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId), query);
+        }
+
+        return Collections.unmodifiableList(this.coll.find(query)
             .limit(limit)
             .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
             .toArray());
