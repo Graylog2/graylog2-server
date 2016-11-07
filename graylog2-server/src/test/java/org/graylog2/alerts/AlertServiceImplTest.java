@@ -21,10 +21,14 @@ import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.graylog2.database.MongoDBServiceTest;
 import org.graylog2.plugin.Tools;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -40,6 +44,20 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     @Before
     public void setUpService() throws Exception {
         this.alertService = new AlertServiceImpl(mongoRule.getMongoConnection(), mapperProvider, alertConditionFactory);
+    }
+
+    @Test
+    @UsingDataSet(locations = "multiple-alerts.json")
+    public void loadRecentOfStreamQueriesByDate() throws Exception {
+        final List<Alert> alerts = alertService.loadRecentOfStream(STREAM_ID, new DateTime(0L, DateTimeZone.UTC), 300);
+        assertThat(alerts.size()).isEqualTo(2);
+    }
+
+    @Test
+    @UsingDataSet(locations = "multiple-alerts.json")
+    public void loadRecentOfStreamLimitResults() throws Exception {
+        final List<Alert> alerts = alertService.loadRecentOfStream(STREAM_ID, new DateTime(0L, DateTimeZone.UTC), 1);
+        assertThat(alerts.size()).isEqualTo(1);
     }
 
     @Test
