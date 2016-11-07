@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -76,23 +77,33 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public int triggeredSecondsAgo(String streamId, String conditionId) {
-        final List<AlertImpl> mostRecentAlerts = this.coll.find(
-            DBQuery.and(
-                DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId),
-                DBQuery.is(AlertImpl.FIELD_CONDITION_ID, conditionId)
-            )
-        )
-            .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
-            .limit(1)
-            .toArray();
-
-        if (mostRecentAlerts == null || mostRecentAlerts.size() == 0) {
+        final Optional<Alert> lastTriggeredAlert = getLastTriggeredAlert(streamId, conditionId);
+        if (!lastTriggeredAlert.isPresent()) {
             return -1;
         }
 
-        final Alert mostRecentAlert = mostRecentAlerts.get(0);
+        final Alert mostRecentAlert = lastTriggeredAlert.get();
 
         return Seconds.secondsBetween(mostRecentAlert.getTriggeredAt(), Tools.nowUTC()).getSeconds();
+    }
+
+    @Override
+    public Optional<Alert> getLastTriggeredAlert(String streamId, String conditionId) {
+        final List<AlertImpl> alert = this.coll.find(
+                DBQuery.and(
+                        DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId),
+                        DBQuery.is(AlertImpl.FIELD_CONDITION_ID, conditionId)
+                )
+        )
+                .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
+                .limit(1)
+                .toArray();
+
+        if (alert == null || alert.size() == 0) {
+            return Optional.empty();
+        }
+
+        return Optional.of(alert.get(0));
     }
 
     @Override
@@ -173,5 +184,29 @@ public class AlertServiceImpl implements AlertService {
         checkArgument(alert instanceof AlertImpl, "Supplied argument must be of type " + AlertImpl.class + ", and not " + alert.getClass());
 
         return this.coll.save((AlertImpl)alert).getSavedId();
+    }
+
+    @Override
+    public Alert resolveAlert(Alert alert) {
+        if (alert == null || isResolved(alert)) {
+            return alert;
+        }
+
+        final AlertImpl updatedAlert = AlertImpl.create(
+                alert.getId(),
+                alert.getStreamId(),
+                alert.getConditionId(),
+                alert.getTriggeredAt(),
+                Tools.nowUTC(),
+                alert.getDescription(),
+                alert.getConditionParameters());
+        this.coll.save(updatedAlert);
+
+        return updatedAlert;
+    }
+
+    @Override
+    public boolean isResolved(Alert alert) {
+        return !alert.isInterval() || alert.getResolvedAt() != null;
     }
 }

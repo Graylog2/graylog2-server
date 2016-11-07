@@ -25,6 +25,7 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface AlertService {
     Alert factory(AlertCondition.CheckResult checkResult);
@@ -32,6 +33,8 @@ public interface AlertService {
     List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit);
 
     int triggeredSecondsAgo(String streamId, String conditionId);
+
+    Optional<Alert> getLastTriggeredAlert(String streamId, String conditionId);
 
     long totalCount();
     long totalCountForStream(String streamId);
@@ -47,4 +50,6 @@ public interface AlertService {
     Alert load(String alertId, String streamId) throws NotFoundException;
     String save(Alert alert) throws ValidationException;
 
+    Alert resolveAlert(Alert alert);
+    boolean isResolved(Alert alert);
 }
