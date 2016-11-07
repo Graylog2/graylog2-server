@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.List;
+import java.util.Optional;
 
 public class AlertScanner {
     private static final Logger LOG = LoggerFactory.getLogger(AlertScanner.class);
@@ -49,7 +50,7 @@ public class AlertScanner {
         this.alarmCallbackHistoryService = alarmCallbackHistoryService;
     }
 
-    protected Alert handleTriggeredCheckResult(AlertCondition.CheckResult result, Stream stream, AlertCondition alertCondition) throws ValidationException {
+    private Alert handleTriggeredCheckResult(AlertCondition.CheckResult result, Stream stream, AlertCondition alertCondition) throws ValidationException {
         // Persist alert.
         final Alert alert = alertService.factory(result);
         alertService.save(alert);
@@ -82,22 +83,36 @@ public class AlertScanner {
         return alert;
     }
 
+    private void handleResolveAlert(Alert alert) {
+        alertService.resolveAlert(alert);
+        // TODO: Send resolve notifications
+    }
+
     public boolean checkAlertCondition(Stream stream, AlertCondition alertCondition) {
         if (stream.isPaused() || alertService.inGracePeriod(alertCondition)) {
             return false;
         }
         try {
             final AlertCondition.CheckResult result = alertCondition.runCheck();
+            final Optional<Alert> alert = alertService.getLastTriggeredAlert(stream.getId(), alertCondition.getId());
             if (result.isTriggered()) {
-                // Alert is triggered!
-                LOG.debug("Alert condition [{}] is triggered. Sending alerts.", alertCondition);
-                handleTriggeredCheckResult(result, stream, alertCondition);
+                if (!alert.isPresent() || alertService.isResolved(alert.get())) {
+                    LOG.debug("Alert condition [{}] is triggered. Sending alerts.", alertCondition);
+                    handleTriggeredCheckResult(result, stream, alertCondition);
+                } else {
+                    LOG.debug("Alert condition [{}] is triggered but alerts were already sent. Nothing to do.", alertCondition);
+                }
                 return true;
             } else {
-                // Alert not triggered.
-                LOG.debug("Alert condition [{}] is not triggered.", alertCondition);
+                // if stream and condition had already an alert, mark it as resolved
+                if (alert.isPresent() && !alertService.isResolved(alert.get())) {
+                    LOG.debug("Alert condition [{}] is not triggered anymore. Resolving alert.", alertCondition);
+                    handleResolveAlert(alert.get());
+                } else {
+                    LOG.debug("Alert condition [{}] is not triggered and is marked as resolved. Nothing to do.", alertCondition);
+                }
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             LOG.error("Skipping alert check that threw an exception.", e);
         }
         return false;
