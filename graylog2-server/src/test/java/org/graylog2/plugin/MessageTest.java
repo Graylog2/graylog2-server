@@ -23,6 +23,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -245,6 +246,38 @@ public class MessageTest {
         // streams2 is no longer assigned
         assertThat(message.removeStream(stream2)).isFalse();
         assertThat(message.getStreams()).containsOnly(stream1, stream3);
+    }
+
+    @Test
+    public void testStreamMutatorsWithIndexSets() {
+        final Stream stream1 = mock(Stream.class);
+        final Stream stream2 = mock(Stream.class);
+        final Stream stream3 = mock(Stream.class);
+
+        final IndexSet indexSet1 = mock(IndexSet.class);
+        final IndexSet indexSet2 = mock(IndexSet.class);
+
+        assertThat(message.getIndexSets()).isEmpty();
+
+        when(stream1.getIndexSets()).thenReturn(Collections.singleton(indexSet1));
+        when(stream2.getIndexSets()).thenReturn(Collections.emptySet());
+        when(stream3.getIndexSets()).thenReturn(Sets.newHashSet(indexSet1, indexSet2));
+
+        message.addStream(stream1);
+        message.addStreams(Sets.newHashSet(stream2, stream3));
+
+        assertThat(message.getIndexSets()).containsOnly(indexSet1, indexSet2);
+
+        message.removeStream(stream3);
+
+        assertThat(message.getIndexSets()).containsOnly(indexSet1);
+
+        final Set<IndexSet> indexSets = message.getIndexSets();
+
+        message.addStream(stream3);
+
+        // getIndexSets is a copy and doesn't change after mutations
+        assertThat(indexSets).containsOnly(indexSet1);
     }
 
     @Test
