@@ -87,7 +87,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         @SuppressWarnings("unchecked")
         final Map<String, Object> fields = o.toMap();
         // TODO 2.2: Needs to load the index sets from the database!
-        return new StreamImpl((ObjectId) o.get("_id"), o.toMap(), streamRules, outputs, indexSets);
+        return new StreamImpl((ObjectId) o.get("_id"), fields, streamRules, outputs, indexSets);
     }
 
     @Override
@@ -154,7 +154,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
             final Map<String, Object> fields = o.toMap();
 
             // TODO 2.2: Needs to load the index sets from the database!
-            streams.add(new StreamImpl((ObjectId) o.get("_id"), o.toMap(), streamRules, outputs, indexSets));
+            streams.add(new StreamImpl(objectId, fields, streamRules, outputs, indexSets));
         }
 
         return streams.build();
