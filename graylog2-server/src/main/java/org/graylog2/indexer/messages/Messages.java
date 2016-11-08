@@ -42,6 +42,7 @@ import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
@@ -114,14 +115,14 @@ public class Messages {
         return terms;
     }
 
-    public boolean bulkIndex(final List<IndexAndMessage> indexAndMessages) {
-        if (indexAndMessages.isEmpty()) {
+    public boolean bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList) {
+        if (messageList.isEmpty()) {
             return true;
         }
 
         final BulkRequestBuilder requestBuilder = c.prepareBulk().setConsistencyLevel(WriteConsistencyLevel.ONE);
-        for (IndexAndMessage indexAndMessage : indexAndMessages) {
-            requestBuilder.add(buildIndexRequest(indexAndMessage.indexName, indexAndMessage.message.toElasticSearchObject(invalidTimestampMeter), indexAndMessage.message.getId()));
+        for (Map.Entry<IndexSet, Message> entry : messageList) {
+            requestBuilder.add(buildIndexRequest(entry.getKey().getWriteIndexAlias(), entry.getValue().toElasticSearchObject(invalidTimestampMeter), entry.getValue().getId()));
         }
 
         final BulkResponse response = runBulkRequest(requestBuilder.request());
@@ -129,7 +130,7 @@ public class Messages {
         LOG.debug("Index: Bulk indexed {} messages, took {} ms, failures: {}",
                 response.getItems().length, response.getTookInMillis(), response.hasFailures());
         if (response.hasFailures()) {
-            propagateFailure(response.getItems(), indexAndMessages, response.buildFailureMessage());
+            propagateFailure(response.getItems(), messageList, response.buildFailureMessage());
         }
 
         return !response.hasFailures();
@@ -149,7 +150,7 @@ public class Messages {
         }
     }
 
-    private void propagateFailure(BulkItemResponse[] items, List<IndexAndMessage> indexAndMessageList, String errorMessage) {
+    private void propagateFailure(BulkItemResponse[] items, List<Map.Entry<IndexSet, Message>> messageList, String errorMessage) {
         final List<IndexFailure> indexFailures = new LinkedList<>();
         for (BulkItemResponse item : items) {
             if (item.isFailed()) {
@@ -157,13 +158,13 @@ public class Messages {
 
                 // Write failure to index_failures.
                 final BulkItemResponse.Failure f = item.getFailure();
-                final IndexAndMessage indexAndMessage = indexAndMessageList.get(item.getItemId());
+                final Map.Entry<IndexSet, Message> messageEntry = messageList.get(item.getItemId());
                 final Map<String, Object> doc = ImmutableMap.<String, Object>builder()
                         .put("letter_id", item.getId())
                         .put("index", f.getIndex())
                         .put("type", f.getType())
                         .put("message", f.getMessage())
-                        .put("timestamp", indexAndMessage.message.getTimestamp())
+                        .put("timestamp", messageEntry.getValue().getTimestamp())
                         .build();
 
                 indexFailures.add(new IndexFailureImpl(doc));

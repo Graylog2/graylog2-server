@@ -18,9 +18,10 @@ package org.graylog2.outputs;
 
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import org.graylog2.Configuration;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.messages.IndexAndMessage;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -32,9 +33,11 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -71,10 +74,10 @@ public class BlockingBatchedESOutputTest {
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
-        final List<IndexAndMessage> messageList = buildMessages(config.getOutputBatchSize());
+        final List<Map.Entry<IndexSet, Message>> messageList = buildMessages(config.getOutputBatchSize());
 
-        for (IndexAndMessage indexAndMessage : messageList) {
-            output.writeIndexAndMessage(indexAndMessage);
+        for (Map.Entry<IndexSet, Message> entry : messageList) {
+            output.writeMessageEntry(entry);
         }
 
         verify(messages, times(1)).bulkIndex(eq(messageList));
@@ -88,11 +91,11 @@ public class BlockingBatchedESOutputTest {
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
-        final List<IndexAndMessage> messageList = buildMessages(config.getOutputBatchSize());
+        final List<Map.Entry<IndexSet, Message>> messageList = buildMessages(config.getOutputBatchSize());
 
-        for (IndexAndMessage indexAndMessage : messageList) {
+        for (Map.Entry<IndexSet, Message> entry : messageList) {
             try {
-                output.writeIndexAndMessage(indexAndMessage);
+                output.writeMessageEntry(entry);
             } catch(RuntimeException ignore) {
             }
         }
@@ -109,11 +112,11 @@ public class BlockingBatchedESOutputTest {
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
-        final List<IndexAndMessage> messageList = buildMessages(config.getOutputBatchSize());
+        final List<Map.Entry<IndexSet, Message>> messageList = buildMessages(config.getOutputBatchSize());
 
-        for (IndexAndMessage indexAndMessage : messageList) {
+        for (Map.Entry<IndexSet, Message> entry : messageList) {
             try {
-                output.writeIndexAndMessage(indexAndMessage);
+                output.writeMessageEntry(entry);
             } catch(RuntimeException ignore) {
             }
         }
@@ -128,10 +131,10 @@ public class BlockingBatchedESOutputTest {
 
         final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
 
-        final List<IndexAndMessage> messageList = buildMessages(config.getOutputBatchSize() - 1);
+        final List<Map.Entry<IndexSet, Message>> messageList = buildMessages(config.getOutputBatchSize() - 1);
 
-        for (IndexAndMessage indexAndMessage : messageList) {
-            output.writeIndexAndMessage(indexAndMessage);
+        for (Map.Entry<IndexSet, Message> entry : messageList) {
+            output.writeMessageEntry(entry);
         }
 
         // Should flush the buffer even though the batch size is not reached yet
@@ -140,10 +143,10 @@ public class BlockingBatchedESOutputTest {
         verify(messages, times(1)).bulkIndex(eq(messageList));
     }
 
-    private List<IndexAndMessage> buildMessages(final int count) {
-        final ImmutableList.Builder<IndexAndMessage> builder = ImmutableList.builder();
+    private List<Map.Entry<IndexSet, Message>> buildMessages(final int count) {
+        final ImmutableList.Builder<Map.Entry<IndexSet, Message>> builder = ImmutableList.builder();
         for (int i = 0; i < count; i++) {
-            builder.add(new IndexAndMessage("graylog_0", new Message("message" + i, "test", Tools.nowUTC())));
+            builder.add(Maps.immutableEntry(mock(IndexSet.class), new Message("message" + i, "test", Tools.nowUTC())));
         }
 
         return builder.build();
