@@ -20,7 +20,6 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Joiner;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -94,8 +93,9 @@ public class ElasticSearchOutput implements MessageOutput {
 
     public void writeIndexAndMessages(List<IndexAndMessage> messageList) throws Exception {
         if (LOG.isTraceEnabled()) {
-            final List<String> sortedIds = Ordering.natural().sortedCopy(Lists.transform(messageList.stream().map(iam -> iam.message).collect(Collectors.toList()),
-                                                                                         Message.ID_FUNCTION));
+            final List<String> sortedIds = Ordering.natural().sortedCopy(messageList.stream()
+                    .map(iam -> iam.message.getId())
+                    .collect(Collectors.toList()));
             LOG.trace("Writing message ids to [{}]: <{}>", NAME, Joiner.on(", ").join(sortedIds));
         }
 
