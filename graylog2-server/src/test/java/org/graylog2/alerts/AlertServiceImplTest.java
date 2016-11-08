@@ -17,6 +17,7 @@
 
 package org.graylog2.alerts;
 
+import com.google.common.collect.ImmutableList;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.graylog2.database.MongoDBServiceTest;
@@ -62,8 +63,33 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
 
     @Test
     @UsingDataSet(locations = "multiple-alerts.json")
-    public void loadRecentOfStreamLimitsResults() throws Exception {
-        final List<Alert> alerts = alertService.loadRecentOfStreams(new DateTime(0L, DateTimeZone.UTC), 1);
+    public void loadRecentOfStreamsIsEmptyIfNoStreams() throws Exception {
+        final List<Alert> alerts = alertService.loadRecentOfStreams(
+                ImmutableList.of(),
+                new DateTime(0L, DateTimeZone.UTC),
+                300);
+        assertThat(alerts.size()).isEqualTo(0);
+    }
+
+    @Test
+    @UsingDataSet(locations = "multiple-alerts.json")
+    public void loadRecentOfStreamsFiltersByStream() throws Exception {
+        final List<Alert> alerts = alertService.loadRecentOfStreams(
+                ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14f"),
+                new DateTime(0L, DateTimeZone.UTC),
+                300);
+        assertThat(alerts.size()).isEqualTo(2);
+        assertThat(alerts.get(0).getStreamId()).isNotEqualTo(STREAM_ID);
+        assertThat(alerts.get(1).getStreamId()).isNotEqualTo(STREAM_ID);
+    }
+
+    @Test
+    @UsingDataSet(locations = "multiple-alerts.json")
+    public void loadRecentOfStreamsLimitsResults() throws Exception {
+        final List<Alert> alerts = alertService.loadRecentOfStreams(
+                ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14e", "5666df42bee80072613ce14f"),
+                new DateTime(0L, DateTimeZone.UTC),
+                1);
         assertThat(alerts.size()).isEqualTo(1);
     }
 

@@ -16,6 +16,7 @@
  */
 package org.graylog2.alerts;
 
+import com.google.common.collect.ImmutableList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -35,14 +36,15 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class AlertServiceImpl implements AlertService {
     private final JacksonDBCollection<AlertImpl, String> coll;
@@ -65,23 +67,29 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    public List<Alert> loadRecentOfStreams(DateTime since, int limit) {
-        return loadRecentOfStream("", since, limit);
+    public List<Alert> loadRecentOfStreams(List<String> streamIds, DateTime since, int limit) {
+        if (streamIds == null || streamIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        final DateTime effectiveSince = (since == null ? new DateTime(0L, DateTimeZone.UTC) : since);
+        final List<DBQuery.Query> streamQueries = streamIds.stream()
+                .map(streamId -> DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId))
+                .collect(Collectors.toList());
+        final DBQuery.Query query = DBQuery.and(
+                DBQuery.or(streamQueries.toArray(new DBQuery.Query[streamQueries.size()])),
+                DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, effectiveSince.toDate())
+        );
+
+        return Collections.unmodifiableList(this.coll.find(query)
+                .limit(limit)
+                .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
+                .toArray());
     }
 
     @Override
     public List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit) {
-        final DateTime effectiveSince = (since == null ? new DateTime(0L, DateTimeZone.UTC) : since);
-        DBQuery.Query query = DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, effectiveSince.toDate());
-
-        if (!isNullOrEmpty(streamId)) {
-            query = DBQuery.and(DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId), query);
-        }
-
-        return Collections.unmodifiableList(this.coll.find(query)
-            .limit(limit)
-            .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
-            .toArray());
+        return loadRecentOfStreams(ImmutableList.of(streamId), since, limit);
     }
 
     @Override
