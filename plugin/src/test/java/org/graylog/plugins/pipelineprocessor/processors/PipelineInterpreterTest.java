@@ -70,33 +70,33 @@ public class PipelineInterpreterTest {
         final RuleService ruleService = mock(MongoDbRuleService.class);
         when(ruleService.loadAll()).thenReturn(Collections.singleton(
                 RuleDao.create("abc",
-                               "title",
-                               "description",
-                               "rule \"creates message\"\n" +
-                                       "when to_string($message.message) == \"original message\"\n" +
-                                       "then\n" +
-                                       "  create_message(\"derived message\");\n" +
-                                       "end",
-                               Tools.nowUTC(),
-                               null)
+                        "title",
+                        "description",
+                        "rule \"creates message\"\n" +
+                                "when to_string($message.message) == \"original message\"\n" +
+                                "then\n" +
+                                "  create_message(\"derived message\");\n" +
+                                "end",
+                        Tools.nowUTC(),
+                        null)
         ));
 
         final PipelineService pipelineService = mock(MongoDbPipelineService.class);
         when(pipelineService.loadAll()).thenReturn(Collections.singleton(
                 PipelineDao.create("cde", "title", "description",
-                                   "pipeline \"pipeline\"\n" +
-                                           "stage 0 match all\n" +
-                                           "    rule \"creates message\";\n" +
-                                           "end\n",
-                                   Tools.nowUTC(),
-                                   null)
+                        "pipeline \"pipeline\"\n" +
+                                "stage 0 match all\n" +
+                                "    rule \"creates message\";\n" +
+                                "end\n",
+                        Tools.nowUTC(),
+                        null)
         ));
 
         final PipelineStreamConnectionsService pipelineStreamConnectionsService = mock(
                 MongoDbPipelineStreamConnectionsService.class);
         final PipelineConnections pipelineConnections = PipelineConnections.create(null,
-                                                                                   DEFAULT_STREAM_ID,
-                                                                                   newHashSet("cde"));
+                DEFAULT_STREAM_ID,
+                newHashSet("cde"));
         when(pipelineStreamConnectionsService.loadAll()).thenReturn(
                 newHashSet(pipelineConnections)
         );
@@ -105,13 +105,15 @@ public class PipelineInterpreterTest {
         functions.put(CreateMessage.NAME, new CreateMessage());
         functions.put(StringConversion.NAME, new StringConversion());
 
-        final PipelineRuleParser parser = setupParser(functions);
+        final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
+        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry, new CodeGenerator());
 
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
                 pipelineService,
                 pipelineStreamConnectionsService,
                 parser,
                 new MetricRegistry(),
+                functionRegistry,
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
                 (currentPipelines, streamPipelineConnections) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, new MetricRegistry(), 1, true));
@@ -133,36 +135,37 @@ public class PipelineInterpreterTest {
     public void testMetrics() {
         final RuleService ruleService = new InMemoryRuleService();
         ruleService.save(RuleDao.create("abc",
-                                        "title",
-                                        "description",
-                                        "rule \"match_all\"\n" +
-                                                "when true\n" +
-                                                "then\n" +
-                                                "end",
-                                        Tools.nowUTC(),
-                                        null)
+                "title",
+                "description",
+                "rule \"match_all\"\n" +
+                        "when true\n" +
+                        "then\n" +
+                        "end",
+                Tools.nowUTC(),
+                null)
         );
 
         final PipelineService pipelineService = new InMemoryPipelineService();
         pipelineService.save(PipelineDao.create("cde", "title", "description",
-                                                "pipeline \"pipeline\"\n" +
-                                                        "stage 0 match all\n" +
-                                                        "    rule \"match_all\";\n" +
-                                                        "stage 1 match all\n" +
-                                                        "    rule \"match_all\";\n" +
-                                                        "end\n",
-                                                Tools.nowUTC(),
-                                                null)
+                "pipeline \"pipeline\"\n" +
+                        "stage 0 match all\n" +
+                        "    rule \"match_all\";\n" +
+                        "stage 1 match all\n" +
+                        "    rule \"match_all\";\n" +
+                        "end\n",
+                Tools.nowUTC(),
+                null)
         );
 
         final PipelineStreamConnectionsService pipelineStreamConnectionsService = new InMemoryPipelineStreamConnectionsService();
         pipelineStreamConnectionsService.save(PipelineConnections.create(null,
-                                                                         DEFAULT_STREAM_ID,
-                                                                         newHashSet("cde")));
+                DEFAULT_STREAM_ID,
+                newHashSet("cde")));
 
         final Map<String, Function<?>> functions = Maps.newHashMap();
 
-        final PipelineRuleParser parser = setupParser(functions);
+        final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
+        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry, new CodeGenerator());
 
         final MetricRegistry metricRegistry = new MetricRegistry();
         final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
@@ -170,6 +173,7 @@ public class PipelineInterpreterTest {
                 pipelineStreamConnectionsService,
                 parser,
                 metricRegistry,
+                functionRegistry,
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class), (currentPipelines, streamPipelineConnections) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, new MetricRegistry(), 1, true));
         final PipelineInterpreter interpreter = new PipelineInterpreter(
@@ -221,11 +225,6 @@ public class PipelineInterpreterTest {
         assertThat(meters.get(name(Rule.class, "abc", "cde", "0", "failed")).getCount()).isEqualTo(0L);
         assertThat(meters.get(name(Rule.class, "abc", "cde", "1", "failed")).getCount()).isEqualTo(0L);
 
-    }
-
-    private PipelineRuleParser setupParser(Map<String, Function<?>> functions) {
-        final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
-        return new PipelineRuleParser(functionRegistry, new CodeGenerator());
     }
 
     private Message messageInDefaultStream(String message, String source) {

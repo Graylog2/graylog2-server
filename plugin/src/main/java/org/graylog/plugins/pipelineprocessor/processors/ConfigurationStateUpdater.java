@@ -17,6 +17,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.events.PipelineConnectionsChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.PipelinesChangedEvent;
 import org.graylog.plugins.pipelineprocessor.events.RulesChangedEvent;
+import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
@@ -46,6 +47,7 @@ public class ConfigurationStateUpdater {
     private final PipelineStreamConnectionsService pipelineStreamConnectionsService;
     private final PipelineRuleParser pipelineRuleParser;
     private final MetricRegistry metricRegistry;
+    private final FunctionRegistry functionRegistry;
     private final ScheduledExecutorService scheduler;
     private final EventBus serverEventBus;
     private final PipelineInterpreter.State.Factory stateFactory;
@@ -60,6 +62,7 @@ public class ConfigurationStateUpdater {
                                      PipelineStreamConnectionsService pipelineStreamConnectionsService,
                                      PipelineRuleParser pipelineRuleParser,
                                      MetricRegistry metricRegistry,
+                                     FunctionRegistry functionRegistry,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                      EventBus serverEventBus,
                                      PipelineInterpreter.State.Factory stateFactory) {
@@ -68,6 +71,7 @@ public class ConfigurationStateUpdater {
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
         this.pipelineRuleParser = pipelineRuleParser;
         this.metricRegistry = metricRegistry;
+        this.functionRegistry = functionRegistry;
         this.scheduler = scheduler;
         this.serverEventBus = serverEventBus;
         this.stateFactory = stateFactory;
@@ -149,7 +153,8 @@ public class ConfigurationStateUpdater {
                             rule = Rule.alwaysFalse("Unresolved rule " + ref);
                         }
                         // make a copy so that the metrics match up (we don't share actual objects between stages)
-                        rule = rule.toBuilder().build();
+                        // this also makes sure we don't accidentally share state of generated code between threads
+                        rule = rule.invokableCopy(functionRegistry);
                         log.debug("Resolved rule `{}` to {}", ref, rule);
                         // include back reference to stage
                         rule.registerMetrics(metricRegistry, pipeline.id(), String.valueOf(stage.stage()));

@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.ast;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Sets;
 
 import com.codahale.metrics.Meter;
@@ -28,7 +29,13 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.LogicalExpression;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
+import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.reflections.ReflectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
@@ -37,6 +44,7 @@ import javax.annotation.Nullable;
 
 @AutoValue
 public abstract class Rule {
+    private static final Logger LOG = LoggerFactory.getLogger(Rule.class);
 
     private transient Set<String> metricNames = Sets.newHashSet();
 
@@ -59,6 +67,9 @@ public abstract class Rule {
     public abstract Collection<Statement> then();
 
     @Nullable
+    public abstract Class<? extends GeneratedRule> generatedRuleClass();
+
+    @Nullable
     public abstract GeneratedRule generatedRule();
 
     public static Builder builder() {
@@ -69,11 +80,6 @@ public abstract class Rule {
 
     public Rule withId(String id) {
         return toBuilder().id(id).build();
-    }
-
-    public Rule withGeneratedRule(GeneratedRule generated) {
-        // TODO this instance should not be shared across rule instances (but currently is)!
-        return toBuilder().generatedRule(generated).build();
     }
 
     public static Rule alwaysFalse(String name) {
@@ -161,6 +167,33 @@ public abstract class Rule {
         }
     }
 
+    /**
+     * Creates a copy of this Rule with a new instance of the generated rule class if present.
+     *
+     * This prevents sharing instances across threads, which is not supported for performance reasons.
+     * Otherwise the generated code would need to be thread safe, adding to the runtime overhead.
+     * Instead we buy speed by spending more memory.
+     *
+     * @param functionRegistry the registered functions of the system
+     * @return a copy of this rule with a new instance of its generated code
+     */
+    public Rule invokableCopy(FunctionRegistry functionRegistry) {
+        final Builder builder = toBuilder();
+        final Class<? extends GeneratedRule> ruleClass = generatedRuleClass();
+        if (ruleClass != null) {
+            try {
+                //noinspection unchecked
+                final Set<Constructor> constructors = ReflectionUtils.getConstructors(ruleClass);
+                final Constructor onlyElement = Iterables.getOnlyElement(constructors);
+                final GeneratedRule instance = (GeneratedRule) onlyElement.newInstance(functionRegistry);
+                builder.generatedRule(instance);
+            } catch (IllegalAccessException | InstantiationException | InvocationTargetException e) {
+                LOG.warn("Unable to generate code for rule {}: {}", id(), e);
+            }
+        }
+        return builder.build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
 
@@ -168,7 +201,8 @@ public abstract class Rule {
         public abstract Builder name(String name);
         public abstract Builder when(LogicalExpression condition);
         public abstract Builder then(Collection<Statement> actions);
-        public abstract Builder generatedRule(@Nullable GeneratedRule generatedRule);
+        public abstract Builder generatedRuleClass(@Nullable Class<? extends GeneratedRule> klass);
+        public abstract Builder generatedRule(GeneratedRule instance);
 
         public abstract Rule build();
     }
