@@ -39,6 +39,7 @@ public interface AlertService {
 
     long totalCount();
     long totalCountForStream(String streamId);
+    long totalCountForStreams(List<String> streamIds);
 
     AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream);
     AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId);
@@ -48,6 +49,7 @@ public interface AlertService {
     boolean inGracePeriod(AlertCondition alertCondition);
 
     List<Alert> listForStreamId(String streamId, int skip, int limit);
+    List<Alert> listForStreamIds(List<String> streamIds, int skip, int limit);
     Alert load(String alertId, String streamId) throws NotFoundException;
     String save(Alert alert) throws ValidationException;
 

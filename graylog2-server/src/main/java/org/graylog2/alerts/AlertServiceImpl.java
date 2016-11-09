@@ -17,7 +17,6 @@
 package org.graylog2.alerts;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.CollectionName;
@@ -73,11 +72,8 @@ public class AlertServiceImpl implements AlertService {
         }
 
         final DateTime effectiveSince = (since == null ? new DateTime(0L, DateTimeZone.UTC) : since);
-        final List<DBQuery.Query> streamQueries = streamIds.stream()
-                .map(streamId -> DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId))
-                .collect(Collectors.toList());
         final DBQuery.Query query = DBQuery.and(
-                DBQuery.or(streamQueries.toArray(new DBQuery.Query[streamQueries.size()])),
+                getFindAnyStreamQuery(streamIds),
                 DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, effectiveSince.toDate())
         );
 
@@ -130,7 +126,15 @@ public class AlertServiceImpl implements AlertService {
 
     @Override
     public long totalCountForStream(String streamId) {
-        return this.coll.count(new BasicDBObject(AlertImpl.FIELD_STREAM_ID, streamId));
+        return totalCountForStreams(ImmutableList.of(streamId));
+    }
+
+    @Override
+    public long totalCountForStreams(List<String> streamIds) {
+        if (streamIds == null || streamIds.isEmpty()) {
+            return 0;
+        }
+        return this.coll.find(getFindAnyStreamQuery(streamIds)).count();
     }
 
     @Override
@@ -183,12 +187,21 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
+    public List<Alert> listForStreamIds(List<String> streamIds, int skip, int limit) {
+        if (streamIds == null || streamIds.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return Collections.unmodifiableList(this.coll.find(getFindAnyStreamQuery(streamIds))
+                .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
+                .skip(skip)
+                .limit(limit)
+                .toArray());
+    }
+
+    @Override
     public List<Alert> listForStreamId(String streamId, int skip, int limit) {
-        return Collections.unmodifiableList(this.coll.find(DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId))
-            .sort(DBSort.desc(AlertImpl.FIELD_TRIGGERED_AT))
-            .skip(skip)
-            .limit(limit)
-            .toArray());
+        return listForStreamIds(ImmutableList.of(streamId), skip, limit);
     }
 
     @Override
@@ -218,5 +231,12 @@ public class AlertServiceImpl implements AlertService {
     @Override
     public boolean isResolved(Alert alert) {
         return !alert.isInterval() || alert.getResolvedAt() != null;
+    }
+
+    private DBQuery.Query getFindAnyStreamQuery(List<String> streamIds) {
+        final List<DBQuery.Query> streamQueries = streamIds.stream()
+                .map(streamId -> DBQuery.is(AlertImpl.FIELD_STREAM_ID, streamId))
+                .collect(Collectors.toList());
+        return DBQuery.or(streamQueries.toArray(new DBQuery.Query[streamQueries.size()]));
     }
 }
