@@ -92,6 +92,8 @@ public abstract class AlertImpl implements Alert {
         return new AutoValue_AlertImpl.Builder();
     }
 
+    public abstract Builder toBuilder();
+
     @JsonCreator
     public static AlertImpl create(@JsonProperty(FIELD_ID) @ObjectId @Id String id,
                                    @JsonProperty(FIELD_STREAM_ID) String streamId,
@@ -116,16 +118,6 @@ public abstract class AlertImpl implements Alert {
                 checkResult.getResultDescription(),
                 ImmutableMap.copyOf(checkResult.getTriggeredCondition().getParameters()),
                 true);
-    }
-
-    public static AlertImpl create(String id,
-                                   String streamId,
-                                   String conditionId,
-                                   DateTime triggeredAt,
-                                   DateTime resolvedAt,
-                                   String description,
-                                   Map<String, Object> conditionParameters) {
-        return create(id, streamId, conditionId, triggeredAt, resolvedAt, description, conditionParameters, true);
     }
 
     public static AlertImpl create(String id,

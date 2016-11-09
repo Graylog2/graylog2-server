@@ -209,14 +209,7 @@ public class AlertServiceImpl implements AlertService {
             return alert;
         }
 
-        final AlertImpl updatedAlert = AlertImpl.create(
-                alert.getId(),
-                alert.getStreamId(),
-                alert.getConditionId(),
-                alert.getTriggeredAt(),
-                Tools.nowUTC(),
-                alert.getDescription(),
-                alert.getConditionParameters());
+        final AlertImpl updatedAlert = ((AlertImpl) alert).toBuilder().resolvedAt(Tools.nowUTC()).build();
         this.coll.save(updatedAlert);
 
         return updatedAlert;
