@@ -1,6 +1,5 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const AlertsActions = ActionsProvider.getActions('Alerts');
@@ -8,8 +7,8 @@ const AlertsActions = ActionsProvider.getActions('Alerts');
 import StoreProvider from 'injection/StoreProvider';
 const AlertsStore = StoreProvider.getStore('Alerts');
 
-import { PaginatedList, Spinner } from 'components/common';
-import AlertsTable from 'components/alerts/AlertsTable';
+import Alert from 'components/alerts/Alert';
+import { EntityList, PaginatedList, Spinner } from 'components/common';
 
 const AlertsComponent = React.createClass({
   mixins: [Reflux.connect(AlertsStore)],
@@ -28,29 +27,18 @@ const AlertsComponent = React.createClass({
 
   render() {
     if (!this.state.alerts) {
-      return (
-        <Row className="content">
-          <Col md={12}>
-            <Spinner />
-          </Col>
-        </Row>
-      );
-    }
-
-    let triggeredAlertsText;
-    if (this.state.alerts.total > 0) {
-      triggeredAlertsText = <span>&nbsp;<small>{this.state.alerts.total} alerts total</small></span>;
+      return <Spinner />;
     }
 
     return (
       <div>
-        <h2>
-          Triggered alerts
-          {triggeredAlertsText}
-        </h2>
+        <h2>Alerts</h2>
+        <p>Check your alerts status from here. Currently displaying <b>all</b> alerts.</p>
 
-        <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}>
-          <AlertsTable alerts={this.state.alerts.alerts} />
+        <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}
+                       showPageSizeSelect={false}>
+          <EntityList bsNoItemsStyle="info" noItemsText="There are no alerts to display."
+                      items={this.state.alerts.alerts.map(alert => <Alert key={alert.id} alert={alert} />)} />
         </PaginatedList>
       </div>
     );

@@ -12,7 +12,7 @@ import DocsHelper from 'util/DocsHelper';
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const StreamsPage = React.createClass({
+const AlertsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
   _isLoading() {
     return false;
@@ -45,4 +45,4 @@ const StreamsPage = React.createClass({
   },
 });
 
-export default StreamsPage;
+export default AlertsPage;
