@@ -106,7 +106,6 @@ public class PipelineRuleParser {
     private final FunctionRegistry functionRegistry;
     private final CodeGenerator codeGenerator;
 
-    private static boolean allowCodeGeneration = false;
     private static AtomicLong uniqueId = new AtomicLong(0);
 
     @Inject
@@ -118,20 +117,29 @@ public class PipelineRuleParser {
     private static final Logger log = LoggerFactory.getLogger(PipelineRuleParser.class);
     public static final ParseTreeWalker WALKER = ParseTreeWalker.DEFAULT;
 
-    public static boolean isAllowCodeGeneration() {
-        return allowCodeGeneration;
-    }
-
-    public static void setAllowCodeGeneration(boolean allowCodeGeneration) {
-        PipelineRuleParser.allowCodeGeneration = allowCodeGeneration;
-    }
-
-
     public Rule parseRule(String rule, boolean silent) throws ParseException {
-        return parseRule("dummy" + uniqueId.getAndIncrement(), rule, silent);
+        return parseRule(rule, silent, null);
+    }
+
+    public Rule parseRule(String rule, boolean silent, ClassLoader classLoader) throws ParseException {
+        return parseRule("dummy" + uniqueId.getAndIncrement(), rule, silent, classLoader);
     }
 
     public Rule parseRule(String id, String rule, boolean silent) throws ParseException {
+        return parseRule(id, rule, silent, null);
+    }
+
+    /**
+     * Parses the given rule source and optionally generates a Java class for it if the classloader is not null.
+     *
+     * @param id the id of the rule, necessary to generate code
+     * @param rule rule source code
+     * @param silent don't emit status messages during parsing
+     * @param ruleClassLoader the classloader to load the generated code into (can be null)
+     * @return the parse rule
+     * @throws ParseException if a one or more parse errors occur
+     */
+    public Rule parseRule(String id, String rule, boolean silent, ClassLoader ruleClassLoader) throws ParseException {
         final ParseContext parseContext = new ParseContext(silent);
         final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
 
@@ -159,8 +167,8 @@ public class PipelineRuleParser {
 
         if (parseContext.getErrors().isEmpty()) {
             Rule parsedRule = parseContext.getRules().get(0).withId(id);
-            if (allowCodeGeneration) {
-                final Class<? extends GeneratedRule> generatedClass = codeGenerator.generateCompiledRule(parsedRule);
+            if (ruleClassLoader != null) {
+                final Class<? extends GeneratedRule> generatedClass = codeGenerator.generateCompiledRule(parsedRule, ruleClassLoader);
                 parsedRule = parsedRule.toBuilder().generatedRuleClass(generatedClass).build();
             }
             return parsedRule;

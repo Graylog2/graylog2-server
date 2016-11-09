@@ -40,7 +40,6 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.Stage;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
-import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
 import org.graylog2.plugin.Message;
@@ -63,6 +62,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -375,7 +375,7 @@ public class PipelineInterpreter implements MessageProcessor {
                 return false;
             }
         } else {
-            if (PipelineRuleParser.isAllowCodeGeneration()) {
+            if (ConfigurationStateUpdater.isAllowCodeGeneration()) {
                 throw new IllegalStateException("Should have generated code and not interpreted the tree");
             }
             for (Statement statement : rule.then()) {
@@ -465,16 +465,19 @@ public class PipelineInterpreter implements MessageProcessor {
         private final ImmutableMap<String, Pipeline> currentPipelines;
         private final ImmutableSetMultimap<String, Pipeline> streamPipelineConnections;
         private final LoadingCache<Set<Pipeline>, StageIterator.Configuration> cache;
+        private final ClassLoader commonClassLoader;
         private final boolean cachedIterators;
 
         @AssistedInject
         public State(@Assisted ImmutableMap<String, Pipeline> currentPipelines,
                      @Assisted ImmutableSetMultimap<String, Pipeline> streamPipelineConnections,
+                     @Nullable @Assisted ClassLoader commonClassLoader,
                      MetricRegistry metricRegistry,
                      @Named("processbuffer_processors") int processorCount,
                      @Named("cached_stageiterators") boolean cachedIterators) {
             this.currentPipelines = currentPipelines;
             this.streamPipelineConnections = streamPipelineConnections;
+            this.commonClassLoader = commonClassLoader;
             this.cachedIterators = cachedIterators;
 
             cache = CacheBuilder.newBuilder()
@@ -522,7 +525,8 @@ public class PipelineInterpreter implements MessageProcessor {
 
         public interface Factory {
             State newState(ImmutableMap<String, Pipeline> currentPipelines,
-                           ImmutableSetMultimap<String, Pipeline> streamPipelineConnections);
+                           ImmutableSetMultimap<String, Pipeline> streamPipelineConnections,
+                           @Nullable ClassLoader commonClassLoader);
         }
     }
 }

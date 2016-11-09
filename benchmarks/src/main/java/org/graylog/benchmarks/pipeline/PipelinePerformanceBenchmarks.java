@@ -54,6 +54,7 @@ import org.graylog.plugins.pipelineprocessor.db.RuleService;
 import org.graylog.plugins.pipelineprocessor.db.memory.InMemoryServicesModule;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
+import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnections;
 import org.graylog2.database.NotFoundException;
@@ -303,7 +304,7 @@ public class PipelinePerformanceBenchmarks {
             metricRegistry = metrics;
 
             // toggle code generation
-            PipelineRuleParser.setAllowCodeGeneration(Boolean.valueOf(codeGenerator));
+            ConfigurationStateUpdater.setAllowCodeGeneration(Boolean.valueOf(codeGenerator));
             interpreter = injector.getInstance(PipelineInterpreter.class);
         }
 

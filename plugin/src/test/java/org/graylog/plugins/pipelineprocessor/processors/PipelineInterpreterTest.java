@@ -116,7 +116,8 @@ public class PipelineInterpreterTest {
                 functionRegistry,
                 Executors.newScheduledThreadPool(1),
                 mock(EventBus.class),
-                (currentPipelines, streamPipelineConnections) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, new MetricRegistry(), 1, true));
+                (currentPipelines, streamPipelineConnections, classLoader) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, null, new MetricRegistry(), 1, true),
+                false);
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(Journal.class),
                 new MetricRegistry(),
@@ -175,7 +176,8 @@ public class PipelineInterpreterTest {
                 metricRegistry,
                 functionRegistry,
                 Executors.newScheduledThreadPool(1),
-                mock(EventBus.class), (currentPipelines, streamPipelineConnections) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, new MetricRegistry(), 1, true));
+                mock(EventBus.class), (currentPipelines, streamPipelineConnections, commonClassLoader) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, null, new MetricRegistry(), 1, true),
+                false);
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(Journal.class),
                 metricRegistry,

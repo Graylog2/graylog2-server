@@ -20,6 +20,6 @@ public class CodegenPipelineRuleParserTest extends PipelineRuleParserTest {
 
     // runs the same tests as in PipelineRuleParserTest but with dynamic code generation turned on.
     public CodegenPipelineRuleParserTest() {
-        PipelineRuleParser.setAllowCodeGeneration(true);
+        classLoader = new ClassLoader(){};
     }
 }

@@ -67,12 +67,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
-import javax.inject.Inject;
 import javax.lang.model.element.Modifier;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -87,13 +85,11 @@ public class CodeGenerator {
     }
 
     @SuppressWarnings("unchecked")
-    public Class<? extends GeneratedRule> generateCompiledRule(Rule rule) {
+    public Class<? extends GeneratedRule> generateCompiledRule(Rule rule, ClassLoader ruleClassloader) {
         if (rule.id() == null) {
             throw new IllegalArgumentException("Rules must have an id to generate code for them");
         }
         final String sourceCode = sourceCodeForRule(rule);
-        ClassLoader ruleClassloader = new ClassLoader() {
-        };
         try {
             log.info("Sourcecode:\n{}", sourceCode);
             return (Class<GeneratedRule>) CompilerUtils.CACHED_COMPILER.loadFromJava(ruleClassloader, "org.graylog.plugins.pipelineprocessor.$dynamic.rules.rule$" + rule.id() , sourceCode);

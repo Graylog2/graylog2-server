@@ -55,6 +55,7 @@ public class ConfigurationStateUpdater {
      * non-null if the update has successfully loaded a state
      */
     private PipelineInterpreter.State latestState;
+    private static boolean allowCodeGeneration = false;
 
     @Inject
     public ConfigurationStateUpdater(RuleService ruleService,
@@ -65,7 +66,8 @@ public class ConfigurationStateUpdater {
                                      FunctionRegistry functionRegistry,
                                      @Named("daemonScheduler") ScheduledExecutorService scheduler,
                                      EventBus serverEventBus,
-                                     PipelineInterpreter.State.Factory stateFactory) {
+                                     PipelineInterpreter.State.Factory stateFactory,
+                                     @Named("generate_native_code") boolean allowCodeGeneration) {
         this.ruleService = ruleService;
         this.pipelineService = pipelineService;
         this.pipelineStreamConnectionsService = pipelineStreamConnectionsService;
@@ -75,12 +77,22 @@ public class ConfigurationStateUpdater {
         this.scheduler = scheduler;
         this.serverEventBus = serverEventBus;
         this.stateFactory = stateFactory;
+        // from global config
+        setAllowCodeGeneration(allowCodeGeneration);
 
         // listens to cluster wide Rule, Pipeline and pipeline stream connection changes
         serverEventBus.register(this);
 
         // eagerly propagate initial state
         serverEventBus.post(reloadAndSave());
+    }
+
+    public static void setAllowCodeGeneration(Boolean allowCodeGeneration) {
+        ConfigurationStateUpdater.allowCodeGeneration = allowCodeGeneration;
+    }
+
+    public static boolean isAllowCodeGeneration() {
+        return allowCodeGeneration;
     }
 
     // only the singleton instance should mutate itself, others are welcome to reload a new state, but we don't
@@ -92,12 +104,15 @@ public class ConfigurationStateUpdater {
 
     // this should not run in parallel to avoid useless database traffic
     public synchronized PipelineInterpreter.State reload() {
+        // this classloader will hold all generated rule classes
+        ClassLoader commonClassLoader = allowCodeGeneration ? new ClassLoader() {} : null;
+
         // read all rules and parse them
         Map<String, Rule> ruleNameMap = Maps.newHashMap();
         ruleService.loadAll().forEach(ruleDao -> {
             Rule rule;
             try {
-                rule = pipelineRuleParser.parseRule(ruleDao.id(), ruleDao.source(), false);
+                rule = pipelineRuleParser.parseRule(ruleDao.id(), ruleDao.source(), false, commonClassLoader);
             } catch (ParseException e) {
                 rule = Rule.alwaysFalse("Failed to parse rule: " + ruleDao.id());
             }
@@ -129,7 +144,7 @@ public class ConfigurationStateUpdater {
         }
         ImmutableSetMultimap<String, Pipeline> streamPipelineConnections = ImmutableSetMultimap.copyOf(connections);
 
-        return stateFactory.newState(currentPipelines, streamPipelineConnections);
+        return stateFactory.newState(currentPipelines, streamPipelineConnections, commonClassLoader);
     }
 
     /**
