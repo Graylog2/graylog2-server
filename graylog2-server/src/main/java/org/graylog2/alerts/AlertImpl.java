@@ -97,11 +97,12 @@ public abstract class AlertImpl implements Alert {
                                    @JsonProperty(FIELD_STREAM_ID) String streamId,
                                    @JsonProperty(FIELD_CONDITION_ID) String conditionId,
                                    @JsonProperty(FIELD_TRIGGERED_AT) Date triggeredAtDate,
-                                   @JsonProperty(FIELD_RESOLVED_AT) Date resolvedAtDate,
+                                   @JsonProperty(FIELD_RESOLVED_AT) @Nullable Date resolvedAtDate,
                                    @JsonProperty(FIELD_DESCRIPTION) String description,
                                    @JsonProperty(FIELD_CONDITION_PARAMETERS) Map<String, Object> conditionParameters,
                                    @JsonProperty(FIELD_IS_INTERVAL) boolean isInterval) {
         final DateTime triggeredAt = new DateTime(triggeredAtDate);
+        // We need to ensure that Alerts with a non-existing or null resolvedAt do not set the field to the current time.
         final DateTime resolvedAt = resolvedAtDate == null ? null : new DateTime(resolvedAtDate);
         return create(id, streamId, conditionId, triggeredAt, resolvedAt, description, conditionParameters, isInterval);
     }
