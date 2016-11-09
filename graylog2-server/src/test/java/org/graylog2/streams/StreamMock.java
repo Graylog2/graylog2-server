@@ -20,6 +20,7 @@ package org.graylog2.streams;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
@@ -202,5 +203,10 @@ public class StreamMock implements Stream {
     @Override
     public int hashCode() {
         return Objects.hash(id, title, description, streamRules, matchingType, defaultStream);
+    }
+
+    @Override
+    public Set<IndexSet> getIndexSets() {
+        return Collections.emptySet();
     }
 }

@@ -17,6 +17,7 @@
 package org.graylog2.plugin.streams;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.database.Persisted;
 
 import java.util.List;
@@ -73,4 +74,6 @@ public interface Stream extends Persisted {
     boolean isDefaultStream();
 
     void setDefaultStream(boolean defaultStream);
+
+    Set<IndexSet> getIndexSets();
 }

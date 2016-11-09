@@ -74,7 +74,7 @@ public class DefaultStreamMigrationPeriodical extends Periodical {
                 .put(StreamImpl.FIELD_MATCHING_TYPE, StreamImpl.MatchingType.DEFAULT.name())
                 .put(StreamImpl.FIELD_DEFAULT_STREAM, true)
                 .build();
-        final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet());
+        final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), Collections.emptySet());
         final StreamRule streamRule = new StreamRuleImpl(
                 ImmutableMap.<String, Object>builder()
                         .put(StreamRuleImpl.FIELD_TYPE, StreamRuleType.ALWAYS_MATCH.getValue())

@@ -74,7 +74,7 @@ public class StreamListFingerprintTest {
         final HashMap<String, Object> fields = Maps.newHashMap();
         fields.put(StreamImpl.FIELD_TITLE, title);
         return new StreamImpl(new ObjectId(String.format(Locale.ENGLISH, "%024d", id)), fields, Lists.newArrayList(rules), Sets.newHashSet(
-                outputs));
+                outputs), Collections.emptySet());
     }
 
     private static StreamRule makeStreamRule(int id, String field) {
