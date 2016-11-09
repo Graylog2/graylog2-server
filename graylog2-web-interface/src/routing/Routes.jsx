@@ -45,6 +45,7 @@ const Routes = {
   STARTPAGE: '/',
   SEARCH: '/search',
   STREAMS: '/streams',
+  ALERTS: '/alerts',
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   GETTING_STARTED: '/gettingstarted',

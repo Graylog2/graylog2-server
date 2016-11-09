@@ -1,7 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
-import LinkedStateMixin from 'react-addons-linked-state-mixin';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const AlertsActions = ActionsProvider.getActions('Alerts');
@@ -13,18 +12,14 @@ import { PaginatedList, Spinner } from 'components/common';
 import AlertsTable from 'components/alerts/AlertsTable';
 
 const AlertsComponent = React.createClass({
-  propTypes: {
-    streamId: React.PropTypes.string.isRequired,
-  },
-
-  mixins: [LinkedStateMixin, Reflux.connect(AlertsStore)],
+  mixins: [Reflux.connect(AlertsStore)],
 
   componentDidMount() {
     this.loadData(1, 10);
   },
 
   loadData(pageNo, limit) {
-    AlertsActions.listPaginated(this.props.streamId, (pageNo - 1) * limit, limit);
+    AlertsActions.listAllPaginated((pageNo - 1) * limit, limit);
   },
 
   _onChangePaginatedList(page, size) {
@@ -48,18 +43,16 @@ const AlertsComponent = React.createClass({
     }
 
     return (
-      <Row className="content triggered-alerts">
-        <Col md={12}>
-          <h2>
-            Triggered alerts
-            {triggeredAlertsText}
-          </h2>
+      <div>
+        <h2>
+          Triggered alerts
+          {triggeredAlertsText}
+        </h2>
 
-          <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}>
-            <AlertsTable alerts={this.state.alerts.alerts} />
-          </PaginatedList>
-        </Col>
-      </Row>
+        <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}>
+          <AlertsTable alerts={this.state.alerts.alerts} />
+        </PaginatedList>
+      </div>
     );
   },
 });
