@@ -225,7 +225,7 @@ public class PipelineInterpreterTest {
 
     private PipelineRuleParser setupParser(Map<String, Function<?>> functions) {
         final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
-        return new PipelineRuleParser(functionRegistry, new CodeGenerator(functionRegistry));
+        return new PipelineRuleParser(functionRegistry, new CodeGenerator());
     }
 
     private Message messageInDefaultStream(String message, String source) {

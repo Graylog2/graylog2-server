@@ -97,6 +97,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
+import java.util.concurrent.atomic.AtomicLong;
 
 import javax.inject.Inject;
 
@@ -110,6 +111,7 @@ public class PipelineRuleParser {
     private final CodeGenerator codeGenerator;
 
     private static boolean allowCodeGeneration = false;
+    private static AtomicLong uniqueId = new AtomicLong(0);
 
     @Inject
     public PipelineRuleParser(FunctionRegistry functionRegistry, CodeGenerator codeGenerator) {
@@ -130,7 +132,7 @@ public class PipelineRuleParser {
 
 
     public Rule parseRule(String rule, boolean silent) throws ParseException {
-        return parseRule(null, rule, silent);
+        return parseRule("dummy" + uniqueId.getAndIncrement(), rule, silent);
     }
 
     public Rule parseRule(String id, String rule, boolean silent) throws ParseException {

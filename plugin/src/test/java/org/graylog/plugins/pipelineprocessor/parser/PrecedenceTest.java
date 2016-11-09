@@ -127,7 +127,7 @@ public class PrecedenceTest extends BaseParserTest {
     }
 
     private static Rule parseRule(String rule) {
-        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry, new CodeGenerator(functionRegistry));
+        final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry, new CodeGenerator());
         return parser.parseRule(rule, true);
     }
 }

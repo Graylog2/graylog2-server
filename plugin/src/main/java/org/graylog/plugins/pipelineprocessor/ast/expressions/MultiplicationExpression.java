@@ -84,6 +84,10 @@ public class MultiplicationExpression extends BinaryExpression implements Numeri
         }
     }
 
+    public char getOperator() {
+        return operator;
+    }
+
     @Override
     public Class getType() {
         return type;

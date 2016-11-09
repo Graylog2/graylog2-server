@@ -67,4 +67,7 @@ public class SignedExpression extends UnaryExpression implements NumericExpressi
         return (isPlus ? " + " : " - ") + right.toString();
     }
 
+    public boolean isPlus() {
+        return isPlus;
+    }
 }

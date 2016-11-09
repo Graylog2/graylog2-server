@@ -3,10 +3,12 @@ package org.graylog.plugins.pipelineprocessor.codegen;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.primitives.Ints;
 import com.google.common.primitives.Primitives;
 
 import com.squareup.javapoet.AnnotationSpec;
@@ -27,20 +29,26 @@ import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.RuleAstBaseListener;
 import org.graylog.plugins.pipelineprocessor.ast.RuleAstWalker;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.AdditionExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.AndExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ArrayLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.BooleanValuedFunctionWrapper;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ComparisonExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.ConstantExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.DoubleExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.EqualityExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.Expression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldAccessExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FieldRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.FunctionExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.IndexedAccessExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.LongExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.MapLiteralExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.MessageRefExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.MultiplicationExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.NotExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.OrExpression;
+import org.graylog.plugins.pipelineprocessor.ast.expressions.SignedExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.StringExpression;
 import org.graylog.plugins.pipelineprocessor.ast.expressions.VarRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -71,13 +79,6 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class CodeGenerator {
     private static final Logger log = LoggerFactory.getLogger(CodeGenerator.class);
-    private static AtomicLong ruleNameCounter = new AtomicLong();
-    private final FunctionRegistry functionRegistry;
-
-    @Inject
-    public CodeGenerator(FunctionRegistry functionRegistry) {
-        this.functionRegistry = functionRegistry;
-    }
 
     public static String sourceCodeForRule(Rule rule) {
         final JavaPoetListener javaPoetListener = new JavaPoetListener();
@@ -94,9 +95,11 @@ public class CodeGenerator {
         ClassLoader ruleClassloader = new ClassLoader() {
         };
         try {
+            log.info("Sourcecode:\n{}", sourceCode);
             return (Class<GeneratedRule>) CompilerUtils.CACHED_COMPILER.loadFromJava(ruleClassloader, "org.graylog.plugins.pipelineprocessor.$dynamic.rules.rule$" + rule.id() , sourceCode);
         } catch (ClassNotFoundException e) {
-            return null;
+            log.error("Unable to compile code\n{}", sourceCode);
+            throw new RuntimeException(e);
         }
 
     }
@@ -459,6 +462,18 @@ public class CodeGenerator {
         }
 
         @Override
+        public void exitLong(LongExpression expr) {
+            // long needs a suffix
+            codeSnippet.putIfAbsent(expr, CodeBlock.of("$LL", expr.evaluateUnsafe()));
+        }
+
+        @Override
+        public void exitDouble(DoubleExpression expr) {
+            // double should have a suffix
+            codeSnippet.putIfAbsent(expr, CodeBlock.of("$Ld", expr.evaluateUnsafe()));
+        }
+
+        @Override
         public void exitMessageRef(MessageRefExpression expr) {
             final Object field = blockOrMissing(codeSnippet.get(expr.getFieldExpr()), expr.getFieldExpr());
 
@@ -470,26 +485,13 @@ public class CodeGenerator {
             final Object value = blockOrMissing(codeSnippet.get(assign.getValueExpression()), assign.getValueExpression());
             final Class type = assign.getValueExpression().getType();
 
-            // potentially annotate the value with the type width, if we assign a constant
-            String suffix = "";
-            final boolean constantValue = assign.getValueExpression().isConstant();
-            if (constantValue) {
-                if (type.equals(Long.class)) {
-                    suffix = "L";
-                } else if (type.equals(Double.class)) {
-                    suffix = "D";
-                }
-            }
             // always hoist declaration
             hoistedExpressionMembers.add(FieldSpec.builder(type, "var$" + assign.getName(), Modifier.PRIVATE).build());
             if (assign.getValueExpression().isConstant()) {
                 // also hoist the assignment
-                hoistedConstantExpressions.addStatement("var$$$L = $L" + suffix,
-                        assign.getName(), value);
+                hoistedConstantExpressions.addStatement("var$$$L = $L", assign.getName(), value);
             } else {
-                currentMethod.addStatement("var$$$L = $L" + suffix,
-                        assign.getName(),
-                        value);
+                currentMethod.addStatement("var$$$L = $L", assign.getName(), value);
             }
         }
 
@@ -552,6 +554,64 @@ public class CodeGenerator {
                 currentMethod.addStatement("$T " + assignmentFormat, args.toArray());
             }
             codeSnippet.putIfAbsent(expr, CodeBlock.of("$L", listName));
+        }
+
+        @Override
+        public void exitAddition(AdditionExpression expr) {
+            final Object leftBlock = blockOrMissing(codeSnippet.get(expr.left()), expr.left());
+            final Object rightBlock = blockOrMissing(codeSnippet.get(expr.right()), expr.right());
+
+            codeSnippet.putIfAbsent(expr,
+                    CodeBlock.of("$L " + (expr.isPlus() ? "+" : "-") + " $L", leftBlock, rightBlock));
+        }
+
+        @Override
+        public void exitMultiplication(MultiplicationExpression expr) {
+            final Object leftBlock = blockOrMissing(codeSnippet.get(expr.left()), expr.left());
+            final Object rightBlock = blockOrMissing(codeSnippet.get(expr.right()), expr.right());
+
+            codeSnippet.putIfAbsent(expr,
+                    CodeBlock.of("$L " + expr.getOperator() + " $L", leftBlock, rightBlock));
+        }
+
+        @Override
+        public void exitSigned(SignedExpression expr) {
+            final Object rightBlock = blockOrMissing(codeSnippet.get(expr.right()), expr.right());
+            codeSnippet.putIfAbsent(expr, CodeBlock.of((expr.isPlus() ? "+" : "-") + "$L", rightBlock));
+        }
+
+        @Override
+        public void exitIndexedAccess(IndexedAccessExpression expr) {
+            final Expression indexableObject = expr.getIndexableObject();
+            final Expression index = expr.getIndex();
+
+            final Object objectBlock = blockOrMissing(codeSnippet.get(indexableObject), indexableObject);
+            final Object indexBlock = blockOrMissing(codeSnippet.get(index), index);
+
+            final Class indexType = index.getType();
+            final Class indexableObjectType = indexableObject.getType();
+            CodeBlock block;
+            if (Long.class.equals(indexType)) {
+                // array indexing
+                if (indexableObjectType.isArray()) {
+                    block = CodeBlock.of("Arrays.get($L, $L)", objectBlock, indexBlock);
+                } else if (List.class.isAssignableFrom(indexableObjectType)) {
+                    block = CodeBlock.of("$L.get($T.saturatedCast($L))", objectBlock, ClassName.get(Ints.class), indexBlock);
+                } else if (Iterable.class.isAssignableFrom(indexableObjectType)) {
+                    block = CodeBlock.of("$T.get($L, $L)", ClassName.get(Iterables.class), objectBlock, indexBlock);
+                } else {
+                    log.error("Unhandled indexable object type: {}", indexableObject);
+                    block = null;
+                }
+            } else if (String.class.equals(indexType) && Map.class.isAssignableFrom(indexableObjectType)) {
+                // map indexing
+                block = CodeBlock.of("$L.get($L)", objectBlock, indexBlock);
+            } else {
+                // illegal
+                log.error("Invalid index type: {}", index);
+                block = null;
+            }
+            codeSnippet.putIfAbsent(expr, block);
         }
 
         @Nonnull

@@ -73,215 +73,22 @@ public class PipelineRuleParserTest extends BaseParserTest {
     @BeforeClass
     public static void registerFunctions() {
         final Map<String, Function<?>> functions = commonFunctions();
-        functions.put("nein", new AbstractFunction<Boolean>() {
-            @Override
-            public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-                return false;
-            }
-
-            @Override
-            public FunctionDescriptor<Boolean> descriptor() {
-                return FunctionDescriptor.<Boolean>builder()
-                        .name("nein")
-                        .returnType(Boolean.class)
-                        .params(of())
-                        .build();
-            }
-        });
-        functions.put("doch", new AbstractFunction<Boolean>() {
-            @Override
-            public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-                return true;
-            }
-
-            @Override
-            public FunctionDescriptor<Boolean> descriptor() {
-                return FunctionDescriptor.<Boolean>builder()
-                        .name("doch")
-                        .returnType(Boolean.class)
-                        .params(of())
-                        .build();
-            }
-        });
-        functions.put("double_valued_func", new AbstractFunction<Double>() {
-            @Override
-            public Double evaluate(FunctionArgs args, EvaluationContext context) {
-                return 0d;
-            }
-
-            @Override
-            public FunctionDescriptor<Double> descriptor() {
-                return FunctionDescriptor.<Double>builder()
-                        .name("double_valued_func")
-                        .returnType(Double.class)
-                        .params(of())
-                        .build();
-            }
-        });
-        functions.put("one_arg", new AbstractFunction<String>() {
-
-            private final ParameterDescriptor<String, String> one = ParameterDescriptor.string("one").build();
-
-            @Override
-            public String evaluate(FunctionArgs args, EvaluationContext context) {
-                return one.optional(args, context).orElse("");
-            }
-
-            @Override
-            public FunctionDescriptor<String> descriptor() {
-                return FunctionDescriptor.<String>builder()
-                        .name("one_arg")
-                        .returnType(String.class)
-                        .params(of(one))
-                        .build();
-            }
-        });
-        functions.put("concat", new AbstractFunction<String>() {
-
-            private final ParameterDescriptor<Object, Object> three = ParameterDescriptor.object("three").build();
-            private final ParameterDescriptor<Object, Object> two = ParameterDescriptor.object("two").build();
-            private final ParameterDescriptor<String, String> one = ParameterDescriptor.string("one").build();
-
-            @Override
-            public String evaluate(FunctionArgs args, EvaluationContext context) {
-                final Object one = this.one.optional(args, context).orElse("");
-                final Object two = this.two.optional(args, context).orElse("");
-                final Object three = this.three.optional(args, context).orElse("");
-                return one.toString() + two.toString() + three.toString();
-            }
-
-            @Override
-            public FunctionDescriptor<String> descriptor() {
-                return FunctionDescriptor.<String>builder()
-                        .name("concat")
-                        .returnType(String.class)
-                        .params(of(
-                                one,
-                                two,
-                                three
-                        ))
-                        .build();
-            }
-        });
-        functions.put("trigger_test", new AbstractFunction<Void>() {
-            @Override
-            public Void evaluate(FunctionArgs args, EvaluationContext context) {
-                actionsTriggered.set(true);
-                return null;
-            }
-
-            @Override
-            public FunctionDescriptor<Void> descriptor() {
-                return FunctionDescriptor.<Void>builder()
-                        .name("trigger_test")
-                        .returnType(Void.class)
-                        .params(of())
-                        .build();
-            }
-        });
-        functions.put("optional", new AbstractFunction<Boolean>() {
-            @Override
-            public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-                return true;
-            }
-
-            @Override
-            public FunctionDescriptor<Boolean> descriptor() {
-                return FunctionDescriptor.<Boolean>builder()
-                        .name("optional")
-                        .returnType(Boolean.class)
-                        .params(of(
-                                ParameterDescriptor.bool("a").build(),
-                                ParameterDescriptor.string("b").build(),
-                                ParameterDescriptor.floating("c").optional().build(),
-                                ParameterDescriptor.integer("d").build()
-                        ))
-                        .build();
-            }
-        });
-        functions.put("customObject", new AbstractFunction<CustomObject>() {
-
-            private final ParameterDescriptor<String, String> aDefault = ParameterDescriptor.string("default").build();
-
-            @Override
-            public CustomObject evaluate(FunctionArgs args, EvaluationContext context) {
-                return new CustomObject(aDefault.optional(args, context).orElse(""));
-            }
-
-            @Override
-            public FunctionDescriptor<CustomObject> descriptor() {
-                return FunctionDescriptor.<CustomObject>builder()
-                        .name("customObject")
-                        .returnType(CustomObject.class)
-                        .params(of(aDefault))
-                        .build();
-            }
-        });
-        functions.put("keys", new AbstractFunction<List>() {
-
-            private final ParameterDescriptor<Map, Map> map = ParameterDescriptor.type("map", Map.class).build();
-
-            @Override
-            public List evaluate(FunctionArgs args, EvaluationContext context) {
-                final Optional<Map> map = this.map.optional(args, context);
-                return Lists.newArrayList(map.orElse(Collections.emptyMap()).keySet());
-            }
-
-            @Override
-            public FunctionDescriptor<List> descriptor() {
-                return FunctionDescriptor.<List>builder()
-                        .name("keys")
-                        .returnType(List.class)
-                        .params(of(map))
-                        .build();
-            }
-        });
-        functions.put("sort", new AbstractFunction<Collection>() {
-
-            private final ParameterDescriptor<Collection, Collection> collection = ParameterDescriptor.type("collection",
-                                                                                                            Collection.class).build();
-
-            @Override
-            public Collection evaluate(FunctionArgs args, EvaluationContext context) {
-                final Collection collection = this.collection.optional(args, context).orElse(Collections.emptyList());
-                return Ordering.natural().sortedCopy(collection);
-            }
-
-            @Override
-            public FunctionDescriptor<Collection> descriptor() {
-                return FunctionDescriptor.<Collection>builder()
-                        .name("sort")
-                        .returnType(Collection.class)
-                        .params(of(collection))
-                        .build();
-            }
-        });
+        functions.put("nein", new NeinFunction());
+        functions.put("doch", new DochFunction());
+        functions.put("double_valued_func", new DoubleValuedFunction());
+        functions.put("one_arg", new OneArgFunction());
+        functions.put("concat", new ConcatFunction());
+        functions.put("trigger_test", new TriggerTestFunction());
+        functions.put("optional", new OptionalFunction());
+        functions.put("customObject", new CustomObjectFunction());
+        functions.put("keys", new KeysFunction());
+        functions.put("sort", new SortFunction());
         functions.put(LongConversion.NAME, new LongConversion());
         functions.put(StringConversion.NAME, new StringConversion());
         functions.put(SetField.NAME, new SetField());
         functions.put(HasField.NAME, new HasField());
         functions.put(RegexMatch.NAME, new RegexMatch());
-        functions.put("now_in_tz", new TimezoneAwareFunction() {
-            @Override
-            protected DateTime evaluate(FunctionArgs args, EvaluationContext context, DateTimeZone timezone) {
-                return DateTime.now(timezone);
-            }
-
-            @Override
-            protected String description() {
-                return "Now in the given timezone";
-            }
-
-            @Override
-            protected String getName() {
-                return "now_in_tz";
-            }
-
-            @Override
-            protected ImmutableList<ParameterDescriptor> params() {
-                return ImmutableList.of();
-            }
-        });
+        functions.put("now_in_tz", new NowInTimezoneFunction());
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -544,6 +351,221 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
         public String getId() {
             return id;
+        }
+    }
+
+    public static class NeinFunction extends AbstractFunction<Boolean> {
+        @Override
+        public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
+            return false;
+        }
+
+        @Override
+        public FunctionDescriptor<Boolean> descriptor() {
+            return FunctionDescriptor.<Boolean>builder()
+                    .name("nein")
+                    .returnType(Boolean.class)
+                    .params(of())
+                    .build();
+        }
+    }
+
+    public static class DochFunction extends AbstractFunction<Boolean> {
+        @Override
+        public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
+            return true;
+        }
+
+        @Override
+        public FunctionDescriptor<Boolean> descriptor() {
+            return FunctionDescriptor.<Boolean>builder()
+                    .name("doch")
+                    .returnType(Boolean.class)
+                    .params(of())
+                    .build();
+        }
+    }
+
+    public static class DoubleValuedFunction extends AbstractFunction<Double> {
+        @Override
+        public Double evaluate(FunctionArgs args, EvaluationContext context) {
+            return 0d;
+        }
+
+        @Override
+        public FunctionDescriptor<Double> descriptor() {
+            return FunctionDescriptor.<Double>builder()
+                    .name("double_valued_func")
+                    .returnType(Double.class)
+                    .params(of())
+                    .build();
+        }
+    }
+
+    public static class OneArgFunction extends AbstractFunction<String> {
+
+        private final ParameterDescriptor<String, String> one = ParameterDescriptor.string("one").build();
+
+        @Override
+        public String evaluate(FunctionArgs args, EvaluationContext context) {
+            return one.optional(args, context).orElse("");
+        }
+
+        @Override
+        public FunctionDescriptor<String> descriptor() {
+            return FunctionDescriptor.<String>builder()
+                    .name("one_arg")
+                    .returnType(String.class)
+                    .params(of(one))
+                    .build();
+        }
+    }
+
+    public static class ConcatFunction extends AbstractFunction<String> {
+
+        private final ParameterDescriptor<Object, Object> three = ParameterDescriptor.object("three").build();
+        private final ParameterDescriptor<Object, Object> two = ParameterDescriptor.object("two").build();
+        private final ParameterDescriptor<String, String> one = ParameterDescriptor.string("one").build();
+
+        @Override
+        public String evaluate(FunctionArgs args, EvaluationContext context) {
+            final Object one = this.one.optional(args, context).orElse("");
+            final Object two = this.two.optional(args, context).orElse("");
+            final Object three = this.three.optional(args, context).orElse("");
+            return one.toString() + two.toString() + three.toString();
+        }
+
+        @Override
+        public FunctionDescriptor<String> descriptor() {
+            return FunctionDescriptor.<String>builder()
+                    .name("concat")
+                    .returnType(String.class)
+                    .params(of(
+                            one,
+                            two,
+                            three
+                    ))
+                    .build();
+        }
+    }
+
+    public static class TriggerTestFunction extends AbstractFunction<Void> {
+        @Override
+        public Void evaluate(FunctionArgs args, EvaluationContext context) {
+            actionsTriggered.set(true);
+            return null;
+        }
+
+        @Override
+        public FunctionDescriptor<Void> descriptor() {
+            return FunctionDescriptor.<Void>builder()
+                    .name("trigger_test")
+                    .returnType(Void.class)
+                    .params(of())
+                    .build();
+        }
+    }
+
+    public static class OptionalFunction extends AbstractFunction<Boolean> {
+        @Override
+        public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
+            return true;
+        }
+
+        @Override
+        public FunctionDescriptor<Boolean> descriptor() {
+            return FunctionDescriptor.<Boolean>builder()
+                    .name("optional")
+                    .returnType(Boolean.class)
+                    .params(of(
+                            ParameterDescriptor.bool("a").build(),
+                            ParameterDescriptor.string("b").build(),
+                            ParameterDescriptor.floating("c").optional().build(),
+                            ParameterDescriptor.integer("d").build()
+                    ))
+                    .build();
+        }
+    }
+
+    public static class CustomObjectFunction extends AbstractFunction<CustomObject> {
+
+        private final ParameterDescriptor<String, String> aDefault = ParameterDescriptor.string("default").build();
+
+        @Override
+        public CustomObject evaluate(FunctionArgs args, EvaluationContext context) {
+            return new CustomObject(aDefault.optional(args, context).orElse(""));
+        }
+
+        @Override
+        public FunctionDescriptor<CustomObject> descriptor() {
+            return FunctionDescriptor.<CustomObject>builder()
+                    .name("customObject")
+                    .returnType(CustomObject.class)
+                    .params(of(aDefault))
+                    .build();
+        }
+    }
+
+    public static class KeysFunction extends AbstractFunction<List> {
+
+        private final ParameterDescriptor<Map, Map> map = ParameterDescriptor.type("map", Map.class).build();
+
+        @Override
+        public List evaluate(FunctionArgs args, EvaluationContext context) {
+            final Optional<Map> map = this.map.optional(args, context);
+            return Lists.newArrayList(map.orElse(Collections.emptyMap()).keySet());
+        }
+
+        @Override
+        public FunctionDescriptor<List> descriptor() {
+            return FunctionDescriptor.<List>builder()
+                    .name("keys")
+                    .returnType(List.class)
+                    .params(of(map))
+                    .build();
+        }
+    }
+
+    public static class SortFunction extends AbstractFunction<Collection> {
+
+        private final ParameterDescriptor<Collection, Collection> collection = ParameterDescriptor.type("collection",
+                                                                                                        Collection.class).build();
+
+        @Override
+        public Collection evaluate(FunctionArgs args, EvaluationContext context) {
+            final Collection collection = this.collection.optional(args, context).orElse(Collections.emptyList());
+            return Ordering.natural().sortedCopy(collection);
+        }
+
+        @Override
+        public FunctionDescriptor<Collection> descriptor() {
+            return FunctionDescriptor.<Collection>builder()
+                    .name("sort")
+                    .returnType(Collection.class)
+                    .params(of(collection))
+                    .build();
+        }
+    }
+
+    public static class NowInTimezoneFunction extends TimezoneAwareFunction {
+        @Override
+        protected DateTime evaluate(FunctionArgs args, EvaluationContext context, DateTimeZone timezone) {
+            return DateTime.now(timezone);
+        }
+
+        @Override
+        protected String description() {
+            return "Now in the given timezone";
+        }
+
+        @Override
+        protected String getName() {
+            return "now_in_tz";
+        }
+
+        @Override
+        protected ImmutableList<ParameterDescriptor> params() {
+            return ImmutableList.of();
         }
     }
 }

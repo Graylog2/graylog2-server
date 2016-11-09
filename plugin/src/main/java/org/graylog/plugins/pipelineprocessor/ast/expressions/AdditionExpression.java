@@ -72,6 +72,10 @@ public class AdditionExpression extends BinaryExpression implements NumericExpre
         }
     }
 
+    public boolean isPlus() {
+        return isPlus;
+    }
+
     @Override
     public Class getType() {
         return type;
