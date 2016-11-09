@@ -1,0 +1,222 @@
+/**
+ * This file is part of Graylog.
+ *
+ * Graylog is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Graylog is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
+ */
+package org.graylog2.indexer;
+
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
+import org.graylog2.audit.AuditEventSender;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
+import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.plugin.system.NodeId;
+import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.system.jobs.SystemJobManager;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
+
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+public class MongoIndexSetTest {
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    @Mock
+    private Indices indices;
+    @Mock
+    private AuditEventSender auditEventSender;
+    @Mock
+    private NodeId nodeId;
+    @Mock
+    private IndexRangeService indexRangeService;
+    @Mock
+    private SystemJobManager systemJobManager;
+    @Mock
+    private SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory;
+    @Mock
+    private ActivityWriter activityWriter;
+
+    private final IndexSetConfig config = IndexSetConfig.create(
+            "Test",
+            "Test",
+            "graylog",
+            1,
+            0,
+            MessageCountRotationStrategyConfig.createDefault(),
+            NoopRetentionStrategyConfig.createDefault(),
+            ZonedDateTime.of(2016, 11, 8, 0, 0, 0, 0, ZoneOffset.UTC)
+    );
+    private MongoIndexSet mongoIndexSet;
+
+    @Before
+    public void setUp() {
+        mongoIndexSet = new MongoIndexSet(config, indices, nodeId, auditEventSender, systemJobManager, jobFactory, activityWriter);
+    }
+
+    @Test
+    public void testExtractIndexNumber() {
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_0")).contains(0);
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_4")).contains(4);
+        assertThat(mongoIndexSet.extractIndexNumber("graylog_52")).contains(52);
+    }
+
+    @Test
+    public void testExtractIndexNumberWithMalformedFormatReturnsEmptyOptional() {
+        assertThat(mongoIndexSet.extractIndexNumber("graylog2_hunderttausend")).isEmpty();
+    }
+
+    @Test
+    public void testBuildIndexName() {
+        assertEquals("graylog_0", mongoIndexSet.buildIndexName(0));
+        assertEquals("graylog_1", mongoIndexSet.buildIndexName(1));
+        assertEquals("graylog_9001", mongoIndexSet.buildIndexName(9001));
+    }
+
+    @Test
+    public void nullIndexerDoesNotThrow() {
+        final Map<String, Set<String>> deflectorIndices = mongoIndexSet.getAllDeflectorAliases();
+        assertThat(deflectorIndices).isEmpty();
+    }
+
+    @Test
+    public void nullIndexerDoesNotThrowOnIndexName() {
+        final String[] indicesNames = mongoIndexSet.getManagedIndicesNames();
+        assertThat(indicesNames).isEmpty();
+    }
+
+    @Test
+    public void testIsDeflectorAlias() {
+        assertTrue(mongoIndexSet.isDeflectorAlias("graylog_deflector"));
+        assertFalse(mongoIndexSet.isDeflectorAlias("graylog_foobar"));
+        assertFalse(mongoIndexSet.isDeflectorAlias("graylog_123"));
+        assertFalse(mongoIndexSet.isDeflectorAlias("HAHA"));
+    }
+
+    @Test
+    public void testIsGraylogIndex() {
+        assertTrue(mongoIndexSet.isGraylogDeflectorIndex("graylog_1"));
+        assertTrue(mongoIndexSet.isManagedIndex("graylog_1"));
+
+        assertTrue(mongoIndexSet.isGraylogDeflectorIndex("graylog_42"));
+        assertTrue(mongoIndexSet.isManagedIndex("graylog_42"));
+
+        assertTrue(mongoIndexSet.isGraylogDeflectorIndex("graylog_100000000"));
+        assertTrue(mongoIndexSet.isManagedIndex("graylog_100000000"));
+
+        // The restored archive indices should NOT be taken into account when getting the new deflector number.
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_restored_archive"));
+        assertTrue(mongoIndexSet.isManagedIndex("graylog_42_restored_archive"));
+
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_restored_archive123"));
+        assertFalse(mongoIndexSet.isManagedIndex("graylog_42_restored_archive123"));
+
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_42_restored_archive_123"));
+        assertFalse(mongoIndexSet.isManagedIndex("graylog_42_restored_archive_123"));
+
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex(null));
+        assertFalse(mongoIndexSet.isManagedIndex(null));
+
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex(""));
+        assertFalse(mongoIndexSet.isManagedIndex(""));
+
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_deflector"));
+        assertFalse(mongoIndexSet.isManagedIndex("graylog_deflector"));
+
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog2beta_1"));
+        assertFalse(mongoIndexSet.isManagedIndex("graylog2beta_1"));
+
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("graylog_1_suffix"));
+        assertFalse(mongoIndexSet.isManagedIndex("graylog_1_suffix"));
+
+        assertFalse(mongoIndexSet.isGraylogDeflectorIndex("HAHA"));
+        assertFalse(mongoIndexSet.isManagedIndex("HAHA"));
+    }
+
+    @Test
+    public void getNewestTargetNumber() throws NoTargetIndexException {
+        final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
+                "graylog_1", Collections.emptySet(),
+                "graylog_2", Collections.emptySet(),
+                "graylog_3", Collections.singleton("graylog_deflector"),
+                "graylog_4_restored_archive", Collections.emptySet());
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, auditEventSender, systemJobManager, jobFactory, activityWriter);
+
+        final int number = mongoIndexSet.getNewestTargetNumber();
+        assertEquals(3, number);
+    }
+
+    @Test
+    public void getAllGraylogIndexNames() {
+        final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
+                "graylog_1", Collections.emptySet(),
+                "graylog_2", Collections.emptySet(),
+                "graylog_3", Collections.emptySet(),
+                "graylog_4_restored_archive", Collections.emptySet(),
+                "graylog_5", Collections.singleton("graylog_deflector"));
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, auditEventSender, systemJobManager, jobFactory, activityWriter);
+
+
+        final String[] allGraylogIndexNames = mongoIndexSet.getManagedIndicesNames();
+        assertThat(allGraylogIndexNames).containsExactlyElementsOf(indexNameAliases.keySet());
+    }
+
+    @Test
+    public void getAllGraylogDeflectorIndices() {
+        final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
+                "graylog_1", Collections.emptySet(),
+                "graylog_2", Collections.emptySet(),
+                "graylog_3", Collections.emptySet(),
+                "graylog_4_restored_archive", Collections.emptySet(),
+                "graylog_5", Collections.singleton("graylog_deflector"));
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final Map<String, Set<String>> deflectorIndices = mongoIndexSet.getAllDeflectorAliases();
+
+        assertThat(deflectorIndices).containsOnlyKeys("graylog_1", "graylog_2", "graylog_3", "graylog_5");
+    }
+
+    @Test
+    public void testCleanupAliases() throws Exception {
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        mongoIndexSet.cleanupAliases(ImmutableSet.of("graylog_2", "graylog_3", "foobar"));
+        verify(indices).removeAliases("graylog_deflector", ImmutableSet.of("graylog_2", "foobar"));
+    }
+}

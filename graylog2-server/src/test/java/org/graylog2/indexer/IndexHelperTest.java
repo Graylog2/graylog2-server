@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import org.elasticsearch.index.query.RangeQueryBuilder;
@@ -39,11 +40,15 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class IndexHelperTest {
@@ -65,25 +70,30 @@ public class IndexHelperTest {
 
     @Test
     public void testGetOldestIndices() {
-        final Set<String> indices = ImmutableSet.<String>builder()
-            .add("graylog2_production_1")
-            .add("graylog2_production_7")
-            .add("graylog2_production_0")
-            .add("graylog2_production_2")
-            .add("graylog2_production_4")
-            .add("graylog2_production_6")
-            .add("graylog2_production_3")
-            .add("graylog2_production_5")
-            .add("graylog2_production_8")
-            .add("graylog2_production_9")
-            .add("graylog2_production_10")
-            .add("graylog2_production_110")
-            .add("graylog2_production_125")
-            .add("graylog2_production_20")
-            .add("graylog2_production_21")
-            .build();
+        final Map<String, Integer> indexNumbers = ImmutableMap.<String, Integer>builder()
+                .put("graylog2_production_1", 1)
+                .put("graylog2_production_7",7)
+                .put("graylog2_production_0",0)
+                .put("graylog2_production_2",2)
+                .put("graylog2_production_4",4)
+                .put("graylog2_production_6",6)
+                .put("graylog2_production_3",3)
+                .put("graylog2_production_5",5)
+                .put("graylog2_production_8",8)
+                .put("graylog2_production_9",9)
+                .put("graylog2_production_10",10)
+                .put("graylog2_production_110",110)
+                .put("graylog2_production_125",125)
+                .put("graylog2_production_20",20)
+                .put("graylog2_production_21",21)
+                .build();
+        final Set<String> indices = ImmutableSet.copyOf(indexNumbers.keySet());
 
-        assertThat(IndexHelper.getOldestIndices(indices, 7)).containsOnly(
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSet.extractIndexNumber(anyString())).thenAnswer(
+                invocationOnMock -> Optional.ofNullable(indexNumbers.get(invocationOnMock.<String>getArgument(0))));
+
+        assertThat(IndexHelper.getOldestIndices(indexSet, indices, 7)).containsOnly(
             "graylog2_production_0",
             "graylog2_production_1",
             "graylog2_production_2",
@@ -91,12 +101,13 @@ public class IndexHelperTest {
             "graylog2_production_4",
             "graylog2_production_5",
             "graylog2_production_6");
-        assertThat(IndexHelper.getOldestIndices(indices, 1)).containsOnly("graylog2_production_0");
+        assertThat(IndexHelper.getOldestIndices(indexSet, indices, 1)).containsOnly("graylog2_production_0");
     }
 
     @Test
     public void testGetOldestIndicesWithEmptySetAndTooHighOffset() {
-        assertThat(IndexHelper.getOldestIndices(Collections.<String>emptySet(), 9001)).isEmpty();
+        final IndexSet indexSet = mock(IndexSet.class);
+        assertThat(IndexHelper.getOldestIndices(indexSet, Collections.emptySet(), 9001)).isEmpty();
     }
 
     @Test
@@ -112,7 +123,6 @@ public class IndexHelperTest {
             .build();
 
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
-        when(indexRangeService.get("graylog_2")).thenReturn(indexRangeLatest);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
         final TimeRange keywordRange = KeywordRange.create("1 day ago");
@@ -163,7 +173,6 @@ public class IndexHelperTest {
             .build();
 
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
-        when(indexRangeService.get("graylog_2")).thenReturn(indexRangeLatest);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
         final TimeRange keywordRange = KeywordRange.create("1 day ago");
