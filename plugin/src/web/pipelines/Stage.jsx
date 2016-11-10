@@ -63,7 +63,7 @@ const Stage = React.createClass({
   },
 
   _formatRules(stage, rules) {
-    const headers = ['Title', 'Description', 'Metrics', 'Errors'];
+    const headers = ['Title', 'Description', 'Throughput', 'Errors'];
 
     return (
       <DataTable id="processing-timeline"
