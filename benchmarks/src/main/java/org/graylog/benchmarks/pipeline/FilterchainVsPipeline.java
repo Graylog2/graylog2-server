@@ -136,7 +136,8 @@ public class FilterchainVsPipeline {
             functions.put(SetField.NAME, new SetField());
             functions.put(StringConversion.NAME, new StringConversion());
 
-            final PipelineRuleParser parser = setupParser(functions);
+            final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
+            final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry, new CodeGenerator());
 
             final MetricRegistry metricRegistry = new MetricRegistry();
             final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,
@@ -144,20 +145,17 @@ public class FilterchainVsPipeline {
                     pipelineStreamConnectionsService,
                     parser,
                     new MetricRegistry(),
+                    functionRegistry,
                     Executors.newScheduledThreadPool(1),
                     mock(EventBus.class),
-                    (currentPipelines, streamPipelineConnections) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, metricRegistry, 1, true));
+                    (currentPipelines, streamPipelineConnections, classLoader) -> new PipelineInterpreter.State(currentPipelines, streamPipelineConnections, null, metricRegistry, 1, true),
+                    false);
             interpreter = new PipelineInterpreter(
                     mock(Journal.class),
                     metricRegistry,
                     mock(EventBus.class),
                     stateUpdater
             );
-        }
-
-        private PipelineRuleParser setupParser(Map<String, org.graylog.plugins.pipelineprocessor.ast.functions.Function<?>> functions) {
-            final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
-            return new PipelineRuleParser(functionRegistry, new CodeGenerator(functionRegistry));
         }
 
     }
