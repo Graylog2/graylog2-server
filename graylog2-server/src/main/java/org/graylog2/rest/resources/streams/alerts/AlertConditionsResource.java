@@ -33,20 +33,21 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiresAuthentication
-@Api(value = "AlertConditions", description = "Available Alert Condition Types")
-@Path("/alerts/conditions/types")
-public class AvailableAlertConditionsResource extends RestResource {
+@Api(value = "AlertConditions", description = "Manage stream alert conditions")
+@Path("/alerts/conditions")
+@Produces(MediaType.APPLICATION_JSON)
+public class AlertConditionsResource extends RestResource {
     private final Map<String, AlertCondition.Factory> alertConditionTypesMap;
 
     @Inject
-    public AvailableAlertConditionsResource(Map<String, AlertCondition.Factory> alertConditionTypesMap) {
+    public AlertConditionsResource(Map<String, AlertCondition.Factory> alertConditionTypesMap) {
         this.alertConditionTypesMap = alertConditionTypesMap;
     }
 
     @GET
+    @Path("/types")
     @Timed
-    @ApiOperation(value = "Get a list of all alarm callback types")
-    @Produces(MediaType.APPLICATION_JSON)
+    @ApiOperation(value = "Get a list of all alert condition types")
     public Map<String, ConfigurableTypeInfo> available() {
         return this.alertConditionTypesMap
             .entrySet()
