@@ -72,10 +72,9 @@ public class SimulatorResource extends RestResource implements PluginRestResourc
         checkPermission(RestPermissions.STREAMS_READ, request.streamId());
 
         final Message message = new Message(request.message());
-        if (!request.streamId().equals("default")) {
-            final Stream stream = streamService.load(request.streamId());
-            message.addStream(stream);
-        }
+        final Stream stream = streamService.load(request.streamId());
+        message.addStream(stream);
+
         if (!Strings.isNullOrEmpty(request.inputId())) {
             message.setSourceInputId(request.inputId());
         }

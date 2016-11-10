@@ -1,14 +1,19 @@
 import React from 'react';
-import { Col, Input, Row } from 'react-bootstrap';
+import { Col, Input, Panel, Row } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { Select } from 'components/common';
 import RawMessageLoader from 'components/messageloaders/RawMessageLoader';
 import SimulationResults from './SimulationResults';
 
+import Routes from 'routing/Routes';
+
 import SimulatorActions from './SimulatorActions';
 // eslint-disable-next-line no-unused-vars
 import SimulatorStore from './SimulatorStore';
+
+const DEFAULT_STREAM_ID = '000000000000000000000001';
 
 const ProcessorSimulator = React.createClass({
   propTypes: {
@@ -16,9 +21,12 @@ const ProcessorSimulator = React.createClass({
   },
 
   getInitialState() {
+    // The default stream could not be present in a system. In that case we fallback to the first available stream.
+    this.defaultStream = this.props.streams.find(s => s.id === DEFAULT_STREAM_ID) || this.props.streams[0];
+
     return {
       message: undefined,
-      stream: this.props.streams.find(s => s.id.toLowerCase() === 'default'),
+      stream: this.defaultStream,
       simulation: undefined,
       loading: false,
       error: undefined,
@@ -58,9 +66,25 @@ const ProcessorSimulator = React.createClass({
   },
 
   render() {
+    if (this.props.streams.length === 0) {
+      return (
+        <div>
+          <Row className="row-sm">
+            <Col md={8} mdOffset={2}>
+              <Panel bsStyle="danger" header="No streams found">
+                Pipelines operate on streams, but your system currently has no streams. Please{' '}
+                <LinkContainer to={Routes.STREAMS}><a>create a stream</a></LinkContainer>{' '}
+                and come back here later to test pipelines processing messages in your new stream.
+              </Panel>
+            </Col>
+          </Row>
+        </div>
+      );
+    }
+
     const streamHelp = (
       <span>
-        Select a stream to use during simulation, the <em>Default</em> stream is used by default.
+        Select a stream to use during simulation, the <em>{this.defaultStream.title}</em> stream is used by default.
       </span>
     );
 

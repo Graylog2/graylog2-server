@@ -140,9 +140,6 @@ public class PipelineInterpreter implements MessageProcessor {
             for (Message message : currentSet) {
                 final String msgId = message.getId();
 
-                // 1. for each message, determine which pipelines are supposed to be executed, based on their streams
-                //    null is the default stream, the other streams are identified by their id
-
                 // this makes a copy of the list, which is mutated later in updateStreamBlacklist
                 // it serves as a worklist, to keep track of which <msg, stream> tuples need to be re-run again
                 final Set<String> initialStreamIds = message.getStreams().stream().map(Stream::getId).collect(Collectors.toSet());
@@ -214,34 +211,17 @@ public class PipelineInterpreter implements MessageProcessor {
                                                    Set<String> initialStreamIds,
                                                    ImmutableSetMultimap<String, Pipeline> streamConnection) {
         final String msgId = message.getId();
-        ImmutableSet<Pipeline> pipelinesToRun;
-        if (initialStreamIds.isEmpty()) {
-            if (processingBlacklist.contains(tuple(msgId, "default"))) {
-                // already processed default pipeline for this message
-                pipelinesToRun = ImmutableSet.of();
-                log.debug("[{}] already processed default stream, skipping", msgId);
-            } else {
-                // get the default stream pipeline connections for this message
-                pipelinesToRun = streamConnection.get("default");
-                interpreterListener.processDefaultStream(message, pipelinesToRun);
-                if (log.isDebugEnabled()) {
-                    log.debug("[{}] running default stream pipelines: [{}]",
-                              msgId,
-                              pipelinesToRun.stream().map(Pipeline::name).toArray());
-                }
-            }
-        } else {
-            // 2. if a message-stream combination has already been processed (is in the set), skip that execution
-            final Set<String> streamsIds = initialStreamIds.stream()
-                    .filter(streamId -> !processingBlacklist.contains(tuple(msgId, streamId)))
-                    .filter(streamConnection::containsKey)
-                    .collect(Collectors.toSet());
-            pipelinesToRun = ImmutableSet.copyOf(streamsIds.stream()
-                    .flatMap(streamId -> streamConnection.get(streamId).stream())
-                    .collect(Collectors.toSet()));
-            interpreterListener.processStreams(message, pipelinesToRun, streamsIds);
-            log.debug("[{}] running pipelines {} for streams {}", msgId, pipelinesToRun, streamsIds);
-        }
+
+        // if a message-stream combination has already been processed (is in the set), skip that execution
+        final Set<String> streamsIds = initialStreamIds.stream()
+                .filter(streamId -> !processingBlacklist.contains(tuple(msgId, streamId)))
+                .filter(streamConnection::containsKey)
+                .collect(Collectors.toSet());
+        final ImmutableSet<Pipeline> pipelinesToRun = ImmutableSet.copyOf(streamsIds.stream()
+                .flatMap(streamId -> streamConnection.get(streamId).stream())
+                .collect(Collectors.toSet()));
+        interpreterListener.processStreams(message, pipelinesToRun, streamsIds);
+        log.debug("[{}] running pipelines {} for streams {}", msgId, pipelinesToRun, streamsIds);
         return pipelinesToRun;
     }
 

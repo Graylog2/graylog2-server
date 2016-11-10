@@ -21,11 +21,6 @@ const SimulatorPage = React.createClass({
 
   componentDidMount() {
     StreamsStore.listStreams().then((streams) => {
-      streams.push({
-        id: 'default',
-        title: 'Default',
-        description: 'Stream used by default for messages not matching another stream.',
-      });
       this.setState({ streams: streams });
     });
   },

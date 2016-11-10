@@ -41,6 +41,16 @@ public class InMemoryPipelineStreamConnectionsService implements PipelineStreamC
         return ImmutableSet.copyOf(store.values());
     }
 
+    @Override
+    public void delete(String streamId) {
+        try {
+            final PipelineConnections connections = load(streamId);
+            store.remove(connections.id());
+        } catch (NotFoundException e) {
+            // Do nothing
+        }
+    }
+
     private String createId() {
         return String.valueOf(idGen.incrementAndGet());
     }

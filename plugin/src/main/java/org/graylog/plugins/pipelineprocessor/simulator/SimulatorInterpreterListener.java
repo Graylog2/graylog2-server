@@ -42,11 +42,6 @@ class SimulatorInterpreterListener implements InterpreterListener {
     }
 
     @Override
-    public void processDefaultStream(Message message, Set<Pipeline> pipelines) {
-        executionTrace.addTrace("Message " + message.getId() + " running " + pipelines + " for default stream");
-    }
-
-    @Override
     public void processStreams(Message message, Set<Pipeline> pipelines, Set<String> streams) {
         executionTrace.addTrace("Message " + message.getId() + " running " + pipelines + " for streams " + streams);
     }

@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor;
 
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
+import org.graylog.plugins.pipelineprocessor.periodical.LegacyDefaultStreamMigration;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineConnectionsResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
@@ -39,6 +40,8 @@ public class PipelineProcessorModule extends PluginModule {
 
     @Override
     protected void configure() {
+        addPeriodical(LegacyDefaultStreamMigration.class);
+
         addMessageProcessor(PipelineInterpreter.class, PipelineInterpreter.Descriptor.class);
         addRestResource(RuleResource.class);
         addRestResource(PipelineResource.class);

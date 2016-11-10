@@ -35,11 +35,6 @@ public class NoopInterpreterListener implements InterpreterListener {
     }
 
     @Override
-    public void processDefaultStream(Message messageId, Set<Pipeline> pipelines) {
-
-    }
-
-    @Override
     public void processStreams(Message messageId, Set<Pipeline> pipelines, Set<String> streams) {
 
     }

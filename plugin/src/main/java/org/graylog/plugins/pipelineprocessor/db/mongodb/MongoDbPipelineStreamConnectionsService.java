@@ -86,4 +86,14 @@ public class MongoDbPipelineStreamConnectionsService implements PipelineStreamCo
             return Collections.emptySet();
         }
     }
+
+    @Override
+    public void delete(String streamId) {
+        try {
+            final PipelineConnections connections = load(streamId);
+            dbCollection.removeById(connections.id());
+        } catch (NotFoundException e) {
+            log.debug("No connections found for stream " + streamId);
+        }
+    }
 }

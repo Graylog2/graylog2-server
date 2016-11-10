@@ -26,7 +26,6 @@ import java.util.Set;
 public interface InterpreterListener {
     void startProcessing();
     void finishProcessing();
-    void processDefaultStream(Message message, Set<Pipeline> pipelines);
     void processStreams(Message message, Set<Pipeline> pipelines, Set<String> streams);
     void enterStage(Stage stage);
     void exitStage(Stage stage);

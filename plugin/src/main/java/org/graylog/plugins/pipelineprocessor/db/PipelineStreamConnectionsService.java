@@ -27,4 +27,6 @@ public interface PipelineStreamConnectionsService {
     PipelineConnections load(String streamId) throws NotFoundException;
 
     Set<PipelineConnections> loadAll();
+
+    void delete(String streamId);
 }

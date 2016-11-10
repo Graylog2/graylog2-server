@@ -46,7 +46,6 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
-import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -81,11 +80,10 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
     @AuditEvent(type = PipelineProcessorAuditEventTypes.PIPELINE_CONNECTION_UPDATE)
     public PipelineConnections connectPipelines(@ApiParam(name = "Json body", required = true) @NotNull PipelineConnections connection) throws NotFoundException {
         final String streamId = connection.streamId();
-        // the default stream doesn't exist as an entity
-        if (!streamId.equalsIgnoreCase("default")) {
-            checkPermission(RestPermissions.STREAMS_READ, streamId);
-            streamService.load(streamId);
-        }
+        // verify the stream exists
+        checkPermission(RestPermissions.STREAMS_READ, streamId);
+        streamService.load(streamId);
+
         // verify the pipelines exist
         for (String s : connection.pipelineIds()) {
             checkPermission(PipelineRestPermissions.PIPELINE_READ, s);
@@ -128,10 +126,8 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
         // update pipeline connections
         for (String streamId : connection.streamIds()) {
             // verify the stream exist
-            if (!streamId.equalsIgnoreCase("default")) {
-                checkPermission(RestPermissions.STREAMS_READ, streamId);
-                streamService.load(streamId);
-            }
+            checkPermission(RestPermissions.STREAMS_READ, streamId);
+            streamService.load(streamId);
 
             PipelineConnections updatedConnection;
             try {
@@ -194,11 +190,6 @@ public class PipelineConnectionsResource extends RestResource implements PluginR
             }
         }
 
-
-        // to simplify clients, we always return the default stream, until we have it as a true entity
-        if (!filteredConnections.stream().anyMatch(pc -> pc.streamId().equals("default"))) {
-            filteredConnections.add(PipelineConnections.create(null, "default", Collections.emptySet()));
-        }
         return filteredConnections;
     }
 

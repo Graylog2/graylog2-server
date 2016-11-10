@@ -47,11 +47,6 @@ const PipelineDetailsPage = React.createClass({
     PipelineConnectionsActions.list();
 
     StreamsStore.listStreams().then((streams) => {
-      streams.push({
-        id: 'default',
-        title: 'Default',
-        description: 'Stream used by default for messages not matching another stream.',
-      });
       this.setState({ streams });
     });
   },
