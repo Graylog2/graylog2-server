@@ -157,6 +157,7 @@ public class KeyUtil {
             final String[] keyAlgorithms = {"RSA", "DSA", "EC"};
             for(String keyAlgorithm : keyAlgorithms) {
                 try {
+                    @SuppressWarnings("InsecureCryptoUsage")
                     final KeyFactory keyFactory = KeyFactory.getInstance(keyAlgorithm);
                     return keyFactory.generatePrivate(keySpec);
                 } catch (InvalidKeySpecException e) {
@@ -180,6 +181,7 @@ public class KeyUtil {
         final PBEKeySpec keySpec = new PBEKeySpec(password.toCharArray());
         final SecretKey secretKey = kf.generateSecret(keySpec);
 
+        @SuppressWarnings("InsecureCryptoUsage")
         final Cipher cipher = Cipher.getInstance(pkInfo.getAlgName());
         cipher.init(Cipher.DECRYPT_MODE, secretKey, pkInfo.getAlgParameters());
 

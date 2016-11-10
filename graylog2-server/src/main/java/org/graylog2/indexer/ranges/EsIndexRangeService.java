@@ -77,7 +77,7 @@ public class EsIndexRangeService implements IndexRangeService {
                 return indexRange;
             }
         };
-        this.cache = CacheBuilder.<String, IndexRange>newBuilder()
+        this.cache = CacheBuilder.newBuilder()
                 .recordStats()
                 .build(cacheLoader);
 

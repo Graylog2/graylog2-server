@@ -165,7 +165,7 @@ public class AlarmCallbackHistoryServiceImplTest extends MongoDBServiceTest {
         assertThat(alarmCallbackHistory).isNotNull();
         assertThat(alarmCallbackHistory.id()).isNotNull().isNotEmpty();
         assertThat(alarmCallbackHistory.alarmcallbackConfiguration()).isNotNull();
-        assertThat(alarmCallbackHistory.alarmcallbackConfiguration().configuration());
+        assertThat(alarmCallbackHistory.alarmcallbackConfiguration().configuration()).isNotNull();
         assertThat(alarmCallbackHistory.alertId()).isEqualTo(alert.getId());
         assertThat(alarmCallbackHistory.alertConditionId()).isEqualTo(alertCondition.getId());
     }
