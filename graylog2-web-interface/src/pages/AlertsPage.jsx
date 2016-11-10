@@ -5,7 +5,7 @@ import { Row, Col } from 'react-bootstrap';
 import AlertsComponent from 'components/alerts/AlertsComponent';
 
 import DocumentationLink from 'components/support/DocumentationLink';
-import { PageHeader, Spinner } from 'components/common';
+import { PageHeader } from 'components/common';
 
 import DocsHelper from 'util/DocsHelper';
 
@@ -14,14 +14,7 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const AlertsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
-  _isLoading() {
-    return false;
-  },
   render() {
-    if (this._isLoading()) {
-      return <Spinner/>;
-    }
-
     return (
       <div>
         <PageHeader title="Alerts overview">

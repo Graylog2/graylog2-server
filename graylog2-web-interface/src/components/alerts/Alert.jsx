@@ -1,12 +1,18 @@
 import React from 'react';
 import { Button, Col, Label } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
-import { EntityListItem, Spinner, Timestamp } from 'components/common';
+import { EntityListItem, Timestamp } from 'components/common';
+
+import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 
 const Alert = React.createClass({
   propTypes: {
     alert: React.PropTypes.object.isRequired,
+    alertConditions: React.PropTypes.array.isRequired,
+    streams: React.PropTypes.array.isRequired,
+    conditionTypes: React.PropTypes.object.isRequired,
   },
 
   getInitialState() {
@@ -17,6 +23,17 @@ const Alert = React.createClass({
 
   render() {
     const alert = this.props.alert;
+    const condition = this.props.alertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
+    const stream = this.props.streams.find(s => s.id === alert.stream_id);
+    const conditionType = condition ? this.props.conditionTypes[condition.type] : {};
+
+    let alertTitle;
+    if (condition) {
+      alertTitle = <span>{condition.title} <small>({conditionType.name || 'Unknown type'})</small></span>;
+    } else {
+      alertTitle = <span><em>Unknown alert</em></span>;
+    }
+
     let statusBadge;
     if (!alert.is_interval || alert.resolved_at) {
       statusBadge = <Label bsStyle="success">Resolved</Label>;
@@ -38,13 +55,16 @@ const Alert = React.createClass({
 
     const content = (
       <Col md={12}>
-        <p><b>Reason:</b> {alert.description}</p>
+        <ul className="no-padding">
+          <li><b>Stream:</b> {stream.title} (<em>{stream.id}</em>)</li>
+          <li><b>Reason:</b> {alert.description}</li>
+        </ul>
       </Col>
     );
 
     return (
       <EntityListItem key={`entry-list-${alert.id}`}
-                      title={alert.condition_id}
+                      title={alertTitle}
                       titleSuffix={statusBadge}
                       description={alertTime}
                       actions={actions}

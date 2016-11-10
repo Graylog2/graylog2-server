@@ -1,17 +1,16 @@
 import React from 'react';
 import Reflux from 'reflux';
 
-import ActionsProvider from 'injection/ActionsProvider';
-const AlertsActions = ActionsProvider.getActions('Alerts');
-
-import StoreProvider from 'injection/StoreProvider';
-const AlertsStore = StoreProvider.getStore('Alerts');
+import CombinedProvider from 'injection/CombinedProvider';
+const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
+const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
+const { StreamsStore } = CombinedProvider.get('Streams');
 
 import Alert from 'components/alerts/Alert';
 import { EntityList, PaginatedList, Spinner } from 'components/common';
 
 const AlertsComponent = React.createClass({
-  mixins: [Reflux.connect(AlertsStore)],
+  mixins: [Reflux.connect(AlertsStore), Reflux.connect(AlertConditionsStore)],
 
   componentDidMount() {
     this.loadData(1, 10);
@@ -19,14 +18,30 @@ const AlertsComponent = React.createClass({
 
   loadData(pageNo, limit) {
     AlertsActions.listAllPaginated((pageNo - 1) * limit, limit);
+    AlertConditionsActions.listAll();
+    AlertConditionsActions.available();
+    StreamsStore.listStreams().then((streams) => {
+      this.setState({ streams: streams });
+    });
   },
 
   _onChangePaginatedList(page, size) {
     this.loadData(page, size);
   },
 
+  _formatAlert(alert) {
+    return (
+      <Alert key={alert.id} alert={alert} alertConditions={this.state.allAlertConditions} streams={this.state.streams}
+             conditionTypes={this.state.types} />
+    );
+  },
+
+  _isLoading() {
+    return !this.state.alerts || !this.state.allAlertConditions || !this.state.types || !this.state.streams;
+  },
+
   render() {
-    if (!this.state.alerts) {
+    if (this._isLoading()) {
       return <Spinner />;
     }
 
@@ -38,7 +53,7 @@ const AlertsComponent = React.createClass({
         <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}
                        showPageSizeSelect={false}>
           <EntityList bsNoItemsStyle="info" noItemsText="There are no alerts to display."
-                      items={this.state.alerts.alerts.map(alert => <Alert key={alert.id} alert={alert} />)} />
+                      items={this.state.alerts.alerts.map(alert => this._formatAlert(alert))} />
         </PaginatedList>
       </div>
     );

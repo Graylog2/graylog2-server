@@ -17,6 +17,10 @@ const ApiRoutes = {
     listAllPaginated: (skip, limit) => { return { url: `/streams/alerts/paginated?skip=${skip}&limit=${limit}` }; },
     listAllStreams: (since) => { return { url: `/streams/alerts?since=${since}` }; },
   },
+  AlertConditionsApiController: {
+    available: () => { return { url: '/alerts/conditions/types' }; },
+    list: () => { return { url: '/alerts/conditions' }; },
+  },
   BundlesApiController: {
     apply: (bundleId) => { return { url: `/system/bundles/${bundleId}/apply` }; },
     create: () => { return { url: '/system/bundles' }; },
@@ -141,7 +145,6 @@ const ApiRoutes = {
     validate: () => { return { url: '/system/sessions' }; },
   },
   StreamAlertsApiController: {
-    available: () => { return { url: '/alerts/conditions/types' }; },
     create: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
     delete: (streamId, alertConditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
     list: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
