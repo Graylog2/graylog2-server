@@ -20,24 +20,13 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface Alert {
     String getId();
     String getStreamId();
     String getConditionId();
     DateTime getTriggeredAt();
+    DateTime getResolvedAt();
     String getDescription();
     Map<String, Object> getConditionParameters();
-
-    interface Builder {
-        Builder streamId(String streamId);
-        Builder conditionId(String conditionId);
-        Builder triggeredAt(DateTime triggeredAt);
-        Builder description(String description);
-        Builder conditionParameters(Map<String, Object> conditionParameters);
-
-        Alert build();
-    }
+    boolean isInterval();
 }

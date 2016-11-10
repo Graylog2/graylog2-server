@@ -25,16 +25,17 @@ import org.joda.time.DateTime;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface AlertService {
     Alert factory(AlertCondition.CheckResult checkResult);
 
+    List<Alert> loadRecentOfStreams(List<String> streamIds, DateTime since, int limit);
     List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit);
 
     int triggeredSecondsAgo(String streamId, String conditionId);
+
+    Optional<Alert> getLastTriggeredAlert(String streamId, String conditionId);
 
     long totalCount();
     long totalCountForStream(String streamId);
@@ -50,5 +51,6 @@ public interface AlertService {
     Alert load(String alertId, String streamId) throws NotFoundException;
     String save(Alert alert) throws ValidationException;
 
-    Alert.Builder builder();
+    Alert resolveAlert(Alert alert);
+    boolean isResolved(Alert alert);
 }

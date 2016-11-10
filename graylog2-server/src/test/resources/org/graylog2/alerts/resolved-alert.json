@@ -1,0 +1,26 @@
+{
+  "alerts": [
+    {
+      "_id": {
+        "$oid": "581b3bff8e4dc4270055dfca"
+      },
+      "triggered_at": {
+        "$date": "2016-11-03T15:30:39Z"
+      },
+      "resolved_at": {
+        "$date": "2016-11-03T15:35:39Z"
+      },
+      "stream_id": "5666df42bee80072613ce14e",
+      "condition_id": "ae7fbc4e-81b1-41b3-bbe6-eaf58d89bff7",
+      "description": "Stream had 199 messages in the last 1 minutes with trigger condition more than 5 messages. (Current grace time: 0 minutes)",
+      "condition_parameters": {
+        "grace": 0,
+        "threshold": "5",
+        "threshold_type": "MORE",
+        "time": "1",
+        "backlog": 0
+      },
+      "is_interval": true
+    }
+  ]
+}

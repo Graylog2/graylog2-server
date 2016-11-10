@@ -23,10 +23,9 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.database.Persisted;
 import org.graylog2.rest.models.streams.alerts.AlertListSummary;
 import org.graylog2.rest.models.streams.alerts.AlertSummary;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -50,7 +49,6 @@ import java.util.stream.Collectors;
 @Api(value = "Alerts", description = "Manage stream alerts for all streams")
 @Path("/streams/alerts")
 public class AlertResource extends RestResource {
-    private static final int DEFAULT_MAX_LIST_COUNT = 300;
     private final StreamService streamService;
     private final AlertService alertService;
 
@@ -64,7 +62,6 @@ public class AlertResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get the most recent alarms of all streams.")
-    @RequiresPermissions(RestPermissions.STREAMS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid ObjectId.")
@@ -75,10 +72,21 @@ public class AlertResource extends RestResource {
                                     @QueryParam("limit") @DefaultValue("300") @Min(1) int limit) throws NotFoundException {
         final DateTime since = new DateTime(sinceTs * 1000L, DateTimeZone.UTC);
 
-        final List<AlertSummary> alerts = streamService.loadAll().stream()
+        final List<String> allowedStreamIds = streamService.loadAll().stream()
                 .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
-                .flatMap(stream -> alertService.loadRecentOfStream(stream.getId(), since, limit).stream())
-                .map(alert -> AlertSummary.create(alert.getId(), alert.getConditionId(), alert.getStreamId(), alert.getDescription(), alert.getConditionParameters(), alert.getTriggeredAt()))
+                .map(Persisted::getId)
+                .collect(Collectors.toList());
+
+        final List<AlertSummary> alerts = alertService.loadRecentOfStreams(allowedStreamIds, since, limit).stream()
+                .map(alert -> AlertSummary.create(
+                        alert.getId(),
+                        alert.getConditionId(),
+                        alert.getStreamId(),
+                        alert.getDescription(),
+                        alert.getConditionParameters(),
+                        alert.getTriggeredAt(),
+                        alert.getResolvedAt(),
+                        alert.isInterval()))
                 .collect(Collectors.toList());
 
         return AlertListSummary.create(alerts.size(), alerts);
