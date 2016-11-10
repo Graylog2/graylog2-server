@@ -18,6 +18,8 @@ const MetricsExtractor = {
           metrics[metricShortName] = metricObject.metric.value;
         } else if (metricObject.type === 'counter') {
           metrics[metricShortName] = metricObject.metric.count;
+        } else if (metricObject.type === 'meter') {
+          metrics[metricShortName] = metricObject.metric.rate.total;
         } else {
           metrics[metricShortName] = null;
         }
