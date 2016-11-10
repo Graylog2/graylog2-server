@@ -58,6 +58,6 @@ public class FilterServiceImplTest {
 
         final FilterDescription filterDescription = filterDescriptionSet.iterator().next();
         assertThat(filterDescription).isNotNull();
-        assertThat(filterDescription instanceof BlacklistPatternCondition);
+        assertThat(filterDescription).isInstanceOf(BlacklistPatternCondition.class);
     }
 }

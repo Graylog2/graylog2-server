@@ -71,6 +71,7 @@ public final class PemKeyStore {
         final PBEKeySpec pbeKeySpec = new PBEKeySpec(password);
         final SecretKey pbeKey = keyFactory.generateSecret(pbeKeySpec);
 
+        @SuppressWarnings("InsecureCryptoUsage")
         final Cipher cipher = Cipher.getInstance(encryptedPrivateKeyInfo.getAlgName());
         cipher.init(Cipher.DECRYPT_MODE, pbeKey, encryptedPrivateKeyInfo.getAlgParameters());
 
@@ -86,6 +87,7 @@ public final class PemKeyStore {
      *                         {@code null} if it's not password-protected.
      * @return generated {@link KeyStore}.
      */
+    @SuppressWarnings("InsecureCryptoUsage")
     public static KeyStore buildKeyStore(Path certChainFile, Path keyFile, char[] keyPasswordChars)
             throws KeyStoreException, NoSuchAlgorithmException,
             NoSuchPaddingException, InvalidKeySpecException, InvalidAlgorithmParameterException,
