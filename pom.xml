@@ -89,7 +89,7 @@
         <!-- Dependencies -->
         <airline.version>0.7</airline.version>
         <amqp-client.version>3.6.5</amqp-client.version>
-        <apache-directory-version>1.0.0-RC1</apache-directory-version>
+        <apache-directory-version>1.0.0-RC2</apache-directory-version>
         <auto-value.version>1.3</auto-value.version>
         <commons-codec.version>1.10</commons-codec.version>
         <commons-email.version>1.4</commons-email.version>
