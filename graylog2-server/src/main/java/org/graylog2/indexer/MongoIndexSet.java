@@ -282,7 +282,7 @@ public class MongoIndexSet implements IndexSet {
             // Re-pointing from existing old index to the new one.
             LOG.debug("Now switching over deflector alias.");
             pointTo(newTarget, oldTarget);
-            calculateRange(oldTarget);
+            setIndexReadOnlyAndCalculateRange(oldTarget);
             activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
         }
 
@@ -292,16 +292,16 @@ public class MongoIndexSet implements IndexSet {
         auditEventSender.success(AuditActor.system(nodeId), ES_WRITE_INDEX_UPDATE, ImmutableMap.of("indexName", newTarget));
     }
 
-    private void calculateRange(String oldTarget) {
+    private void setIndexReadOnlyAndCalculateRange(String indexName) {
         // perform these steps after a delay, so we don't race with indexing into the alias
         // it can happen that an index request still writes to the old deflector target, while we cycled it above.
         // setting the index to readOnly would result in ClusterBlockExceptions in the indexing request.
         // waiting 30 seconds to perform the background task should completely get rid of these errors.
-        final SystemJob setIndexReadOnlyAndCalculateRangeJob = jobFactory.create(oldTarget);
+        final SystemJob setIndexReadOnlyAndCalculateRangeJob = jobFactory.create(indexName);
         try {
             systemJobManager.submitWithDelay(setIndexReadOnlyAndCalculateRangeJob, 30, TimeUnit.SECONDS);
         } catch (SystemJobConcurrencyException e) {
-            LOG.error("Cannot set index <" + oldTarget + "> to read only and calculate its range. It won't be optimized.", e);
+            LOG.error("Cannot set index <" + indexName + "> to read only and calculate its range. It won't be optimized.", e);
         }
     }
 
