@@ -236,14 +236,13 @@ public class MongoIndexSet implements IndexSet {
 
                 cycle(); // No index, so automatically cycling to a new one.
             } catch (InvalidAliasNameException e) {
-                LOG.error("Seems like there already is an index called [{}]", getWriteIndexAlias());
+                LOG.error("Seems like there already is an index called <{}>", getWriteIndexAlias());
             }
         }
     }
 
     @Override
     public void cycle() {
-        LOG.info("Cycling deflector to next index now.");
         int oldTargetNumber;
 
         try {
@@ -257,41 +256,42 @@ public class MongoIndexSet implements IndexSet {
         final String oldTarget = buildIndexName(oldTargetNumber);
 
         if (oldTargetNumber == -1) {
-            LOG.info("Cycling from <none> to <{}>", newTarget);
+            LOG.info("Cycling from <none> to <{}>.", newTarget);
         } else {
-            LOG.info("Cycling from <{}> to <{}>", oldTarget, newTarget);
+            LOG.info("Cycling from <{}> to <{}>.", oldTarget, newTarget);
         }
 
         // Create new index.
-        LOG.info("Creating index target <{}>...", newTarget);
+        LOG.info("Creating target index <{}>.", newTarget);
         if (!indices.create(newTarget)) {
-            LOG.error("Could not properly create new target <{}>", newTarget);
+            LOG.error("Could not create new target index <{}>.", newTarget);
         }
 
-        LOG.info("Waiting for index allocation of <{}>", newTarget);
+        LOG.info("Waiting for allocation of  index <{}>.", newTarget);
         ClusterHealthStatus healthStatus = indices.waitForRecovery(newTarget);
         LOG.debug("Health status of index <{}>: {}", newTarget, healthStatus);
 
         addDeflectorIndexRange(newTarget);
-        LOG.info("Done!");
+        LOG.info("Index <{}> has been successfully allocated.", newTarget);
 
         // Point deflector to new index.
-        LOG.info("Pointing deflector to new target index....");
+        final String indexAlias = getWriteIndexAlias();
+        LOG.info("Pointing index alias <{}> to new index <{}>.", indexAlias, newTarget);
 
         final Activity activity = new Activity(IndexSet.class);
         if (oldTargetNumber == -1) {
             // Only pointing, not cycling.
             pointTo(newTarget);
-            activity.setMessage("Cycled deflector from <none> to <" + newTarget + ">");
+            activity.setMessage("Cycled index alias <" + indexAlias + "> from <none> to <" + newTarget + ">.");
         } else {
             // Re-pointing from existing old index to the new one.
-            LOG.debug("Now switching over deflector alias.");
+            LOG.debug("Switching over index alias <{}>.", indexAlias);
             pointTo(newTarget, oldTarget);
             setIndexReadOnlyAndCalculateRange(oldTarget);
-            activity.setMessage("Cycled deflector from <" + oldTarget + "> to <" + newTarget + ">");
+            activity.setMessage("Cycled index alias <" + indexAlias + "> from <" + oldTarget + "> to <" + newTarget + ">.");
         }
 
-        LOG.info("Done!");
+        LOG.info("Successfully pointed index alias <{}> to index <{}>.", indexAlias, newTarget);
 
         activityWriter.write(activity);
         auditEventSender.success(AuditActor.system(nodeId), ES_WRITE_INDEX_UPDATE, ImmutableMap.of("indexName", newTarget));
