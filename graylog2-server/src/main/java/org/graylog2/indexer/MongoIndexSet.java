@@ -29,6 +29,8 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
+import org.graylog2.indexer.ranges.IndexRange;
+import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -70,6 +72,7 @@ public class MongoIndexSet implements IndexSet {
     private final Indices indices;
     private final Pattern indexPattern;
     private final Pattern deflectorIndexPattern;
+    private final IndexRangeService indexRangeService;
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
     private final SystemJobManager systemJobManager;
@@ -80,6 +83,7 @@ public class MongoIndexSet implements IndexSet {
     public MongoIndexSet(@Assisted final IndexSetConfig config,
                          final Indices indices,
                          final NodeId nodeId,
+                         final IndexRangeService indexRangeService,
                          final AuditEventSender auditEventSender,
                          final SystemJobManager systemJobManager,
                          final SetIndexReadOnlyAndCalculateRangeJob.Factory jobFactory,
@@ -88,6 +92,7 @@ public class MongoIndexSet implements IndexSet {
         this.config = requireNonNull(config);
         this.indices = requireNonNull(indices);
         this.nodeId = requireNonNull(nodeId);
+        this.indexRangeService = requireNonNull(indexRangeService);
         this.auditEventSender = requireNonNull(auditEventSender);
         this.systemJobManager = requireNonNull(systemJobManager);
         this.jobFactory = requireNonNull(jobFactory);
@@ -267,7 +272,7 @@ public class MongoIndexSet implements IndexSet {
         ClusterHealthStatus healthStatus = indices.waitForRecovery(newTarget);
         LOG.debug("Health status of index <{}>: {}", newTarget, healthStatus);
 
-        // addDeflectorIndexRange(newTarget);
+        addDeflectorIndexRange(newTarget);
         LOG.info("Done!");
 
         // Point deflector to new index.
@@ -305,6 +310,11 @@ public class MongoIndexSet implements IndexSet {
         }
     }
 
+    private void addDeflectorIndexRange(String indexName) {
+        final IndexRange deflectorRange = indexRangeService.createUnknownRange(indexName);
+        indexRangeService.save(deflectorRange);
+    }
+
     @Override
     public void cleanupAliases(Set<String> indexNames) {
         final SortedSet<String> sortedSet = ImmutableSortedSet
@@ -316,12 +326,12 @@ public class MongoIndexSet implements IndexSet {
     }
 
     @Override
-    public void pointTo(String shouldBeTarget, String currentTarget) {
-        indices.cycleAlias(getWriteIndexAlias(), shouldBeTarget, currentTarget);
+    public void pointTo(String newIndexName, String oldIndexName) {
+        indices.cycleAlias(getWriteIndexAlias(), newIndexName, oldIndexName);
     }
 
-    private void pointTo(final String newIndex) {
-        indices.cycleAlias(getWriteIndexAlias(), newIndex);
+    private void pointTo(final String indexName) {
+        indices.cycleAlias(getWriteIndexAlias(), indexName);
     }
 
     @Override

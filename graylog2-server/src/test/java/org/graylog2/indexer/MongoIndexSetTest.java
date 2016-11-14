@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
@@ -27,6 +28,7 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.junit.Before;
 import org.junit.Rule;
@@ -40,12 +42,15 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -82,7 +87,7 @@ public class MongoIndexSetTest {
 
     @Before
     public void setUp() {
-        mongoIndexSet = new MongoIndexSet(config, indices, nodeId, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
     }
 
     @Test
@@ -173,7 +178,7 @@ public class MongoIndexSetTest {
                 "graylog_4_restored_archive", Collections.emptySet());
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
 
         final int number = mongoIndexSet.getNewestTargetNumber();
         assertEquals(3, number);
@@ -189,7 +194,7 @@ public class MongoIndexSetTest {
                 "graylog_5", Collections.singleton("graylog_deflector"));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
 
 
         final String[] allGraylogIndexNames = mongoIndexSet.getManagedIndicesNames();
@@ -207,7 +212,7 @@ public class MongoIndexSetTest {
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
 
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
         final Map<String, Set<String>> deflectorIndices = mongoIndexSet.getAllDeflectorAliases();
 
         assertThat(deflectorIndices).containsOnlyKeys("graylog_1", "graylog_2", "graylog_3", "graylog_5");
@@ -215,8 +220,78 @@ public class MongoIndexSetTest {
 
     @Test
     public void testCleanupAliases() throws Exception {
-        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
         mongoIndexSet.cleanupAliases(ImmutableSet.of("graylog_2", "graylog_3", "foobar"));
         verify(indices).removeAliases("graylog_deflector", ImmutableSet.of("graylog_2", "foobar"));
+    }
+
+    @Test
+    public void cycleAddsUnknownDeflectorRange() {
+        final String newIndexName = "graylog_1";
+        final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
+                "graylog_0", Collections.singleton("graylog_deflector"));
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        when(indices.create(newIndexName)).thenReturn(true);
+        when(indices.waitForRecovery(newIndexName)).thenReturn(ClusterHealthStatus.GREEN);
+
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        mongoIndexSet.cycle();
+
+        verify(indexRangeService, times(1)).createUnknownRange(newIndexName);
+    }
+
+    @Test
+    public void cycleSetsOldIndexToReadOnly() throws SystemJobConcurrencyException {
+        final String newIndexName = "graylog_1";
+        final String oldIndexName = "graylog_0";
+        final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
+                oldIndexName, Collections.singleton("graylog_deflector"));
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        when(indices.create(newIndexName)).thenReturn(true);
+        when(indices.waitForRecovery(newIndexName)).thenReturn(ClusterHealthStatus.GREEN);
+
+        final SetIndexReadOnlyAndCalculateRangeJob rangeJob = mock(SetIndexReadOnlyAndCalculateRangeJob.class);
+        when(jobFactory.create(oldIndexName)).thenReturn(rangeJob);
+
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        mongoIndexSet.cycle();
+
+        verify(jobFactory, times(1)).create(oldIndexName);
+        verify(systemJobManager, times(1)).submitWithDelay(rangeJob, 30L, TimeUnit.SECONDS);
+    }
+
+    @Test
+    public void cycleSwitchesIndexAliasToNewTarget() {
+        final String oldIndexName = config.indexPrefix() + "_0";
+        final String newIndexName = config.indexPrefix() + "_1";
+        final String deflector = "graylog_deflector";
+        final Map<String, Set<String>> indexNameAliases = ImmutableMap.of(
+                oldIndexName, Collections.singleton(deflector));
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        when(indices.create(newIndexName)).thenReturn(true);
+        when(indices.waitForRecovery(newIndexName)).thenReturn(ClusterHealthStatus.GREEN);
+
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        mongoIndexSet.cycle();
+
+        verify(indices, times(1)).cycleAlias(deflector, newIndexName, oldIndexName);
+    }
+
+    @Test
+    public void cyclePointsIndexAliasToInitialTarget() {
+        final String indexName = config.indexPrefix() + "_0";
+        final Map<String, Set<String>> indexNameAliases = ImmutableMap.of();
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        when(indices.create(indexName)).thenReturn(true);
+        when(indices.waitForRecovery(indexName)).thenReturn(ClusterHealthStatus.GREEN);
+
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        mongoIndexSet.cycle();
+
+        verify(indices, times(1)).cycleAlias("graylog_deflector", indexName);
     }
 }
