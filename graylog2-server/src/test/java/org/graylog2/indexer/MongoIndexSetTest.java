@@ -33,6 +33,7 @@ import org.graylog2.system.jobs.SystemJobManager;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -57,6 +58,8 @@ import static org.mockito.Mockito.when;
 public class MongoIndexSetTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private Indices indices;
@@ -223,6 +226,20 @@ public class MongoIndexSetTest {
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
         mongoIndexSet.cleanupAliases(ImmutableSet.of("graylog_2", "graylog_3", "foobar"));
         verify(indices).removeAliases("graylog_deflector", ImmutableSet.of("graylog_2", "foobar"));
+    }
+
+    @Test
+    public void cycleThrowsRuntimeExceptionIfIndexCreationFailed() {
+        final Map<String, Set<String>> indexNameAliases = ImmutableMap.of();
+
+        when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
+        when(indices.create("graylog_0")).thenReturn(false);
+
+        expectedException.expect(RuntimeException.class);
+        expectedException.expectMessage("Could not create new target index <graylog_0>.");
+
+        final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
+        mongoIndexSet.cycle();
     }
 
     @Test
