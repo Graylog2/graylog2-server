@@ -77,7 +77,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
     }
 
     private void runRetention(IndexSet indexSet, Map<String, Set<String>> deflectorIndices, int removeCount) {
-        for (String indexName : IndexHelper.getOldestIndices(indexSet, deflectorIndices.keySet(), removeCount)) {
+        for (String indexName : IndexHelper.getOldestIndices(indexSet, removeCount)) {
             // Never run against the current deflector target.
             if (deflectorIndices.get(indexName).contains(indexSet.getWriteIndexAlias())) {
                 LOG.info("Not running retention against current deflector target <{}>.", indexName);

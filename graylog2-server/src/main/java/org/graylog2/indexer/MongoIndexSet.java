@@ -191,6 +191,11 @@ public class MongoIndexSet implements IndexSet {
     }
 
     @Override
+    public String getIndexPrefix() {
+        return config.indexPrefix();
+    }
+
+    @Override
     public boolean isUp() {
         return indices.aliasExists(getWriteIndexAlias());
     }

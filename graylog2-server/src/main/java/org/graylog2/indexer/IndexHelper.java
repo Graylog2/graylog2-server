@@ -34,17 +34,18 @@ import java.util.List;
 import java.util.Set;
 
 public class IndexHelper {
-    public static Set<String> getOldestIndices(IndexSet indexSet, Set<String> indexNames, int count) {
-        if (count <= 0 || indexNames.size() <= count) {
+    public static Set<String> getOldestIndices(IndexSet indexSet, int count) {
+        final String[] managedIndicesNames = indexSet.getManagedIndicesNames();
+        if (count <= 0 || managedIndicesNames.length <= count) {
             return Collections.emptySet();
         }
 
-        final List<Integer> numbers = new ArrayList<>(indexNames.size());
-        for (String indexName : indexNames) {
+        final List<Integer> numbers = new ArrayList<>(managedIndicesNames.length);
+        for (String indexName : managedIndicesNames) {
             indexSet.extractIndexNumber(indexName).ifPresent(numbers::add);
         }
 
-        final List<String> sorted = prependPrefixes(getPrefix(indexNames), Tools.asSortedList(numbers));
+        final List<String> sorted = prependPrefixes(indexSet.getIndexPrefix(), Tools.asSortedList(numbers));
 
         return Sets.newHashSet(sorted.subList(0, count));
     }
@@ -58,15 +59,6 @@ public class IndexHelper {
         return QueryBuilders.rangeQuery("timestamp")
                 .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
                 .lte(Tools.buildElasticSearchTimeFormat(range.getTo()));
-    }
-
-    private static String getPrefix(Set<String> names) {
-        if (names.isEmpty()) {
-            return "";
-        }
-
-        String name = (String) names.toArray()[0];
-        return name.substring(0, name.lastIndexOf("_"));
     }
 
     private static List<String> prependPrefixes(String prefix, List<Integer> numbers) {

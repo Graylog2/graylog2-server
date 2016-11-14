@@ -17,7 +17,6 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -39,10 +38,8 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.SortedSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,43 +68,45 @@ public class IndexHelperTest {
     @Test
     public void testGetOldestIndices() {
         final Map<String, Integer> indexNumbers = ImmutableMap.<String, Integer>builder()
-                .put("graylog2_production_1", 1)
-                .put("graylog2_production_7",7)
-                .put("graylog2_production_0",0)
-                .put("graylog2_production_2",2)
-                .put("graylog2_production_4",4)
-                .put("graylog2_production_6",6)
-                .put("graylog2_production_3",3)
-                .put("graylog2_production_5",5)
-                .put("graylog2_production_8",8)
-                .put("graylog2_production_9",9)
-                .put("graylog2_production_10",10)
-                .put("graylog2_production_110",110)
-                .put("graylog2_production_125",125)
-                .put("graylog2_production_20",20)
-                .put("graylog2_production_21",21)
+                .put("graylog_production_1", 1)
+                .put("graylog_production_7",7)
+                .put("graylog_production_0",0)
+                .put("graylog_production_2",2)
+                .put("graylog_production_4",4)
+                .put("graylog_production_6",6)
+                .put("graylog_production_3",3)
+                .put("graylog_production_5",5)
+                .put("graylog_production_8",8)
+                .put("graylog_production_9",9)
+                .put("graylog_production_10",10)
+                .put("graylog_production_110",110)
+                .put("graylog_production_125",125)
+                .put("graylog_production_20",20)
+                .put("graylog_production_21",21)
                 .build();
-        final Set<String> indices = ImmutableSet.copyOf(indexNumbers.keySet());
 
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.extractIndexNumber(anyString())).thenAnswer(
                 invocationOnMock -> Optional.ofNullable(indexNumbers.get(invocationOnMock.<String>getArgument(0))));
+        when(indexSet.getManagedIndicesNames()).thenReturn(indexNumbers.keySet().toArray(new String[0]));
+        when(indexSet.getIndexPrefix()).thenReturn("graylog_production");
 
-        assertThat(IndexHelper.getOldestIndices(indexSet, indices, 7)).containsOnly(
-            "graylog2_production_0",
-            "graylog2_production_1",
-            "graylog2_production_2",
-            "graylog2_production_3",
-            "graylog2_production_4",
-            "graylog2_production_5",
-            "graylog2_production_6");
-        assertThat(IndexHelper.getOldestIndices(indexSet, indices, 1)).containsOnly("graylog2_production_0");
+        assertThat(IndexHelper.getOldestIndices(indexSet, 7)).containsOnly(
+            "graylog_production_0",
+            "graylog_production_1",
+            "graylog_production_2",
+            "graylog_production_3",
+            "graylog_production_4",
+            "graylog_production_5",
+            "graylog_production_6");
+        assertThat(IndexHelper.getOldestIndices(indexSet, 1)).containsOnly("graylog_production_0");
     }
 
     @Test
     public void testGetOldestIndicesWithEmptySetAndTooHighOffset() {
         final IndexSet indexSet = mock(IndexSet.class);
-        assertThat(IndexHelper.getOldestIndices(indexSet, Collections.emptySet(), 9001)).isEmpty();
+        when(indexSet.getManagedIndicesNames()).thenReturn(new String[0]);
+        assertThat(IndexHelper.getOldestIndices(indexSet, 9001)).isEmpty();
     }
 
     @Test

@@ -40,6 +40,8 @@ public interface IndexSet extends Comparable<IndexSet> {
 
     Map<String,Set<String>> getAllDeflectorAliases();
 
+    String getIndexPrefix();
+
     boolean isUp();
 
     boolean isDeflectorAlias(String index);
