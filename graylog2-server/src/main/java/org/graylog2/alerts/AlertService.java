@@ -16,6 +16,7 @@
  */
 package org.graylog2.alerts;
 
+import org.graylog2.alerts.Alert.AlertState;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.ValidationException;
@@ -39,7 +40,7 @@ public interface AlertService {
 
     long totalCount();
     long totalCountForStream(String streamId);
-    long totalCountForStreams(List<String> streamIds);
+    long totalCountForStreams(List<String> streamIds, AlertState state);
 
     AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream);
     AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId);
@@ -49,7 +50,7 @@ public interface AlertService {
     boolean inGracePeriod(AlertCondition alertCondition);
 
     List<Alert> listForStreamId(String streamId, int skip, int limit);
-    List<Alert> listForStreamIds(List<String> streamIds, int skip, int limit);
+    List<Alert> listForStreamIds(List<String> streamIds, AlertState state, int skip, int limit);
     Alert load(String alertId, String streamId) throws NotFoundException;
     String save(Alert alert) throws ValidationException;
 

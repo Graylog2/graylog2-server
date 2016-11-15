@@ -130,6 +130,7 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     public void listForStreamIdsFilterByStream() throws Exception {
         final List<Alert> alerts = alertService.listForStreamIds(
                 ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14f"),
+                Alert.AlertState.ANY,
                 0,
                 4
         );
@@ -141,11 +142,13 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     public void listForStreamIdsSkips() throws Exception {
         final List<Alert> allAlerts = alertService.listForStreamIds(
                 ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14e", "5666df42bee80072613ce14f"),
+                Alert.AlertState.ANY,
                 0,
                 4
         );
         final List<Alert> alerts = alertService.listForStreamIds(
                 ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14e", "5666df42bee80072613ce14f"),
+                Alert.AlertState.ANY,
                 2,
                 4
         );
@@ -158,10 +161,31 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     public void listForStreamIdsLimits() throws Exception {
         final List<Alert> alerts = alertService.listForStreamIds(
                 ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14e", "5666df42bee80072613ce14f"),
+                Alert.AlertState.ANY,
                 0,
                 1
         );
         assertThat(alerts.size()).isEqualTo(1);
+    }
+
+    @Test
+    @UsingDataSet(locations = "multiple-alerts.json")
+    public void listForStreamIdsFilterByState() throws Exception {
+        final List<Alert> resolvedAlerts = alertService.listForStreamIds(
+                ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14e", "5666df42bee80072613ce14f"),
+                Alert.AlertState.RESOLVED,
+                0,
+                4
+        );
+        final List<Alert> unresolvedAlerts = alertService.listForStreamIds(
+                ImmutableList.of("5666df42bee80072613ce14d", "5666df42bee80072613ce14e", "5666df42bee80072613ce14f"),
+                Alert.AlertState.UNRESOLVED,
+                0,
+                4
+        );
+
+        assertThat(resolvedAlerts.size()).isEqualTo(3);
+        assertThat(unresolvedAlerts.size()).isEqualTo(1);
     }
 
     @Test

@@ -39,8 +39,8 @@ const AlertsStore = Reflux.createStore({
     AlertsActions.listPaginated.promise(promise);
   },
 
-  listAllPaginated(skip, limit) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllPaginated(skip, limit).url);
+  listAllPaginated(skip, limit, state) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllPaginated(skip, limit, state).url);
     const promise = fetch('GET', url);
     promise.then(
       response => this.trigger({ alerts: response }),

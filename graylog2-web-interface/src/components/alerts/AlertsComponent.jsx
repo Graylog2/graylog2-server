@@ -1,5 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
+import { Button } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
@@ -12,17 +13,27 @@ import { EntityList, PaginatedList, Spinner } from 'components/common';
 const AlertsComponent = React.createClass({
   mixins: [Reflux.connect(AlertsStore), Reflux.connect(AlertConditionsStore)],
 
+  getInitialState() {
+    return {
+      displayAllAlerts: false,
+    };
+  },
+
   componentDidMount() {
     this.loadData(1, 10);
   },
 
   loadData(pageNo, limit) {
-    AlertsActions.listAllPaginated((pageNo - 1) * limit, limit);
+    AlertsActions.listAllPaginated((pageNo - 1) * limit, limit, this.state.displayAllAlerts ? 'all' : 'unresolved');
     AlertConditionsActions.listAll();
     AlertConditionsActions.available();
     StreamsStore.listStreams().then((streams) => {
       this.setState({ streams: streams });
     });
+  },
+
+  _onToggleAllAlerts() {
+    this.setState({ displayAllAlerts: !this.state.displayAllAlerts }, () => this.loadData(1, 10));
   },
 
   _onChangePaginatedList(page, size) {
@@ -47,8 +58,16 @@ const AlertsComponent = React.createClass({
 
     return (
       <div>
+        <div className="pull-right">
+          <Button bsStyle="info" onClick={this._onToggleAllAlerts}>
+            Show {this.state.displayAllAlerts ? 'unresolved' : 'all'} alerts
+          </Button>
+        </div>
         <h2>Alerts</h2>
-        <p>Check your alerts status from here. Currently displaying <b>all</b> alerts.</p>
+        <p>
+          Check your alerts status from here. Currently displaying{' '}
+          <b>{this.state.displayAllAlerts ? 'all' : 'unresolved'}</b> alerts.
+        </p>
 
         <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}
                        showPageSizeSelect={false}>

@@ -14,7 +14,7 @@ const ApiRoutes = {
   AlertsApiController: {
     list: (streamId, since) => { return { url: `/streams/${streamId}/alerts?since=${since}` }; },
     listPaginated: (streamId, skip, limit) => { return { url: `/streams/${streamId}/alerts/paginated?skip=${skip}&limit=${limit}` }; },
-    listAllPaginated: (skip, limit) => { return { url: `/streams/alerts/paginated?skip=${skip}&limit=${limit}` }; },
+    listAllPaginated: (skip, limit, state) => { return { url: `/streams/alerts/paginated?skip=${skip}&limit=${limit}&state=${state}` }; },
     listAllStreams: (since) => { return { url: `/streams/alerts?since=${since}` }; },
   },
   AlertConditionsApiController: {

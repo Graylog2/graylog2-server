@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alerts.Alert;
+import org.graylog2.alerts.Alert.AlertState;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.database.Persisted;
@@ -83,17 +84,27 @@ public class AlertResource extends RestResource {
     @Path("paginated")
     @ApiOperation(value = "Get alarms of all streams, filtered by specifying limit and offset parameters.")
     @ApiResponses(value = {
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(code = 400, message = "Invalid ObjectId."),
     })
     public AlertListSummary listPaginated(@ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
                                           @QueryParam("skip") @DefaultValue("0") int skip,
                                           @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
-                                          @QueryParam("limit") @DefaultValue("300") int limit) throws NotFoundException {
-
+                                          @QueryParam("limit") @DefaultValue("300") int limit,
+                                          @ApiParam(name = "state", value = "Alert state (resolved/unresolved)", required = false)
+                                          @QueryParam("state") String state) throws NotFoundException {
         final List<String> allowedStreamIds = getAllowedStreamIds();
-        final List<AlertSummary> alerts = getAlertSummaries(alertService.listForStreamIds(allowedStreamIds, skip, limit).stream());
 
-        return AlertListSummary.create(alertService.totalCountForStreams(allowedStreamIds), alerts);
+        AlertState alertState;
+        try {
+            alertState = AlertState.fromString(state);
+        } catch (IllegalArgumentException e) {
+            alertState = AlertState.ANY;
+        }
+
+        final Stream<Alert> alertsStream = alertService.listForStreamIds(allowedStreamIds, alertState, skip, limit).stream();
+        final List<AlertSummary> alerts = getAlertSummaries(alertsStream);
+
+        return AlertListSummary.create(alertService.totalCountForStreams(allowedStreamIds, alertState), alerts);
     }
 
 
