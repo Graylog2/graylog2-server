@@ -33,6 +33,9 @@ const Stream = React.createClass({
   },
 
   _formatNumberOfStreamRules(stream) {
+    if (stream.is_default) {
+      return 'The default stream contains all messages.';
+    }
     let verbalMatchingType;
     switch (stream.matching_type) {
       case 'OR': verbalMatchingType = 'at least one'; break;
@@ -75,16 +78,17 @@ const Stream = React.createClass({
     const stream = this.props.stream;
     const permissions = this.props.permissions;
 
+    const isDefaultStream = stream.is_default;
     let editRulesLink;
     let manageOutputsLink;
     let manageAlertsLink;
     if (this.isPermitted(permissions, [`streams:edit:${stream.id}`])) {
-      editRulesLink = (
+      editRulesLink = isDefaultStream ? null : (
         <LinkContainer to={Routes.stream_edit(stream.id)}>
           <Button bsStyle="info">Manage Rules</Button>
         </LinkContainer>
       );
-      manageAlertsLink = (
+      manageAlertsLink = isDefaultStream ? null : (
         <LinkContainer to={Routes.stream_alerts(stream.id)}>
           <Button bsStyle="info">Manage Alerts</Button>
         </LinkContainer>
@@ -100,7 +104,7 @@ const Stream = React.createClass({
     }
 
     let toggleStreamLink;
-    if (this.isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`])) {
+    if (this.isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]) && !isDefaultStream) {
       if (stream.disabled) {
         toggleStreamLink = (
           <Button bsStyle="success" className="toggle-stream-button" onClick={this._onResume} disabled={this.state.loading}>
@@ -119,6 +123,17 @@ const Stream = React.createClass({
     const createdFromContentPack = (stream.content_pack ?
       <i className="fa fa-cube" title="Created from content pack"/> : null);
 
+    const streamRuleList = isDefaultStream ? null :
+                           (<CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
+                                 stream={stream}
+                                 streamRuleTypes={this.props.streamRuleTypes}
+                                 permissions={this.props.permissions}/>);
+    const streamControls = isDefaultStream ? null :
+                           (<StreamControls stream={stream} permissions={this.props.permissions}
+                                user={this.props.user}
+                                onDelete={this._onDelete} onUpdate={this._onUpdate}
+                                onClone={this._onClone}
+                                onQuickAdd={this._onQuickAdd}/>);
     return (
       <li className="stream">
         <h2>
@@ -136,9 +151,7 @@ const Stream = React.createClass({
             {manageAlertsLink}{' '}
             {toggleStreamLink}{' '}
 
-            <StreamControls stream={stream} permissions={this.props.permissions} user={this.props.user}
-                            onDelete={this._onDelete} onUpdate={this._onUpdate} onClone={this._onClone}
-                            onQuickAdd={this._onQuickAdd}/>
+            {streamControls}
           </div>
           <div className="stream-description">
             {createdFromContentPack}
@@ -150,12 +163,11 @@ const Stream = React.createClass({
 
             , {this._formatNumberOfStreamRules(stream)}
 
-            <CollapsibleStreamRuleList key={`streamRules-${stream.id}`} stream={stream}
-                                       streamRuleTypes={this.props.streamRuleTypes}
-                                       permissions={this.props.permissions}/>
+            {streamRuleList}
           </div>
         </div>
-        <StreamRuleForm ref="quickAddStreamRuleForm" title="New Stream Rule" onSubmit={this._onSaveStreamRule}
+        <StreamRuleForm ref="quickAddStreamRuleForm" title="New Stream Rule"
+                        onSubmit={this._onSaveStreamRule}
                         streamRuleTypes={this.props.streamRuleTypes}/>
       </li>
     );
