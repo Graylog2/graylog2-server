@@ -27,7 +27,6 @@ import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import org.elasticsearch.client.Client;
 import org.graylog2.Configuration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeComparator;
@@ -118,8 +117,6 @@ public class SearchesTest {
         }
     };
 
-    @Mock
-    private Deflector deflector;
     @Mock
     private IndexRangeService indexRangeService;
 
@@ -356,7 +353,6 @@ public class SearchesTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    @SuppressWarnings("unchecked")
     public void histogramRecordsMetrics() throws Exception {
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC));
         HistogramResult h = searches.histogram("*", Searches.DateHistogramInterval.MINUTE, range);
@@ -393,7 +389,6 @@ public class SearchesTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    @SuppressWarnings("unchecked")
     public void fieldHistogramRecordsMetrics() throws Exception {
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range, false);

@@ -16,12 +16,18 @@
  */
 package org.graylog2.indexer;
 
+import com.google.common.collect.ComparisonChain;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
+import java.util.Comparator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
-public interface IndexSet {
+import static java.util.Objects.requireNonNull;
+
+public interface IndexSet extends Comparable<IndexSet> {
     String[] getManagedIndicesNames();
 
     String getWriteIndexAlias();
@@ -33,6 +39,8 @@ public interface IndexSet {
     String getCurrentActualTargetIndex() throws TooManyAliasesException;
 
     Map<String,Set<String>> getAllDeflectorAliases();
+
+    String getIndexPrefix();
 
     boolean isUp();
 
@@ -47,4 +55,25 @@ public interface IndexSet {
     void cleanupAliases(Set<String> indices);
 
     void pointTo(String shouldBeTarget, String currentTarget);
+
+    Optional<Integer> extractIndexNumber(String index);
+
+    IndexSetConfig getConfig();
+
+    class IndexNameComparator implements Comparator<String> {
+        private final IndexSet indexSet;
+
+        IndexNameComparator(IndexSet indexSet) {
+            this.indexSet = requireNonNull(indexSet);
+        }
+
+        @Override
+        public int compare(String o1, String o2) {
+            final int indexNumber1 = indexSet.extractIndexNumber(o1).orElse(-1);
+            final int indexNumber2 = indexSet.extractIndexNumber(o2).orElse(-1);
+            return ComparisonChain.start()
+                    .compare(indexNumber1, indexNumber2)
+                    .result();
+        }
+    }
 }

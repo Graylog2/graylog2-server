@@ -38,7 +38,6 @@ import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
 import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.indexer.Deflector;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexMapping;
@@ -72,7 +71,6 @@ public class Messages {
             .build();
 
     private final Client c;
-    private final String deflectorName;
     private final String analyzer;
     private final Meter invalidTimestampMeter;
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
@@ -82,7 +80,6 @@ public class Messages {
                     ElasticsearchConfiguration configuration,
                     MetricRegistry metricRegistry) {
         this.c = client;
-        this.deflectorName = Deflector.buildName(configuration.getIndexPrefix());
         this.analyzer = configuration.getAnalyzer();
         invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
 

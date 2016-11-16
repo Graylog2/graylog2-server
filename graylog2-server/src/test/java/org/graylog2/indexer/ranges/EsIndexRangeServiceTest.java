@@ -26,27 +26,20 @@ import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.Deflector;
-import org.graylog2.indexer.LegacyDeflectorIndexSet;
-import org.graylog2.indexer.LegacyDeflectorRegistry;
-import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.messages.Messages;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.system.activities.NullActivityWriter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.inject.Inject;
 import java.util.Set;
@@ -55,14 +48,16 @@ import java.util.SortedSet;
 import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class EsIndexRangeServiceTest {
     @ClassRule
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule()
             .settings(Settings.settingsBuilder().put("action.auto_create_index", false).build())
             .build();
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
     private static final ImmutableSet<String> INDEX_NAMES = ImmutableSet.of("graylog", "graylog_1", "graylog_2", "graylog_3", "graylog_4", "graylog_5", "ignored");
     private static final ElasticsearchConfiguration ELASTICSEARCH_CONFIGURATION = new ElasticsearchConfiguration() {
         @Override
@@ -76,13 +71,14 @@ public class EsIndexRangeServiceTest {
 
     @Inject
     private Client client;
-    private Indices indices;
     @Mock
     private EventBus localEventBus;
     @Mock
     private AuditEventSender auditEventSender;
     @Mock
     private NodeId nodeId;
+    @Mock
+    private IndexSetRegistry indexSetRegistry;
     private EsIndexRangeService indexRangeService;
 
     public EsIndexRangeServiceTest() {
@@ -92,11 +88,9 @@ public class EsIndexRangeServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        final Messages messages = new Messages(client, ELASTICSEARCH_CONFIGURATION, new MetricRegistry());
-        indices = new Indices(client, ELASTICSEARCH_CONFIGURATION, new IndexMapping(), messages, mock(NodeId.class), new NullAuditEventSender());
-        final Deflector deflector = new Deflector(null, ELASTICSEARCH_CONFIGURATION.getIndexPrefix(), new NullActivityWriter(),
-            indices, null, auditEventSender, nodeId, null);
-        indexRangeService = new EsIndexRangeService(client, new LegacyDeflectorRegistry(new LegacyDeflectorIndexSet(deflector)), localEventBus, new MetricRegistry());
+        when(indexSetRegistry.getManagedIndicesNames()).thenReturn(new String[]{
+                "graylog_1", "graylog_2", "graylog_3", "graylog_4", "graylog_5"});
+       indexRangeService = new EsIndexRangeService(client, indexSetRegistry, localEventBus, new MetricRegistry());
     }
 
     @Test

@@ -26,36 +26,31 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 public class IndexHelper {
-    private static final Logger LOG = LoggerFactory.getLogger(IndexHelper.class);
-
-    public static Set<String> getOldestIndices(Set<String> indexNames, int count) {
-        Set<String> r = Sets.newHashSet();
-
-        if (count < 0 || indexNames.size() <= count) {
-            return r;
+    public static Set<String> getOldestIndices(IndexSet indexSet, int count) {
+        final String[] managedIndicesNames = indexSet.getManagedIndicesNames();
+        if (count <= 0 || managedIndicesNames.length <= count) {
+            return Collections.emptySet();
         }
 
-        Set<Integer> numbers = Sets.newHashSet();
-
-        for (String indexName : indexNames) {
-            numbers.add(Deflector.extractIndexNumber(indexName));
+        final List<Integer> numbers = new ArrayList<>(managedIndicesNames.length);
+        for (String indexName : managedIndicesNames) {
+            indexSet.extractIndexNumber(indexName).ifPresent(numbers::add);
         }
 
-        List<String> sorted = prependPrefixes(getPrefix(indexNames), Tools.asSortedList(numbers));
+        final List<String> sorted = prependPrefixes(indexSet.getIndexPrefix(), Tools.asSortedList(numbers));
 
-        // Add last x entries to return set.
-        r.addAll(sorted.subList(0, count));
-
-        return r;
+        return Sets.newHashSet(sorted.subList(0, count));
     }
 
+    @Nullable
     public static QueryBuilder getTimestampRangeFilter(TimeRange range) throws InvalidRangeFormatException {
         if (range == null) {
             return null;
@@ -66,16 +61,7 @@ public class IndexHelper {
                 .lte(Tools.buildElasticSearchTimeFormat(range.getTo()));
     }
 
-    private static String getPrefix(Set<String> names) {
-        if (names.isEmpty()) {
-            return "";
-        }
-
-        String name = (String) names.toArray()[0];
-        return name.substring(0, name.lastIndexOf("_"));
-    }
-
-    public static List<String> prependPrefixes(String prefix, List<Integer> numbers) {
+    private static List<String> prependPrefixes(String prefix, List<Integer> numbers) {
         List<String> r = Lists.newArrayList();
 
         for (int number : numbers) {

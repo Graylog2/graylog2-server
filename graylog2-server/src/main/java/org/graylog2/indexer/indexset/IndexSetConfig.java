@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ComparisonChain;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.hibernate.validator.constraints.NotBlank;
@@ -33,7 +34,7 @@ import java.time.ZonedDateTime;
 
 @AutoValue
 @JsonAutoDetect
-public abstract class IndexSetConfig {
+public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("id")
     @Nullable
     @Id
@@ -104,6 +105,15 @@ public abstract class IndexSetConfig {
                                         RetentionStrategyConfig retentionStrategy,
                                         ZonedDateTime creationDate) {
         return create(null, title, description, indexPrefix, shards, replicas, rotationStrategy, retentionStrategy, creationDate);
+    }
+
+    @Override
+    public int compareTo(IndexSetConfig o) {
+        return ComparisonChain.start()
+                .compare(title(), o.title())
+                .compare(indexPrefix(), o.indexPrefix())
+                .compare(creationDate(), o.creationDate())
+                .result();
     }
 
     public abstract Builder toBuilder();

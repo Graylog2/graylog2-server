@@ -14,19 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer;
+package org.graylog2.indexer.indexset;
 
-import com.google.inject.assistedinject.FactoryModuleBuilder;
-import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.indexer.indexset.MongoIndexSetService;
-import org.graylog2.plugin.inject.Graylog2Module;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.google.auto.value.AutoValue;
 
-public class IndexerBindings extends Graylog2Module {
-    @Override
-    protected void configure() {
-        bind(IndexSetService.class).to(MongoIndexSetService.class);
-
-        install(new FactoryModuleBuilder().build(MongoIndexSet.Factory.class));
-        bind(IndexSetRegistry.class).to(MongoIndexSetRegistry.class);
+@JsonAutoDetect
+@AutoValue
+public abstract class DefaultIndexSetCreated {
+    @JsonCreator
+    public static DefaultIndexSetCreated create() {
+        return new AutoValue_DefaultIndexSetCreated();
     }
 }
