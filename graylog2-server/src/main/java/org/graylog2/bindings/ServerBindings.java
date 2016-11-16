@@ -20,6 +20,7 @@ import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
+
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
@@ -30,13 +31,13 @@ import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
+import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.EsClientProvider;
 import org.graylog2.bindings.providers.EsNodeProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.RulesEngineProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
-import org.graylog2.buffers.processors.ServerProcessBufferProcessor;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
@@ -61,6 +62,8 @@ import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
 import org.graylog2.plugin.inject.Graylog2Module;
+import org.graylog2.plugin.streams.DefaultStream;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
@@ -134,6 +137,9 @@ public class ServerBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(LdapSettingsImpl.Factory.class));
         install(new FactoryModuleBuilder().build(WidgetCacheTime.Factory.class));
         install(new FactoryModuleBuilder().build(UserImpl.Factory.class));
+
+        install(new FactoryModuleBuilder().build(ProcessBufferProcessor.Factory.class));
+        bind(Stream.class).annotatedWith(DefaultStream.class).toProvider(DefaultStreamProvider.class);
     }
 
     private void bindSingletons() {
@@ -176,7 +182,6 @@ public class ServerBindings extends Graylog2Module {
         bind(ActivityWriter.class).to(SystemMessageActivityWriter.class);
         bind(PersistedInputs.class).to(PersistedInputsImpl.class);
 
-        bind(ProcessBufferProcessor.class).to(ServerProcessBufferProcessor.class);
         bind(RoleService.class).to(RoleServiceImpl.class).in(Scopes.SINGLETON);
     }
 

@@ -16,15 +16,17 @@
  */
 package org.graylog2.shared.buffers;
 
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.InstrumentedThreadFactory;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.lmax.disruptor.WaitStrategy;
 import com.lmax.disruptor.dsl.Disruptor;
 import com.lmax.disruptor.dsl.ProducerType;
+
 import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.buffers.Buffer;
 import org.graylog2.plugin.buffers.MessageEvent;
@@ -35,12 +37,12 @@ import org.graylog2.shared.metrics.MetricUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ThreadFactory;
+
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.inject.Provider;
 import javax.inject.Singleton;
-import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static org.graylog2.shared.metrics.MetricUtils.constantGauge;
@@ -55,7 +57,7 @@ public class ProcessBuffer extends Buffer {
     @Inject
     public ProcessBuffer(MetricRegistry metricRegistry,
                          DecodingProcessor.Factory decodingProcessorFactory,
-                         Provider<ProcessBufferProcessor> bufferProcessorFactory,
+                         ProcessBufferProcessor.Factory bufferProcessorFactory,
                          @Named("processbuffer_processors") int processorCount,
                          @Named("ring_size") int ringSize,
                          @Named("processor_wait_strategy") String waitStrategyName) {
@@ -87,9 +89,7 @@ public class ProcessBuffer extends Buffer {
 
         final ProcessBufferProcessor[] processors = new ProcessBufferProcessor[processorCount];
         for (int i = 0; i < processorCount; i++) {
-            // TODO The provider should be converted to a factory so we can pass the DecodingProcessor instead of using a setter after object creation.
-            processors[i] = bufferProcessorFactory.get();
-            processors[i].setDecodingProcessor(decodingProcessorFactory.create(decodeTime, parseTime));
+            processors[i] = bufferProcessorFactory.create(decodingProcessorFactory.create(decodeTime, parseTime));
         }
         disruptor.handleEventsWithWorkerPool(processors);
 

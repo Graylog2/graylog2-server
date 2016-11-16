@@ -58,7 +58,7 @@ public class DefaultStreamMigrationPeriodicalTest {
 
     @Before
     public void setUpService() throws Exception {
-        periodical = new DefaultStreamMigrationPeriodical(streamService, streamRuleService, clusterEventBus, clusterConfigService);
+        periodical = new DefaultStreamMigrationPeriodical(streamService, clusterEventBus, clusterConfigService);
     }
 
     @Test
