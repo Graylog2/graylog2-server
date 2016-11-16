@@ -45,8 +45,14 @@ const Alert = React.createClass({
     if (alert.is_interval) {
       alertTime = (
         <span>
-          {alertTime}&nbsp;&#8211;&nbsp;
-          {alert.resolved_at ? <Timestamp dateTime={alert.resolved_at} format={DateTime.Formats.DATETIME} /> : null}
+          Triggered at {alertTime},&nbsp;
+          {alert.resolved_at ? <span>resolved at <Timestamp dateTime={alert.resolved_at} format={DateTime.Formats.DATETIME} /></span> : 'still ongoing'}
+        </span>
+      );
+    } else {
+      alertTime = (
+        <span>
+          Triggered at {alertTime}
         </span>
       );
     }
