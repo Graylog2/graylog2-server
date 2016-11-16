@@ -71,7 +71,8 @@ const AlertsComponent = React.createClass({
 
         <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}
                        showPageSizeSelect={false}>
-          <EntityList bsNoItemsStyle="info" noItemsText="There are no alerts to display."
+          <EntityList bsNoItemsStyle={this.state.displayAllAlerts ? 'info' : 'success'}
+                      noItemsText={this.state.displayAllAlerts ? 'There are no alerts to display' : 'Good news! Currently there are no unresolved alerts.'}
                       items={this.state.alerts.alerts.map(alert => this._formatAlert(alert))} />
         </PaginatedList>
       </div>

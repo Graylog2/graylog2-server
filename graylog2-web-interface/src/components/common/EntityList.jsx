@@ -3,7 +3,7 @@ import { Alert } from 'react-bootstrap';
 
 const EntityList = React.createClass({
   propTypes: {
-    bsNoItemsStyle: React.PropTypes.oneOf(['info', 'warning']),
+    bsNoItemsStyle: React.PropTypes.oneOf(['info', 'success', 'warning']),
     noItemsText: React.PropTypes.oneOfType([
       React.PropTypes.string,
       React.PropTypes.element,
