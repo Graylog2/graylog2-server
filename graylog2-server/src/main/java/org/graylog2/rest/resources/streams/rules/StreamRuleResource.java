@@ -17,11 +17,7 @@
 package org.graylog2.rest.resources.streams.rules;
 
 import com.codahale.metrics.annotation.Timed;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -42,6 +38,10 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.streams.events.StreamsChangedEvent;
 import org.hibernate.validator.constraints.NotEmpty;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -56,9 +56,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 @RequiresAuthentication
 @Api(value = "StreamRules", description = "Manage stream rules")
@@ -88,6 +91,7 @@ public class StreamRuleResource extends RestResource {
                            @ApiParam(name = "JSON body", required = true)
                            @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+        checkNotDefaultStream(streamId, "Cannot add stream rules to the default stream.");
 
         final Stream stream = streamService.load(streamId);
         final StreamRule streamRule = streamRuleService.create(streamId, cr);
@@ -122,6 +126,7 @@ public class StreamRuleResource extends RestResource {
                                                   @ApiParam(name = "JSON body", required = true)
                                                   @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+        checkNotDefaultStream(streamid, "Cannot update stream rules on default stream.");
 
         final StreamRule streamRule;
         streamRule = streamRuleService.load(streamRuleId);
@@ -158,6 +163,7 @@ public class StreamRuleResource extends RestResource {
     public SingleStreamRuleSummaryResponse updateDeprecated(@PathParam("streamid") String streamid,
                                                             @PathParam("streamRuleId") String streamRuleId,
                                                             @Valid @NotNull CreateStreamRuleRequest cr) throws NotFoundException, ValidationException {
+        checkNotDefaultStream(streamid, "Cannot remove stream rule from default stream.");
         return update(streamid, streamRuleId, cr);
     }
 
@@ -201,6 +207,7 @@ public class StreamRuleResource extends RestResource {
                        @ApiParam(name = "streamRuleId", required = true)
                        @PathParam("streamRuleId") @NotEmpty String streamRuleId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+        checkNotDefaultStream(streamid, "Cannot delete stream rule from default stream.");
 
         final StreamRule streamRule = streamRuleService.load(streamRuleId);
         if (streamRule.getStreamId().equals(streamid)) {
@@ -225,5 +232,11 @@ public class StreamRuleResource extends RestResource {
         }
 
         return result;
+    }
+
+    private void checkNotDefaultStream(String streamId, String message) {
+        if (Stream.DEFAULT_STREAM_ID.equals(streamId)) {
+            throw new BadRequestException(message);
+        }
     }
 }
