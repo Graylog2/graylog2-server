@@ -21,10 +21,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.plugin.streams.StreamRule;
-import org.graylog2.plugin.streams.StreamRuleType;
 import org.graylog2.streams.StreamImpl;
-import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.config.DefaultStreamCreated;
 import org.graylog2.streams.events.StreamsChangedEvent;
@@ -50,8 +47,6 @@ public class DefaultStreamMigrationPeriodicalTest {
     @Mock
     private StreamService streamService;
     @Mock
-    private StreamRuleService streamRuleService;
-    @Mock
     private ClusterEventBus clusterEventBus;
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -64,22 +59,15 @@ public class DefaultStreamMigrationPeriodicalTest {
     @Test
     public void doRunCreatesStreamAndStreamRule() throws Exception {
         final ArgumentCaptor<Stream> streamArgumentCaptor = ArgumentCaptor.forClass(Stream.class);
-        final ArgumentCaptor<StreamRule> streamRuleArgumentCaptor = ArgumentCaptor.forClass(StreamRule.class);
 
         periodical.doRun();
 
         verify(streamService).save(streamArgumentCaptor.capture());
-        verify(streamRuleService).save(streamRuleArgumentCaptor.capture());
 
         final Stream stream = streamArgumentCaptor.getValue();
         assertThat(stream.getTitle()).isEqualTo("All messages");
         assertThat(stream.getDisabled()).isFalse();
         assertThat(stream.getMatchingType()).isEqualTo(StreamImpl.MatchingType.DEFAULT);
-
-        final StreamRule streamRule = streamRuleArgumentCaptor.getValue();
-        assertThat(streamRule.getStreamId()).isEqualTo("000000000000000000000001");
-        assertThat(streamRule.getType()).isEqualTo(StreamRuleType.ALWAYS_MATCH);
-        assertThat(streamRule.getInverted()).isFalse();
     }
 
     @Test
@@ -105,8 +93,6 @@ public class DefaultStreamMigrationPeriodicalTest {
         when(streamService.save(any(Stream.class))).thenThrow(ValidationException.class);
 
         periodical.doRun();
-
-        verifyNoMoreInteractions(streamRuleService);
     }
 
     @Test
