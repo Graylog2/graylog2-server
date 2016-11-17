@@ -31,7 +31,6 @@ import org.graylog2.plugin.database.Persisted;
 import org.graylog2.rest.models.streams.alerts.AlertListSummary;
 import org.graylog2.rest.models.streams.alerts.AlertSummary;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -41,12 +40,15 @@ import javax.validation.constraints.Min;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static org.graylog2.shared.security.RestPermissions.STREAMS_READ;
 
 @RequiresAuthentication
 @Api(value = "Alerts", description = "Manage stream alerts for all streams")
@@ -107,10 +109,34 @@ public class AlertResource extends RestResource {
         return AlertListSummary.create(alertService.totalCountForStreams(allowedStreamIds, alertState), alerts);
     }
 
+    @GET
+    @Timed
+    @Path("{alertId}")
+    @ApiOperation(value = "Get an alert by ID.")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Alert not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    public AlertSummary get(@ApiParam(name = "alertId", value = "The alert ID to retrieve.", required = true)
+                            @PathParam("alertId") String alertId) throws NotFoundException {
+        final Alert alert = alertService.load(alertId, "");
+
+        checkPermission(STREAMS_READ, alert.getStreamId());
+
+        return AlertSummary.create(
+                alert.getId(),
+                alert.getConditionId(),
+                alert.getStreamId(),
+                alert.getDescription(),
+                alert.getConditionParameters(),
+                alert.getTriggeredAt(),
+                alert.getResolvedAt(),
+                alert.isInterval());
+    }
 
     private List<String> getAllowedStreamIds() {
         return streamService.loadAll().stream()
-                .filter(stream -> isPermitted(RestPermissions.STREAMS_READ, stream.getId()))
+                .filter(stream -> isPermitted(STREAMS_READ, stream.getId()))
                 .map(Persisted::getId)
                 .collect(Collectors.toList());
     }
