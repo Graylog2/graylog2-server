@@ -111,6 +111,20 @@ const AlertConditionsStore = Reflux.createStore({
     AlertConditionsActions.update.promise(promise);
     return promise;
   },
+  get(streamId, conditionId, failureCallback) {
+    const failCallback = (error) => {
+      UserNotification.error(`Fetching Alert Condition ${conditionId} failed with status: ${error}`,
+        'Could not retrieve Alert Condition');
+    };
+
+    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.get(streamId, conditionId).url);
+    const promise = fetch('GET', url).then(response => {
+      this.trigger({ alertCondition: response });
+      return response;
+    }, failureCallback || failCallback);
+
+    AlertConditionsActions.get.promise(promise);
+  },
 });
 
 export default AlertConditionsStore;

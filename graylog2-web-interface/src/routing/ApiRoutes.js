@@ -12,6 +12,7 @@ const ApiRoutes = {
     list: (streamId, alertId) => { return { url: `/streams/${streamId}/alerts/${alertId}/history` }; },
   },
   AlertsApiController: {
+    get: (alertId) => { return { url: `/streams/alerts/${alertId}` }; },
     list: (streamId, since) => { return { url: `/streams/${streamId}/alerts?since=${since}` }; },
     listPaginated: (streamId, skip, limit) => { return { url: `/streams/${streamId}/alerts/paginated?skip=${skip}&limit=${limit}` }; },
     listAllPaginated: (skip, limit, state) => { return { url: `/streams/alerts/paginated?skip=${skip}&limit=${limit}&state=${state}` }; },
@@ -147,6 +148,7 @@ const ApiRoutes = {
   StreamAlertsApiController: {
     create: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
     delete: (streamId, alertConditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
+    get: (streamId, conditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${conditionId}` }; },
     list: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
     update: (streamId, alertConditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
     addReceiver: (streamId, type, entity) => { return { url: `/streams/${streamId}/alerts/receivers?entity=${entity}&type=${type}` }; },

@@ -57,7 +57,11 @@ const Alert = React.createClass({
       );
     }
 
-    const actions = <Button bsStyle="info">Show details</Button>;
+    const actions = (
+      <LinkContainer to={Routes.show_alert(alert.id)}>
+        <Button bsStyle="info">Show details</Button>
+      </LinkContainer>
+    );
 
     const content = (
       <Col md={12}>

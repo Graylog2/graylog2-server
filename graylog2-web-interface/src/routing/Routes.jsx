@@ -128,6 +128,8 @@ const Routes = {
   },
   legacy_stream_search: (streamId) => `/streams/${streamId}/messages`,
 
+  show_alert: (alertId) => `/alerts/${alertId}`,
+
   dashboard_show: (dashboardId) => `/dashboards/${dashboardId}`,
 
   node: (nodeId) => `/system/nodes/${nodeId}`,

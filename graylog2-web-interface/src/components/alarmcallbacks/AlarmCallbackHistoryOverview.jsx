@@ -1,15 +1,11 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
-import StoreProvider from 'injection/StoreProvider';
-const AlarmCallbackHistoryStore = StoreProvider.getStore('AlarmCallbackHistory');
-// eslint-disable-next-line no-unused-vars
-const AlarmCallbacksStore = StoreProvider.getStore('AlarmCallbacks');
+import CombinedProvider from 'injection/CombinedProvider';
+const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
+const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 
-import ActionsProvider from 'injection/ActionsProvider';
-const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
-
-import { Spinner } from 'components/common';
+import { EntityList, Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';
 
 const AlarmCallbackHistoryOverview = React.createClass({
@@ -32,11 +28,7 @@ const AlarmCallbackHistoryOverview = React.createClass({
     });
   },
   _formatHistory(history) {
-    return (
-      <li key={history.id}>
-        <AlarmCallbackHistory alarmCallbackHistory={history} types={this.state.types}/>
-      </li>
-    );
+    return <AlarmCallbackHistory key={history.id} alarmCallbackHistory={history} types={this.state.types}/>;
   },
   _isLoading() {
     return !(this.state.histories && this.state.types);
@@ -46,19 +38,12 @@ const AlarmCallbackHistoryOverview = React.createClass({
       return <Spinner />;
     }
 
-    if (this.state.histories.length === 0) {
-      return (
-        <div><i>No history available.</i></div>
-      );
-    }
-
     const histories = this.state.histories.map(this._formatHistory);
     return (
       <Row>
         <Col md={12}>
-          <ul className="alarm-callbacks">
-            {histories}
-          </ul>
+          <EntityList bsNoItemsStyle="info" noItemsText="No notifications were triggered during the alert."
+                      items={histories} />
         </Col>
       </Row>
     );

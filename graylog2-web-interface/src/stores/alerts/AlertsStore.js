@@ -63,6 +63,19 @@ const AlertsStore = Reflux.createStore({
 
     AlertsActions.listAllStreams.promise(promise);
   },
+
+  get(alertId) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.get(alertId).url);
+    const promise = fetch('GET', url);
+    promise
+      .then(
+        response => this.trigger({ alert: response }),
+        error => {
+          UserNotification.error(`Fetching alert '${alertId}' failed with status: ${error.message}`, 'Could not retrieve alert.');
+        });
+
+    AlertsActions.get.promise(promise);
+  },
 });
 
 export default AlertsStore;
