@@ -164,13 +164,40 @@ public class StreamAlertConditionResource extends RestResource {
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     @AuditEvent(type = AuditEventTypes.ALERT_CONDITION_DELETE)
-    public void delete(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
+    public void delete(@ApiParam(name = "streamId", value = "The stream id this alert condition belongs to.", required = true)
                        @PathParam("streamId") String streamid,
-                       @ApiParam(name = "conditionId", value = "The stream id this new alert condition belongs to.", required = true)
+                       @ApiParam(name = "conditionId", value = "The alert condition id to be deleted", required = true)
                        @PathParam("conditionId") String conditionId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         final Stream stream = streamService.load(streamid);
         streamService.removeAlertCondition(stream, conditionId);
+    }
+
+    @GET
+    @Timed
+    @Path("{conditionId}")
+    @ApiOperation(value = "Get an alert condition")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    @AuditEvent(type = AuditEventTypes.ALERT_CONDITION_DELETE)
+    public AlertConditionSummary get(@ApiParam(name = "streamId", value = "The stream id this alert condition belongs to.", required = true)
+                       @PathParam("streamId") String streamId,
+                       @ApiParam(name = "conditionId", value = "The alert condition id to be fetched", required = true)
+                       @PathParam("conditionId") String conditionId) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_READ, streamId);
+
+        final Stream stream = streamService.load(streamId);
+        final AlertCondition condition = streamService.getAlertCondition(stream, conditionId);
+
+        return AlertConditionSummary.create(condition.getId(),
+                condition.getType(),
+                condition.getCreatorUserId(),
+                condition.getCreatedAt().toDate(),
+                condition.getParameters(),
+                alertService.inGracePeriod(condition),
+                condition.getTitle());
     }
 }
