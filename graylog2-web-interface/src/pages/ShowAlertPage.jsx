@@ -96,7 +96,7 @@ const ShowAlertPage = React.createClass({
           </span>
         </PageHeader>
 
-        <AlertDetails alert={alert} />
+        <AlertDetails alert={alert} condition={condition} conditionType={type} />
       </div>
     );
   },
