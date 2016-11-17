@@ -2,6 +2,7 @@ class CombinedProvider {
   constructor() {
     /* eslint-disable import/no-require, global-require */
     this.actions = {
+      AlarmCallbackHistory: () => require('actions/alarmcallbacks/AlarmCallbackHistoryActions'),
       AlarmCallbacks: () => require('actions/alarmcallbacks/AlarmCallbacksActions'),
       AlertConditions: () => require('actions/alertconditions/AlertConditionsActions'),
       AlertReceivers: () => require('actions/alertreceivers/AlertReceiversActions'),
