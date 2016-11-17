@@ -3,9 +3,22 @@ import { Col, Row } from 'react-bootstrap';
 
 import { AlarmCallbackHistoryOverview } from 'components/alarmcallbacks';
 
+import CombinedProvider from 'injection/CombinedProvider';
+const { AlarmCallbackHistoryActions } = CombinedProvider.get('AlarmCallbackHistory');
+const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
+
 const AlertDetails = React.createClass({
   propTypes: {
     alert: React.PropTypes.object.isRequired,
+  },
+
+  componentDidMount() {
+    this._loadData();
+  },
+
+  _loadData() {
+    AlarmCallbacksActions.available(this.props.alert.stream_id);
+    AlarmCallbackHistoryActions.list(this.props.alert.stream_id, this.props.alert.id);
   },
 
   render() {

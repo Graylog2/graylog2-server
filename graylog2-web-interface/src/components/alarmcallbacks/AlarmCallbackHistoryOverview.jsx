@@ -3,8 +3,8 @@ import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
-const { AlarmCallbackHistoryStore, AlarmCallbackHistoryActions } = CombinedProvider.get('AlarmCallbackHistory');
-const { AlarmCallbacksStore, AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
+const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
+const { AlarmCallbacksStore } = CombinedProvider.get('AlarmCallbacks');
 
 import { EntityList, Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';
@@ -17,13 +17,6 @@ const AlarmCallbackHistoryOverview = React.createClass({
 
   mixins: [Reflux.connect(AlarmCallbackHistoryStore), Reflux.connect(AlarmCallbacksStore)],
 
-  componentDidMount() {
-    this.loadData();
-  },
-  loadData() {
-    AlarmCallbacksActions.available(this.props.streamId);
-    AlarmCallbackHistoryActions.list(this.props.streamId, this.props.alertId);
-  },
   _formatHistory(history) {
     return (
       <AlarmCallbackHistory key={history.id} alarmCallbackHistory={history} types={this.state.availableAlarmCallbacks}/>
