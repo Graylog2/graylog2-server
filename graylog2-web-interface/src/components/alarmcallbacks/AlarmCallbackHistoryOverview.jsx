@@ -4,7 +4,7 @@ import { Row, Col } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlarmCallbackHistoryStore, AlarmCallbackHistoryActions } = CombinedProvider.get('AlarmCallbackHistory');
-const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
+const { AlarmCallbacksStore, AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 
 import { EntityList, Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';
@@ -15,25 +15,22 @@ const AlarmCallbackHistoryOverview = React.createClass({
     streamId: React.PropTypes.string.isRequired,
   },
 
-  mixins: [Reflux.connect(AlarmCallbackHistoryStore)],
+  mixins: [Reflux.connect(AlarmCallbackHistoryStore), Reflux.connect(AlarmCallbacksStore)],
 
-  getInitialState() {
-    return {};
-  },
   componentDidMount() {
     this.loadData();
   },
   loadData() {
-    AlarmCallbacksActions.available(this.props.streamId).then((types) => {
-      this.setState({ types: types });
-    });
+    AlarmCallbacksActions.available(this.props.streamId);
     AlarmCallbackHistoryActions.list(this.props.streamId, this.props.alertId);
   },
   _formatHistory(history) {
-    return <AlarmCallbackHistory key={history.id} alarmCallbackHistory={history} types={this.state.types}/>;
+    return (
+      <AlarmCallbackHistory key={history.id} alarmCallbackHistory={history} types={this.state.availableAlarmCallbacks}/>
+    );
   },
   _isLoading() {
-    return !(this.state.histories && this.state.types);
+    return !(this.state.histories && this.state.availableAlarmCallbacks);
   },
   render() {
     if (this._isLoading()) {

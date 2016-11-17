@@ -18,6 +18,7 @@ const AlarmCallbacksStore = Reflux.createStore({
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.available(streamId).url);
     const promise = fetch('GET', url).then((response) => {
+      this.trigger({ availableAlarmCallbacks: response.types });
       return response.types;
     }, failCallback);
 
