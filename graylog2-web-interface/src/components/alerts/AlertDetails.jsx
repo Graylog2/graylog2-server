@@ -45,6 +45,7 @@ const AlertDetails = React.createClass({
     }
 
     const alert = this.props.alert;
+    const stream = this.state.stream;
 
     return (
       <div>
@@ -55,7 +56,7 @@ const AlertDetails = React.createClass({
               This is a timeline of events occurred during the alert, you can see more information about some events
               below.
             </p>
-            <AlertTimeline alert={alert} stream={this.state.stream} condition={this.props.condition}
+            <AlertTimeline alert={alert} stream={stream} condition={this.props.condition}
                            conditionType={this.props.conditionType} />
           </Col>
         </Row>
@@ -72,9 +73,7 @@ const AlertDetails = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <h2>Messages evaluated</h2>
-            <p>These are the messages evaluated during the alert.</p>
-            <AlertMessages alert={alert} />
+            <AlertMessages alert={alert} stream={stream} />
           </Col>
         </Row>
       </div>
