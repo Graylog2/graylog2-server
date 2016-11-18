@@ -19,10 +19,9 @@ const AlertDetails = React.createClass({
 
   getInitialState() {
     return {
-      stream: {},
+      stream: undefined,
     };
   },
-
 
   componentDidMount() {
     this._loadData();

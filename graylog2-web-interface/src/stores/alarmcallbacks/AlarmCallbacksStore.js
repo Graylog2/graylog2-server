@@ -10,6 +10,13 @@ import fetch from 'logic/rest/FetchProvider';
 
 const AlarmCallbacksStore = Reflux.createStore({
   listenables: [AlarmCallbacksActions],
+  availableAlarmCallbacks: undefined,
+
+  getInitialState() {
+    return {
+      availableAlarmCallbacks: this.availableAlarmCallbacks,
+    };
+  },
 
   available(streamId) {
     const failCallback = (error) =>
@@ -18,8 +25,9 @@ const AlarmCallbacksStore = Reflux.createStore({
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.available(streamId).url);
     const promise = fetch('GET', url).then((response) => {
-      this.trigger({ availableAlarmCallbacks: response.types });
-      return response.types;
+      this.availableAlarmCallbacks = response.types;
+      this.trigger({ availableAlarmCallbacks: this.availableAlarmCallbacks });
+      return this.availableAlarmCallbacks;
     }, failCallback);
 
     AlarmCallbacksActions.available.promise(promise);

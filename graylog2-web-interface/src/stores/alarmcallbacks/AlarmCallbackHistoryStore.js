@@ -10,14 +10,20 @@ const AlarmCallbackHistoryActions = ActionsProvider.getActions('AlarmCallbackHis
 
 const AlarmCallbackHistoryStore = Reflux.createStore({
   listenables: [AlarmCallbackHistoryActions],
+  histories: undefined,
+
+  getInitialState() {
+    return { histories: this.histories };
+  },
 
   list(streamId, alertId) {
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
     const promise = fetch('GET', url)
       .then(
         response => {
-          this.trigger({ histories: response.histories });
-          return response.histories;
+          this.histories = response.histories;
+          this.trigger({ histories: this.histories });
+          return this.histories;
         },
         error => {
           UserNotification.error(`Fetching notification history for alert '${alertId}' failed with status: ${error}`,
