@@ -1,11 +1,13 @@
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import { Alert, Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import { PaginatedList, Spinner, Timestamp } from 'components/common';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
 
+import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
 
@@ -98,8 +100,19 @@ const AlertMessages = React.createClass({
   },
 
   render() {
+    const timeRange = {
+      rangetype: 'absolute',
+      from: this._getFrom(),
+      to: this._getTo(),
+    };
+
     const title = (
       <div>
+        <div className="pull-right">
+          <LinkContainer to={Routes.stream_search(this.props.stream.id, '*', timeRange)}>
+            <Button bsStyle="info">Open in search page</Button>
+          </LinkContainer>
+        </div>
         <h2>Messages evaluated</h2>
         <p>
           These are the messages evaluated around the time of the alert {this._formatAlertTimeRange()} in stream{' '}
