@@ -16,34 +16,54 @@
  */
 package org.graylog2.shared.buffers.processors;
 
+import com.google.inject.Provider;
+import com.google.inject.assistedinject.Assisted;
+import com.google.inject.assistedinject.AssistedInject;
+
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.lmax.disruptor.WorkHandler;
+
+import org.graylog2.buffers.OutputBuffer;
+import org.graylog2.messageprocessors.OrderedMessageProcessors;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.buffers.MessageEvent;
+import org.graylog2.plugin.messageprocessors.MessageProcessor;
+import org.graylog2.plugin.streams.DefaultStream;
+import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
+import javax.annotation.Nonnull;
+
 import static com.codahale.metrics.MetricRegistry.name;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
-public abstract class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
+public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(ProcessBufferProcessor.class);
 
     private final Meter incomingMessages;
+
     private final Timer processTime;
     private final Meter outgoingMessages;
-
     protected final MetricRegistry metricRegistry;
-    private DecodingProcessor decodingProcessor;
+    private final OrderedMessageProcessors orderedMessageProcessors;
 
-    public ProcessBufferProcessor(MetricRegistry metricRegistry) {
+    private final OutputBuffer outputBuffer;
+    private final DecodingProcessor decodingProcessor;
+    private final Provider<Stream> defaultStreamProvider;
+
+    @AssistedInject
+    public ProcessBufferProcessor(MetricRegistry metricRegistry, OrderedMessageProcessors orderedMessageProcessors, OutputBuffer outputBuffer,
+                                  @Assisted DecodingProcessor decodingProcessor, @DefaultStream Provider<Stream> defaultStreamProvider) {
         this.metricRegistry = metricRegistry;
+        this.orderedMessageProcessors = orderedMessageProcessors;
+        this.outputBuffer = outputBuffer;
+        this.decodingProcessor = decodingProcessor;
+        this.defaultStreamProvider = defaultStreamProvider;
 
         incomingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "incomingMessages"));
         outgoingMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "outgoingMessages"));
@@ -78,8 +98,8 @@ public abstract class ProcessBufferProcessor implements WorkHandler<MessageEvent
         LOG.debug("Starting to process message <{}>.", msg.getId());
 
         try (final Timer.Context ignored = processTime.time()) {
-            LOG.debug("Finished processing message <{}>. Writing to output buffer.", msg.getId());
             handleMessage(msg);
+            LOG.debug("Finished processing message <{}>. Writing to output buffer.", msg.getId());
         } catch (Exception e) {
             LOG.warn("Unable to process message <{}>: {}", msg.getId(), e);
         } finally {
@@ -87,9 +107,19 @@ public abstract class ProcessBufferProcessor implements WorkHandler<MessageEvent
         }
     }
 
-    protected abstract void handleMessage(Message msg);
+    private void handleMessage(@Nonnull Message msg) {
+        msg.addStream(defaultStreamProvider.get());
+        Messages messages = msg;
 
-    public void setDecodingProcessor(DecodingProcessor decodingProcessor) {
-        this.decodingProcessor = decodingProcessor;
+        for (MessageProcessor messageProcessor : orderedMessageProcessors) {
+            messages = messageProcessor.process(messages);
+        }
+        for (Message message : messages) {
+            outputBuffer.insertBlocking(message);
+        }
+    }
+
+    public interface Factory {
+        ProcessBufferProcessor create(DecodingProcessor decodingProcessor);
     }
 }

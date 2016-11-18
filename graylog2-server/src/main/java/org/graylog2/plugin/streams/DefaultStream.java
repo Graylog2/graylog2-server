@@ -14,17 +14,17 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.streams.config;
+package org.graylog2.plugin.streams;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.google.auto.value.AutoValue;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-@JsonAutoDetect
-@AutoValue
-public abstract class DefaultStreamCreated {
-    @JsonCreator
-    public static DefaultStreamCreated create() {
-        return new AutoValue_DefaultStreamCreated();
-    }
+import javax.inject.Qualifier;
+
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.PARAMETER)
+@Qualifier
+public @interface DefaultStream {
 }

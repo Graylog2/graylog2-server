@@ -16,17 +16,14 @@
  */
 package org.graylog2.rest.resources.streams;
 
-import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+
+import com.codahale.metrics.annotation.Timed;
+
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
@@ -70,6 +67,18 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
+
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -84,17 +93,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -219,6 +223,8 @@ public class StreamResource extends RestResource {
                                  @ApiParam(name = "JSON body", required = true)
                                  @Valid @NotNull UpdateStreamRequest cr) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+        checkNotDefaultStream(streamId, "The default stream cannot be edited.");
+
         final Stream stream = streamService.load(streamId);
 
         if (!Strings.isNullOrEmpty(cr.title())) {
@@ -255,6 +261,7 @@ public class StreamResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.STREAM_DELETE)
     public void delete(@ApiParam(name = "streamId", required = true) @PathParam("streamId") String streamId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+        checkNotDefaultStream(streamId, "The default stream cannot be deleted.");
 
         final Stream stream = streamService.load(streamId);
         streamService.destroy(stream);
@@ -274,6 +281,7 @@ public class StreamResource extends RestResource {
     public void pause(@ApiParam(name = "streamId", required = true)
                       @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
+        checkNotDefaultStream(streamId, "The default stream cannot be paused.");
 
         final Stream stream = streamService.load(streamId);
         streamService.pause(stream);
@@ -292,6 +300,7 @@ public class StreamResource extends RestResource {
     public void resume(@ApiParam(name = "streamId", required = true)
                        @PathParam("streamId") @NotEmpty String streamId) throws NotFoundException, ValidationException {
         checkAnyPermission(new String[]{RestPermissions.STREAMS_CHANGESTATE, RestPermissions.STREAMS_EDIT}, streamId);
+        checkNotDefaultStream(streamId, "The default stream cannot be resumed.");
 
         final Stream stream = streamService.load(streamId);
         streamService.resume(stream);
@@ -354,6 +363,7 @@ public class StreamResource extends RestResource {
                                 @ApiParam(name = "JSON body", required = true) @Valid @NotNull CloneStreamRequest cr) throws ValidationException, NotFoundException {
         checkPermission(RestPermissions.STREAMS_CREATE);
         checkPermission(RestPermissions.STREAMS_READ, streamId);
+        checkNotDefaultStream(streamId, "The default stream cannot be cloned.");
 
         final Stream sourceStream = streamService.load(streamId);
 
@@ -454,5 +464,11 @@ public class StreamResource extends RestResource {
             .map((output) -> OutputSummary.create(output.getId(),output.getTitle(), output.getType(),
                 output.getCreatorUserId(), new DateTime(output.getCreatedAt()), output.getConfiguration(), output.getContentPack()))
             .collect(Collectors.toSet());
+    }
+
+    private void checkNotDefaultStream(String streamId, String message) {
+        if (Stream.DEFAULT_STREAM_ID.equals(streamId)) {
+            throw new BadRequestException(message);
+        }
     }
 }
