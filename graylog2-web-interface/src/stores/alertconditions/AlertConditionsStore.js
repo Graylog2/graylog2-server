@@ -118,10 +118,15 @@ const AlertConditionsStore = Reflux.createStore({
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.get(streamId, conditionId).url);
-    const promise = fetch('GET', url).then(response => {
-      this.trigger({ alertCondition: response });
-      return response;
-    }, failureCallback || failCallback);
+    const promise = fetch('GET', url);
+    promise.then(
+      response => {
+        this.trigger({ alertCondition: response });
+        return response;
+      },
+      error => {
+        return (typeof failureCallback === 'function' ? failureCallback(error) : failCallback(error));
+      });
 
     AlertConditionsActions.get.promise(promise);
   },

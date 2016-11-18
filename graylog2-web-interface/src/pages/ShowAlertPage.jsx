@@ -25,17 +25,25 @@ const ShowAlertPage = React.createClass({
     this._loadData();
   },
 
+  componentDidUpdate(prevProps, prevState) {
+    if (prevState.alert !== this.state.alert) {
+      this._loadAlertCondition(this.state.alert);
+    }
+  },
+
   _loadData() {
     AlertConditionsActions.available();
-    AlertsActions.get(this.props.params.alertId).then(alert => {
-      AlertConditionsActions.get(alert.stream_id, alert.condition_id, error => {
-        if (error.additional && error.additional.status === 404) {
-          this.setState({ alertCondition: {} });
-        } else {
-          UserNotification.error(`Fetching alert condition ${alert.condition_id} failed with status: ${error}`,
-            'Could not get alert condition information');
-        }
-      });
+    AlertsActions.get(this.props.params.alertId);
+  },
+
+  _loadAlertCondition(alert) {
+    AlertConditionsActions.get(alert.stream_id, alert.condition_id, error => {
+      if (error.additional && error.additional.status === 404) {
+        this.setState({ alertCondition: {} });
+      } else {
+        UserNotification.error(`Fetching alert condition ${alert.condition_id} failed with status: ${error}`,
+          'Could not get alert condition information');
+      }
     });
   },
 
