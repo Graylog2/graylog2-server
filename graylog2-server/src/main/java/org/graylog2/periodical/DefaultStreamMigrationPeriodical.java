@@ -17,7 +17,6 @@
 package org.graylog2.periodical;
 
 import com.google.common.collect.ImmutableMap;
-
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
@@ -27,17 +26,15 @@ import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.config.DefaultStreamCreated;
 import org.graylog2.streams.events.StreamsChangedEvent;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
-
-import javax.inject.Inject;
 
 /**
  * Periodical creating the default stream if it doesn't exist.
@@ -76,7 +73,6 @@ public class DefaultStreamMigrationPeriodical extends Periodical {
             streamService.save(stream);
             LOG.info("Successfully created default stream: {}", stream.getTitle());
 
-            clusterConfigService.write(DefaultStreamCreated.create());
             clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
         } catch (ValidationException e) {
             LOG.error("Couldn't create default stream", e);
@@ -101,12 +97,11 @@ public class DefaultStreamMigrationPeriodical extends Periodical {
     @Override
     public boolean startOnThisNode() {
         try {
-            streamService.load(Stream.DEFAULT_STREAM_ID);
+            return streamService.load(Stream.DEFAULT_STREAM_ID) == null;
         } catch (NotFoundException ignored) {
             // if the stream cannot be found, recreate it
             return true;
         }
-        return clusterConfigService.get(DefaultStreamCreated.class) == null;
     }
 
     @Override

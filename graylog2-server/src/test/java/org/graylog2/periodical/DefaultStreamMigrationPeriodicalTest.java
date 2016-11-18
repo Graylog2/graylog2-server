@@ -23,7 +23,6 @@ import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
-import org.graylog2.streams.config.DefaultStreamCreated;
 import org.graylog2.streams.events.StreamsChangedEvent;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,6 +34,7 @@ import org.mockito.junit.MockitoRule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -81,14 +81,6 @@ public class DefaultStreamMigrationPeriodicalTest {
     }
 
     @Test
-    public void doRunPostsSavesDefaultStreamCreatedClusterConfig() throws Exception {
-        final ArgumentCaptor<DefaultStreamCreated> argumentCaptor = ArgumentCaptor.forClass(DefaultStreamCreated.class);
-        periodical.doRun();
-        verify(clusterConfigService).write(argumentCaptor.capture());
-        verifyNoMoreInteractions(clusterConfigService);
-    }
-
-    @Test
     public void doRunDoesNotCreateStreamRuleIfStreamCreationFails() throws Exception {
         when(streamService.save(any(Stream.class))).thenThrow(ValidationException.class);
 
@@ -130,7 +122,8 @@ public class DefaultStreamMigrationPeriodicalTest {
 
     @Test
     public void startOnThisNodeReturnsFalseIfDefaultStreamHasBeenCreatedBefore() throws Exception {
-        when(clusterConfigService.get(DefaultStreamCreated.class)).thenReturn(DefaultStreamCreated.create());
+        final Stream stream = mock(Stream.class);
+        when(streamService.load(Stream.DEFAULT_STREAM_ID)).thenReturn(stream);
         assertThat(periodical.startOnThisNode()).isFalse();
     }
 
