@@ -67,7 +67,7 @@ const AlertTimeline = React.createClass({
       // Old alert without a resolution_at field
       formattedResolution.push(
         <dt key="resolution-title"><Timestamp dateTime={this.props.alert.triggered_at} /></dt>,
-        <dd key="resolution-desc">This alert did not support resolution. It was marked as resolved when triggered.</dd>,
+        <dd key="resolution-desc">This alert does not support resolution. It was marked as resolved when triggered.</dd>,
       );
     } else {
       if (this.props.alert.resolved_at) {
@@ -78,7 +78,7 @@ const AlertTimeline = React.createClass({
       } else {
         formattedResolution.push(
           <dt key="resolution-title"><Timestamp dateTime={new Date()} /></dt>,
-          <dd key="resolution-desc">Condition is still satisfied, alert is still <strong>unresolved</strong></dd>,
+          <dd key="resolution-desc">Condition is still satisfied, alert is <strong>unresolved</strong></dd>,
         );
       }
     }
@@ -106,7 +106,7 @@ const AlertTimeline = React.createClass({
     return (
       <dl className="dl-horizontal">
         <dt>{triggeredAtTimestamp}</dt>
-        <dd>Graylog checks {title} on stream <em>{this.props.stream.title}</em></dd>
+        <dd>Graylog checks {title} condition on stream <em>{this.props.stream.title}</em></dd>
         <dt>{triggeredAtTimestamp}</dt>
         <dd>{alert.description}</dd>
         <dt>{triggeredAtTimestamp}</dt>

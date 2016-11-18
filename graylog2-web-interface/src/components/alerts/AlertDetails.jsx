@@ -52,7 +52,10 @@ const AlertDetails = React.createClass({
         <Row className="content">
           <Col md={12}>
             <h2>Alert timeline</h2>
-            <p>This is a timeline of events occurred during the alert, you can see more information below.</p>
+            <p>
+              This is a timeline of events occurred during the alert, you can see more information about some events
+              below.
+            </p>
             <AlertTimeline alert={alert} stream={this.state.stream} condition={this.props.condition}
                            conditionType={this.props.conditionType} />
           </Col>
