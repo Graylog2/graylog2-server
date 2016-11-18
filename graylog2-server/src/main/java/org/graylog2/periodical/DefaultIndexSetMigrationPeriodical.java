@@ -30,7 +30,6 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.streams.config.DefaultStreamCreated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,6 @@ public class DefaultIndexSetMigrationPeriodical extends Periodical {
     private final Map<String, Provider<RotationStrategy>> rotationStrategies;
     private final Map<String, Provider<RetentionStrategy>> retentionStrategies;
     private final IndexSetService indexSetService;
-    private final ClusterEventBus clusterEventBus;
     private final ClusterConfigService clusterConfigService;
 
     @Inject
@@ -61,13 +59,11 @@ public class DefaultIndexSetMigrationPeriodical extends Periodical {
                                               final Map<String, Provider<RotationStrategy>> rotationStrategies,
                                               final Map<String, Provider<RetentionStrategy>> retentionStrategies,
                                               final IndexSetService indexSetService,
-                                              final ClusterEventBus clusterEventBus,
                                               final ClusterConfigService clusterConfigService) {
         this.elasticsearchConfiguration = elasticsearchConfiguration;
         this.rotationStrategies = requireNonNull(rotationStrategies);
         this.retentionStrategies = requireNonNull(retentionStrategies);
         this.indexSetService = indexSetService;
-        this.clusterEventBus = clusterEventBus;
         this.clusterConfigService = clusterConfigService;
     }
 
