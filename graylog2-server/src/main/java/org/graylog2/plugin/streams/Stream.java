@@ -75,5 +75,9 @@ public interface Stream extends Persisted {
 
     void setDefaultStream(boolean defaultStream);
 
+    boolean getRemoveFromAllMessages();
+
+    void setRemoveFromAllMessages(boolean removeFromAllMessages);
+
     Set<IndexSet> getIndexSets();
 }

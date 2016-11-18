@@ -7,6 +7,8 @@ interface Stream {
   id: string;
   title: string;
   description: string;
+  remove_from_all_messages: boolean;
+  isDefaultStream: boolean;
   creatorUser: string;
   createdAt: number;
 }

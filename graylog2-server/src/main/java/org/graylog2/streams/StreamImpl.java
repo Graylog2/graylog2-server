@@ -17,7 +17,6 @@
 package org.graylog2.streams;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -41,8 +40,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-
 /**
  * Representing a single stream from the streams collection. Also provides method
  * to get all streams of this collection.
@@ -60,6 +57,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
     public static final String FIELD_MATCHING_TYPE = "matching_type";
     public static final String FIELD_DEFAULT_STREAM = "is_default_stream";
+    public static final String FIELD_REMOVE_FROM_ALL_MESSAGES = "remove_from_all_messages";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
 
     private final List<StreamRule> streamRules;
@@ -176,6 +174,8 @@ public class StreamImpl extends PersistedImpl implements Stream {
         result.put(FIELD_RULES, streamRules);
         result.put(FIELD_OUTPUTS, outputs);
         result.put(FIELD_MATCHING_TYPE, getMatchingType());
+        result.put(FIELD_DEFAULT_STREAM, isDefaultStream());
+        result.put(FIELD_REMOVE_FROM_ALL_MESSAGES, getRemoveFromAllMessages());
         return result;
     }
 
@@ -202,11 +202,10 @@ public class StreamImpl extends PersistedImpl implements Stream {
 
     @Override
     public Map<String, List<String>> getAlertReceivers() {
-        if (!fields.containsKey(FIELD_ALERT_RECEIVERS)) {
-            return Collections.emptyMap();
-        }
-
-        return (Map<String, List<String>>) fields.get(FIELD_ALERT_RECEIVERS);
+        @SuppressWarnings("unchecked")
+        final Map<String, List<String>> alertReceivers =
+                (Map<String, List<String>>) fields.getOrDefault(FIELD_ALERT_RECEIVERS, Collections.emptyMap());
+        return alertReceivers;
     }
 
     @Override
@@ -222,18 +221,27 @@ public class StreamImpl extends PersistedImpl implements Stream {
 
     @Override
     public void setMatchingType(MatchingType matchingType) {
-        Preconditions.checkNotNull(matchingType);
         fields.put(FIELD_MATCHING_TYPE, matchingType.toString());
     }
 
     @Override
     public boolean isDefaultStream() {
-        return (boolean) firstNonNull(fields.get(FIELD_DEFAULT_STREAM), false);
+        return (boolean) fields.getOrDefault(FIELD_DEFAULT_STREAM, false);
     }
 
     @Override
     public void setDefaultStream(boolean defaultStream) {
         fields.put(FIELD_DEFAULT_STREAM, defaultStream);
+    }
+
+    @Override
+    public boolean getRemoveFromAllMessages() {
+        return (boolean) fields.getOrDefault(FIELD_REMOVE_FROM_ALL_MESSAGES, false);
+    }
+
+    @Override
+    public void setRemoveFromAllMessages(boolean removeFromAllMessages) {
+        fields.put(FIELD_REMOVE_FROM_ALL_MESSAGES, removeFromAllMessages);
     }
 
     @Override

@@ -27,6 +27,7 @@ import com.google.common.util.concurrent.TimeLimiter;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.plugin.streams.StreamRuleType;
@@ -59,6 +60,7 @@ public class StreamRouterEngine {
     private final TimeLimiter timeLimiter;
     private final long streamProcessingTimeout;
     private final String fingerprint;
+    private final Stream defaultStream;
 
     private final List<Rule> rulesList;
 
@@ -70,13 +72,15 @@ public class StreamRouterEngine {
     public StreamRouterEngine(@Assisted List<Stream> streams,
                               @Assisted ExecutorService executorService,
                               StreamFaultManager streamFaultManager,
-                              StreamMetrics streamMetrics) {
+                              StreamMetrics streamMetrics,
+                              @DefaultStream Stream defaultStream) {
         this.streams = streams;
         this.streamFaultManager = streamFaultManager;
         this.streamMetrics = streamMetrics;
         this.timeLimiter = new SimpleTimeLimiter(executorService);
         this.streamProcessingTimeout = streamFaultManager.getStreamProcessingTimeout();
         this.fingerprint = new StreamListFingerprint(streams).getFingerprint();
+        this.defaultStream = defaultStream;
 
         final List<Rule> alwaysMatchRules = Lists.newArrayList();
         final List<Rule> presenceRules = Lists.newArrayList();
@@ -203,6 +207,13 @@ public class StreamRouterEngine {
 
         for (Stream stream : result) {
             streamMetrics.markIncomingMeter(stream.getId());
+            if(stream.getRemoveFromAllMessages()) {
+                if(message.removeStream(defaultStream)) {
+                    LOG.trace("Successfully removed default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
+                } else {
+                    LOG.warn("Couldn't remove default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
+                }
+            }
         }
 
         return ImmutableList.copyOf(result);

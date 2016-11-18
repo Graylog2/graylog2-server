@@ -32,8 +32,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
-import static com.google.common.base.MoreObjects.firstNonNull;
-
 public class StreamMock implements Stream {
     private String id;
     private String title;
@@ -43,6 +41,7 @@ public class StreamMock implements Stream {
     private List<StreamRule> streamRules;
     private MatchingType matchingType;
     private boolean defaultStream;
+    private boolean removeFromAllMessages;
 
     public StreamMock(Map<String, Object> stream) {
         this(stream, Collections.emptyList());
@@ -57,8 +56,9 @@ public class StreamMock implements Stream {
         }
         this.contentPack = (String) stream.get(StreamImpl.FIELD_CONTENT_PACK);
         this.streamRules = streamRules;
-        this.matchingType = firstNonNull((MatchingType) stream.get(StreamImpl.FIELD_MATCHING_TYPE), MatchingType.AND);
-        this.defaultStream = (boolean) firstNonNull(stream.get(StreamImpl.FIELD_DEFAULT_STREAM), false);
+        this.matchingType = (MatchingType) stream.getOrDefault(StreamImpl.FIELD_MATCHING_TYPE, MatchingType.AND);
+        this.defaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_DEFAULT_STREAM, false);
+        this.removeFromAllMessages = (boolean) stream.getOrDefault(StreamImpl.FIELD_REMOVE_FROM_ALL_MESSAGES, false);
     }
 
     @Override
@@ -68,22 +68,22 @@ public class StreamMock implements Stream {
 
     @Override
     public Map<String, Object> getFields() {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<String, Validator> getValidations() {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     @Override
     public Map<String, Object> asMap() {
-        return Maps.newHashMap();
+        return Collections.emptyMap();
     }
 
     @Override
@@ -177,6 +177,16 @@ public class StreamMock implements Stream {
     }
 
     @Override
+    public boolean getRemoveFromAllMessages() {
+        return removeFromAllMessages;
+    }
+
+    @Override
+    public void setRemoveFromAllMessages(boolean removeFromAllMessages) {
+        this.removeFromAllMessages = removeFromAllMessages;
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(StreamMock.class)
                 .add("id", id)
@@ -184,6 +194,7 @@ public class StreamMock implements Stream {
                 .add("matchingType", matchingType)
                 .add("defaultStream", defaultStream)
                 .add("disabled", disabled)
+                .add("removeFromAllMessages", removeFromAllMessages)
                 .toString();
     }
 
@@ -197,12 +208,14 @@ public class StreamMock implements Stream {
                 Objects.equals(title, that.title) &&
                 Objects.equals(description, that.description) &&
                 Objects.equals(streamRules, that.streamRules) &&
+                Objects.equals(defaultStream, that.defaultStream) &&
+                Objects.equals(removeFromAllMessages, that.removeFromAllMessages) &&
                 matchingType == that.matchingType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, description, streamRules, matchingType, defaultStream);
+        return Objects.hash(id, title, description, streamRules, matchingType, defaultStream, removeFromAllMessages);
     }
 
     @Override

@@ -15,7 +15,11 @@ var StreamForm = React.createClass({
     },
     getDefaultProps() {
         return {
-            stream: {title: "", description: ""}
+            stream: {
+                title: "",
+                description: "",
+                remove_from_all_messages: false
+            }
         };
     },
     _resetValues() {
@@ -24,11 +28,17 @@ var StreamForm = React.createClass({
     _getValuesFromProps(props) {
         return {
             title: props.stream.title,
-            description: props.stream.description
+            description: props.stream.description,
+            remove_from_all_messages: props.stream.remove_from_all_messages
         };
     },
     _onSubmit(evt) {
-        this.props.onSubmit(this.props.stream.id, {title: this.state.title, description: this.state.description});
+        this.props.onSubmit(this.props.stream.id,
+            {
+                title: this.state.title,
+                description: this.state.description,
+                remove_from_all_messages: this.state.remove_from_all_messages,
+            });
         this.refs.modal.close();
     },
     open() {
@@ -46,6 +56,7 @@ var StreamForm = React.createClass({
                                 submitButtonText="Save">
                 <Input type='text' required={true} label='Title' placeholder='A descriptive name of the new stream' valueLink={this.linkState('title')} autoFocus />
                 <Input type='text' required={true} label='Description' placeholder='What kind of messages are routed into this stream?' valueLink={this.linkState('description')}/>
+                <Input type="checkbox" label="Remove from All Messages stream" checkedLink={this.linkState('remove_from_all_messages')}/>
             </BootstrapModalForm>
         );
     }

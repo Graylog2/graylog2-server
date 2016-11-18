@@ -104,6 +104,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
         streamData.put(StreamImpl.FIELD_CONTENT_PACK, cr.contentPack());
         streamData.put(StreamImpl.FIELD_MATCHING_TYPE, cr.matchingType().toString());
+        streamData.put(StreamImpl.FIELD_REMOVE_FROM_ALL_MESSAGES, cr.removeFromAllMessages());
 
         return create(streamData);
     }
