@@ -1,7 +1,7 @@
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 
-import AlertTimeline from 'components/alerts/AlertTimeline';
+import { AlertMessages, AlertTimeline } from 'components/alerts';
 import { AlarmCallbackHistoryOverview } from 'components/alarmcallbacks';
 import { Spinner } from 'components/common';
 
@@ -68,6 +68,14 @@ const AlertDetails = React.createClass({
               These are the notifications triggered during the alert, including the configuration they had at the time.
             </p>
             <AlarmCallbackHistoryOverview alertId={alert.id} streamId={alert.stream_id} />
+          </Col>
+        </Row>
+
+        <Row className="content">
+          <Col md={12}>
+            <h2>Messages evaluated</h2>
+            <p>These are the messages evaluated during the alert.</p>
+            <AlertMessages alert={alert} />
           </Col>
         </Row>
       </div>

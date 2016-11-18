@@ -2,7 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
-import AlertsComponent from 'components/alerts/AlertsComponent';
+import { AlertsComponent } from 'components/alerts';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import { PageHeader } from 'components/common';

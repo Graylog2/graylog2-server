@@ -19,7 +19,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import { AlarmCallbackComponent } from 'components/alarmcallbacks';
 import CreateAlertConditionInput from 'components/alertconditions/CreateAlertConditionInput';
 import AlertConditionsList from 'components/alertconditions/AlertConditionsList';
-import AlertReceiversList from 'components/alerts/AlertReceiversList';
+import { AlertReceiversList } from 'components/alerts';
 
 const StreamAlertsPage = React.createClass({
   propTypes: {

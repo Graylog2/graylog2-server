@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import { Label } from 'react-bootstrap';
 
 import { PageHeader, Spinner, Timestamp } from 'components/common';
-import AlertDetails from 'components/alerts/AlertDetails';
+import { AlertDetails } from 'components/alerts';
 
 import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';

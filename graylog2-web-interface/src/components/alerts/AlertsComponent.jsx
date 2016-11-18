@@ -7,7 +7,7 @@ const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
-import Alert from 'components/alerts/Alert';
+import { Alert } from 'components/alerts';
 import { EntityList, PaginatedList, Spinner } from 'components/common';
 
 const AlertsComponent = React.createClass({
