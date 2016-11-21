@@ -76,7 +76,7 @@ public class V20160929120500_CreateDefaultStreamMigration extends Migration {
                 .put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false)
                 .put(StreamImpl.FIELD_DEFAULT_STREAM, true)
                 .build();
-        final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), Collections.emptySet());
+        final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), null);
 
         try {
             streamService.save(stream);

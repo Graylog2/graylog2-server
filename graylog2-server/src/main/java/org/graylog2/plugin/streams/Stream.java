@@ -79,5 +79,9 @@ public interface Stream extends Persisted {
 
     void setRemoveMatchesFromDefaultStream(boolean removeMatchesFromDefaultStream);
 
-    Set<IndexSet> getIndexSets();
+    IndexSet getIndexSet();
+
+    String getIndexSetId();
+
+    void setIndexSetId(String indexSetId);
 }

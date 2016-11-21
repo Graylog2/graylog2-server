@@ -425,7 +425,7 @@ public class Message implements Messages {
      * @param stream the stream to route this message into
      */
     public void addStream(Stream stream) {
-        indexSets.addAll(stream.getIndexSets());
+        indexSets.add(stream.getIndexSet());
         streams.add(stream);
     }
 
@@ -450,7 +450,7 @@ public class Message implements Messages {
         if (removed) {
             indexSets.clear();
             for (Stream s : streams) {
-                indexSets.addAll(s.getIndexSets());
+                indexSets.add(s.getIndexSet());
             }
         }
 
