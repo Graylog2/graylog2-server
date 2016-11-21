@@ -78,7 +78,7 @@ const CreateExtractorsPage = React.createClass({
         <EditExtractor action="create"
                        extractor={this.state.extractor}
                        inputId={this.state.input.id}
-                       exampleMessage={this.state.exampleMessage.fields[this.state.field]}
+                       exampleMessage={JSON.stringify(this.state.exampleMessage.fields[this.state.field]) || ''}
                        onSave={this._extractorSaved}/>
       </div>
     );
