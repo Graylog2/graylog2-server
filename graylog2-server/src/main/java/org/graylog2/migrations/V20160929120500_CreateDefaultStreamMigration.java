@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.periodical;
+package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableMap;
-
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
@@ -32,29 +30,39 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.inject.Inject;
-
 /**
- * Periodical creating the default stream if it doesn't exist.
+ * Migration creating the default stream if it doesn't exist.
  */
-public class DefaultStreamMigrationPeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultStreamMigrationPeriodical.class);
+public class V20160929120500_CreateDefaultStreamMigration implements Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20160929120500_CreateDefaultStreamMigration.class);
 
     private final StreamService streamService;
     private final ClusterEventBus clusterEventBus;
 
-    @Inject
-    public DefaultStreamMigrationPeriodical(final StreamService streamService,
-                                            final ClusterEventBus clusterEventBus) {
+    public V20160929120500_CreateDefaultStreamMigration(StreamService streamService, ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         this.clusterEventBus = clusterEventBus;
     }
 
     @Override
-    public void doRun() {
+    public ZonedDateTime createdAt() {
+        return ZonedDateTime.parse("2016-09-29T12:05:00Z");
+    }
+
+    @Override
+    public void upgrade() {
+        try {
+            streamService.load(Stream.DEFAULT_STREAM_ID);
+        } catch (NotFoundException ignored) {
+            createDefaultStream();
+        }
+    }
+
+    private void createDefaultStream() {
         final ObjectId id = new ObjectId(Stream.DEFAULT_STREAM_ID);
         final Map<String, Object> fields = ImmutableMap.<String, Object>builder()
                 .put(StreamImpl.FIELD_TITLE, "All messages")
@@ -75,50 +83,5 @@ public class DefaultStreamMigrationPeriodical extends Periodical {
         } catch (ValidationException e) {
             LOG.error("Couldn't create default stream", e);
         }
-    }
-
-    @Override
-    public boolean runsForever() {
-        return true;
-    }
-
-    @Override
-    public boolean stopOnGracefulShutdown() {
-        return false;
-    }
-
-    @Override
-    public boolean masterOnly() {
-        return true;
-    }
-
-    @Override
-    public boolean startOnThisNode() {
-        try {
-            return streamService.load(Stream.DEFAULT_STREAM_ID) == null;
-        } catch (NotFoundException ignored) {
-            // if the stream cannot be found, recreate it
-            return true;
-        }
-    }
-
-    @Override
-    public boolean isDaemon() {
-        return false;
-    }
-
-    @Override
-    public int getInitialDelaySeconds() {
-        return 0;
-    }
-
-    @Override
-    public int getPeriodSeconds() {
-        return 0;
-    }
-
-    @Override
-    protected Logger getLogger() {
-        return LOG;
     }
 }

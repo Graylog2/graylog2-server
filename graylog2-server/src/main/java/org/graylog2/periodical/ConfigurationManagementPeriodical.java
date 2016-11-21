@@ -20,6 +20,7 @@ package org.graylog2.periodical;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.migrations.V20151210140600_ElasticsearchConfigMigration;
+import org.graylog2.migrations.V20160929120500_CreateDefaultStreamMigration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.streams.StreamService;
@@ -49,6 +50,7 @@ public class ConfigurationManagementPeriodical extends Periodical {
     @Override
     public void doRun() {
         new V20151210140600_ElasticsearchConfigMigration(clusterConfigService, elasticsearchConfiguration).upgrade();
+        new V20160929120500_CreateDefaultStreamMigration(streamService, clusterEventBus).upgrade();
     }
 
     @Override
