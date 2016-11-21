@@ -17,10 +17,10 @@
 package org.graylog2.periodical;
 
 import com.google.common.collect.ImmutableMap;
+
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
@@ -32,9 +32,10 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.Map;
+
+import javax.inject.Inject;
 
 /**
  * Periodical creating the default stream if it doesn't exist.
@@ -44,15 +45,12 @@ public class DefaultStreamMigrationPeriodical extends Periodical {
 
     private final StreamService streamService;
     private final ClusterEventBus clusterEventBus;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public DefaultStreamMigrationPeriodical(final StreamService streamService,
-                                            final ClusterEventBus clusterEventBus,
-                                            final ClusterConfigService clusterConfigService) {
+                                            final ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         this.clusterEventBus = clusterEventBus;
-        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
