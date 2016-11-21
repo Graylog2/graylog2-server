@@ -55,12 +55,16 @@ public class DefaultStreamProvider implements Provider<Stream> {
             if (defaultStream != null) {
                 return defaultStream;
             }
+            int i = 0;
             do {
                 try {
                     LOG.debug("Loading shared default stream instance");
                     defaultStream = service.load(Stream.DEFAULT_STREAM_ID);
                 } catch (NotFoundException ignored) {
-                    LOG.warn("Unable to load default stream, retrying. Processing is blocked until this succeeds.");
+                    if (i % 10 == 0) {
+                        LOG.warn("Unable to load default stream, tried {} times, retrying every 500ms. Processing is blocked until this succeeds.", i + 1);
+                    }
+                    i++;
                     Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
                 }
             } while (defaultStream == null);

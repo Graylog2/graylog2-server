@@ -48,12 +48,10 @@ public class DefaultStreamMigrationPeriodicalTest {
     private StreamService streamService;
     @Mock
     private ClusterEventBus clusterEventBus;
-    @Mock
-    private ClusterConfigService clusterConfigService;
 
     @Before
     public void setUpService() throws Exception {
-        periodical = new DefaultStreamMigrationPeriodical(streamService, clusterEventBus, clusterConfigService);
+        periodical = new DefaultStreamMigrationPeriodical(streamService, clusterEventBus);
     }
 
     @Test
@@ -94,15 +92,6 @@ public class DefaultStreamMigrationPeriodicalTest {
         periodical.doRun();
 
         verifyNoMoreInteractions(clusterEventBus);
-    }
-
-    @Test
-    public void doRunDoesNotSaveDefaultStreamCreatedClusterConfigIfStreamCreationFails() throws Exception {
-        when(streamService.save(any(Stream.class))).thenThrow(ValidationException.class);
-
-        periodical.doRun();
-
-        verifyNoMoreInteractions(clusterConfigService);
     }
 
     @Test
