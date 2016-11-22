@@ -14,12 +14,15 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.periodical;
+package org.graylog2.migrations;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.DefaultIndexSetCreated;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategy;
@@ -44,7 +47,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class IndexSetsMigrationPeriodicalTest {
+public class V20161116172100_DefaultIndexSetMigrationTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Rule
@@ -54,25 +57,28 @@ public class IndexSetsMigrationPeriodicalTest {
     private IndexSetService indexSetService;
     @Mock
     private ClusterConfigService clusterConfigService;
+    @Mock
+    private ClusterEventBus clusterEventBus;
 
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
     private RotationStrategy rotationStrategy = new StubRotationStrategy();
     private RetentionStrategy retentionStrategy = new StubRetentionStrategy();
-    private IndexSetsMigrationPeriodical periodical;
+    private Migration migration;
 
 
     @Before
     public void setUpService() throws Exception {
-        periodical = new IndexSetsMigrationPeriodical(
+        migration = new V20161116172100_DefaultIndexSetMigration(
                 elasticsearchConfiguration,
                 Collections.singletonMap("test", () -> rotationStrategy),
                 Collections.singletonMap("test", () -> retentionStrategy),
                 indexSetService,
-                clusterConfigService);
+                clusterConfigService,
+                clusterEventBus);
     }
 
     @Test
-    public void doRunCreatesDefaultIndexSet() throws Exception {
+    public void upgradeCreatesDefaultIndexSet() throws Exception {
         final StubRotationStrategyConfig rotationStrategyConfig = new StubRotationStrategyConfig();
         final StubRetentionStrategyConfig retentionStrategyConfig = new StubRetentionStrategyConfig();
         final IndexSetConfig savedIndexSetConfig = IndexSetConfig.builder()
@@ -92,10 +98,11 @@ public class IndexSetsMigrationPeriodicalTest {
 
         final ArgumentCaptor<IndexSetConfig> indexSetConfigCaptor = ArgumentCaptor.forClass(IndexSetConfig.class);
 
-        periodical.doRun();
+        migration.upgrade();
 
         verify(indexSetService).save(indexSetConfigCaptor.capture());
-        verify(clusterConfigService).write(IndexSetsMigrationPeriodical.IndexSetMigrated.create());
+        verify(clusterConfigService).write(DefaultIndexSetCreated.create());
+        verify(clusterEventBus).post(IndexSetCreatedEvent.create(savedIndexSetConfig));
 
         final IndexSetConfig capturedIndexSetConfig = indexSetConfigCaptor.getValue();
         assertThat(capturedIndexSetConfig.id()).isNull();
@@ -109,107 +116,41 @@ public class IndexSetsMigrationPeriodicalTest {
     }
 
     @Test
-    public void doRunCreatesDefaultIndexSetWithDefaultRotationAndRetentionStrategyConfig() throws Exception {
-        final StubRotationStrategyConfig rotationStrategyConfig = new StubRotationStrategyConfig();
-        final StubRetentionStrategyConfig retentionStrategyConfig = new StubRetentionStrategyConfig();
-        final IndexSetConfig savedIndexSetConfig = IndexSetConfig.builder()
-                .id("id")
-                .title("title")
-                .indexPrefix("prefix")
-                .shards(1)
-                .replicas(0)
-                .rotationStrategy(rotationStrategyConfig)
-                .retentionStrategy(retentionStrategyConfig)
-                .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
-                .build();
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("test", "test"));
-        when(clusterConfigService.get(StubRotationStrategyConfig.class)).thenReturn(null);
-        when(clusterConfigService.get(StubRetentionStrategyConfig.class)).thenReturn(null);
-        when(indexSetService.save(any(IndexSetConfig.class))).thenReturn(savedIndexSetConfig);
-
-        final ArgumentCaptor<IndexSetConfig> indexSetConfigCaptor = ArgumentCaptor.forClass(IndexSetConfig.class);
-
-        periodical.doRun();
-
-        verify(indexSetService).save(indexSetConfigCaptor.capture());
-        verify(clusterConfigService).write(IndexSetsMigrationPeriodical.IndexSetMigrated.create());
-
-        final IndexSetConfig capturedIndexSetConfig = indexSetConfigCaptor.getValue();
-        assertThat(capturedIndexSetConfig.rotationStrategy()).isInstanceOf(StubRotationStrategyConfig.class);
-        assertThat(capturedIndexSetConfig.retentionStrategy()).isInstanceOf(StubRetentionStrategyConfig.class);
-    }
-
-    @Test
-    public void doRunThrowsIllegalStateExceptionIfIndexManagementConfigIsMissing() throws Exception {
+    public void upgradeThrowsIllegalStateExceptionIfIndexManagementConfigIsMissing() throws Exception {
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(null);
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't find index management configuration");
 
-        periodical.doRun();
+        migration.upgrade();
     }
 
     @Test
-    public void doRunThrowsIllegalStateExceptionIfRotationStrategyIsMissing() throws Exception {
+    public void upgradeThrowsIllegalStateExceptionIfRotationStrategyIsMissing() throws Exception {
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("foobar", "test"));
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't retrieve rotation strategy provider for <foobar>");
 
-        periodical.doRun();
+        migration.upgrade();
     }
 
     @Test
-    public void doRunThrowsIllegalStateExceptionIfRetentionStrategyIsMissing() throws Exception {
+    public void upgradeThrowsIllegalStateExceptionIfRetentionStrategyIsMissing() throws Exception {
+        when(clusterConfigService.get(StubRotationStrategyConfig.class)).thenReturn(new StubRotationStrategyConfig());
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("test", "foobar"));
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't retrieve retention strategy provider for <foobar>");
 
-        periodical.doRun();
-    }
-
-
-    @Test
-    public void runsForeverReturnsTrue() throws Exception {
-        assertThat(periodical.runsForever()).isTrue();
-    }
-
-    @Test
-    public void stopOnGracefulShutdownReturnsFalse() throws Exception {
-        assertThat(periodical.stopOnGracefulShutdown()).isFalse();
-    }
-
-    @Test
-    public void masterOnlyReturnsTrue() throws Exception {
-        assertThat(periodical.masterOnly()).isTrue();
+        migration.upgrade();
     }
 
     @Test
     public void startOnThisNodeReturnsFalseIfMigrationWasSuccessfulBefore() throws Exception {
-        when(clusterConfigService.get(IndexSetsMigrationPeriodical.IndexSetMigrated.class))
-                .thenReturn(IndexSetsMigrationPeriodical.IndexSetMigrated.create());
-        assertThat(periodical.startOnThisNode()).isFalse();
-    }
-
-    @Test
-    public void isDaemonReturnsFalse() throws Exception {
-        assertThat(periodical.isDaemon()).isFalse();
-    }
-
-    @Test
-    public void getInitialDelaySecondsReturns0() throws Exception {
-        assertThat(periodical.getInitialDelaySeconds()).isEqualTo(0);
-    }
-
-    @Test
-    public void getPeriodSecondsReturns0() throws Exception {
-        assertThat(periodical.getPeriodSeconds()).isEqualTo(0);
-    }
-
-    @Test
-    public void getLoggerReturnsClassLogger() throws Exception {
-        assertThat(periodical.getLogger().getName()).isEqualTo(IndexSetsMigrationPeriodical.class.getCanonicalName());
+        when(clusterConfigService.get(DefaultIndexSetCreated.class))
+                .thenReturn(DefaultIndexSetCreated.create());
+        //assertThat(migration.startOnThisNode()).isFalse();
     }
 
     private static class StubRotationStrategy implements RotationStrategy {
