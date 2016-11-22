@@ -18,14 +18,13 @@ package org.graylog2.migrations;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.multibindings.Multibinder;
-import org.reflections.Reflections;
 
 public class MigrationsModule extends AbstractModule {
     @Override
     protected void configure() {
         final Multibinder<Migration> binder = Multibinder.newSetBinder(binder(), Migration.class);
-        new Reflections(Migration.class.getPackage().getName())
-                .getSubTypesOf(Migration.class)
-                .forEach(migrationClass -> binder.addBinding().to(migrationClass));
+        binder.addBinding().to(V20151210140600_ElasticsearchConfigMigration.class);
+        binder.addBinding().to(V20160929120500_CreateDefaultStreamMigration.class);
+        binder.addBinding().to(V20161116172100_DefaultIndexSetMigration.class);
     }
 }
