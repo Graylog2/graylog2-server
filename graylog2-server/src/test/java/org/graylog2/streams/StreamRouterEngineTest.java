@@ -30,11 +30,13 @@ import org.graylog2.streams.matchers.StreamRuleMock;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
+import javax.inject.Provider;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -49,21 +51,28 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class StreamRouterEngineTest {
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
     @Mock
-    StreamFaultManager streamFaultManager;
+    private StreamFaultManager streamFaultManager;
+    @Mock
+    private Stream defaultStream;
+    private Provider<Stream> defaultStreamProvider;
+
     private StreamMetrics streamMetrics;
 
     @Before
     public void setUp() throws Exception {
+        defaultStreamProvider = () -> defaultStream;
         streamMetrics = new StreamMetrics(new MetricRegistry());
         when(streamFaultManager.getStreamProcessingTimeout()).thenReturn(250L);
     }
 
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     private StreamRouterEngine newEngine(List<Stream> streams) {
-        return new StreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics);
+        return new StreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics, defaultStreamProvider);
     }
 
     @Test
@@ -96,6 +105,33 @@ public class StreamRouterEngineTest {
         message.addField("testfield", "testvalue");
 
         assertEquals(engine.match(message), Lists.newArrayList(stream));
+    }
+
+    @Test
+    public void testRemoveFromAllMessages() throws Exception {
+        final StreamMock stream = getStreamMock("test");
+        final StreamRuleMock rule = new StreamRuleMock(ImmutableMap.of(
+                "_id", new ObjectId(),
+                "field", "testfield",
+                "type", StreamRuleType.PRESENCE.toInteger(),
+                "stream_id", stream.getId()
+        ));
+        stream.setRemoveMatchesFromDefaultStream(true);
+        stream.setStreamRules(Collections.singletonList(rule));
+
+        final StreamRouterEngine engine = newEngine(Collections.singletonList(stream));
+        final Message message = getMessage();
+        message.addStream(defaultStream);
+
+        assertThat(message.getStreams()).containsExactly(defaultStream);
+
+        // Without testfield in the message.
+        assertThat(engine.match(message)).isEmpty();
+
+        // With field in the message.
+        message.addField("testfield", "testvalue");
+        assertThat(engine.match(message)).containsExactly(stream);
+        assertThat(message.getStreams()).doesNotContain(defaultStream);
     }
 
     @Test

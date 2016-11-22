@@ -27,6 +27,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 @JsonAutoDetect
 @AutoValue
 public abstract class CreateStreamRequest {
@@ -48,12 +50,23 @@ public abstract class CreateStreamRequest {
     @JsonProperty
     public abstract Stream.MatchingType matchingType();
 
+    @JsonProperty("remove_matches_from_default_stream")
+    public abstract boolean removeMatchesFromDefaultStream();
+
     @JsonCreator
     public static CreateStreamRequest create(@JsonProperty("title") @NotEmpty String title,
                                              @JsonProperty("description") @Nullable String description,
                                              @JsonProperty("rules") @Nullable List<CreateStreamRuleRequest> rules,
                                              @JsonProperty("content_pack") @Nullable String contentPack,
-                                             @JsonProperty("matching_type") @Nullable String matchingType) {
-        return new AutoValue_CreateStreamRequest(title, description, rules, contentPack, Stream.MatchingType.valueOfOrDefault(matchingType));
+                                             @JsonProperty("matching_type") @Nullable String matchingType,
+                                             @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream) {
+        return new AutoValue_CreateStreamRequest(
+                title,
+                description,
+                rules,
+                contentPack,
+                Stream.MatchingType.valueOfOrDefault(matchingType),
+                firstNonNull(removeMatchesFromDefaultStream, false)
+        );
     }
 }

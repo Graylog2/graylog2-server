@@ -244,6 +244,11 @@ public class StreamResource extends RestResource {
             }
         }
 
+        final Boolean removeMatchesFromDefaultStream = cr.removeMatchesFromDefaultStream();
+        if(removeMatchesFromDefaultStream != null) {
+            stream.setRemoveMatchesFromDefaultStream(removeMatchesFromDefaultStream);
+        }
+
         streamService.save(stream);
         clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
 
@@ -374,6 +379,7 @@ public class StreamResource extends RestResource {
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
         streamData.put(StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString());
+        streamData.put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, sourceStream.getRemoveMatchesFromDefaultStream());
 
         final Stream stream = streamService.create(streamData);
         streamService.pause(stream);
@@ -441,7 +447,7 @@ public class StreamResource extends RestResource {
             .collect(Collectors.toList());
         return StreamResponse.create(
             stream.getId(),
-            (String)stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
+            (String) stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
             outputsToSummaries(stream.getOutputs()),
             stream.getMatchingType().name(),
             stream.getDescription(),
@@ -450,12 +456,13 @@ public class StreamResource extends RestResource {
             stream.getStreamRules(),
             alertConditions,
             AlertReceivers.create(
-                emailAlertReceivers == null ? Collections.emptyList() : emailAlertReceivers,
-                usersAlertReceivers == null ? Collections.emptyList() : usersAlertReceivers
+                firstNonNull(emailAlertReceivers, Collections.emptyList()),
+                firstNonNull(usersAlertReceivers, Collections.emptyList())
             ),
             stream.getTitle(),
             stream.getContentPack(),
-            stream.isDefaultStream()
+            stream.isDefaultStream(),
+            stream.getRemoveMatchesFromDefaultStream()
         );
     }
 

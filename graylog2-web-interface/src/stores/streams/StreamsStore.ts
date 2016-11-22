@@ -7,6 +7,8 @@ interface Stream {
   id: string;
   title: string;
   description: string;
+  remove_matches_from_default_stream: boolean;
+  isDefaultStream: boolean;
   creatorUser: string;
   createdAt: number;
 }

@@ -42,15 +42,16 @@ public abstract class UpdateStreamRequest {
     @Nullable
     public abstract String matchingType();
 
+    @JsonProperty("remove_matches_from_default_stream")
+    @Nullable
+    public abstract Boolean removeMatchesFromDefaultStream();
+
     @JsonCreator
     public static UpdateStreamRequest create(@JsonProperty("title") @Nullable String title,
                                              @JsonProperty("description") @Nullable String description,
                                              @JsonProperty("matching_type") @Nullable String matchingType,
-                                             @JsonProperty("rules") @Nullable List rules) {
-        return new AutoValue_UpdateStreamRequest(title, description, matchingType);
-    }
-
-    public static UpdateStreamRequest updateMatchingType(@Nonnull String matchingType) {
-        return create(null, null, matchingType, null);
+                                             @JsonProperty("rules") @Nullable List rules,
+                                             @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream) {
+        return new AutoValue_UpdateStreamRequest(title, description, matchingType, removeMatchesFromDefaultStream);
     }
 }
