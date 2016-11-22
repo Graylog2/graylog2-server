@@ -141,7 +141,7 @@ public class AlertServiceImpl implements AlertService {
             query = DBQuery.and(query, getFindByStateQuery(state));
         }
 
-        return this.coll.find(query).count();
+        return this.coll.count(this.coll.serializeQuery(query));
     }
 
     @Override
