@@ -45,6 +45,7 @@ const Routes = {
   STARTPAGE: '/',
   SEARCH: '/search',
   STREAMS: '/streams',
+  ALERTS: '/alerts',
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   GETTING_STARTED: '/gettingstarted',
@@ -126,6 +127,8 @@ const Routes = {
     return Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution);
   },
   legacy_stream_search: (streamId) => `/streams/${streamId}/messages`,
+
+  show_alert: (alertId) => `/alerts/${alertId}`,
 
   dashboard_show: (dashboardId) => `/dashboards/${dashboardId}`,
 

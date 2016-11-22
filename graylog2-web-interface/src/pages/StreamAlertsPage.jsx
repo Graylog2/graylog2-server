@@ -17,10 +17,9 @@ import { IfPermitted, PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import { AlarmCallbackComponent } from 'components/alarmcallbacks';
-import AlertsComponent from 'components/alerts/AlertsComponent';
 import CreateAlertConditionInput from 'components/alertconditions/CreateAlertConditionInput';
 import AlertConditionsList from 'components/alertconditions/AlertConditionsList';
-import AlertReceiversList from 'components/alerts/AlertReceiversList';
+import { AlertReceiversList } from 'components/alerts';
 
 const StreamAlertsPage = React.createClass({
   propTypes: {
@@ -111,8 +110,6 @@ const StreamAlertsPage = React.createClass({
             </Col>
           </Row>
         </IfPermitted>
-
-        <AlertsComponent streamId={stream.id} />
       </span>
     );
   },

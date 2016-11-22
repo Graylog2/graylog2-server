@@ -1,15 +1,12 @@
 import React from 'react';
+import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
-import StoreProvider from 'injection/StoreProvider';
-const AlarmCallbackHistoryStore = StoreProvider.getStore('AlarmCallbackHistory');
-// eslint-disable-next-line no-unused-vars
-const AlarmCallbacksStore = StoreProvider.getStore('AlarmCallbacks');
+import CombinedProvider from 'injection/CombinedProvider';
+const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
+const { AlarmCallbacksStore } = CombinedProvider.get('AlarmCallbacks');
 
-import ActionsProvider from 'injection/ActionsProvider';
-const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
-
-import { Spinner } from 'components/common';
+import { EntityList, Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';
 
 const AlarmCallbackHistoryOverview = React.createClass({
@@ -17,48 +14,28 @@ const AlarmCallbackHistoryOverview = React.createClass({
     alertId: React.PropTypes.string.isRequired,
     streamId: React.PropTypes.string.isRequired,
   },
-  getInitialState() {
-    return {};
-  },
-  componentDidMount() {
-    this.loadData();
-  },
-  loadData() {
-    AlarmCallbacksActions.available(this.props.streamId).then((types) => {
-      this.setState({ types: types });
-    });
-    AlarmCallbackHistoryStore.listForAlert(this.props.streamId, this.props.alertId).done((histories) => {
-      this.setState({ histories: histories });
-    });
-  },
+
+  mixins: [Reflux.connect(AlarmCallbackHistoryStore), Reflux.connect(AlarmCallbacksStore)],
+
   _formatHistory(history) {
     return (
-      <li key={history.id}>
-        <AlarmCallbackHistory alarmCallbackHistory={history} types={this.state.types}/>
-      </li>
+      <AlarmCallbackHistory key={history.id} alarmCallbackHistory={history} types={this.state.availableAlarmCallbacks}/>
     );
   },
   _isLoading() {
-    return !(this.state.histories && this.state.types);
+    return !(this.state.histories && this.state.availableAlarmCallbacks);
   },
   render() {
     if (this._isLoading()) {
       return <Spinner />;
     }
 
-    if (this.state.histories.length === 0) {
-      return (
-        <div><i>No history available.</i></div>
-      );
-    }
-
     const histories = this.state.histories.map(this._formatHistory);
     return (
       <Row>
         <Col md={12}>
-          <ul className="alarm-callbacks">
-            {histories}
-          </ul>
+          <EntityList bsNoItemsStyle="info" noItemsText="No notifications were triggered during the alert."
+                      items={histories} />
         </Col>
       </Row>
     );

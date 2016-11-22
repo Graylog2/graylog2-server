@@ -12,9 +12,15 @@ const ApiRoutes = {
     list: (streamId, alertId) => { return { url: `/streams/${streamId}/alerts/${alertId}/history` }; },
   },
   AlertsApiController: {
-    list: (streamId, since) => { return { url: `/streams/${streamId}/alerts/?since=${since}` }; },
+    get: (alertId) => { return { url: `/streams/alerts/${alertId}` }; },
+    list: (streamId, since) => { return { url: `/streams/${streamId}/alerts?since=${since}` }; },
     listPaginated: (streamId, skip, limit) => { return { url: `/streams/${streamId}/alerts/paginated?skip=${skip}&limit=${limit}` }; },
-    listAllStreams: (since) => { return { url: `/streams/alerts/?since=${since}` }; },
+    listAllPaginated: (skip, limit, state) => { return { url: `/streams/alerts/paginated?skip=${skip}&limit=${limit}&state=${state}` }; },
+    listAllStreams: (since) => { return { url: `/streams/alerts?since=${since}` }; },
+  },
+  AlertConditionsApiController: {
+    available: () => { return { url: '/alerts/conditions/types' }; },
+    list: () => { return { url: '/alerts/conditions' }; },
   },
   BundlesApiController: {
     apply: (bundleId) => { return { url: `/system/bundles/${bundleId}/apply` }; },
@@ -140,9 +146,9 @@ const ApiRoutes = {
     validate: () => { return { url: '/system/sessions' }; },
   },
   StreamAlertsApiController: {
-    available: () => { return { url: '/alerts/conditions/types' }; },
     create: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
     delete: (streamId, alertConditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
+    get: (streamId, conditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${conditionId}` }; },
     list: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
     update: (streamId, alertConditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
     addReceiver: (streamId, type, entity) => { return { url: `/streams/${streamId}/alerts/receivers?entity=${entity}&type=${type}` }; },

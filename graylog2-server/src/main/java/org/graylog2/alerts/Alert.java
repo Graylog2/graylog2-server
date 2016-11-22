@@ -29,4 +29,27 @@ public interface Alert {
     String getDescription();
     Map<String, Object> getConditionParameters();
     boolean isInterval();
+
+    enum AlertState {
+        ANY("any"),
+        RESOLVED("resolved"),
+        UNRESOLVED("unresolved");
+
+        private final String state;
+
+        AlertState(String state) {
+            this.state = state;
+        }
+
+        public static AlertState fromString(String state) {
+            for (AlertState aState : AlertState.values()) {
+                if (aState.toString().equalsIgnoreCase(state)) {
+                    return aState;
+                }
+            }
+
+            throw new IllegalArgumentException("Alert state " + state + " is not supported");
+        }
+    }
+
 }

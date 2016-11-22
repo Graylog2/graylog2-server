@@ -39,6 +39,18 @@ const AlertsStore = Reflux.createStore({
     AlertsActions.listPaginated.promise(promise);
   },
 
+  listAllPaginated(skip, limit, state) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllPaginated(skip, limit, state).url);
+    const promise = fetch('GET', url);
+    promise.then(
+      response => this.trigger({ alerts: response }),
+      error => {
+        UserNotification.error(`Fetching alerts failed with status: ${error.message}`, 'Could not retrieve alerts.');
+      });
+
+    AlertsActions.listAllPaginated.promise(promise);
+  },
+
   listAllStreams(since) {
     const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.listAllStreams(since).url);
     const promise = fetch('GET', url);
@@ -50,6 +62,22 @@ const AlertsStore = Reflux.createStore({
         });
 
     AlertsActions.listAllStreams.promise(promise);
+  },
+
+  get(alertId) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlertsApiController.get(alertId).url);
+    const promise = fetch('GET', url);
+    promise.then(
+      response => {
+        this.trigger({ alert: response });
+        return response;
+      },
+      error => {
+        UserNotification.error(`Fetching alert '${alertId}' failed with status: ${error.message}`, 'Could not retrieve alert.');
+      }
+    );
+
+    AlertsActions.get.promise(promise);
   },
 });
 

@@ -1,7 +1,8 @@
 import React from 'react';
+import Reflux from 'reflux';
 
-import ActionsProvider from 'injection/ActionsProvider';
-const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
+import CombinedProvider from 'injection/CombinedProvider';
+const { AlarmCallbacksStore, AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 
 import { IfPermitted, Spinner } from 'components/common';
 import { AlarmCallbackList, CreateAlarmCallbackButton } from 'components/alarmcallbacks';
@@ -10,6 +11,7 @@ const AlarmCallbackComponent = React.createClass({
   propTypes: {
     streamId: React.PropTypes.string.isRequired,
   },
+  mixins: [Reflux.connect(AlarmCallbacksStore)],
   getInitialState() {
     return {};
   },
@@ -20,9 +22,7 @@ const AlarmCallbackComponent = React.createClass({
     AlarmCallbacksActions.list.triggerPromise(this.props.streamId).then((alarmCallbacks) => {
       this.setState({alarmCallbacks: alarmCallbacks});
     });
-    AlarmCallbacksActions.available.triggerPromise(this.props.streamId).then((available) => {
-      this.setState({availableAlarmCallbacks: available});
-    });
+    AlarmCallbacksActions.available(this.props.streamId);
   },
   _deleteAlarmCallback(alarmCallback) {
     AlarmCallbacksActions.delete.triggerPromise(this.props.streamId, alarmCallback.id).then(() => {

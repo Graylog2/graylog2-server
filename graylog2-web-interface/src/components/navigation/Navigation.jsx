@@ -152,8 +152,13 @@ const Navigation = React.createClass({
                 <NavItem to="search">Search</NavItem>
               </LinkContainer>
             </IfPermitted>
+
             <LinkContainer to={Routes.STREAMS}>
               <NavItem>Streams</NavItem>
+            </LinkContainer>
+
+            <LinkContainer to={Routes.ALERTS}>
+              <NavItem>Alerts</NavItem>
             </LinkContainer>
 
             <LinkContainer to={Routes.DASHBOARDS}>

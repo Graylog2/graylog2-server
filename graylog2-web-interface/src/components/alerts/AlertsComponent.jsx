@@ -1,65 +1,81 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Col } from 'react-bootstrap';
-import LinkedStateMixin from 'react-addons-linked-state-mixin';
+import { Button } from 'react-bootstrap';
 
-import ActionsProvider from 'injection/ActionsProvider';
-const AlertsActions = ActionsProvider.getActions('Alerts');
+import CombinedProvider from 'injection/CombinedProvider';
+const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
+const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
+const { StreamsStore } = CombinedProvider.get('Streams');
 
-import StoreProvider from 'injection/StoreProvider';
-const AlertsStore = StoreProvider.getStore('Alerts');
-
-import { PaginatedList, Spinner } from 'components/common';
-import AlertsTable from 'components/alerts/AlertsTable';
+import { Alert } from 'components/alerts';
+import { EntityList, PaginatedList, Spinner } from 'components/common';
 
 const AlertsComponent = React.createClass({
-  propTypes: {
-    streamId: React.PropTypes.string.isRequired,
-  },
+  mixins: [Reflux.connect(AlertsStore), Reflux.connect(AlertConditionsStore)],
 
-  mixins: [LinkedStateMixin, Reflux.connect(AlertsStore)],
+  getInitialState() {
+    return {
+      displayAllAlerts: false,
+    };
+  },
 
   componentDidMount() {
     this.loadData(1, 10);
   },
 
   loadData(pageNo, limit) {
-    AlertsActions.listPaginated(this.props.streamId, (pageNo - 1) * limit, limit);
+    AlertsActions.listAllPaginated((pageNo - 1) * limit, limit, this.state.displayAllAlerts ? 'all' : 'unresolved');
+    AlertConditionsActions.listAll();
+    AlertConditionsActions.available();
+    StreamsStore.listStreams().then((streams) => {
+      this.setState({ streams: streams });
+    });
+  },
+
+  _onToggleAllAlerts() {
+    this.setState({ displayAllAlerts: !this.state.displayAllAlerts }, () => this.loadData(1, 10));
   },
 
   _onChangePaginatedList(page, size) {
     this.loadData(page, size);
   },
 
-  render() {
-    if (!this.state.alerts) {
-      return (
-        <Row className="content">
-          <Col md={12}>
-            <Spinner />
-          </Col>
-        </Row>
-      );
-    }
+  _formatAlert(alert) {
+    return (
+      <Alert key={alert.id} alert={alert} alertConditions={this.state.allAlertConditions} streams={this.state.streams}
+             conditionTypes={this.state.types} />
+    );
+  },
 
-    let triggeredAlertsText;
-    if (this.state.alerts.total > 0) {
-      triggeredAlertsText = <span>&nbsp;<small>{this.state.alerts.total} alerts total</small></span>;
+  _isLoading() {
+    return !this.state.alerts || !this.state.allAlertConditions || !this.state.types || !this.state.streams;
+  },
+
+  render() {
+    if (this._isLoading()) {
+      return <Spinner />;
     }
 
     return (
-      <Row className="content triggered-alerts">
-        <Col md={12}>
-          <h2>
-            Triggered alerts
-            {triggeredAlertsText}
-          </h2>
+      <div>
+        <div className="pull-right">
+          <Button bsStyle="info" onClick={this._onToggleAllAlerts}>
+            Show {this.state.displayAllAlerts ? 'unresolved' : 'all'} alerts
+          </Button>
+        </div>
+        <h2>Alerts</h2>
+        <p>
+          Check your alerts status from here. Currently displaying{' '}
+          <b>{this.state.displayAllAlerts ? 'all' : 'unresolved'}</b> alerts.
+        </p>
 
-          <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}>
-            <AlertsTable alerts={this.state.alerts.alerts} />
-          </PaginatedList>
-        </Col>
-      </Row>
+        <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}
+                       showPageSizeSelect={false}>
+          <EntityList bsNoItemsStyle={this.state.displayAllAlerts ? 'info' : 'success'}
+                      noItemsText={this.state.displayAllAlerts ? 'There are no alerts to display' : 'Good news! Currently there are no unresolved alerts.'}
+                      items={this.state.alerts.alerts.map(alert => this._formatAlert(alert))} />
+        </PaginatedList>
+      </div>
     );
   },
 });

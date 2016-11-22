@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -44,7 +43,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -57,12 +55,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiresAuthentication
-@Api(value = "AlertConditions", description = "Manage stream alert conditions")
+@Api(value = "Stream/AlertConditions", description = "Manage stream alert conditions")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Path("/streams/{streamId}/alerts/conditions")
@@ -167,13 +164,40 @@ public class StreamAlertConditionResource extends RestResource {
         @ApiResponse(code = 400, message = "Invalid ObjectId.")
     })
     @AuditEvent(type = AuditEventTypes.ALERT_CONDITION_DELETE)
-    public void delete(@ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
+    public void delete(@ApiParam(name = "streamId", value = "The stream id this alert condition belongs to.", required = true)
                        @PathParam("streamId") String streamid,
-                       @ApiParam(name = "conditionId", value = "The stream id this new alert condition belongs to.", required = true)
+                       @ApiParam(name = "conditionId", value = "The alert condition id to be deleted", required = true)
                        @PathParam("conditionId") String conditionId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
 
         final Stream stream = streamService.load(streamid);
         streamService.removeAlertCondition(stream, conditionId);
+    }
+
+    @GET
+    @Timed
+    @Path("{conditionId}")
+    @ApiOperation(value = "Get an alert condition")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Stream not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+    })
+    @AuditEvent(type = AuditEventTypes.ALERT_CONDITION_DELETE)
+    public AlertConditionSummary get(@ApiParam(name = "streamId", value = "The stream id this alert condition belongs to.", required = true)
+                       @PathParam("streamId") String streamId,
+                       @ApiParam(name = "conditionId", value = "The alert condition id to be fetched", required = true)
+                       @PathParam("conditionId") String conditionId) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_READ, streamId);
+
+        final Stream stream = streamService.load(streamId);
+        final AlertCondition condition = streamService.getAlertCondition(stream, conditionId);
+
+        return AlertConditionSummary.create(condition.getId(),
+                condition.getType(),
+                condition.getCreatorUserId(),
+                condition.getCreatedAt().toDate(),
+                condition.getParameters(),
+                alertService.inGracePeriod(condition),
+                condition.getTitle());
     }
 }

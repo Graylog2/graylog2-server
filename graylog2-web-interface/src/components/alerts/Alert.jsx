@@ -1,59 +1,84 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
-import $ from 'jquery';
-import {Timestamp} from 'components/common';
+import { Button, Col, Label } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
-import AlarmCallbackHistoryOverview from 'components/alarmcallbacks/AlarmCallbackHistoryOverview';
+import { EntityListItem, Timestamp } from 'components/common';
+
+import Routes from 'routing/Routes';
+import DateTime from 'logic/datetimes/DateTime';
 
 const Alert = React.createClass({
+  propTypes: {
+    alert: React.PropTypes.object.isRequired,
+    alertConditions: React.PropTypes.array.isRequired,
+    streams: React.PropTypes.array.isRequired,
+    conditionTypes: React.PropTypes.object.isRequired,
+  },
+
   getInitialState() {
     return {
       showAlarmCallbackHistory: false,
     };
   },
-  _onClickConditionId(conditionId) {
-    var alertConditionElem = $('.alert-condition[data-condition-id=' + conditionId + ']');
-    $('html, body').animate({ scrollTop: 0 }, 'fast');
-    alertConditionElem.effect(
-      'highlight', { duration: 2000 }
-    );
-  },
-  _toggleHistory(e) {
-    e.preventDefault();
-    this.setState({showAlarmCallbackHistory: !this.state.showAlarmCallbackHistory});
-  },
-  _getAlarmCallbackHistory(alert) {
-    return (
-      <tr>
-        <td colSpan="2">&nbsp;</td>
-        <td colSpan="2">
-          <AlarmCallbackHistoryOverview alertId={alert.id} streamId={alert.stream_id}/>
-        </td>
-      </tr>
-    );
-  },
+
   render() {
     const alert = this.props.alert;
-    const toggleHistoryText = this.state.showAlarmCallbackHistory ? 'Hide callbacks' : 'Show callbacks';
-    const alarmCallbackHistory = this.state.showAlarmCallbackHistory ? this._getAlarmCallbackHistory(alert) : null;
+    const condition = this.props.alertConditions.find(alertCondition => alertCondition.id === alert.condition_id);
+    const stream = this.props.streams.find(s => s.id === alert.stream_id);
+    const conditionType = condition ? this.props.conditionTypes[condition.type] : {};
+
+    let alertTitle;
+    if (condition) {
+      alertTitle = <span>{condition.title} <small>({conditionType.name || 'Unknown type'})</small></span>;
+    } else {
+      alertTitle = <span><em>Unknown alert</em></span>;
+    }
+
+    let statusBadge;
+    if (!alert.is_interval || alert.resolved_at) {
+      statusBadge = <Label bsStyle="success">Resolved</Label>;
+    } else {
+      statusBadge = <Label bsStyle="danger">Unresolved</Label>;
+    }
+
+    let alertTime = <Timestamp dateTime={alert.triggered_at} format={DateTime.Formats.DATETIME} />;
+    if (alert.is_interval) {
+      alertTime = (
+        <span>
+          Triggered at {alertTime},&nbsp;
+          {alert.resolved_at ? <span>resolved at <Timestamp dateTime={alert.resolved_at} format={DateTime.Formats.DATETIME} /></span> : 'still ongoing'}
+        </span>
+      );
+    } else {
+      alertTime = (
+        <span>
+          Triggered at {alertTime}
+        </span>
+      );
+    }
+
+    const actions = (
+      <LinkContainer to={Routes.show_alert(alert.id)}>
+        <Button bsStyle="info">Show details</Button>
+      </LinkContainer>
+    );
+
+    const content = (
+      <Col md={12}>
+        <ul className="no-padding">
+          <li><b>Stream:</b> {stream.title} (<em>{stream.id}</em>)</li>
+          <li><b>Reason:</b> {alert.description}</li>
+        </ul>
+      </Col>
+    );
+
     return (
-      <tbody>
-      <tr>
-        <td style={{borderTop: 0}}>
-          <Timestamp dateTime={alert.triggered_at} relative/>
-        </td>
-        <td style={{borderTop: 0}}>
-          <a href="#" onClick={this._onClickConditionId.bind(this, alert.condition_id)}>{alert.condition_id}</a>
-        </td>
-        <td style={{borderTop: 0}}>
-          {alert.description}
-        </td>
-        <td className="text-right" style={{borderTop: 0}}>
-          <Button bsStyle="info" bsSize="xsmall" onClick={this._toggleHistory}>{toggleHistoryText}</Button>
-        </td>
-      </tr>
-      {alarmCallbackHistory}
-      </tbody>
+      <EntityListItem key={`entry-list-${alert.id}`}
+                      title={alertTitle}
+                      titleSuffix={statusBadge}
+                      description={alertTime}
+                      actions={actions}
+                      contentRow={content} />
     );
   },
 });
