@@ -26,7 +26,6 @@ import org.graylog2.alerts.AlertService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
-import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
@@ -104,7 +103,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
         streamData.put(StreamImpl.FIELD_CONTENT_PACK, cr.contentPack());
         streamData.put(StreamImpl.FIELD_MATCHING_TYPE, cr.matchingType().toString());
-        streamData.put(StreamImpl.FIELD_REMOVE_FROM_ALL_MESSAGES, cr.removeFromAllMessages());
+        streamData.put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream());
 
         return create(streamData);
     }

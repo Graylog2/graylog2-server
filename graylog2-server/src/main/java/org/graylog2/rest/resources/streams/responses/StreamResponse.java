@@ -76,8 +76,8 @@ public abstract class StreamResponse {
     @Nullable
     public abstract Boolean isDefault();
 
-    @JsonProperty("remove_from_all_messages")
-    public abstract boolean removeFromAllMessages();
+    @JsonProperty("remove_matches_from_default_stream")
+    public abstract boolean removeMatchesFromDefaultStream();
 
     @JsonCreator
     public static StreamResponse create(@JsonProperty("id") String id,
@@ -93,7 +93,7 @@ public abstract class StreamResponse {
                                         @JsonProperty("title") String title,
                                         @JsonProperty("content_pack") @Nullable String contentPack,
                                         @JsonProperty("is_default") @Nullable Boolean isDefault,
-                                        @JsonProperty("remove_from_all_messages") @Nullable Boolean removeFromAllMessages) {
+                                        @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream) {
         return new AutoValue_StreamResponse(
                 id,
                 creatorUserId,
@@ -102,12 +102,12 @@ public abstract class StreamResponse {
                 description,
                 createdAt,
                 disabled,
-            rules,
+                rules,
                 alertConditions,
                 alertReceivers,
                 title,
                 contentPack,
                 firstNonNull(isDefault, false),
-                firstNonNull(removeFromAllMessages, false));
+                firstNonNull(removeMatchesFromDefaultStream, false));
     }
 }

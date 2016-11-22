@@ -57,7 +57,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_CREATOR_USER_ID = "creator_user_id";
     public static final String FIELD_MATCHING_TYPE = "matching_type";
     public static final String FIELD_DEFAULT_STREAM = "is_default_stream";
-    public static final String FIELD_REMOVE_FROM_ALL_MESSAGES = "remove_from_all_messages";
+    public static final String FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM = "remove_matches_from_default_stream";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
 
     private final List<StreamRule> streamRules;
@@ -175,7 +175,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
         result.put(FIELD_OUTPUTS, outputs);
         result.put(FIELD_MATCHING_TYPE, getMatchingType());
         result.put(FIELD_DEFAULT_STREAM, isDefaultStream());
-        result.put(FIELD_REMOVE_FROM_ALL_MESSAGES, getRemoveFromAllMessages());
+        result.put(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, getRemoveMatchesFromDefaultStream());
         return result;
     }
 
@@ -235,13 +235,13 @@ public class StreamImpl extends PersistedImpl implements Stream {
     }
 
     @Override
-    public boolean getRemoveFromAllMessages() {
-        return (boolean) fields.getOrDefault(FIELD_REMOVE_FROM_ALL_MESSAGES, false);
+    public boolean getRemoveMatchesFromDefaultStream() {
+        return (boolean) fields.getOrDefault(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false);
     }
 
     @Override
-    public void setRemoveFromAllMessages(boolean removeFromAllMessages) {
-        fields.put(FIELD_REMOVE_FROM_ALL_MESSAGES, removeFromAllMessages);
+    public void setRemoveMatchesFromDefaultStream(boolean removeMatchesFromDefaultStream) {
+        fields.put(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, removeMatchesFromDefaultStream);
     }
 
     @Override

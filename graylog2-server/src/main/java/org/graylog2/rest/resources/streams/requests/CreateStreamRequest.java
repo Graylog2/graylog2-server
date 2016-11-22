@@ -50,8 +50,8 @@ public abstract class CreateStreamRequest {
     @JsonProperty
     public abstract Stream.MatchingType matchingType();
 
-    @JsonProperty("remove_from_all_messages")
-    public abstract boolean removeFromAllMessages();
+    @JsonProperty("remove_matches_from_default_stream")
+    public abstract boolean removeMatchesFromDefaultStream();
 
     @JsonCreator
     public static CreateStreamRequest create(@JsonProperty("title") @NotEmpty String title,
@@ -59,14 +59,14 @@ public abstract class CreateStreamRequest {
                                              @JsonProperty("rules") @Nullable List<CreateStreamRuleRequest> rules,
                                              @JsonProperty("content_pack") @Nullable String contentPack,
                                              @JsonProperty("matching_type") @Nullable String matchingType,
-                                             @JsonProperty("remove_from_all_messages") @Nullable Boolean removeFromAllMessages) {
+                                             @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream) {
         return new AutoValue_CreateStreamRequest(
                 title,
                 description,
                 rules,
                 contentPack,
                 Stream.MatchingType.valueOfOrDefault(matchingType),
-                firstNonNull(removeFromAllMessages, false)
+                firstNonNull(removeMatchesFromDefaultStream, false)
         );
     }
 }

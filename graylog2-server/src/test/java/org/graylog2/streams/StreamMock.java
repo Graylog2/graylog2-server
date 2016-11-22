@@ -41,7 +41,7 @@ public class StreamMock implements Stream {
     private List<StreamRule> streamRules;
     private MatchingType matchingType;
     private boolean defaultStream;
-    private boolean removeFromAllMessages;
+    private boolean removeMatchesFromDefaultStream;
 
     public StreamMock(Map<String, Object> stream) {
         this(stream, Collections.emptyList());
@@ -58,7 +58,7 @@ public class StreamMock implements Stream {
         this.streamRules = streamRules;
         this.matchingType = (MatchingType) stream.getOrDefault(StreamImpl.FIELD_MATCHING_TYPE, MatchingType.AND);
         this.defaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_DEFAULT_STREAM, false);
-        this.removeFromAllMessages = (boolean) stream.getOrDefault(StreamImpl.FIELD_REMOVE_FROM_ALL_MESSAGES, false);
+        this.removeMatchesFromDefaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false);
     }
 
     @Override
@@ -177,13 +177,13 @@ public class StreamMock implements Stream {
     }
 
     @Override
-    public boolean getRemoveFromAllMessages() {
-        return removeFromAllMessages;
+    public boolean getRemoveMatchesFromDefaultStream() {
+        return removeMatchesFromDefaultStream;
     }
 
     @Override
-    public void setRemoveFromAllMessages(boolean removeFromAllMessages) {
-        this.removeFromAllMessages = removeFromAllMessages;
+    public void setRemoveMatchesFromDefaultStream(boolean removeMatchesFromDefaultStream) {
+        this.removeMatchesFromDefaultStream = removeMatchesFromDefaultStream;
     }
 
     @Override
@@ -194,7 +194,7 @@ public class StreamMock implements Stream {
                 .add("matchingType", matchingType)
                 .add("defaultStream", defaultStream)
                 .add("disabled", disabled)
-                .add("removeFromAllMessages", removeFromAllMessages)
+                .add("removeMatchesFromDefaultStream", removeMatchesFromDefaultStream)
                 .toString();
     }
 
@@ -209,13 +209,13 @@ public class StreamMock implements Stream {
                 Objects.equals(description, that.description) &&
                 Objects.equals(streamRules, that.streamRules) &&
                 Objects.equals(defaultStream, that.defaultStream) &&
-                Objects.equals(removeFromAllMessages, that.removeFromAllMessages) &&
+                Objects.equals(removeMatchesFromDefaultStream, that.removeMatchesFromDefaultStream) &&
                 matchingType == that.matchingType;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title, description, streamRules, matchingType, defaultStream, removeFromAllMessages);
+        return Objects.hash(id, title, description, streamRules, matchingType, defaultStream, removeMatchesFromDefaultStream);
     }
 
     @Override

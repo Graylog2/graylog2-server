@@ -73,7 +73,7 @@ public class V20160929120500_CreateDefaultStreamMigration extends Migration {
                 .put(StreamImpl.FIELD_CREATED_AT, DateTime.now(DateTimeZone.UTC))
                 .put(StreamImpl.FIELD_CREATOR_USER_ID, "local:admin")
                 .put(StreamImpl.FIELD_MATCHING_TYPE, StreamImpl.MatchingType.DEFAULT.name())
-                .put(StreamImpl.FIELD_REMOVE_FROM_ALL_MESSAGES, false)
+                .put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false)
                 .put(StreamImpl.FIELD_DEFAULT_STREAM, true)
                 .build();
         final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), Collections.emptySet());

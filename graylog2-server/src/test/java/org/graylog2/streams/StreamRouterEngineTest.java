@@ -116,7 +116,7 @@ public class StreamRouterEngineTest {
                 "type", StreamRuleType.PRESENCE.toInteger(),
                 "stream_id", stream.getId()
         ));
-        stream.setRemoveFromAllMessages(true);
+        stream.setRemoveMatchesFromDefaultStream(true);
         stream.setStreamRules(Collections.singletonList(rule));
 
         final StreamRouterEngine engine = newEngine(Collections.singletonList(stream));
