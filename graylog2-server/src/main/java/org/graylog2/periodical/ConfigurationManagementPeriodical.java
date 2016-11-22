@@ -17,63 +17,34 @@
 
 package org.graylog2.periodical;
 
-import org.graylog2.configuration.ElasticsearchConfiguration;
-import org.graylog2.events.ClusterEventBus;
-import org.graylog2.indexer.indexset.IndexSetService;
-import org.graylog2.migrations.V20151210140600_ElasticsearchConfigMigration;
-import org.graylog2.migrations.V20160929120500_CreateDefaultStreamMigration;
-import org.graylog2.migrations.V20161116172100_DefaultIndexSetMigration;
-import org.graylog2.plugin.cluster.ClusterConfigService;
-import org.graylog2.plugin.indexer.retention.RetentionStrategy;
-import org.graylog2.plugin.indexer.rotation.RotationStrategy;
+import com.google.common.collect.ImmutableSortedSet;
+import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.periodical.Periodical;
-import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import javax.inject.Provider;
-import java.util.Map;
+import java.util.Set;
+import java.util.SortedSet;
 
 public class ConfigurationManagementPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(ConfigurationManagementPeriodical.class);
-    private final ElasticsearchConfiguration elasticsearchConfiguration;
-    private final ClusterConfigService clusterConfigService;
-    private final StreamService streamService;
-    private final Map<String, Provider<RotationStrategy>> rotationStrategies;
-    private final Map<String, Provider<RetentionStrategy>> retentionStrategies;
-    private final IndexSetService indexSetService;
-    private final ClusterEventBus clusterEventBus;
+    private final SortedSet<Migration> migrations;
 
     @Inject
-    public ConfigurationManagementPeriodical(ElasticsearchConfiguration elasticsearchConfiguration,
-                                             ClusterConfigService clusterConfigService,
-                                             StreamService streamService,
-                                             Map<String, Provider<RotationStrategy>> rotationStrategies,
-                                             Map<String, Provider<RetentionStrategy>> retentionStrategies,
-                                             IndexSetService indexSetService,
-                                             ClusterEventBus clusterEventBus) {
-        this.elasticsearchConfiguration = elasticsearchConfiguration;
-        this.clusterConfigService = clusterConfigService;
-        this.streamService = streamService;
-        this.rotationStrategies = rotationStrategies;
-        this.retentionStrategies = retentionStrategies;
-        this.indexSetService = indexSetService;
-        this.clusterEventBus = clusterEventBus;
+    public ConfigurationManagementPeriodical(Set<Migration> migrations) {
+        this.migrations = ImmutableSortedSet.copyOf(migrations);
     }
 
     @Override
     public void doRun() {
-        new V20151210140600_ElasticsearchConfigMigration(clusterConfigService, elasticsearchConfiguration).upgrade();
-        new V20160929120500_CreateDefaultStreamMigration(streamService, clusterEventBus).upgrade();
-        new V20161116172100_DefaultIndexSetMigration(
-                elasticsearchConfiguration,
-                rotationStrategies,
-                retentionStrategies,
-                indexSetService,
-                clusterConfigService,
-                clusterEventBus
-        ).upgrade();
+        for(Migration migration : migrations) {
+            try {
+                migration.upgrade();
+            } catch (Exception e) {
+                LOG.error("Error while running migration <{}>", migration, e);
+            }
+        }
     }
 
     @Override

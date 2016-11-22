@@ -52,6 +52,7 @@ import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
 import org.graylog2.messageprocessors.MessageProcessorModule;
+import org.graylog2.migrations.MigrationsModule;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.KafkaJournalConfiguration;
@@ -122,7 +123,8 @@ public class Server extends ServerBootstrap {
             new DecoratorBindings(),
             new AuditBindings(),
             new AlertConditionBindings(),
-            new IndexerBindings()
+            new IndexerBindings(),
+            new MigrationsModule()
         );
 
         return modules.build();

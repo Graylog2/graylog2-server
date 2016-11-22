@@ -35,14 +35,16 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.time.ZonedDateTime;
 
-public class V20151210140600_ElasticsearchConfigMigration implements Migration {
+public class V20151210140600_ElasticsearchConfigMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20151210140600_ElasticsearchConfigMigration.class);
 
     private final ClusterConfigService clusterConfigService;
     private final ElasticsearchConfiguration elasticsearchConfiguration;
 
+    @Inject
     public V20151210140600_ElasticsearchConfigMigration(ClusterConfigService clusterConfigService, ElasticsearchConfiguration elasticsearchConfiguration) {
         this.clusterConfigService = clusterConfigService;
         this.elasticsearchConfiguration = elasticsearchConfiguration;

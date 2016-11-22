@@ -31,6 +31,7 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -42,7 +43,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * Migration creating the default index set from the legacy settings.
  */
-public class V20161116172100_DefaultIndexSetMigration implements Migration {
+public class V20161116172100_DefaultIndexSetMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20161116172100_DefaultIndexSetMigration.class);
 
     private final ElasticsearchConfiguration elasticsearchConfiguration;
@@ -52,6 +53,7 @@ public class V20161116172100_DefaultIndexSetMigration implements Migration {
     private final ClusterConfigService clusterConfigService;
     private final ClusterEventBus clusterEventBus;
 
+    @Inject
     public V20161116172100_DefaultIndexSetMigration(final ElasticsearchConfiguration elasticsearchConfiguration,
                                                     final Map<String, Provider<RotationStrategy>> rotationStrategies,
                                                     final Map<String, Provider<RetentionStrategy>> retentionStrategies,

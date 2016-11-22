@@ -30,6 +30,7 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
@@ -37,12 +38,13 @@ import java.util.Map;
 /**
  * Migration creating the default stream if it doesn't exist.
  */
-public class V20160929120500_CreateDefaultStreamMigration implements Migration {
+public class V20160929120500_CreateDefaultStreamMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20160929120500_CreateDefaultStreamMigration.class);
 
     private final StreamService streamService;
     private final ClusterEventBus clusterEventBus;
 
+    @Inject
     public V20160929120500_CreateDefaultStreamMigration(StreamService streamService, ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         this.clusterEventBus = clusterEventBus;
