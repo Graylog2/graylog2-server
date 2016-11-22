@@ -85,6 +85,7 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog.plugins.pipelineprocessor.parser.errors.WrongNumberOfArgs;
+import org.graylog.plugins.pipelineprocessor.processors.ConfigurationStateUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,9 +168,11 @@ public class PipelineRuleParser {
 
         if (parseContext.getErrors().isEmpty()) {
             Rule parsedRule = parseContext.getRules().get(0).withId(id);
-            if (ruleClassLoader != null) {
+            if (ruleClassLoader != null || ConfigurationStateUpdater.isAllowCodeGeneration()) {
                 final Class<? extends GeneratedRule> generatedClass = codeGenerator.generateCompiledRule(parsedRule, ruleClassLoader);
-                parsedRule = parsedRule.toBuilder().generatedRuleClass(generatedClass).build();
+                if (generatedClass != null) {
+                    parsedRule = parsedRule.toBuilder().generatedRuleClass(generatedClass).build();
+                }
             }
             return parsedRule;
         }

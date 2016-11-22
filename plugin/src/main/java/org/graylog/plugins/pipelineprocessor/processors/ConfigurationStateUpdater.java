@@ -35,6 +35,7 @@ import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import javax.tools.ToolProvider;
 
 import static com.codahale.metrics.MetricRegistry.name;
 
@@ -88,6 +89,12 @@ public class ConfigurationStateUpdater {
     }
 
     public static void setAllowCodeGeneration(Boolean allowCodeGeneration) {
+        if (allowCodeGeneration && ToolProvider.getSystemJavaCompiler() == null) {
+            log.warn("Your Java runtime does not have a compiler available, turning off dynamic " +
+                    "code generation. Please consider running Graylog in a JDK, not a JRE, to " +
+                    "avoid a performance penalty in pipeline processing.");
+            allowCodeGeneration = false;
+        }
         ConfigurationStateUpdater.allowCodeGeneration = allowCodeGeneration;
     }
 
