@@ -36,6 +36,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import javax.inject.Provider;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -58,18 +59,20 @@ public class StreamRouterEngineTest {
     private StreamFaultManager streamFaultManager;
     @Mock
     private Stream defaultStream;
+    private Provider<Stream> defaultStreamProvider;
 
     private StreamMetrics streamMetrics;
 
     @Before
     public void setUp() throws Exception {
+        defaultStreamProvider = () -> defaultStream;
         streamMetrics = new StreamMetrics(new MetricRegistry());
         when(streamFaultManager.getStreamProcessingTimeout()).thenReturn(250L);
     }
 
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     private StreamRouterEngine newEngine(List<Stream> streams) {
-        return new StreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics, defaultStream);
+        return new StreamRouterEngine(streams, Executors.newSingleThreadExecutor(), streamFaultManager, streamMetrics, defaultStreamProvider);
     }
 
     @Test

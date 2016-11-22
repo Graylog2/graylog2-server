@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Provider;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ public class StreamRouterEngine {
     private final TimeLimiter timeLimiter;
     private final long streamProcessingTimeout;
     private final String fingerprint;
-    private final Stream defaultStream;
+    private final Provider<Stream> defaultStreamProvider;
 
     private final List<Rule> rulesList;
 
@@ -73,14 +74,14 @@ public class StreamRouterEngine {
                               @Assisted ExecutorService executorService,
                               StreamFaultManager streamFaultManager,
                               StreamMetrics streamMetrics,
-                              @DefaultStream Stream defaultStream) {
+                              @DefaultStream Provider<Stream> defaultStreamProvider) {
         this.streams = streams;
         this.streamFaultManager = streamFaultManager;
         this.streamMetrics = streamMetrics;
         this.timeLimiter = new SimpleTimeLimiter(executorService);
         this.streamProcessingTimeout = streamFaultManager.getStreamProcessingTimeout();
         this.fingerprint = new StreamListFingerprint(streams).getFingerprint();
-        this.defaultStream = defaultStream;
+        this.defaultStreamProvider = defaultStreamProvider;
 
         final List<Rule> alwaysMatchRules = Lists.newArrayList();
         final List<Rule> presenceRules = Lists.newArrayList();
@@ -205,13 +206,18 @@ public class StreamRouterEngine {
             }
         }
 
+        final Stream defaultStream = defaultStreamProvider.get();
         for (Stream stream : result) {
             streamMetrics.markIncomingMeter(stream.getId());
-            if(stream.getRemoveFromAllMessages()) {
-                if(message.removeStream(defaultStream)) {
-                    LOG.trace("Successfully removed default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
+            if (stream.getRemoveFromAllMessages()) {
+                if (message.removeStream(defaultStream)) {
+                    if (LOG.isTraceEnabled()) {
+                        LOG.trace("Successfully removed default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
+                    }
                 } else {
-                    LOG.warn("Couldn't remove default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
+                    if (LOG.isWarnEnabled()) {
+                        LOG.warn("Couldn't remove default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
+                    }
                 }
             }
         }
