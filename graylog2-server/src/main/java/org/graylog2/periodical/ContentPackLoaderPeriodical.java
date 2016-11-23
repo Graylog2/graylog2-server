@@ -224,7 +224,7 @@ public class ContentPackLoaderPeriodical extends Periodical {
                 files.add(path);
             }
         } catch (IOException e) {
-            LOG.error("Couldn't list content packs", e);
+            LOG.warn("Couldn't list content packs: {}", e.getMessage());
         }
 
         return files.build();
