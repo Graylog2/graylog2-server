@@ -16,9 +16,6 @@
  */
 package org.graylog2.plugin.configuration.fields;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class BooleanField extends AbstractConfigurationField {
 
     public static final String FIELD_TYPE = "boolean";

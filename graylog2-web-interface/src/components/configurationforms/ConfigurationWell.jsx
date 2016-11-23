@@ -8,7 +8,13 @@ const ConfigurationWell = React.createClass({
   },
   PASSWORD_PLACEHOLDER: '********',
   _formatRegularField(value, key) {
-    const finalValue = (value === null || value === undefined || value === '' ? <i>{'<empty>'}</i> : String(value));
+    let finalValue;
+    if (value === null || value === undefined || value === '' || (Array.isArray(value) && value.length === 0)) {
+      finalValue = <i>{'<empty>'}</i>;
+    } else {
+      finalValue = Array.isArray(value) ? value.join(', ') : String(value);
+    }
+
     return (<li key={`${this.props.id}-${key}`}><div className="key">{key}:</div> <div className="value">{finalValue}</div></li>);
   },
   _formatPasswordField(value, key) {

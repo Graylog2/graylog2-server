@@ -25,9 +25,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class DropdownField extends AbstractConfigurationField {
 
     public static final String FIELD_TYPE = "dropdown";

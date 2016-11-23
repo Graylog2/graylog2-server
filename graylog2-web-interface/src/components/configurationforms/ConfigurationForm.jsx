@@ -2,7 +2,14 @@ import $ from 'jquery';
 import React from 'react';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
-import { BooleanField, DropdownField, NumberField, TextField, TitleField } from 'components/configurationforms';
+import {
+  BooleanField,
+  DropdownField,
+  ListField,
+  NumberField,
+  TextField,
+  TitleField
+} from 'components/configurationforms';
 
 const ConfigurationForm = React.createClass({
   propTypes: {
@@ -109,6 +116,9 @@ const ConfigurationForm = React.createClass({
       case 'dropdown':
         return (<DropdownField key={elementKey} typeName={typeName} title={key} field={configField}
                                value={value} onChange={this._handleChange} autoFocus={autoFocus} addPlaceholder/>);
+      case 'list':
+        return (<ListField key={elementKey} typeName={typeName} title={key} field={configField}
+                           value={value} onChange={this._handleChange} autoFocus={autoFocus} addPlaceholder />);
       default:
         return null;
     }
