@@ -26,5 +26,6 @@ public class MigrationsModule extends AbstractModule {
         binder.addBinding().to(V20151210140600_ElasticsearchConfigMigration.class);
         binder.addBinding().to(V20160929120500_CreateDefaultStreamMigration.class);
         binder.addBinding().to(V20161116172100_DefaultIndexSetMigration.class);
+        binder.addBinding().to(V20161122174500_AssignIndexSetsToStreamsMigration.class);
     }
 }
