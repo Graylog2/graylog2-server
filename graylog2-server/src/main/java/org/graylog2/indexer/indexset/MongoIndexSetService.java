@@ -25,13 +25,16 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
 import org.mongojack.DBQuery;
+import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -93,6 +96,24 @@ public class MongoIndexSetService implements IndexSetService {
     @Override
     public Set<IndexSetConfig> findAll() {
         return ImmutableSet.copyOf((Iterator<? extends IndexSetConfig>) collection.find());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Set<IndexSetConfig> findPaginated(Set<String> indexSetIds, int limit, int skip) {
+        final List<DBQuery.Query> idQuery = indexSetIds.stream()
+                .map(id -> DBQuery.is("_id", id))
+                .collect(Collectors.toList());
+
+        final DBQuery.Query query = DBQuery.or(idQuery.toArray(new DBQuery.Query[0]));
+
+        return ImmutableSet.copyOf(collection.find(query)
+                .sort(DBSort.desc("creation_date"))
+                .skip(skip)
+                .limit(limit)
+                .toArray());
     }
 
     /**

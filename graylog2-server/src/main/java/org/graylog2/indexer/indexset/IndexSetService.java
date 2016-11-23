@@ -51,6 +51,16 @@ public interface IndexSetService {
     Set<IndexSetConfig> findAll();
 
     /**
+     * Retrieve a paginated set of index set.
+     *
+     * @param indexSetIds List of inde set ids to return
+     * @param limit Maximum number of index sets
+     * @param skip Number of index sets to skip
+     * @return Paginated index sets
+     */
+    Set<IndexSetConfig> findPaginated(Set<String> indexSetIds, int limit, int skip);
+
+    /**
      * Save the given index set.
      *
      * @param indexSetConfig The index set to save.

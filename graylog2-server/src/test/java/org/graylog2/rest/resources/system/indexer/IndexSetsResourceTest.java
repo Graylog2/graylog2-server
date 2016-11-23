@@ -83,7 +83,7 @@ public class IndexSetsResourceTest {
         );
         when(indexSetService.findAll()).thenReturn(Collections.singleton(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list();
+        final IndexSetResponse list = indexSetsResource.list(0, 0);
 
         verify(indexSetService, times(1)).findAll();
         verifyNoMoreInteractions(indexSetService);
@@ -111,7 +111,7 @@ public class IndexSetsResourceTest {
         );
         when(indexSetService.findAll()).thenReturn(Collections.singleton(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list();
+        final IndexSetResponse list = indexSetsResource.list(0, 0);
 
         verify(indexSetService, times(1)).findAll();
         verifyNoMoreInteractions(indexSetService);
@@ -125,7 +125,7 @@ public class IndexSetsResourceTest {
         final IndexSetsResource indexSetsResource = new TestResource(indexSetService, true);
         when(indexSetService.findAll()).thenReturn(Collections.emptySet());
 
-        final IndexSetResponse list = indexSetsResource.list();
+        final IndexSetResponse list = indexSetsResource.list(0, 0);
 
         verify(indexSetService, times(1)).findAll();
         verifyNoMoreInteractions(indexSetService);

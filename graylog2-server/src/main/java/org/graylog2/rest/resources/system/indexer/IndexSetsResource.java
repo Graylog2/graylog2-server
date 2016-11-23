@@ -39,6 +39,7 @@ import javax.validation.constraints.NotNull;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -46,6 +47,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Set;
@@ -71,12 +73,33 @@ public class IndexSetsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Unauthorized"),
     })
-    public IndexSetResponse list() {
-        final Set<IndexSetSummary> indexSets = indexSetService.findAll().stream()
-                .filter(indexSetConfig -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetConfig.id()))
-                .map(IndexSetSummary::fromIndexSetConfig)
-                .collect(Collectors.toSet());
-        return IndexSetResponse.create(indexSets.size(), indexSets);
+    public IndexSetResponse list(@ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
+                                 @QueryParam("skip") @DefaultValue("0") int skip,
+                                 @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
+                                 @QueryParam("limit") @DefaultValue("0") int limit) {
+        Set<IndexSetSummary> indexSets;
+        int count;
+
+        if (limit > 0) {
+            // First collect all index set ids the user is allowed to see.
+            final Set<String> allowedIds = indexSetService.findAll().stream()
+                    .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
+                    .map(IndexSetConfig::id)
+                    .collect(Collectors.toSet());
+
+            indexSets = indexSetService.findPaginated(allowedIds, limit, skip).stream()
+                    .map(IndexSetSummary::fromIndexSetConfig)
+                    .collect(Collectors.toSet());
+            count = allowedIds.size();
+        } else {
+            indexSets = indexSetService.findAll().stream()
+                    .filter(indexSetConfig -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetConfig.id()))
+                    .map(IndexSetSummary::fromIndexSetConfig)
+                    .collect(Collectors.toSet());
+            count = indexSets.size();
+        }
+
+        return IndexSetResponse.create(count, indexSets);
     }
 
     @GET
