@@ -81,8 +81,12 @@ const StreamForm = React.createClass({
     let indexSetSelect;
     if (this.props.indexSets) {
       indexSetSelect = (
-        <Select placeholder="Select input" options={this._formatSelectOptions()} matchProp="label"
-                onValueChange={this._onIndexSetSelect} value={this.state.index_set_id}/>
+        <div className="form-group">
+          <label>Index Set</label>
+          <Select placeholder="Select index set" options={this._formatSelectOptions()} matchProp="label"
+                  onValueChange={this._onIndexSetSelect} value={this.state.index_set_id}/>
+          <p className="help-block">Messages that match this stream will be written to the configured index set.</p>
+        </div>
       );
     } else {
       indexSetSelect = <Spinner>Loading index sets...</Spinner>;
@@ -98,9 +102,10 @@ const StreamForm = React.createClass({
         <Input type="text" required label="Description"
                placeholder="What kind of messages are routed into this stream?"
                valueLink={this.linkState('description')}/>
-        <Input type="checkbox" label="Remove matches from 'All messages' stream"
-               checkedLink={this.linkState('remove_matches_from_default_stream')}/>
         {indexSetSelect}
+        <Input type="checkbox" label="Remove matches from 'All messages' stream"
+               help={<span>Remove messages that match this stream from the 'All messages' stream which is assigned to every message by default.</span>}
+               checkedLink={this.linkState('remove_matches_from_default_stream')}/>
       </BootstrapModalForm>
     );
   },
