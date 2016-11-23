@@ -12,14 +12,11 @@ const DeflectorStore = Reflux.createStore({
   deflector: {
     info: undefined,
   },
-  init() {
-    DeflectorActions.list();
-  },
   getInitialState() {
     return { deflector: this.deflector };
   },
-  cycle() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.cycle().url);
+  cycle(indexSetId) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.cycle(indexSetId).url);
     const promise = fetch('POST', url);
 
     DeflectorActions.cycle.promise(promise);
@@ -27,8 +24,8 @@ const DeflectorStore = Reflux.createStore({
   cycleCompleted() {
     DeflectorActions.list();
   },
-  list() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.list().url);
+  list(indexSetId) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.list(indexSetId).url);
     const promise = fetch('GET', url).then((info) => {
       this.deflector.info = info;
       this.trigger({deflector: this.deflector});

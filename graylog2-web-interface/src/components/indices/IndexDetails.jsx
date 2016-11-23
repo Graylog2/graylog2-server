@@ -16,6 +16,7 @@ const IndexDetails = React.createClass({
     index: React.PropTypes.object.isRequired,
     indexName: React.PropTypes.string.isRequired,
     indexRange: React.PropTypes.object.isRequired,
+    indexSetId: React.PropTypes.string.isRequired,
     isDeflector: React.PropTypes.bool.isRequired,
   },
   componentDidMount() {
@@ -29,8 +30,8 @@ const IndexDetails = React.createClass({
     if (this.props.isDeflector) {
       return (
         <span>
-          <Button bsStyle="warning" bsSize="xs" disabled>Deflector index cannot be closed</Button>{' '}
-          <Button bsStyle="danger" bsSize="xs" disabled>Deflector index cannot be deleted</Button>
+          <Button bsStyle="warning" bsSize="xs" disabled>Active write index cannot be closed</Button>{' '}
+          <Button bsStyle="danger" bsSize="xs" disabled>Active write index cannot be deleted</Button>
         </span>
       );
     }
@@ -45,17 +46,23 @@ const IndexDetails = React.createClass({
   },
   _onRecalculateIndex() {
     if (window.confirm(`Really recalculate the index ranges for index ${this.props.indexName}?`)) {
-      IndexRangesActions.recalculateIndex(this.props.indexName);
+      IndexRangesActions.recalculateIndex(this.props.indexName).then(() => {
+        IndicesActions.list(this.props.indexSetId);
+      });
     }
   },
   _onCloseIndex() {
     if (window.confirm(`Really close index ${this.props.indexName}?`)) {
-      IndicesActions.close(this.props.indexName);
+      IndicesActions.close(this.props.indexName).then(() => {
+        IndicesActions.list(this.props.indexSetId);
+      });
     }
   },
   _onDeleteIndex() {
     if (window.confirm(`Really delete index ${this.props.indexName}?`)) {
-      IndicesActions.delete(this.props.indexName);
+      IndicesActions.delete(this.props.indexName).then(() => {
+        IndicesActions.list(this.props.indexSetId);
+      });
     }
   },
   render() {

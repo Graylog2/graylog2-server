@@ -60,6 +60,11 @@ const Routes = {
       LIST: '/system/indices',
       FAILURES: '/system/indices/failures',
     },
+    INDEX_SETS: {
+      CONFIGURATION: (indexSetId) => `/system/index_sets/${indexSetId}/configuration`,
+      SHOW: (indexSetId) => `/system/index_sets/${indexSetId}`,
+      CREATE: '/system/index_sets/create',
+    },
     INPUTS: '/system/inputs',
     LOGGING: '/system/logging',
     METRICS: (nodeId) => `/system/metrics/node/${nodeId}`,

@@ -9,8 +9,8 @@ const IndexerOverviewActions = ActionsProvider.getActions('IndexerOverview');
 
 const IndexerOverviewStore = Reflux.createStore({
   listenables: [IndexerOverviewActions],
-  list() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list().url);
+  list(indexSetId) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndexerOverviewApiResource.list(indexSetId).url);
     const promise = fetch('GET', url);
     promise.then(
       (response) => {

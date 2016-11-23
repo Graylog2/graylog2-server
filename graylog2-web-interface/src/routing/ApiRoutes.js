@@ -34,6 +34,7 @@ const ApiRoutes = {
   },
   CountsApiController: {
     total: () => { return { url: '/count/total' }; },
+    indexSetTotal: (indexSetId) => { return { url: `/count/${indexSetId}/total` }; },
   },
   ClusterApiResource: {
     list: () => { return { url: '/system/cluster/nodes' }; },
@@ -60,8 +61,8 @@ const ApiRoutes = {
     update: (decoratorId) => { return { url: `/search/decorators/${decoratorId}` }; },
   },
   DeflectorApiController: {
-    cycle: () => { return { url: '/cluster/deflector/cycle' }; },
-    list: () => { return { url: '/system/deflector' }; },
+    cycle: (indexSetId) => { return { url: `/cluster/deflector/${indexSetId}/cycle` }; },
+    list: (indexSetId) => { return { url: `/system/deflector/${indexSetId}` }; },
   },
   IndexerClusterApiController: {
     health: () => { return { url: '/system/indexer/cluster/health' }; },
@@ -72,7 +73,7 @@ const ApiRoutes = {
     list: (limit, offset) => { return { url: `/system/indexer/failures?limit=${limit}&offset=${offset}` }; },
   },
   IndexerOverviewApiResource: {
-    list: () => { return { url: '/system/indexer/overview' }; },
+    list: (indexSetId) => { return { url: `/system/indexer/overview/${indexSetId}` }; },
   },
   IndexRangesApiController: {
     list: () => { return { url: '/system/indices/ranges' }; },
@@ -81,13 +82,16 @@ const ApiRoutes = {
   },
   IndexSetsApiController: {
     list: () => { return { url: '/system/indices/index_sets' }; },
+    listPaginated: (skip, limit) => { return { url: `/system/indices/index_sets?skip=${skip}&limit=${limit}` }; },
+    get: (indexSetId) => { return { url: `/system/indices/index_sets/${indexSetId}` }; },
+    create: () => { return { url: '/system/indices/index_sets' }; },
   },
   IndicesApiController: {
     close: (indexName) => { return { url: `/system/indexer/indices/${indexName}/close` }; },
     delete: (indexName) => { return { url: `/system/indexer/indices/${indexName}` }; },
-    list: () => { return { url: '/system/indexer/indices' }; },
-    listClosed: () => { return { url: '/system/indexer/indices/closed' }; },
-    multiple: () => { return { url: '/system/indexer/indices/multiple' }; },
+    list: (indexSetId) => { return { url: `/system/indexer/indices/${indexSetId}/list` }; },
+    listClosed: (indexSetId) => { return { url: `/system/indexer/indices/${indexSetId}/closed` }; },
+    multiple: () => { return { url: `/system/indexer/indices/multiple` }; },
     reopen: (indexName) => { return { url: `/system/indexer/indices/${indexName}/reopen` }; },
   },
   InputsApiController: {
