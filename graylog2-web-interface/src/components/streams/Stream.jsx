@@ -22,6 +22,7 @@ const Stream = React.createClass({
       permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
       streamRuleTypes: PropTypes.array.isRequired,
       user: PropTypes.object.isRequired,
+      indexSets: React.PropTypes.array.isRequired,
     };
   },
   mixins: [PermissionsMixin],
@@ -133,7 +134,8 @@ const Stream = React.createClass({
                                 user={this.props.user}
                                 onDelete={this._onDelete} onUpdate={this._onUpdate}
                                 onClone={this._onClone}
-                                onQuickAdd={this._onQuickAdd}/>);
+                                onQuickAdd={this._onQuickAdd}
+                                indexSets={this.props.indexSets}/>);
     return (
       <li className="stream">
         <h2>

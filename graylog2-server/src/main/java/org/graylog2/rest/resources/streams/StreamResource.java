@@ -16,14 +16,17 @@
  */
 package org.graylog2.rest.resources.streams;
 
+import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-
-import com.codahale.metrics.annotation.Timed;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
@@ -67,18 +70,6 @@ import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
-
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -93,12 +84,17 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -249,6 +245,8 @@ public class StreamResource extends RestResource {
             stream.setRemoveMatchesFromDefaultStream(removeMatchesFromDefaultStream);
         }
 
+        stream.setIndexSetId(cr.indexSetId());
+
         streamService.save(stream);
         clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
 
@@ -380,6 +378,7 @@ public class StreamResource extends RestResource {
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
         streamData.put(StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString());
         streamData.put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, sourceStream.getRemoveMatchesFromDefaultStream());
+        streamData.put(StreamImpl.FIELD_INDEX_SET_ID, sourceStream.getIndexSetId());
 
         final Stream stream = streamService.create(streamData);
         streamService.pause(stream);
@@ -462,7 +461,8 @@ public class StreamResource extends RestResource {
             stream.getTitle(),
             stream.getContentPack(),
             stream.isDefaultStream(),
-            stream.getRemoveMatchesFromDefaultStream()
+            stream.getRemoveMatchesFromDefaultStream(),
+            stream.getIndexSetId()
         );
     }
 

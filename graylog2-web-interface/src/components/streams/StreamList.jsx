@@ -8,6 +8,7 @@ const StreamList = React.createClass({
   propTypes: {
     streams: React.PropTypes.array.isRequired,
     streamRuleTypes: React.PropTypes.array.isRequired,
+    indexSets: React.PropTypes.array.isRequired,
     user: React.PropTypes.object.isRequired,
     permissions: React.PropTypes.array.isRequired,
     onStreamSave: React.PropTypes.func.isRequired,
@@ -21,7 +22,7 @@ const StreamList = React.createClass({
   _formatStream(stream) {
     return (
       <Stream key={'stream-' + stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
-                   permissions={this.props.permissions} user={this.props.user}/>
+                   permissions={this.props.permissions} user={this.props.user} indexSets={this.props.indexSets} />
     );
   },
 

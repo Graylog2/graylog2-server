@@ -2,12 +2,14 @@ import React from 'react';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { Input } from 'react-bootstrap';
+import { Select, Spinner } from 'components/common';
 
 const StreamForm = React.createClass({
   propTypes: {
     onSubmit: React.PropTypes.func.isRequired,
     stream: React.PropTypes.object.isRequired,
     title: React.PropTypes.string.isRequired,
+    indexSets: React.PropTypes.array.isRequired,
   },
 
   mixins: [LinkedStateMixin],
@@ -18,6 +20,7 @@ const StreamForm = React.createClass({
         title: '',
         description: '',
         remove_matches_from_default_stream: false,
+        index_set_id: '',
       },
     };
   },
@@ -31,10 +34,16 @@ const StreamForm = React.createClass({
   },
 
   _getValuesFromProps(props) {
+    let defaultIndexSetId = props.stream.index_set_id;
+    if (!defaultIndexSetId && props.indexSets && props.indexSets.length > 0) {
+      defaultIndexSetId = props.indexSets[0].id;
+    }
+
     return {
       title: props.stream.title,
       description: props.stream.description,
       remove_matches_from_default_stream: props.stream.remove_matches_from_default_stream,
+      index_set_id: defaultIndexSetId,
     };
   },
 
@@ -44,6 +53,7 @@ const StreamForm = React.createClass({
         title: this.state.title,
         description: this.state.description,
         remove_matches_from_default_stream: this.state.remove_matches_from_default_stream,
+        index_set_id: this.state.index_set_id,
       });
     this.refs.modal.close();
   },
@@ -57,7 +67,27 @@ const StreamForm = React.createClass({
     this.refs.modal.close();
   },
 
+  _formatSelectOptions() {
+    return this.props.indexSets.map(indexSet => {
+      return { value: indexSet.id, label: indexSet.title };
+    });
+  },
+
+  _onIndexSetSelect(selection) {
+    this.linkState('index_set_id').requestChange(selection);
+  },
+
   render() {
+    let indexSetSelect;
+    if (this.props.indexSets) {
+      indexSetSelect = (
+        <Select placeholder="Select input" options={this._formatSelectOptions()} matchProp="label"
+                onValueChange={this._onIndexSetSelect} value={this.state.index_set_id}/>
+      );
+    } else {
+      indexSetSelect = <Spinner>Loading index sets...</Spinner>;
+    }
+
     return (
       <BootstrapModalForm ref="modal"
                           title={this.props.title}
@@ -70,6 +100,7 @@ const StreamForm = React.createClass({
                valueLink={this.linkState('description')}/>
         <Input type="checkbox" label="Remove matches from 'All messages' stream"
                checkedLink={this.linkState('remove_matches_from_default_stream')}/>
+        {indexSetSelect}
       </BootstrapModalForm>
     );
   },

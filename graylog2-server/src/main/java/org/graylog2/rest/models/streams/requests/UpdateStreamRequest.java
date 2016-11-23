@@ -22,7 +22,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
@@ -46,12 +45,16 @@ public abstract class UpdateStreamRequest {
     @Nullable
     public abstract Boolean removeMatchesFromDefaultStream();
 
+    @JsonProperty("index_set_id")
+    public abstract String indexSetId();
+
     @JsonCreator
     public static UpdateStreamRequest create(@JsonProperty("title") @Nullable String title,
                                              @JsonProperty("description") @Nullable String description,
                                              @JsonProperty("matching_type") @Nullable String matchingType,
                                              @JsonProperty("rules") @Nullable List rules,
-                                             @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream) {
-        return new AutoValue_UpdateStreamRequest(title, description, matchingType, removeMatchesFromDefaultStream);
+                                             @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream,
+                                             @JsonProperty("index_set_id") String indexSetId) {
+        return new AutoValue_UpdateStreamRequest(title, description, matchingType, removeMatchesFromDefaultStream, indexSetId);
     }
 }

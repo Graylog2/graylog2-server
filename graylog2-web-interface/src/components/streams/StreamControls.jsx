@@ -12,6 +12,7 @@ const StreamControls = React.createClass({
   propTypes: {
     stream: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
+    indexSets: React.PropTypes.array.isRequired,
     onDelete: PropTypes.func.isRequired,
     onClone: PropTypes.func.isRequired,
     onQuickAdd: PropTypes.func.isRequired,
@@ -72,8 +73,8 @@ const StreamControls = React.createClass({
               </MenuItem>
             </IfPermitted>
           </DropdownButton>
-          <StreamForm ref="streamForm" title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream}/>
-          <StreamForm ref="cloneForm" title="Cloning Stream" onSubmit={this._onCloneSubmit}/>
+          <StreamForm ref="streamForm" title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream} indexSets={this.props.indexSets}/>
+          <StreamForm ref="cloneForm" title="Cloning Stream" onSubmit={this._onCloneSubmit} indexSets={this.props.indexSets}/>
       </span>
     );
   },
