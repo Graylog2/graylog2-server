@@ -12,7 +12,7 @@ const IndexerOverviewStore = StoreProvider.getStore('IndexerOverview');
 const IndicesStore = StoreProvider.getStore('Indices');
 
 import DocsHelper from 'util/DocsHelper';
-import { PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import { IndicesMaintenanceDropdown, IndicesOverview } from 'components/indices';
@@ -63,7 +63,7 @@ const IndicesPage = React.createClass({
   },
   render() {
     const pageHeader = (
-      <PageHeader title="Indices">
+      <PageHeader title="Indices & Index Sets">
         <span>
           This is an overview of all indices (message stores) Graylog is currently taking in account
           for searches and analysis.
@@ -93,31 +93,33 @@ const IndicesPage = React.createClass({
 
     const deflectorInfo = this.state.indexerOverview.deflector;
     return (
-      <span>
-        {pageHeader}
+      <DocumentTitle title="Indices & Index Sets">
+        <span>
+          {pageHeader}
 
-        <Row className="content">
-          <Col md={12}>
-            <IndicesConfiguration />
-          </Col>
-        </Row>
+          <Row className="content">
+            <Col md={12}>
+              <IndicesConfiguration />
+            </Col>
+          </Row>
 
-        <Row className="content">
-          <Col md={12}>
-            <Alert bsStyle="success" style={{ marginTop: '10' }}>
-              <i className="fa fa-th"/> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
-              {numeral(this.state.indexerOverview.counts.events).format('0,0')} messages under management,
-              current write-active index is <i>{deflectorInfo.current_target}</i>.
-            </Alert>
-            <IndexerClusterHealthSummary health={this.state.indexerOverview.indexer_cluster.health} />
-          </Col>
-        </Row>
+          <Row className="content">
+            <Col md={12}>
+              <Alert bsStyle="success" style={{ marginTop: '10' }}>
+                <i className="fa fa-th"/> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
+                {numeral(this.state.indexerOverview.counts.events).format('0,0')} messages under management,
+                current write-active index is <i>{deflectorInfo.current_target}</i>.
+              </Alert>
+              <IndexerClusterHealthSummary health={this.state.indexerOverview.indexer_cluster.health} />
+            </Col>
+          </Row>
 
-        <IndicesOverview indices={this.state.indexerOverview.indices}
-                         indexDetails={this.state.indexDetails.indices}
-                         closedIndices={this.state.indexDetails.closedIndices}
-                         deflector={this.state.indexerOverview.deflector}/>
-      </span>
+          <IndicesOverview indices={this.state.indexerOverview.indices}
+                           indexDetails={this.state.indexDetails.indices}
+                           closedIndices={this.state.indexDetails.closedIndices}
+                           deflector={this.state.indexerOverview.deflector}/>
+        </span>
+      </DocumentTitle>
     );
   },
 });
