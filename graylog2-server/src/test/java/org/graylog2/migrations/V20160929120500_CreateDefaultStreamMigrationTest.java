@@ -61,7 +61,7 @@ public class V20160929120500_CreateDefaultStreamMigrationTest {
 
         migration.upgrade();
 
-        verify(streamService).save(streamArgumentCaptor.capture());
+        verify(streamService).saveWithoutValidation(streamArgumentCaptor.capture());
 
         final Stream stream = streamArgumentCaptor.getValue();
         assertThat(stream.getTitle()).isEqualTo("All messages");

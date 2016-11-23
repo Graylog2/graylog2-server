@@ -32,6 +32,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.mockito.Mockito.mock;
+
 public class StreamMock implements Stream {
     private String id;
     private String title;
@@ -219,7 +221,16 @@ public class StreamMock implements Stream {
     }
 
     @Override
-    public Set<IndexSet> getIndexSets() {
-        return Collections.emptySet();
+    public String getIndexSetId() {
+        return null;
+    }
+
+    @Override
+    public void setIndexSetId(String indexSetId) {
+    }
+
+    @Override
+    public IndexSet getIndexSet() {
+        return mock(IndexSet.class);
     }
 }

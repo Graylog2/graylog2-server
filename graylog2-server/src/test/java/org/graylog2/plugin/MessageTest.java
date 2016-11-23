@@ -259,9 +259,9 @@ public class MessageTest {
 
         assertThat(message.getIndexSets()).isEmpty();
 
-        when(stream1.getIndexSets()).thenReturn(Collections.singleton(indexSet1));
-        when(stream2.getIndexSets()).thenReturn(Collections.emptySet());
-        when(stream3.getIndexSets()).thenReturn(Sets.newHashSet(indexSet1, indexSet2));
+        when(stream1.getIndexSet()).thenReturn(indexSet1);
+        when(stream2.getIndexSet()).thenReturn(indexSet1);
+        when(stream3.getIndexSet()).thenReturn(indexSet2);
 
         message.addStream(stream1);
         message.addStreams(Sets.newHashSet(stream2, stream3));
