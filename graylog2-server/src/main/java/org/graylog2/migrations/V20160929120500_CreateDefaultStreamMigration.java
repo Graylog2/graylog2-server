@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
@@ -78,13 +77,11 @@ public class V20160929120500_CreateDefaultStreamMigration extends Migration {
                 .build();
         final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), null);
 
-        try {
-            streamService.save(stream);
-            LOG.info("Successfully created default stream: {}", stream.getTitle());
+        // Save without validations here to avoid failing the index set validation which has been added at a later
+        // point in time.
+        streamService.saveWithoutValidation(stream);
+        LOG.info("Successfully created default stream: {}", stream.getTitle());
 
-            clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
-        } catch (ValidationException e) {
-            LOG.error("Couldn't create default stream", e);
-        }
+        clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
     }
 }
