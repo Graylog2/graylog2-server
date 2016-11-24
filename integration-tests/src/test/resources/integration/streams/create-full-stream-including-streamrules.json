@@ -1,6 +1,7 @@
 {
   "title": "A full Test Stream",
   "description" : "This is a full test stream including stream rules.",
+  "index_set_id": "index-set-1",
   "rules" : [
     {"type" : 1, "value" : "login", "field" : "action", "inverted" : false, "description": ""},
     {"type" : 5, "value": "", "field" : "controller", "inverted" : false, "description": ""}

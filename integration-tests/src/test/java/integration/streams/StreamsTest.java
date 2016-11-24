@@ -191,6 +191,17 @@ public class StreamsTest extends BaseRestTest {
     }
 
     @Test
+    public void creatingStreamWithoutIndexSetIdShouldFail() throws Exception {
+        final int beforeCount = streamCount();
+
+        final ValidatableResponse response = createStreamFromRequest(jsonResourceForMethod());
+
+        response.statusCode(400);
+
+        assertThat(streamCount()).isEqualTo(beforeCount);
+    }
+
+    @Test
     public void creatingInvalidStreamShouldFail() throws Exception {
         final int beforeCount = streamCount();
 
