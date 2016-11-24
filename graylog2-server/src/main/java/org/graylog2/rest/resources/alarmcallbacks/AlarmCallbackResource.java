@@ -232,23 +232,19 @@ public class AlarmCallbackResource extends RestResource {
                        @ApiParam(name = "JSON body", required = true) CreateAlarmCallbackRequest alarmCallbackRequest) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
-        final AlarmCallbackConfiguration aCC = alarmCallbackConfigurationService.load(alarmCallbackId);
-        if (aCC == null) {
+        final AlarmCallbackConfiguration callbackConfiguration = alarmCallbackConfigurationService.load(alarmCallbackId);
+        if (callbackConfiguration == null) {
             throw new NotFoundException("Unable to find alarm callback configuration " + alarmCallbackId);
         }
 
         final Map<String, Object> configuration = convertConfigurationValues(alarmCallbackRequest);
 
-        final AlarmCallbackConfigurationAVImpl newConfig = AlarmCallbackConfigurationAVImpl.create(
-                alarmCallbackId,
-                aCC.getStreamId(),
-                aCC.getType(),
-                configuration,
-                aCC.getCreatedAt(),
-                aCC.getCreatorUserId());
+        final AlarmCallbackConfiguration updatedConfig = ((AlarmCallbackConfigurationAVImpl) callbackConfiguration).toBuilder()
+                .setConfiguration(configuration)
+                .build();
 
         try {
-             alarmCallbackConfigurationService.save(newConfig);
+             alarmCallbackConfigurationService.save(updatedConfig);
         } catch (ValidationException e) {
             throw new BadRequestException("Unable to save alarm callback configuration", e);
         }
