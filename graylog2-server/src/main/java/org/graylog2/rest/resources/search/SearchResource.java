@@ -19,7 +19,7 @@ package org.graylog2.rest.resources.search;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import joptsimple.internal.Strings;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
@@ -54,27 +54,25 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.ws.rs.BadRequestException;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public abstract class SearchResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(SearchResource.class);
-    private static final Pattern filterStreamIdPattern = Pattern.compile("^(.+[^\\p{Alnum}])?streams:([\\p{XDigit}]+)");
 
     protected final Searches searches;
     private final ClusterConfigService clusterConfigService;
@@ -393,27 +391,4 @@ public abstract class SearchResource extends RestResource {
         return AbsoluteRange.create(from, to);
     }
 
-    /**
-     * Extracts the last stream id from the filter string passed as part of the elasticsearch query. This is used later
-     * to pass to possibly existing message decorators for stream-specific configurations.
-     *
-     * The assumption is that usually (when listing/searching messages for a stream) only a single stream filter is passed.
-     * When this is not the case, only the last stream id will be taked into account.
-     *
-     * This is currently a workaround. A better solution would be to pass the stream id which is supposed to be the scope
-     * for a search query as a separate parameter.
-     *
-     * @param filter
-     * @return the optional stream id
-     */
-    protected Optional<String> extractStreamId(String filter) {
-        if (Strings.isNullOrEmpty(filter)) {
-            return Optional.empty();
-        }
-        final Matcher streamIdMatcher = filterStreamIdPattern.matcher(filter);
-        if (streamIdMatcher.find()) {
-            return Optional.of(streamIdMatcher.group(2));
-        }
-        return Optional.empty();
-    }
 }

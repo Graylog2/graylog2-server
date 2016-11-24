@@ -55,6 +55,9 @@ public class IndexHelperTest {
     @Mock
     private IndexRangeService indexRangeService;
 
+    // TODO this never filters out IndexSet prefixes
+    private String indexPrefix = null;
+
     @BeforeClass
     public static void initialize() {
         DateTimeUtils.setCurrentMillisFixed(new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC).getMillis());
@@ -127,11 +130,11 @@ public class IndexHelperTest {
         final TimeRange keywordRange = KeywordRange.create("1 day ago");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, absoluteRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, absoluteRange, indexPrefix))
             .containsExactly(indexRangeLatest, indexRange0, indexRange1);
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, keywordRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, keywordRange, indexPrefix))
             .containsExactly(indexRangeLatest, indexRange0, indexRange1);
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, relativeRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, relativeRange, indexPrefix))
             .containsExactly(indexRangeLatest, indexRange0, indexRange1);
     }
 
@@ -151,11 +154,11 @@ public class IndexHelperTest {
         final TimeRange keywordRange = KeywordRange.create("1 day ago");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, absoluteRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, absoluteRange, indexPrefix))
             .containsExactly(indexRange0, indexRange1);
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, keywordRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, keywordRange, indexPrefix))
             .containsExactly(indexRange0, indexRange1);
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, relativeRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, relativeRange, indexPrefix))
             .containsExactly(indexRange0, indexRange1);
     }
 
@@ -177,11 +180,11 @@ public class IndexHelperTest {
         final TimeRange keywordRange = KeywordRange.create("1 day ago");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange, indexPrefix))
             .containsExactly(indexRangeLatest.indexName(), indexRange0.indexName(), indexRange1.indexName());
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, keywordRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, keywordRange, indexPrefix))
             .containsExactly(indexRangeLatest.indexName(), indexRange0.indexName(), indexRange1.indexName());
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, relativeRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, relativeRange, indexPrefix))
             .containsExactly(indexRangeLatest.indexName(), indexRange0.indexName(), indexRange1.indexName());
     }
 
@@ -201,11 +204,11 @@ public class IndexHelperTest {
         final TimeRange keywordRange = KeywordRange.create("1 day ago");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange, indexPrefix))
             .containsOnly(indexRange0.indexName(), indexRange1.indexName());
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, keywordRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, keywordRange, indexPrefix))
             .containsOnly(indexRange0.indexName(), indexRange1.indexName());
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, relativeRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, relativeRange, indexPrefix))
             .containsOnly(indexRange0.indexName(), indexRange1.indexName());
     }
 

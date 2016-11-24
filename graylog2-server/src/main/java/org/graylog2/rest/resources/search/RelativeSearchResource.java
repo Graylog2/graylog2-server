@@ -107,7 +107,7 @@ public class RelativeSearchResource extends SearchResource {
                 .sorting(sorting)
                 .build();
 
-        final Optional<String> streamId = extractStreamId(filter);
+        final Optional<String> streamId = Searches.extractStreamId(filter);
 
         try {
             return buildSearchResponse(searches.search(searchesConfig), timeRange, decorate, streamId);

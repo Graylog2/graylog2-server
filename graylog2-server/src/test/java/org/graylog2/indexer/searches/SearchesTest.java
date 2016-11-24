@@ -16,14 +16,16 @@
  */
 package org.graylog2.indexer.searches;
 
+import com.google.common.collect.ImmutableSortedSet;
+
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.collect.ImmutableSortedSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
+
 import org.elasticsearch.client.Client;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexSet;
@@ -44,6 +46,7 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
@@ -54,11 +57,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.SortedSet;
+
+import javax.inject.Inject;
 
 import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
@@ -113,6 +117,9 @@ public class SearchesTest {
     @Mock
     private IndexRangeService indexRangeService;
 
+    @Mock
+    private StreamService streamService;
+
     private MetricRegistry metricRegistry;
     private Searches searches;
 
@@ -143,7 +150,7 @@ public class SearchesTest {
     public void setUp() throws Exception {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         metricRegistry = new MetricRegistry();
-        searches = new Searches(new Configuration(), indexRangeService, client, metricRegistry);
+        searches = new Searches(new Configuration(), indexRangeService, client, metricRegistry, streamService);
     }
 
     @Test
@@ -241,9 +248,9 @@ public class SearchesTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTermsStats() throws Exception {
         TermsStatsResult r = searches.termsStats("message", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
-                                                 AbsoluteRange.create(
-                                                         new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                                                         new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC))
+                AbsoluteRange.create(
+                        new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC))
         );
 
         assertThat(r.getResults()).hasSize(2);
@@ -256,9 +263,9 @@ public class SearchesTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void termsStatsRecordsMetrics() throws Exception {
         TermsStatsResult r = searches.termsStats("message", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
-                                                 AbsoluteRange.create(
-                                                         new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
-                                                         new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC))
+                AbsoluteRange.create(
+                        new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
+                        new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC))
         );
 
         assertThat(metricRegistry.getTimers()).containsKey(REQUEST_TIMER_NAME);

@@ -107,7 +107,7 @@ public class AbsoluteSearchResource extends SearchResource {
                 .sorting(sorting)
                 .build();
 
-        final Optional<String> streamId = extractStreamId(filter);
+        final Optional<String> streamId = Searches.extractStreamId(filter);
 
         try {
             return buildSearchResponse(searches.search(searchesConfig), timeRange, decorate, streamId);

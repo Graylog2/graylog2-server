@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -27,11 +28,12 @@ import org.graylog2.indexer.ranges.IndexRangeService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import javax.annotation.Nullable;
 
 public class IndexHelper {
     public static Set<String> getOldestIndices(IndexSet indexSet, int count) {
@@ -72,8 +74,9 @@ public class IndexHelper {
     }
 
     public static Set<String> determineAffectedIndices(IndexRangeService indexRangeService,
-                                                       TimeRange range) {
-        final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(indexRangeService, range);
+                                                       TimeRange range,
+                                                       String indexPrefix) {
+        final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(indexRangeService, range, indexPrefix);
         final ImmutableSet.Builder<String> indices = ImmutableSet.builder();
         for (IndexRange indexRange : indexRanges) {
             indices.add(indexRange.indexName());
@@ -83,9 +86,14 @@ public class IndexHelper {
     }
 
     public static Set<IndexRange> determineAffectedIndicesWithRanges(IndexRangeService indexRangeService,
-                                                                     TimeRange range) {
+                                                                     TimeRange range,
+                                                                     String indexPrefix) {
         final ImmutableSortedSet.Builder<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         for (IndexRange indexRange : indexRangeService.find(range.getFrom(), range.getTo())) {
+            // if we only consider a certain index set, filter the index ranges by it.
+            if (indexPrefix != null && !indexRange.indexName().startsWith(indexPrefix + "_")) {
+                continue;
+            }
             indices.add(indexRange);
         }
 
