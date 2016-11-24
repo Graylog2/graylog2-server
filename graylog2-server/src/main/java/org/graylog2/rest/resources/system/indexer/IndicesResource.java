@@ -139,8 +139,9 @@ public class IndicesResource extends RestResource {
     @RequiresPermissions(RestPermissions.INDICES_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo open() {
-        final Set<IndexStatistics> indicesStats = indices.getIndicesStats().stream()
-                .filter(indexStats -> indexSetRegistry.isManagedIndex(indexStats.indexName()))
+        final Set<IndexStatistics> indicesStats = indexSetRegistry.getAllIndexSets().stream()
+                .map(IndexSet::getConfig)
+                .flatMap(config -> indices.getIndicesStats(config).stream())
                 .collect(Collectors.toSet());
 
         return getOpenIndicesInfo(indicesStats);

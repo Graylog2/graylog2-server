@@ -193,12 +193,8 @@ public class Indices {
         return docsStats == null ? 0L : docsStats.getCount();
     }
 
-    public Map<String, IndexStats> getAll() {
-        return getAll(ALL_INDEX_PREFIX);
-    }
-
-    public Map<String, IndexStats> getAll(final String indexPrefix) {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias(indexPrefix)).request();
+    public Map<String, IndexStats> getAll(final IndexSetConfig indexSetConfig) {
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias(indexSetConfig.indexPrefix())).request();
         final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
         if (response.getFailedShards() > 0) {
@@ -207,12 +203,8 @@ public class Indices {
         return response.getIndices();
     }
 
-    public Map<String, IndexStats> getAllDocCounts() {
-        return getAllDocCounts(ALL_INDEX_PREFIX);
-    }
-
-    public Map<String, IndexStats> getAllDocCounts(final String indexPrefix) {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias(indexPrefix)).setDocs(true).request();
+    public Map<String, IndexStats> getAllDocCounts(final IndexSetConfig indexSetConfig) {
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias(indexSetConfig.indexPrefix())).setDocs(true).request();
         final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
         return response.getIndices();
@@ -482,29 +474,14 @@ public class Indices {
         return IndexStatistics.create(indexStats.getIndex(), indexStats.getPrimaries(), indexStats.getTotal(), shardRouting.build());
     }
 
-    public Set<IndexStatistics> getIndicesStats() {
-        final Map<String, IndexStats> responseIndices;
-        try {
-            responseIndices = getAll();
-        } catch (ElasticsearchException e) {
-            return Collections.emptySet();
-        }
-
-        return calculateIndexStats(responseIndices);
-    }
-
     public Set<IndexStatistics> getIndicesStats(final IndexSetConfig indexSetConfig) {
         final Map<String, IndexStats> responseIndices;
         try {
-            responseIndices = getAll(indexSetConfig.indexPrefix());
+            responseIndices = getAll(indexSetConfig);
         } catch (ElasticsearchException e) {
             return Collections.emptySet();
         }
 
-        return calculateIndexStats(responseIndices);
-    }
-
-    private Set<IndexStatistics> calculateIndexStats(final Map<String, IndexStats> responseIndices) {
         final ImmutableSet.Builder<IndexStatistics> result = ImmutableSet.builder();
         for (IndexStats indexStats : responseIndices.values()) {
             final ImmutableList.Builder<ShardRouting> shardRouting = ImmutableList.builder();
