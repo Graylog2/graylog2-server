@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Col, Button } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
@@ -13,13 +13,12 @@ const StreamsStore = StoreProvider.getStore('Streams');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const AlertConditionsStore = StoreProvider.getStore('AlertConditions');
 
-import { IfPermitted, PageHeader, Spinner } from 'components/common';
+import { PageHeader, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import { AlarmCallbackComponent } from 'components/alarmcallbacks';
 import CreateAlertConditionInput from 'components/alertconditions/CreateAlertConditionInput';
 import AlertConditionsList from 'components/alertconditions/AlertConditionsList';
-import { AlertReceiversList } from 'components/alerts';
 
 const StreamAlertsPage = React.createClass({
   propTypes: {
@@ -87,29 +86,6 @@ const StreamAlertsPage = React.createClass({
             <AlarmCallbackComponent streamId={stream.id} permissions={this.state.currentUser.permissions} />
           </Col>
         </Row>
-
-        <IfPermitted permissions={'users:list'}>
-          <Row className="content">
-            <Col md={12}>
-              <IfPermitted permissions={`streams:edit:${stream.id}`}>
-                <div className="sendDummyAlert">
-                  <Button className="pull-right" bsStyle="info" onClick={this._onSendDummyAlert}>Send test alert</Button>
-                </div>
-              </IfPermitted>
-
-              <h2>Receivers</h2>
-
-              <p className="description">
-                The following Graylog users will be notified about alerts via email if they have configured
-                an email address in their profile. You can also add any other email address to the alert
-                receivers if it has no Graylog user associated.
-              </p>
-
-              <AlertReceiversList receivers={stream.alert_receivers} streamId={stream.id}/>
-
-            </Col>
-          </Row>
-        </IfPermitted>
       </span>
     );
   },

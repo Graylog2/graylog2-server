@@ -154,8 +154,6 @@ const ApiRoutes = {
     get: (streamId, conditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${conditionId}` }; },
     list: (streamId) => { return { url: `/streams/${streamId}/alerts/conditions` }; },
     update: (streamId, alertConditionId) => { return { url: `/streams/${streamId}/alerts/conditions/${alertConditionId}` }; },
-    addReceiver: (streamId, type, entity) => { return { url: `/streams/${streamId}/alerts/receivers?entity=${entity}&type=${type}` }; },
-    deleteReceiver: (streamId, type, entity) => { return { url: `/streams/${streamId}/alerts/receivers?entity=${entity}&type=${type}` }; },
     sendDummyAlert: (streamId) => { return { url: `/streams/${streamId}/alerts/sendDummyAlert` }; },
   },
   StreamsApiController: {
