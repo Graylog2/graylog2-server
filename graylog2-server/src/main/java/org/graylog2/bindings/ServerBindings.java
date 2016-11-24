@@ -26,6 +26,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
+import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.alerts.FormattedEmailAlertSender;
 import org.graylog2.bindings.providers.BundleExporterProvider;
 import org.graylog2.bindings.providers.BundleImporterProvider;
@@ -137,6 +138,8 @@ public class ServerBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(LdapSettingsImpl.Factory.class));
         install(new FactoryModuleBuilder().build(WidgetCacheTime.Factory.class));
         install(new FactoryModuleBuilder().build(UserImpl.Factory.class));
+
+        install(new FactoryModuleBuilder().build(EmailRecipients.Factory.class));
 
         install(new FactoryModuleBuilder().build(ProcessBufferProcessor.Factory.class));
         bind(Stream.class).annotatedWith(DefaultStream.class).toProvider(DefaultStreamProvider.class);

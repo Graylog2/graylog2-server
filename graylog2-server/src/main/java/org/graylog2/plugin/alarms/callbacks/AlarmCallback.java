@@ -24,10 +24,6 @@ import org.graylog2.plugin.streams.Stream;
 
 import java.util.Map;
 
-/**
- *
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public interface AlarmCallback {
     
     public void initialize(Configuration config) throws AlarmCallbackConfigurationException;
