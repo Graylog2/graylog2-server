@@ -16,6 +16,7 @@ const StreamComponent = React.createClass({
   propTypes: {
     currentUser: PropTypes.object.isRequired,
     onStreamSave: PropTypes.func.isRequired,
+    indexSets: React.PropTypes.array.isRequired,
   },
   getInitialState() {
     return {};
@@ -61,6 +62,7 @@ const StreamComponent = React.createClass({
         <IfPermitted permissions="streams:create">
           <CreateStreamButton bsSize="small" bsStyle="link" className="btn-text"
                               buttonText="Create one now" ref="createStreamButton"
+                              indexSets={this.props.indexSets}
                               onSave={this.props.onStreamSave}/>
         </IfPermitted>
       );
@@ -88,7 +90,7 @@ const StreamComponent = React.createClass({
           <Col md={12}>
             <StreamList streams={this.state.filteredStreams} streamRuleTypes={this.state.streamRuleTypes}
                         permissions={this.props.currentUser.permissions} user={this.props.currentUser}
-                        onStreamSave={this.props.onStreamSave}/>
+                        onStreamSave={this.props.onStreamSave} indexSets={this.props.indexSets} />
           </Col>
         </Row>
       </div>

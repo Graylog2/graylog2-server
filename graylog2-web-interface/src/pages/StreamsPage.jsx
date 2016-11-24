@@ -14,9 +14,21 @@ import UserNotification from 'util/UserNotification';
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const StreamsStore = StoreProvider.getStore('Streams');
+const IndexSetsStore = StoreProvider.getStore('IndexSets');
+
+import ActionsProvider from 'injection/ActionsProvider';
+const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
 const StreamsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(IndexSetsStore)],
+  getInitialState() {
+    return {
+      indexSets: [],
+    };
+  },
+  componentDidMount() {
+    IndexSetsActions.list();
+  },
   _isLoading() {
     return !this.state.currentUser;
   },
@@ -49,13 +61,13 @@ const StreamsPage = React.createClass({
           </span>
 
           <IfPermitted permissions="streams:create">
-            <CreateStreamButton ref="createStreamButton" bsSize="large" bsStyle="success" onSave={this._onSave} />
+            <CreateStreamButton ref="createStreamButton" bsSize="large" bsStyle="success" onSave={this._onSave} indexSets={this.state.indexSets} />
           </IfPermitted>
         </PageHeader>
 
         <Row className="content">
           <Col md={12}>
-            <StreamComponent currentUser={this.state.currentUser} onStreamSave={this._onSave}/>
+            <StreamComponent currentUser={this.state.currentUser} onStreamSave={this._onSave} indexSets={this.state.indexSets}/>
           </Col>
         </Row>
       </div>

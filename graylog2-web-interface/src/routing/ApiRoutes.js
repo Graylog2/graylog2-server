@@ -79,6 +79,9 @@ const ApiRoutes = {
     rebuild: () => { return { url: '/system/indices/ranges/rebuild' }; },
     rebuildSingle: (index) => { return { url: `/system/indices/ranges/${index}/rebuild` }; },
   },
+  IndexSetsApiController: {
+    list: () => { return { url: '/system/indices/index_sets' }; },
+  },
   IndicesApiController: {
     close: (indexName) => { return { url: `/system/indexer/indices/${indexName}/close` }; },
     delete: (indexName) => { return { url: `/system/indexer/indices/${indexName}` }; },
