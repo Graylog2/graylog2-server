@@ -28,15 +28,6 @@ const IndicesConfigurationStore = Reflux.createStore({
     return URLUtils.qualifyUrl(urlPrefix + path);
   },
 
-  _addConfigType(strategies, data) {
-    // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
-    const result = strategies.filter((strategy) => strategy.type === data.strategy)[0];
-
-    if (result) {
-      data.config.type = result.default_config.type;
-    }
-  },
-
   loadRotationConfig() {
     const promise = fetch('GET', this._url('/rotation/config'));
 
@@ -96,8 +87,6 @@ const IndicesConfigurationStore = Reflux.createStore({
   },
 
   updateRotationConfiguration(data) {
-    this._addConfigType(this.rotationStrategies, data);
-
     const promise = fetch('PUT', this._url('/rotation/config'), data);
 
     promise.then(
@@ -113,8 +102,6 @@ const IndicesConfigurationStore = Reflux.createStore({
   },
 
   updateRetentionConfiguration(data) {
-    this._addConfigType(this.retentionStrategies, data);
-
     const promise = fetch('PUT', this._url('/retention/config'), data);
 
     promise.then(
