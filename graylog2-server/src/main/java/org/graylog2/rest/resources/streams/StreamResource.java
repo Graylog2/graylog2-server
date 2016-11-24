@@ -410,12 +410,6 @@ public class StreamResource extends RestResource {
             alarmCallbackConfigurationService.save(alarmCallback);
         }
 
-        for (Map.Entry<String, List<String>> entry : sourceStream.getAlertReceivers().entrySet()) {
-            for (String receiver : entry.getValue()) {
-                streamService.addAlertReceiver(stream, entry.getKey(), receiver);
-            }
-        }
-
         for (Output output : sourceStream.getOutputs()) {
             streamService.addOutput(stream, output);
         }

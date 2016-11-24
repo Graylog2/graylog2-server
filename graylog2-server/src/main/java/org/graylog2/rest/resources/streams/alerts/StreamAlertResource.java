@@ -219,9 +219,11 @@ public class StreamAlertResource extends RestResource {
     @ApiOperation(value = "Add an alert receiver")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(code = 400, message = "Invalid ObjectId."),
+            @ApiResponse(code = 400, message = "Stream has no email alarm callbacks.")
     })
     @AuditEvent(type = AuditEventTypes.ALERT_RECEIVER_CREATE)
+    @Deprecated
     public Response addReceiver(
             @ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true)
             @PathParam("streamId") String streamId,
@@ -262,9 +264,11 @@ public class StreamAlertResource extends RestResource {
     @ApiOperation(value = "Remove an alert receiver")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(code = 400, message = "Invalid ObjectId."),
+            @ApiResponse(code = 400, message = "Stream has no email alarm callbacks.")
     })
     @AuditEvent(type = AuditEventTypes.ALERT_RECEIVER_DELETE)
+    @Deprecated
     public void removeReceiver(
             @ApiParam(name = "streamId", value = "The stream id this new alert condition belongs to.", required = true) @PathParam("streamId") String streamId,
             @ApiParam(name = "entity", value = "Name/ID of user or email address to remove from alert receivers.", required = true) @QueryParam("entity") String entity,
