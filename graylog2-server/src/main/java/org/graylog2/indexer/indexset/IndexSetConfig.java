@@ -18,6 +18,7 @@ package org.graylog2.indexer.indexset;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
@@ -72,6 +73,34 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("creation_date")
     @NotNull
     public abstract ZonedDateTime creationDate();
+
+    // TODO 2.2: Migrate config setting to index set!
+    @JsonProperty("index_analyzer")
+    @JsonIgnore
+    public String indexAnalyzer() {
+        return "standard";
+    }
+
+    // TODO 2.2: Migrate config setting to index set!
+    @JsonProperty("index_template_name")
+    @JsonIgnore
+    public String indexTemplateName() {
+        return "graylog-internal";
+    }
+
+    // TODO 2.2: Migrate config setting to index set!
+    @JsonProperty("index_optimization_max_num_segments")
+    @JsonIgnore
+    public int indexOptimizationMaxNumSegments() {
+        return 1;
+    }
+
+    // TODO 2.2: Migrate config setting to index set!
+    @JsonProperty("index_optimization_disabled")
+    @JsonIgnore
+    public boolean indexOptimizationDisabled() {
+        return false;
+    }
 
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,

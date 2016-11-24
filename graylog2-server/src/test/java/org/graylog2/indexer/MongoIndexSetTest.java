@@ -233,7 +233,7 @@ public class MongoIndexSetTest {
         final Map<String, Set<String>> indexNameAliases = ImmutableMap.of();
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create("graylog_0")).thenReturn(false);
+        when(indices.create("graylog_0", config)).thenReturn(false);
 
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("Could not create new target index <graylog_0>.");
@@ -249,7 +249,7 @@ public class MongoIndexSetTest {
                 "graylog_0", Collections.singleton("graylog_deflector"));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(newIndexName)).thenReturn(true);
+        when(indices.create(newIndexName, config)).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(ClusterHealthStatus.GREEN);
 
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
@@ -266,7 +266,7 @@ public class MongoIndexSetTest {
                 oldIndexName, Collections.singleton("graylog_deflector"));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(newIndexName)).thenReturn(true);
+        when(indices.create(newIndexName, config)).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(ClusterHealthStatus.GREEN);
 
         final SetIndexReadOnlyAndCalculateRangeJob rangeJob = mock(SetIndexReadOnlyAndCalculateRangeJob.class);
@@ -288,7 +288,7 @@ public class MongoIndexSetTest {
                 oldIndexName, Collections.singleton(deflector));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(newIndexName)).thenReturn(true);
+        when(indices.create(newIndexName, config)).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(ClusterHealthStatus.GREEN);
 
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
@@ -303,7 +303,7 @@ public class MongoIndexSetTest {
         final Map<String, Set<String>> indexNameAliases = ImmutableMap.of();
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(indexName)).thenReturn(true);
+        when(indices.create(indexName, config)).thenReturn(true);
         when(indices.waitForRecovery(indexName)).thenReturn(ClusterHealthStatus.GREEN);
 
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);

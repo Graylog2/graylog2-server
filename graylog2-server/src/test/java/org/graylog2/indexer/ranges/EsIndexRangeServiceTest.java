@@ -26,10 +26,14 @@ import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -42,6 +46,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 import java.util.Set;
 import java.util.SortedSet;
 
@@ -59,12 +64,8 @@ public class EsIndexRangeServiceTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private static final ImmutableSet<String> INDEX_NAMES = ImmutableSet.of("graylog", "graylog_1", "graylog_2", "graylog_3", "graylog_4", "graylog_5", "ignored");
-    private static final ElasticsearchConfiguration ELASTICSEARCH_CONFIGURATION = new ElasticsearchConfiguration() {
-        @Override
-        public String getIndexPrefix() {
-            return "graylog";
-        }
-    };
+
+    private final IndexSetConfig indexSetConfig;
 
     @Rule
     public ElasticsearchRule elasticsearchRule;
@@ -82,8 +83,21 @@ public class EsIndexRangeServiceTest {
     private EsIndexRangeService indexRangeService;
 
     public EsIndexRangeServiceTest() {
+        this.indexSetConfig = IndexSetConfig.builder()
+                .id("index-set-1")
+                .title("Index set 1")
+                .description("For testing")
+                .indexPrefix("graylog")
+                .creationDate(ZonedDateTime.now())
+                .shards(1)
+                .replicas(0)
+                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
+                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .build();
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(ELASTICSEARCH_CONFIGURATION, INDEX_NAMES));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSetConfig, INDEX_NAMES));
     }
 
     @Before

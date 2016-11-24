@@ -25,6 +25,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.FluentIterable;
 import com.google.common.collect.Iterables;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.ShiroPrincipal;
@@ -35,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -153,5 +156,10 @@ public abstract class RestResource {
             return UriBuilder.fromUri(configuration.getRestTransportUri());
         } else
             return uriInfo.getBaseUriBuilder();
+    }
+
+    protected IndexSet getIndexSet(final IndexSetRegistry indexSetRegistry, final String indexSetId) {
+        return indexSetRegistry.get(indexSetId)
+                .orElseThrow(() -> new NotFoundException("Index set <" + indexSetId + "> not found."));
     }
 }

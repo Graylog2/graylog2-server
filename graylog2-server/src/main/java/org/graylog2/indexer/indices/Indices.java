@@ -78,9 +78,9 @@ import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.plugin.system.NodeId;
@@ -102,6 +102,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toSet;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
@@ -111,17 +112,17 @@ public class Indices {
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
     private static final String REOPENED_INDEX_SETTING = "graylog2_reopened";
 
+    public static final String ALL_INDEX_PREFIX = "*";
+
     private final Client c;
-    private final ElasticsearchConfiguration configuration;
     private final IndexMapping indexMapping;
     private final Messages messages;
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
 
     @Inject
-    public Indices(Client client, ElasticsearchConfiguration configuration, IndexMapping indexMapping, Messages messages, NodeId nodeId, AuditEventSender auditEventSender) {
+    public Indices(Client client, IndexMapping indexMapping, Messages messages, NodeId nodeId, AuditEventSender auditEventSender) {
         this.c = client;
-        this.configuration = configuration;
         this.indexMapping = indexMapping;
         this.messages = messages;
         this.nodeId = nodeId;
@@ -193,7 +194,11 @@ public class Indices {
     }
 
     public Map<String, IndexStats> getAll() {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias()).request();
+        return getAll(ALL_INDEX_PREFIX);
+    }
+
+    public Map<String, IndexStats> getAll(final String indexPrefix) {
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias(indexPrefix)).request();
         final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
         if (response.getFailedShards() > 0) {
@@ -203,7 +208,11 @@ public class Indices {
     }
 
     public Map<String, IndexStats> getAllDocCounts() {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias()).setDocs(true).request();
+        return getAllDocCounts(ALL_INDEX_PREFIX);
+    }
+
+    public Map<String, IndexStats> getAllDocCounts(final String indexPrefix) {
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias(indexPrefix)).setDocs(true).request();
         final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
         return response.getIndices();
@@ -217,8 +226,8 @@ public class Indices {
         return response.getIndex(indexName);
     }
 
-    public String allIndicesAlias() {
-        return configuration.getIndexPrefix() + "_*";
+    public String allIndicesAlias(final String indexPrefix) {
+        return requireNonNull(indexPrefix) + "_*";
     }
 
     public boolean exists(String index) {
@@ -275,9 +284,9 @@ public class Indices {
         return aliases.isEmpty() ? null : aliases.keysIt().next();
     }
 
-    private void ensureIndexTemplate() {
-        final Map<String, Object> template = indexMapping.messageTemplate(allIndicesAlias(), configuration.getAnalyzer());
-        final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(configuration.getTemplateName())
+    private void ensureIndexTemplate(IndexSetConfig indexSetConfig) {
+        final Map<String, Object> template = indexMapping.messageTemplate(allIndicesAlias(indexSetConfig.indexPrefix()), indexSetConfig.indexAnalyzer());
+        final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(indexSetConfig.indexTemplateName())
                 .setOrder(Integer.MIN_VALUE) // Make sure templates with "order: 0" are applied after our template!
                 .setSource(template)
                 .request();
@@ -285,26 +294,26 @@ public class Indices {
         try {
             final boolean acknowledged = c.admin().indices().putTemplate(itr).actionGet().isAcknowledged();
             if (acknowledged) {
-                LOG.info("Created Graylog index template \"{}\" in Elasticsearch.", configuration.getTemplateName());
+                LOG.info("Created Graylog index template \"{}\" in Elasticsearch.", indexSetConfig.indexTemplateName());
             }
         } catch (Exception e) {
-            LOG.error("Unable to create the Graylog index template: " + configuration.getTemplateName(), e);
+            LOG.error("Unable to create the Graylog index template: " + indexSetConfig.indexTemplateName(), e);
         }
     }
 
-    public boolean create(String indexName) {
-        return create(indexName, configuration.getShards(), configuration.getReplicas(), Settings.EMPTY);
+    public boolean create(String indexName, IndexSetConfig indexSetConfig) {
+        return create(indexName, indexSetConfig, Settings.EMPTY);
     }
 
-    public boolean create(String indexName, int numShards, int numReplicas, Settings customSettings) {
+    public boolean create(String indexName, IndexSetConfig indexSetConfig, Settings customSettings) {
         final Settings settings = Settings.builder()
-                .put("number_of_shards", numShards)
-                .put("number_of_replicas", numReplicas)
+                .put("number_of_shards", indexSetConfig.shards())
+                .put("number_of_replicas", indexSetConfig.replicas())
                 .put(customSettings)
                 .build();
 
         // Make sure our index template exists before creating an index!
-        ensureIndexTemplate();
+        ensureIndexTemplate(indexSetConfig);
 
         final CreateIndexRequest cir = c.admin().indices().prepareCreate(indexName)
                 .setSettings(settings)
@@ -322,7 +331,7 @@ public class Indices {
     public Set<String> getAllMessageFields() {
         Set<String> fields = Sets.newHashSet();
 
-        ClusterStateRequest csr = new ClusterStateRequest().blocks(true).nodes(true).indices(allIndicesAlias());
+        ClusterStateRequest csr = new ClusterStateRequest().blocks(true).nodes(true).indices(allIndicesAlias(ALL_INDEX_PREFIX));
         ClusterState cs = c.admin().cluster().state(csr).actionGet().getState();
 
         for (ObjectObjectCursor<String, IndexMetaData> m : cs.getMetaData().indices()) {
@@ -400,7 +409,7 @@ public class Indices {
                 .orElse(false);
     }
 
-    public Set<String> getClosedIndices() {
+    public Set<String> getClosedIndices(final IndexSetConfig indexSetConfig) {
         final Set<String> closedIndices = Sets.newHashSet();
 
         ClusterStateRequest csr = new ClusterStateRequest()
@@ -416,7 +425,7 @@ public class Indices {
         while (it.hasNext()) {
             IndexMetaData indexMeta = it.next();
             // Only search in our indices.
-            if (!indexMeta.getIndex().startsWith(configuration.getIndexPrefix())) {
+            if (!indexMeta.getIndex().startsWith(indexSetConfig.indexPrefix())) {
                 continue;
             }
             if (indexMeta.getState().equals(IndexMetaData.State.CLOSE)) {
@@ -426,7 +435,7 @@ public class Indices {
         return closedIndices;
     }
 
-    public Set<String> getReopenedIndices() {
+    public Set<String> getReopenedIndices(final IndexSetConfig indexSetConfig) {
         final Set<String> reopenedIndices = Sets.newHashSet();
 
         ClusterStateRequest csr = new ClusterStateRequest()
@@ -442,7 +451,7 @@ public class Indices {
         while (it.hasNext()) {
             IndexMetaData indexMeta = it.next();
             // Only search in our indices.
-            if (!indexMeta.getIndex().startsWith(configuration.getIndexPrefix())) {
+            if (!indexMeta.getIndex().startsWith(indexSetConfig.indexPrefix())) {
                 continue;
             }
             if (checkForReopened(indexMeta)) {
@@ -454,10 +463,6 @@ public class Indices {
 
     @Nullable
     public IndexStatistics getIndexStats(String index) {
-        if (!index.startsWith(configuration.getIndexPrefix())) {
-            return null;
-        }
-
         final IndexStats indexStats;
         try {
             indexStats = indexStats(index);
@@ -485,6 +490,21 @@ public class Indices {
             return Collections.emptySet();
         }
 
+        return calculateIndexStats(responseIndices);
+    }
+
+    public Set<IndexStatistics> getIndicesStats(final IndexSetConfig indexSetConfig) {
+        final Map<String, IndexStats> responseIndices;
+        try {
+            responseIndices = getAll(indexSetConfig.indexPrefix());
+        } catch (ElasticsearchException e) {
+            return Collections.emptySet();
+        }
+
+        return calculateIndexStats(responseIndices);
+    }
+
+    private Set<IndexStatistics> calculateIndexStats(final Map<String, IndexStats> responseIndices) {
         final ImmutableSet.Builder<IndexStatistics> result = ImmutableSet.builder();
         for (IndexStats indexStats : responseIndices.values()) {
             final ImmutableList.Builder<ShardRouting> shardRouting = ImmutableList.builder();
@@ -523,10 +543,10 @@ public class Indices {
                 .execute().actionGet().isAcknowledged();
     }
 
-    public void optimizeIndex(String index) {
+    public void optimizeIndex(String index, int maxNumSegments) {
         // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/indices-forcemerge.html
         final ForceMergeRequest request = c.admin().indices().prepareForceMerge(index)
-                .setMaxNumSegments(configuration.getIndexOptimizationMaxNumSegments())
+                .setMaxNumSegments(maxNumSegments)
                 .setOnlyExpungeDeletes(false)
                 .setFlush(true)
                 .request();

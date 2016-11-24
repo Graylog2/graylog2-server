@@ -23,6 +23,7 @@ import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import javax.inject.Inject;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -51,6 +52,24 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     @Override
     public Set<IndexSet> getAllIndexSets() {
         return ImmutableSet.copyOf(findAllMongoIndexSets());
+    }
+
+    @Override
+    public Optional<IndexSet> get(final String indexSetId) {
+        return findAllMongoIndexSets().stream()
+                .filter(mongoIndexSet -> mongoIndexSet.getConfig().id().equals(indexSetId))
+                .map(mongoIndexSet -> (IndexSet) mongoIndexSet)
+                .findFirst();
+    }
+
+    @Override
+    public Optional<IndexSet> getForIndexName(String indexName) {
+        for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
+            if (indexSet.isManagedIndex(indexName)) {
+                return Optional.of(indexSet);
+            }
+        }
+        return Optional.empty();
     }
 
     @Override

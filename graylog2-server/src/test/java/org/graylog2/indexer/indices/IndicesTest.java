@@ -41,10 +41,14 @@ import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.compress.CompressedXContent;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.audit.NullAuditEventSender;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
@@ -58,6 +62,7 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -75,12 +80,8 @@ public class IndicesTest {
 
     private static final long ES_TIMEOUT = TimeUnit.SECONDS.toMillis(1L);
     private static final String INDEX_NAME = "graylog_0";
-    private static final ElasticsearchConfiguration CONFIG = new ElasticsearchConfiguration() {
-        @Override
-        public String getIndexPrefix() {
-            return "graylog";
-        }
-    };
+
+    private final IndexSetConfig indexSetConfig;
 
     @Rule
     public ElasticsearchRule elasticsearchRule;
@@ -90,13 +91,26 @@ public class IndicesTest {
     private Indices indices;
 
     public IndicesTest() {
+        this.indexSetConfig = IndexSetConfig.builder()
+                .id("index-set-1")
+                .title("Index set 1")
+                .description("For testing")
+                .indexPrefix("graylog")
+                .creationDate(ZonedDateTime.now())
+                .shards(1)
+                .replicas(0)
+                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
+                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .build();
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(CONFIG, Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSetConfig, Collections.singleton(INDEX_NAME)));
     }
 
     @Before
     public void setUp() throws Exception {
-        indices = new Indices(client, CONFIG, new IndexMapping(), new Messages(client, CONFIG, new MetricRegistry()), mock(NodeId.class), new NullAuditEventSender());
+        indices = new Indices(client, new IndexMapping(), new Messages(client, new MetricRegistry()), mock(NodeId.class), new NullAuditEventSender());
     }
 
     @Test
@@ -183,14 +197,14 @@ public class IndicesTest {
 
     @Test
     public void testCreateEnsuresIndexTemplateExists() throws Exception {
-        final String templateName = CONFIG.getTemplateName();
+        final String templateName = indexSetConfig.indexTemplateName();
         final IndicesAdminClient client = this.client.admin().indices();
         final GetIndexTemplatesRequest request = client.prepareGetTemplates(templateName).request();
         final GetIndexTemplatesResponse responseBefore = client.getTemplates(request).actionGet();
 
         assertThat(responseBefore.getIndexTemplates()).isEmpty();
 
-        indices.create("index_template_test");
+        indices.create("index_template_test", indexSetConfig);
 
         final GetIndexTemplatesResponse responseAfter = client.getTemplates(request).actionGet();
         assertThat(responseAfter.getIndexTemplates()).hasSize(1);
@@ -208,7 +222,7 @@ public class IndicesTest {
     @Test
     public void testCreateOverwritesIndexTemplate() throws Exception {
         final ObjectMapper mapper = new ObjectMapperProvider().get();
-        final String templateName = CONFIG.getTemplateName();
+        final String templateName = indexSetConfig.indexTemplateName();
         final IndicesAdminClient client = this.client.admin().indices();
 
         final ImmutableMap<String, Object> beforeMapping = ImmutableMap.of(
@@ -218,7 +232,7 @@ public class IndicesTest {
                     "type", "string",
                     "index", "not_analyzed")));
         assertThat(client.preparePutTemplate(templateName)
-                .setTemplate(indices.allIndicesAlias())
+                .setTemplate(indices.allIndicesAlias(indexSetConfig.indexPrefix()))
                 .addMapping(IndexMapping.TYPE_MESSAGE, beforeMapping)
                 .get()
                 .isAcknowledged())
@@ -231,7 +245,7 @@ public class IndicesTest {
         final Map<String, Object> actualMapping = mapper.readValue(beforeMappings.get(IndexMapping.TYPE_MESSAGE).uncompressed(), new TypeReference<Map<String, Object>>() {});
         assertThat(actualMapping.get(IndexMapping.TYPE_MESSAGE)).isEqualTo(beforeMapping);
 
-        indices.create("index_template_test");
+        indices.create("index_template_test", indexSetConfig);
 
         final GetIndexTemplatesResponse responseAfter = client.prepareGetTemplates(templateName).get();
         assertThat(responseAfter.getIndexTemplates()).hasSize(1);
@@ -240,7 +254,7 @@ public class IndicesTest {
         assertThat(templateMetaData.getMappings().keysIt()).containsExactly(IndexMapping.TYPE_MESSAGE);
 
         final Map<String, Object> mapping = mapper.readValue(templateMetaData.getMappings().get(IndexMapping.TYPE_MESSAGE).uncompressed(), new TypeReference<Map<String, Object>>() {});
-        final Map<String, Object> expectedTemplate = new IndexMapping().messageTemplate(indices.allIndicesAlias(), CONFIG.getAnalyzer());
+        final Map<String, Object> expectedTemplate = new IndexMapping().messageTemplate(indices.allIndicesAlias(indexSetConfig.indexPrefix()), indexSetConfig.indexAnalyzer());
         assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
 
         final DeleteIndexTemplateRequest deleteRequest = client.prepareDeleteTemplate(templateName).request();
@@ -254,7 +268,7 @@ public class IndicesTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        indices.create("index_creation_date_test");
+        indices.create("index_creation_date_test", indexSetConfig);
 
         final DateTime indexCreationDate = indices.indexCreationDate("index_creation_date_test");
         org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now);

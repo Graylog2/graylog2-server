@@ -195,7 +195,8 @@ public class MessageResource extends RestResource {
             @ApiParam(name = "string", value = "The string to analyze.", required = true)
             @QueryParam("string") @NotEmpty String string) {
         try {
-            return MessageTokens.create(messages.analyze(string, index));
+            // TODO 2.2: Remove hardcoded analyzer argument.
+            return MessageTokens.create(messages.analyze(string, index, "standard"));
         } catch (IndexNotFoundException e) {
             final String message = "Index " + index + " does not exist.";
             LOG.error(message, e);

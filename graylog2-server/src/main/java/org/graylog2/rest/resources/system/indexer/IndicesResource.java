@@ -29,6 +29,7 @@ import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.indices.IndexStatistics;
@@ -142,24 +143,7 @@ public class IndicesResource extends RestResource {
                 .filter(indexStats -> indexSetRegistry.isManagedIndex(indexStats.indexName()))
                 .collect(Collectors.toSet());
 
-        final Map<String, IndexInfo> indexInfos = new HashMap<>();
-        final Map<String, Boolean> areReopened = indices.areReopened(indicesStats.stream().map(IndexStatistics::indexName).collect(Collectors.toSet()));
-        for (IndexStatistics indexStatistics : indicesStats) {
-            final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
-            for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : indexStatistics.shardRoutings()) {
-                routing.add(shardRouting(shardRouting));
-            }
-
-            final IndexInfo indexInfo = IndexInfo.create(
-                indexStats(indexStatistics.primaries()),
-                indexStats(indexStatistics.total()),
-                routing.build(),
-                areReopened.get(indexStatistics.indexName()));
-
-            indexInfos.put(indexStatistics.indexName(), indexInfo);
-        }
-
-        return OpenIndicesInfo.create(indexInfos);
+        return getOpenIndicesInfo(indicesStats);
     }
 
     @GET
@@ -168,10 +152,10 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of closed indices that can be reopened.")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices closed() {
-        final Set<String> closedIndices = indices.getClosedIndices()
-            .stream()
-            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
-            .collect(Collectors.toSet());
+        final Set<String> closedIndices = indexSetRegistry.getAllIndexSets().stream()
+                .flatMap(indexSet -> indices.getClosedIndices(indexSet.getConfig()).stream())
+                .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
+                .collect(Collectors.toSet());
 
         return ClosedIndices.create(closedIndices, closedIndices.size());
     }
@@ -182,10 +166,10 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices reopened() {
-        final Set<String> reopenedIndices = indices.getReopenedIndices()
-            .stream()
-            .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
-            .collect(Collectors.toSet());
+        final Set<String> reopenedIndices = indexSetRegistry.getAllIndexSets().stream()
+                .flatMap(indexSet -> indices.getReopenedIndices(indexSet.getConfig()).stream())
+                .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
+                .collect(Collectors.toSet());
 
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
     }
@@ -268,6 +252,64 @@ public class IndicesResource extends RestResource {
         indices.delete(index);
     }
 
+    // Index set
+
+    @GET
+    @Timed
+    @Path("/{indexSetId}/list")
+    @ApiOperation(value = "List all open, closed and reopened indices.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public AllIndices indexSetList(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
+        return AllIndices.create(this.indexSetClosed(indexSetId), this.indexSetReopened(indexSetId), this.indexSetOpen(indexSetId));
+    }
+
+    @GET
+    @Path("/{indexSetId}/open")
+    @Timed
+    @ApiOperation(value = "Get information of all open indices managed by Graylog and their shards.")
+    @RequiresPermissions(RestPermissions.INDICES_READ)
+    @Produces(MediaType.APPLICATION_JSON)
+    public OpenIndicesInfo indexSetOpen(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
+        final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
+        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(indexSet.getConfig()).stream()
+                .filter(indexStats -> indexSetRegistry.isManagedIndex(indexStats.indexName()))
+                .collect(Collectors.toSet());
+
+        return getOpenIndicesInfo(indicesStats);
+    }
+
+    @GET
+    @Timed
+    @Path("/{indexSetId}/closed")
+    @ApiOperation(value = "Get a list of closed indices that can be reopened.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ClosedIndices indexSetClosed(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
+        final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
+
+        final Set<String> closedIndices = indices.getClosedIndices(indexSet.getConfig())
+                .stream()
+                .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
+                .collect(Collectors.toSet());
+
+        return ClosedIndices.create(closedIndices, closedIndices.size());
+    }
+
+    @GET
+    @Timed
+    @Path("/{indexSetId}/reopened")
+    @ApiOperation(value = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ClosedIndices indexSetReopened(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
+        final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
+
+        final Set<String> reopenedIndices = indices.getReopenedIndices(indexSet.getConfig())
+                .stream()
+                .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
+                .collect(Collectors.toSet());
+
+        return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
+    }
+
     private ShardRouting shardRouting(org.elasticsearch.cluster.routing.ShardRouting route) {
         return ShardRouting.create(route.shardId().getId(),
             route.state().name().toLowerCase(Locale.ENGLISH),
@@ -293,5 +335,26 @@ public class IndicesResource extends RestResource {
             stats.getSegments().getCount(),
             IndexStats.DocsStats.create(stats.getDocs().getCount(), stats.getDocs().getDeleted())
         );
+    }
+
+    private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStats) {
+        final Map<String, IndexInfo> indexInfos = new HashMap<>();
+        final Map<String, Boolean> areReopened = indices.areReopened(indicesStats.stream().map(IndexStatistics::indexName).collect(Collectors.toSet()));
+        for (IndexStatistics indexStatistics : indicesStats) {
+            final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
+            for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : indexStatistics.shardRoutings()) {
+                routing.add(shardRouting(shardRouting));
+            }
+
+            final IndexInfo indexInfo = IndexInfo.create(
+                    indexStats(indexStatistics.primaries()),
+                    indexStats(indexStatistics.total()),
+                    routing.build(),
+                    areReopened.get(indexStatistics.indexName()));
+
+            indexInfos.put(indexStatistics.indexName(), indexInfo);
+        }
+
+        return OpenIndicesInfo.create(indexInfos);
     }
 }
