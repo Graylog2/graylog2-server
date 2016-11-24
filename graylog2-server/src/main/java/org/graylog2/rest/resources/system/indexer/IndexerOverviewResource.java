@@ -129,7 +129,7 @@ public class IndexerOverviewResource extends RestResource {
 
         return IndexerOverview.create(deflectorSummary,
                 IndexerClusterOverview.create(indexerClusterResource.clusterHealth(), indexerClusterResource.clusterName().name()),
-                countResource.total(),indicesSummaries);
+                countResource.total(indexSetId),indicesSummaries);
     }
 
 }

@@ -18,10 +18,13 @@ package org.graylog2.indexer.counts;
 
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.Client;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Optional;
 
 @Singleton
 public class Counts {
@@ -36,6 +39,18 @@ public class Counts {
 
     public long total() {
         final SearchRequest request = c.prepareSearch(indexSetRegistry.getManagedIndicesNames())
+                .setSize(0)
+                .request();
+        return c.search(request).actionGet().getHits().totalHits();
+    }
+
+    public long total(final IndexSetConfig indexSetConfig) {
+        final Optional<IndexSet> indexSet = indexSetRegistry.get(indexSetConfig.id());
+
+        final String[] names = indexSet.orElseThrow(() -> new IllegalStateException("Index set <" + indexSetConfig.id() + "> missing"))
+                .getManagedIndicesNames();
+
+        final SearchRequest request = c.prepareSearch(names)
                 .setSize(0)
                 .request();
         return c.search(request).actionGet().getHits().totalHits();
