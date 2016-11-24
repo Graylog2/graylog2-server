@@ -62,9 +62,17 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @Min(0)
     public abstract int replicas();
 
+    @JsonProperty("rotation_strategy_class")
+    @Nullable
+    public abstract String rotationStrategyClass();
+
     @JsonProperty("rotation_strategy")
     @NotNull
     public abstract RotationStrategyConfig rotationStrategy();
+
+    @JsonProperty("retention_strategy_class")
+    @Nullable
+    public abstract String retentionStrategyClass();
 
     @JsonProperty("retention_strategy")
     @NotNull
@@ -109,7 +117,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("index_prefix") @NotBlank String indexPrefix,
                                         @JsonProperty("shards") @Min(1) int shards,
                                         @JsonProperty("replicas") @Min(0) int replicas,
+                                        @JsonProperty("rotation_strategy_class") @Nullable String rotationStrategyClass,
                                         @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
+                                        @JsonProperty("retention_strategy_class") @Nullable String retentionStrategyClass,
                                         @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
                                         @JsonProperty("creation_date") @NotNull ZonedDateTime creationDate) {
         return AutoValue_IndexSetConfig.builder()
@@ -119,7 +129,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .indexPrefix(indexPrefix)
                 .shards(shards)
                 .replicas(replicas)
+                .rotationStrategyClass(rotationStrategyClass)
                 .rotationStrategy(rotationStrategy)
+                .retentionStrategyClass(retentionStrategyClass)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(creationDate)
                 .build();
@@ -130,10 +142,12 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         String indexPrefix,
                                         int shards,
                                         int replicas,
+                                        String rotationStrategyClass,
                                         RotationStrategyConfig rotationStrategy,
+                                        String retentionStrategyClass,
                                         RetentionStrategyConfig retentionStrategy,
                                         ZonedDateTime creationDate) {
-        return create(null, title, description, indexPrefix, shards, replicas, rotationStrategy, retentionStrategy, creationDate);
+        return create(null, title, description, indexPrefix, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
     }
 
     @Override
@@ -165,7 +179,11 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
         public abstract Builder replicas(int replicas);
 
+        public abstract Builder rotationStrategyClass(String rotationStrategyClass);
+
         public abstract Builder rotationStrategy(RotationStrategyConfig rotationStrategy);
+
+        public abstract Builder retentionStrategyClass(String retentionStrategyClass);
 
         public abstract Builder retentionStrategy(RetentionStrategyConfig retentionStrategy);
 

@@ -24,7 +24,9 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -82,7 +84,9 @@ public class MongoIndexSetTest {
             "graylog",
             1,
             0,
+            MessageCountRotationStrategy.class.getCanonicalName(),
             MessageCountRotationStrategyConfig.createDefault(),
+            NoopRetentionStrategy.class.getCanonicalName(),
             NoopRetentionStrategyConfig.createDefault(),
             ZonedDateTime.of(2016, 11, 8, 0, 0, 0, 0, ZoneOffset.UTC)
     );

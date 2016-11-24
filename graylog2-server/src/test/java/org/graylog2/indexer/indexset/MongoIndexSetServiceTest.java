@@ -27,7 +27,9 @@ import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
@@ -78,7 +80,9 @@ public class MongoIndexSetServiceTest {
                                 "test_1",
                                 4,
                                 1,
+                                MessageCountRotationStrategy.class.getCanonicalName(),
                                 MessageCountRotationStrategyConfig.create(1000),
+                                NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(10),
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC)
                         )
@@ -99,7 +103,9 @@ public class MongoIndexSetServiceTest {
                                 "test_1",
                                 4,
                                 1,
+                                MessageCountRotationStrategy.class.getCanonicalName(),
                                 MessageCountRotationStrategyConfig.create(1000),
+                                NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(10),
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC)
                         )
@@ -129,7 +135,9 @@ public class MongoIndexSetServiceTest {
                                 "test_1",
                                 4,
                                 1,
+                                MessageCountRotationStrategy.class.getCanonicalName(),
                                 MessageCountRotationStrategyConfig.create(1000),
+                                NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(10),
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC)
                         ),
@@ -140,7 +148,9 @@ public class MongoIndexSetServiceTest {
                                 "test_2",
                                 1,
                                 0,
+                                MessageCountRotationStrategy.class.getCanonicalName(),
                                 MessageCountRotationStrategyConfig.create(2500),
+                                NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(25),
                                 ZonedDateTime.of(2016, 10, 4, 18, 0, 0, 0, ZoneOffset.UTC)
                         )
@@ -158,7 +168,9 @@ public class MongoIndexSetServiceTest {
                 "test_3",
                 10,
                 0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
                 MessageCountRotationStrategyConfig.create(10000),
+                NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(5),
                 ZonedDateTime.of(2016, 10, 4, 12, 0, 0, 0, ZoneOffset.UTC)
         );
