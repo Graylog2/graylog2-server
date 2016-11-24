@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.functions;
 import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
+
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
@@ -28,6 +29,15 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Days;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Hours;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Millis;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Minutes;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Months;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.PeriodParseFunction;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32C;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
@@ -115,6 +125,15 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(ParseDate.NAME, ParseDate.class);
         addMessageProcessorFunction(FlexParseDate.NAME, FlexParseDate.class);
         addMessageProcessorFunction(FormatDate.NAME, FormatDate.class);
+        addMessageProcessorFunction(Years.NAME, Years.class);
+        addMessageProcessorFunction(Months.NAME, Months.class);
+        addMessageProcessorFunction(Weeks.NAME, Weeks.class);
+        addMessageProcessorFunction(Days.NAME, Days.class);
+        addMessageProcessorFunction(Hours.NAME, Hours.class);
+        addMessageProcessorFunction(Minutes.NAME, Minutes.class);
+        addMessageProcessorFunction(Seconds.NAME, Seconds.class);
+        addMessageProcessorFunction(Millis.NAME, Millis.class);
+        addMessageProcessorFunction(PeriodParseFunction.NAME, PeriodParseFunction.class);
 
         // hash digest
         addMessageProcessorFunction(CRC32.NAME, CRC32.class);

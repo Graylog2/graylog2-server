@@ -55,6 +55,9 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.VarAssignStatement;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -403,7 +406,6 @@ public class CodeGenerator {
             final CodeBlock leftBlock = codeSnippet.get(expr.left());
             final CodeBlock rightBlock = codeSnippet.get(expr.right());
 
-            // TODO optimize operator selection, Objects.equals isn't the ideal candidate because of auto-boxing
             final Class leftType = expr.left().getType();
             final Class rightType = expr.right().getType();
             boolean useOperator = false;
@@ -419,6 +421,20 @@ public class CodeGenerator {
                         blockOrMissing(leftBlock, expr.left()),
                         blockOrMissing(rightBlock, expr.right()));
             } else {
+                // Dates
+                if (DateTime.class.equals(leftType)) {
+                    if (DateTime.class.equals(rightType)) {
+                        codeSnippet.putIfAbsent(expr, CodeBlock.of("$L.isEqual($L)", leftBlock, rightBlock));
+                        return;
+                    }
+                } else if (Period.class.equals(leftType)) {
+                    if (Period.class.equals(rightType)) {
+                        codeSnippet.putIfAbsent(expr,
+                                CodeBlock.of("$L.toDuration().equals($L.toDuration())", leftBlock, rightBlock));
+                        return;
+                    }
+                }
+
                 statement += (checkEquality ? "" : "!") + "$T.equals($L, $L)";
                 currentMethod.addStatement(statement,
                         intermediateName,
@@ -434,7 +450,45 @@ public class CodeGenerator {
         public void exitComparison(ComparisonExpression expr) {
             final CodeBlock left = codeSnippet.get(expr.left());
             final CodeBlock right = codeSnippet.get(expr.right());
-            // TODO dates
+
+            final Class leftType = expr.left().getType();
+            final Class rightType = expr.right().getType();
+
+            if (DateTime.class.equals(leftType)) {
+                if (DateTime.class.equals(rightType)) {
+                    CodeBlock block;
+                    switch (expr.getOperator()) {
+                        case ">":
+                            block = CodeBlock.of("$L.isAfter($L)", left, right);
+                            break;
+                        case ">=":
+                            block = CodeBlock.of("!$L.isBefore($L)", left, right);
+                            break;
+                        case "<":
+                            block = CodeBlock.of("$L.isBefore($L)", left, right);
+                            break;
+                        case "<=":
+                            block = CodeBlock.of("!$L.isAfter($L)", left, right);
+                            break;
+                        default:
+                            block = null;
+                    }
+                    if (block != null) {
+                        codeSnippet.putIfAbsent(expr, block);
+                        return;
+                    }
+                }
+            } else if (Period.class.equals(leftType)) {
+                if (Period.class.equals(rightType)) {
+                    codeSnippet.putIfAbsent(expr,
+                            CodeBlock.of("($L.toDuration().getMillis() " + expr.getOperator() + " $L.toDuration().getMillis())",
+                                    blockOrMissing(left, expr.left()),
+                                    blockOrMissing(right, expr.right())));
+                    return;
+
+                }
+            }
+
             codeSnippet.putIfAbsent(expr, CodeBlock.of("($L " + expr.getOperator() + " $L)",
                     blockOrMissing(left, expr.left()),
                     blockOrMissing(right, expr.right())));
@@ -558,6 +612,36 @@ public class CodeGenerator {
         public void exitAddition(AdditionExpression expr) {
             final Object leftBlock = blockOrMissing(codeSnippet.get(expr.left()), expr.left());
             final Object rightBlock = blockOrMissing(codeSnippet.get(expr.right()), expr.right());
+
+            Class leftType = expr.left().getType();
+            Class rightType = expr.right().getType();
+
+            if (DateTime.class.equals(leftType)) {
+                if (DateTime.class.equals(rightType)) {
+                    // calculate duration between two dates (adding two dates is invalid)
+                    if (expr.isPlus()) {
+                        throw new IllegalStateException("Cannot add two dates, this is a parser bug");
+                    }
+                    codeSnippet.putIfAbsent(expr, CodeBlock.of(
+                            "new $T($L, $L)", Duration.class, leftBlock, rightBlock));
+                } else if (Period.class.equals(rightType)) {
+                    // new datetime
+                    codeSnippet.putIfAbsent(expr,
+                            CodeBlock.of("$L." + (expr.isPlus() ? "plus" : "minus") + "($L)", leftBlock, rightBlock));
+                }
+                return;
+            } else if (Period.class.equals(leftType)) {
+                if (DateTime.class.equals(rightType)) {
+                    // invert the arguments, adding the period to the date, yielding a new DateTime
+                    codeSnippet.putIfAbsent(expr,
+                            CodeBlock.of("$L." + (expr.isPlus() ? "plus" : "minus") + "($L)", rightBlock, leftBlock));
+                } else if (Period.class.equals(rightType)) {
+                    // adding two periods yields a new period
+                    codeSnippet.putIfAbsent(expr,
+                            CodeBlock.of("$L." + (expr.isPlus() ? "plus" : "minus") + "($L)", leftBlock, rightBlock));
+                }
+                return;
+            }
 
             codeSnippet.putIfAbsent(expr,
                     CodeBlock.of("$L " + (expr.isPlus() ? "+" : "-") + " $L", leftBlock, rightBlock));

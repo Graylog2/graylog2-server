@@ -33,7 +33,17 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.TimezoneAwareFunction;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Days;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Hours;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Millis;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Minutes;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Months;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.PeriodParseFunction;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
@@ -41,13 +51,16 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentT
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleTypes;
 import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidFunctionArgument;
+import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidOperation;
 import org.graylog.plugins.pipelineprocessor.parser.errors.NonIndexableType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMustBeNamed;
 import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
+import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.junit.After;
 import org.junit.Assert;
@@ -61,6 +74,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.graylog.plugins.pipelineprocessor.functions.FunctionsSnippetsTest.GRAYLOG_EPOCH;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -91,6 +105,18 @@ public class PipelineRuleParserTest extends BaseParserTest {
         functions.put(HasField.NAME, new HasField());
         functions.put(RegexMatch.NAME, new RegexMatch());
         functions.put("now_in_tz", new NowInTimezoneFunction());
+
+        functions.put(Now.NAME, new Now());
+        functions.put(Years.NAME, new Years());
+        functions.put(Months.NAME, new Months());
+        functions.put(Weeks.NAME, new Weeks());
+        functions.put(Days.NAME, new Days());
+        functions.put(Hours.NAME, new Hours());
+        functions.put(Minutes.NAME, new Minutes());
+        functions.put(Seconds.NAME, new Seconds());
+        functions.put(Millis.NAME, new Millis());
+        functions.put(PeriodParseFunction.NAME, new PeriodParseFunction());
+
         functionRegistry = new FunctionRegistry(functions);
     }
 
@@ -342,11 +368,38 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
     @Test
     public void booleanNot() {
-        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Rule rule = parseRuleWithOptionalCodegen();
         evaluateRule(rule);
 
         assertFalse(actionsTriggered.get());
     }
+
+    @Test
+    public void dateArithmetic() {
+        final InstantMillisProvider clock = new InstantMillisProvider(GRAYLOG_EPOCH);
+        DateTimeUtils.setCurrentMillisProvider(clock);
+        try {
+            final Rule rule = parseRuleWithOptionalCodegen();
+            final Message message = evaluateRule(rule);
+            assertNotNull(message);
+            assertTrue(actionsTriggered.get());
+        } finally {
+            DateTimeUtils.setCurrentMillisSystem();
+        }
+
+    }
+
+    @Test
+    public void invalidDateAddition() {
+        try {
+            parseRuleWithOptionalCodegen();
+            fail("Should have thrown parse exception");
+        } catch (ParseException e) {
+            assertEquals(1, e.getErrors().size());
+            assertEquals(InvalidOperation.class, Iterables.getOnlyElement(e.getErrors()).getClass());
+        }
+    }
+
 
     public static class CustomObject {
         private final String id;
