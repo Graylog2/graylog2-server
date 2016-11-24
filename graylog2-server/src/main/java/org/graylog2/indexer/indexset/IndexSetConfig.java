@@ -33,6 +33,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
+import static java.util.Objects.requireNonNull;
+
 @AutoValue
 @JsonAutoDetect
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
@@ -93,7 +95,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("index_template_name")
     @JsonIgnore
     public String indexTemplateName() {
-        return "graylog-internal";
+        return "graylog-internal-" + requireNonNull(id());
     }
 
     // TODO 2.2: Migrate config setting to index set!
