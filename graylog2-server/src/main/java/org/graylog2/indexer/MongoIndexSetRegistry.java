@@ -56,10 +56,8 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
 
     @Override
     public Optional<IndexSet> get(final String indexSetId) {
-        return findAllMongoIndexSets().stream()
-                .filter(mongoIndexSet -> mongoIndexSet.getConfig().id().equals(indexSetId))
-                .map(mongoIndexSet -> (IndexSet) mongoIndexSet)
-                .findFirst();
+        return indexSetService.get(indexSetId)
+                .flatMap(indexSetConfig -> Optional.of((IndexSet) mongoIndexSetFactory.create(indexSetConfig)));
     }
 
     @Override
