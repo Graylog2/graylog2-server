@@ -17,7 +17,7 @@
 package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
+import com.google.common.collect.Lists;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -104,7 +104,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass , retentionStrategyClass));
-        when(indexSetService.findAll()).thenReturn(Sets.newHashSet(config1, config2));
+        when(indexSetService.findAll()).thenReturn(Lists.newArrayList(config1, config2));
 
         migration.upgrade();
 
@@ -159,7 +159,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass, retentionStrategyClass));
-        when(indexSetService.findAll()).thenReturn(Sets.newHashSet(config1, config2));
+        when(indexSetService.findAll()).thenReturn(Lists.newArrayList(config1, config2));
 
         migration.upgrade();
 
@@ -218,7 +218,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass , retentionStrategyClass));
-        when(indexSetService.findAll()).thenReturn(Sets.newHashSet(config1, config2));
+        when(indexSetService.findAll()).thenReturn(Lists.newArrayList(config1, config2));
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("rotation strategy config type <");
@@ -261,7 +261,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass , retentionStrategyClass));
-        when(indexSetService.findAll()).thenReturn(Sets.newHashSet(config1, config2));
+        when(indexSetService.findAll()).thenReturn(Lists.newArrayList(config1, config2));
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("retention strategy config type <");
@@ -303,7 +303,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass , retentionStrategyClass));
-        when(indexSetService.findAll()).thenReturn(Sets.newHashSet(config1, config2));
+        when(indexSetService.findAll()).thenReturn(Lists.newArrayList(config1, config2));
 
         when(clusterConfigService.get(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.class))
                 .thenReturn(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.create(Collections.emptySet(), Collections.emptySet(), "id-1"));

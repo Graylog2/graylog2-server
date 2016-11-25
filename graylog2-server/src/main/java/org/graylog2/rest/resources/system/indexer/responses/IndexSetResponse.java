@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import java.util.List;
 import java.util.Set;
 
 @JsonAutoDetect
@@ -30,11 +31,11 @@ public abstract class IndexSetResponse {
     public abstract int total();
 
     @JsonProperty("index_sets")
-    public abstract Set<IndexSetSummary> indexSets();
+    public abstract List<IndexSetSummary> indexSets();
 
     @JsonCreator
     public static IndexSetResponse create(@JsonProperty("total") int total,
-                                          @JsonProperty("index_sets") Set<IndexSetSummary> ranges) {
+                                          @JsonProperty("index_sets") List<IndexSetSummary> ranges) {
         return new AutoValue_IndexSetResponse(total, ranges);
     }
 }

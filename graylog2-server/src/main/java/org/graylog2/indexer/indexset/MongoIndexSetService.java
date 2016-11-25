@@ -17,7 +17,7 @@
 package org.graylog2.indexer.indexset;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
@@ -94,22 +94,22 @@ public class MongoIndexSetService implements IndexSetService {
      * {@inheritDoc}
      */
     @Override
-    public Set<IndexSetConfig> findAll() {
-        return ImmutableSet.copyOf((Iterator<? extends IndexSetConfig>) collection.find());
+    public List<IndexSetConfig> findAll() {
+        return ImmutableList.copyOf((Iterator<? extends IndexSetConfig>) collection.find());
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public Set<IndexSetConfig> findPaginated(Set<String> indexSetIds, int limit, int skip) {
+    public List<IndexSetConfig> findPaginated(Set<String> indexSetIds, int limit, int skip) {
         final List<DBQuery.Query> idQuery = indexSetIds.stream()
                 .map(id -> DBQuery.is("_id", id))
                 .collect(Collectors.toList());
 
         final DBQuery.Query query = DBQuery.or(idQuery.toArray(new DBQuery.Query[0]));
 
-        return ImmutableSet.copyOf(collection.find(query)
+        return ImmutableList.copyOf(collection.find(query)
                 .sort(DBSort.desc("creation_date"))
                 .skip(skip)
                 .limit(limit)

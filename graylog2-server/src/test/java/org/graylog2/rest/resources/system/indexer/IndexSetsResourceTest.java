@@ -81,7 +81,7 @@ public class IndexSetsResourceTest {
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
         );
-        when(indexSetService.findAll()).thenReturn(Collections.singleton(indexSetConfig));
+        when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
         final IndexSetResponse list = indexSetsResource.list(0, 0);
 
@@ -109,7 +109,7 @@ public class IndexSetsResourceTest {
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
         );
-        when(indexSetService.findAll()).thenReturn(Collections.singleton(indexSetConfig));
+        when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
         final IndexSetResponse list = indexSetsResource.list(0, 0);
 
@@ -123,7 +123,7 @@ public class IndexSetsResourceTest {
     @Test
     public void list0() {
         final IndexSetsResource indexSetsResource = new TestResource(indexSetService, true);
-        when(indexSetService.findAll()).thenReturn(Collections.emptySet());
+        when(indexSetService.findAll()).thenReturn(Collections.emptyList());
 
         final IndexSetResponse list = indexSetsResource.list(0, 0);
 

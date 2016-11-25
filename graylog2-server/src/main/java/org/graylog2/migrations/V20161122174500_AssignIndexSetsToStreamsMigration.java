@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -100,7 +101,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigration extends Migration
     }
 
     private IndexSetConfig findDefaultIndexSet() {
-        final Set<IndexSetConfig> indexSetConfigs = indexSetService.findAll();
+        final List<IndexSetConfig> indexSetConfigs = indexSetService.findAll();
 
         // If there is more than one index set, we have a problem. Since there wasn't a way to create index sets
         // manually until now, this should not happen.

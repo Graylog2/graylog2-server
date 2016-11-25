@@ -42,7 +42,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
@@ -144,7 +143,7 @@ public class MongoIndexSetServiceTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void findAll() throws Exception {
-        final Set<IndexSetConfig> configs = indexSetService.findAll();
+        final List<IndexSetConfig> configs = indexSetService.findAll();
 
         assertThat(configs)
                 .isNotEmpty()

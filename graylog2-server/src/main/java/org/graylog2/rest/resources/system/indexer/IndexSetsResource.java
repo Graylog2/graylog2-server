@@ -50,6 +50,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -77,7 +78,7 @@ public class IndexSetsResource extends RestResource {
                                  @QueryParam("skip") @DefaultValue("0") int skip,
                                  @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
                                  @QueryParam("limit") @DefaultValue("0") int limit) {
-        Set<IndexSetSummary> indexSets;
+        List<IndexSetSummary> indexSets;
         int count;
 
         if (limit > 0) {
@@ -89,13 +90,13 @@ public class IndexSetsResource extends RestResource {
 
             indexSets = indexSetService.findPaginated(allowedIds, limit, skip).stream()
                     .map(IndexSetSummary::fromIndexSetConfig)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             count = allowedIds.size();
         } else {
             indexSets = indexSetService.findAll().stream()
                     .filter(indexSetConfig -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetConfig.id()))
                     .map(IndexSetSummary::fromIndexSetConfig)
-                    .collect(Collectors.toSet());
+                    .collect(Collectors.toList());
             count = indexSets.size();
         }
 
