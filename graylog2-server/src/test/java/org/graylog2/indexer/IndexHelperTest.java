@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
+
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -45,6 +46,7 @@ import java.util.SortedSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -127,11 +129,11 @@ public class IndexHelperTest {
         final TimeRange keywordRange = KeywordRange.create("1 day ago");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, absoluteRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, absoluteRange, null))
             .containsExactly(indexRangeLatest, indexRange0, indexRange1);
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, keywordRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, keywordRange, null))
             .containsExactly(indexRangeLatest, indexRange0, indexRange1);
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, relativeRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, relativeRange, null))
             .containsExactly(indexRangeLatest, indexRange0, indexRange1);
     }
 
@@ -151,11 +153,11 @@ public class IndexHelperTest {
         final TimeRange keywordRange = KeywordRange.create("1 day ago");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, absoluteRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, absoluteRange, null))
             .containsExactly(indexRange0, indexRange1);
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, keywordRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, keywordRange, null))
             .containsExactly(indexRange0, indexRange1);
-        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, relativeRange))
+        assertThat(IndexHelper.determineAffectedIndicesWithRanges(indexRangeService, relativeRange, null))
             .containsExactly(indexRange0, indexRange1);
     }
 
@@ -177,11 +179,11 @@ public class IndexHelperTest {
         final TimeRange keywordRange = KeywordRange.create("1 day ago");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange, null))
             .containsExactly(indexRangeLatest.indexName(), indexRange0.indexName(), indexRange1.indexName());
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, keywordRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, keywordRange, null))
             .containsExactly(indexRangeLatest.indexName(), indexRange0.indexName(), indexRange1.indexName());
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, relativeRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, relativeRange, null))
             .containsExactly(indexRangeLatest.indexName(), indexRange0.indexName(), indexRange1.indexName());
     }
 
@@ -201,11 +203,11 @@ public class IndexHelperTest {
         final TimeRange keywordRange = KeywordRange.create("1 day ago");
         final TimeRange relativeRange = RelativeRange.create(3600);
 
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange, null))
             .containsOnly(indexRange0.indexName(), indexRange1.indexName());
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, keywordRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, keywordRange, null))
             .containsOnly(indexRange0.indexName(), indexRange1.indexName());
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, relativeRange))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, relativeRange, null))
             .containsOnly(indexRange0.indexName(), indexRange1.indexName());
     }
 
@@ -225,5 +227,29 @@ public class IndexHelperTest {
             .hasFieldOrPropertyWithValue("name", "timestamp")
             .hasFieldOrPropertyWithValue("from", Tools.buildElasticSearchTimeFormat(from))
             .hasFieldOrPropertyWithValue("to", Tools.buildElasticSearchTimeFormat(to));
+    }
+
+    @Test
+    public void determineAffectedIndicesFilterIndexPrefix() throws Exception {
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final MongoIndexRange indexRange0 = MongoIndexRange.create("graylog_0", now, now.plusDays(1), now, 0);
+        final MongoIndexRange indexRange1 = MongoIndexRange.create("graylog_1", now.plusDays(1), now.plusDays(2), now, 0);
+        final MongoIndexRange b0 = MongoIndexRange.create("b_0", now.plusDays(1), now.plusDays(2), now, 0);
+        final MongoIndexRange b1 = MongoIndexRange.create("b_1", now.plusDays(1), now.plusDays(2), now, 0);
+        final SortedSet<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR)
+                .add(indexRange0)
+                .add(indexRange1)
+                .add(b0)
+                .add(b1)
+                .build();
+
+        when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
+
+        final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSet.isManagedIndex(startsWith("b_"))).thenReturn(true);
+
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange, indexSet))
+                .containsOnly(b0.indexName(), b1.indexName());
     }
 }
