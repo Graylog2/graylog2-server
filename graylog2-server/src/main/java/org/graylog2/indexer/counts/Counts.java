@@ -18,6 +18,7 @@ package org.graylog2.indexer.counts;
 
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.client.Client;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 
 import javax.inject.Inject;
@@ -36,6 +37,15 @@ public class Counts {
 
     public long total() {
         final SearchRequest request = c.prepareSearch(indexSetRegistry.getManagedIndicesNames())
+                .setSize(0)
+                .request();
+        return c.search(request).actionGet().getHits().totalHits();
+    }
+
+    public long total(final IndexSet indexSet) {
+        final String[] names = indexSet.getManagedIndicesNames();
+
+        final SearchRequest request = c.prepareSearch(names)
                 .setSize(0)
                 .request();
         return c.search(request).actionGet().getHits().totalHits();

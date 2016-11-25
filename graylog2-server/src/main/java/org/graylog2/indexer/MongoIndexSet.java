@@ -98,6 +98,7 @@ public class MongoIndexSet implements IndexSet {
         this.jobFactory = requireNonNull(jobFactory);
         this.activityWriter = requireNonNull(activityWriter);
 
+        // TODO 2.2: Is this strict enough? What happens if an index set with a prefix of "foo_0" is created?
         this.indexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
         this.deflectorIndexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+");
     }
@@ -263,7 +264,7 @@ public class MongoIndexSet implements IndexSet {
 
         // Create new index.
         LOG.info("Creating target index <{}>.", newTarget);
-        if (!indices.create(newTarget)) {
+        if (!indices.create(newTarget, this)) {
             throw new RuntimeException("Could not create new target index <" + newTarget + ">.");
         }
 

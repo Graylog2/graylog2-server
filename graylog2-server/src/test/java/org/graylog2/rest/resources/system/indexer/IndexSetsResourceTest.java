@@ -19,7 +19,9 @@ package org.graylog2.rest.resources.system.indexer;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -69,10 +71,13 @@ public class IndexSetsResourceTest {
                 "id",
                 "title",
                 "description",
+                true,
                 "prefix",
                 1,
                 0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
                 MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
         );
@@ -94,10 +99,13 @@ public class IndexSetsResourceTest {
                 "id",
                 "title",
                 "description",
+                true,
                 "prefix",
                 1,
                 0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
                 MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
         );
@@ -133,10 +141,13 @@ public class IndexSetsResourceTest {
                 "id",
                 "title",
                 "description",
+                true,
                 "prefix",
                 1,
                 0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
                 MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
         );
@@ -185,10 +196,13 @@ public class IndexSetsResourceTest {
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "title",
                 "description",
+                true,
                 "prefix",
                 1,
                 0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
                 MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
         );
@@ -212,10 +226,13 @@ public class IndexSetsResourceTest {
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "title",
                 "description",
+                true,
                 "prefix",
                 1,
                 0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
                 MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
         );
@@ -237,10 +254,13 @@ public class IndexSetsResourceTest {
                 "id",
                 "new title",
                 "description",
+                true,
                 "prefix",
                 1,
                 0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
                 MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
         );
@@ -264,10 +284,13 @@ public class IndexSetsResourceTest {
                 "id",
                 "new title",
                 "description",
+                true,
                 "prefix",
                 1,
                 0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
                 MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
         );
@@ -289,10 +312,13 @@ public class IndexSetsResourceTest {
                 "id",
                 "title",
                 "description",
+                true,
                 "prefix",
                 1,
                 0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
                 MessageCountRotationStrategyConfig.create(1000),
+                NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
         );

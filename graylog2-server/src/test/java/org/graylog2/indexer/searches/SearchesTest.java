@@ -26,7 +26,9 @@ import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import org.elasticsearch.client.Client;
 import org.graylog2.Configuration;
-import org.graylog2.configuration.ElasticsearchConfiguration;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeComparator;
@@ -37,6 +39,10 @@ import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -49,6 +55,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.Map;
 import java.util.SortedSet;
@@ -100,22 +107,8 @@ public class SearchesTest {
                 }
             }).build();
 
-    private static final ElasticsearchConfiguration CONFIG = new ElasticsearchConfiguration() {
-        @Override
-        public String getIndexPrefix() {
-            return "graylog";
-        }
-
-        @Override
-        public int getShards() {
-            return 1;
-        }
-
-        @Override
-        public int getReplicas() {
-            return 0;
-        }
-    };
+    private final IndexSetConfig indexSetConfig;
+    private final IndexSet indexSet;
 
     @Mock
     private IndexRangeService indexRangeService;
@@ -127,8 +120,23 @@ public class SearchesTest {
     private Client client;
 
     public SearchesTest() {
+        this.indexSetConfig = IndexSetConfig.builder()
+                .id("index-set-1")
+                .title("Index set 1")
+                .description("For testing")
+                .isDefault(true)
+                .indexPrefix("graylog")
+                .creationDate(ZonedDateTime.now())
+                .shards(1)
+                .replicas(0)
+                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
+                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .build();
+        this.indexSet = new TestIndexSet(indexSetConfig);
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(CONFIG, Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
     }
 
     @Before

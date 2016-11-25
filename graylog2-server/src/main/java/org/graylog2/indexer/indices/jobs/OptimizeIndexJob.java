@@ -19,7 +19,6 @@ package org.graylog2.indexer.indices.jobs;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.graylog2.system.jobs.SystemJob;
@@ -27,8 +26,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class OptimizeIndexJob extends SystemJob {
+
     public interface Factory {
-        OptimizeIndexJob create(String index);
+        OptimizeIndexJob create(String index, int maxNumSegments);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OptimizeIndexJob.class);
@@ -37,15 +37,18 @@ public class OptimizeIndexJob extends SystemJob {
 
     private final ActivityWriter activityWriter;
     private final String index;
+    private final int maxNumSegments;
     private final Indices indices;
 
     @AssistedInject
     public OptimizeIndexJob(Indices indices,
                             ActivityWriter activityWriter,
-                            @Assisted String index) {
+                            @Assisted String index,
+                            @Assisted int maxNumSegments) {
         this.indices = indices;
         this.activityWriter = activityWriter;
         this.index = index;
+        this.maxNumSegments = maxNumSegments;
     }
 
     @Override
@@ -54,7 +57,7 @@ public class OptimizeIndexJob extends SystemJob {
         activityWriter.write(new Activity(msg, OptimizeIndexJob.class));
         LOG.info(msg);
 
-        indices.optimizeIndex(index);
+        indices.optimizeIndex(index, maxNumSegments);
     }
 
     @Override

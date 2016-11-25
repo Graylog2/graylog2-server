@@ -27,13 +27,16 @@ import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mongojack.DBQuery;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -75,10 +78,13 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750001",
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
+                                true,
                                 "test_1",
                                 4,
                                 1,
+                                MessageCountRotationStrategy.class.getCanonicalName(),
                                 MessageCountRotationStrategyConfig.create(1000),
+                                NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(10),
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC)
                         )
@@ -96,10 +102,13 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750001",
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
+                                true,
                                 "test_1",
                                 4,
                                 1,
+                                MessageCountRotationStrategy.class.getCanonicalName(),
                                 MessageCountRotationStrategyConfig.create(1000),
+                                NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(10),
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC)
                         )
@@ -111,6 +120,25 @@ public class MongoIndexSetServiceTest {
     public void getReturnsAbsentOptionalIfIndexSetConfigDoesNotExist() throws Exception {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(new ObjectId("57f3d3f0a43c2d595eb0a348"));
         assertThat(indexSetConfig).isEmpty();
+    }
+
+    @Test
+    public void findOne() throws Exception {
+        final Optional<IndexSetConfig> config1 = indexSetService.findOne(DBQuery.is("default", true));
+
+        assertThat(config1).isPresent();
+        assertThat(config1.get().id()).isEqualTo("57f3d721a43c2d59cb750001");
+
+        final Optional<IndexSetConfig> config2 = indexSetService.findOne(DBQuery.is("default", false));
+        assertThat(config2).isPresent();
+        assertThat(config2.get().id()).isEqualTo("57f3d721a43c2d59cb750002");
+
+        final Optional<IndexSetConfig> config3 = indexSetService.findOne(DBQuery.is("title", "Test 2"));
+        assertThat(config3).isPresent();
+        assertThat(config3.get().id()).isEqualTo("57f3d721a43c2d59cb750002");
+
+        final Optional<IndexSetConfig> config4 = indexSetService.findOne(DBQuery.is("title", "__yolo"));
+        assertThat(config4).isNotPresent();
     }
 
     @Test
@@ -126,10 +154,13 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750001",
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
+                                true,
                                 "test_1",
                                 4,
                                 1,
+                                MessageCountRotationStrategy.class.getCanonicalName(),
                                 MessageCountRotationStrategyConfig.create(1000),
+                                NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(10),
                                 ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC)
                         ),
@@ -137,10 +168,13 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750002",
                                 "Test 2",
                                 null,
+                                false,
                                 "test_2",
                                 1,
                                 0,
+                                MessageCountRotationStrategy.class.getCanonicalName(),
                                 MessageCountRotationStrategyConfig.create(2500),
+                                NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(25),
                                 ZonedDateTime.of(2016, 10, 4, 18, 0, 0, 0, ZoneOffset.UTC)
                         )
@@ -155,10 +189,13 @@ public class MongoIndexSetServiceTest {
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "Test 3",
                 null,
+                true,
                 "test_3",
                 10,
                 0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
                 MessageCountRotationStrategyConfig.create(10000),
+                NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(5),
                 ZonedDateTime.of(2016, 10, 4, 12, 0, 0, 0, ZoneOffset.UTC)
         );

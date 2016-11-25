@@ -37,7 +37,6 @@ import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.client.Client;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexMapping;
@@ -71,16 +70,13 @@ public class Messages {
             .build();
 
     private final Client c;
-    private final String analyzer;
     private final Meter invalidTimestampMeter;
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
 
     @Inject
     public Messages(Client client,
-                    ElasticsearchConfiguration configuration,
                     MetricRegistry metricRegistry) {
         this.c = client;
-        this.analyzer = configuration.getAnalyzer();
         invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
 
         // TODO: Magic number
@@ -98,7 +94,7 @@ public class Messages {
         return ResultMessage.parseFromSource(r);
     }
 
-    public List<String> analyze(String string, String index) {
+    public List<String> analyze(String string, String index, String analyzer) {
         final AnalyzeResponse response = c.admin().indices().prepareAnalyze(index, string)
             .setAnalyzer(analyzer)
             .get();

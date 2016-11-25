@@ -20,9 +20,11 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
 import java.util.Iterator;
+import java.util.Optional;
 import java.util.Set;
 
 import static java.util.Objects.requireNonNull;
@@ -51,6 +53,28 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     @Override
     public Set<IndexSet> getAllIndexSets() {
         return ImmutableSet.copyOf(findAllMongoIndexSets());
+    }
+
+    @Override
+    public Optional<IndexSet> get(final String indexSetId) {
+        return indexSetService.get(indexSetId)
+                .flatMap(indexSetConfig -> Optional.of((IndexSet) mongoIndexSetFactory.create(indexSetConfig)));
+    }
+
+    @Override
+    public Optional<IndexSet> getForIndexName(String indexName) {
+        for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
+            if (indexSet.isManagedIndex(indexName)) {
+                return Optional.of(indexSet);
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<IndexSet> getDefault() {
+        return indexSetService.findOne(DBQuery.is("default", true))
+                .flatMap(indexSetConfig -> Optional.of((IndexSet) mongoIndexSetFactory.create(indexSetConfig)));
     }
 
     @Override

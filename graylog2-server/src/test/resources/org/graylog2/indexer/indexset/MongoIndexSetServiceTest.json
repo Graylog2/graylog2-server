@@ -6,13 +6,16 @@
       },
       "title": "Test 1",
       "description": "This is the index set configuration for Test 1",
+      "default": true,
       "index_prefix": "test_1",
       "shards": 4,
       "replicas": 1,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
       "rotation_strategy": {
         "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
         "max_docs_per_index": 1000
       },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
       "retention_strategy": {
         "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
         "max_number_of_indices": 10
@@ -24,13 +27,16 @@
         "$oid": "57f3d721a43c2d59cb750002"
       },
       "title": "Test 2",
+      "default": false,
       "index_prefix": "test_2",
       "shards": 1,
       "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
       "rotation_strategy": {
         "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
         "max_docs_per_index": 2500
       },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
       "retention_strategy": {
         "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
         "max_number_of_indices": 25

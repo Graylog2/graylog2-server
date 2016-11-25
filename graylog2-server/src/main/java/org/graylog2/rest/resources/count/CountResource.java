@@ -17,8 +17,11 @@
 package org.graylog2.rest.resources.count;
 
 import com.codahale.metrics.annotation.Timed;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.counts.Counts;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -29,6 +32,7 @@ import org.graylog2.shared.security.RestPermissions;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
@@ -37,10 +41,12 @@ import javax.ws.rs.core.MediaType;
 @Path("/count")
 public class CountResource extends RestResource {
     private final Counts counts;
+    private final IndexSetRegistry indexSetRegistry;
 
     @Inject
-    public CountResource(Counts counts) {
+    public CountResource(Counts counts, IndexSetRegistry indexSetRegistry) {
         this.counts = counts;
+        this.indexSetRegistry = indexSetRegistry;
     }
 
     @GET
@@ -51,5 +57,17 @@ public class CountResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public MessageCountResponse total() {
         return MessageCountResponse.create(counts.total());
+    }
+
+    @GET
+    @Path("/{indexSetId}/total")
+    @Timed
+    @RequiresPermissions(RestPermissions.MESSAGECOUNT_READ)
+    @ApiOperation(value = "Total number of messages in all your indices.")
+    @Produces(MediaType.APPLICATION_JSON)
+    public MessageCountResponse total(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
+        final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
+
+        return MessageCountResponse.create(counts.total(indexSet));
     }
 }

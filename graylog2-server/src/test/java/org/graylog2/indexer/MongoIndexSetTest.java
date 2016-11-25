@@ -24,7 +24,9 @@ import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.IndexRangeService;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -79,13 +81,17 @@ public class MongoIndexSetTest {
     private final IndexSetConfig config = IndexSetConfig.create(
             "Test",
             "Test",
+            true,
             "graylog",
             1,
             0,
+            MessageCountRotationStrategy.class.getCanonicalName(),
             MessageCountRotationStrategyConfig.createDefault(),
+            NoopRetentionStrategy.class.getCanonicalName(),
             NoopRetentionStrategyConfig.createDefault(),
             ZonedDateTime.of(2016, 11, 8, 0, 0, 0, 0, ZoneOffset.UTC)
     );
+
     private MongoIndexSet mongoIndexSet;
 
     @Before
@@ -233,7 +239,7 @@ public class MongoIndexSetTest {
         final Map<String, Set<String>> indexNameAliases = ImmutableMap.of();
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create("graylog_0")).thenReturn(false);
+        when(indices.create("graylog_0", mongoIndexSet)).thenReturn(false);
 
         expectedException.expect(RuntimeException.class);
         expectedException.expectMessage("Could not create new target index <graylog_0>.");
@@ -249,7 +255,7 @@ public class MongoIndexSetTest {
                 "graylog_0", Collections.singleton("graylog_deflector"));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(newIndexName)).thenReturn(true);
+        when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(ClusterHealthStatus.GREEN);
 
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
@@ -266,7 +272,7 @@ public class MongoIndexSetTest {
                 oldIndexName, Collections.singleton("graylog_deflector"));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(newIndexName)).thenReturn(true);
+        when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(ClusterHealthStatus.GREEN);
 
         final SetIndexReadOnlyAndCalculateRangeJob rangeJob = mock(SetIndexReadOnlyAndCalculateRangeJob.class);
@@ -288,7 +294,7 @@ public class MongoIndexSetTest {
                 oldIndexName, Collections.singleton(deflector));
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(newIndexName)).thenReturn(true);
+        when(indices.create(newIndexName, mongoIndexSet)).thenReturn(true);
         when(indices.waitForRecovery(newIndexName)).thenReturn(ClusterHealthStatus.GREEN);
 
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
@@ -303,7 +309,7 @@ public class MongoIndexSetTest {
         final Map<String, Set<String>> indexNameAliases = ImmutableMap.of();
 
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
-        when(indices.create(indexName)).thenReturn(true);
+        when(indices.create(indexName, mongoIndexSet)).thenReturn(true);
         when(indices.waitForRecovery(indexName)).thenReturn(ClusterHealthStatus.GREEN);
 
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);

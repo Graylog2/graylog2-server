@@ -28,7 +28,7 @@ import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Named;
+import java.util.Optional;
 
 public class SetIndexReadOnlyJob extends SystemJob {
     private static final Logger log = LoggerFactory.getLogger(SetIndexReadOnlyJob.class);
@@ -39,7 +39,7 @@ public class SetIndexReadOnlyJob extends SystemJob {
     }
 
     private final Indices indices;
-    private final boolean disableIndexOptimization;
+    private final IndexSetRegistry indexSetRegistry;
     private final OptimizeIndexJob.Factory optimizeIndexJobFactory;
     private final SystemJobManager systemJobManager;
     private final String index;
@@ -47,13 +47,13 @@ public class SetIndexReadOnlyJob extends SystemJob {
 
     @AssistedInject
     public SetIndexReadOnlyJob(Indices indices,
-                               @Named("disable_index_optimization") boolean disableIndexOptimization,
+                               IndexSetRegistry indexSetRegistry,
                                SystemJobManager systemJobManager,
                                OptimizeIndexJob.Factory optimizeIndexJobFactory,
                                ActivityWriter activityWriter,
                                @Assisted String index) {
         this.indices = indices;
-        this.disableIndexOptimization = disableIndexOptimization;
+        this.indexSetRegistry = indexSetRegistry;
         this.optimizeIndexJobFactory = optimizeIndexJobFactory;
         this.systemJobManager = systemJobManager;
         this.index = index;
@@ -62,6 +62,13 @@ public class SetIndexReadOnlyJob extends SystemJob {
 
     @Override
     public void execute() {
+        final Optional<IndexSet> indexSet = indexSetRegistry.getForIndexName(index);
+
+        if (!indexSet.isPresent()) {
+            log.error("Couldn't find index set for index <{}>", index);
+            return;
+        }
+
         log.info("Flushing old index <{}>.", index);
         indices.flush(index);
 
@@ -70,9 +77,9 @@ public class SetIndexReadOnlyJob extends SystemJob {
 
         activityWriter.write(new Activity("Flushed and set <" + index + "> to read-only.", SetIndexReadOnlyJob.class));
 
-        if (!disableIndexOptimization) {
+        if (!indexSet.get().getConfig().indexOptimizationDisabled()) {
             try {
-                systemJobManager.submit(optimizeIndexJobFactory.create(index));
+                systemJobManager.submit(optimizeIndexJobFactory.create(index, indexSet.get().getConfig().indexOptimizationMaxNumSegments()));
             } catch (SystemJobConcurrencyException e) {
                 // The concurrency limit is very high. This should never happen.
                 log.error("Cannot optimize index <" + index + ">.", e);

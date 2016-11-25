@@ -18,6 +18,7 @@ package org.graylog2.indexer;
 
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
+import java.util.Optional;
 import java.util.Set;
 
 public interface IndexSetRegistry extends Iterable<IndexSet> {
@@ -27,6 +28,29 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
      * @return list of index sets
      */
     Set<IndexSet> getAllIndexSets();
+
+    /**
+     * Returns the {@link IndexSet} for the given ID.
+     *
+     * @param indexSetId ID of the index set
+     * @return index set
+     */
+    Optional<IndexSet> get(String indexSetId);
+
+    /**
+     * Returns the {@link IndexSet} for the given index name.
+     *
+     * @param indexName name of the index
+     * @return index set that manages the given index
+     */
+    Optional<IndexSet> getForIndexName(String indexName);
+
+    /**
+     * Returns the {@link IndexSet} that is marked as default.
+     *
+     * @return the default index set
+     */
+    Optional<IndexSet> getDefault();
 
     /**
      * Returns a list with the names of all managed indices.
