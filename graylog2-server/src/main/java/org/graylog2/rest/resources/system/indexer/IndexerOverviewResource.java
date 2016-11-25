@@ -40,6 +40,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -85,7 +86,14 @@ public class IndexerOverviewResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Deprecated
     public IndexerOverview index() throws TooManyAliasesException {
-        throw new UnsupportedOperationException("Unsupported since Graylog 2.2 - use /system/indexer/overview/{indexSetId}");
+        if (!cluster.isConnected()) {
+            throw new ServiceUnavailableException("Elasticsearch cluster is not available, check your configuration and logs for more information.");
+        }
+
+        final IndexSet indexSet = indexSetRegistry.getDefault()
+                .orElseThrow(() -> new NotFoundException("Default index set not found"));
+
+        return getIndexerOverview(indexSet);
     }
 
     @GET
@@ -99,6 +107,12 @@ public class IndexerOverviewResource extends RestResource {
         }
 
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
+
+        return getIndexerOverview(indexSet);
+    }
+
+    private IndexerOverview getIndexerOverview(IndexSet indexSet) throws TooManyAliasesException {
+        final String indexSetId = indexSet.getConfig().id();
 
         final DeflectorSummary deflectorSummary = deflectorResource.deflector(indexSetId);
         final List<IndexRangeSummary> indexRanges = indexRangesResource.list().ranges();

@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -68,7 +69,10 @@ public class DeflectorResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Deprecated
     public DeflectorSummary deprecatedDeflector() throws TooManyAliasesException {
-        throw new UnsupportedOperationException("Unsupported since Graylog 2.2 - use /system/deflector/{indexSetId}");
+        final IndexSet indexSet = indexSetRegistry.getDefault()
+                .orElseThrow(() -> new NotFoundException("Default index set not found"));
+
+        return DeflectorSummary.create(indexSet.isUp(), indexSet.getCurrentActualTargetIndex());
     }
 
     @GET
@@ -92,7 +96,14 @@ public class DeflectorResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ES_WRITE_INDEX_UPDATE_JOB_START)
     @Deprecated
     public void deprecatedCycle() {
-        throw new UnsupportedOperationException("Unsupported since Graylog 2.2 - use /system/deflector/{indexSetId}/cycle");
+        final IndexSet indexSet = indexSetRegistry.getDefault()
+                .orElseThrow(() -> new NotFoundException("Default index set not found"));
+
+        final String msg = "Cycling deflector for default index set <" + indexSet.getConfig().id()  + ">. Reason: REST request.";
+        LOG.info(msg);
+        activityWriter.write(new Activity(msg, DeflectorResource.class));
+
+        indexSet.cycle();
     }
 
     @POST
