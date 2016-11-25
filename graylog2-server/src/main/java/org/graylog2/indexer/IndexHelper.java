@@ -75,8 +75,8 @@ public class IndexHelper {
 
     public static Set<String> determineAffectedIndices(IndexRangeService indexRangeService,
                                                        TimeRange range,
-                                                       String indexPrefix) {
-        final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(indexRangeService, range, indexPrefix);
+                                                       IndexSet indexSet) {
+        final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(indexRangeService, range, indexSet);
         final ImmutableSet.Builder<String> indices = ImmutableSet.builder();
         for (IndexRange indexRange : indexRanges) {
             indices.add(indexRange.indexName());
@@ -87,11 +87,11 @@ public class IndexHelper {
 
     public static Set<IndexRange> determineAffectedIndicesWithRanges(IndexRangeService indexRangeService,
                                                                      TimeRange range,
-                                                                     String indexPrefix) {
+                                                                     IndexSet indexSet) {
         final ImmutableSortedSet.Builder<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
         for (IndexRange indexRange : indexRangeService.find(range.getFrom(), range.getTo())) {
             // if we only consider a certain index set, filter the index ranges by it.
-            if (indexPrefix != null && !indexRange.indexName().startsWith(indexPrefix + "_")) {
+            if (indexSet != null && !indexSet.isManagedIndex(indexRange.indexName())) {
                 continue;
             }
             indices.add(indexRange);

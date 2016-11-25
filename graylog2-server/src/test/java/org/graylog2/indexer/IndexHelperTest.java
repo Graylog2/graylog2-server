@@ -46,6 +46,7 @@ import java.util.SortedSet;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -245,8 +246,10 @@ public class IndexHelperTest {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices);
 
         final TimeRange absoluteRange = AbsoluteRange.create(now.minusDays(1), now.plusDays(1));
+        final IndexSet indexSet = mock(IndexSet.class);
+        when(indexSet.isManagedIndex(startsWith("b_"))).thenReturn(true);
 
-        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange, "b"))
+        assertThat(IndexHelper.determineAffectedIndices(indexRangeService, absoluteRange, indexSet))
                 .containsOnly(b0.indexName(), b1.indexName());
     }
 }
