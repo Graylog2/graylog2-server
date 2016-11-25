@@ -24,6 +24,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -43,10 +44,12 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 @Path("/system/fields")
 public class SystemFieldsResource extends RestResource {
     private final Indices indices;
+    private final IndexSetRegistry indexSetRegistry;
 
     @Inject
-    public SystemFieldsResource(Indices indices) {
+    public SystemFieldsResource(Indices indices, IndexSetRegistry indexSetRegistry) {
         this.indices = indices;
+        this.indexSetRegistry = indexSetRegistry;
     }
 
     @GET
@@ -59,14 +62,16 @@ public class SystemFieldsResource extends RestResource {
                                            @QueryParam("limit") int limit) {
         boolean unlimited = limit <= 0;
 
+        final String[] writeIndexWildcards = indexSetRegistry.getWriteIndexWildcards();
+
         final Set<String> fields;
         if (unlimited) {
-            fields = indices.getAllMessageFields();
+            fields = indices.getAllMessageFields(writeIndexWildcards);
         } else {
             fields = Sets.newHashSet();
             addStandardFields(fields);
             int i = 0;
-            for (String field : indices.getAllMessageFields()) {
+            for (String field : indices.getAllMessageFields(writeIndexWildcards)) {
                 if (i == limit) {
                     break;
                 }

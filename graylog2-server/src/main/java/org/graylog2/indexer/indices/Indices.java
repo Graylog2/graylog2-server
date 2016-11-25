@@ -102,7 +102,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static java.util.Objects.requireNonNull;
 import static java.util.stream.Collectors.toSet;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
@@ -111,8 +110,6 @@ import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
 public class Indices {
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
     private static final String REOPENED_INDEX_SETTING = "graylog2_reopened";
-
-    public static final String ALL_INDEX_PREFIX = "*";
 
     private final Client c;
     private final IndexMapping indexMapping;
@@ -218,10 +215,6 @@ public class Indices {
         return response.getIndex(indexName);
     }
 
-    public String allIndicesAlias(final String indexPrefix) {
-        return requireNonNull(indexPrefix) + "_*";
-    }
-
     public boolean exists(String index) {
         ActionFuture<IndicesExistsResponse> existsFuture = c.admin().indices().exists(new IndicesExistsRequest(index));
         return existsFuture.actionGet().isExists();
@@ -320,10 +313,10 @@ public class Indices {
         return acknowledged;
     }
 
-    public Set<String> getAllMessageFields() {
+    public Set<String> getAllMessageFields(final String[] writeIndexWildcards) {
         Set<String> fields = Sets.newHashSet();
 
-        ClusterStateRequest csr = new ClusterStateRequest().blocks(true).nodes(true).indices(allIndicesAlias(ALL_INDEX_PREFIX));
+        ClusterStateRequest csr = new ClusterStateRequest().blocks(true).nodes(true).indices(writeIndexWildcards);
         ClusterState cs = c.admin().cluster().state(csr).actionGet().getState();
 
         for (ObjectObjectCursor<String, IndexMetaData> m : cs.getMetaData().indices()) {
