@@ -14,19 +14,21 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.periodical;
+package org.graylog2.migrations;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
-import org.graylog2.alarmcallbacks.events.EmailAlarmCallbackMigrated;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamService;
@@ -34,12 +36,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.time.ZonedDateTime;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class EmailAlarmCallbackMigrationPeriodical extends Periodical {
-    private static final Logger LOG = LoggerFactory.getLogger(EmailAlarmCallbackMigrationPeriodical.class);
+public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20161125142400_EmailAlarmCallbackMigration.class);
+
     private final ClusterConfigService clusterConfigService;
     private final StreamService streamService;
     private final AlarmCallbackConfigurationService alarmCallbackService;
@@ -47,7 +51,7 @@ public class EmailAlarmCallbackMigrationPeriodical extends Periodical {
     private final User localAdminUser;
 
     @Inject
-    public EmailAlarmCallbackMigrationPeriodical(ClusterConfigService clusterConfigService,
+    public V20161125142400_EmailAlarmCallbackMigration(ClusterConfigService clusterConfigService,
                                                  StreamService streamService,
                                                  AlarmCallbackConfigurationService alarmCallbackService,
                                                  EmailAlarmCallback emailAlarmCallback,
@@ -60,56 +64,26 @@ public class EmailAlarmCallbackMigrationPeriodical extends Periodical {
     }
 
     @Override
-    public boolean runsForever() {
-        return true;
+    public ZonedDateTime createdAt() {
+        return ZonedDateTime.parse("2016-11-25T14:24:00Z");
     }
 
     @Override
-    public boolean stopOnGracefulShutdown() {
-        return false;
-    }
+    public void upgrade() {
+        // Do not run again if the migration marker can be found in the database.
+        if (clusterConfigService.get(MigrationCompleted.class) != null) {
+            return;
+        }
 
-    @Override
-    public boolean masterOnly() {
-        return true;
-    }
-
-    @Override
-    public boolean startOnThisNode() {
-        return this.clusterConfigService.get(EmailAlarmCallbackMigrated.class) == null;
-    }
-
-    @Override
-    public boolean isDaemon() {
-        return false;
-    }
-
-    @Override
-    public int getInitialDelaySeconds() {
-        return 0;
-    }
-
-    @Override
-    public int getPeriodSeconds() {
-        return 0;
-    }
-
-    @Override
-    protected Logger getLogger() {
-        return LOG;
-    }
-
-    @Override
-    public void doRun() {
         final Map<String, Optional<String>> streamMigrations = this.streamService.loadAll()
-            .stream()
-            .filter(stream -> !stream.getAlertReceivers().isEmpty()
-                && !streamService.getAlertConditions(stream).isEmpty()
-                && alarmCallbackService.getForStream(stream).isEmpty())
-            .collect(Collectors.toMap(Persisted::getId, this::migrateStream));
+                .stream()
+                .filter(stream -> !stream.getAlertReceivers().isEmpty()
+                        && !streamService.getAlertConditions(stream).isEmpty()
+                        && alarmCallbackService.getForStream(stream).isEmpty())
+                .collect(Collectors.toMap(Persisted::getId, this::migrateStream));
         final boolean allSucceeded = streamMigrations.values()
-            .stream()
-            .allMatch(Optional::isPresent);
+                .stream()
+                .allMatch(Optional::isPresent);
 
         final long count = streamMigrations.size();
         if (allSucceeded) {
@@ -118,12 +92,12 @@ public class EmailAlarmCallbackMigrationPeriodical extends Periodical {
             } else {
                 LOG.info("No streams needed to be migrated.");
             }
-            this.clusterConfigService.write(EmailAlarmCallbackMigrated.create(streamMigrations));
+            this.clusterConfigService.write(MigrationCompleted.create(streamMigrations));
         } else {
             final long errors = streamMigrations.values()
-                .stream()
-                .filter(callbackId -> !callbackId.isPresent())
-                .count();
+                    .stream()
+                    .filter(callbackId -> !callbackId.isPresent())
+                    .count();
             LOG.error("Failed migrating " + errors + "/" + count + " streams to include explicit email alarm callback.");
         }
     }
@@ -132,11 +106,11 @@ public class EmailAlarmCallbackMigrationPeriodical extends Periodical {
         final Map<String, Object> defaultConfig = this.getDefaultEmailAlarmCallbackConfig();
         LOG.debug("Creating email alarm callback for stream <" + stream.getId() + ">");
         final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackService.create(stream.getId(),
-            CreateAlarmCallbackRequest.create(
-                EmailAlarmCallback.class.getCanonicalName(),
-                defaultConfig
-            ),
-            localAdminUser.getId()
+                CreateAlarmCallbackRequest.create(
+                        EmailAlarmCallback.class.getCanonicalName(),
+                        defaultConfig
+                ),
+                localAdminUser.getId()
         );
         try {
             final String callbackId = this.alarmCallbackService.save(alarmCallbackConfiguration);
@@ -153,7 +127,21 @@ public class EmailAlarmCallbackMigrationPeriodical extends Periodical {
         final ConfigurationRequest configurationRequest = this.emailAlarmCallback.getRequestedConfiguration();
 
         return configurationRequest.getFields().entrySet()
-            .stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getDefaultValue()));
+                .stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getDefaultValue()));
+    }
+
+    @AutoValue
+    @JsonAutoDetect
+    public static abstract class MigrationCompleted {
+        private static final String FIELD_CALLBACK_IDS = "callback_ids";
+
+        @JsonProperty(FIELD_CALLBACK_IDS)
+        public abstract Map<String, Optional<String>> callbackIds();
+
+        @JsonCreator
+        public static MigrationCompleted create(@JsonProperty(FIELD_CALLBACK_IDS) Map<String, Optional<String>> callbackIds) {
+            return new AutoValue_V20161125142400_EmailAlarmCallbackMigration_MigrationCompleted(callbackIds);
+        }
     }
 }
