@@ -47,7 +47,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class V20161124104700_MissingRotationRetentionConfigMigrationTest {
+public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrationTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Rule
@@ -64,7 +64,7 @@ public class V20161124104700_MissingRotationRetentionConfigMigrationTest {
 
     @Before
     public void setUp() throws Exception {
-        migration = new V20161124104700_MissingRotationRetentionConfigMigration(indexSetService, clusterConfigService, clusterEventBus);
+        migration = new V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration(indexSetService, clusterConfigService, clusterEventBus);
     }
 
     @Test
@@ -115,7 +115,7 @@ public class V20161124104700_MissingRotationRetentionConfigMigrationTest {
                 .retentionStrategyClass(retentionStrategyClass)
                 .build());
 
-        verify(clusterConfigService).write(V20161124104700_MissingRotationRetentionConfigMigration.MigrationCompleted.create(
+        verify(clusterConfigService).write(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.create(
                 ImmutableSet.of("id-1", "id-2"), Collections.emptySet()
         ));
     }
@@ -160,7 +160,7 @@ public class V20161124104700_MissingRotationRetentionConfigMigrationTest {
         verify(indexSetService).save(config1.toBuilder().rotationStrategyClass(rotationStrategyClass).build());
         verify(indexSetService, never()).save(config2);
 
-        verify(clusterConfigService).write(V20161124104700_MissingRotationRetentionConfigMigration.MigrationCompleted.create(
+        verify(clusterConfigService).write(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.create(
                 Collections.singleton("id-1"), Collections.singleton("id-2")
         ));
     }
@@ -174,7 +174,7 @@ public class V20161124104700_MissingRotationRetentionConfigMigrationTest {
         migration.upgrade();
 
         verify(indexSetService, never()).save(any(IndexSetConfig.class));
-        verify(clusterConfigService, never()).write(V20161124104700_MissingRotationRetentionConfigMigration.MigrationCompleted.class);
+        verify(clusterConfigService, never()).write(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.class);
     }
 
     @Test
@@ -215,7 +215,7 @@ public class V20161124104700_MissingRotationRetentionConfigMigrationTest {
         migration.upgrade();
 
         verify(indexSetService, never()).save(any(IndexSetConfig.class));
-        verify(clusterConfigService, never()).write(V20161124104700_MissingRotationRetentionConfigMigration.MigrationCompleted.class);
+        verify(clusterConfigService, never()).write(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.class);
     }
 
     @Test
@@ -256,7 +256,7 @@ public class V20161124104700_MissingRotationRetentionConfigMigrationTest {
         migration.upgrade();
 
         verify(indexSetService, never()).save(any(IndexSetConfig.class));
-        verify(clusterConfigService, never()).write(V20161124104700_MissingRotationRetentionConfigMigration.MigrationCompleted.class);
+        verify(clusterConfigService, never()).write(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.class);
     }
 
     @Test
@@ -290,12 +290,12 @@ public class V20161124104700_MissingRotationRetentionConfigMigrationTest {
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass , retentionStrategyClass));
         when(indexSetService.findAll()).thenReturn(Sets.newHashSet(config1, config2));
 
-        when(clusterConfigService.get(V20161124104700_MissingRotationRetentionConfigMigration.MigrationCompleted.class))
-                .thenReturn(V20161124104700_MissingRotationRetentionConfigMigration.MigrationCompleted.create(Collections.emptySet(), Collections.emptySet()));
+        when(clusterConfigService.get(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.class))
+                .thenReturn(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.create(Collections.emptySet(), Collections.emptySet()));
 
         migration.upgrade();
 
         verify(indexSetService, never()).save(any(IndexSetConfig.class));
-        verify(clusterConfigService, never()).write(V20161124104700_MissingRotationRetentionConfigMigration.MigrationCompleted.class);
+        verify(clusterConfigService, never()).write(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.class);
     }
 }

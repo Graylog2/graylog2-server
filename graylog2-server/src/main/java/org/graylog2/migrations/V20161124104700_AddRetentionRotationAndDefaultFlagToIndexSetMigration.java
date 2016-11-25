@@ -37,17 +37,17 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkState;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
-public class V20161124104700_MissingRotationRetentionConfigMigration extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20161124104700_MissingRotationRetentionConfigMigration.class);
+public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.class);
 
     private final ClusterConfigService clusterConfigService;
     private final IndexSetService indexSetService;
     private final ClusterEventBus clusterEventBus;
 
     @Inject
-    public V20161124104700_MissingRotationRetentionConfigMigration(final IndexSetService indexSetService,
-                                                                   final ClusterConfigService clusterConfigService,
-                                                                   final ClusterEventBus clusterEventBus) {
+    public V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration(final IndexSetService indexSetService,
+                                                                                 final ClusterConfigService clusterConfigService,
+                                                                                 final ClusterEventBus clusterEventBus) {
         this.clusterConfigService = clusterConfigService;
         this.indexSetService = indexSetService;
         this.clusterEventBus = clusterEventBus;
@@ -118,7 +118,7 @@ public class V20161124104700_MissingRotationRetentionConfigMigration extends Mig
         @JsonCreator
         public static MigrationCompleted create(@JsonProperty("updated_index_set_ids") Set<String> updatedIndexSetIds,
                                                 @JsonProperty("skipped_index_set_ids") Set<String> skippedIndexSetIds) {
-            return new AutoValue_V20161124104700_MissingRotationRetentionConfigMigration_MigrationCompleted(updatedIndexSetIds, skippedIndexSetIds);
+            return new AutoValue_V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration_MigrationCompleted(updatedIndexSetIds, skippedIndexSetIds);
         }
     }
 }
