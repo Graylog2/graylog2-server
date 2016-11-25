@@ -31,6 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.Optional;
 import java.util.Set;
 
@@ -103,7 +104,16 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
             }
         }
 
-        clusterConfigService.write(MigrationCompleted.create(updatedIds.build(), skippedIds.build()));
+        // Mark the oldest index set (there should be only one at this point, though) as default.
+        final IndexSetConfig defaultIndexSetConfig = indexSetService.findAll().stream()
+                .sorted(Comparator.comparing(IndexSetConfig::creationDate))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Unable to find any index set - this should not happen!"));
+
+        LOG.info("Setting index set <{}> as default", defaultIndexSetConfig.id());
+        indexSetService.save(defaultIndexSetConfig.toBuilder().isDefault(true).build());
+
+        clusterConfigService.write(MigrationCompleted.create(updatedIds.build(), skippedIds.build(), defaultIndexSetConfig.id()));
     }
 
     @JsonAutoDetect
@@ -115,10 +125,14 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         @JsonProperty("skipped_index_set_ids")
         public abstract Set<String> skippedIndexSetIds();
 
+        @JsonProperty("default_index_set")
+        public abstract String defaultIndexSet();
+
         @JsonCreator
         public static MigrationCompleted create(@JsonProperty("updated_index_set_ids") Set<String> updatedIndexSetIds,
-                                                @JsonProperty("skipped_index_set_ids") Set<String> skippedIndexSetIds) {
-            return new AutoValue_V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration_MigrationCompleted(updatedIndexSetIds, skippedIndexSetIds);
+                                                @JsonProperty("skipped_index_set_ids") Set<String> skippedIndexSetIds,
+                                                @JsonProperty("default_index_set") String defaultIndexSet) {
+            return new AutoValue_V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration_MigrationCompleted(updatedIndexSetIds, skippedIndexSetIds, defaultIndexSet);
         }
     }
 }

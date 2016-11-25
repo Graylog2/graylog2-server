@@ -52,6 +52,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @Nullable
     public abstract String description();
 
+    @JsonProperty("default")
+    public abstract boolean isDefault();
+
     @JsonProperty("index_prefix")
     @NotBlank
     public abstract String indexPrefix();
@@ -116,6 +119,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
                                         @JsonProperty("title") @NotBlank String title,
                                         @JsonProperty("description") @Nullable String description,
+                                        @JsonProperty("default") @Nullable Boolean isDefault,
                                         @JsonProperty("index_prefix") @NotBlank String indexPrefix,
                                         @JsonProperty("shards") @Min(1) int shards,
                                         @JsonProperty("replicas") @Min(0) int replicas,
@@ -128,6 +132,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .id(id)
                 .title(title)
                 .description(description)
+                .isDefault(isDefault == null ? false : isDefault)
                 .indexPrefix(indexPrefix)
                 .shards(shards)
                 .replicas(replicas)
@@ -141,6 +146,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     public static IndexSetConfig create(String title,
                                         String description,
+                                        boolean isDefault,
                                         String indexPrefix,
                                         int shards,
                                         int replicas,
@@ -149,7 +155,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         String retentionStrategyClass,
                                         RetentionStrategyConfig retentionStrategy,
                                         ZonedDateTime creationDate) {
-        return create(null, title, description, indexPrefix, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
+        return create(null, title, description, isDefault, indexPrefix, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
     }
 
     @Override
@@ -174,6 +180,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         public abstract Builder title(String title);
 
         public abstract Builder description(String description);
+
+        public abstract Builder isDefault(boolean isDefault);
 
         public abstract Builder indexPrefix(String indexPrefix);
 

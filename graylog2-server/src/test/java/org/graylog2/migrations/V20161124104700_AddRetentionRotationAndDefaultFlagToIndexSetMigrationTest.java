@@ -83,6 +83,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         final IndexSetConfig config1 = IndexSetConfig.builder()
                 .id("id-1")
                 .title("title-1")
+                .isDefault(false)
                 .indexPrefix("prefix-1")
                 .shards(1)
                 .replicas(0)
@@ -93,12 +94,13 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         final IndexSetConfig config2 = IndexSetConfig.builder()
                 .id("id-2")
                 .title("title-2")
+                .isDefault(false)
                 .indexPrefix("prefix-2")
                 .shards(1)
                 .replicas(0)
                 .rotationStrategy(rotationStrategy)
                 .retentionStrategy(retentionStrategy)
-                .creationDate(ZonedDateTime.of(2016, 10, 13, 0, 0, 0, 0, ZoneOffset.UTC))
+                .creationDate(ZonedDateTime.of(2016, 10, 10, 0, 0, 0, 0, ZoneOffset.UTC))
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass , retentionStrategyClass));
@@ -114,9 +116,11 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .rotationStrategyClass(rotationStrategyClass)
                 .retentionStrategyClass(retentionStrategyClass)
                 .build());
+        // Check that the oldest index set will be the default
+        verify(indexSetService).save(config2.toBuilder().isDefault(true).build());
 
         verify(clusterConfigService).write(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.create(
-                ImmutableSet.of("id-1", "id-2"), Collections.emptySet()
+                ImmutableSet.of("id-1", "id-2"), Collections.emptySet(), "id-2"
         ));
     }
 
@@ -130,6 +134,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         final IndexSetConfig config1 = IndexSetConfig.builder()
                 .id("id-1")
                 .title("title-1")
+                .isDefault(true)
                 .indexPrefix("prefix-1")
                 .shards(1)
                 .replicas(0)
@@ -142,6 +147,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         final IndexSetConfig config2 = IndexSetConfig.builder()
                 .id("id-2")
                 .title("title-2")
+                .isDefault(false)
                 .indexPrefix("prefix-2")
                 .shards(1)
                 .replicas(0)
@@ -160,8 +166,11 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         verify(indexSetService).save(config1.toBuilder().rotationStrategyClass(rotationStrategyClass).build());
         verify(indexSetService, never()).save(config2);
 
+        // Check that the oldest index set will be the default
+        verify(indexSetService).save(config1.toBuilder().isDefault(true).build());
+
         verify(clusterConfigService).write(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.create(
-                Collections.singleton("id-1"), Collections.singleton("id-2")
+                Collections.singleton("id-1"), Collections.singleton("id-2"), "id-1"
         ));
     }
 
@@ -188,6 +197,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         final IndexSetConfig config1 = IndexSetConfig.builder()
                 .id("id-1")
                 .title("title-1")
+                .isDefault(true)
                 .indexPrefix("prefix-1")
                 .shards(1)
                 .replicas(0)
@@ -198,6 +208,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         final IndexSetConfig config2 = IndexSetConfig.builder()
                 .id("id-2")
                 .title("title-2")
+                .isDefault(false)
                 .indexPrefix("prefix-2")
                 .shards(1)
                 .replicas(0)
@@ -229,6 +240,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         final IndexSetConfig config1 = IndexSetConfig.builder()
                 .id("id-1")
                 .title("title-1")
+                .isDefault(true)
                 .indexPrefix("prefix-1")
                 .shards(1)
                 .replicas(0)
@@ -239,6 +251,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         final IndexSetConfig config2 = IndexSetConfig.builder()
                 .id("id-2")
                 .title("title-2")
+                .isDefault(false)
                 .indexPrefix("prefix-2")
                 .shards(1)
                 .replicas(0)
@@ -269,6 +282,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         final IndexSetConfig config1 = IndexSetConfig.builder()
                 .id("id-1")
                 .title("title-1")
+                .isDefault(true)
                 .indexPrefix("prefix-1")
                 .shards(1)
                 .replicas(0)
@@ -279,6 +293,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         final IndexSetConfig config2 = IndexSetConfig.builder()
                 .id("id-2")
                 .title("title-2")
+                .isDefault(false)
                 .indexPrefix("prefix-2")
                 .shards(1)
                 .replicas(0)
@@ -291,7 +306,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
         when(indexSetService.findAll()).thenReturn(Sets.newHashSet(config1, config2));
 
         when(clusterConfigService.get(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.class))
-                .thenReturn(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.create(Collections.emptySet(), Collections.emptySet()));
+                .thenReturn(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.MigrationCompleted.create(Collections.emptySet(), Collections.emptySet(), "id-1"));
 
         migration.upgrade();
 

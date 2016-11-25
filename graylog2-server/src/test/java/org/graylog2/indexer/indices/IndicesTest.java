@@ -95,6 +95,7 @@ public class IndicesTest {
                 .id("index-set-1")
                 .title("Index set 1")
                 .description("For testing")
+                .isDefault(true)
                 .indexPrefix("graylog")
                 .creationDate(ZonedDateTime.now())
                 .shards(1)

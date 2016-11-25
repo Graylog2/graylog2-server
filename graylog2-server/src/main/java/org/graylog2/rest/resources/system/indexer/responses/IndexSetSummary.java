@@ -45,6 +45,9 @@ public abstract class IndexSetSummary {
     @Nullable
     public abstract String description();
 
+    @JsonProperty("default")
+    public abstract boolean isDefault();
+
     @JsonProperty("index_prefix")
     @NotBlank
     public abstract String indexPrefix();
@@ -81,6 +84,7 @@ public abstract class IndexSetSummary {
     public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
                                          @JsonProperty("title") @NotBlank String title,
                                          @JsonProperty("description") @Nullable String description,
+                                         @JsonProperty("default") boolean isDefault,
                                          @JsonProperty("index_prefix") @NotBlank String indexPrefix,
                                          @JsonProperty("shards") @Min(1) int shards,
                                          @JsonProperty("replicas") @Min(0) int replicas,
@@ -89,7 +93,7 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
                                          @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
                                          @JsonProperty("creation_date") @NotNull ZonedDateTime creationDate) {
-        return new AutoValue_IndexSetSummary(id, title, description, indexPrefix, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
+        return new AutoValue_IndexSetSummary(id, title, description, isDefault, indexPrefix, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet) {
@@ -97,6 +101,7 @@ public abstract class IndexSetSummary {
                 indexSet.id(),
                 indexSet.title(),
                 indexSet.description(),
+                indexSet.isDefault(),
                 indexSet.indexPrefix(),
                 indexSet.shards(),
                 indexSet.replicas(),
@@ -113,6 +118,7 @@ public abstract class IndexSetSummary {
                 id(),
                 title(),
                 description(),
+                isDefault(),
                 indexPrefix(),
                 shards(),
                 replicas(),
