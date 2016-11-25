@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indexset;
 
 import org.bson.types.ObjectId;
+import org.mongojack.DBQuery;
 
 import java.util.Optional;
 import java.util.Set;
@@ -34,6 +35,13 @@ public interface IndexSetService {
      * @see #get(ObjectId)
      */
     Optional<IndexSetConfig> get(String id);
+
+    /**
+     * Retrieve an index set based on the given {@link DBQuery.Query}.
+     *
+     * @return index set
+     */
+    Optional<IndexSetConfig> findOne(DBQuery.Query query);
 
     /**
      * Retrieve all index sets.

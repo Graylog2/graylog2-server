@@ -83,6 +83,14 @@ public class MongoIndexSetService implements IndexSetService {
      * {@inheritDoc}
      */
     @Override
+    public Optional<IndexSetConfig> findOne(DBQuery.Query query) {
+        return Optional.ofNullable(collection.findOne(query));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public Set<IndexSetConfig> findAll() {
         return ImmutableSet.copyOf((Iterator<? extends IndexSetConfig>) collection.find());
     }

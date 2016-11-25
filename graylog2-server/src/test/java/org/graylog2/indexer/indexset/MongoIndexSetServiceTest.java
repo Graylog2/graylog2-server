@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mongojack.DBQuery;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
@@ -119,6 +120,25 @@ public class MongoIndexSetServiceTest {
     public void getReturnsAbsentOptionalIfIndexSetConfigDoesNotExist() throws Exception {
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(new ObjectId("57f3d3f0a43c2d595eb0a348"));
         assertThat(indexSetConfig).isEmpty();
+    }
+
+    @Test
+    public void findOne() throws Exception {
+        final Optional<IndexSetConfig> config1 = indexSetService.findOne(DBQuery.is("default", true));
+
+        assertThat(config1).isPresent();
+        assertThat(config1.get().id()).isEqualTo("57f3d721a43c2d59cb750001");
+
+        final Optional<IndexSetConfig> config2 = indexSetService.findOne(DBQuery.is("default", false));
+        assertThat(config2).isPresent();
+        assertThat(config2.get().id()).isEqualTo("57f3d721a43c2d59cb750002");
+
+        final Optional<IndexSetConfig> config3 = indexSetService.findOne(DBQuery.is("title", "Test 2"));
+        assertThat(config3).isPresent();
+        assertThat(config3.get().id()).isEqualTo("57f3d721a43c2d59cb750002");
+
+        final Optional<IndexSetConfig> config4 = indexSetService.findOne(DBQuery.is("title", "__yolo"));
+        assertThat(config4).isNotPresent();
     }
 
     @Test

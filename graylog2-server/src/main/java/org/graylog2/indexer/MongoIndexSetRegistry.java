@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.mongojack.DBQuery;
 
 import javax.inject.Inject;
 import java.util.Iterator;
@@ -68,6 +69,12 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
             }
         }
         return Optional.empty();
+    }
+
+    @Override
+    public Optional<IndexSet> getDefault() {
+        return indexSetService.findOne(DBQuery.is("default", true))
+                .flatMap(indexSetConfig -> Optional.of((IndexSet) mongoIndexSetFactory.create(indexSetConfig)));
     }
 
     @Override

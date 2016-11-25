@@ -46,6 +46,13 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
     Optional<IndexSet> getForIndexName(String indexName);
 
     /**
+     * Returns the {@link IndexSet} that is marked as default.
+     *
+     * @return the default index set
+     */
+    Optional<IndexSet> getDefault();
+
+    /**
      * Returns a list with the names of all managed indices.
      *
      * @return list with names of managed indices
