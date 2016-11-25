@@ -169,8 +169,8 @@ public class CountsTest {
     @Test
     public void totalReturnsZeroWithEmptyIndex() throws Exception {
         assertThat(counts.total()).isEqualTo(0L);
-        assertThat(counts.total(indexSetConfig1)).isEqualTo(0L);
-        assertThat(counts.total(indexSetConfig2)).isEqualTo(0L);
+        assertThat(counts.total(indexSet1)).isEqualTo(0L);
+        assertThat(counts.total(indexSet2)).isEqualTo(0L);
     }
 
     @Test
@@ -197,7 +197,7 @@ public class CountsTest {
         }
 
         assertThat(counts.total()).isEqualTo(count1 + count2);
-        assertThat(counts.total(indexSetConfig1)).isEqualTo(count1);
-        assertThat(counts.total(indexSetConfig2)).isEqualTo(count2);
+        assertThat(counts.total(indexSet1)).isEqualTo(count1);
+        assertThat(counts.total(indexSet2)).isEqualTo(count2);
     }
 }

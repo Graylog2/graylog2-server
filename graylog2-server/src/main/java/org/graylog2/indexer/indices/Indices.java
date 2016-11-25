@@ -80,7 +80,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.TimestampStats;
 import org.graylog2.plugin.system.NodeId;
@@ -193,8 +193,8 @@ public class Indices {
         return docsStats == null ? 0L : docsStats.getCount();
     }
 
-    public Map<String, IndexStats> getAll(final IndexSetConfig indexSetConfig) {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias(indexSetConfig.indexPrefix())).request();
+    public Map<String, IndexStats> getAll(final IndexSet indexSet) {
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexSet.getWriteIndexWildcard()).request();
         final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
         if (response.getFailedShards() > 0) {
@@ -203,8 +203,8 @@ public class Indices {
         return response.getIndices();
     }
 
-    public Map<String, IndexStats> getAllDocCounts(final IndexSetConfig indexSetConfig) {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(allIndicesAlias(indexSetConfig.indexPrefix())).setDocs(true).request();
+    public Map<String, IndexStats> getAllDocCounts(final IndexSet indexSet) {
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexSet.getWriteIndexWildcard()).setDocs(true).request();
         final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
         return response.getIndices();
@@ -276,9 +276,9 @@ public class Indices {
         return aliases.isEmpty() ? null : aliases.keysIt().next();
     }
 
-    private void ensureIndexTemplate(IndexSetConfig indexSetConfig) {
-        final Map<String, Object> template = indexMapping.messageTemplate(allIndicesAlias(indexSetConfig.indexPrefix()), indexSetConfig.indexAnalyzer());
-        final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(indexSetConfig.indexTemplateName())
+    private void ensureIndexTemplate(IndexSet indexSet) {
+        final Map<String, Object> template = indexMapping.messageTemplate(indexSet.getWriteIndexWildcard(), indexSet.getConfig().indexAnalyzer());
+        final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(indexSet.getConfig().indexTemplateName())
                 .setOrder(Integer.MIN_VALUE) // Make sure templates with "order: 0" are applied after our template!
                 .setSource(template)
                 .request();
@@ -286,26 +286,26 @@ public class Indices {
         try {
             final boolean acknowledged = c.admin().indices().putTemplate(itr).actionGet().isAcknowledged();
             if (acknowledged) {
-                LOG.info("Created Graylog index template \"{}\" in Elasticsearch.", indexSetConfig.indexTemplateName());
+                LOG.info("Created Graylog index template \"{}\" in Elasticsearch.", indexSet.getConfig().indexTemplateName());
             }
         } catch (Exception e) {
-            LOG.error("Unable to create the Graylog index template: " + indexSetConfig.indexTemplateName(), e);
+            LOG.error("Unable to create the Graylog index template: " + indexSet.getConfig().indexTemplateName(), e);
         }
     }
 
-    public boolean create(String indexName, IndexSetConfig indexSetConfig) {
-        return create(indexName, indexSetConfig, Settings.EMPTY);
+    public boolean create(String indexName, IndexSet indexSet) {
+        return create(indexName, indexSet, Settings.EMPTY);
     }
 
-    public boolean create(String indexName, IndexSetConfig indexSetConfig, Settings customSettings) {
+    public boolean create(String indexName, IndexSet indexSet, Settings customSettings) {
         final Settings settings = Settings.builder()
-                .put("number_of_shards", indexSetConfig.shards())
-                .put("number_of_replicas", indexSetConfig.replicas())
+                .put("number_of_shards", indexSet.getConfig().shards())
+                .put("number_of_replicas", indexSet.getConfig().replicas())
                 .put(customSettings)
                 .build();
 
         // Make sure our index template exists before creating an index!
-        ensureIndexTemplate(indexSetConfig);
+        ensureIndexTemplate(indexSet);
 
         final CreateIndexRequest cir = c.admin().indices().prepareCreate(indexName)
                 .setSettings(settings)
@@ -401,7 +401,7 @@ public class Indices {
                 .orElse(false);
     }
 
-    public Set<String> getClosedIndices(final IndexSetConfig indexSetConfig) {
+    public Set<String> getClosedIndices(final IndexSet indexSet) {
         final Set<String> closedIndices = Sets.newHashSet();
 
         ClusterStateRequest csr = new ClusterStateRequest()
@@ -417,7 +417,7 @@ public class Indices {
         while (it.hasNext()) {
             IndexMetaData indexMeta = it.next();
             // Only search in our indices.
-            if (!indexMeta.getIndex().startsWith(indexSetConfig.indexPrefix())) {
+            if (!indexMeta.getIndex().startsWith(indexSet.getIndexPrefix())) {
                 continue;
             }
             if (indexMeta.getState().equals(IndexMetaData.State.CLOSE)) {
@@ -427,7 +427,7 @@ public class Indices {
         return closedIndices;
     }
 
-    public Set<String> getReopenedIndices(final IndexSetConfig indexSetConfig) {
+    public Set<String> getReopenedIndices(final IndexSet indexSet) {
         final Set<String> reopenedIndices = Sets.newHashSet();
 
         ClusterStateRequest csr = new ClusterStateRequest()
@@ -443,7 +443,7 @@ public class Indices {
         while (it.hasNext()) {
             IndexMetaData indexMeta = it.next();
             // Only search in our indices.
-            if (!indexMeta.getIndex().startsWith(indexSetConfig.indexPrefix())) {
+            if (!indexMeta.getIndex().startsWith(indexSet.getIndexPrefix())) {
                 continue;
             }
             if (checkForReopened(indexMeta)) {
@@ -474,10 +474,10 @@ public class Indices {
         return IndexStatistics.create(indexStats.getIndex(), indexStats.getPrimaries(), indexStats.getTotal(), shardRouting.build());
     }
 
-    public Set<IndexStatistics> getIndicesStats(final IndexSetConfig indexSetConfig) {
+    public Set<IndexStatistics> getIndicesStats(final IndexSet indexSet) {
         final Map<String, IndexStats> responseIndices;
         try {
-            responseIndices = getAll(indexSetConfig);
+            responseIndices = getAll(indexSet);
         } catch (ElasticsearchException e) {
             return Collections.emptySet();
         }

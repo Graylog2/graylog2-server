@@ -25,7 +25,7 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.system.NodeId;
@@ -37,13 +37,13 @@ import static org.mockito.Mockito.mock;
 
 public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client> {
     private final DatabaseOperation<Client> databaseOperation;
-    private final IndexSetConfig indexSetConfig;
+    private final IndexSet indexSet;
     private final Client client;
     private final Set<String> indexes;
 
-    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, IndexSetConfig indexSetConfig, Set<String> indexes) {
+    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, IndexSet indexSet, Set<String> indexes) {
         this.databaseOperation = databaseOperation;
-        this.indexSetConfig = indexSetConfig;
+        this.indexSet = indexSet;
         this.client = databaseOperation.connectionManager();
         this.indexes = ImmutableSet.copyOf(indexes);
     }
@@ -64,7 +64,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
             final Messages messages = new Messages(client, new MetricRegistry());
             final Indices indices = new Indices(client, new IndexMapping(), messages, mock(NodeId.class), new NullAuditEventSender());
 
-            if (!indices.create(index, indexSetConfig)) {
+            if (!indices.create(index, indexSet)) {
                 throw new IllegalStateException("Couldn't create index " + index);
             }
         }

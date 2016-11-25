@@ -42,6 +42,8 @@ import org.elasticsearch.common.compress.CompressedXContent;
 import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
@@ -82,6 +84,7 @@ public class IndicesTest {
     private static final String INDEX_NAME = "graylog_0";
 
     private final IndexSetConfig indexSetConfig;
+    private final IndexSet indexSet;
 
     @Rule
     public ElasticsearchRule elasticsearchRule;
@@ -105,8 +108,9 @@ public class IndicesTest {
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
                 .build();
+        this.indexSet = new TestIndexSet(indexSetConfig);
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSetConfig, Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
     }
 
     @Before
@@ -205,7 +209,7 @@ public class IndicesTest {
 
         assertThat(responseBefore.getIndexTemplates()).isEmpty();
 
-        indices.create("index_template_test", indexSetConfig);
+        indices.create("index_template_test", indexSet);
 
         final GetIndexTemplatesResponse responseAfter = client.getTemplates(request).actionGet();
         assertThat(responseAfter.getIndexTemplates()).hasSize(1);
@@ -233,7 +237,7 @@ public class IndicesTest {
                     "type", "string",
                     "index", "not_analyzed")));
         assertThat(client.preparePutTemplate(templateName)
-                .setTemplate(indices.allIndicesAlias(indexSetConfig.indexPrefix()))
+                .setTemplate(indexSet.getWriteIndexWildcard())
                 .addMapping(IndexMapping.TYPE_MESSAGE, beforeMapping)
                 .get()
                 .isAcknowledged())
@@ -246,7 +250,7 @@ public class IndicesTest {
         final Map<String, Object> actualMapping = mapper.readValue(beforeMappings.get(IndexMapping.TYPE_MESSAGE).uncompressed(), new TypeReference<Map<String, Object>>() {});
         assertThat(actualMapping.get(IndexMapping.TYPE_MESSAGE)).isEqualTo(beforeMapping);
 
-        indices.create("index_template_test", indexSetConfig);
+        indices.create("index_template_test", indexSet);
 
         final GetIndexTemplatesResponse responseAfter = client.prepareGetTemplates(templateName).get();
         assertThat(responseAfter.getIndexTemplates()).hasSize(1);
@@ -255,7 +259,7 @@ public class IndicesTest {
         assertThat(templateMetaData.getMappings().keysIt()).containsExactly(IndexMapping.TYPE_MESSAGE);
 
         final Map<String, Object> mapping = mapper.readValue(templateMetaData.getMappings().get(IndexMapping.TYPE_MESSAGE).uncompressed(), new TypeReference<Map<String, Object>>() {});
-        final Map<String, Object> expectedTemplate = new IndexMapping().messageTemplate(indices.allIndicesAlias(indexSetConfig.indexPrefix()), indexSetConfig.indexAnalyzer());
+        final Map<String, Object> expectedTemplate = new IndexMapping().messageTemplate(indexSet.getWriteIndexWildcard(), indexSetConfig.indexAnalyzer());
         assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
 
         final DeleteIndexTemplateRequest deleteRequest = client.prepareDeleteTemplate(templateName).request();
@@ -269,7 +273,7 @@ public class IndicesTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        indices.create("index_creation_date_test", indexSetConfig);
+        indices.create("index_creation_date_test", indexSet);
 
         final DateTime indexCreationDate = indices.indexCreationDate("index_creation_date_test");
         org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now);

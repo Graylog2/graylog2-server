@@ -264,7 +264,7 @@ public class MongoIndexSet implements IndexSet {
 
         // Create new index.
         LOG.info("Creating target index <{}>.", newTarget);
-        if (!indices.create(newTarget, getConfig())) {
+        if (!indices.create(newTarget, this)) {
             throw new RuntimeException("Could not create new target index <" + newTarget + ">.");
         }
 

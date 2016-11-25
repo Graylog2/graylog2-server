@@ -116,7 +116,7 @@ public class IndexerOverviewResource extends RestResource {
 
         final DeflectorSummary deflectorSummary = deflectorResource.deflector(indexSetId);
         final List<IndexRangeSummary> indexRanges = indexRangesResource.list().ranges();
-        final Map<String, IndexStats> allDocCounts = indices.getAllDocCounts(indexSet.getConfig()).entrySet().stream()
+        final Map<String, IndexStats> allDocCounts = indices.getAllDocCounts(indexSet).entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
         final Map<String, Boolean> areReopened = indices.areReopened(allDocCounts.keySet());
         final Map<String, IndexSummary> indicesSummaries = allDocCounts.values()
@@ -133,7 +133,7 @@ public class IndexerOverviewResource extends RestResource {
                                 areReopened.get(indexStats.getIndex()))
                 ));
 
-        indices.getClosedIndices(indexSet.getConfig()).forEach(indexName -> indicesSummaries.put(indexName, IndexSummary.create(
+        indices.getClosedIndices(indexSet).forEach(indexName -> indicesSummaries.put(indexName, IndexSummary.create(
                 null,
                 indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexName)).findFirst().orElse(null),
                 deflectorSummary.currentTarget().equals(indexName),

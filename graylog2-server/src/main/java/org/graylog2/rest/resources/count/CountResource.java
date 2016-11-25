@@ -68,6 +68,6 @@ public class CountResource extends RestResource {
     public MessageCountResponse total(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
 
-        return MessageCountResponse.create(counts.total(indexSet.getConfig()));
+        return MessageCountResponse.create(counts.total(indexSet));
     }
 }

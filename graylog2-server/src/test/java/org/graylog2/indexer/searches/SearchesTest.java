@@ -26,6 +26,8 @@ import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import org.elasticsearch.client.Client;
 import org.graylog2.Configuration;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -106,6 +108,7 @@ public class SearchesTest {
             }).build();
 
     private final IndexSetConfig indexSetConfig;
+    private final IndexSet indexSet;
 
     @Mock
     private IndexRangeService indexRangeService;
@@ -131,8 +134,9 @@ public class SearchesTest {
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
                 .build();
+        this.indexSet = new TestIndexSet(indexSetConfig);
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSetConfig, Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
     }
 
     @Before

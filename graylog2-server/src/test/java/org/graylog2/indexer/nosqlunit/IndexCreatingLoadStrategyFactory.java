@@ -22,17 +22,17 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.core.LoadStrategyFactory;
 import com.lordofthejars.nosqlunit.core.LoadStrategyOperation;
 import com.lordofthejars.nosqlunit.core.ReflectionLoadStrategyFactory;
-import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.IndexSet;
 
 import java.util.Set;
 
 public class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {
     private final LoadStrategyFactory loadStrategyFactory;
     private final Set<String> indexNames;
-    private final IndexSetConfig indexSetConfig;
+    private final IndexSet indexSet;
 
-    public IndexCreatingLoadStrategyFactory(IndexSetConfig indexSetConfig, Set<String> indexNames) {
-        this.indexSetConfig = indexSetConfig;
+    public IndexCreatingLoadStrategyFactory(IndexSet indexSet, Set<String> indexNames) {
+        this.indexSet = indexSet;
         this.loadStrategyFactory = new ReflectionLoadStrategyFactory();
         this.indexNames = ImmutableSet.copyOf(indexNames);
     }
@@ -42,6 +42,6 @@ public class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {
     public LoadStrategyOperation getLoadStrategyInstance(LoadStrategyEnum loadStrategyEnum, DatabaseOperation databaseOperation) {
         return loadStrategyFactory.getLoadStrategyInstance(
                 loadStrategyEnum,
-                new IndexCreatingDatabaseOperation(databaseOperation, indexSetConfig, indexNames));
+                new IndexCreatingDatabaseOperation(databaseOperation, indexSet, indexNames));
     }
 }

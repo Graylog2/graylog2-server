@@ -27,7 +27,9 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.Settings;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
@@ -66,6 +68,7 @@ public class EsIndexRangeServiceTest {
     private static final ImmutableSet<String> INDEX_NAMES = ImmutableSet.of("graylog", "graylog_1", "graylog_2", "graylog_3", "graylog_4", "graylog_5", "ignored");
 
     private final IndexSetConfig indexSetConfig;
+    private final IndexSet indexSet;
 
     @Rule
     public ElasticsearchRule elasticsearchRule;
@@ -97,8 +100,9 @@ public class EsIndexRangeServiceTest {
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
                 .build();
+        this.indexSet = new TestIndexSet(indexSetConfig);
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSetConfig, INDEX_NAMES));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, INDEX_NAMES));
     }
 
     @Before

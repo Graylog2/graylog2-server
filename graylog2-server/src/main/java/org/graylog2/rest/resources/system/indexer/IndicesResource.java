@@ -140,8 +140,7 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo open() {
         final Set<IndexStatistics> indicesStats = indexSetRegistry.getAllIndexSets().stream()
-                .map(IndexSet::getConfig)
-                .flatMap(config -> indices.getIndicesStats(config).stream())
+                .flatMap(indexSet -> indices.getIndicesStats(indexSet).stream())
                 .collect(Collectors.toSet());
 
         return getOpenIndicesInfo(indicesStats);
@@ -154,7 +153,7 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices closed() {
         final Set<String> closedIndices = indexSetRegistry.getAllIndexSets().stream()
-                .flatMap(indexSet -> indices.getClosedIndices(indexSet.getConfig()).stream())
+                .flatMap(indexSet -> indices.getClosedIndices(indexSet).stream())
                 .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
                 .collect(Collectors.toSet());
 
@@ -168,7 +167,7 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices reopened() {
         final Set<String> reopenedIndices = indexSetRegistry.getAllIndexSets().stream()
-                .flatMap(indexSet -> indices.getReopenedIndices(indexSet.getConfig()).stream())
+                .flatMap(indexSet -> indices.getReopenedIndices(indexSet).stream())
                 .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
                 .collect(Collectors.toSet());
 
@@ -272,7 +271,7 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo indexSetOpen(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
-        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(indexSet.getConfig()).stream()
+        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(indexSet).stream()
                 .filter(indexStats -> indexSetRegistry.isManagedIndex(indexStats.indexName()))
                 .collect(Collectors.toSet());
 
@@ -287,7 +286,7 @@ public class IndicesResource extends RestResource {
     public ClosedIndices indexSetClosed(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
 
-        final Set<String> closedIndices = indices.getClosedIndices(indexSet.getConfig())
+        final Set<String> closedIndices = indices.getClosedIndices(indexSet)
                 .stream()
                 .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
                 .collect(Collectors.toSet());
@@ -303,7 +302,7 @@ public class IndicesResource extends RestResource {
     public ClosedIndices indexSetReopened(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
 
-        final Set<String> reopenedIndices = indices.getReopenedIndices(indexSet.getConfig())
+        final Set<String> reopenedIndices = indices.getReopenedIndices(indexSet)
                 .stream()
                 .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
                 .collect(Collectors.toSet());
