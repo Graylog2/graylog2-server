@@ -17,21 +17,25 @@
 package org.graylog2.indexer.ranges;
 
 import com.google.common.collect.ImmutableSortedSet;
+
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.List;
 import java.util.SortedSet;
+
+import javax.inject.Inject;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -69,7 +73,7 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
         final DateTime calculatedAt = new DateTime(firstNonNull((Integer) dbo.get("calculated_at"), 0) * 1000L, DateTimeZone.UTC);
         final int calculationDuration = firstNonNull((Integer) dbo.get("took_ms"), 0);
 
-        return MongoIndexRange.create(id, indexName, begin, end, calculatedAt, calculationDuration);
+        return MongoIndexRange.create(id, indexName, begin, end, calculatedAt, calculationDuration, null);
     }
 
     @Override
@@ -99,7 +103,7 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
     }
 
     @Override
-    public void save(IndexRange indexRange) {
+    public WriteResult<MongoIndexRange, ObjectId> save(IndexRange indexRange) {
         throw new UnsupportedOperationException();
     }
 

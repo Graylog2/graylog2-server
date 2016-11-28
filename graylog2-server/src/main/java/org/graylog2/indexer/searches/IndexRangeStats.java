@@ -16,26 +16,31 @@
  */
 package org.graylog2.indexer.searches;
 
+import com.google.auto.value.AutoValue;
+
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.junit.Test;
 
-import static org.assertj.jodatime.api.Assertions.assertThat;
+import java.util.List;
 
-public class TimestampStatsTest {
-    @Test
-    public void testCreate() throws Exception {
-        DateTime min = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
-        DateTime max = new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC);
-        TimestampStats timestampStats = TimestampStats.create(min, max);
+import javax.annotation.Nullable;
 
-        assertThat(timestampStats.min()).isEqualTo(min);
-        assertThat(timestampStats.max()).isEqualTo(max);
+@AutoValue
+public abstract class IndexRangeStats {
+    public static final IndexRangeStats EMPTY = create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), null);
+
+    public abstract DateTime min();
+
+    public abstract DateTime max();
+
+    @Nullable
+    public abstract List<String> streamIds();
+
+    public static IndexRangeStats create(DateTime min, DateTime max, @Nullable List<String> streamIds) {
+        return new AutoValue_IndexRangeStats(min, max, streamIds);
     }
 
-    @Test
-    public void testEmptyInstance() throws Exception {
-        assertThat(TimestampStats.EMPTY.min()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
-        assertThat(TimestampStats.EMPTY.max()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
+    public static IndexRangeStats create(DateTime min, DateTime max) {
+        return create(min, max, null);
     }
 }

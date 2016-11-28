@@ -16,7 +16,6 @@
  */
 package org.graylog2.indexer.ranges;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -25,6 +24,10 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+
+import com.codahale.metrics.MetricRegistry;
+
+import org.bson.types.ObjectId;
 import org.elasticsearch.action.NoShardAvailableActionException;
 import org.elasticsearch.action.get.GetRequest;
 import org.elasticsearch.action.get.GetResponse;
@@ -36,15 +39,17 @@ import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.metrics.CacheStatsSet;
 import org.graylog2.shared.metrics.MetricUtils;
 import org.joda.time.DateTime;
+import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.concurrent.ExecutionException;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.concurrent.ExecutionException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -130,7 +135,8 @@ public class EsIndexRangeService implements IndexRangeService {
                     parseFromDateString((String) fields.get(EsIndexRange.FIELD_BEGIN)),
                     parseFromDateString((String) fields.get(EsIndexRange.FIELD_END)),
                     parseFromDateString((String) fields.get(EsIndexRange.FIELD_CALCULATED_AT)),
-                    (int) fields.get(EsIndexRange.FIELD_TOOK_MS)
+                    (int) fields.get(EsIndexRange.FIELD_TOOK_MS),
+                    null
             );
         } catch (Exception e) {
             LOG.debug("Couldn't create index range from fields: " + fields);
@@ -184,7 +190,7 @@ public class EsIndexRangeService implements IndexRangeService {
     }
 
     @Override
-    public void save(IndexRange indexRange) {
+    public WriteResult<MongoIndexRange, ObjectId> save(IndexRange indexRange) {
         throw new UnsupportedOperationException();
     }
 

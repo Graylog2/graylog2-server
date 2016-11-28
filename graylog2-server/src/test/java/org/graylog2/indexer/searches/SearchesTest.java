@@ -59,6 +59,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
@@ -103,6 +104,11 @@ public class SearchesTest {
                 @Override
                 public int calculationDuration() {
                     return 0;
+                }
+
+                @Override
+                public List<String> streamIds() {
+                    return null;
                 }
 
                 @Override
@@ -203,12 +209,14 @@ public class SearchesTest {
                         new DateTime(0L, UTC),
                         new DateTime(2015, 1, 1, 0, 0, UTC),
                         DateTime.now(UTC),
-                        0))
+                        0,
+                        null))
                 .add(MongoIndexRange.create("does-not-exist",
                         new DateTime(0L, UTC),
                         new DateTime(2015, 1, 1, 0, 0, UTC),
                         DateTime.now(UTC),
-                        0))
+                        0,
+                        null))
                 .build();
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indexRanges);
 
@@ -343,12 +351,14 @@ public class SearchesTest {
                         new DateTime(0L, UTC),
                         new DateTime(2015, 1, 1, 0, 0, UTC),
                         DateTime.now(UTC),
-                        0))
+                        0,
+                        null))
                 .add(MongoIndexRange.create("does-not-exist",
                         new DateTime(0L, UTC),
                         new DateTime(2015, 1, 1, 0, 0, UTC),
                         DateTime.now(UTC),
-                        0))
+                        0,
+                        null))
                 .build();
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indexRanges);
 
