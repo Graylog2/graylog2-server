@@ -589,8 +589,8 @@ public class Indices {
         final SearchResponse response;
         try {
             final SearchRequest request = srb.request();
-            if (LOG.isInfoEnabled()) {
-                LOG.info("Query _search/{}: {}",
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Index range query: _search/{}: {}",
                         index,
                         XContentHelper.convertToJson(request.source(), false));
             }
