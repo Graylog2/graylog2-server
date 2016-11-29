@@ -24,6 +24,8 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamService;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
@@ -43,23 +45,28 @@ public class MongoIndexSetService implements IndexSetService {
 
     private final JacksonDBCollection<IndexSetConfig, ObjectId> collection;
     private final ClusterEventBus clusterEventBus;
+    private final StreamService streamService;
 
     @Inject
     public MongoIndexSetService(MongoConnection mongoConnection,
                                 MongoJackObjectMapperProvider objectMapperProvider,
+                                StreamService streamService,
                                 ClusterEventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 IndexSetConfig.class,
                 ObjectId.class,
                 objectMapperProvider.get()),
+                streamService,
                 clusterEventBus);
     }
 
     @VisibleForTesting
     protected MongoIndexSetService(JacksonDBCollection<IndexSetConfig, ObjectId> collection,
+                                   StreamService streamService,
                                    ClusterEventBus clusterEventBus) {
         this.collection = requireNonNull(collection);
+        this.streamService = streamService;
         this.clusterEventBus = requireNonNull(clusterEventBus);
     }
 
@@ -143,6 +150,10 @@ public class MongoIndexSetService implements IndexSetService {
      */
     @Override
     public int delete(ObjectId id) {
+        if (!isDeletable(id)) {
+            return 0;
+        }
+
         final DBQuery.Query query = DBQuery.is("_id", id);
         final WriteResult<IndexSetConfig, ObjectId> writeResult = collection.remove(query);
 
@@ -153,5 +164,18 @@ public class MongoIndexSetService implements IndexSetService {
         }
 
         return removedEntries;
+    }
+
+    private boolean isDeletable(ObjectId id) {
+        final String stringId = id.toHexString();
+
+        // TODO: This can be expensive, create a method in StreamService to find streams for a given index set ID.
+        for (Stream stream : streamService.loadAll()) {
+            if (stream.getIndexSetId() != null && stream.getIndexSetId().equals(stringId)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

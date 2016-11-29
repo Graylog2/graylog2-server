@@ -26,16 +26,24 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -61,11 +69,22 @@ import static java.util.Objects.requireNonNull;
 @Path("/system/indices/index_sets")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(IndexSetsResource.class);
+
     private final IndexSetService indexSetService;
+    private final IndexSetRegistry indexSetRegistry;
+    private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
+    private final SystemJobManager systemJobManager;
 
     @Inject
-    public IndexSetsResource(IndexSetService indexSetService) {
+    public IndexSetsResource(final IndexSetService indexSetService,
+                             final IndexSetRegistry indexSetRegistry,
+                             final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
+                             final SystemJobManager systemJobManager) {
         this.indexSetService = requireNonNull(indexSetService);
+        this.indexSetRegistry = indexSetRegistry;
+        this.indexSetCleanupJobFactory = requireNonNull(indexSetCleanupJobFactory);
+        this.systemJobManager = systemJobManager;
     }
 
     @GET
@@ -167,10 +186,27 @@ public class IndexSetsResource extends RestResource {
             @ApiResponse(code = 404, message = "Index set not found"),
     })
     public void delete(@ApiParam(name = "id", required = true)
-                       @PathParam("id") String id) {
+                       @PathParam("id") String id,
+                       @ApiParam(name = "delete_indices")
+                       @QueryParam("delete_indices") @DefaultValue("true") boolean deleteIndices) {
         checkPermission(RestPermissions.INDEXSETS_DELETE, id);
+
+        final IndexSet indexSet = getIndexSet(indexSetRegistry, id);
+
+        if (indexSet.getConfig().isDefault()) {
+            throw new BadRequestException("Default index set <" + indexSet.getConfig().id() + "> cannot be deleted!");
+        }
+
         if (indexSetService.delete(id) == 0) {
             throw new NotFoundException("Couldn't delete index set with ID <" + id + ">");
+        } else {
+            if (deleteIndices) {
+                try {
+                    systemJobManager.submit(indexSetCleanupJobFactory.create(indexSet));
+                } catch (SystemJobConcurrencyException e) {
+                    LOG.error("Error running system job", e);
+                }
+            }
         }
     }
 }

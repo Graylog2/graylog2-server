@@ -23,6 +23,7 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
+import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
@@ -32,20 +33,26 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 import org.mongojack.DBQuery;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
 public class MongoIndexSetServiceTest {
     @ClassRule
@@ -54,16 +61,22 @@ public class MongoIndexSetServiceTest {
     @Rule
     public final MongoConnectionRule mongoRule = MongoConnectionRule.build("index-sets");
 
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
     private final MongoJackObjectMapperProvider objectMapperProvider = new MongoJackObjectMapperProvider(objectMapper);
 
     private ClusterEventBus clusterEventBus;
     private MongoIndexSetService indexSetService;
 
+    @Mock
+    private StreamService streamService;
+
     @Before
     public void setUp() throws Exception {
         clusterEventBus = new ClusterEventBus();
-        indexSetService = new MongoIndexSetService(mongoRule.getMongoConnection(), objectMapperProvider, clusterEventBus);
+        indexSetService = new MongoIndexSetService(mongoRule.getMongoConnection(), objectMapperProvider, streamService, clusterEventBus);
     }
 
     @Test
@@ -250,6 +263,26 @@ public class MongoIndexSetServiceTest {
         assertThat(deletedEntries).isEqualTo(0);
         assertThat(indexSetService.get("57f3d721a43c2d59cb750001")).isPresent();
         assertThat(indexSetService.get("57f3d721a43c2d59cb750003")).isEmpty();
+        assertThat(indexSetService.findAll()).hasSize(2);
+
+        assertThat(subscriber.getEvents()).isEmpty();
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void deleteWithAssignedStreams() throws Exception {
+        final IndexSetDeletedSubscriber subscriber = new IndexSetDeletedSubscriber();
+        clusterEventBus.registerClusterEventSubscriber(subscriber);
+
+        final FakeStream stream1 = new FakeStream("Test stream 1");
+
+        stream1.setIndexSetId("57f3d721a43c2d59cb750001");
+
+        when(streamService.loadAll()).thenReturn(Collections.singletonList(stream1));
+
+        final int deletedEntries = indexSetService.delete("57f3d721a43c2d59cb750001");
+        assertThat(deletedEntries).isEqualTo(0);
+        assertThat(indexSetService.get("57f3d721a43c2d59cb750001")).isPresent();
         assertThat(indexSetService.findAll()).hasSize(2);
 
         assertThat(subscriber.getEvents()).isEmpty();
