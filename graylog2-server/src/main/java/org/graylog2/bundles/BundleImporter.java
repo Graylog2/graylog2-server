@@ -26,6 +26,8 @@ import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPatternService;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
@@ -74,6 +76,7 @@ public class BundleImporter {
     private final ExtractorFactory extractorFactory;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
+    private final IndexSetRegistry indexSetRegistry;
     private final OutputService outputService;
     private final DashboardService dashboardService;
     private final DashboardWidgetCreator dashboardWidgetCreator;
@@ -97,6 +100,7 @@ public class BundleImporter {
                           final ExtractorFactory extractorFactory,
                           final StreamService streamService,
                           final StreamRuleService streamRuleService,
+                          final IndexSetRegistry indexSetRegistry,
                           final OutputService outputService,
                           final DashboardService dashboardService,
                           final DashboardWidgetCreator dashboardWidgetCreator,
@@ -110,6 +114,7 @@ public class BundleImporter {
         this.extractorFactory = extractorFactory;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
+        this.indexSetRegistry = indexSetRegistry;
         this.outputService = outputService;
         this.dashboardService = dashboardService;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
@@ -449,6 +454,11 @@ public class BundleImporter {
 
     private org.graylog2.plugin.streams.Stream createStream(final String bundleId, final Stream streamDescription, final String userName)
             throws ValidationException {
+
+        // We cannot create streams without having a default index set.
+        final IndexSet indexSet = indexSetRegistry.getDefault()
+                .orElseThrow(() -> new IllegalStateException("Couldn't find default stream!"));
+
         final ImmutableMap.Builder<String, Object> streamData = ImmutableMap.builder();
         streamData.put(StreamImpl.FIELD_TITLE, streamDescription.getTitle());
         streamData.put(StreamImpl.FIELD_DESCRIPTION, streamDescription.getDescription());
@@ -458,6 +468,7 @@ public class BundleImporter {
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
         streamData.put(StreamImpl.FIELD_CONTENT_PACK, bundleId);
         streamData.put(StreamImpl.FIELD_DEFAULT_STREAM, streamDescription.isDefaultStream());
+        streamData.put(StreamImpl.FIELD_INDEX_SET_ID, indexSet.getConfig().id());
 
         final org.graylog2.plugin.streams.Stream stream;
         if (streamDescription.isDefaultStream()) {
@@ -466,7 +477,7 @@ public class BundleImporter {
                     streamData.build(),
                     Collections.emptyList(),
                     Collections.emptySet(),
-                    null);
+                    indexSet);
         } else {
             stream = streamService.create(streamData.build());
         }
