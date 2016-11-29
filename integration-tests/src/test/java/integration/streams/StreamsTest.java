@@ -306,7 +306,7 @@ public class StreamsTest extends BaseRestTest {
 
         given()
                 .when()
-                .body("{\"title\":\"foo\", \"description\":\"bar\"}")
+                .body("{\"title\":\"foo\", \"description\":\"bar\", \"index_set_id\":\"582f3c4e43761335e4859f72\"}")
                 .put("/streams/" + streamId)
                 .then()
                 .statusCode(404);
