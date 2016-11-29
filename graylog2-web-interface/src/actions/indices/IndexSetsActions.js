@@ -6,6 +6,7 @@ const IndexSetsActions = Reflux.createActions({
   get: { asyncResult: true },
   update: { asyncResult: true },
   create: { asyncResult: true },
+  delete: { asyncResult: true },
 });
 
 export default IndexSetsActions;

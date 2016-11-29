@@ -2,6 +2,7 @@ export { default as ClosedIndexDetails } from './ClosedIndexDetails';
 export { default as IndexDetails } from './IndexDetails';
 export { default as IndexRangeSummary } from './IndexRangeSummary';
 export { default as IndexSetConfigurationForm } from './IndexSetConfigurationForm';
+export { default as IndexSetDeletionForm } from './IndexSetDeletionForm';
 export { default as IndexSetsComponent } from './IndexSetsComponent';
 export { default as IndexSummary } from './IndexSummary';
 export { default as IndexSizeSummary } from './IndexSizeSummary';

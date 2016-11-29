@@ -85,6 +85,7 @@ const ApiRoutes = {
     listPaginated: (skip, limit) => { return { url: `/system/indices/index_sets?skip=${skip}&limit=${limit}` }; },
     get: (indexSetId) => { return { url: `/system/indices/index_sets/${indexSetId}` }; },
     create: () => { return { url: '/system/indices/index_sets' }; },
+    delete: (indexSetId, deleteIndices) => { return { url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}` }; },
   },
   IndicesApiController: {
     close: (indexName) => { return { url: `/system/indexer/indices/${indexName}/close` }; },

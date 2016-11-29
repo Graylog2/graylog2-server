@@ -1,10 +1,12 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Col, Button, Label } from 'react-bootstrap';
+import { Col, Button, Label, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { EntityList, EntityListItem, PaginatedList, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
+
+import { IndexSetDeletionForm } from 'components/indices';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -27,16 +29,35 @@ const IndexSetsComponent = React.createClass({
     this.loadData(page, size);
   },
 
+  _onDelete(indexSet) {
+    return (e) => {
+      e.preventDefault();
+
+      this.refs[`index-set-deletion-form-${indexSet.id}`].open();
+    };
+  },
+
+  _deleteIndexSet(indexSet, deleteIndices) {
+    IndexSetsActions.delete(indexSet, deleteIndices).then(() => {
+      this.loadData(1, this.PAGE_SIZE);
+    });
+  },
+
   _formatIndexSet(indexSet) {
     const actions = (
-      <span>
+      <div>
         <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
           <Button bsStyle="info">Show</Button>
         </LinkContainer>
-        <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id)}>
-          <Button bsStyle="info">Edit</Button>
-        </LinkContainer>
-      </span>
+        {' '}
+        <DropdownButton title="More Actions" id={`index-set-dropdown-${indexSet.id}`} pullRight>
+          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id)}>
+            <MenuItem>Edit</MenuItem>
+          </LinkContainer>
+          <MenuItem divider />
+          <MenuItem onSelect={this._onDelete(indexSet)}>Delete</MenuItem>
+        </DropdownButton>
+      </div>
     );
 
     const content = (
@@ -46,6 +67,7 @@ const IndexSetsComponent = React.createClass({
           <li><b>Shards:</b> {indexSet.shards}</li>
           <li><b>Replicas:</b> {indexSet.replicas}</li>
         </ul>
+        <IndexSetDeletionForm ref={`index-set-deletion-form-${indexSet.id}`} indexSet={indexSet} onDelete={this._deleteIndexSet} />
       </Col>
     );
 

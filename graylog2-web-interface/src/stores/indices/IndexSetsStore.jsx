@@ -89,6 +89,21 @@ const IndexSetsStore = Reflux.createStore({
 
     IndexSetsActions.create.promise(promise);
   },
+
+  delete(indexSet, deleteIndices) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.delete(indexSet.id, deleteIndices).url);
+    const promise = fetch('DELETE', url);
+    promise.then(
+      () => {
+        UserNotification.success(`Successfully deleted index set '${indexSet.title}'`, 'Success');
+      },
+      error => {
+        UserNotification.error(`Deleting index set '${indexSet.title}' failed with status: ${error.message}`, 'Could not delete index set.');
+      }
+    );
+
+    IndexSetsActions.delete.promise(promise);
+  },
 });
 
 export default IndexSetsStore;
