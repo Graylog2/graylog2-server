@@ -245,7 +245,9 @@ public class StreamResource extends RestResource {
             stream.setRemoveMatchesFromDefaultStream(removeMatchesFromDefaultStream);
         }
 
-        stream.setIndexSetId(cr.indexSetId());
+        if (!Strings.isNullOrEmpty(cr.indexSetId())) {
+            stream.setIndexSetId(cr.indexSetId());
+        }
 
         streamService.save(stream);
         clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
