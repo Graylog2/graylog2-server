@@ -61,7 +61,12 @@ const Routes = {
       FAILURES: '/system/indices/failures',
     },
     INDEX_SETS: {
-      CONFIGURATION: (indexSetId) => `/system/index_sets/${indexSetId}/configuration`,
+      CONFIGURATION: (indexSetId, from) => {
+        if (from) {
+          return `/system/index_sets/${indexSetId}/configuration?from=${from}`;
+        }
+        return `/system/index_sets/${indexSetId}/configuration`;
+      },
       SHOW: (indexSetId) => `/system/index_sets/${indexSetId}`,
       CREATE: '/system/index_sets/create',
     },

@@ -17,6 +17,7 @@ const IndexSetConfigurationForm = React.createClass({
     retentionStrategies: React.PropTypes.array.isRequired,
     create: React.PropTypes.bool,
     onUpdate: React.PropTypes.func.isRequired,
+    cancelLink: React.PropTypes.string.isRequired,
   },
 
   getInitialState() {
@@ -159,7 +160,7 @@ const IndexSetConfigurationForm = React.createClass({
             <hr/>
             <Button type="submit" bsStyle="success">Save</Button>
             &nbsp;
-            <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+            <LinkContainer to={this.props.cancelLink}>
               <Button bsStyle="default">Cancel</Button>
             </LinkContainer>
           </Input>

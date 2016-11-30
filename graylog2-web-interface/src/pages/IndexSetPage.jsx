@@ -109,6 +109,10 @@ const IndexSetPage = React.createClass({
             <Button bsStyle="info" bsSize="lg">Index set overview</Button>
           </LinkContainer>
           &nbsp;
+          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
+            <Button bsStyle="info" bsSize="lg">Edit Index Set</Button>
+          </LinkContainer>
+          &nbsp;
           <IndicesMaintenanceDropdown indexSetId={this.props.params.indexSetId} />
         </span>
       </PageHeader>

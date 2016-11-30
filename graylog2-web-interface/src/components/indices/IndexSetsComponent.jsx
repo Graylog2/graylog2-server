@@ -47,7 +47,7 @@ const IndexSetsComponent = React.createClass({
     const actions = (
       <div>
         <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
-          <Button bsStyle="info">Show</Button>
+          <Button bsStyle="info">Show Details</Button>
         </LinkContainer>
         {' '}
         <DropdownButton title="More Actions" id={`index-set-dropdown-${indexSet.id}`} pullRight>

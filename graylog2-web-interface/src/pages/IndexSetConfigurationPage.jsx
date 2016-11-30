@@ -18,6 +18,7 @@ import Routes from 'routing/Routes';
 const IndexSetConfigurationPage = React.createClass({
   propTypes: {
     params: React.PropTypes.object.isRequired,
+    location: React.PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(IndexSetsStore), Reflux.connect(IndicesConfigurationStore)],
@@ -32,6 +33,14 @@ const IndexSetConfigurationPage = React.createClass({
     IndexSetsActions.get(this.props.params.indexSetId);
     IndicesConfigurationActions.loadRotationStrategies();
     IndicesConfigurationActions.loadRetentionStrategies();
+  },
+
+  _formCancelLink() {
+    if (this.props.location.query.from === 'details') {
+      return Routes.SYSTEM.INDEX_SETS.SHOW(this.state.indexSet.id);
+    }
+
+    return Routes.SYSTEM.INDICES.LIST;
   },
 
   _saveConfiguration(indexSet) {
@@ -70,6 +79,7 @@ const IndexSetConfigurationPage = React.createClass({
               <IndexSetConfigurationForm indexSet={indexSet}
                                          rotationStrategies={this.state.rotationStrategies}
                                          retentionStrategies={this.state.retentionStrategies}
+                                         cancelLink={this._formCancelLink()}
                                          onUpdate={this._saveConfiguration} />
             </Col>
           </Row>
