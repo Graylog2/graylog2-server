@@ -30,7 +30,7 @@ const IndicesMaintenanceDropdown = React.createClass({
     return (
       <ButtonGroup>
         <DropdownButton bsStyle="info" bsSize="lg" title="Maintenance" id="indices-maintenance-actions" pullRight>
-          <MenuItem eventKey="1" onClick={this._onRecalculateIndexRange}>Recalculate index ranges</MenuItem>
+          <MenuItem eventKey="1" onClick={this._onRecalculateIndexRange}>Recalculate all index ranges</MenuItem>
           <MenuItem eventKey="2" onClick={this._onCycleDeflector}>Manually rotate active write index</MenuItem>
         </DropdownButton>
       </ButtonGroup>
