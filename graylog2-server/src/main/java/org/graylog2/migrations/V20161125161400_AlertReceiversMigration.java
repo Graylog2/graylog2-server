@@ -32,6 +32,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
 import org.slf4j.Logger;
@@ -69,6 +70,17 @@ public class V20161125161400_AlertReceiversMigration extends Migration {
         return ZonedDateTime.parse("2016-11-25T16:14:00Z");
     }
 
+    private boolean hasAlertReceivers(Stream stream) {
+        final Map<String, List<String>> alertReceivers = stream.getAlertReceivers();
+        if (alertReceivers == null || alertReceivers.isEmpty()) {
+            return false;
+        }
+
+        final List<String> users = alertReceivers.get("users");
+        final List<String> emails = alertReceivers.get("emails");
+        return (users != null && !users.isEmpty()) || (emails != null && !emails.isEmpty());
+    }
+
     @Override
     public void upgrade() {
         // Do not run again if the migration marker can be found in the database.
@@ -78,7 +90,7 @@ public class V20161125161400_AlertReceiversMigration extends Migration {
 
         final Map<String, Optional<String>> streamMigrations = this.streamService.loadAll()
                 .stream()
-                .filter(stream -> !stream.getAlertReceivers().isEmpty()
+                .filter(stream -> this.hasAlertReceivers(stream)
                         && !streamService.getAlertConditions(stream).isEmpty()
                         && !alarmCallbackService.getForStream(stream).isEmpty())
                 .collect(Collectors.toMap(Persisted::getId, this::migrateStream));

@@ -29,6 +29,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
 import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamService;
@@ -37,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -68,6 +70,17 @@ public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
         return ZonedDateTime.parse("2016-11-25T14:24:00Z");
     }
 
+    private boolean hasAlertReceivers(Stream stream) {
+        final Map<String, List<String>> alertReceivers = stream.getAlertReceivers();
+        if (alertReceivers == null || alertReceivers.isEmpty()) {
+            return false;
+        }
+
+        final List<String> users = alertReceivers.get("users");
+        final List<String> emails = alertReceivers.get("emails");
+        return (users != null && !users.isEmpty()) || (emails != null && !emails.isEmpty());
+    }
+
     @Override
     public void upgrade() {
         // Do not run again if the migration marker can be found in the database.
@@ -77,7 +90,7 @@ public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
 
         final Map<String, Optional<String>> streamMigrations = this.streamService.loadAll()
                 .stream()
-                .filter(stream -> !stream.getAlertReceivers().isEmpty()
+                .filter(stream -> this.hasAlertReceivers(stream)
                         && !streamService.getAlertConditions(stream).isEmpty()
                         && alarmCallbackService.getForStream(stream).isEmpty())
                 .collect(Collectors.toMap(Persisted::getId, this::migrateStream));

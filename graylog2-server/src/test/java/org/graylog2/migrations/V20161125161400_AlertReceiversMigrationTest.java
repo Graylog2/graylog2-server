@@ -111,12 +111,17 @@ public class V20161125161400_AlertReceiversMigrationTest {
         final Stream stream1 = mock(Stream.class);
         when(stream1.getAlertReceivers()).thenReturn(Collections.emptyMap());
         final Stream stream2 = mock(Stream.class);
-        when(stream2.getAlertReceivers()).thenReturn(Collections.emptyMap());
+        when(stream2.getAlertReceivers()).thenReturn(ImmutableMap.of(
+                "users", Collections.emptyList(),
+                "emails", Collections.emptyList())
+        );
         when(this.streamService.loadAll()).thenReturn(ImmutableList.of(stream1, stream2));
 
         this.alertReceiversMigration.upgrade();
 
+        verify(this.streamService, never()).getAlertConditions(any());
         verify(this.alarmCallbackConfigurationService, never()).getForStream(any());
+        verify(this.alarmCallbackConfigurationService, never()).save(any());
         verify(this.dbCollection, never()).update(any(), any());
         verifyMigrationCompletedWasPosted();
     }
