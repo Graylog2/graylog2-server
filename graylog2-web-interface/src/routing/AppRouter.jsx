@@ -78,7 +78,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage}/>
             <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage}/>
             <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsPage}/>
-            <Route path={Routes.ALERTS} component={AlertsPage} />
+            <Route path={Routes.ALERTS.LIST} component={AlertsPage} />
             <Route path={Routes.show_alert(':alertId')} component={ShowAlertPage} />
             <Route path={Routes.DASHBOARDS} component={DashboardsPage}/>
             <Route path={Routes.dashboard_show(':dashboardId')} component={ShowDashboardPage}/>
