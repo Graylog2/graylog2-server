@@ -245,6 +245,8 @@ public class StreamResource extends RestResource {
             stream.setRemoveMatchesFromDefaultStream(removeMatchesFromDefaultStream);
         }
 
+        // Apparently we are sending partial resources sometimes so do not overwrite the index set
+        // id if it's null/empty in the update request.
         if (!Strings.isNullOrEmpty(cr.indexSetId())) {
             stream.setIndexSetId(cr.indexSetId());
         }
