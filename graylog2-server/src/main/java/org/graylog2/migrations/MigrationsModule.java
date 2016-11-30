@@ -30,5 +30,6 @@ public class MigrationsModule extends AbstractModule {
         binder.addBinding().to(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.class);
         binder.addBinding().to(V20161125142400_EmailAlarmCallbackMigration.class);
         binder.addBinding().to(V20161125161400_AlertReceiversMigration.class);
+        binder.addBinding().to(V20161130141500_DefaultStreamRecalcIndexRanges.class);
     }
 }

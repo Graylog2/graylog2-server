@@ -619,14 +619,16 @@ public class Indices {
         final DateTime min = new DateTime((long) minAgg.getValue(), DateTimeZone.UTC);
         final Max maxAgg = f.getAggregations().get("ts_max");
         final DateTime max = new DateTime((long) maxAgg.getValue(), DateTimeZone.UTC);
-        List<String> streamIds = null;
+        // make sure we return an empty list, so we can differentiate between old indices that don't have this information
+        // and newer ones that simply have no streams.
+        ImmutableList.Builder<String> streamIds = ImmutableList.builder();
         final Terms streams = f.getAggregations().get("streams");
         if (!streams.getBuckets().isEmpty()) {
-            streamIds = ImmutableList.copyOf(streams.getBuckets().stream()
+            streamIds.addAll(streams.getBuckets().stream()
                     .map(Terms.Bucket::getKeyAsString)
                     .collect(toSet()));
         }
 
-        return IndexRangeStats.create(min, max, streamIds);
+        return IndexRangeStats.create(min, max, streamIds.build());
     }
 }
