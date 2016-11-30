@@ -20,3 +20,11 @@ Due to the extensive rework done in alerting, this behaviour has been modified t
 
 To easy the transition to people relying on this behaviour, we have added a migration step that will create an Email alarm callback for each stream that has alert conditions, has alert receivers, but has no associated alarm callbacks.
 
+Default stream/Index Sets
+---------------------------
+
+With the introduction of index sets, and the ability to change a stream's write target, the default stream needs additional information, which is calculated when starting a new Graylog 2.2 master node.
+
+It requires recalculation of the index ranges of the default stream's index set, which when updating from pre-2.2 versions is stored in the `graylog_` index. This is potentially expensive, because it has to calculate three aggregations across every open index to detect which streams are stored in which index.
+
+Please be advised that this necessary migration can put additional load on your cluster.
