@@ -9,7 +9,7 @@ const SizeBasedRotationStrategySummary = React.createClass({
   render() {
     return (
       <div>
-        <dl className="deflist">
+        <dl>
           <dt>Index rotation strategy:</dt>
           <dd>Index Size</dd>
           <dt>Max index size:</dt>

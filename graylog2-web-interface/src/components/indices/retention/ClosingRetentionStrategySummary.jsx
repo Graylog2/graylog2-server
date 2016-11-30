@@ -8,7 +8,7 @@ const ClosingRetentionStrategySummary = React.createClass({
   render() {
     return (
       <div>
-        <dl className="deflist">
+        <dl>
           <dt>Index retention strategy:</dt>
           <dd>Close</dd>
           <dt>Max number of indices:</dt>

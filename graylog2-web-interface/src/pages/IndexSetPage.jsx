@@ -5,7 +5,7 @@ import { Alert, Button, Row, Col, Panel } from 'react-bootstrap';
 import numeral from 'numeral';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
-import { IndicesMaintenanceDropdown, IndicesOverview } from 'components/indices';
+import { IndicesMaintenanceDropdown, IndicesOverview, IndexSetDetails } from 'components/indices';
 import { IndexerClusterHealthSummary } from 'components/indexers';
 import { DocumentationLink } from 'components/support';
 
@@ -158,6 +158,12 @@ const IndexSetPage = React.createClass({
       <DocumentTitle title={`Index Set - ${indexSet.title}`}>
         <div>
           {pageHeader}
+
+          <Row className="content">
+            <Col md={12}>
+              <IndexSetDetails indexSet={indexSet} />
+            </Col>
+          </Row>
 
           <Row className="content">
             <Col md={12}>

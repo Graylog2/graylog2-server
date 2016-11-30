@@ -6,7 +6,7 @@ import { Col, Button, Label, DropdownButton, MenuItem } from 'react-bootstrap';
 import { EntityList, EntityListItem, PaginatedList, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 
-import { IndexSetDeletionForm } from 'components/indices';
+import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -62,11 +62,8 @@ const IndexSetsComponent = React.createClass({
 
     const content = (
       <Col md={12}>
-        <ul className="no-padding">
-          <li><b>Index prefix:</b> {indexSet.index_prefix}</li>
-          <li><b>Shards:</b> {indexSet.shards}</li>
-          <li><b>Replicas:</b> {indexSet.replicas}</li>
-        </ul>
+        <IndexSetDetails indexSet={indexSet} />
+
         <IndexSetDeletionForm ref={`index-set-deletion-form-${indexSet.id}`} indexSet={indexSet} onDelete={this._deleteIndexSet} />
       </Col>
     );
