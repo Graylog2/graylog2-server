@@ -3,10 +3,9 @@ import Reflux from 'reflux';
 import { Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { AlertsComponent } from 'components/alerts';
-
 import DocumentationLink from 'components/support/DocumentationLink';
 import { PageHeader } from 'components/common';
+import { AlertConditionsComponent } from 'components/alertconditions';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
@@ -14,15 +13,15 @@ import DocsHelper from 'util/DocsHelper';
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const AlertsPage = React.createClass({
+const AlertConditionsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
   render() {
     return (
       <div>
-        <PageHeader title="Alerts overview">
+        <PageHeader title="Manage alert conditions">
           <span>
-            Alerts are triggered when conditions you define are satisfied. Graylog will automatically mark alerts as
-            resolved once the status of your conditions change.
+            Alert conditions define situations that require your attention. Graylog will check those conditions
+            periodically and notify you when their statuses change.
           </span>
 
           <span>
@@ -30,19 +29,19 @@ const AlertsPage = React.createClass({
           </span>
 
           <span>
-            <LinkContainer to={Routes.ALERTS.CONDITIONS}>
-              <Button bsStyle="info">Manage conditions</Button>
-            </LinkContainer>
-            &nbsp;
             <LinkContainer to={Routes.ALERTS.NOTIFICATIONS}>
               <Button bsStyle="info">Manage notifications</Button>
             </LinkContainer>
+            &nbsp;
+            <Button bsStyle="info" href="https://marketplace.graylog.org/" target="_blank">
+              <i className="fa fa-external-link"/>&nbsp; Find more conditions
+            </Button>
           </span>
         </PageHeader>
 
         <Row className="content">
           <Col md={12}>
-            <AlertsComponent />
+            <AlertConditionsComponent />
           </Col>
         </Row>
       </div>
@@ -50,4 +49,4 @@ const AlertsPage = React.createClass({
   },
 });
 
-export default AlertsPage;
+export default AlertConditionsPage;
