@@ -25,13 +25,10 @@ import org.graylog2.plugin.streams.Stream;
 
 import java.util.List;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface AlertSender {
     void initialize(Configuration configuration);
 
-    void sendEmails(Stream stream, AlertCondition.CheckResult checkResult) throws TransportConfigurationException, EmailException;
+    void sendEmails(Stream stream, EmailRecipients recipients, AlertCondition.CheckResult checkResult) throws TransportConfigurationException, EmailException;
 
-    void sendEmails(Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException;
+    void sendEmails(Stream stream, EmailRecipients recipients, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException;
 }

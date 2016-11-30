@@ -16,9 +16,7 @@
  */
 package org.graylog2.alerts;
 
-import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.common.collect.ImmutableSet;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailConstants;
@@ -33,10 +31,8 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamRuleService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -55,7 +51,6 @@ public class StaticEmailAlertSender implements AlertSender {
 
     private final StreamRuleService streamRuleService;
     protected final EmailConfiguration configuration;
-    private final UserService userService;
     private final NotificationService notificationService;
     private final NodeId nodeId;
     private Configuration pluginConfig;
@@ -63,12 +58,10 @@ public class StaticEmailAlertSender implements AlertSender {
     @Inject
     public StaticEmailAlertSender(EmailConfiguration configuration,
                                   StreamRuleService streamRuleService,
-                                  UserService userService,
                                   NotificationService notificationService,
                                   NodeId nodeId) {
         this.configuration = configuration;
         this.streamRuleService = streamRuleService;
-        this.userService = userService;
         this.notificationService = notificationService;
         this.nodeId = nodeId;
     }
@@ -79,8 +72,8 @@ public class StaticEmailAlertSender implements AlertSender {
     }
 
     @Override
-    public void sendEmails(Stream stream, AlertCondition.CheckResult checkResult) throws TransportConfigurationException, EmailException {
-        sendEmails(stream, checkResult, null);
+    public void sendEmails(Stream stream, EmailRecipients recipients, AlertCondition.CheckResult checkResult) throws TransportConfigurationException, EmailException {
+        sendEmails(stream, recipients, checkResult, null);
     }
 
     private void sendEmail(String emailAddress, Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
@@ -207,43 +200,17 @@ public class StaticEmailAlertSender implements AlertSender {
 
 
     @Override
-    public void sendEmails(Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
+    public void sendEmails(Stream stream, EmailRecipients recipients, AlertCondition.CheckResult checkResult, List<Message> backlog) throws TransportConfigurationException, EmailException {
         if(!configuration.isEnabled()) {
             throw new TransportConfigurationException("Email transport is not enabled in server configuration file!");
         }
 
-        if (stream.getAlertReceivers() == null || stream.getAlertReceivers().isEmpty()) {
-            throw new RuntimeException("Stream [" + stream + "] has no alert receivers.");
+        if (recipients == null || recipients.isEmpty()) {
+            throw new RuntimeException("Cannot send emails: empty recipient list.");
         }
 
-        final ImmutableSet.Builder<String> recipientsBuilder = ImmutableSet.builder();
-
-        // Send emails to subscribed users.
-        final List<String> userNames = stream.getAlertReceivers().get("users");
-        if(userNames != null) {
-            for (String username : userNames) {
-                final User user = userService.load(username);
-
-                if(user != null && !isNullOrEmpty(user.getEmail())) {
-                    // LDAP users might have multiple email addresses defined.
-                    // See: https://github.com/Graylog2/graylog2-server/issues/1439
-                    final Iterable<String> addresses = Splitter.on(",").omitEmptyStrings().trimResults().split(user.getEmail());
-                    recipientsBuilder.addAll(addresses);
-                }
-            }
-        }
-
-        // Send emails to directly subscribed email addresses.
-        if(stream.getAlertReceivers().get("emails") != null) {
-            for (String email : stream.getAlertReceivers().get("emails")) {
-                if(!email.isEmpty()) {
-                    recipientsBuilder.add(email);
-                }
-            }
-        }
-
-        final Set<String> recipients = recipientsBuilder.build();
-        if (recipients.size() == 0) {
+        final Set<String> recipientsSet = recipients.getEmailRecipients();
+        if (recipientsSet.size() == 0) {
             final Notification notification = notificationService.buildNow()
                     .addNode(nodeId.toString())
                     .addType(Notification.Type.GENERIC)
@@ -253,7 +220,7 @@ public class StaticEmailAlertSender implements AlertSender {
             notificationService.publishIfFirst(notification);
         }
 
-        for (String email : recipients) {
+        for (String email : recipientsSet) {
             sendEmail(email, stream, checkResult, backlog);
         }
     }

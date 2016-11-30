@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.periodical;
+package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
-import org.graylog2.alarmcallbacks.events.EmailAlarmCallbackMigrated;
-import org.graylog2.alerts.Alert;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -53,11 +51,11 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-public class EmailAlarmCallbackMigrationPeriodicalTest {
+public class V20161125142400_EmailAlarmCallbackMigrationTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private EmailAlarmCallbackMigrationPeriodical emailAlarmCallbackMigrationPeriodical;
+    private V20161125142400_EmailAlarmCallbackMigration emailAlarmCallbackMigrationPeriodical;
 
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -82,7 +80,7 @@ public class EmailAlarmCallbackMigrationPeriodicalTest {
         when(localAdmin.getId()).thenReturn(localAdminId);
         when(userService.getAdminUser()).thenReturn(localAdmin);
 
-        this.emailAlarmCallbackMigrationPeriodical = new EmailAlarmCallbackMigrationPeriodical(clusterConfigService,
+        this.emailAlarmCallbackMigrationPeriodical = new V20161125142400_EmailAlarmCallbackMigration(clusterConfigService,
             streamService,
             alarmCallbackConfigurationService,
             emailAlarmCallback,
@@ -90,25 +88,13 @@ public class EmailAlarmCallbackMigrationPeriodicalTest {
     }
 
     @Test
-    public void doRunIfNotRunBefore() throws Exception {
-        assertThat(this.emailAlarmCallbackMigrationPeriodical.startOnThisNode()).isTrue();
-    }
-
-    @Test
-    public void doNotRunMigrationTwice() throws Exception {
-        when(this.clusterConfigService.get(EmailAlarmCallbackMigrated.class)).thenReturn(EmailAlarmCallbackMigrated.create(Collections.emptyMap()));
-
-        assertThat(this.emailAlarmCallbackMigrationPeriodical.startOnThisNode()).isFalse();
-    }
-
-    @Test
     public void doNotMigrateAnythingWithoutStreams() throws Exception {
         when(this.streamService.loadAll()).thenReturn(Collections.emptyList());
 
-        this.emailAlarmCallbackMigrationPeriodical.doRun();
+        this.emailAlarmCallbackMigrationPeriodical.upgrade();
 
         verify(this.alarmCallbackConfigurationService, never()).create(any(), any(), any());
-        verifyEmailAlarmCallbackMigratedWasPosted();
+        verifyMigrationCompletedWasPosted();
     }
 
     @Test
@@ -116,13 +102,18 @@ public class EmailAlarmCallbackMigrationPeriodicalTest {
         final Stream stream1 = mock(Stream.class);
         when(stream1.getAlertReceivers()).thenReturn(Collections.emptyMap());
         final Stream stream2 = mock(Stream.class);
-        when(stream2.getAlertReceivers()).thenReturn(Collections.emptyMap());
+        when(stream2.getAlertReceivers()).thenReturn(ImmutableMap.of(
+                "users", Collections.emptyList(),
+                "emails", Collections.emptyList())
+        );
         when(this.streamService.loadAll()).thenReturn(ImmutableList.of(stream1, stream2));
 
-        this.emailAlarmCallbackMigrationPeriodical.doRun();
+        this.emailAlarmCallbackMigrationPeriodical.upgrade();
 
+        verify(this.streamService, never()).getAlertConditions(any());
+        verify(this.alarmCallbackConfigurationService, never()).getForStream(any());
         verify(this.alarmCallbackConfigurationService, never()).create(any(), any(), any());
-        verifyEmailAlarmCallbackMigratedWasPosted();
+        verifyMigrationCompletedWasPosted();
     }
 
     @Test
@@ -150,7 +141,7 @@ public class EmailAlarmCallbackMigrationPeriodicalTest {
         when(alarmCallbackConfigurationService.create(eq(matchingStreamId), any(CreateAlarmCallbackRequest.class), eq(localAdminId))).thenReturn(newAlarmCallback);
         when(alarmCallbackConfigurationService.save(eq(newAlarmCallback))).thenReturn(newAlarmCallbackId);
 
-        this.emailAlarmCallbackMigrationPeriodical.doRun();
+        this.emailAlarmCallbackMigrationPeriodical.upgrade();
 
         final ArgumentCaptor<String> streamIdCaptor = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<CreateAlarmCallbackRequest> createAlarmCallbackRequestCaptor = ArgumentCaptor.forClass(CreateAlarmCallbackRequest.class);
@@ -168,7 +159,7 @@ public class EmailAlarmCallbackMigrationPeriodicalTest {
         verify(this.alarmCallbackConfigurationService, times(1)).save(alarmCallbackConfigurationCaptor.capture());
         assertThat(alarmCallbackConfigurationCaptor.getValue()).isEqualTo(newAlarmCallback);
 
-        verifyEmailAlarmCallbackMigratedWasPosted(ImmutableMap.of(
+        verifyMigrationCompletedWasPosted(ImmutableMap.of(
             matchingStreamId, Optional.of(newAlarmCallbackId)
         ));
     }
@@ -212,7 +203,7 @@ public class EmailAlarmCallbackMigrationPeriodicalTest {
         when(alarmCallbackConfigurationService.save(eq(newAlarmCallback1))).thenReturn(newAlarmCallbackId1);
         when(alarmCallbackConfigurationService.save(eq(newAlarmCallback2))).thenReturn(newAlarmCallbackId2);
 
-        this.emailAlarmCallbackMigrationPeriodical.doRun();
+        this.emailAlarmCallbackMigrationPeriodical.upgrade();
 
         final ArgumentCaptor<String> streamIdCaptor = ArgumentCaptor.forClass(String.class);
         final ArgumentCaptor<CreateAlarmCallbackRequest> createAlarmCallbackRequestCaptor = ArgumentCaptor.forClass(CreateAlarmCallbackRequest.class);
@@ -237,7 +228,7 @@ public class EmailAlarmCallbackMigrationPeriodicalTest {
             .contains(newAlarmCallback1)
             .contains(newAlarmCallback2);
 
-        verifyEmailAlarmCallbackMigratedWasPosted(ImmutableMap.of(
+        verifyMigrationCompletedWasPosted(ImmutableMap.of(
             matchingStreamId1, Optional.of(newAlarmCallbackId1),
             matchingStreamId2, Optional.of(newAlarmCallbackId2)
         ));
@@ -283,17 +274,17 @@ public class EmailAlarmCallbackMigrationPeriodicalTest {
             ));
     }
 
-    private void verifyEmailAlarmCallbackMigratedWasPosted() {
-        verifyEmailAlarmCallbackMigratedWasPosted(Collections.emptyMap());
+    private void verifyMigrationCompletedWasPosted() {
+        verifyMigrationCompletedWasPosted(Collections.emptyMap());
     }
 
-    private void verifyEmailAlarmCallbackMigratedWasPosted(Map<String, Optional<String>> migratedStreams) {
-        final ArgumentCaptor<EmailAlarmCallbackMigrated> argumentCaptor = ArgumentCaptor.forClass(EmailAlarmCallbackMigrated.class);
+    private void verifyMigrationCompletedWasPosted(Map<String, Optional<String>> migratedStreams) {
+        final ArgumentCaptor<V20161125142400_EmailAlarmCallbackMigration.MigrationCompleted> argumentCaptor = ArgumentCaptor.forClass(V20161125142400_EmailAlarmCallbackMigration.MigrationCompleted.class);
         verify(this.clusterConfigService, times(1)).write(argumentCaptor.capture());
 
-        final EmailAlarmCallbackMigrated emailAlarmCallbackMigrated = argumentCaptor.getValue();
+        final V20161125142400_EmailAlarmCallbackMigration.MigrationCompleted emailAlarmCallbackMigrated = argumentCaptor.getValue();
         assertThat(emailAlarmCallbackMigrated)
             .isNotNull()
-            .isEqualTo(EmailAlarmCallbackMigrated.create(migratedStreams));
+            .isEqualTo(V20161125142400_EmailAlarmCallbackMigration.MigrationCompleted.create(migratedStreams));
     }
 }

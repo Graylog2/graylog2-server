@@ -134,20 +134,6 @@ class StreamsStore {
         "Could not test stream rules of stream");
     });
   }
-  addReceiver(streamId: string, type: string, entity: string, callback: () => void) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.addReceiver(streamId, type, entity).url);
-    fetch('POST', url).then(callback, (error) => {
-      UserNotification.error("Adding stream alert received failed with error: " + error.message,
-          "Could not add stream alert receiver");
-    }).then(this._emitChange.bind(this));
-  }
-  deleteReceiver(streamId: string, type: string, entity: string, callback: () => void) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.deleteReceiver(streamId, type, entity).url);
-    fetch('DELETE', url).then(callback, (error) => {
-      UserNotification.error("Deleting stream alert received failed with error: " + error.message,
-          "Could not delete stream alert receiver");
-    }).then(this._emitChange.bind(this));
-  }
   sendDummyAlert(streamId: string) {
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.sendDummyAlert(streamId).url);
     const promise = fetch('POST', url);

@@ -22,6 +22,10 @@ import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
+import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -45,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,6 +57,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class StreamServiceImpl extends PersistedServiceImpl implements StreamService {
@@ -62,6 +68,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory indexSetFactory;
     private final NotificationService notificationService;
+    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
 
     @Inject
     public StreamServiceImpl(MongoConnection mongoConnection,
@@ -70,7 +77,8 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                              OutputService outputService,
                              IndexSetService indexSetService,
                              MongoIndexSet.Factory indexSetFactory,
-                             NotificationService notificationService) {
+                             NotificationService notificationService,
+                             AlarmCallbackConfigurationService alarmCallbackConfigurationService) {
         super(mongoConnection);
         this.streamRuleService = streamRuleService;
         this.alertService = alertService;
@@ -78,6 +86,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         this.indexSetService = indexSetService;
         this.indexSetFactory = indexSetFactory;
         this.notificationService = notificationService;
+        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
     }
 
     @Nullable
@@ -307,19 +316,60 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Override
     public void addAlertReceiver(Stream stream, String type, String name) {
-        collection(stream).update(
-                new BasicDBObject("_id", new ObjectId(stream.getId())),
-                new BasicDBObject("$push", new BasicDBObject("alert_receivers." + type, name))
-        );
+        final List<AlarmCallbackConfiguration> streamCallbacks = alarmCallbackConfigurationService.getForStream(stream);
+        updateCallbackConfiguration("add", type, name, streamCallbacks);
     }
 
     @Override
     public void removeAlertReceiver(Stream stream, String type, String name) {
-        collection(stream).update(
-                new BasicDBObject("_id", new ObjectId(stream.getId())),
-                new BasicDBObject("$pull", new BasicDBObject("alert_receivers." + type, name))
-        );
+        final List<AlarmCallbackConfiguration> streamCallbacks = alarmCallbackConfigurationService.getForStream(stream);
+        updateCallbackConfiguration("remove", type, name, streamCallbacks);
     }
+
+    // I tried to be sorry, really. https://www.youtube.com/watch?v=3KVyRqloGmk
+    private void updateCallbackConfiguration(String action, String type, String entity, List<AlarmCallbackConfiguration> streamCallbacks) {
+        final AtomicBoolean ran = new AtomicBoolean(false);
+
+        streamCallbacks.stream()
+                .filter(callback -> callback.getType().equals(EmailAlarmCallback.class.getCanonicalName()))
+                .forEach(callback -> {
+                    ran.set(true);
+                    final Map<String, Object> configuration = callback.getConfiguration();
+                    String key;
+
+                    if (type.equals("users")) {
+                        key = EmailAlarmCallback.CK_USER_RECEIVERS;
+                    } else {
+                        key = EmailAlarmCallback.CK_EMAIL_RECEIVERS;
+                    }
+
+                    final List<String> recipients = (List<String>) configuration.get(key);
+                    if (action.equals("add")) {
+                        if (!recipients.contains(entity)) {
+                            recipients.add(entity);
+                        }
+                    } else {
+                        if (recipients.contains(entity)) {
+                            recipients.remove(entity);
+                        }
+                    }
+                    configuration.put(key, recipients);
+
+                    final AlarmCallbackConfiguration updatedConfig = ((AlarmCallbackConfigurationAVImpl) callback).toBuilder()
+                            .setConfiguration(configuration)
+                            .build();
+                    try {
+                        alarmCallbackConfigurationService.save(updatedConfig);
+                    } catch (ValidationException e) {
+                        throw new BadRequestException("Unable to save alarm callback configuration", e);
+                    }
+                });
+
+        if (!ran.get()) {
+            throw new BadRequestException("Unable to " + action + " receiver: Stream has no email alarm callback.");
+        }
+    }
+
 
     @Override
     public void addOutput(Stream stream, Output output) {

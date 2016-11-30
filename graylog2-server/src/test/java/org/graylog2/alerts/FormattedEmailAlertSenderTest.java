@@ -23,7 +23,6 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamRuleService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -45,8 +44,6 @@ public class FormattedEmailAlertSenderTest {
     @Mock
     private StreamRuleService mockStreamRuleService;
     @Mock
-    private UserService mockUserService;
-    @Mock
     private NotificationService mockNotificationService;
     @Mock
     private NodeId mockNodeId;
@@ -55,7 +52,7 @@ public class FormattedEmailAlertSenderTest {
     public void buildSubjectUsesCustomSubject() throws Exception {
         Configuration pluginConfig = new Configuration(Collections.<String, Object>singletonMap("subject", "Test"));
         FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockStreamRuleService,
-                mockUserService, mockNotificationService, mockNodeId);
+                mockNotificationService, mockNodeId);
         emailAlertSender.initialize(pluginConfig);
 
         Stream stream = mock(Stream.class);
@@ -69,7 +66,7 @@ public class FormattedEmailAlertSenderTest {
     @Test
     public void buildSubjectUsesDefaultSubjectIfConfigDoesNotExist() throws Exception {
         FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockStreamRuleService,
-                mockUserService, mockNotificationService, mockNodeId);
+                mockNotificationService, mockNodeId);
 
         Stream stream = mock(Stream.class);
         when(stream.getTitle()).thenReturn("Stream Title");
@@ -85,7 +82,7 @@ public class FormattedEmailAlertSenderTest {
     public void buildBodyUsesCustomBody() throws Exception {
         Configuration pluginConfig = new Configuration(Collections.<String, Object>singletonMap("body", "Test: ${stream.id}"));
         FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockStreamRuleService,
-                mockUserService, mockNotificationService, mockNodeId);
+                mockNotificationService, mockNodeId);
         emailAlertSender.initialize(pluginConfig);
 
         Stream stream = mock(Stream.class);
@@ -101,7 +98,7 @@ public class FormattedEmailAlertSenderTest {
     @Test
     public void buildBodyUsesDefaultBodyIfConfigDoesNotExist() throws Exception {
         FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockStreamRuleService,
-                mockUserService, mockNotificationService, mockNodeId);
+                mockNotificationService, mockNodeId);
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");
@@ -131,7 +128,7 @@ public class FormattedEmailAlertSenderTest {
             }
         };
         FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(configuration, mockStreamRuleService,
-                mockUserService, mockNotificationService, mockNodeId);
+                mockNotificationService, mockNodeId);
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");
@@ -157,7 +154,7 @@ public class FormattedEmailAlertSenderTest {
             }
         };
         FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(configuration, mockStreamRuleService,
-                mockUserService, mockNotificationService, mockNodeId);
+                mockNotificationService, mockNodeId);
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");
@@ -183,7 +180,7 @@ public class FormattedEmailAlertSenderTest {
             }
         };
         FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(configuration, mockStreamRuleService,
-                mockUserService, mockNotificationService, mockNodeId);
+                mockNotificationService, mockNodeId);
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");
@@ -203,7 +200,7 @@ public class FormattedEmailAlertSenderTest {
     @Test
     public void defaultBodyTemplateDoesNotShowBacklogIfBacklogIsEmpty() throws Exception {
         FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockStreamRuleService,
-                mockUserService, mockNotificationService, mockNodeId);
+                mockNotificationService, mockNodeId);
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");
@@ -225,7 +222,7 @@ public class FormattedEmailAlertSenderTest {
     @Test
     public void defaultBodyTemplateShowsBacklogIfBacklogIsNotEmpty() throws Exception {
         FormattedEmailAlertSender emailAlertSender = new FormattedEmailAlertSender(new EmailConfiguration(), mockStreamRuleService,
-                mockUserService, mockNotificationService, mockNodeId);
+                mockNotificationService, mockNodeId);
 
         Stream stream = mock(Stream.class);
         when(stream.getId()).thenReturn("123456");

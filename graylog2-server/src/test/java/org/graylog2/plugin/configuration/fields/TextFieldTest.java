@@ -21,9 +21,6 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class TextFieldTest {
     @Test
     public void testGetFieldType() throws Exception {

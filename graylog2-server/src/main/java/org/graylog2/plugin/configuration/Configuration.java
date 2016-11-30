@@ -30,7 +30,9 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -50,6 +52,8 @@ public class Configuration {
     private final Map<String, Integer> ints = Maps.newHashMap();
     @JsonIgnore
     private final Map<String, Boolean> bools = Maps.newHashMap();
+    @JsonIgnore
+    private final Map<String, List<String>> lists = Maps.newHashMap();
 
     @JsonCreator
     public Configuration(@JsonProperty("source") @Nullable Map<String, Object> m) {
@@ -75,6 +79,9 @@ public class Configuration {
                     ints.put(key, ((Double) value).intValue()); // same as for longs lol
                 } else if (value instanceof Boolean) {
                     bools.put(key, (Boolean) value);
+                } else if (value instanceof List) {
+                    final List<String> list = ((List<?>) value).stream().map(element -> (String) element).collect(Collectors.toList());
+                    lists.put(key, list);
                 } else {
                     LOG.error("Cannot handle type [{}] of plugin configuration key <{}>.", value.getClass().getCanonicalName(), key);
                 }
@@ -120,6 +127,14 @@ public class Configuration {
 
     public void setBoolean(String key, boolean value) {
         bools.put(key, value);
+    }
+
+    public List<String> getList(String key) {
+        return lists.get(key);
+    }
+
+    public List<String> getList(String key, List<String> defaultValue) {
+        return firstNonNull(lists.get(key), defaultValue);
     }
 
     @Nullable

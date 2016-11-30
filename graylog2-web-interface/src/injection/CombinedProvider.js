@@ -5,7 +5,6 @@ class CombinedProvider {
       AlarmCallbackHistory: () => require('actions/alarmcallbacks/AlarmCallbackHistoryActions'),
       AlarmCallbacks: () => require('actions/alarmcallbacks/AlarmCallbacksActions'),
       AlertConditions: () => require('actions/alertconditions/AlertConditionsActions'),
-      AlertReceivers: () => require('actions/alertreceivers/AlertReceiversActions'),
       Alerts: () => require('actions/alerts/AlertsActions'),
       CodecTypes: () => require('actions/codecs/CodecTypesActions'),
       Authentication: () => require('actions/authentication/AuthenticationActions'),

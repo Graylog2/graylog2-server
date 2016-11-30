@@ -29,6 +29,7 @@ import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
+import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -67,6 +68,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static org.graylog2.shared.security.RestPermissions.USERS_LIST;
+
 @RequiresAuthentication
 @Api(value = "AlarmCallbacks", description = "Manage stream alarm callbacks")
 @Path("/streams/{streamid}/alarmcallbacks")
@@ -88,8 +91,6 @@ public class AlarmCallbackResource extends RestResource {
         this.availableAlarmCallbacks = availableAlarmCallbacks;
         this.alarmCallbackFactory = alarmCallbackFactory;
     }
-
-    // TODO: add permission checks
 
     @GET
     @Timed
@@ -179,7 +180,7 @@ public class AlarmCallbackResource extends RestResource {
         for (AlarmCallback availableAlarmCallback : availableAlarmCallbacks) {
             final AvailableAlarmCallbackSummaryResponse type = new AvailableAlarmCallbackSummaryResponse();
             type.name = availableAlarmCallback.getName();
-            type.requested_configuration = availableAlarmCallback.getRequestedConfiguration().asList();
+            type.requested_configuration = getConfigurationRequest(availableAlarmCallback).asList();
             types.put(availableAlarmCallback.getClass().getCanonicalName(), type);
         }
 
@@ -231,23 +232,19 @@ public class AlarmCallbackResource extends RestResource {
                        @ApiParam(name = "JSON body", required = true) CreateAlarmCallbackRequest alarmCallbackRequest) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
-        final AlarmCallbackConfiguration aCC = alarmCallbackConfigurationService.load(alarmCallbackId);
-        if (aCC == null) {
+        final AlarmCallbackConfiguration callbackConfiguration = alarmCallbackConfigurationService.load(alarmCallbackId);
+        if (callbackConfiguration == null) {
             throw new NotFoundException("Unable to find alarm callback configuration " + alarmCallbackId);
         }
 
         final Map<String, Object> configuration = convertConfigurationValues(alarmCallbackRequest);
 
-        final AlarmCallbackConfigurationAVImpl newConfig = AlarmCallbackConfigurationAVImpl.create(
-                alarmCallbackId,
-                aCC.getStreamId(),
-                aCC.getType(),
-                configuration,
-                aCC.getCreatedAt(),
-                aCC.getCreatorUserId());
+        final AlarmCallbackConfiguration updatedConfig = ((AlarmCallbackConfigurationAVImpl) callbackConfiguration).toBuilder()
+                .setConfiguration(configuration)
+                .build();
 
         try {
-             alarmCallbackConfigurationService.save(newConfig);
+             alarmCallbackConfigurationService.save(updatedConfig);
         } catch (ValidationException e) {
             throw new BadRequestException("Unable to save alarm callback configuration", e);
         }
@@ -271,5 +268,14 @@ public class AlarmCallbackResource extends RestResource {
             throw new BadRequestException("Invalid configuration map", e);
         }
         return configuration;
+    }
+
+    /* This is used to add user auto-completion to EmailAlarmCallback when the current user has permissions to list users */
+    private ConfigurationRequest getConfigurationRequest(AlarmCallback callback) {
+        if (callback instanceof EmailAlarmCallback && isPermitted(USERS_LIST)) {
+            return ((EmailAlarmCallback) callback).getEnrichedRequestedConfiguration();
+        }
+
+        return callback.getRequestedConfiguration();
     }
 }

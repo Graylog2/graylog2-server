@@ -56,6 +56,8 @@ public abstract class AlarmCallbackConfigurationAVImpl implements AlarmCallbackC
     @Override
     public abstract String getCreatorUserId();
 
+    public abstract Builder toBuilder();
+
     @JsonCreator
     public static AlarmCallbackConfigurationAVImpl create(@JsonProperty("_id") String id,
                                                           @JsonProperty("stream_id") String streamId,
@@ -73,6 +75,30 @@ public abstract class AlarmCallbackConfigurationAVImpl implements AlarmCallbackC
                                                           @JsonProperty("configuration") Map<String, Object> configuration,
                                                           @JsonProperty("created_at") Date createdAt,
                                                           @JsonProperty("creator_user_id") String creatorUserId) {
-        return new AutoValue_AlarmCallbackConfigurationAVImpl(id, streamId, type, configuration, createdAt, creatorUserId);
+        return new AutoValue_AlarmCallbackConfigurationAVImpl.Builder()
+                .setId(id)
+                .setStreamId(streamId)
+                .setType(type)
+                .setConfiguration(configuration)
+                .setCreatedAt(createdAt)
+                .setCreatorUserId(creatorUserId)
+                .build();
+    }
+
+    @AutoValue.Builder
+    public abstract static class Builder {
+        public abstract Builder setId(String id);
+
+        public abstract Builder setStreamId(String streamId);
+
+        public abstract Builder setType(String type);
+
+        public abstract Builder setConfiguration(Map<String, Object> configuration);
+
+        public abstract Builder setCreatedAt(Date createdAt);
+
+        public abstract Builder setCreatorUserId(String creatorUserId);
+
+        public abstract AlarmCallbackConfigurationAVImpl build();
     }
 }

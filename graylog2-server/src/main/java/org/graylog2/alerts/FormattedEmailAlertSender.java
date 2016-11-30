@@ -24,7 +24,6 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.shared.users.UserService;
 import org.graylog2.streams.StreamRuleService;
 
 import javax.inject.Inject;
@@ -63,10 +62,9 @@ public class FormattedEmailAlertSender extends StaticEmailAlertSender implements
     @Inject
     public FormattedEmailAlertSender(EmailConfiguration configuration,
                                      StreamRuleService streamRuleService,
-                                     UserService userService,
                                      NotificationService notificationService,
                                      NodeId nodeId) {
-        super(configuration, streamRuleService, userService, notificationService, nodeId);
+        super(configuration, streamRuleService, notificationService, nodeId);
     }
 
     @Override

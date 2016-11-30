@@ -24,9 +24,6 @@ import org.graylog2.plugin.configuration.Configuration;
 import javax.inject.Inject;
 import java.util.Set;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public class AlarmCallbackFactory {
     private Injector injector;
     private final Set<Class<? extends AlarmCallback>> availableAlarmCallbacks;

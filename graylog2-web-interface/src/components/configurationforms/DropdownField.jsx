@@ -12,6 +12,7 @@ const DropdownField = React.createClass({
     typeName: React.PropTypes.string.isRequired,
     value: React.PropTypes.any,
     addPlaceholder: React.PropTypes.bool,
+    disabled: React.PropTypes.bool,
   },
   getDefaultProps() {
     return {
