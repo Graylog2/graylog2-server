@@ -21,7 +21,9 @@ const IndicesMaintenanceDropdown = React.createClass({
   },
   _onCycleDeflector() {
     if (window.confirm('Really manually cycle deflector? Follow the documentation link on this page to learn more.')) {
-      DeflectorActions.cycle(this.props.indexSetId);
+      DeflectorActions.cycle(this.props.indexSetId).then(() => {
+        DeflectorActions.list(this.props.indexSetId);
+      });
     }
   },
   render() {

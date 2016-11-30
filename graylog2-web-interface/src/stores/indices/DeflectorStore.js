@@ -21,9 +21,6 @@ const DeflectorStore = Reflux.createStore({
 
     DeflectorActions.cycle.promise(promise);
   },
-  cycleCompleted() {
-    DeflectorActions.list();
-  },
   list(indexSetId) {
     const url = URLUtils.qualifyUrl(ApiRoutes.DeflectorApiController.list(indexSetId).url);
     const promise = fetch('GET', url).then((info) => {
