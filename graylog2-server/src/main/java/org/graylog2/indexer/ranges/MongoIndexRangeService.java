@@ -16,10 +16,6 @@
  */
 package org.graylog2.indexer.ranges;
 
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -27,8 +23,14 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
+
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
+
 import org.bson.types.ObjectId;
 import org.elasticsearch.indices.IndexClosedException;
 import org.graylog2.audit.AuditActor;
@@ -41,7 +43,7 @@ import org.graylog2.indexer.esplugin.IndicesClosedEvent;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -52,10 +54,11 @@ import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_DELETE;
@@ -139,11 +142,11 @@ public class MongoIndexRangeService implements IndexRangeService {
         indices.waitForRecovery(index);
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final Stopwatch sw = Stopwatch.createStarted();
-        final TimestampStats stats = indices.timestampStatsOfIndex(index);
+        final IndexRangeStats stats = indices.indexRangeStatsOfIndex(index);
         final int duration = Ints.saturatedCast(sw.stop().elapsed(TimeUnit.MILLISECONDS));
 
         LOG.info("Calculated range of [{}] in [{}ms].", index, duration);
-        return MongoIndexRange.create(index, stats.min(), stats.max(), now, duration);
+        return MongoIndexRange.create(index, stats.min(), stats.max(), now, duration, stats.streamIds());
     }
 
     @Override
@@ -155,9 +158,10 @@ public class MongoIndexRangeService implements IndexRangeService {
     }
 
     @Override
-    public void save(IndexRange indexRange) {
+    public WriteResult<MongoIndexRange, ObjectId> save(IndexRange indexRange) {
         collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, indexRange.indexName()));
-        collection.save(MongoIndexRange.create(indexRange));
+        final WriteResult<MongoIndexRange, ObjectId> save = collection.save(MongoIndexRange.create(indexRange));
+        return save;
     }
 
     @Subscribe

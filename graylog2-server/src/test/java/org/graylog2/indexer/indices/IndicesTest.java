@@ -51,7 +51,7 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
-import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -180,7 +180,7 @@ public class IndicesTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTimestampStatsOfIndex() throws Exception {
-        TimestampStats stats = indices.timestampStatsOfIndex(INDEX_NAME);
+        IndexRangeStats stats = indices.indexRangeStatsOfIndex(INDEX_NAME);
 
         assertThat(stats.min()).isEqualTo(new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC));
         assertThat(stats.max()).isEqualTo(new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC));
@@ -189,7 +189,7 @@ public class IndicesTest {
     @Test
     @UsingDataSet(locations = "IndicesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTimestampStatsOfIndexWithEmptyIndex() throws Exception {
-        TimestampStats stats = indices.timestampStatsOfIndex(INDEX_NAME);
+        IndexRangeStats stats = indices.indexRangeStatsOfIndex(INDEX_NAME);
 
         assertThat(stats.min()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
         assertThat(stats.max()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
@@ -197,7 +197,7 @@ public class IndicesTest {
 
     @Test(expected = IndexNotFoundException.class)
     public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
-        indices.timestampStatsOfIndex("does-not-exist");
+        indices.indexRangeStatsOfIndex("does-not-exist");
     }
 
     @Test

@@ -16,19 +16,26 @@
  */
 package org.graylog2.indexer.searches;
 
-import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
+import org.junit.Test;
 
-@AutoValue
-public abstract class TimestampStats {
-    public static final TimestampStats EMPTY = create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC));
+import static org.assertj.jodatime.api.Assertions.assertThat;
 
-    public abstract DateTime min();
+public class IndexRangeStatsTest {
+    @Test
+    public void testCreate() throws Exception {
+        DateTime min = new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC);
+        DateTime max = new DateTime(2015, 1, 3, 0, 0, DateTimeZone.UTC);
+        IndexRangeStats indexRangeStats = IndexRangeStats.create(min, max);
 
-    public abstract DateTime max();
+        assertThat(indexRangeStats.min()).isEqualTo(min);
+        assertThat(indexRangeStats.max()).isEqualTo(max);
+    }
 
-    public static TimestampStats create(DateTime min, DateTime max) {
-        return new AutoValue_TimestampStats(min, max);
+    @Test
+    public void testEmptyInstance() throws Exception {
+        assertThat(IndexRangeStats.EMPTY.min()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
+        assertThat(IndexRangeStats.EMPTY.max()).isEqualTo(new DateTime(0L, DateTimeZone.UTC));
     }
 }

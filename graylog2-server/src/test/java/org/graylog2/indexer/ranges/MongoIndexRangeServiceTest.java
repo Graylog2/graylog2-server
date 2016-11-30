@@ -33,7 +33,7 @@ import org.graylog2.indexer.esplugin.IndicesClosedEvent;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
@@ -161,7 +161,7 @@ public class MongoIndexRangeServiceTest {
         final String index = "graylog";
         final DateTime min = new DateTime(2015, 1, 1, 1, 0, DateTimeZone.UTC);
         final DateTime max = new DateTime(2015, 1, 1, 5, 0, DateTimeZone.UTC);
-        when(indices.timestampStatsOfIndex(index)).thenReturn(TimestampStats.create(min, max));
+        when(indices.indexRangeStatsOfIndex(index)).thenReturn(IndexRangeStats.create(min, max));
 
         final IndexRange indexRange = indexRangeService.calculateRange(index);
 
@@ -183,7 +183,7 @@ public class MongoIndexRangeServiceTest {
     @UsingDataSet(locations = "MongoIndexRangeServiceTest-EmptyCollection.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testCalculateRangeWithEmptyIndex() throws Exception {
         final String index = "graylog";
-        when(indices.timestampStatsOfIndex(index)).thenReturn(TimestampStats.EMPTY);
+        when(indices.indexRangeStatsOfIndex(index)).thenReturn(IndexRangeStats.EMPTY);
 
         final IndexRange range = indexRangeService.calculateRange(index);
 
@@ -195,7 +195,7 @@ public class MongoIndexRangeServiceTest {
 
     @Test(expected = IndexNotFoundException.class)
     public void testCalculateRangeWithNonExistingIndex() throws Exception {
-        when(indices.timestampStatsOfIndex("does-not-exist")).thenThrow(new IndexNotFoundException("does-not-exist"));
+        when(indices.indexRangeStatsOfIndex("does-not-exist")).thenThrow(new IndexNotFoundException("does-not-exist"));
         indexRangeService.calculateRange("does-not-exist");
     }
 
@@ -264,7 +264,7 @@ public class MongoIndexRangeServiceTest {
     public void testHandleIndexReopening() throws Exception {
         final DateTime begin = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2016, 1, 15, 0, 0, DateTimeZone.UTC);
-        when(indices.timestampStatsOfIndex("graylog_3")).thenReturn(TimestampStats.create(begin, end));
+        when(indices.indexRangeStatsOfIndex("graylog_3")).thenReturn(IndexRangeStats.create(begin, end));
 
         localEventBus.post(IndicesReopenedEvent.create(Collections.singleton("graylog_3")));
 

@@ -16,13 +16,15 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableIterator;
+
+import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
+
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
@@ -51,6 +53,7 @@ import org.elasticsearch.action.admin.indices.stats.ShardStats;
 import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
+import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
@@ -65,6 +68,7 @@ import org.elasticsearch.cluster.routing.ShardRouting;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
+import org.elasticsearch.common.xcontent.XContentHelper;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.shard.DocsStats;
 import org.elasticsearch.indices.IndexClosedException;
@@ -72,6 +76,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.max.Max;
 import org.elasticsearch.search.aggregations.metrics.min.Min;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -82,17 +87,14 @@ import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Messages;
-import org.graylog2.indexer.searches.TimestampStats;
+import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.validation.constraints.NotNull;
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -101,6 +103,11 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.validation.constraints.NotNull;
 
 import static java.util.stream.Collectors.toSet;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
@@ -567,11 +574,12 @@ public class Indices {
      * @return the timestamp stats in the given index, or {@code null} if they couldn't be calculated.
      * @see org.elasticsearch.search.aggregations.metrics.stats.Stats
      */
-    public TimestampStats timestampStatsOfIndex(String index) {
+    public IndexRangeStats indexRangeStatsOfIndex(String index) {
         final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
                 .filter(QueryBuilders.existsQuery("timestamp"))
                 .subAggregation(AggregationBuilders.min("ts_min").field("timestamp"))
-                .subAggregation(AggregationBuilders.max("ts_max").field("timestamp"));
+                .subAggregation(AggregationBuilders.max("ts_max").field("timestamp"))
+                .subAggregation(AggregationBuilders.terms("streams").field("streams"));
         final SearchRequestBuilder srb = c.prepareSearch()
                 .setIndices(index)
                 .setSearchType(SearchType.QUERY_THEN_FETCH)
@@ -580,7 +588,13 @@ public class Indices {
 
         final SearchResponse response;
         try {
-            response = c.search(srb.request()).actionGet();
+            final SearchRequest request = srb.request();
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Index range query: _search/{}: {}",
+                        index,
+                        XContentHelper.convertToJson(request.source(), false));
+            }
+            response = c.search(request).actionGet();
         } catch (IndexClosedException e) {
             throw e;
         } catch (org.elasticsearch.index.IndexNotFoundException e) {
@@ -589,19 +603,32 @@ public class Indices {
         } catch (ElasticsearchException e) {
             LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
             throw new org.elasticsearch.index.IndexNotFoundException("Index " + index + " not found", e);
+        } catch (IOException e) {
+            // can potentially happen when recreating the source of
+            // the index range aggregation query on DEBUG (via XContentHelper)
+            throw new RuntimeException(e);
         }
 
         final Filter f = response.getAggregations().get("agg");
         if (f.getDocCount() == 0L) {
             LOG.debug("No documents with attribute \"timestamp\" found in index <{}>", index);
-            return TimestampStats.EMPTY;
+            return IndexRangeStats.EMPTY;
         }
 
         final Min minAgg = f.getAggregations().get("ts_min");
         final DateTime min = new DateTime((long) minAgg.getValue(), DateTimeZone.UTC);
         final Max maxAgg = f.getAggregations().get("ts_max");
         final DateTime max = new DateTime((long) maxAgg.getValue(), DateTimeZone.UTC);
+        // make sure we return an empty list, so we can differentiate between old indices that don't have this information
+        // and newer ones that simply have no streams.
+        ImmutableList.Builder<String> streamIds = ImmutableList.builder();
+        final Terms streams = f.getAggregations().get("streams");
+        if (!streams.getBuckets().isEmpty()) {
+            streamIds.addAll(streams.getBuckets().stream()
+                    .map(Terms.Bucket::getKeyAsString)
+                    .collect(toSet()));
+        }
 
-        return TimestampStats.create(min, max);
+        return IndexRangeStats.create(min, max, streamIds.build());
     }
 }
