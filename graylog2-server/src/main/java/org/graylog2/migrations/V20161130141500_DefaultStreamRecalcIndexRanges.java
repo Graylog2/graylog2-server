@@ -76,7 +76,7 @@ public class V20161130141500_DefaultStreamRecalcIndexRanges extends Migration {
                     cluster.waitForConnectedAndDeflectorHealthy();
                     break;
                 } catch (InterruptedException | TimeoutException e) {
-                    e.printStackTrace();
+                    LOG.warn("Interrupted or timed out waiting for Elasticsearch cluster, checking again.");
                 }
             }
         }
