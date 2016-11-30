@@ -34,6 +34,7 @@ const AlertConditionForm = React.createClass({
     const values = this.refs.customConfigurationForm ? this.refs.customConfigurationForm.getValue() : this.refs.configurationForm.getValue();
     return {
       title: this.state.title,
+      type: this.props.type,
       parameters: values.configuration,
     };
   },
@@ -48,7 +49,6 @@ const AlertConditionForm = React.createClass({
   },
   _onSubmit() {
     const request = this.getValue();
-    request.type = this.props.type;
     this.props.onSubmit(request);
     this.refs.configurationForm.close();
   },
@@ -85,7 +85,6 @@ const AlertConditionForm = React.createClass({
                           onSubmitForm={this._onSubmit}
                           submitButtonText="Save">
         <fieldset>
-          <input type="hidden" name="type" value={type} />
           <TitleField typeName={type} value={this.state.title} onChange={this._handleTitleChange} />
           <alertConditionType.configuration_form ref="customConfigurationForm" alertCondition={alertCondition} typeDefinition={typeDefinition} />
         </fieldset>
