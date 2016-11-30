@@ -19,6 +19,7 @@ package org.graylog2.indexer.indexset;
 import org.bson.types.ObjectId;
 import org.mongojack.DBQuery;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -48,7 +49,17 @@ public interface IndexSetService {
      *
      * @return All index sets.
      */
-    Set<IndexSetConfig> findAll();
+    List<IndexSetConfig> findAll();
+
+    /**
+     * Retrieve a paginated set of index set.
+     *
+     * @param indexSetIds List of inde set ids to return
+     * @param limit Maximum number of index sets
+     * @param skip Number of index sets to skip
+     * @return Paginated index sets
+     */
+    List<IndexSetConfig> findPaginated(Set<String> indexSetIds, int limit, int skip);
 
     /**
      * Save the given index set.

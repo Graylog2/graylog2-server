@@ -52,6 +52,9 @@ import LdapGroupsPage from 'pages/LdapGroupsPage';
 import ConfigurationsPage from 'pages/ConfigurationsPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import AuthenticationPage from 'pages/AuthenticationPage';
+import IndexSetPage from 'pages/IndexSetPage';
+import IndexSetConfigurationPage from 'pages/IndexSetConfigurationPage';
+import IndexSetCreationPage from 'pages/IndexSetCreationPage';
 
 const AppRouter = React.createClass({
   render() {
@@ -92,6 +95,9 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.CONTENTPACKS.EXPORT} component={ExportContentPackPage}/>
             <Route path={Routes.SYSTEM.GROKPATTERNS} component={GrokPatternsPage}/>
             <Route path={Routes.SYSTEM.INDICES.LIST} component={IndicesPage}/>
+            <Route path={Routes.SYSTEM.INDEX_SETS.CREATE} component={IndexSetCreationPage}/>
+            <Route path={Routes.SYSTEM.INDEX_SETS.SHOW(':indexSetId')} component={IndexSetPage}/>
+            <Route path={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(':indexSetId')} component={IndexSetConfigurationPage}/>
             <Route path={Routes.SYSTEM.INDICES.FAILURES} component={IndexerFailuresPage}/>
             <Route path={Routes.SYSTEM.LOGGING} component={LoggersPage}/>
             <Route path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage}/>

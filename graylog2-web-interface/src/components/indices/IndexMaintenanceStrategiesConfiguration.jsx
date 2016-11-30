@@ -54,9 +54,23 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
     this.props.updateState(newStrategy, newConfig);
   },
 
+  _addConfigType(strategy, data) {
+    // The config object needs to have the "type" field set to the "default_config.type" to make the REST call work.
+    const result = this.props.strategies.filter((s) => s.type === strategy)[0];
+    const copy = data;
+
+    if (result) {
+      copy.type = result.default_config.type;
+    }
+
+    return copy;
+  },
+
   _onConfigUpdate(newConfig) {
-    this.setState({newConfig: newConfig});
-    this.props.updateState(this.state.newStrategy, newConfig);
+    const config = this._addConfigType(this.state.newStrategy, newConfig);
+
+    this.setState({newConfig: config});
+    this.props.updateState(this.state.newStrategy, config);
   },
 
   _availableSelectOptions() {

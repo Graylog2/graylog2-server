@@ -26,19 +26,28 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.system.jobs.SystemJobConcurrencyException;
+import org.graylog2.system.jobs.SystemJobManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -46,8 +55,10 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -58,11 +69,22 @@ import static java.util.Objects.requireNonNull;
 @Path("/system/indices/index_sets")
 @Produces(MediaType.APPLICATION_JSON)
 public class IndexSetsResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(IndexSetsResource.class);
+
     private final IndexSetService indexSetService;
+    private final IndexSetRegistry indexSetRegistry;
+    private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
+    private final SystemJobManager systemJobManager;
 
     @Inject
-    public IndexSetsResource(IndexSetService indexSetService) {
+    public IndexSetsResource(final IndexSetService indexSetService,
+                             final IndexSetRegistry indexSetRegistry,
+                             final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
+                             final SystemJobManager systemJobManager) {
         this.indexSetService = requireNonNull(indexSetService);
+        this.indexSetRegistry = indexSetRegistry;
+        this.indexSetCleanupJobFactory = requireNonNull(indexSetCleanupJobFactory);
+        this.systemJobManager = systemJobManager;
     }
 
     @GET
@@ -71,12 +93,33 @@ public class IndexSetsResource extends RestResource {
     @ApiResponses(value = {
             @ApiResponse(code = 403, message = "Unauthorized"),
     })
-    public IndexSetResponse list() {
-        final Set<IndexSetSummary> indexSets = indexSetService.findAll().stream()
-                .filter(indexSetConfig -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetConfig.id()))
-                .map(IndexSetSummary::fromIndexSetConfig)
-                .collect(Collectors.toSet());
-        return IndexSetResponse.create(indexSets.size(), indexSets);
+    public IndexSetResponse list(@ApiParam(name = "skip", value = "The number of elements to skip (offset).", required = true)
+                                 @QueryParam("skip") @DefaultValue("0") int skip,
+                                 @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
+                                 @QueryParam("limit") @DefaultValue("0") int limit) {
+        List<IndexSetSummary> indexSets;
+        int count;
+
+        if (limit > 0) {
+            // First collect all index set ids the user is allowed to see.
+            final Set<String> allowedIds = indexSetService.findAll().stream()
+                    .filter(indexSet -> isPermitted(RestPermissions.INDEXSETS_READ, indexSet.id()))
+                    .map(IndexSetConfig::id)
+                    .collect(Collectors.toSet());
+
+            indexSets = indexSetService.findPaginated(allowedIds, limit, skip).stream()
+                    .map(IndexSetSummary::fromIndexSetConfig)
+                    .collect(Collectors.toList());
+            count = allowedIds.size();
+        } else {
+            indexSets = indexSetService.findAll().stream()
+                    .filter(indexSetConfig -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetConfig.id()))
+                    .map(IndexSetSummary::fromIndexSetConfig)
+                    .collect(Collectors.toList());
+            count = indexSets.size();
+        }
+
+        return IndexSetResponse.create(count, indexSets);
     }
 
     @GET
@@ -143,10 +186,27 @@ public class IndexSetsResource extends RestResource {
             @ApiResponse(code = 404, message = "Index set not found"),
     })
     public void delete(@ApiParam(name = "id", required = true)
-                       @PathParam("id") String id) {
+                       @PathParam("id") String id,
+                       @ApiParam(name = "delete_indices")
+                       @QueryParam("delete_indices") @DefaultValue("true") boolean deleteIndices) {
         checkPermission(RestPermissions.INDEXSETS_DELETE, id);
+
+        final IndexSet indexSet = getIndexSet(indexSetRegistry, id);
+
+        if (indexSet.getConfig().isDefault()) {
+            throw new BadRequestException("Default index set <" + indexSet.getConfig().id() + "> cannot be deleted!");
+        }
+
         if (indexSetService.delete(id) == 0) {
             throw new NotFoundException("Couldn't delete index set with ID <" + id + ">");
+        } else {
+            if (deleteIndices) {
+                try {
+                    systemJobManager.submit(indexSetCleanupJobFactory.create(indexSet));
+                } catch (SystemJobConcurrencyException e) {
+                    LOG.error("Error running system job", e);
+                }
+            }
         }
     }
 }

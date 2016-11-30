@@ -63,6 +63,7 @@ const TimeBasedRotationStrategyConfiguration = React.createClass({
                help={'How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours)'}
                addonAfter={this._formatDuration()}
                bsStyle={this._validationState()}
+               standalone
                autofocus
                required />
       </div>

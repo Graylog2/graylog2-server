@@ -1,10 +1,15 @@
 export { default as ClosedIndexDetails } from './ClosedIndexDetails';
 export { default as IndexDetails } from './IndexDetails';
 export { default as IndexRangeSummary } from './IndexRangeSummary';
+export { default as IndexSetConfigurationForm } from './IndexSetConfigurationForm';
+export { default as IndexSetDeletionForm } from './IndexSetDeletionForm';
+export { default as IndexSetDetails } from './IndexSetDetails';
+export { default as IndexSetsComponent } from './IndexSetsComponent';
 export { default as IndexSummary } from './IndexSummary';
 export { default as IndexSizeSummary } from './IndexSizeSummary';
 export { default as IndicesMaintenanceDropdown } from './IndicesMaintenanceDropdown';
 export { default as IndicesOverview } from './IndicesOverview';
+export { default as IndicesConfiguration } from './IndicesConfiguration';
 export { default as ShardMeter } from './ShardMeter';
 export { default as ShardRouting } from './ShardRouting';
 export { default as ShardRoutingOverview } from './ShardRoutingOverview';

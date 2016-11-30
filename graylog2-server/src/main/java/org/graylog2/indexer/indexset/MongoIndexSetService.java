@@ -17,21 +17,26 @@
 package org.graylog2.indexer.indexset;
 
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
+import org.graylog2.plugin.streams.Stream;
+import org.graylog2.streams.StreamService;
 import org.mongojack.DBQuery;
+import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,23 +45,28 @@ public class MongoIndexSetService implements IndexSetService {
 
     private final JacksonDBCollection<IndexSetConfig, ObjectId> collection;
     private final ClusterEventBus clusterEventBus;
+    private final StreamService streamService;
 
     @Inject
     public MongoIndexSetService(MongoConnection mongoConnection,
                                 MongoJackObjectMapperProvider objectMapperProvider,
+                                StreamService streamService,
                                 ClusterEventBus clusterEventBus) {
         this(JacksonDBCollection.wrap(
                 mongoConnection.getDatabase().getCollection(COLLECTION_NAME),
                 IndexSetConfig.class,
                 ObjectId.class,
                 objectMapperProvider.get()),
+                streamService,
                 clusterEventBus);
     }
 
     @VisibleForTesting
     protected MongoIndexSetService(JacksonDBCollection<IndexSetConfig, ObjectId> collection,
+                                   StreamService streamService,
                                    ClusterEventBus clusterEventBus) {
         this.collection = requireNonNull(collection);
+        this.streamService = streamService;
         this.clusterEventBus = requireNonNull(clusterEventBus);
     }
 
@@ -91,8 +101,26 @@ public class MongoIndexSetService implements IndexSetService {
      * {@inheritDoc}
      */
     @Override
-    public Set<IndexSetConfig> findAll() {
-        return ImmutableSet.copyOf((Iterator<? extends IndexSetConfig>) collection.find());
+    public List<IndexSetConfig> findAll() {
+        return ImmutableList.copyOf((Iterator<? extends IndexSetConfig>) collection.find());
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public List<IndexSetConfig> findPaginated(Set<String> indexSetIds, int limit, int skip) {
+        final List<DBQuery.Query> idQuery = indexSetIds.stream()
+                .map(id -> DBQuery.is("_id", id))
+                .collect(Collectors.toList());
+
+        final DBQuery.Query query = DBQuery.or(idQuery.toArray(new DBQuery.Query[0]));
+
+        return ImmutableList.copyOf(collection.find(query)
+                .sort(DBSort.desc("creation_date"))
+                .skip(skip)
+                .limit(limit)
+                .toArray());
     }
 
     /**
@@ -122,6 +150,10 @@ public class MongoIndexSetService implements IndexSetService {
      */
     @Override
     public int delete(ObjectId id) {
+        if (!isDeletable(id)) {
+            return 0;
+        }
+
         final DBQuery.Query query = DBQuery.is("_id", id);
         final WriteResult<IndexSetConfig, ObjectId> writeResult = collection.remove(query);
 
@@ -132,5 +164,18 @@ public class MongoIndexSetService implements IndexSetService {
         }
 
         return removedEntries;
+    }
+
+    private boolean isDeletable(ObjectId id) {
+        final String stringId = id.toHexString();
+
+        // TODO: This can be expensive, create a method in StreamService to find streams for a given index set ID.
+        for (Stream stream : streamService.loadAll()) {
+            if (stream.getIndexSetId() != null && stream.getIndexSetId().equals(stringId)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

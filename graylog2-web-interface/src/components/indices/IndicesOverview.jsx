@@ -10,6 +10,7 @@ const IndicesOverview = React.createClass({
     deflector: React.PropTypes.object.isRequired,
     indexDetails: React.PropTypes.object.isRequired,
     indices: React.PropTypes.object.isRequired,
+    indexSetId: React.PropTypes.string.isRequired,
   },
   _formatIndex(indexName, index) {
     const indexSummary = this.props.indices[indexName];
@@ -23,6 +24,7 @@ const IndicesOverview = React.createClass({
               <IndexDetails index={this.props.indexDetails[indexName]}
                             indexName={indexName}
                             indexRange={indexRange}
+                            indexSetId={this.props.indexSetId}
                             isDeflector={indexSummary.is_deflector}/>
             </span>
           </IndexSummary>

@@ -8,7 +8,7 @@ const MessageCountRotationStrategySummary = React.createClass({
   render() {
     return (
       <div>
-        <dl className="deflist">
+        <dl>
           <dt>Index rotation strategy:</dt>
           <dd>Message Count</dd>
           <dt>Max docs per index:</dt>

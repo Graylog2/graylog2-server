@@ -80,7 +80,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
         final Stream stream2 = mock(Stream.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
-        when(indexSetService.findAll()).thenReturn(Collections.singleton(indexSetConfig));
+        when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
         when(indexSetConfig.id()).thenReturn("abc123");
         when(stream1.getId()).thenReturn("stream1");
         when(stream2.getId()).thenReturn("stream2");
@@ -104,7 +104,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
         final Stream stream2 = mock(Stream.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
-        when(indexSetService.findAll()).thenReturn(Collections.singleton(indexSetConfig));
+        when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
         when(indexSetConfig.id()).thenReturn("abc123");
         when(stream1.getId()).thenReturn("stream1");
         when(stream2.getId()).thenReturn("stream2");
@@ -129,7 +129,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
         final Stream stream2 = mock(Stream.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
-        when(indexSetService.findAll()).thenReturn(Collections.singleton(indexSetConfig));
+        when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
         when(indexSetConfig.id()).thenReturn("abc123");
         when(stream1.getId()).thenReturn("stream1");
         when(stream2.getId()).thenReturn("stream2");
@@ -154,7 +154,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
 
     @Test
     public void upgradeWithoutAnyIndexSetConfig() throws Exception {
-        when(indexSetService.findAll()).thenReturn(Collections.emptySet());
+        when(indexSetService.findAll()).thenReturn(Collections.emptyList());
 
         expectedException.expect(IllegalStateException.class);
 
@@ -163,7 +163,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
 
     @Test
     public void upgradeWithMoreThanOneIndexSetConfig() throws Exception {
-        when(indexSetService.findAll()).thenReturn(Sets.newHashSet(mock(IndexSetConfig.class), mock(IndexSetConfig.class)));
+        when(indexSetService.findAll()).thenReturn(Lists.newArrayList(mock(IndexSetConfig.class), mock(IndexSetConfig.class)));
 
         expectedException.expect(IllegalStateException.class);
 
@@ -174,7 +174,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigrationTest {
     public void upgradeWhenAlreadyCompleted() throws Exception {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
-        when(indexSetService.findAll()).thenReturn(Collections.singleton(indexSetConfig));
+        when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
         when(indexSetConfig.id()).thenReturn("abc123");
         when(clusterConfigService.get(V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.class))
                 .thenReturn(V20161122174500_AssignIndexSetsToStreamsMigration.MigrationCompleted.create("1", Collections.emptySet(), Collections.emptySet()));

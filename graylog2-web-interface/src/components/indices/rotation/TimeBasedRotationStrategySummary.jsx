@@ -17,7 +17,7 @@ const TimeBasedRotationStrategySummary = React.createClass({
   render() {
     return (
       <div>
-        <dl className="deflist">
+        <dl>
           <dt>Index rotation strategy:</dt>
           <dd>Index Time</dd>
           <dt>Rotation period:</dt>

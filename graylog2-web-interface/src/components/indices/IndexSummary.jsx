@@ -20,7 +20,7 @@ const IndexSummary = React.createClass({
   _formatLabels(index) {
     const labels = [];
     if (index.is_deflector) {
-      labels.push(<Label key={`${this.props.name}-deflector-label`} bsStyle="primary">deflector</Label>);
+      labels.push(<Label key={`${this.props.name}-deflector-label`} bsStyle="primary">active write index</Label>);
     }
 
     if (index.is_closed) {

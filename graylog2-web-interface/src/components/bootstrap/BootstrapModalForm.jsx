@@ -80,7 +80,7 @@ class BootstrapModalForm extends Component {
           </Modal.Body>
           <Modal.Footer>
             <Button type="button" onClick={this._onModalCancel}>{this.props.cancelButtonText}</Button>
-            <Button type="submit" bsStyle="primary">{this.props.submitButtonText}</Button>
+            <Button type="submit" disabled={this.props.submitButtonDisabled} bsStyle="primary">{this.props.submitButtonText}</Button>
           </Modal.Footer>
         </form>
       </BootstrapModalWrapper>
@@ -106,12 +106,14 @@ BootstrapModalForm.propTypes = {
   cancelButtonText: PropTypes.string,
   /* Text to use in the submit button. "Submit" is the default */
   submitButtonText: PropTypes.string,
+  submitButtonDisabled: PropTypes.bool,
 };
 
 BootstrapModalForm.defaultProps = {
   formProps: {},
   cancelButtonText: 'Cancel',
   submitButtonText: 'Submit',
+  submitButtonDisabled: false,
 };
 
 export default BootstrapModalForm;

@@ -115,6 +115,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         return false;
     }
 
+    // TODO 2.2: creation_date is a string but needs to be a date - look at AlertImpl for example
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
                                         @JsonProperty("title") @NotBlank String title,

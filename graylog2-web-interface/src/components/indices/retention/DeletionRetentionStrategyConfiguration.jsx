@@ -34,6 +34,7 @@ const DeletionRetentionStrategyConfiguration = React.createClass({
                  onChange={this._onInputUpdate('max_number_of_indices')}
                  value={this.state.max_number_of_indices}
                  help={<span>Maximum number of indices to keep before <strong>deleting</strong> the oldest ones</span>}
+                 standalone
                  autoFocus
                  required />
         </fieldset>

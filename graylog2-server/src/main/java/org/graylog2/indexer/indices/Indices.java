@@ -50,6 +50,7 @@ import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
 import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
 import org.elasticsearch.action.admin.indices.stats.ShardStats;
+import org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
 import org.elasticsearch.action.bulk.BulkRequestBuilder;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -290,6 +291,28 @@ public class Indices {
             }
         } catch (Exception e) {
             LOG.error("Unable to create the Graylog index template: " + indexSet.getConfig().indexTemplateName(), e);
+        }
+    }
+
+    public void deleteIndexTemplate(IndexSet indexSet) {
+        final String templateName = indexSet.getConfig().indexTemplateName();
+
+        final DeleteIndexTemplateRequest deleteRequest = c.admin()
+                .indices()
+                .prepareDeleteTemplate(templateName)
+                .request();
+
+        try {
+            final boolean acknowledged = c.admin()
+                    .indices()
+                    .deleteTemplate(deleteRequest)
+                    .actionGet()
+                    .isAcknowledged();
+            if (acknowledged) {
+                LOG.info("Deleted Graylog index template \"{}\" in Elasticsearch.", templateName);
+            }
+        } catch (Exception e) {
+            LOG.error("Unable to delete the Graylog index template: " + templateName, e);
         }
     }
 

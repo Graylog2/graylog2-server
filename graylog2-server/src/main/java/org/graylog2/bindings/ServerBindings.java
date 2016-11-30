@@ -52,6 +52,7 @@ import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.indexer.SetIndexReadOnlyJob;
 import org.graylog2.indexer.healing.FixDeflectorByDeleteJob;
 import org.graylog2.indexer.healing.FixDeflectorByMoveJob;
+import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
 import org.graylog2.indexer.indices.jobs.OptimizeIndexJob;
 import org.graylog2.indexer.indices.jobs.SetIndexReadOnlyAndCalculateRangeJob;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
@@ -130,6 +131,7 @@ public class ServerBindings extends Graylog2Module {
         install(new FactoryModuleBuilder().build(RebuildIndexRangesJob.Factory.class));
         install(new FactoryModuleBuilder().build(OptimizeIndexJob.Factory.class));
         install(new FactoryModuleBuilder().build(SetIndexReadOnlyJob.Factory.class));
+        install(new FactoryModuleBuilder().build(IndexSetCleanupJob.Factory.class));
         install(new FactoryModuleBuilder().build(CreateNewSingleIndexRangeJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByDeleteJob.Factory.class));
         install(new FactoryModuleBuilder().build(FixDeflectorByMoveJob.Factory.class));

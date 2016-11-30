@@ -24,6 +24,7 @@ import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.mongojack.DBQuery;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,7 +44,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     private Set<MongoIndexSet> findAllMongoIndexSets() {
-        final Set<IndexSetConfig> configs = indexSetService.findAll();
+        final List<IndexSetConfig> configs = indexSetService.findAll();
         final ImmutableSet.Builder<MongoIndexSet> mongoIndexSets = ImmutableSet.builder();
         for (IndexSetConfig config : configs) {
             final MongoIndexSet mongoIndexSet = mongoIndexSetFactory.create(config);
