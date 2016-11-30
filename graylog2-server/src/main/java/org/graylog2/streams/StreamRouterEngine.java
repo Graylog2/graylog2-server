@@ -17,7 +17,6 @@
 
 package org.graylog2.streams;
 
-import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -26,6 +25,9 @@ import com.google.common.util.concurrent.SimpleTimeLimiter;
 import com.google.common.util.concurrent.TimeLimiter;
 import com.google.common.util.concurrent.UncheckedTimeoutException;
 import com.google.inject.assistedinject.Assisted;
+
+import com.codahale.metrics.Timer;
+
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
@@ -35,9 +37,6 @@ import org.graylog2.streams.matchers.StreamRuleMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Provider;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +44,10 @@ import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Provider;
 
 /**
  * Stream routing engine to select matching streams for a message.
@@ -207,10 +210,12 @@ public class StreamRouterEngine {
         }
 
         final Stream defaultStream = defaultStreamProvider.get();
+        boolean alreadyRemovedDefaultStream = false;
         for (Stream stream : result) {
             streamMetrics.markIncomingMeter(stream.getId());
             if (stream.getRemoveMatchesFromDefaultStream()) {
-                if (message.removeStream(defaultStream)) {
+                if (message.removeStream(defaultStream) || alreadyRemovedDefaultStream) {
+                    alreadyRemovedDefaultStream = true;
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Successfully removed default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
                     }
