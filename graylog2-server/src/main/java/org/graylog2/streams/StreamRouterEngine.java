@@ -214,7 +214,7 @@ public class StreamRouterEngine {
         for (Stream stream : result) {
             streamMetrics.markIncomingMeter(stream.getId());
             if (stream.getRemoveMatchesFromDefaultStream()) {
-                if (message.removeStream(defaultStream) || alreadyRemovedDefaultStream) {
+                if (alreadyRemovedDefaultStream || message.removeStream(defaultStream)) {
                     alreadyRemovedDefaultStream = true;
                     if (LOG.isTraceEnabled()) {
                         LOG.trace("Successfully removed default stream <{}> from message <{}>", defaultStream.getId(), message.getId());
