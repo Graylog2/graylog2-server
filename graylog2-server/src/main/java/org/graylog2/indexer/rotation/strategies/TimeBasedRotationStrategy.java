@@ -19,9 +19,9 @@ package org.graylog2.indexer.rotation.strategies;
 
 import com.google.common.base.MoreObjects;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
@@ -51,15 +51,13 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
 
     private final Indices indices;
-    private final ClusterConfigService clusterConfigService;
     private DateTime lastRotation;
     private DateTime anchor;
 
     @Inject
     public TimeBasedRotationStrategy(Indices indices, NodeId nodeId,
-                                     ClusterConfigService clusterConfigService, AuditEventSender auditEventSender) {
+                                     AuditEventSender auditEventSender) {
         super(auditEventSender, nodeId);
-        this.clusterConfigService = clusterConfigService;
         this.anchor = null;
         this.lastRotation = null;
         this.indices = indices;
@@ -136,14 +134,12 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Nullable
     @Override
-    protected Result shouldRotate(String index) {
-        // TODO 2.2: Rotation strategy config is per write target, not global.
-        final TimeBasedRotationStrategyConfig config = clusterConfigService.get(TimeBasedRotationStrategyConfig.class);
-
-        if (config == null) {
-            log.warn("No rotation strategy configuration found, not running index rotation!");
-            return null;
+    protected Result shouldRotate(String index, IndexSet indexSet) {
+        if (!(indexSet.getConfig().rotationStrategy() instanceof TimeBasedRotationStrategyConfig)) {
+            throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
         }
+
+        final TimeBasedRotationStrategyConfig config = (TimeBasedRotationStrategyConfig) indexSet.getConfig().rotationStrategy();
 
         final Period rotationPeriod = config.rotationPeriod().normalizedStandard();
         final DateTime now = Tools.nowUTC();

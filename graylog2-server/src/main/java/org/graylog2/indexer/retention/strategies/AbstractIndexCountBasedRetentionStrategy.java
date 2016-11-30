@@ -45,14 +45,14 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
         this.activityWriter = requireNonNull(activityWriter);
     }
 
-    protected abstract Optional<Integer> getMaxNumberOfIndices();
-    protected abstract void retain(String indexName);
+    protected abstract Optional<Integer> getMaxNumberOfIndices(IndexSet indexSet);
+    protected abstract void retain(String indexName, IndexSet indexSet);
 
     @Override
     public void retain(IndexSet indexSet) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllDeflectorAliases();
         final int indexCount = deflectorIndices.size();
-        final Optional<Integer> maxIndices = getMaxNumberOfIndices();
+        final Optional<Integer> maxIndices = getMaxNumberOfIndices(indexSet);
 
         if (!maxIndices.isPresent()) {
             LOG.warn("No retention strategy configuration found, not running index retention!");
@@ -99,7 +99,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
             activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
             // Sorry if this should ever go mad. Run retention strategy!
-            retain(indexName);
+            retain(indexName, indexSet);
         }
     }
 }

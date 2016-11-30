@@ -21,14 +21,14 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.NullActivityWriter;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -50,6 +50,8 @@ public class IndexRotationThreadTest {
     @Mock
     private IndexSet indexSet;
     @Mock
+    private IndexSetConfig indexSetConfig;
+    @Mock
     private NotificationService notificationService;
     @Mock
     private Indices indices;
@@ -59,8 +61,11 @@ public class IndexRotationThreadTest {
     private NodeId nodeId;
     @Mock
     private IndexSetRegistry indexSetRegistry;
-    @Mock
-    private ClusterConfigService clusterConfigService;
+
+    @Before
+    public void setUp() throws Exception {
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+    }
 
     @Test
     public void testPerformRotation() throws NoTargetIndexException {
@@ -70,7 +75,6 @@ public class IndexRotationThreadTest {
                 indexSet.cycle();
             }
         };
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -79,9 +83,10 @@ public class IndexRotationThreadTest {
                 cluster,
                 new NullActivityWriter(),
                 nodeId,
-                clusterConfigService,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
+        when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
+
         rotationThread.checkForRotation(indexSet);
 
         verify(indexSet, times(1)).cycle();
@@ -90,7 +95,6 @@ public class IndexRotationThreadTest {
     @Test
     public void testDoNotPerformRotation() throws NoTargetIndexException {
         final Provider<RotationStrategy> provider = new RotationStrategyProvider();
-        when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("strategy", "retention"));
 
         final IndexRotationThread rotationThread = new IndexRotationThread(
                 notificationService,
@@ -99,9 +103,10 @@ public class IndexRotationThreadTest {
                 cluster,
                 new NullActivityWriter(),
                 nodeId,
-                clusterConfigService,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
+        when(indexSetConfig.rotationStrategyClass()).thenReturn("strategy");
+
         rotationThread.checkForRotation(indexSet);
 
         verify(indexSet, never()).cycle();
@@ -119,7 +124,6 @@ public class IndexRotationThreadTest {
                 cluster,
                 new NullActivityWriter(),
                 nodeId,
-                clusterConfigService,
                 ImmutableMap.<String, Provider<RotationStrategy>>builder().put("strategy", provider).build()
         );
         rotationThread.doRun();

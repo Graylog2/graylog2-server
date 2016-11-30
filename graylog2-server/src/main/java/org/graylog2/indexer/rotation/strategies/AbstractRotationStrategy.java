@@ -49,7 +49,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
     }
 
     @Nullable
-    protected abstract Result shouldRotate(String indexName);
+    protected abstract Result shouldRotate(String indexName, IndexSet indexSet);
 
     @Override
     public void rotate(IndexSet indexSet) {
@@ -62,7 +62,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
             return;
         }
 
-        final Result rotate = shouldRotate(indexName);
+        final Result rotate = shouldRotate(indexName, indexSet);
         if (rotate == null) {
             LOG.error("Cannot perform rotation at this moment.");
             return;
