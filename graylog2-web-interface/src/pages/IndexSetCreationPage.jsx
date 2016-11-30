@@ -91,6 +91,7 @@ const IndexSetCreationPage = React.createClass({
                                          rotationStrategies={this.state.rotationStrategies}
                                          retentionStrategies={this.state.retentionStrategies}
                                          create
+                                         cancelLink={Routes.SYSTEM.INDICES.LIST}
                                          onUpdate={this._saveConfiguration} />
             </Col>
           </Row>
