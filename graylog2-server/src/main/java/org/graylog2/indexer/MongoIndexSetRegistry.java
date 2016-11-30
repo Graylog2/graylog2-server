@@ -17,15 +17,17 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableSet;
+
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.mongojack.DBQuery;
 
-import javax.inject.Inject;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+
+import javax.inject.Inject;
 
 import static java.util.Objects.requireNonNull;
 
