@@ -245,7 +245,11 @@ public class StreamResource extends RestResource {
             stream.setRemoveMatchesFromDefaultStream(removeMatchesFromDefaultStream);
         }
 
-        stream.setIndexSetId(cr.indexSetId());
+        // Apparently we are sending partial resources sometimes so do not overwrite the index set
+        // id if it's null/empty in the update request.
+        if (!Strings.isNullOrEmpty(cr.indexSetId())) {
+            stream.setIndexSetId(cr.indexSetId());
+        }
 
         streamService.save(stream);
         clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
