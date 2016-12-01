@@ -55,9 +55,18 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("default")
     public abstract boolean isDefault();
 
+    // TODO 2.2: Add writable flag and use it for retention/rotation and to decide if a deflector needs to be created.
+    //@JsonProperty("writable")
+    //public abstract boolean isWritable();
+
     @JsonProperty("index_prefix")
     @NotBlank
     public abstract String indexPrefix();
+
+    // TODO 2.2: Make this configurable because we might have to change it for some index sets. (e.g. Archive: "^<prefix>-\S+_\d+" instead of "^<prefix>_\d+")
+    // TODO 2.2: But it should probably not be configurable in the user interface...
+    //@JsonProperty("index_match_pattern")
+    //public abstract String indexMatchPattern();
 
     @JsonProperty("shards")
     @Min(1)
