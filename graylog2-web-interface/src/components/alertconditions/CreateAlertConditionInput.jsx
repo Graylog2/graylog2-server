@@ -39,17 +39,20 @@ const CreateAlertConditionInput = React.createClass({
     this.setState({ selectedStream: this.state.streams.find(s => s.id === nextStream) });
   },
 
-  _onSubmit(request) {
+  _onSubmit(data) {
     if (!this.state.selectedStream) {
       UserNotification.error('Please select the stream that the condition should check.', 'Could not save condition');
     }
 
-    AlertConditionsActions.save(this.state.selectedStream.id, request).then(conditionId => {
+    AlertConditionsActions.save(this.state.selectedStream.id, data).then(conditionId => {
       history.pushState(null, Routes.show_alert_condition(this.state.selectedStream.id, conditionId));
     });
   },
   _openForm() {
     this.refs.configurationForm.open();
+  },
+  _resetForm() {
+    this.setState({ type: this.PLACEHOLDER });
   },
   _formatConditionForm(type) {
     return (

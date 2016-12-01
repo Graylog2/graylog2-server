@@ -18,7 +18,7 @@ const AlertCondition = React.createClass({
   mixins: [Reflux.connect(AlertConditionsStore)],
 
   _onDelete() {
-    if (window.confirm('Really delete alarm condition?')) {
+    if (window.confirm('Really delete alert condition?')) {
       AlertConditionsActions.delete(this.props.stream.id, this.props.alertCondition.id);
     }
   },
