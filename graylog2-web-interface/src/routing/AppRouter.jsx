@@ -23,7 +23,6 @@ import NewAlertNotificationPage from 'pages/NewAlertNotificationPage';
 import EditAlertConditionPage from 'pages/EditAlertConditionPage';
 import StreamEditPage from 'pages/StreamEditPage';
 import StreamOutputsPage from 'pages/StreamOutputsPage';
-import StreamAlertsPage from 'pages/StreamAlertsPage';
 import StreamSearchPage from 'pages/StreamSearchPage';
 import DashboardsPage from 'pages/DashboardsPage';
 import ShowDashboardPage from 'pages/ShowDashboardPage';
@@ -82,7 +81,6 @@ const AppRouter = React.createClass({
             <Route path={Routes.STREAMS} component={StreamsPage}/>
             <Route path={Routes.stream_edit(':streamId')} component={StreamEditPage}/>
             <Route path={Routes.stream_outputs(':streamId')} component={StreamOutputsPage}/>
-            <Route path={Routes.stream_alerts(':streamId')} component={StreamAlertsPage}/>
             <Route path={Routes.ALERTS.LIST} component={AlertsPage} />
             <Route path={Routes.ALERTS.CONDITIONS} component={AlertConditionsPage} />
             <Route path={Routes.ALERTS.NEW_CONDITION} component={NewAlertConditionPage} />
