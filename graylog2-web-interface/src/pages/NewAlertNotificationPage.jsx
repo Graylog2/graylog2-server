@@ -3,41 +3,42 @@ import Reflux from 'reflux';
 import { Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import DocumentationLink from 'components/support/DocumentationLink';
 import { PageHeader } from 'components/common';
-import { AlertConditionsComponent } from 'components/alertconditions';
+import { CreateAlertNotificationInput } from 'components/alertnotifications';
 
 import Routes from 'routing/Routes';
-import DocsHelper from 'util/DocsHelper';
 
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const AlertConditionsPage = React.createClass({
+const NewAlertNotificationPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
   render() {
     return (
       <div>
-        <PageHeader title="Manage alert conditions">
+        <PageHeader title="New alert notification">
           <span>
-            Alert conditions define situations that require your attention. Graylog will check those conditions
-            periodically and notify you when their statuses change.
+            Create a new notification that you can use to not miss any of your alerts.
           </span>
 
           <span>
-            Read more about alerting in the <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="documentation"/>.
+            Remember to assign the notifications to use in the alert conditions page.
           </span>
 
           <span>
             <LinkContainer to={Routes.ALERTS.NOTIFICATIONS}>
               <Button bsStyle="info">Manage notifications</Button>
             </LinkContainer>
+            &nbsp;
+            <Button bsStyle="info" href="https://marketplace.graylog.org/" target="_blank">
+              <i className="fa fa-external-link"/>&nbsp; Find more notifications
+            </Button>
           </span>
         </PageHeader>
 
         <Row className="content">
           <Col md={12}>
-            <AlertConditionsComponent />
+            <CreateAlertNotificationInput />
           </Col>
         </Row>
       </div>
@@ -45,4 +46,4 @@ const AlertConditionsPage = React.createClass({
   },
 });
 
-export default AlertConditionsPage;
+export default NewAlertNotificationPage;
