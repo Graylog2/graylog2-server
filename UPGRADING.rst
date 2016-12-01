@@ -28,3 +28,10 @@ With the introduction of index sets, and the ability to change a stream's write 
 It requires recalculation of the index ranges of the default stream's index set, which when updating from pre-2.2 versions is stored in the `graylog_` index. This is potentially expensive, because it has to calculate three aggregations across every open index to detect which streams are stored in which index.
 
 Please be advised that this necessary migration can put additional load on your cluster.
+
+RotationStrategy & RetentionStrategy Interfaces
+-----------------------------------------------
+
+The Java interfaces for ``RetentionStrategy`` and ``RotationStrategy`` changed in 2.2. The ``#rotate()`` and ``#retain()`` methods are now getting an ``IndexSet`` as first parameter.
+
+This only affects you if you are using custom rotation or retention strategies.

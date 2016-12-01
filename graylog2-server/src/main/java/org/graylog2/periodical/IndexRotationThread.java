@@ -21,12 +21,11 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
-import org.graylog2.indexer.management.IndexManagementConfig;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategy;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
@@ -48,7 +47,6 @@ public class IndexRotationThread extends Periodical {
     private final ActivityWriter activityWriter;
     private final Indices indices;
     private final NodeId nodeId;
-    private final ClusterConfigService clusterConfigService;
     private final Map<String, Provider<RotationStrategy>> rotationStrategyMap;
 
     @Inject
@@ -58,7 +56,6 @@ public class IndexRotationThread extends Periodical {
                                Cluster cluster,
                                ActivityWriter activityWriter,
                                NodeId nodeId,
-                               ClusterConfigService clusterConfigService,
                                Map<String, Provider<RotationStrategy>> rotationStrategyMap) {
         this.notificationService = notificationService;
         this.indexSetRegistry = indexSetRegistry;
@@ -66,7 +63,6 @@ public class IndexRotationThread extends Periodical {
         this.activityWriter = activityWriter;
         this.indices = indices;
         this.nodeId = nodeId;
-        this.clusterConfigService = clusterConfigService;
         this.rotationStrategyMap = rotationStrategyMap;
     }
 
@@ -93,22 +89,13 @@ public class IndexRotationThread extends Periodical {
     }
 
     protected void checkForRotation(IndexSet indexSet) {
-        // TODO 2.2: Retention strategy config is per write target, not global.
-        final IndexManagementConfig config = clusterConfigService.get(IndexManagementConfig.class);
-
-        if (config == null) {
-            LOG.warn("No index management configuration found, not running index rotation!");
-            rotationProblemNotification("Index Rotation Problem!",
-                    "No index management configuration found, not running index rotation! Please fix your index rotation configuration!");
-            return;
-        }
-
-        final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategy());
+        final IndexSetConfig config = indexSet.getConfig();
+        final Provider<RotationStrategy> rotationStrategyProvider = rotationStrategyMap.get(config.rotationStrategyClass());
 
         if (rotationStrategyProvider == null) {
-            LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.rotationStrategy());
+            LOG.warn("Rotation strategy \"{}\" not found, not running index rotation!", config.rotationStrategyClass());
             rotationProblemNotification("Index Rotation Problem!",
-                    "Index rotation strategy " + config.rotationStrategy() + " not found! Please fix your index rotation configuration!");
+                    "Index rotation strategy " + config.rotationStrategyClass() + " not found! Please fix your index rotation configuration!");
             return;
         }
 

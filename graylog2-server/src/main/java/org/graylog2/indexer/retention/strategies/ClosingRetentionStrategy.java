@@ -20,8 +20,9 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -39,36 +40,35 @@ public class ClosingRetentionStrategy extends AbstractIndexCountBasedRetentionSt
 
     private final Indices indices;
     private final NodeId nodeId;
-    private final ClusterConfigService clusterConfigService;
     private final AuditEventSender auditEventSender;
 
     @Inject
     public ClosingRetentionStrategy(Indices indices,
                                     ActivityWriter activityWriter,
                                     NodeId nodeId,
-                                    ClusterConfigService clusterConfigService,
                                     AuditEventSender auditEventSender) {
         super(indices, activityWriter);
         this.indices = indices;
         this.nodeId = nodeId;
-        this.clusterConfigService = clusterConfigService;
         this.auditEventSender = auditEventSender;
     }
 
     @Override
-    protected Optional<Integer> getMaxNumberOfIndices() {
-        // TODO 2.2: Retention strategy config is per write target, not global.
-        final ClosingRetentionStrategyConfig config = clusterConfigService.get(ClosingRetentionStrategyConfig.class);
+    protected Optional<Integer> getMaxNumberOfIndices(IndexSet indexSet) {
+        final IndexSetConfig indexSetConfig = indexSet.getConfig();
+        final RetentionStrategyConfig strategyConfig = indexSetConfig.retentionStrategy();
 
-        if (config != null) {
-            return Optional.of(config.maxNumberOfIndices());
-        } else {
-            return Optional.empty();
+        if (!(strategyConfig instanceof ClosingRetentionStrategyConfig)) {
+            throw new IllegalStateException("Invalid retention strategy config <" + strategyConfig.getClass().getCanonicalName() + "> for index set <" + indexSetConfig.id() + ">");
         }
+
+        final ClosingRetentionStrategyConfig config = (ClosingRetentionStrategyConfig) strategyConfig;
+
+        return Optional.of(config.maxNumberOfIndices());
     }
 
     @Override
-    public void retain(String indexName) {
+    public void retain(String indexName, IndexSet indexSet) {
         final Stopwatch sw = Stopwatch.createStarted();
 
         indices.close(indexName);

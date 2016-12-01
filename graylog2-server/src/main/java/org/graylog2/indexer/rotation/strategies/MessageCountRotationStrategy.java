@@ -19,8 +19,8 @@ package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IndexNotFoundException;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -35,14 +35,12 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(MessageCountRotationStrategy.class);
 
     private final Indices indices;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public MessageCountRotationStrategy(Indices indices, NodeId nodeId,
-                                        ClusterConfigService clusterConfigService, AuditEventSender auditEventSender) {
+                                        AuditEventSender auditEventSender) {
         super(auditEventSender, nodeId);
         this.indices = indices;
-        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -57,14 +55,12 @@ public class MessageCountRotationStrategy extends AbstractRotationStrategy {
 
     @Nullable
     @Override
-    protected Result shouldRotate(String index) {
-        // TODO 2.2: Rotation strategy config is per write target, not global.
-        final MessageCountRotationStrategyConfig config = clusterConfigService.get(MessageCountRotationStrategyConfig.class);
-
-        if (config == null) {
-            log.warn("No rotation strategy configuration found, not running index rotation!");
-            return null;
+    protected Result shouldRotate(String index, IndexSet indexSet) {
+        if (!(indexSet.getConfig().rotationStrategy() instanceof MessageCountRotationStrategyConfig)) {
+            throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
         }
+
+        final MessageCountRotationStrategyConfig config = (MessageCountRotationStrategyConfig) indexSet.getConfig().rotationStrategy();
 
         try {
             final long numberOfMessages = indices.numberOfMessages(index);

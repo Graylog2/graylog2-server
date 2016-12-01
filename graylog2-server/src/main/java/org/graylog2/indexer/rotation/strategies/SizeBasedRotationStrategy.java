@@ -18,9 +18,9 @@
 package org.graylog2.indexer.rotation.strategies;
 
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
 import org.slf4j.Logger;
@@ -35,16 +35,13 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
     private static final Logger LOG = LoggerFactory.getLogger(SizeBasedRotationStrategy.class);
 
     private final Indices indices;
-    private final ClusterConfigService clusterConfigService;
 
     @Inject
     public SizeBasedRotationStrategy(Indices indices,
-                                     ClusterConfigService clusterConfigService,
                                      NodeId nodeId,
                                      AuditEventSender auditEventSender) {
         super(auditEventSender, nodeId);
         this.indices = indices;
-        this.clusterConfigService = clusterConfigService;
     }
 
     @Override
@@ -59,14 +56,12 @@ public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
 
     @Nullable
     @Override
-    protected Result shouldRotate(final String index) {
-        // TODO 2.2: Rotation strategy config is per write target, not global.
-        final SizeBasedRotationStrategyConfig config = clusterConfigService.get(SizeBasedRotationStrategyConfig.class);
-
-        if (config == null) {
-            LOG.warn("No rotation strategy configuration found, not running index rotation!");
-            return null;
+    protected Result shouldRotate(final String index, IndexSet indexSet) {
+        if (!(indexSet.getConfig().rotationStrategy() instanceof SizeBasedRotationStrategyConfig)) {
+            throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
         }
+
+        final SizeBasedRotationStrategyConfig config = (SizeBasedRotationStrategyConfig) indexSet.getConfig().rotationStrategy();
 
         final IndexStatistics indexStats = indices.getIndexStats(index);
         if (indexStats == null) {

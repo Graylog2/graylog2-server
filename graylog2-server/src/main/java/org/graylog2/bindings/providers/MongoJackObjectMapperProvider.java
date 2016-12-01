@@ -16,9 +16,19 @@
  */
 package org.graylog2.bindings.providers;
 
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
+import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
+import com.fasterxml.jackson.databind.type.SimpleType;
+
+import org.graylog2.indexer.retention.strategies.UnknownRetentionStrategyConfig;
+import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.mongojack.internal.MongoJackModule;
+
+import java.io.IOException;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
@@ -30,6 +40,7 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
     public MongoJackObjectMapperProvider(ObjectMapper objectMapper) {
         // add the mongojack specific stuff on a copy of the original ObjectMapper to avoid changing the singleton instance
         this.objectMapper = objectMapper.copy()
+                .addHandler(new ReplaceUnknownSubtypesWithFallbackHandler())
                 .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy());
         
         MongoJackModule.configure(this.objectMapper);
@@ -56,6 +67,17 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
                 translated = "_" + translated; // lol underscore
             }
             return translated;
+        }
+    }
+
+    // TODO this should be pluggable to allow subsystems to specify their own fallback types instead of hardcoding it there.
+    private static class ReplaceUnknownSubtypesWithFallbackHandler extends DeserializationProblemHandler {
+        @Override
+        public JavaType handleUnknownTypeId(DeserializationContext ctxt, JavaType baseType, String subTypeId, TypeIdResolver idResolver, String failureMsg) throws IOException {
+            if (baseType.getRawClass().equals(RetentionStrategyConfig.class)) {
+                return SimpleType.constructUnsafe(UnknownRetentionStrategyConfig.class);
+            }
+            return super.handleUnknownTypeId(ctxt, baseType, subTypeId, idResolver, failureMsg);
         }
     }
 }
