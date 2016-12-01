@@ -23,6 +23,7 @@ public interface AlarmCallbackConfiguration {
     String getId();
     String getStreamId();
     String getType();
+    String getTitle();
     Map<String, Object> getConfiguration();
     Date getCreatedAt();
     String getCreatorUserId();
