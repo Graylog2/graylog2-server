@@ -5,7 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import { PageHeader, Spinner } from 'components/common';
-import { EditAlertConditionForm } from 'components/alertconditions';
+import { ConditionAlertNotifications, EditAlertConditionForm } from 'components/alertconditions';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
@@ -79,8 +79,7 @@ const EditAlertConditionPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <h2>Notifications</h2>
-            <p>TBD</p>
+            <ConditionAlertNotifications alertCondition={condition} stream={stream} />
           </Col>
         </Row>
       </div>
