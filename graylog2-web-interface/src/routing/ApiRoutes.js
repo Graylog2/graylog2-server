@@ -92,6 +92,7 @@ const ApiRoutes = {
     close: (indexName) => { return { url: `/system/indexer/indices/${indexName}/close` }; },
     delete: (indexName) => { return { url: `/system/indexer/indices/${indexName}` }; },
     list: (indexSetId) => { return { url: `/system/indexer/indices/${indexSetId}/list` }; },
+    listAll: () => { return { url: '/system/indexer/indices' };  },
     listClosed: (indexSetId) => { return { url: `/system/indexer/indices/${indexSetId}/closed` }; },
     multiple: () => { return { url: `/system/indexer/indices/multiple` }; },
     reopen: (indexName) => { return { url: `/system/indexer/indices/${indexName}/reopen` }; },
