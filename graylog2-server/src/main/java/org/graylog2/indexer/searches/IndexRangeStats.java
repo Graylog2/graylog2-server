@@ -21,13 +21,14 @@ import com.google.auto.value.AutoValue;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import java.util.Collections;
 import java.util.List;
 
 import javax.annotation.Nullable;
 
 @AutoValue
 public abstract class IndexRangeStats {
-    public static final IndexRangeStats EMPTY = create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), null);
+    public static final IndexRangeStats EMPTY = create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), Collections.emptyList());
 
     public abstract DateTime min();
 
