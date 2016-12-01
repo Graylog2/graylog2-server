@@ -47,7 +47,9 @@ const AlertNotification = React.createClass({
       return <UnknownAlertNotification alertNotification={notification} onDelete={this._onDelete} />;
     }
 
-    const suffix = (stream ? <span>on stream <em>{stream.title}</em></span> : 'Not connected to a stream');
+    const description = (stream ?
+      <span>Executed once per triggered alert condition in stream <em>{stream.title}</em></span>
+      : 'Not executed, as it is not connected to a stream');
 
     const actions = [
       <Button key="test-button" bsStyle="info" onClick={this._onTestNotification}>Test</Button>,
@@ -62,11 +64,13 @@ const AlertNotification = React.createClass({
     const content = (
       <Col md={12}>
         <div className="alert-callback alarm-callbacks">
-          <ConfigurationForm ref="configurationForm" key={`configuration-form-notification-${notification.id}`}
+          <ConfigurationForm ref="configurationForm"
+                             key={`configuration-form-notification-${notification.id}`}
                              configFields={typeDefinition.requested_configuration}
                              title={"Editing alert configuration "}
-                             typeName={notification.type} includeTitleField={false}
-                             submitAction={this._onSubmit} values={notification.configuration} />
+                             typeName={notification.type}
+                             submitAction={this._onSubmit}
+                             values={notification.configuration} />
           <ConfigurationWell configuration={notification.configuration} typeDefinition={typeDefinition} />
         </div>
       </Col>
@@ -74,9 +78,9 @@ const AlertNotification = React.createClass({
 
     return (
       <EntityListItem key={`entry-list-${notification.id}`}
-                      title={typeDefinition.name}
-                      titleSuffix={suffix}
-                      description={stream ? 'Executed once per triggered alert condition' : 'Not executed, as it is not connected to a stream'}
+                      title={notification.title ? notification.title : 'Untitled'}
+                      titleSuffix={`(${typeDefinition.name})`}
+                      description={description}
                       actions={actions}
                       contentRow={content} />
     );
