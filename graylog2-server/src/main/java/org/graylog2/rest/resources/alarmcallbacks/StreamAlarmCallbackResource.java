@@ -18,7 +18,6 @@ package org.graylog2.rest.resources.alarmcallbacks;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -29,7 +28,6 @@ import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
-import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -40,7 +38,6 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackListSummary;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
 import org.graylog2.rest.models.alarmcallbacks.requests.CreateAlarmCallbackRequest;
-import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse;
 import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbacksResponse;
 import org.graylog2.rest.models.alarmcallbacks.responses.CreateAlarmCallbackResponse;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -68,28 +65,29 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static org.graylog2.shared.security.RestPermissions.USERS_LIST;
-
 @RequiresAuthentication
-@Api(value = "AlarmCallbacks", description = "Manage stream alarm callbacks")
+@Api(value = "Stream/AlarmCallbacks", description = "Manage stream alarm callbacks")
 @Path("/streams/{streamid}/alarmcallbacks")
-public class AlarmCallbackResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(AlarmCallbackResource.class);
+public class StreamAlarmCallbackResource extends RestResource {
+    private static final Logger LOG = LoggerFactory.getLogger(StreamAlarmCallbackResource.class);
 
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final StreamService streamService;
     private final Set<AlarmCallback> availableAlarmCallbacks;
     private final AlarmCallbackFactory alarmCallbackFactory;
+    private final AlarmCallbacksResource alarmCallbacksResource;
 
     @Inject
-    public AlarmCallbackResource(AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                                 StreamService streamService,
-                                 Set<AlarmCallback> availableAlarmCallbacks,
-                                 AlarmCallbackFactory alarmCallbackFactory) {
+    public StreamAlarmCallbackResource(AlarmCallbackConfigurationService alarmCallbackConfigurationService,
+                                       StreamService streamService,
+                                       Set<AlarmCallback> availableAlarmCallbacks,
+                                       AlarmCallbackFactory alarmCallbackFactory,
+                                       AlarmCallbacksResource alarmCallbacksResource) {
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.streamService = streamService;
         this.availableAlarmCallbacks = availableAlarmCallbacks;
         this.alarmCallbackFactory = alarmCallbackFactory;
+        this.alarmCallbacksResource = alarmCallbacksResource;
     }
 
     @GET
@@ -97,7 +95,7 @@ public class AlarmCallbackResource extends RestResource {
     @ApiOperation(value = "Get a list of all alarm callbacks for this stream")
     @Produces(MediaType.APPLICATION_JSON)
     public AlarmCallbackListSummary get(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
-                                   @PathParam("streamid") String streamid) throws NotFoundException {
+                                        @PathParam("streamid") String streamid) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
         final Stream stream = streamService.load(streamid);
 
@@ -122,9 +120,9 @@ public class AlarmCallbackResource extends RestResource {
     @ApiOperation(value = "Get a single specified alarm callback for this stream")
     @Produces(MediaType.APPLICATION_JSON)
     public AlarmCallbackSummary get(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
-                                   @PathParam("streamid") String streamid,
-                                   @ApiParam(name = "alarmCallbackId", value = "The alarm callback id we are getting", required = true)
-                                   @PathParam("alarmCallbackId") String alarmCallbackId) throws NotFoundException {
+                                    @PathParam("streamid") String streamid,
+                                    @ApiParam(name = "alarmCallbackId", value = "The alarm callback id we are getting", required = true)
+                                    @PathParam("alarmCallbackId") String alarmCallbackId) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
         final Stream stream = streamService.load(streamid);
 
@@ -161,7 +159,7 @@ public class AlarmCallbackResource extends RestResource {
             throw new BadRequestException(e);
         }
 
-        final URI alarmCallbackUri = getUriBuilderToSelf().path(AlarmCallbackResource.class)
+        final URI alarmCallbackUri = getUriBuilderToSelf().path(StreamAlarmCallbackResource.class)
                 .path("{alarmCallbackId}")
                 .build(streamid, id);
 
@@ -173,21 +171,11 @@ public class AlarmCallbackResource extends RestResource {
     @Timed
     @ApiOperation(value = "Get a list of all alarm callback types")
     @Produces(MediaType.APPLICATION_JSON)
+    @Deprecated
     public AvailableAlarmCallbacksResponse available(@ApiParam(name = "streamid", value = "The id of the stream whose alarm callbacks we want.", required = true)
-                                                      @PathParam("streamid") String streamid) {
+                                                     @PathParam("streamid") String streamid) {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
-        final Map<String, AvailableAlarmCallbackSummaryResponse> types = Maps.newHashMapWithExpectedSize(availableAlarmCallbacks.size());
-        for (AlarmCallback availableAlarmCallback : availableAlarmCallbacks) {
-            final AvailableAlarmCallbackSummaryResponse type = new AvailableAlarmCallbackSummaryResponse();
-            type.name = availableAlarmCallback.getName();
-            type.requested_configuration = getConfigurationRequest(availableAlarmCallback).asList();
-            types.put(availableAlarmCallback.getClass().getCanonicalName(), type);
-        }
-
-        final AvailableAlarmCallbacksResponse response = new AvailableAlarmCallbacksResponse();
-        response.types = types;
-
-        return response;
+        return alarmCallbacksResource.available();
     }
 
     @DELETE
@@ -268,14 +256,5 @@ public class AlarmCallbackResource extends RestResource {
             throw new BadRequestException("Invalid configuration map", e);
         }
         return configuration;
-    }
-
-    /* This is used to add user auto-completion to EmailAlarmCallback when the current user has permissions to list users */
-    private ConfigurationRequest getConfigurationRequest(AlarmCallback callback) {
-        if (callback instanceof EmailAlarmCallback && isPermitted(USERS_LIST)) {
-            return ((EmailAlarmCallback) callback).getEnrichedRequestedConfiguration();
-        }
-
-        return callback.getRequestedConfiguration();
     }
 }
