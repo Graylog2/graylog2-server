@@ -63,7 +63,6 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 @RequiresAuthentication
 @Api(value = "Stream/AlarmCallbacks", description = "Manage stream alarm callbacks")
@@ -73,19 +72,16 @@ public class StreamAlarmCallbackResource extends RestResource {
 
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final StreamService streamService;
-    private final Set<AlarmCallback> availableAlarmCallbacks;
     private final AlarmCallbackFactory alarmCallbackFactory;
     private final AlarmCallbacksResource alarmCallbacksResource;
 
     @Inject
     public StreamAlarmCallbackResource(AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                                        StreamService streamService,
-                                       Set<AlarmCallback> availableAlarmCallbacks,
                                        AlarmCallbackFactory alarmCallbackFactory,
                                        AlarmCallbacksResource alarmCallbacksResource) {
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.streamService = streamService;
-        this.availableAlarmCallbacks = availableAlarmCallbacks;
         this.alarmCallbackFactory = alarmCallbackFactory;
         this.alarmCallbacksResource = alarmCallbacksResource;
     }
