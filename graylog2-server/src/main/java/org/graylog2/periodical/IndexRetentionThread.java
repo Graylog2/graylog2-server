@@ -75,7 +75,7 @@ public class IndexRetentionThread extends Periodical {
                 LOG.warn("Retention strategy \"{}\" not found, not running index retention!", config.retentionStrategyClass());
                 retentionProblemNotification("Index Retention Problem!",
                         "Index retention strategy " + config.retentionStrategyClass() + " not found! Please fix your index retention configuration!");
-                return;
+                continue;
             }
 
             retentionStrategyProvider.get().retain(indexSet);
