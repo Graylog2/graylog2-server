@@ -21,7 +21,7 @@ const AlertDetails = React.createClass({
   },
 
   _loadData() {
-    AlarmCallbacksActions.available(this.props.alert.stream_id);
+    AlarmCallbacksActions.available();
     AlarmCallbackHistoryActions.list(this.props.alert.stream_id, this.props.alert.id);
   },
 

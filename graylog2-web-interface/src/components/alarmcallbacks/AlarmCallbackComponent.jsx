@@ -22,7 +22,7 @@ const AlarmCallbackComponent = React.createClass({
     AlarmCallbacksActions.list.triggerPromise(this.props.streamId).then((alarmCallbacks) => {
       this.setState({alarmCallbacks: alarmCallbacks});
     });
-    AlarmCallbacksActions.available(this.props.streamId);
+    AlarmCallbacksActions.available();
   },
   _deleteAlarmCallback(alarmCallback) {
     AlarmCallbacksActions.delete.triggerPromise(this.props.streamId, alarmCallback.id).then(() => {

@@ -50,6 +50,7 @@ const Routes = {
     CONDITIONS: '/alerts/conditions',
     NEW_CONDITION: '/alerts/conditions/new',
     NOTIFICATIONS: '/alerts/notifications',
+    NEW_NOTIFICATION: '/alerts/notifications/new',
   },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
