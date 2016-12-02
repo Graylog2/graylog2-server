@@ -44,6 +44,11 @@ public abstract class AlarmCallbackConfigurationAVImpl implements AlarmCallbackC
     @Override
     public abstract String getType();
 
+    @JsonProperty("title")
+    @Override
+    @Nullable
+    public abstract String getTitle();
+
     @JsonProperty("configuration")
     @Override
     public abstract Map<String, Object> getConfiguration();
@@ -62,16 +67,18 @@ public abstract class AlarmCallbackConfigurationAVImpl implements AlarmCallbackC
     public static AlarmCallbackConfigurationAVImpl create(@JsonProperty("_id") String id,
                                                           @JsonProperty("stream_id") String streamId,
                                                           @JsonProperty("type") String type,
+                                                          @JsonProperty("title") @Nullable String title,
                                                           @JsonProperty("configuration") Map<String, Object> configuration,
                                                           @JsonProperty("created_at") Date createdAt,
                                                           @JsonProperty("creator_user_id") String creatorUserId,
                                                           @Nullable @JsonProperty("id") String redundantId) {
-        return create(id, streamId, type, configuration, createdAt, creatorUserId);
+        return create(id, streamId, type, title, configuration, createdAt, creatorUserId);
     }
 
     public static AlarmCallbackConfigurationAVImpl create(@JsonProperty("_id") String id,
                                                           @JsonProperty("stream_id") String streamId,
                                                           @JsonProperty("type") String type,
+                                                          @JsonProperty("title") @Nullable String title,
                                                           @JsonProperty("configuration") Map<String, Object> configuration,
                                                           @JsonProperty("created_at") Date createdAt,
                                                           @JsonProperty("creator_user_id") String creatorUserId) {
@@ -79,6 +86,7 @@ public abstract class AlarmCallbackConfigurationAVImpl implements AlarmCallbackC
                 .setId(id)
                 .setStreamId(streamId)
                 .setType(type)
+                .setTitle(title)
                 .setConfiguration(configuration)
                 .setCreatedAt(createdAt)
                 .setCreatorUserId(creatorUserId)
@@ -92,6 +100,8 @@ public abstract class AlarmCallbackConfigurationAVImpl implements AlarmCallbackC
         public abstract Builder setStreamId(String streamId);
 
         public abstract Builder setType(String type);
+
+        public abstract Builder setTitle(String title);
 
         public abstract Builder setConfiguration(Map<String, Object> configuration);
 

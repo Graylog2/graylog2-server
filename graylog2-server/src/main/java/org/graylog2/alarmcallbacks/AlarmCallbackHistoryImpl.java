@@ -87,6 +87,7 @@ public abstract class AlarmCallbackHistoryImpl implements AlarmCallbackHistory {
                 alarmCallbackConfiguration.getId(),
                 alarmCallbackConfiguration.getStreamId(),
                 alarmCallbackConfiguration.getType(),
+                alarmCallbackConfiguration.getTitle(),
                 alarmCallbackConfiguration.getConfiguration(),
                 alarmCallbackConfiguration.getCreatedAt(),
                 alarmCallbackConfiguration.getCreatorUserId()

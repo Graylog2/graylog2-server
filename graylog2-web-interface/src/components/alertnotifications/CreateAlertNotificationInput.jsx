@@ -64,7 +64,6 @@ const CreateAlertNotificationInput = React.createClass({
                          configFields={typeDefinition.requested_configuration}
                          title={`Create new ${typeDefinition.name}`}
                          typeName={type}
-                         includeTitleField={false}
                          submitAction={this._onSubmit}
                          cancelAction={this._resetForm} />
     );

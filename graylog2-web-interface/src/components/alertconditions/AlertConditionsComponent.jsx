@@ -43,7 +43,11 @@ const AlertConditionsComponent = React.createClass({
       return <Spinner />;
     }
 
-    const alertConditions = this.state.allAlertConditions.sort((a1, a2) => naturalSort(a1.title.toLowerCase(), a2.title.toLowerCase()));
+    const alertConditions = this.state.allAlertConditions.sort((a1, a2) => {
+      const t1 = a1.title || 'Untitled';
+      const t2 = a2.title || 'Untitled';
+      return naturalSort(t1.toLowerCase(), t2.toLowerCase());
+    });
 
     return (
       <div>

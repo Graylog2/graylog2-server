@@ -101,6 +101,7 @@ public class StreamAlarmCallbackResource extends RestResource {
                     callback.getId(),
                     callback.getStreamId(),
                     callback.getType(),
+                    callback.getTitle(),
                     callback.getConfiguration(),
                     callback.getCreatedAt(),
                     callback.getCreatorUserId()
@@ -127,7 +128,7 @@ public class StreamAlarmCallbackResource extends RestResource {
             throw new javax.ws.rs.NotFoundException("Couldn't find alarm callback " + alarmCallbackId + " in for steam " + streamid);
         }
 
-        return AlarmCallbackSummary.create(result.getId(), result.getStreamId(), result.getType(), result.getConfiguration(), result.getCreatedAt(), result.getCreatorUserId());
+        return AlarmCallbackSummary.create(result.getId(), result.getStreamId(), result.getType(), result.getTitle(), result.getConfiguration(), result.getCreatedAt(), result.getCreatorUserId());
     }
 
     @POST
@@ -143,7 +144,7 @@ public class StreamAlarmCallbackResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         // make sure the values are correctly converted to the declared configuration types
-        final CreateAlarmCallbackRequest cr = CreateAlarmCallbackRequest.create(originalCr.type(), convertConfigurationValues(originalCr));
+        final CreateAlarmCallbackRequest cr = CreateAlarmCallbackRequest.create(originalCr.type(), originalCr.title(), convertConfigurationValues(originalCr));
 
         final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackConfigurationService.create(streamid, cr, getCurrentUser().getName());
 
@@ -224,6 +225,7 @@ public class StreamAlarmCallbackResource extends RestResource {
         final Map<String, Object> configuration = convertConfigurationValues(alarmCallbackRequest);
 
         final AlarmCallbackConfiguration updatedConfig = ((AlarmCallbackConfigurationAVImpl) callbackConfiguration).toBuilder()
+                .setTitle(alarmCallbackRequest.title())
                 .setConfiguration(configuration)
                 .build();
 

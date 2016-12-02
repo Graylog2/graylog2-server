@@ -75,6 +75,7 @@ public class AlarmCallbacksResource extends RestResource {
                                 callback.getId(),
                                 callback.getStreamId(),
                                 callback.getType(),
+                                callback.getTitle(),
                                 callback.getConfiguration(),
                                 callback.getCreatedAt(),
                                 callback.getCreatorUserId()
