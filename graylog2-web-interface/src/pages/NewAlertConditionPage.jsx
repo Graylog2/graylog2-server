@@ -3,10 +3,9 @@ import Reflux from 'reflux';
 import { Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { AlertsComponent } from 'components/alerts';
-
 import DocumentationLink from 'components/support/DocumentationLink';
 import { PageHeader } from 'components/common';
+import { CreateAlertConditionInput } from 'components/alertconditions';
 
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
@@ -14,19 +13,19 @@ import DocsHelper from 'util/DocsHelper';
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-const AlertsPage = React.createClass({
+const NewAlertConditionPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
   render() {
     return (
       <div>
-        <PageHeader title="Alerts overview">
+        <PageHeader title="New alert condition">
           <span>
-            Alerts are triggered when conditions you define are satisfied. Graylog will automatically mark alerts as
-            resolved once the status of your conditions change.
+            Define an alert condition and configure the way Graylog will notify you when that condition is satisfied.
           </span>
 
           <span>
-            Read more about alerting in the <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="documentation"/>.
+            Are the default conditions not flexible enough? You can write your own! Read more about alerting in the{' '}
+            <DocumentationLink page={DocsHelper.PAGES.ALERTS} text="documentation" />.
           </span>
 
           <span>
@@ -42,7 +41,7 @@ const AlertsPage = React.createClass({
 
         <Row className="content">
           <Col md={12}>
-            <AlertsComponent />
+            <CreateAlertConditionInput />
           </Col>
         </Row>
       </div>
@@ -50,4 +49,4 @@ const AlertsPage = React.createClass({
   },
 });
 
-export default AlertsPage;
+export default NewAlertConditionPage;

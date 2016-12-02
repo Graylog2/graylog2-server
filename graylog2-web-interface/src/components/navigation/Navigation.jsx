@@ -157,7 +157,7 @@ const Navigation = React.createClass({
               <NavItem>Streams</NavItem>
             </LinkContainer>
 
-            <LinkContainer to={Routes.ALERTS}>
+            <LinkContainer to={Routes.ALERTS.LIST}>
               <NavItem>Alerts</NavItem>
             </LinkContainer>
 

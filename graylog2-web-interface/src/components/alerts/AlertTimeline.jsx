@@ -78,7 +78,7 @@ const AlertTimeline = React.createClass({
       } else {
         formattedResolution.push(
           <dt key="resolution-title"><Timestamp dateTime={new Date()} /></dt>,
-          <dd key="resolution-desc">Condition is still satisfied, alert is <strong>unresolved</strong></dd>,
+          <dd key="resolution-desc">Condition is still satisfied, <strong>alert is unresolved</strong></dd>,
         );
       }
     }

@@ -2,9 +2,10 @@ import Qs from 'qs';
 
 const ApiRoutes = {
   AlarmCallbacksApiController: {
-    available: (streamId) => { return { url: `/streams/${streamId}/alarmcallbacks/available` }; },
+    available: () => { return { url: '/alerts/callbacks/types' }; },
     create: (streamId) => { return { url: `/streams/${streamId}/alarmcallbacks` }; },
     delete: (streamId, alarmCallbackId) => { return { url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}` }; },
+    listAll: () => { return { url: '/alerts/callbacks' }; },
     list: (streamId) => { return { url: `/streams/${streamId}/alarmcallbacks` }; },
     update: (streamId, alarmCallbackId) => { return { url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}` }; },
   },

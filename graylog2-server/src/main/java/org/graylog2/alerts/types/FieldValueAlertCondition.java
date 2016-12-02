@@ -120,9 +120,10 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
     public static class Descriptor extends AlertCondition.Descriptor {
         public Descriptor() {
             super(
-                "Field Value Alert Condition",
+                "Field Aggregation Alert Condition",
                 "https://www.graylog.org/",
-                "This condition is triggered when the content of messages is equal to a defined value."
+                "This condition is triggered when the aggregated value of a field is higher/lower than a defined "
+                        + "threshold for a given time range."
             );
         }
     }

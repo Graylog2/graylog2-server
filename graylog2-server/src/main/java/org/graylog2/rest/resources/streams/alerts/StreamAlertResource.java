@@ -291,7 +291,8 @@ public class StreamAlertResource extends RestResource {
     @ApiOperation(value = "Send a test mail for a given stream")
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "Stream not found."),
-            @ApiResponse(code = 400, message = "Invalid ObjectId.")
+            @ApiResponse(code = 400, message = "Invalid ObjectId."),
+            @ApiResponse(code = 400, message = "Stream has no alarm callbacks")
     })
     @NoAuditEvent("only used to test alert emails")
     public void sendDummyAlert(@ApiParam(name = "streamId", value = "The stream id the dummy alert should be sent for.", required = true)
@@ -305,13 +306,15 @@ public class StreamAlertResource extends RestResource {
         try {
             AbstractAlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck();
             List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);
-            if (callConfigurations.size() > 0)
-                for (AlarmCallbackConfiguration configuration : callConfigurations) {
-                    AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
-                    alarmCallback.call(stream, checkResult);
-                }
-            else {
-                emailAlarmCallback.call(stream, checkResult);
+            if (callConfigurations.size() == 0) {
+                final String message = "Stream has no alarm callbacks, cannot send test alert.";
+                LOG.warn(message);
+                throw new BadRequestException(message);
+            }
+
+            for (AlarmCallbackConfiguration configuration : callConfigurations) {
+                AlarmCallback alarmCallback = alarmCallbackFactory.create(configuration);
+                alarmCallback.call(stream, checkResult);
             }
         } catch (AlarmCallbackException | ClassNotFoundException | AlarmCallbackConfigurationException e) {
             throw new InternalServerErrorException(e.getMessage(), e);

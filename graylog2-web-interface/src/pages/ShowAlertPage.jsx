@@ -11,6 +11,7 @@ import UserNotification from 'util/UserNotification';
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
+const { StreamsStore } = CombinedProvider.get('Streams');
 
 import style from './ShowAlertPage.css';
 
@@ -21,13 +22,19 @@ const ShowAlertPage = React.createClass({
 
   mixins: [Reflux.connect(AlertsStore), Reflux.connect(AlertConditionsStore)],
 
+  getInitialState() {
+    return {
+      stream: undefined,
+    };
+  },
+
   componentDidMount() {
     this._loadData();
   },
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState.alert !== this.state.alert) {
-      this._loadAlertCondition(this.state.alert);
+      this._loadAlertDetails(this.state.alert);
     }
   },
 
@@ -36,7 +43,10 @@ const ShowAlertPage = React.createClass({
     AlertsActions.get(this.props.params.alertId);
   },
 
-  _loadAlertCondition(alert) {
+  _loadAlertDetails(alert) {
+    StreamsStore.get(alert.stream_id, stream => {
+      this.setState({ stream: stream });
+    });
     AlertConditionsActions.get(alert.stream_id, alert.condition_id, error => {
       if (error.additional && error.additional.status === 404) {
         this.setState({ alertCondition: {} });
@@ -48,7 +58,7 @@ const ShowAlertPage = React.createClass({
   },
 
   _isLoading() {
-    return !this.state.alert || !this.state.alertCondition || !this.state.types;
+    return !this.state.alert || !this.state.alertCondition || !this.state.types || !this.state.stream;
   },
 
   render() {
@@ -59,6 +69,7 @@ const ShowAlertPage = React.createClass({
     const alert = this.state.alert;
     const condition = this.state.alertCondition;
     const type = this.state.types[condition.type] || {};
+    const stream = this.state.stream;
 
     let statusLabel;
     let resolvedState;
@@ -86,7 +97,7 @@ const ShowAlertPage = React.createClass({
     const title = (
       <span>{condition.title || <em>Unknown alert</em>}&nbsp;
         <small>
-          ({type.name || condition.type || 'Unknown condition type'})&nbsp;
+          on stream <em>{stream.title}</em>&nbsp;
           <span className={style.alertStatusLabel}>{statusLabel}</span>
         </small>
       </span>
@@ -104,7 +115,7 @@ const ShowAlertPage = React.createClass({
           </span>
         </PageHeader>
 
-        <AlertDetails alert={alert} condition={condition} conditionType={type} />
+        <AlertDetails alert={alert} condition={condition} conditionType={type} stream={stream} />
       </div>
     );
   },

@@ -29,7 +29,7 @@ const Alert = React.createClass({
 
     let alertTitle;
     if (condition) {
-      alertTitle = <span>{condition.title} <small>({conditionType.name || 'Unknown type'})</small></span>;
+      alertTitle = <span>{condition.title} <small>on stream <em>{stream.title}</em></small></span>;
     } else {
       alertTitle = <span><em>Unknown alert</em></span>;
     }
@@ -66,8 +66,8 @@ const Alert = React.createClass({
     const content = (
       <Col md={12}>
         <ul className="no-padding">
-          <li><b>Stream:</b> {stream.title} (<em>{stream.id}</em>)</li>
           <li><b>Reason:</b> {alert.description}</li>
+          <li><b>Alert type:</b> {conditionType.name || 'Unknown type. This usually means that the alert condition was deleted since the alert was triggered.'}</li>
         </ul>
       </Col>
     );

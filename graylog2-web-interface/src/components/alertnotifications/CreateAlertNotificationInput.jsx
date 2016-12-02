@@ -4,17 +4,18 @@ import naturalSort from 'javascript-natural-sort';
 import { Button, Col, Input, Row } from 'react-bootstrap';
 
 import { Select, Spinner } from 'components/common';
-import { AlertConditionForm } from 'components/alertconditions';
+import { ConfigurationForm } from 'components/configurationforms';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import history from 'util/History';
 
 import CombinedProvider from 'injection/CombinedProvider';
-const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
+const { AlertNotificationsStore, AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
+const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { StreamsStore } = CombinedProvider.get('Streams');
 
-const CreateAlertConditionInput = React.createClass({
-  mixins: [Reflux.connect(AlertConditionsStore)],
+const CreateAlertNotificationInput = React.createClass({
+  mixins: [Reflux.connect(AlertNotificationsStore)],
   getInitialState() {
     return {
       streams: undefined,
@@ -27,6 +28,7 @@ const CreateAlertConditionInput = React.createClass({
     StreamsStore.listStreams().then(streams => {
       this.setState({ streams: streams });
     });
+    AlertNotificationsActions.available();
   },
 
   PLACEHOLDER: 'placeholder',
@@ -44,8 +46,8 @@ const CreateAlertConditionInput = React.createClass({
       UserNotification.error('Please select the stream that the condition should check.', 'Could not save condition');
     }
 
-    AlertConditionsActions.save(this.state.selectedStream.id, data).then(conditionId => {
-      history.pushState(null, Routes.show_alert_condition(this.state.selectedStream.id, conditionId));
+    AlarmCallbacksActions.save(this.state.selectedStream.id, data).then(() => {
+      history.pushState(null, Routes.ALERTS.NOTIFICATIONS);
     });
   },
   _openForm() {
@@ -54,9 +56,17 @@ const CreateAlertConditionInput = React.createClass({
   _resetForm() {
     this.setState({ type: this.PLACEHOLDER });
   },
-  _formatConditionForm(type) {
+  _formatNotificationForm(type) {
+    const typeDefinition = this.state.availableNotifications[type];
     return (
-      <AlertConditionForm ref="configurationForm" onCancel={this._resetForm} onSubmit={this._onSubmit} type={type} />
+      <ConfigurationForm ref="configurationForm"
+                         key="configuration-form-output"
+                         configFields={typeDefinition.requested_configuration}
+                         title={`Create new ${typeDefinition.name}`}
+                         typeName={type}
+                         includeTitleField={false}
+                         submitAction={this._onSubmit}
+                         cancelAction={this._resetForm} />
     );
   },
 
@@ -65,7 +75,7 @@ const CreateAlertConditionInput = React.createClass({
   },
 
   _isLoading() {
-    return !this.state.types || !this.state.streams;
+    return !this.state.availableNotifications || !this.state.streams;
   },
 
   render() {
@@ -73,35 +83,42 @@ const CreateAlertConditionInput = React.createClass({
       return <Spinner />;
     }
 
-    const conditionForm = (this.state.type !== this.PLACEHOLDER ? this._formatConditionForm(this.state.type) : null);
-    const availableTypes = Object.keys(this.state.types).map(value => {
-      return <option key={`type-option-${value}`} value={value}>{this.state.types[value].name}</option>;
+    const notificationForm = (this.state.type !== this.PLACEHOLDER ? this._formatNotificationForm(this.state.type) : null);
+    const availableTypes = Object.keys(this.state.availableNotifications).map(value => {
+      return (
+        <option key={`type-option-${value}`} value={value}>
+          {this.state.availableNotifications[value].name}
+        </option>
+      );
     });
     const formattedStreams = this.state.streams
       .map(stream => this._formatOption(stream.title, stream.id))
       .sort((s1, s2) => naturalSort(s1.label.toLowerCase(), s2.label.toLowerCase()));
     return (
       <div>
-        <h2>Condition</h2>
-        <p className="description">Define the condition to evaluate when triggering a new alert.</p>
+        <h2>Notification</h2>
+        <p className="description">
+          Define the notification that will be triggered from the alert conditions in a stream.
+        </p>
 
         <Row>
           <Col md={6}>
             <form>
-              <Input label="Alert on stream" help="Select the stream that the condition will use to trigger alerts.">
+              <Input label="Notify on stream"
+                     help="Select the stream that should use this notification when its alert conditions are triggered.">
                 <Select placeholder="Select a stream" options={formattedStreams} onValueChange={this._onStreamChange} />
               </Input>
 
               <Input type="select" value={this.state.type} onChange={this._onChange}
                      disabled={!this.state.selectedStream}
-                     label="Condition type" help="Select the condition type that will be used.">
-                <option value={this.PLACEHOLDER} disabled>Select a condition type</option>
+                     label="Notification type" help="Select the notification type that will be used.">
+                <option value={this.PLACEHOLDER} disabled>Select a notification type</option>
                 {availableTypes}
               </Input>
-              {conditionForm}
+              {notificationForm}
               {' '}
               <Button onClick={this._openForm} disabled={this.state.type === this.PLACEHOLDER} bsStyle="success">
-                Add alert condition
+                Add alert notificaiton
               </Button>
             </form>
           </Col>
@@ -111,4 +128,4 @@ const CreateAlertConditionInput = React.createClass({
   },
 });
 
-export default CreateAlertConditionInput;
+export default CreateAlertNotificationInput;

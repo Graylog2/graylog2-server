@@ -19,6 +19,7 @@ const AlertConditionsStore = Reflux.createStore({
   getInitialState() {
     return {
       types: this.types,
+      allAlertConditions: this.allAlertConditions,
     };
   },
 
@@ -41,7 +42,8 @@ const AlertConditionsStore = Reflux.createStore({
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.delete(streamId, alertConditionId).url);
     const promise = fetch('DELETE', url).then(() => {
-      AlertConditionsActions.list(streamId);
+      AlertConditionsActions.listAll();
+      UserNotification.success('Condition deleted successfully');
     }, failCallback);
     AlertConditionsActions.delete.promise(promise);
     return promise;
@@ -51,9 +53,9 @@ const AlertConditionsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.AlertConditionsApiController.list().url);
     const promise = fetch('GET', url).then(
       response => {
-        const conditions = response.conditions;
-        this.trigger({ allAlertConditions: conditions });
-        return conditions;
+        this.allAlertConditions = response.conditions;
+        this.trigger({ allAlertConditions: this.allAlertConditions });
+        return this.allAlertConditions;
       },
       error => {
         UserNotification.error(`Fetching alert conditions failed with status: ${error}`,
@@ -90,8 +92,9 @@ const AlertConditionsStore = Reflux.createStore({
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.create(streamId).url);
-    const promise = fetch('POST', url, alertCondition).then(() => {
-      AlertConditionsActions.list(streamId);
+    const promise = fetch('POST', url, alertCondition).then(response => {
+      UserNotification.success('Condition created successfully');
+      return response.alert_condition_id;
     }, failCallback);
 
     AlertConditionsActions.save.promise(promise);
@@ -104,8 +107,9 @@ const AlertConditionsStore = Reflux.createStore({
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.update(streamId, alertConditionId).url);
-    const promise = fetch('PUT', url, request).then(() => {
-      AlertConditionsActions.list(streamId);
+    const promise = fetch('PUT', url, request).then(response => {
+      UserNotification.success('Condition updated successfully');
+      return response;
     }, failCallback);
 
     AlertConditionsActions.update.promise(promise);

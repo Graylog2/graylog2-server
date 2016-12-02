@@ -1,32 +1,45 @@
 import React from 'react';
 
-import AlertCondition from 'components/alertconditions/AlertCondition';
+import { AlertCondition } from 'components/alertconditions';
+import { EntityList, PaginatedList } from 'components/common';
 
 const AlertConditionsList = React.createClass({
   propTypes: {
     alertConditions: React.PropTypes.array.isRequired,
+    streams: React.PropTypes.array.isRequired,
   },
+
+  getInitialState() {
+    return {
+      currentPage: 0,
+    };
+  },
+
+  PAGE_SIZE: 10,
+
+  _onChangePaginatedList(currentPage) {
+    this.setState({ currentPage: currentPage - 1 });
+  },
+
+  _paginatedConditions() {
+    return this.props.alertConditions.slice(this.state.currentPage, this.state.currentPage + this.PAGE_SIZE);
+  },
+
+  _formatCondition(condition) {
+    const stream = this.props.streams.find(s => s.alert_conditions.find(c => c.id === condition.id));
+    return <AlertCondition key={condition.id} alertCondition={condition} stream={stream}/>;
+  },
+
   render() {
-    if (this.props.alertConditions.length === 0) {
-      return (
-        <div
-          style={{ marginTop: 10 }}
-          className="alert alert-info">
-          No configured alarm conditions.
-        </div>
-      );
-    }
+    const alertConditions = this.props.alertConditions;
 
     return (
-      <ul style={{ padding: 0 }}>
-        {this.props.alertConditions.map((alertCondition) => {
-          return (
-            <li key={`alertCondition-${alertCondition.id}`} className="alert-condition-item">
-              <AlertCondition alertCondition={alertCondition}/>
-            </li>
-          );
-        })}
-      </ul>
+      <PaginatedList totalItems={alertConditions.length} onChange={this._onChangePaginatedList}
+                     showPageSizeSelect={false} pageSize={this.PAGE_SIZE}>
+        <EntityList bsNoItemsStyle="info"
+                    noItemsText="There are no configured conditions."
+                    items={this._paginatedConditions().map(condition => this._formatCondition(condition))} />
+      </PaginatedList>
     );
   },
 });

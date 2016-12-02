@@ -45,7 +45,13 @@ const Routes = {
   STARTPAGE: '/',
   SEARCH: '/search',
   STREAMS: '/streams',
-  ALERTS: '/alerts',
+  ALERTS: {
+    LIST: '/alerts',
+    CONDITIONS: '/alerts/conditions',
+    NEW_CONDITION: '/alerts/conditions/new',
+    NOTIFICATIONS: '/alerts/notifications',
+    NEW_NOTIFICATION: '/alerts/notifications/new',
+  },
   SOURCES: '/sources',
   DASHBOARDS: '/dashboards',
   GETTING_STARTED: '/gettingstarted',
@@ -138,7 +144,8 @@ const Routes = {
   },
   legacy_stream_search: (streamId) => `/streams/${streamId}/messages`,
 
-  show_alert: (alertId) => `/alerts/${alertId}`,
+  show_alert: (alertId) => `${Routes.ALERTS.LIST}/${alertId}`,
+  show_alert_condition: (streamId, conditionId) => `${Routes.ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
 
   dashboard_show: (dashboardId) => `/dashboards/${dashboardId}`,
 

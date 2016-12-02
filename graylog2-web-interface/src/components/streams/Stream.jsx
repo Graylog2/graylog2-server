@@ -89,11 +89,6 @@ const Stream = React.createClass({
           <Button bsStyle="info">Manage Rules</Button>
         </LinkContainer>
       );
-      manageAlertsLink = isDefaultStream ? null : (
-        <LinkContainer to={Routes.stream_alerts(stream.id)}>
-          <Button bsStyle="info">Manage Alerts</Button>
-        </LinkContainer>
-      );
 
       if (this.isPermitted(permissions, ['stream_outputs:read'])) {
         manageOutputsLink = (
