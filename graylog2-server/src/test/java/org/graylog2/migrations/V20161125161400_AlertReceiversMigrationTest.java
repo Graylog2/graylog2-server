@@ -147,7 +147,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 alarmCallbackId,
                 matchingStreamId,
                 EmailAlarmCallback.class.getCanonicalName(),
-                "Email Alert Callback",
+                "Email Alert Notification",
                 new HashMap<>(),
                 new Date(),
                 "admin"
@@ -211,7 +211,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 alarmCallbackId1,
                 matchingStreamId1,
                 EmailAlarmCallback.class.getCanonicalName(),
-                "Email Alert Callback",
+                "Email Alert Notification",
                 new HashMap<>(),
                 new Date(),
                 "admin"
@@ -221,7 +221,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 alarmCallbackId2,
                 matchingStreamId2,
                 EmailAlarmCallback.class.getCanonicalName(),
-                "Email Alert Callback",
+                "Email Alert Notification",
                 new HashMap<>(),
                 new Date(),
                 "admin"
@@ -231,7 +231,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 alarmCallbackId3,
                 matchingStreamId2,
                 EmailAlarmCallback.class.getCanonicalName(),
-                "Email Alert Callback",
+                "Email Alert Notification",
                 new HashMap<>(),
                 new Date(),
                 "admin"
@@ -241,7 +241,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 alarmCallbackId4,
                 matchingStreamId2,
                 HTTPAlarmCallback.class.getCanonicalName(),
-                "Email Alert Callback",
+                "Email Alert Notification",
                 new HashMap<>(),
                 new Date(),
                 "admin"

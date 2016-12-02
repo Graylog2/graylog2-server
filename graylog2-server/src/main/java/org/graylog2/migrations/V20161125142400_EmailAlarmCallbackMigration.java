@@ -121,7 +121,7 @@ public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
         final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackService.create(stream.getId(),
                 CreateAlarmCallbackRequest.create(
                         EmailAlarmCallback.class.getCanonicalName(),
-                        "Email Alert Callback",
+                        "Email Alert Notification",
                         defaultConfig
                 ),
                 localAdminUser.getId()
