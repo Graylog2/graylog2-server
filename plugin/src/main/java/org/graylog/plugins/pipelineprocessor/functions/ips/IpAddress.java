@@ -23,12 +23,12 @@ import java.net.UnknownHostException;
 import java.util.Objects;
 
 /**
- * Graylog's rule language wrapper for InetAddress.
- * <br/>
+ * Graylog's rule language wrapper for {@link InetAddress}.
+ * <br>
  * The purpose of this class is to guard against accidentally accessing properties which can trigger name resolutions
  * and to provide a known interface to deal with IP addresses.
- * <br/>
- * Almost all of the logic is in the actual InetAddress delegate object.
+ * <br>
+ * Almost all of the logic is in the actual {@link InetAddress} delegate object.
  */
 public class IpAddress {
 

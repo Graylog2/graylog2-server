@@ -83,7 +83,7 @@ public class RegexMatch extends AbstractFunction<RegexMatch.RegexMatchResult> {
 
     /**
      * The bean returned into the rule engine. It implements Map so rules can access it directly.
-     * <br/>
+     * <br>
      * At the same time there's an additional <code>matches</code> bean property to quickly check whether the regex has matched at all.
      */
     public static class RegexMatchResult extends ForwardingMap<String, String> {

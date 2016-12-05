@@ -73,7 +73,7 @@ public interface Function<T> {
 
     /**
      * Implementations should provide a non-null value for each argument they wish to pre-compute.
-     * <br/>
+     * <br>
      * Examples include compile a Pattern from a regex string, which will never change during the lifetime of the function.
      * If any part of the expression tree depends on external values this method will not be called, e.g. if the regex depends on a message field.
      * @param args the function args for this functions, usually you don't need this
