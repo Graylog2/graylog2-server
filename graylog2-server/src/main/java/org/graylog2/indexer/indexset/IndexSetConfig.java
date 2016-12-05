@@ -63,10 +63,13 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @NotBlank
     public abstract String indexPrefix();
 
-    // TODO 2.2: Make this configurable because we might have to change it for some index sets. (e.g. Archive: "^<prefix>-\S+_\d+" instead of "^<prefix>_\d+")
-    // TODO 2.2: But it should probably not be configurable in the user interface...
-    //@JsonProperty("index_match_pattern")
-    //public abstract String indexMatchPattern();
+    @JsonProperty("index_match_pattern")
+    @Nullable
+    public abstract String indexMatchPattern();
+
+    @JsonProperty("index_wildcard")
+    @Nullable
+    public abstract String indexWildcard();
 
     @JsonProperty("shards")
     @Min(1)
@@ -131,6 +134,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("default") @Nullable Boolean isDefault,
                                         @JsonProperty("index_prefix") @NotBlank String indexPrefix,
+                                        @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
+                                        @JsonProperty("index_wildcard") @Nullable String indexWildcard,
                                         @JsonProperty("shards") @Min(1) int shards,
                                         @JsonProperty("replicas") @Min(0) int replicas,
                                         @JsonProperty("rotation_strategy_class") @Nullable String rotationStrategyClass,
@@ -144,6 +149,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .description(description)
                 .isDefault(isDefault == null ? false : isDefault)
                 .indexPrefix(indexPrefix)
+                .indexMatchPattern(indexMatchPattern)
+                .indexWildcard(indexWildcard)
                 .shards(shards)
                 .replicas(replicas)
                 .rotationStrategyClass(rotationStrategyClass)
@@ -152,6 +159,21 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .retentionStrategy(retentionStrategy)
                 .creationDate(creationDate)
                 .build();
+    }
+
+    public static IndexSetConfig create(String id,
+                                        String title,
+                                        String description,
+                                        boolean isDefault,
+                                        String indexPrefix,
+                                        int shards,
+                                        int replicas,
+                                        String rotationStrategyClass,
+                                        RotationStrategyConfig rotationStrategy,
+                                        String retentionStrategyClass,
+                                        RetentionStrategyConfig retentionStrategy,
+                                        ZonedDateTime creationDate) {
+        return create(id, title, description, isDefault, indexPrefix, null, null, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
     }
 
     public static IndexSetConfig create(String title,
@@ -165,7 +187,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         String retentionStrategyClass,
                                         RetentionStrategyConfig retentionStrategy,
                                         ZonedDateTime creationDate) {
-        return create(null, title, description, isDefault, indexPrefix, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
+        return create(null, title, description, isDefault, indexPrefix, null, null, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
     }
 
     @Override
@@ -194,6 +216,10 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         public abstract Builder isDefault(boolean isDefault);
 
         public abstract Builder indexPrefix(String indexPrefix);
+
+        public abstract Builder indexMatchPattern(String indexMatchPattern);
+
+        public abstract Builder indexWildcard(String indexWildcard);
 
         public abstract Builder shards(int shards);
 

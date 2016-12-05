@@ -72,6 +72,7 @@ public class MongoIndexSet implements IndexSet {
     private final Indices indices;
     private final Pattern indexPattern;
     private final Pattern deflectorIndexPattern;
+    private final String indexWildcard;
     private final IndexRangeService indexRangeService;
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
@@ -98,9 +99,23 @@ public class MongoIndexSet implements IndexSet {
         this.jobFactory = requireNonNull(jobFactory);
         this.activityWriter = requireNonNull(activityWriter);
 
-        // TODO 2.2: Is this strict enough? What happens if an index set with a prefix of "foo_0" is created?
-        this.indexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
-        this.deflectorIndexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+");
+        // Part of the pattern can be configured in IndexSetConfig. If set we use the indexMatchPattern from the config.
+        if (isNullOrEmpty(config.indexMatchPattern())) {
+            // TODO 2.2: Is this strict enough? What happens if an index set with a prefix of "foo_0" is created?
+            this.indexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
+            this.deflectorIndexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+");
+        } else {
+            this.indexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
+            this.deflectorIndexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+");
+        }
+
+        // The index wildcard can be configured in IndexSetConfig. If not set we use a default one based on the index
+        // prefix.
+        if (isNullOrEmpty(config.indexWildcard())) {
+            this.indexWildcard = config.indexPrefix() + SEPARATOR + "*";
+        } else {
+            this.indexWildcard = config.indexWildcard();
+        }
     }
 
     @Override
@@ -121,7 +136,7 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public String getWriteIndexWildcard() {
-        return config.indexPrefix() + SEPARATOR + "*";
+        return indexWildcard;
     }
 
     @Override
