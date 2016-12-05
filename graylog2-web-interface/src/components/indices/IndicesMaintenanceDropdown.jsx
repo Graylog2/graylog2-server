@@ -11,6 +11,7 @@ const DeflectorStore = StoreProvider.getStore('Deflector'); // eslint-disable-li
 const IndicesMaintenanceDropdown = React.createClass({
   propTypes: {
     indexSetId: React.PropTypes.string.isRequired,
+    indexSet: React.PropTypes.object,
   },
 
   _onRecalculateIndexRange() {
@@ -27,11 +28,15 @@ const IndicesMaintenanceDropdown = React.createClass({
     }
   },
   render() {
+    let cycleButton;
+    if (this.props.indexSet && this.props.indexSet.writable) {
+      cycleButton = <MenuItem eventKey="2" onClick={this._onCycleDeflector}>Manually rotate active write index</MenuItem>;
+    }
     return (
       <ButtonGroup>
         <DropdownButton bsStyle="info" bsSize="lg" title="Maintenance" id="indices-maintenance-actions" pullRight>
           <MenuItem eventKey="1" onClick={this._onRecalculateIndexRange}>Recalculate all index ranges</MenuItem>
-          <MenuItem eventKey="2" onClick={this._onCycleDeflector}>Manually rotate active write index</MenuItem>
+          {cycleButton}
         </DropdownButton>
       </ButtonGroup>
     );
