@@ -68,7 +68,7 @@ const StreamForm = React.createClass({
   },
 
   _formatSelectOptions() {
-    return this.props.indexSets.map(indexSet => {
+    return this.props.indexSets.filter(indexSet => indexSet.writable).map(indexSet => {
       return { value: indexSet.id, label: indexSet.title };
     });
   },

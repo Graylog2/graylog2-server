@@ -40,6 +40,7 @@ import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
@@ -197,6 +198,7 @@ public class MongoIndexSet implements IndexSet {
     }
 
     @Override
+    @Nullable
     public String getCurrentActualTargetIndex() throws TooManyAliasesException {
         return indices.aliasTarget(getWriteIndexAlias());
     }
@@ -233,6 +235,11 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public void setUp() {
+        if (!getConfig().isWritable()) {
+            LOG.debug("Not setting up non-writable index set <{}> ({})", getConfig().id(), getConfig().title());
+            return;
+        }
+
         // Check if there already is an deflector index pointing somewhere.
         if (isUp()) {
             LOG.info("Found deflector alias <{}>. Using it.", getWriteIndexAlias());
@@ -259,6 +266,11 @@ public class MongoIndexSet implements IndexSet {
 
     @Override
     public void cycle() {
+        if (!getConfig().isWritable()) {
+            LOG.debug("Not cycling non-writable index set <{}> ({})", getConfig().id(), getConfig().title());
+            return;
+        }
+
         int oldTargetNumber;
 
         try {

@@ -38,6 +38,8 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
@@ -92,6 +94,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
@@ -105,6 +108,7 @@ public class StreamResource extends RestResource {
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final StreamRouterEngine.Factory streamRouterEngineFactory;
+    private final IndexSetRegistry indexSetRegistry;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final AlertService alertService;
     private final ClusterEventBus clusterEventBus;
@@ -113,12 +117,14 @@ public class StreamResource extends RestResource {
     public StreamResource(StreamService streamService,
                           StreamRuleService streamRuleService,
                           StreamRouterEngine.Factory streamRouterEngineFactory,
+                          IndexSetRegistry indexSetRegistry,
                           AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                           AlertService alertService,
                           ClusterEventBus clusterEventBus) {
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.streamRouterEngineFactory = streamRouterEngineFactory;
+        this.indexSetRegistry = indexSetRegistry;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.alertService = alertService;
         this.clusterEventBus = clusterEventBus;
@@ -135,6 +141,10 @@ public class StreamResource extends RestResource {
         // Create stream.
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
         stream.setDisabled(true);
+
+        if (!stream.getIndexSet().getConfig().isWritable()) {
+            throw new BadRequestException("Assigned index set must be writable!");
+        }
 
         final String id = streamService.save(stream);
 
@@ -249,6 +259,14 @@ public class StreamResource extends RestResource {
         // id if it's null/empty in the update request.
         if (!Strings.isNullOrEmpty(cr.indexSetId())) {
             stream.setIndexSetId(cr.indexSetId());
+        }
+
+        final Optional<IndexSet> indexSet = indexSetRegistry.get(stream.getIndexSetId());
+
+        if (!indexSet.isPresent()) {
+            throw new BadRequestException("Index set with ID <" + stream.getIndexSetId() + "> does not exist!");
+        } else if (!indexSet.get().getConfig().isWritable()) {
+            throw new BadRequestException("Assigned index set must be writable!");
         }
 
         streamService.save(stream);

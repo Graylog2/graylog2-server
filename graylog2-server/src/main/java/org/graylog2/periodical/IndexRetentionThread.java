@@ -68,6 +68,10 @@ public class IndexRetentionThread extends Periodical {
         }
 
         for (final IndexSet indexSet : indexSetRegistry) {
+            if (!indexSet.getConfig().isWritable()) {
+                LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
+                continue;
+            }
             final IndexSetConfig config = indexSet.getConfig();
             final Provider<RetentionStrategy> retentionStrategyProvider = retentionStrategyMap.get(config.retentionStrategyClass());
 

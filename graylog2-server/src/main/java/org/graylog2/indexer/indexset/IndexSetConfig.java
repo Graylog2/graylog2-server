@@ -55,9 +55,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("default")
     public abstract boolean isDefault();
 
-    // TODO 2.2: Add writable flag and use it for retention/rotation and to decide if a deflector needs to be created.
-    //@JsonProperty("writable")
-    //public abstract boolean isWritable();
+    @JsonProperty("writable")
+    public abstract boolean isWritable();
 
     @JsonProperty("index_prefix")
     @NotBlank
@@ -133,6 +132,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("title") @NotBlank String title,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("default") @Nullable Boolean isDefault,
+                                        @JsonProperty("writable") @Nullable Boolean isWritable,
                                         @JsonProperty("index_prefix") @NotBlank String indexPrefix,
                                         @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
                                         @JsonProperty("index_wildcard") @Nullable String indexWildcard,
@@ -148,6 +148,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .title(title)
                 .description(description)
                 .isDefault(isDefault == null ? false : isDefault)
+                .isWritable(isWritable == null ? true : isWritable)
                 .indexPrefix(indexPrefix)
                 .indexMatchPattern(indexMatchPattern)
                 .indexWildcard(indexWildcard)
@@ -165,6 +166,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         String title,
                                         String description,
                                         boolean isDefault,
+                                        boolean isWritable,
                                         String indexPrefix,
                                         int shards,
                                         int replicas,
@@ -173,12 +175,13 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         String retentionStrategyClass,
                                         RetentionStrategyConfig retentionStrategy,
                                         ZonedDateTime creationDate) {
-        return create(id, title, description, isDefault, indexPrefix, null, null, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
+        return create(id, title, description, isDefault, isWritable, indexPrefix, null, null, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
     }
 
     public static IndexSetConfig create(String title,
                                         String description,
                                         boolean isDefault,
+                                        boolean isWritable,
                                         String indexPrefix,
                                         int shards,
                                         int replicas,
@@ -187,7 +190,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         String retentionStrategyClass,
                                         RetentionStrategyConfig retentionStrategy,
                                         ZonedDateTime creationDate) {
-        return create(null, title, description, isDefault, indexPrefix, null, null, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
+        return create(null, title, description, isDefault, isWritable, indexPrefix, null, null, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
     }
 
     @Override
@@ -202,7 +205,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public abstract Builder toBuilder();
 
     public static Builder builder() {
-        return new AutoValue_IndexSetConfig.Builder();
+        // Index sets are writable by default.
+        return new AutoValue_IndexSetConfig.Builder().isWritable(true);
     }
 
     @AutoValue.Builder
@@ -214,6 +218,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         public abstract Builder description(String description);
 
         public abstract Builder isDefault(boolean isDefault);
+
+        public abstract Builder isWritable(boolean isWritable);
 
         public abstract Builder indexPrefix(String indexPrefix);
 
