@@ -20,6 +20,9 @@ import com.google.common.collect.ImmutableMap;
 import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
@@ -37,16 +40,20 @@ import java.util.Map;
 /**
  * Migration creating the default stream if it doesn't exist.
  */
-public class V20160929120500_CreateDefaultStreamMigration extends Migration {
-    private static final Logger LOG = LoggerFactory.getLogger(V20160929120500_CreateDefaultStreamMigration.class);
+public class V20161116172200_CreateDefaultStreamMigration extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20161116172200_CreateDefaultStreamMigration.class);
 
     private final StreamService streamService;
     private final ClusterEventBus clusterEventBus;
+    private final IndexSetRegistry indexSetRegistry;
 
     @Inject
-    public V20160929120500_CreateDefaultStreamMigration(StreamService streamService, ClusterEventBus clusterEventBus) {
+    public V20161116172200_CreateDefaultStreamMigration(StreamService streamService,
+                                                        ClusterEventBus clusterEventBus,
+                                                        IndexSetRegistry indexSetRegistry) {
         this.streamService = streamService;
         this.clusterEventBus = clusterEventBus;
+        this.indexSetRegistry = indexSetRegistry;
     }
 
     @Override
@@ -64,6 +71,9 @@ public class V20160929120500_CreateDefaultStreamMigration extends Migration {
     }
 
     private void createDefaultStream() {
+        final IndexSet indexSet = indexSetRegistry.getDefault()
+                .orElseThrow(() -> new IllegalStateException("Couldn't find default index set! This is a bug!"));
+
         final ObjectId id = new ObjectId(Stream.DEFAULT_STREAM_ID);
         final Map<String, Object> fields = ImmutableMap.<String, Object>builder()
                 .put(StreamImpl.FIELD_TITLE, "All messages")
@@ -74,13 +84,16 @@ public class V20160929120500_CreateDefaultStreamMigration extends Migration {
                 .put(StreamImpl.FIELD_MATCHING_TYPE, StreamImpl.MatchingType.DEFAULT.name())
                 .put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false)
                 .put(StreamImpl.FIELD_DEFAULT_STREAM, true)
+                .put(StreamImpl.FIELD_INDEX_SET_ID, indexSet.getConfig().id())
                 .build();
-        final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), null);
+        final Stream stream = new StreamImpl(id, fields, Collections.emptyList(), Collections.emptySet(), indexSet);
 
-        // Save without validations here to avoid failing the index set validation which has been added at a later
-        // point in time.
-        streamService.saveWithoutValidation(stream);
-        LOG.info("Successfully created default stream: {}", stream.getTitle());
+        try {
+            streamService.save(stream);
+            LOG.info("Successfully created default stream: {}", stream.getTitle());
+        } catch (ValidationException e) {
+            LOG.error("Couldn't create default stream! This is a bug!");
+        }
 
         clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
     }

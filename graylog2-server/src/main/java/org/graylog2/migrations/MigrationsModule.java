@@ -24,8 +24,8 @@ public class MigrationsModule extends AbstractModule {
     protected void configure() {
         final Multibinder<Migration> binder = Multibinder.newSetBinder(binder(), Migration.class);
         binder.addBinding().to(V20151210140600_ElasticsearchConfigMigration.class);
-        binder.addBinding().to(V20160929120500_CreateDefaultStreamMigration.class);
         binder.addBinding().to(V20161116172100_DefaultIndexSetMigration.class);
+        binder.addBinding().to(V20161116172200_CreateDefaultStreamMigration.class);
         binder.addBinding().to(V20161122174500_AssignIndexSetsToStreamsMigration.class);
         binder.addBinding().to(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.class);
         binder.addBinding().to(V20161125142400_EmailAlarmCallbackMigration.class);
