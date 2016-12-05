@@ -69,6 +69,7 @@ const AlertNotification = React.createClass({
                              configFields={typeDefinition.requested_configuration}
                              title={"Editing alert configuration "}
                              typeName={notification.type}
+                             titleValue={notification.title}
                              submitAction={this._onSubmit}
                              values={notification.configuration} />
           <ConfigurationWell configuration={notification.configuration} typeDefinition={typeDefinition} />
