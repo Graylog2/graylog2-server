@@ -29,6 +29,7 @@ const IndexSetCreationPage = React.createClass({
         title: '',
         description: '',
         index_prefix: '',
+        writable: true,
         shards: 4,
         replicas: 0,
         retention_strategy_class: 'org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy',
