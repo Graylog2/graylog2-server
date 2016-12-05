@@ -58,7 +58,7 @@ public class V20161116172200_CreateDefaultStreamMigration extends Migration {
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2016-09-29T12:05:00Z");
+        return ZonedDateTime.parse("2016-11-16T17:22:00Z");
     }
 
     @Override
