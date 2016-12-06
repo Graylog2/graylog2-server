@@ -32,6 +32,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConvers
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
@@ -169,6 +170,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
         functions.put(SelectJsonPath.NAME, new SelectJsonPath(objectMapper));
 
+        functions.put(DateConversion.NAME, new DateConversion());
         functions.put(Now.NAME, new Now());
         functions.put(FlexParseDate.NAME, new FlexParseDate());
         functions.put(ParseDate.NAME, new ParseDate());
@@ -625,6 +627,8 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
 
             assertThat(message.getFieldAs(DateTime.class, "long_time_ago")).matches(date -> date.plus(Period.years(10000)).equals(GRAYLOG_EPOCH));
+
+            assertThat(message.getTimestamp()).isEqualTo(GRAYLOG_EPOCH.plusHours(1));
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }

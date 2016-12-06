@@ -35,5 +35,7 @@ then
       millis: millis(2),
       period: period("P1YT1M")
     });
+    set_field("timestamp", to_date($message.timestamp) + hours(1));
+
     trigger_test();
 end

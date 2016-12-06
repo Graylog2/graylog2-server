@@ -25,6 +25,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConvers
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
@@ -121,6 +122,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(SelectJsonPath.NAME, SelectJsonPath.class);
 
         // dates
+        addMessageProcessorFunction(DateConversion.NAME, DateConversion.class);
         addMessageProcessorFunction(Now.NAME, Now.class);
         addMessageProcessorFunction(ParseDate.NAME, ParseDate.class);
         addMessageProcessorFunction(FlexParseDate.NAME, FlexParseDate.class);
