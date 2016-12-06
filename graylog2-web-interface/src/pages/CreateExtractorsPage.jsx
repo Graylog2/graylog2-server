@@ -7,6 +7,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import EditExtractor from 'components/extractors/EditExtractor';
 
 import DocsHelper from 'util/DocsHelper';
+import StringUtils from 'util/StringUtils';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -62,6 +63,8 @@ const CreateExtractorsPage = React.createClass({
       return <Spinner/>;
     }
 
+    const exampleMessage = StringUtils.stringify(this.state.exampleMessage.fields[this.state.field]);
+
     return (
       <div>
         <PageHeader title={<span>New extractor for input <em>{this.state.input.title}</em></span>}>
@@ -78,7 +81,7 @@ const CreateExtractorsPage = React.createClass({
         <EditExtractor action="create"
                        extractor={this.state.extractor}
                        inputId={this.state.input.id}
-                       exampleMessage={JSON.stringify(this.state.exampleMessage.fields[this.state.field]) || ''}
+                       exampleMessage={exampleMessage}
                        onSave={this._extractorSaved}/>
       </div>
     );

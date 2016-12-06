@@ -5,6 +5,7 @@ import MessageFormatter from 'logic/message/MessageFormatter';
 import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import UserNotification from 'util/UserNotification';
+import StringUtils from 'util/StringUtils';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const MessagesActions = ActionsProvider.getActions('Messages');
@@ -31,7 +32,7 @@ const MessagesStore = Reflux.createStore({
   },
 
   fieldTerms(index, string) {
-    const url = ApiRoutes.MessagesController.analyze(index, JSON.stringify(string)).url;
+    const url = ApiRoutes.MessagesController.analyze(index, StringUtils.stringify(string)).url;
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
       .then(
         response => response.tokens,
