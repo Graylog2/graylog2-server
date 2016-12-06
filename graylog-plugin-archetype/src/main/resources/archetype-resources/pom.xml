@@ -233,7 +233,7 @@
                                 </goals>
                                 <configuration>
                                     <nodeVersion>v4.4.3</nodeVersion>
-                                    <npmVersion>3.8.6</npmVersion>
+                                    <npmVersion>4.0.3</npmVersion>
                                 </configuration>
                             </execution>
 
