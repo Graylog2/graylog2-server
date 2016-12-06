@@ -93,7 +93,8 @@ public abstract class Rule {
      */
     public void registerMetrics(MetricRegistry metricRegistry, String pipelineId, String stageId) {
         if (id() == null) {
-            throw new IllegalStateException();
+            LOG.debug("Not registering metrics for unsaved rule {}", name());
+            return;
         }
         if (id() != null) {
             globalExecuted = registerGlobalMeter(metricRegistry, "executed");

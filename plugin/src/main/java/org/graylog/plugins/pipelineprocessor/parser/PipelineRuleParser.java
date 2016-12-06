@@ -172,10 +172,14 @@ public class PipelineRuleParser {
 
         if (parseContext.getErrors().isEmpty()) {
             Rule parsedRule = parseContext.getRules().get(0).withId(id);
-            if (ruleClassLoader != null || ConfigurationStateUpdater.isAllowCodeGeneration()) {
-                final Class<? extends GeneratedRule> generatedClass = codeGenerator.generateCompiledRule(parsedRule, ruleClassLoader);
-                if (generatedClass != null) {
-                    parsedRule = parsedRule.toBuilder().generatedRuleClass(generatedClass).build();
+            if (ruleClassLoader != null && ConfigurationStateUpdater.isAllowCodeGeneration()) {
+                try {
+                    final Class<? extends GeneratedRule> generatedClass = codeGenerator.generateCompiledRule(parsedRule, ruleClassLoader);
+                    if (generatedClass != null) {
+                        parsedRule = parsedRule.toBuilder().generatedRuleClass(generatedClass).build();
+                    }
+                } catch (Exception e) {
+                    log.warn("Unable to compile rule {} to native code, falling back to interpreting it: {}", parsedRule.name(), e.getMessage());
                 }
             }
             return parsedRule;
