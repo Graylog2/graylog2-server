@@ -7,6 +7,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import EditExtractor from 'components/extractors/EditExtractor';
 
 import DocsHelper from 'util/DocsHelper';
+import StringUtils from 'util/StringUtils';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -62,8 +63,7 @@ const CreateExtractorsPage = React.createClass({
       return <Spinner/>;
     }
 
-    const value = this.state.exampleMessage.fields[this.state.field];
-    const exampleMessage = (typeof value === 'object' ? JSON.stringify(value) : String(value));
+    const exampleMessage = StringUtils.stringify(this.state.exampleMessage.fields[this.state.field]);
 
     return (
       <div>

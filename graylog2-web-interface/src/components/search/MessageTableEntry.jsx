@@ -1,7 +1,8 @@
 import React from 'react';
 import MessageDetail from './MessageDetail';
 import Immutable from 'immutable';
-import {Timestamp} from 'components/common';
+import { Timestamp } from 'components/common';
+import StringUtils from 'util/StringUtils';
 
 const MessageTableEntry = React.createClass({
   shouldComponentUpdate(newProps) {
@@ -31,7 +32,7 @@ const MessageTableEntry = React.createClass({
       return '';
     }
     // Ensure the field is a string for later processing
-    const fullStringOrigValue = (typeof fullOrigValue === 'object' ? JSON.stringify(fullOrigValue) : String(fullOrigValue));
+    const fullStringOrigValue = StringUtils.stringify(fullOrigValue);
 
     // Truncate the field to 2048 characters if requested. This is for performance reasons to avoid hogging the CPU.
     // It's not optimal, more like a workaround to at least being able to show the page...

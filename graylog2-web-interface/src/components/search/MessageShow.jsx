@@ -2,6 +2,7 @@ import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
 import MessageDetail from './MessageDetail';
+import StringUtils from 'util/StringUtils';
 
 const MessageShow = React.createClass({
   propTypes: {
@@ -28,8 +29,7 @@ const MessageShow = React.createClass({
 
   possiblyHighlight(fieldName) {
     // No highlighting for the message details view.
-    const value = this.props.message.fields[fieldName];
-    return (typeof value === 'object' ? JSON.stringify(value) : String(value));
+    return StringUtils.stringify(this.props.message.fields[fieldName]);
   },
   render() {
     return (
