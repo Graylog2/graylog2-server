@@ -27,6 +27,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.codegen.CodeGenerator;
 import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
+import org.graylog.plugins.pipelineprocessor.codegen.compiler.JavaCompiler;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.plugin.Message;
@@ -78,7 +79,7 @@ public class BaseParserTest {
 
     @Before
     public void setup() {
-        parser = new PipelineRuleParser(functionRegistry, new CodeGenerator());
+        parser = new PipelineRuleParser(functionRegistry, new CodeGenerator(JavaCompiler::new));
         // initialize before every test!
         actionsTriggered.set(false);
     }

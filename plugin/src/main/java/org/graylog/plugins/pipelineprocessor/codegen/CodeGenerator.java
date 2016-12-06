@@ -21,8 +21,6 @@ import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
-import net.openhft.compiler.CompilerUtils;
-
 import org.apache.commons.beanutils.PropertyUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -54,6 +52,7 @@ import org.graylog.plugins.pipelineprocessor.ast.expressions.VarRefExpression;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.statements.VarAssignStatement;
+import org.graylog.plugins.pipelineprocessor.codegen.compiler.JavaCompiler;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
@@ -74,12 +73,20 @@ import java.util.function.Function;
 import java.util.stream.Stream;
 
 import javax.annotation.Nonnull;
+import javax.inject.Inject;
+import javax.inject.Provider;
 import javax.lang.model.element.Modifier;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class CodeGenerator {
     private static final Logger log = LoggerFactory.getLogger(CodeGenerator.class);
+    private final Provider<JavaCompiler> compilerProvider;
+
+    @Inject
+    public CodeGenerator(Provider<JavaCompiler> compilerProvider) {
+        this.compilerProvider = compilerProvider;
+    }
 
     public static String sourceCodeForRule(Rule rule) {
         final JavaPoetListener javaPoetListener = new JavaPoetListener();
@@ -88,7 +95,7 @@ public class CodeGenerator {
     }
 
     @SuppressWarnings("unchecked")
-    public Class<? extends GeneratedRule> generateCompiledRule(Rule rule, ClassLoader ruleClassloader) {
+    public Class<? extends GeneratedRule> generateCompiledRule(Rule rule, PipelineClassloader ruleClassloader) {
         if (rule.id() == null) {
             throw new IllegalArgumentException("Rules must have an id to generate code for them");
         }
@@ -97,7 +104,7 @@ public class CodeGenerator {
             if (log.isTraceEnabled()) {
                 log.trace("Sourcecode:\n{}", sourceCode);
             }
-            return (Class<GeneratedRule>) CompilerUtils.CACHED_COMPILER.loadFromJava(ruleClassloader, "org.graylog.plugins.pipelineprocessor.$dynamic.rules.rule$" + rule.id() , sourceCode);
+            return (Class<GeneratedRule>) compilerProvider.get().loadFromString(ruleClassloader, "org.graylog.plugins.pipelineprocessor.$dynamic.rules.rule$" + rule.id() , sourceCode);
         } catch (ClassNotFoundException e) {
             log.error("Unable to compile code\n{}", sourceCode);
             return null;

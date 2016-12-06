@@ -28,6 +28,7 @@ import com.codahale.metrics.MetricRegistry;
 
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.codegen.CodeGenerator;
+import org.graylog.plugins.pipelineprocessor.codegen.compiler.JavaCompiler;
 import org.graylog.plugins.pipelineprocessor.db.PipelineDao;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
@@ -139,7 +140,7 @@ public class FilterchainVsPipeline {
             functions.put(StringConversion.NAME, new StringConversion());
 
             final FunctionRegistry functionRegistry = new FunctionRegistry(functions);
-            final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry, new CodeGenerator());
+            final PipelineRuleParser parser = new PipelineRuleParser(functionRegistry, new CodeGenerator(JavaCompiler::new));
 
             final MetricRegistry metricRegistry = new MetricRegistry();
             final ConfigurationStateUpdater stateUpdater = new ConfigurationStateUpdater(ruleService,

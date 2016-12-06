@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Graylog Pipeline Processor.
  *
  * Graylog Pipeline Processor is free software: you can redistribute it and/or modify
@@ -14,14 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor.parser;
+package org.graylog.plugins.pipelineprocessor.codegen.compiler;
 
-import org.graylog.plugins.pipelineprocessor.codegen.PipelineClassloader;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Collectors;
 
-public class CodegenPipelineRuleParserTest extends PipelineRuleParserTest {
+import javax.tools.Diagnostic;
 
-    // runs the same tests as in PipelineRuleParserTest but with dynamic code generation turned on.
-    public CodegenPipelineRuleParserTest() {
-        classLoader = new PipelineClassloader();
+public class PipelineCompilationException extends RuntimeException {
+    private final List<Diagnostic> errors;
+
+    public PipelineCompilationException(List<Diagnostic> errors) {
+        this.errors = errors;
+    }
+
+    @Override
+    public String getMessage() {
+        return errors.stream()
+                .map(diagnostic -> diagnostic.getMessage(Locale.ENGLISH))
+                .collect(Collectors.joining("\n"));
     }
 }

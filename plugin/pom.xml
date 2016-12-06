@@ -91,11 +91,6 @@
                 <artifactId>javapoet</artifactId>
                 <version>1.7.0</version>
             </dependency>
-            <dependency>
-                <groupId>net.openhft</groupId>
-                <artifactId>compiler</artifactId>
-                <version>2.2.4</version>
-            </dependency>
 
             <dependency>
                 <groupId>org.slf4j</groupId>
@@ -166,10 +161,6 @@
         <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>net.openhft</groupId>
-            <artifactId>compiler</artifactId>
         </dependency>
 
         <dependency>

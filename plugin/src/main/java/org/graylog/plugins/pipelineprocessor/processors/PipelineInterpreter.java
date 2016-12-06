@@ -490,6 +490,8 @@ public class PipelineInterpreter implements MessageProcessor {
                         }
                     });
 
+            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(State.class, "stage-cache")));
+
             metricRegistry.register(name(State.class, "stage-cache", "hit-count"), (Gauge<Long>) () -> cache.stats().hitCount());
             metricRegistry.register(name(State.class, "stage-cache", "hit-rate"), (Gauge<Double>) () -> cache.stats().hitRate());
             metricRegistry.register(name(State.class, "stage-cache", "miss-count"), (Gauge<Long>) () -> cache.stats().missCount());

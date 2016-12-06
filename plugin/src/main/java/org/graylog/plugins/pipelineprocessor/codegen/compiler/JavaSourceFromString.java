@@ -1,4 +1,4 @@
-/**
+/*
  * This file is part of Graylog Pipeline Processor.
  *
  * Graylog Pipeline Processor is free software: you can redistribute it and/or modify
@@ -14,14 +14,26 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog Pipeline Processor.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog.plugins.pipelineprocessor.parser;
+package org.graylog.plugins.pipelineprocessor.codegen.compiler;
 
-import org.graylog.plugins.pipelineprocessor.codegen.PipelineClassloader;
+import java.net.URI;
 
-public class CodegenPipelineRuleParserTest extends PipelineRuleParserTest {
+import javax.tools.SimpleJavaFileObject;
+import javax.validation.constraints.NotNull;
 
-    // runs the same tests as in PipelineRuleParserTest but with dynamic code generation turned on.
-    public CodegenPipelineRuleParserTest() {
-        classLoader = new PipelineClassloader();
+import static javax.tools.JavaFileObject.Kind.SOURCE;
+
+public class JavaSourceFromString extends SimpleJavaFileObject {
+
+    private final String sourceCode;
+
+    public JavaSourceFromString(@NotNull String name, String sourceCode) {
+        super(URI.create("string:///" + name.replace('.', '/') + SOURCE.extension), SOURCE);
+        this.sourceCode = sourceCode;
+    }
+
+    @Override
+    public CharSequence getCharContent(boolean ignoreEncodingErrors) {
+        return sourceCode;
     }
 }

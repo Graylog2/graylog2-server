@@ -11,6 +11,7 @@ import com.codahale.metrics.MetricRegistry;
 
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
+import org.graylog.plugins.pipelineprocessor.codegen.PipelineClassloader;
 import org.graylog.plugins.pipelineprocessor.db.PipelineService;
 import org.graylog.plugins.pipelineprocessor.db.PipelineStreamConnectionsService;
 import org.graylog.plugins.pipelineprocessor.db.RuleService;
@@ -112,7 +113,7 @@ public class ConfigurationStateUpdater {
     // this should not run in parallel to avoid useless database traffic
     public synchronized PipelineInterpreter.State reload() {
         // this classloader will hold all generated rule classes
-        ClassLoader commonClassLoader = allowCodeGeneration ? new ClassLoader() {} : null;
+        PipelineClassloader commonClassLoader = allowCodeGeneration ? new PipelineClassloader() : null;
 
         // read all rules and parse them
         Map<String, Rule> ruleNameMap = Maps.newHashMap();

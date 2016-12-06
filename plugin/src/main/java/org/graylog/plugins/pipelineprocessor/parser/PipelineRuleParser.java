@@ -72,6 +72,7 @@ import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.ast.statements.VarAssignStatement;
 import org.graylog.plugins.pipelineprocessor.codegen.CodeGenerator;
 import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
+import org.graylog.plugins.pipelineprocessor.codegen.PipelineClassloader;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleArgumentType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleIndexType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.IncompatibleType;
@@ -126,7 +127,7 @@ public class PipelineRuleParser {
         return parseRule(rule, silent, null);
     }
 
-    public Rule parseRule(String rule, boolean silent, ClassLoader classLoader) throws ParseException {
+    public Rule parseRule(String rule, boolean silent, PipelineClassloader classLoader) throws ParseException {
         return parseRule("dummy" + uniqueId.getAndIncrement(), rule, silent, classLoader);
     }
 
@@ -144,7 +145,7 @@ public class PipelineRuleParser {
      * @return the parse rule
      * @throws ParseException if a one or more parse errors occur
      */
-    public Rule parseRule(String id, String rule, boolean silent, ClassLoader ruleClassLoader) throws ParseException {
+    public Rule parseRule(String id, String rule, boolean silent, PipelineClassloader ruleClassLoader) throws ParseException {
         final ParseContext parseContext = new ParseContext(silent);
         final SyntaxErrorListener errorListener = new SyntaxErrorListener(parseContext);
 

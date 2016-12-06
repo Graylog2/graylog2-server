@@ -31,6 +31,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
+import org.graylog.plugins.pipelineprocessor.codegen.PipelineClassloader;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
@@ -84,7 +85,7 @@ import static org.junit.Assert.fail;
 
 public class PipelineRuleParserTest extends BaseParserTest {
 
-    protected static ClassLoader classLoader;
+    protected static PipelineClassloader classLoader;
 
     @BeforeClass
     public static void registerFunctions() {
