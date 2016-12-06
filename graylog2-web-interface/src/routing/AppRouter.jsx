@@ -51,8 +51,6 @@ import ShowMetricsPage from 'pages/ShowMetricsPage';
 import ShowNodePage from 'pages/ShowNodePage';
 import NodesPage from 'pages/NodesPage';
 import ThreadDumpPage from 'pages/ThreadDumpPage';
-import LdapPage from 'pages/LdapPage';
-import LdapGroupsPage from 'pages/LdapGroupsPage';
 import ConfigurationsPage from 'pages/ConfigurationsPage';
 import NotFoundPage from 'pages/NotFoundPage';
 import AuthenticationPage from 'pages/AuthenticationPage';
@@ -123,8 +121,6 @@ const AppRouter = React.createClass({
             </Route>
             <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage}/>
             <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage}/>
-            <Route path={Routes.SYSTEM.LDAP.SETTINGS} component={LdapPage}/>
-            <Route path={Routes.SYSTEM.LDAP.GROUPS} component={LdapGroupsPage}/>
             {pluginRoutes}
             <Route path="*" component={NotFoundPage}/>
           </Route>

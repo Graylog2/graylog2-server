@@ -86,10 +86,6 @@ const Routes = {
     THREADDUMP: (nodeId) => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
-    LDAP: {
-      SETTINGS: '/system/ldap',
-      GROUPS: '/system/ldap/groups',
-    },
     AUTHENTICATION: {
       OVERVIEW: '/system/authentication',
       ROLES: '/system/authentication/roles',

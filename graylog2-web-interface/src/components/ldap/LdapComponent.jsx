@@ -64,7 +64,7 @@ const HelperText = {
       <span>
         The default Graylog role determines whether a user created via Active Directory can access the entire system, or has limited access.<br/>
         You can assign additional permissions by{' '}
-        <LinkContainer to={Routes.SYSTEM.LDAP.GROUPS}><a>mapping Active Directory groups to Graylog roles</a></LinkContainer>,{' '}
+        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider('legacy-ldap-groups')}><a>mapping Active Directory groups to Graylog roles</a></LinkContainer>,{' '}
         or you can assign additional Graylog roles to Active Directory users below.
       </span>
     ),
@@ -118,7 +118,7 @@ const HelperText = {
       <span>
         The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.<br/>
         You can assign additional permissions by{' '}
-        <LinkContainer to={Routes.SYSTEM.LDAP.GROUPS}><a>mapping LDAP groups to Graylog roles</a></LinkContainer>,{' '}
+        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider('legacy-ldap-groups')}><a>mapping LDAP groups to Graylog roles</a></LinkContainer>,{' '}
         or you can assign additional Graylog roles to LDAP users below.
       </span>
     ),
