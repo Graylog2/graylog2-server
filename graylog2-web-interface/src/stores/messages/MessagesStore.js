@@ -31,7 +31,8 @@ const MessagesStore = Reflux.createStore({
   },
 
   fieldTerms(index, string) {
-    const url = ApiRoutes.MessagesController.analyze(index, JSON.stringify(string)).url;
+    const value = (typeof string === 'object' ? JSON.stringify(string) : String(string));
+    const url = ApiRoutes.MessagesController.analyze(index, value).url;
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
       .then(
         response => response.tokens,

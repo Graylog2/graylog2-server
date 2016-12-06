@@ -30,7 +30,8 @@ const MessageTableEntry = React.createClass({
     if (fullOrigValue === undefined) {
       return '';
     }
-    const fullStringOrigValue = JSON.stringify(fullOrigValue); // Ensure the field is a string for later processing
+    // Ensure the field is a string for later processing
+    const fullStringOrigValue = (typeof fullOrigValue === 'object' ? JSON.stringify(fullOrigValue) : String(fullOrigValue));
 
     // Truncate the field to 2048 characters if requested. This is for performance reasons to avoid hogging the CPU.
     // It's not optimal, more like a workaround to at least being able to show the page...

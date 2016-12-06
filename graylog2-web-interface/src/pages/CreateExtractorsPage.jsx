@@ -62,6 +62,9 @@ const CreateExtractorsPage = React.createClass({
       return <Spinner/>;
     }
 
+    const value = this.state.exampleMessage.fields[this.state.field];
+    const exampleMessage = (typeof value === 'object' ? JSON.stringify(value) : String(value));
+
     return (
       <div>
         <PageHeader title={<span>New extractor for input <em>{this.state.input.title}</em></span>}>
@@ -78,7 +81,7 @@ const CreateExtractorsPage = React.createClass({
         <EditExtractor action="create"
                        extractor={this.state.extractor}
                        inputId={this.state.input.id}
-                       exampleMessage={JSON.stringify(this.state.exampleMessage.fields[this.state.field]) || ''}
+                       exampleMessage={exampleMessage}
                        onSave={this._extractorSaved}/>
       </div>
     );

@@ -28,7 +28,8 @@ const MessageShow = React.createClass({
 
   possiblyHighlight(fieldName) {
     // No highlighting for the message details view.
-    return JSON.stringify(this.props.message.fields[fieldName]) || '';
+    const value = this.props.message.fields[fieldName];
+    return (typeof value === 'object' ? JSON.stringify(value) : String(value));
   },
   render() {
     return (
