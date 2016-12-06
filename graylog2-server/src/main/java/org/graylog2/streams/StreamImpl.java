@@ -73,6 +73,13 @@ public class StreamImpl extends PersistedImpl implements Stream {
         this.indexSet = null;
     }
 
+    public StreamImpl(Map<String, Object> fields, IndexSet indexSet) {
+        super(fields);
+        this.streamRules = null;
+        this.outputs = null;
+        this.indexSet = indexSet;
+    }
+
     protected StreamImpl(ObjectId id, Map<String, Object> fields) {
         super(id, fields);
         this.streamRules = null;

@@ -18,6 +18,9 @@ package org.graylog2.migrations;
 
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamImpl;
@@ -26,10 +29,13 @@ import org.graylog2.streams.events.StreamsChangedEvent;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
+
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,34 +45,56 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-public class V20160929120500_CreateDefaultStreamMigrationTest {
+public class V20161116172200_CreateDefaultStreamMigrationTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     private Migration migration;
     @Mock
     private StreamService streamService;
     @Mock
     private ClusterEventBus clusterEventBus;
+    @Mock
+    private IndexSetRegistry indexSetRegistry;
+    @Mock
+    private IndexSet indexSet;
+    @Mock
+    private IndexSetConfig indexSetConfig;
 
     @Before
     public void setUpService() throws Exception {
-        migration = new V20160929120500_CreateDefaultStreamMigration(streamService, clusterEventBus);
+        migration = new V20161116172200_CreateDefaultStreamMigration(streamService, clusterEventBus, indexSetRegistry);
+
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSetConfig.id()).thenReturn("abc123");
     }
 
     @Test
     public void upgrade() throws Exception {
         final ArgumentCaptor<Stream> streamArgumentCaptor = ArgumentCaptor.forClass(Stream.class);
         when(streamService.load("000000000000000000000001")).thenThrow(NotFoundException.class);
+        when(indexSetRegistry.getDefault()).thenReturn(Optional.of(indexSet));
 
         migration.upgrade();
 
-        verify(streamService).saveWithoutValidation(streamArgumentCaptor.capture());
+        verify(streamService).save(streamArgumentCaptor.capture());
 
         final Stream stream = streamArgumentCaptor.getValue();
         assertThat(stream.getTitle()).isEqualTo("All messages");
         assertThat(stream.getDisabled()).isFalse();
         assertThat(stream.getMatchingType()).isEqualTo(StreamImpl.MatchingType.DEFAULT);
+    }
+
+    @Test
+    public void upgradeWithoutDefaultIndexSet() throws Exception {
+        when(streamService.load("000000000000000000000001")).thenThrow(NotFoundException.class);
+        when(indexSetRegistry.getDefault()).thenReturn(Optional.empty());
+
+        expectedException.expect(IllegalStateException.class);
+
+        migration.upgrade();
     }
 
     @Test
@@ -80,6 +108,7 @@ public class V20160929120500_CreateDefaultStreamMigrationTest {
 
     @Test
     public void upgradePostsStreamsChangedEvent() throws Exception {
+        when(indexSetRegistry.getDefault()).thenReturn(Optional.of(indexSet));
         when(streamService.load("000000000000000000000001")).thenThrow(NotFoundException.class);
         final ArgumentCaptor<StreamsChangedEvent> argumentCaptor = ArgumentCaptor.forClass(StreamsChangedEvent.class);
         migration.upgrade();

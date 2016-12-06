@@ -60,6 +60,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class StreamServiceImpl extends PersistedServiceImpl implements StreamService {
     private static final Logger LOG = LoggerFactory.getLogger(StreamServiceImpl.class);
     private final StreamRuleService streamRuleService;
@@ -91,8 +93,12 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Nullable
     private IndexSet getIndexSet(DBObject dbObject) {
-        final String id = (String) dbObject.get(StreamImpl.FIELD_INDEX_SET_ID);
-        if (id == null) {
+        return getIndexSet((String) dbObject.get(StreamImpl.FIELD_INDEX_SET_ID));
+    }
+
+    @Nullable
+    private IndexSet getIndexSet(String id) {
+        if (isNullOrEmpty(id)) {
             return null;
         }
         final Optional<IndexSetConfig> indexSetConfig = indexSetService.get(id);
@@ -117,7 +123,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Override
     public Stream create(Map<String, Object> fields) {
-        return new StreamImpl(fields);
+        return new StreamImpl(fields, getIndexSet((String) fields.get(StreamImpl.FIELD_INDEX_SET_ID)));
     }
 
     @Override
