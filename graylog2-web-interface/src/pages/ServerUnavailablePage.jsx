@@ -1,5 +1,6 @@
 import React from 'react';
 import { Modal, Well } from 'react-bootstrap';
+import { DocumentTitle } from 'components/common';
 
 import URLUtils from 'util/URLUtils';
 
@@ -88,30 +89,32 @@ const ServerUnavailablePage = React.createClass({
 
   render() {
     return (
-      <Modal show>
-        <Modal.Header>
-          <Modal.Title><i className="fa fa-exclamation-triangle"/> Server currently unavailable</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>
-          <div>
-            <p>
-              We are experiencing problems connecting to the Graylog server running on <i>{URLUtils.qualifyUrl('')}</i>.
-              Please verify that the server is healthy and working correctly.
-            </p>
-            <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
-            <p>
-              Do you need a hand?{' '}
-              <a href="https://www.graylog.org/community-support" target="_blank">We can help you</a>.
-            </p>
+      <DocumentTitle title="Server unavailable">
+        <Modal show>
+          <Modal.Header>
+            <Modal.Title><i className="fa fa-exclamation-triangle"/> Server currently unavailable</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
             <div>
-              <a href="#" onClick={this._toggleDetails}>
-                {this.state.showDetails ? 'Less details' : 'More details'}
-              </a>
-              {this._formatErrorMessage()}
+              <p>
+                We are experiencing problems connecting to the Graylog server running on <i>{URLUtils.qualifyUrl('')}</i>.
+                Please verify that the server is healthy and working correctly.
+              </p>
+              <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
+              <p>
+                Do you need a hand?{' '}
+                <a href="https://www.graylog.org/community-support" target="_blank">We can help you</a>.
+              </p>
+              <div>
+                <a href="#" onClick={this._toggleDetails}>
+                  {this.state.showDetails ? 'Less details' : 'More details'}
+                </a>
+                {this._formatErrorMessage()}
+              </div>
             </div>
-          </div>
-        </Modal.Body>
-      </Modal>
+          </Modal.Body>
+        </Modal>
+      </DocumentTitle>
     );
   },
 });

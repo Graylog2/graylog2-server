@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { Button, Grid, Row, Col } from 'react-bootstrap';
 import Qs from 'qs';
 
-import {Spinner} from 'components/common';
+import { DocumentTitle, Spinner } from 'components/common';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
@@ -135,10 +135,12 @@ const GettingStarted = React.createClass({
       </div>);
     }
     return (
-      <div id="react-gettingstarted">
-        <div className="pull-right">{dismissButton}</div>
-        {gettingStartedContent}
-      </div>
+      <DocumentTitle title="Getting started">
+        <div id="react-gettingstarted">
+          <div className="pull-right">{dismissButton}</div>
+          {gettingStartedContent}
+        </div>
+      </DocumentTitle>
     );
   },
 });

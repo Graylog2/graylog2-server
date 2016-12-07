@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
-import { PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -31,17 +31,19 @@ const StreamEditPage = React.createClass({
     }
 
     return (
-      <div>
-        <PageHeader title={<span>Rules of Stream &raquo;{this.state.stream.title}&raquo;</span>}>
-          <span>
-            This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can{' '}
-            see the effect configured stream rules have on message matching here.
-          </span>
-        </PageHeader>
+      <DocumentTitle title={`Rules of Stream ${this.state.stream.title}`}>
+        <div>
+          <PageHeader title={<span>Rules of Stream &raquo;{this.state.stream.title}&raquo;</span>}>
+            <span>
+              This screen is dedicated to an easy and comfortable creation and manipulation of stream rules. You can{' '}
+              see the effect configured stream rules have on message matching here.
+            </span>
+          </PageHeader>
 
-        <StreamRulesEditor currentUser={this.state.currentUser} streamId={this.props.params.streamId}
-                           messageId={this.props.location.query.message_id} index={this.props.location.query.index} />
-      </div>
+          <StreamRulesEditor currentUser={this.state.currentUser} streamId={this.props.params.streamId}
+                             messageId={this.props.location.query.message_id} index={this.props.location.query.index} />
+        </div>
+      </DocumentTitle>
     );
   },
 });

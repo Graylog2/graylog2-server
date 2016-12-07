@@ -8,7 +8,7 @@ const MetricsStore = StoreProvider.getStore('Metrics');
 import ActionsProvider from 'injection/ActionsProvider';
 const MetricsActions = ActionsProvider.getActions('Metrics');
 
-import { PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { MetricsComponent } from 'components/metrics';
 
 const ShowMetricsPage = React.createClass({
@@ -41,17 +41,19 @@ const ShowMetricsPage = React.createClass({
     const names = this.state.metricsNames[nodeId];
     const filter = this.props.location.query.filter;
     return (
-      <span>
-        <PageHeader title={title}>
-          <span>
-            All Graylog nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access
-            all metrics via JMX, too.
-          </span>
-          <span>This node is reporting a total of {names.length} metrics.</span>
-        </PageHeader>
+      <DocumentTitle title={`Metrics of node ${node.short_node_id} / ${node.hostname}`}>
+        <span>
+          <PageHeader title={title}>
+            <span>
+              All Graylog nodes provide a set of internal metrics for diagnosis, debugging and monitoring. Note that you can access
+              all metrics via JMX, too.
+            </span>
+            <span>This node is reporting a total of {names.length} metrics.</span>
+          </PageHeader>
 
-        <MetricsComponent names={names} namespace={namespace} nodeId={nodeId} filter={filter} />
-      </span>
+          <MetricsComponent names={names} namespace={namespace} nodeId={nodeId} filter={filter} />
+        </span>
+      </DocumentTitle>
     );
   },
 });

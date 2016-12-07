@@ -1,8 +1,7 @@
 import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 
-import PageHeader from 'components/common/PageHeader';
-import Spinner from 'components/common/Spinner';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import ExportExtractors from 'components/extractors/ExportExtractors';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -33,15 +32,17 @@ const ExportExtractorsPage = React.createClass({
     }
 
     return (
-      <div>
-        <PageHeader title={<span>Export extractors of <em>{this.state.input.title}</em></span>}>
-          <span>
-            The extractors of an input can be exported to JSON for importing into other setups
-            or sharing in <a href="https://marketplace.graylog.org/" target="_blank">the Graylog Marketplace</a>.
-          </span>
-        </PageHeader>
-        <ExportExtractors input={this.state.input}/>
-      </div>
+      <DocumentTitle title={`Export extractors of ${this.state.input.title}`}>
+        <div>
+          <PageHeader title={<span>Export extractors of <em>{this.state.input.title}</em></span>}>
+            <span>
+              The extractors of an input can be exported to JSON for importing into other setups
+              or sharing in <a href="https://marketplace.graylog.org/" target="_blank">the Graylog Marketplace</a>.
+            </span>
+          </PageHeader>
+          <ExportExtractors input={this.state.input}/>
+        </div>
+      </DocumentTitle>
     );
   },
 });

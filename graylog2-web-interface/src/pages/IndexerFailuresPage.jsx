@@ -8,7 +8,7 @@ const IndexerFailuresStore = StoreProvider.getStore('IndexerFailures');
 
 import DocsHelper from 'util/DocsHelper';
 
-import { Spinner, PageHeader, PaginatedList } from 'components/common';
+import { DocumentTitle, Spinner, PageHeader, PaginatedList } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import { IndexerFailuresList } from 'components/indexers';
 
@@ -36,27 +36,29 @@ const IndexerFailuresPage = React.createClass({
       return <Spinner />;
     }
     return (
-      <span>
-        <PageHeader title="Indexer failures">
-          <span>
-            This is a list of message index attempts that failed. A failure means that a message you sent to Graylog was{' '}
-            properly processed but writing it to the Elasticsearch cluster failed. Note that the list is capped to a size{' '}
-            of 50 MB so it will contain a lot of failure logs but not necessarily all that ever occurred.
-          </span>
+      <DocumentTitle title="Indexer failures">
+        <span>
+          <PageHeader title="Indexer failures">
+            <span>
+              This is a list of message index attempts that failed. A failure means that a message you sent to Graylog was{' '}
+              properly processed but writing it to the Elasticsearch cluster failed. Note that the list is capped to a size{' '}
+              of 50 MB so it will contain a lot of failure logs but not necessarily all that ever occurred.
+            </span>
 
-          <span>
-            Collection containing a total of {numeral(this.state.total).format('0,0')} indexer failures. Read more about
-            this topic in the <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text="documentation" />.
-          </span>
-        </PageHeader>
-        <Row className="content">
-          <Col md={12}>
-            <PaginatedList totalItems={this.state.total} onChange={this._onChangePaginatedList} pageSize={this.defaultPageSize}>
-              <IndexerFailuresList failures={this.state.failures}/>
-            </PaginatedList>
-          </Col>
-        </Row>
-      </span>
+            <span>
+              Collection containing a total of {numeral(this.state.total).format('0,0')} indexer failures. Read more about
+              this topic in the <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text="documentation" />.
+            </span>
+          </PageHeader>
+          <Row className="content">
+            <Col md={12}>
+              <PaginatedList totalItems={this.state.total} onChange={this._onChangePaginatedList} pageSize={this.defaultPageSize}>
+                <IndexerFailuresList failures={this.state.failures}/>
+              </PaginatedList>
+            </Col>
+          </Row>
+        </span>
+      </DocumentTitle>
     );
   },
 });
