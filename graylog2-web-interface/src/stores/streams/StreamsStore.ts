@@ -70,7 +70,12 @@ class StreamsStore {
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.pause(streamId).url);
-    return fetch('POST', url).then(callback, failCallback).then(this._emitChange.bind(this));
+    return fetch('POST', url)
+      .then(callback, failCallback)
+      .then(response => {
+        this._emitChange();
+        return response;
+      });
   }
   resume(streamId: string, callback: (() => void)) {
     const failCallback = (errorThrown) => {
@@ -80,7 +85,11 @@ class StreamsStore {
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.resume(streamId).url);
     return fetch('POST', url)
-      .then(callback, failCallback).then(this._emitChange.bind(this));
+      .then(callback, failCallback)
+      .then(response => {
+        this._emitChange();
+        return response;
+      });
   }
   save(stream: any, callback: ((streamId: string) => void)) {
     const failCallback = (errorThrown) => {
@@ -112,7 +121,7 @@ class StreamsStore {
     fetch('POST', url, data)
       .then(callback, failCallback).then(this._emitChange.bind(this));
   }
-  removeOutput(streamId: string, outputId: string, callback: (errorThrown) => void) {
+  removeOutput(streamId: string, outputId: string, callback: (reponse) => void) {
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamOutputsApiController.delete(streamId, outputId).url);
 
     fetch('DELETE', url).then(callback, (errorThrown) => {
@@ -138,8 +147,11 @@ class StreamsStore {
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.sendDummyAlert(streamId).url);
     const promise = fetch('POST', url);
     promise.then(
-      () => UserNotification.success('Test notification was sent successfully'),
-      (error) => UserNotification.error('Could not send test notification')
+      response => {
+        UserNotification.success('Test notification was sent successfully');
+        return response;
+      },
+      error => UserNotification.error('Could not send test notification')
     );
     return promise;
   }

@@ -25,6 +25,7 @@ const AuthenticationStore = Reflux.createStore({
       .then(
         (response) => {
           this.trigger({ authenticators: response });
+          return response;
         },
         (error) => UserNotification.error(`Unable to load authentication configuration: ${error}`, 'Could not load authenticators')
       );
@@ -40,6 +41,7 @@ const AuthenticationStore = Reflux.createStore({
           (response) => {
             this.trigger({ authenticators: response });
             UserNotification.success('Configuration updated successfully');
+            return response;
           },
           (error) => UserNotification.error(`Unable to save authentication provider configuration: ${error}`, 'Could not save configuration')
         );

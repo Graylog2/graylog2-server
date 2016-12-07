@@ -47,12 +47,14 @@ const OutputsComponent = React.createClass({
     OutputsStore.save(data, (result) => {
       this.setState({typeName: "placeholder"});
       if (this.props.streamId) {
-        StreamsStore.addOutput(this.props.streamId, result.id, () => {
+        StreamsStore.addOutput(this.props.streamId, result.id, response => {
           this._handleUpdate();
+          return response;
         });
       } else {
         this._handleUpdate();
       }
+      return result;
     });
   },
   _fetchAssignableOutputs(outputs) {
@@ -65,23 +67,26 @@ const OutputsComponent = React.createClass({
     });
   },
   _handleAssignOutput(outputId) {
-    StreamsStore.addOutput(this.props.streamId, outputId, () => {
+    StreamsStore.addOutput(this.props.streamId, outputId, response => {
       this._handleUpdate();
+      return response;
     });
   },
   _removeOutputGlobally(outputId) {
     if (window.confirm("Do you really want to terminate this output?")) {
-      OutputsStore.remove(outputId, (jqXHR, textStatus, errorThrown) => {
+      OutputsStore.remove(outputId, response => {
         UserNotification.success("Output was terminated.", "Success");
         this._handleUpdate();
+        return response;
       });
     }
   },
   _removeOutputFromStream(outputId, streamId) {
     if (window.confirm("Do you really want to remove this output from the stream?")) {
-      StreamsStore.removeOutput(streamId, outputId, (jqXHR, textStatus, errorThrown) => {
+      StreamsStore.removeOutput(streamId, outputId, response => {
         UserNotification.success("Output was removed from stream.", "Success");
         this._handleUpdate();
+        return response;
       });
     }
   },

@@ -59,9 +59,10 @@ const InputStatesStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.start(input.id).url);
     return fetch('PUT', url)
       .then(
-        (response) => {
+        response => {
           this._checkInputStateChangeResponse(input, response, 'START');
           this.list();
+          return response;
         },
         error => {
           UserNotification.error(`Error starting input '${input.title}': ${error}`, `Input '${input.title}' could not be started`);
@@ -72,9 +73,10 @@ const InputStatesStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.ClusterInputStatesController.stop(input.id).url);
     return fetch('DELETE', url)
       .then(
-        (response) => {
+        response => {
           this._checkInputStateChangeResponse(input, response, 'STOP');
           this.list();
+          return response;
         },
         error => {
           UserNotification.error(`Error stopping input '${input.title}': ${error}`, `Input '${input.title}' could not be stopped`);

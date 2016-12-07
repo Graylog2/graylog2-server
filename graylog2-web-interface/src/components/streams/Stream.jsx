@@ -48,24 +48,33 @@ const Stream = React.createClass({
   },
   _onDelete(stream) {
     if (window.confirm('Do you really want to remove this stream?')) {
-      StreamsStore.remove(stream.id, () => UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success'));
+      StreamsStore.remove(stream.id, response => {
+        UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
+        return response;
+      });
     }
   },
   _onResume() {
     this.setState({ loading: true });
-    StreamsStore.resume(this.props.stream.id, () => {})
+    StreamsStore.resume(this.props.stream.id, response => response)
       .finally(() => this.setState({ loading: false }));
   },
   _onUpdate(streamId, stream) {
-    StreamsStore.update(streamId, stream, () => UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success'));
+    StreamsStore.update(streamId, stream, response => {
+      UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success');
+      return response;
+    });
   },
   _onClone(streamId, stream) {
-    StreamsStore.cloneStream(streamId, stream, () => UserNotification.success(`Stream was successfully cloned as '${stream.title}'.`, 'Success'));
+    StreamsStore.cloneStream(streamId, stream, response => {
+      UserNotification.success(`Stream was successfully cloned as '${stream.title}'.`, 'Success');
+      return response;
+    });
   },
   _onPause() {
     if (window.confirm(`Do you really want to pause stream '${this.props.stream.title}'?`)) {
       this.setState({ loading: true });
-      StreamsStore.pause(this.props.stream.id, () => {})
+      StreamsStore.pause(this.props.stream.id, response => response)
         .finally(() => this.setState({ loading: false }));
     }
   },

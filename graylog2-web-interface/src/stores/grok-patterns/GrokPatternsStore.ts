@@ -18,13 +18,16 @@ const GrokPatternsStore = {
         "Could not load Grok patterns");
     };
     // get the current list of patterns and sort it by name
-    fetch('GET', this.URL).then((resp: any) => {
-      const patterns = resp.patterns;
-      patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) => {
-        return pattern1.name.toLowerCase().localeCompare(pattern2.name.toLowerCase());
-      });
-      callback(patterns);
-    }, failCallback);
+    fetch('GET', this.URL).then(
+      (resp: any) => {
+        const patterns = resp.patterns;
+        patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) => {
+          return pattern1.name.toLowerCase().localeCompare(pattern2.name.toLowerCase());
+        });
+        callback(patterns);
+        return resp;
+      },
+      failCallback);
   },
 
   savePattern(pattern: GrokPattern, callback: () => void) {
@@ -48,12 +51,17 @@ const GrokPatternsStore = {
       url += '/' + pattern.id;
       method = 'PUT';
     }
-    fetch(method, url, requestPattern).then(() => {
-      callback();
-      var action = pattern.id === "" ? "created" : "updated";
-      var message = "Grok pattern \"" + pattern.name + "\" successfully " + action;
-      UserNotification.success(message);
-    }).catch(failCallback);
+    fetch(method, url, requestPattern)
+      .then(
+        response => {
+          callback();
+          const action = pattern.id === "" ? "created" : "updated";
+          const message = "Grok pattern \"" + pattern.name + "\" successfully " + action;
+          UserNotification.success(message);
+          return response;
+        },
+        failCallback
+      );
   },
 
   deletePattern(pattern: GrokPattern, callback: () => void) {
@@ -61,10 +69,15 @@ const GrokPatternsStore = {
       UserNotification.error("Deleting Grok pattern \"" + pattern.name + "\" failed with status: " + error.message,
         "Could not delete Grok pattern");
     };
-    fetch('DELETE', this.URL + "/" + pattern.id).then(() => {
-      callback();
-      UserNotification.success("Grok pattern \"" + pattern.name + "\" successfully deleted");
-    }).catch(failCallback);
+    fetch('DELETE', this.URL + "/" + pattern.id)
+      .then(
+        response => {
+          callback();
+          UserNotification.success("Grok pattern \"" + pattern.name + "\" successfully deleted");
+          return response;
+        },
+        failCallback
+      );
   },
 
   bulkImport(patterns: string[], replaceAll: boolean) {

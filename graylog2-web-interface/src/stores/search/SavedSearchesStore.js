@@ -25,14 +25,16 @@ const SavedSearchesStore = Reflux.createStore({
 
   list() {
     const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl)))
-      .then(response => {
-        this.savedSearches = response.searches;
-        this.trigger({savedSearches: this.savedSearches});
-      })
-      .catch(error => {
-        UserNotification.error('Fetching saved searches failed with status: ' + error,
-          'Could not get saved searches');
-      });
+      .then(
+        response => {
+          this.savedSearches = response.searches;
+          this.trigger({ savedSearches: this.savedSearches });
+          return response;
+        },
+        error => {
+          UserNotification.error(`Fetching saved searches failed with status: ${error}`,
+            'Could not get saved searches');
+        });
 
     SavedSearchesActions.list.promise(promise);
   },
@@ -110,14 +112,16 @@ const SavedSearchesStore = Reflux.createStore({
   create(title) {
     const promise = this._createOrUpdate(title);
     promise
-      .then(() => {
-        UserNotification.success(`Search criteria saved as "${title}".`);
-        SavedSearchesActions.list.triggerPromise();
-      })
-      .catch(error => {
-        UserNotification.error('Saving search criteria failed with status: ' + error,
-          'Could not save search criteria');
-      });
+      .then(
+        response => {
+          UserNotification.success(`Search criteria saved as "${title}".`);
+          SavedSearchesActions.list.triggerPromise();
+          return response;
+        },
+        error => {
+          UserNotification.error(`Saving search criteria failed with status: ${error}`,
+            'Could not save search criteria');
+        });
 
     SavedSearchesActions.create.promise(promise);
   },
@@ -125,14 +129,16 @@ const SavedSearchesStore = Reflux.createStore({
   update(searchId, title) {
     const promise = this._createOrUpdate(title, searchId);
     promise
-      .then(() => {
-        UserNotification.success(`Saved search "${title}" was updated.`);
-        SavedSearchesActions.list.triggerPromise();
-      })
-      .catch(error => {
-        UserNotification.error(`Updating saved search "${title}" failed with status: ${error}`,
-          'Could not update saved search');
-      });
+      .then(
+        response => {
+          UserNotification.success(`Saved search "${title}" was updated.`);
+          SavedSearchesActions.list.triggerPromise();
+          return response;
+        },
+        error => {
+          UserNotification.error(`Updating saved search "${title}" failed with status: ${error}`,
+            'Could not update saved search');
+        });
 
     SavedSearchesActions.update.promise(promise);
   },
@@ -141,14 +147,16 @@ const SavedSearchesStore = Reflux.createStore({
     const url = ApiRoutes.SavedSearchesApiController.delete(searchId).url;
     const promise = fetch('DELETE', URLUtils.qualifyUrl(url));
     promise
-      .then(() => {
-        UserNotification.success(`Saved search "${this.savedSearches[searchId]}" was deleted successfully.`);
-        SearchStore.savedSearchDeleted(searchId);
-      })
-      .catch(error => {
-        UserNotification.error(`Deleting saved search "${this.savedSearches[searchId]}" failed with status: ${error}`,
-          'Could not delete saved search');
-      });
+      .then(
+        response => {
+          UserNotification.success(`Saved search "${this.savedSearches[searchId]}" was deleted successfully.`);
+          SearchStore.savedSearchDeleted(searchId);
+          return response;
+        },
+        error => {
+          UserNotification.error(`Deleting saved search "${this.savedSearches[searchId]}" failed with status: ${error}`,
+            'Could not delete saved search');
+        });
 
     SavedSearchesActions.delete.promise(promise);
   },
