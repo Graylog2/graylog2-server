@@ -381,8 +381,8 @@ public class StreamResource extends RestResource {
         streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, getCurrentUser().getName());
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
         streamData.put(StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString());
-        streamData.put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, sourceStream.getRemoveMatchesFromDefaultStream());
-        streamData.put(StreamImpl.FIELD_INDEX_SET_ID, sourceStream.getIndexSetId());
+        streamData.put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream());
+        streamData.put(StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId());
 
         final Stream stream = streamService.create(streamData);
         streamService.pause(stream);

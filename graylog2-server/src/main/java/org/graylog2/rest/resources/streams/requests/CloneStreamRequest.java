@@ -21,8 +21,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import java.util.List;
-
 @JsonAutoDetect
 @AutoValue
 public abstract class CloneStreamRequest {
@@ -32,10 +30,17 @@ public abstract class CloneStreamRequest {
     @JsonProperty
     public abstract String description();
 
+    @JsonProperty("remove_matches_from_default_stream")
+    public abstract boolean removeMatchesFromDefaultStream();
+
+    @JsonProperty("index_set_id")
+    public abstract String indexSetId();
+
     @JsonCreator
     public static CloneStreamRequest create(@JsonProperty("title") String title,
                                             @JsonProperty("description") String description,
-                                            @JsonProperty("rules") List rules) {
-        return new AutoValue_CloneStreamRequest(title, description);
+                                            @JsonProperty("remove_matches_from_default_stream") boolean removeMatchesFromDefaultStream,
+                                            @JsonProperty("index_set_id") String indexSetId) {
+        return new AutoValue_CloneStreamRequest(title, description, removeMatchesFromDefaultStream, indexSetId);
     }
 }
