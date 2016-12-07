@@ -158,7 +158,7 @@
         <system-rules.version>1.16.1</system-rules.version>
 
         <!-- Nodejs dependencies -->
-        <nodejs.version>v6.9.1</nodejs.version>
+        <nodejs.version>v6.9.2</nodejs.version>
         <npm.version>4.0.3</npm.version>
     </properties>
 
