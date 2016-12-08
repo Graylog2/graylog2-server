@@ -16,14 +16,12 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.InetAddresses;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -75,6 +73,7 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
+import org.graylog.plugins.pipelineprocessor.functions.strings.Split;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
@@ -165,6 +164,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Uncapitalize.NAME, new Uncapitalize());
         functions.put(Uppercase.NAME, new Uppercase());
         functions.put(KeyValue.NAME, new KeyValue());
+        functions.put(Split.NAME, new Split());
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));
@@ -341,6 +341,27 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat((boolean) message.getField("has_xyz")).isFalse();
         assertThat(message.getField("string_literal")).isInstanceOf(String.class);
         assertThat((String) message.getField("string_literal")).isEqualTo("abcd\\.e\tfg\u03a9\363");
+    }
+
+    @Test
+    public void split() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
+        assertThat(message).isNotNull();
+        assertThat(message.getField("limit_0")).isInstanceOf(String[].class);
+        assertThat((String[]) message.getField("limit_0"))
+                .isNotEmpty()
+                .containsExactly("foo", "bar", "baz");
+        assertThat(message.getField("limit_1")).isInstanceOf(String[].class);
+        assertThat((String[]) message.getField("limit_1"))
+                .isNotEmpty()
+                .containsExactly("foo:bar:baz");
+        assertThat(message.getField("limit_2")).isInstanceOf(String[].class);
+        assertThat((String[]) message.getField("limit_2"))
+                .isNotEmpty()
+                .containsExactly("foo", "bar|baz");
     }
 
     @Test
