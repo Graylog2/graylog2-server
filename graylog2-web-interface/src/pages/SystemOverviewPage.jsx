@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { IfPermitted } from 'components/common';
+import { DocumentTitle, IfPermitted } from 'components/common';
 import { IndexerClusterHealth, IndexerFailuresComponent } from 'components/indexers';
 import { NotificationsList } from 'components/notifications';
 import { SystemJobsComponent } from 'components/systemjobs';
@@ -12,35 +12,37 @@ import { GraylogClusterOverview } from 'components/cluster';
 const SystemOverviewPage = React.createClass({
   render() {
     return (
-      <span>
-        <IfPermitted permissions="notifications:read">
-          <NotificationsList />
-        </IfPermitted>
+      <DocumentTitle title="System overview">
+        <span>
+          <IfPermitted permissions="notifications:read">
+            <NotificationsList />
+          </IfPermitted>
 
-        <IfPermitted permissions="systemjobs:read">
-          <SystemJobsComponent />
-        </IfPermitted>
+          <IfPermitted permissions="systemjobs:read">
+            <SystemJobsComponent />
+          </IfPermitted>
 
-        <GraylogClusterOverview />
+          <GraylogClusterOverview />
 
-        <IfPermitted permissions="indexercluster:read">
-          <IndexerClusterHealth />
-        </IfPermitted>
+          <IfPermitted permissions="indexercluster:read">
+            <IndexerClusterHealth />
+          </IfPermitted>
 
-        <IfPermitted permissions="indices:failures">
-          <IndexerFailuresComponent />
-        </IfPermitted>
+          <IfPermitted permissions="indices:failures">
+            <IndexerFailuresComponent />
+          </IfPermitted>
 
-        <TimesList />
+          <TimesList />
 
-        <IfPermitted permissions="clusterconfigentry:edit:org.graylog.plugins.usagestatistics.UsageStatsOptOutState">
-          <UsageStatsOptIn />
-        </IfPermitted>
+          <IfPermitted permissions="clusterconfigentry:edit:org.graylog.plugins.usagestatistics.UsageStatsOptOutState">
+            <UsageStatsOptIn />
+          </IfPermitted>
 
-        <IfPermitted permissions="systemmessages:read">
-          <SystemMessagesComponent />
-        </IfPermitted>
-      </span>
+          <IfPermitted permissions="systemmessages:read">
+            <SystemMessagesComponent />
+          </IfPermitted>
+        </span>
+      </DocumentTitle>
     );
   },
 });

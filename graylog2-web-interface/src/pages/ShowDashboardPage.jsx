@@ -14,7 +14,7 @@ import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 
-import { GridsterContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
+import { DocumentTitle, GridsterContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTrigger';
@@ -230,16 +230,18 @@ const ShowDashboardPage = React.createClass({
       </span>
     );
     return (
-      <span>
-        <PageHeader title={dashboardTitle}>
-          <span data-dashboard-id={dashboard.id} className="dashboard-description">{dashboard.description}</span>
-          {supportText}
-          {actions}
-        </PageHeader>
+      <DocumentTitle title={`Rules of Stream ${dashboard.title}`}>
+        <span>
+          <PageHeader title={dashboardTitle}>
+            <span data-dashboard-id={dashboard.id} className="dashboard-description">{dashboard.description}</span>
+            {supportText}
+            {actions}
+          </PageHeader>
 
-        {this.formatDashboard(dashboard)}
-        <div className="clearfix"/>
-      </span>
+          {this.formatDashboard(dashboard)}
+          <div className="clearfix"/>
+        </span>
+      </DocumentTitle>
     );
   },
 });

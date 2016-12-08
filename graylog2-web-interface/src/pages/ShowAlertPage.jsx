@@ -2,7 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Label } from 'react-bootstrap';
 
-import { PageHeader, Spinner, Timestamp } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
 import { AlertDetails } from 'components/alerts';
 
 import DateTime from 'logic/datetimes/DateTime';
@@ -104,19 +104,22 @@ const ShowAlertPage = React.createClass({
     );
 
     return (
-      <div>
-        <PageHeader title={title}>
-          <span>
-            Check the timeline of this alert, including the notifications sent, and messages received during the alert.
-          </span>
+      <DocumentTitle title={`${condition.title || 'Unknown alert'} on stream ${stream.title}`}>
+        <div>
+          <PageHeader title={title}>
+            <span>
+              Check the timeline of this alert, including the notifications sent, and messages received during the
+              alert.
+            </span>
 
-          <span>
-            {resolvedState}
-          </span>
-        </PageHeader>
+            <span>
+              {resolvedState}
+            </span>
+          </PageHeader>
 
-        <AlertDetails alert={alert} condition={condition} conditionType={type} stream={stream} />
-      </div>
+          <AlertDetails alert={alert} condition={condition} conditionType={type} stream={stream} />
+        </div>
+      </DocumentTitle>
     );
   },
 });

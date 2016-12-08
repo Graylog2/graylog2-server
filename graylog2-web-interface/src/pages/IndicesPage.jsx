@@ -32,7 +32,7 @@ const IndicesPage = React.createClass({
     );
 
     return (
-      <DocumentTitle title="Indices & Index Sets">
+      <DocumentTitle title="Indices and Index Sets">
         <span>
           {pageHeader}
 

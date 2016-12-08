@@ -14,7 +14,7 @@ const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
 const { SearchStore } = CombinedProvider.get('Search');
 const { DecoratorsActions } = CombinedProvider.get('Decorators');
 
-import { Spinner } from 'components/common';
+import { DocumentTitle, Spinner } from 'components/common';
 import { MalformedSearchQuery, SearchExecutionError, SearchResult } from 'components/search';
 
 const SearchPage = React.createClass({
@@ -198,12 +198,16 @@ const SearchPage = React.createClass({
 
   render() {
     if (this.state.error) {
+      let errorPage;
       switch (this.state.error.status) {
         case 400:
-          return <MalformedSearchQuery error={this.state.error} />;
+          errorPage = <MalformedSearchQuery error={this.state.error} />;
+          break;
         default:
-          return <SearchExecutionError error={this.state.error} />;
+          errorPage = <SearchExecutionError error={this.state.error} />;
       }
+
+      return <DocumentTitle title="Search error">{errorPage}</DocumentTitle>;
     }
 
     if (this._isLoading()) {
@@ -213,14 +217,16 @@ const SearchPage = React.createClass({
     const searchResult = this.state.searchResult;
     searchResult.all_fields = this.state.fields;
     return (
-      <SearchResult query={SearchStore.query} page={SearchStore.page} builtQuery={searchResult.built_query}
-                    result={searchResult} histogram={this.state.histogram}
-                    formattedHistogram={this.state.histogram.histogram}
-                    streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
-                    searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions}
-                    searchConfig={this.props.searchConfig}
-                    loadingSearch={this.state.updatingSearch || this.state.updatingHistogram}
-                    forceFetch={this.props.forceFetch} />
+      <DocumentTitle title="Search">
+        <SearchResult query={SearchStore.query} page={SearchStore.page} builtQuery={searchResult.built_query}
+                      result={searchResult} histogram={this.state.histogram}
+                      formattedHistogram={this.state.histogram.histogram}
+                      streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
+                      searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions}
+                      searchConfig={this.props.searchConfig}
+                      loadingSearch={this.state.updatingSearch || this.state.updatingHistogram}
+                      forceFetch={this.props.forceFetch} />
+      </DocumentTitle>
     );
   },
 });

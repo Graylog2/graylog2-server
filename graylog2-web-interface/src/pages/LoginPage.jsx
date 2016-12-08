@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Input, ButtonInput, Alert } from 'react-bootstrap';
+import { DocumentTitle } from 'components/common';
 
 import LoadingPage from './LoadingPage';
 
@@ -72,26 +73,28 @@ const LoginPage = React.createClass({
 
     const alert = this.formatLastError(this.state.lastError);
     return (
-      <div>
-        <div className="container" id="login-box">
-          <Row>
-            <form className="col-md-4 col-md-offset-4 well" id="login-box-content" onSubmit={this.onSignInClicked}>
-              <legend><i className="fa fa-group"/> Welcome to Graylog</legend>
+      <DocumentTitle title="Sign in">
+        <div>
+          <div className="container" id="login-box">
+            <Row>
+              <form className="col-md-4 col-md-offset-4 well" id="login-box-content" onSubmit={this.onSignInClicked}>
+                <legend><i className="fa fa-group"/> Welcome to Graylog</legend>
 
-              {alert}
+                {alert}
 
-              <Input ref="username" type="text" placeholder="Username" autoFocus />
+                <Input ref="username" type="text" placeholder="Username" autoFocus />
 
-              <Input ref="password" type="password" placeholder="Password" />
+                <Input ref="password" type="password" placeholder="Password" />
 
-              <ButtonInput type="submit" bsStyle="info" disabled={this.state.loading}>
-                {this.state.loading ? 'Signing in...' : 'Sign in'}
-              </ButtonInput>
+                <ButtonInput type="submit" bsStyle="info" disabled={this.state.loading}>
+                  {this.state.loading ? 'Signing in...' : 'Sign in'}
+                </ButtonInput>
 
-            </form>
-          </Row>
+              </form>
+            </Row>
+          </div>
         </div>
-      </div>
+      </DocumentTitle>
     );
   },
 });

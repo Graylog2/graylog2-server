@@ -1,7 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
-import { PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -117,33 +117,35 @@ const ConfigurationsPage = React.createClass({
     const pluginConfigRows = this._pluginConfigRows();
 
     return (
-      <span>
-        <PageHeader title="Configurations">
-          <span>
-            You can configure system settings for different sub systems on this page.
-          </span>
-        </PageHeader>
+      <DocumentTitle title="Configurations">
+        <span>
+          <PageHeader title="Configurations">
+            <span>
+              You can configure system settings for different sub systems on this page.
+            </span>
+          </PageHeader>
 
-        <Row className="content">
-          <Col md={6}>
-            {searchesConfigComponent}
-          </Col>
-          <Col md={6}>
-            {messageProcessorsConfigComponent}
-          </Col>
-        </Row>
+          <Row className="content">
+            <Col md={6}>
+              {searchesConfigComponent}
+            </Col>
+            <Col md={6}>
+              {messageProcessorsConfigComponent}
+            </Col>
+          </Row>
 
-        {pluginConfigRows.length > 0 && <Row className="content">
-          <Col md={12}>
-            <h2>Plugins</h2>
-            <p className="description">Configuration for installed plugins.</p>
-            <hr className="separator" />
-            <div className="top-margin">
-              {pluginConfigRows}
-            </div>
-          </Col>
-        </Row>}
-      </span>
+          {pluginConfigRows.length > 0 && <Row className="content">
+            <Col md={12}>
+              <h2>Plugins</h2>
+              <p className="description">Configuration for installed plugins.</p>
+              <hr className="separator" />
+              <div className="top-margin">
+                {pluginConfigRows}
+              </div>
+            </Col>
+          </Row>}
+        </span>
+      </DocumentTitle>
     );
   },
 });

@@ -95,7 +95,7 @@ const LdapGroupsComponent = React.createClass({
       return (
         <p>
           No LDAP/Active Directory groups found. Please verify that your{' '}
-          <LinkContainer to={Routes.SYSTEM.LDAP.SETTINGS}><a>LDAP group mapping</a></LinkContainer>{' '}
+          <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider('legacy-ldap')}><a>LDAP group mapping</a></LinkContainer>{' '}
           settings are correct.
         </p>
       );

@@ -9,7 +9,7 @@ const StreamsStore = StoreProvider.getStore('Streams');
 
 import OutputsComponent from 'components/outputs/OutputsComponent';
 import SupportLink from 'components/support/SupportLink';
-import Spinner from 'components/common/Spinner';
+import { DocumentTitle, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 
 const StreamOutputsPage = React.createClass({
@@ -27,31 +27,32 @@ const StreamOutputsPage = React.createClass({
       return <Spinner />;
     }
     return (
-      <div>
-        <Row className="content content-head">
-          <Col md={10}>
-            <h1>
-              Outputs for Stream &raquo;{this.state.stream.title}&laquo;
-            </h1>
+      <DocumentTitle title={`Outputs for Stream ${this.state.stream.title}`}>
+        <div>
+          <Row className="content content-head">
+            <Col md={10}>
+              <h1>
+                Outputs for Stream &raquo;{this.state.stream.title}&laquo;
+              </h1>
 
-            <p className="description">
-              Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
-              You can also reuse outputs that are already running for other streams.
+              <p className="description">
+                Graylog nodes can forward messages of streams via outputs. Launch or terminate as many outputs as you want here.
+                You can also reuse outputs that are already running for other streams.
 
-              A global view of all configured outputs is available <a href="@routes.OutputsController.index()">here</a>.
-              You can find output plugins on <a href="https://marketplace.graylog.org/" target="_blank">the Graylog Marketplace</a>.
-            </p>
+                A global view of all configured outputs is available <a href="@routes.OutputsController.index()">here</a>.
+                You can find output plugins on <a href="https://marketplace.graylog.org/" target="_blank">the Graylog Marketplace</a>.
+              </p>
 
-            <SupportLink>
-              <i>Removing</i> an output removes it from this stream but it will still be in the list of available outputs.
-              Deleting an output <i>globally</i> will remove it from this and all other streams and terminate it.
-              You can see all defined outputs in details at the {' '} <LinkContainer to={Routes.SYSTEM.OUTPUTS}><a>global output list</a></LinkContainer>.
-            </SupportLink>
-          </Col>
-        </Row>
-        <OutputsComponent streamId={this.state.stream.id} permissions={this.state.currentUser.permissions}/>
-      </div>
-
+              <SupportLink>
+                <i>Removing</i> an output removes it from this stream but it will still be in the list of available outputs.
+                Deleting an output <i>globally</i> will remove it from this and all other streams and terminate it.
+                You can see all defined outputs in details at the {' '} <LinkContainer to={Routes.SYSTEM.OUTPUTS}><a>global output list</a></LinkContainer>.
+              </SupportLink>
+            </Col>
+          </Row>
+          <OutputsComponent streamId={this.state.stream.id} permissions={this.state.currentUser.permissions}/>
+        </div>
+      </DocumentTitle>
     );
   }
 });

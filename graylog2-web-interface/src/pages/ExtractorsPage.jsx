@@ -5,7 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import PageHeader from 'components/common/PageHeader';
 import ExtractorsList from 'components/extractors/ExtractorsList';
-import Spinner from 'components/common/Spinner';
+import { DocumentTitle, Spinner } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import Routes from 'routing/Routes';
@@ -61,31 +61,33 @@ const ExtractorsPage = React.createClass({
     }
 
     return (
-      <div>
-        <PageHeader title={<span>Extractors of <em>{this.state.input.title}</em></span>}>
-          <span>
-            Extractors are applied on every message that is received by this input. Use them to extract and transform{' '}
-            any text data into fields that allow you easy filtering and analysis later on.{' '}
-            Example: Extract the HTTP response code from a log message, transform it to a numeric field and attach it{' '}
-            as <em>http_response_code</em> to the message.
-          </span>
+      <DocumentTitle title={`Extractors of ${this.state.input.title}`}>
+        <div>
+          <PageHeader title={<span>Extractors of <em>{this.state.input.title}</em></span>}>
+            <span>
+              Extractors are applied on every message that is received by this input. Use them to extract and transform{' '}
+              any text data into fields that allow you easy filtering and analysis later on.{' '}
+              Example: Extract the HTTP response code from a log message, transform it to a numeric field and attach it{' '}
+              as <em>http_response_code</em> to the message.
+            </span>
 
-          <span>
-            Find more information about extractors in the
-            {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
-          </span>
+            <span>
+              Find more information about extractors in the
+              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
+            </span>
 
-          <DropdownButton bsStyle="info" bsSize="large" id="extractor-actions-dropdown" title="Actions" pullRight>
-            <LinkContainer to={Routes.import_extractors(this.state.node.node_id, this.state.input.id)}>
-              <MenuItem>Import extractors</MenuItem>
-            </LinkContainer>
-            <LinkContainer to={Routes.export_extractors(this.state.node.node_id, this.state.input.id)}>
-              <MenuItem>Export extractors</MenuItem>
-            </LinkContainer>
-          </DropdownButton>
-        </PageHeader>
-        <ExtractorsList input={this.state.input} node={this.state.node} />
-      </div>
+            <DropdownButton bsStyle="info" bsSize="large" id="extractor-actions-dropdown" title="Actions" pullRight>
+              <LinkContainer to={Routes.import_extractors(this.state.node.node_id, this.state.input.id)}>
+                <MenuItem>Import extractors</MenuItem>
+              </LinkContainer>
+              <LinkContainer to={Routes.export_extractors(this.state.node.node_id, this.state.input.id)}>
+                <MenuItem>Export extractors</MenuItem>
+              </LinkContainer>
+            </DropdownButton>
+          </PageHeader>
+          <ExtractorsList input={this.state.input} node={this.state.node} />
+        </div>
+      </DocumentTitle>
     );
   },
 });

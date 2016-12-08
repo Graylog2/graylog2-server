@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader } from 'components/common';
 import { Button } from 'react-bootstrap';
 
 import LdapComponent from 'components/ldap/LdapComponent';
@@ -41,16 +41,23 @@ const LegacyLdapConfig = React.createClass({
     const toggleButtonText = this.state.showSettings ? 'LDAP Group Mapping' : 'LDAP Settings';
     const activeComponent = this.state.showSettings ? <LdapComponent onCancel={this._onCancel} /> : <LdapGroupsComponent onCancel={this._onSettingsCancel} />;
 
-    return (<span>
-      <PageHeader title="LDAP Settings" subpage>
-        <span>This page is the only resource you need to set up the Graylog LDAP integration. You can test the connection to your LDAP server and even try to log in with an LDAP account of your choice right away.</span>
-        {null}
+    return (
+      <DocumentTitle title="LDAP Settings">
         <span>
-          <Button bsStyle="success" onClick={this._toggleButton}>{toggleButtonText}</Button>
+          <PageHeader title="LDAP Settings" subpage>
+            <span>
+              This page is the only resource you need to set up the Graylog LDAP integration. You can test the
+              connection to your LDAP server and even try to log in with an LDAP account of your choice right away.
+            </span>
+            {null}
+            <span>
+              <Button bsStyle="success" onClick={this._toggleButton}>{toggleButtonText}</Button>
+            </span>
+          </PageHeader>
+          {activeComponent}
         </span>
-      </PageHeader>
-      {activeComponent}
-    </span>);
+      </DocumentTitle>
+    );
   },
 });
 

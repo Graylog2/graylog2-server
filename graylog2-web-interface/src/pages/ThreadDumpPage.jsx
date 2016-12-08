@@ -2,7 +2,7 @@ import React, {PropTypes} from 'react';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
 
-import { PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
 const NodesStore = StoreProvider.getStore('Nodes');
@@ -42,14 +42,16 @@ const ThreadDumpPage = React.createClass({
     const threadDump = this.state.threadDump ? <pre className="threaddump">{this.state.threadDump}</pre> : <Spinner/>;
 
     return (
-      <div>
-        <PageHeader title={title}/>
-        <Row className="content input-list">
-          <Col md={12}>
-            {threadDump}
-          </Col>
-        </Row>
-      </div>
+      <DocumentTitle title={`Thread dump of node ${this.state.node.short_node_id} / ${this.state.node.hostname}`}>
+        <div>
+          <PageHeader title={title}/>
+          <Row className="content input-list">
+            <Col md={12}>
+              {threadDump}
+            </Col>
+          </Row>
+        </div>
+      </DocumentTitle>
     );
   },
 });

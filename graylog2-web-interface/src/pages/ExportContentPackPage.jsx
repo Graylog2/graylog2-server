@@ -18,7 +18,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');
 const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
-import PageHeader from 'components/common/PageHeader';
+import { DocumentTitle, PageHeader } from 'components/common';
 
 const ExportContentPackPage = React.createClass({
   mixins: [Reflux.connect(InputsStore)],
@@ -142,144 +142,146 @@ const ExportContentPackPage = React.createClass({
   },
   render() {
     return (
-      <span>
-        <PageHeader title="Create a content pack">
-          <span>Export your inputs, outputs, streams and dashboards as a content pack and share it with the community or other setups.</span>
-        </PageHeader>
+      <DocumentTitle title="Create a content pack">
+        <span>
+          <PageHeader title="Create a content pack">
+            <span>Export your inputs, outputs, streams and dashboards as a content pack and share it with the community or other setups.</span>
+          </PageHeader>
 
-        <Row className="content">
-          <Col md={6}>
-            <form className="form-horizontal build-content-pack" onSubmit={this.onSubmit}>
-              <div className="form-group">
-                <Col sm={2}>
-                  <label className="control-label" htmlFor="name">Name</label>
-                </Col>
-                <Col sm={10}>
-                  <input ref="name" type="text" id="name" className="input-xlarge form-control" name="name" required />
-                  <span className="help-block">The name of your configuration bundle.</span>
-                </Col>
-              </div>
+          <Row className="content">
+            <Col md={6}>
+              <form className="form-horizontal build-content-pack" onSubmit={this.onSubmit}>
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="name">Name</label>
+                  </Col>
+                  <Col sm={10}>
+                    <input ref="name" type="text" id="name" className="input-xlarge form-control" name="name" required />
+                    <span className="help-block">The name of your configuration bundle.</span>
+                  </Col>
+                </div>
 
-              <div className="form-group">
-                <Col sm={2}>
-                  <label className="control-label" htmlFor="description">Description</label>
-                </Col>
-                <Col sm={10}>
-                  <textarea ref="description" rows="6" id="description" name="description" className="input-xlarge form-control" required />
-                  <span className="help-block">
-                    A description of what your bundle does and possible special instructions for the user.
-                    You can use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown</a> syntax.
-                  </span>
-                </Col>
-              </div>
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="description">Description</label>
+                  </Col>
+                  <Col sm={10}>
+                    <textarea ref="description" rows="6" id="description" name="description" className="input-xlarge form-control" required />
+                    <span className="help-block">
+                      A description of what your bundle does and possible special instructions for the user.
+                      You can use <a href="http://daringfireball.net/projects/markdown/syntax" target="_blank">Markdown</a> syntax.
+                    </span>
+                  </Col>
+                </div>
 
-              <div className="form-group">
-                <Col sm={2}>
-                  <label className="control-label" htmlFor="category">Category</label>
-                </Col>
-                <Col sm={10}>
-                  <input ref="category" type="text" id="category" name="category" className="input-xlarge form-control" required />
-                  <span className="help-block">A category for your bundle, e.g. Operating Systems, Firewalls or Switches.</span>
-                </Col>
-              </div>
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="category">Category</label>
+                  </Col>
+                  <Col sm={10}>
+                    <input ref="category" type="text" id="category" name="category" className="input-xlarge form-control" required />
+                    <span className="help-block">A category for your bundle, e.g. Operating Systems, Firewalls or Switches.</span>
+                  </Col>
+                </div>
 
-              <div className="form-group">
-                <Col sm={2}>
-                  <label className="control-label" htmlFor="inputs">Inputs</label>
-                </Col>
-                <Col sm={10}>
-                  {this.isEmpty(this.state.inputs) ?
-                  <span className="help-block help-standalone">There are no inputs to export.</span>
-                    :
-                  <span>
-                    <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllInputs}>Select all</Button>
-                    {this.state.inputs.sort((i1, i2) => {return i1.title.localeCompare(i2.title); }).map(this.formatInput)}
-                  </span>
-                  }
-                </Col>
-              </div>
-
-              <div className="form-group">
-                <Col sm={2}>
-                  <label className="control-label" htmlFor="grokPatterns">Grok Patterns</label>
-                </Col>
-                <Col sm={10}>
-                  {this.isEmpty(this.state.grok_patterns) ?
-                  <span className="help-block help-standalone">There are no grok patterns to export.</span>
-                    :
-                  <span>
-                    <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllGrokPatterns}>Select all</Button>
-                    {this.state.grok_patterns.sort((g1, g2) => {return g1.name.localeCompare(g2.name);}).map(this.formatGrokPattern)}
-                  </span>
-                    }
-                </Col>
-              </div>
-
-              <div className="form-group">
-                <Col sm={2}>
-                  <label className="control-label" htmlFor="outputs">Outputs</label>
-                </Col>
-                <Col sm={10}>
-                  {this.isEmpty(this.state.outputs) ?
-                  <span className="help-block help-standalone">There are no outputs to export.</span>
-                    :
-                  <span>
-                    <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllOutputs}>Select all</Button>
-                    {this.state.outputs.sort((o1, o2) => {return o1.title.localeCompare(o2.title);}).map(this.formatOutput)}
-                  </span>
-                  }
-                </Col>
-              </div>
-
-              <div className="form-group">
-                <Col sm={2}>
-                  <label className="control-label" htmlFor="streams">Streams</label>
-                </Col>
-                <Col sm={10}>
-                  {this.isEmpty(this.state.streams) ?
-                  <span className="help-block help-standalone">There are no streams to export.</span>
-                    :
-                  <span>
-                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllStreams}>Select all</Button>
-                    {this.state.streams.sort((s1, s2) => { return s1.title.localeCompare(s2.title); }).map(this.formatStream)}
-                  </span>
-                    }
-                </Col>
-              </div>
-
-              <div className="form-group">
-                <Col sm={2}>
-                  <label className="control-label" htmlFor="dashboards">Dashboards</label>
-                </Col>
-                <Col sm={10}>
-                  {this.isEmpty(this.state.dashboards) ?
-                  <span className="help-block help-standalone">There are no dashboards to export.</span>
-                    :
-                  <span>
-                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllDashboards}>Select all</Button>
-                      {this.state.dashboards.sort((d1, d2) => {return d1.title.localeCompare(d2.title); }).map(this.formatDashboard)}
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="inputs">Inputs</label>
+                  </Col>
+                  <Col sm={10}>
+                    {this.isEmpty(this.state.inputs) ?
+                    <span className="help-block help-standalone">There are no inputs to export.</span>
+                      :
+                    <span>
+                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllInputs}>Select all</Button>
+                      {this.state.inputs.sort((i1, i2) => {return i1.title.localeCompare(i2.title); }).map(this.formatInput)}
                     </span>
                     }
-                </Col>
-              </div>
+                  </Col>
+                </div>
 
-              <div className="form-group">
-                <Col smOffset={2} sm={10}>
-                  <Button bsStyle="success" type="submit">
-                    <i className="fa fa-cloud-download" /> Download my content pack
-                  </Button>
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="grokPatterns">Grok Patterns</label>
+                  </Col>
+                  <Col sm={10}>
+                    {this.isEmpty(this.state.grok_patterns) ?
+                    <span className="help-block help-standalone">There are no grok patterns to export.</span>
+                      :
+                    <span>
+                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllGrokPatterns}>Select all</Button>
+                      {this.state.grok_patterns.sort((g1, g2) => {return g1.name.localeCompare(g2.name);}).map(this.formatGrokPattern)}
+                    </span>
+                      }
+                  </Col>
+                </div>
 
-                  <br /><br />
-                  <p>
-                    <i className="fa fa-lightbulb-o" />&nbsp;
-                    Share your content pack with the community on the <a href="https://marketplace.graylog.org/" target="_blank">Graylog Marketplace</a> after you have downloaded it.
-                  </p>
-                </Col>
-              </div>
-            </form>
-          </Col>
-        </Row>
-      </span>
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="outputs">Outputs</label>
+                  </Col>
+                  <Col sm={10}>
+                    {this.isEmpty(this.state.outputs) ?
+                    <span className="help-block help-standalone">There are no outputs to export.</span>
+                      :
+                    <span>
+                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllOutputs}>Select all</Button>
+                      {this.state.outputs.sort((o1, o2) => {return o1.title.localeCompare(o2.title);}).map(this.formatOutput)}
+                    </span>
+                    }
+                  </Col>
+                </div>
+
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="streams">Streams</label>
+                  </Col>
+                  <Col sm={10}>
+                    {this.isEmpty(this.state.streams) ?
+                    <span className="help-block help-standalone">There are no streams to export.</span>
+                      :
+                    <span>
+                        <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllStreams}>Select all</Button>
+                      {this.state.streams.sort((s1, s2) => { return s1.title.localeCompare(s2.title); }).map(this.formatStream)}
+                    </span>
+                      }
+                  </Col>
+                </div>
+
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="dashboards">Dashboards</label>
+                  </Col>
+                  <Col sm={10}>
+                    {this.isEmpty(this.state.dashboards) ?
+                    <span className="help-block help-standalone">There are no dashboards to export.</span>
+                      :
+                    <span>
+                        <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllDashboards}>Select all</Button>
+                        {this.state.dashboards.sort((d1, d2) => {return d1.title.localeCompare(d2.title); }).map(this.formatDashboard)}
+                      </span>
+                      }
+                  </Col>
+                </div>
+
+                <div className="form-group">
+                  <Col smOffset={2} sm={10}>
+                    <Button bsStyle="success" type="submit">
+                      <i className="fa fa-cloud-download" /> Download my content pack
+                    </Button>
+
+                    <br /><br />
+                    <p>
+                      <i className="fa fa-lightbulb-o" />&nbsp;
+                      Share your content pack with the community on the <a href="https://marketplace.graylog.org/" target="_blank">Graylog Marketplace</a> after you have downloaded it.
+                    </p>
+                  </Col>
+                </div>
+              </form>
+            </Col>
+          </Row>
+        </span>
+      </DocumentTitle>
     );
   },
 });
