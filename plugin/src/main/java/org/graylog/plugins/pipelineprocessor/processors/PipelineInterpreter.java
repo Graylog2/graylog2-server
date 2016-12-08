@@ -25,8 +25,6 @@ import com.google.common.collect.ImmutableSetMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import com.google.common.eventbus.EventBus;
-import com.google.common.eventbus.Subscribe;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
@@ -58,7 +56,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -76,46 +73,16 @@ public class PipelineInterpreter implements MessageProcessor {
 
     private final Journal journal;
     private final Meter filteredOutMessages;
-    private EventBus serverEventBus;
-
-    /**
-     * The current pipeline/stage/rule configuration of the system, including the stream-pipeline connections
-     */
-    private final AtomicReference<State> state = new AtomicReference<>(null);
+    private final ConfigurationStateUpdater stateUpdater;
 
     @Inject
     public PipelineInterpreter(Journal journal,
                                MetricRegistry metricRegistry,
-                               EventBus serverEventBus,
                                ConfigurationStateUpdater stateUpdater) {
 
         this.journal = journal;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
-        this.serverEventBus = serverEventBus;
-
-        /*
-         * get around the initialization race between state updater and the interpreter instances:
-         * the updater loads the config and posts an event on the bus, but the interpreters haven't registered yet.
-         * once the updater is constructed, it has loaded a state so we can get it once it has been injected
-         */
-        state.set(stateUpdater.getLatestState());
-
-        // listens to state changes
-        serverEventBus.register(this);
-    }
-
-    @Subscribe
-    public void handleStateUpdate(State newState) {
-        log.debug("Updated pipeline state to {}", newState);
-        state.set(newState);
-    }
-
-    /*
-     * Allow to unregister PipelineInterpreter from the event bus, allowing the object to be garbage collected.
-     * This is needed in some classes, when new PipelineInterpreter instances are created per request.
-     */
-    public void stop() {
-        serverEventBus.unregister(this);
+        this.stateUpdater = stateUpdater;
     }
 
     /**
@@ -124,19 +91,22 @@ public class PipelineInterpreter implements MessageProcessor {
      */
     @Override
     public Messages process(Messages messages) {
-        return process(messages, new NoopInterpreterListener(), this.state.get());
+        final State latestState = stateUpdater.getLatestState();
+        return process(messages, new NoopInterpreterListener(), latestState);
     }
 
     /**
-     * Evaluates all pipelines that apply to the given messages, based on the current stream routing of the messages.
+     * Evaluates all pipelines that apply to the given messages, based on the current stream routing
+     * of the messages.
      *
-     * The processing loops on each single message (passed in or created by pipelines) until the set of streams does
-     * not change anymore.
-     * No cycle detection is performed.
+     * The processing loops on each single message (passed in or created by pipelines) until the set
+     * of streams does not change anymore. No cycle detection is performed.
      *
-     * @param messages the messages to process through the pipelines
-     * @param interpreterListener a listener which gets called for each processing stage (e.g. to trace execution)
-     * @param state the pipeline/stage/rule/stream connection state to use during processing
+     * @param messages            the messages to process through the pipelines
+     * @param interpreterListener a listener which gets called for each processing stage (e.g. to
+     *                            trace execution)
+     * @param state               the pipeline/stage/rule/stream connection state to use during
+     *                            processing
      * @return the processed messages
      */
     public Messages process(Messages messages, InterpreterListener interpreterListener, State state) {
@@ -160,10 +130,10 @@ public class PipelineInterpreter implements MessageProcessor {
                 final Set<String> initialStreamIds = message.getStreams().stream().map(Stream::getId).collect(Collectors.toSet());
 
                 final ImmutableSet<Pipeline> pipelinesToRun = selectPipelines(interpreterListener,
-                                                                              processingBlacklist,
-                                                                              message,
-                                                                              initialStreamIds,
-                                                                              state.getStreamPipelineConnections());
+                        processingBlacklist,
+                        message,
+                        initialStreamIds,
+                        state.getStreamPipelineConnections());
 
                 toProcess.addAll(processForResolvedPipelines(message, msgId, pipelinesToRun, interpreterListener, state));
 
@@ -171,8 +141,8 @@ public class PipelineInterpreter implements MessageProcessor {
                 // has added a stream to the message, in which case we need to cycle and determine whether to process
                 // its pipeline connections, too
                 boolean addedStreams = updateStreamBlacklist(processingBlacklist,
-                                                             message,
-                                                             initialStreamIds);
+                        message,
+                        initialStreamIds);
                 potentiallyDropFilteredMessage(message);
 
                 // go to 1 and iterate over all messages again until no more streams are being assigned
@@ -243,15 +213,16 @@ public class PipelineInterpreter implements MessageProcessor {
     /**
      * Given a set of pipeline ids, process the given message according to the passed state.
      *
-     * This method returns the list of messages produced by the configuration in state, it does not look at the database
-     * or any other external resource besides what is being passed as parameters.
+     * This method returns the list of messages produced by the configuration in state, it does not
+     * look at the database or any other external resource besides what is being passed as
+     * parameters.
      *
      * This can be used to simulate pipelines without having to store them in the database.
      *
-     * @param message the message to process
-     * @param pipelineIds the ids of the pipelines to resolve and run the message through
+     * @param message             the message to process
+     * @param pipelineIds         the ids of the pipelines to resolve and run the message through
      * @param interpreterListener the listener tracing the execution
-     * @param state the pipeline/stage/rule state to interpret
+     * @param state               the pipeline/stage/rule state to interpret
      * @return the list of messages created during the interpreter run
      */
     public List<Message> processForPipelines(Message message,
@@ -300,16 +271,16 @@ public class PipelineInterpreter implements MessageProcessor {
         final Pipeline pipeline = stage.getPipeline();
         if (pipelinesToSkip.contains(pipeline)) {
             log.debug("[{}] previous stage result prevents further processing of pipeline `{}`",
-                     msgId,
-                     pipeline.name());
+                    msgId,
+                    pipeline.name());
             return;
         }
         stage.markExecution();
         interpreterListener.enterStage(stage);
         log.debug("[{}] evaluating rule conditions in stage {}: match {}",
-                 msgId,
-                 stage.stage(),
-                 stage.matchAll() ? "all" : "either");
+                msgId,
+                stage.stage(),
+                stage.matchAll() ? "all" : "either");
 
         // TODO the message should be decorated to allow layering changes and isolate stages
         final EvaluationContext context = new EvaluationContext(message);
@@ -335,12 +306,12 @@ public class PipelineInterpreter implements MessageProcessor {
                 || (rulesToRun.size() > 0 && anyRulesMatched)) {
             interpreterListener.continuePipelineExecution(pipeline, stage);
             log.debug("[{}] stage {} for pipeline `{}` required match: {}, ok to proceed with next stage",
-                     msgId, stage.stage(), pipeline.name(), stage.matchAll() ? "all" : "either");
+                    msgId, stage.stage(), pipeline.name(), stage.matchAll() ? "all" : "either");
         } else {
             // no longer execute stages from this pipeline, the guard prevents it
             interpreterListener.stopPipelineExecution(pipeline, stage);
             log.debug("[{}] stage {} for pipeline `{}` required match: {}, NOT ok to proceed with next stage",
-                      msgId, stage.stage(), pipeline.name(), stage.matchAll() ? "all" : "either");
+                    msgId, stage.stage(), pipeline.name(), stage.matchAll() ? "all" : "either");
             pipelinesToSkip.add(pipeline);
         }
 
@@ -399,7 +370,7 @@ public class PipelineInterpreter implements MessageProcessor {
             appendProcessingError(rule, message, lastError.toString());
             interpreterListener.failExecuteRule(rule, pipeline);
             log.debug("Encountered evaluation error, skipping rest of the rule: {}",
-                      lastError);
+                    lastError);
             rule.markFailure();
             return false;
         }
@@ -423,7 +394,7 @@ public class PipelineInterpreter implements MessageProcessor {
                 appendProcessingError(rule, message, lastError.toString());
                 interpreterListener.failEvaluateRule(rule, pipeline);
                 log.debug("Encountered evaluation error during condition, skipping rule actions: {}",
-                          lastError);
+                        lastError);
                 return false;
             }
             interpreterListener.satisfyRule(rule, pipeline);
@@ -490,17 +461,21 @@ public class PipelineInterpreter implements MessageProcessor {
                         }
                     });
 
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(State.class, "stage-cache")));
-
-            metricRegistry.register(name(State.class, "stage-cache", "hit-count"), (Gauge<Long>) () -> cache.stats().hitCount());
-            metricRegistry.register(name(State.class, "stage-cache", "hit-rate"), (Gauge<Double>) () -> cache.stats().hitRate());
-            metricRegistry.register(name(State.class, "stage-cache", "miss-count"), (Gauge<Long>) () -> cache.stats().missCount());
-            metricRegistry.register(name(State.class, "stage-cache", "miss-rate"), (Gauge<Double>) () -> cache.stats().missRate());
-            metricRegistry.register(name(State.class, "stage-cache", "load-count"), (Gauge<Long>) () -> cache.stats().loadCount());
-            metricRegistry.register(name(State.class, "stage-cache", "total-load-time"), (Gauge<Long>) () -> cache.stats().totalLoadTime());
-            metricRegistry.register(name(State.class, "stage-cache", "eviction-count"), (Gauge<Long>) () -> cache.stats().evictionCount());
-            metricRegistry.register(name(State.class, "stage-cache", "average-load-penalty"), (Gauge<Double>) () -> cache.stats().averageLoadPenalty());
-            metricRegistry.register(name(State.class, "stage-cache", "load-exception-count"), (Gauge<Long>) () -> cache.stats().loadExceptionCount());
+            // we have to remove the metrics, because otherwise we leak references to the cache (and the register call with throw)
+            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(State.class,"stage-cache")));
+            try {
+                metricRegistry.register(name(State.class, "stage-cache", "hit-count"), (Gauge<Long>) () -> cache.stats().hitCount());
+                metricRegistry.register(name(State.class, "stage-cache", "hit-rate"), (Gauge<Double>) () -> cache.stats().hitRate());
+                metricRegistry.register(name(State.class, "stage-cache", "miss-count"), (Gauge<Long>) () -> cache.stats().missCount());
+                metricRegistry.register(name(State.class, "stage-cache", "miss-rate"), (Gauge<Double>) () -> cache.stats().missRate());
+                metricRegistry.register(name(State.class, "stage-cache", "load-count"), (Gauge<Long>) () -> cache.stats().loadCount());
+                metricRegistry.register(name(State.class, "stage-cache", "total-load-time"), (Gauge<Long>) () -> cache.stats().totalLoadTime());
+                metricRegistry.register(name(State.class, "stage-cache", "eviction-count"), (Gauge<Long>) () -> cache.stats().evictionCount());
+                metricRegistry.register(name(State.class, "stage-cache", "average-load-penalty"), (Gauge<Double>) () -> cache.stats().averageLoadPenalty());
+                metricRegistry.register(name(State.class, "stage-cache", "load-exception-count"), (Gauge<Long>) () -> cache.stats().loadExceptionCount());
+            } catch (Exception e) {
+                LOG.error("Registering cache metrics failed, this is a bug.");
+            }
         }
 
         public ImmutableMap<String, Pipeline> getCurrentPipelines() {

@@ -122,7 +122,6 @@ public class PipelineInterpreterTest {
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(Journal.class),
                 new MetricRegistry(),
-                mock(EventBus.class),
                 stateUpdater
         );
 
@@ -182,7 +181,6 @@ public class PipelineInterpreterTest {
         final PipelineInterpreter interpreter = new PipelineInterpreter(
                 mock(Journal.class),
                 metricRegistry,
-                mock(EventBus.class),
                 stateUpdater
         );
 
