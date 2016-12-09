@@ -37,6 +37,7 @@ import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.GraylogErrorPageGenerator;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
@@ -352,6 +353,7 @@ public class JerseyService extends AbstractIdleService {
         // See "Selector runners count" at https://grizzly.java.net/bestpractices.html for details.
         listener.getTransport().setSelectorRunnersCount(selectorRunnersCount);
 
+        listener.setDefaultErrorPageGenerator(new GraylogErrorPageGenerator());
 
         if(enableGzip) {
             final CompressionConfig compressionConfig = listener.getCompressionConfig();
