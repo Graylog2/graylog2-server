@@ -28,11 +28,14 @@ const GettingStartedStore = Reflux.createStore({
   getStatus() {
     const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
     promise
-      .then(response => {
-        this.status = response;
-        this.trigger({status: this.status});
-      })
-      .catch(console.error);
+      .then(
+        response => {
+          this.status = response;
+          this.trigger({ status: this.status });
+          return response;
+        },
+        error => console.error(error)
+      );
 
     GettingStartedActions.getStatus.promise(promise);
   },
@@ -40,11 +43,15 @@ const GettingStartedStore = Reflux.createStore({
   dismiss() {
     const promise = fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl}/dismiss`), '{}');
     promise
-      .then(() => this.getStatus())
-      .catch((error) => {
-        UserNotification.error('Dismissing Getting Started Guide failed with status: ' + error,
-          'Could not dismiss guide');
-      });
+      .then(
+        response => {
+          this.getStatus();
+          return response;
+        },
+        error => {
+          UserNotification.error(`Dismissing Getting Started Guide failed with status: ${error}`,
+            'Could not dismiss guide');
+        });
 
     GettingStartedActions.dismiss.promise(promise);
   },

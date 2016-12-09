@@ -99,8 +99,13 @@ const SearchPage = React.createClass({
 
           this.setState({ updatingHistogram: true });
           UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId)
-            .then((histogram) => this.setState({ histogram: histogram }))
+            .then(histogram => {
+              this.setState({ histogram: histogram });
+              return histogram;
+            })
             .finally(() => this.setState({ updatingHistogram: false }));
+
+          return response;
         },
         error => {
           // Treat searches with a malformed query
