@@ -267,7 +267,11 @@ const LdapComponent = React.createClass({
                    onChange={this._bindChecked}/>
 
             <fieldset>
-              <legend className="col-sm-12">1. Server configuration</legend>
+              <Row className="row-sm">
+                <Col sm={12}>
+                  <legend>1. Server configuration</legend>
+                </Col>
+              </Row>
               <Input id="active_directory" labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" label="Server Type">
                 <label className="radio-inline">
@@ -326,12 +330,20 @@ const LdapComponent = React.createClass({
             </fieldset>
 
             <fieldset>
-              <legend className="col-sm-12">2. Connection Test</legend>
+              <Row className="row-sm">
+                <Col sm={12}>
+                  <legend>2. Connection Test</legend>
+                </Col>
+              </Row>
               <TestLdapConnection ldapSettings={this.state.ldapSettings} ldapUri={this.state.ldapUri} disabled={disabled}/>
             </fieldset>
 
             <fieldset>
-              <legend className="col-sm-12">3. User mapping</legend>
+              <Row className="row-sm">
+                <Col sm={12}>
+                  <legend>3. User mapping</legend>
+                </Col>
+              </Row>
               <Input type="text" id="search_base" name="search_base" labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" placeholder="Search Base" label="Search Base DN"
                      value={this.state.ldapSettings.search_base} help={help.SEARCH_BASE}
@@ -349,9 +361,11 @@ const LdapComponent = React.createClass({
             </fieldset>
 
             <fieldset>
-              <legend className="col-sm-12">4. Group Mapping
-                <small>(optional)</small>
-              </legend>
+              <Row className="row-sm">
+                <Col sm={12}>
+                  <legend>4. Group Mapping <small>(optional)</small></legend>
+                </Col>
+              </Row>
               <Input type="text" id="group_search_base" name="group_search_base" labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" placeholder="Group Search Base" label="Group Search Base DN"
                      value={this.state.ldapSettings.group_search_base} help={help.GROUP_SEARCH_BASE}
@@ -416,12 +430,20 @@ const LdapComponent = React.createClass({
             </fieldset>
 
             <fieldset>
-              <legend className="col-sm-12">5. Login test</legend>
+              <Row className="row-sm">
+                <Col sm={12}>
+                  <legend>5. Login test</legend>
+                </Col>
+              </Row>
               <TestLdapLogin ldapSettings={this.state.ldapSettings} disabled={disabled}/>
             </fieldset>
 
             <fieldset>
-              <legend className="col-sm-12">6. Store settings</legend>
+              <Row className="row-sm">
+                <Col sm={12}>
+                  <legend>6. Store settings</legend>
+                </Col>
+              </Row>
               <div className="form-group">
                 <Col sm={9} smOffset={3}>
                   <Button type="submit" bsStyle="primary" className="save-button-margin">Save LDAP settings</Button>
