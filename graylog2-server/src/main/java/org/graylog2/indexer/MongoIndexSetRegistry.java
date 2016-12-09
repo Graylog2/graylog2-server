@@ -17,18 +17,16 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableSet;
-
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.mongojack.DBQuery;
 
+import javax.inject.Inject;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-
-import javax.inject.Inject;
 
 import static java.util.Objects.requireNonNull;
 
@@ -105,7 +103,9 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     public String[] getWriteIndexWildcards() {
         final ImmutableSet.Builder<String> wildcardsBuilder = ImmutableSet.builder();
         for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            wildcardsBuilder.add(indexSet.getWriteIndexWildcard());
+            if (indexSet.getConfig().isWritable()) {
+                wildcardsBuilder.add(indexSet.getWriteIndexWildcard());
+            }
         }
 
         final ImmutableSet<String> wildcards = wildcardsBuilder.build();
@@ -116,7 +116,9 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     public String[] getWriteIndexNames() {
         final ImmutableSet.Builder<String> indexNamesBuilder = ImmutableSet.builder();
         for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            indexNamesBuilder.add(indexSet.getWriteIndexAlias());
+            if (indexSet.getConfig().isWritable()) {
+                indexNamesBuilder.add(indexSet.getWriteIndexAlias());
+            }
         }
 
         final ImmutableSet<String> indexNames = indexNamesBuilder.build();
@@ -127,7 +129,9 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     public boolean isUp() {
         boolean result = true;
         for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            result = result && indexSet.isUp();
+            if (indexSet.getConfig().isWritable()) {
+                result = result && indexSet.isUp();
+            }
         }
 
         return result;
@@ -147,7 +151,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     @Override
     public boolean isCurrentWriteIndex(String indexName) throws TooManyAliasesException {
         for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            if (indexSet.getCurrentActualTargetIndex().equals(indexName)) {
+            if (indexSet.getCurrentActualTargetIndex() != null && indexSet.getCurrentActualTargetIndex().equals(indexName)) {
                 return true;
             }
         }

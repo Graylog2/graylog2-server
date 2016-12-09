@@ -82,6 +82,7 @@ public class MongoIndexSetTest {
             "Test",
             "Test",
             true,
+            true,
             "graylog",
             1,
             0,

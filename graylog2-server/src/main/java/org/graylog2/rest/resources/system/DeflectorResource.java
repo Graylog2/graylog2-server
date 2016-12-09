@@ -37,6 +37,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
@@ -99,6 +100,8 @@ public class DeflectorResource extends RestResource {
         final IndexSet indexSet = indexSetRegistry.getDefault()
                 .orElseThrow(() -> new NotFoundException("Default index set not found"));
 
+        checkCycle(indexSet);
+
         final String msg = "Cycling deflector for default index set <" + indexSet.getConfig().id()  + ">. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, DeflectorResource.class));
@@ -116,10 +119,20 @@ public class DeflectorResource extends RestResource {
     public void cycle(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
 
+        checkCycle(indexSet);
+
         final String msg = "Cycling deflector for index set <" + indexSetId + ">. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, DeflectorResource.class));
 
         indexSet.cycle();
+    }
+
+    private void checkCycle(IndexSet indexSet) {
+        if (!indexSet.getConfig().isWritable()) {
+            final String id = indexSet.getConfig().id();
+            final String title = indexSet.getConfig().title();
+            throw new BadRequestException("Unable to cycle non-writable index set <" + id + "> (" + title + ")");
+        }
     }
 }

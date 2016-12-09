@@ -113,7 +113,7 @@ const IndexSetPage = React.createClass({
             <Button bsStyle="info" bsSize="lg">Edit Index Set</Button>
           </LinkContainer>
           &nbsp;
-          <IndicesMaintenanceDropdown indexSetId={this.props.params.indexSetId} />
+          <IndicesMaintenanceDropdown indexSetId={this.props.params.indexSetId} indexSet={this.state.indexSet} />
         </span>
       </PageHeader>
     );

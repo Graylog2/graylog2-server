@@ -20,6 +20,7 @@ import com.google.common.collect.ComparisonChain;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
+import javax.annotation.Nullable;
 import java.util.Comparator;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +37,7 @@ public interface IndexSet extends Comparable<IndexSet> {
 
     String getNewestTargetName() throws NoTargetIndexException;
 
+    @Nullable
     String getCurrentActualTargetIndex() throws TooManyAliasesException;
 
     Map<String,Set<String>> getAllDeflectorAliases();

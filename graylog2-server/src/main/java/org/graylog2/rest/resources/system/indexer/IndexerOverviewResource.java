@@ -128,7 +128,7 @@ public class IndexerOverviewResource extends RestResource {
                                         indexStats.getPrimaries().getDocs().getDeleted(),
                                         indexStats.getPrimaries().getStore().sizeInBytes()),
                                 indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexStats.getIndex())).findFirst().orElse(null),
-                                deflectorSummary.currentTarget().equals(indexStats.getIndex()),
+                                deflectorSummary.currentTarget() != null && deflectorSummary.currentTarget().equals(indexStats.getIndex()),
                                 false,
                                 areReopened.get(indexStats.getIndex()))
                 ));
@@ -136,7 +136,7 @@ public class IndexerOverviewResource extends RestResource {
         indices.getClosedIndices(indexSet).forEach(indexName -> indicesSummaries.put(indexName, IndexSummary.create(
                 null,
                 indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexName)).findFirst().orElse(null),
-                deflectorSummary.currentTarget().equals(indexName),
+                deflectorSummary.currentTarget() != null && deflectorSummary.equals(indexName),
                 true,
                 false
         )));

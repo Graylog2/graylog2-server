@@ -23,6 +23,17 @@ const IndicesConfiguration = React.createClass({
   },
 
   render() {
+    if (!this.props.indexSet.writable) {
+      return (
+        <Row>
+          <Col md={12}>
+            Index set is not writable and will not be included in index rotation and retention.
+            It is also not possible to assign it to a stream.
+          </Col>
+        </Row>
+      );
+    }
+
     const rotationConfig = {
       strategy: this.props.indexSet.rotation_strategy_class,
       config: this.props.indexSet.rotation_strategy,

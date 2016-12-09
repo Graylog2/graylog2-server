@@ -72,8 +72,12 @@ public class IndexRotationThread extends Periodical {
         if (cluster.isConnected()) {
             indexSetRegistry.forEach((indexSet) -> {
                 try {
-                    checkAndRepair(indexSet);
-                    checkForRotation(indexSet);
+                    if (indexSet.getConfig().isWritable()) {
+                        checkAndRepair(indexSet);
+                        checkForRotation(indexSet);
+                    } else {
+                        LOG.debug("Skipping non-writable index set <{}> ({})", indexSet.getConfig().id(), indexSet.getConfig().title());
+                    }
                 } catch (Exception e) {
                     LOG.error("Couldn't point deflector to a new index", e);
                 }

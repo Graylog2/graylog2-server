@@ -21,6 +21,8 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+
 @AutoValue
 @JsonAutoDetect
 public abstract class DeflectorSummary {
@@ -28,11 +30,12 @@ public abstract class DeflectorSummary {
     public abstract boolean isUp();
 
     @JsonProperty("current_target")
+    @Nullable
     public abstract String currentTarget();
 
     @JsonCreator
     public static DeflectorSummary create(@JsonProperty("is_up") boolean isUp,
-                                          @JsonProperty("current_target") String currentTarget) {
+                                          @JsonProperty("current_target") @Nullable String currentTarget) {
         return new AutoValue_DeflectorSummary(isUp, currentTarget);
     }
 }

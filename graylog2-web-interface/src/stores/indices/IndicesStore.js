@@ -27,6 +27,17 @@ const IndicesStore = Reflux.createStore({
 
     IndicesActions.list.promise(promise);
   },
+  listAll() {
+    const urlList = URLUtils.qualifyUrl(ApiRoutes.IndicesApiController.listAll().url);
+    const promise = fetch('GET', urlList).then((response) => {
+      this.indices = response.all.indices;
+      this.closedIndices = response.closed.indices;
+      this.trigger({ indices: this.indices, closedIndices: this.closedIndices });
+      return { indices: this.indices, closedIndices: this.closedIndices };
+    });
+
+    IndicesActions.listAll.promise(promise);
+  },
   multiple() {
     const indexNames = Object.keys(this.registrations);
     if (indexNames.length <= 0) {
