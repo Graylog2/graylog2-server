@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="robots" content="noindex, nofollow">
+<meta charset="UTF-8">
+<title>Graylog - ${reason}</title>
+</head>
+<body>
+<h1>${description(Internal Server Error)}</h1>
+${if exception}
+<h2>Reason</h2>
+<p>${exception}</p>
+<h2>Stacktrace</h2>
+<p><pre>
+${stacktrace}
+</pre></p>
+${end}
+</body>
+</html>
