@@ -1,5 +1,5 @@
 {
-  "nextFreeModuleId": 1422,
+  "nextFreeModuleId": 1423,
   "modules": {
     "byIdentifier": {
       "node_modules/react/react.js": 1,
@@ -1423,7 +1423,8 @@
       "node_modules/react-bootstrap/lib/MediaLeft.js": 1418,
       "node_modules/react-bootstrap/lib/MediaList.js": 1419,
       "node_modules/react-bootstrap/lib/MediaListItem.js": 1420,
-      "node_modules/react-bootstrap/lib/MediaRight.js": 1421
+      "node_modules/react-bootstrap/lib/MediaRight.js": 1421,
+      "node_modules/setimmediate/setImmediate.js": 1422
     }
   },
   "nextFreeChunkId": 1,
