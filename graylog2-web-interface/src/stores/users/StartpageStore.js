@@ -1,14 +1,14 @@
 import Reflux from 'reflux';
+import ApiRoutes from 'routing/ApiRoutes';
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 const StartpageStore = Reflux.createStore({
   listenables: [],
-  sourceUrl: (username) => `/users/${username}`,
 
   set(username, type, id) {
-    const url = URLUtils.qualifyUrl(this.sourceUrl(username));
+    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.update(username).url);
     const payload = {};
     if (type && id) {
       payload.type = type;
