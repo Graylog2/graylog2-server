@@ -51,6 +51,7 @@ import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.bindings.providers.MetricRegistryProvider;
 import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamService;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +60,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Ignore("code generation disabled")
 public class ConfigurationStateUpdaterTest {
     private static final Logger log = LoggerFactory.getLogger(ConfigurationStateUpdaterTest.class);
     private PipelineInterpreter.State reload;

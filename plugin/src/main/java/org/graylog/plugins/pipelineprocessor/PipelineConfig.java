@@ -10,5 +10,5 @@ public class PipelineConfig implements PluginConfigBean {
     private boolean cachedStageIterators = true;
 
     @Parameter("generate_native_code")
-    private boolean generateNativeCode = true;
+    private boolean generateNativeCode = false;
 }
