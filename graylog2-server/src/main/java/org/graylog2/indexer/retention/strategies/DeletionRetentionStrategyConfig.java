@@ -21,12 +21,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 
 import javax.validation.constraints.Min;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class DeletionRetentionStrategyConfig implements RetentionStrategyConfig {
     private static final int DEFAULT_MAX_NUMBER_OF_INDICES = 20;
 

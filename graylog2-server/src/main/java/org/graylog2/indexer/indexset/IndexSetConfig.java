@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ComparisonChain;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -36,6 +37,7 @@ import java.time.ZonedDateTime;
 import static java.util.Objects.requireNonNull;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("id")

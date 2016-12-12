@@ -19,8 +19,10 @@ package org.graylog2.rest.models.system.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 public abstract class SizeBasedRotationStrategyResponse implements DeflectorConfigResponse {
     @JsonProperty("max_size_per_index")

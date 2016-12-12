@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.Sets;
 
 import java.util.Map;
@@ -29,6 +30,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 public abstract class DecorationStats {
     private static final String FIELD_ADDED_FIELDS = "added_fields";

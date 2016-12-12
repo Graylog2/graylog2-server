@@ -20,9 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class ClusterName {
     @JsonProperty
     public abstract String name();

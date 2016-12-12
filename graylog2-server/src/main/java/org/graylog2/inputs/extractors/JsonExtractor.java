@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
@@ -168,6 +169,7 @@ public class JsonExtractor extends Extractor {
     }
 
     @AutoValue
+@WithBeanGetter
     protected abstract static class Entry {
         public abstract String key();
 

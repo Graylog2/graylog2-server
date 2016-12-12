@@ -17,8 +17,10 @@
 package org.graylog2.indexer.results;
 
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
+@WithBeanGetter
 public abstract class CountResult {
     public abstract long count();
 

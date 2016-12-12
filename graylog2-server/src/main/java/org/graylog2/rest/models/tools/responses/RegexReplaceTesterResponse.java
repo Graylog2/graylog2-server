@@ -21,11 +21,13 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class RegexReplaceTesterResponse {
     @JsonProperty
@@ -59,6 +61,7 @@ public abstract class RegexReplaceTesterResponse {
 
     @JsonAutoDetect
     @AutoValue
+@WithBeanGetter
     public static abstract class Match {
         @JsonProperty
         public abstract String match();

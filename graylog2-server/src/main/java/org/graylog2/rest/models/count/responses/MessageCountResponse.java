@@ -19,9 +19,11 @@ package org.graylog2.rest.models.count.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class MessageCountResponse {
     @JsonProperty
     public abstract long events();

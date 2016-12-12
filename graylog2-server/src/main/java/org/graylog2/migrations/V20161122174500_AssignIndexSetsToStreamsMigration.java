@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -115,6 +116,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigration extends Migration
 
     @JsonAutoDetect
     @AutoValue
+@WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("index_set_id")
         public abstract String indexSetId();

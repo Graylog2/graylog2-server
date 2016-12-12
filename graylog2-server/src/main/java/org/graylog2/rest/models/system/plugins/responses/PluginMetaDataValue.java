@@ -20,11 +20,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 import java.net.URI;
 import java.util.Set;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 public abstract class PluginMetaDataValue {
     @JsonProperty("unique_id")

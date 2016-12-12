@@ -19,6 +19,7 @@ package org.graylog2.system.stats.mongo;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -28,6 +29,7 @@ import javax.annotation.Nullable;
  */
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class HostInfo {
     @JsonProperty
     public abstract System system();
@@ -46,6 +48,7 @@ public abstract class HostInfo {
 
     @JsonAutoDetect
     @AutoValue
+@WithBeanGetter
     public abstract static class System {
         @JsonProperty
         public abstract DateTime currentTime();
@@ -81,6 +84,7 @@ public abstract class HostInfo {
 
     @JsonAutoDetect
     @AutoValue
+@WithBeanGetter
     public abstract static class Os {
         @JsonProperty
         public abstract String type();
@@ -100,6 +104,7 @@ public abstract class HostInfo {
 
     @JsonAutoDetect
     @AutoValue
+@WithBeanGetter
     public abstract static class Extra {
         @JsonProperty
         @Nullable

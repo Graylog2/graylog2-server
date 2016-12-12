@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
@@ -30,6 +31,7 @@ import org.joda.time.Seconds;
 import java.util.Map;
 
 @AutoValue
+@WithBeanGetter
 @JsonTypeName(RelativeRange.RELATIVE)
 public abstract class RelativeRange extends TimeRange {
 

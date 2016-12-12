@@ -20,10 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 import java.net.URI;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 public abstract class AppConfig {
     @JsonProperty("gl2ServerUrl")

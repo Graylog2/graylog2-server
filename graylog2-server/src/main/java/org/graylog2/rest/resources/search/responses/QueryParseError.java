@@ -19,11 +19,13 @@ package org.graylog2.rest.resources.search.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class QueryParseError {
     @JsonProperty
     public abstract String query();

@@ -19,6 +19,7 @@ package org.graylog2.shared.system.stats;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.shared.system.stats.fs.FsStats;
 import org.graylog2.shared.system.stats.jvm.JvmStats;
 import org.graylog2.shared.system.stats.network.NetworkStats;
@@ -27,6 +28,7 @@ import org.graylog2.shared.system.stats.process.ProcessStats;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class SystemStats {
     @JsonProperty("fs")
     public abstract FsStats fsStats();

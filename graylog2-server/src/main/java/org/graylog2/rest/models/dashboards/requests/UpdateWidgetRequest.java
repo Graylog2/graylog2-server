@@ -20,12 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class UpdateWidgetRequest {
     @Nullable
     @JsonProperty

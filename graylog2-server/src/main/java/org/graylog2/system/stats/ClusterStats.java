@@ -19,6 +19,7 @@ package org.graylog2.system.stats;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchStats;
 import org.graylog2.system.stats.mongo.MongoStats;
@@ -27,6 +28,7 @@ import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class ClusterStats {
     @JsonProperty("elasticsearch")
     public abstract ElasticsearchStats elasticsearchStats();

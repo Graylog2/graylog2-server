@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.hibernate.validator.constraints.Email;
 
 import javax.annotation.Nullable;
@@ -30,6 +31,7 @@ import java.util.List;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class ChangeUserRequest {
     @JsonProperty

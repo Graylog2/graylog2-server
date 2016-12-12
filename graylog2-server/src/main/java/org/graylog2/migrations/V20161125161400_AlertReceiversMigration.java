@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import org.bson.types.ObjectId;
@@ -171,6 +172,7 @@ public class V20161125161400_AlertReceiversMigration extends Migration {
     }
 
     @AutoValue
+@WithBeanGetter
     @JsonAutoDetect
     public static abstract class MigrationCompleted {
         @JsonProperty("stream_ids")

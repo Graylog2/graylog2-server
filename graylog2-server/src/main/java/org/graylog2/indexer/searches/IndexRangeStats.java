@@ -17,6 +17,7 @@
 package org.graylog2.indexer.searches;
 
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -27,6 +28,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 @AutoValue
+@WithBeanGetter
 public abstract class IndexRangeStats {
     public static final IndexRangeStats EMPTY = create(new DateTime(0L, DateTimeZone.UTC), new DateTime(0L, DateTimeZone.UTC), Collections.emptyList());
 

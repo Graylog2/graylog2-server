@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
@@ -29,6 +30,7 @@ import org.joda.time.format.ISODateTimeFormat;
 import java.util.Map;
 
 @AutoValue
+@WithBeanGetter
 @JsonTypeName(value = AbsoluteRange.ABSOLUTE)
 public abstract class AbsoluteRange extends TimeRange {
 

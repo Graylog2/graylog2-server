@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.joda.time.DateTime;
 
@@ -28,6 +29,7 @@ import javax.annotation.Nullable;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class JournalSummaryResponse {
 
     public static JournalSummaryResponse createDisabled() {

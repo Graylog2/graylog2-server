@@ -19,6 +19,7 @@ package org.graylog2.rest.models.system.config;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ImmutableSet;
 
 import java.util.Collection;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class ClusterConfigList {
     @JsonProperty
     public abstract int total();

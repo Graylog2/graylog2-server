@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.Configuration;
 
 /**
@@ -29,6 +30,7 @@ import org.graylog2.Configuration;
  */
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class ExposedConfiguration {
     @JsonProperty("inputbuffer_processors")
     public abstract int inputBufferProcessors();

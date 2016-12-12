@@ -20,8 +20,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 public abstract class DashboardDeletedEvent {
     private static final String FIELD_DASHBOARD_ID = "dashboard_id";

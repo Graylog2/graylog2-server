@@ -17,12 +17,14 @@
 package org.graylog2.indexer.indices;
 
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.elasticsearch.cluster.routing.ShardRouting;
 
 import java.util.List;
 
 @AutoValue
+@WithBeanGetter
 public abstract class IndexStatistics {
     public abstract String indexName();
 
