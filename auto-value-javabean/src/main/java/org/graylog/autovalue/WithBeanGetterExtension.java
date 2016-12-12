@@ -65,9 +65,13 @@ public class WithBeanGetterExtension extends AutoValueExtension {
         final String getterName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name);
         final MethodSpec.Builder builder = MethodSpec.methodBuilder(prefix + getterName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build())
                 .addStatement("return $N()", name)
                 .returns(returnType);
+
+        // Don't duplicate the @JsonIgnore annotation
+        if (element.getAnnotation(JsonIgnore.class) == null) {
+            builder.addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build());
+        }
 
         // Copy all annotations but JsonProperty to the new method.
         for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
