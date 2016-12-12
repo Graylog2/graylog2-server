@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const glob = require('glob');
 const path = require('path');
+const fs = require('fs');
 const merge = require('webpack-merge');
 
 const ROOT_PATH = path.resolve(__dirname);
@@ -17,8 +18,21 @@ process.env.web_src_path = path.resolve(__dirname);
 
 const webpackConfig = require(path.resolve(__dirname, './webpack.config.js'));
 
-pluginConfigs.forEach(function(pluginConfig) {
-  const pluginName = pluginConfig.split('/')[2];
+pluginConfigs.filter(pluginConfig => {
+  // Avoid including webpack configs of dependencies and built files.
+  return !pluginConfig.includes('/target/') && !pluginConfig.includes('/node_modules/');
+}).forEach(pluginConfig => {
+  const packageConfig = path.join(path.dirname(pluginConfig), 'package.json');
+
+  let pluginName;
+  if (fs.existsSync(packageConfig)) {
+    // If a package.json file exists (should normally be the case) use the package name for pluginName
+    const pkg = JSON.parse(fs.readFileSync(packageConfig, 'utf8'));
+    pluginName = pkg.name.replace(/\s+/g, '');
+  } else {
+    // Otherwise just use the directory name of the webpack config file
+    pluginName = path.basename(path.dirname(pluginConfig));
+  }
   const pluginDir = path.resolve(pluginConfig, '../src/web');
   webpackConfig.entry[pluginName] = pluginDir;
   webpackConfig.resolve.modulesDirectories.unshift(pluginDir);
