@@ -467,6 +467,10 @@
             <groupId>com.google.auto.value</groupId>
             <artifactId>auto-value</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.graylog.autovalue</groupId>
+            <artifactId>auto-value-javabean</artifactId>
+        </dependency>
         <!-- our basic test libraries, please only add infrastructure dependencies here -->
         <dependency>
             <groupId>junit</groupId>
