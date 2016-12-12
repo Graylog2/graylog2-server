@@ -26,6 +26,7 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
@@ -287,10 +288,12 @@ public class IndexSetsResourceTest {
                 .title("new title")
                 .build();
 
+        when(indexSetService.get("id")).thenReturn(Optional.of(indexSetConfig));
         when(indexSetService.save(indexSetConfig)).thenReturn(updatedIndexSetConfig);
 
-        final IndexSetSummary summary = indexSetsResource.update("id", IndexSetSummary.fromIndexSetConfig(indexSetConfig));
+        final IndexSetSummary summary = indexSetsResource.update("id", IndexSetUpdateRequest.fromIndexSetConfig(indexSetConfig));
 
+        verify(indexSetService, times(1)).get("id");
         verify(indexSetService, times(1)).save(indexSetConfig);
         verifyNoMoreInteractions(indexSetService);
         assertThat(summary.toIndexSetConfig()).isEqualTo(updatedIndexSetConfig);
@@ -319,7 +322,7 @@ public class IndexSetsResourceTest {
         expectedException.expectMessage("Mismatch of IDs in URI path and payload");
 
         try {
-            indexSetsResource.update("wrong-id", IndexSetSummary.fromIndexSetConfig(indexSetConfig));
+            indexSetsResource.update("wrong-id", IndexSetUpdateRequest.fromIndexSetConfig(indexSetConfig));
         } finally {
             verifyZeroInteractions(indexSetService);
         }
@@ -348,7 +351,7 @@ public class IndexSetsResourceTest {
         expectedException.expectMessage("Not authorized to access resource id <wrong-id>");
 
         try {
-            indexSetsResource.update("wrong-id", IndexSetSummary.fromIndexSetConfig(indexSetConfig));
+            indexSetsResource.update("wrong-id", IndexSetUpdateRequest.fromIndexSetConfig(indexSetConfig));
         } finally {
             verifyZeroInteractions(indexSetService);
         }

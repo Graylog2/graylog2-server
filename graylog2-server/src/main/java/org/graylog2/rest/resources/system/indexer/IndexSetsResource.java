@@ -29,9 +29,11 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -151,7 +153,15 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary save(@ApiParam(name = "Index set configuration", required = true)
                                 @Valid @NotNull IndexSetSummary indexSet) {
         try {
-            final IndexSetConfig savedObject = indexSetService.save(indexSet.toIndexSetConfig());
+            final IndexSetConfig indexSetConfig = indexSet.toIndexSetConfig();
+
+            // Build an example index name with the new prefix and check if this would be managed by an existing index set
+            final String indexName = indexSetConfig.indexPrefix() + MongoIndexSet.SEPARATOR + "0";
+            if (indexSetRegistry.isManagedIndex(indexName)) {
+                throw new BadRequestException("Index prefix <" + indexSetConfig.indexPrefix() + "> would conflict with an existing index set!");
+            }
+
+            final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
             return IndexSetSummary.fromIndexSetConfig(savedObject);
         } catch (DuplicateKeyException e) {
             throw new BadRequestException(e.getMessage());
@@ -170,13 +180,16 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary update(@ApiParam(name = "id", required = true)
                                   @PathParam("id") String id,
                                   @ApiParam(name = "Index set configuration", required = true)
-                                  @Valid @NotNull IndexSetSummary indexSet) {
+                                  @Valid @NotNull IndexSetUpdateRequest updateRequest) {
         checkPermission(RestPermissions.INDEXSETS_EDIT, id);
-        if (indexSet.id() != null && !id.equals(indexSet.id())) {
+        if (!id.equals(updateRequest.id())) {
             throw new ClientErrorException("Mismatch of IDs in URI path and payload", Response.Status.CONFLICT);
         }
 
-        final IndexSetConfig savedObject = indexSetService.save(indexSet.toIndexSetConfig());
+        final IndexSetConfig oldConfig = indexSetService.get(id)
+                .orElseThrow(() -> new NotFoundException("Index set <" + id + "> not found"));
+
+        final IndexSetConfig savedObject = indexSetService.save(updateRequest.toIndexSetConfig(oldConfig));
 
         return IndexSetSummary.fromIndexSetConfig(savedObject);
     }
