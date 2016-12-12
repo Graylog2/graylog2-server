@@ -114,6 +114,17 @@ const ToolsStore = {
 
         return promise;
     },
+    testContainsString(searchString: string, string: string): Promise<Object> {
+        const url = ApiRoutes.ToolsApiController.containsStringTest().url;
+        const promise = fetch('POST', URLUtils.qualifyUrl(url), { search_string: searchString, string: string });
+
+        promise.catch((errorThrown) => {
+            UserNotification.error('Details: ' + errorThrown,
+              'Could not check if field contains the string');
+        });
+
+        return promise;
+    },
 };
 
 export = ToolsStore;

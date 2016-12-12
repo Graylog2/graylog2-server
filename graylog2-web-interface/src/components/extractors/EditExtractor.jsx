@@ -88,8 +88,10 @@ const EditExtractor = React.createClass({
     this.setState({updatedExtractor: updatedExtractor});
   },
   _testCondition() {
-    const promise = ToolsStore.testRegex(this.state.updatedExtractor.condition_value, this.state.exampleMessage);
-    promise.then(result => this.setState({conditionTestResult: result.matched}));
+    const updatedExtractor = this.state.updatedExtractor;
+    const tester = (updatedExtractor.condition_type === 'string' ? ToolsStore.testContainsString : ToolsStore.testRegex);
+    const promise = tester(updatedExtractor.condition_value, this.state.exampleMessage);
+    promise.then(result => this.setState({ conditionTestResult: result.matched }));
   },
   _tryButtonDisabled() {
     return this.state.updatedExtractor.condition_value === '' || this.state.updatedExtractor.condition_value === undefined || !this.state.exampleMessage;
