@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
+import com.mongodb.DuplicateKeyException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -149,8 +150,12 @@ public class IndexSetsResource extends RestResource {
     })
     public IndexSetSummary save(@ApiParam(name = "Index set configuration", required = true)
                                 @Valid @NotNull IndexSetSummary indexSet) {
-        final IndexSetConfig savedObject = indexSetService.save(indexSet.toIndexSetConfig());
-        return IndexSetSummary.fromIndexSetConfig(savedObject);
+        try {
+            final IndexSetConfig savedObject = indexSetService.save(indexSet.toIndexSetConfig());
+            return IndexSetSummary.fromIndexSetConfig(savedObject);
+        } catch (DuplicateKeyException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @PUT
