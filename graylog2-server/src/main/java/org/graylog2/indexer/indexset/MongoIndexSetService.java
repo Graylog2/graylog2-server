@@ -68,6 +68,8 @@ public class MongoIndexSetService implements IndexSetService {
         this.collection = requireNonNull(collection);
         this.streamService = streamService;
         this.clusterEventBus = requireNonNull(clusterEventBus);
+
+        this.collection.getDbCollection().createIndex(DBSort.asc(IndexSetConfig.FIELD_INDEX_PREFIX), null, true);
     }
 
     /**

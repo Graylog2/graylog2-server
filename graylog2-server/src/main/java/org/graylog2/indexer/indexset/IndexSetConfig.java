@@ -38,6 +38,8 @@ import static java.util.Objects.requireNonNull;
 @AutoValue
 @JsonAutoDetect
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
+    public static final String FIELD_INDEX_PREFIX = "index_prefix";
+
     @JsonProperty("id")
     @Nullable
     @Id
@@ -58,7 +60,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("writable")
     public abstract boolean isWritable();
 
-    @JsonProperty("index_prefix")
+    @JsonProperty(FIELD_INDEX_PREFIX)
     @NotBlank
     public abstract String indexPrefix();
 
@@ -133,7 +135,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("default") @Nullable Boolean isDefault,
                                         @JsonProperty("writable") @Nullable Boolean isWritable,
-                                        @JsonProperty("index_prefix") @NotBlank String indexPrefix,
+                                        @JsonProperty(FIELD_INDEX_PREFIX) @NotBlank String indexPrefix,
                                         @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
                                         @JsonProperty("index_wildcard") @Nullable String indexWildcard,
                                         @JsonProperty("shards") @Min(1) int shards,
