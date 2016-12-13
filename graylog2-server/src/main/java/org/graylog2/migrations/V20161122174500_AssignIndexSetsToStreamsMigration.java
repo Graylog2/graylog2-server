@@ -116,7 +116,7 @@ public class V20161122174500_AssignIndexSetsToStreamsMigration extends Migration
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("index_set_id")
         public abstract String indexSetId();

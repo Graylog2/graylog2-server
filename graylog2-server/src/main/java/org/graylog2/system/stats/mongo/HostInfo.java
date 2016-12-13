@@ -48,7 +48,7 @@ public abstract class HostInfo {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class System {
         @JsonProperty
         public abstract DateTime currentTime();
@@ -84,7 +84,7 @@ public abstract class HostInfo {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class Os {
         @JsonProperty
         public abstract String type();
@@ -104,7 +104,7 @@ public abstract class HostInfo {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class Extra {
         @JsonProperty
         @Nullable

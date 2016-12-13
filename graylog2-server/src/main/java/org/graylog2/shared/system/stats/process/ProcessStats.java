@@ -60,7 +60,7 @@ public abstract class ProcessStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class Cpu {
         @JsonProperty
         public abstract short percent();
@@ -84,7 +84,7 @@ public abstract class ProcessStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class Memory {
         @JsonProperty
         public abstract long totalVirtual();

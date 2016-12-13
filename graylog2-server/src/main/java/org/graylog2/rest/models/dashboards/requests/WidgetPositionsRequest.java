@@ -40,7 +40,7 @@ public abstract class WidgetPositionsRequest {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class WidgetPosition {
         @JsonProperty
         public abstract String id();

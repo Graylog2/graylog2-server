@@ -147,7 +147,7 @@ public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
     }
 
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     @JsonAutoDetect
     public static abstract class MigrationCompleted {
         private static final String FIELD_CALLBACK_IDS = "callback_ids";

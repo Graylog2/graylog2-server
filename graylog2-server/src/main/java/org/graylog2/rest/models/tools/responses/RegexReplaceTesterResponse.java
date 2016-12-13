@@ -61,7 +61,7 @@ public abstract class RegexReplaceTesterResponse {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public static abstract class Match {
         @JsonProperty
         public abstract String match();

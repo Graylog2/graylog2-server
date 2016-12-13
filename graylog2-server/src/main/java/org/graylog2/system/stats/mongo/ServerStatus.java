@@ -85,7 +85,7 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class Connections {
         @JsonProperty
         public abstract int current();
@@ -106,7 +106,7 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class Network {
         @JsonProperty
         public abstract int bytesIn();
@@ -126,7 +126,7 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class Memory {
         @JsonProperty
         public abstract int bits();
@@ -158,7 +158,7 @@ public abstract class ServerStatus {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class StorageEngine {
         public static final StorageEngine DEFAULT = create("mmapv1");
 

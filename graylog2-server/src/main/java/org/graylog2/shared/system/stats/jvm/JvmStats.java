@@ -81,7 +81,7 @@ public abstract class JvmStats {
             memoryPools.add(memoryPoolMXBean.getName());
         }
 
-        INSTANCE = JvmStats.create(version, vmName,vmVersion,vmVendor,specName,specVersion,specVendor,startTime,memory,inputArguments,bootClassPath,classPath,systemProperties,garbageCollectors, memoryPools);
+        INSTANCE = JvmStats.create(version, vmName, vmVersion, vmVendor, specName, specVersion, specVendor, startTime, memory, inputArguments, bootClassPath, classPath, systemProperties, garbageCollectors, memoryPools);
     }
 
     @JsonProperty
@@ -153,7 +153,7 @@ public abstract class JvmStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class Memory {
         @JsonProperty
         public abstract long heapInit();

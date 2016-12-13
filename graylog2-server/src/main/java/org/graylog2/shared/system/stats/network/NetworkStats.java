@@ -48,7 +48,7 @@ public abstract class NetworkStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class Interface {
         @JsonProperty
         public abstract String name();
@@ -77,7 +77,7 @@ public abstract class NetworkStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class InterfaceStats {
         @JsonProperty
         public abstract long rxPackets();
@@ -140,7 +140,7 @@ public abstract class NetworkStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class TcpStats {
         @JsonProperty
         public abstract long activeOpens();

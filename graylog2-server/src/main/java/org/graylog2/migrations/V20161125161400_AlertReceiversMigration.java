@@ -172,7 +172,7 @@ public class V20161125161400_AlertReceiversMigration extends Migration {
     }
 
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     @JsonAutoDetect
     public static abstract class MigrationCompleted {
         @JsonProperty("stream_ids")

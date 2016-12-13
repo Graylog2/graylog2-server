@@ -77,7 +77,7 @@ public abstract class IndexStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public static abstract class DocsStats {
         @JsonProperty("count")
         public abstract long count();
@@ -93,7 +93,7 @@ public abstract class IndexStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public static abstract class TimeAndTotalStats {
         @JsonProperty("total")
         public abstract long total();

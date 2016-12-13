@@ -119,7 +119,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("updated_index_set_ids")
         public abstract Set<String> updatedIndexSetIds();

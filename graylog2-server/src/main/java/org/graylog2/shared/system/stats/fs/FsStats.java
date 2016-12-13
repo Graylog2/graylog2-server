@@ -37,7 +37,7 @@ public abstract class FsStats {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public abstract static class Filesystem {
         @JsonProperty
         public abstract String path();

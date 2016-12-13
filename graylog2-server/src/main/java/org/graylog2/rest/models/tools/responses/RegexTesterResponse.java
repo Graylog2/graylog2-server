@@ -53,7 +53,7 @@ public abstract class RegexTesterResponse {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public static abstract class Match {
         @JsonProperty
         @Nullable

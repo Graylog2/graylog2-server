@@ -40,7 +40,7 @@ public abstract class ClusterHealth {
 
     @JsonAutoDetect
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     public static abstract class ShardStatus {
         @JsonProperty
         public abstract int active();
