@@ -39,6 +39,7 @@ import static java.util.Objects.requireNonNull;
 @JsonAutoDetect
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_INDEX_PREFIX = "index_prefix";
+    public static final String FIELD_CREATION_DATE = "creation_date";
 
     @JsonProperty("id")
     @Nullable
@@ -96,7 +97,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @NotNull
     public abstract RetentionStrategyConfig retentionStrategy();
 
-    @JsonProperty("creation_date")
+    @JsonProperty(FIELD_CREATION_DATE)
     @NotNull
     public abstract ZonedDateTime creationDate();
 
@@ -144,7 +145,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
                                         @JsonProperty("retention_strategy_class") @Nullable String retentionStrategyClass,
                                         @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
-                                        @JsonProperty("creation_date") @NotNull ZonedDateTime creationDate) {
+                                        @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate) {
         return AutoValue_IndexSetConfig.builder()
                 .id(id)
                 .title(title)
