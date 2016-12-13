@@ -149,7 +149,7 @@
         <assertj-joda-time.version>2.0.0</assertj-joda-time.version>
         <awaitility.version>1.7.0</awaitility.version>
         <equalsverifier.version>2.1.6</equalsverifier.version>
-        <fongo.version>2.0.9</fongo.version>
+        <fongo.version>2.0.11</fongo.version>
         <jukito.version>1.4.1</jukito.version>
         <junit.version>4.12</junit.version>
         <mockito.version>2.2.19</mockito.version>
