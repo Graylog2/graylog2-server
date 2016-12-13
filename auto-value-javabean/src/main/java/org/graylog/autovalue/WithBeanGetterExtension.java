@@ -65,8 +65,6 @@ public class WithBeanGetterExtension extends AutoValueExtension {
     }
 
     private MethodSpec generateGetterMethod(String name, ExecutableElement element) {
-
-
         final TypeName returnType = ClassName.get(element.getReturnType());
         final String prefix = isBoolean(returnType) ? "is" : "get";
         final String getterName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name);
