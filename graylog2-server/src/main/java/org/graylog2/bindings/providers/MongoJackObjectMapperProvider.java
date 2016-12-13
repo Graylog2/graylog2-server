@@ -22,16 +22,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
 import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.SimpleType;
-
 import org.graylog2.indexer.retention.strategies.UnknownRetentionStrategyConfig;
+import org.graylog2.jackson.MongoZonedDateTimeDeserializer;
+import org.graylog2.jackson.MongoZonedDateTimeSerializer;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.mongojack.internal.MongoJackModule;
 
-import java.io.IOException;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
+import java.io.IOException;
+import java.time.ZonedDateTime;
 
 public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
     private final ObjectMapper objectMapper;
@@ -41,8 +43,11 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
         // add the mongojack specific stuff on a copy of the original ObjectMapper to avoid changing the singleton instance
         this.objectMapper = objectMapper.copy()
                 .addHandler(new ReplaceUnknownSubtypesWithFallbackHandler())
-                .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy());
-        
+                .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy())
+                .registerModule(new SimpleModule("JSR-310-MongoJack")
+                        .addSerializer(ZonedDateTime.class, new MongoZonedDateTimeSerializer())
+                        .addDeserializer(ZonedDateTime.class, new MongoZonedDateTimeDeserializer()));
+
         MongoJackModule.configure(this.objectMapper);
     }
 
