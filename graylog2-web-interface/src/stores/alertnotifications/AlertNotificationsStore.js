@@ -69,6 +69,9 @@ const AlertNotificationsStore = Reflux.createStore({
     );
 
     AlertNotificationsActions.testAlert.promise(promise);
+
+    // Need to do this to handle possible concurrent calls to this method
+    return promise;
   },
 });
 

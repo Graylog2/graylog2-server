@@ -17,8 +17,16 @@ const AlertNotification = React.createClass({
   },
   mixins: [Reflux.connect(AlertNotificationsStore)],
 
+  getInitialState() {
+    return {
+      isTestingAlert: false,
+    };
+  },
+
   _onTestNotification() {
-    AlertNotificationsActions.testAlert(this.props.alertNotification.id);
+    this.setState({ isTestingAlert: true });
+    AlertNotificationsStore.testAlert(this.props.alertNotification.id)
+      .finally(() => this.setState({ isTestingAlert: false }));
   },
 
   _onEdit() {
@@ -51,7 +59,9 @@ const AlertNotification = React.createClass({
       : 'Not executed, as it is not connected to a stream');
 
     const actions = [
-      <Button key="test-button" bsStyle="info" onClick={this._onTestNotification}>Test</Button>,
+      <Button key="test-button" bsStyle="info" disabled={this.state.isTestingAlert} onClick={this._onTestNotification}>
+        {this.state.isTestingAlert ? 'Testing...' : 'Test'}
+      </Button>,
       <DropdownButton key="more-actions-button" title="More actions" pullRight
                       id={`more-actions-dropdown-${notification.id}`}>
         <MenuItem onSelect={this._onEdit}>Edit</MenuItem>
