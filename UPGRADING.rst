@@ -29,6 +29,8 @@ It requires recalculation of the index ranges of the default stream's index set,
 
 Please be advised that this necessary migration can put additional load on your cluster.
 
+.. warning:: Make sure that all rotation and retention strategy plugins you had installed in 2.1 are updated to a version that is compatible with 2.2 before you start the Graylog 2.2 version for the first time. (e.g. Graylog Enterprise) This is needed so the required data migrations will run without problems.
+
 RotationStrategy & RetentionStrategy Interfaces
 -----------------------------------------------
 

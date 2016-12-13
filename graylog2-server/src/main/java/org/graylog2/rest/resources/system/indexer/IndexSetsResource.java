@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
+import com.mongodb.DuplicateKeyException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -28,9 +29,11 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
+import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -59,6 +62,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -73,16 +77,19 @@ public class IndexSetsResource extends RestResource {
 
     private final IndexSetService indexSetService;
     private final IndexSetRegistry indexSetRegistry;
+    private final IndexSetValidator indexSetValidator;
     private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
     private final SystemJobManager systemJobManager;
 
     @Inject
     public IndexSetsResource(final IndexSetService indexSetService,
                              final IndexSetRegistry indexSetRegistry,
+                             final IndexSetValidator indexSetValidator,
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final SystemJobManager systemJobManager) {
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
+        this.indexSetValidator = indexSetValidator;
         this.indexSetCleanupJobFactory = requireNonNull(indexSetCleanupJobFactory);
         this.systemJobManager = systemJobManager;
     }
@@ -149,8 +156,19 @@ public class IndexSetsResource extends RestResource {
     })
     public IndexSetSummary save(@ApiParam(name = "Index set configuration", required = true)
                                 @Valid @NotNull IndexSetSummary indexSet) {
-        final IndexSetConfig savedObject = indexSetService.save(indexSet.toIndexSetConfig());
-        return IndexSetSummary.fromIndexSetConfig(savedObject);
+        try {
+            final IndexSetConfig indexSetConfig = indexSet.toIndexSetConfig();
+
+            final Optional<IndexSetValidator.Violation> violation = indexSetValidator.validate(indexSetConfig);
+            if (violation.isPresent()) {
+                throw new BadRequestException(violation.get().message());
+            }
+
+            final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
+            return IndexSetSummary.fromIndexSetConfig(savedObject);
+        } catch (DuplicateKeyException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @PUT
@@ -165,13 +183,16 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary update(@ApiParam(name = "id", required = true)
                                   @PathParam("id") String id,
                                   @ApiParam(name = "Index set configuration", required = true)
-                                  @Valid @NotNull IndexSetSummary indexSet) {
+                                  @Valid @NotNull IndexSetUpdateRequest updateRequest) {
         checkPermission(RestPermissions.INDEXSETS_EDIT, id);
-        if (indexSet.id() != null && !id.equals(indexSet.id())) {
+        if (!id.equals(updateRequest.id())) {
             throw new ClientErrorException("Mismatch of IDs in URI path and payload", Response.Status.CONFLICT);
         }
 
-        final IndexSetConfig savedObject = indexSetService.save(indexSet.toIndexSetConfig());
+        final IndexSetConfig oldConfig = indexSetService.get(id)
+                .orElseThrow(() -> new NotFoundException("Index set <" + id + "> not found"));
+
+        final IndexSetConfig savedObject = indexSetService.save(updateRequest.toIndexSetConfig(oldConfig));
 
         return IndexSetSummary.fromIndexSetConfig(savedObject);
     }

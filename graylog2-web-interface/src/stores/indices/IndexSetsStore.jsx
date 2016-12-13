@@ -33,7 +33,7 @@ const IndexSetsStore = Reflux.createStore({
       .then(
         response => this.trigger({ indexSetsCount: response.total, indexSets: response.index_sets }),
         error => {
-          UserNotification.error(`Fetching index sets list failed: ${error.message}`,
+          UserNotification.error(`Fetching index sets list failed: ${this._errorMessage(error)}`,
             'Could not retrieve index sets.');
         });
 
@@ -49,7 +49,7 @@ const IndexSetsStore = Reflux.createStore({
         return response;
       },
       error => {
-        UserNotification.error(`Fetching index set '${indexSetId}' failed with status: ${error.message}`, 'Could not retrieve index set.');
+        UserNotification.error(`Fetching index set '${indexSetId}' failed with status: ${this._errorMessage(error)}`, 'Could not retrieve index set.');
       }
     );
 
@@ -66,7 +66,7 @@ const IndexSetsStore = Reflux.createStore({
         return response;
       },
       error => {
-        UserNotification.error(`Updating index set '${indexSet.id}' failed with status: ${error.message}`, 'Could not update index set.');
+        UserNotification.error(`Updating index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`, 'Could not update index set.');
       }
     );
 
@@ -83,7 +83,7 @@ const IndexSetsStore = Reflux.createStore({
         return response;
       },
       error => {
-        UserNotification.error(`Creating index set '${indexSet.id}' failed with status: ${error.message}`, 'Could not create index set.');
+        UserNotification.error(`Creating index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`, 'Could not create index set.');
       }
     );
 
@@ -98,11 +98,19 @@ const IndexSetsStore = Reflux.createStore({
         UserNotification.success(`Successfully deleted index set '${indexSet.title}'`, 'Success');
       },
       error => {
-        UserNotification.error(`Deleting index set '${indexSet.title}' failed with status: ${error.message}`, 'Could not delete index set.');
+        UserNotification.error(`Deleting index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`, 'Could not delete index set.');
       }
     );
 
     IndexSetsActions.delete.promise(promise);
+  },
+
+  _errorMessage(error) {
+    try {
+      return error.additional.body.message;
+    } catch (e) {
+      return error.message;
+    }
   },
 });
 

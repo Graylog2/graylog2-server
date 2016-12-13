@@ -38,6 +38,9 @@ import static java.util.Objects.requireNonNull;
 @AutoValue
 @JsonAutoDetect
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
+    public static final String FIELD_INDEX_PREFIX = "index_prefix";
+    public static final String FIELD_CREATION_DATE = "creation_date";
+
     @JsonProperty("id")
     @Nullable
     @Id
@@ -58,7 +61,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @JsonProperty("writable")
     public abstract boolean isWritable();
 
-    @JsonProperty("index_prefix")
+    @JsonProperty(FIELD_INDEX_PREFIX)
     @NotBlank
     public abstract String indexPrefix();
 
@@ -94,7 +97,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @NotNull
     public abstract RetentionStrategyConfig retentionStrategy();
 
-    @JsonProperty("creation_date")
+    @JsonProperty(FIELD_CREATION_DATE)
     @NotNull
     public abstract ZonedDateTime creationDate();
 
@@ -133,7 +136,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("default") @Nullable Boolean isDefault,
                                         @JsonProperty("writable") @Nullable Boolean isWritable,
-                                        @JsonProperty("index_prefix") @NotBlank String indexPrefix,
+                                        @JsonProperty(FIELD_INDEX_PREFIX) @NotBlank String indexPrefix,
                                         @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
                                         @JsonProperty("index_wildcard") @Nullable String indexWildcard,
                                         @JsonProperty("shards") @Min(1) int shards,
@@ -142,7 +145,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
                                         @JsonProperty("retention_strategy_class") @Nullable String retentionStrategyClass,
                                         @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
-                                        @JsonProperty("creation_date") @NotNull ZonedDateTime creationDate) {
+                                        @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate) {
         return AutoValue_IndexSetConfig.builder()
                 .id(id)
                 .title(title)
