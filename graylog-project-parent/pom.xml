@@ -417,6 +417,11 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>com.gabrielittner.auto.value</groupId>
+                <artifactId>auto-value-extension-util</artifactId>
+                <version>${auto-value-extension-util.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.graylog.autovalue</groupId>
                 <artifactId>auto-value-javabean</artifactId>
                 <version>${project.version}</version>

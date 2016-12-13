@@ -34,11 +34,13 @@ import javax.lang.model.element.Modifier;
 import java.util.Map;
 import java.util.Set;
 
+import static com.gabrielittner.auto.value.util.AutoValueUtil.newTypeSpecBuilder;
+
 /**
  * Creates Java Bean getter methods for each property.
  */
 public class WithBeanGetterExtension extends AutoValueExtension {
-    private static final Set<TypeName> SKIP_CLASSES = ImmutableSet.of(
+    private static final Set<TypeName> SKIP_ANNOTATIONS = ImmutableSet.of(
             TypeName.get(JsonIgnore.class),
             TypeName.get(JsonProperty.class),
             TypeName.get(Override.class)
@@ -51,10 +53,7 @@ public class WithBeanGetterExtension extends AutoValueExtension {
 
     @Override
     public String generateClass(Context context, String className, String classToExtend, boolean isFinal) {
-        final Generator generator = new Generator(context, className, classToExtend, isFinal);
-        final TypeSpec.Builder typeSpecBuilder = generator.classBuilder();
-        typeSpecBuilder.addMethod(generator.superConstructor());
-
+        final TypeSpec.Builder typeSpecBuilder = newTypeSpecBuilder(context, className, classToExtend, isFinal);
         final Map<String, ExecutableElement> properties = context.properties();
         for (Map.Entry<String, ExecutableElement> entry : properties.entrySet()) {
             typeSpecBuilder.addMethod(generateGetterMethod(entry.getKey(), entry.getValue()));
@@ -66,6 +65,8 @@ public class WithBeanGetterExtension extends AutoValueExtension {
     }
 
     private MethodSpec generateGetterMethod(String name, ExecutableElement element) {
+
+
         final TypeName returnType = ClassName.get(element.getReturnType());
         final String prefix = isBoolean(returnType) ? "is" : "get";
         final String getterName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name);
@@ -78,7 +79,7 @@ public class WithBeanGetterExtension extends AutoValueExtension {
         // Copy all annotations but @JsonProperty, @JsonIgnore, and @Override to the new method.
         for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
             final TypeName annotationType = ClassName.get(annotationMirror.getAnnotationType());
-            if (SKIP_CLASSES.contains(annotationType)) {
+            if (SKIP_ANNOTATIONS.contains(annotationType)) {
                 continue;
             }
             builder.addAnnotation(AnnotationSpec.get(annotationMirror));

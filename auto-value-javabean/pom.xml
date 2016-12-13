@@ -32,6 +32,10 @@
             <artifactId>auto-value</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.gabrielittner.auto.value</groupId>
+            <artifactId>auto-value-extension-util</artifactId>
+        </dependency>
+        <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
         </dependency>
