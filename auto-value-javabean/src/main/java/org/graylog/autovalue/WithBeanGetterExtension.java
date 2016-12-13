@@ -56,12 +56,7 @@ public class WithBeanGetterExtension extends AutoValueExtension {
         final TypeSpec.Builder typeSpecBuilder = newTypeSpecBuilder(context, className, classToExtend, isFinal);
         final Map<String, ExecutableElement> properties = context.properties();
         for (Map.Entry<String, ExecutableElement> entry : properties.entrySet()) {
-            final ExecutableElement element = entry.getValue();
-
-            // Only override public abstract methods annotated with @JsonProperty
-            if (isPublicAbstract(element) && isJsonProperty(element)) {
-                typeSpecBuilder.addMethod(generateGetterMethod(entry.getKey(), element));
-            }
+            typeSpecBuilder.addMethod(generateGetterMethod(entry.getKey(), entry.getValue()));
         }
 
         final JavaFile javaFile = JavaFile.builder(context.packageName(), typeSpecBuilder.build()).build();
@@ -69,15 +64,9 @@ public class WithBeanGetterExtension extends AutoValueExtension {
         return javaFile.toString();
     }
 
-    private boolean isJsonProperty(ExecutableElement element) {
-        return element.getAnnotation(JsonProperty.class) != null;
-    }
-
-    private boolean isPublicAbstract(ExecutableElement element) {
-        return element.getModifiers().contains(Modifier.PUBLIC) && element.getModifiers().contains(Modifier.ABSTRACT);
-    }
-
     private MethodSpec generateGetterMethod(String name, ExecutableElement element) {
+
+
         final TypeName returnType = ClassName.get(element.getReturnType());
         final String prefix = isBoolean(returnType) ? "is" : "get";
         final String getterName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name);
