@@ -16,6 +16,7 @@
  */
 package org.graylog2.autovalue;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -30,22 +31,35 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class WithBeanGetterTest {
     @Test
-    public void testBeanHasJavaBeanGetters() {
+    public void testBeanHasJavaBeanGetters() throws NoSuchMethodException {
         final TestBean bean = TestBean.create("Test", true, false);
 
-        final List<String> methodNames = Arrays.stream(bean.getClass().getMethods())
+        final Class<? extends TestBean> beanClass = bean.getClass();
+        final Method[] methods = beanClass.getMethods();
+        final List<String> methodNames = Arrays.stream(methods)
                 .map(Method::getName)
                 .collect(Collectors.toList());
+
         assertThat(methodNames)
                 .contains("text", "getText")
                 .contains("bool", "isBool")
                 .contains("boxedBool", "isBoxedBool");
+
+        assertThat(beanClass.getMethod("text").getAnnotation(JsonProperty.class)).isNotNull();
+        assertThat(beanClass.getMethod("getText").getAnnotation(JsonProperty.class)).isNull();
+        assertThat(beanClass.getMethod("text").getAnnotation(JsonIgnore.class)).isNull();
+        assertThat(beanClass.getMethod("getText").getAnnotation(JsonIgnore.class)).isNotNull();
+    }
+
+    interface TestInterface {
+        String text();
     }
 
     @AutoValue
     @WithBeanGetter
-    static abstract class TestBean {
+    static abstract class TestBean implements TestInterface {
         @JsonProperty
+        @Override
         public abstract String text();
 
         @JsonProperty
