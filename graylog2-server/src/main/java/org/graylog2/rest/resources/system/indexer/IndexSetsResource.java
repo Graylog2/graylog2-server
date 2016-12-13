@@ -29,7 +29,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
@@ -62,6 +62,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -76,16 +77,19 @@ public class IndexSetsResource extends RestResource {
 
     private final IndexSetService indexSetService;
     private final IndexSetRegistry indexSetRegistry;
+    private final IndexSetValidator indexSetValidator;
     private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
     private final SystemJobManager systemJobManager;
 
     @Inject
     public IndexSetsResource(final IndexSetService indexSetService,
                              final IndexSetRegistry indexSetRegistry,
+                             final IndexSetValidator indexSetValidator,
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final SystemJobManager systemJobManager) {
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
+        this.indexSetValidator = indexSetValidator;
         this.indexSetCleanupJobFactory = requireNonNull(indexSetCleanupJobFactory);
         this.systemJobManager = systemJobManager;
     }
@@ -155,10 +159,9 @@ public class IndexSetsResource extends RestResource {
         try {
             final IndexSetConfig indexSetConfig = indexSet.toIndexSetConfig();
 
-            // Build an example index name with the new prefix and check if this would be managed by an existing index set
-            final String indexName = indexSetConfig.indexPrefix() + MongoIndexSet.SEPARATOR + "0";
-            if (indexSetRegistry.isManagedIndex(indexName)) {
-                throw new BadRequestException("Index prefix <" + indexSetConfig.indexPrefix() + "> would conflict with an existing index set!");
+            final Optional<IndexSetValidator.Error> error = indexSetValidator.validate(indexSetConfig);
+            if (error.isPresent()) {
+                throw new BadRequestException(error.get().message());
             }
 
             final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
