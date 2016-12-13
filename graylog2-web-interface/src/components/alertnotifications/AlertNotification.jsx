@@ -5,7 +5,6 @@ import { Button, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertNotificationsStore, AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
-const { StreamsStore } = CombinedProvider.get('Streams');
 
 import { EntityListItem } from 'components/common';
 import { UnknownAlertNotification } from 'components/alertnotifications';
@@ -19,7 +18,7 @@ const AlertNotification = React.createClass({
   mixins: [Reflux.connect(AlertNotificationsStore)],
 
   _onTestNotification() {
-    StreamsStore.sendDummyAlert(this.props.alertNotification.stream_id);
+    AlertNotificationsActions.testAlert(this.props.alertNotification.id);
   },
 
   _onEdit() {

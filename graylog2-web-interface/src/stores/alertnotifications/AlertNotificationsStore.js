@@ -37,6 +37,7 @@ const AlertNotificationsStore = Reflux.createStore({
 
     AlertNotificationsActions.available.promise(promise);
   },
+
   listAll() {
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.listAll().url);
     const promise = fetch('GET', url);
@@ -52,6 +53,22 @@ const AlertNotificationsStore = Reflux.createStore({
       });
 
     AlertNotificationsActions.listAll.promise(promise);
+  },
+
+  testAlert(alarmCallbackId) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.testAlert(alarmCallbackId).url);
+
+    const promise = fetch('POST', url);
+    promise.then(
+      () => UserNotification.success('Test notification was sent successfully'),
+      (error) => {
+        const message = (error.additional && error.additional.body && error.additional.body.message ? error.additional.body.message : error.message);
+        UserNotification.error(`Sending test alert notification failed with message: ${message}`,
+          'Could not send test alert notification');
+      }
+    );
+
+    AlertNotificationsActions.testAlert.promise(promise);
   },
 });
 

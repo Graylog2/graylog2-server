@@ -7,6 +7,7 @@ const ApiRoutes = {
     delete: (streamId, alarmCallbackId) => { return { url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}` }; },
     listAll: () => { return { url: '/alerts/callbacks' }; },
     list: (streamId) => { return { url: `/streams/${streamId}/alarmcallbacks` }; },
+    testAlert: (alarmCallbackId) => { return { url: `/alerts/callbacks/${alarmCallbackId}/test` }; },
     update: (streamId, alarmCallbackId) => { return { url: `/streams/${streamId}/alarmcallbacks/${alarmCallbackId}` }; },
   },
   AlarmCallbackHistoryApiController: {
