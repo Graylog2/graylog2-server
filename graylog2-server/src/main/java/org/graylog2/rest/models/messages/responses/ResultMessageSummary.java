@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Range;
 
@@ -27,6 +28,7 @@ import javax.annotation.Nullable;
 import java.util.Map;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 public abstract class ResultMessageSummary {
     private static final String FIELD_HIGHLIGHT_RANGES = "highlight_ranges";

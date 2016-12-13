@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -118,6 +119,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
 
     @JsonAutoDetect
     @AutoValue
+    @WithBeanGetter
     public static abstract class MigrationCompleted {
         @JsonProperty("updated_index_set_ids")
         public abstract Set<String> updatedIndexSetIds();

@@ -20,11 +20,13 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 
 import javax.validation.Valid;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 public abstract class IndexSetCreatedEvent {
     @JsonProperty("index_set")

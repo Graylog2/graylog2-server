@@ -20,10 +20,12 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ImmutableSet;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class StreamsChangedEvent {
     private static final String FIELD_STREAM_IDS = "stream_ids";
 

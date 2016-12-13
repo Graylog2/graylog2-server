@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
@@ -27,6 +28,7 @@ import java.util.UUID;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class SystemJobSummary {
     @JsonProperty
     public abstract UUID id();

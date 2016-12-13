@@ -20,9 +20,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.rest.models.metrics.responses.TimerRateMetricsResponse;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 public abstract class ExtractorMetrics {
 

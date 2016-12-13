@@ -19,6 +19,7 @@ package org.graylog2.security;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ImmutableList;
 import org.graylog2.security.realm.AccessTokenAuthenticator;
 import org.graylog2.security.realm.LdapUserAuthenticator;
@@ -32,6 +33,7 @@ import java.util.List;
 import java.util.Set;
 
 @AutoValue
+@WithBeanGetter
 public abstract class AuthenticationConfig {
 
     @JsonProperty("realm_order")

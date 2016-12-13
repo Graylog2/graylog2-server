@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.alerts.Alert;
 import org.graylog2.database.CollectionName;
 import org.graylog2.plugin.Tools;
@@ -31,6 +32,7 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 @CollectionName("alarmcallbackhistory")
 public abstract class AlarmCallbackHistoryImpl implements AlarmCallbackHistory {

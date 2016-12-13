@@ -20,12 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 
 import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class CreateAlarmCallbackRequest {
     private static final String FIELD_TYPE = "type";
     private static final String FIELD_TITLE = "title";

@@ -19,6 +19,7 @@ package org.graylog2.cluster;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -28,6 +29,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 
 @AutoValue
+@WithBeanGetter
 public abstract class ClusterConfig {
     @Id
     @ObjectId

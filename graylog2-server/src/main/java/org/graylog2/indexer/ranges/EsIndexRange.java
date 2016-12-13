@@ -17,6 +17,7 @@
 package org.graylog2.indexer.ranges;
 
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -29,6 +30,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 @Deprecated
 public abstract class EsIndexRange implements IndexRange {

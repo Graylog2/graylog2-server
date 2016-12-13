@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -31,6 +32,7 @@ import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
 @AutoValue
+@WithBeanGetter
 @JsonAutoDetect
 public abstract class IndexSetSummary {
     @JsonProperty("id")

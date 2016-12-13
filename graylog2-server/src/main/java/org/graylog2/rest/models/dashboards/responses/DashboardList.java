@@ -19,12 +19,14 @@ package org.graylog2.rest.models.dashboards.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.List;
 import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class DashboardList {
     @JsonProperty
     public abstract int total();

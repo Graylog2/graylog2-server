@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.annotations.VisibleForTesting;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
@@ -146,6 +147,7 @@ public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
     }
 
     @AutoValue
+    @WithBeanGetter
     @JsonAutoDetect
     public static abstract class MigrationCompleted {
         private static final String FIELD_CALLBACK_IDS = "callback_ids";

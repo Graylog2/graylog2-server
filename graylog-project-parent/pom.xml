@@ -24,6 +24,7 @@
     </prerequisites>
 
     <modules>
+        <module>../auto-value-javabean</module>
         <module>../graylog2-server</module>
         <module>../integration-tests</module>
     </modules>
@@ -416,6 +417,17 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
+                <groupId>com.gabrielittner.auto.value</groupId>
+                <artifactId>auto-value-extension-util</artifactId>
+                <version>${auto-value-extension-util.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.graylog.autovalue</groupId>
+                <artifactId>auto-value-javabean</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.fusesource</groupId>
                 <artifactId>sigar</artifactId>
                 <version>${sigar.version}</version>
@@ -460,6 +472,11 @@
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
                 <version>${validation-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.squareup</groupId>
+                <artifactId>javapoet</artifactId>
+                <version>${javapoet.version}</version>
             </dependency>
 
             <!-- Test dependencies -->

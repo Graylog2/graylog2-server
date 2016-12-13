@@ -17,6 +17,7 @@
 package org.graylog2.audit;
 
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.system.NodeId;
 
 import javax.annotation.Nonnull;
@@ -25,6 +26,7 @@ import static java.util.Objects.requireNonNull;
 import static org.elasticsearch.common.Strings.isNullOrEmpty;
 
 @AutoValue
+@WithBeanGetter
 public abstract class AuditActor {
     private static final String URN_GRAYLOG_NODE = "urn:graylog:node:";
     private static final String URN_GRAYLOG_USER = "urn:graylog:user:";

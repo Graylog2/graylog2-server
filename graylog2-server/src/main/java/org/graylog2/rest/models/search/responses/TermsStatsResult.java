@@ -20,12 +20,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.List;
 import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class TermsStatsResult {
     @JsonProperty
     public abstract long time();

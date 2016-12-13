@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 
@@ -44,6 +45,7 @@ import static org.elasticsearch.common.Strings.isNullOrEmpty;
  */
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class AuditEventType {
     private static final String FIELD_NAMESPACE = "namespace";
     private static final String FIELD_OBJECT = "object";

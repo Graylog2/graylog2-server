@@ -21,10 +21,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 
 @JsonAutoDetect
 @AutoValue
+@WithBeanGetter
 public abstract class RetentionStrategyDescription {
     @JsonProperty("type")
     public abstract String type();
