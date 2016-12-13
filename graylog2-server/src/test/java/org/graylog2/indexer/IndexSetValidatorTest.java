@@ -58,9 +58,9 @@ public class IndexSetValidatorTest {
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
         when(newConfig.indexPrefix()).thenReturn(prefix);
 
-        final Optional<IndexSetValidator.Error> error = validator.validate(newConfig);
+        final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
-        assertThat(error).isNotPresent();
+        assertThat(violation).isNotPresent();
     }
 
     @Test
@@ -74,9 +74,9 @@ public class IndexSetValidatorTest {
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
         when(newConfig.indexPrefix()).thenReturn(prefix);
 
-        final Optional<IndexSetValidator.Error> error = validator.validate(newConfig);
+        final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
-        assertThat(error).isPresent();
+        assertThat(violation).isPresent();
     }
 
     @Test
@@ -89,8 +89,8 @@ public class IndexSetValidatorTest {
         when(indexSetRegistry.iterator()).thenReturn(Collections.singleton(indexSet).iterator());
         when(newConfig.indexPrefix()).thenReturn(prefix);
 
-        final Optional<IndexSetValidator.Error> error = validator.validate(newConfig);
+        final Optional<IndexSetValidator.Violation> violation = validator.validate(newConfig);
 
-        assertThat(error).isPresent();
+        assertThat(violation).isPresent();
     }
 }

@@ -159,9 +159,9 @@ public class IndexSetsResource extends RestResource {
         try {
             final IndexSetConfig indexSetConfig = indexSet.toIndexSetConfig();
 
-            final Optional<IndexSetValidator.Error> error = indexSetValidator.validate(indexSetConfig);
-            if (error.isPresent()) {
-                throw new BadRequestException(error.get().message());
+            final Optional<IndexSetValidator.Violation> violation = indexSetValidator.validate(indexSetConfig);
+            if (violation.isPresent()) {
+                throw new BadRequestException(violation.get().message());
             }
 
             final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);

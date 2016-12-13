@@ -30,11 +30,11 @@ public class IndexSetValidator {
         this.indexSetRegistry = indexSetRegistry;
     }
 
-    public Optional<Error> validate(IndexSetConfig newConfig) {
+    public Optional<Violation> validate(IndexSetConfig newConfig) {
         // Build an example index name with the new prefix and check if this would be managed by an existing index set
         final String indexName = newConfig.indexPrefix() + MongoIndexSet.SEPARATOR + "0";
         if (indexSetRegistry.isManagedIndex(indexName)) {
-            return Optional.of(Error.create("Index prefix \"" + newConfig.indexPrefix() + "\" would conflict with an existing index set!"));
+            return Optional.of(Violation.create("Index prefix \"" + newConfig.indexPrefix() + "\" would conflict with an existing index set!"));
         }
 
         // Check if an existing index set has a more generic index prefix.
@@ -42,7 +42,7 @@ public class IndexSetValidator {
         // This avoids problems with wildcard matching like "graylog_*".
         for (final IndexSet indexSet : indexSetRegistry) {
             if (newConfig.indexPrefix().startsWith(indexSet.getIndexPrefix())) {
-                return Optional.of(Error.create("Index prefix \"" + newConfig.indexPrefix() + "\" would conflict with existing index set prefix \"" + indexSet.getIndexPrefix() + "\""));
+                return Optional.of(Violation.create("Index prefix \"" + newConfig.indexPrefix() + "\" would conflict with existing index set prefix \"" + indexSet.getIndexPrefix() + "\""));
             }
         }
 
@@ -50,11 +50,11 @@ public class IndexSetValidator {
     }
 
     @AutoValue
-    public static abstract class Error {
+    public static abstract class Violation {
         public abstract String message();
 
-        public static Error create(String message) {
-            return new AutoValue_IndexSetValidator_Error(message);
+        public static Violation create(String message) {
+            return new AutoValue_IndexSetValidator_Violation(message);
         }
     }
 }
