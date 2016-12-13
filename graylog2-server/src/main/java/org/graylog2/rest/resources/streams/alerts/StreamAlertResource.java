@@ -295,14 +295,14 @@ public class StreamAlertResource extends RestResource {
             @ApiResponse(code = 400, message = "Stream has no alarm callbacks")
     })
     @NoAuditEvent("only used to test alert emails")
-    public void sendDummyAlert(@ApiParam(name = "streamId", value = "The stream id the dummy alert should be sent for.", required = true)
+    public void sendDummyAlert(@ApiParam(name = "streamId", value = "The stream id the test alert should be sent for.", required = true)
                                @PathParam("streamId") String streamId)
             throws TransportConfigurationException, EmailException, NotFoundException {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
 
         final Stream stream = streamService.load(streamId);
 
-        final DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(stream, null, Tools.nowUTC(), getSubject().getPrincipal().toString(), Collections.emptyMap(), "Dummy Alert");
+        final DummyAlertCondition dummyAlertCondition = new DummyAlertCondition(stream, null, Tools.nowUTC(), getSubject().getPrincipal().toString(), Collections.emptyMap(), "Test Alert");
         try {
             AbstractAlertCondition.CheckResult checkResult = dummyAlertCondition.runCheck();
             List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);

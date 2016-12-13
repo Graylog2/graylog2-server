@@ -20,24 +20,42 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.Maps;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import org.apache.commons.mail.EmailException;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
+import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
+import org.graylog2.alerts.AbstractAlertCondition;
+import org.graylog2.alerts.types.DummyAlertCondition;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
+import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackListSummary;
 import org.graylog2.rest.models.alarmcallbacks.AlarmCallbackSummary;
 import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbackSummaryResponse;
 import org.graylog2.rest.models.alarmcallbacks.responses.AvailableAlarmCallbacksResponse;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -54,14 +72,17 @@ public class AlarmCallbacksResource extends RestResource {
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
     private final StreamService streamService;
     private final Set<AlarmCallback> availableAlarmCallbacks;
+    private final AlarmCallbackFactory alarmCallbackFactory;
 
     @Inject
     public AlarmCallbacksResource(AlarmCallbackConfigurationService alarmCallbackConfigurationService,
                                   StreamService streamService,
-                                  Set<AlarmCallback> availableAlarmCallbacks) {
+                                  Set<AlarmCallback> availableAlarmCallbacks,
+                                  AlarmCallbackFactory alarmCallbackFactory) {
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
         this.streamService = streamService;
         this.availableAlarmCallbacks = availableAlarmCallbacks;
+        this.alarmCallbackFactory = alarmCallbackFactory;
     }
 
     @GET
@@ -102,6 +123,36 @@ public class AlarmCallbacksResource extends RestResource {
         response.types = types;
 
         return response;
+    }
+
+    @POST
+    @Timed
+    @Path("/{alarmCallbackId}/test")
+    @ApiOperation(value = "Send a test alert for a given alarm callback")
+    @ApiResponses(value = {
+            @ApiResponse(code = 404, message = "Alarm callback not found."),
+            @ApiResponse(code = 400, message = "Invalid ObjectId."),
+            @ApiResponse(code = 500, message = "Error while testing alarm callback")
+    })
+    @NoAuditEvent("only used to test alert notifications")
+    public Response test(@ApiParam(name = "alarmCallbackId", value = "The alarm callback id to send a test alert for.", required = true)
+                         @PathParam("alarmCallbackId") String alarmCallbackId) throws TransportConfigurationException, EmailException, NotFoundException {
+        final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackConfigurationService.load(alarmCallbackId);
+        final String streamId = alarmCallbackConfiguration.getStreamId();
+        checkPermission(RestPermissions.STREAMS_EDIT, streamId);
+
+        final Stream stream = streamService.load(streamId);
+
+        final DummyAlertCondition testAlertCondition = new DummyAlertCondition(stream, null, Tools.nowUTC(), getSubject().getPrincipal().toString(), Collections.emptyMap(), "Test Alert");
+        try {
+            AbstractAlertCondition.CheckResult checkResult = testAlertCondition.runCheck();
+            AlarmCallback alarmCallback = alarmCallbackFactory.create(alarmCallbackConfiguration);
+            alarmCallback.call(stream, checkResult);
+        } catch (Exception e) {
+            throw new InternalServerErrorException(e.getMessage(), e);
+        }
+
+        return Response.ok().build();
     }
 
     /* This is used to add user auto-completion to EmailAlarmCallback when the current user has permissions to list users */
