@@ -91,6 +91,6 @@ public class IndexSetValidatorTest {
 
         final Optional<IndexSetValidator.Error> error = validator.validate(newConfig);
 
-        assertThat(error).isNotPresent();
+        assertThat(error).isPresent();
     }
 }
