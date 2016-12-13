@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.extension.AutoValueExtension;
 import com.google.common.base.CaseFormat;
+import com.google.common.collect.ImmutableSet;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -31,12 +32,17 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Creates Java Bean getter methods for each property.
  */
 public class WithBeanGetterExtension extends AutoValueExtension {
-    private static final ClassName ANNOTATION_JSON_PROPERTY = ClassName.get(JsonProperty.class);
+    private static final Set<TypeName> SKIP_CLASSES = ImmutableSet.of(
+            TypeName.get(JsonIgnore.class),
+            TypeName.get(JsonProperty.class),
+            TypeName.get(Override.class)
+    );
 
     @Override
     public boolean applicable(Context context) {
@@ -65,17 +71,14 @@ public class WithBeanGetterExtension extends AutoValueExtension {
         final String getterName = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_CAMEL, name);
         final MethodSpec.Builder builder = MethodSpec.methodBuilder(prefix + getterName)
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
+                .addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build())
                 .addStatement("return $N()", name)
                 .returns(returnType);
 
-        // Don't duplicate the @JsonIgnore annotation
-        if (element.getAnnotation(JsonIgnore.class) == null) {
-            builder.addAnnotation(AnnotationSpec.builder(JsonIgnore.class).build());
-        }
-
-        // Copy all annotations but JsonProperty to the new method.
+        // Copy all annotations but @JsonProperty, @JsonIgnore, and @Override to the new method.
         for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
-            if (ClassName.get(annotationMirror.getAnnotationType()).equals(ANNOTATION_JSON_PROPERTY)) {
+            final TypeName annotationType = ClassName.get(annotationMirror.getAnnotationType());
+            if (SKIP_CLASSES.contains(annotationType)) {
                 continue;
             }
             builder.addAnnotation(AnnotationSpec.get(annotationMirror));
