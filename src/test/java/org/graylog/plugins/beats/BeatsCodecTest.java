@@ -25,7 +25,6 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -138,5 +137,37 @@ public class BeatsCodecTest {
         assertThat(message.getField("facility")).isEqualTo("genericbeat");
         assertThat(message.getField("beat_foo")).isEqualTo("bar");
         assertThat(message.getField("foo_field")).isEqualTo("bar");
+    }
+
+    @Test
+    public void decodeMessagesHandlesMetricbeatMessages() throws Exception {
+        final String[] testFiles = {
+                "metricbeat-docker-container.json",
+                "metricbeat-docker-cpu.json",
+                "metricbeat-docker-diskio.json",
+                "metricbeat-docker-info.json",
+                "metricbeat-docker-memory.json",
+                "metricbeat-docker-network.json",
+                "metricbeat-mongodb-status.json",
+                "metricbeat-mysql-status.json",
+                "metricbeat-system-core.json",
+                "metricbeat-system-cpu.json",
+                "metricbeat-system-filesystem.json",
+                "metricbeat-system-fsstat.json",
+                "metricbeat-system-load.json",
+                "metricbeat-system-memory.json",
+                "metricbeat-system-network.json",
+                "metricbeat-system-process.json"
+        };
+
+        for (String testFile : testFiles) {
+            final byte[] json = Resources.toByteArray(Resources.getResource(testFile));
+            final RawMessage rawMessage = new RawMessage(json);
+            final Message message = codec.decode(rawMessage);
+            assertThat(message).isNotNull();
+            assertThat(message.getSource()).isEqualTo("example.local");
+            assertThat(message.getTimestamp()).isEqualTo(new DateTime(2016, 12, 14, 12, 0, DateTimeZone.UTC));
+            assertThat(message.getField("facility")).isEqualTo("metricbeat");
+        }
     }
 }

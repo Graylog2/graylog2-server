@@ -1,0 +1,32 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "docker": {
+    "container": {
+      "command": "/docker-entrypoint.sh elasticsearch",
+      "created": "2016-12-14T12:43:10.000Z",
+      "id": "f36c43096b5b0a35073094a8b31092629e4b086ec74a4e23dcb6f39e0f934e0c",
+      "image": "elasticsearch:5.1",
+      "name": "adoring_ride",
+      "size": {
+        "root_fs": 0,
+        "rw": 0
+      },
+      "status": "Up 11 seconds"
+    }
+  },
+  "metricset": {
+    "host": "/var/run/docker.sock",
+    "module": "docker",
+    "name": "container",
+    "rtt": 50808
+  },
+  "type": "metricsets"
+}

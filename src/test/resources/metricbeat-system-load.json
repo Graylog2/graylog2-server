@@ -1,0 +1,29 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "metricset": {
+    "module": "system",
+    "name": "load",
+    "rtt": 101
+  },
+  "system": {
+    "load": {
+      "1": 2.325200,
+      "15": 2.511200,
+      "5": 2.460000,
+      "norm": {
+        "1": 0.290600,
+        "15": 0.313900,
+        "5": 0.307500
+      }
+    }
+  },
+  "type": "metricsets"
+}

@@ -1,0 +1,42 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "metricset": {
+    "module": "system",
+    "name": "memory",
+    "rtt": 257
+  },
+  "system": {
+    "memory": {
+      "actual": {
+        "free": 5525114880,
+        "used": {
+          "bytes": 11654754304,
+          "pct": 0.678400
+        }
+      },
+      "free": 277991424,
+      "swap": {
+        "free": 1274019840,
+        "total": 5368709120,
+        "used": {
+          "bytes": 4094689280,
+          "pct": 0.762700
+        }
+      },
+      "total": 17179869184,
+      "used": {
+        "bytes": 16901877760,
+        "pct": 0.983800
+      }
+    }
+  },
+  "type": "metricsets"
+}
