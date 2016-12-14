@@ -25,9 +25,12 @@ import com.fasterxml.jackson.databind.jsontype.TypeIdResolver;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.databind.type.SimpleType;
 import org.graylog2.indexer.retention.strategies.UnknownRetentionStrategyConfig;
+import org.graylog2.jackson.MongoJodaDateTimeDeserializer;
+import org.graylog2.jackson.MongoJodaDateTimeSerializer;
 import org.graylog2.jackson.MongoZonedDateTimeDeserializer;
 import org.graylog2.jackson.MongoZonedDateTimeSerializer;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
+import org.joda.time.DateTime;
 import org.mongojack.internal.MongoJackModule;
 
 import javax.inject.Inject;
@@ -46,7 +49,9 @@ public class MongoJackObjectMapperProvider implements Provider<ObjectMapper> {
                 .setPropertyNamingStrategy(new PreserveLeadingUnderscoreStrategy())
                 .registerModule(new SimpleModule("JSR-310-MongoJack")
                         .addSerializer(ZonedDateTime.class, new MongoZonedDateTimeSerializer())
-                        .addDeserializer(ZonedDateTime.class, new MongoZonedDateTimeDeserializer()));
+                        .addDeserializer(ZonedDateTime.class, new MongoZonedDateTimeDeserializer())
+                        .addSerializer(DateTime.class, new MongoJodaDateTimeSerializer())
+                        .addDeserializer(DateTime.class, new MongoJodaDateTimeDeserializer()));
 
         MongoJackModule.configure(this.objectMapper);
     }
