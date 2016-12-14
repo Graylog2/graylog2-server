@@ -6,7 +6,7 @@ import { AlarmCallbackHistoryOverview } from 'components/alarmcallbacks';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlarmCallbackHistoryActions } = CombinedProvider.get('AlarmCallbackHistory');
-const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
+const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
 
 const AlertDetails = React.createClass({
   propTypes: {
@@ -21,7 +21,7 @@ const AlertDetails = React.createClass({
   },
 
   _loadData() {
-    AlarmCallbacksActions.available();
+    AlertNotificationsActions.available();
     AlarmCallbackHistoryActions.list(this.props.alert.stream_id, this.props.alert.id);
   },
 

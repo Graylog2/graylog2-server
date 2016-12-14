@@ -143,18 +143,6 @@ class StreamsStore {
         "Could not test stream rules of stream");
     });
   }
-  sendDummyAlert(streamId: string) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.sendDummyAlert(streamId).url);
-    const promise = fetch('POST', url);
-    promise.then(
-      response => {
-        UserNotification.success('Test notification was sent successfully');
-        return response;
-      },
-      error => UserNotification.error('Could not send test notification')
-    );
-    return promise;
-  }
   onChange(callback: Callback) {
     this.callbacks.push(callback);
   }

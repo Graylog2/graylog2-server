@@ -6,7 +6,7 @@ import { Spinner, Timestamp } from 'components/common';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
-const { AlarmCallbacksStore } = CombinedProvider.get('AlarmCallbacks');
+const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 
 const AlertTimeline = React.createClass({
   propTypes: {
@@ -16,10 +16,10 @@ const AlertTimeline = React.createClass({
     conditionType: React.PropTypes.object,
   },
 
-  mixins: [Reflux.connect(AlarmCallbacksStore), Reflux.connect(AlarmCallbackHistoryStore)],
+  mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(AlarmCallbackHistoryStore)],
 
   _isLoading() {
-    return !this.state.histories || !this.state.availableAlarmCallbacks;
+    return !this.state.histories || !this.state.availableNotifications;
   },
 
   _historiesTimeline(lastEventTime) {
@@ -41,7 +41,7 @@ const AlertTimeline = React.createClass({
       })
       .forEach(history => {
         const configuration = history.alarmcallbackconfiguration;
-        const type = this.state.availableAlarmCallbacks[configuration.type];
+        const type = this.state.availableNotifications[configuration.type];
         let title;
         if (type) {
           title = <em>{type.name}</em>;

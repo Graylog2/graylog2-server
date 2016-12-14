@@ -10,30 +10,7 @@ import fetch from 'logic/rest/FetchProvider';
 
 const AlarmCallbacksStore = Reflux.createStore({
   listenables: [AlarmCallbacksActions],
-  availableAlarmCallbacks: undefined,
 
-  getInitialState() {
-    return {
-      availableAlarmCallbacks: this.availableAlarmCallbacks,
-    };
-  },
-
-  available(streamId) {
-    const failCallback = (error) =>
-      UserNotification.error(`Fetching available AlarmCallback types failed with status: ${error.message}`,
-        'Could not retrieve available AlarmCallbacks');
-
-    const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.available(streamId).url);
-    const promise = fetch('GET', url).then((response) => {
-      this.availableAlarmCallbacks = response.types;
-      this.trigger({ availableAlarmCallbacks: this.availableAlarmCallbacks });
-      return this.availableAlarmCallbacks;
-    }, failCallback);
-
-    AlarmCallbacksActions.available.promise(promise);
-
-    return promise;
-  },
   list(streamId) {
     const failCallback = (error) =>
       UserNotification.error(`Fetching alert notifications failed with status: ${error.message}`,
