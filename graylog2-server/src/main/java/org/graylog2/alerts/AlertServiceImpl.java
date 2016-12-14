@@ -74,7 +74,7 @@ public class AlertServiceImpl implements AlertService {
         final DateTime effectiveSince = (since == null ? new DateTime(0L, DateTimeZone.UTC) : since);
         final DBQuery.Query query = DBQuery.and(
                 getFindAnyStreamQuery(streamIds),
-                DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, effectiveSince.toDate())
+                DBQuery.greaterThanEquals(AlertImpl.FIELD_TRIGGERED_AT, effectiveSince)
         );
 
         return Collections.unmodifiableList(this.coll.find(query)

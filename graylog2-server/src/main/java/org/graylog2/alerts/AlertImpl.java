@@ -28,7 +28,6 @@ import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import java.util.Date;
 import java.util.Map;
 
 @AutoValue
@@ -58,9 +57,11 @@ public abstract class AlertImpl implements Alert {
     @Override
     public abstract String getConditionId();
 
+    @JsonProperty(FIELD_TRIGGERED_AT)
     @Override
     public abstract DateTime getTriggeredAt();
 
+    @JsonProperty(FIELD_RESOLVED_AT)
     @Override
     @Nullable
     public abstract DateTime getResolvedAt();
@@ -77,17 +78,6 @@ public abstract class AlertImpl implements Alert {
     @Override
     public abstract boolean isInterval();
 
-    @JsonProperty(FIELD_TRIGGERED_AT)
-    private Date getTriggeredAtDate() {
-        return getTriggeredAt().toDate();
-    }
-
-    @JsonProperty(FIELD_RESOLVED_AT)
-    @Nullable
-    private Date getResolvedAtDate() {
-        return getResolvedAt() == null ? null : getResolvedAt().toDate();
-    }
-
     static Builder builder() {
         return new AutoValue_AlertImpl.Builder();
     }
@@ -98,15 +88,21 @@ public abstract class AlertImpl implements Alert {
     public static AlertImpl create(@JsonProperty(FIELD_ID) @ObjectId @Id String id,
                                    @JsonProperty(FIELD_STREAM_ID) String streamId,
                                    @JsonProperty(FIELD_CONDITION_ID) String conditionId,
-                                   @JsonProperty(FIELD_TRIGGERED_AT) Date triggeredAtDate,
-                                   @JsonProperty(FIELD_RESOLVED_AT) @Nullable Date resolvedAtDate,
+                                   @JsonProperty(FIELD_TRIGGERED_AT) DateTime triggeredAt,
+                                   @JsonProperty(FIELD_RESOLVED_AT) @Nullable DateTime resolvedAt,
                                    @JsonProperty(FIELD_DESCRIPTION) String description,
                                    @JsonProperty(FIELD_CONDITION_PARAMETERS) Map<String, Object> conditionParameters,
                                    @JsonProperty(FIELD_IS_INTERVAL) boolean isInterval) {
-        final DateTime triggeredAt = new DateTime(triggeredAtDate);
-        // We need to ensure that Alerts with a non-existing or null resolvedAt do not set the field to the current time.
-        final DateTime resolvedAt = resolvedAtDate == null ? null : new DateTime(resolvedAtDate);
-        return create(id, streamId, conditionId, triggeredAt, resolvedAt, description, conditionParameters, isInterval);
+        return builder()
+                .id(id)
+                .streamId(streamId)
+                .conditionId(conditionId)
+                .triggeredAt(triggeredAt)
+                .resolvedAt(resolvedAt)
+                .description(description)
+                .conditionParameters(conditionParameters)
+                .interval(isInterval)
+                .build();
     }
 
     public static AlertImpl fromCheckResult(AlertCondition.CheckResult checkResult) {
@@ -120,25 +116,6 @@ public abstract class AlertImpl implements Alert {
                 true);
     }
 
-    public static AlertImpl create(String id,
-                                   String streamId,
-                                   String conditionId,
-                                   DateTime triggeredAt,
-                                   DateTime resolvedAt,
-                                   String description,
-                                   Map<String, Object> conditionParameters,
-                                   boolean isInterval) {
-        return builder()
-            .id(id)
-            .streamId(streamId)
-            .conditionId(conditionId)
-            .triggeredAt(triggeredAt)
-            .resolvedAt(resolvedAt)
-            .description(description)
-            .conditionParameters(conditionParameters)
-            .interval(isInterval)
-            .build();
-    }
 
     @AutoValue.Builder
     public interface Builder {
