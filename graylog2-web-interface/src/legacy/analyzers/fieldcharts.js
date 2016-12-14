@@ -364,6 +364,7 @@ export const FieldChart = {
         if (fieldGraph) {
           const series = fieldGraph.series.filter(aSeries => aSeries.name === seriesName)[0];
           if (series) {
+            series.valuetype = GraphVisualization.getReadableFieldChartStatisticalFunction(options.valuetype);
             series.data = data.values;
             fieldGraph.update();
           }
