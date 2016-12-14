@@ -1,7 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 
-import { Spinner } from 'components/common';
+import { DocumentTitle, Spinner } from 'components/common';
 
 import Rule from './Rule';
 import RulesStore from './RulesStore';
@@ -56,9 +56,13 @@ const RuleDetailsPage = React.createClass({
       return pipeline.stages.some(stage => stage.rules.indexOf(this.state.rule.title) !== -1);
     });
 
+    const pageTitle = (this.props.params.ruleId === 'new' ? 'New pipeline rule' : `Pipeline rule ${this.state.rule.title}`);
+
     return (
-      <Rule rule={this.state.rule} usedInPipelines={pipelinesUsingRule} create={this.props.params.ruleId === 'new'}
-            onSave={this._save} validateRule={this._validateRule} history={this.props.history} />
+      <DocumentTitle title={pageTitle}>
+        <Rule rule={this.state.rule} usedInPipelines={pipelinesUsingRule} create={this.props.params.ruleId === 'new'}
+              onSave={this._save} validateRule={this._validateRule} history={this.props.history} />
+      </DocumentTitle>
     );
   },
 });

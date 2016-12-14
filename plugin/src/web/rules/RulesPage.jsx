@@ -4,7 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import Reflux from 'reflux';
 
-import PageHeader from 'components/common/PageHeader';
+import { DocumentTitle, PageHeader } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import DocsHelper from 'util/DocsHelper';
@@ -25,31 +25,33 @@ const RulesPage = React.createClass({
 
   render() {
     return (
-      <span>
-        <PageHeader title="Pipeline Rules" experimental>
-          <span>
-            Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
-            Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
-          </span>
+      <DocumentTitle title="Pipeline rules">
+        <span>
+          <PageHeader title="Pipeline Rules" experimental>
+            <span>
+              Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
+              Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.
+            </span>
 
-          <span>
-            Read more about Graylog pipeline rules in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
-                                                                    text="documentation" />.
-          </span>
+            <span>
+              Read more about Graylog pipeline rules in the <DocumentationLink page={DocsHelper.PAGES.PIPELINE_RULES}
+                                                                      text="documentation" />.
+            </span>
 
-          <span>
-            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
-              <Button bsStyle="info">Manage pipelines</Button>
-            </LinkContainer>
-          </span>
-        </PageHeader>
+            <span>
+              <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
+                <Button bsStyle="info">Manage pipelines</Button>
+              </LinkContainer>
+            </span>
+          </PageHeader>
 
-        <Row className="content">
-          <Col md={12}>
-            <RulesComponent rules={this.state.rules}/>
-          </Col>
-        </Row>
-      </span>
+          <Row className="content">
+            <Col md={12}>
+              <RulesComponent rules={this.state.rules}/>
+            </Col>
+          </Row>
+        </span>
+      </DocumentTitle>
     );
   },
 });

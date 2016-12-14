@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { PageHeader, Spinner } from 'components/common';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import Pipeline from './Pipeline';
 import NewPipeline from './NewPipeline';
 
@@ -117,34 +117,39 @@ const PipelineDetailsPage = React.createClass({
       );
     }
 
+    const pageTitle = (this._isNewPipeline(this.props.params.pipelineId) ? 'New pipeline' : `Pipeline ${this.state.pipeline.title}`);
+
     return (
-      <div>
-        <PageHeader title={title} experimental>
-          <span>
-            Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where{' '}
-            rules are evaluated and applied. Messages can go through one or more stages.
-          </span>
-          <span>
-            After each stage is completed, you can decide if messages matching all or one of the rules continue to the next stage.
-          </span>
+      <DocumentTitle title={pageTitle}>
+        <div>
+          <PageHeader title={title} experimental>
+            <span>
+              Pipelines let you transform and process messages coming from streams. Pipelines consist of stages where
+              rules are evaluated and applied. Messages can go through one or more stages.
+            </span>
+            <span>
+              After each stage is completed, you can decide if messages matching all or one of the rules continue to
+              the next stage.
+            </span>
 
-          <span>
-            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
-              <Button bsStyle="info">Manage pipelines</Button>
-            </LinkContainer>
-            {' '}
-            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>
-              <Button bsStyle="info">Manage rules</Button>
-            </LinkContainer>
-          </span>
-        </PageHeader>
+            <span>
+              <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
+                <Button bsStyle="info">Manage pipelines</Button>
+              </LinkContainer>
+              {' '}
+              <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>
+                <Button bsStyle="info">Manage rules</Button>
+              </LinkContainer>
+            </span>
+          </PageHeader>
 
-        <Row className="content">
-          <Col md={12}>
-            {content}
-          </Col>
-        </Row>
-      </div>
+          <Row className="content">
+            <Col md={12}>
+              {content}
+            </Col>
+          </Row>
+        </div>
+      </DocumentTitle>
     );
   },
 });
