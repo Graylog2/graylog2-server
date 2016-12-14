@@ -1,7 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 
-import { PageHeader } from 'components/common';
+import { DocumentTitle, PageHeader } from 'components/common';
 import { GraylogClusterOverview } from 'components/cluster';
 import PluginList from './PluginList';
 
@@ -23,23 +23,25 @@ const EnterprisePage = React.createClass({
     }
 
     return (
-      <div>
-        <PageHeader title="Graylog Enterprise">
-          {null}
+      <DocumentTitle title="Graylog Enterprise">
+        <div>
+          <PageHeader title="Graylog Enterprise">
+            {null}
 
-          <span>
-            Graylog Enterprise adds commercial functionality to the Open Source Graylog core. You can learn more
-            about Graylog Enterprise and order a license on the <a href={orderLink} target="_blank">product page</a>.
-          </span>
+            <span>
+              Graylog Enterprise adds commercial functionality to the Open Source Graylog core. You can learn more
+              about Graylog Enterprise and order a license on the <a href={orderLink} target="_blank">product page</a>.
+            </span>
 
-          <span>
-            <a className="btn btn-lg btn-success" href={orderLink} target="_blank">Order a license</a>
-          </span>
-        </PageHeader>
+            <span>
+              <a className="btn btn-lg btn-success" href={orderLink} target="_blank">Order a license</a>
+            </span>
+          </PageHeader>
 
-        <GraylogClusterOverview />
-        <PluginList/>
-      </div>
+          <GraylogClusterOverview />
+          <PluginList/>
+        </div>
+      </DocumentTitle>
     );
   },
 });
