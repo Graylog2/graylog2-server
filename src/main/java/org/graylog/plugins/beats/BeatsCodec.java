@@ -129,6 +129,12 @@ public class BeatsCodec extends AbstractCodec {
         result.addField("type", type);
         result.addField("tags", tags);
 
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> fields = (Map<String, Object>) event.get("fields");
+        if (fields != null) {
+            result.addFields(fields);
+        }
+
         return result;
     }
 
@@ -143,11 +149,7 @@ public class BeatsCodec extends AbstractCodec {
         gelfMessage.addField("input_type", event.get("input_type"));
         gelfMessage.addField("count", event.get("count"));
         gelfMessage.addField("offset", event.get("offset"));
-        @SuppressWarnings("unchecked")
-        final Map<String, Object> fields = (Map<String, Object>) event.get("fields");
-        if (fields != null) {
-            gelfMessage.addFields(fields);
-        }
+
         return gelfMessage;
     }
 

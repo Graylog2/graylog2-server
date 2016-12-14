@@ -117,5 +117,19 @@ public class BeatsCodecTest {
         assertThat(message.getSource()).isEqualTo("unknown");
         assertThat(message.getTimestamp()).isEqualTo(new DateTime(2016, 4, 1, 0, 0, DateTimeZone.UTC));
         assertThat(message.getField("facility")).isEqualTo("genericbeat");
+        assertThat(message.getField("beat_foo")).isEqualTo("bar");
+    }
+
+    @Test
+    public void decodeMessagesHandleGenericBeatMessagesWithFields() throws Exception {
+        final byte[] json = Resources.toByteArray(Resources.getResource("generic-with-fields.json"));
+        final RawMessage rawMessage = new RawMessage(json);
+        final Message message = codec.decode(rawMessage);
+        assertThat(message).isNotNull();
+        assertThat(message.getSource()).isEqualTo("unknown");
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2016, 4, 1, 0, 0, DateTimeZone.UTC));
+        assertThat(message.getField("facility")).isEqualTo("genericbeat");
+        assertThat(message.getField("beat_foo")).isEqualTo("bar");
+        assertThat(message.getField("foo_field")).isEqualTo("bar");
     }
 }
