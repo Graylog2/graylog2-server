@@ -100,12 +100,19 @@ public class BeatsCodecTest {
     }
 
     @Test
-    @Ignore("Ignored until JSON payload is added to test assets")
     public void decodeMessagesHandlesWinlogbeatMessages() throws Exception {
         final byte[] json = Resources.toByteArray(Resources.getResource("winlogbeat.json"));
         final RawMessage rawMessage = new RawMessage(json);
         final Message message = codec.decode(rawMessage);
         assertThat(message).isNotNull();
+        assertThat(message.getSource()).isEqualTo("example.local");
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2016, 11, 24, 12, 13, DateTimeZone.UTC));
+        assertThat(message.getField("facility")).isEqualTo("winlogbeat");
+        assertThat(message.getField("type")).isEqualTo("wineventlog");
+        assertThat(message.getField("winlogbeat_level")).isEqualTo("Information");
+        assertThat(message.getField("winlogbeat_event_id")).isEqualTo(5024);
+        assertThat(message.getField("winlogbeat_process_id")).isEqualTo(500);
+        assertThat(message.getField("winlogbeat_log_name")).isEqualTo("Security");
     }
 
     @Test
