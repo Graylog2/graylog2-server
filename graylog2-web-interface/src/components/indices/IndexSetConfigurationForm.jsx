@@ -3,7 +3,6 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Button, Input } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
-import Routes from 'routing/Routes';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import IndexMaintenanceStrategiesConfiguration from 'components/indices/IndexMaintenanceStrategiesConfiguration';
@@ -154,8 +153,8 @@ const IndexSetConfigurationForm = React.createClass({
                  required />
           {readOnlyconfig}
           <Input wrapperClassName="col-sm-offset-3 col-sm-7">
-            {rotationConfig}
-            {retentionConfig}
+            {indexSet.writable && rotationConfig}
+            {indexSet.writable && retentionConfig}
 
             <hr/>
             <Button type="submit" bsStyle="success">Save</Button>
