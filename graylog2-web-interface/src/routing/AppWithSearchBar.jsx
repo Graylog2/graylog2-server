@@ -31,6 +31,7 @@ const AppWithSearchBar = React.createClass({
   ],
   getInitialState() {
     return {
+      forceFetch: false,
       savedSearches: undefined,
       stream: undefined,
       searchesClusterConfig: undefined,
@@ -47,7 +48,6 @@ const AppWithSearchBar = React.createClass({
   componentWillUnmount() {
     SearchStore.unload();
   },
-  forceFetch: false,
   _loadStream(streamId) {
     if (streamId) {
       StreamsStore.get(streamId, (stream) => this.setState({ stream: stream }, this._updateSearchParams));
@@ -67,9 +67,11 @@ const AppWithSearchBar = React.createClass({
   },
   _decorateChildren(children) {
     const decoratedChildren = React.Children.map(children, (child) => {
-      return React.cloneElement(child, { searchConfig: this.state.searchesClusterConfig, forceFetch: this.forceFetch });
+      return React.cloneElement(child, { searchConfig: this.state.searchesClusterConfig, forceFetch: this.state.forceFetch });
     });
-    this.forceFetch = false;
+    if (this.state.forceFetch) {
+      this.setState({ forceFetch: false });
+    }
     return decoratedChildren;
   },
   _searchBarShouldDisplayRefreshControls() {
@@ -77,7 +79,7 @@ const AppWithSearchBar = React.createClass({
     return this.props.location.pathname !== Routes.SOURCES;
   },
   _onExecuteSearch() {
-    this.forceFetch = true;
+    this.setState({ forceFetch: true });
   },
   render() {
     if (this._isLoading()) {
