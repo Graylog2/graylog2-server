@@ -105,7 +105,7 @@ public class MongoIndexSetService implements IndexSetService {
      */
     @Override
     public List<IndexSetConfig> findAll() {
-        return ImmutableList.copyOf((Iterator<? extends IndexSetConfig>) collection.find());
+        return ImmutableList.copyOf((Iterator<? extends IndexSetConfig>) collection.find().sort(DBSort.asc("title")));
     }
 
     /**
@@ -120,7 +120,7 @@ public class MongoIndexSetService implements IndexSetService {
         final DBQuery.Query query = DBQuery.or(idQuery.toArray(new DBQuery.Query[0]));
 
         return ImmutableList.copyOf(collection.find(query)
-                .sort(DBSort.desc("creation_date"))
+                .sort(DBSort.asc("title"))
                 .skip(skip)
                 .limit(limit)
                 .toArray());
