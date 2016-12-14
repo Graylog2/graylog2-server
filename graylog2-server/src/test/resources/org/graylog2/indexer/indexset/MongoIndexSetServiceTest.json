@@ -20,7 +20,9 @@
         "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
         "max_number_of_indices": 10
       },
-      "creation_date": "2016-10-04T17:00:00Z"
+      "creation_date": {
+        "$date": "2016-10-04T17:00:00Z"
+      }
     },
     {
       "_id": {
@@ -41,7 +43,9 @@
         "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
         "max_number_of_indices": 25
       },
-      "creation_date": "2016-10-04T18:00:00Z"
+      "creation_date": {
+        "$date": "2016-10-04T18:00:00Z"
+      }
     }
   ]
 }
