@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
 import org.graylog2.alerts.FormattedEmailAlertSender;
+import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.Message;
@@ -27,6 +28,7 @@ import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallbackException;
 import org.graylog2.plugin.alarms.transports.TransportConfigurationException;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationException;
@@ -58,57 +60,72 @@ public class EmailAlarmCallback implements AlarmCallback {
     private final NodeId nodeId;
     private final EmailRecipients.Factory emailRecipientsFactory;
     private final UserService userService;
+    private final EmailConfiguration emailConfiguration;
     private Configuration configuration;
 
     @Inject
     public EmailAlarmCallback(AlertSender alertSender,
                               NotificationService notificationService,
                               NodeId nodeId,
-                              EmailRecipients.Factory emailRecipientsFactory, UserService userService) {
+                              EmailRecipients.Factory emailRecipientsFactory,
+                              UserService userService,
+                              EmailConfiguration emailConfiguration) {
         this.alertSender = alertSender;
         this.notificationService = notificationService;
         this.nodeId = nodeId;
         this.emailRecipientsFactory = emailRecipientsFactory;
         this.userService = userService;
+        this.emailConfiguration = emailConfiguration;
     }
 
     @Override
-    public void call(Stream stream, AlertCondition.CheckResult result) {
+    public void call(Stream stream, AlertCondition.CheckResult result) throws AlarmCallbackException {
         // Send alerts.
-        AlertCondition alertCondition = result.getTriggeredCondition();
         final EmailRecipients emailRecipients = this.getEmailRecipients();
-        if (!emailRecipients.isEmpty()) {
-            try {
-                if (alertCondition.getBacklog() > 0 && result.getMatchingMessages() != null) {
-                    alertSender.sendEmails(stream, emailRecipients, result, getAlarmBacklog(result));
-                } else {
-                    alertSender.sendEmails(stream, emailRecipients, result);
-                }
-            } catch (TransportConfigurationException e) {
-                LOG.warn("Stream [{}] has email recipients and is triggered, but email transport is not configured.", stream);
-                Notification notification = notificationService.buildNow()
-                        .addNode(nodeId.toString())
-                        .addType(Notification.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
-                        .addSeverity(Notification.Severity.NORMAL)
-                        .addDetail("stream_id", stream.getId())
-                        .addDetail("exception", e.getMessage());
-                notificationService.publishIfFirst(notification);
-            } catch (Exception e) {
-                LOG.error("Stream [" + stream + "] has email recipients and is triggered, but sending emails failed", e);
-
-                String exceptionDetail = e.toString();
-                if (e.getCause() != null) {
-                    exceptionDetail += " (" + e.getCause() + ")";
-                }
-
-                Notification notification = notificationService.buildNow()
-                        .addNode(nodeId.toString())
-                        .addType(Notification.Type.EMAIL_TRANSPORT_FAILED)
-                        .addSeverity(Notification.Severity.NORMAL)
-                        .addDetail("stream_id", stream.getId())
-                        .addDetail("exception", exceptionDetail);
-                notificationService.publishIfFirst(notification);
+        if (emailRecipients.isEmpty()) {
+            if (!emailConfiguration.isEnabled()) {
+                throw new AlarmCallbackException("Email transport is not enabled in server configuration file!");
             }
+
+            LOG.info("Alarm callback has no email recipients, not sending any emails.");
+            return;
+        }
+
+        AlertCondition alertCondition = result.getTriggeredCondition();
+        try {
+            if (alertCondition.getBacklog() > 0 && result.getMatchingMessages() != null) {
+                alertSender.sendEmails(stream, emailRecipients, result, getAlarmBacklog(result));
+            } else {
+                alertSender.sendEmails(stream, emailRecipients, result);
+            }
+        } catch (TransportConfigurationException e) {
+            LOG.warn("Alarm callback has email recipients and is triggered, but email transport is not configured.");
+            Notification notification = notificationService.buildNow()
+                    .addNode(nodeId.toString())
+                    .addType(Notification.Type.EMAIL_TRANSPORT_CONFIGURATION_INVALID)
+                    .addSeverity(Notification.Severity.NORMAL)
+                    .addDetail("stream_id", stream.getId())
+                    .addDetail("exception", e.getMessage());
+            notificationService.publishIfFirst(notification);
+
+            throw new AlarmCallbackException(e.getMessage(), e);
+        } catch (Exception e) {
+            LOG.error("Alarm callback has email recipients and is triggered, but sending emails failed", e);
+
+            String exceptionDetail = e.toString();
+            if (e.getCause() != null) {
+                exceptionDetail += " (" + e.getCause() + ")";
+            }
+
+            Notification notification = notificationService.buildNow()
+                    .addNode(nodeId.toString())
+                    .addType(Notification.Type.EMAIL_TRANSPORT_FAILED)
+                    .addSeverity(Notification.Severity.NORMAL)
+                    .addDetail("stream_id", stream.getId())
+                    .addDetail("exception", exceptionDetail);
+            notificationService.publishIfFirst(notification);
+
+            throw new AlarmCallbackException(e.getMessage(), e);
         }
     }
 
