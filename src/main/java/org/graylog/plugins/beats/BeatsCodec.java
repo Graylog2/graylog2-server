@@ -89,6 +89,9 @@ public class BeatsCodec extends AbstractCodec {
             case "topbeat":
                 gelfMessage = parseTopbeat(event);
                 break;
+            case "metricbeat":
+                gelfMessage = parseMetricbeat(event);
+                break;
             case "packetbeat":
                 gelfMessage = parsePacketbeat(event);
                 break;
@@ -155,6 +158,20 @@ public class BeatsCodec extends AbstractCodec {
         final Message gelfMessage = createMessage("-", event);
         gelfMessage.addField("facility", "topbeat");
         final Map<String, Object> flattened = flatten(event, "topbeat", MAP_KEY_SEPARATOR);
+
+        // Fix field names containing dots, like "cpu.name"
+        final Map<String, Object> withoutDots = MapUtils.replaceKeyCharacter(flattened, '.', MAP_KEY_SEPARATOR.charAt(0));
+        gelfMessage.addFields(withoutDots);
+        return gelfMessage;
+    }
+
+    /**
+     * @see <a href="https://www.elastic.co/guide/en/beats/metricbeat/5.1/exported-fields.html">Metricbeat Exported Fields</a>
+     */
+    private Message parseMetricbeat(Map<String, Object> event) {
+        final Message gelfMessage = createMessage("-", event);
+        gelfMessage.addField("facility", "metricbeat");
+        final Map<String, Object> flattened = flatten(event, "metricbeat", MAP_KEY_SEPARATOR);
 
         // Fix field names containing dots, like "cpu.name"
         final Map<String, Object> withoutDots = MapUtils.replaceKeyCharacter(flattened, '.', MAP_KEY_SEPARATOR.charAt(0));
