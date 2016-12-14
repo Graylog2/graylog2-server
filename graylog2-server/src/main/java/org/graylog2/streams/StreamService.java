@@ -75,4 +75,6 @@ public interface StreamService extends PersistedService {
     void removeOutput(Stream stream, Output output);
 
     void removeOutputFromAllStreams(Output output);
+
+    List<Stream> loadAllWithIndexSet(String indexSetId);
 }

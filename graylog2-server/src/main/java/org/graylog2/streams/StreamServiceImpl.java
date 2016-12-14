@@ -403,4 +403,10 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                 match, modify, false, true
         );
     }
+
+    @Override
+    public List<Stream> loadAllWithIndexSet(String indexSetId) {
+        final Map<String, Object> query = new BasicDBObject(StreamImpl.FIELD_INDEX_SET_ID, indexSetId);
+        return loadAll(query);
+    }
 }
