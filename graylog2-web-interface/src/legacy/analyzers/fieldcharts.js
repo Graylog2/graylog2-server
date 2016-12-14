@@ -453,7 +453,7 @@ export const FieldChart = {
         name: series.name,
         color: lineColor,
         gl2_query: query,
-        valuetype: GraphVisualization.getReadableFieldChartStatisticalFunction(series.valuetype),
+        valuetype: series.valuetype,
         field: series.field,
       };
 
