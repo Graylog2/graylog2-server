@@ -165,14 +165,17 @@ const Stream = React.createClass({
                         isDefaultStream={isDefaultStream} />
       </OverlayElement>
     );
+
+    const indexSet = this.props.indexSets.find(is => is.id === stream.index_set_id) || this.props.indexSets.find(is => is.is_default);
+
     return (
       <li className="stream">
         <h2>
           <LinkContainer to={Routes.stream_search(stream.id)}>
             <a>{stream.title}</a>
           </LinkContainer>
-
-          <StreamStateBadge stream={stream}/>
+          {' '}
+          <small>index set <em>{indexSet.title}</em> &nbsp;<StreamStateBadge stream={stream} /></small>
         </h2>
 
         <div className="stream-data">
