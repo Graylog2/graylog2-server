@@ -93,8 +93,8 @@ const Stream = React.createClass({
     let manageOutputsLink;
     let manageAlertsLink;
     if (this.isPermitted(permissions, [`streams:edit:${stream.id}`])) {
-      editRulesLink = isDefaultStream ? null : (
-        <LinkContainer to={Routes.stream_edit(stream.id)}>
+      editRulesLink = (
+        <LinkContainer disabled={isDefaultStream} to={Routes.stream_edit(stream.id)}>
           <Button bsStyle="info">Manage Rules</Button>
         </LinkContainer>
       );
@@ -109,16 +109,16 @@ const Stream = React.createClass({
     }
 
     let toggleStreamLink;
-    if (this.isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`]) && !isDefaultStream) {
+    if (this.isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`])) {
       if (stream.disabled) {
         toggleStreamLink = (
-          <Button bsStyle="success" className="toggle-stream-button" onClick={this._onResume} disabled={this.state.loading}>
+          <Button bsStyle="success" className="toggle-stream-button" onClick={this._onResume} disabled={isDefaultStream || this.state.loading}>
             {this.state.loading ? 'Starting...' : 'Start Stream'}
           </Button>
         );
       } else {
         toggleStreamLink = (
-          <Button bsStyle="primary" className="toggle-stream-button" onClick={this._onPause} disabled={this.state.loading}>
+          <Button bsStyle="primary" className="toggle-stream-button" onClick={this._onPause} disabled={isDefaultStream || this.state.loading}>
             {this.state.loading ? 'Pausing...' : 'Pause Stream'}
           </Button>
         );
@@ -133,13 +133,15 @@ const Stream = React.createClass({
                                  stream={stream}
                                  streamRuleTypes={this.props.streamRuleTypes}
                                  permissions={this.props.permissions}/>);
-    const streamControls = isDefaultStream ? null :
-                           (<StreamControls stream={stream} permissions={this.props.permissions}
-                                user={this.props.user}
-                                onDelete={this._onDelete} onUpdate={this._onUpdate}
-                                onClone={this._onClone}
-                                onQuickAdd={this._onQuickAdd}
-                                indexSets={this.props.indexSets}/>);
+    const streamControls = (
+      <StreamControls stream={stream} permissions={this.props.permissions}
+                      user={this.props.user}
+                      onDelete={this._onDelete} onUpdate={this._onUpdate}
+                      onClone={this._onClone}
+                      onQuickAdd={this._onQuickAdd}
+                      indexSets={this.props.indexSets}
+                      isDefaultStream={isDefaultStream} />
+    );
     return (
       <li className="stream">
         <h2>
