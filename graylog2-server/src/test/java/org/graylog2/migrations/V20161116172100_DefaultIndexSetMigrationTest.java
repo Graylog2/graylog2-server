@@ -84,7 +84,6 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         final IndexSetConfig savedIndexSetConfig = IndexSetConfig.builder()
                 .id("id")
                 .title("title")
-                .isDefault(true)
                 .indexPrefix("prefix")
                 .shards(1)
                 .replicas(0)

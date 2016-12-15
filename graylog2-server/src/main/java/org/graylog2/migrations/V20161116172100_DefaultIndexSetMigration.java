@@ -87,7 +87,6 @@ public class V20161116172100_DefaultIndexSetMigration extends Migration {
         final IndexSetConfig config = IndexSetConfig.builder()
                 .title("Default index set")
                 .description("The Graylog default index set")
-                .isDefault(true)
                 .indexPrefix(elasticsearchConfiguration.getIndexPrefix())
                 .shards(elasticsearchConfiguration.getShards())
                 .replicas(elasticsearchConfiguration.getReplicas())

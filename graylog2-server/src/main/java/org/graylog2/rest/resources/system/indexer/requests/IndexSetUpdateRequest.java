@@ -45,9 +45,6 @@ public abstract class IndexSetUpdateRequest {
     @Nullable
     public abstract String description();
 
-    @JsonProperty("default")
-    public abstract boolean isDefault();
-
     @JsonProperty("writable")
     public abstract boolean isWritable();
 
@@ -80,7 +77,6 @@ public abstract class IndexSetUpdateRequest {
     public static IndexSetUpdateRequest create(@JsonProperty("id") String id,
                                                @JsonProperty("title") @NotBlank String title,
                                                @JsonProperty("description") @Nullable String description,
-                                               @JsonProperty("default") boolean isDefault,
                                                @JsonProperty("writable") boolean isWritable,
                                                @JsonProperty("shards") @Min(1) int shards,
                                                @JsonProperty("replicas") @Min(0) int replicas,
@@ -88,7 +84,7 @@ public abstract class IndexSetUpdateRequest {
                                                @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
                                                @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
                                                @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy) {
-        return new AutoValue_IndexSetUpdateRequest(id, title, description, isDefault, isWritable, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy);
+        return new AutoValue_IndexSetUpdateRequest(id, title, description, isWritable, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy);
     }
 
     public static IndexSetUpdateRequest fromIndexSetConfig(IndexSetConfig indexSet) {
@@ -96,7 +92,6 @@ public abstract class IndexSetUpdateRequest {
                 indexSet.id(),
                 indexSet.title(),
                 indexSet.description(),
-                indexSet.isDefault(),
                 indexSet.isWritable(),
                 indexSet.shards(),
                 indexSet.replicas(),
@@ -108,21 +103,21 @@ public abstract class IndexSetUpdateRequest {
     }
 
     public IndexSetConfig toIndexSetConfig(IndexSetConfig oldConfig) {
-        return IndexSetConfig.create(
-                id(),
-                title(),
-                description(),
-                isDefault(),
-                isWritable(),
-                oldConfig.indexPrefix(),
-                oldConfig.indexMatchPattern(),
-                oldConfig.indexWildcard(),
-                shards(),
-                replicas(),
-                rotationStrategyClass(),
-                rotationStrategy(),
-                retentionStrategyClass(),
-                retentionStrategy(),
-                oldConfig.creationDate());
+        return IndexSetConfig.builder()
+                .id(id())
+                .title(title())
+                .description(description())
+                .isWritable(isWritable())
+                .indexPrefix(oldConfig.indexPrefix())
+                .indexMatchPattern(oldConfig.indexMatchPattern())
+                .indexWildcard(oldConfig.indexWildcard())
+                .shards(shards())
+                .replicas(replicas())
+                .rotationStrategyClass(rotationStrategyClass())
+                .rotationStrategy(rotationStrategy())
+                .retentionStrategyClass(retentionStrategyClass())
+                .retentionStrategy(retentionStrategy())
+                .creationDate(oldConfig.creationDate())
+                .build();
     }
 }

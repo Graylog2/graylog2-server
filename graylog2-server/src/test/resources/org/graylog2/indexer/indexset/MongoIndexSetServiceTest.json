@@ -6,7 +6,6 @@
       },
       "title": "Test 1",
       "description": "This is the index set configuration for Test 1",
-      "default": true,
       "index_prefix": "test_1",
       "shards": 4,
       "replicas": 1,
@@ -29,7 +28,6 @@
         "$oid": "57f3d721a43c2d59cb750002"
       },
       "title": "Test 2",
-      "default": false,
       "index_prefix": "test_2",
       "shards": 1,
       "replicas": 0,

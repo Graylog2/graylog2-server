@@ -38,6 +38,13 @@ public interface IndexSetService {
     Optional<IndexSetConfig> get(String id);
 
     /**
+     * Retrieve the default index set.
+     *
+     * @return A filled {@link Optional} with the default index set, an empty {@link Optional} if there is no default.
+     */
+    Optional<IndexSetConfig> getDefault();
+
+    /**
      * Retrieve an index set based on the given {@link DBQuery.Query}.
      *
      * @return index set

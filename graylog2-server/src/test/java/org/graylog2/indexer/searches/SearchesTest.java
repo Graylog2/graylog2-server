@@ -16,16 +16,14 @@
  */
 package org.graylog2.indexer.searches;
 
-import com.google.common.collect.ImmutableSortedSet;
-
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.google.common.collect.ImmutableSortedSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
-
 import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog2.Configuration;
@@ -64,13 +62,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
+import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
-
-import javax.inject.Inject;
 
 import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
@@ -147,7 +144,6 @@ public class SearchesTest {
                 .id("index-set-1")
                 .title("Index set 1")
                 .description("For testing")
-                .isDefault(true)
                 .indexPrefix("graylog")
                 .creationDate(ZonedDateTime.now())
                 .shards(1)

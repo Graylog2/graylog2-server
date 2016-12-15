@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.management.IndexManagementConfig;
@@ -112,7 +113,7 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .orElseThrow(() -> new IllegalStateException("Unable to find any index set - this should not happen!"));
 
         LOG.info("Setting index set <{}> as default", defaultIndexSetConfig.id());
-        indexSetService.save(defaultIndexSetConfig.toBuilder().isDefault(true).build());
+        clusterConfigService.write(DefaultIndexSetConfig.create(defaultIndexSetConfig.id()));
 
         clusterConfigService.write(MigrationCompleted.create(updatedIds.build(), skippedIds.build(), defaultIndexSetConfig.id()));
     }
