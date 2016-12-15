@@ -172,7 +172,7 @@ const Stream = React.createClass({
             <a>{stream.title}</a>
           </LinkContainer>
 
-          <StreamStateBadge stream={stream} onClick={this._onResume}/>
+          <StreamStateBadge stream={stream}/>
         </h2>
 
         <div className="stream-data">
