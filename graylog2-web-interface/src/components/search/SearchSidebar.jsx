@@ -4,6 +4,7 @@ import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'react-bootst
 import { AutoAffix } from 'react-overlays';
 import numeral from 'numeral';
 import URI from 'urijs';
+import naturalSort from 'javascript-natural-sort';
 
 import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
@@ -128,6 +129,10 @@ const SearchSidebar = React.createClass({
   },
 
   render() {
+    const formattedIndices = this.props.result.used_indices
+      .sort((i1, i2) => naturalSort(i1.index_name.toLowerCase(), i2.index_name.toLowerCase()))
+      .map((index) => <li key={index.index_name}> {index.index_name}</li>);
+
     const indicesModal = (
       <BootstrapModalWrapper ref="indicesModal">
         <Modal.Header closeButton>
@@ -140,7 +145,7 @@ const SearchSidebar = React.createClass({
           <h4>Indices used for this search:</h4>
 
           <ul className="index-list">
-            {this.props.result.used_indices.map((index) => <li key={index.index_name}> {index.index_name}</li>)}
+            {formattedIndices}
           </ul>
         </Modal.Body>
         <Modal.Footer>
