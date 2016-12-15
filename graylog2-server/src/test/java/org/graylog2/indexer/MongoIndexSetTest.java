@@ -89,7 +89,11 @@ public class MongoIndexSetTest {
             MessageCountRotationStrategyConfig.createDefault(),
             NoopRetentionStrategy.class.getCanonicalName(),
             NoopRetentionStrategyConfig.createDefault(),
-            ZonedDateTime.of(2016, 11, 8, 0, 0, 0, 0, ZoneOffset.UTC)
+            ZonedDateTime.of(2016, 11, 8, 0, 0, 0, 0, ZoneOffset.UTC),
+            "standard",
+            "index-template",
+            1,
+            false
     );
 
     private MongoIndexSet mongoIndexSet;

@@ -106,6 +106,10 @@ public class IndicesTest {
                 .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-1")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         this.indexSet = new TestIndexSet(indexSetConfig);
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();

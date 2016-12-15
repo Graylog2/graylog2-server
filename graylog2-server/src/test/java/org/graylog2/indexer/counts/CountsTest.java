@@ -125,6 +125,10 @@ public class CountsTest {
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-1")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
 
         indexSetConfig2 = IndexSetConfig.builder()
@@ -138,6 +142,10 @@ public class CountsTest {
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
                 .creationDate(ZonedDateTime.of(2016, 10, 13, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-2")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
 
         when(indexSetRegistry.getManagedIndicesNames()).thenReturn(new String[]{INDEX_NAME_1, INDEX_NAME_2});

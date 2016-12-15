@@ -109,7 +109,11 @@ public class MongoIndexSetServiceTest {
                                 MessageCountRotationStrategyConfig.create(1000),
                                 NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(10),
-                                ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC)
+                                ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC),
+                                "standard",
+                                "test_1",
+                                1,
+                                false
                         )
                 );
     }
@@ -133,7 +137,11 @@ public class MongoIndexSetServiceTest {
                                 MessageCountRotationStrategyConfig.create(1000),
                                 NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(10),
-                                ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC)
+                                ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC),
+                                "standard",
+                                "test_1",
+                                1,
+                                false
                         )
                 );
     }
@@ -193,7 +201,11 @@ public class MongoIndexSetServiceTest {
                                 MessageCountRotationStrategyConfig.create(1000),
                                 NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(10),
-                                ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC)
+                                ZonedDateTime.of(2016, 10, 4, 17, 0, 0, 0, ZoneOffset.UTC),
+                                "standard",
+                                "test_1",
+                                1,
+                                false
                         ),
                         IndexSetConfig.create(
                                 "57f3d721a43c2d59cb750002",
@@ -207,7 +219,11 @@ public class MongoIndexSetServiceTest {
                                 MessageCountRotationStrategyConfig.create(2500),
                                 NoopRetentionStrategy.class.getCanonicalName(),
                                 NoopRetentionStrategyConfig.create(25),
-                                ZonedDateTime.of(2016, 10, 4, 18, 0, 0, 0, ZoneOffset.UTC)
+                                ZonedDateTime.of(2016, 10, 4, 18, 0, 0, 0, ZoneOffset.UTC),
+                                "standard",
+                                "test_2",
+                                1,
+                                false
                         )
                 );
     }
@@ -228,7 +244,11 @@ public class MongoIndexSetServiceTest {
                 MessageCountRotationStrategyConfig.create(10000),
                 NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(5),
-                ZonedDateTime.of(2016, 10, 4, 12, 0, 0, 0, ZoneOffset.UTC)
+                ZonedDateTime.of(2016, 10, 4, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                1,
+                false
         );
 
         final IndexSetConfig savedIndexSetConfig = indexSetService.save(indexSetConfig);

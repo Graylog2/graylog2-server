@@ -92,6 +92,10 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
                 .rotationStrategy(rotationStrategyConfig)
                 .retentionStrategy(retentionStrategyConfig)
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-1")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("test", "test"));
         when(clusterConfigService.get(StubRotationStrategyConfig.class)).thenReturn(rotationStrategyConfig);
@@ -116,6 +120,10 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         assertThat(capturedIndexSetConfig.replicas()).isEqualTo(elasticsearchConfiguration.getReplicas());
         assertThat(capturedIndexSetConfig.rotationStrategy()).isInstanceOf(StubRotationStrategyConfig.class);
         assertThat(capturedIndexSetConfig.retentionStrategy()).isInstanceOf(StubRetentionStrategyConfig.class);
+        assertThat(capturedIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
+        assertThat(capturedIndexSetConfig.indexTemplateName()).isEqualTo(elasticsearchConfiguration.getTemplateName());
+        assertThat(capturedIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
+        assertThat(capturedIndexSetConfig.indexOptimizationDisabled()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
     }
 
     @Test

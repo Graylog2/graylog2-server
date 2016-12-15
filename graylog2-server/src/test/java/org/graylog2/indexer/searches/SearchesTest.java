@@ -58,9 +58,9 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -79,7 +79,6 @@ import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class SearchesTest {
     @ClassRule
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
@@ -87,7 +86,10 @@ public class SearchesTest {
     private static final String RANGES_HISTOGRAM_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.ranges";
 
     @Rule
-    public ElasticsearchRule elasticsearchRule;
+    public final ElasticsearchRule elasticsearchRule;
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private static final String INDEX_NAME = "graylog_0";
     private static final SortedSet<IndexRange> INDEX_RANGES = ImmutableSortedSet
@@ -152,6 +154,10 @@ public class SearchesTest {
                 .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
                 .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
                 .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-1")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         this.indexSet = new TestIndexSet(indexSetConfig);
         this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();

@@ -21,7 +21,11 @@
       },
       "creation_date": {
         "$date": "2016-10-04T17:00:00Z"
-      }
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "test_1",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false
     },
     {
       "_id": {
@@ -43,7 +47,11 @@
       },
       "creation_date": {
         "$date": "2016-10-04T18:00:00Z"
-      }
+      },
+      "index_analyzer": "standard",
+      "index_template_name": "test_2",
+      "index_optimization_max_num_segments": 1,
+      "index_optimization_disabled": false
     }
   ]
 }

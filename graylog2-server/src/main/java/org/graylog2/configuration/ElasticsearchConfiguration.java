@@ -114,9 +114,11 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "elasticsearch_replicas", validator = PositiveIntegerValidator.class, required = true)
     private int replicas = 0;
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_analyzer", required = true)
     private String analyzer = "standard";
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "elasticsearch_template_name")
     private String templateName = "graylog-internal";
 
@@ -131,9 +133,11 @@ public class ElasticsearchConfiguration {
     @Parameter(value = "rotation_strategy")
     private String rotationStrategy = "count";
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "disable_index_optimization")
     private boolean disableIndexOptimization = false;
 
+    @Deprecated // Should be removed in Graylog 3.0
     @Parameter(value = "index_optimization_max_num_segments", validator = PositiveIntegerValidator.class)
     private int indexOptimizationMaxNumSegments = 1;
 
@@ -235,10 +239,12 @@ public class ElasticsearchConfiguration {
         return replicas;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public String getAnalyzer() {
         return analyzer;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public String getTemplateName() {
         return templateName;
     }
@@ -261,10 +267,12 @@ public class ElasticsearchConfiguration {
         return retentionStrategy;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public int getIndexOptimizationMaxNumSegments() {
         return indexOptimizationMaxNumSegments;
     }
 
+    @Deprecated // Should be removed in Graylog 3.0
     public boolean isDisableIndexOptimization() {
         return disableIndexOptimization;
     }

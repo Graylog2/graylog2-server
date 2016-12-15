@@ -18,7 +18,6 @@ package org.graylog2.indexer.indexset;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
@@ -33,8 +32,6 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
-
-import static java.util.Objects.requireNonNull;
 
 @AutoValue
 @WithBeanGetter
@@ -100,40 +97,25 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     @NotNull
     public abstract ZonedDateTime creationDate();
 
-    // TODO 2.2: Migrate config setting to index set!
     @JsonProperty("index_analyzer")
-    @JsonIgnore
-    public String indexAnalyzer() {
-        return "standard";
-    }
+    @NotBlank
+    public abstract String indexAnalyzer();
 
-    // TODO 2.2: Migrate config setting to index set!
     @JsonProperty("index_template_name")
-    @JsonIgnore
-    public String indexTemplateName() {
-        return "graylog-internal-" + requireNonNull(id());
-    }
+    @NotBlank
+    public abstract String indexTemplateName();
 
-    // TODO 2.2: Migrate config setting to index set!
     @JsonProperty("index_optimization_max_num_segments")
-    @JsonIgnore
-    public int indexOptimizationMaxNumSegments() {
-        return 1;
-    }
+    @Min(1L)
+    public abstract int indexOptimizationMaxNumSegments();
 
-    // TODO 2.2: Migrate config setting to index set!
     @JsonProperty("index_optimization_disabled")
-    @JsonIgnore
-    public boolean indexOptimizationDisabled() {
-        return false;
-    }
+    public abstract boolean indexOptimizationDisabled();
 
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
                                         @JsonProperty("title") @NotBlank String title,
                                         @JsonProperty("description") @Nullable String description,
-                                        // TODO 3.0: Remove "default" field here. A migration in 2.2 removed it.
-                                        @JsonProperty("default") @Nullable Boolean isDefault, // Ignored, older objects might still have it
                                         @JsonProperty("writable") @Nullable Boolean isWritable,
                                         @JsonProperty(FIELD_INDEX_PREFIX) @NotBlank String indexPrefix,
                                         @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
@@ -144,7 +126,11 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
                                         @JsonProperty("retention_strategy_class") @Nullable String retentionStrategyClass,
                                         @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
-                                        @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate) {
+                                        @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate,
+                                        @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
+                                        @JsonProperty("index_template_name") @NotBlank String indexTemplateName,
+                                        @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
+                                        @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled) {
         return AutoValue_IndexSetConfig.builder()
                 .id(id)
                 .title(title)
@@ -160,6 +146,10 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .retentionStrategyClass(retentionStrategyClass)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(creationDate)
+                .indexAnalyzer(indexAnalyzer)
+                .indexTemplateName(indexTemplateName)
+                .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments)
+                .indexOptimizationDisabled(indexOptimizationDisabled)
                 .build();
     }
 
@@ -174,8 +164,14 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         RotationStrategyConfig rotationStrategy,
                                         String retentionStrategyClass,
                                         RetentionStrategyConfig retentionStrategy,
-                                        ZonedDateTime creationDate) {
-        return create(id, title, description, null, isWritable, indexPrefix, null, null, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
+                                        ZonedDateTime creationDate,
+                                        String indexAnalyzer,
+                                        String indexTemplateName,
+                                        int indexOptimizationMaxNumSegments,
+                                        boolean indexOptimizationDisabled) {
+        return create(id, title, description, isWritable, indexPrefix, null, null, shards, replicas,
+                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
+                indexAnalyzer, indexTemplateName, indexOptimizationMaxNumSegments, indexOptimizationDisabled);
     }
 
     public static IndexSetConfig create(String title,
@@ -188,8 +184,14 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         RotationStrategyConfig rotationStrategy,
                                         String retentionStrategyClass,
                                         RetentionStrategyConfig retentionStrategy,
-                                        ZonedDateTime creationDate) {
-        return create(null, title, description, null, isWritable, indexPrefix, null, null, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
+                                        ZonedDateTime creationDate,
+                                        String indexAnalyzer,
+                                        String indexTemplateName,
+                                        int indexOptimizationMaxNumSegments,
+                                        boolean indexOptimizationDisabled) {
+        return create(null, title, description, isWritable, indexPrefix, null, null, shards, replicas,
+                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
+                indexAnalyzer, indexTemplateName, indexOptimizationMaxNumSegments, indexOptimizationDisabled);
     }
 
     @Override
@@ -237,6 +239,14 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
         public abstract Builder retentionStrategy(RetentionStrategyConfig retentionStrategy);
 
         public abstract Builder creationDate(ZonedDateTime creationDate);
+
+        public abstract Builder indexAnalyzer(String analyzer);
+
+        public abstract Builder indexTemplateName(String templateName);
+
+        public abstract Builder indexOptimizationMaxNumSegments(int indexOptimizationMaxNumSegments);
+
+        public abstract Builder indexOptimizationDisabled(boolean indexOptimizationDisabled);
 
         public abstract IndexSetConfig build();
     }

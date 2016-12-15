@@ -85,6 +85,21 @@ public abstract class IndexSetSummary {
     @NotNull
     public abstract ZonedDateTime creationDate();
 
+    @JsonProperty("index_analyzer")
+    @NotBlank
+    public abstract String indexAnalyzer();
+
+    @JsonProperty("index_template_name")
+    @NotBlank
+    public abstract String indexTemplateName();
+
+    @JsonProperty("index_optimization_max_num_segments")
+    @Min(1L)
+    public abstract int indexOptimizationMaxNumSegments();
+
+    @JsonProperty("index_optimization_disabled")
+    public abstract boolean indexOptimizationDisabled();
+
     @JsonCreator
     public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
                                          @JsonProperty("title") @NotBlank String title,
@@ -98,8 +113,14 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
                                          @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
                                          @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
-                                         @JsonProperty("creation_date") @NotNull ZonedDateTime creationDate) {
-        return new AutoValue_IndexSetSummary(id, title, description, isDefault, isWritable, indexPrefix, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
+                                         @JsonProperty("creation_date") @NotNull ZonedDateTime creationDate,
+                                         @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
+                                         @JsonProperty("index_template_name") @NotBlank String indexTemplateName,
+                                         @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
+                                         @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled) {
+        return new AutoValue_IndexSetSummary(id, title, description, isDefault, isWritable, indexPrefix, shards, replicas,
+                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
+                indexAnalyzer, indexTemplateName, indexOptimizationMaxNumSegments, indexOptimizationDisabled);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
@@ -116,24 +137,31 @@ public abstract class IndexSetSummary {
                 indexSet.rotationStrategy(),
                 indexSet.retentionStrategyClass(),
                 indexSet.retentionStrategy(),
-                indexSet.creationDate());
+                indexSet.creationDate(),
+                indexSet.indexAnalyzer(),
+                indexSet.indexTemplateName(),
+                indexSet.indexOptimizationMaxNumSegments(),
+                indexSet.indexOptimizationDisabled());
 
     }
 
     public IndexSetConfig toIndexSetConfig() {
-        return IndexSetConfig.builder()
-                .id(id())
-                .title(title())
-                .description(description())
-                .isWritable(isWritable())
-                .indexPrefix(indexPrefix())
-                .shards(shards())
-                .replicas(replicas())
-                .rotationStrategyClass(rotationStrategyClass())
-                .rotationStrategy(rotationStrategy())
-                .retentionStrategyClass(retentionStrategyClass())
-                .retentionStrategy(retentionStrategy())
-                .creationDate(creationDate())
-                .build();
+        return IndexSetConfig.create(
+                id(),
+                title(),
+                description(),
+                isWritable(),
+                indexPrefix(),
+                shards(),
+                replicas(),
+                rotationStrategyClass(),
+                rotationStrategy(),
+                retentionStrategyClass(),
+                retentionStrategy(),
+                creationDate(),
+                indexAnalyzer(),
+                indexTemplateName(),
+                indexOptimizationMaxNumSegments(),
+                indexOptimizationDisabled());
     }
 }

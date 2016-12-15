@@ -99,7 +99,11 @@ public class IndexSetsResourceTest {
                 MessageCountRotationStrategyConfig.create(1000),
                 NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                1,
+                false
         );
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
@@ -128,7 +132,11 @@ public class IndexSetsResourceTest {
                 MessageCountRotationStrategyConfig.create(1000),
                 NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                1,
+                false
         );
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
@@ -172,7 +180,11 @@ public class IndexSetsResourceTest {
                 MessageCountRotationStrategyConfig.create(1000),
                 NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                1,
+                false
         );
         when(indexSetService.get("id")).thenReturn(Optional.of(indexSetConfig));
 
@@ -229,7 +241,11 @@ public class IndexSetsResourceTest {
                 MessageCountRotationStrategyConfig.create(1000),
                 NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                1,
+                false
         );
         final IndexSetConfig savedIndexSetConfig = indexSetConfig.toBuilder()
                 .id("id")
@@ -260,7 +276,11 @@ public class IndexSetsResourceTest {
                 MessageCountRotationStrategyConfig.create(1000),
                 NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                1,
+                false
         );
 
         expectedException.expect(ForbiddenException.class);
@@ -288,7 +308,11 @@ public class IndexSetsResourceTest {
                 MessageCountRotationStrategyConfig.create(1000),
                 NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                1,
+                false
         );
         final IndexSetConfig updatedIndexSetConfig = indexSetConfig.toBuilder()
                 .title("new title")
@@ -321,7 +345,11 @@ public class IndexSetsResourceTest {
                 MessageCountRotationStrategyConfig.create(1000),
                 NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                1,
+                false
         );
 
         expectedException.expect(ClientErrorException.class);
@@ -349,7 +377,11 @@ public class IndexSetsResourceTest {
                 MessageCountRotationStrategyConfig.create(1000),
                 NoopRetentionStrategy.class.getCanonicalName(),
                 NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC)
+                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "index-template",
+                1,
+                false
         );
 
         expectedException.expect(ForbiddenException.class);
