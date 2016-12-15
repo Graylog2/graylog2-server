@@ -10,8 +10,9 @@ const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
+import { OverlayElement } from 'components/common';
 import UserNotification from 'util/UserNotification';
-import { Button } from 'react-bootstrap';
+import { Button, Tooltip } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 
@@ -89,14 +90,19 @@ const Stream = React.createClass({
     const permissions = this.props.permissions;
 
     const isDefaultStream = stream.is_default;
+    const defaultStreamTooltip = isDefaultStream ?
+      <Tooltip id="default-stream-tooltip">Action not available for the default stream</Tooltip> : null;
+
     let editRulesLink;
     let manageOutputsLink;
     let manageAlertsLink;
     if (this.isPermitted(permissions, [`streams:edit:${stream.id}`])) {
       editRulesLink = (
-        <LinkContainer disabled={isDefaultStream} to={Routes.stream_edit(stream.id)}>
-          <Button bsStyle="info">Manage Rules</Button>
-        </LinkContainer>
+        <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
+          <LinkContainer disabled={isDefaultStream} to={Routes.stream_edit(stream.id)}>
+            <Button bsStyle="info">Manage Rules</Button>
+          </LinkContainer>
+        </OverlayElement>
       );
 
       if (this.isPermitted(permissions, ['stream_outputs:read'])) {
@@ -112,15 +118,21 @@ const Stream = React.createClass({
     if (this.isAnyPermitted(permissions, [`streams:changestate:${stream.id}`, `streams:edit:${stream.id}`])) {
       if (stream.disabled) {
         toggleStreamLink = (
-          <Button bsStyle="success" className="toggle-stream-button" onClick={this._onResume} disabled={isDefaultStream || this.state.loading}>
-            {this.state.loading ? 'Starting...' : 'Start Stream'}
-          </Button>
+          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
+            <Button bsStyle="success" className="toggle-stream-button" onClick={this._onResume}
+                    disabled={isDefaultStream || this.state.loading}>
+              {this.state.loading ? 'Starting...' : 'Start Stream'}
+            </Button>
+          </OverlayElement>
         );
       } else {
         toggleStreamLink = (
-          <Button bsStyle="primary" className="toggle-stream-button" onClick={this._onPause} disabled={isDefaultStream || this.state.loading}>
-            {this.state.loading ? 'Pausing...' : 'Pause Stream'}
-          </Button>
+          <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
+            <Button bsStyle="primary" className="toggle-stream-button" onClick={this._onPause}
+                    disabled={isDefaultStream || this.state.loading}>
+              {this.state.loading ? 'Pausing...' : 'Pause Stream'}
+            </Button>
+          </OverlayElement>
         );
       }
     }
@@ -134,13 +146,15 @@ const Stream = React.createClass({
                                  streamRuleTypes={this.props.streamRuleTypes}
                                  permissions={this.props.permissions}/>);
     const streamControls = (
-      <StreamControls stream={stream} permissions={this.props.permissions}
-                      user={this.props.user}
-                      onDelete={this._onDelete} onUpdate={this._onUpdate}
-                      onClone={this._onClone}
-                      onQuickAdd={this._onQuickAdd}
-                      indexSets={this.props.indexSets}
-                      isDefaultStream={isDefaultStream} />
+      <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
+        <StreamControls stream={stream} permissions={this.props.permissions}
+                        user={this.props.user}
+                        onDelete={this._onDelete} onUpdate={this._onUpdate}
+                        onClone={this._onClone}
+                        onQuickAdd={this._onQuickAdd}
+                        indexSets={this.props.indexSets}
+                        isDefaultStream={isDefaultStream} />
+      </OverlayElement>
     );
     return (
       <li className="stream">
