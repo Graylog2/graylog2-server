@@ -238,6 +238,11 @@ public class ConfigurationStateUpdaterTest {
         }
 
         @Override
+        public List<Stream> loadAllWithIndexSet(String indexSetId) {
+            throw new IllegalStateException("no implemented");
+        }
+
+        @Override
         public <T extends Persisted> int destroy(T model) {
             throw new IllegalStateException("no implemented");
         }
