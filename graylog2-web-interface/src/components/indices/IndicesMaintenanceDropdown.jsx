@@ -34,7 +34,7 @@ const IndicesMaintenanceDropdown = React.createClass({
     }
     return (
       <ButtonGroup>
-        <DropdownButton bsStyle="info" bsSize="lg" title="Maintenance" id="indices-maintenance-actions" pullRight>
+        <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
           <MenuItem eventKey="1" onClick={this._onRecalculateIndexRange}>Recalculate all index ranges</MenuItem>
           {cycleButton}
         </DropdownButton>

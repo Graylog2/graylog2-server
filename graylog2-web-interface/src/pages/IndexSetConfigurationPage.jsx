@@ -69,7 +69,7 @@ const IndexSetConfigurationPage = React.createClass({
             </span>
             <span>
               <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                <Button bsStyle="info">Overview</Button>
+                <Button bsStyle="info">Index sets overview</Button>
               </LinkContainer>
             </span>
           </PageHeader>
