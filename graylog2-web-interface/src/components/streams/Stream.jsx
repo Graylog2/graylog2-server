@@ -10,7 +10,7 @@ const StreamsStore = StoreProvider.getStore('Streams');
 const StreamRulesStore = StoreProvider.getStore('StreamRules');
 
 import StreamRuleForm from 'components/streamrules/StreamRuleForm';
-import { OverlayElement } from 'components/common';
+import { OverlayElement, Pluralize } from 'components/common';
 import UserNotification from 'util/UserNotification';
 import { Button, Tooltip } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -38,14 +38,23 @@ const Stream = React.createClass({
     if (stream.is_default) {
       return 'The default stream contains all messages.';
     }
+    if (stream.rules.length === 0) {
+      return 'No configured rules.';
+    }
+
     let verbalMatchingType;
     switch (stream.matching_type) {
       case 'OR': verbalMatchingType = 'at least one'; break;
       default:
       case 'AND': verbalMatchingType = 'all'; break;
     }
-    return (stream.rules.length > 0 ?
-    `Must match ${verbalMatchingType} of the ${stream.rules.length} configured stream rule(s).` : 'No configured rules.');
+
+    return (
+      <span>
+        Must match {verbalMatchingType} of the {stream.rules.length} configured stream{' '}
+        <Pluralize value={stream.rules.length} plural="rules" singular="rule" />.
+      </span>
+    );
   },
   _onDelete(stream) {
     if (window.confirm('Do you really want to remove this stream?')) {
