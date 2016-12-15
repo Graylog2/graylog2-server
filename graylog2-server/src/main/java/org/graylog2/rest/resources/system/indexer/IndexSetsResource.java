@@ -33,13 +33,11 @@ import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.streams.StreamService;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
 import org.slf4j.Logger;
@@ -81,7 +79,6 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetRegistry indexSetRegistry;
     private final IndexSetValidator indexSetValidator;
     private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
-    private final StreamService streamService;
     private final SystemJobManager systemJobManager;
 
     @Inject
@@ -89,13 +86,11 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetRegistry indexSetRegistry,
                              final IndexSetValidator indexSetValidator,
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
-                             final StreamService streamService,
                              final SystemJobManager systemJobManager) {
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
         this.indexSetValidator = indexSetValidator;
         this.indexSetCleanupJobFactory = requireNonNull(indexSetCleanupJobFactory);
-        this.streamService = requireNonNull(streamService);
         this.systemJobManager = systemJobManager;
     }
 
@@ -221,11 +216,6 @@ public class IndexSetsResource extends RestResource {
 
         if (indexSet.getConfig().isDefault()) {
             throw new BadRequestException("Default index set <" + indexSet.getConfig().id() + "> cannot be deleted!");
-        }
-
-        final List<Stream> streams = streamService.loadAllWithIndexSet(id);
-        if (!streams.isEmpty()) {
-            throw new BadRequestException("Actively used index set <" + id + "> cannot be deleted!");
         }
 
         if (indexSetService.delete(id) == 0) {
