@@ -24,7 +24,6 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
 import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
-import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -170,15 +169,6 @@ public class MongoIndexSetService implements IndexSetService {
     }
 
     private boolean isDeletable(ObjectId id) {
-        final String stringId = id.toHexString();
-
-        // TODO: This can be expensive, create a method in StreamService to find streams for a given index set ID.
-        for (Stream stream : streamService.loadAll()) {
-            if (stream.getIndexSetId() != null && stream.getIndexSetId().equals(stringId)) {
-                return false;
-            }
-        }
-
-        return true;
+        return streamService.loadAllWithIndexSet(id.toHexString()).isEmpty();
     }
 }

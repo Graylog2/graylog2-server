@@ -52,6 +52,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class MongoIndexSetServiceTest {
@@ -281,13 +282,14 @@ public class MongoIndexSetServiceTest {
 
         final FakeStream stream1 = new FakeStream("Test stream 1");
 
-        stream1.setIndexSetId("57f3d721a43c2d59cb750001");
+        final String streamId = "57f3d721a43c2d59cb750001";
+        stream1.setIndexSetId(streamId);
 
-        when(streamService.loadAll()).thenReturn(Collections.singletonList(stream1));
+        when(streamService.loadAllWithIndexSet(streamId)).thenReturn(Collections.singletonList(stream1));
 
-        final int deletedEntries = indexSetService.delete("57f3d721a43c2d59cb750001");
+        final int deletedEntries = indexSetService.delete(streamId);
         assertThat(deletedEntries).isEqualTo(0);
-        assertThat(indexSetService.get("57f3d721a43c2d59cb750001")).isPresent();
+        assertThat(indexSetService.get(streamId)).isPresent();
         assertThat(indexSetService.findAll()).hasSize(2);
 
         assertThat(subscriber.getEvents()).isEmpty();
