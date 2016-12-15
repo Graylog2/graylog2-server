@@ -42,7 +42,6 @@ const SizeBasedRotationStrategyConfiguration = React.createClass({
                  help="Maximum size of an index before it gets rotated"
                  addonAfter={this._formatSize()}
                  standalone
-                 autoFocus
                  required />
         </fieldset>
       </div>

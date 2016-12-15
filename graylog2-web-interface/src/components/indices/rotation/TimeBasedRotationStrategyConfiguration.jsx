@@ -64,7 +64,6 @@ const TimeBasedRotationStrategyConfiguration = React.createClass({
                addonAfter={this._formatDuration()}
                bsStyle={this._validationState()}
                standalone
-               autofocus
                required />
       </div>
     );
