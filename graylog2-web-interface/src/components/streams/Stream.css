@@ -1,0 +1,5 @@
+:local(.streamTitle) .label {
+    line-height: 2;
+    margin-left: 5px;
+    vertical-align: bottom;
+}

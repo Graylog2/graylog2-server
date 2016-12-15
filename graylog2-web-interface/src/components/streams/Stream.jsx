@@ -16,6 +16,8 @@ import { Button, Tooltip } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 
+import style from './Stream.css';
+
 const Stream = React.createClass({
   propTypes() {
     return {
@@ -170,7 +172,16 @@ const Stream = React.createClass({
 
     return (
       <li className="stream">
-        <h2>
+        <div className="stream-actions pull-right">
+          {editRulesLink}{' '}
+          {manageOutputsLink}{' '}
+          {manageAlertsLink}{' '}
+          {toggleStreamLink}{' '}
+
+          {streamControls}
+        </div>
+
+        <h2 className={style.streamTitle}>
           <LinkContainer to={Routes.stream_search(stream.id)}>
             <a>{stream.title}</a>
           </LinkContainer>
@@ -179,14 +190,6 @@ const Stream = React.createClass({
         </h2>
 
         <div className="stream-data">
-          <div className="stream-actions pull-right">
-            {editRulesLink}{' '}
-            {manageOutputsLink}{' '}
-            {manageAlertsLink}{' '}
-            {toggleStreamLink}{' '}
-
-            {streamControls}
-          </div>
           <div className="stream-description">
             {createdFromContentPack}
 
