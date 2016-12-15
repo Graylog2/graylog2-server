@@ -61,6 +61,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -195,6 +196,21 @@ public class IndexSetsResource extends RestResource {
         final IndexSetConfig savedObject = indexSetService.save(updateRequest.toIndexSetConfig(oldConfig));
 
         return IndexSetSummary.fromIndexSetConfig(savedObject);
+    }
+
+    @PUT
+    @Path("{id}/default")
+    @Timed
+    @ApiOperation(value = "Set default index set")
+    @AuditEvent(type = AuditEventTypes.INDEX_SET_UPDATE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized"),
+    })
+    public IndexSetResponse setDefault(@ApiParam(name = "id", required = true)
+                                      @PathParam("id") String id) {
+        checkPermission(RestPermissions.INDEXSETS_EDIT, id);
+
+        return IndexSetResponse.create(0, Collections.emptyList());
     }
 
     @DELETE
