@@ -88,6 +88,7 @@ const ApiRoutes = {
     get: (indexSetId) => { return { url: `/system/indices/index_sets/${indexSetId}` }; },
     create: () => { return { url: '/system/indices/index_sets' }; },
     delete: (indexSetId, deleteIndices) => { return { url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}` }; },
+    setDefault: (indexSetId) => { return { url: `/system/indices/index_sets/${indexSetId}/default` }; },
   },
   IndicesApiController: {
     close: (indexName) => { return { url: `/system/indexer/indices/${indexName}/close` }; },

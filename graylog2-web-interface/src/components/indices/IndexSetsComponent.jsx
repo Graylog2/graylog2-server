@@ -20,13 +20,27 @@ const IndexSetsComponent = React.createClass({
   },
 
   loadData(pageNo, limit) {
+    this.currentPageNo = pageNo;
+    this.currentPageSize = limit;
     IndexSetsActions.listPaginated((pageNo - 1) * limit, limit);
   },
+
+  // Stores the current page and page size to be able to reload the current page
+  currentPageNo: 1,
+  currentPageSize: 10,
 
   PAGE_SIZE: 10,
 
   _onChangePaginatedList(page, size) {
     this.loadData(page, size);
+  },
+
+  _onSetDefault(indexSet) {
+    return (e) => {
+      e.preventDefault();
+
+      IndexSetsActions.setDefault(indexSet).then(() => this.loadData(this.currentPageNo, this.currentPageSize));
+    };
   },
 
   _onDelete(indexSet) {
@@ -51,6 +65,8 @@ const IndexSetsComponent = React.createClass({
         </LinkContainer>
         {' '}
         <DropdownButton title="More Actions" id={`index-set-dropdown-${indexSet.id}`} pullRight>
+          <MenuItem onSelect={this._onSetDefault(indexSet)}>Set as default</MenuItem>
+          <MenuItem divider />
           <MenuItem onSelect={this._onDelete(indexSet)}>Delete</MenuItem>
         </DropdownButton>
       </div>
