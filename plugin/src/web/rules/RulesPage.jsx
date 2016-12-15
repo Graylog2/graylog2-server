@@ -27,7 +27,7 @@ const RulesPage = React.createClass({
     return (
       <DocumentTitle title="Pipeline rules">
         <span>
-          <PageHeader title="Pipeline Rules" experimental>
+          <PageHeader title="Pipeline Rules">
             <span>
               Rules are a way of applying changes to messages in Graylog. A rule consists of a condition and a list of actions.
               Graylog evaluates the condition against a message and executes the actions if the condition is satisfied.

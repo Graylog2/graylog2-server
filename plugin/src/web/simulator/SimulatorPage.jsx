@@ -40,7 +40,7 @@ const SimulatorPage = React.createClass({
     return (
       <DocumentTitle title="Simulate processing">
         <div>
-          <PageHeader title="Simulate processing" experimental>
+          <PageHeader title="Simulate processing">
             <span>
               Processing messages can be complex. Use this page to simulate the result of processing an incoming
               message using your current set of pipelines and rules.
