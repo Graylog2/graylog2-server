@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
+import Promise from 'bluebird';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
@@ -16,27 +17,44 @@ const AlertsComponent = React.createClass({
   getInitialState() {
     return {
       displayAllAlerts: false,
+      loading: false,
     };
   },
 
   componentDidMount() {
-    this.loadData(1, 10);
+    this.loadData(this.currentPage, this.pageSize);
   },
 
+  currentPage: 1,
+  pageSize: 10,
+
   loadData(pageNo, limit) {
-    AlertsActions.listAllPaginated((pageNo - 1) * limit, limit, this.state.displayAllAlerts ? 'all' : 'unresolved');
-    AlertConditionsActions.listAll();
-    AlertConditionsActions.available();
-    StreamsStore.listStreams().then((streams) => {
-      this.setState({ streams: streams });
-    });
+    this.setState({ loading: true });
+    const promises = [
+      AlertsActions.listAllPaginated((pageNo - 1) * limit, limit, this.state.displayAllAlerts ? 'all' : 'unresolved'),
+      AlertConditionsActions.listAll(),
+      AlertConditionsActions.available(),
+      StreamsStore.listStreams().then((streams) => {
+        this.setState({ streams: streams });
+      }),
+    ];
+
+    Promise.all(promises).finally(() => this.setState({ loading: false }));
+  },
+
+  _refreshData() {
+    this.loadData(this.currentPage, this.pageSize);
   },
 
   _onToggleAllAlerts() {
-    this.setState({ displayAllAlerts: !this.state.displayAllAlerts }, () => this.loadData(1, 10));
+    this.currentPage = 1;
+    this.pageSize = 10;
+    this.setState({ displayAllAlerts: !this.state.displayAllAlerts }, () => this.loadData(this.currentPage, this.pageSize));
   },
 
   _onChangePaginatedList(page, size) {
+    this.currentPage = page;
+    this.pageSize = size;
     this.loadData(page, size);
   },
 
@@ -59,17 +77,21 @@ const AlertsComponent = React.createClass({
     return (
       <div>
         <div className="pull-right">
+          <Button bsStyle="info" onClick={this._refreshData} disabled={this.state.loading}>
+            {this.state.loading ? 'Refreshing...' : 'Refresh'}
+          </Button>
+          &nbsp;
           <Button bsStyle="info" onClick={this._onToggleAllAlerts}>
             Show {this.state.displayAllAlerts ? 'unresolved' : 'all'} alerts
           </Button>
         </div>
-        <h2>Alerts</h2>
-        <p>
+        <h2>{this.state.displayAllAlerts ? 'Alerts' : 'Unresolved alerts'}</h2>
+        <p className="description">
           Check your alerts status from here. Currently displaying{' '}
-          <b>{this.state.displayAllAlerts ? 'all' : 'unresolved'}</b> alerts.
+          {this.state.displayAllAlerts ? 'all' : 'unresolved'} alerts.
         </p>
 
-        <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}
+        <PaginatedList totalItems={this.state.alerts.total} pageSize={this.pageSize} onChange={this._onChangePaginatedList}
                        showPageSizeSelect={false}>
           <EntityList bsNoItemsStyle={this.state.displayAllAlerts ? 'info' : 'success'}
                       noItemsText={this.state.displayAllAlerts ? 'There are no alerts to display' : 'Good news! Currently there are no unresolved alerts.'}
