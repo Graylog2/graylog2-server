@@ -98,19 +98,20 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public abstract ZonedDateTime creationDate();
 
     @JsonProperty("index_analyzer")
-    @NotBlank
+    @Nullable
     public abstract String indexAnalyzer();
 
     @JsonProperty("index_template_name")
-    @NotBlank
+    @Nullable
     public abstract String indexTemplateName();
 
     @JsonProperty("index_optimization_max_num_segments")
-    @Min(1L)
-    public abstract int indexOptimizationMaxNumSegments();
+    @Nullable
+    public abstract Integer indexOptimizationMaxNumSegments();
 
     @JsonProperty("index_optimization_disabled")
-    public abstract boolean indexOptimizationDisabled();
+    @Nullable
+    public abstract Boolean indexOptimizationDisabled();
 
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
@@ -127,10 +128,10 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("retention_strategy_class") @Nullable String retentionStrategyClass,
                                         @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
                                         @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate,
-                                        @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
-                                        @JsonProperty("index_template_name") @NotBlank String indexTemplateName,
-                                        @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
-                                        @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled) {
+                                        @JsonProperty("index_analyzer") @Nullable String indexAnalyzer,
+                                        @JsonProperty("index_template_name") @Nullable String indexTemplateName,
+                                        @JsonProperty("index_optimization_max_num_segments") @Nullable Integer  maxNumSegments,
+                                        @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled) {
         return AutoValue_IndexSetConfig.builder()
                 .id(id)
                 .title(title)
@@ -148,8 +149,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .creationDate(creationDate)
                 .indexAnalyzer(indexAnalyzer)
                 .indexTemplateName(indexTemplateName)
-                .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments)
-                .indexOptimizationDisabled(indexOptimizationDisabled)
+                .indexOptimizationMaxNumSegments(maxNumSegments == null ? 1 : maxNumSegments)
+                .indexOptimizationDisabled(indexOptimizationDisabled == null ? false : indexOptimizationDisabled)
                 .build();
     }
 
@@ -244,9 +245,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
         public abstract Builder indexTemplateName(String templateName);
 
-        public abstract Builder indexOptimizationMaxNumSegments(int indexOptimizationMaxNumSegments);
+        public abstract Builder indexOptimizationMaxNumSegments(Integer indexOptimizationMaxNumSegments);
 
-        public abstract Builder indexOptimizationDisabled(boolean indexOptimizationDisabled);
+        public abstract Builder indexOptimizationDisabled(Boolean indexOptimizationDisabled);
 
         public abstract IndexSetConfig build();
     }

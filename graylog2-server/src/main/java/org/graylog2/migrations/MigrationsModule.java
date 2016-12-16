@@ -32,5 +32,6 @@ public class MigrationsModule extends AbstractModule {
         binder.addBinding().to(V20161125161400_AlertReceiversMigration.class);
         binder.addBinding().to(V20161130141500_DefaultStreamRecalcIndexRanges.class);
         binder.addBinding().to(V20161215163900_MoveIndexSetDefaultConfig.class);
+        binder.addBinding().to(V20161216123500_DefaultIndexSetMigration.class);
     }
 }
