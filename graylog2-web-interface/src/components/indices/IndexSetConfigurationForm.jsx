@@ -22,6 +22,7 @@ const IndexSetConfigurationForm = React.createClass({
   getInitialState() {
     return {
       indexSet: this.props.indexSet,
+      validationErrors: {},
     };
   },
 
@@ -31,12 +32,43 @@ const IndexSetConfigurationForm = React.createClass({
     this.setState({ indexSet: config });
   },
 
+  _validateIndexPrefix(event) {
+    const value = event.target.value;
+
+    if (value.match(/^[A-Za-z0-9][A-Za-z0-9_\-+]*$/)) {
+      if (this.state.validationErrors[event.target.name]) {
+        const nextValidationErrors = Object.assign({}, this.state.validationErrors);
+        delete nextValidationErrors[event.target.name];
+        this.setState({ validationErrors: nextValidationErrors });
+      }
+    } else {
+      const nextValidationErrors = Object.assign({}, this.state.validationErrors);
+      if (value.length === 0) {
+        nextValidationErrors[event.target.name] = 'Invalid index prefix: cannot be empty';
+      } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
+        nextValidationErrors[event.target.name] = 'Invalid index prefix: must start with a letter or number';
+      } else {
+        nextValidationErrors[event.target.name] = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
+      }
+      this.setState({ validationErrors: nextValidationErrors });
+    }
+
+    this._onInputChange(event);
+  },
+
   _onInputChange(event) {
     this._updateConfig(event.target.name, event.target.value);
   },
 
   _saveConfiguration(event) {
     event.preventDefault();
+
+    const invalidFields = Object.keys(this.state.validationErrors);
+    if (invalidFields.length !== 0) {
+      document.getElementsByName(invalidFields[0])[0].focus();
+      return;
+    }
+
     this.props.onUpdate(this.state.indexSet);
   },
 
@@ -52,6 +84,7 @@ const IndexSetConfigurationForm = React.createClass({
 
   render() {
     const indexSet = this.props.indexSet;
+    const validationErrors = this.state.validationErrors;
 
     let rotationConfig;
     if (this.props.rotationStrategies) {
@@ -91,15 +124,22 @@ const IndexSetConfigurationForm = React.createClass({
 
     let readOnlyconfig;
     if (this.props.create) {
+      const indexPrefixHelp = (
+        <span>
+          A <strong>unique</strong> prefix used in Elasticsearch indices belonging to this index set.
+          The prefix must start with a letter or number, and can only contain letters, numbers, '_', '-' and '+'.
+        </span>
+      );
       readOnlyconfig = (
         <span>
           <Input type="text"
                  id="index-set-index-prefix"
                  label="Index prefix"
                  name="index_prefix"
-                 onChange={this._onInputChange}
+                 onChange={this._validateIndexPrefix}
                  value={indexSet.index_prefix}
-                 help="The prefix for all indices in this index set."
+                 help={validationErrors.index_prefix ? validationErrors.index_prefix : indexPrefixHelp}
+                 bsStyle={validationErrors.index_prefix ? 'error' : null}
                  required />
           <Input type="number"
                  id="index-set-shards"
@@ -107,7 +147,7 @@ const IndexSetConfigurationForm = React.createClass({
                  name="shards"
                  onChange={this._onInputChange}
                  value={indexSet.shards}
-                 help="Number of shards per index."
+                 help="Number of Elasticsearch shards used per index in this index set."
                  required />
           <Input type="number"
                  id="index-set-replicas"
@@ -115,7 +155,7 @@ const IndexSetConfigurationForm = React.createClass({
                  name="replicas"
                  onChange={this._onInputChange}
                  value={indexSet.replicas}
-                 help="Number of replicas per index."
+                 help="Number of Elasticsearch replicas used per index in this index set."
                  required />
         </span>
       );
@@ -142,7 +182,7 @@ const IndexSetConfigurationForm = React.createClass({
                        name="description"
                        onChange={this._onInputChange}
                        value={indexSet.description}
-                       help="Description of the index set."
+                       help="Add a description of this index set."
                        required />
                 {readOnlyconfig}
               </Col>
