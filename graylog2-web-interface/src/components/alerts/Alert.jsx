@@ -1,11 +1,13 @@
 import React from 'react';
-import { Button, Col, Label } from 'react-bootstrap';
+import { Col, Label } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { EntityListItem, Timestamp } from 'components/common';
 
 import Routes from 'routing/Routes';
 import DateTime from 'logic/datetimes/DateTime';
+
+import styles from './Alert.css';
 
 const Alert = React.createClass({
   propTypes: {
@@ -29,9 +31,18 @@ const Alert = React.createClass({
 
     let alertTitle;
     if (condition) {
-      alertTitle = <span>{condition.title} <small>on stream <em>{stream.title}</em></small></span>;
+      alertTitle = (
+        <span>
+          <LinkContainer to={Routes.show_alert(alert.id)}><a>{condition.title}</a></LinkContainer>{' '}
+          <small>on stream <em>{stream.title}</em></small>
+        </span>
+      );
     } else {
-      alertTitle = <span><em>Unknown alert</em></span>;
+      alertTitle = (
+        <span>
+          <LinkContainer to={Routes.show_alert(alert.id)}><a><em>Unknown alert</em></a></LinkContainer>
+        </span>
+      );
     }
 
     let statusBadge;
@@ -46,7 +57,9 @@ const Alert = React.createClass({
       alertTime = (
         <span>
           Triggered at {alertTime},&nbsp;
-          {alert.resolved_at ? <span>resolved at <Timestamp dateTime={alert.resolved_at} format={DateTime.Formats.DATETIME} /></span> : 'still ongoing'}
+          {alert.resolved_at ?
+            <span>resolved at <Timestamp dateTime={alert.resolved_at} format={DateTime.Formats.DATETIME} />.</span> :
+            <span><strong>still ongoing</strong>.</span>}
         </span>
       );
     } else {
@@ -57,18 +70,14 @@ const Alert = React.createClass({
       );
     }
 
-    const actions = (
-      <LinkContainer to={Routes.show_alert(alert.id)}>
-        <Button bsStyle="info">Show details</Button>
-      </LinkContainer>
-    );
-
     const content = (
       <Col md={12}>
-        <ul className="no-padding">
-          <li><b>Reason:</b> {alert.description}</li>
-          <li><b>Alert type:</b> {conditionType.name || 'Unknown type. This usually means that the alert condition was deleted since the alert was triggered.'}</li>
-        </ul>
+        <dl className={`dl-horizontal ${styles.alertDescription}`}>
+          <dt>Reason:</dt>
+          <dd>{alert.description}</dd>
+          <dt>Type:</dt>
+          <dd>{conditionType.name || 'Unknown type. This usually means that the alert condition was deleted since the alert was triggered.'}</dd>
+        </dl>
       </Col>
     );
 
@@ -77,7 +86,6 @@ const Alert = React.createClass({
                       title={alertTitle}
                       titleSuffix={statusBadge}
                       description={alertTime}
-                      actions={actions}
                       contentRow={content} />
     );
   },

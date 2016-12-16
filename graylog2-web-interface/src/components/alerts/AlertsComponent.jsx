@@ -63,10 +63,10 @@ const AlertsComponent = React.createClass({
             Show {this.state.displayAllAlerts ? 'unresolved' : 'all'} alerts
           </Button>
         </div>
-        <h2>Alerts</h2>
-        <p>
+        <h2>{this.state.displayAllAlerts ? 'Alerts' : 'Unresolved alerts'}</h2>
+        <p className="description">
           Check your alerts status from here. Currently displaying{' '}
-          <b>{this.state.displayAllAlerts ? 'all' : 'unresolved'}</b> alerts.
+          {this.state.displayAllAlerts ? 'all' : 'unresolved'} alerts.
         </p>
 
         <PaginatedList totalItems={this.state.alerts.total} onChange={this._onChangePaginatedList}
