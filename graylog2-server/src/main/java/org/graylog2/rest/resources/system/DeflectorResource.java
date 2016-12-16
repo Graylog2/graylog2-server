@@ -39,7 +39,6 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -70,9 +69,7 @@ public class DeflectorResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Deprecated
     public DeflectorSummary deprecatedDeflector() throws TooManyAliasesException {
-        final IndexSet indexSet = indexSetRegistry.getDefault()
-                .orElseThrow(() -> new NotFoundException("Default index set not found"));
-
+        final IndexSet indexSet = indexSetRegistry.getDefault();
         return DeflectorSummary.create(indexSet.isUp(), indexSet.getCurrentActualTargetIndex());
     }
 
@@ -97,12 +94,11 @@ public class DeflectorResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ES_WRITE_INDEX_UPDATE_JOB_START)
     @Deprecated
     public void deprecatedCycle() {
-        final IndexSet indexSet = indexSetRegistry.getDefault()
-                .orElseThrow(() -> new NotFoundException("Default index set not found"));
+        final IndexSet indexSet = indexSetRegistry.getDefault();
 
         checkCycle(indexSet);
 
-        final String msg = "Cycling deflector for default index set <" + indexSet.getConfig().id()  + ">. Reason: REST request.";
+        final String msg = "Cycling deflector for default index set <" + indexSet.getConfig().id() + ">. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, DeflectorResource.class));
 

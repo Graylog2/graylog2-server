@@ -24,6 +24,7 @@ import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
+import org.graylog2.cluster.ClusterConfigServiceImpl;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
@@ -32,7 +33,10 @@ import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
+import org.graylog2.plugin.cluster.ClusterConfigService;
+import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
+import org.graylog2.shared.plugins.ChainingClassLoader;
 import org.graylog2.streams.StreamService;
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -52,7 +56,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class MongoIndexSetServiceTest {
@@ -70,14 +73,19 @@ public class MongoIndexSetServiceTest {
 
     private ClusterEventBus clusterEventBus;
     private MongoIndexSetService indexSetService;
+    private ClusterConfigService clusterConfigService;
 
     @Mock
     private StreamService streamService;
+    @Mock
+    private NodeId nodeId;
 
     @Before
     public void setUp() throws Exception {
         clusterEventBus = new ClusterEventBus();
-        indexSetService = new MongoIndexSetService(mongoRule.getMongoConnection(), objectMapperProvider, streamService, clusterEventBus);
+        clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongoRule.getMongoConnection(),
+                nodeId, objectMapper, new ChainingClassLoader(getClass().getClassLoader()), clusterEventBus);
+        indexSetService = new MongoIndexSetService(mongoRule.getMongoConnection(), objectMapperProvider, streamService, clusterConfigService, clusterEventBus);
     }
 
     @Test
@@ -91,7 +99,6 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750001",
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
-                                true,
                                 true,
                                 "test_1",
                                 4,
@@ -117,7 +124,6 @@ public class MongoIndexSetServiceTest {
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
                                 true,
-                                true,
                                 "test_1",
                                 4,
                                 1,
@@ -138,16 +144,24 @@ public class MongoIndexSetServiceTest {
     }
 
     @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void getDefault() throws Exception {
+        clusterConfigService.write(DefaultIndexSetConfig.create("57f3d721a43c2d59cb750002"));
+
+        final IndexSetConfig indexSetConfig = indexSetService.getDefault();
+
+        assertThat(indexSetConfig).isNotNull();
+        assertThat(indexSetConfig.id()).isEqualTo("57f3d721a43c2d59cb750002");
+    }
+
+    @Test(expected = IllegalStateException.class)
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void getDefaultWithoutDefault() throws Exception {
+        indexSetService.getDefault();
+    }
+
+    @Test
     public void findOne() throws Exception {
-        final Optional<IndexSetConfig> config1 = indexSetService.findOne(DBQuery.is("default", true));
-
-        assertThat(config1).isPresent();
-        assertThat(config1.get().id()).isEqualTo("57f3d721a43c2d59cb750001");
-
-        final Optional<IndexSetConfig> config2 = indexSetService.findOne(DBQuery.is("default", false));
-        assertThat(config2).isPresent();
-        assertThat(config2.get().id()).isEqualTo("57f3d721a43c2d59cb750002");
-
         final Optional<IndexSetConfig> config3 = indexSetService.findOne(DBQuery.is("title", "Test 2"));
         assertThat(config3).isPresent();
         assertThat(config3.get().id()).isEqualTo("57f3d721a43c2d59cb750002");
@@ -170,7 +184,6 @@ public class MongoIndexSetServiceTest {
                                 "Test 1",
                                 "This is the index set configuration for Test 1",
                                 true,
-                                true,
                                 "test_1",
                                 4,
                                 1,
@@ -184,7 +197,6 @@ public class MongoIndexSetServiceTest {
                                 "57f3d721a43c2d59cb750002",
                                 "Test 2",
                                 null,
-                                false,
                                 true,
                                 "test_2",
                                 1,
@@ -206,7 +218,6 @@ public class MongoIndexSetServiceTest {
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "Test 3",
                 null,
-                true,
                 true,
                 "test_3",
                 10,

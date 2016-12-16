@@ -456,8 +456,7 @@ public class BundleImporter {
             throws ValidationException {
 
         // We cannot create streams without having a default index set.
-        final IndexSet indexSet = indexSetRegistry.getDefault()
-                .orElseThrow(() -> new IllegalStateException("Couldn't find default stream!"));
+        final IndexSet indexSet = indexSetRegistry.getDefault();
 
         final ImmutableMap.Builder<String, Object> streamData = ImmutableMap.builder();
         streamData.put(StreamImpl.FIELD_TITLE, streamDescription.getTitle());

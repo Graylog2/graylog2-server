@@ -105,6 +105,21 @@ const IndexSetsStore = Reflux.createStore({
     IndexSetsActions.delete.promise(promise);
   },
 
+  setDefault(indexSet) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.setDefault(indexSet.id).url);
+    const promise = fetch('PUT', url);
+    promise.then(
+      () => {
+        UserNotification.success(`Successfully set index set '${indexSet.title}' as default`, 'Success');
+      },
+      error => {
+        UserNotification.error(`Setting index set '${indexSet.title}' as default failed with status: ${this._errorMessage(error)}`, 'Could not set default index set.');
+      }
+    );
+
+    IndexSetsActions.setDefault.promise(promise);
+  },
+
   _errorMessage(error) {
     try {
       return error.additional.body.message;

@@ -48,9 +48,11 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
     /**
      * Returns the {@link IndexSet} that is marked as default.
      *
+     * Throws an {@link IllegalStateException} if the default index set does not exist.
+     *
      * @return the default index set
      */
-    Optional<IndexSet> getDefault();
+    IndexSet getDefault();
 
     /**
      * Returns a list with the names of all managed indices.

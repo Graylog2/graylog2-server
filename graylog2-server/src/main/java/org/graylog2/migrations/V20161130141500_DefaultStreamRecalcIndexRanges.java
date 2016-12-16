@@ -26,13 +26,11 @@ import org.graylog2.indexer.ranges.IndexRangeService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
-
-import javax.inject.Inject;
 
 public class V20161130141500_DefaultStreamRecalcIndexRanges extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20161130141500_DefaultStreamRecalcIndexRanges.class);
@@ -60,14 +58,7 @@ public class V20161130141500_DefaultStreamRecalcIndexRanges extends Migration {
 
     @Override
     public void upgrade() {
-        final Optional<IndexSet> optDefaultIndexSet = indexSetRegistry.getAllIndexSets().stream()
-                .filter(indexSet -> indexSet.getConfig().isDefault())
-                .findFirst();
-        if (!optDefaultIndexSet.isPresent()) {
-            LOG.error("No default index set found, this should not happen. Unable to assign streams to older indices");
-            return;
-        }
-        final IndexSet defaultIndexSet = optDefaultIndexSet.get();
+        final IndexSet defaultIndexSet = indexSetRegistry.getDefault();
 
         if (!cluster.isConnected()) {
             LOG.info("Cluster not connected yet, delaying migration until it is reachable.");

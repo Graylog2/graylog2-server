@@ -30,9 +30,11 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
+import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
@@ -79,6 +81,7 @@ public class IndexSetsResource extends RestResource {
     private final IndexSetRegistry indexSetRegistry;
     private final IndexSetValidator indexSetValidator;
     private final IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
+    private final ClusterConfigService clusterConfigService;
     private final SystemJobManager systemJobManager;
 
     @Inject
@@ -86,11 +89,13 @@ public class IndexSetsResource extends RestResource {
                              final IndexSetRegistry indexSetRegistry,
                              final IndexSetValidator indexSetValidator,
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
+                             final ClusterConfigService clusterConfigService,
                              final SystemJobManager systemJobManager) {
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
         this.indexSetValidator = indexSetValidator;
         this.indexSetCleanupJobFactory = requireNonNull(indexSetCleanupJobFactory);
+        this.clusterConfigService = clusterConfigService;
         this.systemJobManager = systemJobManager;
     }
 
@@ -104,6 +109,8 @@ public class IndexSetsResource extends RestResource {
                                  @QueryParam("skip") @DefaultValue("0") int skip,
                                  @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
                                  @QueryParam("limit") @DefaultValue("0") int limit) {
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
+
         List<IndexSetSummary> indexSets;
         int count;
 
@@ -115,13 +122,13 @@ public class IndexSetsResource extends RestResource {
                     .collect(Collectors.toSet());
 
             indexSets = indexSetService.findPaginated(allowedIds, limit, skip).stream()
-                    .map(IndexSetSummary::fromIndexSetConfig)
+                    .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
                     .collect(Collectors.toList());
             count = allowedIds.size();
         } else {
             indexSets = indexSetService.findAll().stream()
                     .filter(indexSetConfig -> isPermitted(RestPermissions.INDEXSETS_READ, indexSetConfig.id()))
-                    .map(IndexSetSummary::fromIndexSetConfig)
+                    .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
                     .collect(Collectors.toList());
             count = indexSets.size();
         }
@@ -140,8 +147,9 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary get(@ApiParam(name = "id", required = true)
                                @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         return indexSetService.get(id)
-                .map(IndexSetSummary::fromIndexSetConfig)
+                .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
                 .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
     }
 
@@ -165,7 +173,8 @@ public class IndexSetsResource extends RestResource {
             }
 
             final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
-            return IndexSetSummary.fromIndexSetConfig(savedObject);
+            final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
+            return IndexSetSummary.fromIndexSetConfig(savedObject, savedObject.equals(defaultIndexSet));
         } catch (DuplicateKeyException e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -193,8 +202,31 @@ public class IndexSetsResource extends RestResource {
                 .orElseThrow(() -> new NotFoundException("Index set <" + id + "> not found"));
 
         final IndexSetConfig savedObject = indexSetService.save(updateRequest.toIndexSetConfig(oldConfig));
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
 
-        return IndexSetSummary.fromIndexSetConfig(savedObject);
+        return IndexSetSummary.fromIndexSetConfig(savedObject, savedObject.equals(defaultIndexSet));
+    }
+
+    @PUT
+    @Path("{id}/default")
+    @Timed
+    @ApiOperation(value = "Set default index set")
+    @AuditEvent(type = AuditEventTypes.INDEX_SET_UPDATE)
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized"),
+    })
+    public IndexSetSummary setDefault(@ApiParam(name = "id", required = true)
+                                      @PathParam("id") String id) {
+        checkPermission(RestPermissions.INDEXSETS_EDIT, id);
+
+        final IndexSetConfig indexSet = indexSetService.get(id)
+                .orElseThrow(() -> new NotFoundException("Index set <" + id + "> does not exist"));
+
+        clusterConfigService.write(DefaultIndexSetConfig.create(indexSet.id()));
+
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
+
+        return IndexSetSummary.fromIndexSetConfig(indexSet, indexSet.equals(defaultIndexSet));
     }
 
     @DELETE
@@ -213,8 +245,9 @@ public class IndexSetsResource extends RestResource {
         checkPermission(RestPermissions.INDEXSETS_DELETE, id);
 
         final IndexSet indexSet = getIndexSet(indexSetRegistry, id);
+        final IndexSet defaultIndexSet = indexSetRegistry.getDefault();
 
-        if (indexSet.getConfig().isDefault()) {
+        if (indexSet.equals(defaultIndexSet)) {
             throw new BadRequestException("Default index set <" + indexSet.getConfig().id() + "> cannot be deleted!");
         }
 

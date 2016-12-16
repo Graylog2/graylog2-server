@@ -102,12 +102,12 @@ public abstract class IndexSetSummary {
         return new AutoValue_IndexSetSummary(id, title, description, isDefault, isWritable, indexPrefix, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
     }
 
-    public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet) {
+    public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
         return create(
                 indexSet.id(),
                 indexSet.title(),
                 indexSet.description(),
-                indexSet.isDefault(),
+                isDefault,
                 indexSet.isWritable(),
                 indexSet.indexPrefix(),
                 indexSet.shards(),
@@ -121,19 +121,19 @@ public abstract class IndexSetSummary {
     }
 
     public IndexSetConfig toIndexSetConfig() {
-        return IndexSetConfig.create(
-                id(),
-                title(),
-                description(),
-                isDefault(),
-                isWritable(),
-                indexPrefix(),
-                shards(),
-                replicas(),
-                rotationStrategyClass(),
-                rotationStrategy(),
-                retentionStrategyClass(),
-                retentionStrategy(),
-                creationDate());
+        return IndexSetConfig.builder()
+                .id(id())
+                .title(title())
+                .description(description())
+                .isWritable(isWritable())
+                .indexPrefix(indexPrefix())
+                .shards(shards())
+                .replicas(replicas())
+                .rotationStrategyClass(rotationStrategyClass())
+                .rotationStrategy(rotationStrategy())
+                .retentionStrategyClass(retentionStrategyClass())
+                .retentionStrategy(retentionStrategy())
+                .creationDate(creationDate())
+                .build();
     }
 }
