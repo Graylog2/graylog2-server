@@ -62,7 +62,10 @@ const IndexSetConfigurationPage = React.createClass({
       <DocumentTitle title="Configure Index Set">
         <div>
           <PageHeader title="Configure Index Set">
-            <span>{/* TODO 2.2: Add description */}</span>
+            <span>
+              Modify the current configuration for this index set, allowing you to customize the retention, sharding,
+              and replication of messages coming from one or more streams.
+            </span>
             <span>
               You can learn more about the index model in the{' '}
               <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />

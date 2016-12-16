@@ -71,14 +71,18 @@ const IndexSetsComponent = React.createClass({
     );
 
     const isDefault = indexSet.default ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';
+    let description = indexSet.description;
+    if (indexSet.default) {
+      description += `${description.endsWith('.') ? '' : '.'} Graylog will use this index set by default.`;
+    }
 
     return (
       <EntityListItem key={`index-set-${indexSet.id}`}
-                    title={indexSetTitle}
-                    titleSuffix={isDefault}
-                    description={indexSet.description}
-                    actions={actions}
-                    contentRow={content} />
+                      title={indexSetTitle}
+                      titleSuffix={isDefault}
+                      description={description}
+                      actions={actions}
+                      contentRow={content} />
     );
   },
 
