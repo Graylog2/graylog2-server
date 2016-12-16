@@ -14,6 +14,7 @@ export { default as LinkToNode } from './LinkToNode';
 export { default as LoadingIndicator } from './LoadingIndicator';
 export { default as KeyValueTable } from './KeyValueTable';
 export { default as MultiSelect } from './MultiSelect';
+export { default as OverlayElement } from './OverlayElement';
 export { default as Page } from './Page';
 export { default as PageErrorOverview } from './PageErrorOverview';
 export { default as PageHeader } from './PageHeader';

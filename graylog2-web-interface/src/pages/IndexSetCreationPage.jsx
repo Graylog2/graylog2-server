@@ -74,14 +74,17 @@ const IndexSetCreationPage = React.createClass({
       <DocumentTitle title="Create Index Set">
         <div>
           <PageHeader title="Create Index Set">
-            <span>{/* TODO 2.2: Add description */}</span>
+            <span>
+              Create a new index set that will let you configure the retention, sharding, and replication of messages
+              coming from one or more streams.
+            </span>
             <span>
               You can learn more about the index model in the{' '}
               <DocumentationLink page={DocsHelper.PAGES.INDEX_MODEL} text="documentation" />
             </span>
             <span>
               <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                <Button bsStyle="info">Overview</Button>
+                <Button bsStyle="info">Index sets overview</Button>
               </LinkContainer>
             </span>
           </PageHeader>

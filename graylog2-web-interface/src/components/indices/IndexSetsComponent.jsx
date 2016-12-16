@@ -46,15 +46,11 @@ const IndexSetsComponent = React.createClass({
   _formatIndexSet(indexSet) {
     const actions = (
       <div>
-        <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
-          <Button bsStyle="info">Show Details</Button>
+        <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id)}>
+          <Button bsStyle="info">Edit</Button>
         </LinkContainer>
         {' '}
         <DropdownButton title="More Actions" id={`index-set-dropdown-${indexSet.id}`} pullRight>
-          <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id)}>
-            <MenuItem>Edit</MenuItem>
-          </LinkContainer>
-          <MenuItem divider />
           <MenuItem onSelect={this._onDelete(indexSet)}>Delete</MenuItem>
         </DropdownButton>
       </div>
@@ -68,15 +64,25 @@ const IndexSetsComponent = React.createClass({
       </Col>
     );
 
+    const indexSetTitle = (
+      <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
+        <a>{indexSet.title}</a>
+      </LinkContainer>
+    );
+
     const isDefault = indexSet.default ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';
+    let description = indexSet.description;
+    if (indexSet.default) {
+      description += `${description.endsWith('.') ? '' : '.'} Graylog will use this index set by default.`;
+    }
 
     return (
       <EntityListItem key={`index-set-${indexSet.id}`}
-                    title={indexSet.title}
-                    titleSuffix={isDefault}
-                    description={indexSet.description}
-                    actions={actions}
-                    contentRow={content} />
+                      title={indexSetTitle}
+                      titleSuffix={isDefault}
+                      description={description}
+                      actions={actions}
+                      contentRow={content} />
     );
   },
 

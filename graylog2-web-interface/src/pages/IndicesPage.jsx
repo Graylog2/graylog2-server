@@ -14,8 +14,9 @@ const IndicesPage = React.createClass({
     const pageHeader = (
       <PageHeader title="Indices & Index Sets">
         <span>
-          This is an overview of all indices (message stores) Graylog is currently taking in account
-          for searches and analysis.
+          A Graylog stream write messages to an index set, which is a configuration for retention, sharding, and
+          replication of the stored data.
+          By configuring index sets, you could, for example, have different retention times for certain streams.
         </span>
 
         <span>

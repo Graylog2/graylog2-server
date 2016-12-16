@@ -106,11 +106,11 @@ const IndexSetPage = React.createClass({
 
         <span>
           <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-            <Button bsStyle="info" bsSize="lg">Index set overview</Button>
+            <Button bsStyle="info">Index sets overview</Button>
           </LinkContainer>
           &nbsp;
           <LinkContainer to={Routes.SYSTEM.INDEX_SETS.CONFIGURATION(indexSet.id, 'details')}>
-            <Button bsStyle="info" bsSize="lg">Edit Index Set</Button>
+            <Button bsStyle="info">Edit Index Set</Button>
           </LinkContainer>
           &nbsp;
           <IndicesMaintenanceDropdown indexSetId={this.props.params.indexSetId} indexSet={this.state.indexSet} />

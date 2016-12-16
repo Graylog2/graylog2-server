@@ -23,14 +23,14 @@ const StreamsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(IndexSetsStore)],
   getInitialState() {
     return {
-      indexSets: [],
+      indexSets: undefined,
     };
   },
   componentDidMount() {
     IndexSetsActions.list();
   },
   _isLoading() {
-    return !this.state.currentUser;
+    return !this.state.currentUser || !this.state.indexSets;
   },
   _onSave(_, stream) {
     StreamsStore.save(stream, () => {
