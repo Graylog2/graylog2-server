@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkState;
 import static java.util.Objects.requireNonNull;
 
 public class MongoIndexSetService implements IndexSetService {
@@ -98,14 +99,14 @@ public class MongoIndexSetService implements IndexSetService {
     }
 
     @Override
-    public Optional<IndexSetConfig> getDefault() {
+    public IndexSetConfig getDefault() {
         final DefaultIndexSetConfig defaultIndexSetConfig = clusterConfigService.get(DefaultIndexSetConfig.class);
 
-        if (defaultIndexSetConfig == null) {
-            return Optional.empty();
-        }
+        checkState(defaultIndexSetConfig != null, "No default index set configured. This is a bug!");
 
-        return get(defaultIndexSetConfig.defaultIndexSetId());
+        final String indexSetId = defaultIndexSetConfig.defaultIndexSetId();
+        return get(indexSetId)
+                .orElseThrow(() -> new IllegalStateException("Couldn't find default index set <" + indexSetId + ">. This is a bug!"));
     }
 
     /**

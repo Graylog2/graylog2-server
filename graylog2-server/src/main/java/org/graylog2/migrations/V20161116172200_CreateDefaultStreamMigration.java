@@ -71,8 +71,7 @@ public class V20161116172200_CreateDefaultStreamMigration extends Migration {
     }
 
     private void createDefaultStream() {
-        final IndexSet indexSet = indexSetRegistry.getDefault()
-                .orElseThrow(() -> new IllegalStateException("Couldn't find default index set! This is a bug!"));
+        final IndexSet indexSet = indexSetRegistry.getDefault();
 
         final ObjectId id = new ObjectId(Stream.DEFAULT_STREAM_ID);
         final Map<String, Object> fields = ImmutableMap.<String, Object>builder()

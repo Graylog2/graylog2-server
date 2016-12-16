@@ -90,10 +90,11 @@ public class IndexerOverviewResource extends RestResource {
             throw new ServiceUnavailableException("Elasticsearch cluster is not available, check your configuration and logs for more information.");
         }
 
-        final IndexSet indexSet = indexSetRegistry.getDefault()
-                .orElseThrow(() -> new NotFoundException("Default index set not found"));
-
-        return getIndexerOverview(indexSet);
+        try {
+            return getIndexerOverview(indexSetRegistry.getDefault());
+        } catch (IllegalStateException e) {
+            throw new NotFoundException("Default index set not found");
+        }
     }
 
     @GET

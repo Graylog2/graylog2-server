@@ -40,9 +40,11 @@ public interface IndexSetService {
     /**
      * Retrieve the default index set.
      *
+     * Throws an {@link IllegalStateException} if the default index set does not exist.
+     *
      * @return A filled {@link Optional} with the default index set, an empty {@link Optional} if there is no default.
      */
-    Optional<IndexSetConfig> getDefault();
+    IndexSetConfig getDefault();
 
     /**
      * Retrieve an index set based on the given {@link DBQuery.Query}.

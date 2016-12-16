@@ -70,10 +70,12 @@ public class DeflectorResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @Deprecated
     public DeflectorSummary deprecatedDeflector() throws TooManyAliasesException {
-        final IndexSet indexSet = indexSetRegistry.getDefault()
-                .orElseThrow(() -> new NotFoundException("Default index set not found"));
-
-        return DeflectorSummary.create(indexSet.isUp(), indexSet.getCurrentActualTargetIndex());
+        try {
+            final IndexSet indexSet = indexSetRegistry.getDefault();
+            return DeflectorSummary.create(indexSet.isUp(), indexSet.getCurrentActualTargetIndex());
+        } catch (IllegalStateException e) {
+            throw new NotFoundException("Default index set not found");
+        }
     }
 
     @GET
@@ -97,16 +99,19 @@ public class DeflectorResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.ES_WRITE_INDEX_UPDATE_JOB_START)
     @Deprecated
     public void deprecatedCycle() {
-        final IndexSet indexSet = indexSetRegistry.getDefault()
-                .orElseThrow(() -> new NotFoundException("Default index set not found"));
+        try {
+            final IndexSet indexSet = indexSetRegistry.getDefault();
 
-        checkCycle(indexSet);
+            checkCycle(indexSet);
 
-        final String msg = "Cycling deflector for default index set <" + indexSet.getConfig().id()  + ">. Reason: REST request.";
-        LOG.info(msg);
-        activityWriter.write(new Activity(msg, DeflectorResource.class));
+            final String msg = "Cycling deflector for default index set <" + indexSet.getConfig().id() + ">. Reason: REST request.";
+            LOG.info(msg);
+            activityWriter.write(new Activity(msg, DeflectorResource.class));
 
-        indexSet.cycle();
+            indexSet.cycle();
+        } catch (IllegalStateException e) {
+            throw new NotFoundException("Default index set not found");
+        }
     }
 
     @POST

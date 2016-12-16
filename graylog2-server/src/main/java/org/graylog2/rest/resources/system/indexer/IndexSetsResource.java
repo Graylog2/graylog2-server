@@ -109,7 +109,7 @@ public class IndexSetsResource extends RestResource {
                                  @QueryParam("skip") @DefaultValue("0") int skip,
                                  @ApiParam(name = "limit", value = "The maximum number of elements to return.", required = true)
                                  @QueryParam("limit") @DefaultValue("0") int limit) {
-        final IndexSetConfig defaultIndexSet = indexSetService.getDefault().orElse(null);
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
 
         List<IndexSetSummary> indexSets;
         int count;
@@ -147,7 +147,7 @@ public class IndexSetsResource extends RestResource {
     public IndexSetSummary get(@ApiParam(name = "id", required = true)
                                @PathParam("id") String id) {
         checkPermission(RestPermissions.INDEXSETS_READ, id);
-        final IndexSetConfig defaultIndexSet = indexSetService.getDefault().orElse(null);
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
         return indexSetService.get(id)
                 .map(config -> IndexSetSummary.fromIndexSetConfig(config, config.equals(defaultIndexSet)))
                 .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
@@ -173,7 +173,7 @@ public class IndexSetsResource extends RestResource {
             }
 
             final IndexSetConfig savedObject = indexSetService.save(indexSetConfig);
-            final IndexSetConfig defaultIndexSet = indexSetService.getDefault().orElse(null);
+            final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
             return IndexSetSummary.fromIndexSetConfig(savedObject, savedObject.equals(defaultIndexSet));
         } catch (DuplicateKeyException e) {
             throw new BadRequestException(e.getMessage());
@@ -202,7 +202,7 @@ public class IndexSetsResource extends RestResource {
                 .orElseThrow(() -> new NotFoundException("Index set <" + id + "> not found"));
 
         final IndexSetConfig savedObject = indexSetService.save(updateRequest.toIndexSetConfig(oldConfig));
-        final IndexSetConfig defaultIndexSet = indexSetService.getDefault().orElse(null);
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
 
         return IndexSetSummary.fromIndexSetConfig(savedObject, savedObject.equals(defaultIndexSet));
     }
@@ -224,7 +224,7 @@ public class IndexSetsResource extends RestResource {
 
         clusterConfigService.write(DefaultIndexSetConfig.create(indexSet.id()));
 
-        final IndexSetConfig defaultIndexSet = indexSetService.getDefault().orElse(null);
+        final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
 
         return IndexSetSummary.fromIndexSetConfig(indexSet, indexSet.equals(defaultIndexSet));
     }
@@ -245,7 +245,7 @@ public class IndexSetsResource extends RestResource {
         checkPermission(RestPermissions.INDEXSETS_DELETE, id);
 
         final IndexSet indexSet = getIndexSet(indexSetRegistry, id);
-        final IndexSet defaultIndexSet = indexSetRegistry.getDefault().orElse(null);
+        final IndexSet defaultIndexSet = indexSetRegistry.getDefault();
 
         if (indexSet.equals(defaultIndexSet)) {
             throw new BadRequestException("Default index set <" + indexSet.getConfig().id() + "> cannot be deleted!");

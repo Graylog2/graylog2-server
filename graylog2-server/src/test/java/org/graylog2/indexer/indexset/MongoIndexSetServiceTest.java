@@ -56,7 +56,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 public class MongoIndexSetServiceTest {
@@ -149,18 +148,16 @@ public class MongoIndexSetServiceTest {
     public void getDefault() throws Exception {
         clusterConfigService.write(DefaultIndexSetConfig.create("57f3d721a43c2d59cb750002"));
 
-        final Optional<IndexSetConfig> indexSetConfig = indexSetService.getDefault();
+        final IndexSetConfig indexSetConfig = indexSetService.getDefault();
 
-        assertThat(indexSetConfig).isPresent();
-        assertThat(indexSetConfig.get().id()).isEqualTo("57f3d721a43c2d59cb750002");
+        assertThat(indexSetConfig).isNotNull();
+        assertThat(indexSetConfig.id()).isEqualTo("57f3d721a43c2d59cb750002");
     }
 
-    @Test
+    @Test(expected = IllegalStateException.class)
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void getDefaultWithoutDefault() throws Exception {
-        final Optional<IndexSetConfig> indexSetConfig = indexSetService.getDefault();
-
-        assertThat(indexSetConfig).isNotPresent();
+        indexSetService.getDefault();
     }
 
     @Test

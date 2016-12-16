@@ -35,8 +35,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -75,7 +73,7 @@ public class V20161116172200_CreateDefaultStreamMigrationTest {
     public void upgrade() throws Exception {
         final ArgumentCaptor<Stream> streamArgumentCaptor = ArgumentCaptor.forClass(Stream.class);
         when(streamService.load("000000000000000000000001")).thenThrow(NotFoundException.class);
-        when(indexSetRegistry.getDefault()).thenReturn(Optional.of(indexSet));
+        when(indexSetRegistry.getDefault()).thenReturn(indexSet);
 
         migration.upgrade();
 
@@ -90,7 +88,7 @@ public class V20161116172200_CreateDefaultStreamMigrationTest {
     @Test
     public void upgradeWithoutDefaultIndexSet() throws Exception {
         when(streamService.load("000000000000000000000001")).thenThrow(NotFoundException.class);
-        when(indexSetRegistry.getDefault()).thenReturn(Optional.empty());
+        when(indexSetRegistry.getDefault()).thenThrow(IllegalStateException.class);
 
         expectedException.expect(IllegalStateException.class);
 
@@ -108,7 +106,7 @@ public class V20161116172200_CreateDefaultStreamMigrationTest {
 
     @Test
     public void upgradePostsStreamsChangedEvent() throws Exception {
-        when(indexSetRegistry.getDefault()).thenReturn(Optional.of(indexSet));
+        when(indexSetRegistry.getDefault()).thenReturn(indexSet);
         when(streamService.load("000000000000000000000001")).thenThrow(NotFoundException.class);
         final ArgumentCaptor<StreamsChangedEvent> argumentCaptor = ArgumentCaptor.forClass(StreamsChangedEvent.class);
         migration.upgrade();

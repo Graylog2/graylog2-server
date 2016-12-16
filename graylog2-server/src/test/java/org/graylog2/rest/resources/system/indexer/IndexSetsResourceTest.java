@@ -371,7 +371,7 @@ public class IndexSetsResourceTest {
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetRegistry.get("id")).thenReturn(Optional.of(indexSet));
         when(indexSetCleanupJobFactory.create(indexSet)).thenReturn(mock(IndexSetCleanupJob.class));
-        when(indexSetRegistry.getDefault()).thenReturn(Optional.empty());
+        when(indexSetRegistry.getDefault()).thenReturn(null);
         when(indexSetService.delete("id")).thenReturn(1);
 
         indexSetsResource.delete("id", false);
@@ -390,7 +390,7 @@ public class IndexSetsResourceTest {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetRegistry.getDefault()).thenReturn(Optional.empty());
+        when(indexSetRegistry.getDefault()).thenReturn(null);
         when(indexSetRegistry.get("id")).thenReturn(Optional.of(indexSet));
         when(indexSetService.delete("id")).thenReturn(0);
 
@@ -413,7 +413,7 @@ public class IndexSetsResourceTest {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
-        when(indexSetRegistry.getDefault()).thenReturn(Optional.of(indexSet));
+        when(indexSetRegistry.getDefault()).thenReturn(indexSet);
         when(indexSetRegistry.get("id")).thenReturn(Optional.of(indexSet));
         when(indexSetCleanupJobFactory.create(indexSet)).thenReturn(mock(IndexSetCleanupJob.class));
         when(indexSetService.delete("id")).thenReturn(1);

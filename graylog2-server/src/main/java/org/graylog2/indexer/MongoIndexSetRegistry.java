@@ -72,9 +72,8 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     @Override
-    public Optional<IndexSet> getDefault() {
-        return indexSetService.getDefault()
-                .flatMap(indexSetConfig -> Optional.of((IndexSet) mongoIndexSetFactory.create(indexSetConfig)));
+    public IndexSet getDefault() {
+        return mongoIndexSetFactory.create(indexSetService.getDefault());
     }
 
     @Override

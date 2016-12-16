@@ -28,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.stream.Collectors;
@@ -59,12 +58,7 @@ public class V20161130141500_DefaultStreamRecalcIndexRanges extends Migration {
 
     @Override
     public void upgrade() {
-        final Optional<IndexSet> optDefaultIndexSet = indexSetRegistry.getDefault();
-        if (!optDefaultIndexSet.isPresent()) {
-            LOG.error("No default index set found, this should not happen. Unable to assign streams to older indices");
-            return;
-        }
-        final IndexSet defaultIndexSet = optDefaultIndexSet.get();
+        final IndexSet defaultIndexSet = indexSetRegistry.getDefault();
 
         if (!cluster.isConnected()) {
             LOG.info("Cluster not connected yet, delaying migration until it is reachable.");
