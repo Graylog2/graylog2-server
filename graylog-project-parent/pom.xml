@@ -529,12 +529,6 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.fakemongo</groupId>
-                <artifactId>fongo</artifactId>
-                <version>${fongo.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
                 <groupId>org.jukito</groupId>
                 <artifactId>jukito</artifactId>
                 <version>${jukito.version}</version>
