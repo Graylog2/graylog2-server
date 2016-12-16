@@ -8,6 +8,8 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
 const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 
+import style from './AlertTimeline.css';
+
 const AlertTimeline = React.createClass({
   propTypes: {
     alert: React.PropTypes.object.isRequired,
@@ -104,7 +106,7 @@ const AlertTimeline = React.createClass({
     );
 
     return (
-      <dl className="dl-horizontal">
+      <dl className={`dl-horizontal ${style.alertTimeline}`}>
         <dt>{triggeredAtTimestamp}</dt>
         <dd>Graylog checks {title} condition on stream <em>{this.props.stream.title}</em></dd>
         <dt>{triggeredAtTimestamp}</dt>

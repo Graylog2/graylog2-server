@@ -1,0 +1,8 @@
+:local(.alertTimeline) dt {
+    text-align: left;
+    width: 140px;
+}
+
+:local(.alertTimeline) dd {
+    margin-left: 160px;
+}
