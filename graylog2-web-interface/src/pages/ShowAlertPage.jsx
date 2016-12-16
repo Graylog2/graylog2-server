@@ -1,12 +1,14 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Label } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import { Button, Label, Tooltip } from 'react-bootstrap';
 
-import { DocumentTitle, PageHeader, Spinner, Timestamp } from 'components/common';
+import { DocumentTitle, OverlayElement, PageHeader, Spinner, Timestamp } from 'components/common';
 import { AlertDetails } from 'components/alerts';
 
 import DateTime from 'logic/datetimes/DateTime';
 import UserNotification from 'util/UserNotification';
+import Routes from 'routing/Routes';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertsStore, AlertsActions } = CombinedProvider.get('Alerts');
@@ -103,6 +105,12 @@ const ShowAlertPage = React.createClass({
       </span>
     );
 
+    const conditionDetailsTooltip = (
+      <Tooltip id="disabled-condition-details">
+        The condition was most likely deleted since the alert was triggered, no details available.
+      </Tooltip>
+    );
+
     return (
       <DocumentTitle title={`${condition.title || 'Unknown alert'} on stream ${stream.title}`}>
         <div>
@@ -114,6 +122,19 @@ const ShowAlertPage = React.createClass({
 
             <span>
               {resolvedState}
+            </span>
+
+            <span>
+              <OverlayElement overlay={conditionDetailsTooltip} placement="top" useOverlay={!condition.id}
+                              trigger={['hover', 'focus']}>
+                <LinkContainer to={Routes.show_alert_condition(stream.id, condition.id)} disabled={!condition.id}>
+                  <Button bsStyle="info">Condition details</Button>
+                </LinkContainer>
+              </OverlayElement>
+              &nbsp;
+              <LinkContainer to={Routes.ALERTS.LIST}>
+                <Button bsStyle="info">Alerts overview</Button>
+              </LinkContainer>
             </span>
           </PageHeader>
 
