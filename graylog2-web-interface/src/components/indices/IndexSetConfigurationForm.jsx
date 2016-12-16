@@ -1,6 +1,6 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, Input } from 'react-bootstrap';
+import { Button, Col, Input, Row } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
 
@@ -100,8 +100,6 @@ const IndexSetConfigurationForm = React.createClass({
                  onChange={this._onInputChange}
                  value={indexSet.index_prefix}
                  help="The prefix for all indices in this index set."
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-7"
                  required />
           <Input type="number"
                  id="index-set-shards"
@@ -110,8 +108,6 @@ const IndexSetConfigurationForm = React.createClass({
                  onChange={this._onInputChange}
                  value={indexSet.shards}
                  help="Number of shards per index."
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-7"
                  required />
           <Input type="number"
                  id="index-set-replicas"
@@ -120,51 +116,59 @@ const IndexSetConfigurationForm = React.createClass({
                  onChange={this._onInputChange}
                  value={indexSet.replicas}
                  help="Number of replicas per index."
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-7"
                  required />
         </span>
       );
     }
 
     return (
-      <form className="form form-horizontal index-set-form" onSubmit={this._saveConfiguration}>
-        <fieldset>
-          <Input type="text"
-                 id="index-set-title"
-                 label="Title"
-                 name="title"
-                 onChange={this._onInputChange}
-                 value={indexSet.title}
-                 help="Descriptive name of the index set."
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-7"
-                 autoFocus
-                 required />
-          <Input type="text"
-                 id="index-set-description"
-                 label="Description"
-                 name="description"
-                 onChange={this._onInputChange}
-                 value={indexSet.description}
-                 help="Description of the index set."
-                 labelClassName="col-sm-3"
-                 wrapperClassName="col-sm-7"
-                 required />
-          {readOnlyconfig}
-          <Input wrapperClassName="col-sm-offset-3 col-sm-7">
-            {indexSet.writable && rotationConfig}
-            {indexSet.writable && retentionConfig}
+      <Row>
+        <Col md={8}>
+          <form className="form" onSubmit={this._saveConfiguration}>
+            <Row>
+              <Col md={12}>
+                <Input type="text"
+                       id="index-set-title"
+                       label="Title"
+                       name="title"
+                       onChange={this._onInputChange}
+                       value={indexSet.title}
+                       help="Descriptive name of the index set."
+                       autoFocus
+                       required />
+                <Input type="text"
+                       id="index-set-description"
+                       label="Description"
+                       name="description"
+                       onChange={this._onInputChange}
+                       value={indexSet.description}
+                       help="Description of the index set."
+                       required />
+                {readOnlyconfig}
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                {indexSet.writable && rotationConfig}
+              </Col>
+            </Row>
+            <Row>
+              <Col md={12}>
+                {indexSet.writable && retentionConfig}
+              </Col>
+            </Row>
 
-            <hr/>
-            <Button type="submit" bsStyle="success">Save</Button>
-            &nbsp;
-            <LinkContainer to={this.props.cancelLink}>
-              <Button bsStyle="default">Cancel</Button>
-            </LinkContainer>
-          </Input>
-        </fieldset>
-      </form>
+            <Row>
+              <Col md={12}>
+                <Button type="submit" bsStyle="primary" style={{ marginRight: 10 }}>Save</Button>
+                <LinkContainer to={this.props.cancelLink}>
+                  <Button bsStyle="default">Cancel</Button>
+                </LinkContainer>
+              </Col>
+            </Row>
+          </form>
+        </Col>
+      </Row>
     );
   },
 });

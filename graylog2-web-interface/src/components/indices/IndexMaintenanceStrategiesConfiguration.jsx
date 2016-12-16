@@ -1,4 +1,5 @@
 import React from 'react';
+import { Input } from 'react-bootstrap';
 
 import { Select } from 'components/common';
 
@@ -108,19 +109,15 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
     return (
       <span>
         <h3>{this.props.title}</h3>
-        <div className="top-margin">
-          <p>{this.props.description}</p>
-        </div>
-        <div className="top-margin">
+        <p className="description">{this.props.description}</p>
+        <Input label={this.props.selectPlaceholder}>
           <Select placeholder={this.props.selectPlaceholder}
                   options={this._availableSelectOptions()}
                   matchProp="value"
                   value={this._activeSelection()}
                   onValueChange={this._onSelect}/>
-        </div>
-        <div className="top-margin">
-          {this._getConfigurationComponent(this._activeSelection())}
-        </div>
+        </Input>
+        {this._getConfigurationComponent(this._activeSelection())}
       </span>
     );
   },
