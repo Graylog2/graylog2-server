@@ -1,0 +1,74 @@
+{
+  "index_sets": [
+    {
+      "_id": {
+        "$oid": "57f3d721a43c2d59cb750001"
+      },
+      "title": "Test 1",
+      "description": "This is the index set configuration for Test 1",
+      "index_prefix": "test_1",
+      "default": true,
+      "shards": 4,
+      "replicas": 1,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 1000
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 10
+      },
+      "creation_date": {
+        "$date": "2016-10-04T17:00:00Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "57f3d721a43c2d59cb750002"
+      },
+      "title": "Test 2",
+      "index_prefix": "test_2",
+      "shards": 1,
+      "replicas": 0,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 2500
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 25
+      },
+      "creation_date": {
+        "$date": "2016-10-04T18:00:00Z"
+      }
+    },
+    {
+      "_id": {
+        "$oid": "57f3d721a43c2d59cb750003"
+      },
+      "title": "Test 3",
+      "description": "This is the index set configuration for Test 3",
+      "index_prefix": "test_3",
+      "default": false,
+      "shards": 4,
+      "replicas": 1,
+      "rotation_strategy_class": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy",
+      "rotation_strategy": {
+        "type": "org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig",
+        "max_docs_per_index": 1000
+      },
+      "retention_strategy_class": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategy",
+      "retention_strategy": {
+        "type": "org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig",
+        "max_number_of_indices": 10
+      },
+      "creation_date": {
+        "$date": "2016-10-04T17:00:00Z"
+      }
+    }
+  ]
+}

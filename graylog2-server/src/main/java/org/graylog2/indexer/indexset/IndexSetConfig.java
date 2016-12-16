@@ -133,6 +133,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
                                         @JsonProperty("title") @NotBlank String title,
                                         @JsonProperty("description") @Nullable String description,
+                                        // TODO 3.0: Remove "default" field here. A migration in 2.2 removed it.
                                         @JsonProperty("default") @Nullable Boolean isDefault, // Ignored, older objects might still have it
                                         @JsonProperty("writable") @Nullable Boolean isWritable,
                                         @JsonProperty(FIELD_INDEX_PREFIX) @NotBlank String indexPrefix,
