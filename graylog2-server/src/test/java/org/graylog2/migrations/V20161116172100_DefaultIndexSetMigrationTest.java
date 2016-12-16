@@ -19,6 +19,7 @@ package org.graylog2.migrations;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetCreated;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -44,6 +45,7 @@ import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -101,6 +103,7 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         migration.upgrade();
 
         verify(indexSetService).save(indexSetConfigCaptor.capture());
+        verify(clusterConfigService).write(DefaultIndexSetConfig.create("id"));
         verify(clusterConfigService).write(DefaultIndexSetCreated.create());
         verify(clusterEventBus).post(IndexSetCreatedEvent.create(savedIndexSetConfig));
 
@@ -150,7 +153,9 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
     public void startOnThisNodeReturnsFalseIfMigrationWasSuccessfulBefore() throws Exception {
         when(clusterConfigService.get(DefaultIndexSetCreated.class))
                 .thenReturn(DefaultIndexSetCreated.create());
-        //assertThat(migration.startOnThisNode()).isFalse();
+
+        verify(indexSetService, never()).save(any(IndexSetConfig.class));
+        verify(clusterConfigService, never()).write(any(DefaultIndexSetCreated.class));
     }
 
     private static class StubRotationStrategy implements RotationStrategy {
