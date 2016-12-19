@@ -41,6 +41,11 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 public class V20161215163900_MoveIndexSetDefaultConfigTest {
     @Rule
@@ -64,9 +69,9 @@ public class V20161215163900_MoveIndexSetDefaultConfigTest {
 
     @Before
     public void setUp() throws Exception {
-        this.clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider,
+        this.clusterConfigService = spy(new ClusterConfigServiceImpl(objectMapperProvider,
                 fongoRule.getConnection(), nodeId, objectMapper,
-                new ChainingClassLoader(getClass().getClassLoader()), new ClusterEventBus());
+                new ChainingClassLoader(getClass().getClassLoader()), new ClusterEventBus()));
 
         this.collection = fongoRule.getDatabase().getCollection("index_sets");
 
@@ -118,5 +123,17 @@ public class V20161215163900_MoveIndexSetDefaultConfigTest {
         // and shouldn't touch the database. Thank means we should still have all documents with the "default" field
         // from the seed file in the database.
         assertThat(collection.count(Filters.exists("default"))).isEqualTo(count);
+    }
+
+    @Test
+    public void upgradeWhenDefaultIndexSetConfigExists() throws Exception {
+        clusterConfigService.write(DefaultIndexSetConfig.create("57f3d721a43c2d59cb750001"));
+
+        // Reset the spy to be able to verify that there wasn't a write
+        reset(clusterConfigService);
+
+        migration.upgrade();
+
+        verify(clusterConfigService, never()).write(any(DefaultIndexSetConfig.class));
     }
 }

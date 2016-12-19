@@ -70,7 +70,8 @@ public class V20161215163900_MoveIndexSetDefaultConfig extends Migration {
             return;
         }
 
-        boolean defaultDone = false;
+        // Do not overwrite an existing default index config
+        boolean defaultDone = clusterConfigService.get(DefaultIndexSetConfig.class) != null;
         final ImmutableSet.Builder<String> builder = ImmutableSet.builder();
 
         final FindIterable<Document> documents = collection.find(exists(FIELD_DEFAULT)).sort(ascending(FIELD_CREATION_DATE));
