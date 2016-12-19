@@ -16,11 +16,13 @@
  */
 package org.graylog2.indexer.indexset;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.Subscribe;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
@@ -84,7 +86,7 @@ public class MongoIndexSetServiceTest {
     public void setUp() throws Exception {
         clusterEventBus = new ClusterEventBus();
         clusterConfigService = new ClusterConfigServiceImpl(objectMapperProvider, mongoRule.getMongoConnection(),
-                nodeId, objectMapper, new ChainingClassLoader(getClass().getClassLoader()), clusterEventBus);
+                nodeId, new ChainingClassLoader(getClass().getClassLoader()), clusterEventBus);
         indexSetService = new MongoIndexSetService(mongoRule.getMongoConnection(), objectMapperProvider, streamService, clusterConfigService, clusterEventBus);
     }
 
