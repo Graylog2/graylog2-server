@@ -72,10 +72,6 @@ public abstract class IndexSetUpdateRequest {
     @NotNull
     public abstract RetentionStrategyConfig retentionStrategy();
 
-    @JsonProperty("index_analyzer")
-    @NotBlank
-    public abstract String indexAnalyzer();
-
     @JsonProperty("index_optimization_max_num_segments")
     @Min(1L)
     public abstract int indexOptimizationMaxNumSegments();
@@ -95,12 +91,11 @@ public abstract class IndexSetUpdateRequest {
                                                @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
                                                @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
                                                @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
-                                               @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
                                                @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                                @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled) {
         return new AutoValue_IndexSetUpdateRequest(id, title, description, isWritable, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy,
-                indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled);
+                indexOptimizationMaxNumSegments, indexOptimizationDisabled);
     }
 
     public static IndexSetUpdateRequest fromIndexSetConfig(IndexSetConfig indexSet) {
@@ -115,7 +110,6 @@ public abstract class IndexSetUpdateRequest {
                 indexSet.rotationStrategy(),
                 indexSet.retentionStrategyClass(),
                 indexSet.retentionStrategy(),
-                indexSet.indexAnalyzer(),
                 indexSet.indexOptimizationMaxNumSegments(),
                 indexSet.indexOptimizationDisabled());
 
@@ -137,7 +131,7 @@ public abstract class IndexSetUpdateRequest {
                 retentionStrategyClass(),
                 retentionStrategy(),
                 oldConfig.creationDate(),
-                indexAnalyzer(),
+                oldConfig.indexAnalyzer(),
                 oldConfig.indexTemplateName(),
                 indexOptimizationMaxNumSegments(),
                 indexOptimizationDisabled());
