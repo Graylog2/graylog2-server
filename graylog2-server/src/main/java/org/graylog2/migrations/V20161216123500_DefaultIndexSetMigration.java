@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -56,7 +57,7 @@ public class V20161216123500_DefaultIndexSetMigration extends Migration {
 
     @Override
     public ZonedDateTime createdAt() {
-        return ZonedDateTime.parse("2016-12-12:35:00Z");
+        return ZonedDateTime.of(2016, 12, 16, 12, 35, 0, 0, ZoneOffset.UTC);
     }
 
     @Override
