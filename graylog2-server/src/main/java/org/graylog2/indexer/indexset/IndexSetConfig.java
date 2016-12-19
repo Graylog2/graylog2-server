@@ -18,6 +18,7 @@ package org.graylog2.indexer.indexset;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ComparisonChain;
@@ -36,6 +37,7 @@ import java.time.ZonedDateTime;
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
+@JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_INDEX_PREFIX = "index_prefix";
     public static final String FIELD_CREATION_DATE = "creation_date";
