@@ -70,7 +70,7 @@ public class V20161215163900_MoveIndexSetDefaultConfigTest {
     @Before
     public void setUp() throws Exception {
         this.clusterConfigService = spy(new ClusterConfigServiceImpl(objectMapperProvider,
-                fongoRule.getConnection(), nodeId, objectMapper,
+                fongoRule.getConnection(), nodeId,
                 new ChainingClassLoader(getClass().getClassLoader()), new ClusterEventBus()));
 
         this.collection = fongoRule.getDatabase().getCollection("index_sets");
