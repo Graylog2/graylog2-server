@@ -18,6 +18,7 @@ package org.graylog2.migrations;
 
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.DefaultIndexSetCreated;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -96,6 +97,7 @@ public class V20161116172100_DefaultIndexSetMigration extends Migration {
                 .build();
 
         final IndexSetConfig savedConfig = indexSetService.save(config);
+        clusterConfigService.write(DefaultIndexSetConfig.create(savedConfig.id()));
         clusterConfigService.write(DefaultIndexSetCreated.create());
 
         // Publish event to cluster event bus so the stream router will reload.
