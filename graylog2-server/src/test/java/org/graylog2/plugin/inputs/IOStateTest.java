@@ -18,16 +18,19 @@ package org.graylog2.plugin.inputs;
 
 import com.google.common.eventbus.EventBus;
 import org.graylog2.plugin.IOState;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@RunWith(MockitoJUnitRunner.class)
 public class IOStateTest {
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
     @Test
     public void testNotEqualIfDifferentInput() throws Exception {
         EventBus eventBus = mock(EventBus.class);

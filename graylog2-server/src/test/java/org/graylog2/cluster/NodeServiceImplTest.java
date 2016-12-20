@@ -28,9 +28,9 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.net.URI;
 
@@ -38,7 +38,6 @@ import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoR
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class NodeServiceImplTest {
     @ClassRule
     public static final InMemoryMongoDb IN_MEMORY_MONGO_DB = newInMemoryMongoDbRule().build();
@@ -49,6 +48,9 @@ public class NodeServiceImplTest {
 
     @Rule
     public MongoConnectionRule mongoRule = MongoConnectionRule.build("test");
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private Configuration configuration;
