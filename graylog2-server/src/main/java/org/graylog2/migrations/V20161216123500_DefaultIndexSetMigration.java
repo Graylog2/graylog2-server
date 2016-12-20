@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -69,23 +71,36 @@ public class V20161216123500_DefaultIndexSetMigration extends Migration {
         // The default index set must have been created first.
         checkState(clusterConfigService.get(DefaultIndexSetCreated.class) != null, "The default index set hasn't been created yet. This is a bug!");
 
-        for (IndexSetConfig indexSetConfig : indexSetService.findAll()) {
-            final String analyzer = elasticsearchConfiguration.getAnalyzer();
-            final IndexSetConfig updatedConfig = indexSetConfig.toBuilder()
-                    .indexAnalyzer(analyzer)
-                    .indexTemplateName(indexSetConfig.indexPrefix() + "-template")
-                    .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                    .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
-                    .build();
+        final IndexSetConfig defaultIndexSet= indexSetService.getDefault();
+        migrateIndexSet(defaultIndexSet, elasticsearchConfiguration.getTemplateName());
 
-            final IndexSetConfig savedConfig = indexSetService.save(updatedConfig);
+        final List<IndexSetConfig> allWithoutDefault = indexSetService.findAll()
+                .stream()
+                .filter(indexSetConfig -> !indexSetConfig.equals(defaultIndexSet))
+                .collect(Collectors.toList());
 
-            // Publish event to cluster event bus so the stream router will reload.
-            clusterEventBus.post(IndexSetCreatedEvent.create(savedConfig));
-
-            LOG.debug("Successfully updated default index set: {}", savedConfig);
+        for (IndexSetConfig indexSetConfig : allWithoutDefault) {
+            migrateIndexSet(indexSetConfig, indexSetConfig.indexPrefix() + "-template");
         }
 
+
         clusterConfigService.write(V20161216123500_Succeeded.create());
+    }
+
+    private void migrateIndexSet(IndexSetConfig indexSetConfig, String templateName) {
+        final String analyzer = elasticsearchConfiguration.getAnalyzer();
+        final IndexSetConfig updatedConfig = indexSetConfig.toBuilder()
+                .indexAnalyzer(analyzer)
+                .indexTemplateName(templateName)
+                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
+                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
+                .build();
+
+        final IndexSetConfig savedConfig = indexSetService.save(updatedConfig);
+
+        // Publish event to cluster event bus so the stream router will reload.
+        clusterEventBus.post(IndexSetCreatedEvent.create(savedConfig));
+
+        LOG.debug("Successfully updated index set: {}", savedConfig);
     }
 }

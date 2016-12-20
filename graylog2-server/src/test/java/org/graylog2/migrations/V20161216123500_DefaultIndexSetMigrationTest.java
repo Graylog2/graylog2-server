@@ -16,6 +16,7 @@
  */
 package org.graylog2.migrations;
 
+import com.google.common.collect.ImmutableList;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.DefaultIndexSetCreated;
@@ -37,11 +38,12 @@ import org.mockito.junit.MockitoRule;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
-import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -92,37 +94,66 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
                 .indexOptimizationMaxNumSegments(1)
                 .indexOptimizationDisabled(false)
                 .build();
-        final IndexSetConfig savedConfig = defaultConfig.toBuilder()
+        final IndexSetConfig additionalConfig = defaultConfig.toBuilder()
+                .id("foo")
+                .indexPrefix("foo")
+                .build();
+        final IndexSetConfig savedDefaultConfig = defaultConfig.toBuilder()
                 .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
                 .indexTemplateName(elasticsearchConfiguration.getTemplateName())
                 .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
                 .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
                 .build();
-        when(indexSetService.save(any(IndexSetConfig.class))).thenReturn(savedConfig);
+        final IndexSetConfig savedAdditionalConfig = additionalConfig.toBuilder()
+                .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
+                .indexTemplateName("foo-template")
+                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
+                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
+                .build();
+
+        when(indexSetService.save(any(IndexSetConfig.class))).thenReturn(savedAdditionalConfig, savedDefaultConfig);
+        when(indexSetService.getDefault()).thenReturn(defaultConfig);
+        when(indexSetService.findAll()).thenReturn(ImmutableList.of(defaultConfig, additionalConfig));
         when(clusterConfigService.get(DefaultIndexSetCreated.class)).thenReturn(DefaultIndexSetCreated.create());
-        when(indexSetService.findAll()).thenReturn(Collections.singletonList(defaultConfig));
 
         final ArgumentCaptor<IndexSetConfig> indexSetConfigCaptor = ArgumentCaptor.forClass(IndexSetConfig.class);
 
         migration.upgrade();
 
-        verify(indexSetService).save(indexSetConfigCaptor.capture());
+        verify(indexSetService, times(2)).save(indexSetConfigCaptor.capture());
+        verify(clusterEventBus, times(2)).post(any(IndexSetCreatedEvent.class));
         verify(clusterConfigService).write(V20161216123500_Succeeded.create());
-        verify(clusterEventBus).post(IndexSetCreatedEvent.create(savedConfig));
 
-        final IndexSetConfig capturedIndexSetConfig = indexSetConfigCaptor.getValue();
-        assertThat(capturedIndexSetConfig.id()).isEqualTo("id");
-        assertThat(capturedIndexSetConfig.title()).isEqualTo("title");
-        assertThat(capturedIndexSetConfig.description()).isEqualTo("description");
-        assertThat(capturedIndexSetConfig.indexPrefix()).isEqualTo("prefix");
-        assertThat(capturedIndexSetConfig.shards()).isEqualTo(1);
-        assertThat(capturedIndexSetConfig.replicas()).isEqualTo(0);
-        assertThat(capturedIndexSetConfig.rotationStrategy()).isEqualTo(rotationStrategyConfig);
-        assertThat(capturedIndexSetConfig.retentionStrategy()).isEqualTo(retentionStrategyConfig);
-        assertThat(capturedIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
-        assertThat(capturedIndexSetConfig.indexTemplateName()).isEqualTo("prefix-template");
-        assertThat(capturedIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
-        assertThat(capturedIndexSetConfig.indexOptimizationDisabled()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
+        final List<IndexSetConfig> allValues = indexSetConfigCaptor.getAllValues();
+        assertThat(allValues).hasSize(2);
+
+        final IndexSetConfig capturedDefaultIndexSetConfig = allValues.get(0);
+        assertThat(capturedDefaultIndexSetConfig.id()).isEqualTo("id");
+        assertThat(capturedDefaultIndexSetConfig.title()).isEqualTo("title");
+        assertThat(capturedDefaultIndexSetConfig.description()).isEqualTo("description");
+        assertThat(capturedDefaultIndexSetConfig.indexPrefix()).isEqualTo("prefix");
+        assertThat(capturedDefaultIndexSetConfig.shards()).isEqualTo(1);
+        assertThat(capturedDefaultIndexSetConfig.replicas()).isEqualTo(0);
+        assertThat(capturedDefaultIndexSetConfig.rotationStrategy()).isEqualTo(rotationStrategyConfig);
+        assertThat(capturedDefaultIndexSetConfig.retentionStrategy()).isEqualTo(retentionStrategyConfig);
+        assertThat(capturedDefaultIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
+        assertThat(capturedDefaultIndexSetConfig.indexTemplateName()).isEqualTo(elasticsearchConfiguration.getTemplateName());
+        assertThat(capturedDefaultIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
+        assertThat(capturedDefaultIndexSetConfig.indexOptimizationDisabled()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
+
+        final IndexSetConfig capturedAdditionalIndexSetConfig = allValues.get(1);
+        assertThat(capturedAdditionalIndexSetConfig.id()).isEqualTo("foo");
+        assertThat(capturedAdditionalIndexSetConfig.title()).isEqualTo("title");
+        assertThat(capturedAdditionalIndexSetConfig.description()).isEqualTo("description");
+        assertThat(capturedAdditionalIndexSetConfig.indexPrefix()).isEqualTo("foo");
+        assertThat(capturedAdditionalIndexSetConfig.shards()).isEqualTo(1);
+        assertThat(capturedAdditionalIndexSetConfig.replicas()).isEqualTo(0);
+        assertThat(capturedAdditionalIndexSetConfig.rotationStrategy()).isEqualTo(rotationStrategyConfig);
+        assertThat(capturedAdditionalIndexSetConfig.retentionStrategy()).isEqualTo(retentionStrategyConfig);
+        assertThat(capturedAdditionalIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
+        assertThat(capturedAdditionalIndexSetConfig.indexTemplateName()).isEqualTo("foo-template");
+        assertThat(capturedAdditionalIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
+        assertThat(capturedAdditionalIndexSetConfig.indexOptimizationDisabled()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
     }
 
     @Test
