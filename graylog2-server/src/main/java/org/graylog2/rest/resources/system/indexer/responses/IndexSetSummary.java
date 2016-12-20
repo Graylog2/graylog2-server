@@ -140,22 +140,23 @@ public abstract class IndexSetSummary {
     }
 
     public IndexSetConfig toIndexSetConfig() {
-        return IndexSetConfig.create(
-                id(),
-                title(),
-                description(),
-                isWritable(),
-                indexPrefix(),
-                shards(),
-                replicas(),
-                rotationStrategyClass(),
-                rotationStrategy(),
-                retentionStrategyClass(),
-                retentionStrategy(),
-                creationDate(),
-                indexAnalyzer(),
-                indexPrefix() + "-template",
-                indexOptimizationMaxNumSegments(),
-                indexOptimizationDisabled());
+        return IndexSetConfig.builder()
+                .id(id())
+                .title(title())
+                .description(description())
+                .isWritable(isWritable())
+                .indexPrefix(indexPrefix())
+                .shards(shards())
+                .replicas(replicas())
+                .rotationStrategyClass(rotationStrategyClass())
+                .rotationStrategy(rotationStrategy())
+                .retentionStrategyClass(retentionStrategyClass())
+                .retentionStrategy(retentionStrategy())
+                .creationDate(creationDate())
+                .indexAnalyzer(indexAnalyzer())
+                .indexTemplateName(indexPrefix() + "-template")
+                .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
+                .indexOptimizationDisabled(indexOptimizationDisabled())
+                .build();
     }
 }
