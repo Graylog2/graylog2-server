@@ -154,7 +154,7 @@ public abstract class IndexSetSummary {
                 retentionStrategy(),
                 creationDate(),
                 indexAnalyzer(),
-                indexPrefix() + "-" + id(),
+                indexPrefix() + "-template",
                 indexOptimizationMaxNumSegments(),
                 indexOptimizationDisabled());
     }
