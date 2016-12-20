@@ -94,6 +94,10 @@ public class V20161116172100_DefaultIndexSetMigration extends Migration {
                 .rotationStrategy(getRotationStrategyConfig(indexManagementConfig))
                 .retentionStrategy(getRetentionStrategyConfig(indexManagementConfig))
                 .creationDate(ZonedDateTime.now(ZoneOffset.UTC))
+                .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
+                .indexTemplateName(elasticsearchConfiguration.getTemplateName())
+                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
+                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
                 .build();
 
         final IndexSetConfig savedConfig = indexSetService.save(config);
