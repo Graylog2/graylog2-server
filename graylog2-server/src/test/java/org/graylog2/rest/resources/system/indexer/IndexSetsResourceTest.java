@@ -243,7 +243,7 @@ public class IndexSetsResourceTest {
                 NoopRetentionStrategyConfig.create(1),
                 ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
                 "standard",
-                "index-template",
+                "prefix-template",
                 1,
                 false
         );
@@ -327,7 +327,12 @@ public class IndexSetsResourceTest {
         verify(indexSetService, times(1)).save(indexSetConfig);
         verify(indexSetService, times(1)).getDefault();
         verifyNoMoreInteractions(indexSetService);
-        assertThat(summary.toIndexSetConfig()).isEqualTo(updatedIndexSetConfig);
+
+        // The real update wouldn't replace the index template name…
+        final IndexSetConfig actual = summary.toIndexSetConfig().toBuilder()
+                .indexTemplateName("index-template")
+                .build();
+        assertThat(actual).isEqualTo(updatedIndexSetConfig);
     }
 
     @Test
