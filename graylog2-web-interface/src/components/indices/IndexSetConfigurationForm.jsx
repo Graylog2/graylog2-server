@@ -169,14 +169,6 @@ const IndexSetConfigurationForm = React.createClass({
                  value={indexSet.index_analyzer}
                  help="Elasticsearch analyzer for this index set."
                  required />
-          <Input type="text"
-                 id="index-set-index-template"
-                 label="Index Template"
-                 name="index_template_name"
-                 onChange={this._onInputChange}
-                 value={indexSet.index_template_name}
-                 help="Elasticsearch index template."
-                 required />
         </span>
       );
     }

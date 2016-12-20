@@ -89,10 +89,6 @@ public abstract class IndexSetSummary {
     @NotBlank
     public abstract String indexAnalyzer();
 
-    @JsonProperty("index_template_name")
-    @NotBlank
-    public abstract String indexTemplateName();
-
     @JsonProperty("index_optimization_max_num_segments")
     @Min(1L)
     public abstract int indexOptimizationMaxNumSegments();
@@ -115,12 +111,11 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
                                          @JsonProperty("creation_date") @NotNull ZonedDateTime creationDate,
                                          @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
-                                         @JsonProperty("index_template_name") @NotBlank String indexTemplateName,
                                          @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                          @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled) {
         return new AutoValue_IndexSetSummary(id, title, description, isDefault, isWritable, indexPrefix, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
-                indexAnalyzer, indexTemplateName, indexOptimizationMaxNumSegments, indexOptimizationDisabled);
+                indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
@@ -139,7 +134,6 @@ public abstract class IndexSetSummary {
                 indexSet.retentionStrategy(),
                 indexSet.creationDate(),
                 indexSet.indexAnalyzer(),
-                indexSet.indexTemplateName(),
                 indexSet.indexOptimizationMaxNumSegments(),
                 indexSet.indexOptimizationDisabled());
 
@@ -160,7 +154,7 @@ public abstract class IndexSetSummary {
                 retentionStrategy(),
                 creationDate(),
                 indexAnalyzer(),
-                indexTemplateName(),
+                indexPrefix() + "-" + id(),
                 indexOptimizationMaxNumSegments(),
                 indexOptimizationDisabled());
     }
