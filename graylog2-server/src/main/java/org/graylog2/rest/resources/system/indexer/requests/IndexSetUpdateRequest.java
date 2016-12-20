@@ -116,24 +116,25 @@ public abstract class IndexSetUpdateRequest {
     }
 
     public IndexSetConfig toIndexSetConfig(IndexSetConfig oldConfig) {
-        return IndexSetConfig.create(
-                id(),
-                title(),
-                description(),
-                isWritable(),
-                oldConfig.indexPrefix(),
-                oldConfig.indexMatchPattern(),
-                oldConfig.indexWildcard(),
-                shards(),
-                replicas(),
-                rotationStrategyClass(),
-                rotationStrategy(),
-                retentionStrategyClass(),
-                retentionStrategy(),
-                oldConfig.creationDate(),
-                oldConfig.indexAnalyzer(),
-                oldConfig.indexTemplateName(),
-                indexOptimizationMaxNumSegments(),
-                indexOptimizationDisabled());
+        return IndexSetConfig.builder()
+                .id(id())
+                .title(title())
+                .description(description())
+                .isWritable(isWritable())
+                .indexPrefix(oldConfig.indexPrefix())
+                .indexMatchPattern(oldConfig.indexMatchPattern())
+                .indexWildcard(oldConfig.indexWildcard())
+                .shards(shards())
+                .replicas(replicas())
+                .rotationStrategyClass(rotationStrategyClass())
+                .rotationStrategy(rotationStrategy())
+                .retentionStrategyClass(retentionStrategyClass())
+                .retentionStrategy(retentionStrategy())
+                .creationDate(oldConfig.creationDate())
+                .indexAnalyzer(oldConfig.indexAnalyzer())
+                .indexTemplateName(oldConfig.indexTemplateName())
+                .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
+                .indexOptimizationDisabled(indexOptimizationDisabled())
+                .build();
     }
 }
