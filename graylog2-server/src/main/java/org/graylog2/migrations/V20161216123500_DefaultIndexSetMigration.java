@@ -73,7 +73,7 @@ public class V20161216123500_DefaultIndexSetMigration extends Migration {
             final String analyzer = elasticsearchConfiguration.getAnalyzer();
             final IndexSetConfig updatedConfig = indexSetConfig.toBuilder()
                     .indexAnalyzer(analyzer)
-                    .indexTemplateName(elasticsearchConfiguration.getTemplateName())
+                    .indexTemplateName(indexSetConfig.indexPrefix() + "-template")
                     .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
                     .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
                     .build();

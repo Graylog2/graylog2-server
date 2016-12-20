@@ -120,7 +120,7 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
         assertThat(capturedIndexSetConfig.rotationStrategy()).isEqualTo(rotationStrategyConfig);
         assertThat(capturedIndexSetConfig.retentionStrategy()).isEqualTo(retentionStrategyConfig);
         assertThat(capturedIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
-        assertThat(capturedIndexSetConfig.indexTemplateName()).isEqualTo(elasticsearchConfiguration.getTemplateName());
+        assertThat(capturedIndexSetConfig.indexTemplateName()).isEqualTo("prefix-template");
         assertThat(capturedIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
         assertThat(capturedIndexSetConfig.indexOptimizationDisabled()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
     }
