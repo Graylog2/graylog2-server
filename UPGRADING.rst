@@ -21,7 +21,7 @@ Due to the extensive rework done in alerting, this behaviour has been modified t
 To easy the transition to people relying on this behaviour, we have added a migration step that will create an Email alarm callback for each stream that has alert conditions, has alert receivers, but has no associated alarm callbacks.
 
 Default stream/Index Sets
----------------------------
+-------------------------
 
 With the introduction of index sets, and the ability to change a stream's write target, the default stream needs additional information, which is calculated when starting a new Graylog 2.2 master node.
 
@@ -37,3 +37,13 @@ RotationStrategy & RetentionStrategy Interfaces
 The Java interfaces for ``RetentionStrategy`` and ``RotationStrategy`` changed in 2.2. The ``#rotate()`` and ``#retain()`` methods are now getting an ``IndexSet`` as first parameter.
 
 This only affects you if you are using custom rotation or retention strategies.
+
+Changes in Exposed Configuration
+--------------------------------
+
+The exposed configuration settings on the ``/system/configuration`` resource of the Graylog REST API doesn't contain the following (deprecated) Elasticsearch-related settings anymore:
+
+* ``elasticsearch_shards``
+* ``elasticsearch_replicas``
+* ``index_optimization_max_num_segments``
+* ``disable_index_optimization``
