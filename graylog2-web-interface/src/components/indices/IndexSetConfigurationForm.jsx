@@ -60,6 +60,10 @@ const IndexSetConfigurationForm = React.createClass({
     this._updateConfig(event.target.name, event.target.value);
   },
 
+  _onDisableOptimizationClick(event) {
+      this._updateConfig(event.target.name, event.target.checked);
+  },
+
   _saveConfiguration(event) {
     event.preventDefault();
 
@@ -205,6 +209,7 @@ const IndexSetConfigurationForm = React.createClass({
                        id="index-set-max-num-segments"
                        label="Max. number of segments"
                        name="index_optimization_max_num_segments"
+                       min="1"
                        onChange={this._onInputChange}
                        value={indexSet.index_optimization_max_num_segments}
                        help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
@@ -213,7 +218,7 @@ const IndexSetConfigurationForm = React.createClass({
                        id="index-set-disable-optimization"
                        label="Disable index optimization after rotation"
                        name="index_optimization_disabled"
-                       onChange={this._onInputChange}
+                       onChange={this._onDisableOptimizationClick}
                        checked={indexSet.index_optimization_disabled}
                        help="Disable Elasticsearch index optimization (force merge) after rotation." />
               </Col>
