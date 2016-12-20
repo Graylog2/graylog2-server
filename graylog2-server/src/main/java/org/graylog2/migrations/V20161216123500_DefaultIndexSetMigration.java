@@ -34,7 +34,7 @@ import java.time.ZonedDateTime;
 import static com.google.common.base.Preconditions.checkState;
 
 /**
- * Migration for moving indexing settings into default index set.
+ * Migration for moving indexing settings into existing index sets.
  */
 public class V20161216123500_DefaultIndexSetMigration extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20161216123500_DefaultIndexSetMigration.class);
@@ -69,22 +69,23 @@ public class V20161216123500_DefaultIndexSetMigration extends Migration {
         // The default index set must have been created first.
         checkState(clusterConfigService.get(DefaultIndexSetCreated.class) != null, "The default index set hasn't been created yet. This is a bug!");
 
-        // TODO: Migrate to new method once it's been merged
-        final IndexSetConfig indexSetConfig = indexSetService.getDefault();
+        for (IndexSetConfig indexSetConfig : indexSetService.findAll()) {
+            final String analyzer = elasticsearchConfiguration.getAnalyzer();
+            final IndexSetConfig updatedConfig = indexSetConfig.toBuilder()
+                    .indexAnalyzer(analyzer)
+                    .indexTemplateName(elasticsearchConfiguration.getTemplateName())
+                    .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
+                    .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
+                    .build();
 
-        final IndexSetConfig updatedConfig = indexSetConfig.toBuilder()
-                .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
-                .indexTemplateName(elasticsearchConfiguration.getTemplateName())
-                .indexOptimizationMaxNumSegments(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments())
-                .indexOptimizationDisabled(elasticsearchConfiguration.isDisableIndexOptimization())
-                .build();
+            final IndexSetConfig savedConfig = indexSetService.save(updatedConfig);
 
-        final IndexSetConfig savedConfig = indexSetService.save(updatedConfig);
+            // Publish event to cluster event bus so the stream router will reload.
+            clusterEventBus.post(IndexSetCreatedEvent.create(savedConfig));
+
+            LOG.debug("Successfully updated default index set: {}", savedConfig);
+        }
+
         clusterConfigService.write(V20161216123500_Succeeded.create());
-
-        // Publish event to cluster event bus so the stream router will reload.
-        clusterEventBus.post(IndexSetCreatedEvent.create(savedConfig));
-
-        LOG.debug("Successfully updated default index set: {}", savedConfig);
     }
 }

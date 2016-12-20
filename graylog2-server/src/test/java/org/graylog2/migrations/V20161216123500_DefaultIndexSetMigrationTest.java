@@ -37,6 +37,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -86,6 +87,10 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
                 .rotationStrategy(rotationStrategyConfig)
                 .retentionStrategy(retentionStrategyConfig)
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("prefix-template")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         final IndexSetConfig savedConfig = defaultConfig.toBuilder()
                 .indexAnalyzer(elasticsearchConfiguration.getAnalyzer())
@@ -95,7 +100,7 @@ public class V20161216123500_DefaultIndexSetMigrationTest {
                 .build();
         when(indexSetService.save(any(IndexSetConfig.class))).thenReturn(savedConfig);
         when(clusterConfigService.get(DefaultIndexSetCreated.class)).thenReturn(DefaultIndexSetCreated.create());
-        when(indexSetService.getDefault()).thenReturn(defaultConfig);
+        when(indexSetService.findAll()).thenReturn(Collections.singletonList(defaultConfig));
 
         final ArgumentCaptor<IndexSetConfig> indexSetConfigCaptor = ArgumentCaptor.forClass(IndexSetConfig.class);
 
