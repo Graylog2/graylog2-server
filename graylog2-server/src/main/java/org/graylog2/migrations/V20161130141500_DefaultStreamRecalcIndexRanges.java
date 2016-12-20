@@ -18,11 +18,15 @@ package org.graylog2.migrations;
 
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.MongoIndexSet;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.indexer.ranges.CreateNewSingleIndexRangeJob;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
+import org.mongojack.DBQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,16 +40,22 @@ public class V20161130141500_DefaultStreamRecalcIndexRanges extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20161130141500_DefaultStreamRecalcIndexRanges.class);
 
     private final IndexSetRegistry indexSetRegistry;
+    private final IndexSetService indexSetService;
+    private final MongoIndexSet.Factory indexSetFactory;
     private final IndexRangeService indexRangeService;
     private final CreateNewSingleIndexRangeJob.Factory rebuildIndexRangeJobFactory;
     private final Cluster cluster;
 
     @Inject
     public V20161130141500_DefaultStreamRecalcIndexRanges(final IndexSetRegistry indexSetRegistry,
+                                                          final IndexSetService indexSetService,
+                                                          final MongoIndexSet.Factory indexSetFactory,
                                                           final IndexRangeService indexRangeService,
                                                           final CreateNewSingleIndexRangeJob.Factory rebuildIndexRangeJobFactory,
                                                           final Cluster cluster) {
         this.indexSetRegistry = indexSetRegistry;
+        this.indexSetService = indexSetService;
+        this.indexSetFactory = indexSetFactory;
         this.indexRangeService = indexRangeService;
         this.rebuildIndexRangeJobFactory = rebuildIndexRangeJobFactory;
         this.cluster = cluster;
@@ -58,7 +68,18 @@ public class V20161130141500_DefaultStreamRecalcIndexRanges extends Migration {
 
     @Override
     public void upgrade() {
-        final IndexSet defaultIndexSet = indexSetRegistry.getDefault();
+        IndexSet indexSet;
+        try {
+            indexSet = indexSetRegistry.getDefault();
+        } catch (IllegalStateException e) {
+            // Try to find the default index set manually if the index set registry cannot find it.
+            // This is needed if you run this migration with a 2.2.0-beta.2 state before commit 460cac6af.
+            final IndexSetConfig indexSetConfig = indexSetService.findOne(DBQuery.is("default", true))
+                    .orElseThrow(() -> new IllegalStateException("No default index set configured! This is a bug!"));
+            indexSet = indexSetFactory.create(indexSetConfig);
+        }
+
+        final IndexSet defaultIndexSet = indexSet;
 
         if (!cluster.isConnected()) {
             LOG.info("Cluster not connected yet, delaying migration until it is reachable.");
