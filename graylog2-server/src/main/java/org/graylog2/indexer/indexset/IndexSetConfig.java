@@ -34,6 +34,8 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
 import java.time.ZonedDateTime;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
@@ -100,20 +102,19 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public abstract ZonedDateTime creationDate();
 
     @JsonProperty("index_analyzer")
-    @Nullable
+    @NotBlank
     public abstract String indexAnalyzer();
 
     @JsonProperty("index_template_name")
-    @Nullable
+    @NotBlank
     public abstract String indexTemplateName();
 
     @JsonProperty("index_optimization_max_num_segments")
-    @Nullable
-    public abstract Integer indexOptimizationMaxNumSegments();
+    @Min(1L)
+    public abstract int indexOptimizationMaxNumSegments();
 
     @JsonProperty("index_optimization_disabled")
-    @Nullable
-    public abstract Boolean indexOptimizationDisabled();
+    public abstract boolean indexOptimizationDisabled();
 
     @JsonCreator
     public static IndexSetConfig create(@Id @ObjectId @JsonProperty("_id") @Nullable String id,
@@ -132,7 +133,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty(FIELD_CREATION_DATE) @NotNull ZonedDateTime creationDate,
                                         @JsonProperty("index_analyzer") @Nullable String indexAnalyzer,
                                         @JsonProperty("index_template_name") @Nullable String indexTemplateName,
-                                        @JsonProperty("index_optimization_max_num_segments") @Nullable Integer  maxNumSegments,
+                                        @JsonProperty("index_optimization_max_num_segments") @Nullable Integer maxNumSegments,
                                         @JsonProperty("index_optimization_disabled") @Nullable Boolean indexOptimizationDisabled) {
         return AutoValue_IndexSetConfig.builder()
                 .id(id)
@@ -149,8 +150,8 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                 .retentionStrategyClass(retentionStrategyClass)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(creationDate)
-                .indexAnalyzer(indexAnalyzer)
-                .indexTemplateName(indexTemplateName)
+                .indexAnalyzer(isNullOrEmpty(indexAnalyzer) ? "standard" : indexAnalyzer)
+                .indexTemplateName(isNullOrEmpty(indexTemplateName) ? indexPrefix + "-template" : indexTemplateName)
                 .indexOptimizationMaxNumSegments(maxNumSegments == null ? 1 : maxNumSegments)
                 .indexOptimizationDisabled(indexOptimizationDisabled == null ? false : indexOptimizationDisabled)
                 .build();
@@ -247,9 +248,9 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
         public abstract Builder indexTemplateName(String templateName);
 
-        public abstract Builder indexOptimizationMaxNumSegments(Integer indexOptimizationMaxNumSegments);
+        public abstract Builder indexOptimizationMaxNumSegments(int indexOptimizationMaxNumSegments);
 
-        public abstract Builder indexOptimizationDisabled(Boolean indexOptimizationDisabled);
+        public abstract Builder indexOptimizationDisabled(boolean indexOptimizationDisabled);
 
         public abstract IndexSetConfig build();
     }
