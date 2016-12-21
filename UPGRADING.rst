@@ -47,3 +47,22 @@ The exposed configuration settings on the ``/system/configuration`` resource of 
 * ``elasticsearch_replicas``
 * ``index_optimization_max_num_segments``
 * ``disable_index_optimization``
+
+Changes in Split & Count Converter
+----------------------------------
+
+The behavior of the split & count converter has been changed to that it resembles typical ``split()`` functions.
+
+Previously, the split & count converter returned 0, if the split pattern didn't occur in the string. Now it will return 1.
+
+Examples:
+
++-------------+---------------+------------+------------+
+| String      | Split Pattern | Old Result | New Result |
++=============+===============+===========+=============+
+| <empty>     | ``-``         | 0         | 0           |
++-------------+---------------+-----------+-------------+
+| ``foo``     | ``-``         | 0         | 1           |
++-------------+---------------+-----------+-------------+
+| ``foo-bar`` | ``-``         | 1         | 1           |
++-------------+---------------+-----------+-------------+
