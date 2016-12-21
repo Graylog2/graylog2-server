@@ -57,8 +57,8 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         }
         fields.put("attributes", attributes);
         final MongoDbSession dbSession = new MongoDbSession(fields);
-        LOG.debug("Created session {}", id);
         final String objectId = mongoDBSessionService.saveWithoutValidation(dbSession);
+        LOG.debug("Created session {}", objectId);
 
         return id;
     }
@@ -90,7 +90,7 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
     protected void doUpdate(Session session) {
         final MongoDbSession dbSession = mongoDBSessionService.load(session.getId().toString());
 
-        if(null == dbSession) {
+        if (null == dbSession) {
             throw new RuntimeException("Couldn't load session <" + session.getId() + ">");
         }
 
@@ -116,7 +116,12 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         LOG.debug("Deleting session {}", session);
         final Serializable id = session.getId();
         final MongoDbSession dbSession = mongoDBSessionService.load(id.toString());
-        mongoDBSessionService.destroy(dbSession);
+        if (dbSession != null) {
+            final int deleted = mongoDBSessionService.destroy(dbSession);
+            LOG.debug("Deleted {} sessions with ID {} from database", deleted, id);
+        } else {
+            LOG.debug("Session {} not found in database", id);
+        }
     }
 
     @Override
