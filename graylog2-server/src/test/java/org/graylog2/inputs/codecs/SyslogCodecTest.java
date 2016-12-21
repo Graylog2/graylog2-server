@@ -211,7 +211,6 @@ public class SyslogCodecTest {
         assertEquals(message.getField("full_message"), UNSTRUCTURED);
     }
 
-
     @Test
     public void rfc3164_section5_4_messages() {
         // See https://tools.ietf.org/html/rfc3164#section-5.4
@@ -318,6 +317,20 @@ public class SyslogCodecTest {
             assertThat(message).isNotNull();
             assertThat(message.getFields()).containsAllEntriesOf(entry.getValue());
         }
+    }
+
+    @Test
+    public void testIssue2954() throws Exception {
+        // https://github.com/Graylog2/graylog2-server/issues/2954
+        final RawMessage rawMessage = buildRawMessage("<6>2016-10-12T14:10:18Z hostname testmsg[20]: Test");
+        final Message message = codec.decode(rawMessage);
+
+        assertNotNull(message);
+        assertEquals("hostname testmsg[20]: Test", message.getMessage());
+        assertEquals(new DateTime(2016, 10, 12, 14, 10, 18, DateTimeZone.UTC), message.getTimestamp());
+        assertEquals("hostname", message.getSource());
+        assertEquals(6, message.getField("level"));
+        assertEquals("kernel", message.getField("facility"));
     }
 
     private RawMessage buildRawMessage(String message) {
