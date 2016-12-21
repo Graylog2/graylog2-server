@@ -89,6 +89,10 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .rotationStrategy(rotationStrategy)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-1")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         final IndexSetConfig config2 = IndexSetConfig.builder()
                 .id("id-2")
@@ -99,6 +103,10 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .rotationStrategy(rotationStrategy)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(ZonedDateTime.of(2016, 10, 10, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-2")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass , retentionStrategyClass));
@@ -138,6 +146,10 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .retentionStrategyClass(retentionStrategyClass)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-1")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         final IndexSetConfig config2 = IndexSetConfig.builder()
                 .id("id-2")
@@ -150,6 +162,10 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .retentionStrategyClass(retentionStrategyClass)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(ZonedDateTime.of(2016, 10, 13, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-2")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass, retentionStrategyClass));
@@ -194,6 +210,10 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .rotationStrategy(rotationStrategy)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-1")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         final IndexSetConfig config2 = IndexSetConfig.builder()
                 .id("id-2")
@@ -204,6 +224,10 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .rotationStrategy(rotationStrategy)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(ZonedDateTime.of(2016, 10, 13, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-2")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass , retentionStrategyClass));
@@ -235,6 +259,10 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .rotationStrategy(rotationStrategy)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-1")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         final IndexSetConfig config2 = IndexSetConfig.builder()
                 .id("id-2")
@@ -245,6 +273,10 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .rotationStrategy(rotationStrategy)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(ZonedDateTime.of(2016, 10, 13, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-2")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass , retentionStrategyClass));
@@ -275,6 +307,10 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .rotationStrategy(rotationStrategy)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-1")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         final IndexSetConfig config2 = IndexSetConfig.builder()
                 .id("id-2")
@@ -285,6 +321,10 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
                 .rotationStrategy(rotationStrategy)
                 .retentionStrategy(retentionStrategy)
                 .creationDate(ZonedDateTime.of(2016, 10, 13, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template-2")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
 
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create(rotationStrategyClass , retentionStrategyClass));

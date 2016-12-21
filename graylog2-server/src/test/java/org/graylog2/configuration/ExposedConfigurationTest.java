@@ -30,8 +30,7 @@ public class ExposedConfigurationTest {
     @Test
     public void testCreateWithConfiguration() throws Exception {
         final Configuration configuration = new Configuration();
-        final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
-        final ExposedConfiguration c = ExposedConfiguration.create(configuration, elasticsearchConfiguration);
+        final ExposedConfiguration c = ExposedConfiguration.create(configuration);
 
         assertThat(c.inputBufferProcessors()).isEqualTo(configuration.getInputbufferProcessors());
         assertThat(c.processBufferProcessors()).isEqualTo(configuration.getProcessBufferProcessors());
@@ -44,22 +43,17 @@ public class ExposedConfigurationTest {
         assertThat(c.nodeIdFile()).isEqualTo(configuration.getNodeIdFile());
         assertThat(c.allowHighlighting()).isEqualTo(configuration.isAllowHighlighting());
         assertThat(c.allowLeadingWildcardSearches()).isEqualTo(configuration.isAllowLeadingWildcardSearches());
-        assertThat(c.shards()).isEqualTo(elasticsearchConfiguration.getShards());
-        assertThat(c.replicas()).isEqualTo(elasticsearchConfiguration.getReplicas());
         assertThat(c.streamProcessingTimeout()).isEqualTo(configuration.getStreamProcessingTimeout());
         assertThat(c.streamProcessingMaxFaults()).isEqualTo(configuration.getStreamProcessingMaxFaults());
         assertThat(c.outputModuleTimeout()).isEqualTo(configuration.getOutputModuleTimeout());
         assertThat(c.staleMasterTimeout()).isEqualTo(configuration.getStaleMasterTimeout());
-        assertThat(c.disableIndexOptimization()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
-        assertThat(c.indexOptimizationMaxSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
         assertThat(c.gcWarningThreshold()).isEqualTo(configuration.getGcWarningThreshold().toString());
     }
 
     @Test
     public void testSerialization() throws Exception {
         final Configuration configuration = new Configuration();
-        final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
-        final ExposedConfiguration c = ExposedConfiguration.create(configuration, elasticsearchConfiguration);
+        final ExposedConfiguration c = ExposedConfiguration.create(configuration);
 
         final String json = objectMapper.writeValueAsString(c);
         assertThat((int) JsonPath.read(json, "$.inputbuffer_processors")).isEqualTo(c.inputBufferProcessors());
@@ -73,14 +67,10 @@ public class ExposedConfigurationTest {
         assertThat((String) JsonPath.read(json, "$.node_id_file")).isEqualTo(c.nodeIdFile());
         assertThat((boolean) JsonPath.read(json, "$.allow_highlighting")).isEqualTo(c.allowHighlighting());
         assertThat((boolean) JsonPath.read(json, "$.allow_leading_wildcard_searches")).isEqualTo(c.allowLeadingWildcardSearches());
-        assertThat((int) JsonPath.read(json, "$.elasticsearch_shards")).isEqualTo(c.shards());
-        assertThat((int) JsonPath.read(json, "$.elasticsearch_replicas")).isEqualTo(c.replicas());
         assertThat((int) JsonPath.read(json, "$.stream_processing_timeout")).isEqualTo((int) c.streamProcessingTimeout());
         assertThat((int) JsonPath.read(json, "$.stream_processing_max_faults")).isEqualTo(c.streamProcessingMaxFaults());
         assertThat((int) JsonPath.read(json, "$.output_module_timeout")).isEqualTo((int) c.outputModuleTimeout());
         assertThat((int) JsonPath.read(json, "$.stale_master_timeout")).isEqualTo(c.staleMasterTimeout());
-        assertThat((boolean) JsonPath.read(json, "$.disable_index_optimization")).isEqualTo(c.disableIndexOptimization());
-        assertThat((int) JsonPath.read(json, "$.index_optimization_max_num_segments")).isEqualTo(c.indexOptimizationMaxSegments());
         assertThat((String) JsonPath.read(json, "$.gc_warning_threshold")).isEqualTo(c.gcWarningThreshold());
     }
 
@@ -98,14 +88,10 @@ public class ExposedConfigurationTest {
                 "  \"node_id_file\": \"/etc/graylog/server/node-id\"," +
                 "  \"allow_highlighting\": false," +
                 "  \"allow_leading_wildcard_searches\": false," +
-                "  \"elasticsearch_shards\": 4," +
-                "  \"elasticsearch_replicas\": 0," +
                 "  \"stream_processing_timeout\": 2000," +
                 "  \"stream_processing_max_faults\": 3," +
                 "  \"output_module_timeout\": 10000," +
                 "  \"stale_master_timeout\": 2000," +
-                "  \"disable_index_optimization\": false," +
-                "  \"index_optimization_max_num_segments\": 1," +
                 "  \"gc_warning_threshold\": \"1 second\"" +
                 "}";
 
@@ -122,14 +108,10 @@ public class ExposedConfigurationTest {
         assertThat(c.nodeIdFile()).isEqualTo(JsonPath.read(json, "$.node_id_file"));
         assertThat(c.allowHighlighting()).isEqualTo(JsonPath.read(json, "$.allow_highlighting"));
         assertThat(c.allowLeadingWildcardSearches()).isEqualTo(JsonPath.read(json, "$.allow_leading_wildcard_searches"));
-        assertThat(c.shards()).isEqualTo(JsonPath.read(json, "$.elasticsearch_shards"));
-        assertThat(c.replicas()).isEqualTo(JsonPath.read(json, "$.elasticsearch_replicas"));
         assertThat((int) c.streamProcessingTimeout()).isEqualTo(JsonPath.read(json, "$.stream_processing_timeout"));
         assertThat(c.streamProcessingMaxFaults()).isEqualTo(JsonPath.read(json, "$.stream_processing_max_faults"));
         assertThat((int) c.outputModuleTimeout()).isEqualTo(JsonPath.read(json, "$.output_module_timeout"));
         assertThat(c.staleMasterTimeout()).isEqualTo(JsonPath.read(json, "$.stale_master_timeout"));
-        assertThat(c.disableIndexOptimization()).isEqualTo(JsonPath.read(json, "$.disable_index_optimization"));
-        assertThat(c.indexOptimizationMaxSegments()).isEqualTo(JsonPath.read(json, "$.index_optimization_max_num_segments"));
         assertThat(c.gcWarningThreshold()).isEqualTo(JsonPath.read(json, "$.gc_warning_threshold"));
     }
 }

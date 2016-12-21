@@ -42,6 +42,9 @@ const IndexSetCreationPage = React.createClass({
           max_docs_per_index: 20000000,
           type: 'org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig',
         },
+        index_analyzer: 'standard',
+        index_optimization_max_num_segments: 1,
+        index_optimization_disabled: false
       },
     };
   },

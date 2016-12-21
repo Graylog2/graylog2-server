@@ -72,6 +72,13 @@ public abstract class IndexSetUpdateRequest {
     @NotNull
     public abstract RetentionStrategyConfig retentionStrategy();
 
+    @JsonProperty("index_optimization_max_num_segments")
+    @Min(1L)
+    public abstract int indexOptimizationMaxNumSegments();
+
+    @JsonProperty("index_optimization_disabled")
+    public abstract boolean indexOptimizationDisabled();
+
     @JsonCreator
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static IndexSetUpdateRequest create(@JsonProperty("id") String id,
@@ -83,8 +90,12 @@ public abstract class IndexSetUpdateRequest {
                                                @JsonProperty("rotation_strategy_class") @NotNull String rotationStrategyClass,
                                                @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
                                                @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
-                                               @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy) {
-        return new AutoValue_IndexSetUpdateRequest(id, title, description, isWritable, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy);
+                                               @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
+                                               @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
+                                               @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled) {
+        return new AutoValue_IndexSetUpdateRequest(id, title, description, isWritable, shards, replicas,
+                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy,
+                indexOptimizationMaxNumSegments, indexOptimizationDisabled);
     }
 
     public static IndexSetUpdateRequest fromIndexSetConfig(IndexSetConfig indexSet) {
@@ -98,7 +109,9 @@ public abstract class IndexSetUpdateRequest {
                 indexSet.rotationStrategyClass(),
                 indexSet.rotationStrategy(),
                 indexSet.retentionStrategyClass(),
-                indexSet.retentionStrategy());
+                indexSet.retentionStrategy(),
+                indexSet.indexOptimizationMaxNumSegments(),
+                indexSet.indexOptimizationDisabled());
 
     }
 
@@ -118,6 +131,10 @@ public abstract class IndexSetUpdateRequest {
                 .retentionStrategyClass(retentionStrategyClass())
                 .retentionStrategy(retentionStrategy())
                 .creationDate(oldConfig.creationDate())
+                .indexAnalyzer(oldConfig.indexAnalyzer())
+                .indexTemplateName(oldConfig.indexTemplateName())
+                .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
+                .indexOptimizationDisabled(indexOptimizationDisabled())
                 .build();
     }
 }

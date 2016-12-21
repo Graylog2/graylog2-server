@@ -60,6 +60,10 @@ const IndexSetConfigurationForm = React.createClass({
     this._updateConfig(event.target.name, event.target.value);
   },
 
+  _onDisableOptimizationClick(event) {
+      this._updateConfig(event.target.name, event.target.checked);
+  },
+
   _saveConfiguration(event) {
     event.preventDefault();
 
@@ -157,6 +161,14 @@ const IndexSetConfigurationForm = React.createClass({
                  value={indexSet.replicas}
                  help="Number of Elasticsearch replicas used per index in this index set."
                  required />
+          <Input type="text"
+                 id="index-set-index-analyzer"
+                 label="Analyzer"
+                 name="index_analyzer"
+                 onChange={this._onInputChange}
+                 value={indexSet.index_analyzer}
+                 help="Elasticsearch analyzer for this index set."
+                 required />
         </span>
       );
     }
@@ -185,6 +197,22 @@ const IndexSetConfigurationForm = React.createClass({
                        help="Add a description of this index set."
                        required />
                 {readOnlyconfig}
+                <Input type="number"
+                       id="index-set-max-num-segments"
+                       label="Max. number of segments"
+                       name="index_optimization_max_num_segments"
+                       min="1"
+                       onChange={this._onInputChange}
+                       value={indexSet.index_optimization_max_num_segments}
+                       help="Maximum number of segments per Elasticsearch index after optimization (force merge)."
+                       required />
+                <Input type="checkbox"
+                       id="index-set-disable-optimization"
+                       label="Disable index optimization after rotation"
+                       name="index_optimization_disabled"
+                       onChange={this._onDisableOptimizationClick}
+                       checked={indexSet.index_optimization_disabled}
+                       help="Disable Elasticsearch index optimization (force merge) after rotation." />
               </Col>
             </Row>
             <Row>

@@ -85,6 +85,17 @@ public abstract class IndexSetSummary {
     @NotNull
     public abstract ZonedDateTime creationDate();
 
+    @JsonProperty("index_analyzer")
+    @NotBlank
+    public abstract String indexAnalyzer();
+
+    @JsonProperty("index_optimization_max_num_segments")
+    @Min(1L)
+    public abstract int indexOptimizationMaxNumSegments();
+
+    @JsonProperty("index_optimization_disabled")
+    public abstract boolean indexOptimizationDisabled();
+
     @JsonCreator
     public static IndexSetSummary create(@JsonProperty("id") @Nullable String id,
                                          @JsonProperty("title") @NotBlank String title,
@@ -98,8 +109,13 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("rotation_strategy") @NotNull RotationStrategyConfig rotationStrategy,
                                          @JsonProperty("retention_strategy_class") @NotNull String retentionStrategyClass,
                                          @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
-                                         @JsonProperty("creation_date") @NotNull ZonedDateTime creationDate) {
-        return new AutoValue_IndexSetSummary(id, title, description, isDefault, isWritable, indexPrefix, shards, replicas, rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate);
+                                         @JsonProperty("creation_date") @NotNull ZonedDateTime creationDate,
+                                         @JsonProperty("index_analyzer") @NotBlank String indexAnalyzer,
+                                         @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
+                                         @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled) {
+        return new AutoValue_IndexSetSummary(id, title, description, isDefault, isWritable, indexPrefix, shards, replicas,
+                rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy, creationDate,
+                indexAnalyzer, indexOptimizationMaxNumSegments, indexOptimizationDisabled);
     }
 
     public static IndexSetSummary fromIndexSetConfig(IndexSetConfig indexSet, boolean isDefault) {
@@ -116,7 +132,10 @@ public abstract class IndexSetSummary {
                 indexSet.rotationStrategy(),
                 indexSet.retentionStrategyClass(),
                 indexSet.retentionStrategy(),
-                indexSet.creationDate());
+                indexSet.creationDate(),
+                indexSet.indexAnalyzer(),
+                indexSet.indexOptimizationMaxNumSegments(),
+                indexSet.indexOptimizationDisabled());
 
     }
 
@@ -134,6 +153,10 @@ public abstract class IndexSetSummary {
                 .retentionStrategyClass(retentionStrategyClass())
                 .retentionStrategy(retentionStrategy())
                 .creationDate(creationDate())
+                .indexAnalyzer(indexAnalyzer())
+                .indexTemplateName(indexPrefix() + "-template")
+                .indexOptimizationMaxNumSegments(indexOptimizationMaxNumSegments())
+                .indexOptimizationDisabled(indexOptimizationDisabled())
                 .build();
     }
 }

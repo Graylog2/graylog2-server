@@ -22,7 +22,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.Configuration;
-import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.ExposedConfiguration;
 import org.graylog2.shared.rest.resources.RestResource;
 
@@ -37,20 +36,17 @@ import javax.ws.rs.core.MediaType;
 @Path("/system/configuration")
 @Produces(MediaType.APPLICATION_JSON)
 public class ConfigurationResource extends RestResource {
-
     private final Configuration configuration;
-    private final ElasticsearchConfiguration esConfiguration;
 
     @Inject
-    public ConfigurationResource(Configuration configuration, ElasticsearchConfiguration esConfiguration) {
+    public ConfigurationResource(Configuration configuration) {
         this.configuration = configuration;
-        this.esConfiguration = esConfiguration;
     }
 
     @GET
     @Timed
     @ApiOperation(value = "Get relevant configuration settings and their values")
     public ExposedConfiguration getRelevant() {
-        return ExposedConfiguration.create(configuration, esConfiguration);
+        return ExposedConfiguration.create(configuration);
     }
 }

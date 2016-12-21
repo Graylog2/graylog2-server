@@ -47,6 +47,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 public class V20161116172100_DefaultIndexSetMigrationTest {
@@ -92,6 +94,10 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
                 .rotationStrategy(rotationStrategyConfig)
                 .retentionStrategy(retentionStrategyConfig)
                 .creationDate(ZonedDateTime.of(2016, 10, 12, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("prefix-template")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
                 .build();
         when(clusterConfigService.get(IndexManagementConfig.class)).thenReturn(IndexManagementConfig.create("test", "test"));
         when(clusterConfigService.get(StubRotationStrategyConfig.class)).thenReturn(rotationStrategyConfig);
@@ -116,6 +122,10 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
         assertThat(capturedIndexSetConfig.replicas()).isEqualTo(elasticsearchConfiguration.getReplicas());
         assertThat(capturedIndexSetConfig.rotationStrategy()).isInstanceOf(StubRotationStrategyConfig.class);
         assertThat(capturedIndexSetConfig.retentionStrategy()).isInstanceOf(StubRetentionStrategyConfig.class);
+        assertThat(capturedIndexSetConfig.indexAnalyzer()).isEqualTo(elasticsearchConfiguration.getAnalyzer());
+        assertThat(capturedIndexSetConfig.indexTemplateName()).isEqualTo(elasticsearchConfiguration.getTemplateName());
+        assertThat(capturedIndexSetConfig.indexOptimizationMaxNumSegments()).isEqualTo(elasticsearchConfiguration.getIndexOptimizationMaxNumSegments());
+        assertThat(capturedIndexSetConfig.indexOptimizationDisabled()).isEqualTo(elasticsearchConfiguration.isDisableIndexOptimization());
     }
 
     @Test
@@ -150,12 +160,14 @@ public class V20161116172100_DefaultIndexSetMigrationTest {
     }
 
     @Test
-    public void startOnThisNodeReturnsFalseIfMigrationWasSuccessfulBefore() throws Exception {
-        when(clusterConfigService.get(DefaultIndexSetCreated.class))
-                .thenReturn(DefaultIndexSetCreated.create());
+    public void migrationDoesNotRunAgainIfMigrationWasSuccessfulBefore() throws Exception {
+        when(clusterConfigService.get(DefaultIndexSetCreated.class)).thenReturn(DefaultIndexSetCreated.create());
+        migration.upgrade();
 
-        verify(indexSetService, never()).save(any(IndexSetConfig.class));
-        verify(clusterConfigService, never()).write(any(DefaultIndexSetCreated.class));
+        verify(clusterConfigService).get(DefaultIndexSetCreated.class);
+        verifyNoMoreInteractions(clusterConfigService);
+        verifyZeroInteractions(clusterEventBus);
+        verifyZeroInteractions(indexSetService);
     }
 
     private static class StubRotationStrategy implements RotationStrategy {
