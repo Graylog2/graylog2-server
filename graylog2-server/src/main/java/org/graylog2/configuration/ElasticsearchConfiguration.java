@@ -21,7 +21,6 @@ import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.StringListConverter;
 import com.github.joschi.jadconfig.util.Duration;
-import com.github.joschi.jadconfig.validators.DirectoryWritableValidator;
 import com.github.joschi.jadconfig.validators.FilePathReadableValidator;
 import com.github.joschi.jadconfig.validators.InetPortValidator;
 import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
@@ -143,6 +142,12 @@ public class ElasticsearchConfiguration {
 
     @Parameter(value = "elasticsearch_request_timeout", validator = PositiveDurationValidator.class)
     private Duration requestTimeout = Duration.minutes(1L);
+
+    @Parameter(value = "elasticsearch_index_optimization_timeout", validator = PositiveDurationValidator.class)
+    private Duration indexOptimizationTimeout = Duration.hours(1L);
+
+    @Parameter(value = "elasticsearch_index_optimization_jobs", validator = PositiveIntegerValidator.class)
+    private int indexOptimizationJobs = 20;
 
     public String getClusterName() {
         return clusterName;
@@ -287,6 +292,14 @@ public class ElasticsearchConfiguration {
 
     public Duration getRequestTimeout() {
         return requestTimeout;
+    }
+
+    public Duration getIndexOptimizationTimeout() {
+        return indexOptimizationTimeout;
+    }
+
+    public int getIndexOptimizationJobs() {
+        return indexOptimizationJobs;
     }
 
     @ValidatorMethod

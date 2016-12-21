@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.indices.jobs;
 
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.indices.Indices;
@@ -25,28 +26,33 @@ import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class OptimizeIndexJob extends SystemJob {
+import javax.inject.Named;
 
+public class OptimizeIndexJob extends SystemJob {
     public interface Factory {
         OptimizeIndexJob create(String index, int maxNumSegments);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(OptimizeIndexJob.class);
 
-    public static final int MAX_CONCURRENCY = 1000;
-
+    private final Indices indices;
     private final ActivityWriter activityWriter;
+    private final Duration indexOptimizationTimeout;
+    private final int indexOptimizationJobs;
     private final String index;
     private final int maxNumSegments;
-    private final Indices indices;
 
     @AssistedInject
     public OptimizeIndexJob(Indices indices,
                             ActivityWriter activityWriter,
+                            @Named("elasticsearch_index_optimization_timeout") Duration indexOptimizationTimeout,
+                            @Named("elasticsearch_index_optimization_jobs") int indexOptimizationJobs,
                             @Assisted String index,
                             @Assisted int maxNumSegments) {
         this.indices = indices;
         this.activityWriter = activityWriter;
+        this.indexOptimizationTimeout = indexOptimizationTimeout;
+        this.indexOptimizationJobs = indexOptimizationJobs;
         this.index = index;
         this.maxNumSegments = maxNumSegments;
     }
@@ -57,7 +63,7 @@ public class OptimizeIndexJob extends SystemJob {
         activityWriter.write(new Activity(msg, OptimizeIndexJob.class));
         LOG.info(msg);
 
-        indices.optimizeIndex(index, maxNumSegments);
+        indices.optimizeIndex(index, maxNumSegments, indexOptimizationTimeout);
     }
 
     @Override
@@ -71,7 +77,7 @@ public class OptimizeIndexJob extends SystemJob {
 
     @Override
     public int maxConcurrency() {
-        return MAX_CONCURRENCY;
+        return indexOptimizationJobs;
     }
 
     @Override
