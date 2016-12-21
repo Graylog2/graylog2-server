@@ -170,7 +170,7 @@ public class EmailAlarmCallback implements AlarmCallback {
                 "Sender",
                 "graylog@example.org",
                 "The sender of sent out mail alerts",
-                ConfigurationField.Optional.NOT_OPTIONAL));
+                ConfigurationField.Optional.OPTIONAL));
 
         configurationRequest.addField(new TextField("subject",
                 "E-Mail Subject",
