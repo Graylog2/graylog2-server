@@ -23,6 +23,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
@@ -34,6 +35,7 @@ public class MongoDBSessionServiceImpl extends PersistedServiceImpl implements M
     }
 
     @Override
+    @Nullable
     public MongoDbSession load(String sessionId) {
         DBObject query = new BasicDBObject();
         query.put("session_id", sessionId);

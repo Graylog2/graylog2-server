@@ -18,12 +18,11 @@ package org.graylog2.security;
 
 import org.graylog2.plugin.database.PersistedService;
 
+import javax.annotation.Nullable;
 import java.util.Collection;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface MongoDBSessionService extends PersistedService {
+    @Nullable
     MongoDbSession load(String sessionId);
 
     Collection<MongoDbSession> loadAll();
