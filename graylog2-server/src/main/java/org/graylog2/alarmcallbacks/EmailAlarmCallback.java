@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class EmailAlarmCallback implements AlarmCallback {
     private static final Logger LOG = LoggerFactory.getLogger(EmailAlarmCallback.class);
 
@@ -228,8 +230,9 @@ public class EmailAlarmCallback implements AlarmCallback {
 
     @Override
     public void checkConfiguration() throws ConfigurationException {
-        if (configuration.getString("sender") == null || configuration.getString("sender").isEmpty()
-                || configuration.getString("subject") == null || configuration.getString("subject").isEmpty())
+        final boolean missingSender = isNullOrEmpty(configuration.getString("sender")) && isNullOrEmpty(emailConfiguration.getFromEmail());
+        if (missingSender || isNullOrEmpty(configuration.getString("subject"))) {
             throw new ConfigurationException("Sender or subject are missing or invalid!");
+        }
     }
 }
