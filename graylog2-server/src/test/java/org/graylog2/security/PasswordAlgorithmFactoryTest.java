@@ -19,10 +19,11 @@ package org.graylog2.security;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.Map;
@@ -32,8 +33,9 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class PasswordAlgorithmFactoryTest {
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private PasswordAlgorithm passwordAlgorithm1;

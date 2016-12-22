@@ -19,15 +19,18 @@ package org.graylog2.inputs.extractors;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import org.junit.Before;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.junit.Rule;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public abstract class AbstractExtractorTest {
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
     protected MetricRegistry metricRegistry;
     protected Timer timer;
     protected Timer.Context timerContext;

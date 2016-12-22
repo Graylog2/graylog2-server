@@ -28,10 +28,11 @@ import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
@@ -45,7 +46,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class SyslogCodecTest {
     private static final int YEAR = Tools.nowUTC().getYear();
     public static String STRUCTURED = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
@@ -54,6 +54,9 @@ public class SyslogCodecTest {
     // The folowing message from issue 549 is from a Juniper SRX 240 device.
     public static String STRUCTURED_ISSUE_549 = "<14>1 2014-05-01T08:26:51.179Z fw01 RT_FLOW - RT_FLOW_SESSION_DENY [junos@2636.1.1.1.2.39 source-address=\"1.2.3.4\" source-port=\"56639\" destination-address=\"5.6.7.8\" destination-port=\"2003\" service-name=\"None\" protocol-id=\"6\" icmp-type=\"0\" policy-name=\"log-all-else\" source-zone-name=\"campus\" destination-zone-name=\"mngmt\" application=\"UNKNOWN\" nested-application=\"UNKNOWN\" username=\"N/A\" roles=\"N/A\" packet-incoming-interface=\"reth6.0\" encrypted=\"No\"]";
     private final String UNSTRUCTURED = "<45>Oct 21 12:09:37 c4dc57ba1ebb syslog-ng[7208]: syslog-ng starting up; version='3.5.3'";
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private Configuration configuration;

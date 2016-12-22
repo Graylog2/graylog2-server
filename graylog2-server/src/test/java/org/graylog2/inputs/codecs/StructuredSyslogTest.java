@@ -22,10 +22,11 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.net.InetSocketAddress;
 import java.util.Collections;
@@ -36,10 +37,8 @@ import java.util.regex.Pattern;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class StructuredSyslogTest {
     // http://tools.ietf.org/rfc/rfc5424.txt
     private static final String ValidStructuredMessage = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 [exampleSDID@32473 iut=\"3\" eventSource=\"Application\" eventID=\"1011\"] BOMAn application event log entry";
@@ -48,6 +47,9 @@ public class StructuredSyslogTest {
     private static final String ValidStructuredNoStructValues = "<165>1 2012-12-25T22:14:15.003Z mymachine.example.com evntslog - ID47 - BOMAn application event log entry";
     private static final String ValidNonStructuredMessage = "<86>Dec 24 17:05:01 nb-lkoopmann CRON[10049]: pam_unix(cron:session): session closed for user root";
     private static final String MessageLookingLikeStructured = "<133>NOMA101FW01A: NetScreen device_id=NOMA101FW01A [Root]system-notification-00257(traffic): start_time=\"2011-12-23 17:33:43\" duration=0 reason=Creation";
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private final Configuration configuration = new Configuration(ImmutableMap.<String, Object>of(
             SyslogCodec.CK_FORCE_RDNS, false,

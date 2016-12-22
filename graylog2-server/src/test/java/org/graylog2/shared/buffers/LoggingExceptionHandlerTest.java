@@ -17,15 +17,11 @@
 package org.graylog2.shared.buffers;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.slf4j.Logger;
 
 import static org.mockito.Mockito.mock;
 
-@RunWith(MockitoJUnitRunner.class)
 public class LoggingExceptionHandlerTest {
-
     @Test
     public void testHandleEventException() throws Exception {
         final Logger logger = mock(Logger.class);

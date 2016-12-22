@@ -28,10 +28,11 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import static org.joda.time.Period.minutes;
 import static org.joda.time.Period.seconds;
@@ -43,8 +44,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
 
-@RunWith(MockitoJUnitRunner.class)
 public class TimeBasedRotationStrategyTest {
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
     @Mock
     private IndexSet indexSet;
 

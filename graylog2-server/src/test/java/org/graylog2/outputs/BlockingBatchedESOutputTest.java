@@ -27,10 +27,11 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.shared.journal.NoopJournal;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.List;
 import java.util.Map;
@@ -43,8 +44,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(MockitoJUnitRunner.class)
 public class BlockingBatchedESOutputTest {
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private MetricRegistry metricRegistry;
     private NoopJournal journal;

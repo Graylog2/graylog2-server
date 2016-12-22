@@ -60,8 +60,8 @@ import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import javax.inject.Inject;
 import java.time.ZonedDateTime;
@@ -75,7 +75,6 @@ import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.E
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-@RunWith(MockitoJUnitRunner.class)
 public class IndicesTest {
     @ClassRule
     public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
@@ -83,11 +82,13 @@ public class IndicesTest {
     private static final long ES_TIMEOUT = TimeUnit.SECONDS.toMillis(1L);
     private static final String INDEX_NAME = "graylog_0";
 
-    private final IndexSetConfig indexSetConfig;
-    private final IndexSet indexSet;
-
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
     @Rule
     public ElasticsearchRule elasticsearchRule;
+
+    private final IndexSetConfig indexSetConfig;
+    private final IndexSet indexSet;
 
     @Inject
     private Client client;

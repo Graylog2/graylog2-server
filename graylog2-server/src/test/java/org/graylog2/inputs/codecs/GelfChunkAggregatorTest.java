@@ -29,9 +29,10 @@ import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnit;
+import org.mockito.junit.MockitoRule;
 
 import java.util.concurrent.ConcurrentSkipListSet;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -51,9 +52,11 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-@RunWith(MockitoJUnitRunner.class)
 public class GelfChunkAggregatorTest {
     private static final byte[] CHUNK_MAGIC_BYTES = new byte[]{0x1e, 0x0f};
+
+    @Rule
+    public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private ScheduledThreadPoolExecutor poolExecutor;
     private GelfChunkAggregator aggregator;
