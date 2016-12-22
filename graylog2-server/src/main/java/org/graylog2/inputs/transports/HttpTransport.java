@@ -70,6 +70,7 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
 
 public class HttpTransport extends AbstractTcpTransport {
     static final int DEFAULT_MAX_INITIAL_LINE_LENGTH = 4096;
@@ -200,7 +201,10 @@ public class HttpTransport extends AbstractTcpTransport {
             final String origin = request.headers().get(Names.ORIGIN);
 
             // to allow for future changes, let's be at least a little strict in what we accept here.
-            if (!HttpMethod.POST.equals(request.getMethod())) {
+            if (HttpMethod.OPTIONS.equals(request.getMethod())) {
+                writeResponse(channel, keepAlive, httpRequestVersion, OK, origin);
+                return;
+            } else if (!HttpMethod.POST.equals(request.getMethod())) {
                 writeResponse(channel, keepAlive, httpRequestVersion, METHOD_NOT_ALLOWED, origin);
                 return;
             }
