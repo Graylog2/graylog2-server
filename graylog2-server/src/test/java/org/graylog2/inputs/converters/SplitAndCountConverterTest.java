@@ -24,15 +24,12 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SplitAndCountConverterTest {
-
     @Test
     public void testConvert() throws Exception {
         assertEquals(0, new SplitAndCountConverter(config("x")).convert(""));
-        assertEquals(0, new SplitAndCountConverter(config("_")).convert("foo-bar-baz"));
+        assertEquals(1, new SplitAndCountConverter(config("_")).convert("foo-bar-baz"));
+        assertEquals(1, new SplitAndCountConverter(config("-")).convert("foo"));
         assertEquals(2, new SplitAndCountConverter(config("-")).convert("foo-bar"));
         assertEquals(3, new SplitAndCountConverter(config("-")).convert("foo-bar-baz"));
         assertEquals(3, new SplitAndCountConverter(config(".")).convert("foo.bar.baz")); // Regex. Must be escaped.

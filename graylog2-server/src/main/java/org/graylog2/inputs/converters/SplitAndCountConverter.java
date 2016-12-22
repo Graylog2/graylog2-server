@@ -22,33 +22,25 @@ import org.graylog2.plugin.inputs.Converter;
 import java.util.Map;
 import java.util.regex.Pattern;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class SplitAndCountConverter extends Converter {
+import static com.google.common.base.Strings.isNullOrEmpty;
 
-    private final String splitBy;
+public class SplitAndCountConverter extends Converter {
     private final String splitByEscaped;
 
     public SplitAndCountConverter(Map<String, Object> config) throws ConfigurationException {
         super(Type.SPLIT_AND_COUNT, config);
 
-        if (config.get("split_by") == null || ((String) config.get("split_by")).isEmpty()) {
+        final String splitBy = (String) config.get("split_by");
+        if (isNullOrEmpty(splitBy)) {
             throw new ConfigurationException("Missing config [split_by].");
         }
 
-        splitBy = (String) config.get("split_by");
-        splitByEscaped = Pattern.quote((String) config.get("split_by"));
+        splitByEscaped = Pattern.quote(splitBy);
     }
 
     @Override
     public Object convert(String value) {
         if (value == null || value.isEmpty()) {
-            return 0;
-        }
-
-        if (!value.contains(splitBy)) {
-            // split().length would be 1, but we want 0.
             return 0;
         }
 
