@@ -45,7 +45,7 @@ public class BaseConfigurationTest {
 
     private class Configuration extends BaseConfiguration {
         @Parameter(value = "rest_listen_uri", required = true)
-        private URI restListenUri = URI.create("http://127.0.0.1:9000/api/");
+        private URI restListenUri = URI.create("http://127.0.0.1:12900/");
 
         @Parameter(value = "web_listen_uri", required = true)
         private URI webListenUri = URI.create("http://127.0.0.1:9000/");
@@ -441,5 +441,26 @@ public class BaseConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         assertThat(configuration.getRestTransportUri()).hasScheme("https");
+    }
+
+    @Test
+    public void testRestListenUriAndWebListenUriWithSameScheme() throws Exception {
+        final File privateKey = temporaryFolder.newFile("graylog.key");
+        final File certificate = temporaryFolder.newFile("graylog.crt");
+
+        validProperties.put("rest_listen_uri", "https://127.0.0.1:8000/api");
+        validProperties.put("rest_transport_uri", "https://127.0.0.1:8000/api");
+        validProperties.put("rest_enable_tls", "true");
+        validProperties.put("rest_tls_key_file", privateKey.getAbsolutePath());
+        validProperties.put("rest_tls_cert_file", certificate.getAbsolutePath());
+        validProperties.put("web_listen_uri", "https://127.0.0.1:8000/");
+        validProperties.put("web_enable_tls", "true");
+
+        org.graylog2.Configuration configuration = new org.graylog2.Configuration();
+        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
+
+        assertThat(configuration.getRestListenUri()).hasScheme("https");
+        assertThat(configuration.getRestTransportUri()).hasScheme("https");
+        assertThat(configuration.getWebListenUri()).hasScheme("https");
     }
 }
