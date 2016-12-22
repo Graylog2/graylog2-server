@@ -25,12 +25,14 @@ const EntityListItem = React.createClass({
         <Row className="row-sm">
           <Col md={6}>
             <h2>{this.props.title} {titleSuffix}</h2>
-            <div className="item-description">
+            {(this.props.createdFromContentPack || this.props.description) &&
+              <div className="item-description">
               {this.props.createdFromContentPack &&
-              <span><i className="fa fa-cube" title="Created from content pack" />&nbsp;</span>
+                <span><i className="fa fa-cube" title="Created from content pack" />&nbsp;</span>
               }
-              <span>{this.props.description}</span>
-            </div>
+                <span>{this.props.description}</span>
+              </div>
+            }
           </Col>
 
           <Col md={6}>
