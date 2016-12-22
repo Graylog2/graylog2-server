@@ -18,6 +18,7 @@ package org.graylog2.commands.journal;
 
 import com.google.inject.Module;
 import org.graylog2.Configuration;
+import org.graylog2.audit.AuditBindings;
 import org.graylog2.bindings.ConfigurationModule;
 import org.graylog2.bootstrap.CmdLineTool;
 import org.graylog2.plugin.KafkaJournalConfiguration;
@@ -55,7 +56,8 @@ public abstract class AbstractJournalCommand extends CmdLineTool {
         return Arrays.asList(new ConfigurationModule(configuration),
                              new ServerStatusBindings(capabilities()),
                              new SchedulerBindings(),
-                             new KafkaJournalModule());
+                             new KafkaJournalModule(),
+                             new AuditBindings());
     }
 
     @Override
