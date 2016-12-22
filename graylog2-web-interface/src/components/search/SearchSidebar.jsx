@@ -87,10 +87,6 @@ const SearchSidebar = React.createClass({
     this.setState({ availableHeight: maxHeight });
   },
 
-  _showIndicesModal(event) {
-    event.preventDefault();
-    this.refs.indicesModal.open();
-  },
   _getURLForExportAsCSV() {
     const searchParams = SearchStore.getOriginalSearchURLParams();
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
@@ -121,11 +117,13 @@ const SearchSidebar = React.createClass({
 
     return url.toString();
   },
-  _indicesModalClose() {
-    this.refs.indicesModal.close();
+
+  _closeModal(ref) {
+    return () => this.refs[ref].close();
   },
-  _showQueryModalOpen() {
-    this.refs.showQueryModal.open();
+
+  _openModal(ref) {
+    return () => this.refs[ref].open();
   },
 
   render() {
@@ -149,7 +147,7 @@ const SearchSidebar = React.createClass({
           </ul>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this._indicesModalClose}>Close</Button>
+          <Button onClick={this._closeModal('indicesModal')}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -167,7 +165,7 @@ const SearchSidebar = React.createClass({
 
     // always add the debug query link as last elem
     moreActions.push(<MenuItem divider key="div2"/>);
-    moreActions.push(<MenuItem key="showQuery" onSelect={this._showQueryModalOpen}>Show query</MenuItem>);
+    moreActions.push(<MenuItem key="showQuery" onSelect={this._openModal('showQueryModal')}>Show query</MenuItem>);
 
     return (
       <AutoAffix affixClassName="affix">
@@ -180,7 +178,7 @@ const SearchSidebar = React.createClass({
             <p style={{ marginTop: 3 }}>
               Found <strong>{numeral(this.props.result.total_results).format('0,0')} messages</strong>{' '}
               in {numeral(this.props.result.time).format('0,0')} ms, searched in&nbsp;
-              <a href="#" onClick={this._showIndicesModal}>
+              <a href="#" onClick={this._openModal('indicesModal')}>
                 {this.props.result.used_indices.length}&nbsp;{this.props.result.used_indices.length === 1 ? 'index' : 'indices'}
               </a>.
               {indicesModal}
