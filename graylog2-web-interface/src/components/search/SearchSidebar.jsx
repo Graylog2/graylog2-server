@@ -111,9 +111,13 @@ const SearchSidebar = React.createClass({
 
     const url = new URI(URLUtils.qualifyUrl(
       ApiRoutes.UniversalSearchApiController.export(rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
-    ))
-      .username(SessionStore.getSessionId())
-      .password('session');
+    ));
+
+    if (URLUtils.areCredentialsInURLSupported()) {
+      url
+        .username(SessionStore.getSessionId())
+        .password('session');
+    }
 
     return url.toString();
   },
@@ -124,6 +128,32 @@ const SearchSidebar = React.createClass({
 
   _openModal(ref) {
     return () => this.refs[ref].open();
+  },
+
+  _getExportModal() {
+    const infoText = (URLUtils.areCredentialsInURLSupported() ?
+      'Please right click the download link below and choose "Save Link As..." to download the CSV file.' :
+      'Please click the download link below. Your browser may ask for your username and password to ' +
+      'download the CSV file.');
+    return (
+      <BootstrapModalWrapper ref="exportModal">
+        <Modal.Header closeButton>
+          <Modal.Title>Export search results as CSV</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>{infoText}</p>
+          <p>
+            <a href={this._getURLForExportAsCSV()} target="_blank">
+              <i className="fa fa-cloud-download"/>&nbsp;
+              Download
+            </a>
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={this._closeModal('exportModal')}>Close</Button>
+        </Modal.Footer>
+      </BootstrapModalWrapper>
+    );
   },
 
   render() {
@@ -154,7 +184,7 @@ const SearchSidebar = React.createClass({
 
     let searchTitle = null;
     const moreActions = [
-      <MenuItem key="export" href={this._getURLForExportAsCSV()}>Export as CSV</MenuItem>,
+      <MenuItem key="export" onSelect={this._openModal('exportModal')}>Export as CSV</MenuItem>,
     ];
     if (this.props.searchInStream) {
       searchTitle = <span>{this.props.searchInStream.title}</span>;
@@ -198,6 +228,8 @@ const SearchSidebar = React.createClass({
                 <ShowQueryModal key="debugQuery" ref="showQueryModal" builtQuery={this.props.builtQuery}/>
               </div>
             </div>
+
+            {this._getExportModal()}
 
             <hr />
           </div>

@@ -1,8 +1,10 @@
 import Qs from 'qs';
 import URI from 'urijs';
 import AppConfig from 'util/AppConfig';
+import UAParser from 'ua-parser-js';
 
 const URLUtils = {
+  parser: new UAParser(),
   qualifyUrl(url) {
     return new URI(AppConfig.gl2ServerUrl() + url).normalizePathname().toString();
   },
@@ -45,6 +47,10 @@ const URLUtils = {
 
     const joinedPath = `/${args.join('/')}`;
     return joinedPath.replace(/[\/]+/g, '/');
+  },
+  areCredentialsInURLSupported() {
+    const browser = this.parser.getBrowser();
+    return browser.name !== 'IE' && browser.name !== 'Edge';
   },
 };
 
