@@ -198,8 +198,8 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
 
     public static List<ConfigurationField> getDefaultConfigurationFields() {
         return Lists.newArrayList(
-            new NumberField("grace", "Grace Period", 0, "Time span in seconds defining how long alerting is paused after alert is triggered", ConfigurationField.Optional.NOT_OPTIONAL),
-            new NumberField("backlog", "Message Backlog", 0, "The number of messages to be included in alert notification", ConfigurationField.Optional.NOT_OPTIONAL)
+            new NumberField("grace", "Grace Period", 0, "Number of minutes to wait after an alert is triggered, to trigger another alert", ConfigurationField.Optional.NOT_OPTIONAL),
+            new NumberField("backlog", "Message Backlog", 0, "The number of messages to be included in alert notifications", ConfigurationField.Optional.NOT_OPTIONAL)
         );
     }
 }
