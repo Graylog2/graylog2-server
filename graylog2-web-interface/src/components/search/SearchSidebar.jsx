@@ -87,10 +87,6 @@ const SearchSidebar = React.createClass({
     this.setState({ availableHeight: maxHeight });
   },
 
-  _showIndicesModal(event) {
-    event.preventDefault();
-    this.refs.indicesModal.open();
-  },
   _getURLForExportAsCSV() {
     const searchParams = SearchStore.getOriginalSearchURLParams();
     const streamId = this.props.searchInStream ? this.props.searchInStream.id : undefined;
@@ -115,17 +111,49 @@ const SearchSidebar = React.createClass({
 
     const url = new URI(URLUtils.qualifyUrl(
       ApiRoutes.UniversalSearchApiController.export(rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
-    ))
-      .username(SessionStore.getSessionId())
-      .password('session');
+    ));
+
+    if (URLUtils.areCredentialsInURLSupported()) {
+      url
+        .username(SessionStore.getSessionId())
+        .password('session');
+    }
 
     return url.toString();
   },
-  _indicesModalClose() {
-    this.refs.indicesModal.close();
+
+  _closeModal(ref) {
+    return () => this.refs[ref].close();
   },
-  _showQueryModalOpen() {
-    this.refs.showQueryModal.open();
+
+  _openModal(ref) {
+    return () => this.refs[ref].open();
+  },
+
+  _getExportModal() {
+    const infoText = (URLUtils.areCredentialsInURLSupported() ?
+      'Please right click the download link below and choose "Save Link As..." to download the CSV file.' :
+      'Please click the download link below. Your browser may ask for your username and password to ' +
+      'download the CSV file.');
+    return (
+      <BootstrapModalWrapper ref="exportModal">
+        <Modal.Header closeButton>
+          <Modal.Title>Export search results as CSV</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>{infoText}</p>
+          <p>
+            <a href={this._getURLForExportAsCSV()} target="_blank">
+              <i className="fa fa-cloud-download"/>&nbsp;
+              Download
+            </a>
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button onClick={this._closeModal('exportModal')}>Close</Button>
+        </Modal.Footer>
+      </BootstrapModalWrapper>
+    );
   },
 
   render() {
@@ -149,14 +177,14 @@ const SearchSidebar = React.createClass({
           </ul>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this._indicesModalClose}>Close</Button>
+          <Button onClick={this._closeModal('indicesModal')}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
 
     let searchTitle = null;
     const moreActions = [
-      <MenuItem key="export" href={this._getURLForExportAsCSV()}>Export as CSV</MenuItem>,
+      <MenuItem key="export" onSelect={this._openModal('exportModal')}>Export as CSV</MenuItem>,
     ];
     if (this.props.searchInStream) {
       searchTitle = <span>{this.props.searchInStream.title}</span>;
@@ -167,7 +195,7 @@ const SearchSidebar = React.createClass({
 
     // always add the debug query link as last elem
     moreActions.push(<MenuItem divider key="div2"/>);
-    moreActions.push(<MenuItem key="showQuery" onSelect={this._showQueryModalOpen}>Show query</MenuItem>);
+    moreActions.push(<MenuItem key="showQuery" onSelect={this._openModal('showQueryModal')}>Show query</MenuItem>);
 
     return (
       <AutoAffix affixClassName="affix">
@@ -180,7 +208,7 @@ const SearchSidebar = React.createClass({
             <p style={{ marginTop: 3 }}>
               Found <strong>{numeral(this.props.result.total_results).format('0,0')} messages</strong>{' '}
               in {numeral(this.props.result.time).format('0,0')} ms, searched in&nbsp;
-              <a href="#" onClick={this._showIndicesModal}>
+              <a href="#" onClick={this._openModal('indicesModal')}>
                 {this.props.result.used_indices.length}&nbsp;{this.props.result.used_indices.length === 1 ? 'index' : 'indices'}
               </a>.
               {indicesModal}
@@ -200,6 +228,8 @@ const SearchSidebar = React.createClass({
                 <ShowQueryModal key="debugQuery" ref="showQueryModal" builtQuery={this.props.builtQuery}/>
               </div>
             </div>
+
+            {this._getExportModal()}
 
             <hr />
           </div>
