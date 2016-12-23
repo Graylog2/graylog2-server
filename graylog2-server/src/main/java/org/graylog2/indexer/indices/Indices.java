@@ -16,15 +16,14 @@
  */
 package org.graylog2.indexer.indices;
 
+import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
+import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.UnmodifiableIterator;
-
-import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
-
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ActionFuture;
 import org.elasticsearch.action.WriteConsistencyLevel;
@@ -95,6 +94,10 @@ import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
@@ -104,11 +107,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import javax.validation.constraints.NotNull;
 
 import static java.util.stream.Collectors.toSet;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
@@ -543,7 +541,7 @@ public class Indices {
                 .execute().actionGet().isAcknowledged();
     }
 
-    public void optimizeIndex(String index, int maxNumSegments) {
+    public void optimizeIndex(String index, int maxNumSegments, Duration timeout) {
         // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/indices-forcemerge.html
         final ForceMergeRequest request = c.admin().indices().prepareForceMerge(index)
                 .setMaxNumSegments(maxNumSegments)
@@ -552,7 +550,7 @@ public class Indices {
                 .request();
 
         // Using a specific timeout to override the global Elasticsearch request timeout
-        c.admin().indices().forceMerge(request).actionGet(1L, TimeUnit.HOURS);
+        c.admin().indices().forceMerge(request).actionGet(timeout.getQuantity(), timeout.getUnit());
     }
 
     public ClusterHealthStatus waitForRecovery(String index) {
