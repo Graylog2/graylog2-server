@@ -24,7 +24,6 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.shared.system.activities.Activity;
 import org.graylog2.shared.system.activities.ActivityWriter;
@@ -37,7 +36,7 @@ import java.util.concurrent.TimeUnit;
 
 public class RebuildIndexRangesJob extends SystemJob {
     public interface Factory {
-        RebuildIndexRangesJob create(IndexSetRegistry indexSetRegistry);
+        RebuildIndexRangesJob create(Set<IndexSet> indexSets);
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(RebuildIndexRangesJob.class);
@@ -47,15 +46,15 @@ public class RebuildIndexRangesJob extends SystemJob {
     private volatile int indicesToCalculate = 0;
     private volatile int indicesCalculated = 0;
 
-    protected final IndexSetRegistry indexSetRegistry;
+    protected final Set<IndexSet> indexSets;
     private final ActivityWriter activityWriter;
     protected final IndexRangeService indexRangeService;
 
     @AssistedInject
-    public RebuildIndexRangesJob(@Assisted IndexSetRegistry indexSetRegistry,
+    public RebuildIndexRangesJob(@Assisted Set<IndexSet> indexSets,
                                  ActivityWriter activityWriter,
                                  IndexRangeService indexRangeService) {
-        this.indexSetRegistry = indexSetRegistry;
+        this.indexSets = indexSets;
         this.activityWriter = activityWriter;
         this.indexRangeService = indexRangeService;
     }
@@ -86,8 +85,7 @@ public class RebuildIndexRangesJob extends SystemJob {
 
         // for each index set we know about
         final ListMultimap<IndexSet, String> indexSets = MultimapBuilder.hashKeys().arrayListValues().build();
-        final Set<IndexSet> allIndexSets = indexSetRegistry.getAllIndexSets();
-        for (IndexSet indexSet : allIndexSets) {
+        for (IndexSet indexSet : this.indexSets) {
             final String[] managedIndicesNames = indexSet.getManagedIndicesNames();
             for (String name : managedIndicesNames) {
                 indexSets.put(indexSet, name);

@@ -120,7 +120,7 @@ public class V20161130141500_DefaultStreamRecalcIndexRanges extends Migration {
                 continue;
             }
             LOG.info("Recalculating streams in index {}", indexName);
-            final CreateNewSingleIndexRangeJob createNewSingleIndexRangeJob = rebuildIndexRangeJobFactory.create(indexSetRegistry, indexName);
+            final CreateNewSingleIndexRangeJob createNewSingleIndexRangeJob = rebuildIndexRangeJobFactory.create(indexSetRegistry.getAllIndexSets(), indexName);
             createNewSingleIndexRangeJob.execute();
         }
 

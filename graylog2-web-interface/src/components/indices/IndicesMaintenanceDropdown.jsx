@@ -16,8 +16,7 @@ const IndicesMaintenanceDropdown = React.createClass({
 
   _onRecalculateIndexRange() {
     if (window.confirm('This will recalculate index ranges for ALL index sets using a background system job. Do you want to proceed?')) {
-      // TODO 2.2: Only rebuild index set here? It currently rebuilds all index ranges!
-      IndexRangesActions.recalculate();
+      IndexRangesActions.recalculate(this.props.indexSetId);
     }
   },
   _onCycleDeflector() {

@@ -18,10 +18,12 @@ package org.graylog2.indexer.ranges;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.IndexSet;
 import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Set;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -30,15 +32,15 @@ public class CreateNewSingleIndexRangeJob extends RebuildIndexRangesJob {
     private final String indexName;
 
     public interface Factory {
-        CreateNewSingleIndexRangeJob create(IndexSetRegistry indexSetRegistry, String indexName);
+        CreateNewSingleIndexRangeJob create(Set<IndexSet> indexSets, String indexName);
     }
 
     @AssistedInject
-    public CreateNewSingleIndexRangeJob(@Assisted IndexSetRegistry indexSetRegistry,
+    public CreateNewSingleIndexRangeJob(@Assisted Set<IndexSet> indexSets,
                                         @Assisted String indexName,
                                         ActivityWriter activityWriter,
                                         IndexRangeService indexRangeService) {
-        super(indexSetRegistry, activityWriter, indexRangeService);
+        super(indexSets, activityWriter, indexRangeService);
         this.indexName = checkNotNull(indexName);
     }
 

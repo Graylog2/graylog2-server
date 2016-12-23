@@ -49,7 +49,7 @@ public class SetIndexReadOnlyAndCalculateRangeJob extends SystemJob {
     public void execute() {
         final SystemJob setIndexReadOnlyJob = setIndexReadOnlyJobFactory.create(indexName);
         setIndexReadOnlyJob.execute();
-        final SystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(indexSetRegistry, indexName);
+        final SystemJob createNewSingleIndexRangeJob = createNewSingleIndexRangeJobFactory.create(indexSetRegistry.getAllIndexSets(), indexName);
         createNewSingleIndexRangeJob.execute();
 
     }
