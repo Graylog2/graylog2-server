@@ -43,7 +43,7 @@ const DropdownField = React.createClass({
     const field = this.state.field;
     const options = $.map(field.additional_info.values, this._formatOption);
     if (this.props.addPlaceholder) {
-      options.unshift(this._formatOption(`Select ${this.state.title}`, '', true));
+      options.unshift(this._formatOption(`Select ${field.human_name || this.state.title}`, '', true));
     }
     const typeName = this.state.typeName;
     return (
