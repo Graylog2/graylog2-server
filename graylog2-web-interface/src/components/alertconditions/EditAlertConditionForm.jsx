@@ -2,7 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 
-import { EntityList } from 'components/common';
+import { EntityList, Spinner } from 'components/common';
 import { AlertConditionForm, AlertConditionSummary } from 'components/alertconditions';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -43,7 +43,15 @@ const EditAlertConditionForm = React.createClass({
     ];
   },
 
+  _isLoading() {
+    return !this.state.types;
+  },
+
   render() {
+    if (this._isLoading()) {
+      return <Spinner />;
+    }
+
     const condition = this.props.alertCondition;
 
     return (
