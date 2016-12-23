@@ -127,9 +127,9 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         super(stream, id, Type.MESSAGE_COUNT.toString(), createdAt, creatorUserId, parameters, title);
 
         this.searches = searches;
-        this.time = getNumber(parameters.get("time")).orElse(0).intValue();
+        this.time = Tools.getNumber(parameters.get("time"), 0).intValue();
         this.thresholdType = ThresholdType.valueOf(((String) parameters.get("threshold_type")).toUpperCase(Locale.ENGLISH));
-        this.threshold = getNumber(parameters.get("threshold")).orElse(0).intValue();
+        this.threshold = Tools.getNumber(parameters.get("threshold"), 0).intValue();
     }
 
     @Override

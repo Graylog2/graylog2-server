@@ -149,9 +149,9 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
 
         this.decimalFormat = new DecimalFormat("#.###", DecimalFormatSymbols.getInstance(Locale.ENGLISH));
 
-        this.time = getNumber(parameters.get("time")).orElse(0).intValue();
+        this.time = Tools.getNumber(parameters.get("time"), 0).intValue();
         this.thresholdType = ThresholdType.valueOf(((String) parameters.get("threshold_type")).toUpperCase(Locale.ENGLISH));
-        this.threshold = getNumber(parameters.get("threshold")).orElse(0.0).doubleValue();
+        this.threshold = Tools.getNumber(parameters.get("threshold"), 0.0).doubleValue();
         this.type = CheckType.valueOf(((String) parameters.get("type")).toUpperCase(Locale.ENGLISH));
         this.field = (String) parameters.get("field");
 

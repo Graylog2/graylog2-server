@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 public abstract class AbstractAlertCondition implements EmbeddedPersistable, AlertCondition {
@@ -57,6 +56,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     protected final DateTime createdAt;
     protected final String creatorUserId;
     protected final int grace;
+    protected final int backlog;
     protected final String title;
 
     private final Map<String, Object> parameters;
@@ -75,7 +75,8 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         this.creatorUserId = creatorUserId;
         this.parameters = ImmutableMap.copyOf(parameters);
 
-        this.grace = getNumber(this.parameters.get("grace")).orElse(0).intValue();
+        this.grace = Tools.getNumber(this.parameters.get("grace"), 0).intValue();
+        this.backlog = Tools.getNumber(getParameters().get("backlog"), 0).intValue();
     }
 
     @Override
@@ -115,7 +116,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
 
     @Override
     public Integer getBacklog() {
-        return getNumber(getParameters().get("backlog")).orElse(0).intValue();
+        return backlog;
     }
 
     @Override
@@ -192,18 +193,6 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     public static class NegativeCheckResult extends CheckResult {
         public NegativeCheckResult() {
             super(false, null, null, null, null);
-        }
-    }
-
-    protected Optional<Number> getNumber(Object o) {
-        if (o instanceof Number) {
-            return Optional.of((Number)o);
-        }
-
-        try {
-            return Optional.of(Double.valueOf(String.valueOf(o)));
-        } catch (NumberFormatException e) {
-            return Optional.empty();
         }
     }
 
