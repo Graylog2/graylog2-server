@@ -42,11 +42,13 @@ import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelLocal;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelHandler;
 import org.jboss.netty.handler.codec.http.DefaultHttpResponse;
 import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
 import org.jboss.netty.handler.codec.http.HttpContentDecompressor;
+import org.jboss.netty.handler.codec.http.HttpHeaders;
 import org.jboss.netty.handler.codec.http.HttpMethod;
 import org.jboss.netty.handler.codec.http.HttpRequest;
 import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
@@ -54,6 +56,8 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
 import java.util.LinkedHashMap;
@@ -72,6 +76,7 @@ import static org.jboss.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_A
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 
 public class HttpTransport extends AbstractTcpTransport {
+    private static final Logger log = LoggerFactory.getLogger(HttpTransport.class);
     static final int DEFAULT_MAX_INITIAL_LINE_LENGTH = 4096;
     static final int DEFAULT_MAX_HEADER_SIZE = 8192;
     static final int DEFAULT_MAX_CHUNK_SIZE = (int) Size.kilobytes(64L).toBytes();
@@ -81,6 +86,12 @@ public class HttpTransport extends AbstractTcpTransport {
 
     private final boolean enableCors;
     private final int maxChunkSize;
+
+    public static final ChannelLocal<String> XForwardedFor = new ChannelLocal<String>() {
+        protected String initialValue(Channel channel) {
+            return "null";
+        }
+    };
 
     @AssistedInject
     public HttpTransport(@Assisted Configuration configuration,
@@ -197,7 +208,9 @@ public class HttpTransport extends AbstractTcpTransport {
             final HttpRequest request = (HttpRequest) e.getMessage();
             final boolean keepAlive = isKeepAlive(request);
             final HttpVersion httpRequestVersion = request.getProtocolVersion();
-            final String origin = request.headers().get(Names.ORIGIN);
+            final HttpHeaders headers = request.headers();
+            final String origin = headers.get(Names.ORIGIN);
+            final String XForwardedFor = headers.get("X-Forwarded-For");
 
             // to allow for future changes, let's be at least a little strict in what we accept here.
             if (!HttpMethod.POST.equals(request.getMethod())) {
@@ -208,7 +221,9 @@ public class HttpTransport extends AbstractTcpTransport {
             final ChannelBuffer buffer = request.getContent();
 
             if ("/gelf".equals(request.getUri())) {
+                HttpTransport.XForwardedFor.set(channel, String.valueOf(XForwardedFor));
                 // send on to raw message handler
+
                 writeResponse(channel, keepAlive, httpRequestVersion, ACCEPTED, origin);
                 fireMessageReceived(ctx, buffer);
             } else {

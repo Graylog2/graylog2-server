@@ -22,6 +22,8 @@ import com.codahale.metrics.MetricSet;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.Maps;
 import com.google.common.util.concurrent.Callables;
+import com.google.inject.Inject;
+import org.graylog2.inputs.transports.HttpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.MetricSets;
 import org.graylog2.plugin.configuration.Configuration;
@@ -32,6 +34,7 @@ import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.util.PacketInformationDumper;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.rest.RestTools;
 import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
@@ -49,14 +52,19 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.jboss.netty.channel.socket.DefaultDatagramChannelConfig;
 import org.jboss.netty.channel.socket.ServerSocketChannelConfig;
+import org.jboss.netty.handler.ipfilter.IpSubnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.inject.Named;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
+import java.net.UnknownHostException;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import static org.jboss.netty.channel.Channels.fireMessageReceived;
@@ -79,6 +87,10 @@ public abstract class NettyTransport implements Transport {
 
     private Bootstrap bootstrap;
     private Channel acceptChannel;
+
+    @Inject
+    @Named("trusted_proxies")
+    private static Set<IpSubnet> trustedProxies;
 
     public NettyTransport(Configuration configuration,
                           ThroughputCounter throughputCounter,
@@ -341,7 +353,26 @@ public abstract class NettyTransport implements Transport {
             final byte[] payload = new byte[buffer.readableBytes()];
             buffer.toByteBuffer().get(payload, buffer.readerIndex(), buffer.readableBytes());
 
-            final RawMessage raw = new RawMessage(payload, (InetSocketAddress) e.getRemoteAddress());
+            // Get X-Forwarded-For from ChannelLocal, and act accordingly
+            final String XForwardedFor = HttpTransport.XForwardedFor.get(e.getChannel());
+            final InetSocketAddress remoteAddress = (InetSocketAddress) e.getRemoteAddress();
+            final String forwardedAddr = RestTools.getAddrFromXForwardedFor(XForwardedFor, remoteAddress.getHostString(), NettyTransport.trustedProxies);
+
+            RawMessage raw;
+            if (!remoteAddress.getHostString().equals(forwardedAddr)) {
+                try {
+                    log.debug("X-Forwarded-For and remoteAddress differ, use X-Forwarded-For");
+                    InetAddress addr = InetAddress.getByName(forwardedAddr);
+                    // As X-Forwarded-For does not convey port, use ephemeral
+                    raw = new RawMessage(payload, new InetSocketAddress(addr, 0));
+                } catch (UnknownHostException ex) {
+                    log.warn("Received invalid X-Forwarded-For address {} from {}", forwardedAddr, remoteAddress);
+                    raw = new RawMessage(payload, remoteAddress);
+                }
+            } else {
+                raw = new RawMessage(payload, remoteAddress);
+            }
+
             input.processRawMessage(raw);
         }
 

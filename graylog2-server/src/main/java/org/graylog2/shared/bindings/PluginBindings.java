@@ -23,6 +23,7 @@ import com.google.inject.multibindings.Multibinder;
 import org.graylog2.plugin.Plugin;
 import org.graylog2.plugin.PluginMetaData;
 import org.graylog2.plugin.PluginModule;
+import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.rest.PluginRestResource;
 
 import java.util.Set;
@@ -53,5 +54,7 @@ public class PluginBindings extends AbstractModule {
 
             pluginMetaDataBinder.addBinding().toInstance(plugin.metadata());
         }
+
+        requestStaticInjection(NettyTransport.class);
     }
 }
