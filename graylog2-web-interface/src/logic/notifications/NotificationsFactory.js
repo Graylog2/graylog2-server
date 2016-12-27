@@ -213,7 +213,7 @@ class NotificationsFactory {
           title: 'Processing of a stream has been disabled due to excessive processing time.',
           description: (
             <span>
-              The processing of stream <em>{notification.details.stream_id}</em> has taken too long for
+              The processing of stream <em>{notification.details.stream_id}</em> has taken too long for{' '}
               {notification.details.fault_count} times. To protect the stability of message processing,
               this stream has been disabled. Please correct the stream rules and reenable the stream.
               Check <DocumentationLink page={DocsHelper.PAGES.STREAM_PROCESSING_RUNTIME_LIMITS} text="the documentation" />{' '}
