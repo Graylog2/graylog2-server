@@ -49,7 +49,9 @@ const AlertConditionForm = React.createClass({
   _onSubmit() {
     const request = this.getValue();
     this.props.onSubmit(request);
-    this.refs.configurationForm.close();
+    if (typeof this.refs.configurationForm.close === 'function') {
+      this.refs.configurationForm.close();
+    }
   },
   _formatTitle(alertCondition, name) {
     const activity = alertCondition ? 'Update' : 'Create new';
