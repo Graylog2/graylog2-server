@@ -29,6 +29,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.alerts.AlertConditionListSummary;
@@ -37,10 +38,12 @@ import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.StreamService;
+import org.graylog2.utilities.ConfigurationMapConverter;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -64,11 +67,15 @@ import java.util.stream.Collectors;
 public class StreamAlertConditionResource extends RestResource {
     private final StreamService streamService;
     private final AlertService alertService;
+    private final Map<String, AlertCondition.Factory> alertConditionMap;
 
     @Inject
-    public StreamAlertConditionResource(StreamService streamService, AlertService alertService) {
+    public StreamAlertConditionResource(StreamService streamService,
+                                        AlertService alertService,
+                                        Map<String, AlertCondition.Factory> alertConditionMap) {
         this.streamService = streamService;
         this.alertService = alertService;
+        this.alertConditionMap = alertConditionMap;
     }
 
     @POST
@@ -86,7 +93,7 @@ public class StreamAlertConditionResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         final Stream stream = streamService.load(streamid);
-        final AlertCondition alertCondition = alertService.fromRequest(ccr, stream, getCurrentUser().getName());
+        final AlertCondition alertCondition = alertService.fromRequest(convertConfigurationInRequest(ccr), stream, getCurrentUser().getName());
 
         streamService.addAlertCondition(stream, alertCondition);
 
@@ -118,7 +125,7 @@ public class StreamAlertConditionResource extends RestResource {
         final Stream stream = streamService.load(streamid);
         AlertCondition alertCondition = streamService.getAlertCondition(stream, conditionid);
 
-        final AlertCondition updatedCondition = alertService.updateFromRequest(alertCondition, ccr);
+        final AlertCondition updatedCondition = alertService.updateFromRequest(alertCondition, convertConfigurationInRequest(ccr));
 
         streamService.updateAlertCondition(stream, updatedCondition);
     }
@@ -195,5 +202,23 @@ public class StreamAlertConditionResource extends RestResource {
                 condition.getParameters(),
                 alertService.inGracePeriod(condition),
                 condition.getTitle());
+    }
+
+    private CreateConditionRequest convertConfigurationInRequest(final CreateConditionRequest request) {
+        final AlertCondition.Factory factory = alertConditionMap.get(request.type());
+        if (factory == null) {
+            throw new BadRequestException("Unable to load alert condition of type " + request.type());
+        }
+        final ConfigurationRequest requestedConfiguration = factory.config().getRequestedConfiguration();
+
+        // coerce the configuration to their correct types according to the condition's requested config
+        final Map<String, Object> parameters;
+        try {
+            parameters = ConfigurationMapConverter.convertValues(request.parameters(), requestedConfiguration);
+        } catch (ValidationException e) {
+            throw new BadRequestException("Invalid parameters map", e);
+        }
+
+        return request.toBuilder().setParameters(parameters).build();
     }
 }
