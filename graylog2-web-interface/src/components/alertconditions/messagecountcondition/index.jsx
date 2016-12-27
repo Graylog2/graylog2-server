@@ -1,7 +1,2 @@
-import MessageCountConditionForm from './MessageCountConditionForm';
-import MessageCountConditionSummary from './MessageCountConditionSummary';
-
-export default {
-  configuration_form: MessageCountConditionForm,
-  summary: MessageCountConditionSummary,
-}
+export { default as MessageCountConditionForm } from './MessageCountConditionForm';
+export { default as MessageCountConditionSummary } from './MessageCountConditionSummary';

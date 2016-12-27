@@ -8,3 +8,28 @@ export { default as CreateAlertConditionInput } from './CreateAlertConditionInpu
 export { default as EditAlertConditionForm } from './EditAlertConditionForm';
 export { default as GenericAlertConditionSummary } from './GenericAlertConditionSummary';
 export { default as UnknownAlertCondition } from './UnknownAlertCondition';
+
+import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
+import { FieldContentConditionForm, FieldContentConditionSummary } from 'components/alertconditions/fieldcontentcondition';
+import { FieldValueConditionForm, FieldValueConditionSummary } from 'components/alertconditions/fieldvaluecondition';
+import { MessageCountConditionForm, MessageCountConditionSummary } from 'components/alertconditions/messagecountcondition';
+
+PluginStore.register(new PluginManifest({}, {
+  alertConditions: [
+    {
+      formComponent: FieldContentConditionForm,
+      summaryComponent: FieldContentConditionSummary,
+      type: 'field_content_value',
+    },
+    {
+      formComponent: FieldValueConditionForm,
+      summaryComponent: FieldValueConditionSummary,
+      type: 'field_value',
+    },
+    {
+      formComponent: MessageCountConditionForm,
+      summaryComponent: MessageCountConditionSummary,
+      type: 'message_count',
+    },
+  ],
+}));

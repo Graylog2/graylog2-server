@@ -7,8 +7,7 @@ import { ConfigurationForm, TitleField } from 'components/configurationforms';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertConditionsStore } = CombinedProvider.get('AlertConditions');
-
-import AlertConditionsFactory from 'logic/alertconditions/AlertConditionsFactory';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 
 const AlertConditionForm = React.createClass({
   propTypes: {
@@ -57,14 +56,13 @@ const AlertConditionForm = React.createClass({
     const conditionName = alertCondition ? `"${alertCondition.title}"` : '';
     return `${activity} ${name} ${conditionName}`;
   },
-  alertConditionsFactory: new AlertConditionsFactory(),
+
   render() {
     const type = this.props.type;
     const alertCondition = this.props.alertCondition;
     const typeDefinition = this.state.types[type];
-    const alertConditionTypes = this.alertConditionsFactory.get(type);
-    const alertConditionType = alertConditionTypes && alertConditionTypes.length > 0 && alertConditionTypes[0];
-    if (!alertConditionType || !alertConditionType.configuration_form) {
+    const conditionType = PluginStore.exports('alertConditions').find(c => c.type === type) || {};
+    if (!conditionType.formComponent) {
       return (<ConfigurationForm ref="configurationForm"
                                  key="configuration-form-alert-condition"
                                  configFields={typeDefinition.requested_configuration}
@@ -86,7 +84,7 @@ const AlertConditionForm = React.createClass({
                           submitButtonText="Save">
         <fieldset>
           <TitleField typeName={type} value={this.state.title} onChange={this._handleTitleChange} />
-          <alertConditionType.configuration_form ref="customConfigurationForm" alertCondition={alertCondition} typeDefinition={typeDefinition} />
+          <conditionType.formComponent ref="customConfigurationForm" alertCondition={alertCondition} typeDefinition={typeDefinition} />
         </fieldset>
       </BootstrapModalForm>
     );
