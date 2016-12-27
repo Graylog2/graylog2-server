@@ -15,7 +15,7 @@ const IndicesMaintenanceDropdown = React.createClass({
   },
 
   _onRecalculateIndexRange() {
-    if (window.confirm('This will recalculate index ranges for ALL index sets using a background system job. Do you want to proceed?')) {
+    if (window.confirm('This will recalculate index ranges for this index set using a background system job. Do you want to proceed?')) {
       IndexRangesActions.recalculate(this.props.indexSetId);
     }
   },
@@ -34,7 +34,7 @@ const IndicesMaintenanceDropdown = React.createClass({
     return (
       <ButtonGroup>
         <DropdownButton bsStyle="info" title="Maintenance" id="indices-maintenance-actions" pullRight>
-          <MenuItem eventKey="1" onClick={this._onRecalculateIndexRange}>Recalculate all index ranges</MenuItem>
+          <MenuItem eventKey="1" onClick={this._onRecalculateIndexRange}>Recalculate index ranges</MenuItem>
           {cycleButton}
         </DropdownButton>
       </ButtonGroup>
