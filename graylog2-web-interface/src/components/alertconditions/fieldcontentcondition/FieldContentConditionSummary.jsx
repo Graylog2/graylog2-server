@@ -8,7 +8,7 @@ const FieldContentConditionSummary = React.createClass({
     alertCondition: React.PropTypes.object.isRequired,
   },
   _formatMatcher(field, value) {
-    return <span>{'<' + field + ':"' + value + '">'}</span>;
+    return <span>{`\<${field}: "${value}"\>`}</span>;
   },
   render() {
     const alertCondition = this.props.alertCondition;
