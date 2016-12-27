@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Well } from 'react-bootstrap';
+import { FormControls } from 'react-bootstrap';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { ConfigurationForm, TitleField } from 'components/configurationforms';
@@ -54,9 +54,9 @@ const AlertConditionForm = React.createClass({
     }
   },
   _formatTitle(alertCondition, name) {
-    const activity = alertCondition ? 'Update' : 'Create new';
-    const conditionName = alertCondition ? `"${alertCondition.title}"` : '';
-    return `${activity} ${name} ${conditionName}`;
+    const action = alertCondition ? 'Update' : 'Create new';
+    const conditionName = alertCondition ? <em>{alertCondition.title || 'Untitled'}</em> : name;
+    return <span>{action} {conditionName}</span>;
   },
 
   render() {
@@ -74,7 +74,7 @@ const AlertConditionForm = React.createClass({
                                  cancelAction={this._onCancel}
                                  titleValue={alertCondition ? alertCondition.title : ''}
                                  values={alertCondition ? alertCondition.parameters : {}}>
-        <Well>{typeDefinition.human_name}</Well>
+        <FormControls.Static label="Condition description">{typeDefinition.human_name}</FormControls.Static>
       </ConfigurationForm>);
     }
 
