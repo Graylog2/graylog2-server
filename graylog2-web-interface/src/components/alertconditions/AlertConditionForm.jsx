@@ -32,7 +32,7 @@ const AlertConditionForm = React.createClass({
   getValue() {
     const values = this.refs.customConfigurationForm ? this.refs.customConfigurationForm.getValue() : this.refs.configurationForm.getValue();
     return {
-      title: this.state.title,
+      title: values.title || this.state.title,
       type: this.props.type,
       parameters: values.configuration,
     };
