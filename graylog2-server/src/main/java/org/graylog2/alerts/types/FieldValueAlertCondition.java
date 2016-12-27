@@ -154,8 +154,6 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         this.threshold = Tools.getNumber(parameters.get("threshold"), 0.0).doubleValue();
         this.type = CheckType.valueOf(((String) parameters.get("type")).toUpperCase(Locale.ENGLISH));
         this.field = (String) parameters.get("field");
-
-        checkArgument(!isNullOrEmpty(field), "\"field\" must not be empty.");
     }
 
     @Override

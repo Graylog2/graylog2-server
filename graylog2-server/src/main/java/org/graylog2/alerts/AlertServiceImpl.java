@@ -25,6 +25,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
@@ -145,7 +146,7 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) {
+    public AlertCondition fromPersisted(Map<String, Object> fields, Stream stream) throws ConfigurationException {
         final String type = (String)fields.get("type");
 
         return this.alertConditionFactory.createAlertCondition(type,
@@ -158,7 +159,7 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    public AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) {
+    public AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) throws ConfigurationException {
         final String type = ccr.type();
         checkArgument(type != null, "Missing alert condition type");
 
@@ -166,7 +167,7 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
-    public AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) {
+    public AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws ConfigurationException {
         final Map<String, Object> parameters = new HashMap<>();
         parameters.putAll(alertCondition.getParameters());
         parameters.putAll(ccr.parameters());
