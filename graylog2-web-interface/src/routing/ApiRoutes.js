@@ -79,7 +79,7 @@ const ApiRoutes = {
   },
   IndexRangesApiController: {
     list: () => { return { url: '/system/indices/ranges' }; },
-    rebuild: () => { return { url: '/system/indices/ranges/rebuild' }; },
+    rebuild: (indexSetId) => { return { url: `/system/indices/ranges/index_set/${indexSetId}/rebuild` }; },
     rebuildSingle: (index) => { return { url: `/system/indices/ranges/${index}/rebuild` }; },
   },
   IndexSetsApiController: {
