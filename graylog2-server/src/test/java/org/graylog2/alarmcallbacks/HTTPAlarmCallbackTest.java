@@ -252,7 +252,7 @@ public class HTTPAlarmCallbackTest {
         alarmCallback.initialize(configuration);
 
         expectedException.expect(ConfigurationException.class);
-        expectedException.expectMessage("URL parameter is missing!");
+        expectedException.expectMessage("URL parameter is missing.");
 
         alarmCallback.checkConfiguration();
     }
@@ -264,7 +264,7 @@ public class HTTPAlarmCallbackTest {
         alarmCallback.initialize(configuration);
 
         expectedException.expect(ConfigurationException.class);
-        expectedException.expectMessage("URL parameter is missing!");
+        expectedException.expectMessage("URL parameter is missing.");
 
         alarmCallback.checkConfiguration();
     }

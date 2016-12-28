@@ -122,13 +122,13 @@ public class HTTPAlarmCallback implements AlarmCallback {
     public void checkConfiguration() throws ConfigurationException {
         final String url = configuration.getString(CK_URL);
         if (isNullOrEmpty(url)) {
-            throw new ConfigurationException("URL parameter is missing!");
+            throw new ConfigurationException("URL parameter is missing.");
         }
 
         try {
             new URL(url);
         } catch (MalformedURLException e) {
-            throw new ConfigurationException("Malformed URL", e);
+            throw new ConfigurationException("Malformed URL '" + url + "'", e);
         }
     }
 }
