@@ -16,6 +16,10 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
@@ -23,14 +27,8 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.primitives.Ints;
-
-import com.github.rholder.retry.Retryer;
-import com.github.rholder.retry.RetryerBuilder;
-import com.github.rholder.retry.StopStrategies;
-import com.github.rholder.retry.WaitStrategies;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
-
 import org.bson.types.ObjectId;
 import org.elasticsearch.indices.IndexClosedException;
 import org.graylog2.audit.AuditActor;
@@ -38,6 +36,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.esplugin.IndexChangeMonitor;
 import org.graylog2.indexer.esplugin.IndicesClosedEvent;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
@@ -54,11 +53,10 @@ import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.Iterator;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
-
-import javax.inject.Inject;
 
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_CREATE;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_RANGE_DELETE;
@@ -68,6 +66,7 @@ public class MongoIndexRangeService implements IndexRangeService {
     private static final String COLLECTION_NAME = "index_ranges";
 
     private final Indices indices;
+    private final IndexSetRegistry indexSetRegistry;
     private final AuditEventSender auditEventSender;
     private final NodeId nodeId;
     private final JacksonDBCollection<MongoIndexRange, ObjectId> collection;
@@ -76,10 +75,12 @@ public class MongoIndexRangeService implements IndexRangeService {
     public MongoIndexRangeService(MongoConnection mongoConnection,
                                   MongoJackObjectMapperProvider objectMapperProvider,
                                   Indices indices,
+                                  IndexSetRegistry indexSetRegistry,
                                   AuditEventSender auditEventSender,
                                   NodeId nodeId,
                                   EventBus eventBus) {
         this.indices = indices;
+        this.indexSetRegistry = indexSetRegistry;
         this.auditEventSender = auditEventSender;
         this.nodeId = nodeId;
         this.collection = JacksonDBCollection.wrap(
@@ -168,6 +169,10 @@ public class MongoIndexRangeService implements IndexRangeService {
     @AllowConcurrentEvents
     public void handleIndexDeletion(IndicesDeletedEvent event) {
         for (String index : event.indices()) {
+            if (!indexSetRegistry.isManagedIndex(index)) {
+                LOG.debug("Not handling deleted index <{}> because it's not managed by any index set.", index);
+                continue;
+            }
             LOG.debug("Index \"{}\" has been deleted. Removing index range.");
             final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
             if (remove.getN() > 0) {
@@ -180,6 +185,10 @@ public class MongoIndexRangeService implements IndexRangeService {
     @AllowConcurrentEvents
     public void handleIndexClosing(IndicesClosedEvent event) {
         for (String index : event.indices()) {
+            if (!indexSetRegistry.isManagedIndex(index)) {
+                LOG.debug("Not handling closed index <{}> because it's not managed by any index set.", index);
+                continue;
+            }
             LOG.debug("Index \"{}\" has been closed. Removing index range.");
             final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
             if (remove.getN() > 0) {
@@ -192,6 +201,10 @@ public class MongoIndexRangeService implements IndexRangeService {
     @AllowConcurrentEvents
     public void handleIndexReopening(IndicesReopenedEvent event) {
         for (final String index : event.indices()) {
+            if (!indexSetRegistry.isManagedIndex(index)) {
+                LOG.debug("Not handling reopened index <{}> because it's not managed by any index set.", index);
+                continue;
+            }
             LOG.debug("Index \"{}\" has been reopened. Calculating index range.", index);
 
             indices.waitForRecovery(index);

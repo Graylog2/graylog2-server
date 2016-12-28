@@ -29,6 +29,7 @@ import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.esplugin.IndicesClosedEvent;
 import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
 import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
@@ -69,13 +70,15 @@ public class MongoIndexRangeServiceTest {
 
     @Mock
     private Indices indices;
+    @Mock
+    private IndexSetRegistry indexSetRegistry;
     private EventBus localEventBus;
     private MongoIndexRangeService indexRangeService;
 
     @Before
     public void setUp() throws Exception {
         localEventBus = new EventBus("local-event-bus");
-        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, new NullAuditEventSender(), mock(NodeId.class), localEventBus);
+        indexRangeService = new MongoIndexRangeService(mongoRule.getMongoConnection(), objectMapperProvider, indices, indexSetRegistry, new NullAuditEventSender(), mock(NodeId.class), localEventBus);
     }
 
     @Test
@@ -243,6 +246,8 @@ public class MongoIndexRangeServiceTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testHandleIndexDeletion() throws Exception {
+        when(indexSetRegistry.isManagedIndex("graylog_1")).thenReturn(true);
+
         assertThat(indexRangeService.findAll()).hasSize(2);
 
         localEventBus.post(IndicesDeletedEvent.create(Collections.singleton("graylog_1")));
@@ -253,6 +258,8 @@ public class MongoIndexRangeServiceTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testHandleIndexClosing() throws Exception {
+        when(indexSetRegistry.isManagedIndex("graylog_1")).thenReturn(true);
+
         assertThat(indexRangeService.findAll()).hasSize(2);
 
         localEventBus.post(IndicesClosedEvent.create(Collections.singleton("graylog_1")));
@@ -266,6 +273,7 @@ public class MongoIndexRangeServiceTest {
         final DateTime begin = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
         final DateTime end = new DateTime(2016, 1, 15, 0, 0, DateTimeZone.UTC);
         when(indices.indexRangeStatsOfIndex("graylog_3")).thenReturn(IndexRangeStats.create(begin, end));
+        when(indexSetRegistry.isManagedIndex("graylog_3")).thenReturn(true);
 
         localEventBus.post(IndicesReopenedEvent.create(Collections.singleton("graylog_3")));
 
@@ -274,5 +282,19 @@ public class MongoIndexRangeServiceTest {
         assertThat(indexRanges.first().indexName()).isEqualTo("graylog_3");
         assertThat(indexRanges.first().begin()).isEqualTo(begin);
         assertThat(indexRanges.first().end()).isEqualTo(end);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testHandleIndexReopeningWhenNotManaged() throws Exception {
+        final DateTime begin = new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC);
+        final DateTime end = new DateTime(2016, 1, 15, 0, 0, DateTimeZone.UTC);
+        when(indexSetRegistry.isManagedIndex("graylog_3")).thenReturn(false);
+        when(indices.indexRangeStatsOfIndex("graylog_3")).thenReturn(IndexRangeStats.EMPTY);
+
+        localEventBus.post(IndicesReopenedEvent.create(Collections.singleton("graylog_3")));
+
+        final SortedSet<IndexRange> indexRanges = indexRangeService.find(begin, end);
+        assertThat(indexRanges).isEmpty();
     }
 }
