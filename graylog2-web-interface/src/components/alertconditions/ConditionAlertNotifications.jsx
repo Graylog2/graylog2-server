@@ -1,4 +1,5 @@
 import React from 'react';
+import naturalSort from 'javascript-natural-sort';
 
 import { Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
@@ -34,7 +35,11 @@ const ConditionAlertNotifications = React.createClass({
       return <Spinner />;
     }
 
-    const notifications = this.state.conditionNotifications;
+    const notifications = this.state.conditionNotifications.sort((a1, a2) => {
+      const t1 = a1.title || 'Untitled';
+      const t2 = a2.title || 'Untitled';
+      return naturalSort(t1.toLowerCase(), t2.toLowerCase());
+    });
 
     return (
       <div>
