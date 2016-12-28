@@ -40,10 +40,27 @@ public abstract class CreateConditionRequest {
     @JsonProperty("parameters")
     public abstract Map<String, Object> parameters();
 
+    public static Builder builder() {
+        return new AutoValue_CreateConditionRequest.Builder();
+    }
+
+    public abstract Builder toBuilder();
+
     @JsonCreator
     public static CreateConditionRequest create(@JsonProperty("type") @Nullable String type,
                                                 @JsonProperty("title") @Nullable String title,
                                                 @JsonProperty("parameters") Map<String, Object> parameters) {
         return new AutoValue_CreateConditionRequest(type, title, parameters);
+    }
+
+    @AutoValue.Builder
+    public static abstract class Builder {
+        public abstract Builder setType(String type);
+
+        public abstract Builder setTitle(String title);
+
+        public abstract Builder setParameters(Map<String, Object> parameters);
+
+        public abstract CreateConditionRequest build();
     }
 }

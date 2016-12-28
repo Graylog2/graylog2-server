@@ -33,7 +33,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 
 public abstract class AbstractAlertCondition implements EmbeddedPersistable, AlertCondition {
@@ -57,6 +56,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     protected final DateTime createdAt;
     protected final String creatorUserId;
     protected final int grace;
+    protected final int backlog;
     protected final String title;
 
     private final Map<String, Object> parameters;
@@ -75,7 +75,8 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         this.creatorUserId = creatorUserId;
         this.parameters = ImmutableMap.copyOf(parameters);
 
-        this.grace = getNumber(this.parameters.get("grace")).orElse(0).intValue();
+        this.grace = Tools.getNumber(this.parameters.get("grace"), 0).intValue();
+        this.backlog = Tools.getNumber(getParameters().get("backlog"), 0).intValue();
     }
 
     @Override
@@ -115,7 +116,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
 
     @Override
     public Integer getBacklog() {
-        return getNumber(getParameters().get("backlog")).orElse(0).intValue();
+        return backlog;
     }
 
     @Override
@@ -195,22 +196,10 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         }
     }
 
-    protected Optional<Number> getNumber(Object o) {
-        if (o instanceof Number) {
-            return Optional.of((Number)o);
-        }
-
-        try {
-            return Optional.of(Double.valueOf(String.valueOf(o)));
-        } catch (NumberFormatException e) {
-            return Optional.empty();
-        }
-    }
-
     public static List<ConfigurationField> getDefaultConfigurationFields() {
         return Lists.newArrayList(
-            new NumberField("grace", "Grace Period", 0, "Time span in seconds defining how long alerting is paused after alert is triggered", ConfigurationField.Optional.NOT_OPTIONAL),
-            new NumberField("backlog", "Message Backlog", 0, "The number of messages to be included in alert notification", ConfigurationField.Optional.NOT_OPTIONAL)
+            new NumberField("grace", "Grace Period", 0, "Number of minutes to wait after an alert is triggered, to trigger another alert", ConfigurationField.Optional.NOT_OPTIONAL),
+            new NumberField("backlog", "Message Backlog", 0, "The number of messages to be included in alert notifications", ConfigurationField.Optional.NOT_OPTIONAL)
         );
     }
 }

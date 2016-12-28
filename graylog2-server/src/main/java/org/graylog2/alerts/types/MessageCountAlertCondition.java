@@ -86,14 +86,15 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(
-                    new NumberField("time", "Time Range", 0, "Time span in seconds to check", ConfigurationField.Optional.NOT_OPTIONAL),
-                    new NumberField("threshold", "Threshold", 0.0, "Value which triggers an alert if crossed", ConfigurationField.Optional.NOT_OPTIONAL),
+                    new NumberField("time", "Time Range", 5, "Evaluate the condition for all messages received in the given number of minutes", ConfigurationField.Optional.NOT_OPTIONAL),
                     new DropdownField(
                             "threshold_type",
                             "Threshold Type",
                             ThresholdType.MORE.toString(),
                             Arrays.stream(ThresholdType.values()).collect(Collectors.toMap(Enum::toString, ThresholdType::getDescription)),
-                            ConfigurationField.Optional.NOT_OPTIONAL)
+                            "Select condition to trigger alert: when there are more or less messages than the threshold",
+                            ConfigurationField.Optional.NOT_OPTIONAL),
+                    new NumberField("threshold", "Threshold", 0.0, "Value which triggers an alert if crossed", ConfigurationField.Optional.NOT_OPTIONAL)
             );
             configurationRequest.addFields(AbstractAlertCondition.getDefaultConfigurationFields());
 
@@ -106,7 +107,7 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
             super(
                 "Message Count Alert Condition",
                 "https://www.graylog.org/",
-                "This condition is triggered when the number of messages in a defined time interval is higher or lower a defined threshold."
+                "This condition is triggered when the number of messages is higher/lower than a defined threshold in a given time range."
             );
         }
     }
@@ -127,9 +128,9 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         super(stream, id, Type.MESSAGE_COUNT.toString(), createdAt, creatorUserId, parameters, title);
 
         this.searches = searches;
-        this.time = getNumber(parameters.get("time")).orElse(0).intValue();
+        this.time = Tools.getNumber(parameters.get("time"), 5).intValue();
         this.thresholdType = ThresholdType.valueOf(((String) parameters.get("threshold_type")).toUpperCase(Locale.ENGLISH));
-        this.threshold = getNumber(parameters.get("threshold")).orElse(0).intValue();
+        this.threshold = Tools.getNumber(parameters.get("threshold"), 0).intValue();
     }
 
     @Override

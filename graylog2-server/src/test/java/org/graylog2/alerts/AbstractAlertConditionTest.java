@@ -22,10 +22,8 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.junit.Test;
 
 import java.util.Map;
-import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 
 public class AbstractAlertConditionTest extends AlertConditionTest {
     final protected int time = 10;
@@ -40,32 +38,6 @@ public class AbstractAlertConditionTest extends AlertConditionTest {
         assertEquals(alertConditionWithStringDouble.getGrace(), 3);
         final AlertCondition alertConditionWithStringInteger = getDummyAlertCondition(ImmutableMap.of("grace", "3"));
         assertEquals(alertConditionWithStringInteger.getGrace(), 3);
-    }
-
-    @Test
-    public void testGetNumberForDifferentFormats() throws Exception {
-        final AbstractAlertCondition alertCondition = (AbstractAlertCondition)getDummyAlertCondition(ImmutableMap.of("grace", 0));
-        final Optional<Number> optionalForInteger = alertCondition.getNumber(1);
-        assertEquals(optionalForInteger.orElse(null).intValue(), 1);
-        assertEquals(optionalForInteger.orElse(null).doubleValue(), 1.0, 0.0);
-
-        final Optional<Number> optionalForDouble = alertCondition.getNumber(42.23);
-        assertEquals(optionalForDouble.orElse(null).intValue(), 42);
-        assertEquals(optionalForDouble.orElse(null).doubleValue(), 42.23, 0.0);
-
-        final Optional<Number> optionalForStringInteger = alertCondition.getNumber("17");
-        assertEquals(optionalForStringInteger.orElse(null).intValue(), 17);
-        assertEquals(optionalForStringInteger.orElse(null).doubleValue(), 17.0, 0.0);
-
-        final Optional<Number> optionalForStringDouble = alertCondition.getNumber("23.42");
-        assertEquals(optionalForStringDouble.orElse(null).intValue(), 23);
-        assertEquals(optionalForStringDouble.orElse(null).doubleValue(), 23.42, 0.0);
-
-        final Optional<Number> optionalForNull = alertCondition.getNumber(null);
-        assertNull(optionalForNull.orElse(null));
-        assertNull(optionalForNull.orElse(null));
-        assertEquals(optionalForNull.orElse(1).intValue(), 1);
-        assertEquals(optionalForNull.orElse(1).doubleValue(), 1.0, 0.0);
     }
 
     private AlertCondition getDummyAlertCondition(Map<String, Object> parameters) {

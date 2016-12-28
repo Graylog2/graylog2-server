@@ -19,6 +19,7 @@ package org.graylog2.alerts;
 import org.graylog2.alerts.Alert.AlertState;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
@@ -42,10 +43,10 @@ public interface AlertService {
     long totalCountForStream(String streamId);
     long totalCountForStreams(List<String> streamIds, AlertState state);
 
-    AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream);
-    AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId);
+    AlertCondition fromPersisted(Map<String, Object> conditionFields, Stream stream) throws ConfigurationException;
+    AlertCondition fromRequest(CreateConditionRequest ccr, Stream stream, String userId) throws ConfigurationException;
 
-    AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr);
+    AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws ConfigurationException;
 
     boolean inGracePeriod(AlertCondition alertCondition);
 

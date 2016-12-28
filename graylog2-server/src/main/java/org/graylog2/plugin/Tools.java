@@ -16,7 +16,6 @@
  */
 package org.graylog2.plugin;
 
-import com.google.common.base.Optional;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Doubles;
@@ -433,6 +432,18 @@ public final class Tools {
         return Doubles.tryParse(x.toString());
     }
 
+    public static Number getNumber(Object o, Number defaultValue) {
+        if (o instanceof Number) {
+            return (Number)o;
+        }
+
+        try {
+            return Double.valueOf(String.valueOf(o));
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
     /**
      * Try to get the primary {@link java.net.InetAddress} of the primary network interface with
      * fallback to the local loopback address (usually {@code 127.0.0.1} or {@code ::1}.
@@ -563,7 +574,7 @@ public final class Tools {
 
     @Nullable
     public static URI normalizeURI(@Nullable final URI uri, String scheme, int port, String path) {
-        return Optional.fromNullable(uri)
+        return com.google.common.base.Optional.fromNullable(uri)
                 .transform(u -> getUriWithScheme(u, scheme))
                 .transform(u -> getUriWithPort(u, port))
                 .transform(u -> getUriWithDefaultPath(u, path))

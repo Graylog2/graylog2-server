@@ -102,18 +102,18 @@ public class ConfigurationRequest {
                 switch (type) {
                     case BooleanField.FIELD_TYPE:
                         if (!configuration.booleanIsSet(field.getName())) {
-                            throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing");
+                            throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing or has the wrong data type");
                         }
                         break;
                     case NumberField.FIELD_TYPE:
                         if (!configuration.intIsSet(field.getName())) {
-                            throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing");
+                            throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing or has the wrong data type");
                         }
                         break;
                     case TextField.FIELD_TYPE:
                     case DropdownField.FIELD_TYPE:
                         if (!configuration.stringIsSet(field.getName())) {
-                                throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing");
+                                throw new ConfigurationException("Mandatory configuration field " + field.getName() + " is missing or has the wrong data type");
                         }
                         break;
                     default:
