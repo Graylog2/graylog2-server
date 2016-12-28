@@ -1,7 +1,7 @@
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 
-import { Spinner } from 'components/common';
+import { Pluralize, Spinner } from 'components/common';
 import { AlertNotificationsList } from 'components/alertnotifications';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -35,6 +35,8 @@ const ConditionAlertNotifications = React.createClass({
       return <Spinner />;
     }
 
+    const stream = this.props.stream;
+
     const notifications = this.state.conditionNotifications.sort((a1, a2) => {
       const t1 = a1.title || 'Untitled';
       const t2 = a2.title || 'Untitled';
@@ -44,9 +46,12 @@ const ConditionAlertNotifications = React.createClass({
     return (
       <div>
         <h2>Notifications</h2>
-        <p>Define the notifications to send when the condition is satisfied.</p>
+        <p>
+          <Pluralize value={notifications.length} singular="This is" plural="These are" /> the notifications set
+          for the stream <em>{stream.title}</em>. They will be triggered when the alert condition is satisfied.
+        </p>
 
-        <AlertNotificationsList alertNotifications={notifications} streams={[this.props.stream]} />
+        <AlertNotificationsList alertNotifications={notifications} streams={[stream]} />
       </div>
     );
   },
