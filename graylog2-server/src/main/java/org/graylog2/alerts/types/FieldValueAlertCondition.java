@@ -93,7 +93,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest configurationRequest = ConfigurationRequest.createWithFields(
                     new TextField("field", "Field", "", "Field name that should be checked", ConfigurationField.Optional.NOT_OPTIONAL),
-                    new NumberField("time", "Time Range", 5, "Number of minutes to evaluate in the condition (0 evaluates condition in all messages)", ConfigurationField.Optional.NOT_OPTIONAL),
+                    new NumberField("time", "Time Range", 5, "Evaluate the condition for all messages received in the given number of minutes", ConfigurationField.Optional.NOT_OPTIONAL),
                     new DropdownField(
                             "threshold_type",
                             "Threshold Type",
