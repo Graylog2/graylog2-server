@@ -7,6 +7,8 @@ const AlertNotificationsList = React.createClass({
   propTypes: {
     alertNotifications: React.PropTypes.array.isRequired,
     streams: React.PropTypes.array.isRequired,
+    onNotificationUpdate: React.PropTypes.func,
+    onNotificationDelete: React.PropTypes.func,
   },
 
   getInitialState() {
@@ -27,7 +29,11 @@ const AlertNotificationsList = React.createClass({
 
   _formatNotification(notification) {
     const stream = this.props.streams.find(s => s.id === notification.stream_id);
-    return <AlertNotification key={notification.id} alertNotification={notification} stream={stream} />;
+    return (
+      <AlertNotification key={notification.id} alertNotification={notification} stream={stream}
+                         onNotificationUpdate={this.props.onNotificationUpdate}
+                         onNotificationDelete={this.props.onNotificationDelete} />
+    );
   },
 
   render() {
