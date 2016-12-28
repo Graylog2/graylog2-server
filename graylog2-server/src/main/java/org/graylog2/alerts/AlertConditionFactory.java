@@ -29,6 +29,7 @@ import javax.inject.Inject;
 import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class AlertConditionFactory {
     private static final Logger LOG = LoggerFactory.getLogger(AlertConditionFactory.class);
@@ -61,7 +62,8 @@ public class AlertConditionFactory {
             final Configuration configuration = new Configuration(parameters);
             requestedConfiguration.check(configuration);
         } catch (ConfigurationException e) {
-            LOG.error("Could not load alert condition <" + id + ">, invalid configuration detected.");
+            final String conditionTitle = isNullOrEmpty(title) ? "" : "'" + title + "' ";
+            LOG.error("Could not load alert condition " + conditionTitle + "<" + id + ">, invalid configuration detected.");
             throw e;
         }
 
