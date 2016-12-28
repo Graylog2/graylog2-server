@@ -117,7 +117,7 @@ const CreateAlertNotificationInput = React.createClass({
               {notificationForm}
               {' '}
               <Button onClick={this._openForm} disabled={this.state.type === this.PLACEHOLDER} bsStyle="success">
-                Add alert notificaiton
+                Add alert notification
               </Button>
             </form>
           </Col>
