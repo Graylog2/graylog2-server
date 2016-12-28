@@ -32,6 +32,8 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
+import org.graylog2.plugin.alarms.callbacks.AlarmCallbackConfigurationException;
+import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
@@ -150,10 +152,14 @@ public class StreamAlarmCallbackResource extends RestResource {
 
         final String id;
         try {
+            alarmCallbackFactory.create(alarmCallbackConfiguration).checkConfiguration();
             id = alarmCallbackConfigurationService.save(alarmCallbackConfiguration);
-        } catch (ValidationException e) {
-            LOG.error("Validation error.", e);
-            throw new BadRequestException(e);
+        } catch (ValidationException | AlarmCallbackConfigurationException | ConfigurationException e) {
+            LOG.error("Invalid alarm callback configuration.", e);
+            throw new BadRequestException(e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            LOG.error("Invalid alarm callback type.", e);
+            throw new BadRequestException("Invalid alarm callback type.", e);
         }
 
         final URI alarmCallbackUri = getUriBuilderToSelf().path(StreamAlarmCallbackResource.class)
@@ -230,9 +236,14 @@ public class StreamAlarmCallbackResource extends RestResource {
                 .build();
 
         try {
-             alarmCallbackConfigurationService.save(updatedConfig);
-        } catch (ValidationException e) {
-            throw new BadRequestException("Unable to save alarm callback configuration", e);
+            alarmCallbackFactory.create(updatedConfig).checkConfiguration();
+            alarmCallbackConfigurationService.save(updatedConfig);
+        } catch (ValidationException | AlarmCallbackConfigurationException | ConfigurationException e) {
+            LOG.error("Invalid alarm callback configuration.", e);
+            throw new BadRequestException(e.getMessage(), e);
+        } catch (ClassNotFoundException e) {
+            LOG.error("Invalid alarm callback type.", e);
+            throw new BadRequestException("Invalid alarm callback type.", e);
         }
     }
 
