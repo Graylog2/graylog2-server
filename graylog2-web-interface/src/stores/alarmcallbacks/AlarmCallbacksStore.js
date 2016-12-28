@@ -22,9 +22,11 @@ const AlarmCallbacksStore = Reflux.createStore({
     AlarmCallbacksActions.list.promise(promise);
   },
   save(streamId, alarmCallback) {
-    const failCallback = (error) =>
-      UserNotification.error(`Saving alert notification failed with status: ${error.message}`,
+    const failCallback = (error) => {
+      const errorMessage = (error.additional && error.additional.status === 400 ? error.additional.body.message : error.message);
+      UserNotification.error(`Saving alert notification failed with status: ${errorMessage}`,
         'Could not save alert notification');
+    };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.create(streamId).url);
 
@@ -52,9 +54,11 @@ const AlarmCallbacksStore = Reflux.createStore({
     AlarmCallbacksActions.delete.promise(promise);
   },
   update(streamId, alarmCallbackId, deltas) {
-    const failCallback = (error) =>
-      UserNotification.error(`Updating alert notification '${alarmCallbackId}' failed with status: ${error.message}`,
+    const failCallback = (error) => {
+      const errorMessage = (error.additional && error.additional.status === 400 ? error.additional.body.message : error.message);
+      UserNotification.error(`Updating alert notification '${alarmCallbackId}' failed with status: ${errorMessage}`,
         'Could not update alert notification');
+    };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.update(streamId, alarmCallbackId).url);
 

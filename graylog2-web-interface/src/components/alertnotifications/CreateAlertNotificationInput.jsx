@@ -46,9 +46,12 @@ const CreateAlertNotificationInput = React.createClass({
       UserNotification.error('Please select the stream that the condition should check.', 'Could not save condition');
     }
 
-    AlarmCallbacksActions.save(this.state.selectedStream.id, data).then(() => {
-      history.pushState(null, Routes.ALERTS.NOTIFICATIONS);
-    });
+    AlarmCallbacksActions.save(this.state.selectedStream.id, data).then(
+      () => {
+        history.pushState(null, Routes.ALERTS.NOTIFICATIONS);
+      },
+      () => this.refs.configurationForm.open(),
+    );
   },
   _openForm() {
     this.refs.configurationForm.open();
@@ -117,7 +120,7 @@ const CreateAlertNotificationInput = React.createClass({
               {notificationForm}
               {' '}
               <Button onClick={this._openForm} disabled={this.state.type === this.PLACEHOLDER} bsStyle="success">
-                Add alert notificaiton
+                Add alert notification
               </Button>
             </form>
           </Col>

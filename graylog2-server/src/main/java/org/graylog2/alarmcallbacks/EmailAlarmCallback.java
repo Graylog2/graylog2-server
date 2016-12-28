@@ -232,7 +232,7 @@ public class EmailAlarmCallback implements AlarmCallback {
     public void checkConfiguration() throws ConfigurationException {
         final boolean missingSender = isNullOrEmpty(configuration.getString("sender")) && isNullOrEmpty(emailConfiguration.getFromEmail());
         if (missingSender || isNullOrEmpty(configuration.getString("subject"))) {
-            throw new ConfigurationException("Sender or subject are missing or invalid!");
+            throw new ConfigurationException("Sender or subject are missing or invalid.");
         }
     }
 }
