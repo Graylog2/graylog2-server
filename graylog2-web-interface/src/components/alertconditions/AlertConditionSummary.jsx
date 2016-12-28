@@ -1,5 +1,8 @@
 import React from 'react';
 import { Col } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+
+import Routes from 'routing/Routes';
 
 import { EntityListItem } from 'components/common';
 
@@ -12,6 +15,7 @@ const AlertConditionSummary = React.createClass({
     typeDefinition: React.PropTypes.object.isRequired,
     stream: React.PropTypes.object,
     actions: React.PropTypes.array.isRequired,
+    linkToDetails: React.PropTypes.bool,
   },
 
   render() {
@@ -30,9 +34,20 @@ const AlertConditionSummary = React.createClass({
       </Col>
     );
 
+    let title;
+    if (this.props.linkToDetails) {
+      title = (
+        <LinkContainer to={Routes.show_alert_condition(stream.id, condition.id)}>
+          <a>{condition.title ? condition.title : 'Untitled'}</a>
+        </LinkContainer>
+      );
+    } else {
+      title = (condition.title ? condition.title : 'Untitled');
+    }
+
     return (
       <EntityListItem key={`entry-list-${condition.id}`}
-                      title={condition.title ? condition.title : 'Untitled'}
+                      title={title}
                       titleSuffix={`(${typeDefinition.name})`}
                       description={description}
                       actions={this.props.actions}
