@@ -1,9 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
-
-import Routes from 'routing/Routes';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertConditionsActions, AlertConditionsStore } = CombinedProvider.get('AlertConditions');
@@ -34,10 +31,7 @@ const AlertCondition = React.createClass({
     }
 
     const actions = [
-      <LinkContainer key="details-button" to={Routes.show_alert_condition(stream.id, condition.id)}>
-        <Button bsStyle="info">Show details</Button>
-      </LinkContainer>,
-      <DropdownButton key="more-actions-button" title="More actions" pullRight
+      <DropdownButton key="more-actions-button" title="Actions" pullRight
                       id={`more-actions-dropdown-${condition.id}`}>
         <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
       </DropdownButton>,
@@ -45,7 +39,7 @@ const AlertCondition = React.createClass({
 
     return (
       <AlertConditionSummary alertCondition={condition} typeDefinition={typeDefinition} stream={stream}
-                             actions={actions} />
+                             actions={actions} linkToDetails />
     );
   },
 });
