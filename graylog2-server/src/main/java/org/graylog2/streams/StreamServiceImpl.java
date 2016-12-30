@@ -26,6 +26,7 @@ import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
+import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -317,6 +318,12 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Override
     public void removeAlertCondition(Stream stream, String conditionId) {
+        // Before deleting alert condition, resolve all its alerts.
+        final List<Alert> alerts = alertService.listForStreamIds(Collections.singletonList(stream.getId()), Alert.AlertState.UNRESOLVED, 0, 0);
+        alerts.stream()
+                .filter(alert -> alert.getConditionId().equals(conditionId))
+                .forEach(alertService::resolveAlert);
+
         removeEmbedded(stream, StreamImpl.EMBEDDED_ALERT_CONDITIONS, conditionId);
     }
 
