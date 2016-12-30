@@ -110,7 +110,7 @@ public class V20161125142400_EmailAlarmCallbackMigrationTest {
 
         this.emailAlarmCallbackMigrationPeriodical.upgrade();
 
-        verify(this.streamService, never()).getAlertConditions(any());
+        verify(this.streamService, never()).getAlertConditions(any(Stream.class));
         verify(this.alarmCallbackConfigurationService, never()).getForStream(any());
         verify(this.alarmCallbackConfigurationService, never()).create(any(), any(), any());
         verifyMigrationCompletedWasPosted();

@@ -17,10 +17,13 @@
 package org.graylog2.alerts;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
+import com.google.common.collect.Maps;
 import com.mongodb.DBCollection;
+import org.apache.commons.lang3.time.StopWatch;
 import org.graylog2.alerts.Alert.AlertState;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.CollectionName;
@@ -35,11 +38,15 @@ import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
+import org.mongojack.Aggregation;
+import org.mongojack.AggregationResult;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
+import org.mongojack.Id;
 import org.mongojack.JacksonDBCollection;
 
 import javax.inject.Inject;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -112,6 +119,43 @@ public class AlertServiceImpl implements AlertService {
             return -1;
         }
         return Seconds.secondsBetween(resolvedAt, Tools.nowUTC()).getSeconds();
+    }
+
+    @Override
+    public Map<String, Map<String, DateTime>> getLastTriggeredAt(Collection<String> streamIds, Collection<String> conditionIds)
+    {
+        final StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        Map<String, Map<String, DateTime>> lastTriggeredAt = Maps.newHashMap();
+
+        Map<String, Aggregation.Expression<?>> expressionMap = Maps.newHashMap();
+        expressionMap.put("stream_id", Aggregation.Expression.path("stream_id"));
+        expressionMap.put("condition_id", Aggregation.Expression.path("condition_id"));
+
+        Map<String, Aggregation.Group.Accumulator> accumulatorMap = Maps.newHashMap();
+        accumulatorMap.put("triggered_at", Aggregation.Group.max(Aggregation.Expression.path("triggered_at")));
+
+        final Aggregation.Pipeline<Aggregation.Group.Accumulator> group = Aggregation
+            .match(
+                DBQuery.and(
+                    DBQuery.in(AlertImpl.FIELD_STREAM_ID, streamIds),
+                    DBQuery.in(AlertImpl.FIELD_CONDITION_ID, conditionIds)
+                )
+            )
+            .group(Aggregation.Expression.object(expressionMap), accumulatorMap);
+
+        final AggregationResult<AlertLastTriggeredAt> aggregate = this.coll.aggregate(group, AlertLastTriggeredAt.class);
+        aggregate.results().forEach(alertLastTriggeredAt -> {
+            final Map<String, DateTime> stream = lastTriggeredAt.getOrDefault(alertLastTriggeredAt.id.get("stream_id"), Maps.newHashMap());
+
+            stream.put(alertLastTriggeredAt.id.get("condition_id"), alertLastTriggeredAt.lastTriggeredAt);
+        });
+
+        stopWatch.stop();
+        System.out.println("getLastTriggeredAt: " + stopWatch.getTime());
+
+        return lastTriggeredAt;
     }
 
     @Override
@@ -208,6 +252,24 @@ public class AlertServiceImpl implements AlertService {
     }
 
     @Override
+    public boolean inGracePeriod(AlertCondition alertCondition, Map<String, Map<String, DateTime>> lastTriggeredAts)
+    {
+        if (!lastTriggeredAts.containsKey(alertCondition.getStream().getId())) {
+            return false;
+        }
+
+        final DateTime lastTriggeredAt = lastTriggeredAts.get(alertCondition.getStream().getId()).get(alertCondition.getId());
+
+        int lastAlertSecondsAgo = Seconds.secondsBetween(lastTriggeredAt, Tools.nowUTC()).getSeconds();
+
+        if (lastAlertSecondsAgo == -1 || alertCondition.getGrace() == 0) {
+            return false;
+        }
+
+        return lastAlertSecondsAgo < alertCondition.getGrace() * 60;
+    }
+
+    @Override
     public List<Alert> listForStreamIds(List<String> streamIds, AlertState state, int skip, int limit) {
         if (streamIds == null || streamIds.isEmpty()) {
             return Collections.emptyList();
@@ -290,5 +352,13 @@ public class AlertServiceImpl implements AlertService {
         }
 
         return DBQuery.empty();
+    }
+
+    public static class AlertLastTriggeredAt {
+        @Id
+        public Map<String, String> id;
+
+        @JsonProperty("triggered_at")
+        public DateTime lastTriggeredAt;
     }
 }

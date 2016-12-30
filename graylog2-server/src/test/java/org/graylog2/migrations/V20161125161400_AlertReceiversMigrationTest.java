@@ -114,7 +114,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
 
         this.alertReceiversMigration.upgrade();
 
-        verify(this.streamService, never()).getAlertConditions(any());
+        verify(this.streamService, never()).getAlertConditions(any(Stream.class));
         verify(this.alarmCallbackConfigurationService, never()).getForStream(any());
         verify(this.alarmCallbackConfigurationService, never()).save(any());
         verify(this.dbCollection, never()).update(any(), any());
