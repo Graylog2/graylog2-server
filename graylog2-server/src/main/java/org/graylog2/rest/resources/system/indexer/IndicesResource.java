@@ -77,7 +77,6 @@ public class IndicesResource extends RestResource {
     private final Cluster cluster;
     private final IndexSetRegistry indexSetRegistry;
 
-    // TODO 2.2: Resource needs to be adjusted to handle a specific write target
     @Inject
     public IndicesResource(Indices indices, Cluster cluster, IndexSetRegistry indexSetRegistry) {
         this.indices = indices;

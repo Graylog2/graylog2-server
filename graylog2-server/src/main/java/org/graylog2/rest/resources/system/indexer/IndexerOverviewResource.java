@@ -62,7 +62,6 @@ public class IndexerOverviewResource extends RestResource {
     private final Indices indices;
     private final Cluster cluster;
 
-    // TODO 2.2: Resource needs to be adjusted to return overview for a specific write target
     @Inject
     public IndexerOverviewResource(DeflectorResource deflectorResource,
                                    IndexerClusterResource indexerClusterResource,
