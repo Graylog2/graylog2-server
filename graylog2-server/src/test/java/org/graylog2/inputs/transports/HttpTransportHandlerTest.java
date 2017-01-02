@@ -61,7 +61,7 @@ public class HttpTransportHandlerTest {
         assertThat(headers.get(HttpHeaders.Names.CONTENT_LENGTH)).isEqualTo("0");
         assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("http://example.com");
         assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
-        assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS)).isEqualTo("Authorization");
+        assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS)).isEqualTo("Authorization, Content-Type");
     }
 
     @Test
@@ -80,7 +80,7 @@ public class HttpTransportHandlerTest {
         assertThat(headers.get(HttpHeaders.Names.CONTENT_LENGTH)).isEqualTo("0");
         assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("http://example.com");
         assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
-        assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS)).isEqualTo("Authorization");
+        assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS)).isEqualTo("Authorization, Content-Type");
     }
 
     @Test
@@ -99,7 +99,7 @@ public class HttpTransportHandlerTest {
         assertThat(headers.get(HttpHeaders.Names.CONTENT_LENGTH)).isEqualTo("0");
         assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("http://example.com");
         assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
-        assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS)).isEqualTo("Authorization");
+        assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS)).isEqualTo("Authorization, Content-Type");
     }
 
     @Test
@@ -118,6 +118,6 @@ public class HttpTransportHandlerTest {
         assertThat(headers.get(HttpHeaders.Names.CONTENT_LENGTH)).isEqualTo("0");
         assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN)).isEqualTo("http://example.com");
         assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_CREDENTIALS)).isEqualTo("true");
-        assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS)).isEqualTo("Authorization");
+        assertThat(headers.get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS)).isEqualTo("Authorization, Content-Type");
     }
 }
