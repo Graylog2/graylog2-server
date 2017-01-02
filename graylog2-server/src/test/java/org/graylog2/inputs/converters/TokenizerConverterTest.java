@@ -257,7 +257,7 @@ public class TokenizerConverterTest {
                 .containsEntry("k3", " 'v3' ");
     }
     
-        @Test 
+    @Test
     public void testFilterRetainsNestedDoubleQuotesInSingleQuotedValues() {
         TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
         @SuppressWarnings("unchecked")
@@ -268,5 +268,15 @@ public class TokenizerConverterTest {
                 .containsEntry("k1", "v1")
                 .containsEntry("k2", " \"v2\"")
                 .containsEntry("k3", " \"v3\" ");
+    }
+
+    @Test
+    public void testFilterSupportsMultipleIdenticalKeys() {
+        TokenizerConverter f = new TokenizerConverter(new HashMap<String, Object>());
+        @SuppressWarnings("unchecked")
+        Map<String, String> result = (Map<String, String>) f.convert("Ohai I am a message k1=v1 k1=v2 Awesome!");
+
+        assertEquals(1, result.size());
+        assertEquals("v2", result.get("k1"));
     }
 }
