@@ -236,7 +236,7 @@ public class HttpTransport extends AbstractTcpTransport {
                 if (origin != null && !origin.isEmpty()) {
                     response.headers().set(Names.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                     response.headers().set(Names.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
-                    response.headers().set(Names.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization");
+                    response.headers().set(Names.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");
                 }
             }
 
