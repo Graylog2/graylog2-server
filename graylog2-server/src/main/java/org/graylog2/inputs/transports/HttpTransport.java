@@ -56,6 +56,7 @@ import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
 
 import javax.inject.Named;
+import javax.ws.rs.core.MediaType;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
@@ -63,6 +64,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 import static com.codahale.metrics.MetricRegistry.name;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.jboss.netty.channel.Channels.fireMessageReceived;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Names;
 import static org.jboss.netty.handler.codec.http.HttpHeaders.Values;
@@ -70,6 +72,8 @@ import static org.jboss.netty.handler.codec.http.HttpHeaders.isKeepAlive;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.METHOD_NOT_ALLOWED;
 import static org.jboss.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.jboss.netty.handler.codec.http.HttpResponseStatus.UNSUPPORTED_MEDIA_TYPE;
 
 public class HttpTransport extends AbstractTcpTransport {
     static final int DEFAULT_MAX_INITIAL_LINE_LENGTH = 4096;
@@ -200,19 +204,30 @@ public class HttpTransport extends AbstractTcpTransport {
             final String origin = request.headers().get(Names.ORIGIN);
 
             // to allow for future changes, let's be at least a little strict in what we accept here.
-            if (!HttpMethod.POST.equals(request.getMethod())) {
+            if (HttpMethod.OPTIONS.equals(request.getMethod())) {
+                writeResponse(channel, keepAlive, httpRequestVersion, OK, origin);
+                return;
+            } else if (!HttpMethod.POST.equals(request.getMethod())) {
                 writeResponse(channel, keepAlive, httpRequestVersion, METHOD_NOT_ALLOWED, origin);
                 return;
             }
 
             final ChannelBuffer buffer = request.getContent();
 
-            if ("/gelf".equals(request.getUri())) {
+            final boolean correctPath = "/gelf".equals(request.getUri());
+            final String contentType = request.headers().get(Names.CONTENT_TYPE);
+            final boolean correctContentType = isNullOrEmpty(contentType)
+                    || MediaType.APPLICATION_JSON.equals(contentType)
+                    || MediaType.APPLICATION_FORM_URLENCODED.equals(contentType);
+
+            if (!correctPath) {
+                writeResponse(channel, keepAlive, httpRequestVersion, NOT_FOUND, origin);
+            } else if (!correctContentType) {
+                writeResponse(channel, keepAlive, httpRequestVersion, UNSUPPORTED_MEDIA_TYPE, origin);
+            } else {
                 // send on to raw message handler
                 writeResponse(channel, keepAlive, httpRequestVersion, ACCEPTED, origin);
                 fireMessageReceived(ctx, buffer);
-            } else {
-                writeResponse(channel, keepAlive, httpRequestVersion, NOT_FOUND, origin);
             }
         }
 
@@ -232,7 +247,7 @@ public class HttpTransport extends AbstractTcpTransport {
                 if (origin != null && !origin.isEmpty()) {
                     response.headers().set(Names.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
                     response.headers().set(Names.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
-                    response.headers().set(Names.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization");
+                    response.headers().set(Names.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");
                 }
             }
 
