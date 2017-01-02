@@ -64,7 +64,11 @@ public class RestTools {
     public static String getRemoteAddrFromRequest(Request request, Set<IpSubnet> trustedSubnets) {
         final String remoteAddr = request.getRemoteAddr();
         final String XForwardedFor = request.getHeader("X-Forwarded-For");
-        if (XForwardedFor != null) {
+        return getAddrFromXForwardedFor(XForwardedFor, remoteAddr, trustedSubnets);
+    }
+
+    public static String getAddrFromXForwardedFor(String XForwardedFor, String remoteAddr, Set<IpSubnet> trustedSubnets) {
+        if (XForwardedFor != null && !"null".equals(XForwardedFor)) {
             for (IpSubnet s : trustedSubnets) {
                 try {
                     if (s.contains(remoteAddr)) {
@@ -76,7 +80,6 @@ public class RestTools {
                 }
             }
         }
-
         // Request did not come from a trusted source, or the X-Forwarded-For header was not set
         return remoteAddr;
     }

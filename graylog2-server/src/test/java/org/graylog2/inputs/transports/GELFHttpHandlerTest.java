@@ -230,4 +230,17 @@ public class GELFHttpHandlerTest {
         assertNull(response.headers().get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_CREDENTIALS));
         assertNull(response.headers().get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS));
     }
+
+    @Test
+    public void testAddingXForwardedFor() throws Exception {
+        final HttpTransport.Handler handler = new HttpTransport.Handler(false);
+
+        String XForwardedFor = "192.168.122.60";
+        when(this.headers.get("X-Forwarded-For")).thenReturn(XForwardedFor);
+
+        handler.messageReceived(ctx, evt);
+
+        verify(channel).write(any(HttpResponse.class));
+        verify(ctx, atMost(1)).sendUpstream(any(ChannelEvent.class));
+    }
 }
