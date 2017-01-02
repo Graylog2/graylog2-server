@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -216,6 +217,7 @@ public class Message implements Messages {
 
         obj.put(FIELD_MESSAGE, getMessage());
         obj.put(FIELD_SOURCE, getSource());
+        obj.put(FIELD_STREAMS, getStreamIds());
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         DateTime dateTime;
@@ -241,17 +243,6 @@ public class Message implements Messages {
         }
         if (dateTime != null) {
             obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
-        }
-
-        // Manually converting stream ID to string - caused strange problems without it.
-        if (getStreams().isEmpty()) {
-            obj.put(FIELD_STREAMS, Collections.emptyList());
-        } else {
-            final List<String> streamIds = Lists.newArrayListWithCapacity(streams.size());
-            for (Stream stream : streams) {
-                streamIds.add(stream.getId());
-            }
-            obj.put(FIELD_STREAMS, streamIds);
         }
 
         return obj;

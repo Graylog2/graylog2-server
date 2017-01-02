@@ -365,6 +365,7 @@ public class MessageTest {
     public void testToElasticSearchObject() throws Exception {
         message.addField("field1", "wat");
         message.addField("field2", "that");
+        message.addField(Message.FIELD_STREAMS, Collections.singletonList("test-stream"));
 
         final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
 
@@ -373,7 +374,7 @@ public class MessageTest {
         assertEquals("wat", object.get("field1"));
         assertEquals("that", object.get("field2"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
-        assertEquals(Collections.emptyList(), object.get("streams"));
+        assertEquals(Collections.singletonList("test-stream"), object.get("streams"));
     }
 
     @Test
@@ -406,10 +407,10 @@ public class MessageTest {
     @Test
     public void testToElasticSearchObjectWithStreams() throws Exception {
         final Stream stream = mock(Stream.class);
-
         when(stream.getId()).thenReturn("stream-id");
+        when(stream.getIndexSet()).thenReturn(mock(IndexSet.class));
 
-        message.setStreams(Lists.newArrayList(stream));
+        message.addStream(stream);
 
         final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
 
