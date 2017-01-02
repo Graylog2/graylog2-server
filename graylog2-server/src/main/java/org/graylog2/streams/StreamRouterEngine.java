@@ -226,6 +226,11 @@ public class StreamRouterEngine {
                 }
             }
         }
+        // either the message stayed on the default stream, in which case we mark that stream's throughput,
+        // or someone removed it, in which case we don't mark it.
+        if (!alreadyRemovedDefaultStream) {
+            streamMetrics.markIncomingMeter(defaultStream.getId());
+        }
 
         return ImmutableList.copyOf(result);
     }
