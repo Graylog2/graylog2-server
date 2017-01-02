@@ -317,6 +317,7 @@ const ApiRoutes = {
     parse: () => { return { url: '/messages/parse' }; },
     single: (index, messageId) => { return { url: `/messages/${index}/${messageId}` }; },
   },
+  ping: () => { return { url: '/' }; },
 };
 
 export default ApiRoutes;

@@ -23,6 +23,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.cluster.Node;
 import org.graylog2.cluster.NodeNotFoundException;
 import org.graylog2.cluster.NodeService;
@@ -47,6 +48,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @Api(value = "System/Cluster", description = "Node discovery")
+@RequiresAuthentication
 @Path("/system/cluster")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterResource extends RestResource {
