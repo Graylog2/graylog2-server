@@ -28,7 +28,6 @@ import com.google.common.collect.Sets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 
-import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 
@@ -40,6 +39,7 @@ import org.graylog.plugins.pipelineprocessor.ast.statements.Statement;
 import org.graylog.plugins.pipelineprocessor.codegen.GeneratedRule;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.InterpreterListener;
 import org.graylog.plugins.pipelineprocessor.processors.listeners.NoopInterpreterListener;
+import org.graylog2.metrics.CacheStatsSet;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.MessageCollection;
 import org.graylog2.plugin.Messages;
@@ -47,6 +47,7 @@ import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.buffers.processors.ProcessBufferProcessor;
 import org.graylog2.shared.journal.Journal;
+import org.graylog2.shared.metrics.MetricUtils;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.jooq.lambda.tuple.Tuple2;
 import org.slf4j.Logger;
@@ -462,20 +463,8 @@ public class PipelineInterpreter implements MessageProcessor {
                     });
 
             // we have to remove the metrics, because otherwise we leak references to the cache (and the register call with throw)
-            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(State.class,"stage-cache")));
-            try {
-                metricRegistry.register(name(State.class, "stage-cache", "hit-count"), (Gauge<Long>) () -> cache.stats().hitCount());
-                metricRegistry.register(name(State.class, "stage-cache", "hit-rate"), (Gauge<Double>) () -> cache.stats().hitRate());
-                metricRegistry.register(name(State.class, "stage-cache", "miss-count"), (Gauge<Long>) () -> cache.stats().missCount());
-                metricRegistry.register(name(State.class, "stage-cache", "miss-rate"), (Gauge<Double>) () -> cache.stats().missRate());
-                metricRegistry.register(name(State.class, "stage-cache", "load-count"), (Gauge<Long>) () -> cache.stats().loadCount());
-                metricRegistry.register(name(State.class, "stage-cache", "total-load-time"), (Gauge<Long>) () -> cache.stats().totalLoadTime());
-                metricRegistry.register(name(State.class, "stage-cache", "eviction-count"), (Gauge<Long>) () -> cache.stats().evictionCount());
-                metricRegistry.register(name(State.class, "stage-cache", "average-load-penalty"), (Gauge<Double>) () -> cache.stats().averageLoadPenalty());
-                metricRegistry.register(name(State.class, "stage-cache", "load-exception-count"), (Gauge<Long>) () -> cache.stats().loadExceptionCount());
-            } catch (Exception e) {
-                LOG.error("Registering cache metrics failed, this is a bug.");
-            }
+            metricRegistry.removeMatching((name, metric) -> name.startsWith(name(PipelineInterpreter.class,"stage-cache")));
+            MetricUtils.safelyRegisterAll(metricRegistry, new CacheStatsSet(name(PipelineInterpreter.class, "stage-cache"), cache));
         }
 
         public ImmutableMap<String, Pipeline> getCurrentPipelines() {
