@@ -24,14 +24,7 @@ const BulkLoadPatternModal = React.createClass({
     const reader = new FileReader();
 
     reader.onload = (loaded) => {
-      const request = loaded.target.result.split('\n').map((line) => {
-        if (!line.startsWith('#')) {
-          const splitted = line.match(/^(\w+)\s+(.*)$/)
-          if (splitted != null && splitted.length === 3) {
-            return {name: splitted[1], pattern: splitted[2]};
-          }
-        }
-      }).filter((elem) => elem !== undefined);
+      const request = loaded.target.result;
       GrokPatternsStore.bulkImport(request, this.state.replacePatterns).then(() => {
         UserNotification.success('Grok Patterns imported successfully', 'Success!');
         this.refs.modal.close();

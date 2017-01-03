@@ -2,6 +2,7 @@ const UserNotification = require("util/UserNotification");
 const URLUtils = require('util/URLUtils');
 
 const fetch = require('logic/rest/FetchProvider').default;
+const fetchPlainText = require('logic/rest/FetchProvider').fetchPlainText;
 
 interface GrokPattern {
   id: string;
@@ -80,13 +81,13 @@ const GrokPatternsStore = {
       );
   },
 
-  bulkImport(patterns: string[], replaceAll: boolean) {
+  bulkImport(patterns: string, replaceAll: boolean) {
     var failCallback = (error) => {
       UserNotification.error("Importing Grok pattern file failed with status: " + error.message,
         "Could not load Grok patterns");
     };
 
-    const promise = fetch('PUT', `${this.URL}?replace=${replaceAll}`, {patterns: patterns});
+    const promise = fetchPlainText('PUT', `${this.URL}?replace=${replaceAll}`, patterns);
 
     promise.catch(failCallback);
 
