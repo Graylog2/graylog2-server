@@ -180,6 +180,25 @@ public class CountsTest {
     }
 
     @Test
+    public void totalReturnsZeroWithNoIndices() throws Exception {
+        for (int i = 0; i < 10; i++) {
+            final IndexResponse indexResponse = client.prepareIndex()
+                    .setIndex(INDEX_NAME_1)
+                    .setRefresh(true)
+                    .setType("test")
+                    .setSource("foo", "bar", "counter", i)
+                    .execute().get();
+            assumeTrue(indexResponse.isCreated());
+        }
+
+        // Simulate no indices for the second index set.
+        when(indexSet2.getManagedIndicesNames()).thenReturn(new String[0]);
+
+        assertThat(counts.total(indexSet1)).isEqualTo(10L);
+        assertThat(counts.total(indexSet2)).isEqualTo(0L);
+    }
+
+    @Test
     public void totalReturnsNumberOfMessages() throws Exception {
         final int count1 = 10;
         final int count2 = 5;
