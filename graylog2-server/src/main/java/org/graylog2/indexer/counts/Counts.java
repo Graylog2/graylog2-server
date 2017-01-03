@@ -45,6 +45,12 @@ public class Counts {
     public long total(final IndexSet indexSet) {
         final String[] names = indexSet.getManagedIndicesNames();
 
+        // Return 0 if there are no indices in the given index set. If we run the query with an empty index list,
+        // Elasticsearch will count all documents in all indices and thus return a wrong count.
+        if (names.length == 0) {
+            return 0L;
+        }
+
         final SearchRequest request = c.prepareSearch(names)
                 .setSize(0)
                 .request();
