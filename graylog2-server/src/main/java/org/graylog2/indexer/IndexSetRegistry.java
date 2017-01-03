@@ -86,8 +86,6 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
     /**
      * Checks if all deflector aliases exist.
      *
-     * TODO 2.2: Check if we can get rid of this method or create a good implementation.
-     *
      * @return if all aliases exist
      */
     boolean isUp();
