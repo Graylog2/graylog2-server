@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -287,7 +288,7 @@ public class MessageTest {
     public void testGetStreamIds() throws Exception {
         message.addField("streams", Lists.newArrayList("stream-id"));
 
-        assertEquals(Lists.newArrayList("stream-id"), message.getStreamIds());
+        assertThat(message.getStreamIds()).containsOnly("stream-id");
     }
 
     @Test
@@ -365,6 +366,7 @@ public class MessageTest {
     public void testToElasticSearchObject() throws Exception {
         message.addField("field1", "wat");
         message.addField("field2", "that");
+        message.addField(Message.FIELD_STREAMS, Collections.singletonList("test-stream"));
 
         final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
 
@@ -373,7 +375,10 @@ public class MessageTest {
         assertEquals("wat", object.get("field1"));
         assertEquals("that", object.get("field2"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
-        assertEquals(Collections.emptyList(), object.get("streams"));
+
+        @SuppressWarnings("unchecked")
+        final Collection<String> streams = (Collection<String>) object.get("streams");
+        assertThat(streams).containsOnly("test-stream");
     }
 
     @Test
@@ -389,7 +394,10 @@ public class MessageTest {
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
-        assertEquals(Collections.emptyList(), object.get("streams"));
+
+        @SuppressWarnings("unchecked")
+        final Collection<String> streams = (Collection<String>) object.get("streams");
+        assertThat(streams).isEmpty();
     }
 
     @Test
@@ -406,14 +414,16 @@ public class MessageTest {
     @Test
     public void testToElasticSearchObjectWithStreams() throws Exception {
         final Stream stream = mock(Stream.class);
-
         when(stream.getId()).thenReturn("stream-id");
+        when(stream.getIndexSet()).thenReturn(mock(IndexSet.class));
 
-        message.setStreams(Lists.newArrayList(stream));
+        message.addStream(stream);
 
         final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
 
-        assertEquals(Lists.newArrayList("stream-id"), object.get("streams"));
+        @SuppressWarnings("unchecked")
+        final Collection<String> streams = (Collection<String>) object.get("streams");
+        assertThat(streams).containsOnly("stream-id");
     }
 
     @Test
@@ -516,10 +526,11 @@ public class MessageTest {
     public void getStreamIdsReturnsStreamsFieldContentsIfFieldDoesExist() {
         final Message message = new Message("", "source", Tools.nowUTC());
         final Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn("test1");
         message.addField("streams", Collections.singletonList("test2"));
         message.addStream(stream);
 
-        assertThat(message.getStreamIds()).containsOnly("test2");
+        assertThat(message.getStreamIds()).containsOnly("test1", "test2");
 
     }
 }

@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
@@ -38,15 +37,16 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
@@ -216,6 +216,7 @@ public class Message implements Messages {
 
         obj.put(FIELD_MESSAGE, getMessage());
         obj.put(FIELD_SOURCE, getSource());
+        obj.put(FIELD_STREAMS, getStreamIds());
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         DateTime dateTime;
@@ -241,17 +242,6 @@ public class Message implements Messages {
         }
         if (dateTime != null) {
             obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
-        }
-
-        // Manually converting stream ID to string - caused strange problems without it.
-        if (getStreams().isEmpty()) {
-            obj.put(FIELD_STREAMS, Collections.emptyList());
-        } else {
-            final List<String> streamIds = Lists.newArrayListWithCapacity(streams.size());
-            for (Stream stream : streams) {
-                streamIds.add(stream.getId());
-            }
-            obj.put(FIELD_STREAMS, streamIds);
         }
 
         return obj;
@@ -466,18 +456,22 @@ public class Message implements Messages {
         return ImmutableSet.copyOf(this.indexSets);
     }
 
-    public List<String> getStreamIds() {
-        if (!hasField(FIELD_STREAMS)) {
-            return streams.stream().map(Stream::getId).collect(Collectors.toList());
-        }
+    @SuppressWarnings("unchecked")
+    public Collection<String> getStreamIds() {
+        Collection<String> streamField;
         try {
-            @SuppressWarnings("unchecked")
-            final List<String> streamIds = getFieldAs(List.class, FIELD_STREAMS);
-            return new ArrayList<>(streamIds);
+            streamField = getFieldAs(Collection.class, FIELD_STREAMS);
         } catch (ClassCastException e) {
             LOG.trace("Couldn't cast {} to List", FIELD_STREAMS, e);
-            return Collections.emptyList();
+            streamField = Collections.emptySet();
         }
+
+        final Set<String> streamIds = streamField == null ? new HashSet<>(streams.size()) : new HashSet<>(streamField);
+        for (Stream stream : streams) {
+            streamIds.add(stream.getId());
+        }
+
+        return streamIds;
     }
 
     public void setFilterOut(final boolean filterOut) {
