@@ -24,6 +24,8 @@ import org.graylog2.indexer.IndexSetRegistry;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
+import static java.util.Objects.requireNonNull;
+
 @Singleton
 public class Counts {
     private final Client c;
@@ -36,22 +38,21 @@ public class Counts {
     }
 
     public long total() {
-        final SearchRequest request = c.prepareSearch(indexSetRegistry.getManagedIndicesNames())
-                .setSize(0)
-                .request();
-        return c.search(request).actionGet().getHits().totalHits();
+        return totalCount(indexSetRegistry.getManagedIndicesNames());
     }
 
     public long total(final IndexSet indexSet) {
-        final String[] names = indexSet.getManagedIndicesNames();
+        return totalCount(indexSet.getManagedIndicesNames());
+    }
 
+    private long totalCount(final String[] indexNames) {
         // Return 0 if there are no indices in the given index set. If we run the query with an empty index list,
         // Elasticsearch will count all documents in all indices and thus return a wrong count.
-        if (names.length == 0) {
+        if (requireNonNull(indexNames).length == 0) {
             return 0L;
         }
 
-        final SearchRequest request = c.prepareSearch(names)
+        final SearchRequest request = c.prepareSearch(indexNames)
                 .setSize(0)
                 .request();
         return c.search(request).actionGet().getHits().totalHits();

@@ -196,6 +196,11 @@ public class CountsTest {
 
         assertThat(counts.total(indexSet1)).isEqualTo(10L);
         assertThat(counts.total(indexSet2)).isEqualTo(0L);
+
+        // Simulate no indices for all index sets.
+        when(indexSetRegistry.getManagedIndicesNames()).thenReturn(new String[0]);
+
+        assertThat(counts.total()).isEqualTo(0L);
     }
 
     @Test
