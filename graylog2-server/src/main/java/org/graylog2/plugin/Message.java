@@ -25,7 +25,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Iterators;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.net.InetAddresses;
@@ -38,7 +37,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Iterator;
@@ -47,7 +45,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Predicates.equalTo;
 import static com.google.common.base.Predicates.not;
@@ -459,7 +456,11 @@ public class Message implements Messages {
 
     public List<String> getStreamIds() {
         if (!hasField(FIELD_STREAMS)) {
-            return streams.stream().map(Stream::getId).collect(Collectors.toList());
+            final List<String> streamIds = new ArrayList<>(streams.size());
+            for (Stream stream : streams) {
+                streamIds.add(stream.getId());
+            }
+            return streamIds;
         }
         try {
             @SuppressWarnings("unchecked")
