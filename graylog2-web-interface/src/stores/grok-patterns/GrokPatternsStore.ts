@@ -87,7 +87,7 @@ const GrokPatternsStore = {
         "Could not load Grok patterns");
     };
 
-    const promise = fetchPlainText('PUT', `${this.URL}?replace=${replaceAll}`, patterns);
+    const promise = fetchPlainText('POST', `${this.URL}?replace=${replaceAll}`, patterns);
 
     promise.catch(failCallback);
 

@@ -140,7 +140,7 @@ public class GrokResource extends RestResource {
         return Response.accepted().build();
     }
 
-    @PUT
+    @POST
     @Consumes(MediaType.TEXT_PLAIN)
     @Timed
     @ApiOperation("Add a list of new patterns")
