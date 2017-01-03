@@ -39,6 +39,7 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -454,22 +455,22 @@ public class Message implements Messages {
         return ImmutableSet.copyOf(this.indexSets);
     }
 
+    @SuppressWarnings("unchecked")
     public List<String> getStreamIds() {
-        if (!hasField(FIELD_STREAMS)) {
-            final List<String> streamIds = new ArrayList<>(streams.size());
-            for (Stream stream : streams) {
-                streamIds.add(stream.getId());
-            }
-            return streamIds;
-        }
+        List<String> streamField;
         try {
-            @SuppressWarnings("unchecked")
-            final List<String> streamIds = getFieldAs(List.class, FIELD_STREAMS);
-            return new ArrayList<>(streamIds);
+            streamField = getFieldAs(List.class, FIELD_STREAMS);
         } catch (ClassCastException e) {
             LOG.trace("Couldn't cast {} to List", FIELD_STREAMS, e);
-            return Collections.emptyList();
+            streamField = Collections.emptyList();
         }
+
+        final Set<String> streamIds = streamField == null ? new HashSet<>(streams.size()) : new HashSet<>(streamField);
+        for (Stream stream : streams) {
+            streamIds.add(stream.getId());
+        }
+
+        return new ArrayList<>(streamIds);
     }
 
     public void setFilterOut(final boolean filterOut) {

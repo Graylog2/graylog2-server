@@ -517,10 +517,11 @@ public class MessageTest {
     public void getStreamIdsReturnsStreamsFieldContentsIfFieldDoesExist() {
         final Message message = new Message("", "source", Tools.nowUTC());
         final Stream stream = mock(Stream.class);
+        when(stream.getId()).thenReturn("test1");
         message.addField("streams", Collections.singletonList("test2"));
         message.addStream(stream);
 
-        assertThat(message.getStreamIds()).containsOnly("test2");
+        assertThat(message.getStreamIds()).containsOnly("test1", "test2");
 
     }
 }
