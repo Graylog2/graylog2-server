@@ -63,6 +63,7 @@ public class MongoIndexSet implements IndexSet {
     public static final String DEFLECTOR_SUFFIX = "deflector";
 
     // TODO: Hardcoded archive suffix. See: https://github.com/Graylog2/graylog2-server/issues/2058
+    // TODO 3.0: Remove this in 3.0, only used for pre 2.2 backwards compatibility.
     public static final String RESTORED_ARCHIVE_SUFFIX = "_restored_archive";
 
     public interface Factory {
@@ -102,10 +103,11 @@ public class MongoIndexSet implements IndexSet {
 
         // Part of the pattern can be configured in IndexSetConfig. If set we use the indexMatchPattern from the config.
         if (isNullOrEmpty(config.indexMatchPattern())) {
-            // TODO 2.2: Is this strict enough? What happens if an index set with a prefix of "foo_0" is created?
+            // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
             this.indexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
             this.deflectorIndexPattern = Pattern.compile("^" + config.indexPrefix() + SEPARATOR + "\\d+");
         } else {
+            // This pattern requires that we check that each index prefix is unique and unambiguous to avoid false matches.
             this.indexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+(?:" + RESTORED_ARCHIVE_SUFFIX + ")?");
             this.deflectorIndexPattern = Pattern.compile("^" + config.indexMatchPattern() + SEPARATOR + "\\d+");
         }
