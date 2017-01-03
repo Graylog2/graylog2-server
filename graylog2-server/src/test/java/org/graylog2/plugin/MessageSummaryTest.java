@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
@@ -76,7 +77,7 @@ public class MessageSummaryTest {
 
     @Test
     public void testGetStreamIds() throws Exception {
-        assertEquals(messageSummary.getStreamIds(), STREAM_IDS);
+        assertThat(messageSummary.getStreamIds()).containsAll(STREAM_IDS);
     }
 
     @Test

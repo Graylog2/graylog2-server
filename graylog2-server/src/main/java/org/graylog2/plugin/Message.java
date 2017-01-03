@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -456,13 +457,13 @@ public class Message implements Messages {
     }
 
     @SuppressWarnings("unchecked")
-    public List<String> getStreamIds() {
-        List<String> streamField;
+    public Collection<String> getStreamIds() {
+        Collection<String> streamField;
         try {
-            streamField = getFieldAs(List.class, FIELD_STREAMS);
+            streamField = getFieldAs(Collection.class, FIELD_STREAMS);
         } catch (ClassCastException e) {
             LOG.trace("Couldn't cast {} to List", FIELD_STREAMS, e);
-            streamField = Collections.emptyList();
+            streamField = Collections.emptySet();
         }
 
         final Set<String> streamIds = streamField == null ? new HashSet<>(streams.size()) : new HashSet<>(streamField);
@@ -470,7 +471,7 @@ public class Message implements Messages {
             streamIds.add(stream.getId());
         }
 
-        return new ArrayList<>(streamIds);
+        return streamIds;
     }
 
     public void setFilterOut(final boolean filterOut) {

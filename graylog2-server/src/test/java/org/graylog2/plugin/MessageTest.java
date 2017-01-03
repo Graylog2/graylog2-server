@@ -33,6 +33,7 @@ import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -287,7 +288,7 @@ public class MessageTest {
     public void testGetStreamIds() throws Exception {
         message.addField("streams", Lists.newArrayList("stream-id"));
 
-        assertEquals(Lists.newArrayList("stream-id"), message.getStreamIds());
+        assertThat(message.getStreamIds()).containsOnly("stream-id");
     }
 
     @Test
@@ -374,7 +375,10 @@ public class MessageTest {
         assertEquals("wat", object.get("field1"));
         assertEquals("that", object.get("field2"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
-        assertEquals(Collections.singletonList("test-stream"), object.get("streams"));
+
+        @SuppressWarnings("unchecked")
+        final Collection<String> streams = (Collection<String>) object.get("streams");
+        assertThat(streams).containsOnly("test-stream");
     }
 
     @Test
@@ -390,7 +394,10 @@ public class MessageTest {
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
-        assertEquals(Collections.emptyList(), object.get("streams"));
+
+        @SuppressWarnings("unchecked")
+        final Collection<String> streams = (Collection<String>) object.get("streams");
+        assertThat(streams).isEmpty();
     }
 
     @Test
@@ -414,7 +421,9 @@ public class MessageTest {
 
         final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
 
-        assertEquals(Lists.newArrayList("stream-id"), object.get("streams"));
+        @SuppressWarnings("unchecked")
+        final Collection<String> streams = (Collection<String>) object.get("streams");
+        assertThat(streams).containsOnly("stream-id");
     }
 
     @Test

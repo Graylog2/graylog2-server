@@ -22,8 +22,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.joda.time.DateTime;
 
+import java.util.Collection;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -73,7 +73,7 @@ public class MessageSummary {
     }
 
     @JsonProperty
-    public List<String> getStreamIds() {
+    public Collection<String> getStreamIds() {
         return message.getStreamIds();
     }
 
