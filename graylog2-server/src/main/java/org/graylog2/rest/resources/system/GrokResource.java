@@ -47,10 +47,20 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 
 @RequiresAuthentication
@@ -59,6 +69,7 @@ import java.util.Set;
 @Consumes("application/json")
 @Api(value = "System/Grok", description = "Manage grok patterns")
 public class GrokResource extends RestResource {
+    private static final Pattern GROK_LINE_PATTERN = Pattern.compile("^(\\w+)[ \t]+(.*)$");
 
     private final GrokPatternService grokPatternService;
     private final ClusterEventBus clusterBus;
@@ -127,6 +138,47 @@ public class GrokResource extends RestResource {
         grokPatternService.saveAll(patternList.patterns(), replace);
         clusterBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), updatedPatternNames));
         return Response.accepted().build();
+    }
+
+    @POST
+    @Consumes(MediaType.TEXT_PLAIN)
+    @Timed
+    @ApiOperation("Add a list of new patterns")
+    @AuditEvent(type = AuditEventTypes.GROK_PATTERN_IMPORT_CREATE)
+    public Response bulkUpdatePatternsFromTextFile(@ApiParam(name = "patterns", required = true) @NotNull InputStream patternsFile,
+                                                   @ApiParam(name = "replace", value = "Replace all patterns with the new ones.")
+                                                   @QueryParam("replace") @DefaultValue("false") boolean replace) throws ValidationException, IOException {
+        checkPermission(RestPermissions.INPUTS_CREATE);
+
+        final List<GrokPattern> grokPatterns = readGrokPatterns(patternsFile);
+        if (!grokPatterns.isEmpty()) {
+            final Set<String> updatedPatternNames = Sets.newHashSetWithExpectedSize(grokPatterns.size());
+            for (final GrokPattern pattern : grokPatterns) {
+                updatedPatternNames.add(pattern.name());
+                if (!grokPatternService.validate(pattern)) {
+                    throw new ValidationException("Invalid pattern " + pattern + ". Did not save any patterns.");
+                }
+            }
+
+            grokPatternService.saveAll(grokPatterns, replace);
+            clusterBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), updatedPatternNames));
+        }
+
+        return Response.accepted().build();
+    }
+
+    private List<GrokPattern> readGrokPatterns(InputStream patternList) throws IOException {
+        try (final InputStreamReader inputStreamReader = new InputStreamReader(patternList, StandardCharsets.UTF_8);
+             final BufferedReader bufferedReader = new BufferedReader(inputStreamReader)) {
+            return bufferedReader.lines()
+                    .map(String::trim)
+                    .filter(s -> !s.startsWith("#") && !s.isEmpty())
+                    .map(GROK_LINE_PATTERN::matcher)
+                    .filter(Matcher::matches)
+                    .map(matcher -> GrokPattern.create(matcher.group(1), matcher.group(2)))
+                    .collect(Collectors.toList());
+
+        }
     }
 
     @PUT
