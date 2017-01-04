@@ -57,6 +57,7 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
@@ -135,6 +136,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
         functions.put(DropMessage.NAME, new DropMessage());
         functions.put(CreateMessage.NAME, new CreateMessage());
+        functions.put(CloneMessage.NAME, new CloneMessage());
 
         // route to stream mocks
         final StreamService streamService = mock(StreamService.class);
@@ -392,18 +394,52 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void newlyCreatedMessage() {
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        message.addField("foo", "bar");
+        message.addStream(mock(Stream.class));
         final Rule rule = parser.parseRule(ruleForTest(), false);
-        final EvaluationContext context = contextForRuleEval(rule, new Message("test", "test", Tools.nowUTC()));
+        final EvaluationContext context = contextForRuleEval(rule, message);
 
         final Message origMessage = context.currentMessage();
         final Message newMessage = Iterables.getOnlyElement(context.createdMessages());
 
         assertThat(origMessage).isNotSameAs(newMessage);
+        assertThat(newMessage.getMessage()).isEqualTo("new");
+        assertThat(newMessage.getSource()).isEqualTo("synthetic");
+        assertThat(newMessage.getStreams()).isEmpty();
         assertThat(newMessage.hasField("removed_again")).isFalse();
         assertThat(newMessage.getFieldAs(Boolean.class, "has_source")).isTrue();
         assertThat(newMessage.getFieldAs(String.class, "only_in")).isEqualTo("new message");
         assertThat(newMessage.getFieldAs(String.class, "multi")).isEqualTo("new message");
+        assertThat(newMessage.getFieldAs(String.class, "foo")).isNull();
+    }
 
+    @Test
+    public void clonedMessage() {
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        message.addField("foo", "bar");
+        message.addStream(mock(Stream.class));
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final EvaluationContext context = contextForRuleEval(rule, message);
+
+        final Message origMessage = context.currentMessage();
+        final Message clonedMessage = Iterables.get(context.createdMessages(), 0);
+        final Message otherMessage = Iterables.get(context.createdMessages(), 1);
+
+        assertThat(origMessage).isNotSameAs(clonedMessage);
+        assertThat(clonedMessage).isNotNull();
+        assertThat(clonedMessage.getMessage()).isEqualTo(origMessage.getMessage());
+        assertThat(clonedMessage.getSource()).isEqualTo(origMessage.getSource());
+        assertThat(clonedMessage.getTimestamp()).isEqualTo(origMessage.getTimestamp());
+        assertThat(clonedMessage.getStreams()).isEqualTo(origMessage.getStreams());
+        assertThat(clonedMessage.hasField("removed_again")).isFalse();
+        assertThat(clonedMessage.getFieldAs(Boolean.class, "has_source")).isTrue();
+        assertThat(clonedMessage.getFieldAs(String.class, "only_in")).isEqualTo("new message");
+        assertThat(clonedMessage.getFieldAs(String.class, "multi")).isEqualTo("new message");
+        assertThat(clonedMessage.getFieldAs(String.class, "foo")).isEqualTo("bar");
+        assertThat(otherMessage).isNotNull();
+        assertThat(otherMessage.getMessage()).isEqualTo("foo");
+        assertThat(otherMessage.getSource()).isEqualTo("source");
     }
 
     @Test

@@ -51,6 +51,7 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
@@ -97,6 +98,7 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);
         addMessageProcessorFunction(CreateMessage.NAME, CreateMessage.class);
+        addMessageProcessorFunction(CloneMessage.NAME, CloneMessage.class);
         addMessageProcessorFunction(RouteToStream.NAME, RouteToStream.class);
 
         // input related functions
