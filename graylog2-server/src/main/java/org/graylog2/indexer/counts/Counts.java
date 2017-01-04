@@ -16,7 +16,7 @@
  */
 package org.graylog2.indexer.counts;
 
-import org.elasticsearch.action.search.SearchRequest;
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.client.Client;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -50,9 +50,14 @@ public class Counts {
             return 0L;
         }
 
-        final SearchRequest request = c.prepareSearch(indexNames)
-                .setSize(0)
-                .request();
-        return c.search(request).actionGet().getHits().totalHits();
+        try {
+            return c.prepareSearch(indexNames)
+                    .setSize(0)
+                    .get()
+                    .getHits()
+                    .getTotalHits();
+        } catch (ElasticsearchException e) {
+            return -1L;
+        }
     }
 }
