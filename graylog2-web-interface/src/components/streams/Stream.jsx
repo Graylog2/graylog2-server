@@ -169,7 +169,7 @@ const Stream = React.createClass({
     );
 
     const indexSet = this.props.indexSets.find(is => is.id === stream.index_set_id) || this.props.indexSets.find(is => is.is_default);
-    const indexSetDetails = this.isPermitted(permissions, ['indexsets:read']) && <span>index set <em>{indexSet.title}</em> &nbsp;</span>;
+    const indexSetDetails = this.isPermitted(permissions, ['indexsets:read']) && indexSet ? <span>index set <em>{indexSet.title}</em> &nbsp;</span> : null;
 
     return (
       <li className="stream">
