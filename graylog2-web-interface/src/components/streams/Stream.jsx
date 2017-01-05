@@ -169,6 +169,7 @@ const Stream = React.createClass({
     );
 
     const indexSet = this.props.indexSets.find(is => is.id === stream.index_set_id) || this.props.indexSets.find(is => is.is_default);
+    const indexSetDetails = this.isPermitted(permissions, ['indexsets:read']) && <span>index set <em>{indexSet.title}</em> &nbsp;</span>;
 
     return (
       <li className="stream">
@@ -186,7 +187,7 @@ const Stream = React.createClass({
             <a>{stream.title}</a>
           </LinkContainer>
           {' '}
-          <small>index set <em>{indexSet.title}</em> &nbsp;<StreamStateBadge stream={stream} /></small>
+          <small>{indexSetDetails}<StreamStateBadge stream={stream} /></small>
         </h2>
 
         <div className="stream-data">
