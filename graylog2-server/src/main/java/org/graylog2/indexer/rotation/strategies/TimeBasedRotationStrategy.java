@@ -20,6 +20,7 @@ package org.graylog2.indexer.rotation.strategies;
 import com.google.common.base.MoreObjects;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
@@ -37,7 +38,12 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.text.MessageFormat;
 import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
+import static com.google.common.base.Preconditions.checkState;
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
 import static org.joda.time.DateTimeFieldType.dayOfMonth;
 import static org.joda.time.DateTimeFieldType.hourOfDay;
 import static org.joda.time.DateTimeFieldType.minuteOfHour;
@@ -51,16 +57,16 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     private static final Logger log = LoggerFactory.getLogger(TimeBasedRotationStrategy.class);
 
     private final Indices indices;
-    private DateTime lastRotation;
-    private DateTime anchor;
+    private Map<String, DateTime> lastRotation;
+    private Map<String, DateTime> anchor;
 
     @Inject
     public TimeBasedRotationStrategy(Indices indices, NodeId nodeId,
                                      AuditEventSender auditEventSender) {
         super(auditEventSender, nodeId);
-        this.anchor = null;
-        this.lastRotation = null;
-        this.indices = indices;
+        this.anchor = new ConcurrentHashMap<>();
+        this.lastRotation = new ConcurrentHashMap<>();
+        this.indices = requireNonNull(indices, "indices must not be null");
     }
 
     @Override
@@ -87,7 +93,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
      * @param period the rotation period
      * @return the anchor DateTime to calculate rotation periods from
      */
-    protected static DateTime determineRotationPeriodAnchor(@Nullable DateTime lastAnchor, Period period) {
+    static DateTime determineRotationPeriodAnchor(@Nullable DateTime lastAnchor, Period period) {
         final Period normalized = period.normalizedStandard();
         int years = normalized.getYears();
         int months = normalized.getMonths();
@@ -135,25 +141,33 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
     @Nullable
     @Override
     protected Result shouldRotate(String index, IndexSet indexSet) {
-        if (!(indexSet.getConfig().rotationStrategy() instanceof TimeBasedRotationStrategyConfig)) {
-            throw new IllegalStateException("Invalid rotation strategy config <" + indexSet.getConfig().rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSet.getConfig().id() + ">");
-        }
+        final IndexSetConfig indexSetConfig = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null");
+        final String indexSetId = indexSetConfig.id();
+        checkState(!isNullOrEmpty(index), "Index name must not be null or empty");
+        checkState(!isNullOrEmpty(indexSetId), "Index set ID must not be null or empty");
+        checkState(indexSetConfig.rotationStrategy() instanceof TimeBasedRotationStrategyConfig,
+                "Invalid rotation strategy config <" + indexSetConfig.rotationStrategy().getClass().getCanonicalName() + "> for index set <" + indexSetId + ">");
 
-        final TimeBasedRotationStrategyConfig config = (TimeBasedRotationStrategyConfig) indexSet.getConfig().rotationStrategy();
-
+        final TimeBasedRotationStrategyConfig config = (TimeBasedRotationStrategyConfig) indexSetConfig.rotationStrategy();
         final Period rotationPeriod = config.rotationPeriod().normalizedStandard();
         final DateTime now = Tools.nowUTC();
         // when first started, we might not know the last rotation time, look up the creation time of the index instead.
-        if (lastRotation == null) {
-            lastRotation = indices.indexCreationDate(index);
-            anchor = determineRotationPeriodAnchor(lastRotation, rotationPeriod);
+        if (!lastRotation.containsKey(indexSetId)) {
+            final DateTime creationDate = indices.indexCreationDate(index);
+            if(creationDate != null) {
+                final DateTime currentAnchor = determineRotationPeriodAnchor(creationDate, rotationPeriod);
+                anchor.put(indexSetId, currentAnchor);
+                lastRotation.put(indexSetId, creationDate);
+            }
+
             // still not able to figure out the last rotation time, we'll rotate forcibly
-            if (lastRotation == null) {
+            if (!lastRotation.containsKey(indexSetId)) {
                 return new SimpleResult(true, "No known previous rotation time, forcing index rotation now.");
             }
         }
 
-        final DateTime nextRotation = anchor.plus(rotationPeriod);
+        final DateTime currentAnchor = anchor.get(indexSetId);
+        final DateTime nextRotation = currentAnchor.plus(rotationPeriod);
         if (nextRotation.isAfter(now)) {
             final String message = new MessageFormat("Next rotation at {0}", Locale.ENGLISH)
                     .format(new Object[]{nextRotation});
@@ -164,20 +178,22 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         DateTime tmpAnchor;
         int multiplicator = 0;
         do {
-            tmpAnchor = anchor.withPeriodAdded(rotationPeriod, ++multiplicator);
+            tmpAnchor = currentAnchor.withPeriodAdded(rotationPeriod, ++multiplicator);
         } while (tmpAnchor.isBefore(now));
-        anchor = anchor.withPeriodAdded(rotationPeriod, multiplicator - 1);
-        lastRotation = now;
+
+        final DateTime nextAnchor = currentAnchor.withPeriodAdded(rotationPeriod, multiplicator - 1);
+        anchor.put(indexSetId, nextAnchor);
+        lastRotation.put(indexSetId, now);
         final String message = new MessageFormat("Rotation period {0} elapsed, next rotation at {1}", Locale.ENGLISH)
-                .format(new Object[]{lastRotation, anchor});
+                .format(new Object[]{now, nextAnchor});
         return new SimpleResult(true, message);
     }
 
-    private static class SimpleResult implements AbstractRotationStrategy.Result {
+    static class SimpleResult implements AbstractRotationStrategy.Result {
         private final String message;
         private final boolean rotate;
 
-        public SimpleResult(boolean rotate, String message) {
+        SimpleResult(boolean rotate, String message) {
             this.message = message;
             this.rotate = rotate;
             log.debug("{} because of: {}", rotate ? "Rotating" : "Not rotating", message);

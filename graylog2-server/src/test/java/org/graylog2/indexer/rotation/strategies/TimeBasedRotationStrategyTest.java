@@ -28,8 +28,10 @@ import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Period;
 import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -38,6 +40,7 @@ import static org.joda.time.Period.minutes;
 import static org.joda.time.Period.seconds;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -47,6 +50,9 @@ import static org.mockito.internal.verification.VerificationModeFactory.times;
 public class TimeBasedRotationStrategyTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private IndexSet indexSet;
@@ -62,6 +68,14 @@ public class TimeBasedRotationStrategyTest {
 
     @Mock
     private AuditEventSender auditEventSender;
+
+    private TimeBasedRotationStrategy rotationStrategy;
+
+    @Before
+    public void setUp() {
+        when(indexSetConfig.id()).thenReturn("index-set-id");
+        rotationStrategy = new TimeBasedRotationStrategy(indices, nodeId, auditEventSender);
+    }
 
     @After
     public void resetTimeProvider() {
@@ -132,11 +146,9 @@ public class TimeBasedRotationStrategyTest {
         when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
         when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(minutes(5)));
 
-        final TimeBasedRotationStrategy hourlyRotation = new TimeBasedRotationStrategy(indices, nodeId, auditEventSender);
-
         // Should not rotate the first index.
         when(indexSet.getNewestTargetName()).thenReturn("ignored");
-        hourlyRotation.rotate(indexSet);
+        rotationStrategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
         reset(indexSet);
 
@@ -146,7 +158,7 @@ public class TimeBasedRotationStrategyTest {
         when(indexSet.getNewestTargetName()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
-        hourlyRotation.rotate(indexSet);
+        rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
         reset(indexSet);
 
@@ -156,7 +168,7 @@ public class TimeBasedRotationStrategyTest {
         when(indexSet.getNewestTargetName()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
-        hourlyRotation.rotate(indexSet);
+        rotationStrategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
         reset(indexSet);
     }
@@ -173,14 +185,12 @@ public class TimeBasedRotationStrategyTest {
         when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
         when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(minutes(11)));
 
-        final TimeBasedRotationStrategy tenMinRotation = new TimeBasedRotationStrategy(indices, nodeId, auditEventSender);
-
         // Should rotate the first index.
         // time is 01:55:00, index was created at 01:44:00, so we missed one period, and should rotate
         when(indexSet.getNewestTargetName()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
-        tenMinRotation.rotate(indexSet);
+        rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
         reset(indexSet);
 
@@ -191,7 +201,7 @@ public class TimeBasedRotationStrategyTest {
         when(indexSet.getNewestTargetName()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
-        tenMinRotation.rotate(indexSet);
+        rotationStrategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
         reset(indexSet);
 
@@ -202,7 +212,7 @@ public class TimeBasedRotationStrategyTest {
         when(indexSet.getNewestTargetName()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
-        tenMinRotation.rotate(indexSet);
+        rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
         reset(indexSet);
 
@@ -214,7 +224,7 @@ public class TimeBasedRotationStrategyTest {
         when(indexSet.getNewestTargetName()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
-        tenMinRotation.rotate(indexSet);
+        rotationStrategy.rotate(indexSet);
         verify(indexSet, times(1)).cycle();
         reset(indexSet);
 
@@ -224,9 +234,147 @@ public class TimeBasedRotationStrategyTest {
         when(indexSet.getNewestTargetName()).thenReturn("ignored");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
-        tenMinRotation.rotate(indexSet);
+        rotationStrategy.rotate(indexSet);
         verify(indexSet, never()).cycle();
         reset(indexSet);
     }
 
+    @Test
+    public void shouldRotateThrowsNPEIfIndexSetConfigIsNull() throws Exception {
+        when(indexSet.getConfig()).thenReturn(null);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+
+        expectedException.expect(NullPointerException.class);
+        expectedException.expectMessage("Index set configuration must not be null");
+
+        rotationStrategy.rotate(indexSet);
+    }
+
+    @Test
+    public void shouldRotateThrowsISEIfIndexIsNull() throws Exception {
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSet.getNewestTargetName()).thenReturn(null);
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Index name must not be null or empty");
+
+        rotationStrategy.rotate(indexSet);
+    }
+
+    @Test
+    public void shouldRotateThrowsISEIfIndexIsEmpty() throws Exception {
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSet.getNewestTargetName()).thenReturn("");
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Index name must not be null or empty");
+
+        rotationStrategy.rotate(indexSet);
+    }
+
+    @Test
+    public void shouldRotateThrowsISEIfIndexSetIdIsNull() throws Exception {
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSetConfig.id()).thenReturn(null);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Index set ID must not be null or empty");
+
+        rotationStrategy.rotate(indexSet);
+    }
+
+    @Test
+    public void shouldRotateThrowsISEIfIndexSetIdIsEmpty() throws Exception {
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSetConfig.id()).thenReturn("");
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Index set ID must not be null or empty");
+
+        rotationStrategy.rotate(indexSet);
+    }
+
+    @Test
+    public void shouldRotateThrowsISEIfRotationStrategyHasIncorrectType() throws Exception {
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSet.getNewestTargetName()).thenReturn("ignored");
+        when(indexSetConfig.rotationStrategy()).thenReturn(MessageCountRotationStrategyConfig.createDefault());
+
+        expectedException.expect(IllegalStateException.class);
+        expectedException.expectMessage("Invalid rotation strategy config");
+
+        rotationStrategy.rotate(indexSet);
+    }
+
+    @Test
+    public void shouldRotateConcurrently() throws Exception {
+        final DateTime initialTime = new DateTime(2014, 1, 1, 1, 59, 59, 0, DateTimeZone.UTC);
+        final Period period = Period.hours(1);
+
+        final InstantMillisProvider clock = new InstantMillisProvider(initialTime);
+        DateTimeUtils.setCurrentMillisProvider(clock);
+
+        final IndexSet indexSet1 = mock(IndexSet.class);
+        final IndexSet indexSet2 = mock(IndexSet.class);
+        final IndexSetConfig indexSetConfig1 = mock(IndexSetConfig.class);
+        final IndexSetConfig indexSetConfig2 = mock(IndexSetConfig.class);
+
+        when(indexSetConfig1.id()).thenReturn("id1");
+        when(indexSetConfig2.id()).thenReturn("id2");
+        
+        when(indexSet1.getConfig()).thenReturn(indexSetConfig1);
+        when(indexSet2.getConfig()).thenReturn(indexSetConfig2);
+
+        when(indexSetConfig1.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        when(indexSetConfig2.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+
+        when(indices.indexCreationDate(anyString())).thenReturn(initialTime.minus(minutes(5)));
+
+        // Should not rotate the initial index.
+        when(indexSet1.getNewestTargetName()).thenReturn("index1");
+        rotationStrategy.rotate(indexSet1);
+        verify(indexSet1, never()).cycle();
+        reset(indexSet1);
+
+        when(indexSet2.getNewestTargetName()).thenReturn("index2");
+        rotationStrategy.rotate(indexSet2);
+        verify(indexSet2, never()).cycle();
+        reset(indexSet2);
+
+        clock.tick(seconds(2));
+
+        // Crossed rotation period.
+        when(indexSet1.getNewestTargetName()).thenReturn("index1");
+        when(indexSet1.getConfig()).thenReturn(indexSetConfig1);
+        when(indexSetConfig1.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        rotationStrategy.rotate(indexSet1);
+        verify(indexSet1, times(1)).cycle();
+        reset(indexSet1);
+
+        when(indexSet2.getNewestTargetName()).thenReturn("index2");
+        when(indexSet2.getConfig()).thenReturn(indexSetConfig2);
+        when(indexSetConfig2.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        rotationStrategy.rotate(indexSet2);
+        verify(indexSet2, times(1)).cycle();
+        reset(indexSet2);
+
+        clock.tick(seconds(2));
+
+        // Did not cross rotation period.
+        when(indexSet1.getNewestTargetName()).thenReturn("index1");
+        when(indexSet1.getConfig()).thenReturn(indexSetConfig1);
+        when(indexSetConfig1.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        rotationStrategy.rotate(indexSet1);
+        verify(indexSet1, never()).cycle();
+        reset(indexSet1);
+
+        when(indexSet2.getNewestTargetName()).thenReturn("index2");
+        when(indexSet2.getConfig()).thenReturn(indexSetConfig2);
+        when(indexSetConfig2.rotationStrategy()).thenReturn(TimeBasedRotationStrategyConfig.create(period));
+        rotationStrategy.rotate(indexSet2);
+        verify(indexSet2, never()).cycle();
+        reset(indexSet2);
+    }
 }
