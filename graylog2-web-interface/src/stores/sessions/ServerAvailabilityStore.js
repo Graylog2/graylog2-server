@@ -17,7 +17,7 @@ const ServerAvailabilityStore = Reflux.createStore({
     return { server: this.server };
   },
   ping() {
-    return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.node().url)).build().then(
+    return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.ping().url)).build().then(
       () => ServerAvailabilityActions.reportSuccess(),
       (error) => ServerAvailabilityActions.reportError(error)
     );
