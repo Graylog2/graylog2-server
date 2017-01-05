@@ -248,6 +248,7 @@ public class RestPermissions implements PluginPermissions {
         JOURNAL_READ,
         JVMSTATS_READ,
         MESSAGECOUNT_READ,
+        MESSAGES_ANALYZE,
         MESSAGES_READ,
         METRICS_READ,
         SAVEDSEARCHES_CREATE,
