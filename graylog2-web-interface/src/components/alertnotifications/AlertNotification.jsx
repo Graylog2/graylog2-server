@@ -2,9 +2,12 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Button, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 
+import PermissionsMixin from 'util/PermissionsMixin';
+
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 import { EntityListItem } from 'components/common';
 import { UnknownAlertNotification } from 'components/alertnotifications';
@@ -17,7 +20,7 @@ const AlertNotification = React.createClass({
     onNotificationUpdate: React.PropTypes.func,
     onNotificationDelete: React.PropTypes.func,
   },
-  mixins: [Reflux.connect(AlertNotificationsStore)],
+  mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   getInitialState() {
     return {
@@ -68,7 +71,7 @@ const AlertNotification = React.createClass({
       <span>Executed once per triggered alert condition in stream <em>{stream.title}</em></span>
       : 'Not executed, as it is not connected to a stream');
 
-    const actions = [
+    const actions = this.isPermitted(this.state.currentUser.permissions, [`streams:edit:${stream.id}`]) && [
       <Button key="test-button" bsStyle="info" disabled={this.state.isTestingAlert} onClick={this._onTestNotification}>
         {this.state.isTestingAlert ? 'Testing...' : 'Test'}
       </Button>,
