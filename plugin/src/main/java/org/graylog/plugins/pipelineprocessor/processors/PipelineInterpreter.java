@@ -30,6 +30,7 @@ import com.google.inject.assistedinject.AssistedInject;
 
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -74,6 +75,7 @@ public class PipelineInterpreter implements MessageProcessor {
 
     private final Journal journal;
     private final Meter filteredOutMessages;
+    private final Timer executionTime;
     private final ConfigurationStateUpdater stateUpdater;
 
     @Inject
@@ -83,6 +85,7 @@ public class PipelineInterpreter implements MessageProcessor {
 
         this.journal = journal;
         this.filteredOutMessages = metricRegistry.meter(name(ProcessBufferProcessor.class, "filteredOutMessages"));
+        this.executionTime = metricRegistry.timer(name(PipelineInterpreter.class, "executionTime"));
         this.stateUpdater = stateUpdater;
     }
 
@@ -92,8 +95,10 @@ public class PipelineInterpreter implements MessageProcessor {
      */
     @Override
     public Messages process(Messages messages) {
-        final State latestState = stateUpdater.getLatestState();
-        return process(messages, new NoopInterpreterListener(), latestState);
+        try (Timer.Context ignored = executionTime.time()) {
+            final State latestState = stateUpdater.getLatestState();
+            return process(messages, new NoopInterpreterListener(), latestState);
+        }
     }
 
     /**
