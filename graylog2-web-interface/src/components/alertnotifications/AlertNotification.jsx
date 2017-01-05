@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 import { Button, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
-const { AlertNotificationsStore, AlertNotificationsActions } = CombinedProvider.get('AlertNotifications');
+const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 
 import { EntityListItem } from 'components/common';
@@ -14,6 +14,8 @@ const AlertNotification = React.createClass({
   propTypes: {
     alertNotification: React.PropTypes.object.isRequired,
     stream: React.PropTypes.object,
+    onNotificationUpdate: React.PropTypes.func,
+    onNotificationDelete: React.PropTypes.func,
   },
   mixins: [Reflux.connect(AlertNotificationsStore)],
 
@@ -35,13 +37,21 @@ const AlertNotification = React.createClass({
 
   _onSubmit(data) {
     AlarmCallbacksActions.update(this.props.alertNotification.stream_id, this.props.alertNotification.id, data)
-      .then(() => AlertNotificationsActions.listAll());
+      .then(() => {
+        if (typeof this.props.onNotificationUpdate === 'function') {
+          this.props.onNotificationUpdate();
+        }
+      });
   },
 
   _onDelete() {
     if (window.confirm('Really delete alert notification?')) {
       AlarmCallbacksActions.delete(this.props.alertNotification.stream_id, this.props.alertNotification.id)
-        .then(() => AlertNotificationsActions.listAll());
+        .then(() => {
+          if (typeof this.props.onNotificationUpdate === 'function') {
+            this.props.onNotificationUpdate();
+          }
+        });
     }
   },
 

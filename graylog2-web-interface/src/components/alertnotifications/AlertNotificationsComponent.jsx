@@ -59,7 +59,8 @@ const AlertNotificationsComponent = React.createClass({
         </div>
         <h2>Notifications</h2>
         <p>These are all configured alert notifications.</p>
-        <AlertNotificationsList alertNotifications={notifications} streams={this.state.streams} />
+        <AlertNotificationsList alertNotifications={notifications} streams={this.state.streams}
+                                onNotificationUpdate={this._loadData} onNotificationDelete={this._loadData} />
       </div>
     );
   },
