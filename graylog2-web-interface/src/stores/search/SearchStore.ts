@@ -352,7 +352,7 @@ class SearchStore {
 
       var query = Object.keys(filter)
         .filter((key) => filter[key])
-        .map((key) => `${key}:"${filter[key]}"`)
+        .map((key) => `${key}:"${SearchStore.escape(filter[key])}"`)
         .join(' AND ');
 
       var params = {
