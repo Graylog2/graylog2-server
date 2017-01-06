@@ -17,10 +17,14 @@ const ServerAvailabilityStore = Reflux.createStore({
     return { server: this.server };
   },
   ping() {
-    return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.ping().url)).build().then(
-      () => ServerAvailabilityActions.reportSuccess(),
-      (error) => ServerAvailabilityActions.reportError(error)
-    );
+    return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.ping().url))
+      // Make sure to request JSON to avoid a redirect which breaks in Firefox (see https://github.com/Graylog2/graylog2-server/issues/3312)
+      .setHeader('Accept', 'application/json')
+      .build()
+      .then(
+        () => ServerAvailabilityActions.reportSuccess(),
+        (error) => ServerAvailabilityActions.reportError(error)
+      );
   },
   reportError(error) {
     if (this.server.up) {
