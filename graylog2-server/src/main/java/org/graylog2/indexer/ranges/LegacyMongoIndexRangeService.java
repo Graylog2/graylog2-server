@@ -17,11 +17,9 @@
 package org.graylog2.indexer.ranges;
 
 import com.google.common.collect.ImmutableSortedSet;
-
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
-
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
@@ -32,10 +30,9 @@ import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.SortedSet;
-
-import javax.inject.Inject;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -104,6 +101,11 @@ public class LegacyMongoIndexRangeService extends PersistedServiceImpl implement
 
     @Override
     public WriteResult<MongoIndexRange, ObjectId> save(IndexRange indexRange) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean remove(String index) {
         throw new UnsupportedOperationException();
     }
 

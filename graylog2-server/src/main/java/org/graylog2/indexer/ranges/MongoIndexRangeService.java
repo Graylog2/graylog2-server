@@ -165,6 +165,12 @@ public class MongoIndexRangeService implements IndexRangeService {
         return save;
     }
 
+    @Override
+    public boolean remove(String index) {
+        final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+        return remove.getN() > 0;
+    }
+
     @Subscribe
     @AllowConcurrentEvents
     public void handleIndexDeletion(IndicesDeletedEvent event) {
@@ -174,8 +180,7 @@ public class MongoIndexRangeService implements IndexRangeService {
                 continue;
             }
             LOG.debug("Index \"{}\" has been deleted. Removing index range.");
-            final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
-            if (remove.getN() > 0) {
+            if (remove(index)) {
                 auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }
         }
