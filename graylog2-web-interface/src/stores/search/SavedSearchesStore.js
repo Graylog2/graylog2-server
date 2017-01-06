@@ -151,6 +151,7 @@ const SavedSearchesStore = Reflux.createStore({
         response => {
           UserNotification.success(`Saved search "${this.savedSearches[searchId]}" was deleted successfully.`);
           SearchStore.savedSearchDeleted(searchId);
+          SavedSearchesActions.list.triggerPromise();
           return response;
         },
         error => {
