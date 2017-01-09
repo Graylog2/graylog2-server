@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.ranges;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -24,9 +25,6 @@ import com.google.common.eventbus.AllowConcurrentEvents;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.UncheckedExecutionException;
-
-import com.codahale.metrics.MetricRegistry;
-
 import org.bson.types.ObjectId;
 import org.elasticsearch.action.NoShardAvailableActionException;
 import org.elasticsearch.action.get.GetRequest;
@@ -43,13 +41,12 @@ import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.concurrent.ExecutionException;
-
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.concurrent.ExecutionException;
 
 import static java.util.Objects.requireNonNull;
 
@@ -191,6 +188,11 @@ public class EsIndexRangeService implements IndexRangeService {
 
     @Override
     public WriteResult<MongoIndexRange, ObjectId> save(IndexRange indexRange) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean remove(String index) {
         throw new UnsupportedOperationException();
     }
 

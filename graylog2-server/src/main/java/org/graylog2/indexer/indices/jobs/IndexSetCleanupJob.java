@@ -21,6 +21,7 @@ import org.elasticsearch.indices.IndexTemplateMissingException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.ranges.MongoIndexRangeService;
 import org.graylog2.system.jobs.SystemJob;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +37,7 @@ public class IndexSetCleanupJob extends SystemJob {
     }
 
     private final Indices indices;
+    private final MongoIndexRangeService indexRangeService;
     private final IndexSet indexSet;
 
     private volatile boolean cancel;
@@ -43,8 +45,9 @@ public class IndexSetCleanupJob extends SystemJob {
     private volatile long deleted = 0L;
 
     @Inject
-    public IndexSetCleanupJob(final Indices indices, @Assisted final IndexSet indexSet) {
+    public IndexSetCleanupJob(final Indices indices, final MongoIndexRangeService indexRangeService, @Assisted final IndexSet indexSet) {
         this.indices = indices;
+        this.indexRangeService = indexRangeService;
         this.indexSet = indexSet;
         this.cancel = false;
     }
@@ -71,6 +74,9 @@ public class IndexSetCleanupJob extends SystemJob {
                 break;
             }
             try {
+                LOG.info("Removing index range information for index: {}", indexName);
+                indexRangeService.remove(indexName);
+
                 LOG.info("Deleting index <{}> in index set <{}> ({})", indexName, config.id(), config.title());
                 indices.delete(indexName);
                 this.deleted++;

@@ -245,6 +245,17 @@ public class MongoIndexRangeServiceTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void remove() throws Exception {
+        assertThat(indexRangeService.findAll()).hasSize(2);
+
+        assertThat(indexRangeService.remove("graylog_1")).isTrue();
+        assertThat(indexRangeService.remove("graylog_1")).isFalse();
+
+        assertThat(indexRangeService.findAll()).hasSize(1);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testHandleIndexDeletion() throws Exception {
         when(indexSetRegistry.isManagedIndex("graylog_1")).thenReturn(true);
 

@@ -160,9 +160,15 @@ public class MongoIndexRangeService implements IndexRangeService {
 
     @Override
     public WriteResult<MongoIndexRange, ObjectId> save(IndexRange indexRange) {
-        collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, indexRange.indexName()));
+        remove(indexRange.indexName());
         final WriteResult<MongoIndexRange, ObjectId> save = collection.save(MongoIndexRange.create(indexRange));
         return save;
+    }
+
+    @Override
+    public boolean remove(String index) {
+        final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
+        return remove.getN() > 0;
     }
 
     @Subscribe
@@ -174,8 +180,7 @@ public class MongoIndexRangeService implements IndexRangeService {
                 continue;
             }
             LOG.debug("Index \"{}\" has been deleted. Removing index range.");
-            final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
-            if (remove.getN() > 0) {
+            if (remove(index)) {
                 auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }
         }
@@ -190,8 +195,7 @@ public class MongoIndexRangeService implements IndexRangeService {
                 continue;
             }
             LOG.debug("Index \"{}\" has been closed. Removing index range.");
-            final WriteResult<MongoIndexRange, ObjectId> remove = collection.remove(DBQuery.in(IndexRange.FIELD_INDEX_NAME, index));
-            if (remove.getN() > 0) {
+            if (remove(index)) {
                 auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_DELETE, ImmutableMap.of("index_name", index));
             }
         }
