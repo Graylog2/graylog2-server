@@ -15,7 +15,7 @@ const GeoIpResolverConfig = React.createClass({
       config: {
         enabled: false,
         db_type: 'MAXMIND_CITY',
-        db_path: '/tmp/GeoLite2-City.mmdb',
+        db_path: '/etc/graylog/server/GeoLite2-City.mmdb',
         run_before_extractors: false,
       },
     };
