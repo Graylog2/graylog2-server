@@ -221,7 +221,8 @@ public class HttpTransport extends AbstractTcpTransport {
                                         "Idle writer timeout",
                                         DEFAULT_IDLE_WRITER_TIMEOUT,
                                         "The server closes the connection after the given time in seconds after the last client write request. (use 0 to disable)",
-                                        ConfigurationField.Optional.OPTIONAL));
+                                        ConfigurationField.Optional.OPTIONAL,
+                                        NumberField.Attribute.ONLY_POSITIVE));
             return r;
         }
     }
