@@ -54,10 +54,7 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
-import org.jboss.netty.handler.timeout.IdleState;
-import org.jboss.netty.handler.timeout.IdleStateAwareChannelHandler;
-import org.jboss.netty.handler.timeout.IdleStateEvent;
-import org.jboss.netty.handler.timeout.IdleStateHandler;
+import org.jboss.netty.handler.timeout.ReadTimeoutHandler;
 import org.jboss.netty.util.HashedWheelTimer;
 
 import javax.inject.Named;
@@ -132,21 +129,14 @@ public class HttpTransport extends AbstractTcpTransport {
                 super.getBaseChannelHandlers(input);
 
         if (idleWriterTimeout > 0) {
-            // Install IdleState and IdleStateEvent handler to close idle connections after a timeout.
+            // Install read timeout handler to close idle connections after a timeout.
             // This avoids dangling HTTP connections when the HTTP client does not close the connection properly.
             // For details see: https://github.com/Graylog2/graylog2-server/issues/3223#issuecomment-270350500
 
-            baseChannelHandlers.put("idlestate", new Callable<ChannelHandler>() {
+            baseChannelHandlers.put("read-timeout-handler", new Callable<ChannelHandler>() {
                 @Override
                 public ChannelHandler call() throws Exception {
-                    return new IdleStateHandler(timer, 0, idleWriterTimeout, 0, TimeUnit.SECONDS);
-                }
-            });
-
-            baseChannelHandlers.put("idlestateevent", new Callable<ChannelHandler>() {
-                @Override
-                public ChannelHandler call() throws Exception {
-                    return new IdleStateEventHandler();
+                    return new ReadTimeoutHandler(timer, idleWriterTimeout, TimeUnit.SECONDS);
                 }
             });
         }
@@ -226,16 +216,6 @@ public class HttpTransport extends AbstractTcpTransport {
             return r;
         }
     }
-
-    public static class IdleStateEventHandler extends IdleStateAwareChannelHandler {
-        @Override
-        public void channelIdle(ChannelHandlerContext ctx, IdleStateEvent e) throws Exception {
-            if (e.getState() == IdleState.WRITER_IDLE) {
-                e.getChannel().close();
-            }
-        }
-    }
-
     public static class Handler extends SimpleChannelHandler {
 
         private final boolean enableCors;
