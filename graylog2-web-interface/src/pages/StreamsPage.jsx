@@ -27,7 +27,7 @@ const StreamsPage = React.createClass({
     };
   },
   componentDidMount() {
-    IndexSetsActions.list();
+    IndexSetsActions.list(false);
   },
   _isLoading() {
     return !this.state.currentUser || !this.state.indexSets;

@@ -5,6 +5,8 @@ import { Col, Button, Label, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { EntityList, EntityListItem, PaginatedList, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
+import StringUtils from 'util/StringUtils';
+import NumberUtils from 'util/NumberUtils';
 
 import { IndexSetDeletionForm, IndexSetDetails } from 'components/indices';
 
@@ -22,7 +24,7 @@ const IndexSetsComponent = React.createClass({
   loadData(pageNo, limit) {
     this.currentPageNo = pageNo;
     this.currentPageSize = limit;
-    IndexSetsActions.listPaginated((pageNo - 1) * limit, limit);
+    IndexSetsActions.listPaginated((pageNo - 1) * limit, limit, true);
   },
 
   // Stores the current page and page size to be able to reload the current page
@@ -92,10 +94,20 @@ const IndexSetsComponent = React.createClass({
       description += `${description.endsWith('.') ? '' : '.'} Graylog will use this index set by default.`;
     }
 
+    let statsString;
+    const stats = this.state.indexSetStats[indexSet.id];
+    if (stats) {
+      const indices = `${NumberUtils.formatNumber(stats.indices)} ${StringUtils.pluralize(stats.indices, 'index', 'indices')}`;
+      const documents = `${NumberUtils.formatNumber(stats.documents)} ${StringUtils.pluralize(stats.documents, 'document', 'documents')}`;
+      const size = NumberUtils.formatBytes(stats.size);
+
+      statsString = `${indices}, ${documents}, ${size}`;
+    }
+
     return (
       <EntityListItem key={`index-set-${indexSet.id}`}
                       title={indexSetTitle}
-                      titleSuffix={isDefault}
+                      titleSuffix={<span>{statsString} {isDefault}</span>}
                       description={description}
                       actions={actions}
                       contentRow={content} />

@@ -12,12 +12,16 @@ const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 const IndexSetsStore = Reflux.createStore({
   listenables: [IndexSetsActions],
 
-  list() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.list().url);
+  list(stats) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.list(stats).url);
     const promise = fetch('GET', url);
     promise
       .then(
-        response => this.trigger({ indexSetsCount: response.total, indexSets: response.index_sets }),
+        response => this.trigger({
+          indexSetsCount: response.total,
+          indexSets: response.index_sets,
+          indexSetStats: response.stats,
+        }),
         error => {
           UserNotification.error(`Fetching index sets list failed: ${error.message}`,
             'Could not retrieve index sets.');
@@ -26,12 +30,16 @@ const IndexSetsStore = Reflux.createStore({
     IndexSetsActions.list.promise(promise);
   },
 
-  listPaginated(skip, limit) {
-    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.listPaginated(skip, limit).url);
+  listPaginated(skip, limit, stats) {
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.listPaginated(skip, limit, stats).url);
     const promise = fetch('GET', url);
     promise
       .then(
-        response => this.trigger({ indexSetsCount: response.total, indexSets: response.index_sets }),
+        response => this.trigger({
+          indexSetsCount: response.total,
+          indexSets: response.index_sets,
+          indexSetStats: response.stats,
+        }),
         error => {
           UserNotification.error(`Fetching index sets list failed: ${this._errorMessage(error)}`,
             'Could not retrieve index sets.');
