@@ -17,7 +17,6 @@
 
 package org.graylog2.indexer.retention.strategies;
 
-import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.periodical.IndexRetentionThread;
@@ -27,9 +26,12 @@ import org.graylog2.shared.system.activities.ActivityWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
@@ -51,7 +53,11 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
     @Override
     public void retain(IndexSet indexSet) {
         final Map<String, Set<String>> deflectorIndices = indexSet.getAllDeflectorAliases();
-        final int indexCount = deflectorIndices.size();
+        final int indexCount = (int)deflectorIndices.keySet()
+            .stream()
+            .filter(indexName -> !indices.isReopened(indexName))
+            .count();
+
         final Optional<Integer> maxIndices = getMaxNumberOfIndices(indexSet);
 
         if (!maxIndices.isPresent()) {
@@ -77,29 +83,22 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
     }
 
     private void runRetention(IndexSet indexSet, Map<String, Set<String>> deflectorIndices, int removeCount) {
-        for (String indexName : IndexHelper.getOldestIndices(indexSet, removeCount)) {
-            // Never run against the current deflector target.
-            if (deflectorIndices.get(indexName).contains(indexSet.getWriteIndexAlias())) {
-                LOG.info("Not running retention against current deflector target <{}>.", indexName);
-                continue;
-            }
+        final Set<String> orderedIndices = Arrays.stream(indexSet.getManagedIndicesNames())
+            .filter(indexName -> !indices.isReopened(indexName))
+            .filter(indexName -> !(deflectorIndices.get(indexName).contains(indexSet.getWriteIndexAlias())))
+            .sorted((indexName1, indexName2) -> indexSet.extractIndexNumber(indexName2).orElse(0).compareTo(indexSet.extractIndexNumber(indexName1).orElse(0)))
+            .collect(Collectors.toCollection(LinkedHashSet::new));
+        orderedIndices
+            .stream()
+            .skip(orderedIndices.size() - removeCount)
+            .forEach(indexName -> {
+                final String strategyName = this.getClass().getCanonicalName();
+                final String msg = "Running retention strategy [" + strategyName + "] for index <" + indexName + ">";
+                LOG.info(msg);
+                activityWriter.write(new Activity(msg, IndexRetentionThread.class));
 
-            /*
-             * Never run against a re-opened index. Indices are marked as re-opened by storing a setting
-             * attribute and we can check for that here.
-             */
-            if (indices.isReopened(indexName)) {
-                LOG.info("Not running retention against reopened index <{}>.", indexName);
-                continue;
-            }
-
-            final String strategyName = this.getClass().getCanonicalName();
-            final String msg = "Running retention strategy [" + strategyName + "] for index <" + indexName + ">";
-            LOG.info(msg);
-            activityWriter.write(new Activity(msg, IndexRetentionThread.class));
-
-            // Sorry if this should ever go mad. Run retention strategy!
-            retain(indexName, indexSet);
-        }
+                // Sorry if this should ever go mad. Run retention strategy!
+                retain(indexName, indexSet);
+            });
     }
 }
