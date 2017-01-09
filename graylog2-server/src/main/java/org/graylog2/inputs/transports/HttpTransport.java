@@ -54,6 +54,8 @@ import org.jboss.netty.handler.codec.http.HttpResponse;
 import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
 import org.jboss.netty.handler.codec.http.HttpResponseStatus;
 import org.jboss.netty.handler.codec.http.HttpVersion;
+import org.jboss.netty.handler.timeout.ReadTimeoutHandler;
+import org.jboss.netty.util.HashedWheelTimer;
 
 import javax.inject.Named;
 import javax.ws.rs.core.MediaType;
@@ -62,6 +64,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -79,18 +82,23 @@ public class HttpTransport extends AbstractTcpTransport {
     static final int DEFAULT_MAX_INITIAL_LINE_LENGTH = 4096;
     static final int DEFAULT_MAX_HEADER_SIZE = 8192;
     static final int DEFAULT_MAX_CHUNK_SIZE = (int) Size.kilobytes(64L).toBytes();
+    static final int DEFAULT_IDLE_WRITER_TIMEOUT = 60;
 
     static final String CK_ENABLE_CORS = "enable_cors";
     static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
+    static final String CK_IDLE_WRITER_TIMEOUT = "idle_writer_timeout";
 
     private final boolean enableCors;
+    private final HashedWheelTimer timer;
     private final int maxChunkSize;
+    private final int idleWriterTimeout;
 
     @AssistedInject
     public HttpTransport(@Assisted Configuration configuration,
                          @Named("bossPool") Executor bossPool,
                          ThroughputCounter throughputCounter,
                          ConnectionCounter connectionCounter,
+                         HashedWheelTimer timer,
                          LocalMetricRegistry localRegistry) {
         super(configuration,
               throughputCounter,
@@ -101,8 +109,10 @@ public class HttpTransport extends AbstractTcpTransport {
 
         enableCors = configuration.getBoolean(CK_ENABLE_CORS);
 
+        this.timer = timer;
         int maxChunkSize = configuration.intIsSet(CK_MAX_CHUNK_SIZE) ? configuration.getInt(CK_MAX_CHUNK_SIZE) : DEFAULT_MAX_CHUNK_SIZE;
         this.maxChunkSize = maxChunkSize <= 0 ? DEFAULT_MAX_CHUNK_SIZE : maxChunkSize;
+        this.idleWriterTimeout = configuration.intIsSet(CK_IDLE_WRITER_TIMEOUT) ? configuration.getInt(CK_IDLE_WRITER_TIMEOUT, DEFAULT_IDLE_WRITER_TIMEOUT) : DEFAULT_IDLE_WRITER_TIMEOUT;
     }
 
     private static Executor executorService(final String executorName, final String threadNameFormat, final MetricRegistry metricRegistry) {
@@ -117,6 +127,19 @@ public class HttpTransport extends AbstractTcpTransport {
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseChannelHandlers =
                 super.getBaseChannelHandlers(input);
+
+        if (idleWriterTimeout > 0) {
+            // Install read timeout handler to close idle connections after a timeout.
+            // This avoids dangling HTTP connections when the HTTP client does not close the connection properly.
+            // For details see: https://github.com/Graylog2/graylog2-server/issues/3223#issuecomment-270350500
+
+            baseChannelHandlers.put("read-timeout-handler", new Callable<ChannelHandler>() {
+                @Override
+                public ChannelHandler call() throws Exception {
+                    return new ReadTimeoutHandler(timer, idleWriterTimeout, TimeUnit.SECONDS);
+                }
+            });
+        }
 
         baseChannelHandlers.put("decoder", new Callable<ChannelHandler>() {
             @Override
@@ -184,6 +207,12 @@ public class HttpTransport extends AbstractTcpTransport {
                                         DEFAULT_MAX_CHUNK_SIZE,
                                         "The maximum HTTP chunk size in bytes (e. g. length of HTTP request body)",
                                         ConfigurationField.Optional.OPTIONAL));
+            r.addField(new NumberField(CK_IDLE_WRITER_TIMEOUT,
+                                        "Idle writer timeout",
+                                        DEFAULT_IDLE_WRITER_TIMEOUT,
+                                        "The server closes the connection after the given time in seconds after the last client write request. (use 0 to disable)",
+                                        ConfigurationField.Optional.OPTIONAL,
+                                        NumberField.Attribute.ONLY_POSITIVE));
             return r;
         }
     }
