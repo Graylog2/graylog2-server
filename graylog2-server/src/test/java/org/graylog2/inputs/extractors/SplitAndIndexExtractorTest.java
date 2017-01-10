@@ -16,25 +16,19 @@
  */
 package org.graylog2.inputs.extractors;
 
-import com.google.common.collect.Lists;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.junit.Test;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SplitAndIndexExtractorTest extends AbstractExtractorTest {
     @Test
     public void testBasicExtraction() throws Exception {
@@ -313,9 +307,4 @@ public class SplitAndIndexExtractorTest extends AbstractExtractorTest {
             put("split_by", splitChar);
         }};
     }
-
-    public static List<Converter> noConverters() {
-        return Lists.newArrayList();
-    }
-
 }
