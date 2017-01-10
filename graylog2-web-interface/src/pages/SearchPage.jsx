@@ -77,18 +77,15 @@ const SearchPage = React.createClass({
       clearInterval(this.timer);
     }
   },
-  _getEffectiveQuery() {
-    return SearchStore.query.length > 0 ? SearchStore.query : '*';
-  },
   _refreshData(searchInStream) {
-    const query = this._getEffectiveQuery();
+    const query = SearchStore.originalQuery;
     const stream = searchInStream || this.props.searchInStream || {};
     const streamId = stream.id;
     if (this.promise && !this.promise.isCancelled()) {
       return this.promise;
     }
     this.setState({ updatingSearch: true });
-    this.promise = UniversalSearchStore.search(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
+    this.promise = UniversalSearchStore.search(SearchStore.originalRangeType, query, SearchStore.originalRangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
       .then(
         response => {
           if (this.isMounted()) {
@@ -98,7 +95,7 @@ const SearchPage = React.createClass({
           const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
 
           this.setState({ updatingHistogram: true });
-          UniversalSearchStore.histogram(SearchStore.rangeType, query, SearchStore.rangeParams.toJS(), interval, streamId)
+          UniversalSearchStore.histogram(SearchStore.originalRangeType, query, SearchStore.originalRangeParams.toJS(), interval, streamId)
             .then(histogram => {
               this.setState({ histogram: histogram });
               return histogram;
@@ -128,7 +125,7 @@ const SearchPage = React.createClass({
   _determineSearchDuration(response) {
     const searchTo = response.to;
     let searchFrom;
-    if (SearchStore.rangeType === 'relative' && SearchStore.rangeParams.get('relative') === 0) {
+    if (SearchStore.originalRangeType === 'relative' && SearchStore.originalRangeParams.get('relative') === 0) {
       const sortedIndices = response.used_indices.sort((i1, i2) => moment(i1.end) - moment(i2.end));
       // If we didn't calculate index ranges for the oldest index, pick the next one.
       // This usually happens to the deflector, when index ranges weren't calculated for it yet.
@@ -223,7 +220,7 @@ const SearchPage = React.createClass({
     searchResult.all_fields = this.state.fields;
     return (
       <DocumentTitle title="Search">
-        <SearchResult query={SearchStore.query} page={SearchStore.page} builtQuery={searchResult.built_query}
+        <SearchResult query={SearchStore.originalQuery} page={SearchStore.page} builtQuery={searchResult.built_query}
                       result={searchResult} histogram={this.state.histogram}
                       formattedHistogram={this.state.histogram.histogram}
                       streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
