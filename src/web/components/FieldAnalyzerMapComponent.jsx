@@ -7,6 +7,8 @@ import { Button } from 'react-bootstrap';
 import { MapsActions, MapsStore } from 'stores/MapsStore';
 import MapVisualization from 'components/MapVisualization';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
+import StoreProvider from 'injection/StoreProvider';
+const RefreshStore = StoreProvider.getStore('Refresh');
 
 const FieldAnalyzerMapComponent = React.createClass({
   propTypes: {
@@ -19,9 +21,10 @@ const FieldAnalyzerMapComponent = React.createClass({
     page: React.PropTypes.number.isRequired,
     rangeType: React.PropTypes.string.isRequired,
     rangeParams: React.PropTypes.object.isRequired,
+    forceFetch: React.PropTypes.bool,
   },
 
-  mixins: [Reflux.connect(MapsStore)],
+  mixins: [Reflux.connect(MapsStore), Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
 
   getInitialState() {
     return {
@@ -37,7 +40,28 @@ const FieldAnalyzerMapComponent = React.createClass({
   componentWillUnmount() {
     window.removeEventListener('resize', this._onResize);
   },
+  componentWillReceiveProps(nextProps) {
+    // Reload values when executed search changes
+    if (this.props.query !== nextProps.query ||
+        this.props.rangeType !== nextProps.rangeType ||
+        JSON.stringify(this.props.rangeParams) !== JSON.stringify(nextProps.rangeParams) ||
+        this.props.stream !== nextProps.stream ||
+        nextProps.forceFetch) {
+        this._loadData(nextProps);
+    }
+  },
 
+  _setupTimer(refresh) {
+    this._stopTimer();
+    if (refresh.enabled) {
+      this.timer = setInterval(() => this._loadData(this.props), refresh.interval);
+    }
+  },
+  _stopTimer() {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  },
   DEFAULT_WIDTH: 800,
   WIDGET_TYPE: 'org.graylog.plugins.map.widget.strategy.MapWidgetStrategy',
   eventThrottler: new EventHandlersThrottler(),
@@ -46,7 +70,7 @@ const FieldAnalyzerMapComponent = React.createClass({
     this.setState({field: field}, () => {
       // We need to update the map width when the container is rendered
       this._updateMapWidth();
-      this._loadData();
+      this._loadData(this.props);
     });
   },
 
@@ -62,13 +86,13 @@ const FieldAnalyzerMapComponent = React.createClass({
     return this.props.stream ? this.props.stream.id : null;
   },
 
-  _loadData() {
+  _loadData(props) {
     if (this.state.field !== undefined) {
       const promise = MapsActions.getMapData(
-        this.props.query,
+        props.query,
         this.state.field,
-        this.props.rangeType,
-        this.props.rangeParams,
+        props.rangeType,
+        props.rangeParams,
         this._getStreamId()
       );
       promise.catch(() => this._resetStatus());
