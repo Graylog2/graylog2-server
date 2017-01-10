@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system.indexer;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.IndexSetStatsCreator;
 import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -76,6 +77,8 @@ public class IndexSetsResourceTest {
     @Mock
     private IndexSetCleanupJob.Factory indexSetCleanupJobFactory;
     @Mock
+    private IndexSetStatsCreator indexSetStatsCreator;
+    @Mock
     private SystemJobManager systemJobManager;
     @Mock
     private ClusterConfigService clusterConfigService;
@@ -86,7 +89,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void list() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, true);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "title",
@@ -107,7 +110,7 @@ public class IndexSetsResourceTest {
         );
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0);
+        final IndexSetResponse list = indexSetsResource.list(0, 0, false);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -119,7 +122,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void listDenied() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, false);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, false);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "title",
@@ -140,7 +143,7 @@ public class IndexSetsResourceTest {
         );
         when(indexSetService.findAll()).thenReturn(Collections.singletonList(indexSetConfig));
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0);
+        final IndexSetResponse list = indexSetsResource.list(0, 0, false);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -152,10 +155,10 @@ public class IndexSetsResourceTest {
 
     @Test
     public void list0() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, true);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         when(indexSetService.findAll()).thenReturn(Collections.emptyList());
 
-        final IndexSetResponse list = indexSetsResource.list(0, 0);
+        final IndexSetResponse list = indexSetsResource.list(0, 0, false);
 
         verify(indexSetService, times(1)).findAll();
         verify(indexSetService, times(1)).getDefault();
@@ -167,7 +170,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void get() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, true);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "title",
@@ -198,7 +201,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void get0() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, true);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         when(indexSetService.get("id")).thenReturn(Optional.empty());
 
         expectedException.expect(NotFoundException.class);
@@ -215,7 +218,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void getDenied() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, false);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, false);
 
         expectedException.expect(ForbiddenException.class);
         expectedException.expectMessage("Not authorized to access resource id <id>");
@@ -229,7 +232,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void save() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, true);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "title",
                 "description",
@@ -264,7 +267,7 @@ public class IndexSetsResourceTest {
     @Test
     @Ignore("Currently doesn't work with @RequiresPermissions")
     public void saveDenied() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, false);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, false);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "title",
                 "description",
@@ -295,7 +298,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void update() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, true);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "new title",
@@ -337,7 +340,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void updateIdMismatch() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, true);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "new title",
@@ -369,7 +372,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void updateDenied() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, false);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, false);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "title",
@@ -401,7 +404,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void delete() throws Exception {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, true);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
@@ -422,7 +425,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void delete0() throws Exception {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, true);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
@@ -445,7 +448,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void deleteDefaultIndexSet() throws Exception {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, true);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
@@ -467,7 +470,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void deleteDenied() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager, false);
+        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, false);
 
         expectedException.expect(ForbiddenException.class);
         expectedException.expectMessage("Not authorized to access resource id <id>");
@@ -482,8 +485,8 @@ public class IndexSetsResourceTest {
     private static class TestResource extends IndexSetsResource {
         private final boolean permitted;
 
-        TestResource(IndexSetService indexSetService, IndexSetRegistry indexSetRegistry, IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory, ClusterConfigService clusterConfigService, SystemJobManager systemJobManager, boolean permitted) {
-            super(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, clusterConfigService, systemJobManager);
+        TestResource(IndexSetService indexSetService, IndexSetRegistry indexSetRegistry, IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory, IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService, SystemJobManager systemJobManager, boolean permitted) {
+            super(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager);
             this.permitted = permitted;
         }
 

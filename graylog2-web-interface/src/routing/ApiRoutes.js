@@ -83,8 +83,8 @@ const ApiRoutes = {
     rebuildSingle: (index) => { return { url: `/system/indices/ranges/${index}/rebuild` }; },
   },
   IndexSetsApiController: {
-    list: () => { return { url: '/system/indices/index_sets' }; },
-    listPaginated: (skip, limit) => { return { url: `/system/indices/index_sets?skip=${skip}&limit=${limit}` }; },
+    list: (stats) => { return { url: `/system/indices/index_sets?stats=${stats}` }; },
+    listPaginated: (skip, limit, stats) => { return { url: `/system/indices/index_sets?skip=${skip}&limit=${limit}&stats=${stats}` }; },
     get: (indexSetId) => { return { url: `/system/indices/index_sets/${indexSetId}` }; },
     create: () => { return { url: '/system/indices/index_sets' }; },
     delete: (indexSetId, deleteIndices) => { return { url: `/system/indices/index_sets/${indexSetId}?delete_indices=${deleteIndices}` }; },

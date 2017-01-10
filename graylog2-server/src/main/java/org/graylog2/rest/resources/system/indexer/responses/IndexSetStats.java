@@ -20,28 +20,27 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-
-import java.util.List;
-import java.util.Map;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
-public abstract class IndexSetResponse {
-    @JsonProperty("total")
-    public abstract int total();
+public abstract class IndexSetStats {
+    private static final String FIELD_INDICES = "indices";
+    private static final String FIELD_DOCUMENTS = "documents";
+    private static final String FIELD_SIZE = "size";
 
-    @JsonProperty("index_sets")
-    public abstract List<IndexSetSummary> indexSets();
+    @JsonProperty(FIELD_INDICES)
+    public abstract long indices();
 
-    @JsonProperty("stats")
-    public abstract Map<String, IndexSetStats> stats();
+    @JsonProperty(FIELD_DOCUMENTS)
+    public abstract long documents();
+
+    @JsonProperty(FIELD_SIZE)
+    public abstract long size();
 
     @JsonCreator
-    public static IndexSetResponse create(@JsonProperty("total") int total,
-                                          @JsonProperty("index_sets") List<IndexSetSummary> ranges,
-                                          @JsonProperty("stats") Map<String, IndexSetStats> stats) {
-        return new AutoValue_IndexSetResponse(total, ranges, stats);
+    public static IndexSetStats create(@JsonProperty(FIELD_INDICES) long indices,
+                                       @JsonProperty(FIELD_DOCUMENTS) long documents,
+                                       @JsonProperty(FIELD_SIZE) long size) {
+        return new AutoValue_IndexSetStats(indices, documents, size);
     }
 }
