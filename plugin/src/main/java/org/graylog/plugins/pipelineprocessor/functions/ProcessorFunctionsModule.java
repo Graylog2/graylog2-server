@@ -17,6 +17,7 @@
 package org.graylog.plugins.pipelineprocessor.functions;
 
 import com.google.inject.Binder;
+import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 
@@ -60,6 +61,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
+import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
@@ -100,6 +102,8 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(CreateMessage.NAME, CreateMessage.class);
         addMessageProcessorFunction(CloneMessage.NAME, CloneMessage.class);
         addMessageProcessorFunction(RouteToStream.NAME, RouteToStream.class);
+        // helper service for route_to_stream
+        serviceBinder().addBinding().to(StreamCacheService.class).in(Scopes.SINGLETON);
 
         // input related functions
         addMessageProcessorFunction(FromInput.NAME, FromInput.class);

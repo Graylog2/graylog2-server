@@ -16,18 +16,18 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.messages;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import com.google.inject.Inject;
+
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
-import org.graylog2.streams.StreamService;
+
+import java.util.Collection;
+import java.util.Collections;
 
 import static com.google.common.collect.ImmutableList.of;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
@@ -38,50 +38,48 @@ public class RouteToStream extends AbstractFunction<Void> {
     public static final String NAME = "route_to_stream";
     private static final String ID_ARG = "id";
     private static final String NAME_ARG = "name";
-    private final StreamService streamService;
+    private final StreamCacheService streamCacheService;
     private final ParameterDescriptor<Message, Message> messageParam;
     private final ParameterDescriptor<String, String> nameParam;
     private final ParameterDescriptor<String, String> idParam;
 
     @Inject
-    public RouteToStream(StreamService streamService) {
-        this.streamService = streamService;
-        streamService.loadAllEnabled();
+    public RouteToStream(StreamCacheService streamCacheService) {
+        this.streamCacheService = streamCacheService;
 
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
         nameParam = string(NAME_ARG).optional().description("The name of the stream to route the message to, must match exactly").build();
-        idParam = string(ID_ARG).optional().description("The ID of the stream, this is much faster than using 'name'").build();
+        idParam = string(ID_ARG).optional().description("The ID of the stream").build();
     }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
         String id = idParam.optional(args, context).orElse("");
 
-        final Stream stream;
+        final Collection<Stream> streams;
         if ("".equals(id)) {
             final String name = nameParam.optional(args, context).orElse("");
             if ("".equals(name)) {
                 return null;
             }
-            // TODO efficiency
-            final ImmutableMap<String, Stream> stringStreamImmutableMap = Maps.uniqueIndex(streamService.loadAll(),
-                                                                                           Stream::getTitle);
-            stream = stringStreamImmutableMap.get(name);
-            if (stream == null) {
+            streams = streamCacheService.getByName(name);
+            if (streams.isEmpty()) {
                 // TODO signal error somehow
                 return null;
             }
         } else {
-            try {
-                stream = streamService.load(id);
-            } catch (NotFoundException e) {
+            final Stream stream = streamCacheService.getById(id);
+            if (stream == null) {
                 return null;
             }
+            streams = Collections.singleton(stream);
         }
-        if (!stream.isPaused()) {
-            final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
-            message.addStream(stream);
-        }
+        final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
+        streams.forEach(stream -> {
+            if (!stream.isPaused()) {
+                message.addStream(stream);
+            }
+        });
         return null;
     }
 

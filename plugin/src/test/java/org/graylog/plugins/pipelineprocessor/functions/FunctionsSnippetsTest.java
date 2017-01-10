@@ -16,12 +16,15 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.InetAddresses;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -66,6 +69,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetFields;
+import org.graylog.plugins.pipelineprocessor.functions.messages.StreamCacheService;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
@@ -86,6 +90,7 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToSt
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPattern;
 import org.graylog2.grok.GrokPatternRegistry;
 import org.graylog2.grok.GrokPatternService;
@@ -102,6 +107,7 @@ import org.joda.time.Period;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.mockito.ArgumentMatchers;
 
 import java.util.Map;
 import java.util.Set;
@@ -111,12 +117,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class FunctionsSnippetsTest extends BaseParserTest {
 
     public static final DateTime GRAYLOG_EPOCH = DateTime.parse("2010-07-30T16:03:25Z");
+    private static final EventBus eventBus = new EventBus();
+    private static StreamCacheService streamCacheService;
 
     @BeforeClass
     public static void registerFunctions() {
@@ -144,9 +153,24 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         when(stream.isPaused()).thenReturn(false);
         when(stream.getTitle()).thenReturn("some name");
         when(stream.getId()).thenReturn("id");
-        when(streamService.loadAll()).thenReturn(Lists.newArrayList(stream));
 
-        functions.put(RouteToStream.NAME, new RouteToStream(streamService));
+        final Stream stream2 = mock(Stream.class);
+        when(stream2.isPaused()).thenReturn(false);
+        when(stream2.getTitle()).thenReturn("some name");
+        when(stream2.getId()).thenReturn("id2");
+
+        when(streamService.loadAll()).thenReturn(Lists.newArrayList(stream, stream2));
+        when(streamService.loadAllEnabled()).thenReturn(Lists.newArrayList(stream, stream2));
+        try {
+            when(streamService.load(anyString())).thenThrow(new NotFoundException());
+            when(streamService.load(ArgumentMatchers.eq("id"))).thenReturn(stream);
+            when(streamService.load(ArgumentMatchers.eq("id2"))).thenReturn(stream2);
+        } catch (NotFoundException ignored) {
+            // oh well, checked exceptions <3
+        }
+        streamCacheService = new StreamCacheService(eventBus, streamService, null);
+        streamCacheService.startAsync().awaitRunning();
+        functions.put(RouteToStream.NAME, new RouteToStream(streamCacheService));
 
         // input related functions
         // TODO needs mock
@@ -689,5 +713,21 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }
+    }
+
+    @Test
+    public void routeToStream() {
+        final Rule rule = parser.parseRule(ruleForTest(), true);
+        final Message message = evaluateRule(rule);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getStreams()).isNotEmpty();
+        assertThat(message.getStreams().size()).isEqualTo(2);
+
+        streamCacheService.updateStreams(ImmutableSet.of("id"));
+
+        final Message message2 = evaluateRule(rule);
+        assertThat(message2).isNotNull();
+        assertThat(message2.getStreams().size()).isEqualTo(2);
     }
 }
