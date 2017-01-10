@@ -87,6 +87,10 @@ class SearchStore {
         }
     }
 
+    /*
+     * This returns the current search query introduced in the search bar. Use "originalQuery()" if you need the
+     * query for the last executed search.
+     */
     get query(): string {
         return this._query;
     }
@@ -96,6 +100,11 @@ class SearchStore {
         if (this.onParamsChanged !== undefined) {
             this.onParamsChanged(this.getParams());
         }
+    }
+
+    get originalQuery(): string {
+        const query = this.originalSearch.get('query');
+        return (query.length > 0 ? query : '*');
     }
 
     get page(): number {
@@ -110,6 +119,10 @@ class SearchStore {
         }
     }
 
+    /*
+     * This returns the current range type introduced in the search bar. Use "originalRangeType()" if you need the
+     * range type for the last executed search.
+     */
     get rangeType(): string {
         return this._rangeType;
     }
@@ -123,6 +136,14 @@ class SearchStore {
         }
     }
 
+    get originalRangeType(): string {
+        return this.originalSearch.get('rangeType');
+    }
+
+    /*
+     * This returns the current range parameters introduced in the search bar. Use "originalRangeParams()" if you
+     * need the range parameters for the last executed search.
+     */
     get rangeParams(): Immutable.Map<string, any> {
         return this._rangeParams;
     }
@@ -132,6 +153,10 @@ class SearchStore {
         if (this.onParamsChanged !== undefined) {
             this.onParamsChanged(this.getParams());
         }
+    }
+
+    get originalRangeParams(): Immutable.Map<string, any> {
+        return this.originalSearch.get('rangeParams');
     }
 
     get resolution(): string {
