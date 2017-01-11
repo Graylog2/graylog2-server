@@ -351,37 +351,6 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void updateIdMismatch() {
-        final IndexSetConfig indexSetConfig = IndexSetConfig.create(
-                "id",
-                "new title",
-                "description",
-                true,
-                "prefix",
-                1,
-                0,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-                "standard",
-                "index-template",
-                1,
-                false
-        );
-
-        expectedException.expect(ClientErrorException.class);
-        expectedException.expectMessage("Mismatch of IDs in URI path and payload");
-
-        try {
-            indexSetsResource.update("wrong-id", IndexSetUpdateRequest.fromIndexSetConfig(indexSetConfig));
-        } finally {
-            verifyZeroInteractions(indexSetService);
-        }
-    }
-
-    @Test
     public void updateDenied() {
         notPermitted();
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(

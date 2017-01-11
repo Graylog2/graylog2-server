@@ -34,9 +34,6 @@ import javax.validation.constraints.NotNull;
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 public abstract class IndexSetUpdateRequest {
-    @JsonProperty("id")
-    public abstract String id();
-
     @JsonProperty("title")
     @NotBlank
     public abstract String title();
@@ -81,8 +78,7 @@ public abstract class IndexSetUpdateRequest {
 
     @JsonCreator
     @JsonIgnoreProperties(ignoreUnknown = true)
-    public static IndexSetUpdateRequest create(@JsonProperty("id") String id,
-                                               @JsonProperty("title") @NotBlank String title,
+    public static IndexSetUpdateRequest create(@JsonProperty("title") @NotBlank String title,
                                                @JsonProperty("description") @Nullable String description,
                                                @JsonProperty("writable") boolean isWritable,
                                                @JsonProperty("shards") @Min(1) int shards,
@@ -93,14 +89,13 @@ public abstract class IndexSetUpdateRequest {
                                                @JsonProperty("retention_strategy") @NotNull RetentionStrategyConfig retentionStrategy,
                                                @JsonProperty("index_optimization_max_num_segments") @Min(1L) int indexOptimizationMaxNumSegments,
                                                @JsonProperty("index_optimization_disabled") boolean indexOptimizationDisabled) {
-        return new AutoValue_IndexSetUpdateRequest(id, title, description, isWritable, shards, replicas,
+        return new AutoValue_IndexSetUpdateRequest(title, description, isWritable, shards, replicas,
                 rotationStrategyClass, rotationStrategy, retentionStrategyClass, retentionStrategy,
                 indexOptimizationMaxNumSegments, indexOptimizationDisabled);
     }
 
     public static IndexSetUpdateRequest fromIndexSetConfig(IndexSetConfig indexSet) {
         return create(
-                indexSet.id(),
                 indexSet.title(),
                 indexSet.description(),
                 indexSet.isWritable(),
@@ -115,9 +110,9 @@ public abstract class IndexSetUpdateRequest {
 
     }
 
-    public IndexSetConfig toIndexSetConfig(IndexSetConfig oldConfig) {
+    public IndexSetConfig toIndexSetConfig(String id, IndexSetConfig oldConfig) {
         return IndexSetConfig.builder()
-                .id(id())
+                .id(id)
                 .title(title())
                 .description(description())
                 .isWritable(isWritable())
