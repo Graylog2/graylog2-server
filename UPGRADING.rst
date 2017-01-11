@@ -63,3 +63,17 @@ Examples:
 +-------------+---------------+-----------+-------------+
 | ``foo-bar`` | ``-``         | 2         | 2           |
 +-------------+---------------+-----------+-------------+
+
+Graylog REST API
+================
+
+Streams API
+-----------
+
+Due to the introduction of index sets, the payload for creating, updating and cloning of streams now requires the ``index_set_id`` field. The value for this needs to be the ID of an existing index set.
+
+Affected endpoints:
+
+* ``POST /streams``
+* ``PUT  /streams/{streamId}``
+* ``POST /streams/{streamId}/clone``
