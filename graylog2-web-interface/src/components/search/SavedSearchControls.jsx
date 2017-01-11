@@ -12,7 +12,7 @@ const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
 const SavedSearchControls = React.createClass({
   propTypes: {
-    currentSavedSearch: React.PropTypes.string,
+    currentSavedSearch: React.PropTypes.string, // saved search ID
     pullRight: React.PropTypes.bool,
   },
   mixins: [Reflux.listenTo(SavedSearchesStore, '_updateTitle')],
@@ -25,17 +25,25 @@ const SavedSearchControls = React.createClass({
   componentDidMount() {
     this._updateTitle();
   },
+  componentDidUpdate(prevProps) {
+    if (prevProps.currentSavedSearch !== this.props.currentSavedSearch) {
+      this._updateTitle();
+    }
+  },
   _isSearchSaved() {
     return this.props.currentSavedSearch !== undefined;
   },
   _updateTitle() {
     if (!this._isSearchSaved()) {
+      if (this.state.title !== '') {
+        this.setState({ title: '', error: false });
+      }
       return;
     }
 
     const currentSavedSearch = SavedSearchesStore.getSavedSearch(this.props.currentSavedSearch);
     if (currentSavedSearch !== undefined) {
-      this.setState({ title: currentSavedSearch.title });
+      this.setState({ title: currentSavedSearch.title, error: false });
     }
   },
   _openModal() {
@@ -60,7 +68,7 @@ const SavedSearchControls = React.createClass({
   _deleteSavedSearch(event) {
     event.preventDefault();
     if (window.confirm('Do you really want to delete this saved search?')) {
-      SavedSearchesActions.delete.triggerPromise(this.props.currentSavedSearch);
+      SavedSearchesActions.delete(this.props.currentSavedSearch);
     }
   },
   _titleChanged() {

@@ -144,18 +144,20 @@ const SavedSearchesStore = Reflux.createStore({
   },
 
   delete(searchId) {
+    const savedSearch = this.savedSearches.find(s => s.id === searchId);
+    const title = savedSearch ? `"${savedSearch.title}"` : searchId;
     const url = ApiRoutes.SavedSearchesApiController.delete(searchId).url;
     const promise = fetch('DELETE', URLUtils.qualifyUrl(url));
     promise
       .then(
         response => {
-          UserNotification.success(`Saved search "${this.savedSearches[searchId]}" was deleted successfully.`);
+          UserNotification.success(`Saved search ${title} was deleted successfully.`);
           SearchStore.savedSearchDeleted(searchId);
           SavedSearchesActions.list.triggerPromise();
           return response;
         },
         error => {
-          UserNotification.error(`Deleting saved search "${this.savedSearches[searchId]}" failed with status: ${error}`,
+          UserNotification.error(`Deleting saved search ${title} failed with status: ${error}`,
             'Could not delete saved search');
         });
 

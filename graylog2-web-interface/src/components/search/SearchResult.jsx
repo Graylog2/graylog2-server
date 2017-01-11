@@ -41,12 +41,16 @@ const SearchResult = React.createClass({
   },
 
   getInitialState() {
-    const initialFields = SearchStore.fields;
     return {
-      selectedFields: this.sortFields(initialFields),
+      selectedFields: this.sortFields(SearchStore.fields),
       showAllFields: false,
       shouldHighlight: true,
+      savedSearch: SearchStore.savedSearch,
     };
+  },
+
+  componentDidUpdate() {
+    this._resetSelectedFields();
   },
 
   onFieldToggled(fieldName) {
@@ -58,6 +62,16 @@ const SearchResult = React.createClass({
       newFieldSet = currentFields.add(fieldName);
     }
     this.updateSelectedFields(newFieldSet);
+  },
+
+  // Reset selected fields if saved search changed
+  _resetSelectedFields() {
+    if (this.state.savedSearch !== SearchStore.savedSearch) {
+      this.setState({
+        savedSearch: SearchStore.savedSearch,
+        selectedFields: this.sortFields(SearchStore.fields),
+      });
+    }
   },
 
   togglePageFields() {
