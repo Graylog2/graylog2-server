@@ -11,13 +11,17 @@ const UsersStore = StoreProvider.getStore('Users');
 import RolesSelect from 'components/users/RolesSelect';
 import { Spinner } from 'components/common';
 
+import EditRolesFormStyle from '!style!css!./EditRolesForm.css';
+
 const EditRolesForm = React.createClass({
   propTypes: {
     user: React.PropTypes.object.isRequired,
     history: React.PropTypes.object,
   },
   getInitialState() {
-    return {};
+    return {
+      newRoles: null,
+    };
   },
   componentDidMount() {
     RolesStore.loadRoles().then(roles => {
@@ -39,10 +43,21 @@ const EditRolesForm = React.createClass({
   _onCancel() {
     this.props.history.pushState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
   },
+  _onValueChange(newRoles) {
+    const roles = newRoles.split(',');
+    this.setState({ newRoles: roles });
+  },
   render() {
     const user = this.props.user;
     if (!this.state.roles) {
       return <Spinner />;
+    }
+    let rolesAlert = null;
+    const roles = this.state.newRoles;
+    if (roles != null && roles.indexOf('Reader') === -1 && roles.indexOf('Admin') === -1) {
+      rolesAlert = <Alert bsStyle="danger" role="alert" className={EditRolesFormStyle.rolesMissingAlert}>
+        You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
+      </Alert>;
     }
     const externalUser = user.external ?
       (
@@ -65,11 +80,12 @@ const EditRolesForm = React.createClass({
         <form className="form-horizontal" style={{ marginTop: '10px' }} onSubmit={this._updateRoles}>
           <Input label="Roles" help="Choose the roles the user should be a member of. All the granted permissions will be combined."
                  labelClassName="col-sm-3" wrapperClassName="col-sm-9">
-            <RolesSelect ref="roles" userRoles={user.roles} availableRoles={this.state.roles} />
+            <RolesSelect ref="roles" userRoles={user.roles} availableRoles={this.state.roles} onValueChange={this._onValueChange} />
           </Input>
           <div className="form-group">
             <Col smOffset={3} sm={9}>
-              <Button bsStyle="primary" type="submit" className="save-button-margin">
+              {rolesAlert}
+              <Button bsStyle="primary" type="submit" className="save-button-margin" disabled={!!rolesAlert}>
                 Update role
               </Button>
               <Button onClick={this._onCancel}>Cancel</Button>
