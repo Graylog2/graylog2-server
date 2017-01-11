@@ -55,9 +55,9 @@ const EditRolesForm = React.createClass({
     let rolesAlert = null;
     const roles = this.state.newRoles;
     if (roles != null && roles.indexOf('Reader') === -1 && roles.indexOf('Admin') === -1) {
-      rolesAlert = <Alert bsStyle="danger" role="alert" className={EditRolesFormStyle.rolesMissingAlert}>
+      rolesAlert = (<Alert bsStyle="danger" role="alert" className={EditRolesFormStyle.rolesMissingAlert}>
         You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
-      </Alert>;
+      </Alert>);
     }
     const externalUser = user.external ?
       (
