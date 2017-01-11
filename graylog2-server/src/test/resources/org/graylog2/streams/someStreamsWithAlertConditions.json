@@ -1,0 +1,65 @@
+{
+  "streams": [
+    {
+      "_id" : { "$oid" :"565f02223b0c25a537197af2" },
+      "creator_user_id" : "admin",
+      "index_set_id" : "586bb9288e82bf5e2c9ab68d",
+      "matching_type" : "AND",
+      "description" : "all logins",
+      "created_at" : { "$date" :"2015-12-02T14:37:22.252Z" },
+      "disabled" : true,
+      "alert_conditions" : [
+        {
+          "creator_user_id" : "admin",
+          "created_at" : "2016-03-11T13:43:11.536Z",
+          "id" : "fb501cf0-0be1-403e-9dda-b0a91bdf860b",
+          "type" : "message_count",
+          "parameters" : {
+            "grace" : 0,
+            "threshold_type" : "more",
+            "threshold" : 1,
+            "time" : 1,
+            "backlog" : 0
+          }
+        }
+      ],
+      "title" : "Logins",
+      "content_pack" : null
+    },
+    {
+      "_id" : { "$oid" :"559d14663b0cf26a15ee0f01" },
+      "creator_user_id" : "admin",
+      "outputs" : [
+        { "$oid" :"56d46466e3f1980e598b690c" }
+      ],
+      "index_set_id" : "586bb9288e82bf5e2c9ab68d",
+      "alert_receivers" : {
+        "users" : [
+          "dennis"
+        ]
+      },
+      "matching_type" : "AND",
+      "description" : "foodescription",
+      "created_at" : { "$date" :"2015-07-08T12:15:34.725Z" },
+      "disabled" : true,
+      "alert_conditions" : [
+        {
+          "creator_user_id" : "admin",
+          "created_at" : "2017-01-10T10:37:08.293Z",
+          "id" : "9afc875e-73b2-42fc-baf2-6c86e1eb2814",
+          "type" : "message_count",
+          "title" : "Max Messages",
+          "parameters" : {
+            "grace" : 0,
+            "threshold_type" : "MORE",
+            "threshold" : 100,
+            "time" : 5,
+            "backlog" : 0
+          }
+        }
+      ],
+      "title" : "footitle",
+      "content_pack" : null
+    }
+  ]
+}

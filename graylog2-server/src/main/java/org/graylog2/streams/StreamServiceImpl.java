@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
@@ -169,6 +170,10 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     public List<Stream> loadAll(Map<String, Object> additionalQueryOpts) {
         final DBObject query = new BasicDBObject(additionalQueryOpts);
+        return loadAll(query);
+    }
+
+    private List<Stream> loadAll(DBObject query) {
         final List<DBObject> results = query(StreamImpl.class, query);
         final List<String> streamIds = results.stream()
                 .map(o -> o.get("_id").toString())
@@ -195,11 +200,12 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
 
     @Override
     public List<Stream> loadAllWithConfiguredAlertConditions() {
-        // Explanation: alert_conditions.1 is the first Array element.
-        Map<String, Object> queryOpts = Collections.singletonMap(
-                StreamImpl.EMBEDDED_ALERT_CONDITIONS, new BasicDBObject("$ne", Collections.emptyList()));
+        final DBObject query = QueryBuilder.start().and(
+            QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).exists(true).get(),
+            QueryBuilder.start(StreamImpl.EMBEDDED_ALERT_CONDITIONS).not().size(0).get()
+        ).get();
 
-        return loadAll(queryOpts);
+        return loadAll(query);
     }
 
     protected Set<Output> loadOutputsForRawStream(DBObject stream) {
