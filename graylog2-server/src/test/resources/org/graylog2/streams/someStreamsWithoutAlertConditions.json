@@ -1,0 +1,38 @@
+{
+  "streams": [
+    {
+      "_id" : { "$oid": "5628f4503b0c5756a8eebc4d" },
+      "creator_user_id" : "admin",
+      "index_set_id" : "586bb9288e82bf5e2c9ab68d",
+      "matching_type" : "AND",
+      "description" : "All requests that were logged into the nginx access_log",
+      "created_at" : { "$date" : "2015-10-22T14:36:00.812Z" },
+      "disabled" : true,
+      "title" : "nginx requests",
+      "content_pack" : "552b90f6e4b08fd819039288"
+    },
+    {
+      "_id" : { "$oid": "5628f4503b0c5756a8eebc4f" },
+      "creator_user_id" : "admin",
+      "index_set_id" : "586bb9288e82bf5e2c9ab68d",
+      "matching_type" : "AND",
+      "description" : "All requests that were logged into the nginx access_log or nginx_error_log",
+      "created_at" : { "$date" : "2015-10-22T14:36:00.812Z" },
+      "disabled" : true,
+      "title" : "nginx",
+      "content_pack" : "552b90f6e4b08fd819039288"
+    },
+    {
+      "_id" : { "$oid": "5628f4503b0c5756a8eebc51" },
+      "creator_user_id" : "admin",
+      "index_set_id" : "586bb9288e82bf5e2c9ab68d",
+      "matching_type" : "AND",
+      "description" : "All requests that were answered with a HTTP code in the 400 range by nginx",
+      "created_at" : { "$date" : "2015-10-22T14:36:00.812Z" },
+      "disabled" : true,
+      "title" : "nginx HTTP 4XXs",
+      "content_pack" : "552b90f6e4b08fd819039288",
+      "alert_conditions" : []
+    }
+  ]
+}

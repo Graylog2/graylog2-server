@@ -17,12 +17,7 @@
 package org.graylog2.periodical;
 
 import org.graylog2.Configuration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
-import org.graylog2.alarmcallbacks.AlarmCallbackHistoryService;
-import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.AlertScanner;
-import org.graylog2.alerts.AlertService;
 import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
@@ -42,14 +37,9 @@ public class AlertScannerThread extends Periodical {
     private final AlertScanner alertScanner;
 
     @Inject
-    public AlertScannerThread(final AlertService alertService,
-                              final StreamService streamService,
-                              final AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                              final AlarmCallbackFactory alarmCallbackFactory,
-                              final EmailAlarmCallback emailAlarmCallback,
+    public AlertScannerThread(final StreamService streamService,
                               final IndexerSetupService indexerSetupService,
                               final Configuration configuration,
-                              final AlarmCallbackHistoryService alarmCallbackHistoryService,
                               final AlertScanner alertScanner) {
         this.streamService = streamService;
         this.indexerSetupService = indexerSetupService;
