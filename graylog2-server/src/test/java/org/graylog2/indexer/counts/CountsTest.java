@@ -149,11 +149,11 @@ public class CountsTest {
                 .indexOptimizationDisabled(false)
                 .build();
 
-        when(indexSetRegistry.getManagedIndicesNames()).thenReturn(new String[]{INDEX_NAME_1, INDEX_NAME_2});
+        when(indexSetRegistry.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_1, INDEX_NAME_2});
         when(indexSetRegistry.get(indexSetConfig1.id())).thenReturn(Optional.of(indexSet1));
         when(indexSetRegistry.get(indexSetConfig2.id())).thenReturn(Optional.of(indexSet2));
-        when(indexSet1.getManagedIndicesNames()).thenReturn(new String[]{INDEX_NAME_1});
-        when(indexSet2.getManagedIndicesNames()).thenReturn(new String[]{INDEX_NAME_2});
+        when(indexSet1.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_1});
+        when(indexSet2.getManagedIndices()).thenReturn(new String[]{INDEX_NAME_2});
     }
 
     @After
@@ -193,13 +193,13 @@ public class CountsTest {
         }
 
         // Simulate no indices for the second index set.
-        when(indexSet2.getManagedIndicesNames()).thenReturn(new String[0]);
+        when(indexSet2.getManagedIndices()).thenReturn(new String[0]);
 
         assertThat(counts.total(indexSet1)).isEqualTo(10L);
         assertThat(counts.total(indexSet2)).isEqualTo(0L);
 
         // Simulate no indices for all index sets.
-        when(indexSetRegistry.getManagedIndicesNames()).thenReturn(new String[0]);
+        when(indexSetRegistry.getManagedIndices()).thenReturn(new String[0]);
 
         assertThat(counts.total()).isEqualTo(0L);
     }
@@ -235,7 +235,7 @@ public class CountsTest {
     @Test
     public void totalReturnsMinusOneIfIndexDoesNotExist() throws Exception {
         final IndexSet indexSet = mock(IndexSet.class);
-        when(indexSet.getManagedIndicesNames()).thenReturn(new String[]{"does_not_exist"});
+        when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
         assertThat(counts.total(indexSet)).isEqualTo(-1L);
     }
 }

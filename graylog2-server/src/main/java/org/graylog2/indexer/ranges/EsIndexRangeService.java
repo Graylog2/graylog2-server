@@ -160,7 +160,7 @@ public class EsIndexRangeService implements IndexRangeService {
     @Override
     public SortedSet<IndexRange> findAll() {
         final ImmutableSortedSet.Builder<IndexRange> indexRanges = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
-        for (String index : indexSetRegistry.getManagedIndicesNames()) {
+        for (String index : indexSetRegistry.getManagedIndices()) {
             try {
                 indexRanges.add(cache.get(index));
             } catch (ExecutionException e) {

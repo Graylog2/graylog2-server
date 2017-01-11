@@ -124,22 +124,22 @@ public class MongoIndexSetTest {
 
     @Test
     public void nullIndexerDoesNotThrow() {
-        final Map<String, Set<String>> deflectorIndices = mongoIndexSet.getAllDeflectorAliases();
+        final Map<String, Set<String>> deflectorIndices = mongoIndexSet.getAllIndexAliases();
         assertThat(deflectorIndices).isEmpty();
     }
 
     @Test
     public void nullIndexerDoesNotThrowOnIndexName() {
-        final String[] indicesNames = mongoIndexSet.getManagedIndicesNames();
+        final String[] indicesNames = mongoIndexSet.getManagedIndices();
         assertThat(indicesNames).isEmpty();
     }
 
     @Test
     public void testIsDeflectorAlias() {
-        assertTrue(mongoIndexSet.isDeflectorAlias("graylog_deflector"));
-        assertFalse(mongoIndexSet.isDeflectorAlias("graylog_foobar"));
-        assertFalse(mongoIndexSet.isDeflectorAlias("graylog_123"));
-        assertFalse(mongoIndexSet.isDeflectorAlias("HAHA"));
+        assertTrue(mongoIndexSet.isWriteIndexAlias("graylog_deflector"));
+        assertFalse(mongoIndexSet.isWriteIndexAlias("graylog_foobar"));
+        assertFalse(mongoIndexSet.isWriteIndexAlias("graylog_123"));
+        assertFalse(mongoIndexSet.isWriteIndexAlias("HAHA"));
     }
 
     @Test
@@ -193,7 +193,7 @@ public class MongoIndexSetTest {
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
 
-        final int number = mongoIndexSet.getNewestTargetNumber();
+        final int number = mongoIndexSet.getNewestIndexNumber();
         assertEquals(3, number);
     }
 
@@ -210,7 +210,7 @@ public class MongoIndexSetTest {
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
 
 
-        final String[] allGraylogIndexNames = mongoIndexSet.getManagedIndicesNames();
+        final String[] allGraylogIndexNames = mongoIndexSet.getManagedIndices();
         assertThat(allGraylogIndexNames).containsExactlyElementsOf(indexNameAliases.keySet());
     }
 
@@ -226,7 +226,7 @@ public class MongoIndexSetTest {
         when(indices.getIndexNamesAndAliases(anyString())).thenReturn(indexNameAliases);
 
         final MongoIndexSet mongoIndexSet = new MongoIndexSet(config, indices, nodeId, indexRangeService, auditEventSender, systemJobManager, jobFactory, activityWriter);
-        final Map<String, Set<String>> deflectorIndices = mongoIndexSet.getAllDeflectorAliases();
+        final Map<String, Set<String>> deflectorIndices = mongoIndexSet.getAllIndexAliases();
 
         assertThat(deflectorIndices).containsOnlyKeys("graylog_1", "graylog_2", "graylog_3", "graylog_5");
     }

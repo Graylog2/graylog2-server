@@ -241,7 +241,7 @@ public class IndicesTest {
                     "type", "string",
                     "index", "not_analyzed")));
         assertThat(client.preparePutTemplate(templateName)
-                .setTemplate(indexSet.getWriteIndexWildcard())
+                .setTemplate(indexSet.getIndexWildcard())
                 .addMapping(IndexMapping.TYPE_MESSAGE, beforeMapping)
                 .get()
                 .isAcknowledged())
@@ -263,7 +263,7 @@ public class IndicesTest {
         assertThat(templateMetaData.getMappings().keysIt()).containsExactly(IndexMapping.TYPE_MESSAGE);
 
         final Map<String, Object> mapping = mapper.readValue(templateMetaData.getMappings().get(IndexMapping.TYPE_MESSAGE).uncompressed(), new TypeReference<Map<String, Object>>() {});
-        final Map<String, Object> expectedTemplate = new IndexMapping().messageTemplate(indexSet.getWriteIndexWildcard(), indexSetConfig.indexAnalyzer());
+        final Map<String, Object> expectedTemplate = new IndexMapping().messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer());
         assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
 
         final DeleteIndexTemplateRequest deleteRequest = client.prepareDeleteTemplate(templateName).request();

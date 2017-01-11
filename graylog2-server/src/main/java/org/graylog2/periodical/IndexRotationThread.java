@@ -141,19 +141,19 @@ public class IndexRotationThread extends Periodical {
             try {
                 String currentTarget;
                 try {
-                    currentTarget = indexSet.getCurrentActualTargetIndex();
+                    currentTarget = indexSet.getActiveWriteIndex();
                 } catch (TooManyAliasesException e) {
                     // If we get this exception, there are multiple indices which have the deflector alias set.
                     // We try to cleanup the alias and try again. This should not happen, but might under certain
                     // circumstances.
                     indexSet.cleanupAliases(e.getIndices());
                     try {
-                        currentTarget = indexSet.getCurrentActualTargetIndex();
+                        currentTarget = indexSet.getActiveWriteIndex();
                     } catch (TooManyAliasesException e1) {
                         throw new IllegalStateException(e1);
                     }
                 }
-                String shouldBeTarget = indexSet.getNewestTargetName();
+                String shouldBeTarget = indexSet.getNewestIndex();
 
                 if (!shouldBeTarget.equals(currentTarget)) {
                     String msg = "Deflector is pointing to [" + currentTarget + "], not the newest one: [" + shouldBeTarget + "]. Re-pointing.";

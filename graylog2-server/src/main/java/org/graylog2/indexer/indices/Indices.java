@@ -197,7 +197,7 @@ public class Indices {
     }
 
     public Map<String, IndexStats> getAll(final IndexSet indexSet) {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexSet.getWriteIndexWildcard()).request();
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexSet.getIndexWildcard()).request();
         final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
         if (response.getFailedShards() > 0) {
@@ -207,7 +207,7 @@ public class Indices {
     }
 
     public Map<String, IndexStats> getAllDocCounts(final IndexSet indexSet) {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexSet.getWriteIndexWildcard()).setDocs(true).request();
+        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexSet.getIndexWildcard()).setDocs(true).request();
         final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
 
         return response.getIndices();
@@ -276,7 +276,7 @@ public class Indices {
     }
 
     private void ensureIndexTemplate(IndexSet indexSet) {
-        final Map<String, Object> template = indexMapping.messageTemplate(indexSet.getWriteIndexWildcard(), indexSet.getConfig().indexAnalyzer());
+        final Map<String, Object> template = indexMapping.messageTemplate(indexSet.getIndexWildcard(), indexSet.getConfig().indexAnalyzer());
         final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(indexSet.getConfig().indexTemplateName())
                 .setOrder(Integer.MIN_VALUE) // Make sure templates with "order: 0" are applied after our template!
                 .setSource(template)

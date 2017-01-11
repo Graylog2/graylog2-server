@@ -147,7 +147,7 @@ public class IndexRangesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     @AuditEvent(type = AuditEventTypes.ES_INDEX_RANGE_UPDATE_JOB)
     public Response rebuild() {
-        submitIndexRangesJob(indexSetRegistry.getAllIndexSets());
+        submitIndexRangesJob(indexSetRegistry.getAll());
 
         return Response.accepted().build();
     }
@@ -194,7 +194,7 @@ public class IndexRangesResource extends RestResource {
         }
         checkPermission(RestPermissions.INDEXRANGES_REBUILD, index);
 
-        final SystemJob rebuildJob = singleIndexRangeJobFactory.create(indexSetRegistry.getAllIndexSets(), index);
+        final SystemJob rebuildJob = singleIndexRangeJobFactory.create(indexSetRegistry.getAll(), index);
         try {
             this.systemJobManager.submit(rebuildJob);
         } catch (SystemJobConcurrencyException e) {

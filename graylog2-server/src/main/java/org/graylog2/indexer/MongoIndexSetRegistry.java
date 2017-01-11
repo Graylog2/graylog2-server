@@ -51,7 +51,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     @Override
-    public Set<IndexSet> getAllIndexSets() {
+    public Set<IndexSet> getAll() {
         return ImmutableSet.copyOf(findAllMongoIndexSets());
     }
 
@@ -62,7 +62,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     @Override
-    public Optional<IndexSet> getForIndexName(String indexName) {
+    public Optional<IndexSet> getForIndex(String indexName) {
         for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
             if (indexSet.isManagedIndex(indexName)) {
                 return Optional.of(indexSet);
@@ -77,10 +77,10 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     @Override
-    public String[] getManagedIndicesNames() {
+    public String[] getManagedIndices() {
         final ImmutableSet.Builder<String> indexNamesBuilder = ImmutableSet.builder();
         for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            indexNamesBuilder.add(indexSet.getManagedIndicesNames());
+            indexNamesBuilder.add(indexSet.getManagedIndices());
         }
 
         final ImmutableSet<String> indexNames = indexNamesBuilder.build();
@@ -98,11 +98,11 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     @Override
-    public String[] getWriteIndexWildcards() {
+    public String[] getIndexWildcards() {
         final ImmutableSet.Builder<String> wildcardsBuilder = ImmutableSet.builder();
         for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
             if (indexSet.getConfig().isWritable()) {
-                wildcardsBuilder.add(indexSet.getWriteIndexWildcard());
+                wildcardsBuilder.add(indexSet.getIndexWildcard());
             }
         }
 
@@ -111,7 +111,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     @Override
-    public String[] getWriteIndexNames() {
+    public String[] getWriteIndexAliases() {
         final ImmutableSet.Builder<String> indexNamesBuilder = ImmutableSet.builder();
         for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
             if (indexSet.getConfig().isWritable()) {
@@ -138,7 +138,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     @Override
     public boolean isCurrentWriteIndexAlias(String indexName) {
         for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            if (indexSet.isDeflectorAlias(indexName)) {
+            if (indexSet.isWriteIndexAlias(indexName)) {
                 return true;
             }
         }
@@ -149,7 +149,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     @Override
     public boolean isCurrentWriteIndex(String indexName) throws TooManyAliasesException {
         for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            if (indexSet.getCurrentActualTargetIndex() != null && indexSet.getCurrentActualTargetIndex().equals(indexName)) {
+            if (indexSet.getActiveWriteIndex() != null && indexSet.getActiveWriteIndex().equals(indexName)) {
                 return true;
             }
         }
@@ -159,6 +159,6 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
 
     @Override
     public Iterator<IndexSet> iterator() {
-        return getAllIndexSets().iterator();
+        return getAll().iterator();
     }
 }

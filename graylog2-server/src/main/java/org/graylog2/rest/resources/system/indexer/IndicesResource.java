@@ -138,7 +138,7 @@ public class IndicesResource extends RestResource {
     @RequiresPermissions(RestPermissions.INDICES_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo open() {
-        final Set<IndexStatistics> indicesStats = indexSetRegistry.getAllIndexSets().stream()
+        final Set<IndexStatistics> indicesStats = indexSetRegistry.getAll().stream()
                 .flatMap(indexSet -> indices.getIndicesStats(indexSet).stream())
                 .collect(Collectors.toSet());
 
@@ -151,7 +151,7 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of closed indices that can be reopened.")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices closed() {
-        final Set<String> closedIndices = indexSetRegistry.getAllIndexSets().stream()
+        final Set<String> closedIndices = indexSetRegistry.getAll().stream()
                 .flatMap(indexSet -> indices.getClosedIndices(indexSet).stream())
                 .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
                 .collect(Collectors.toSet());
@@ -165,7 +165,7 @@ public class IndicesResource extends RestResource {
     @ApiOperation(value = "Get a list of reopened indices, which will not be cleaned by retention cleaning")
     @Produces(MediaType.APPLICATION_JSON)
     public ClosedIndices reopened() {
-        final Set<String> reopenedIndices = indexSetRegistry.getAllIndexSets().stream()
+        final Set<String> reopenedIndices = indexSetRegistry.getAll().stream()
                 .flatMap(indexSet -> indices.getReopenedIndices(indexSet).stream())
                 .filter((indexName) -> isPermitted(RestPermissions.INDICES_READ, indexName) && indexSetRegistry.isManagedIndex(indexName))
                 .collect(Collectors.toSet());

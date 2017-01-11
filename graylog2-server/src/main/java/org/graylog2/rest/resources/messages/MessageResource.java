@@ -204,7 +204,7 @@ public class MessageResource extends RestResource {
             @ApiParam(name = "string", value = "The string to analyze.", required = true)
             @QueryParam("string") @NotEmpty String string) {
 
-        final String indexAnalyzer = indexSetRegistry.getForIndexName(index)
+        final String indexAnalyzer = indexSetRegistry.getForIndex(index)
                 .map(indexSet -> indexSet.getConfig().indexAnalyzer())
                 .orElse("standard");
         final String messageAnalyzer = analyzer == null ? indexAnalyzer : analyzer;

@@ -105,12 +105,12 @@ public class V20161130141500_DefaultStreamRecalcIndexRanges extends Migration {
 
         final String currentWriteTarget;
         try {
-            currentWriteTarget = defaultIndexSet.getCurrentActualTargetIndex();
+            currentWriteTarget = defaultIndexSet.getActiveWriteIndex();
         } catch (TooManyAliasesException e) {
             LOG.error("Multiple write targets found for write alias. Cannot continue to assign streams to older indices", e);
             return;
         }
-        for (String indexName : defaultIndexSet.getManagedIndicesNames()) {
+        for (String indexName : defaultIndexSet.getManagedIndices()) {
             if (indexName.equals(currentWriteTarget)) {
                 // do not recalculate for current write target
                 continue;
@@ -120,7 +120,7 @@ public class V20161130141500_DefaultStreamRecalcIndexRanges extends Migration {
                 continue;
             }
             LOG.info("Recalculating streams in index {}", indexName);
-            final CreateNewSingleIndexRangeJob createNewSingleIndexRangeJob = rebuildIndexRangeJobFactory.create(indexSetRegistry.getAllIndexSets(), indexName);
+            final CreateNewSingleIndexRangeJob createNewSingleIndexRangeJob = rebuildIndexRangeJobFactory.create(indexSetRegistry.getAll(), indexName);
             createNewSingleIndexRangeJob.execute();
         }
 
