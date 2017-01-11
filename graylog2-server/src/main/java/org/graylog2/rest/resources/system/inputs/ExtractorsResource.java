@@ -298,13 +298,30 @@ public class ExtractorsResource extends RestResource {
     }
 
     private ExtractorSummary toSummary(Extractor extractor) {
-        final ExtractorMetrics metrics = ExtractorMetrics.create(MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getTotalTimerName())),
-                MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getConverterTimerName())));
+        final ExtractorMetrics metrics = ExtractorMetrics.create(
+                MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getCompleteTimerName())),
+                MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getConditionTimerName())),
+                MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getExecutionTimerName())),
+                MetricUtils.buildTimerMap(metricRegistry.getTimers().get(extractor.getConverterTimerName())),
+                metricRegistry.getCounters().get(extractor.getConditionHitsCounterName()).getCount(),
+                metricRegistry.getCounters().get(extractor.getConditionMissesCounterName()).getCount());
 
-        return ExtractorSummary.create(extractor.getId(), extractor.getTitle(), extractor.getType().toString().toLowerCase(Locale.ENGLISH), extractor.getCursorStrategy().toString().toLowerCase(Locale.ENGLISH),
-                extractor.getSourceField(), extractor.getTargetField(), extractor.getExtractorConfig(), extractor.getCreatorUserId(), extractor.converterConfigMap(),
-                extractor.getConditionType().toString().toLowerCase(Locale.ENGLISH), extractor.getConditionValue(), extractor.getOrder(), extractor.getExceptionCount(),
-                extractor.getConverterExceptionCount(), metrics);
+        return ExtractorSummary.create(
+                extractor.getId(),
+                extractor.getTitle(),
+                extractor.getType().toString().toLowerCase(Locale.ENGLISH),
+                extractor.getCursorStrategy().toString().toLowerCase(Locale.ENGLISH),
+                extractor.getSourceField(),
+                extractor.getTargetField(),
+                extractor.getExtractorConfig(),
+                extractor.getCreatorUserId(),
+                extractor.converterConfigMap(),
+                extractor.getConditionType().toString().toLowerCase(Locale.ENGLISH),
+                extractor.getConditionValue(),
+                extractor.getOrder(),
+                extractor.getExceptionCount(),
+                extractor.getConverterExceptionCount(),
+                metrics);
     }
 
     private List<Converter> loadConverters(Map<String, Map<String, Object>> requestConverters) {

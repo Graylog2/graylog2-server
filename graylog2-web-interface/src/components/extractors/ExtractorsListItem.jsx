@@ -1,15 +1,12 @@
-import React, {PropTypes} from 'react';
-import {Button, Row, Col, Well} from 'react-bootstrap';
-import {LinkContainer} from 'react-router-bootstrap';
-import numeral from 'numeral';
-
-import EntityListItem from 'components/common/EntityListItem';
-import ExtractorUtils from 'util/ExtractorUtils';
-
-import ActionsProvider from 'injection/ActionsProvider';
+import React, {PropTypes} from "react";
+import {Button, Row, Col, Well} from "react-bootstrap";
+import {LinkContainer} from "react-router-bootstrap";
+import numeral from "numeral";
+import EntityListItem from "components/common/EntityListItem";
+import ExtractorUtils from "util/ExtractorUtils";
+import ActionsProvider from "injection/ActionsProvider";
+import Routes from "routing/Routes";
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
-
-import Routes from 'routing/Routes';
 
 const ExtractorsListItem = React.createClass({
   propTypes: {
@@ -161,11 +158,32 @@ const ExtractorsListItem = React.createClass({
       );
     }
 
+    let conditionCounts = (
+      <div className="meter" style={{marginBottom: 10}}>
+        {metrics.condition_hits} hits,{' '}
+        {metrics.condition_misses} misses
+      </div>
+    );
+
     let totalTime;
     if (metrics.total.time) {
       totalTime = this._formatTimingMetrics(metrics.total.time);
     } else {
       totalTime = 'No message passed through here yet.';
+    }
+
+    let conditionTime;
+    if (metrics.condition.time) {
+        conditionTime = this._formatTimingMetrics(metrics.condition.time);
+    } else {
+        conditionTime = 'No message passed through here yet.';
+    }
+
+    let executionTime;
+    if (metrics.execution.time) {
+      executionTime = this._formatTimingMetrics(metrics.execution.time);
+    } else {
+      executionTime = 'No message passed through here yet.';
     }
 
     let convertersTime;
@@ -178,14 +196,22 @@ const ExtractorsListItem = React.createClass({
     return (
       <div>
         {totalRate}
+        {conditionCounts}
         <Row>
           <Col md={6}>
-            <h3 style={{display: 'inline'}}>Total time</h3><br />
+            <h4 style={{display: 'inline'}}>Total time</h4><br />
             {totalTime}
           </Col>
-
           <Col md={6}>
-            <h3 style={{display: 'inline'}}>Converter time</h3><br />
+            <h4 style={{display: 'inline'}}>Condition time</h4><br />
+            {conditionTime}
+          </Col>
+          <Col md={6}>
+            <h4 style={{display: 'inline'}}>Execution time</h4><br />
+            {executionTime}
+          </Col>
+          <Col md={6}>
+            <h4 style={{display: 'inline'}}>Converter time</h4><br />
             {convertersTime}
           </Col>
         </Row>

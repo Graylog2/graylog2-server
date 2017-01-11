@@ -17,30 +17,32 @@
 package org.graylog2.inputs.extractors;
 
 import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.Timer;
+import org.graylog2.plugin.inputs.Converter;
 import org.junit.Before;
 import org.junit.Rule;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public abstract class AbstractExtractorTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     protected MetricRegistry metricRegistry;
-    protected Timer timer;
-    protected Timer.Context timerContext;
 
     @Before
     public void setUp() throws Exception {
-        metricRegistry = mock(MetricRegistry.class);
-        timer = mock(Timer.class);
-        timerContext = mock(Timer.Context.class);
-        when(metricRegistry.timer(anyString())).thenReturn(timer);
-        when(timer.time()).thenReturn(timerContext);
+        metricRegistry = new MetricRegistry();
+    }
+
+    static List<Converter> noConverters() {
+        return Collections.emptyList();
+    }
+
+    static Map<String, Object> noConfig() {
+        return Collections.emptyMap();
     }
 }

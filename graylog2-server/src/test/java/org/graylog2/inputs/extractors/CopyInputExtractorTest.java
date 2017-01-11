@@ -16,17 +16,11 @@
  */
 package org.graylog2.inputs.extractors;
 
-import com.google.common.collect.Lists;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
-import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
@@ -42,14 +36,5 @@ public class CopyInputExtractorTest extends AbstractExtractorTest {
 
         assertEquals("foo", msg.getField("our_result"));
         assertEquals("foo", msg.getField("somefield"));
-    }
-
-    public static Map<String, Object> noConfig() {
-        return new HashMap<String, Object>() {{
-        }};
-    }
-
-    public static List<Converter> noConverters() {
-        return Lists.newArrayList();
     }
 }
