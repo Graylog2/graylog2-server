@@ -54,7 +54,7 @@ const EditRolesForm = React.createClass({
     }
     let rolesAlert = null;
     const roles = this.state.newRoles;
-    if (roles != null && roles.indexOf('Reader') === -1 && roles.indexOf('Admin') === -1) {
+    if (roles != null && !(roles.includes('Reader') || roles.includes('Admin'))) {
       rolesAlert = (<Alert bsStyle="danger" role="alert" className={EditRolesFormStyle.rolesMissingAlert}>
         You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
       </Alert>);
