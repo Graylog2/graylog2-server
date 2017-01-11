@@ -6,6 +6,7 @@ const RolesSelect = React.createClass({
   propTypes: {
     userRoles: React.PropTypes.arrayOf(React.PropTypes.string),
     availableRoles: React.PropTypes.array.isRequired,
+    onValueChange: React.PropTypes.func,
   },
   getDefaultProps() {
     return {
@@ -25,6 +26,7 @@ const RolesSelect = React.createClass({
         ref="select"
         options={rolesOptions}
         value={rolesValue}
+        onValueChange={this.props.onValueChange}
         placeholder="Choose roles..."
       />
     );

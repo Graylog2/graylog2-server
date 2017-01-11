@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Input, Button } from 'react-bootstrap';
+import { Alert, Row, Col, Input, Button } from 'react-bootstrap';
 
 import RolesSelect from 'components/users/RolesSelect';
 import TimeoutInput from 'components/users/TimeoutInput';
@@ -20,6 +20,7 @@ const NewUserForm = React.createClass({
   getInitialState() {
     return {
       users: [],
+      newRoles: null,
     };
   },
 
@@ -57,6 +58,11 @@ const NewUserForm = React.createClass({
     this.props.onSubmit(result);
   },
 
+  _onValueChange(newRoles) {
+    const roles = newRoles.split(',');
+    this.setState({ newRoles: roles });
+  },
+
   render() {
     const rolesHelp = (
       <span className="help-block">
@@ -65,6 +71,13 @@ const NewUserForm = React.createClass({
         The <em>Admin</em> role grants access to everything in Graylog.
       </span>
     );
+    const roles = this.state.newRoles;
+    let rolesAlert = null;
+    if (roles != null && !(roles.includes('Reader') || roles.includes('Admin'))) {
+      rolesAlert = (<Alert bsStyle="danger" role="alert">
+        You need to select at least one of the <em>Reader</em> or <em>Admin</em> roles.
+      </Alert>);
+    }
     return (
       <form id="create-user-form" className="form-horizontal" onSubmit={this._onSubmit}>
         <Input ref="username" name="username" id="username" type="text" maxLength={100}
@@ -97,7 +110,9 @@ const NewUserForm = React.createClass({
 
         <Input label="Roles" help={rolesHelp}
                labelClassName="col-sm-2" wrapperClassName="col-sm-10">
-          <RolesSelect ref="roles" availableRoles={this.props.roles} userRoles={['Reader']} className="form-control" />
+          <RolesSelect ref="roles" availableRoles={this.props.roles} userRoles={['Reader']}
+                       className="form-control" onValueChange={this._onValueChange}/>
+          {rolesAlert}
         </Input>
 
         <TimeoutInput ref="session_timeout_ms" />
@@ -109,7 +124,7 @@ const NewUserForm = React.createClass({
 
         <div className="form-group">
           <Col smOffset={2} sm={10}>
-            <Button type="submit" bsStyle="primary" className="create-user save-button-margin">
+            <Button type="submit" bsStyle="primary" className="create-user save-button-margin" disabled={!!rolesAlert}>
               Create User
             </Button>
             <Button onClick={this.props.onCancel}>Cancel</Button>
