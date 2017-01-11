@@ -33,7 +33,6 @@ const SearchPage = React.createClass({
   ],
   getInitialState() {
     return {
-      selectedFields: ['message', 'source'],
       error: undefined,
       updatingSearch: false,
       updatingHistogram: false,
@@ -173,25 +172,6 @@ const SearchPage = React.createClass({
     }
 
     return 'year';
-  },
-  sortFields(fieldSet) {
-    let newFieldSet = fieldSet;
-    let sortedFields = Immutable.OrderedSet();
-
-    if (newFieldSet.contains('source')) {
-      sortedFields = sortedFields.add('source');
-    }
-    newFieldSet = newFieldSet.delete('source');
-    const remainingFieldsSorted = newFieldSet.sort((field1, field2) => field1.toLowerCase().localeCompare(field2.toLowerCase()));
-    return sortedFields.concat(remainingFieldsSorted);
-  },
-
-  _onToggled(fieldName) {
-    if (this.state.selectedFields.indexOf(fieldName) > 0) {
-      this.setState({ selectedFields: this.state.selectedFields.filter((field) => field !== fieldName) });
-    } else {
-      this.setState({ selectedFields: this.state.selectedFields.concat(fieldName) });
-    }
   },
 
   _isLoading() {
