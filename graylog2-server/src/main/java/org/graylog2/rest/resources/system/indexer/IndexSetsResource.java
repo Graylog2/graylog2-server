@@ -218,10 +218,16 @@ public class IndexSetsResource extends RestResource {
         final IndexSetConfig oldConfig = indexSetService.get(id)
                 .orElseThrow(() -> new NotFoundException("Index set <" + id + "> not found"));
 
-        final IndexSetConfig savedObject = indexSetService.save(updateRequest.toIndexSetConfig(oldConfig));
         final IndexSetConfig defaultIndexSet = indexSetService.getDefault();
+        final boolean isDefaultSet = oldConfig.equals(defaultIndexSet);
 
-        return IndexSetSummary.fromIndexSetConfig(savedObject, savedObject.equals(defaultIndexSet));
+        if (isDefaultSet && !updateRequest.isWritable()) {
+            throw new ClientErrorException("Default index set must be writable.", Response.Status.CONFLICT);
+        }
+
+        final IndexSetConfig savedObject = indexSetService.save(updateRequest.toIndexSetConfig(oldConfig));
+
+        return IndexSetSummary.fromIndexSetConfig(savedObject, isDefaultSet);
     }
 
     @PUT
