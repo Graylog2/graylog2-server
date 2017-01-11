@@ -114,13 +114,16 @@ public abstract class Extractor implements EmbeddedPersistable {
 
     private final Counter conditionHitsCounter;
     private final Counter conditionMissesCounter;
+    private final Timer conditionTimer;
+    private final Timer executionTimer;
+    private final Timer converterTimer;
+    private final Timer completeTimer;
     private final String conditionHitsCounterName;
     private final String conditionMissesCounterName;
     private final String conditionTimerName;
     private final String executionTimerName;
     private final String converterTimerName;
     private final String completeTimerName;
-
 
     protected abstract Result[] run(String field);
 
@@ -173,12 +176,16 @@ public abstract class Extractor implements EmbeddedPersistable {
         this.completeTimerName = name(metricsPrefix, "completeExecutionTime");
         this.conditionHitsCounter = metricRegistry.counter(conditionHitsCounterName);
         this.conditionMissesCounter = metricRegistry.counter(conditionMissesCounterName);
+        this.conditionTimer = metricRegistry.timer(conditionTimerName);
+        this.executionTimer = metricRegistry.timer(executionTimerName);
+        this.converterTimer = metricRegistry.timer(converterTimerName);
+        this.completeTimer = metricRegistry.timer(completeTimerName);
     }
 
     public void runExtractor(Message msg) {
-        try(final Timer.Context completeTimer = metricRegistry.timer(getCompleteTimerName()).time()) {
+        try(final Timer.Context ignored = completeTimer.time()) {
             final String field;
-            try (final Timer.Context conditionTimer = metricRegistry.timer(getConditionTimerName()).time()) {
+            try (final Timer.Context ignored2 = conditionTimer.time()) {
                 // We can only work on Strings.
                 if (!(msg.getField(sourceField) instanceof String)) {
                     conditionMissesCounter.inc();
@@ -205,7 +212,7 @@ public abstract class Extractor implements EmbeddedPersistable {
                 }
             }
 
-            try (final Timer.Context executionTimer = metricRegistry.timer(getExecutionTimerName()).time()) {
+            try (final Timer.Context ignored2 = executionTimer.time()) {
                 final Result[] results = run(field);
                 if (results == null || results.length == 0 || Arrays.stream(results).anyMatch(result -> result.getValue() == null)) {
                     return;
@@ -245,7 +252,7 @@ public abstract class Extractor implements EmbeddedPersistable {
     }
 
     private void runConverters(Message msg) {
-        try(final Timer.Context converterTimer = metricRegistry.timer(getConverterTimerName()).time()) {
+        try(final Timer.Context ignored = converterTimer.time()) {
             for (Converter converter : converters) {
                 try {
                     if (!(msg.getField(targetField) instanceof String)) {
