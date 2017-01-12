@@ -21,6 +21,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.IndexSetStatsCreator;
 import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
@@ -39,6 +40,7 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -493,6 +495,109 @@ public class IndexSetsResourceTest {
             indexSetsResource.delete("id", false);
         } finally {
             verifyZeroInteractions(indexSetService);
+        }
+    }
+
+    @Test
+    public void setDefaultMakesIndexDefaultIfWritable() throws Exception {
+        final String indexSetId = "newDefaultIndexSetId";
+        final IndexSet indexSet = mock(IndexSet.class);
+        final IndexSetConfig indexSetConfig = IndexSetConfig.create(
+            indexSetId,
+            "title",
+            "description",
+            true,
+            "prefix",
+            1,
+            0,
+            MessageCountRotationStrategy.class.getCanonicalName(),
+            MessageCountRotationStrategyConfig.create(1000),
+            NoopRetentionStrategy.class.getCanonicalName(),
+            NoopRetentionStrategyConfig.create(1),
+            ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+            "standard",
+            "index-template",
+            1,
+            false
+        );
+
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSetService.get(indexSetId)).thenReturn(Optional.of(indexSetConfig));
+
+        indexSetsResource.setDefault(indexSetId);
+
+        final ArgumentCaptor<DefaultIndexSetConfig> defaultIndexSetIdCaptor = ArgumentCaptor.forClass(DefaultIndexSetConfig.class);
+        verify(clusterConfigService, times(1)).write(defaultIndexSetIdCaptor.capture());
+
+        final DefaultIndexSetConfig defaultIndexSetConfig = defaultIndexSetIdCaptor.getValue();
+        assertThat(defaultIndexSetConfig).isNotNull();
+        assertThat(defaultIndexSetConfig.defaultIndexSetId()).isEqualTo(indexSetId);
+    }
+
+    @Test
+    public void setDefaultDoesNotDoAnyThingIfNotPermitted() throws Exception {
+        notPermitted();
+
+        expectedException.expect(ForbiddenException.class);
+        expectedException.expectMessage("Not authorized to access resource id <someIndexSetId>");
+
+        try {
+            indexSetsResource.setDefault("someIndexSetId");
+        } finally {
+            verifyZeroInteractions(indexSetService);
+            verifyZeroInteractions(clusterConfigService);
+        }
+    }
+
+    @Test
+    public void setDefaultDoesNotDoAnythingForInvalidId() throws Exception {
+        final String nonExistingIndexSetId = "nonExistingId";
+
+        when(indexSetService.get(nonExistingIndexSetId)).thenReturn(Optional.empty());
+
+        expectedException.expect(NotFoundException.class);
+        expectedException.expectMessage("Index set <" + nonExistingIndexSetId + "> does not exist");
+
+        try {
+            indexSetsResource.setDefault(nonExistingIndexSetId);
+        } finally {
+            verifyZeroInteractions(clusterConfigService);
+        }
+    }
+
+    @Test
+    public void setDefaultDoesNotDoAnythingIfIndexSetIsNotWritable() throws Exception {
+        final String readOnlyIndexSetId = "newDefaultIndexSetId";
+        final IndexSet readOnlyIndexSet = mock(IndexSet.class);
+        final IndexSetConfig readOnlyIndexSetConfig = IndexSetConfig.create(
+            readOnlyIndexSetId,
+            "title",
+            "description",
+            false,
+            "prefix",
+            1,
+            0,
+            MessageCountRotationStrategy.class.getCanonicalName(),
+            MessageCountRotationStrategyConfig.create(1000),
+            NoopRetentionStrategy.class.getCanonicalName(),
+            NoopRetentionStrategyConfig.create(1),
+            ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+            "standard",
+            "index-template",
+            1,
+            false
+        );
+
+        when(readOnlyIndexSet.getConfig()).thenReturn(readOnlyIndexSetConfig);
+        when(indexSetService.get(readOnlyIndexSetId)).thenReturn(Optional.of(readOnlyIndexSetConfig));
+
+        expectedException.expect(ClientErrorException.class);
+        expectedException.expectMessage("Default index set must be writable.");
+
+        try {
+            indexSetsResource.setDefault(readOnlyIndexSetId);
+        } finally {
+            verifyZeroInteractions(clusterConfigService);
         }
     }
 
