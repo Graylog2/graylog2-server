@@ -94,7 +94,7 @@ public class FixDeflectorByMoveJob extends SystemJob {
             // Copy messages to new index.
             String newTarget = null;
             try {
-                newTarget = indexSet.getNewestTargetName();
+                newTarget = indexSet.getNewestIndex();
 
                 LOG.info("Starting to move <{}> to <{}>.", indexSet.getWriteIndexAlias(), newTarget);
                 indices.move(indexSet.getWriteIndexAlias(), newTarget);

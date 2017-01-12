@@ -36,7 +36,7 @@ public class TestIndexSet implements IndexSet {
     }
 
     @Override
-    public String[] getManagedIndicesNames() {
+    public String[] getManagedIndices() {
         return new String[0];
     }
 
@@ -46,22 +46,22 @@ public class TestIndexSet implements IndexSet {
     }
 
     @Override
-    public String getWriteIndexWildcard() {
+    public String getIndexWildcard() {
         return config.indexPrefix() + SEPARATOR + "*";
     }
 
     @Override
-    public String getNewestTargetName() throws NoTargetIndexException {
+    public String getNewestIndex() throws NoTargetIndexException {
         return null;
     }
 
     @Override
-    public String getCurrentActualTargetIndex() throws TooManyAliasesException {
+    public String getActiveWriteIndex() throws TooManyAliasesException {
         return null;
     }
 
     @Override
-    public Map<String, Set<String>> getAllDeflectorAliases() {
+    public Map<String, Set<String>> getAllIndexAliases() {
         return null;
     }
 
@@ -76,7 +76,7 @@ public class TestIndexSet implements IndexSet {
     }
 
     @Override
-    public boolean isDeflectorAlias(String index) {
+    public boolean isWriteIndexAlias(String index) {
         return false;
     }
 

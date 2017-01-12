@@ -86,7 +86,7 @@ public class RebuildIndexRangesJob extends SystemJob {
         // for each index set we know about
         final ListMultimap<IndexSet, String> indexSets = MultimapBuilder.hashKeys().arrayListValues().build();
         for (IndexSet indexSet : this.indexSets) {
-            final String[] managedIndicesNames = indexSet.getManagedIndicesNames();
+            final String[] managedIndicesNames = indexSet.getManagedIndices();
             for (String name : managedIndicesNames) {
                 indexSets.put(indexSet, name);
             }
@@ -102,11 +102,11 @@ public class RebuildIndexRangesJob extends SystemJob {
         for (IndexSet indexSet : indexSets.keySet()) {
             LOG.info("Recalculating index ranges for index set {} ({}): {} indices affected.",
                     indexSet.getConfig().title(),
-                    indexSet.getWriteIndexWildcard(),
+                    indexSet.getIndexWildcard(),
                     indexSets.get(indexSet).size());
             for (String index : indexSets.get(indexSet)) {
                 try {
-                    if (index.equals(indexSet.getCurrentActualTargetIndex())) {
+                    if (index.equals(indexSet.getActiveWriteIndex())) {
                         LOG.debug("{} is current write target, do not calculate index range for it", index);
                         final IndexRange emptyRange = indexRangeService.createUnknownRange(index);
                         try {

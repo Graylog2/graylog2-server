@@ -55,7 +55,7 @@ public class IndexSetCleanupJob extends SystemJob {
     @Override
     public void execute() {
         final IndexSetConfig config = indexSet.getConfig();
-        final String[] managedIndices = indexSet.getManagedIndicesNames();
+        final String[] managedIndices = indexSet.getManagedIndices();
 
         this.total = managedIndices.length;
 

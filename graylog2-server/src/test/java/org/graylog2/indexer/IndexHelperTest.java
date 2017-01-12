@@ -78,7 +78,7 @@ public class IndexHelperTest {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.extractIndexNumber(anyString())).thenAnswer(
                 invocationOnMock -> Optional.ofNullable(indexNumbers.get(invocationOnMock.<String>getArgument(0))));
-        when(indexSet.getManagedIndicesNames()).thenReturn(indexNumbers.keySet().toArray(new String[0]));
+        when(indexSet.getManagedIndices()).thenReturn(indexNumbers.keySet().toArray(new String[0]));
         when(indexSet.getIndexPrefix()).thenReturn("graylog_production");
 
         assertThat(IndexHelper.getOldestIndices(indexSet, 7)).containsOnly(
@@ -95,7 +95,7 @@ public class IndexHelperTest {
     @Test
     public void testGetOldestIndicesWithEmptySetAndTooHighOffset() {
         final IndexSet indexSet = mock(IndexSet.class);
-        when(indexSet.getManagedIndicesNames()).thenReturn(new String[0]);
+        when(indexSet.getManagedIndices()).thenReturn(new String[0]);
         assertThat(IndexHelper.getOldestIndices(indexSet, 9001)).isEmpty();
     }
 }

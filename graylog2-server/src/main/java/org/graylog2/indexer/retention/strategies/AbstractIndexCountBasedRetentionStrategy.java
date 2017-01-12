@@ -52,7 +52,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
 
     @Override
     public void retain(IndexSet indexSet) {
-        final Map<String, Set<String>> deflectorIndices = indexSet.getAllDeflectorAliases();
+        final Map<String, Set<String>> deflectorIndices = indexSet.getAllIndexAliases();
         final int indexCount = (int)deflectorIndices.keySet()
             .stream()
             .filter(indexName -> !indices.isReopened(indexName))
@@ -83,7 +83,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
     }
 
     private void runRetention(IndexSet indexSet, Map<String, Set<String>> deflectorIndices, int removeCount) {
-        final Set<String> orderedIndices = Arrays.stream(indexSet.getManagedIndicesNames())
+        final Set<String> orderedIndices = Arrays.stream(indexSet.getManagedIndices())
             .filter(indexName -> !indices.isReopened(indexName))
             .filter(indexName -> !(deflectorIndices.get(indexName).contains(indexSet.getWriteIndexAlias())))
             .sorted((indexName1, indexName2) -> indexSet.extractIndexNumber(indexName2).orElse(0).compareTo(indexSet.extractIndexNumber(indexName1).orElse(0)))

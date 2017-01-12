@@ -78,7 +78,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public ClusterHealthResponse health() {
-        ClusterHealthRequest request = new ClusterHealthRequest(indexSetRegistry.getWriteIndexWildcards());
+        ClusterHealthRequest request = new ClusterHealthRequest(indexSetRegistry.getIndexWildcards());
         return c.admin().cluster().health(request).actionGet();
     }
 
@@ -91,7 +91,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public ClusterHealthResponse deflectorHealth() {
-        ClusterHealthRequest request = new ClusterHealthRequest(indexSetRegistry.getWriteIndexNames());
+        ClusterHealthRequest request = new ClusterHealthRequest(indexSetRegistry.getWriteIndexAliases());
         return c.admin().cluster().health(request).actionGet();
     }
 

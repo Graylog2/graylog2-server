@@ -72,8 +72,8 @@ public class AbstractIndexCountBasedRetentionStrategyTest {
             put("index6", Collections.emptySet());
         }};
 
-        when(indexSet.getAllDeflectorAliases()).thenReturn(indexMap);
-        when(indexSet.getManagedIndicesNames()).thenReturn(indexMap.keySet().stream().toArray(String[]::new));
+        when(indexSet.getAllIndexAliases()).thenReturn(indexMap);
+        when(indexSet.getManagedIndices()).thenReturn(indexMap.keySet().stream().toArray(String[]::new));
         when(indexSet.extractIndexNumber(anyString())).then(this::extractIndexNumber);
 
         retentionStrategy = spy(new AbstractIndexCountBasedRetentionStrategy(indices, activityWriter) {

@@ -62,7 +62,7 @@ public class SystemFieldsResource extends RestResource {
                                            @QueryParam("limit") int limit) {
         boolean unlimited = limit <= 0;
 
-        final String[] writeIndexWildcards = indexSetRegistry.getWriteIndexWildcards();
+        final String[] writeIndexWildcards = indexSetRegistry.getIndexWildcards();
 
         final Set<String> fields;
         if (unlimited) {

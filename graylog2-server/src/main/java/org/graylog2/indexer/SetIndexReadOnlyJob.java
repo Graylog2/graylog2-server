@@ -62,7 +62,7 @@ public class SetIndexReadOnlyJob extends SystemJob {
 
     @Override
     public void execute() {
-        final Optional<IndexSet> indexSet = indexSetRegistry.getForIndexName(index);
+        final Optional<IndexSet> indexSet = indexSetRegistry.getForIndex(index);
 
         if (!indexSet.isPresent()) {
             log.error("Couldn't find index set for index <{}>", index);

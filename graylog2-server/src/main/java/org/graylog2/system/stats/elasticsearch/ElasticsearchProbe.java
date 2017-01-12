@@ -72,7 +72,7 @@ public class ElasticsearchProbe {
             pendingTasksTimeInQueue.add(pendingClusterTask.getTimeInQueueInMillis());
         }
 
-        final ClusterHealthResponse clusterHealthResponse = adminClient.health(new ClusterHealthRequest(indexSetRegistry.getWriteIndexWildcards())).actionGet();
+        final ClusterHealthResponse clusterHealthResponse = adminClient.health(new ClusterHealthRequest(indexSetRegistry.getIndexWildcards())).actionGet();
         final ClusterHealth clusterHealth = ClusterHealth.create(
                 clusterHealthResponse.getNumberOfNodes(),
                 clusterHealthResponse.getNumberOfDataNodes(),

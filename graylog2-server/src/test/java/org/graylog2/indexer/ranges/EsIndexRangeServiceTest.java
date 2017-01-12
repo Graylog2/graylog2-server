@@ -110,7 +110,7 @@ public class EsIndexRangeServiceTest {
 
     @Before
     public void setUp() throws Exception {
-        when(indexSetRegistry.getManagedIndicesNames()).thenReturn(new String[]{
+        when(indexSetRegistry.getManagedIndices()).thenReturn(new String[]{
                 "graylog_1", "graylog_2", "graylog_3", "graylog_4", "graylog_5"});
        indexRangeService = new EsIndexRangeService(client, indexSetRegistry, localEventBus, new MetricRegistry());
     }

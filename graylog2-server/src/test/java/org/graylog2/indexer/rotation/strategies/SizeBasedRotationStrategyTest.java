@@ -66,7 +66,7 @@ public class SizeBasedRotationStrategyTest {
         final IndexStatistics stats = IndexStatistics.create("name", commonStats, commonStats, Collections.<ShardRouting>emptyList());
 
         when(indices.getIndexStats("name")).thenReturn(stats);
-        when(indexSet.getNewestTargetName()).thenReturn("name");
+        when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
 
@@ -85,7 +85,7 @@ public class SizeBasedRotationStrategyTest {
         final IndexStatistics stats = IndexStatistics.create("name", commonStats, commonStats, Collections.<ShardRouting>emptyList());
 
         when(indices.getIndexStats("name")).thenReturn(stats);
-        when(indexSet.getNewestTargetName()).thenReturn("name");
+        when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100000L));
 
@@ -100,7 +100,7 @@ public class SizeBasedRotationStrategyTest {
     @Test
     public void testRotateFailed() throws Exception {
         when(indices.getIndexStats("name")).thenReturn(null);
-        when(indexSet.getNewestTargetName()).thenReturn("name");
+        when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
 

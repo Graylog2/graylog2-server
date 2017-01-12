@@ -36,11 +36,11 @@ public class Counts {
     }
 
     public long total() {
-        return totalCount(indexSetRegistry.getManagedIndicesNames());
+        return totalCount(indexSetRegistry.getManagedIndices());
     }
 
     public long total(final IndexSet indexSet) {
-        return totalCount(indexSet.getManagedIndicesNames());
+        return totalCount(indexSet.getManagedIndices());
     }
 
     private long totalCount(final String[] indexNames) {

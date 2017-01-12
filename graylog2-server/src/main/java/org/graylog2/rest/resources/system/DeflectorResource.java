@@ -70,7 +70,7 @@ public class DeflectorResource extends RestResource {
     @Deprecated
     public DeflectorSummary deprecatedDeflector() throws TooManyAliasesException {
         final IndexSet indexSet = indexSetRegistry.getDefault();
-        return DeflectorSummary.create(indexSet.isUp(), indexSet.getCurrentActualTargetIndex());
+        return DeflectorSummary.create(indexSet.isUp(), indexSet.getActiveWriteIndex());
     }
 
     @GET
@@ -82,7 +82,7 @@ public class DeflectorResource extends RestResource {
     public DeflectorSummary deflector(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) throws TooManyAliasesException {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
 
-        return DeflectorSummary.create(indexSet.isUp(), indexSet.getCurrentActualTargetIndex());
+        return DeflectorSummary.create(indexSet.isUp(), indexSet.getActiveWriteIndex());
     }
 
     @POST

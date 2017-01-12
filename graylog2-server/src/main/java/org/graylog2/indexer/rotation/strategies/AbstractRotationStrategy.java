@@ -56,7 +56,7 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
         final String strategyName = this.getClass().getCanonicalName();
         final String indexName;
         try {
-            indexName = indexSet.getNewestTargetName();
+            indexName = indexSet.getNewestIndex();
         } catch (NoTargetIndexException e) {
             LOG.error("Could not find current deflector target. Aborting.", e);
             return;
