@@ -1,0 +1,115 @@
+{
+  "streams": [
+    {
+      "_id": {
+        "$oid": "58458e442f857c314491344e"
+      },
+      "title": "Stream 1",
+      "description": "The first stream",
+      "alert_conditions": [
+        {
+          "creator_user_id": "admin",
+          "created_at": "2016-12-27T17:19:53.172Z",
+          "id": "2fa6a415-ce0c-4a36-accc-dd9519eb06d9",
+          "type": "message_count",
+          "title": "message count condition 1",
+          "parameters": {
+            "backlog": 2,
+            "grace": 1,
+            "threshold_type": "MORE",
+            "threshold": "5",
+            "time": "1"
+          }
+        }
+      ],
+      "content_pack": null,
+      "created_at": {
+        "$date": "2016-12-05T15:56:52.162Z"
+      },
+      "creator_user_id": "admin",
+      "disabled": false,
+      "index_set_id": "584589ca2f857c1c2799a77e",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": true
+    },
+    {
+      "_id": {
+        "$oid": "58458e442f857c314491345e"
+      },
+      "title": "Stream 2",
+      "description": "The second stream",
+      "alert_conditions": [
+        {
+          "creator_user_id": "admin",
+          "created_at": "2017-01-10T16:01:46.880Z",
+          "id": "393fd8b2-9b17-42d3-86b0-6e55d0f5343a",
+          "type": "field_content_value",
+          "title": "field content value condition",
+          "parameters": {
+            "backlog": 0,
+            "field": "bar",
+            "grace": "0",
+            "value": "baz"
+          }
+        },
+        {
+          "creator_user_id": "admin",
+          "created_at": "2017-01-10T16:39:09.514Z",
+          "id": "0e75404f-c0ee-40b0-8872-b1aec441ba1c",
+          "type": "field_value",
+          "title": "field value condition",
+          "parameters": {
+            "backlog": "0",
+            "field": "foo",
+            "grace": "0",
+            "threshold_type": "HIGHER",
+            "threshold": "0",
+            "time": "5",
+            "type": "MAX"
+          }
+        }
+      ],
+      "content_pack": null,
+      "created_at": {
+        "$date": "2016-12-06T14:46:52.162Z"
+      },
+      "creator_user_id": "admin",
+      "disabled": false,
+      "index_set_id": "584589ca2f857c1c2799a77e",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": true
+    },
+    {
+      "_id": {
+        "$oid": "58458e442f857c314491346e"
+      },
+      "title": "Stream 3",
+      "description": "The third stream",
+      "alert_conditions": [
+        {
+          "creator_user_id": "admin",
+          "created_at": "2016-12-27T17:19:53.172Z",
+          "id": "1eb51c5f-780d-4337-ae0c-9c5a37a395ba",
+          "type": "message_count",
+          "title": "message count condition 1 (this one does not need any conversion)",
+          "parameters": {
+            "grace": 1,
+            "threshold_type": "MORE",
+            "threshold": 5,
+            "time": 1,
+            "backlog": 2
+          }
+        }
+      ],
+      "content_pack": null,
+      "created_at": {
+        "$date": "2016-12-05T15:56:52.162Z"
+      },
+      "creator_user_id": "admin",
+      "disabled": false,
+      "index_set_id": "584589ca2f857c1c2799a77e",
+      "matching_type": "AND",
+      "remove_matches_from_default_stream": true
+    }
+  ]
+}
