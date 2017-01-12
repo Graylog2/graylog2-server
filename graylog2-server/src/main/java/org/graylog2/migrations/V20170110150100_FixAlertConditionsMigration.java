@@ -92,6 +92,7 @@ public class V20170110150100_FixAlertConditionsMigration extends Migration {
 
             for (Document alertCondition : alertConditions) {
                 final String alertConditionId = alertCondition.get("id", String.class);
+                final String alertConditionTitle = alertCondition.get("title", String.class);
                 final Document parameters = alertCondition.get("parameters", Document.class);
 
                 for (String field : intFields) {
@@ -103,15 +104,17 @@ public class V20170110150100_FixAlertConditionsMigration extends Migration {
                     }
 
                     if (!(fieldValue instanceof String)) {
-                        LOG.warn("Field <{}> in alert condition <{}> of stream <{}> is not a string but a <{}>, not trying to convert it!",
-                                field, alertConditionId, streamId, fieldValue.getClass().getCanonicalName());
+                        LOG.warn("Field <{}> in alert condition <{}> ({}) of stream <{}> is not a string but a <{}>, not trying to convert it!",
+                                field, alertConditionId, alertConditionTitle, streamId,
+                                fieldValue.getClass().getCanonicalName());
                         return;
                     }
 
                     final String stringValue = parameters.get(field, String.class);
                     final Integer intValue = Ints.tryParse(stringValue);
 
-                    LOG.info("Converting value for field <{}> from string to integer in alert condition <{}> of stream <{}>", field, alertConditionId, streamId);
+                    LOG.info("Converting value for field <{}> from string to integer in alert condition <{}> ({}) of stream <{}>",
+                            field, alertConditionId, alertConditionTitle, streamId);
 
                     if (intValue == null) {
                         LOG.error("Unable to parse \"{}\" into integer!", fieldValue);
@@ -124,7 +127,7 @@ public class V20170110150100_FixAlertConditionsMigration extends Migration {
                         modifiedStreams.add(streamId);
                         modifiedAlertConditions.add(alertConditionId);
                     } else {
-                        LOG.warn("No document modified for alert condition <{}>", alertConditionId);
+                        LOG.warn("No document modified for alert condition <{}> ({})", alertConditionId, alertConditionTitle);
                     }
                 }
             }
