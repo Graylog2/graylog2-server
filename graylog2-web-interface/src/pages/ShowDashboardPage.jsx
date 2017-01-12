@@ -24,6 +24,7 @@ const ShowDashboardPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
   propTypes: {
     history: React.PropTypes.object.isRequired,
+    params: React.PropTypes.object.isRequired,
   },
 
   getInitialState() {
@@ -149,9 +150,11 @@ const ShowDashboardPage = React.createClass({
   },
   _unlockDashboard(event) {
     event.preventDefault();
-    this.setState({ locked: false });
+    if (this.state.locked) {
+      this._toggleUnlock();
+    }
   },
-  _onUnlock() {
+  _toggleUnlock() {
     const locked = !this.state.locked;
     this.setState({ locked: locked });
 
@@ -199,7 +202,7 @@ const ShowDashboardPage = React.createClass({
           <Button className="toggle-fullscreen" bsStyle="info" onClick={this._toggleFullscreen}>Fullscreen</Button>
           <IfPermitted permissions={`${this.DASHBOARDS_EDIT}:${dashboard.id}`}>
             {' '}
-            <Button bsStyle="success" onClick={this._onUnlock}>{this.state.locked ? 'Unlock / Edit' : 'Lock'}</Button>
+            <Button bsStyle="success" onClick={this._toggleUnlock}>{this.state.locked ? 'Unlock / Edit' : 'Lock'}</Button>
           </IfPermitted>
         </div>
       );
