@@ -21,6 +21,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.IndexSetStatsCreator;
 import org.graylog2.indexer.IndexSetValidator;
+import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
@@ -34,14 +35,17 @@ import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.system.jobs.SystemJobManager;
+import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import javax.inject.Provider;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.ForbiddenException;
@@ -87,9 +91,22 @@ public class IndexSetsResourceTest {
         GuiceInjectorHolder.createInjector(Collections.emptyList());
     }
 
+    private IndexSetsResource indexSetsResource;
+
+    private Boolean permitted;
+
+    @Before
+    public void setUp() throws Exception {
+        this.permitted = true;
+        this.indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, () -> permitted);
+    }
+
+    private void notPermitted() {
+        this.permitted = false;
+    }
+
     @Test
     public void list() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "title",
@@ -122,7 +139,8 @@ public class IndexSetsResourceTest {
 
     @Test
     public void listDenied() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, false);
+        notPermitted();
+
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "title",
@@ -155,7 +173,6 @@ public class IndexSetsResourceTest {
 
     @Test
     public void list0() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         when(indexSetService.findAll()).thenReturn(Collections.emptyList());
 
         final IndexSetResponse list = indexSetsResource.list(0, 0, false);
@@ -170,7 +187,6 @@ public class IndexSetsResourceTest {
 
     @Test
     public void get() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "title",
@@ -201,7 +217,6 @@ public class IndexSetsResourceTest {
 
     @Test
     public void get0() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         when(indexSetService.get("id")).thenReturn(Optional.empty());
 
         expectedException.expect(NotFoundException.class);
@@ -218,7 +233,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void getDenied() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, false);
+        notPermitted();
 
         expectedException.expect(ForbiddenException.class);
         expectedException.expectMessage("Not authorized to access resource id <id>");
@@ -232,7 +247,6 @@ public class IndexSetsResourceTest {
 
     @Test
     public void save() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "title",
                 "description",
@@ -267,7 +281,8 @@ public class IndexSetsResourceTest {
     @Test
     @Ignore("Currently doesn't work with @RequiresPermissions")
     public void saveDenied() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, false);
+        notPermitted();
+
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "title",
                 "description",
@@ -298,7 +313,6 @@ public class IndexSetsResourceTest {
 
     @Test
     public void update() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "new title",
@@ -339,40 +353,8 @@ public class IndexSetsResourceTest {
     }
 
     @Test
-    public void updateIdMismatch() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
-        final IndexSetConfig indexSetConfig = IndexSetConfig.create(
-                "id",
-                "new title",
-                "description",
-                true,
-                "prefix",
-                1,
-                0,
-                MessageCountRotationStrategy.class.getCanonicalName(),
-                MessageCountRotationStrategyConfig.create(1000),
-                NoopRetentionStrategy.class.getCanonicalName(),
-                NoopRetentionStrategyConfig.create(1),
-                ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
-                "standard",
-                "index-template",
-                1,
-                false
-        );
-
-        expectedException.expect(ClientErrorException.class);
-        expectedException.expectMessage("Mismatch of IDs in URI path and payload");
-
-        try {
-            indexSetsResource.update("wrong-id", IndexSetUpdateRequest.fromIndexSetConfig(indexSetConfig));
-        } finally {
-            verifyZeroInteractions(indexSetService);
-        }
-    }
-
-    @Test
     public void updateDenied() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, false);
+        notPermitted();
         final IndexSetConfig indexSetConfig = IndexSetConfig.create(
                 "id",
                 "title",
@@ -403,8 +385,44 @@ public class IndexSetsResourceTest {
     }
 
     @Test
+    public void updateFailsWhenDefaultSetIsSetReadOnly() throws Exception {
+        final String defaultIndexSetId = "defaultIndexSet";
+        final IndexSetConfig defaultIndexSetConfig = IndexSetConfig.create(
+            defaultIndexSetId,
+            "title",
+            "description",
+            true,
+            "prefix",
+            1,
+            0,
+            MessageCountRotationStrategy.class.getCanonicalName(),
+            MessageCountRotationStrategyConfig.create(1000),
+            NoopRetentionStrategy.class.getCanonicalName(),
+            NoopRetentionStrategyConfig.create(1),
+            ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+            "standard",
+            "index-template",
+            1,
+            false
+        );
+
+        when(indexSetService.getDefault()).thenReturn(defaultIndexSetConfig);
+        when(indexSetService.get(defaultIndexSetId)).thenReturn(Optional.of(defaultIndexSetConfig));
+
+        final IndexSetConfig defaultIndexSetConfigSetReadOnly = defaultIndexSetConfig.toBuilder().isWritable(false).build();
+
+        expectedException.expect(ClientErrorException.class);
+        expectedException.expectMessage("Default index set must be writable.");
+
+        try {
+            indexSetsResource.update("defaultIndexSet", IndexSetUpdateRequest.fromIndexSetConfig(defaultIndexSetConfigSetReadOnly));
+        } finally {
+            verify(indexSetService, never()).save(any());
+        }
+    }
+
+    @Test
     public void delete() throws Exception {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
@@ -425,7 +443,6 @@ public class IndexSetsResourceTest {
 
     @Test
     public void delete0() throws Exception {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
@@ -448,7 +465,6 @@ public class IndexSetsResourceTest {
 
     @Test
     public void deleteDefaultIndexSet() throws Exception {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, true);
         final IndexSet indexSet = mock(IndexSet.class);
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
 
@@ -470,7 +486,7 @@ public class IndexSetsResourceTest {
 
     @Test
     public void deleteDenied() {
-        final IndexSetsResource indexSetsResource = new TestResource(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager, false);
+        notPermitted();
 
         expectedException.expect(ForbiddenException.class);
         expectedException.expectMessage("Not authorized to access resource id <id>");
@@ -482,10 +498,113 @@ public class IndexSetsResourceTest {
         }
     }
 
-    private static class TestResource extends IndexSetsResource {
-        private final boolean permitted;
+    @Test
+    public void setDefaultMakesIndexDefaultIfWritable() throws Exception {
+        final String indexSetId = "newDefaultIndexSetId";
+        final IndexSet indexSet = mock(IndexSet.class);
+        final IndexSetConfig indexSetConfig = IndexSetConfig.create(
+            indexSetId,
+            "title",
+            "description",
+            true,
+            "prefix",
+            1,
+            0,
+            MessageCountRotationStrategy.class.getCanonicalName(),
+            MessageCountRotationStrategyConfig.create(1000),
+            NoopRetentionStrategy.class.getCanonicalName(),
+            NoopRetentionStrategyConfig.create(1),
+            ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+            "standard",
+            "index-template",
+            1,
+            false
+        );
 
-        TestResource(IndexSetService indexSetService, IndexSetRegistry indexSetRegistry, IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory, IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService, SystemJobManager systemJobManager, boolean permitted) {
+        when(indexSet.getConfig()).thenReturn(indexSetConfig);
+        when(indexSetService.get(indexSetId)).thenReturn(Optional.of(indexSetConfig));
+
+        indexSetsResource.setDefault(indexSetId);
+
+        final ArgumentCaptor<DefaultIndexSetConfig> defaultIndexSetIdCaptor = ArgumentCaptor.forClass(DefaultIndexSetConfig.class);
+        verify(clusterConfigService, times(1)).write(defaultIndexSetIdCaptor.capture());
+
+        final DefaultIndexSetConfig defaultIndexSetConfig = defaultIndexSetIdCaptor.getValue();
+        assertThat(defaultIndexSetConfig).isNotNull();
+        assertThat(defaultIndexSetConfig.defaultIndexSetId()).isEqualTo(indexSetId);
+    }
+
+    @Test
+    public void setDefaultDoesNotDoAnyThingIfNotPermitted() throws Exception {
+        notPermitted();
+
+        expectedException.expect(ForbiddenException.class);
+        expectedException.expectMessage("Not authorized to access resource id <someIndexSetId>");
+
+        try {
+            indexSetsResource.setDefault("someIndexSetId");
+        } finally {
+            verifyZeroInteractions(indexSetService);
+            verifyZeroInteractions(clusterConfigService);
+        }
+    }
+
+    @Test
+    public void setDefaultDoesNotDoAnythingForInvalidId() throws Exception {
+        final String nonExistingIndexSetId = "nonExistingId";
+
+        when(indexSetService.get(nonExistingIndexSetId)).thenReturn(Optional.empty());
+
+        expectedException.expect(NotFoundException.class);
+        expectedException.expectMessage("Index set <" + nonExistingIndexSetId + "> does not exist");
+
+        try {
+            indexSetsResource.setDefault(nonExistingIndexSetId);
+        } finally {
+            verifyZeroInteractions(clusterConfigService);
+        }
+    }
+
+    @Test
+    public void setDefaultDoesNotDoAnythingIfIndexSetIsNotWritable() throws Exception {
+        final String readOnlyIndexSetId = "newDefaultIndexSetId";
+        final IndexSet readOnlyIndexSet = mock(IndexSet.class);
+        final IndexSetConfig readOnlyIndexSetConfig = IndexSetConfig.create(
+            readOnlyIndexSetId,
+            "title",
+            "description",
+            false,
+            "prefix",
+            1,
+            0,
+            MessageCountRotationStrategy.class.getCanonicalName(),
+            MessageCountRotationStrategyConfig.create(1000),
+            NoopRetentionStrategy.class.getCanonicalName(),
+            NoopRetentionStrategyConfig.create(1),
+            ZonedDateTime.of(2016, 10, 10, 12, 0, 0, 0, ZoneOffset.UTC),
+            "standard",
+            "index-template",
+            1,
+            false
+        );
+
+        when(readOnlyIndexSet.getConfig()).thenReturn(readOnlyIndexSetConfig);
+        when(indexSetService.get(readOnlyIndexSetId)).thenReturn(Optional.of(readOnlyIndexSetConfig));
+
+        expectedException.expect(ClientErrorException.class);
+        expectedException.expectMessage("Default index set must be writable.");
+
+        try {
+            indexSetsResource.setDefault(readOnlyIndexSetId);
+        } finally {
+            verifyZeroInteractions(clusterConfigService);
+        }
+    }
+
+    private static class TestResource extends IndexSetsResource {
+        private final Provider<Boolean> permitted;
+
+        TestResource(IndexSetService indexSetService, IndexSetRegistry indexSetRegistry, IndexSetValidator indexSetValidator, IndexSetCleanupJob.Factory indexSetCleanupJobFactory, IndexSetStatsCreator indexSetStatsCreator, ClusterConfigService clusterConfigService, SystemJobManager systemJobManager, Provider<Boolean> permitted) {
             super(indexSetService, indexSetRegistry, indexSetValidator, indexSetCleanupJobFactory, indexSetStatsCreator, clusterConfigService, systemJobManager);
             this.permitted = permitted;
         }
@@ -493,7 +612,7 @@ public class IndexSetsResourceTest {
         @Override
         protected Subject getSubject() {
             final Subject mockSubject = mock(Subject.class);
-            when(mockSubject.isPermitted(anyString())).thenReturn(permitted);
+            when(mockSubject.isPermitted(anyString())).thenReturn(permitted.get());
             return mockSubject;
         }
     }
