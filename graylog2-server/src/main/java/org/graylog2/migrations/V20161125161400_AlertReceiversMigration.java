@@ -25,7 +25,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import org.bson.types.ObjectId;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.database.CollectionName;
@@ -157,7 +157,7 @@ public class V20161125161400_AlertReceiversMigration extends Migration {
             configuration.put(EmailAlarmCallback.CK_EMAIL_RECEIVERS, emails);
         }
 
-        final AlarmCallbackConfigurationAVImpl updatedConfiguration = ((AlarmCallbackConfigurationAVImpl) callbackConfiguration).toBuilder()
+        final AlarmCallbackConfigurationImpl updatedConfiguration = ((AlarmCallbackConfigurationImpl) callbackConfiguration).toBuilder()
                 .setConfiguration(configuration).build();
 
         try {

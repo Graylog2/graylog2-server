@@ -24,7 +24,7 @@ import com.mongodb.DBCollection;
 import com.mongodb.WriteResult;
 import org.bson.types.ObjectId;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alarmcallbacks.HTTPAlarmCallback;
@@ -143,7 +143,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
         when(this.streamService.getAlertConditions(eq(stream2))).thenReturn(ImmutableList.of(alertCondition));
 
         final String alarmCallbackId = new ObjectId().toHexString();
-        final AlarmCallbackConfiguration alarmCallback = AlarmCallbackConfigurationAVImpl.create(
+        final AlarmCallbackConfiguration alarmCallback = AlarmCallbackConfigurationImpl.create(
                 alarmCallbackId,
                 matchingStreamId,
                 EmailAlarmCallback.class.getCanonicalName(),
@@ -207,7 +207,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
         when(this.streamService.getAlertConditions(eq(stream3))).thenReturn(ImmutableList.of(alertCondition2));
 
         final String alarmCallbackId1 = new ObjectId().toHexString();
-        final AlarmCallbackConfiguration alarmCallback1 = AlarmCallbackConfigurationAVImpl.create(
+        final AlarmCallbackConfiguration alarmCallback1 = AlarmCallbackConfigurationImpl.create(
                 alarmCallbackId1,
                 matchingStreamId1,
                 EmailAlarmCallback.class.getCanonicalName(),
@@ -217,7 +217,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 "admin"
         );
         final String alarmCallbackId2 = new ObjectId().toHexString();
-        final AlarmCallbackConfiguration alarmCallback2 = AlarmCallbackConfigurationAVImpl.create(
+        final AlarmCallbackConfiguration alarmCallback2 = AlarmCallbackConfigurationImpl.create(
                 alarmCallbackId2,
                 matchingStreamId2,
                 EmailAlarmCallback.class.getCanonicalName(),
@@ -227,7 +227,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 "admin"
         );
         final String alarmCallbackId3 = new ObjectId().toHexString();
-        final AlarmCallbackConfiguration alarmCallback3 = AlarmCallbackConfigurationAVImpl.create(
+        final AlarmCallbackConfiguration alarmCallback3 = AlarmCallbackConfigurationImpl.create(
                 alarmCallbackId3,
                 matchingStreamId2,
                 EmailAlarmCallback.class.getCanonicalName(),
@@ -237,7 +237,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
                 "admin"
         );
         final String alarmCallbackId4 = new ObjectId().toHexString();
-        final AlarmCallbackConfiguration alarmCallback4 = AlarmCallbackConfigurationAVImpl.create(
+        final AlarmCallbackConfiguration alarmCallback4 = AlarmCallbackConfigurationImpl.create(
                 alarmCallbackId4,
                 matchingStreamId2,
                 HTTPAlarmCallback.class.getCanonicalName(),

@@ -40,7 +40,7 @@ public class AlarmCallbackConfigurationServiceMJImplTest extends MongoDBServiceT
 
     @Before
     public void setUpService() throws Exception {
-        this.alarmCallbackConfigurationService = new AlarmCallbackConfigurationServiceMJImpl(mongoRule.getMongoConnection(), mapperProvider);
+        this.alarmCallbackConfigurationService = new AlarmCallbackConfigurationServiceImpl(mongoRule.getMongoConnection(), mapperProvider);
     }
 
     @Test

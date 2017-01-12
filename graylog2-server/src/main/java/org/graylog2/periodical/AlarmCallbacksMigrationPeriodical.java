@@ -21,7 +21,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationImpl;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.periodical.Periodical;
@@ -45,7 +45,7 @@ public class AlarmCallbacksMigrationPeriodical extends Periodical {
 
     @Inject
     public AlarmCallbacksMigrationPeriodical(MongoConnection mongoConnection) {
-        final String collectionName = AlarmCallbackConfigurationAVImpl.class.getAnnotation(CollectionName.class).value();
+        final String collectionName = AlarmCallbackConfigurationImpl.class.getAnnotation(CollectionName.class).value();
         this.dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
     }
 

@@ -41,6 +41,7 @@ public class StreamRuleServiceImpl extends PersistedServiceImpl implements Strea
     @Inject
     public StreamRuleServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
+        collection(StreamRuleImpl.class).createIndex(StreamRuleImpl.FIELD_STREAM_ID);
     }
 
     @Override
