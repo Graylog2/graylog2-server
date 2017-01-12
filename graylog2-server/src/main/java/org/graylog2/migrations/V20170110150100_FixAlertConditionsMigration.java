@@ -107,7 +107,7 @@ public class V20170110150100_FixAlertConditionsMigration extends Migration {
                         LOG.warn("Field <{}> in alert condition <{}> ({}) of stream <{}> is not a string but a <{}>, not trying to convert it!",
                                 field, alertConditionId, alertConditionTitle, streamId,
                                 fieldValue.getClass().getCanonicalName());
-                        return;
+                        continue;
                     }
 
                     final String stringValue = parameters.get(field, String.class);
