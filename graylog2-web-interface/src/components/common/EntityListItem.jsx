@@ -20,10 +20,20 @@ const EntityListItem = React.createClass({
     if (this.props.titleSuffix) {
       titleSuffix = <small>{this.props.titleSuffix}</small>;
     }
+
+    const actionsContainer = (
+      <div className="item-actions text-right">
+        {this.props.actions}
+      </div>
+    );
+
     return (
       <li className="entity-list-item">
         <Row className="row-sm">
-          <Col md={6}>
+          <Col md={12}>
+            <div className="pull-right hidden-xs">
+              {actionsContainer}
+            </div>
             <h2>{this.props.title} {titleSuffix}</h2>
             {(this.props.createdFromContentPack || this.props.description) &&
               <div className="item-description">
@@ -35,10 +45,8 @@ const EntityListItem = React.createClass({
             }
           </Col>
 
-          <Col md={6}>
-            <div className="item-actions text-right">
-              {this.props.actions}
-            </div>
+          <Col sm={12} lgHidden mdHidden smHidden>
+            {actionsContainer}
           </Col>
         </Row>
 
