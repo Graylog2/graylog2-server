@@ -35,8 +35,9 @@ const StreamComponent = React.createClass({
     StreamsStore.load((streams) => {
       this.setState({
         streams: streams,
-        filteredStreams: streams.slice(),
+        filteredStreams: null,
       });
+      this.refs.streamFilter.filterData();
     });
   },
 
@@ -74,11 +75,16 @@ const StreamComponent = React.createClass({
       );
     }
 
+    const streamsList = this.state.filteredStreams ? (<StreamList streams={this.state.filteredStreams} streamRuleTypes={this.state.streamRuleTypes}
+                                                                  permissions={this.props.currentUser.permissions} user={this.props.currentUser}
+                                                                  onStreamSave={this.props.onStreamSave} indexSets={this.props.indexSets} />) : <Spinner/>;
+
     return (
       <div>
         <Row className="row-sm">
           <Col md={8}>
-            <TypeAheadDataFilter label="Filter streams"
+            <TypeAheadDataFilter ref="streamFilter"
+                                 label="Filter streams"
                                  data={this.state.streams}
                                  displayKey={'title'}
                                  filterSuggestions={[]}
@@ -88,9 +94,7 @@ const StreamComponent = React.createClass({
         </Row>
         <Row>
           <Col md={12}>
-            <StreamList streams={this.state.filteredStreams} streamRuleTypes={this.state.streamRuleTypes}
-                        permissions={this.props.currentUser.permissions} user={this.props.currentUser}
-                        onStreamSave={this.props.onStreamSave} indexSets={this.props.indexSets} />
+            {streamsList}
           </Col>
         </Row>
       </div>
