@@ -19,9 +19,12 @@ package org.graylog.plugins.map.geoip;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.auto.value.AutoValue;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.net.InetAddresses;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
+import com.maxmind.geoip2.record.City;
+import com.maxmind.geoip2.record.Country;
 import com.maxmind.geoip2.record.Location;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.plugin.Message;
@@ -73,16 +76,21 @@ public class GeoIpResolverEngine {
         for (Map.Entry<String, Object> field : message.getFields().entrySet()) {
             final String key = field.getKey();
             if (!key.startsWith(INTERNAL_FIELD_PREFIX)) {
-                final Optional<Coordinates> coordinates = extractGeoLocationInformation(field.getValue());
-                // We will store the coordinates as a "lat,long" string
-                coordinates.ifPresent(c -> message.addField(key + "_geolocation", c.latitude() + "," + c.longitude()));
+                final Optional<GeoLocationInformation> geoLocationInformation = extractGeoLocationInformation(field.getValue());
+                geoLocationInformation.ifPresent(locationInformation -> {
+                    // We will store the coordinates as a "lat,long" string
+                    message.addField(key + "_geolocation", locationInformation.latitude() + "," + locationInformation.longitude());
+                    message.addField(key + "_country_code", locationInformation.countryIsoCode());
+                    message.addField(key + "_city_name", locationInformation.cityName());
+                });
             }
         }
 
         return false;
     }
 
-    protected Optional<Coordinates> extractGeoLocationInformation(Object fieldValue) {
+    @VisibleForTesting
+    Optional<GeoLocationInformation> extractGeoLocationInformation(Object fieldValue) {
         final InetAddress ipAddress;
         if (fieldValue instanceof InetAddress) {
             ipAddress = (InetAddress) fieldValue;
@@ -92,22 +100,30 @@ public class GeoIpResolverEngine {
             ipAddress = null;
         }
 
-        Coordinates coordinates = null;
+        GeoLocationInformation geoLocationInformation = null;
         if (ipAddress != null) {
             try (Timer.Context ignored = resolveTime.time()) {
                 final CityResponse response = databaseReader.city(ipAddress);
                 final Location location = response.getLocation();
-                coordinates = Coordinates.create(location.getLatitude(), location.getLongitude());
+                final Country country = response.getCountry();
+                final City city = response.getCity();
+
+                geoLocationInformation = GeoLocationInformation.create(
+                        location.getLatitude(), location.getLongitude(),
+                        country.getGeoNameId() != null ? country.getIsoCode() : "N/A",
+                        city.getGeoNameId() != null ? city.getName() : "N/A" // calling to .getName() may throw a NPE
+                );
             } catch (Exception e) {
                 LOG.debug("Could not get location from IP {}", ipAddress.getHostAddress(), e);
             }
         }
 
-        return Optional.ofNullable(coordinates);
+        return Optional.ofNullable(geoLocationInformation);
     }
 
     @Nullable
-    protected InetAddress getIpFromFieldValue(String fieldValue) {
+    @VisibleForTesting
+    InetAddress getIpFromFieldValue(String fieldValue) {
         try {
             return InetAddresses.forString(fieldValue.trim());
         } catch (IllegalArgumentException e) {
@@ -118,13 +134,17 @@ public class GeoIpResolverEngine {
     }
 
     @AutoValue
-    static abstract class Coordinates {
+    static abstract class GeoLocationInformation {
         public abstract double latitude();
 
         public abstract double longitude();
 
-        public static Coordinates create(double latitude, double longitude) {
-            return new AutoValue_GeoIpResolverEngine_Coordinates(latitude, longitude);
+        public abstract String countryIsoCode();
+
+        public abstract String cityName();
+
+        public static GeoLocationInformation create(double latitude, double longitude, String countryIsoCode, String cityName) {
+            return new AutoValue_GeoIpResolverEngine_GeoLocationInformation(latitude, longitude, countryIsoCode, cityName);
         }
     }
 }

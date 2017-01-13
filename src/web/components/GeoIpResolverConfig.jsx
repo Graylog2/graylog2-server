@@ -2,6 +2,7 @@ import React from 'react';
 import { Input, Button } from 'react-bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { IfPermitted, Select } from 'components/common';
+import { DocumentationLink } from 'components/support';
 import ObjectUtils from 'util/ObjectUtils';
 
 const GeoIpResolverConfig = React.createClass({
@@ -91,9 +92,9 @@ const GeoIpResolverConfig = React.createClass({
         <h3>Geo-Location Processor</h3>
 
         <p>
-          If enabled, the Geo-Location Processor plugin scans all messages for fields
-          containing <strong>exclusively</strong> an IP address, and puts their geo-location information into a field
-          named <code>fieldname_geolocation</code> where "fieldname" is the name of the field containing an IP address.
+          The Geo-Location Processor plugin scans all messages for fields containing <strong>exclusively</strong> an
+          IP address, and puts their geo-location information (coordinates, ISO country code, and city name) into
+          different fields. Read more in the <DocumentationLink page="geolocation.html" text="Graylog documentation" />.
         </p>
 
         <dl className="deflist">

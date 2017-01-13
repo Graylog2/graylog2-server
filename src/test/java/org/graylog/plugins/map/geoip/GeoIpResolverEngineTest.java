@@ -112,6 +112,20 @@ public class GeoIpResolverEngineTest {
         assertEquals(message.getFields().size(), messageFields.size(), "Filter should not add new message fields");
     }
 
+    private void assertFieldNotResolved(Message message, String fieldName, String errorMessage) {
+        assertNull(message.getField(fieldName + "_geolocation"), errorMessage + " coordinates in " + fieldName);
+        assertNull(message.getField(fieldName + "_country_code"), errorMessage + " country in " + fieldName);
+        assertNull(message.getField(fieldName + "_city_name"), errorMessage + " city in " + fieldName);
+    }
+
+    private void assertFieldResolved(Message message, String fieldName, String errorMessage) {
+        assertNotNull(message.getField(fieldName + "_geolocation"), errorMessage + " coordinates in " + fieldName);
+        assertNotNull(message.getField(fieldName + "_country_code"), errorMessage + " country in " + fieldName);
+        assertNotNull(message.getField(fieldName + "_city_name"), errorMessage + " city in " + fieldName);
+        assertTrue(((String) message.getField(fieldName + "_geolocation")).contains(","),
+                "Location coordinates for " + fieldName + " should include a comma");
+    }
+
     @Test
     public void filterResolvesIpGeoLocation() throws Exception {
         final GeoIpResolverEngine resolver = new GeoIpResolverEngine(config, metricRegistry);
@@ -128,14 +142,11 @@ public class GeoIpResolverEngineTest {
         final boolean filtered = resolver.filter(message);
 
         assertFalse(filtered, "Message should not be filtered out");
-        assertEquals(message.getFields().size(), messageFields.size() + 2, "Filter should add new message fields");
         assertEquals(metricRegistry.timer(name(GeoIpResolverEngine.class, "resolveTime")).getCount(), 3, "Should have looked up three IPs");
-        assertNull(message.getField("source_geolocation"), "Should not have resolved private IP");
-        assertNull(message.getField("message_geolocation"), "Should have resolved public IP inside message");
-        assertNull(message.getField("gl2_remote_ip_geolocation"), "Should not have resolved internal message field");
-        assertNotNull(message.getField("extracted_ip_geolocation"), "Should have resolved public IP inside extracted_ip");
-        assertTrue(((String) message.getField("extracted_ip_geolocation")).contains(","), "Should include a comma");
-        assertNotNull(message.getField("ipv6_geolocation"), "Should have resolved public IPv6 inside ipv6");
-        assertTrue(((String) message.getField("ipv6_geolocation")).contains(","), "Should include a comma");
+        assertFieldNotResolved(message, "source", "Should not have resolved private IP");
+        assertFieldNotResolved(message, "message", "Should have resolved public IP");
+        assertFieldNotResolved(message, "gl2_remote_ip", "Should not have resolved text with an IP");
+        assertFieldResolved(message, "extracted_ip", "Should have resolved public IP");
+        assertFieldResolved(message, "ipv6", "Should have resolved public IPv6");
     }
 }
