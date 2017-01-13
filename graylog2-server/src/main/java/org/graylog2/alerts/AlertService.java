@@ -35,8 +35,6 @@ public interface AlertService {
     List<Alert> loadRecentOfStreams(List<String> streamIds, DateTime since, int limit);
     List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit);
 
-    int triggeredSecondsAgo(String streamId, String conditionId);
-
     Optional<Alert> getLastTriggeredAlert(String streamId, String conditionId);
 
     long totalCount();

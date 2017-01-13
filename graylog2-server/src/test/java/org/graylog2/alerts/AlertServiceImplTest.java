@@ -95,11 +95,17 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
 
     @Test
     @UsingDataSet(locations = "unresolved-alert.json")
-    public void triggeredSecondsAgoOnExistingAlert() throws Exception {
+    public void resolvedSecondsAgoOnExistingUnresolvedAlert() throws Exception {
+        assertThat(alertService.resolvedSecondsAgo(STREAM_ID, CONDITION_ID)).isEqualTo(-1);
+    }
+
+    @Test
+    @UsingDataSet(locations = "resolved-alert.json")
+    public void resolvedSecondsAgoOnExistingResolvedAlert() throws Exception {
         final Alert alert = alertService.load(ALERT_ID, STREAM_ID);
-        final int expectedResult = Seconds.secondsBetween(alert.getTriggeredAt(), Tools.nowUTC()).getSeconds();
+        final int expectedResult = Seconds.secondsBetween(alert.getResolvedAt(), Tools.nowUTC()).getSeconds();
         // Add a second threshold in case the clock changed since the previous call to Tools.nowUTC()
-        assertThat(alertService.triggeredSecondsAgo(STREAM_ID, CONDITION_ID)).isBetween(expectedResult, expectedResult + 1);
+        assertThat(alertService.resolvedSecondsAgo(STREAM_ID, CONDITION_ID)).isBetween(expectedResult, expectedResult + 1);
     }
 
     @Test
@@ -190,8 +196,8 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    public void triggeredSecondsAgoOnNonExistingAlert() throws Exception {
-        assertThat(alertService.triggeredSecondsAgo(STREAM_ID, CONDITION_ID)).isEqualTo(-1);
+    public void resolvedSecondsAgoOnNonExistingAlert() throws Exception {
+        assertThat(alertService.resolvedSecondsAgo(STREAM_ID, CONDITION_ID)).isEqualTo(-1);
     }
 
     @Test
