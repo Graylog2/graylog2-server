@@ -176,7 +176,7 @@ const UserForm = React.createClass({
   },
 
   _onCancel() {
-    this.props.history.pushState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+    this.props.history.goBack();
   },
 
   render() {
