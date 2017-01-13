@@ -145,22 +145,6 @@ const IndexSetConfigurationForm = React.createClass({
                  help={validationErrors.index_prefix ? validationErrors.index_prefix : indexPrefixHelp}
                  bsStyle={validationErrors.index_prefix ? 'error' : null}
                  required />
-          <Input type="number"
-                 id="index-set-shards"
-                 label="Index shards"
-                 name="shards"
-                 onChange={this._onInputChange}
-                 value={indexSet.shards}
-                 help="Number of Elasticsearch shards used per index in this index set."
-                 required />
-          <Input type="number"
-                 id="index-set-replicas"
-                 label="Index replicas"
-                 name="replicas"
-                 onChange={this._onInputChange}
-                 value={indexSet.replicas}
-                 help="Number of Elasticsearch replicas used per index in this index set."
-                 required />
           <Input type="text"
                  id="index-set-index-analyzer"
                  label="Analyzer"
@@ -197,6 +181,22 @@ const IndexSetConfigurationForm = React.createClass({
                        help="Add a description of this index set."
                        required />
                 {readOnlyconfig}
+                <Input type="number"
+                       id="index-set-shards"
+                       label="Index shards"
+                       name="shards"
+                       onChange={this._onInputChange}
+                       value={indexSet.shards}
+                       help="Number of Elasticsearch shards used per index in this index set."
+                       required />
+                <Input type="number"
+                       id="index-set-replicas"
+                       label="Index replicas"
+                       name="replicas"
+                       onChange={this._onInputChange}
+                       value={indexSet.replicas}
+                       help="Number of Elasticsearch replicas used per index in this index set."
+                       required />
                 <Input type="number"
                        id="index-set-max-num-segments"
                        label="Max. number of segments"
