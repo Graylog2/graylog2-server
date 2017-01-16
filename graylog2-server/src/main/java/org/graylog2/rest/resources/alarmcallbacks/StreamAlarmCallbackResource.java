@@ -25,7 +25,7 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
 import org.graylog2.audit.AuditEventTypes;
@@ -230,7 +230,7 @@ public class StreamAlarmCallbackResource extends RestResource {
 
         final Map<String, Object> configuration = convertConfigurationValues(alarmCallbackRequest);
 
-        final AlarmCallbackConfiguration updatedConfig = ((AlarmCallbackConfigurationAVImpl) callbackConfiguration).toBuilder()
+        final AlarmCallbackConfiguration updatedConfig = ((AlarmCallbackConfigurationImpl) callbackConfiguration).toBuilder()
                 .setTitle(alarmCallbackRequest.title())
                 .setConfiguration(configuration)
                 .build();

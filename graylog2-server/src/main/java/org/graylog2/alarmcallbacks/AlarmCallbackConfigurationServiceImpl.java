@@ -36,15 +36,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackConfigurationService {
-    private final JacksonDBCollection<AlarmCallbackConfigurationAVImpl, String> coll;
+public class AlarmCallbackConfigurationServiceImpl implements AlarmCallbackConfigurationService {
+    private final JacksonDBCollection<AlarmCallbackConfigurationImpl, String> coll;
 
     @Inject
-    public AlarmCallbackConfigurationServiceMJImpl(MongoConnection mongoConnection,
-                                                   MongoJackObjectMapperProvider mapperProvider) {
-        final String collectionName = AlarmCallbackConfigurationAVImpl.class.getAnnotation(CollectionName.class).value();
+    public AlarmCallbackConfigurationServiceImpl(MongoConnection mongoConnection,
+                                                 MongoJackObjectMapperProvider mapperProvider) {
+        final String collectionName = AlarmCallbackConfigurationImpl.class.getAnnotation(CollectionName.class).value();
         final DBCollection dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
-        this.coll = JacksonDBCollection.wrap(dbCollection, AlarmCallbackConfigurationAVImpl.class, String.class, mapperProvider.get());
+        this.coll = JacksonDBCollection.wrap(dbCollection, AlarmCallbackConfigurationImpl.class, String.class, mapperProvider.get());
+        dbCollection.createIndex(AlarmCallbackConfigurationImpl.FIELD_STREAM_ID);
     }
 
     @Override
@@ -64,7 +65,7 @@ public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackCon
 
     @Override
     public AlarmCallbackConfiguration create(String streamId, CreateAlarmCallbackRequest request, String userId) {
-        return AlarmCallbackConfigurationAVImpl.create(new ObjectId().toHexString(), streamId, request.type(), request.title(), request.configuration(), new Date(), userId);
+        return AlarmCallbackConfigurationImpl.create(new ObjectId().toHexString(), streamId, request.type(), request.title(), request.configuration(), new Date(), userId);
     }
 
     @Override
@@ -76,8 +77,8 @@ public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackCon
     public Map<String, Long> countPerType() {
         final HashMap<String, Long> result = Maps.newHashMap();
 
-        final DBCursor<AlarmCallbackConfigurationAVImpl> avs = coll.find();
-        for (AlarmCallbackConfigurationAVImpl av : avs) {
+        final DBCursor<AlarmCallbackConfigurationImpl> avs = coll.find();
+        for (AlarmCallbackConfigurationImpl av : avs) {
             Long count = result.get(av.getType());
             if (count == null) {
                 count = 0L;
@@ -98,17 +99,17 @@ public class AlarmCallbackConfigurationServiceMJImpl implements AlarmCallbackCon
         return coll.removeById(model.getId()).getN();
     }
 
-    private List<AlarmCallbackConfiguration> toAbstractListType(List<AlarmCallbackConfigurationAVImpl> callbacks) {
+    private List<AlarmCallbackConfiguration> toAbstractListType(List<AlarmCallbackConfigurationImpl> callbacks) {
         final List<AlarmCallbackConfiguration> result = Lists.newArrayList();
         result.addAll(callbacks);
 
         return result;
     }
 
-    private AlarmCallbackConfigurationAVImpl implOrFail(AlarmCallbackConfiguration callback) {
-        final AlarmCallbackConfigurationAVImpl callbackImpl;
-        if (callback instanceof AlarmCallbackConfigurationAVImpl) {
-            callbackImpl = (AlarmCallbackConfigurationAVImpl) callback;
+    private AlarmCallbackConfigurationImpl implOrFail(AlarmCallbackConfiguration callback) {
+        final AlarmCallbackConfigurationImpl callbackImpl;
+        if (callback instanceof AlarmCallbackConfigurationImpl) {
+            callbackImpl = (AlarmCallbackConfigurationImpl) callback;
             return callbackImpl;
         } else {
             throw new IllegalArgumentException("Supplied output must be of implementation type AlarmCallbackConfigurationAVImpl, not " + callback.getClass());

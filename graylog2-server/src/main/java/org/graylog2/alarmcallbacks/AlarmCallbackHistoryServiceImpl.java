@@ -42,6 +42,7 @@ public class AlarmCallbackHistoryServiceImpl implements AlarmCallbackHistoryServ
         final String collectionName = AlarmCallbackHistoryImpl.class.getAnnotation(CollectionName.class).value();
         final DBCollection dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
         this.coll = JacksonDBCollection.wrap(dbCollection, AlarmCallbackHistoryImpl.class, String.class, mapperProvider.get());
+        dbCollection.createIndex(AlarmCallbackHistoryImpl.FIELD_ALERTID);
     }
 
     @Override

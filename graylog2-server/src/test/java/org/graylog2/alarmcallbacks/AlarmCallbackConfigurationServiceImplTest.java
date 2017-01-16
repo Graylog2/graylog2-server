@@ -35,12 +35,12 @@ import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class AlarmCallbackConfigurationServiceMJImplTest extends MongoDBServiceTest {
+public class AlarmCallbackConfigurationServiceImplTest extends MongoDBServiceTest {
     private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
 
     @Before
     public void setUpService() throws Exception {
-        this.alarmCallbackConfigurationService = new AlarmCallbackConfigurationServiceMJImpl(mongoRule.getMongoConnection(), mapperProvider);
+        this.alarmCallbackConfigurationService = new AlarmCallbackConfigurationServiceImpl(mongoRule.getMongoConnection(), mapperProvider);
     }
 
     @Test

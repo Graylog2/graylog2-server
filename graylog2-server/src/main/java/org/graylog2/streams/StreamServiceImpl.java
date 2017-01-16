@@ -24,7 +24,7 @@ import com.mongodb.DBObject;
 import com.mongodb.QueryBuilder;
 import org.bson.types.ObjectId;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationAVImpl;
+import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationImpl;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.Alert;
@@ -374,7 +374,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                     }
                     configuration.put(key, recipients);
 
-                    final AlarmCallbackConfiguration updatedConfig = ((AlarmCallbackConfigurationAVImpl) callback).toBuilder()
+                    final AlarmCallbackConfiguration updatedConfig = ((AlarmCallbackConfigurationImpl) callback).toBuilder()
                             .setConfiguration(configuration)
                             .build();
                     try {

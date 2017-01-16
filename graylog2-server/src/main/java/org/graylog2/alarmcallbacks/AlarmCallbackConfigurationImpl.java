@@ -30,59 +30,67 @@ import java.util.Map;
 @AutoValue
 @JsonAutoDetect
 @CollectionName("alarmcallbackconfigurations")
-public abstract class AlarmCallbackConfigurationAVImpl implements AlarmCallbackConfiguration {
-    @JsonProperty("_id")
+public abstract class AlarmCallbackConfigurationImpl implements AlarmCallbackConfiguration {
+    static final String FIELD_ID = "_id";
+    static final String FIELD_STREAM_ID = "stream_id";
+    static final String FIELD_TYPE = "type";
+    static final String FIELD_TITLE = "title";
+    static final String FIELD_CONFIGURATION = "configuration";
+    static final String FIELD_CREATED_AT = "created_at";
+    static final String FIELD_CREATOR_USER_ID = "creator_user_id";
+
+    @JsonProperty(FIELD_ID)
     @ObjectId
     @Override
     public abstract String getId();
 
-    @JsonProperty("stream_id")
+    @JsonProperty(FIELD_STREAM_ID)
     @Override
     public abstract String getStreamId();
 
-    @JsonProperty("type")
+    @JsonProperty(FIELD_TYPE)
     @Override
     public abstract String getType();
 
-    @JsonProperty("title")
+    @JsonProperty(FIELD_TITLE)
     @Override
     @Nullable
     public abstract String getTitle();
 
-    @JsonProperty("configuration")
+    @JsonProperty(FIELD_CONFIGURATION)
     @Override
     public abstract Map<String, Object> getConfiguration();
 
-    @JsonProperty("created_at")
+    @JsonProperty(FIELD_CREATED_AT)
     @Override
     public abstract Date getCreatedAt();
 
-    @JsonProperty("creator_user_id")
+    @JsonProperty(FIELD_CREATOR_USER_ID)
     @Override
     public abstract String getCreatorUserId();
 
     public abstract Builder toBuilder();
 
     @JsonCreator
-    public static AlarmCallbackConfigurationAVImpl create(@JsonProperty("_id") String id,
-                                                          @JsonProperty("stream_id") String streamId,
-                                                          @JsonProperty("type") String type,
-                                                          @JsonProperty("title") @Nullable String title,
-                                                          @JsonProperty("configuration") Map<String, Object> configuration,
-                                                          @JsonProperty("created_at") Date createdAt,
-                                                          @JsonProperty("creator_user_id") String creatorUserId,
-                                                          @Nullable @JsonProperty("id") String redundantId) {
+    public static AlarmCallbackConfigurationImpl create(@JsonProperty(FIELD_ID) String id,
+                                                        @JsonProperty(FIELD_STREAM_ID) String streamId,
+                                                        @JsonProperty(FIELD_TYPE) String type,
+                                                        @JsonProperty(FIELD_TITLE) @Nullable String title,
+                                                        @JsonProperty(FIELD_CONFIGURATION) Map<String, Object> configuration,
+                                                        @JsonProperty(FIELD_CREATED_AT) Date createdAt,
+                                                        @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId,
+                                                        @Nullable @JsonProperty("id") String redundantId) {
         return create(id, streamId, type, title, configuration, createdAt, creatorUserId);
     }
 
-    public static AlarmCallbackConfigurationAVImpl create(@JsonProperty("_id") String id,
-                                                          @JsonProperty("stream_id") String streamId,
-                                                          @JsonProperty("type") String type,
-                                                          @JsonProperty("title") @Nullable String title,
-                                                          @JsonProperty("configuration") Map<String, Object> configuration,
-                                                          @JsonProperty("created_at") Date createdAt,
-                                                          @JsonProperty("creator_user_id") String creatorUserId) {
-        return new AutoValue_AlarmCallbackConfigurationAVImpl.Builder()
+    public static AlarmCallbackConfigurationImpl create(@JsonProperty(FIELD_ID) String id,
+                                                        @JsonProperty(FIELD_STREAM_ID) String streamId,
+                                                        @JsonProperty(FIELD_TYPE) String type,
+                                                        @JsonProperty(FIELD_TITLE) @Nullable String title,
+                                                        @JsonProperty(FIELD_CONFIGURATION) Map<String, Object> configuration,
+                                                        @JsonProperty(FIELD_CREATED_AT) Date createdAt,
+                                                        @JsonProperty(FIELD_CREATOR_USER_ID) String creatorUserId) {
+        return new AutoValue_AlarmCallbackConfigurationImpl.Builder()
                 .setId(id)
                 .setStreamId(streamId)
                 .setType(type)
@@ -109,6 +117,6 @@ public abstract class AlarmCallbackConfigurationAVImpl implements AlarmCallbackC
 
         public abstract Builder setCreatorUserId(String creatorUserId);
 
-        public abstract AlarmCallbackConfigurationAVImpl build();
+        public abstract AlarmCallbackConfigurationImpl build();
     }
 }

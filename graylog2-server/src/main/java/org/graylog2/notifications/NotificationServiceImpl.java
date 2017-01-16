@@ -51,6 +51,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
         super(mongoConnection);
         this.nodeId = checkNotNull(nodeId);
         this.auditEventSender = auditEventSender;
+        collection(NotificationImpl.class).createIndex(NotificationImpl.FIELD_TYPE);
     }
 
     @Override
@@ -74,9 +75,9 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
     @Override
     public boolean fixed(NotificationImpl.Type type, Node node) {
         BasicDBObject qry = new BasicDBObject();
-        qry.put("type", type.toString().toLowerCase(Locale.ENGLISH));
+        qry.put(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH));
         if (node != null) {
-            qry.put("node_id", node.getNodeId());
+            qry.put(NotificationImpl.FIELD_NODE_ID, node.getNodeId());
         }
 
         final boolean removed = destroyAll(NotificationImpl.class, qry) > 0;
@@ -88,18 +89,18 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
     @Override
     public boolean isFirst(NotificationImpl.Type type) {
-        return (findOne(NotificationImpl.class, new BasicDBObject("type", type.toString().toLowerCase(Locale.ENGLISH))) == null);
+        return (findOne(NotificationImpl.class, new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH))) == null);
     }
 
     @Override
     public List<Notification> all() {
-        final List<DBObject> dbObjects = query(NotificationImpl.class, new BasicDBObject(), new BasicDBObject("timestamp", -1));
+        final List<DBObject> dbObjects = query(NotificationImpl.class, new BasicDBObject(), new BasicDBObject(NotificationImpl.FIELD_TIMESTAMP, -1));
         final List<Notification> notifications = Lists.newArrayListWithCapacity(dbObjects.size());
         for (DBObject obj : dbObjects) {
             try {
                 notifications.add(new NotificationImpl(new ObjectId(obj.get("_id").toString()), obj.toMap()));
             } catch (IllegalArgumentException e) {
-                LOG.warn("There is a notification type we can't handle: [{}]", obj.get("type"));
+                LOG.warn("There is a notification type we can't handle: [{}]", obj.get(NotificationImpl.FIELD_TYPE));
             }
         }
 
@@ -142,6 +143,6 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
     @Override
     public int destroyAllByType(Notification.Type type) {
-        return destroyAll(NotificationImpl.class, new BasicDBObject("type", type.toString().toLowerCase(Locale.ENGLISH)));
+        return destroyAll(NotificationImpl.class, new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH)));
     }
 }
