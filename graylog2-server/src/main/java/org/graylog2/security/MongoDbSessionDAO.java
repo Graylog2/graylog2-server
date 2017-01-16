@@ -18,17 +18,28 @@ package org.graylog2.security;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
+import com.github.rholder.retry.RetryException;
+import com.github.rholder.retry.Retryer;
+import com.github.rholder.retry.RetryerBuilder;
+import com.github.rholder.retry.StopStrategies;
+import com.github.rholder.retry.WaitStrategies;
+import com.mongodb.DuplicateKeyException;
+
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.CachingSessionDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 public class MongoDbSessionDAO extends CachingSessionDAO {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDbSessionDAO.class);
@@ -107,8 +118,23 @@ public class MongoDbSessionDAO extends CachingSessionDAO {
         } else {
             throw new RuntimeException("Unsupported session type: " + session.getClass().getCanonicalName());
         }
-
-        mongoDBSessionService.saveWithoutValidation(dbSession);
+        // Due to https://jira.mongodb.org/browse/SERVER-14322 upserts can fail under concurrency.
+        // We need to retry the update, and stagger them a bit, so no all of the retries attempt it at the same time again.
+        // Usually this should succeed the first time, though
+        final Retryer<Object> retryer = RetryerBuilder.newBuilder()
+                .retryIfExceptionOfType(DuplicateKeyException.class)
+                .withWaitStrategy(WaitStrategies.randomWait(5, TimeUnit.MILLISECONDS))
+                .withStopStrategy(StopStrategies.stopAfterAttempt(10))
+                .build();
+        try {
+            retryer.call(() -> mongoDBSessionService.saveWithoutValidation(dbSession));
+        } catch (ExecutionException e) {
+            LOG.warn("Unexpected exception when saving session to MongoDB. Failed to update session.", e);
+            throw new RuntimeException(e.getCause());
+        } catch (RetryException e) {
+            LOG.warn("Tried to update session 10 times, but still failed. This is likely because of https://jira.mongodb.org/browse/SERVER-14322", e);
+            throw new RuntimeException(e.getCause());
+        }
     }
 
     @Override
