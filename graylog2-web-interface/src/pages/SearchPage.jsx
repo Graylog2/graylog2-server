@@ -39,7 +39,10 @@ const SearchPage = React.createClass({
     };
   },
   componentDidMount() {
-    [DecoratorsActions.create.completed, DecoratorsActions.remove.completed, DecoratorsActions.update.completed].forEach((action) => action.listen(this._refreshData));
+    [DecoratorsActions.create.completed, DecoratorsActions.remove.completed, DecoratorsActions.update.completed].forEach((action) => action.listen(() => {
+      const searchInStream = this.props.searchInStream;
+      this._refreshData(searchInStream);
+    }));
     this._refreshData();
     InputsActions.list.triggerPromise();
 
