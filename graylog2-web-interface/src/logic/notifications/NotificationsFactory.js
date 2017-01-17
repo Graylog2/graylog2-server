@@ -112,7 +112,7 @@ class NotificationsFactory {
           description: (
             <span>
               The index ranges are out of sync. Please go to System/Indices and trigger a index range recalculation from
-              the Maintenance menu.
+              the Maintenance menu of {notification.details.index_sets ? (`the following index sets: ${notification.details.index_sets}`) : "all index sets"}
             </span>
           ),
         };
