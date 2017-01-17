@@ -25,7 +25,7 @@ const RecentMessageLoader = React.createClass({
     }
     this.setState({ loading: true });
     const promise = UniversalSearchStore.search('relative', `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
-      { range: 0 }, undefined, 1, undefined, undefined, undefined, false);
+      { range: 3600 }, undefined, 1, undefined, undefined, undefined, false);
     promise.then((response) => {
       if (response.total_results > 0) {
         this.props.onMessageLoaded(response.messages[0]);
@@ -39,9 +39,9 @@ const RecentMessageLoader = React.createClass({
   render() {
     let helpMessage;
     if (this.props.selectedInputId) {
-      helpMessage = 'Click on "Load Message" to load the most recent message from this input.';
+      helpMessage = 'Click on "Load Message" to load the most recent message received by this input within the last hour.';
     } else {
-      helpMessage = 'Select an Input from the list below and click "Load Message" to load the most recent message from this input.';
+      helpMessage = 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.';
     }
     return (
       <div style={{marginTop: 5}}>
