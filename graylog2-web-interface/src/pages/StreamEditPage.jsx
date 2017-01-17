@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
+import { Alert, Row, Col } from 'react-bootstrap';
 
 import StreamRulesEditor from 'components/streamrules/StreamRulesEditor';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -30,6 +31,19 @@ const StreamEditPage = React.createClass({
       return <Spinner />;
     }
 
+    let content = <StreamRulesEditor currentUser={this.state.currentUser} streamId={this.props.params.streamId}
+                                 messageId={this.props.location.query.message_id} index={this.props.location.query.index} />;
+    if (this.state.stream.is_default) {
+      content = (
+        <div className="row content">
+          <div className="col-md-12">
+            <Alert bsStyle="danger">
+              The default stream cannot be edited.
+            </Alert>
+          </div>
+        </div>
+      );
+    }
     return (
       <DocumentTitle title={`Rules of Stream ${this.state.stream.title}`}>
         <div>
@@ -40,8 +54,7 @@ const StreamEditPage = React.createClass({
             </span>
           </PageHeader>
 
-          <StreamRulesEditor currentUser={this.state.currentUser} streamId={this.props.params.streamId}
-                             messageId={this.props.location.query.message_id} index={this.props.location.query.index} />
+          {content}
         </div>
       </DocumentTitle>
     );
