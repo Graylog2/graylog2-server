@@ -26,6 +26,7 @@ import com.codahale.metrics.Timer;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
+import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.unit.TimeValue;
@@ -65,6 +66,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -515,6 +517,18 @@ public class Searches {
             r = c.search(request).actionGet();
         } catch (org.elasticsearch.action.search.SearchPhaseExecutionException e) {
             throw new FieldTypeException(e);
+        }
+        // unwrap shard failure due to non-numeric mapping. this happens when searching across index sets
+        // if at least one of the index sets comes back with a result, the overall result will have the aggregation
+        // but not considered failed entirely. however, if one shard has the error, we will refuse to respond
+        // otherwise we would be showing empty graphs for non-numeric fields.
+        if (r.getFailedShards() > 0) {
+            final Optional<ShardSearchFailure> failure = Arrays.stream(r.getShardFailures())
+                    .filter(shardSearchFailure -> shardSearchFailure.getCause() instanceof IllegalArgumentException)
+                    .findFirst();
+            if (failure.isPresent()) {
+                throw new FieldTypeException(failure.get().getCause());
+            }
         }
         recordEsMetrics(r, range);
 
