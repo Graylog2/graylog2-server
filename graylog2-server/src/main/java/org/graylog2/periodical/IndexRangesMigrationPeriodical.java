@@ -16,6 +16,7 @@
  */
 package org.graylog2.periodical;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -43,6 +44,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -126,19 +128,19 @@ public class IndexRangesMigrationPeriodical extends Periodical {
             // remove all present index names so we can display the index sets that need manual fixing
             final Set<String> extraIndices = Sets.newHashSet(indexNames);
             allIndexRanges.forEach(indexRange -> extraIndices.remove(indexRange.indexName()));
-            final Optional<String> affectedIndexSetNames = extraIndices.stream()
+            final Set<String> affectedIndexSetNames = extraIndices.stream()
                     .map(indexSetRegistry::getForIndex)
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .map(IndexSet::getConfig)
                     .map(IndexSetConfig::title)
-                    .reduce((titles, title) -> titles + ", " + title);
+                    .collect(Collectors.toSet());
             final Notification notification = notificationService.buildNow()
                     .addSeverity(Notification.Severity.URGENT)
                     .addType(Notification.Type.INDEX_RANGES_RECALCULATION)
                     .addDetail("indices", numberOfIndices)
                     .addDetail("index_ranges", numberOfIndexRanges)
-                    .addDetail("index_sets", affectedIndexSetNames.orElse(null));
+                    .addDetail("index_sets", affectedIndexSetNames.isEmpty() ? null : Joiner.on(", ").join(affectedIndexSetNames));
             notificationService.publishIfFirst(notification);
         }
 
