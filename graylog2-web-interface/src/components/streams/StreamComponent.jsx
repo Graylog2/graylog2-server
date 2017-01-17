@@ -30,6 +30,10 @@ const StreamComponent = React.createClass({
     StreamsStore.onChange(this.loadData);
     StreamRulesStore.onChange(this.loadData);
   },
+  componentWillUnmount() {
+    StreamsStore.unregister(this.loadData);
+    StreamRulesStore.unregister(this.loadData);
+  },
 
   loadData() {
     StreamsStore.load((streams) => {
