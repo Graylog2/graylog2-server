@@ -32,7 +32,7 @@ const ShowMessagePage = React.createClass({
   componentDidMount() {
     MessagesActions.loadMessage.triggerPromise(this.props.params.index, this.props.params.messageId).then(message => {
       this.setState({ message: message });
-      InputsActions.get.triggerPromise(message.source_input_id);
+      InputsActions.getOptional.triggerPromise(message.source_input_id);
     });
     StreamsStore.listStreams().then(streams => {
       const streamsMap = {};
