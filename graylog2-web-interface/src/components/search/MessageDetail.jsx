@@ -97,12 +97,19 @@ const MessageDetail = React.createClass({
       if (!streamList) {
         streamList = [];
       }
-      streamList.push(
-        <LinkContainer key={stream.id}
-                       to={Routes.stream_edit_example(stream.id, this.props.message.index, this.props.message.id)}>
-          <MenuItem>{stream.title}</MenuItem>
-        </LinkContainer>
-      );
+      if (stream.is_default) {
+        streamList.push(
+          <MenuItem key={stream.id} disabled title="Cannot test against the default stream">{stream.title}</MenuItem>
+        );
+      } else {
+        streamList.push(
+          <LinkContainer key={stream.id}
+                         to={Routes.stream_edit_example(stream.id, this.props.message.index,
+                                                        this.props.message.id)}>
+            <MenuItem>{stream.title}</MenuItem>
+          </LinkContainer>
+        );
+      }
     });
 
     return (
