@@ -25,7 +25,7 @@ const RecentMessageLoader = React.createClass({
     }
     this.setState({ loading: true });
     const promise = UniversalSearchStore.search('relative', `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
-      { range: 0 }, undefined, 1, undefined, undefined, undefined, false);
+      { range: 3600 }, undefined, 1, undefined, undefined, undefined, false);
     promise.then((response) => {
       if (response.total_results > 0) {
         this.props.onMessageLoaded(response.messages[0]);
