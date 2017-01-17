@@ -24,12 +24,12 @@ public class ContainsMatcher implements StreamRuleMatcher {
     public boolean match(Message msg, StreamRule rule) {
         final boolean inverted = rule.getInverted();
         final Object field = msg.getField(rule.getField());
-        if (field instanceof String) {
-            final String value = (String) field;
+
+        if (field != null) {
+            final String value = field.toString();
             return inverted ^ value.contains(rule.getValue());
         } else {
             return inverted;
         }
     }
-
 }
