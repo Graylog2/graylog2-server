@@ -39,9 +39,9 @@ const RecentMessageLoader = React.createClass({
   render() {
     let helpMessage;
     if (this.props.selectedInputId) {
-      helpMessage = 'Click on "Load Message" to load the most recent message from this input.';
+      helpMessage = 'Click on "Load Message" to load the most recent message received by this input within the last hour.';
     } else {
-      helpMessage = 'Select an Input from the list below and click "Load Message" to load the most recent message from this input.';
+      helpMessage = 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.';
     }
     return (
       <div style={{marginTop: 5}}>
