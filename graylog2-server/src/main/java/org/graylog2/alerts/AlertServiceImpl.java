@@ -107,10 +107,11 @@ public class AlertServiceImpl implements AlertService {
 
         final Alert mostRecentAlert = lastTriggeredAlert.get();
 
-        if (!isResolved(mostRecentAlert)) {
+        final DateTime resolvedAt = mostRecentAlert.getResolvedAt();
+        if (resolvedAt == null || !isResolved(mostRecentAlert)) {
             return -1;
         }
-        return Seconds.secondsBetween(mostRecentAlert.getResolvedAt(), Tools.nowUTC()).getSeconds();
+        return Seconds.secondsBetween(resolvedAt, Tools.nowUTC()).getSeconds();
     }
 
     @Override
