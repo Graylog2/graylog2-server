@@ -99,7 +99,7 @@ const MessageDetail = React.createClass({
       }
       if (stream.is_default) {
         streamList.push(
-          <MenuItem key={stream.id} disabled={true} title="Cannot test against the default stream">{stream.title}</MenuItem>
+          <MenuItem key={stream.id} disabled title="Cannot test against the default stream">{stream.title}</MenuItem>
         );
       } else {
         streamList.push(
