@@ -100,6 +100,12 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     }
 
     @Test
+    @UsingDataSet(locations = "non-interval-alert.json")
+    public void resolvedSecondsAgoOnExistingNonIntervalAlert() throws Exception {
+        assertThat(alertService.resolvedSecondsAgo(STREAM_ID, CONDITION_ID)).isEqualTo(-1);
+    }
+
+    @Test
     @UsingDataSet(locations = "resolved-alert.json")
     public void resolvedSecondsAgoOnExistingResolvedAlert() throws Exception {
         final Alert alert = alertService.load(ALERT_ID, STREAM_ID);
