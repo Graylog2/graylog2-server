@@ -31,8 +31,8 @@ const StreamEditPage = React.createClass({
       return <Spinner />;
     }
 
-    let content = <StreamRulesEditor currentUser={this.state.currentUser} streamId={this.props.params.streamId}
-                                 messageId={this.props.location.query.message_id} index={this.props.location.query.index} />;
+    let content = (<StreamRulesEditor currentUser={this.state.currentUser} streamId={this.props.params.streamId}
+                                 messageId={this.props.location.query.message_id} index={this.props.location.query.index} />);
     if (this.state.stream.is_default) {
       content = (
         <div className="row content">
