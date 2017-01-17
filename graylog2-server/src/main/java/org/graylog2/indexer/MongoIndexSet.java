@@ -297,7 +297,7 @@ public class MongoIndexSet implements IndexSet {
             throw new RuntimeException("Could not create new target index <" + newTarget + ">.");
         }
 
-        LOG.info("Waiting for allocation of  index <{}>.", newTarget);
+        LOG.info("Waiting for allocation of index <{}>.", newTarget);
         ClusterHealthStatus healthStatus = indices.waitForRecovery(newTarget);
         LOG.debug("Health status of index <{}>: {}", newTarget, healthStatus);
 
