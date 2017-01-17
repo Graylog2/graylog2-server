@@ -40,6 +40,10 @@ const InputsStore = Reflux.createStore({
   },
 
   get(inputId) {
+    return this.getOptional(inputId, true);
+  },
+
+  getOptional(inputId, showError) {
     const promise = fetch('GET', URLUtils.qualifyUrl(`${this.sourceUrl}/${inputId}`));
 
     promise
@@ -51,8 +55,12 @@ const InputsStore = Reflux.createStore({
           return this.input;
         },
         error => {
-          UserNotification.error(`Fetching input ${inputId} failed with status: ${error}`,
-            'Could not retrieve input');
+          if (showError) {
+            UserNotification.error(`Fetching input ${inputId} failed with status: ${error}`,
+                                   'Could not retrieve input');
+          } else {
+            this.trigger({ input: {} });
+          }
         });
 
     InputsActions.get.promise(promise);
