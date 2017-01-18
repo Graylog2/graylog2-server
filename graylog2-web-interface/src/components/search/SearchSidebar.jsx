@@ -127,7 +127,12 @@ const SearchSidebar = React.createClass({
   },
 
   _openModal(ref) {
-    return () => this.refs[ref].open();
+    return (event) => {
+      if (event) {
+        event.preventDefault();
+      }
+      this.refs[ref].open();
+    };
   },
 
   _getExportModal() {
