@@ -5,6 +5,7 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 import deepEqual from 'deep-equal';
 
 import StoreProvider from 'injection/StoreProvider';
+const StreamsStore = StoreProvider.getStore('Streams');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const DashboardsStore = StoreProvider.getStore('Dashboards');
 const FocusStore = StoreProvider.getStore('Focus');
@@ -31,11 +32,20 @@ const ShowDashboardPage = React.createClass({
     return {
       locked: true,
       forceUpdateInBackground: false,
+      streamIds: null,
     };
   },
   componentDidMount() {
     this.loadData();
     this.listenTo(WidgetsStore, this.removeWidget);
+    // we use the stream ids to potentially disable search replay buttons for deleted streams
+    StreamsStore.load((streams) => {
+      let streamIds2 = streams.reduce((streamIds, stream) => {
+        streamIds[stream.id] = stream.id;
+        return streamIds;
+      }, {});
+      this.setState({ streamIds: streamIds2 });
+    });
     this.loadInterval = setInterval(this.loadData, 2000);
     // eslint-disable-next-line react/no-did-mount-set-state
     this.setState({ forceUpdateInBackground: this.state.currentUser.preferences.updateUnfocussed });
@@ -134,7 +144,7 @@ const ShowDashboardPage = React.createClass({
     }).map((widget) => {
       return (
         <Widget id={widget.id} key={`widget-${widget.id}`} widget={widget} dashboardId={dashboard.id}
-                locked={this.state.locked} shouldUpdate={this.shouldUpdate()}/>
+                locked={this.state.locked} shouldUpdate={this.shouldUpdate()} streamIds={this.state.streamIds}/>
       );
     });
 
