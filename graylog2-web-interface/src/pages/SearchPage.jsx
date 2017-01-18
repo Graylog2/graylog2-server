@@ -12,7 +12,7 @@ const { RefreshStore } = CombinedProvider.get('Refresh');
 const { StreamsStore } = CombinedProvider.get('Streams');
 const { UniversalSearchStore } = CombinedProvider.get('UniversalSearch');
 const { SearchStore } = CombinedProvider.get('Search');
-const { DecoratorsActions } = CombinedProvider.get('Decorators');
+const { DecoratorsStore } = CombinedProvider.get('Decorators');
 
 import { DocumentTitle, Spinner } from 'components/common';
 import { MalformedSearchQuery, SearchExecutionError, SearchResult } from 'components/search';
@@ -30,6 +30,7 @@ const SearchPage = React.createClass({
     Reflux.connect(CurrentUserStore),
     Reflux.listenTo(InputsStore, '_formatInputs'),
     Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'),
+    Reflux.listenTo(DecoratorsStore, '_refreshDataFromDecoratorStore', '_refreshDataFromDecoratorStore')
   ],
   getInitialState() {
     return {
@@ -39,11 +40,6 @@ const SearchPage = React.createClass({
     };
   },
   componentDidMount() {
-    [DecoratorsActions.create.completed, DecoratorsActions.remove.completed, DecoratorsActions.update.completed].forEach((action) => action.listen(() => {
-      const searchInStream = this.props.searchInStream;
-      this._refreshData(searchInStream);
-    }));
-    this._refreshData();
     InputsActions.list.triggerPromise();
 
     StreamsStore.listStreams().then((streams) => {
@@ -78,6 +74,10 @@ const SearchPage = React.createClass({
     if (this.timer) {
       clearInterval(this.timer);
     }
+  },
+  _refreshDataFromDecoratorStore() {
+    const searchInStream = this.props.searchInStream;
+    this._refreshData(searchInStream);
   },
   _refreshData(searchInStream) {
     const query = SearchStore.originalQuery;
