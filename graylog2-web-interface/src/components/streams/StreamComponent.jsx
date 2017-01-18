@@ -30,6 +30,13 @@ const StreamComponent = React.createClass({
     StreamsStore.onChange(this.loadData);
     StreamRulesStore.onChange(this.loadData);
   },
+
+  componentDidUpdate() {
+    if (this.state.filteredStreams === null) {
+      this._filterStreams();
+    }
+  },
+
   componentWillUnmount() {
     StreamsStore.unregister(this.loadData);
     StreamRulesStore.unregister(this.loadData);
@@ -41,8 +48,13 @@ const StreamComponent = React.createClass({
         streams: streams,
         filteredStreams: null,
       });
-      this.refs.streamFilter.filterData();
     });
+  },
+
+  _filterStreams() {
+    if (this.refs.streamFilter) {
+      this.refs.streamFilter.filterData();
+    }
   },
 
   _updateFilteredStreams(filteredStreams) {
