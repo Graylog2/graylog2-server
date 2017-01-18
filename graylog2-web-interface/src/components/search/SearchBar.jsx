@@ -103,6 +103,7 @@ const SearchBar = React.createClass({
   },
   _rangeTypeChanged(event, newRangeType) {
     SearchStore.rangeType = newRangeType;
+    this._resetKeywordPreview();
   },
   _rangeParamsChanged(key) {
     return () => {
