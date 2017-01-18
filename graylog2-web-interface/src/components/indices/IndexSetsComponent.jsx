@@ -69,7 +69,7 @@ const IndexSetsComponent = React.createClass({
         <DropdownButton title="More Actions" id={`index-set-dropdown-${indexSet.id}`} pullRight>
           <MenuItem
             onSelect={this._onSetDefault(indexSet)}
-            disabled={!indexSet.writable}>Set as default</MenuItem>
+            disabled={!indexSet.writable || indexSet.default}>Set as default</MenuItem>
           <MenuItem divider />
           <MenuItem onSelect={this._onDelete(indexSet)}>Delete</MenuItem>
         </DropdownButton>
