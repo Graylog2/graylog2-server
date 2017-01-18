@@ -2,6 +2,7 @@ const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
 import ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
+const lodash = require('lodash');
 
 interface Stream {
   id: string;
@@ -148,6 +149,9 @@ class StreamsStore {
   }
   _emitChange() {
     this.callbacks.forEach((callback) => callback());
+  }
+  unregister(callback: Callback) {
+    lodash.pull(this.callbacks, callback);
   }
 }
 
