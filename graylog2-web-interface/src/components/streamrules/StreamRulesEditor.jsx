@@ -31,6 +31,10 @@ const StreamRulesEditor = React.createClass({
     StreamsStore.onChange(this.loadData);
     StreamRulesStore.onChange(this.loadData);
   },
+  componentWillUnmount() {
+    StreamsStore.unregister(this.loadData);
+    StreamRulesStore.unregister(this.loadData);
+  },
   onMessageLoaded(message) {
     this.setState({ message: message });
     if (message !== undefined) {
