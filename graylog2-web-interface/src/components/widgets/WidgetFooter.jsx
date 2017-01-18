@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const WidgetFooter = React.createClass({
   propTypes: {
@@ -8,6 +8,7 @@ const WidgetFooter = React.createClass({
     onEditConfig: React.PropTypes.func.isRequired,
     onShowConfig: React.PropTypes.func.isRequired,
     replayHref: React.PropTypes.string.isRequired,
+    replayToolTip: React.PropTypes.string,
   },
   _showConfig(e) {
     e.preventDefault();
@@ -22,12 +23,25 @@ const WidgetFooter = React.createClass({
     this.props.onDelete();
   },
   render() {
+    // if we have a tooltip, we disable the button link and instead show a tooltip on hover
+    const title = this.props.replayToolTip ? null : "Replay search";
+    const href = this.props.replayToolTip ? null : this.props.replayHref;
+    let replay = (
+      <Button bsStyle="link" className="btn-text" title={title} href={href}>
+        <i className="fa fa-play"/>
+      </Button>
+    );
+    if (this.props.replayToolTip) {
+      replay = (
+        <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">{this.props.replayToolTip}</Tooltip>}>
+          {replay}
+        </OverlayTrigger>
+      );
+    }
     const lockedActions = (
       <div className="actions">
         <div className="widget-replay">
-          <Button bsStyle="link" className="btn-text" title="Replay search" href={this.props.replayHref}>
-            <i className="fa fa-play"/>
-          </Button>
+          {replay}
         </div>
         <div className="widget-info">
           <Button bsStyle="link" className="btn-text" title="Show widget configuration" onClick={this._showConfig}>

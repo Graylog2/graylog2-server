@@ -19,6 +19,7 @@ const Widget = React.createClass({
     dashboardId: PropTypes.string.isRequired,
     shouldUpdate: PropTypes.bool.isRequired,
     locked: PropTypes.bool.isRequired,
+    streamIds: PropTypes.object,
   },
   getInitialState() {
     this.widgetPlugin = this._getWidgetPlugin(this.props.widget.type);
@@ -202,6 +203,11 @@ const Widget = React.createClass({
                              onUpdate={this.updateWidget}/>
     );
 
+    let disabledTooltip = null;
+    if (this.props.streamIds != null && this.props.widget.config.stream_id &&
+        !this.props.streamIds[this.props.widget.config.stream_id]) {
+      disabledTooltip = "The stream is not available, cannot replay search.";
+    }
     return (
       <div ref="widget" className="widget" data-widget-id={this.props.widget.id}>
         <WidgetHeader ref="widgetHeader"
@@ -217,7 +223,8 @@ const Widget = React.createClass({
                       onShowConfig={this._showConfig}
                       onEditConfig={this._showEditConfig}
                       onDelete={this.deleteWidget}
-                      replayHref={this.replayUrl()}/>
+                      replayHref={this.replayUrl()}
+                      replayToolTip={disabledTooltip}/>
         {this.props.locked ? showConfigModal : editConfigModal}
       </div>
     );
