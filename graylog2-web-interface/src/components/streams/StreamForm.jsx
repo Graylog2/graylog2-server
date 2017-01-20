@@ -20,7 +20,6 @@ const StreamForm = React.createClass({
         title: '',
         description: '',
         remove_matches_from_default_stream: false,
-        index_set_id: '',
       },
     };
   },
@@ -36,7 +35,10 @@ const StreamForm = React.createClass({
   _getValuesFromProps(props) {
     let defaultIndexSetId = props.stream.index_set_id;
     if (!defaultIndexSetId && props.indexSets && props.indexSets.length > 0) {
-      defaultIndexSetId = props.indexSets[0].id;
+      const defaultIndexSet = props.indexSets.find(indexSet => indexSet.default);
+      if (defaultIndexSet) {
+        defaultIndexSetId = defaultIndexSet.id;
+      }
     }
 
     return {
