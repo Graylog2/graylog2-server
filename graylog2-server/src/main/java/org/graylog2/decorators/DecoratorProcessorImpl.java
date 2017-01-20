@@ -100,7 +100,7 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
 
         decoratedMessages.forEach(message -> {
             final DecorationStats decorationStats = message.decorationStats();
-            if (decoratedMessages != null) {
+            if (decorationStats != null) {
                 addedFields.addAll(decorationStats.addedFields().keySet());
                 changedFields.addAll(decorationStats.changedFields().keySet());
                 removedFields.addAll(decorationStats.removedFields().keySet());
