@@ -23,7 +23,7 @@ const MessageFieldSearchActions = React.createClass({
     );
   },
   render() {
-    let messageField = this.props.message.fields[this.props.fieldName];
+    const messageField = this.props.message.fields[this.props.fieldName];
     let extractors;
     if(typeof messageField === 'string') {
       extractors = (<li className="dropdown-submenu left-submenu">
@@ -33,7 +33,7 @@ const MessageFieldSearchActions = React.createClass({
         </ul>
       </li>);
     } else {
-        extractors = (<MenuItem disabled={true}>Extractors can only be used with string fields</MenuItem>);
+        extractors = (<MenuItem disabled>Extractors can only be used with string fields</MenuItem>);
     }
     return (
       <div className="message-field-actions pull-right">

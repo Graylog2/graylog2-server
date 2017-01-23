@@ -25,7 +25,7 @@ const MessageFieldExtractorActions = React.createClass({
     );
   },
   render() {
-    let messageField = this.props.message.fields[this.props.fieldName];
+    const messageField = this.props.message.fields[this.props.fieldName];
     if(typeof messageField === 'string') {
       return (
           <div className="message-field-actions pull-right">
@@ -46,7 +46,7 @@ const MessageFieldExtractorActions = React.createClass({
                               title="Select extractor type"
                               key={1}
                               id={`select-extractor-type-dropdown-field-${this.props.fieldName}`}>
-                <MenuItem key={`menu-item-disabled`} disabled={true}>
+                <MenuItem key="select-extractor-type-disabled" disabled>
                     Extractors can only be used with string fields.
                 </MenuItem>
               </DropdownButton>
