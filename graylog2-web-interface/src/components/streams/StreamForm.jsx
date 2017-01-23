@@ -3,6 +3,9 @@ import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { Input } from 'react-bootstrap';
 import { Select, Spinner } from 'components/common';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { IndexSetsActions } = CombinedProvider.get('IndexSets');
 
 const StreamForm = React.createClass({
   propTypes: {
@@ -60,6 +63,7 @@ const StreamForm = React.createClass({
 
   open() {
     this._resetValues();
+    IndexSetsActions.list(false);
     this.refs.modal.open();
   },
 
