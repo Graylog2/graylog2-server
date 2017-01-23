@@ -1,6 +1,6 @@
-import React, {PropTypes} from 'react';
-import {SplitButton, MenuItem} from 'react-bootstrap';
-import ExtractorUtils from 'util/ExtractorUtils';
+import React, {PropTypes} from "react";
+import {SplitButton, MenuItem} from "react-bootstrap";
+import ExtractorUtils from "util/ExtractorUtils";
 
 const MessageFieldSearchActions = React.createClass({
   propTypes: {
@@ -23,6 +23,18 @@ const MessageFieldSearchActions = React.createClass({
     );
   },
   render() {
+    const messageField = this.props.message.fields[this.props.fieldName];
+    let extractors;
+    if(typeof messageField === 'string') {
+      extractors = (<li className="dropdown-submenu left-submenu">
+        <a href="#">Create extractor for field {this.props.fieldName}</a>
+        <ul className="dropdown-menu">
+            {ExtractorUtils.EXTRACTOR_TYPES.map(extractorType => this._formatExtractorMenuItem(extractorType))}
+        </ul>
+      </li>);
+    } else {
+        extractors = (<MenuItem disabled>Extractors can only be used with string fields</MenuItem>);
+    }
     return (
       <div className="message-field-actions pull-right">
         <SplitButton pullRight
@@ -31,13 +43,9 @@ const MessageFieldSearchActions = React.createClass({
                      key={1}
                      onClick={this.props.onAddFieldToSearchBar}
                      id={`more-actions-dropdown-field-${this.props.fieldName}`}>
-          <li className="dropdown-submenu left-submenu">
-            <a href="#">Create extractor for field {this.props.fieldName}</a>
-            <ul className="dropdown-menu">
-              {ExtractorUtils.EXTRACTOR_TYPES.map(extractorType => this._formatExtractorMenuItem(extractorType))}
-            </ul>
-          </li>
-          <MenuItem onSelect={this.props.onLoadTerms(this.props.fieldName)}>Show terms of {this.props.fieldName}</MenuItem>
+          {extractors}
+          <MenuItem onSelect={this.props.onLoadTerms(this.props.fieldName)}>Show terms
+            of <em>{this.props.fieldName}</em></MenuItem>
         </SplitButton>
       </div>
     );
