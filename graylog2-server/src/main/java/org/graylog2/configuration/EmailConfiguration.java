@@ -46,9 +46,6 @@ public class EmailConfiguration {
     @Parameter(value = "transport_email_auth_password")
     private String password;
 
-    @Parameter(value = "transport_email_subject_prefix")
-    private String subjectPrefix;
-
     @Parameter(value = "transport_email_from_email")
     private String fromEmail;
 
@@ -85,10 +82,6 @@ public class EmailConfiguration {
 
     public String getPassword() {
         return password;
-    }
-
-    public String getSubjectPrefix() {
-        return subjectPrefix;
     }
 
     public String getFromEmail() {
