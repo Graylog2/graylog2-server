@@ -273,12 +273,17 @@ public class BundleImporter {
 
         // Don't run if exclusive and another instance is already running.
         if (messageInput.isExclusive() && inputRegistry.hasTypeRunning(messageInput.getClass())) {
-            final String error = "Type is exclusive and already has input running.";
-            LOG.error(error);
+            LOG.error("Input type <{}> of input <{}> is exclusive and already has input running.",
+                    messageInput.getClass(), messageInput.getTitle());
         }
 
-        org.graylog2.inputs.Input mongoInput = inputService.create(
-                buildMongoDbInput(inputDescription, userName, createdAt, bundleId));
+        final String id = inputDescription.getId();
+        final org.graylog2.inputs.Input mongoInput;
+        if (id == null) {
+            mongoInput = inputService.create(buildMongoDbInput(inputDescription, userName, createdAt, bundleId));
+        } else {
+            mongoInput = inputService.create(id, buildMongoDbInput(inputDescription, userName, createdAt, bundleId));
+        }
 
         // Persist input.
         final String persistId = inputService.save(mongoInput);
@@ -458,42 +463,35 @@ public class BundleImporter {
         // We cannot create streams without having a default index set.
         final IndexSet indexSet = indexSetRegistry.getDefault();
 
-        final ImmutableMap.Builder<String, Object> streamData = ImmutableMap.builder();
-        streamData.put(StreamImpl.FIELD_TITLE, streamDescription.getTitle());
-        streamData.put(StreamImpl.FIELD_DESCRIPTION, streamDescription.getDescription());
-        streamData.put(StreamImpl.FIELD_DISABLED, streamDescription.isDisabled());
-        streamData.put(StreamImpl.FIELD_MATCHING_TYPE, streamDescription.getMatchingType().name());
-        streamData.put(StreamImpl.FIELD_CREATOR_USER_ID, userName);
-        streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
-        streamData.put(StreamImpl.FIELD_CONTENT_PACK, bundleId);
-        streamData.put(StreamImpl.FIELD_DEFAULT_STREAM, streamDescription.isDefaultStream());
-        streamData.put(StreamImpl.FIELD_INDEX_SET_ID, indexSet.getConfig().id());
+        final Map<String, Object> streamData = ImmutableMap.<String, Object>builder()
+                .put(StreamImpl.FIELD_TITLE, streamDescription.getTitle())
+                .put(StreamImpl.FIELD_DESCRIPTION, streamDescription.getDescription())
+                .put(StreamImpl.FIELD_DISABLED, streamDescription.isDisabled())
+                .put(StreamImpl.FIELD_MATCHING_TYPE, streamDescription.getMatchingType().name())
+                .put(StreamImpl.FIELD_CREATOR_USER_ID, userName)
+                .put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC())
+                .put(StreamImpl.FIELD_CONTENT_PACK, bundleId)
+                .put(StreamImpl.FIELD_DEFAULT_STREAM, streamDescription.isDefaultStream())
+                .put(StreamImpl.FIELD_INDEX_SET_ID, indexSet.getConfig().id())
+                .build();
 
-        final org.graylog2.plugin.streams.Stream stream;
-        if (streamDescription.isDefaultStream()) {
-            stream = new StreamImpl(
-                    new ObjectId(org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID),
-                    streamData.build(),
-                    Collections.emptyList(),
-                    Collections.emptySet(),
-                    indexSet);
-        } else {
-            stream = streamService.create(streamData.build());
-        }
+        final String defaultStreamId = org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
+        final ObjectId id = streamDescription.isDefaultStream() ? new ObjectId(defaultStreamId) : new ObjectId(streamDescription.getId());
+        final org.graylog2.plugin.streams.Stream stream = new StreamImpl(id, streamData, Collections.emptyList(), Collections.emptySet(), indexSet);
+
         final String streamId = streamService.save(stream);
-
         if (streamDescription.getStreamRules() != null) {
             for (StreamRule streamRule : streamDescription.getStreamRules()) {
-                final ImmutableMap.Builder<String, Object> streamRuleData = ImmutableMap.builder();
-                streamRuleData.put(StreamRuleImpl.FIELD_TYPE, streamRule.getType().toInteger());
-                streamRuleData.put(StreamRuleImpl.FIELD_VALUE, streamRule.getValue());
-                streamRuleData.put(StreamRuleImpl.FIELD_FIELD, streamRule.getField());
-                streamRuleData.put(StreamRuleImpl.FIELD_INVERTED, streamRule.isInverted());
-                streamRuleData.put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamId));
-                streamRuleData.put(StreamRuleImpl.FIELD_CONTENT_PACK, bundleId);
-                streamRuleData.put(StreamRuleImpl.FIELD_DESCRIPTION, streamRule.getDescription());
-
-                streamRuleService.save(new StreamRuleImpl(streamRuleData.build()));
+                final Map<String, Object> streamRuleData = ImmutableMap.<String, Object>builder()
+                        .put(StreamRuleImpl.FIELD_TYPE, streamRule.getType().toInteger())
+                        .put(StreamRuleImpl.FIELD_VALUE, streamRule.getValue())
+                        .put(StreamRuleImpl.FIELD_FIELD, streamRule.getField())
+                        .put(StreamRuleImpl.FIELD_INVERTED, streamRule.isInverted())
+                        .put(StreamRuleImpl.FIELD_STREAM_ID, new ObjectId(streamId))
+                        .put(StreamRuleImpl.FIELD_CONTENT_PACK, bundleId)
+                        .put(StreamRuleImpl.FIELD_DESCRIPTION, streamRule.getDescription())
+                        .build();
+                streamRuleService.save(new StreamRuleImpl(streamRuleData));
             }
         }
 
