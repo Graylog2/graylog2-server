@@ -12,6 +12,7 @@ var Qs = require('qs');
 const URLUtils = require('util/URLUtils');
 const moment = require('moment');
 const history = require('util/History');
+const DateTime = require('logic/datetimes/DateTime');
 
 class SearchStore {
     static NOT_OPERATOR = "NOT";
@@ -230,7 +231,12 @@ class SearchStore {
     }
 
     addSearchTerm(field, value, operator) {
-        const term = `${field}:${SearchStore.escape(value)}`;
+        let effectiveValue = value;
+        if (field === 'timestamp') {
+            const dateTime = new DateTime(value).toTimeZone('UTC');
+            effectiveValue = dateTime.toString(DateTime.Formats.TIMESTAMP);
+        }
+        const term = `${field}:${SearchStore.escape(effectiveValue)}`;
         const effectiveOperator = operator || SearchStore.AND_OPERATOR;
         this.addQueryTerm(term, effectiveOperator);
     }
