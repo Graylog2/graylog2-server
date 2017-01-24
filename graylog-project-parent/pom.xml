@@ -59,7 +59,7 @@
                 <scope>import</scope>
             </dependency>
             <dependency>
-                <groupId>com.github.joschi.jackson</groupId>
+                <groupId>com.fasterxml.jackson</groupId>
                 <artifactId>jackson-bom</artifactId>
                 <version>${jackson.version}</version>
                 <type>pom</type>
