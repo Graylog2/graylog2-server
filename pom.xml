@@ -152,7 +152,7 @@
         <awaitility.version>1.7.0</awaitility.version>
         <equalsverifier.version>2.1.8</equalsverifier.version>
         <fongo.version>2.0.11</fongo.version>
-        <jukito.version>1.4.1</jukito.version>
+        <jukito.version>1.5</jukito.version>
         <junit.version>4.12</junit.version>
         <mockito.version>2.3.10</mockito.version>
         <nosqlunit.version>0.10.0</nosqlunit.version>
