@@ -332,7 +332,8 @@ public class JerseyService extends AbstractIdleService {
                 listenUri,
                 resourceConfig,
                 sslEngineConfigurator != null,
-                sslEngineConfigurator);
+                sslEngineConfigurator,
+                false);
 
         final NetworkListener listener = httpServer.getListener("grizzly");
         listener.setMaxHttpHeaderSize(maxInitialLineLength);
