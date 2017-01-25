@@ -16,13 +16,15 @@
  */
 package org.graylog2.shared.initializers;
 
+import com.google.common.base.Strings;
+import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
-import com.google.common.base.Strings;
-import com.google.common.util.concurrent.AbstractIdleService;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
+
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
@@ -55,12 +57,6 @@ import org.graylog2.shared.security.tls.PemKeyStore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.ws.rs.container.ContainerResponseFilter;
-import javax.ws.rs.container.DynamicFeature;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -81,6 +77,13 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.stream.Collectors;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.ws.rs.container.ContainerResponseFilter;
+import javax.ws.rs.container.DynamicFeature;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.ExceptionMapper;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.MoreObjects.firstNonNull;
@@ -130,6 +133,9 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void startUp() throws Exception {
+        // we need to work around the change introduced in https://github.com/GrizzlyNIO/grizzly-mirror/commit/ba9beb2d137e708e00caf7c22603532f753ec850
+        // because the PooledMemoryManager which is default now uses 10% of the heap no matter what
+        System.setProperty("org.glassfish.grizzly.DEFAULT_MEMORY_MANAGER", "org.glassfish.grizzly.memory.HeapMemoryManager");
         startUpApi();
         if (configuration.isWebEnable() && !configuration.isRestAndWebOnSamePort()) {
             startUpWeb();
