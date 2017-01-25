@@ -16,24 +16,30 @@
  */
 package org.graylog2.indexer.indices;
 
+import com.google.common.collect.ImmutableMap;
+
 import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
+import com.jayway.jsonpath.JsonPath;
+import com.jayway.jsonpath.ReadContext;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
+
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
 import org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
 import org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateResponse;
 import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequest;
 import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResponse;
+import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
@@ -57,11 +63,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import javax.inject.Inject;
 
 import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
@@ -267,5 +274,56 @@ public class IndicesTest {
     public void indexCreationDateReturnsNullForNonExistingIndex() {
         final DateTime indexCreationDate = indices.indexCreationDate("index_missing");
         assertThat(indexCreationDate).isNull();
+    }
+
+    @Test
+    public void testIndexTemplateCanBeOverridden() throws Exception {
+        final String customTemplateName = "custom-template";
+        final IndicesAdminClient client = this.client.admin().indices();
+
+        // Create custom index template
+        final Map<String, Object> customMapping = ImmutableMap.of(
+                "_source", ImmutableMap.of("enabled", false),
+                "properties", ImmutableMap.of("message",
+                        ImmutableMap.of(
+                                "type", "string",
+                                "index", "not_analyzed")));
+        final PutIndexTemplateResponse putIndexTemplateResponse = client.preparePutTemplate(customTemplateName)
+                .setTemplate("graylog_override_*")
+                .setOrder(1)
+                .addMapping(IndexMapping.TYPE_MESSAGE, customMapping)
+                .get();
+        assertThat(putIndexTemplateResponse.isAcknowledged()).isTrue();
+
+        // Validate existing index templates
+        final GetIndexTemplatesResponse getTemplatesResponse = client.prepareGetTemplates().get();
+        final List<IndexTemplateMetaData> indexTemplates = getTemplatesResponse.getIndexTemplates();
+        assertThat(indexTemplates)
+                .extracting(IndexTemplateMetaData::getName)
+                .containsExactly(customTemplateName);
+
+        // Create index with custom template
+        final String testIndexName = "graylog_override_template";
+        indices.create(testIndexName);
+
+        // Check index mapping
+        final GetMappingsResponse indexMappingResponse = client.prepareGetMappings(testIndexName).get();
+        final String mapping = indexMappingResponse.getMappings()
+                .get(testIndexName)
+                .get(IndexMapping.TYPE_MESSAGE)
+                .source()
+                .string();
+
+        final ReadContext ctx = JsonPath.parse(mapping);
+        final boolean sourceEnabled = ctx.read("$.message._source.enabled");
+        assertThat(sourceEnabled).isFalse();
+        final String messageField = ctx.read("$.message.properties.message.index");
+        assertThat(messageField).isEqualTo("not_analyzed");
+
+        // Clean up
+        final DeleteIndexTemplateResponse deleteResponse = client.prepareDeleteTemplate(customTemplateName).get();
+        assertThat(deleteResponse.isAcknowledged()).isTrue();
+
+        indices.delete(testIndexName);
     }
 }
