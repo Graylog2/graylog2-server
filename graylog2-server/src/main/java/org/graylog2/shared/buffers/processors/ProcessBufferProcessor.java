@@ -72,23 +72,27 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
 
     @Override
     public void onEvent(MessageEvent event) throws Exception {
-        // Decode the RawMessage to a Message object. The DecodingProcessor used to be a separate handler in the
-        // ProcessBuffer. Due to performance problems discovered during 1.0.0 testing, we decided to move this here.
-        // TODO The DecodingProcessor does not need to be a EventHandler. We decided to do it like this to keep the change as small as possible for 1.0.0.
-        decodingProcessor.onEvent(event, 0L, false);
+        try {
+            // Decode the RawMessage to a Message object. The DecodingProcessor used to be a separate handler in the
+            // ProcessBuffer. Due to performance problems discovered during 1.0.0 testing, we decided to move this here.
+            // TODO The DecodingProcessor does not need to be a EventHandler. We decided to do it like this to keep the change as small as possible for 1.0.0.
+            decodingProcessor.onEvent(event, 0L, false);
 
-        if (event.isSingleMessage()) {
-            dispatchMessage(event.getMessage());
-        } else {
-            final Collection<Message> messageList = event.getMessages();
-            if (messageList == null) {
-                // skip message events which could not be decoded properly
-                return;
-            }
+            if (event.isSingleMessage()) {
+                dispatchMessage(event.getMessage());
+            } else {
+                final Collection<Message> messageList = event.getMessages();
+                if (messageList == null) {
+                    // skip message events which could not be decoded properly
+                    return;
+                }
 
-            for (final Message message : messageList) {
-                dispatchMessage(message);
+                for (final Message message : messageList) {
+                    dispatchMessage(message);
+                }
             }
+        } finally {
+            event.clearMessages();
         }
     }
 
