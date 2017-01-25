@@ -278,7 +278,7 @@ public class Indices {
     private void ensureIndexTemplate(IndexSet indexSet) {
         final Map<String, Object> template = indexMapping.messageTemplate(indexSet.getIndexWildcard(), indexSet.getConfig().indexAnalyzer());
         final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(indexSet.getConfig().indexTemplateName())
-                .setOrder(Integer.MIN_VALUE) // Make sure templates with "order: 0" are applied after our template!
+                .setOrder(-1) // Make sure templates with "order: 0" and higher are applied after our template!
                 .setSource(template)
                 .request();
 
