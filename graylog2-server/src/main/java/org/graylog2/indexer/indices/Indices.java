@@ -358,7 +358,9 @@ public class Indices {
                 @SuppressWarnings("unchecked")
                 final Map<String, Object> mapping = (Map<String, Object>) mmd.getSourceAsMap().get("properties");
 
-                fields.put(m.key, mapping.keySet());
+                if (mapping != null) {
+                    fields.put(m.key, mapping.keySet());
+                }
             } catch (Exception e) {
                 LOG.error("Error while trying to get fields of <" + m.index + ">", e);
             }
