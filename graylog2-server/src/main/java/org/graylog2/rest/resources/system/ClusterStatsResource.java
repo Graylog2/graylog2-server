@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.system.stats.ClusterStats;
 import org.graylog2.system.stats.ClusterStatsService;
@@ -32,6 +33,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Api(value = "System/ClusterStats", description = "Cluster stats")
+@RequiresAuthentication
 @Path("/system/cluster/stats")
 @Produces(MediaType.APPLICATION_JSON)
 public class ClusterStatsResource extends RestResource {
