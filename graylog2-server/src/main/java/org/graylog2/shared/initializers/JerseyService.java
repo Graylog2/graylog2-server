@@ -37,6 +37,7 @@ import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.rest.PluginRestResource;
+import org.graylog2.rest.GraylogErrorPageGenerator;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
@@ -331,7 +332,8 @@ public class JerseyService extends AbstractIdleService {
                 listenUri,
                 resourceConfig,
                 sslEngineConfigurator != null,
-                sslEngineConfigurator);
+                sslEngineConfigurator,
+                false);
 
         final NetworkListener listener = httpServer.getListener("grizzly");
         listener.setMaxHttpHeaderSize(maxInitialLineLength);
@@ -342,6 +344,8 @@ public class JerseyService extends AbstractIdleService {
                 namePrefix + "-worker-%d",
                 threadPoolSize);
         listener.getTransport().setWorkerThreadPool(workerThreadPoolExecutor);
+
+        listener.setDefaultErrorPageGenerator(new GraylogErrorPageGenerator());
 
         if(enableGzip) {
             final CompressionConfig compressionConfig = listener.getCompressionConfig();
