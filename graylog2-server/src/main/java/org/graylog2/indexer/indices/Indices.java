@@ -101,6 +101,7 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -341,11 +342,11 @@ public class Indices {
         return acknowledged;
     }
 
-    public Set<String> getAllMessageFields(final String[] writeIndexWildcards) {
-        Set<String> fields = Sets.newHashSet();
+    public Map<String, Set<String>> getAllMessageFieldsForIndices(final String[] writeIndexWildcards) {
+        final Map<String, Set<String>> fields = new HashMap<>();
 
-        ClusterStateRequest csr = new ClusterStateRequest().blocks(true).nodes(true).indices(writeIndexWildcards);
-        ClusterState cs = c.admin().cluster().state(csr).actionGet().getState();
+        final ClusterStateRequest csr = new ClusterStateRequest().blocks(true).nodes(true).indices(writeIndexWildcards);
+        final ClusterState cs = c.admin().cluster().state(csr).actionGet().getState();
 
         for (ObjectObjectCursor<String, IndexMetaData> m : cs.getMetaData().indices()) {
             try {
@@ -355,15 +356,24 @@ public class Indices {
                     continue;
                 }
                 @SuppressWarnings("unchecked")
-                Map<String, Object> mapping = (Map<String, Object>) mmd.getSourceAsMap().get("properties");
+                final Map<String, Object> mapping = (Map<String, Object>) mmd.getSourceAsMap().get("properties");
 
-                fields.addAll(mapping.keySet());
+                fields.put(m.key, mapping.keySet());
             } catch (Exception e) {
                 LOG.error("Error while trying to get fields of <" + m.index + ">", e);
             }
         }
 
         return fields;
+    }
+
+    public Set<String> getAllMessageFields(final String[] writeIndexWildcards) {
+        final Optional<Set<String>> result = getAllMessageFieldsForIndices(writeIndexWildcards)
+            .values()
+            .stream()
+            .reduce((strings, strings2) -> ImmutableSet.<String>builder().addAll(strings).addAll(strings2).build());
+
+        return result.orElse(Collections.emptySet());
     }
 
     public void setReadOnly(String index) {

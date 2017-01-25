@@ -31,6 +31,7 @@ import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeComparator;
@@ -168,7 +169,7 @@ public class SearchesTest {
     public void setUp() throws Exception {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         metricRegistry = new MetricRegistry();
-        searches = new Searches(new Configuration(), indexRangeService, client, metricRegistry, streamService);
+        searches = new Searches(new Configuration(), indexRangeService, client, metricRegistry, streamService, mock(Indices.class));
     }
 
     @Test
