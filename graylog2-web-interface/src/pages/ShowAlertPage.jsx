@@ -70,6 +70,7 @@ const ShowAlertPage = React.createClass({
 
     const alert = this.state.alert;
     const condition = this.state.alertCondition;
+    const conditionExists = Object.keys(condition).length > 0;
     const type = this.state.types[condition.type] || {};
     const stream = this.state.stream;
 
@@ -97,7 +98,7 @@ const ShowAlertPage = React.createClass({
     }
 
     const title = (
-      <span>{condition.title || <em>Unknown alert</em>}&nbsp;
+      <span>{conditionExists ? condition.title || 'Untitled alert' : 'Unknown alert'}&nbsp;
         <small>
           on stream <em>{stream.title}</em>&nbsp;
           <span className={style.alertStatusLabel}>{statusLabel}</span>
@@ -112,7 +113,7 @@ const ShowAlertPage = React.createClass({
     );
 
     return (
-      <DocumentTitle title={`${condition.title || 'Unknown alert'} on stream ${stream.title}`}>
+      <DocumentTitle title={`${conditionExists ? condition.title || 'Untitled alert' : 'Unknown alert'} on stream ${stream.title}`}>
         <div>
           <PageHeader title={title}>
             <span>
@@ -138,7 +139,7 @@ const ShowAlertPage = React.createClass({
             </span>
           </PageHeader>
 
-          <AlertDetails alert={alert} condition={condition} conditionType={type} stream={stream} />
+          <AlertDetails alert={alert} condition={conditionExists && condition} conditionType={type} stream={stream} />
         </div>
       </DocumentTitle>
     );
