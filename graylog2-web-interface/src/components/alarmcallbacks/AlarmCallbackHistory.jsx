@@ -18,7 +18,13 @@ const AlarmCallbackHistory = React.createClass({
     const hadError = history.result.type === 'error';
     const result = (hadError ? <Label bsStyle="danger">Error</Label> : <Label bsStyle="success">Sent</Label>);
 
-    const title = (type ? type.name : <span><em>Unknown notification</em> <small>({configuration.type})</small></span>);
+    const title = (
+      <span>
+        {type ? configuration.title || 'Untitled notification' : 'Unknown notification'}
+        {' '}
+        <small>({type ? type.name : configuration.type})</small>
+      </span>
+    );
     const description = (hadError ? `Error sending notification: ${history.result.error}` : 'Notification was sent successfully.');
 
     let configurationWell;

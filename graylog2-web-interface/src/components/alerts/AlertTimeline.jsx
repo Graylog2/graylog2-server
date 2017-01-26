@@ -46,7 +46,7 @@ const AlertTimeline = React.createClass({
         const type = this.state.availableNotifications[configuration.type];
         let title;
         if (type) {
-          title = <em>{type.name}</em>;
+          title = <span><em>{configuration.title || 'Untitled notification'}</em> ({type.name})</span>;
         } else {
           title = <span><em>Unknown notification</em> <small>({configuration.type})</small></span>;
         }
