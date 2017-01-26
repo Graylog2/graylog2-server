@@ -33,14 +33,17 @@ const Alert = React.createClass({
     if (condition) {
       alertTitle = (
         <span>
-          <LinkContainer to={Routes.show_alert(alert.id)}><a>{condition.title}</a></LinkContainer>{' '}
+          <LinkContainer to={Routes.show_alert(alert.id)}>
+            <a>{condition.title || 'Untitled alert'}</a>
+          </LinkContainer>
+          {' '}
           <small>on stream <em>{stream.title}</em></small>
         </span>
       );
     } else {
       alertTitle = (
         <span>
-          <LinkContainer to={Routes.show_alert(alert.id)}><a><em>Unknown alert</em></a></LinkContainer>
+          <LinkContainer to={Routes.show_alert(alert.id)}><a>Unknown alert</a></LinkContainer>
         </span>
       );
     }

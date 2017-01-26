@@ -94,13 +94,14 @@ const AlertTimeline = React.createClass({
     }
 
     const alert = this.props.alert;
-    const condition = this.props.condition;
+    const conditionExists = this.props.condition && Object.keys(this.props.condition).length > 0;
+    const condition = this.props.condition || {};
     const type = this.props.conditionType;
     const triggeredAtTimestamp = <Timestamp dateTime={alert.triggered_at} />;
 
     const title = (
       <span>
-        <em>{condition.title || 'Unknown alert'}</em>{' '}
+        <em>{conditionExists ? condition.title || 'Untitled condition' : 'Unknown condition'}</em>{' '}
         ({type.name || condition.type || 'Unknown condition type'})
       </span>
     );
