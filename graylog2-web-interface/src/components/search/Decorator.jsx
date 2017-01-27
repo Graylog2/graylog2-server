@@ -40,6 +40,7 @@ const Decorator = React.createClass({
       type: data.type,
       config: data.configuration,
       order: this.props.decorator.order,
+      stream: this.props.decorator.stream,
     });
   },
   _decoratorTypeNotPresent() {
