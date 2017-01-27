@@ -1,0 +1,42 @@
+{
+  "decorators": [
+    {
+      "_id": {
+        "$oid": "588bcafebabedeadbeef0001"
+      },
+      "type": "org.graylog2.decorators.FormatStringDecorator",
+      "config": {
+        "format_string": "${source} - ${message}",
+        "require_all_fields": false,
+        "target_field": "message"
+      },
+      "stream": "000000000000000000000001",
+      "order": 0
+    },
+    {
+      "_id": {
+        "$oid": "588bcafebabedeadbeef0002"
+      },
+      "type": "org.graylog2.decorators.FormatStringDecorator",
+      "config": {
+        "format_string": "${source} - ${message}",
+        "require_all_fields": false,
+        "target_field": "message"
+      },
+      "stream": "000000000000000000000001",
+      "order": 1
+    },
+    {
+      "_id": {
+        "$oid": "588bcafebabedeadbeef0003"
+      },
+      "type": "org.graylog2.decorators.FormatStringDecorator",
+      "config": {
+        "format_string": "${source} - ${message}",
+        "require_all_fields": false,
+        "target_field": "message"
+      },
+      "order": 0
+    }
+  ]
+}
