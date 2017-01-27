@@ -44,7 +44,9 @@ const IndexSetConfigurationPage = React.createClass({
   },
 
   _saveConfiguration(indexSet) {
-    IndexSetsActions.update(indexSet);
+    IndexSetsActions.update(indexSet).then(() => {
+      this.props.history.pushState(null, Routes.SYSTEM.INDICES.LIST);
+    });
   },
 
   _isLoading() {
