@@ -69,7 +69,7 @@ const IndexSetsStore = Reflux.createStore({
     const promise = fetch('PUT', url, indexSet);
     promise.then(
       response => {
-        UserNotification.success(`Successfully updated index set '${indexSet.id}'`, 'Success');
+        UserNotification.success(`Successfully updated index set '${indexSet.title}'`, 'Success');
         this.trigger({ indexSet: response });
         return response;
       },
@@ -86,7 +86,7 @@ const IndexSetsStore = Reflux.createStore({
     const promise = fetch('POST', url, indexSet);
     promise.then(
       response => {
-        UserNotification.success(`Successfully created index set '${response.id}'`, 'Success');
+        UserNotification.success(`Successfully created index set '${indexSet.title}'`, 'Success');
         this.trigger({ indexSet: response });
         return response;
       },
