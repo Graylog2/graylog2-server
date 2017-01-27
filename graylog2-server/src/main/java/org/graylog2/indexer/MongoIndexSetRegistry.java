@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Supplier;
 import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;
@@ -28,6 +29,7 @@ import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -37,14 +39,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.requireNonNull;
 
+@Singleton
 public class MongoIndexSetRegistry implements IndexSetRegistry {
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
 
-    class IndexSetsCache {
+    static class IndexSetsCache {
         private final IndexSetService indexSetService;
         private AtomicReference<Supplier<List<IndexSetConfig>>> indexSetConfigs;
 
+        @Inject
         IndexSetsCache(IndexSetService indexSetService,
                        EventBus serverEventBus) {
             this.indexSetService = requireNonNull(indexSetService);
@@ -56,6 +60,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
             return indexSetConfigs.get().get();
         }
 
+        @VisibleForTesting
         void invalidate() {
             this.indexSetConfigs.set(Suppliers.memoize(this.indexSetService::findAll));
         }
@@ -76,10 +81,10 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     @Inject
     public MongoIndexSetRegistry(IndexSetService indexSetService,
                                  MongoIndexSet.Factory mongoIndexSetFactory,
-                                 EventBus serverEventBus) {
+                                 IndexSetsCache indexSetsCache) {
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = requireNonNull(mongoIndexSetFactory);
-        this.indexSetsCache = new IndexSetsCache(indexSetService, serverEventBus);
+        this.indexSetsCache = indexSetsCache;
     }
 
     private Set<MongoIndexSet> findAllMongoIndexSets() {
