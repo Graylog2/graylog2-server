@@ -16,32 +16,80 @@
  */
 package org.graylog2.indexer;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indexset.events.IndexSetCreatedEvent;
+import org.graylog2.indexer.indexset.events.IndexSetDeletedEvent;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.util.Objects.requireNonNull;
 
+@Singleton
 public class MongoIndexSetRegistry implements IndexSetRegistry {
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
 
+    static class IndexSetsCache {
+        private final IndexSetService indexSetService;
+        private AtomicReference<Supplier<List<IndexSetConfig>>> indexSetConfigs;
+
+        @Inject
+        IndexSetsCache(IndexSetService indexSetService,
+                       EventBus serverEventBus) {
+            this.indexSetService = requireNonNull(indexSetService);
+            this.indexSetConfigs = new AtomicReference<>(Suppliers.memoize(this.indexSetService::findAll));
+            serverEventBus.register(this);
+        }
+
+        List<IndexSetConfig> get() {
+            return Collections.unmodifiableList(indexSetConfigs.get().get());
+        }
+
+        @VisibleForTesting
+        void invalidate() {
+            this.indexSetConfigs.set(Suppliers.memoize(this.indexSetService::findAll));
+        }
+
+        @Subscribe
+        void handleIndexSetCreation(IndexSetCreatedEvent indexSetCreatedEvent) {
+            this.invalidate();
+        }
+
+        @Subscribe
+        void handleIndexSetDeletion(IndexSetDeletedEvent indexSetDeletedEvent) {
+            this.invalidate();
+        }
+    }
+
+    private final IndexSetsCache indexSetsCache;
+
     @Inject
     public MongoIndexSetRegistry(IndexSetService indexSetService,
-                                 MongoIndexSet.Factory mongoIndexSetFactory) {
-        this.indexSetService = requireNonNull(indexSetService);
+                                 MongoIndexSet.Factory mongoIndexSetFactory,
+                                 IndexSetsCache indexSetsCache) {
+        this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = requireNonNull(mongoIndexSetFactory);
+        this.indexSetsCache = indexSetsCache;
     }
 
     private Set<MongoIndexSet> findAllMongoIndexSets() {
-        final List<IndexSetConfig> configs = indexSetService.findAll();
+        final List<IndexSetConfig> configs = this.indexSetsCache.get();
         final ImmutableSet.Builder<MongoIndexSet> mongoIndexSets = ImmutableSet.builder();
         for (IndexSetConfig config : configs) {
             final MongoIndexSet mongoIndexSet = mongoIndexSetFactory.create(config);
@@ -57,18 +105,20 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
 
     @Override
     public Optional<IndexSet> get(final String indexSetId) {
-        return indexSetService.get(indexSetId)
-                .flatMap(indexSetConfig -> Optional.of((IndexSet) mongoIndexSetFactory.create(indexSetConfig)));
+        return this.indexSetsCache.get()
+            .stream()
+            .filter(indexSet -> Objects.equals(indexSet.id(), indexSetId))
+            .map(indexSetConfig -> (IndexSet)mongoIndexSetFactory.create(indexSetConfig))
+            .findFirst();
     }
 
     @Override
     public Optional<IndexSet> getForIndex(String indexName) {
-        for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            if (indexSet.isManagedIndex(indexName)) {
-                return Optional.of(indexSet);
-            }
-        }
-        return Optional.empty();
+        return findAllMongoIndexSets()
+            .stream()
+            .filter(indexSet -> indexSet.isManagedIndex(indexName))
+            .map(indexSet -> (IndexSet)indexSet)
+            .findFirst();
     }
 
     @Override
@@ -125,14 +175,9 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
 
     @Override
     public boolean isUp() {
-        boolean result = true;
-        for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            if (indexSet.getConfig().isWritable()) {
-                result = result && indexSet.isUp();
-            }
-        }
-
-        return result;
+        return findAllMongoIndexSets().stream()
+            .filter(indexSet -> indexSet.getConfig().isWritable())
+            .allMatch(MongoIndexSet::isUp);
     }
 
     @Override
