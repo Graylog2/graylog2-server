@@ -30,6 +30,7 @@ import org.graylog2.indexer.indices.TooManyAliasesException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -57,7 +58,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
         }
 
         List<IndexSetConfig> get() {
-            return indexSetConfigs.get().get();
+            return Collections.unmodifiableList(indexSetConfigs.get().get());
         }
 
         @VisibleForTesting
