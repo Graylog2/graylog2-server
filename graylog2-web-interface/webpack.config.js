@@ -96,6 +96,7 @@ if (TARGET === 'start') {
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
+      new webpack.NamedModulesPlugin(),
       new webpack.DefinePlugin({DEVELOPMENT: true}),
     ],
   });
