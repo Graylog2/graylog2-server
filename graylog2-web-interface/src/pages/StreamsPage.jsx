@@ -46,20 +46,13 @@ const StreamsPage = React.createClass({
       <DocumentTitle title="Streams">
         <div>
           <PageHeader title="Streams">
-            <span>You can route incoming messages into streams by applying rules against them. If a
-              message
-              matches all rules of a stream it is routed into it. A message can be routed into
-              multiple
-              streams. You can for example create a stream that contains all SSH logins and configure
-              to be alerted whenever there are more logins than usual.
-
-              Read more about streams in the <DocumentationLink page={DocsHelper.PAGES.STREAMS} text="documentation" />.</span>
+            <span>
+              You can route incoming messages into streams by applying rules against them. Messages matching
+              the rules of a stream are routed into it. A message can also be routed into multiple streams.
+            </span>
 
             <span>
-              Take a look at the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTERNAL_DASHBOARDS}
-                                      text="Graylog stream dashboards" />{' '}
-              for wall-mounted displays or other integrations.
+              Read more about streams in the <DocumentationLink page={DocsHelper.PAGES.STREAMS} text="documentation" />.
             </span>
 
             <IfPermitted permissions="streams:create">
