@@ -4,9 +4,9 @@ const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
 
 // Need to use explicit require here to be able to access the User interface
-import UsersStore = require('stores/users/UsersStore');
+import UsersStore = require("./UsersStore");
 
-import ApiRoutes = require('routing/ApiRoutes');
+const ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 
 interface Role {
@@ -92,4 +92,4 @@ const RolesStore = {
   }
 };
 
-module.exports = RolesStore;
+export = RolesStore;
