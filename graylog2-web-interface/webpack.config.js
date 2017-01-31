@@ -144,7 +144,6 @@ if (TARGET === 'build') {
           except: ['$super', '$', 'exports', 'require'],
         },
       }),
-      new webpack.optimize.OccurenceOrderPlugin(),
     ],
   });
 }
