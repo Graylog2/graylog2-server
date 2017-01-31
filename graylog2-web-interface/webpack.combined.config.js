@@ -12,7 +12,7 @@ const VENDOR_MANIFEST = require(VENDOR_MANIFEST_PATH);
 const pluginPrefix = '../../graylog-plugin-*/**/';
 const pluginConfigPattern = pluginPrefix + 'webpack.config.js';
 
-const pluginConfigs = process.env.disable_plugins == 'true' ? [] : glob.sync(pluginConfigPattern);
+const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern);
 
 process.env.web_src_path = path.resolve(__dirname);
 
@@ -35,7 +35,7 @@ pluginConfigs.filter(pluginConfig => {
   }
   const pluginDir = path.resolve(pluginConfig, '../src/web');
   webpackConfig.entry[pluginName] = pluginDir;
-  webpackConfig.resolve.modulesDirectories.unshift(pluginDir);
+  webpackConfig.resolve.modules.unshift(pluginDir);
   webpackConfig.plugins.unshift(new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: path.resolve(pluginDir, '../..') }));
 });
 
