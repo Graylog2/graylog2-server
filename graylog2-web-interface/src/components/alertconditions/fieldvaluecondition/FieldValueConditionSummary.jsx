@@ -13,7 +13,7 @@ const FieldValueConditionSummary = React.createClass({
     const field = alertCondition.parameters.field;
     const threshold = alertCondition.parameters.threshold;
     const thresholdType = alertCondition.parameters.threshold_type.toLowerCase();
-    const type = alertCondition.parameters.type;
+    const type = alertCondition.parameters.type.toLowerCase();
     const time = alertCondition.parameters.time;
 
     return (
