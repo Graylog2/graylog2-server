@@ -59,7 +59,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     protected final int backlog;
     protected final String title;
 
-    private final Map<String, Object> parameters;
+    private Map<String, Object> parameters;
 
     protected AbstractAlertCondition(Stream stream, String id, String type, DateTime createdAt, String creatorUserId, Map<String, Object> parameters, String title) {
         this.title = title;
@@ -107,6 +107,10 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     @Override
     public Stream getStream() {
         return stream;
+    }
+
+    protected void setParameters(Map<String, Object> parameters) {
+        this.parameters = ImmutableMap.copyOf(parameters);
     }
 
     @Override

@@ -24,8 +24,10 @@ import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.junit.Test;
 
+import java.util.Locale;
 import java.util.Map;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.anyString;
@@ -43,6 +45,23 @@ public class MessageCountAlertConditionTest extends AlertConditionTest {
 
         assertNotNull(messageCountAlertCondition);
         assertNotNull(messageCountAlertCondition.getDescription());
+        final String thresholdType = (String) messageCountAlertCondition.getParameters().get("threshold_type");
+        assertEquals(thresholdType, thresholdType.toUpperCase(Locale.ENGLISH));
+    }
+
+    /*
+     * Ensure MessageCountAlertCondition objects created before 2.2.0 and having a lowercase threshold_type,
+     * get converted to uppercase for consistency with new created alert conditions.
+     */
+    @Test
+    public void testConstructorOldObjects() throws Exception {
+        final Map<String, Object> parameters = getParametersMap(0, 0, MessageCountAlertCondition.ThresholdType.MORE, 0);
+        parameters.put("threshold_type", MessageCountAlertCondition.ThresholdType.MORE.toString().toLowerCase(Locale.ENGLISH));
+
+        final MessageCountAlertCondition messageCountAlertCondition = getMessageCountAlertCondition(parameters, alertConditionTitle);
+
+        final String thresholdType = (String) messageCountAlertCondition.getParameters().get("threshold_type");
+        assertEquals(thresholdType, thresholdType.toUpperCase(Locale.ENGLISH));
     }
 
     @Test
