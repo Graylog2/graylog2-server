@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -129,7 +130,23 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
 
         this.searches = searches;
         this.time = Tools.getNumber(parameters.get("time"), 5).intValue();
-        this.thresholdType = ThresholdType.valueOf(((String) parameters.get("threshold_type")).toUpperCase(Locale.ENGLISH));
+
+        final String thresholdType = (String) parameters.get("threshold_type");
+        final String upperCaseThresholdType = thresholdType.toUpperCase(Locale.ENGLISH);
+
+        /*
+         * Alert conditions created before 2.2.0 had a threshold_type parameter in lowercase, but this was
+         * inconsistent with the parameters in FieldValueAlertCondition, which were always stored in uppercase.
+         * To ensure we return the expected case in the API and also store the right case in the database, we
+         * are converting the parameter to uppercase here, if it wasn't uppercase already.
+         */
+        if (!thresholdType.equals(upperCaseThresholdType)) {
+            final HashMap<String, Object> updatedParameters = new HashMap<>();
+            updatedParameters.putAll(parameters);
+            updatedParameters.put("threshold_type", upperCaseThresholdType);
+            super.setParameters(updatedParameters);
+        }
+        this.thresholdType = ThresholdType.valueOf(upperCaseThresholdType);
         this.threshold = Tools.getNumber(parameters.get("threshold"), 0).intValue();
     }
 

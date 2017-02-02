@@ -11,7 +11,7 @@ const MessageCountConditionSummary = React.createClass({
   render() {
     const alertCondition = this.props.alertCondition;
     const threshold = alertCondition.parameters.threshold;
-    const thresholdType = alertCondition.parameters.threshold_type;
+    const thresholdType = alertCondition.parameters.threshold_type.toLowerCase();
     const time = alertCondition.parameters.time;
 
     return (
