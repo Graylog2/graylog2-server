@@ -12,3 +12,5 @@ manifests/*-manifest.json
 plugin
 cache
 
+yarn.lock
+
