@@ -1,4 +1,3 @@
-export { default as ChosenSelectInput } from './ChosenSelectInput';
 export { default as ClipboardButton } from './ClipboardButton';
 export { default as DataFilter } from './DataFilter';
 export { default as DataTable } from './DataTable';
