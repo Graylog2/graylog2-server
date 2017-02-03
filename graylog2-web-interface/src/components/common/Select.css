@@ -1,0 +1,11 @@
+.select-sm .Select-control {
+    height: 28px;
+}
+
+.select-sm .Select-placeholder {
+    line-height: 28px;
+}
+
+.select-sm .Select-input, .select-sm .Select-input > input {
+    height: 28px;
+}
