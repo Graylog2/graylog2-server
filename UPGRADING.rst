@@ -17,6 +17,15 @@ Due to the extensive rework done in alerting, this behaviour has been modified t
 
 To easy the transition to people relying on this behaviour, we have added a migration step that will create an Email alarm callback for each stream that has alert conditions, has alert receivers, but has no associated alarm callbacks.
 
+Alert Notifications (previously known as Alarm Callbacks)
+=========================================================
+
+Graylog 2.2.0 introduces some changes in alerting. Alerts have now states, helping you to know in an easier way if something requires your attention.
+
+These changes also affect the way we send notifications: Starting in Graylog 2.2.0, alert notifications are only executed **once**, just when a new alert is triggered. As long as the alert is unresolved or in grace period, **Graylog will not send further notifications**. This will help you reducing the noise and annoyance of getting notified way too often when a problem persists for a while.
+
+If you are using Graylog for alerting, please take a moment to ensure this change will not break any of your processes when an alert occurs.
+
 Default stream/Index Sets
 =========================
 
