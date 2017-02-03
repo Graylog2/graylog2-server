@@ -5,7 +5,7 @@ import Immutable from 'immutable';
 import { Input, Button, ButtonToolbar, DropdownButton, MenuItem, Alert } from 'react-bootstrap';
 import URI from 'urijs';
 
-import { ChosenSelectInput, DatePicker } from 'components/common';
+import { DatePicker, Select } from 'components/common';
 import { RefreshControls, QueryInput } from 'components/search';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
@@ -213,10 +213,12 @@ const SearchBar = React.createClass({
       this.props.onExecuteSearch(resource);
     }
   },
-  _savedSearchSelected() {
-    const selectedSavedSearch = this.refs.savedSearchesSelector.getValue();
+  _onSavedSearchSelect(searchId) {
+    if (searchId === '') {
+      this._performSearch();
+    }
     const streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : undefined;
-    SavedSearchesActions.execute.triggerPromise(selectedSavedSearch, streamId, $(window).width());
+    SavedSearchesActions.execute.triggerPromise(searchId, streamId, $(window).width());
   },
 
   _onDateSelected(field) {
@@ -362,20 +364,15 @@ const SearchBar = React.createClass({
   },
 
   _getSavedSearchesSelector() {
-    const sortedSavedSearches = this.props.savedSearches.sort((searchA, searchB) => {
-      return searchA.title.toLowerCase().localeCompare(searchB.title.toLowerCase());
-    });
+    const formattedSavedSearches = this.props.savedSearches
+      .sort((searchA, searchB) => searchA.title.toLowerCase().localeCompare(searchB.title.toLowerCase()))
+      .map(savedSearch => {
+        return { value: savedSearch.id, label: savedSearch.title };
+      });
 
     return (
-      <ChosenSelectInput ref="savedSearchesSelector"
-                         className="input-sm"
-                         value={this.state.savedSearch}
-                         dataPlaceholder="Saved searches"
-                         onChange={this._savedSearchSelected}>
-        {sortedSavedSearches.map((savedSearch) => {
-          return <option key={savedSearch.id} value={savedSearch.id}>{savedSearch.title}</option>;
-        })}
-      </ChosenSelectInput>
+      <Select placeholder="Saved searches" options={formattedSavedSearches} value={this.state.savedSearch}
+              onValueChange={this._onSavedSearchSelect} size="small" />
     );
   },
 
