@@ -37,6 +37,8 @@ Please be advised that this necessary migration can put additional load on your 
 
 .. warning:: Make sure that all rotation and retention strategy plugins you had installed in 2.1 are updated to a version that is compatible with 2.2 before you start the Graylog 2.2 version for the first time. (e.g. Graylog Enterprise) This is needed so the required data migrations will run without problems.
 
+.. warning:: The option to remove a message from the default stream is currently not available when using the pipeline function `route_to_stream`. This will be fixed in a subsequent bug fix release. Please see `the corresponding Github issue <https://github.com/Graylog2/graylog-plugin-pipeline-processor/issues/117>`_.
+
 RotationStrategy & RetentionStrategy Interfaces
 ===============================================
 
