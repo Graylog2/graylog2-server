@@ -1,0 +1,16 @@
+## Upstart script
+
+Simple upstart script for start/stopping graylog2-server.  
+Place this in /etc/init and graylog2-server will start upon bootup.  
+It can also be stopped or started manually by issuing the following commands.
+
+    start graylog2-server
+    stop graylog2-server
+
+You can test if it is running or not with the following command
+
+    status graylog2-server
+
+Tested on Ubuntu Lucid.
+
+Contributed by Mick Pollard <twitter.com/aussielunix>
