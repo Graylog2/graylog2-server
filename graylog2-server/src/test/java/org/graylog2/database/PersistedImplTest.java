@@ -29,7 +29,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 
 public class PersistedImplTest {
-    class PersistedImplSUT extends PersistedImpl {
+    private static class PersistedImplSUT extends PersistedImpl {
         PersistedImplSUT(Map<String, Object> fields) {
             super(fields);
         }

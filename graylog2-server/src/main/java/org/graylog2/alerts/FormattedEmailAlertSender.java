@@ -87,6 +87,7 @@ public class FormattedEmailAlertSender implements AlertSender {
         this.nodeId = nodeId;
     }
 
+    @Override
     public void initialize(Configuration configuration) {
         this.pluginConfig = configuration;
     }
@@ -152,6 +153,7 @@ public class FormattedEmailAlertSender implements AlertSender {
         return baseUri + "/streams/" + stream.getId() + "/messages?rangetype=absolute&from=" + alertStart + "&to=" + alertEnd + "&q=*";
     }
 
+    @Override
     public void sendEmails(Stream stream, EmailRecipients recipients, AlertCondition.CheckResult checkResult) throws TransportConfigurationException, EmailException {
         sendEmails(stream, recipients, checkResult, null);
     }

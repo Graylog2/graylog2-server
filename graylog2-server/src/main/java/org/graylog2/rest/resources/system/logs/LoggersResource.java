@@ -252,7 +252,7 @@ public class LoggersResource extends RestResource {
                     new DateTime(event.getTimeMillis(), DateTimeZone.UTC),
                     throwable,
                     event.getThreadName(),
-                    event.getContextMap()
+                    event.getContextData().toMap()
             ));
         }
 

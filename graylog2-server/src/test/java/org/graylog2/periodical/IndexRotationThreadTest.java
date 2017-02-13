@@ -132,7 +132,7 @@ public class IndexRotationThreadTest {
         verify(provider, never()).get();
     }
 
-    private class RotationStrategyProvider implements Provider<RotationStrategy> {
+    private static class RotationStrategyProvider implements Provider<RotationStrategy> {
         @Override
         public RotationStrategy get() {
             return new RotationStrategy() {

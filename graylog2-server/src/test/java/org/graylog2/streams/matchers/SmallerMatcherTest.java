@@ -223,6 +223,7 @@ public class SmallerMatcherTest extends MatcherTest {
         assertFalse(matcher.match(msg, rule));
     }
 
+    @Override
     protected StreamRule getSampleRule() {
         StreamRule rule = super.getSampleRule();
         rule.setType(StreamRuleType.SMALLER);
@@ -230,6 +231,7 @@ public class SmallerMatcherTest extends MatcherTest {
         return rule;
     }
 
+    @Override
     protected StreamRuleMatcher getMatcher(StreamRule rule) {
         StreamRuleMatcher matcher = super.getMatcher(rule);
 

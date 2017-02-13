@@ -100,7 +100,7 @@ public class SystemJobManagerTest {
         assertEquals(1, manager.concurrentJobs(job1.getClass()));
     }
 
-    class LongRunningJob extends SystemJob {
+    private static class LongRunningJob extends SystemJob {
 
         private int seconds;
         private int maxConcurrency = 9001;
@@ -153,7 +153,7 @@ public class SystemJobManagerTest {
         }
     }
 
-    class AnotherLongRunningJob extends SystemJob {
+    private static class AnotherLongRunningJob extends SystemJob {
 
         private int seconds;
 

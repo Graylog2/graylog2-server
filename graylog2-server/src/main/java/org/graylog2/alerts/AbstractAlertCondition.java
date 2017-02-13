@@ -84,6 +84,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         return id;
     }
 
+    @Override
     public String getType() {
         return type;
     }

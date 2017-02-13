@@ -24,10 +24,10 @@ import org.bson.BSONDecoder;
 import org.bson.BSONObject;
 import org.bson.BasicBSONDecoder;
 
+import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.file.Files;
@@ -46,7 +46,7 @@ public class BsonReader implements DumpReader {
         collectionMap = readBsonDirectory(dir);
     }
 
-    protected List<DBObject> readBsonFile(String filename){
+    protected List<DBObject> readBsonFile(String filename) {
         Path filePath = Paths.get(filename);
         List<DBObject> dataset = new ArrayList<>();
 
@@ -55,7 +55,7 @@ public class BsonReader implements DumpReader {
             BSONDecoder decoder = new BasicBSONDecoder();
             BSONObject obj;
 
-            while((obj = decoder.readObject(fileBytes)) != null) {
+            while ((obj = decoder.readObject(fileBytes)) != null) {
                 final DBObject mongoDocument = new BasicDBObject(obj.toMap());
                 dataset.add(mongoDocument);
             }
@@ -72,15 +72,11 @@ public class BsonReader implements DumpReader {
         return dataset;
     }
 
+    @Nullable
     protected Map<String, List<DBObject>> readBsonDirectory(File directory) {
         final Map<String, List<DBObject>> collections = new HashMap<>();
 
-        File[] collectionListing = directory.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return (name.endsWith(".bson") && !name.startsWith("system.indexes."));
-            }
-        });
+        final File[] collectionListing = directory.listFiles((dir, name) -> (name.endsWith(".bson") && !name.startsWith("system.indexes.")));
 
         if (collectionListing != null) {
             for (File collection : collectionListing) {
@@ -92,6 +88,7 @@ public class BsonReader implements DumpReader {
         return collections;
     }
 
+    @Override
     public Map<String, List<DBObject>> toMap() {
         return collectionMap;
     }

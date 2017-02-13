@@ -113,6 +113,7 @@ public class ContainsMatcherTest extends MatcherTest {
         assertTrue(matcher.match(msg, rule));
     }
 
+    @Override
     protected StreamRule getSampleRule() {
         final StreamRule rule = super.getSampleRule();
         rule.setType(StreamRuleType.CONTAINS);
@@ -121,6 +122,7 @@ public class ContainsMatcherTest extends MatcherTest {
         return rule;
     }
 
+    @Override
     protected StreamRuleMatcher getMatcher(StreamRule rule) {
         final StreamRuleMatcher matcher = super.getMatcher(rule);
 

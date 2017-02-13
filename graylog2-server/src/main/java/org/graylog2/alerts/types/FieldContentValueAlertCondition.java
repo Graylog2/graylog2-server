@@ -55,15 +55,13 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
     private final String value;
 
     public interface Factory extends AlertCondition.Factory {
+        @Override
         FieldContentValueAlertCondition create(Stream stream,
                                                @Assisted("id") String id,
                                                DateTime createdAt,
                                                @Assisted("userid") String creatorUserId,
                                                Map<String, Object> parameters,
                                                @Assisted("title") @Nullable String title);
-
-        Config config();
-        Descriptor descriptor();
     }
 
     public static class Config implements AlertCondition.Config {

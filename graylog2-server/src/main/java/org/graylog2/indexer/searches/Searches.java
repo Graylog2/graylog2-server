@@ -16,13 +16,12 @@
  */
 package org.graylog2.indexer.searches;
 
-import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Sets;
-
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-
+import com.google.common.collect.ImmutableSortedSet;
+import com.google.common.collect.Sets;
+import joptsimple.internal.Strings;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -66,6 +65,9 @@ import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -77,12 +79,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-
-import joptsimple.internal.Strings;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Preconditions.checkNotNull;
@@ -128,6 +124,7 @@ public class Searches {
         HOUR(Period.hours(1)),
         MINUTE(Period.minutes(1));
 
+        @SuppressWarnings("ImmutableEnumChecker")
         private final Period period;
 
         DateHistogramInterval(Period period) {

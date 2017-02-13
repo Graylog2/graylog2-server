@@ -136,7 +136,7 @@ public class IndexerOverviewResource extends RestResource {
         indices.getClosedIndices(indexSet).forEach(indexName -> indicesSummaries.put(indexName, IndexSummary.create(
                 null,
                 indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexName)).findFirst().orElse(null),
-                deflectorSummary.currentTarget() != null && deflectorSummary.equals(indexName),
+                deflectorSummary.currentTarget() != null && deflectorSummary.currentTarget().equals(indexName),
                 true,
                 false
         )));

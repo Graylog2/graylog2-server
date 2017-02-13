@@ -123,10 +123,12 @@ public class GELFMessage {
 
         private static final int HEADER_SIZE = 2;
 
-        private final byte[] bytes;
+        private final byte first;
+        private final byte second;
 
         Type(final byte first, final byte second) {
-            bytes = new byte[]{first, second};
+            this.first = first;
+            this.second = second;
         }
 
         static Type determineType(final byte first, final byte second) {
@@ -167,11 +169,11 @@ public class GELFMessage {
         }
 
         public byte first() {
-            return bytes[0];
+            return first;
         }
 
         public byte second() {
-            return bytes[1];
+            return second;
         }
     }
 }

@@ -138,7 +138,7 @@ public class Messages {
                 return BULK_REQUEST_RETRYER.call(new BulkRequestCallable(c, request));
             } catch (ExecutionException | RetryException e) {
                 LOG.error("Couldn't bulk index " + request.numberOfActions() + " messages.", e);
-                throw Throwables.propagate(e);
+                throw new RuntimeException(e);
             }
         }
     }
