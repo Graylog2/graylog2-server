@@ -115,7 +115,7 @@
         <javax.inject.version>1</javax.inject.version>
         <javax.ws.rs-api.version>2.0.1</javax.ws.rs-api.version>
         <jbcrypt.version>0.3m</jbcrypt.version>
-        <jersey.version>2.25</jersey.version>
+        <jersey.version>2.25.1</jersey.version>
         <jmte.version>3.2.0</jmte.version>
         <jna.version>4.1.0</jna.version> <!-- for ES, make sure to use the version that ES uses -->
         <joda-time.version>2.9.7</joda-time.version>
