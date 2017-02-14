@@ -3,9 +3,15 @@ import ReactSelect from 'react-select';
 
 const propTypes = ReactSelect.propTypes;
 propTypes.onValueChange = React.PropTypes.func;
+propTypes.size = React.PropTypes.oneOf(['normal', 'small']);
 
 const Select = React.createClass({
   propTypes: propTypes,
+  getDefaultProps() {
+    return {
+      size: 'normal',
+    };
+  },
   getInitialState() {
     return {
       value: this.props.value,
@@ -13,6 +19,7 @@ const Select = React.createClass({
   },
   componentDidMount() {
     this.reactSelectStyles.use();
+    this.reactSelectSmStyles.use();
   },
   componentWillReceiveProps(nextProps) {
     if (this.props.value !== nextProps.value) {
@@ -21,6 +28,7 @@ const Select = React.createClass({
   },
   componentWillUnmount() {
     this.reactSelectStyles.unuse();
+    this.reactSelectSmStyles.unuse();
   },
   getValue() {
     return this.state.value;
@@ -38,8 +46,16 @@ const Select = React.createClass({
     }
   },
   reactSelectStyles: require('!style/useable!css!react-select/dist/default.css'),
+  reactSelectSmStyles: require('!style/useable!css!./Select.css'),
   render() {
-    return <ReactSelect ref="select" onChange={this._onChange} {...this.props} value={this.state.value} />;
+    // eslint-disable-next-line no-unused-vars
+    const { onValueChange, size, ...reactSelectProps } = this.props;
+
+    return (
+      <div className={size === 'small' ? 'select-sm' : ''}>
+        <ReactSelect ref="select" onChange={this._onChange} {...reactSelectProps} value={this.state.value} />
+      </div>
+    );
   },
 });
 
