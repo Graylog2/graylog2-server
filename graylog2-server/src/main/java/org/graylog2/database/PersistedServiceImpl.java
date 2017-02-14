@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -99,14 +100,12 @@ public class PersistedServiceImpl implements PersistedService {
 
     protected <T extends Persisted> DBCollection collection(Class<T> modelClass) {
         CollectionName collectionNameAnnotation = modelClass.getAnnotation(CollectionName.class);
-        if (collectionNameAnnotation == null)
+        if (collectionNameAnnotation == null) {
             throw new RuntimeException("Unable to determine collection for class " + modelClass.getCanonicalName());
-        final String collectionName = (collectionNameAnnotation == null ? null : collectionNameAnnotation.value());
+        }
+        final String collectionName = collectionNameAnnotation.value();
 
-        if (collectionName == null)
-            return null;
-        else
-            return collection(collectionName);
+        return collection(collectionName);
     }
 
     protected <T extends Persisted> DBCollection collection(T model) {
@@ -114,21 +113,15 @@ public class PersistedServiceImpl implements PersistedService {
     }
 
     protected List<DBObject> cursorToList(DBCursor cursor) {
-        List<DBObject> results = Lists.newArrayList();
-
         if (cursor == null) {
-            return results;
+            return Collections.emptyList();
         }
 
         try {
-            while (cursor.hasNext()) {
-                results.add(cursor.next());
-            }
+            return Lists.newArrayList((Iterable<DBObject>) cursor);
         } finally {
             cursor.close();
         }
-
-        return results;
     }
 
     protected <T extends Persisted> DBObject findOne(Class<T> model, DBObject query) {
@@ -217,11 +210,11 @@ public class PersistedServiceImpl implements PersistedService {
 
     @Override
     public Map<String, List<ValidationResult>> validate(Map<String, Validator> validators, Map<String, Object> fields) {
-        Map<String, List<ValidationResult>> validationErrors = new HashMap<>();
         if (validators == null || validators.isEmpty()) {
-            return validationErrors;
+            return Collections.emptyMap();
         }
 
+        final Map<String, List<ValidationResult>> validationErrors = new HashMap<>();
         for (Map.Entry<String, Validator> validation : validators.entrySet()) {
             Validator v = validation.getValue();
             String field = validation.getKey();
@@ -230,15 +223,13 @@ public class PersistedServiceImpl implements PersistedService {
                 ValidationResult validationResult = v.validate(fields.get(field));
                 if (validationResult instanceof ValidationResult.ValidationFailed) {
                     LOG.debug("Validation failure: [{}] on field [{}]", v.getClass().getCanonicalName(), field);
-                    if (validationErrors.get(field) == null)
-                        validationErrors.put(field, new ArrayList<ValidationResult>());
+                    validationErrors.computeIfAbsent(field, k -> new ArrayList<>());
                     validationErrors.get(field).add(validationResult);
                 }
             } catch (Exception e) {
                 final String error = "Error while trying to validate <" + field + ">, got exception: " + e;
                 LOG.debug(error);
-                if (validationErrors.get(field) == null)
-                    validationErrors.put(field, new ArrayList<ValidationResult>());
+                validationErrors.computeIfAbsent(field, k -> new ArrayList<>());
                 validationErrors.get(field).add(new ValidationResult.ValidationFailed(error));
             }
         }

@@ -49,7 +49,7 @@ public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
         final List<MediaType> acceptableMediaTypes = requestContext.getAcceptableMediaTypes();
         final boolean acceptsHtml = acceptableMediaTypes.stream()
                 .anyMatch(mediaType -> mediaType.isCompatible(MediaType.TEXT_HTML_TYPE) || mediaType.isCompatible(MediaType.APPLICATION_XHTML_XML_TYPE));
-        final boolean isGetRequest = requestContext.getMethod().equalsIgnoreCase("get");
+        final boolean isGetRequest = "get".equalsIgnoreCase(requestContext.getMethod());
 
         if (isGetRequest
                 && responseStatus == Response.Status.NOT_FOUND

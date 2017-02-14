@@ -202,7 +202,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
 
     @Override
     public Map<String, Validator> getEmbeddedValidations(String key) {
-        if (key.equals(EMBEDDED_ALERT_CONDITIONS)) {
+        if (EMBEDDED_ALERT_CONDITIONS.equals(key)) {
             return ImmutableMap.of(
                     "id", new FilledStringValidator(),
                     "parameters", new MapValidator());

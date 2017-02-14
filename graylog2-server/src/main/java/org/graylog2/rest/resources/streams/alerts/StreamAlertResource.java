@@ -231,7 +231,7 @@ public class StreamAlertResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkArgument(!Strings.isNullOrEmpty(entity));
 
-        if (type == null || !type.equals("users") && !type.equals("emails")) {
+        if (type == null || !"users".equals(type) && !"emails".equals(type)) {
             final String msg = "No such type: [" + type + "]";
             LOG.warn(msg);
             throw new BadRequestException(msg);

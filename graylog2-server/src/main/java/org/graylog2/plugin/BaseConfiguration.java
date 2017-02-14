@@ -187,12 +187,13 @@ public abstract class BaseConfiguration {
     }
 
     public URI getRestTransportUri() {
+        final URI defaultRestTransportUri = getDefaultRestTransportUri();
         if (restTransportUri == null) {
-            LOG.debug("No rest_transport_uri set. Using default [{}].", getDefaultRestTransportUri());
-            return getDefaultRestTransportUri();
+            LOG.debug("No rest_transport_uri set. Using default [{}].", defaultRestTransportUri);
+            return defaultRestTransportUri;
         } else if (WILDCARD_IP_ADDRESS.equals(restTransportUri.getHost())) {
-            LOG.warn("\"{}\" is not a valid setting for \"rest_transport_uri\". Using default [{}].", restTransportUri, getDefaultRestTransportUri());
-            return getDefaultRestTransportUri();
+            LOG.warn("\"{}\" is not a valid setting for \"rest_transport_uri\". Using default [{}].", restTransportUri, defaultRestTransportUri);
+            return defaultRestTransportUri;
         } else {
             return Tools.normalizeURI(restTransportUri, restTransportUri.getScheme(), GRAYLOG_DEFAULT_PORT, "/");
         }

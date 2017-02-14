@@ -620,7 +620,7 @@ public class Searches {
         }
 
         final QueryBuilder queryBuilder;
-        if (query.trim().equals("*")) {
+        if ("*".equals(query.trim())) {
             queryBuilder = matchAllQuery();
         } else {
             queryBuilder = queryStringQuery(query).allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
@@ -673,7 +673,7 @@ public class Searches {
         }
 
         // Not creating a filter for a "*" value because an empty filter used to be submitted that way.
-        if (!isNullOrEmpty(filter) && !filter.equals("*")) {
+        if (!isNullOrEmpty(filter) && !"*".equals(filter)) {
             if (bfb == null) {
                 bfb = QueryBuilders.boolQuery();
             }

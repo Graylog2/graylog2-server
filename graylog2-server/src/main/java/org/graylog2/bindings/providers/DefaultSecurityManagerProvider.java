@@ -42,7 +42,7 @@ import static com.google.common.collect.ImmutableList.of;
 
 @Singleton
 public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityManager> {
-    private static DefaultSecurityManager sm = null;
+    private DefaultSecurityManager sm = null;
 
     @Inject
     public DefaultSecurityManagerProvider(MongoDbSessionDAO mongoDbSessionDAO,

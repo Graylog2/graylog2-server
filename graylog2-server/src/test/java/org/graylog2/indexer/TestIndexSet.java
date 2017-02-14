@@ -106,7 +106,7 @@ public class TestIndexSet implements IndexSet {
 
     @Override
     public Optional<Integer> extractIndexNumber(String index) {
-        return null;
+        return Optional.empty();
     }
 
     @Override

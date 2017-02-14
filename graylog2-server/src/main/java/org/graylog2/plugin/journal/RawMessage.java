@@ -64,7 +64,7 @@ public class RawMessage implements Serializable {
 
     private static final Logger log = LoggerFactory.getLogger(RawMessage.class);
 
-    private final JournalMessage.Builder msgBuilder;
+    private transient final JournalMessage.Builder msgBuilder;
     private final UUID id;
     private final long journalOffset;
     private Configuration codecConfig;
