@@ -720,12 +720,12 @@
                                 <plugin>
                                     <groupId>com.h3xstream.findsecbugs</groupId>
                                     <artifactId>findsecbugs-plugin</artifactId>
-                                    <version>1.4.6</version>
+                                    <version>1.5.0</version>
                                 </plugin>
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
                                     <artifactId>fb-contrib</artifactId>
-                                    <version>6.6.1</version>
+                                    <version>6.8.3</version>
                                 </plugin>
                             </plugins>
                         </configuration>
