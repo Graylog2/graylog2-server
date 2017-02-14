@@ -16,8 +16,6 @@
  */
 package org.graylog2.inputs.transports;
 
-import com.codahale.metrics.MetricRegistry;
-import org.graylog2.plugin.inputs.MessageInput;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
@@ -54,10 +52,6 @@ public class GELFHttpHandlerTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    @Mock
-    private MessageInput messageInput;
-    @Mock
-    private MetricRegistry metricRegistry;
     @Mock
     private ChannelHandlerContext ctx;
     @Mock

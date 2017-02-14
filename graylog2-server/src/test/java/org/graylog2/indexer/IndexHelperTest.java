@@ -17,7 +17,6 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
-import org.graylog2.indexer.ranges.IndexRangeService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -25,7 +24,6 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
@@ -40,9 +38,6 @@ import static org.mockito.Mockito.when;
 public class IndexHelperTest {
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    @Mock
-    private IndexRangeService indexRangeService;
 
     @BeforeClass
     public static void initialize() {

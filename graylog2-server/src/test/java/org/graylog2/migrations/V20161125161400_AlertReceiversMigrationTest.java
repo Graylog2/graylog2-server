@@ -74,12 +74,7 @@ public class V20161125161400_AlertReceiversMigrationTest {
     private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
 
     @Mock
-    private EmailAlarmCallback emailAlarmCallback;
-
-    @Mock
     private DBCollection dbCollection;
-
-    private final static String localAdminId = "local:adminMock";
 
     @Before
     public void setUp() throws Exception {

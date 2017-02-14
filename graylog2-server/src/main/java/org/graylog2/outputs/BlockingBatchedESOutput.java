@@ -169,14 +169,6 @@ public class BlockingBatchedESOutput extends ElasticSearchOutput {
     }
 
     public interface Factory extends ElasticSearchOutput.Factory {
-        @Override
-        BlockingBatchedESOutput create(Stream stream, Configuration configuration);
-
-        @Override
-        Config getConfig();
-
-        @Override
-        Descriptor getDescriptor();
     }
 
     public static class Config extends ElasticSearchOutput.Config {

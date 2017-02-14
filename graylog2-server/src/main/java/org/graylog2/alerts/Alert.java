@@ -31,15 +31,7 @@ public interface Alert {
     boolean isInterval();
 
     enum AlertState {
-        ANY("any"),
-        RESOLVED("resolved"),
-        UNRESOLVED("unresolved");
-
-        private final String state;
-
-        AlertState(String state) {
-            this.state = state;
-        }
+        ANY, RESOLVED, UNRESOLVED;
 
         public static AlertState fromString(String state) {
             for (AlertState aState : AlertState.values()) {
@@ -51,5 +43,4 @@ public interface Alert {
             throw new IllegalArgumentException("Alert state " + state + " is not supported");
         }
     }
-
 }

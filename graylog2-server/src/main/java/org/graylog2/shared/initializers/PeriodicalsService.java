@@ -31,14 +31,10 @@ import java.util.Set;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @Singleton
 public class PeriodicalsService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(PeriodicalsService.class);
 
-    public static final String NAME = "Periodicals initializer";
     private final Periodicals periodicals;
     private final ServerStatus serverStatus;
     private final Set<Periodical> periodicalSet;

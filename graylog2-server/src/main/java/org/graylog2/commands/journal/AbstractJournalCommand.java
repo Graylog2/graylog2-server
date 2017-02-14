@@ -29,8 +29,6 @@ import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.journal.KafkaJournal;
 import org.graylog2.shared.journal.KafkaJournalModule;
 import org.graylog2.shared.plugins.ChainingClassLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,8 +36,6 @@ import java.util.List;
 import java.util.Set;
 
 public abstract class AbstractJournalCommand extends CmdLineTool {
-    protected static final Logger log = LoggerFactory.getLogger(AbstractJournalCommand.class);
-
     protected static final Configuration configuration = new Configuration();
     protected final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
     protected KafkaJournal journal;

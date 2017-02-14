@@ -46,7 +46,6 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
 
     private final Timer processTime;
     private final Meter outgoingMessages;
-    protected final MetricRegistry metricRegistry;
     private final OrderedMessageProcessors orderedMessageProcessors;
 
     private final OutputBuffer outputBuffer;
@@ -56,7 +55,6 @@ public class ProcessBufferProcessor implements WorkHandler<MessageEvent> {
     @AssistedInject
     public ProcessBufferProcessor(MetricRegistry metricRegistry, OrderedMessageProcessors orderedMessageProcessors, OutputBuffer outputBuffer,
                                   @Assisted DecodingProcessor decodingProcessor, @DefaultStream Provider<Stream> defaultStreamProvider) {
-        this.metricRegistry = metricRegistry;
         this.orderedMessageProcessors = orderedMessageProcessors;
         this.outputBuffer = outputBuffer;
         this.decodingProcessor = decodingProcessor;
