@@ -47,7 +47,7 @@ public class QuickvaluesWidgetStrategy implements WidgetStrategy {
     private final TimeRange timeRange;
 
     @AssistedInject
-    public QuickvaluesWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) throws InvalidWidgetConfigurationException {
+    public QuickvaluesWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange) throws InvalidWidgetConfigurationException {
         this.searches = searches;
         this.timeRange = timeRange;
 

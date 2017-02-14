@@ -21,18 +21,8 @@ import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.authc.credential.SimpleCredentialsMatcher;
 import org.graylog2.plugin.database.users.User;
-import org.graylog2.security.PasswordAlgorithmFactory;
-
-import javax.inject.Inject;
 
 public class PasswordAlgorithmCredentialsMatcher extends SimpleCredentialsMatcher {
-    private final PasswordAlgorithmFactory passwordAlgorithmFactory;
-
-    @Inject
-    public PasswordAlgorithmCredentialsMatcher(PasswordAlgorithmFactory passwordAlgorithmFactory) {
-        this.passwordAlgorithmFactory = passwordAlgorithmFactory;
-    }
-
     @Override
     public boolean doCredentialsMatch(AuthenticationToken token, AuthenticationInfo info) {
         if (token instanceof UsernamePasswordToken && info instanceof UserAccount) {

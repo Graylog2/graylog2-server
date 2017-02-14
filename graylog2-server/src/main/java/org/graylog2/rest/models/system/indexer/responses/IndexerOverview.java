@@ -24,7 +24,6 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.rest.models.count.responses.MessageCountResponse;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
 
-import java.util.List;
 import java.util.Map;
 
 @AutoValue

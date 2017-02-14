@@ -19,12 +19,8 @@ package org.graylog2.plugin.outputs;
 import java.util.Map;
 import java.util.Set;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public interface OutputStreamConfiguration {
-    
-    public void add(String streamId, Set<Map<String, String>> config);
-    public Set<Map<String, String>> get(String streamId);
-    
+    void add(String streamId, Set<Map<String, String>> config);
+
+    Set<Map<String, String>> get(String streamId);
 }

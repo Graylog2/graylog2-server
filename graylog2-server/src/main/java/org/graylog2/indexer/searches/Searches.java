@@ -21,7 +21,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
-import joptsimple.internal.Strings;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -678,7 +677,7 @@ public class Searches {
             if (bfb == null) {
                 bfb = QueryBuilders.boolQuery();
             }
-            bfb.must(QueryBuilders.queryStringQuery(filter));
+            bfb.must(queryStringQuery(filter));
         }
 
         return bfb;
@@ -716,7 +715,7 @@ public class Searches {
      * @return the optional stream id
      */
     public static Optional<String> extractStreamId(String filter) {
-        if (Strings.isNullOrEmpty(filter)) {
+        if (isNullOrEmpty(filter)) {
             return Optional.empty();
         }
         final Matcher streamIdMatcher = filterStreamIdPattern.matcher(filter);

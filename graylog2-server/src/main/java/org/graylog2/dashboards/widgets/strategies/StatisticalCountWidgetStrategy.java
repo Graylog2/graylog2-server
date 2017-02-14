@@ -83,12 +83,8 @@ public class StatisticalCountWidgetStrategy extends SearchResultCountWidgetStrat
     @AssistedInject
     public StatisticalCountWidgetStrategy(Searches searches,
                                           @Assisted Map<String, Object> config,
-                                          @Assisted TimeRange timeRange,
-                                          @Assisted String widgetId) {
-        super(searches,
-                config,
-                timeRange,
-                widgetId);
+                                          @Assisted TimeRange timeRange) {
+        super(searches, config, timeRange);
         this.field = (String) config.get("field");
         String statsFunction = (String) config.get("stats_function");
         // We accidentally modified the standard deviation function name, we need this to make old widgets work again

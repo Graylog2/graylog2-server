@@ -150,7 +150,7 @@ public class Message implements Messages {
     public boolean isComplete() {
         for (final String key : REQUIRED_FIELDS) {
             final Object field = getField(key);
-            if (field == null || (field instanceof String && ((String) field).isEmpty())) {
+            if (field == null || field instanceof String && ((String) field).isEmpty()) {
                 return false;
             }
         }

@@ -308,7 +308,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
             }
         }
 
-        throw new org.graylog2.database.NotFoundException();
+        throw new NotFoundException("Alert condition <" + conditionId + "> for stream <" + stream.getId() + "> not found");
     }
 
     @Override

@@ -271,7 +271,7 @@ public class Version implements Comparable<Version> {
      */
     @Deprecated
     public boolean greaterMinor(Version other) {
-        return (other.major < this.major) || (other.major == this.major && other.minor < this.minor);
+        return other.major < this.major || other.major == this.major && other.minor < this.minor;
     }
 
     /**

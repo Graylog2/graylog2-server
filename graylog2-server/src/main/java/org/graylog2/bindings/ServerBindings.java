@@ -217,6 +217,6 @@ public class ServerBindings extends Graylog2Module {
 
     private void bindSearchResponseDecorators() {
         // only triggering an initialize to make sure that the binding exists
-        final MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder = searchResponseDecoratorBinder();
+        searchResponseDecoratorBinder();
     }
 }

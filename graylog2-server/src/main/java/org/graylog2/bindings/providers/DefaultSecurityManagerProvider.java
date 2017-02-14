@@ -30,13 +30,12 @@ import org.apache.shiro.subject.Subject;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.MongoDbSessionDAO;
 import org.graylog2.security.OrderedAuthenticatingRealms;
-import org.graylog2.security.realm.RootAccountRealm;
 import org.graylog2.security.realm.MongoDbAuthorizationRealm;
+import org.graylog2.security.realm.RootAccountRealm;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
-
 import java.util.concurrent.TimeUnit;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -66,7 +65,7 @@ public class DefaultSecurityManagerProvider implements Provider<DefaultSecurityM
             @Override
             public boolean isSessionStorageEnabled(Subject subject) {
                 // save to session if we already have a session. do not create on just for saving the subject
-                return (subject.getSession(false) != null);
+                return subject.getSession(false) != null;
             }
         };
         sessionStorageEvaluator.setSessionStorageEnabled(false);

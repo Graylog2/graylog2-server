@@ -32,7 +32,6 @@ import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.events.DashboardDeletedEvent;
-import org.graylog2.dashboards.widgets.WidgetResultCache;
 import org.graylog2.dashboards.widgets.events.WidgetUpdatedEvent;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;

@@ -333,9 +333,9 @@ public class Configuration extends BaseConfiguration {
         final URI restListenUri = getRestListenUri();
         final URI webListenUri = getWebListenUri();
 
-        if ((restListenUri.getPort() == webListenUri.getPort()) &&
+        if (restListenUri.getPort() == webListenUri.getPort() &&
                 !restListenUri.getHost().equals(webListenUri.getHost()) &&
-                ("0.0.0.0".equals(restListenUri.getHost()) || "0.0.0.0".equals(webListenUri.getHost()))) {
+                (WILDCARD_IP_ADDRESS.equals(restListenUri.getHost()) || WILDCARD_IP_ADDRESS.equals(webListenUri.getHost()))) {
             throw new ValidationException("Wildcard IP addresses cannot be used if the Graylog REST API and web interface listen on the same port.");
         }
     }

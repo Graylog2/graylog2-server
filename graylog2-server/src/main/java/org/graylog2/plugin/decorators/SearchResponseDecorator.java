@@ -17,7 +17,6 @@
 package org.graylog2.plugin.decorators;
 
 import org.graylog2.decorators.Decorator;
-import org.graylog2.plugin.AbstractDescriptor;
 import org.graylog2.plugin.DescriptorWithHumanName;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.rest.resources.search.responses.SearchResponse;

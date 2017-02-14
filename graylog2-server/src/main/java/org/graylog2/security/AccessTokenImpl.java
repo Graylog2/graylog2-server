@@ -23,15 +23,11 @@ import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.FilledStringValidator;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 
 @CollectionName("access_tokens")
 public class AccessTokenImpl extends PersistedImpl implements AccessToken {
-    private static final Logger LOG = LoggerFactory.getLogger(AccessTokenImpl.class);
-
     public static final String USERNAME = "username";
     public static final String TOKEN = "token";
     public static final String NAME = "NAME";

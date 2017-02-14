@@ -132,7 +132,7 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
         result.remove("_id");
         result.put("id", ((ObjectId) fields.get("_id")).toHexString());
         result.remove(FIELD_CREATED_AT);
-        result.put(FIELD_CREATED_AT, (Tools.getISO8601String((DateTime) fields.get(FIELD_CREATED_AT))));
+        result.put(FIELD_CREATED_AT, Tools.getISO8601String((DateTime) fields.get(FIELD_CREATED_AT)));
 
         if (!result.containsKey(EMBEDDED_WIDGETS)) {
             result.put(EMBEDDED_WIDGETS, Collections.emptyList());

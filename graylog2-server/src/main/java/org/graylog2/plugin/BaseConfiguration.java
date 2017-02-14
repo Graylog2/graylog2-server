@@ -43,6 +43,8 @@ import java.nio.file.Path;
 @SuppressWarnings("FieldMayBeFinal")
 public abstract class BaseConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(BaseConfiguration.class);
+    protected static final String WILDCARD_IP_ADDRESS = "0.0.0.0";
+
     protected static final int GRAYLOG_DEFAULT_PORT = 9000;
     protected static final int GRAYLOG_DEFAULT_WEB_PORT = 9000;
 
@@ -188,7 +190,7 @@ public abstract class BaseConfiguration {
         if (restTransportUri == null) {
             LOG.debug("No rest_transport_uri set. Using default [{}].", getDefaultRestTransportUri());
             return getDefaultRestTransportUri();
-        } else if ("0.0.0.0".equals(restTransportUri.getHost())) {
+        } else if (WILDCARD_IP_ADDRESS.equals(restTransportUri.getHost())) {
             LOG.warn("\"{}\" is not a valid setting for \"rest_transport_uri\". Using default [{}].", restTransportUri, getDefaultRestTransportUri());
             return getDefaultRestTransportUri();
         } else {
@@ -205,7 +207,7 @@ public abstract class BaseConfiguration {
         final URI transportUri;
         final URI listenUri = getRestListenUri();
 
-        if ("0.0.0.0".equals(listenUri.getHost())) {
+        if (WILDCARD_IP_ADDRESS.equals(listenUri.getHost())) {
             final InetAddress guessedAddress;
             try {
                 guessedAddress = Tools.guessPrimaryNetworkAddress();
@@ -476,10 +478,8 @@ public abstract class BaseConfiguration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validateRestAndWebListenConfigConflict() throws ValidationException {
-        if (isRestAndWebOnSamePort()) {
-            if (getRestListenUri().getPath().equals(getWebListenUri().getPath())) {
-                throw new ValidationException("If REST and Web interface are served on the same host/port, the path must be different!");
-            }
+        if (isRestAndWebOnSamePort() && getRestListenUri().getPath().equals(getWebListenUri().getPath())) {
+            throw new ValidationException("If REST and Web interface are served on the same host/port, the path must be different!");
         }
     }
 

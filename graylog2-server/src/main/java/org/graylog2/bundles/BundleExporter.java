@@ -348,10 +348,8 @@ public class BundleExporter {
 
                 // Mark referenced streams for export
                 final Object streamId = widgetConfig.get("stream_id");
-                if (streamId instanceof String) {
-                    if (streamSet.add((String) streamId)) {
-                        LOG.debug("Adding stream {} to export list", streamId);
-                    }
+                if (streamId instanceof String && streamSet.add((String) streamId)) {
+                    LOG.debug("Adding stream {} to export list", streamId);
                 }
 
                 @SuppressWarnings("unchecked")

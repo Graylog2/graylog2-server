@@ -20,7 +20,7 @@ import java.util.Objects;
 
 public final class BlacklistFieldEqualityCondition extends FilterDescription {
     public boolean matchesFieldStringValue(Object value) {
-        return (value != null) && pattern.equalsIgnoreCase(String.valueOf(value));
+        return value != null && pattern.equalsIgnoreCase(String.valueOf(value));
     }
 
     @Override

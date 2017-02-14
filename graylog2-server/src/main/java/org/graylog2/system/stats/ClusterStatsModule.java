@@ -17,24 +17,8 @@
 package org.graylog2.system.stats;
 
 import com.google.inject.AbstractModule;
-import org.graylog2.shared.system.stats.SigarService;
-import org.graylog2.shared.system.stats.fs.FsProbe;
-import org.graylog2.shared.system.stats.fs.JmxFsProbe;
-import org.graylog2.shared.system.stats.fs.SigarFsProbe;
-import org.graylog2.shared.system.stats.jvm.JvmProbe;
-import org.graylog2.shared.system.stats.network.JmxNetworkProbe;
-import org.graylog2.shared.system.stats.network.NetworkProbe;
-import org.graylog2.shared.system.stats.network.SigarNetworkProbe;
-import org.graylog2.shared.system.stats.os.JmxOsProbe;
-import org.graylog2.shared.system.stats.os.OsProbe;
-import org.graylog2.shared.system.stats.os.SigarOsProbe;
-import org.graylog2.shared.system.stats.process.JmxProcessProbe;
-import org.graylog2.shared.system.stats.process.ProcessProbe;
-import org.graylog2.shared.system.stats.process.SigarProcessProbe;
 import org.graylog2.system.stats.elasticsearch.ElasticsearchProbe;
 import org.graylog2.system.stats.mongo.MongoProbe;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class ClusterStatsModule extends AbstractModule {
     @Override

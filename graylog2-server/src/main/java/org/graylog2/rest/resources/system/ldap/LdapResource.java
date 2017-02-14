@@ -285,7 +285,7 @@ public class LdapResource extends RestResource {
         if (!ldapSettings.isEnabled()) {
             throw new BadRequestException("LDAP is disabled.");
         }
-        if (Strings.isNullOrEmpty(ldapSettings.getGroupSearchBase()) || Strings.isNullOrEmpty(ldapSettings.getGroupIdAttribute())) {
+        if (isNullOrEmpty(ldapSettings.getGroupSearchBase()) || isNullOrEmpty(ldapSettings.getGroupIdAttribute())) {
             throw new BadRequestException("LDAP group configuration settings are not set.");
         }
 

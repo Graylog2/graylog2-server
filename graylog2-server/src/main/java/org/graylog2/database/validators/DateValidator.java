@@ -19,25 +19,20 @@ package org.graylog2.database.validators;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.database.validators.Validator;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class DateValidator implements Validator {
-
     /**
      * Validates: Object is not null, of type org.joda.time.DateTime and
      * the String representation is in UTC.
-     *
      *
      * @param value The object to check
      * @return validation result
      */
     @Override
     public ValidationResult validate(Object value) {
-        if (value != null && (value instanceof org.joda.time.DateTime) && value.toString().endsWith("Z"))
+        if (value instanceof org.joda.time.DateTime && value.toString().endsWith("Z")) {
             return new ValidationResult.ValidationPassed();
-        else
+        } else {
             return new ValidationResult.ValidationFailed(value + " is not a valid date!");
+        }
     }
-
 }

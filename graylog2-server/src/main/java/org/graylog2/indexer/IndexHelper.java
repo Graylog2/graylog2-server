@@ -16,8 +16,7 @@
  */
 package org.graylog2.indexer;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.graylog2.plugin.Tools;
@@ -25,6 +24,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -41,9 +41,9 @@ public class IndexHelper {
             indexSet.extractIndexNumber(indexName).ifPresent(numbers::add);
         }
 
-        final List<String> sorted = prependPrefixes(indexSet.getIndexPrefix(), Tools.asSortedList(numbers));
+        final List<String> sorted = prependPrefixes(indexSet.getIndexPrefix(), Tools.asSortedSet(numbers));
 
-        return Sets.newHashSet(sorted.subList(0, count));
+        return ImmutableSet.copyOf(sorted.subList(0, count));
     }
 
     @Nullable
@@ -57,14 +57,12 @@ public class IndexHelper {
                 .lte(Tools.buildElasticSearchTimeFormat(range.getTo()));
     }
 
-    private static List<String> prependPrefixes(String prefix, List<Integer> numbers) {
-        List<String> r = Lists.newArrayList();
-
+    private static List<String> prependPrefixes(String prefix, Collection<Integer> numbers) {
+        final List<String> r = new ArrayList<>();
         for (int number : numbers) {
             r.add(prefix + "_" + number);
         }
 
         return r;
     }
-
 }

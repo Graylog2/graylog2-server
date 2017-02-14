@@ -205,9 +205,9 @@ public class PersistedServiceImpl implements PersistedService {
     public <T extends Persisted> String saveWithoutValidation(T model) {
         try {
             return save(model);
-        } catch (ValidationException e) { /* */ }
-
-        return null;
+        } catch (ValidationException ignored) {
+            return null;
+        }
     }
 
     @Override

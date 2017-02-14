@@ -32,7 +32,6 @@ import org.elasticsearch.common.Strings;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
-import org.graylog2.alarmcallbacks.EmailAlarmCallback;
 import org.graylog2.alerts.AbstractAlertCondition;
 import org.graylog2.alerts.Alert;
 import org.graylog2.alerts.AlertService;
@@ -99,19 +98,16 @@ public class StreamAlertResource extends RestResource {
     private final StreamService streamService;
     private final AlertService alertService;
     private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
-    private final EmailAlarmCallback emailAlarmCallback;
     private final AlarmCallbackFactory alarmCallbackFactory;
 
     @Inject
     public StreamAlertResource(StreamService streamService,
                                AlertService alertService,
                                AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                               EmailAlarmCallback emailAlarmCallback,
                                AlarmCallbackFactory alarmCallbackFactory) {
         this.streamService = streamService;
         this.alertService = alertService;
         this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
-        this.emailAlarmCallback = emailAlarmCallback;
         this.alarmCallbackFactory = alarmCallbackFactory;
     }
 
@@ -127,7 +123,7 @@ public class StreamAlertResource extends RestResource {
                                  @PathParam("streamId") String streamId,
                                  @ApiParam(name = "since", value = "Optional parameter to define a lower date boundary. (UNIX timestamp)")
                                  @QueryParam("since") @DefaultValue("0") @Min(0) int sinceTs,
-                                 @ApiParam(name = "limit", value = "Maximum number of alerts to return.", required = false)
+                                 @ApiParam(name = "limit", value = "Maximum number of alerts to return.")
                                  @QueryParam("limit") @DefaultValue("300") @Min(1) int limit) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamId);
 
@@ -235,7 +231,7 @@ public class StreamAlertResource extends RestResource {
         checkPermission(RestPermissions.STREAMS_EDIT, streamId);
         checkArgument(!Strings.isNullOrEmpty(entity));
 
-        if (type == null || (!type.equals("users") && !type.equals("emails"))) {
+        if (type == null || !type.equals("users") && !type.equals("emails")) {
             final String msg = "No such type: [" + type + "]";
             LOG.warn(msg);
             throw new BadRequestException(msg);
@@ -247,10 +243,10 @@ public class StreamAlertResource extends RestResource {
         final URI streamAlertUri = getUriBuilderToSelf().path(StreamAlertResource.class).build(streamId);
 
         // Maybe the list already contains this receiver?
-        if (stream.getAlertReceivers().containsKey(type) || stream.getAlertReceivers().get(type) != null) {
-            if (stream.getAlertReceivers().get(type).contains(entity)) {
-                return Response.created(streamAlertUri).build();
-            }
+        if (stream.getAlertReceivers().containsKey(type)
+                || stream.getAlertReceivers().get(type) != null
+                && stream.getAlertReceivers().get(type).contains(entity)) {
+            return Response.created(streamAlertUri).build();
         }
 
         streamService.addAlertReceiver(stream, type, entity);

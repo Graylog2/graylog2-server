@@ -79,7 +79,7 @@ public class V20161125161400_AlertReceiversMigration extends Migration {
 
         final List<String> users = alertReceivers.get("users");
         final List<String> emails = alertReceivers.get("emails");
-        return (users != null && !users.isEmpty()) || (emails != null && !emails.isEmpty());
+        return users != null && !users.isEmpty() || emails != null && !emails.isEmpty();
     }
 
     @Override
@@ -116,7 +116,7 @@ public class V20161125161400_AlertReceiversMigration extends Migration {
         }
     }
 
-    private Optional<String> migrateStream(org.graylog2.plugin.streams.Stream stream) {
+    private Optional<String> migrateStream(Stream stream) {
         final List<AlarmCallbackConfiguration> alarmCallbacks = alarmCallbackService.getForStream(stream);
         final List<Optional<String>> updatedConfigurations = alarmCallbacks.stream()
                 .filter(callbackConfiguration -> callbackConfiguration.getType().equals(EmailAlarmCallback.class.getCanonicalName()))
@@ -140,7 +140,7 @@ public class V20161125161400_AlertReceiversMigration extends Migration {
         return Optional.of(updatedConfigurations.stream().map(Optional::get).collect(Collectors.joining(", ")));
     }
 
-    private Optional<String> updateConfiguration(org.graylog2.plugin.streams.Stream stream, AlarmCallbackConfiguration callbackConfiguration) {
+    private Optional<String> updateConfiguration(Stream stream, AlarmCallbackConfiguration callbackConfiguration) {
         final Map<String, List<String>> alertReceivers = stream.getAlertReceivers();
         final List<String> usernames = alertReceivers.get("users");
         final List<String> emails = alertReceivers.get("emails");

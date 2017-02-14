@@ -17,7 +17,6 @@
 package org.graylog2.security.hashing;
 
 import org.apache.shiro.crypto.hash.SimpleHash;
-import org.graylog2.Configuration;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 
 import javax.inject.Inject;

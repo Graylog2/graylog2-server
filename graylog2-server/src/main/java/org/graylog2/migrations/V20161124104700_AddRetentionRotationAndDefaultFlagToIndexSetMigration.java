@@ -20,9 +20,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ImmutableSet;
-import org.graylog2.events.ClusterEventBus;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -45,15 +44,12 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
 
     private final ClusterConfigService clusterConfigService;
     private final IndexSetService indexSetService;
-    private final ClusterEventBus clusterEventBus;
 
     @Inject
     public V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration(final IndexSetService indexSetService,
-                                                                                 final ClusterConfigService clusterConfigService,
-                                                                                 final ClusterEventBus clusterEventBus) {
+                                                                                 final ClusterConfigService clusterConfigService) {
         this.clusterConfigService = clusterConfigService;
         this.indexSetService = indexSetService;
-        this.clusterEventBus = clusterEventBus;
     }
 
     @Override

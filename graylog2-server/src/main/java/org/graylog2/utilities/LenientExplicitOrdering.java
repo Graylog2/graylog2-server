@@ -46,15 +46,13 @@ public class LenientExplicitOrdering<T> extends Ordering<T> {
             //noinspection SuspiciousNameCombination
             return Integer.compare(leftIdx, rightIdx);
         }
-        if (left instanceof Comparable) {
-            if (leftIdx == null && rightIdx == null) {
-                //noinspection unchecked
-                return ((Comparable)left).compareTo(right);
-            }
+        if (left instanceof Comparable && leftIdx == null && rightIdx == null) {
+            //noinspection unchecked
+            return ((Comparable) left).compareTo(right);
         }
         if (leftIdx == null) {
             return -1;
         }
-        return  1;
+        return 1;
     }
 }

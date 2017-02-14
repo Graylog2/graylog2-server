@@ -102,7 +102,7 @@ public abstract class ThrottleableTransport implements Transport {
             try {
                 eventBus.unregister(this);
             } catch (IllegalArgumentException ignored) {
-                // Ingored. This will be thrown if the object has been unregistered before.
+                // Ignored. This will be thrown if the object has been unregistered before.
             }
         }
     }

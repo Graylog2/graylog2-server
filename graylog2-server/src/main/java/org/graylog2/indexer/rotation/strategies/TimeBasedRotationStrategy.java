@@ -133,7 +133,7 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
             log.warn("Determining stride length failed because of a 0 period. Defaulting back to 1 period to avoid crashing, but this is a bug!");
             periodValue = 1;
         }
-        final long difference = (fieldValueInUnit % periodValue);
+        final long difference = fieldValueInUnit % periodValue;
         final long newValue = field.add(fieldValue, -1 * difference);
         return new DateTime(newValue, DateTimeZone.UTC);
     }

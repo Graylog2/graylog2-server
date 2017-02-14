@@ -19,8 +19,6 @@ package org.graylog2.shared.metrics.jersey2;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.annotation.ExceptionMetered;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerResponseContext;
@@ -28,7 +26,6 @@ import javax.ws.rs.container.ResourceInfo;
 import java.io.IOException;
 
 public class ExceptionMeteredMetricsFilter extends AbstractMetricsFilter {
-    private static final Logger LOG = LoggerFactory.getLogger(ExceptionMeteredMetricsFilter.class);
     private final Meter meter;
     private final Class<? extends Throwable> exceptionClass;
 

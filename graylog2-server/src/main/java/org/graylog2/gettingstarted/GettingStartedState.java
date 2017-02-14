@@ -22,14 +22,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
-import java.util.Map;
 import java.util.Set;
 
 @AutoValue
 @WithBeanGetter
 @JsonAutoDetect
 public abstract class GettingStartedState {
-
     /**
      * A map of Version.getMajor + Version.getMinor -> true/false.
      * <br/>

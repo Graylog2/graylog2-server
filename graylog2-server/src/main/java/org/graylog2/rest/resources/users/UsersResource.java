@@ -76,6 +76,7 @@ import javax.ws.rs.core.Response;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -127,7 +128,7 @@ public class UsersResource extends RestResource {
             throw new NotFoundException("Couldn't find user " + username);
         }
         // if the requested username does not match the authenticated user, then we don't return permission information
-        final boolean allowedToSeePermissions = isPermitted(RestPermissions.USERS_PERMISSIONSEDIT, username);
+        final boolean allowedToSeePermissions = isPermitted(USERS_PERMISSIONSEDIT, username);
         final boolean permissionsAllowed = getSubject().getPrincipal().toString().equals(username) || allowedToSeePermissions;
 
         return toUserResponse(user, permissionsAllowed, Optional.empty());
@@ -145,7 +146,7 @@ public class UsersResource extends RestResource {
         final Map<String, Optional<MongoDbSession>> lastSessionForUser = sessions.stream()
                 .filter(s -> s.getUsernameAttribute().isPresent())
                 .collect(groupingBy(s -> s.getUsernameAttribute().get(),
-                                    maxBy((s1, s2) -> s1.getLastAccessTime().compareTo(s2.getLastAccessTime()))));
+                                    maxBy(Comparator.comparing(MongoDbSession::getLastAccessTime))));
 
         final List<UserSummary> resultUsers = Lists.newArrayListWithCapacity(users.size() + 1);
         final User adminUser = userService.getAdminUser();
@@ -356,7 +357,7 @@ public class UsersResource extends RestResource {
         if (user == null) {
             throw new NotFoundException("Couldn't find user " + username);
         }
-        user.setPermissions(Collections.<String>emptyList());
+        user.setPermissions(Collections.emptyList());
         userService.save(user);
     }
 
@@ -459,7 +460,7 @@ public class UsersResource extends RestResource {
     public void revokeToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
             @ApiParam(name = "token", required = true) @PathParam("token") String token) {
-        final User user = _tokensCheckAndLoadUser(username);
+        _tokensCheckAndLoadUser(username);
         final AccessToken accessToken = accessTokenService.load(token);
 
         if (accessToken != null) {
@@ -514,7 +515,7 @@ public class UsersResource extends RestResource {
                 user.getName(),
                 user.getEmail(),
                 user.getFullName(),
-                includePermissions ? userService.getPermissionsForUser(user) : Collections.<String>emptyList(),
+                includePermissions ? userService.getPermissionsForUser(user) : Collections.emptyList(),
                 user.getPreferences(),
                 firstNonNull(user.getTimeZone(), DateTimeZone.UTC).getID(),
                 user.getSessionTimeoutMs(),

@@ -19,8 +19,6 @@ package org.graylog2.shared.security;
 import com.google.common.collect.ImmutableSet;
 import org.graylog2.plugin.security.Permission;
 import org.graylog2.plugin.security.PluginPermissions;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -28,8 +26,6 @@ import java.util.stream.Collectors;
 import static org.graylog2.plugin.security.Permission.create;
 
 public class RestPermissions implements PluginPermissions {
-    private static final Logger LOG = LoggerFactory.getLogger(RestPermissions.class);
-
     /**
      * These should all be in the form of "group:action", because {@link Permissions#allPermissionsMap()} below depends on it.
      * Should this ever change, you need to adapt the code below, too.

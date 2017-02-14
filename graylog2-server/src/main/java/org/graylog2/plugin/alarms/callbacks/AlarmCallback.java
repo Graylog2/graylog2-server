@@ -25,12 +25,15 @@ import org.graylog2.plugin.streams.Stream;
 import java.util.Map;
 
 public interface AlarmCallback {
-    
-    public void initialize(Configuration config) throws AlarmCallbackConfigurationException;
-    public void call(Stream stream, AlertCondition.CheckResult result) throws AlarmCallbackException;
+    void initialize(Configuration config) throws AlarmCallbackConfigurationException;
 
-    public ConfigurationRequest getRequestedConfiguration();
-    public String getName();
-    public Map<String, Object> getAttributes();
-    public void checkConfiguration() throws ConfigurationException;
+    void call(Stream stream, AlertCondition.CheckResult result) throws AlarmCallbackException;
+
+    ConfigurationRequest getRequestedConfiguration();
+
+    String getName();
+
+    Map<String, Object> getAttributes();
+
+    void checkConfiguration() throws ConfigurationException;
 }

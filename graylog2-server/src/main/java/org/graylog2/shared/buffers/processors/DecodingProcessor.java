@@ -54,7 +54,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     private final Timer decodeTime;
 
     public interface Factory {
-        public DecodingProcessor create(@Assisted("decodeTime") Timer decodeTime, @Assisted("parseTime") Timer parseTime);
+        DecodingProcessor create(@Assisted("decodeTime") Timer decodeTime, @Assisted("parseTime") Timer parseTime);
     }
 
     private final Map<String, Codec.Factory<? extends Codec>> codecFactory;

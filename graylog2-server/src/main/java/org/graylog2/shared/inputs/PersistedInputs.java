@@ -19,8 +19,8 @@ package org.graylog2.shared.inputs;
 import org.graylog2.plugin.inputs.MessageInput;
 
 public interface PersistedInputs extends Iterable<MessageInput> {
-    public MessageInput get(String id);
-    public boolean add(MessageInput e);
-    public boolean remove(Object o);
-    public boolean update(String id, MessageInput newInput);
+    MessageInput get(String id);
+    boolean add(MessageInput e);
+    boolean remove(Object o);
+    boolean update(String id, MessageInput newInput);
 }

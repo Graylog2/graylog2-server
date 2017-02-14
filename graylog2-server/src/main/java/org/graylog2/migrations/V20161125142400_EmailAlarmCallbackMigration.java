@@ -79,7 +79,7 @@ public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
 
         final List<String> users = alertReceivers.get("users");
         final List<String> emails = alertReceivers.get("emails");
-        return (users != null && !users.isEmpty()) || (emails != null && !emails.isEmpty());
+        return users != null && !users.isEmpty() || emails != null && !emails.isEmpty();
     }
 
     @Override
@@ -116,7 +116,7 @@ public class V20161125142400_EmailAlarmCallbackMigration extends Migration {
         }
     }
 
-    private Optional<String> migrateStream(org.graylog2.plugin.streams.Stream stream) {
+    private Optional<String> migrateStream(Stream stream) {
         final Map<String, Object> defaultConfig = this.getDefaultEmailAlarmCallbackConfig();
         LOG.debug("Creating email alarm callback for stream <" + stream.getId() + ">");
         final AlarmCallbackConfiguration alarmCallbackConfiguration = alarmCallbackService.create(stream.getId(),

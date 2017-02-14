@@ -153,7 +153,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
     @Override
     public Boolean isPaused() {
         Boolean disabled = getDisabled();
-        return (disabled != null && disabled);
+        return disabled != null && disabled;
     }
 
     @Override
@@ -179,7 +179,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
         result.remove("_id");
         result.put("id", ((ObjectId) fields.get("_id")).toHexString());
         result.remove(FIELD_CREATED_AT);
-        result.put(FIELD_CREATED_AT, (Tools.getISO8601String((DateTime) fields.get(FIELD_CREATED_AT))));
+        result.put(FIELD_CREATED_AT, Tools.getISO8601String((DateTime) fields.get(FIELD_CREATED_AT)));
         result.put(FIELD_RULES, streamRules);
         result.put(FIELD_OUTPUTS, outputs);
         result.put(FIELD_MATCHING_TYPE, getMatchingType());

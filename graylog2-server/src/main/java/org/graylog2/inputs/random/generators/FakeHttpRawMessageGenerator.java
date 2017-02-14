@@ -86,7 +86,7 @@ public class FakeHttpRawMessageGenerator {
         final int successProb = RANDOM.nextInt(100);
 
         generatorState.source = source;
-        generatorState.isSuccessful = (successProb < 98);
+        generatorState.isSuccessful = successProb < 98;
         generatorState.isTimeout = RANDOM.nextInt(5) == 1;
         generatorState.isSlowRequest = RANDOM.nextInt(500) == 1;
         generatorState.userId = ((UserId) getWeighted(USER_IDS)).getId();
