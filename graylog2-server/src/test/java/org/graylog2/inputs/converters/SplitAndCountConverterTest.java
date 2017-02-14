@@ -19,7 +19,7 @@ package org.graylog2.inputs.converters;
 import org.graylog2.ConfigurationException;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -46,9 +46,6 @@ public class SplitAndCountConverterTest {
     }
 
     private Map<String, Object> config(final String splitBy) {
-        return new HashMap<String, Object>() {{
-            put("split_by", splitBy);
-        }};
+        return Collections.singletonMap("split_by", splitBy);
     }
-
 }

@@ -22,7 +22,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Extractor;
 import org.junit.Test;
 
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
@@ -192,8 +192,6 @@ public class RegexExtractorTest extends AbstractExtractorTest {
     }
 
     public static Map<String, Object> config(final String regex) {
-        return new HashMap<String, Object>() {{
-            put("regex_value", regex);
-        }};
+        return Collections.singletonMap("regex_value", regex);
     }
 }

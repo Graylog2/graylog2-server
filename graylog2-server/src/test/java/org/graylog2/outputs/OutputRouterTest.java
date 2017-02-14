@@ -29,7 +29,6 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -75,9 +74,7 @@ public class OutputRouterTest {
         final Output output = mock(Output.class);
         final String outputId = "foobar";
         final MessageOutput messageOutput = mock(MessageOutput.class);
-        final Set<Output> outputSet = new HashSet<Output>() {{
-            add(output);
-        }};
+        final Set<Output> outputSet = ImmutableSet.of(output);
         when(stream.getOutputs()).thenReturn(outputSet);
         when(output.getId()).thenReturn(outputId);
         when(outputRegistry.getOutputForIdAndStream(eq(outputId), eq(stream))).thenReturn(messageOutput);
@@ -98,10 +95,7 @@ public class OutputRouterTest {
         final String output2Id = "bar";
         final MessageOutput messageOutput1 = mock(MessageOutput.class);
         final MessageOutput messageOutput2 = mock(MessageOutput.class);
-        final Set<Output> outputSet = new HashSet<Output>() {{
-            add(output1);
-            add(output2);
-        }};
+        final Set<Output> outputSet = ImmutableSet.of(output1, output2);
         when(stream.getOutputs()).thenReturn(outputSet);
         when(output1.getId()).thenReturn(output1Id);
         when(output2.getId()).thenReturn(output2Id);
@@ -123,9 +117,7 @@ public class OutputRouterTest {
         when(message.getStreams()).thenReturn(ImmutableSet.of(stream));
 
         final MessageOutput messageOutput = mock(MessageOutput.class);
-        final Set<MessageOutput> messageOutputList = new HashSet<MessageOutput>() {{
-            add(messageOutput);
-        }};
+        final Set<MessageOutput> messageOutputList = ImmutableSet.of(messageOutput);
 
         final OutputRouter outputRouter = Mockito.spy(new OutputRouter(defaultMessageOutput, outputRegistry));
         doReturn(messageOutputList).when(outputRouter).getMessageOutputsForStream(eq(stream));
@@ -144,13 +136,9 @@ public class OutputRouterTest {
         final Stream stream1 = mock(Stream.class);
         final Stream stream2 = mock(Stream.class);
         final MessageOutput messageOutput1 = mock(MessageOutput.class);
-        final Set<MessageOutput> messageOutputSet1 = new HashSet<MessageOutput>() {{
-            add(messageOutput1);
-        }};
+        final Set<MessageOutput> messageOutputSet1 = ImmutableSet.of(messageOutput1);
         final MessageOutput messageOutput2 = mock(MessageOutput.class);
-        final Set<MessageOutput> messageOutputSet2 = new HashSet<MessageOutput>() {{
-            add(messageOutput2);
-        }};
+        final Set<MessageOutput> messageOutputSet2 = ImmutableSet.of(messageOutput2);
         final Message message = mock(Message.class);
         when(message.getStreams()).thenReturn(ImmutableSet.of(stream1, stream2));
 
@@ -171,9 +159,7 @@ public class OutputRouterTest {
         final Stream stream1 = mock(Stream.class);
         final Stream stream2 = mock(Stream.class);
         final MessageOutput messageOutput = mock(MessageOutput.class);
-        final Set<MessageOutput> messageOutputSet = new HashSet<MessageOutput>() {{
-            add(messageOutput);
-        }};
+        final Set<MessageOutput> messageOutputSet = ImmutableSet.of(messageOutput);
         final Message message = mock(Message.class);
         when(message.getStreams()).thenReturn(ImmutableSet.of(stream1, stream2));
 

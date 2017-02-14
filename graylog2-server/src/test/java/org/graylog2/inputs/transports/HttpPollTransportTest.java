@@ -16,9 +16,9 @@
  */
 package org.graylog2.inputs.transports;
 
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.graylog2.inputs.transports.HttpPollTransport.parseHeaders;
@@ -37,14 +37,10 @@ public class HttpPollTransportTest {
         assertEquals(0, parseHeaders("foo").size());
         assertEquals(1, parseHeaders("X-Foo: Bar").size());
 
-        Map<String, String> expectedSingle = new HashMap<String, String>() {{
-            put("Accept", "application/json");
-        }};
-
-        Map<String, String> expectedMulti = new HashMap<String, String>() {{
-            put("Accept", "application/json");
-            put("X-Foo", "bar");
-        }};
+        Map<String, String> expectedSingle = ImmutableMap.of("Accept", "application/json");
+        Map<String, String> expectedMulti = ImmutableMap.of(
+                "Accept", "application/json",
+                "X-Foo", "bar");
 
         assertEquals(expectedMulti, parseHeaders("Accept: application/json, X-Foo: bar"));
         assertEquals(expectedSingle, parseHeaders("Accept: application/json"));

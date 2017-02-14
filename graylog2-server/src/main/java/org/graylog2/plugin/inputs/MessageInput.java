@@ -22,6 +22,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.MoreObjects;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.AbstractDescriptor;
 import org.graylog2.plugin.GlobalMetricNames;
@@ -40,7 +41,6 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public abstract class MessageInput implements Stoppable {
@@ -264,28 +264,31 @@ public abstract class MessageInput implements Stoppable {
     }
 
     public Map<String, Object> asMap() {
-        final MessageInput messageInput = this;
-        return new HashMap<String, Object>() {{
-            put(FIELD_TYPE, messageInput.getClass().getCanonicalName());
-            put(FIELD_NAME, messageInput.getName());
-            put(FIELD_TITLE, messageInput.getTitle());
-            put(FIELD_CREATOR_USER_ID, messageInput.getCreatorUserId());
-            put(FIELD_GLOBAL, messageInput.isGlobal());
-            put(FIELD_CONTENT_PACK, messageInput.getContentPack());
-            put(FIELD_CONFIGURATION, messageInput.getConfiguration().getSource());
+        final ImmutableMap.Builder<String, Object> map = ImmutableMap.<String, Object>builder()
+                .put(FIELD_TYPE, getClass().getCanonicalName())
+                .put(FIELD_NAME, getName())
+                .put(FIELD_TITLE, getTitle())
+                .put(FIELD_CREATOR_USER_ID, getCreatorUserId())
+                .put(FIELD_GLOBAL, isGlobal())
+                .put(FIELD_CONTENT_PACK, getContentPack())
+                .put(FIELD_CONFIGURATION, getConfiguration().getSource());
 
-            if (messageInput.getCreatedAt() != null)
-                put(FIELD_CREATED_AT, messageInput.getCreatedAt());
-            else
-                put(FIELD_CREATED_AT, Tools.nowUTC());
+        if (getCreatedAt() != null) {
+            map.put(FIELD_CREATED_AT, getCreatedAt());
+        } else {
+            map.put(FIELD_CREATED_AT, Tools.nowUTC());
+        }
 
 
-            if (messageInput.getStaticFields() != null && !messageInput.getStaticFields().isEmpty())
-                put(FIELD_STATIC_FIELDS, messageInput.getStaticFields());
+        if (getStaticFields() != null && !getStaticFields().isEmpty()) {
+            map.put(FIELD_STATIC_FIELDS, getStaticFields());
+        }
 
-            if (!messageInput.isGlobal())
-                put(FIELD_NODE_ID, messageInput.getNodeId());
-        }};
+        if (!isGlobal()) {
+            map.put(FIELD_NODE_ID, getNodeId());
+        }
+
+        return map.build();
     }
 
     public void addStaticField(String key, String value) {

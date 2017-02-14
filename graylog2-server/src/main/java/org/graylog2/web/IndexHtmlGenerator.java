@@ -17,6 +17,7 @@
 package org.graylog2.web;
 
 import com.floreysoft.jmte.Engine;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.graylog2.Configuration;
 
@@ -25,7 +26,6 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
@@ -37,12 +37,12 @@ public class IndexHtmlGenerator {
     public IndexHtmlGenerator(PluginAssets pluginAssets, Configuration configuration) throws IOException {
         final URL templateUrl = this.getClass().getResource("/web-interface/index.html.template");
         final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
-        final Map<String, Object> model = new HashMap<String, Object>() {{
-            put("title", title);
-            put("cssFiles", pluginAssets.cssFiles());
-            put("jsFiles", pluginAssets.sortedJsFiles());
-            put("appPrefix", configuration.getWebPrefix());
-        }};
+        final Map<String, Object> model = ImmutableMap.<String, Object>builder()
+                .put("title", title)
+                .put("cssFiles", pluginAssets.cssFiles())
+                .put("jsFiles", pluginAssets.sortedJsFiles())
+                .put("appPrefix", configuration.getWebPrefix())
+                .build();
 
         final Engine engine = new Engine();
         this.content = engine.transform(template, model);

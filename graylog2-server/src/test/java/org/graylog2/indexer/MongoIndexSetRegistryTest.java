@@ -28,7 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -59,7 +59,7 @@ public class MongoIndexSetRegistryTest {
     @Test
     public void indexSetsCacheShouldReturnCachedList() {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
-        final List<IndexSetConfig> indexSetConfigs = new ArrayList<IndexSetConfig>() {{ add(indexSetConfig); }};
+        final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
 
         final List<IndexSetConfig> result = this.indexSetsCache.get();
@@ -80,7 +80,7 @@ public class MongoIndexSetRegistryTest {
     @Test
     public void indexSetsCacheShouldReturnNewListAfterInvalidate() {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
-        final List<IndexSetConfig> indexSetConfigs = new ArrayList<IndexSetConfig>() {{ add(indexSetConfig); }};
+        final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
 
         final List<IndexSetConfig> result = this.indexSetsCache.get();
@@ -92,7 +92,7 @@ public class MongoIndexSetRegistryTest {
         this.indexSetsCache.invalidate();
 
         final IndexSetConfig newIndexSetConfig = mock(IndexSetConfig.class);
-        final List<IndexSetConfig> newIndexSetConfigs = new ArrayList<IndexSetConfig>() {{ add(newIndexSetConfig); }};
+        final List<IndexSetConfig> newIndexSetConfigs = Collections.singletonList(newIndexSetConfig);
         when(indexSetService.findAll()).thenReturn(newIndexSetConfigs);
 
 
@@ -108,7 +108,7 @@ public class MongoIndexSetRegistryTest {
     @Test
     public void indexSetsCacheShouldBeInvalidatedForIndexSetCreation() {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
-        final List<IndexSetConfig> indexSetConfigs = new ArrayList<IndexSetConfig>() {{ add(indexSetConfig); }};
+        final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
 
         final List<IndexSetConfig> result = this.indexSetsCache.get();
@@ -120,7 +120,7 @@ public class MongoIndexSetRegistryTest {
         this.indexSetsCache.handleIndexSetCreation(mock(IndexSetCreatedEvent.class));
 
         final IndexSetConfig newIndexSetConfig = mock(IndexSetConfig.class);
-        final List<IndexSetConfig> newIndexSetConfigs = new ArrayList<IndexSetConfig>() {{ add(newIndexSetConfig); }};
+        final List<IndexSetConfig> newIndexSetConfigs = Collections.singletonList(newIndexSetConfig);
         when(indexSetService.findAll()).thenReturn(newIndexSetConfigs);
 
 
@@ -136,7 +136,7 @@ public class MongoIndexSetRegistryTest {
     @Test
     public void indexSetsCacheShouldBeInvalidatedForIndexSetDeletion() {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
-        final List<IndexSetConfig> indexSetConfigs = new ArrayList<IndexSetConfig>() {{ add(indexSetConfig); }};
+        final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
 
         final List<IndexSetConfig> result = this.indexSetsCache.get();
@@ -148,7 +148,7 @@ public class MongoIndexSetRegistryTest {
         this.indexSetsCache.handleIndexSetDeletion(mock(IndexSetDeletedEvent.class));
 
         final IndexSetConfig newIndexSetConfig = mock(IndexSetConfig.class);
-        final List<IndexSetConfig> newIndexSetConfigs = new ArrayList<IndexSetConfig>() {{ add(newIndexSetConfig); }};
+        final List<IndexSetConfig> newIndexSetConfigs = Collections.singletonList(newIndexSetConfig);
         when(indexSetService.findAll()).thenReturn(newIndexSetConfigs);
 
 
@@ -163,7 +163,7 @@ public class MongoIndexSetRegistryTest {
 
     @Test
     public void getAllShouldBeCachedForEmptyList() {
-        final List<IndexSetConfig> indexSetConfigs = new ArrayList<>();
+        final List<IndexSetConfig> indexSetConfigs = Collections.emptyList();
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
 
         assertThat(this.indexSetRegistry.getAll())
@@ -180,7 +180,7 @@ public class MongoIndexSetRegistryTest {
     @Test
     public void getAllShouldBeCachedForNonEmptyList() {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
-        final List<IndexSetConfig> indexSetConfigs = new ArrayList<IndexSetConfig>() {{ add(indexSetConfig); }};
+        final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
         final MongoIndexSet indexSet = mock(MongoIndexSet.class);
         when(mongoIndexSetFactory.create(indexSetConfig)).thenReturn(indexSet);
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
@@ -203,7 +203,7 @@ public class MongoIndexSetRegistryTest {
     @Test
     public void getAllShouldNotBeCachedForCallAfterInvalidate() {
         final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
-        final List<IndexSetConfig> indexSetConfigs = new ArrayList<IndexSetConfig>() {{ add(indexSetConfig); }};
+        final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
         final MongoIndexSet indexSet = mock(MongoIndexSet.class);
         when(mongoIndexSetFactory.create(indexSetConfig)).thenReturn(indexSet);
         when(indexSetService.findAll()).thenReturn(indexSetConfigs);
