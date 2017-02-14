@@ -22,7 +22,6 @@ import com.lordofthejars.nosqlunit.annotation.ShouldMatchDataSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.MongoFlexibleComparisonStrategy;
-import com.mongodb.DBObject;
 import org.graylog2.alerts.Alert;
 import org.graylog2.database.MongoDBServiceTest;
 import org.graylog2.plugin.alarms.AlertCondition;

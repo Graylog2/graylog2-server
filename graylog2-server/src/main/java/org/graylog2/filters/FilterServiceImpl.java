@@ -18,19 +18,19 @@ package org.graylog2.filters;
 
 import com.google.common.collect.Iterators;
 import com.google.common.collect.Sets;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 import org.bson.types.ObjectId;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.filters.blacklist.FilterDescription;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.database.ValidationException;
 import org.mongojack.DBCursor;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Set;
 
 @Singleton

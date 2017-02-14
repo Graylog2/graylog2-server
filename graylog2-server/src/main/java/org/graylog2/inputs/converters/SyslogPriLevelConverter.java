@@ -17,7 +17,6 @@
 package org.graylog2.inputs.converters;
 
 import com.google.common.primitives.Ints;
-import org.graylog2.inputs.converters.SyslogPriUtilities;
 import org.graylog2.plugin.inputs.Converter;
 
 import java.util.Map;

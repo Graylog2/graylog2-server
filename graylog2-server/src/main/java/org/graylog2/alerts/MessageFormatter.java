@@ -19,7 +19,11 @@ package org.graylog2.alerts;
 import com.google.common.collect.Lists;
 import org.graylog2.plugin.Message;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Dennis Oelkers <dennis@torch.sh>

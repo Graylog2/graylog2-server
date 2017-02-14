@@ -17,16 +17,16 @@
 package org.graylog2.rest.resources.count;
 
 import com.codahale.metrics.annotation.Timed;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.counts.Counts;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.count.responses.MessageCountResponse;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;

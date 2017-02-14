@@ -18,15 +18,15 @@
 package org.graylog2.streams;
 
 import com.google.common.collect.Maps;
-import javax.inject.Inject;
 import org.graylog2.Configuration;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
+import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicInteger;
 

@@ -16,13 +16,11 @@
  */
 package org.graylog2.indexer.retention.strategies;
 
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
+import com.google.auto.value.AutoValue;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 
 /**

@@ -17,13 +17,13 @@
 package org.graylog2.system.activities;
 
 import com.google.common.collect.Lists;
-import javax.inject.Inject;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 

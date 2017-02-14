@@ -17,10 +17,11 @@
 package org.graylog2.outputs;
 
 import com.google.common.collect.Maps;
-import java.util.Map;
-import java.util.Set;
 import org.bson.types.ObjectId;
 import org.graylog2.plugin.outputs.OutputStreamConfiguration;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Lennart Koopmann <lennart@socketfeed.com>

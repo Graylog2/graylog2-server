@@ -17,7 +17,6 @@
 package org.graylog2.indexer;
 
 import com.google.common.collect.ImmutableMap;
-
 import org.graylog2.indexer.ranges.IndexRangeService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;

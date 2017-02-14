@@ -24,11 +24,11 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.rest.models.system.responses.Throughput;
 import org.graylog2.shared.metrics.MetricUtils;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.plugin.GlobalMetricNames;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
