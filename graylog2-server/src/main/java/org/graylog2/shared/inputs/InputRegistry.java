@@ -23,7 +23,8 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 public class InputRegistry extends HashSet<IOState<MessageInput>> {
     private static final Logger LOG = LoggerFactory.getLogger(InputRegistry.class);

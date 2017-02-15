@@ -82,21 +82,9 @@ public class DiscardMessageOutput implements MessageOutput {
     }
 
     public interface Factory extends MessageOutput.Factory<DiscardMessageOutput> {
-        @Override
-        DiscardMessageOutput create(Stream stream, Configuration configuration);
-
-        @Override
-        Config getConfig();
-
-        @Override
-        Descriptor getDescriptor();
     }
 
     public static class Config extends MessageOutput.Config {
-        @Override
-        public ConfigurationRequest getRequestedConfiguration() {
-            return new ConfigurationRequest();
-        }
     }
 
     public static class Descriptor extends MessageOutput.Descriptor {

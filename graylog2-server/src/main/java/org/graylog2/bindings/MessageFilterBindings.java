@@ -42,7 +42,7 @@ public class MessageFilterBindings extends AbstractModule {
         try {
             final URI blacklistRulesUri = Resources.getResource("blacklist.drl").toURI();
             rulesUrls.addBinding().toInstance(blacklistRulesUri);
-        } catch (URISyntaxException e) {
+        } catch (URISyntaxException ignored) {
             // Ignore
         }
     }

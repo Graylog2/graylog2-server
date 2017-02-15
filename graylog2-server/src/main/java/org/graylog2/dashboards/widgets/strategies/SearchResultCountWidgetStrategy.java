@@ -45,7 +45,7 @@ public class SearchResultCountWidgetStrategy implements WidgetStrategy {
     protected final Boolean lowerIsBetter;
 
     @AssistedInject
-    public SearchResultCountWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) {
+    public SearchResultCountWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange) {
         this.searches = searches;
 
         this.query = (String)config.get("query");

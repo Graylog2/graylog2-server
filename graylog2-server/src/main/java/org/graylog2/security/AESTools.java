@@ -16,6 +16,7 @@
  */
 package org.graylog2.security;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.shiro.codec.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +32,7 @@ public class AESTools {
     @Nullable
     public static String encrypt(String plainText, String encryptionKey, String salt) {
         try {
+            @SuppressFBWarnings("CIPHER_INTEGRITY")
             Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
             SecretKeySpec key = new SecretKeySpec(encryptionKey.getBytes("UTF-8"), "AES");
             cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));
@@ -44,6 +46,7 @@ public class AESTools {
     @Nullable
     public static String decrypt(String cipherText, String encryptionKey, String salt) {
         try {
+            @SuppressFBWarnings("CIPHER_INTEGRITY")
             Cipher cipher = Cipher.getInstance("AES/CBC/ISO10126Padding", "SunJCE");
             SecretKeySpec key = new SecretKeySpec(encryptionKey.getBytes("UTF-8"), "AES");
             cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(salt.getBytes("UTF-8")));

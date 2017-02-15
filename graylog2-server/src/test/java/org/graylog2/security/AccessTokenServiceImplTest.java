@@ -29,8 +29,10 @@ import org.junit.Test;
 import java.util.List;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
-import static org.junit.Assert.*;
 import static org.assertj.jodatime.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class AccessTokenServiceImplTest {
     @ClassRule

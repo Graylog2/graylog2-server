@@ -160,7 +160,7 @@ public class GelfCodec extends AbstractCodec {
         }
 
         // Facility is set by server if not specified by client.
-        final String facility = stringValue(node, ("facility"));
+        final String facility = stringValue(node, "facility");
         if (facility != null && !facility.isEmpty()) {
             message.addField("facility", facility);
         }
@@ -183,12 +183,12 @@ public class GelfCodec extends AbstractCodec {
             }
 
             // We already set short_message and host as message and source. Do not add as fields again.
-            if (key.equals("short_message") || key.equals("host")) {
+            if ("short_message".equals(key) || "host".equals(key)) {
                 continue;
             }
 
             // Skip standard or already set fields.
-            if (message.getField(key) != null || (Message.RESERVED_FIELDS.contains(key) && !Message.RESERVED_SETTABLE_FIELDS.contains(key))) {
+            if (message.getField(key) != null || Message.RESERVED_FIELDS.contains(key) && !Message.RESERVED_SETTABLE_FIELDS.contains(key)) {
                 continue;
             }
 

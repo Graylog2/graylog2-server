@@ -35,9 +35,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 @Singleton
 public class InputSetupService extends AbstractExecutionThreadService {
     private static final Logger LOG = LoggerFactory.getLogger(InputSetupService.class);
@@ -67,7 +64,7 @@ public class InputSetupService extends AbstractExecutionThreadService {
         // if we switch to RUNNING from STARTING (or unknown) the server is ready to accept connections on inputs.
         // we want to postpone opening the inputs earlier, so we don't get swamped with messages before
         // we can actually process them.
-        if ((lifecycle == Lifecycle.RUNNING) && (previousLifecycle.get() == Lifecycle.STARTING || previousLifecycle.get() == Lifecycle.UNINITIALIZED)) {
+        if (lifecycle == Lifecycle.RUNNING && previousLifecycle.get() == Lifecycle.STARTING || previousLifecycle.get() == Lifecycle.UNINITIALIZED) {
             LOG.info("Triggering launching persisted inputs, node transitioned from {} to {}", previousLifecycle.get(), lifecycle);
 
             // Set lifecycle BEFORE counting down the latch to avoid race conditions!

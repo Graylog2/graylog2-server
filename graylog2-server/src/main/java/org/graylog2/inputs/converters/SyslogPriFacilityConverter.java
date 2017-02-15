@@ -17,17 +17,12 @@
 package org.graylog2.inputs.converters;
 
 import com.google.common.primitives.Ints;
-import org.graylog2.inputs.converters.SyslogPriUtilities;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.Converter;
 
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class SyslogPriFacilityConverter extends Converter {
-
     public SyslogPriFacilityConverter(Map<String, Object> config) {
         super(Type.SYSLOG_PRI_FACILITY, config);
     }
@@ -38,8 +33,7 @@ public class SyslogPriFacilityConverter extends Converter {
             return value;
         }
 
-        Integer priority = Ints.tryParse(value);
-
+        final Integer priority = Ints.tryParse(value);
         if (priority == null) {
             return value;
         }
@@ -51,5 +45,4 @@ public class SyslogPriFacilityConverter extends Converter {
     public boolean buildsMultipleFields() {
         return false;
     }
-
 }

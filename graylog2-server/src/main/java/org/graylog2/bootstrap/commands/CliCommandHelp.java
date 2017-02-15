@@ -14,11 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin.streams;
+package org.graylog2.bootstrap.commands;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
-public interface AlertAction {
-    public void handle(Stream stream);
+import io.airlift.airline.Help;
+import org.graylog2.bootstrap.CliCommand;
+
+/* shallow subclass to make it implement CliCommand */
+public class CliCommandHelp extends Help implements CliCommand {
 }

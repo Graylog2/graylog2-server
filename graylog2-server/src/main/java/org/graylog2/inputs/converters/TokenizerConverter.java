@@ -59,8 +59,9 @@ public class TokenizerConverter extends Converter {
     }
 
     private String removeQuotes(String s) {
-        if ((s.startsWith("\"") && s.endsWith("\"")) ||
-                (s.startsWith("'") && s.endsWith("'")) ) {
+        final boolean doubleQuotes = s.startsWith("\"") && s.endsWith("\"");
+        final boolean singleQuotes = s.startsWith("'") && s.endsWith("'");
+        if (doubleQuotes || singleQuotes) {
             return s.substring(1, s.length() - 1);
         } else {
             return s;

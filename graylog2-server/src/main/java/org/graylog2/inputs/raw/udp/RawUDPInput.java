@@ -34,7 +34,6 @@
 package org.graylog2.inputs.raw.udp;
 
 import com.codahale.metrics.MetricRegistry;
-import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.inputs.codecs.RawCodec;
@@ -43,6 +42,8 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
+
+import javax.inject.Inject;
 
 public class RawUDPInput extends MessageInput {
 

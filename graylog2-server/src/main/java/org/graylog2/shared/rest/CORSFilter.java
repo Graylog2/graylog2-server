@@ -28,7 +28,7 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     @Override
     public void filter(ContainerRequestContext requestContext, ContainerResponseContext responseContext) throws IOException {
         // we have already added the necessary headers for OPTIONS requests below
-        if (requestContext.getRequest().getMethod().equalsIgnoreCase("options")) {
+        if ("options".equalsIgnoreCase(requestContext.getRequest().getMethod())) {
             if(Response.Status.Family.familyOf(responseContext.getStatus()) == Response.Status.Family.SUCCESSFUL) {
                 return;
             }
@@ -50,7 +50,7 @@ public class CORSFilter implements ContainerRequestFilter, ContainerResponseFilt
     @Override
     public void filter(ContainerRequestContext requestContext) throws IOException {
         // answer OPTIONS requests early so we don't have jersey produce WADL responses for them (we only use them for CORS preflight)
-        if (requestContext.getRequest().getMethod().equalsIgnoreCase("options")) {
+        if ("options".equalsIgnoreCase(requestContext.getRequest().getMethod())) {
             final Response.ResponseBuilder options = Response.noContent();
             String origin = requestContext.getHeaders().getFirst("Origin");
             if (origin != null && !origin.isEmpty()) {

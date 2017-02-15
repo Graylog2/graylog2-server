@@ -19,25 +19,27 @@ package org.graylog2.plugin.configuration.fields;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public interface ConfigurationField {
-
-    public enum Optional {
+    enum Optional {
         OPTIONAL,
         NOT_OPTIONAL
     }
 
-    public String getFieldType();
+    String getFieldType();
 
-    public String getName();
-    public String getHumanName();
-    public String getDescription();
-    public Object getDefaultValue();
-    public void setDefaultValue(Object defaultValue);
-    public Optional isOptional();
-    public List<String> getAttributes();
-    public Map<String, Map<String, String>> getAdditionalInformation();
+    String getName();
 
+    String getHumanName();
+
+    String getDescription();
+
+    Object getDefaultValue();
+
+    void setDefaultValue(Object defaultValue);
+
+    Optional isOptional();
+
+    List<String> getAttributes();
+
+    Map<String, Map<String, String>> getAdditionalInformation();
 }

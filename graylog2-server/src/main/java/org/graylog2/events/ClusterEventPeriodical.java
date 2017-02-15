@@ -16,12 +16,11 @@
  */
 package org.graylog2.events;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.eventbus.DeadEvent;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.BasicDBList;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DB;
@@ -29,7 +28,6 @@ import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import com.mongodb.MongoException;
 import com.mongodb.WriteConcern;
-
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.plugin.periodical.Periodical;
@@ -40,7 +38,6 @@ import org.mongojack.DBCursor;
 import org.mongojack.DBSort;
 import org.mongojack.DBUpdate;
 import org.mongojack.JacksonDBCollection;
-import org.mongojack.WriteResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -199,7 +196,7 @@ public class ClusterEventPeriodical extends Periodical {
     }
 
     private void updateConsumers(final String eventId, final NodeId nodeId) {
-        final WriteResult<ClusterEvent, String> writeResult = dbCollection.updateById(eventId, DBUpdate.addToSet("consumers", nodeId.toString()));
+        dbCollection.updateById(eventId, DBUpdate.addToSet("consumers", nodeId.toString()));
     }
 
     private Object extractPayload(Object payload, String eventClass) {

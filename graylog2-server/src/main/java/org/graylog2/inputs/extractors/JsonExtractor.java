@@ -20,10 +20,10 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.base.Joiner;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Maps;
+import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
 import org.graylog2.plugin.inputs.Extractor;
@@ -119,10 +119,8 @@ public class JsonExtractor extends Extractor {
             if (replaceKeyWhitespace && key.contains(" ")) {
                 key = key.replace(" ", keyWhitespaceReplacement);
             } else {
-                if (LOG.isDebugEnabled()) {
-                    if (key.contains(" ")) {
-                        LOG.debug("Invalid key \"{}\" in JSON object!", key);
-                    }
+                if (LOG.isDebugEnabled() && key.contains(" ")) {
+                    LOG.debug("Invalid key \"{}\" in JSON object!", key);
                 }
             }
             for (Entry entry : parseValue(key, mapEntry.getValue())) {
@@ -169,7 +167,7 @@ public class JsonExtractor extends Extractor {
     }
 
     @AutoValue
-@WithBeanGetter
+    @WithBeanGetter
     protected abstract static class Entry {
         public abstract String key();
 

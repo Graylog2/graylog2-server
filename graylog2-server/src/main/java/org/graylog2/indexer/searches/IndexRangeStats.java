@@ -18,14 +18,12 @@ package org.graylog2.indexer.searches;
 
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.List;
-
-import javax.annotation.Nullable;
 
 @AutoValue
 @WithBeanGetter

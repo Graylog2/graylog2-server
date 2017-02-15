@@ -17,8 +17,8 @@
 package org.graylog2.indexer.esplugin;
 
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Set;
 

@@ -167,7 +167,7 @@ public class FormattedEmailAlertSender implements AlertSender {
         final Email email = new SimpleEmail();
         email.setCharset(EmailConstants.UTF_8);
 
-        if (Strings.isNullOrEmpty(configuration.getHostname())) {
+        if (isNullOrEmpty(configuration.getHostname())) {
             throw new TransportConfigurationException("No hostname configured for email transport while trying to send alert email!");
         } else {
             email.setHostName(configuration.getHostname());
@@ -186,7 +186,7 @@ public class FormattedEmailAlertSender implements AlertSender {
 
         email.setSSLOnConnect(configuration.isUseSsl());
         email.setStartTLSEnabled(configuration.isUseTls());
-        if (pluginConfig != null && !Strings.isNullOrEmpty(pluginConfig.getString("sender"))) {
+        if (pluginConfig != null && !isNullOrEmpty(pluginConfig.getString("sender"))) {
             email.setFrom(pluginConfig.getString("sender"));
         } else {
             email.setFrom(configuration.getFromEmail());

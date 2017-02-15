@@ -21,7 +21,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.util.concurrent.AbstractExecutionThreadService;
 import com.google.common.util.concurrent.Service;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
@@ -83,9 +82,5 @@ public abstract class GeneratorTransport extends ThrottleableTransport {
     }
 
     public static class Config extends ThrottleableTransport.Config {
-        @Override
-        public ConfigurationRequest getRequestedConfiguration() {
-            return super.getRequestedConfiguration();
-        }
     }
 }

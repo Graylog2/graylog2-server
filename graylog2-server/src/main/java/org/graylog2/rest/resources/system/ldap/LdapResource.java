@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.system.ldap;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.base.Strings;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -285,7 +284,7 @@ public class LdapResource extends RestResource {
         if (!ldapSettings.isEnabled()) {
             throw new BadRequestException("LDAP is disabled.");
         }
-        if (Strings.isNullOrEmpty(ldapSettings.getGroupSearchBase()) || Strings.isNullOrEmpty(ldapSettings.getGroupIdAttribute())) {
+        if (isNullOrEmpty(ldapSettings.getGroupSearchBase()) || isNullOrEmpty(ldapSettings.getGroupIdAttribute())) {
             throw new BadRequestException("LDAP group configuration settings are not set.");
         }
 

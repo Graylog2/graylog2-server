@@ -22,6 +22,7 @@ import org.graylog2.shared.plugins.PluginLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,9 +34,9 @@ import java.util.stream.Collectors;
 public class PluginAssets {
     private static final Logger LOG = LoggerFactory.getLogger(PluginAssets.class);
 
-    public static String pathPrefix = "web-interface/assets";
-    private static String pluginPathPrefix = "plugin/";
-    private static String manifestFilename = "module.json";
+    public static final String pathPrefix = "web-interface/assets";
+    private static final String pluginPathPrefix = "plugin/";
+    private static final String manifestFilename = "module.json";
 
     private final ObjectMapper objectMapper;
     private final List<String> jsFiles;
@@ -49,7 +50,7 @@ public class PluginAssets {
         this.jsFiles = new ArrayList<>();
         this.cssFiles = new ArrayList<>();
 
-        plugins.stream().forEach(plugin -> {
+        plugins.forEach(plugin -> {
             final ModuleManifest pluginManifest = manifestForPlugin(plugin);
             final String pathPrefix = pluginPathPrefix + plugin.metadata().getUniqueId() + "/";
             if (pluginManifest != null) {
@@ -79,7 +80,7 @@ public class PluginAssets {
 
     // Sort JS files in the intended load order, so templates don't need to care about it.
     public List<String> sortedJsFiles() {
-        List<String> sortedJsFiles = jsFiles().stream()
+        return jsFiles().stream()
                 .sorted((file1, file2) -> {
                     // Polyfill JS script goes first
                     if (file1.equals(polyfillJsFile)) {
@@ -94,7 +95,6 @@ public class PluginAssets {
                     return file2.compareTo(file1);
                 })
                 .collect(Collectors.toList());
-        return sortedJsFiles;
     }
 
     public List<String> cssFiles() {
@@ -105,6 +105,7 @@ public class PluginAssets {
         return filenames.stream().map(file -> file.startsWith(pathPrefix) ? file : pathPrefix + file).collect(Collectors.toList());
     }
 
+    @Nullable
     private ModuleManifest manifestForPlugin(Plugin plugin) {
         if (!(plugin instanceof PluginLoader.PluginAdapter)) {
             LOG.warn("Unable to read web manifest from plugin " + plugin + ": Plugin is not an instance of PluginAdapter.");
@@ -115,8 +116,7 @@ public class PluginAssets {
         final InputStream manifestStream = plugin.metadata().getClass().getResourceAsStream("/plugin." + pluginClassName + "." + manifestFilename);
         if (manifestStream != null) {
             try {
-                final ModuleManifest manifest = objectMapper.readValue(manifestStream, ModuleManifest.class);
-                return manifest;
+                return objectMapper.readValue(manifestStream, ModuleManifest.class);
             } catch (IOException e) {
                 LOG.warn("Unable to read web manifest from plugin " + plugin + ": ", e);
             }

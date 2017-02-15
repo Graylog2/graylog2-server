@@ -41,8 +41,6 @@ import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamService;
 import org.graylog2.streams.events.StreamsChangedEvent;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -64,8 +62,6 @@ import java.util.Set;
 @Api(value = "StreamOutputs", description = "Manage stream outputs for a given stream")
 @Path("/streams/{streamid}/outputs")
 public class StreamOutputResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(StreamOutputResource.class);
-
     private final OutputService outputService;
     private final StreamService streamService;
     private final OutputRegistry outputRegistry;
@@ -91,7 +87,7 @@ public class StreamOutputResource extends RestResource {
             @ApiResponse(code = 404, message = "No such stream on this node.")
     })
     public OutputListResponse get(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true)
-                                   @PathParam("streamid") String streamid) throws org.graylog2.database.NotFoundException {
+                                   @PathParam("streamid") String streamid) throws NotFoundException {
         checkPermission(RestPermissions.STREAMS_READ, streamid);
         checkPermission(RestPermissions.STREAM_OUTPUTS_READ);
 
@@ -170,7 +166,7 @@ public class StreamOutputResource extends RestResource {
     public void remove(@ApiParam(name = "streamid", value = "The id of the stream whose outputs we want.", required = true)
                        @PathParam("streamid") String streamid,
                        @ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
-                       @PathParam("outputId") String outputId) throws org.graylog2.database.NotFoundException {
+                       @PathParam("outputId") String outputId) throws NotFoundException {
         final Stream stream = streamService.load(streamid);
         final Output output = outputService.load(outputId);
 

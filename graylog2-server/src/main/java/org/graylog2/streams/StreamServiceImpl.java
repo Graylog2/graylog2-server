@@ -308,7 +308,7 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
             }
         }
 
-        throw new org.graylog2.database.NotFoundException();
+        throw new NotFoundException("Alert condition <" + conditionId + "> for stream <" + stream.getId() + "> not found");
     }
 
     @Override
@@ -356,14 +356,15 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
                     final Map<String, Object> configuration = callback.getConfiguration();
                     String key;
 
-                    if (type.equals("users")) {
+                    if ("users".equals(type)) {
                         key = EmailAlarmCallback.CK_USER_RECEIVERS;
                     } else {
                         key = EmailAlarmCallback.CK_EMAIL_RECEIVERS;
                     }
 
+                    @SuppressWarnings("unchecked")
                     final List<String> recipients = (List<String>) configuration.get(key);
-                    if (action.equals("add")) {
+                    if ("add".equals(action)) {
                         if (!recipients.contains(entity)) {
                             recipients.add(entity);
                         }

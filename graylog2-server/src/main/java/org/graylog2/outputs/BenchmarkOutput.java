@@ -17,18 +17,21 @@
 
 package org.graylog2.outputs;
 
-import com.codahale.metrics.*;
+import com.codahale.metrics.CsvReporter;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metric;
+import com.codahale.metrics.MetricFilter;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableList;
-import javax.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.journal.Journal;
 
+import javax.inject.Inject;
 import java.io.File;
 import java.util.List;
 import java.util.Locale;
@@ -116,10 +119,6 @@ public class BenchmarkOutput implements MessageOutput {
     }
 
     public static class Config extends MessageOutput.Config {
-        @Override
-        public ConfigurationRequest getRequestedConfiguration() {
-            return new ConfigurationRequest();
-        }
     }
 
     public static class Descriptor extends MessageOutput.Descriptor {

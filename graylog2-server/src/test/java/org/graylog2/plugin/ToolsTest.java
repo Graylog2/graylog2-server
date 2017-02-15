@@ -32,6 +32,8 @@ import java.nio.file.Paths;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
@@ -176,7 +178,7 @@ public class ToolsTest {
     }
 
     @Test
-    public void testAsSortedList() {
+    public void testAsSortedSet() {
         List<Integer> sortMe = Lists.newArrayList();
         sortMe.add(0);
         sortMe.add(2);
@@ -186,7 +188,7 @@ public class ToolsTest {
         sortMe.add(25);
         sortMe.add(11);
 
-        List<Integer> expected = Lists.newArrayList();
+        SortedSet<Integer> expected = new TreeSet<>();
         expected.add(0);
         expected.add(1);
         expected.add(2);
@@ -195,7 +197,7 @@ public class ToolsTest {
         expected.add(11);
         expected.add(25);
 
-        assertEquals(expected, Tools.asSortedList(sortMe));
+        assertEquals(expected, Tools.asSortedSet(sortMe));
     }
 
     @Test

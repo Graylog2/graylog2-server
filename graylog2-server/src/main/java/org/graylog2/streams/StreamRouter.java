@@ -43,7 +43,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class StreamRouter {
     private static final Logger LOG = LoggerFactory.getLogger(StreamRouter.class);
 
-    protected final StreamService streamService;
     private final ServerStatus serverStatus;
     private final ScheduledExecutorService scheduler;
 
@@ -56,7 +55,6 @@ public class StreamRouter {
                         StreamRouterEngine.Factory routerEngineFactory,
                         EventBus serverEventBus,
                         @Named("daemonScheduler") ScheduledExecutorService scheduler) {
-        this.streamService = streamService;
         this.serverStatus = serverStatus;
         this.scheduler = scheduler;
 

@@ -84,7 +84,6 @@ import java.util.SortedMap;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -317,7 +316,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
     private Timer registerHdrTimer(MetricRegistry metricRegistry, final String metricName) {
         Timer timer;
         try {
-            timer = metricRegistry.register(metricName, new HdrTimer(1, TimeUnit.MINUTES, 1));
+            timer = metricRegistry.register(metricName, new HdrTimer(1, MINUTES, 1));
         } catch (IllegalArgumentException e) {
             final SortedMap<String, Timer> timers = metricRegistry.getTimers((name, metric) -> metricName.equals(name));
             timer = Iterables.getOnlyElement(timers.values());

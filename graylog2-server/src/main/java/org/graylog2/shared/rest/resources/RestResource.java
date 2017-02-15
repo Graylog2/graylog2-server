@@ -21,9 +21,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
-import com.google.common.base.Function;
-import com.google.common.collect.FluentIterable;
-import com.google.common.collect.Iterables;
 import org.apache.shiro.subject.Subject;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
@@ -44,8 +41,11 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import java.net.URI;
 import java.security.Principal;
 import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(RestResource.class);
@@ -113,15 +113,10 @@ public abstract class RestResource {
     }
 
     protected boolean isAnyPermitted(String[] permissions, final String instanceId) {
-        final Iterable<String> instancePermissions = Iterables.transform(Arrays.asList(permissions),
-                                                               new Function<String, String>() {
-                                                                   @Nullable
-                                                                   @Override
-                                                                   public String apply(String permission) {
-                                                                       return permission + ":" + instanceId;
-                                                                   }
-                                                               });
-        return isAnyPermitted(FluentIterable.from(instancePermissions).toArray(String.class));
+        final List<String> instancePermissions = Arrays.stream(permissions)
+                .map(permission -> permission + ":" + instanceId)
+                .collect(Collectors.toList());
+        return isAnyPermitted(instancePermissions.toArray(new String[0]));
     }
 
     protected boolean isAnyPermitted(String... permissions) {
@@ -140,6 +135,7 @@ public abstract class RestResource {
         }
     }
 
+    @Nullable
     protected User getCurrentUser() {
         final Object principal = getSubject().getPrincipal();
         final User user = userService.load(principal.toString());
@@ -152,10 +148,12 @@ public abstract class RestResource {
     }
 
     protected UriBuilder getUriBuilderToSelf() {
-        if (configuration.getRestTransportUri() != null) {
-            return UriBuilder.fromUri(configuration.getRestTransportUri());
-        } else
+        final URI restTransportUri = configuration.getRestTransportUri();
+        if (restTransportUri != null) {
+            return UriBuilder.fromUri(restTransportUri);
+        } else {
             return uriInfo.getBaseUriBuilder();
+        }
     }
 
     protected IndexSet getIndexSet(final IndexSetRegistry indexSetRegistry, final String indexSetId) {

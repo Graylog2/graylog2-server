@@ -20,18 +20,16 @@ import com.codahale.metrics.annotation.Timed;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.plugin.Tools;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.graylog2.plugin.Tools;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.activities.SystemMessage;
 import org.graylog2.system.activities.SystemMessageService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -46,9 +44,6 @@ import java.util.Map;
 @Api(value = "System/Messages", description = "Internal Graylog messages")
 @Path("/system/messages")
 public class MessagesResource extends RestResource {
-
-    private static final Logger LOG = LoggerFactory.getLogger(MessagesResource.class);
-
     private final SystemMessageService systemMessageService;
 
     @Inject
@@ -61,7 +56,7 @@ public class MessagesResource extends RestResource {
     @ApiOperation(value = "Get internal Graylog system messages")
     @RequiresPermissions(RestPermissions.SYSTEMMESSAGES_READ)
     @Produces(MediaType.APPLICATION_JSON)
-    public Map<String, Object> all(@ApiParam(name = "page", value = "Page", required = false) @QueryParam("page") int page) {
+    public Map<String, Object> all(@ApiParam(name = "page", value = "Page") @QueryParam("page") int page) {
         final List<Map<String, Object>> messages = Lists.newArrayList();
         for (SystemMessage sm : systemMessageService.all(page(page))) {
             Map<String, Object> message = Maps.newHashMapWithExpectedSize(4);

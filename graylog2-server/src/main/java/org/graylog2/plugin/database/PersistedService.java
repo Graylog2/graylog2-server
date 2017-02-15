@@ -19,12 +19,10 @@ package org.graylog2.plugin.database;
 import org.graylog2.plugin.database.validators.ValidationResult;
 import org.graylog2.plugin.database.validators.Validator;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @author Dennis Oelkers <dennis@torch.sh>
- */
 public interface PersistedService {
     <T extends Persisted> int destroy(T model);
 
@@ -32,6 +30,7 @@ public interface PersistedService {
 
     <T extends Persisted> String save(T model) throws ValidationException;
 
+    @Nullable
     <T extends Persisted> String saveWithoutValidation(T model);
 
     <T extends Persisted> Map<String, List<ValidationResult>> validate(T model, Map<String, Object> fields);

@@ -24,7 +24,6 @@ import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 
 public interface Transport {
-
     void setMessageAggregator(CodecAggregator aggregator);
 
     void launch(MessageInput input) throws MisfireException;
@@ -33,12 +32,13 @@ public interface Transport {
 
     MetricSet getMetricSet();
 
-    public interface Config {
+    interface Config {
         ConfigurationRequest getRequestedConfiguration();
     }
 
     interface Factory<T extends Transport> {
         T create(Configuration configuration);
+
         Config getConfig();
     }
 }

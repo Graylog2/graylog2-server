@@ -24,16 +24,14 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.events.ClusterEventBus;
-import org.graylog2.filters.events.FilterDescriptionUpdateEvent;
-import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.filters.FilterService;
 import org.graylog2.filters.blacklist.FilterDescription;
+import org.graylog2.filters.events.FilterDescriptionUpdateEvent;
+import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.graylog2.plugin.database.users.User;
 import org.hibernate.validator.constraints.NotEmpty;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -58,8 +56,6 @@ import java.util.Set;
 @Api(value = "Filters", description = "Message blacklist filters")
 @Path("/filters/blacklist")
 public class BlacklistSourceResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(BlacklistSourceResource.class);
-
     private FilterService filterService;
     private final ClusterEventBus clusterEventBus;
 

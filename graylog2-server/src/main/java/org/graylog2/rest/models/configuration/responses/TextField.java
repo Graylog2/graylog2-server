@@ -16,15 +16,9 @@
  */
 package org.graylog2.rest.models.configuration.responses;
 
-import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
-
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class TextField extends RequestedConfigurationField {
-
     private final static String TYPE = "text";
 
     public enum Attribute {
@@ -44,5 +38,4 @@ public class TextField extends RequestedConfigurationField {
     public String attributeToJSValidation(String attribute) {
         throw new RuntimeException("This type does not have any validatable attributes.");
     }
-
 }

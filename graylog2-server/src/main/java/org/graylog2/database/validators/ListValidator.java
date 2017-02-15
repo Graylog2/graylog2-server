@@ -34,9 +34,10 @@ public class ListValidator implements Validator {
 
     @Override
     public ValidationResult validate(Object value) {
-        if ((allowMissing && (value == null)) || (value instanceof List))
+        if ((allowMissing && value == null) || value instanceof List) {
             return new ValidationResult.ValidationPassed();
-        else
+        } else {
             return new ValidationResult.ValidationFailed("Value is not a list!");
+        }
     }
 }

@@ -133,38 +133,13 @@ public class HttpTransport extends AbstractTcpTransport {
             // This avoids dangling HTTP connections when the HTTP client does not close the connection properly.
             // For details see: https://github.com/Graylog2/graylog2-server/issues/3223#issuecomment-270350500
 
-            baseChannelHandlers.put("read-timeout-handler", new Callable<ChannelHandler>() {
-                @Override
-                public ChannelHandler call() throws Exception {
-                    return new ReadTimeoutHandler(timer, idleWriterTimeout, TimeUnit.SECONDS);
-                }
-            });
+            baseChannelHandlers.put("read-timeout-handler", () -> new ReadTimeoutHandler(timer, idleWriterTimeout, TimeUnit.SECONDS));
         }
 
-        baseChannelHandlers.put("decoder", new Callable<ChannelHandler>() {
-            @Override
-            public ChannelHandler call() throws Exception {
-                return new HttpRequestDecoder(DEFAULT_MAX_INITIAL_LINE_LENGTH, DEFAULT_MAX_HEADER_SIZE, maxChunkSize);
-            }
-        });
-        baseChannelHandlers.put("aggregator", new Callable<ChannelHandler>() {
-            @Override
-            public ChannelHandler call() throws Exception {
-                return new HttpChunkAggregator(maxChunkSize);
-            }
-        });
-        baseChannelHandlers.put("encoder", new Callable<ChannelHandler>() {
-            @Override
-            public ChannelHandler call() throws Exception {
-                return new HttpResponseEncoder();
-            }
-        });
-        baseChannelHandlers.put("decompressor", new Callable<ChannelHandler>() {
-            @Override
-            public ChannelHandler call() throws Exception {
-                return new HttpContentDecompressor();
-            }
-        });
+        baseChannelHandlers.put("decoder", () -> new HttpRequestDecoder(DEFAULT_MAX_INITIAL_LINE_LENGTH, DEFAULT_MAX_HEADER_SIZE, maxChunkSize));
+        baseChannelHandlers.put("aggregator", () -> new HttpChunkAggregator(maxChunkSize));
+        baseChannelHandlers.put("encoder", HttpResponseEncoder::new);
+        baseChannelHandlers.put("decompressor", HttpContentDecompressor::new);
 
         return baseChannelHandlers;
     }
@@ -173,12 +148,7 @@ public class HttpTransport extends AbstractTcpTransport {
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = Maps.newLinkedHashMap();
 
-        handlers.put("http-handler", new Callable<ChannelHandler>() {
-            @Override
-            public ChannelHandler call() throws Exception {
-                return new Handler(enableCors);
-            }
-        });
+        handlers.put("http-handler", () -> new Handler(enableCors));
 
         handlers.putAll(super.getFinalChannelHandlers(input));
         return handlers;
@@ -272,12 +242,10 @@ public class HttpTransport extends AbstractTcpTransport {
             response.headers().set(Names.CONNECTION,
                                    keepAlive ? Values.KEEP_ALIVE : Values.CLOSE);
 
-            if (enableCors) {
-                if (origin != null && !origin.isEmpty()) {
-                    response.headers().set(Names.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-                    response.headers().set(Names.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
-                    response.headers().set(Names.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");
-                }
+            if (enableCors && origin != null && !origin.isEmpty()) {
+                response.headers().set(Names.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
+                response.headers().set(Names.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
+                response.headers().set(Names.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");
             }
 
             final ChannelFuture channelFuture = channel.write(response);
@@ -286,5 +254,4 @@ public class HttpTransport extends AbstractTcpTransport {
             }
         }
     }
-
 }

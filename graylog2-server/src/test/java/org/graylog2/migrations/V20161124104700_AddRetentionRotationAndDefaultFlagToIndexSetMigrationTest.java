@@ -18,7 +18,6 @@ package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import org.graylog2.events.ClusterEventBus;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.management.IndexManagementConfig;
@@ -57,14 +56,12 @@ public class V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigrati
     private IndexSetService indexSetService;
     @Mock
     private ClusterConfigService clusterConfigService;
-    @Mock
-    private ClusterEventBus clusterEventBus;
 
     private Migration migration;
 
     @Before
     public void setUp() throws Exception {
-        migration = new V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration(indexSetService, clusterConfigService, clusterEventBus);
+        migration = new V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration(indexSetService, clusterConfigService);
     }
 
     @Test

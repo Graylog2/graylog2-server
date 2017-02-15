@@ -32,17 +32,15 @@ import org.graylog2.outputs.MessageOutputFactory;
 import org.graylog2.outputs.OutputRegistry;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Output;
+import org.graylog2.rest.models.streams.outputs.OutputListResponse;
+import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
 import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 import org.graylog2.rest.resources.streams.outputs.AvailableOutputSummary;
-import org.graylog2.rest.models.streams.outputs.OutputListResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.streams.OutputService;
-import org.graylog2.rest.models.streams.outputs.requests.CreateOutputRequest;
 import org.graylog2.utilities.ConfigurationMapConverter;
 import org.joda.time.DateTime;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.ws.rs.Consumes;
@@ -65,8 +63,6 @@ import java.util.Set;
 @Api(value = "System/Outputs", description = "Manage outputs")
 @Path("/system/outputs")
 public class OutputResource extends RestResource {
-    private static final Logger LOG = LoggerFactory.getLogger(OutputResource.class);
-
     private final OutputService outputService;
     private final MessageOutputFactory messageOutputFactory;
     private final OutputRegistry outputRegistry;
@@ -211,7 +207,8 @@ public class OutputResource extends RestResource {
 
         deltas.remove("streams");
         if (deltas.containsKey("configuration")) {
-            final Map<String, Object> configuration = (Map<String, Object>)deltas.get("configuration");
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> configuration = (Map<String, Object>) deltas.get("configuration");
             deltas.put("configuration", ConfigurationMapConverter.convertValues(configuration, outputSummary.requestedConfiguration()));
         }
 

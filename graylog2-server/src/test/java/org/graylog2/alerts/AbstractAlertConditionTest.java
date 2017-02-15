@@ -26,8 +26,6 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 public class AbstractAlertConditionTest extends AlertConditionTest {
-    final protected int time = 10;
-
     @Test
     public void testDifferingTypesForNumericalParameters() throws Exception {
         final AlertCondition alertConditionWithDouble = getDummyAlertCondition(ImmutableMap.of("grace", 3.0));

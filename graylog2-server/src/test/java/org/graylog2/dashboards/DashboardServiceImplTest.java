@@ -16,14 +16,12 @@
  */
 package org.graylog2.dashboards;
 
-import com.codahale.metrics.MetricRegistry;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.database.NotFoundException;
-import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 import org.junit.Before;
@@ -50,12 +48,6 @@ public class DashboardServiceImplTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private DashboardService dashboardService;
-
-    @Mock
-    private MetricRegistry metricRegistry;
-
-    @Mock
-    private Searches searches;
 
     @Mock
     private DashboardWidgetCreator dashboardWidgetCreator;

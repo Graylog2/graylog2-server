@@ -121,7 +121,7 @@ public class WebInterfaceAssetsResource {
     @GET
     public Response get(@Context Request request,
                         @PathParam("filename") String filename) {
-        if (filename == null || filename.isEmpty() || filename.equals("/") || filename.equals("index.html")) {
+        if (filename == null || filename.isEmpty() || "/".equals(filename) || "index.html".equals(filename)) {
             return getDefaultResponse();
         }
         try {

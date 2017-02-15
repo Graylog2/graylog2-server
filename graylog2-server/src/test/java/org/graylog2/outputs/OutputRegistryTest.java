@@ -56,8 +56,6 @@ public class OutputRegistryTest {
     private Output output;
     @Mock
     private OutputService outputService;
-    @Mock
-    private org.graylog2.Configuration configuration;
 
     @Test
     public void testMessageOutputsIncludesDefault() {

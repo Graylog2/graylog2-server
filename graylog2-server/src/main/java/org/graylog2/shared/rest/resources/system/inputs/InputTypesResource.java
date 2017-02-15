@@ -23,11 +23,11 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.rest.models.system.inputs.responses.InputTypeInfo;
 import org.graylog2.rest.models.system.inputs.responses.InputTypesSummary;
 import org.graylog2.shared.inputs.InputDescription;
 import org.graylog2.shared.inputs.MessageInputFactory;
+import org.graylog2.shared.rest.resources.RestResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

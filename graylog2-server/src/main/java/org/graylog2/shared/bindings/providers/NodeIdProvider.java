@@ -16,8 +16,8 @@
  */
 package org.graylog2.shared.bindings.providers;
 
-import org.graylog2.plugin.system.NodeId;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.system.NodeId;
 
 import javax.inject.Inject;
 import javax.inject.Provider;

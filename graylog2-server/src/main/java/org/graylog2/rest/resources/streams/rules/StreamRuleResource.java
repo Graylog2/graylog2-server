@@ -17,7 +17,11 @@
 package org.graylog2.rest.resources.streams.rules;
 
 import com.codahale.metrics.annotation.Timed;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -38,10 +42,6 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.streams.events.StreamsChangedEvent;
 import org.hibernate.validator.constraints.NotEmpty;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
 import javax.inject.Inject;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
@@ -56,12 +56,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 @RequiresAuthentication
 @Api(value = "StreamRules", description = "Manage stream rules")

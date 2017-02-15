@@ -73,7 +73,7 @@ public class RegexReplaceExtractor extends Extractor {
 
         this.pattern = Pattern.compile((String) configRegexValue, Pattern.DOTALL);
         this.replacement = isNullOrEmpty((String) configReplaceValue) ? DEFAULT_REPLACE_VALUE : (String) configReplaceValue;
-        this.replaceAll = configReplaceAll == null ? false : (boolean) configReplaceAll;
+        this.replaceAll = configReplaceAll != null && (boolean) configReplaceAll;
     }
 
     @Override

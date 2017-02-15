@@ -29,7 +29,7 @@ public interface Journal {
 
     void markJournalOffsetCommitted(long offset);
 
-    public static class Entry {
+    class Entry {
         private final byte[] idBytes;
         private final byte[] messageBytes;
 
@@ -47,7 +47,7 @@ public interface Journal {
         }
     }
 
-    public static class JournalReadEntry {
+    class JournalReadEntry {
 
         private final byte[] payload;
         private final long offset;

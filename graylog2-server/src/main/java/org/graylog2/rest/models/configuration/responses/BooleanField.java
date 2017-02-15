@@ -16,15 +16,9 @@
  */
 package org.graylog2.rest.models.configuration.responses;
 
-import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
-
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class BooleanField extends RequestedConfigurationField {
-
     private final static String TYPE = "boolean";
 
     public BooleanField(Map.Entry<String, Map<String, Object>> c) {

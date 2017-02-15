@@ -16,7 +16,6 @@
  */
 package org.graylog2.streams;
 
-import org.bson.types.ObjectId;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.database.PersistedService;

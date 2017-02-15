@@ -23,8 +23,6 @@ import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.plugin.system.NodeId;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -32,8 +30,6 @@ import java.text.MessageFormat;
 import java.util.Locale;
 
 public class SizeBasedRotationStrategy extends AbstractRotationStrategy {
-    private static final Logger LOG = LoggerFactory.getLogger(SizeBasedRotationStrategy.class);
-
     private final Indices indices;
 
     @Inject

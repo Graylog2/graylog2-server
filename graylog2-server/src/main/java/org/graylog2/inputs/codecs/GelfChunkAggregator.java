@@ -216,7 +216,7 @@ public class GelfChunkAggregator implements CodecAggregator {
             sb.append("\tChunks:\n");
             for (int i = 0; i < entry.getValue().payloadArray.length(); i++) {
                 final GELFMessageChunk chunk = entry.getValue().payloadArray.get(i);
-                sb.append("\t\t").append(chunk == null ? "<not arrived yet>" : chunk).append(("\n"));
+                sb.append("\t\t").append(chunk == null ? "<not arrived yet>" : chunk).append("\n");
             }
         }
 

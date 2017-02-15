@@ -16,21 +16,18 @@
  */
 package org.graylog2.indexer.ranges;
 
-import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
+import com.google.auto.value.AutoValue;
 import org.bson.types.ObjectId;
+import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.mongojack.Id;
 
-import java.util.List;
-
 import javax.annotation.Nullable;
+import java.util.List;
 
 
 @AutoValue

@@ -25,8 +25,6 @@ import org.apache.shiro.cache.CacheException;
 import org.apache.shiro.cache.CacheManager;
 import org.graylog2.metrics.CacheStatsSet;
 import org.graylog2.shared.metrics.MetricUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Collection;
@@ -35,7 +33,6 @@ import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class MongoDbAuthorizationCacheManager implements CacheManager {
-    private static final Logger log = LoggerFactory.getLogger(MongoDbAuthorizationCacheManager.class);
     private final MetricRegistry registry;
 
     @Inject

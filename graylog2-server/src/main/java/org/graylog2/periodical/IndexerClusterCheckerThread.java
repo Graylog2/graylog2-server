@@ -18,7 +18,6 @@ package org.graylog2.periodical;
 
 import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
 import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.monitor.jvm.JvmInfo;
 import org.elasticsearch.monitor.process.ProcessStats;
 import org.graylog2.indexer.cluster.Cluster;
@@ -52,7 +51,7 @@ public class IndexerClusterCheckerThread extends Periodical {
         }
 
         try {
-            final ClusterHealthStatus clusterHealthStatus = cluster.health().getStatus();
+            cluster.health().getStatus();
         } catch (Exception e) {
             LOG.info("Indexer not fully initialized yet. Skipping periodic cluster check.");
             return;

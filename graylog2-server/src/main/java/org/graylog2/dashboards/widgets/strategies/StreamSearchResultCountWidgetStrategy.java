@@ -36,8 +36,8 @@ public class StreamSearchResultCountWidgetStrategy extends SearchResultCountWidg
     private final String streamId;
 
     @AssistedInject
-    public StreamSearchResultCountWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) {
-        super(searches, config, timeRange, widgetId);
+    public StreamSearchResultCountWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange) {
+        super(searches, config, timeRange);
         this.streamId = (String) config.get("stream_id");
     }
 

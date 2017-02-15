@@ -17,8 +17,8 @@
 package org.graylog2.plugin.dashboards.widgets;
 
 import com.google.common.collect.Maps;
-import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;
 
 import java.util.Map;

@@ -188,7 +188,7 @@ public class UserImpl extends PersistedImpl implements User {
     public Map<String, Object> getPreferences() {
         final Map<String, Object> preferences = (Map<String, Object>) fields.get(PREFERENCES);
 
-        return (preferences == null || preferences.isEmpty()) ? DEFAULT_PREFERENCES : preferences;
+        return preferences == null || preferences.isEmpty() ? DEFAULT_PREFERENCES : preferences;
     }
 
     @Override

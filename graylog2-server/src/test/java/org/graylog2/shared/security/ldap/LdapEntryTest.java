@@ -20,8 +20,6 @@ import nl.jqno.equalsverifier.EqualsVerifier;
 import nl.jqno.equalsverifier.Warning;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
-
 public class LdapEntryTest {
     @Test
     public void testEquals() throws Exception {

@@ -108,10 +108,8 @@ public class FormatStringDecorator implements SearchResponseDecorator {
     public SearchResponse apply(SearchResponse searchResponse) {
         final List<ResultMessageSummary> summaries = searchResponse.messages().stream()
                 .map(summary -> {
-                    if (requireAllFields) {
-                        if (!usedVariables.stream().allMatch(variable -> summary.message().containsKey(variable))) {
-                            return summary;
-                        }
+                    if (requireAllFields && !usedVariables.stream().allMatch(variable -> summary.message().containsKey(variable))) {
+                        return summary;
                     }
                     final String formattedString = template.transform(summary.message(), Locale.ENGLISH);
 

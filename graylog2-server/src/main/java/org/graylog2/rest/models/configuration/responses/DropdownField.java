@@ -16,12 +16,9 @@
  */
 package org.graylog2.rest.models.configuration.responses;
 
-import org.graylog2.rest.models.configuration.responses.RequestedConfigurationField;
-
 import java.util.Map;
 
 public class DropdownField extends RequestedConfigurationField {
-
     private final static String TYPE = "dropdown";
 
     private final Map<String, String> values;

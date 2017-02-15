@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public abstract class RequestedConfigurationField {
 
     private final String title;
@@ -31,7 +28,6 @@ public abstract class RequestedConfigurationField {
     private final String description;
     private final boolean isOptional;
     private final List<String> attributes;
-    private final String superType;
 
     public RequestedConfigurationField(String superType, Map.Entry<String, Map<String, Object>> c) {
         this.title = c.getKey();
@@ -40,8 +36,6 @@ public abstract class RequestedConfigurationField {
         if (!info.get("type").equals(superType)) {
             throw new RuntimeException("Type does not match supertype. This should never happen.");
         }
-
-        this.superType = (String) info.get("type");
 
         this.humanName = (String) info.get("human_name");
         this.defaultValue = info.get("default_value");

@@ -17,7 +17,6 @@
 package org.graylog2.plugin.streams;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 public enum StreamRuleType {
     EXACT(1, "match exactly", "match exactly"),

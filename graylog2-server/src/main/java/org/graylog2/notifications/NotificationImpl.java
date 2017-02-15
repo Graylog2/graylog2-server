@@ -25,8 +25,6 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -35,8 +33,6 @@ import java.util.Map;
 
 @CollectionName("notifications")
 public class NotificationImpl extends PersistedImpl implements Notification {
-
-    private static final Logger LOG = LoggerFactory.getLogger(NotificationImpl.class);
     static final String FIELD_TYPE = "type";
     static final String FIELD_SEVERITY = "severity";
     static final String FIELD_TIMESTAMP = "timestamp";

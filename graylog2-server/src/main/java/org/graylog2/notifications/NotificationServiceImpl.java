@@ -89,7 +89,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
     @Override
     public boolean isFirst(NotificationImpl.Type type) {
-        return (findOne(NotificationImpl.class, new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH))) == null);
+        return findOne(NotificationImpl.class, new BasicDBObject(NotificationImpl.FIELD_TYPE, type.toString().toLowerCase(Locale.ENGLISH))) == null;
     }
 
     @Override

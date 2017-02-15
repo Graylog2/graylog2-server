@@ -21,8 +21,8 @@ import org.graylog2.bindings.providers.DefaultPasswordAlgorithmProvider;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.security.hashing.BCryptPasswordAlgorithm;
-import org.graylog2.users.DefaultPasswordAlgorithm;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
+import org.graylog2.users.DefaultPasswordAlgorithm;
 
 public class PasswordAlgorithmBindings extends Graylog2Module {
     @Override
