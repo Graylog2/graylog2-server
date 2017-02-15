@@ -6,8 +6,8 @@ import dc from 'dc';
 import d3 from 'd3';
 import deepEqual from 'deep-equal';
 
-const D3Utils = require('../../util/D3Utils');
-const StringUtils = require('../../util/StringUtils');
+import D3Utils from 'util/D3Utils';
+import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';
 
 import StoreProvider from 'injection/StoreProvider';

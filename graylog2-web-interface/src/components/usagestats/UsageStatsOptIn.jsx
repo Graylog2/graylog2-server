@@ -1,5 +1,3 @@
-'use strict';
-
 import React from 'react';
 import { Alert, Button, Row, Col } from 'react-bootstrap';
 
@@ -72,7 +70,7 @@ const UsageStatsOptIn = React.createClass({
     }
 
     return content;
-  }
+  },
 });
 
-module.exports = UsageStatsOptIn;
+export default UsageStatsOptIn;
