@@ -53,7 +53,7 @@ const SessionStore = Reflux.createStore({
     this._validateSession(sessionId)
       .then((response) => {
         if (response.is_valid) {
-          SessionActions.login.completed({
+          return SessionActions.login.completed({
             sessionId: sessionId || response.session_id,
             username: username || response.username,
           });
