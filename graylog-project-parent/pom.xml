@@ -743,6 +743,10 @@
                         <configuration>
                             <targetJdk>${maven.compiler.target}</targetJdk>
                             <failOnViolation>false</failOnViolation>
+                            <excludeRoots>
+                                <excludeRoot>${project.build.directory}/generated-sources</excludeRoot>
+                                <excludeRoot>${project.build.directory}/generated-test-sources</excludeRoot>
+                            </excludeRoots>
                         </configuration>
                         <executions>
                             <execution>
