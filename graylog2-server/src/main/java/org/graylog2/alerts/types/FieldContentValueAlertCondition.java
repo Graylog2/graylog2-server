@@ -62,6 +62,12 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
                                                @Assisted("userid") String creatorUserId,
                                                Map<String, Object> parameters,
                                                @Assisted("title") @Nullable String title);
+
+        @Override
+        Config config();
+
+        @Override
+        Descriptor descriptor();
     }
 
     public static class Config implements AlertCondition.Config {

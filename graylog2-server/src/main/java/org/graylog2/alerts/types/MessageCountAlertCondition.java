@@ -77,6 +77,12 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
                                           @Assisted("userid") String creatorUserId,
                                           Map<String, Object> parameters,
                                           @Assisted("title") @Nullable String title);
+
+        @Override
+        MessageCountAlertCondition.Config config();
+
+        @Override
+        MessageCountAlertCondition.Descriptor descriptor();
     }
 
     public static class Config implements AlertCondition.Config {
