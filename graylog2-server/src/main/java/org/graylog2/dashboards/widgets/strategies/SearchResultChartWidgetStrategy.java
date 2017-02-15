@@ -39,8 +39,7 @@ public class SearchResultChartWidgetStrategy extends ChartWidgetStrategy {
     private final TimeRange timeRange;
 
     @AssistedInject
-    public SearchResultChartWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange) {
-        super(config);
+    public SearchResultChartWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) {        super(config);
         this.searches = searches;
         this.timeRange = timeRange;
         this.query = getNonEmptyQuery((String)config.get("query"));
