@@ -16,9 +16,8 @@
  */
 package org.graylog2.plugin.configuration.fields;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -36,24 +35,16 @@ public class ListField extends AbstractConfigurationField {
     private List<String> attributes;
 
     public ListField(String name, String humanName, List<String> defaultValue, String description, Optional isOptional) {
-        this(name, humanName, defaultValue, Collections.emptyMap(), description, isOptional, null);
-    }
-
-    public ListField(String name, String humanName, List<String> defaultValue, Map<String, String> values, String description, Optional isOptional) {
-        this(name, humanName, defaultValue, values, description, isOptional, null);
+        this(name, humanName, defaultValue, Collections.emptyMap(), description, isOptional);
     }
 
     public ListField(String name, String humanName, List<String> defaultValue, Map<String, String> values, String description, Optional isOptional, Attribute... attributes) {
         super(FIELD_TYPE, name, humanName, description, isOptional);
         this.defaultValue = defaultValue;
         this.values = values;
-
-        this.attributes = new ArrayList<>();
-        if (attributes != null) {
-            for (Attribute attribute : attributes) {
-                this.attributes.add(attribute.toString().toLowerCase(Locale.ENGLISH));
-            }
-        }
+        this.attributes = Arrays.stream(attributes)
+                .map(attribute -> attribute.toString().toLowerCase(Locale.ENGLISH))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -74,9 +65,7 @@ public class ListField extends AbstractConfigurationField {
 
     @Override
     public Map<String, Map<String, String>> getAdditionalInformation() {
-        Map<String, Map<String, String>> result = new HashMap<>();
-        result.put("values", values);
-        return result;
+        return Collections.singletonMap("values", values);
     }
 
     @Override

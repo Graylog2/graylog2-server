@@ -158,6 +158,7 @@ public class RegexMatcherTest extends MatcherTest {
         assertTrue(matcher.match(msg, rule));
     }
 
+    @Override
     protected StreamRule getSampleRule() {
         StreamRule rule = super.getSampleRule();
         rule.setType(StreamRuleType.REGEX);
@@ -165,6 +166,7 @@ public class RegexMatcherTest extends MatcherTest {
         return rule;
     }
 
+    @Override
     protected StreamRuleMatcher getMatcher(StreamRule rule) {
         StreamRuleMatcher matcher = super.getMatcher(rule);
 

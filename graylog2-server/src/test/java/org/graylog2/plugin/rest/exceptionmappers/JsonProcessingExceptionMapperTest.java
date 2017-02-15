@@ -16,7 +16,9 @@
  */
 package org.graylog2.plugin.rest.exceptionmappers;
 
+import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonLocation;
+import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import org.graylog2.plugin.rest.ApiError;
@@ -41,9 +43,10 @@ public class JsonProcessingExceptionMapperTest {
 
     @Test
     public void testToResponse() throws Exception {
-        ExceptionMapper<JsonProcessingException> mapper = new JsonProcessingExceptionMapper();
-
-        Response response = mapper.toResponse(new JsonMappingException("Boom!", JsonLocation.NA, new RuntimeException("rootCause")));
+        final ExceptionMapper<JsonProcessingException> mapper = new JsonProcessingExceptionMapper();
+        final JsonParser jsonParser = new JsonFactory().createParser("");
+        final JsonMappingException exception = new JsonMappingException(jsonParser, "Boom!", new RuntimeException("rootCause"));
+        final Response response = mapper.toResponse(exception);
 
         assertEquals(response.getStatusInfo(), Response.Status.BAD_REQUEST);
         assertEquals(response.getMediaType(), MediaType.APPLICATION_JSON_TYPE);

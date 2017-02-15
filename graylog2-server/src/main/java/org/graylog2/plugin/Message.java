@@ -298,7 +298,7 @@ public class Message implements Messages {
         final String trimmedKey = key.trim();
 
         // Don't accept protected keys. (some are allowed though lol)
-        if (RESERVED_FIELDS.contains(trimmedKey) && !RESERVED_SETTABLE_FIELDS.contains(trimmedKey) || !validKey(trimmedKey)) {
+        if ((RESERVED_FIELDS.contains(trimmedKey) && !RESERVED_SETTABLE_FIELDS.contains(trimmedKey)) || !validKey(trimmedKey)) {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Ignoring invalid or reserved key {} for message {}", trimmedKey, getId());
             }

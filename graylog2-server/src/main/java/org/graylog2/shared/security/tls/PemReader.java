@@ -61,7 +61,7 @@ final class PemReader {
         int start = 0;
         while (m.find(start)) {
             final String s = m.group(1);
-            byte[] der = Base64.getDecoder().decode(CharMatcher.BREAKING_WHITESPACE.removeFrom(s));
+            byte[] der = Base64.getDecoder().decode(CharMatcher.breakingWhitespace().removeFrom(s));
             certs.add(der);
 
             start = m.end();
@@ -88,7 +88,7 @@ final class PemReader {
             throw new KeyException("No private key found in file: " + path);
         }
 
-        final String s = CharMatcher.BREAKING_WHITESPACE.removeFrom(m.group(1));
+        final String s = CharMatcher.breakingWhitespace().removeFrom(m.group(1));
         byte[] base64 = s.getBytes(StandardCharsets.US_ASCII);
         return Base64.getDecoder().decode(base64);
     }

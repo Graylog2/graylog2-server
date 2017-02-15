@@ -91,7 +91,7 @@ public class AuditCoverageTest {
             }
             String type = "";
             try {
-                type = (String) field.get(field.getType().newInstance());
+                type = (String) field.get(field.getType().getConstructor().newInstance());
                 if (!auditEventTypes.contains(type)) {
                     missingErrors.add(field.getName() + "=" + type);
                 }

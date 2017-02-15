@@ -21,7 +21,6 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.MultimapBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indices.TooManyAliasesException;
@@ -33,6 +32,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class RebuildIndexRangesJob extends SystemJob {
     public interface Factory {
@@ -44,7 +44,7 @@ public class RebuildIndexRangesJob extends SystemJob {
 
     private volatile boolean cancelRequested = false;
     private volatile int indicesToCalculate = 0;
-    private volatile int indicesCalculated = 0;
+    private final AtomicInteger indicesCalculated = new AtomicInteger(0);
 
     protected final Set<IndexSet> indexSets;
     private final ActivityWriter activityWriter;
@@ -71,7 +71,7 @@ public class RebuildIndexRangesJob extends SystemJob {
         }
 
         // lolwtfbbqcasting
-        return (int) Math.floor(((float) indicesCalculated / (float) indicesToCalculate) * 100);
+        return (int) Math.floor((indicesCalculated.floatValue() / (float) indicesToCalculate) * 100);
     }
 
     @Override
@@ -120,12 +120,12 @@ public class RebuildIndexRangesJob extends SystemJob {
                             indexRangeService.save(emptyRange);
                         }
 
-                        indicesCalculated++;
+                        indicesCalculated.incrementAndGet();
                         continue;
                     }
                 } catch (TooManyAliasesException e) {
                     LOG.error("Multiple write alias targets found, this is a bug.");
-                    indicesCalculated++;
+                    indicesCalculated.incrementAndGet();
                     continue;
                 }
                 if (cancelRequested) {
@@ -141,7 +141,7 @@ public class RebuildIndexRangesJob extends SystemJob {
                 } catch (Exception e) {
                     LOG.info("Could not calculate range of index [" + index + "]. Skipping.", e);
                 } finally {
-                    indicesCalculated++;
+                    indicesCalculated.incrementAndGet();
                 }
             }
         }

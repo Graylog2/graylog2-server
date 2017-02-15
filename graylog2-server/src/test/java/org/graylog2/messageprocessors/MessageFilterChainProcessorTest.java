@@ -19,7 +19,6 @@ package org.graylog2.messageprocessors;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Sets;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.ServerStatus;
@@ -37,6 +36,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -48,6 +48,8 @@ public class MessageFilterChainProcessorTest {
 
     @Mock
     private ServerStatus serverStatus;
+    @Mock
+    private Journal journal;
 
     @Before
     public void setUp() throws Exception {
@@ -59,13 +61,10 @@ public class MessageFilterChainProcessorTest {
         final DummyFilter third = new DummyFilter(30);
         final DummyFilter first = new DummyFilter(10);
         final DummyFilter second = new DummyFilter(20);
-        Set<MessageFilter> filters = Sets.<MessageFilter>newHashSet(
-                third,
-                first,
-                second);
+        final Set<MessageFilter> filters = ImmutableSet.of(third, first, second);
         final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(new MetricRegistry(),
                                                                                       filters,
-                                                                                      Mockito.mock(Journal.class),
+                                                                                      journal,
                                                                                       serverStatus);
         final List<MessageFilter> filterRegistry = processor.getFilterRegistry();
 
@@ -78,8 +77,8 @@ public class MessageFilterChainProcessorTest {
     public void testHandleMessageEmptyFilterSet() throws Exception {
         try {
             new MessageFilterChainProcessor(new MetricRegistry(),
-                                            Sets.newHashSet(),
-                                            Mockito.mock(Journal.class),
+                                            Collections.emptySet(),
+                                            journal,
                                             serverStatus);
             Assert.fail("A processor without message filters should fail on creation");
         } catch (RuntimeException ignored) {}
@@ -113,8 +112,8 @@ public class MessageFilterChainProcessorTest {
         };
 
         final MessageFilterChainProcessor filterTest = new MessageFilterChainProcessor(new MetricRegistry(),
-                                                                                       Sets.newHashSet(filterOnlyFirst),
-                                                                                       Mockito.mock(Journal.class),
+                                                                                       Collections.singleton(filterOnlyFirst),
+                                                                                       journal,
                                                                                        serverStatus);
         Message filteredoutMessage = new Message("filtered out", "source", Tools.nowUTC());
         filteredoutMessage.setJournalOffset(1);
@@ -137,7 +136,7 @@ public class MessageFilterChainProcessorTest {
         final Set<MessageFilter> filters = ImmutableSet.of(first, second, third);
         final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(new MetricRegistry(),
                 filters,
-                Mockito.mock(Journal.class),
+                journal,
                 serverStatus);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
@@ -154,7 +153,7 @@ public class MessageFilterChainProcessorTest {
         final Set<MessageFilter> filters = ImmutableSet.of(first, second);
         final MessageFilterChainProcessor processor = new MessageFilterChainProcessor(new MetricRegistry(),
                 filters,
-                Mockito.mock(Journal.class),
+                journal,
                 serverStatus);
 
         final Message message = new Message("message", "source", new DateTime(2016, 1, 1, 0, 0, DateTimeZone.UTC));
@@ -163,7 +162,7 @@ public class MessageFilterChainProcessorTest {
         assertThat(result).isEmpty();
     }
 
-    private class DummyFilter implements MessageFilter {
+    private static class DummyFilter implements MessageFilter {
         private final int prio;
 
         private DummyFilter(int prio) {
@@ -187,7 +186,7 @@ public class MessageFilterChainProcessorTest {
         }
     }
 
-    private class RemovingMessageFilter implements MessageFilter {
+    private static class RemovingMessageFilter implements MessageFilter {
         @Override
         public boolean filter(Message msg) {
             return true;

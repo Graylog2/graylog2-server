@@ -16,10 +16,7 @@
  */
 package org.graylog2.plugin;
 
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
-public class ProcessingPauseLockedException extends Exception {
+public class ProcessingPauseLockedException extends RuntimeException {
 
     public ProcessingPauseLockedException() {
         super();

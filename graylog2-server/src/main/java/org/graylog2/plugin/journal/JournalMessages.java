@@ -19,7 +19,9 @@
 
 package org.graylog2.plugin.journal;
 
-@SuppressWarnings("all")
+import javax.annotation.Generated;
+
+@Generated("protoc")
 public final class JournalMessages {
   private JournalMessages() {}
   public static void registerAllExtensions(

@@ -390,7 +390,7 @@ public class JerseyService extends AbstractIdleService {
             throw new IllegalStateException("Couldn't initialize SSL context for HTTP server");
         }
 
-        return new SSLEngineConfigurator(sslContext.createSSLContext(), false, false, false);
+        return new SSLEngineConfigurator(sslContext.createSSLContext(false), false, false, false);
     }
 
     private ExecutorService instrumentedExecutor(final String executorName,

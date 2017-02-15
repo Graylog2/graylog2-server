@@ -120,15 +120,10 @@ public class FixDeflectorByMoveJob extends SystemJob {
             progress = 95;
         } finally {
             // Start message processing again.
-            try {
-                serverStatus.unlockProcessingPause();
+            serverStatus.unlockProcessingPause();
 
-                if (wasProcessing) {
-                    serverStatus.resumeMessageProcessing();
-                }
-            } catch (Exception e) {
-                // lol checked exceptions
-                throw new RuntimeException("Could not unlock processing pause.", e);
+            if (wasProcessing) {
+                serverStatus.resumeMessageProcessing();
             }
         }
 

@@ -47,48 +47,54 @@ public class StreamRuleMock implements StreamRule {
         this.streamId = (String) rule.get(StreamRuleImpl.FIELD_STREAM_ID);
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public String getStreamId() {
         return streamId;
     }
 
+    @Override
     public StreamRuleType getType() {
         return type;
     }
 
+    @Override
     public String getValue() {
         return value;
     }
 
+    @Override
     public String getField() {
         return field;
     }
 
+    @Override
     public Boolean getInverted() {
         return firstNonNull(inverted, false);
     }
 
+    @Override
     public void setType(StreamRuleType type) {
         this.type = type;
     }
 
+    @Override
     public void setValue(String value) {
         this.value = value;
     }
 
+    @Override
     public void setField(String field) {
         this.field = field;
     }
 
+    @Override
     public void setInverted(Boolean inverted) {
         this.inverted = inverted;
-    }
-
-    public void setStreamId(String streamId) {
-        this.streamId = streamId;
     }
 
     @Override

@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class IndexSetCleanupJob extends SystemJob {
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetCleanupJob.class);
@@ -42,7 +43,7 @@ public class IndexSetCleanupJob extends SystemJob {
 
     private volatile boolean cancel;
     private volatile long total = 0L;
-    private volatile long deleted = 0L;
+    private final AtomicLong deleted = new AtomicLong(0L);
 
     @Inject
     public IndexSetCleanupJob(final Indices indices, final MongoIndexRangeService indexRangeService, @Assisted final IndexSet indexSet) {
@@ -79,7 +80,7 @@ public class IndexSetCleanupJob extends SystemJob {
 
                 LOG.info("Deleting index <{}> in index set <{}> ({})", indexName, config.id(), config.title());
                 indices.delete(indexName);
-                this.deleted++;
+                deleted.incrementAndGet();
             } catch (Exception e) {
                 LOG.error("Unable to delete index <{}>", indexName, e);
             }
@@ -96,7 +97,7 @@ public class IndexSetCleanupJob extends SystemJob {
         if (total <= 0) {
             return 0;
         }
-        return (int) Math.floor(((float) deleted / (float) total) * 100);
+        return (int) Math.floor((deleted.floatValue() / (float) total) * 100);
     }
 
     @Override

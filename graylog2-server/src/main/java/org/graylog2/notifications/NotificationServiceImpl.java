@@ -82,7 +82,7 @@ public class NotificationServiceImpl extends PersistedServiceImpl implements Not
 
         final boolean removed = destroyAll(NotificationImpl.class, qry) > 0;
         if (removed) {
-            auditEventSender.success(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_DELETE, Collections.singletonMap("notification_type", type.getClass().getCanonicalName()));
+            auditEventSender.success(AuditActor.system(nodeId), SYSTEM_NOTIFICATION_DELETE, Collections.singletonMap("notification_type", type.getDeclaringClass().getCanonicalName()));
         }
         return removed;
     }

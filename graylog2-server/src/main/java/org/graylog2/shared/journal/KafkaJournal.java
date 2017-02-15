@@ -238,9 +238,9 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
                         "MD5");
 
         if (!journalDirectory.exists() && !journalDirectory.mkdirs()) {
-            LOG.error("Cannot create journal directory at {}, please check the permissions",
-                    journalDirectory.getAbsolutePath());
-            Throwables.propagate(new AccessDeniedException(journalDirectory.getAbsolutePath(), null, "Could not create journal directory."));
+            LOG.error("Cannot create journal directory at {}, please check the permissions", journalDirectory.getAbsolutePath());
+            final AccessDeniedException accessDeniedException = new AccessDeniedException(journalDirectory.getAbsolutePath(), null, "Could not create journal directory.");
+            throw new RuntimeException(accessDeniedException);
         }
 
         // TODO add check for directory, etc
@@ -257,9 +257,8 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             }
         } catch (IOException e) {
             LOG.error("Cannot access offset file: {}", e.getMessage());
-            Throwables.propagate(new AccessDeniedException(committedReadOffsetFile.getAbsolutePath(),
-                    null,
-                    e.getMessage()));
+            final AccessDeniedException accessDeniedException = new AccessDeniedException(committedReadOffsetFile.getAbsolutePath(), null, e.getMessage());
+            throw new RuntimeException(accessDeniedException);
         }
         try {
             final BrokerState brokerState = new BrokerState();
