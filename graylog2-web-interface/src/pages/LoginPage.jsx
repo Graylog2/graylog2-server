@@ -47,7 +47,11 @@ const LoginPage = React.createClass({
         this.setState({lastError: 'Error - the server returned: ' + error.additional.status + ' - ' + error.message});
       }
     });
-    promise.finally(() => this.setState({ loading: false }));
+    promise.finally(() => {
+      if (this.isMounted()) {
+        this.setState({ loading: false });
+      }
+    });
   },
   formatLastError(error) {
     if (error) {
