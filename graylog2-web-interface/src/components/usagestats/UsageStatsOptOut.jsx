@@ -77,7 +77,7 @@ const UsageStatsOptOut = React.createClass({
     }
 
     return content;
-  }
+  },
 });
 
-module.exports = UsageStatsOptOut;
+export default UsageStatsOptOut;

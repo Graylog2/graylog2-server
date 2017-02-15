@@ -3,7 +3,7 @@ import Immutable from 'immutable';
 
 import { Tabs, Tab, Button, ButtonGroup } from 'react-bootstrap';
 
-import TableList from '../common/TableList';
+import { TableList } from 'components/common';
 
 const PermissionSelector = React.createClass({
   propTypes: {

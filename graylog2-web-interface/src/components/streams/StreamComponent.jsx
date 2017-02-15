@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React from 'react';
 import { Row, Col, Alert } from 'react-bootstrap';
 
 import { IfPermitted, TypeAheadDataFilter } from 'components/common';
@@ -14,8 +14,8 @@ import CreateStreamButton from './CreateStreamButton';
 
 const StreamComponent = React.createClass({
   propTypes: {
-    currentUser: PropTypes.object.isRequired,
-    onStreamSave: PropTypes.func.isRequired,
+    currentUser: React.PropTypes.object.isRequired,
+    onStreamSave: React.PropTypes.func.isRequired,
     indexSets: React.PropTypes.array.isRequired,
   },
   getInitialState() {
@@ -118,4 +118,4 @@ const StreamComponent = React.createClass({
   },
 });
 
-module.exports = StreamComponent;
+export default StreamComponent;

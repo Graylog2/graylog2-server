@@ -1,44 +1,41 @@
-'use strict';
+import React from 'react';
+import PureRenderMixin from 'react-addons-pure-render-mixin';
+import { Modal } from 'react-bootstrap';
 
-var React = require('react');
-var PureRenderMixin = require('react-addons-pure-render-mixin');
+import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
+import { ClipboardButton } from 'components/common';
 
-var Modal = require('react-bootstrap').Modal;
-import {ClipboardButton} from 'components/common';
+const ShowQueryModal = React.createClass({
+  propTypes: {
+    builtQuery: React.PropTypes.string,
+  },
 
-var BootstrapModalWrapper = require('../bootstrap/BootstrapModalWrapper');
+  mixins: [PureRenderMixin],
 
-var ShowQueryModal = React.createClass({
-    mixins: [PureRenderMixin],
+  open() {
+    this.refs.modal.open();
+  },
 
-    propTypes: {
-        builtQuery: React.PropTypes.string,
-    },
+  close() {
+    this.refs.modal.close();
+  },
 
-    open() {
-        this.refs.modal.open();
-    },
-
-    close() {
-        this.refs.modal.close();
-    },
-
-    render () {
-        var queryText = JSON.stringify(JSON.parse(this.props.builtQuery), null, '  ');
-        return (
-          <BootstrapModalWrapper ref="modal">
-              <Modal.Header closeButton>
-                  <Modal.Title>Elasticsearch Query</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                  <pre>{queryText}</pre>
-              </Modal.Body>
-              <Modal.Footer>
-                <ClipboardButton title="Copy query" text={queryText}/>
-              </Modal.Footer>
-          </BootstrapModalWrapper>
-        );
-    }
+  render() {
+    const queryText = JSON.stringify(JSON.parse(this.props.builtQuery), null, '  ');
+    return (
+      <BootstrapModalWrapper ref="modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Elasticsearch Query</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <pre>{queryText}</pre>
+        </Modal.Body>
+        <Modal.Footer>
+          <ClipboardButton title="Copy query" text={queryText} />
+        </Modal.Footer>
+      </BootstrapModalWrapper>
+    );
+  }
 });
 
-module.exports = ShowQueryModal;
+export default ShowQueryModal;

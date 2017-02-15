@@ -38,8 +38,7 @@ const StreamThroughput = React.createClass({
     return (
       <span>{this._calculateThroughput()} messages/second</span>
     );
-
-  }
+  },
 });
 
-module.exports = StreamThroughput;
+export default StreamThroughput;

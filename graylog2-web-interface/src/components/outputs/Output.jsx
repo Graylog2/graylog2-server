@@ -1,100 +1,106 @@
-'use strict';
+import React from 'react';
+import { Alert, Button, Col, Row } from 'react-bootstrap';
 
-var React = require('react');
-var EditOutputButton = require('./EditOutputButton');
-var ConfigurationWell = require('../configurationforms/ConfigurationWell');
-var Button = require('react-bootstrap').Button;
-var PermissionsMixin = require('../../util/PermissionsMixin');
-var Col = require('react-bootstrap').Col;
-var Row = require('react-bootstrap').Row;
-var Alert = require('react-bootstrap').Alert;
-var Spinner = require('../common/Spinner');
+import EditOutputButton from 'components/outputs/EditOutputButton';
+import { ConfigurationWell } from 'components/configurationforms';
+import { IfPermitted, Spinner } from 'components/common';
 
-var Output = React.createClass({
-    mixins: [PermissionsMixin],
-    _deleteFromStreamButton(output) {
-        return (
-            <Button bsStyle="info" onClick={this.props.removeOutputFromStream.bind(null, output.id, this.props.streamId)}>
-                Delete from stream
-            </Button>
-        );
-    },
-    _deleteGloballyButton(output) {
-        return (
-            <Button bsStyle="primary" onClick={this.props.removeOutputGlobally.bind(null, output.id)}>
-                Delete globally
-            </Button>
-        );
-    },
-    /* jshint -W116 */
-    _typeNotAvailable() {
-        return (this.props.types[this.props.output.type] == undefined);
-    },
-    /* jshint +W116 */
-    getInitialState() {
-        return {};
-    },
-    componentDidMount() {
-        if (!this._typeNotAvailable()) {
-            this.props.getTypeDefinition(this.props.output.type, (typeDefinition) => {
-                this.setState({typeDefinition: typeDefinition});
-            });
-        }
-    },
-    render() {
-        if (this._typeNotAvailable() || this.state.typeDefinition) {
-            var output = this.props.output;
-            var deleteButton = (this.props.streamId && this.isPermitted(this.props.permissions, ["stream_outputs:delete"]) ? this._deleteFromStreamButton(output) : null);
-
-            var editButton = (this.isPermitted(this.props.permissions, ["outputs:edit"]) ?
-                <EditOutputButton disabled={this._typeNotAvailable()} output={output} onUpdate={this.props.onUpdate}
-                                  getTypeDefinition={this.props.getTypeDefinition}/> : null);
-            var terminateButton = (this.isPermitted(this.props.permissions, ["outputs:terminate"]) ? this._deleteGloballyButton(output) : null);
-
-            var contentPack = (output.content_pack ? (
-                <span title="Created from content pack"><i className="fa fa-gift"></i></span>) : null);
-
-            var alert = (this._typeNotAvailable() ? <Alert bsStyle="danger">
-                The plugin required for this output is not loaded. Editing it is not possible. Please load the plugin or
-                delete the output.
-            </Alert> : null);
-            var configurationWell = (this._typeNotAvailable() ? null :
-                <ConfigurationWell key={"configuration-well-output-" + output.id}
-                                   id={output.id} configuration={output.configuration}
-                                   typeDefinition={this.state.typeDefinition}/>);
-            return (
-                <div key={output.id} className="row content node-row">
-                    <Col md={12}>
-                        <Row className="row-sm">
-                            <Col md={6}>
-                                <h2 className="extractor-title">
-                                    {output.title} {contentPack}
-                                    <small>ID: {output.id}</small>
-                                </h2>
-                                Type: {output.type}
-                            </Col>
-                            <Col md={6}>
-                                <div className="text-right node-row-info">
-                                    {editButton}
-                                    {' '}
-                                    {deleteButton}
-                                    {' '}
-                                    {terminateButton}
-                                </div>
-                            </Col>
-                        </Row>
-                        <Row>
-                            <Col md={8}>
-                                {alert}
-                                {configurationWell}
-                            </Col>
-                        </Row>
-                    </Col>
-                </div>
-            );
-        } else {
-            return <Spinner />;
-        }
+const Output = React.createClass({
+  propTypes: {
+    streamId: React.PropTypes.string,
+    output: React.PropTypes.object.isRequired,
+    types: React.PropTypes.object.isRequired,
+    getTypeDefinition: React.PropTypes.func.isRequired,
+    removeOutputFromStream: React.PropTypes.func.isRequired,
+    removeOutputGlobally: React.PropTypes.func.isRequired,
+  },
+  getInitialState() {
+    return {};
+  },
+  componentDidMount() {
+    if (!this._typeNotAvailable()) {
+      this.props.getTypeDefinition(this.props.output.type, (typeDefinition) => {
+        this.setState({ typeDefinition: typeDefinition });
+      });
     }
+  },
+  _onDeleteFromStream() {
+    this.props.removeOutputFromStream(this.props.output.id, this.props.streamId);
+  },
+  _onDeleteGlobally() {
+    this.props.removeOutputGlobally(this.props.output.id);
+  },
+  _typeNotAvailable() {
+    return (this.props.types[this.props.output.type] === undefined);
+  },
+  render() {
+    if (!this._typeNotAvailable() && !this.state.typeDefinition) {
+      return <Spinner />;
+    }
+
+    const output = this.props.output;
+    const contentPack = (output.content_pack ?
+      <span title="Created from content pack"><i className="fa fa-gift" /></span> : null);
+
+    let alert;
+    let configurationWell;
+    if (this._typeNotAvailable()) {
+      alert = (
+        <Alert bsStyle="danger">
+          The plugin required for this output is not loaded. Editing it is not possible. Please load the plugin or
+          delete the output.
+        </Alert>
+      );
+    } else {
+      configurationWell = (
+        <ConfigurationWell key={`configuration-well-output-${output.id}`}
+                           id={output.id} configuration={output.configuration}
+                           typeDefinition={this.state.typeDefinition} />
+      );
+    }
+
+    return (
+      <div key={output.id} className="row content node-row">
+        <Col md={12}>
+          <Row className="row-sm">
+            <Col md={6}>
+              <h2 className="extractor-title">
+                {output.title} {contentPack}
+                <small>ID: {output.id}</small>
+              </h2>
+              Type: {output.type}
+            </Col>
+            <Col md={6}>
+              <div className="text-right node-row-info">
+                <IfPermitted permissions="outputs:edit">
+                  <EditOutputButton disabled={this._typeNotAvailable()} output={output} onUpdate={this.props.onUpdate}
+                                    getTypeDefinition={this.props.getTypeDefinition} />
+                </IfPermitted>
+                {' '}
+                <IfPermitted permissions="stream_outputs:delete">
+                  <Button bsStyle="info" onClick={this._onDeleteFromStream}>
+                    Delete from stream
+                  </Button>
+                </IfPermitted>
+                {' '}
+                <IfPermitted permissions="outputs:terminate">
+                  <Button bsStyle="primary" onClick={this._onDeleteGlobally}>
+                    Delete globally
+                  </Button>
+                </IfPermitted>
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col md={8}>
+              {alert}
+              {configurationWell}
+            </Col>
+          </Row>
+        </Col>
+      </div>
+    );
+  },
 });
-module.exports = Output;
+
+export default Output;
