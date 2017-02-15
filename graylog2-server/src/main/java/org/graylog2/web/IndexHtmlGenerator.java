@@ -30,7 +30,7 @@ import java.util.Map;
 
 @Singleton
 public class IndexHtmlGenerator {
-    private static final String title = "Graylog Web Interface";
+    private static final String title = "Militus Inc";
     private final Engine engine = new Engine();
     private final String content;
     private final Configuration configuration;
