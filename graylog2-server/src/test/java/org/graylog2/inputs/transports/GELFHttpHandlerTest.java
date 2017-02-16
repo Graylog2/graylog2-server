@@ -37,7 +37,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -65,7 +65,7 @@ public class GELFHttpHandlerTest {
 
     @Before
     public void setUp() throws Exception {
-        ChannelBuffer channelBuffer = ChannelBuffers.copiedBuffer("{}", Charset.defaultCharset());
+        ChannelBuffer channelBuffer = ChannelBuffers.copiedBuffer("{}", StandardCharsets.UTF_8);
 
         when(headers.get(HttpHeaders.Names.CONNECTION)).thenReturn(HttpHeaders.Values.CLOSE);
 
@@ -223,5 +223,38 @@ public class GELFHttpHandlerTest {
         assertNull(response.headers().get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_ORIGIN));
         assertNull(response.headers().get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_CREDENTIALS));
         assertNull(response.headers().get(HttpHeaders.Names.ACCESS_CONTROL_ALLOW_HEADERS));
+    }
+
+
+    @Test
+    public void testWithJavascriptContentType() throws Exception {
+        when(headers.get(HttpHeaders.Names.CONTENT_TYPE)).thenReturn("application/json");
+        HttpTransport.Handler handler = new HttpTransport.Handler(true);
+
+        handler.messageReceived(ctx, evt);
+
+        ArgumentCaptor<HttpResponse> argument = ArgumentCaptor.forClass(HttpResponse.class);
+        verify(channel).write(argument.capture());
+        verify(ctx, atMost(1)).sendUpstream(any(ChannelEvent.class));
+
+        HttpResponse response = argument.getValue();
+        assertEquals(HttpResponseStatus.ACCEPTED, response.getStatus());
+        assertEquals(response.headers().get(HttpHeaders.Names.CONNECTION), HttpHeaders.Values.CLOSE);
+    }
+
+    @Test
+    public void testWithArbitraryContentType() throws Exception {
+        when(headers.get(HttpHeaders.Names.CONTENT_TYPE)).thenReturn("foo/bar");
+        HttpTransport.Handler handler = new HttpTransport.Handler(true);
+
+        handler.messageReceived(ctx, evt);
+
+        ArgumentCaptor<HttpResponse> argument = ArgumentCaptor.forClass(HttpResponse.class);
+        verify(channel).write(argument.capture());
+        verify(ctx, atMost(1)).sendUpstream(any(ChannelEvent.class));
+
+        HttpResponse response = argument.getValue();
+        assertEquals(HttpResponseStatus.ACCEPTED, response.getStatus());
+        assertEquals(response.headers().get(HttpHeaders.Names.CONNECTION), HttpHeaders.Values.CLOSE);
     }
 }
