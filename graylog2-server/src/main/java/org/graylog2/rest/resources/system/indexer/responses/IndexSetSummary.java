@@ -29,6 +29,7 @@ import org.hibernate.validator.constraints.NotBlank;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;
 
 @AutoValue
@@ -54,7 +55,7 @@ public abstract class IndexSetSummary {
     public abstract boolean isWritable();
 
     @JsonProperty("index_prefix")
-    @NotBlank
+    @Pattern(regexp = IndexSetConfig.INDEX_PREFIX_REGEX)
     public abstract String indexPrefix();
 
     @JsonProperty("shards")
@@ -102,7 +103,7 @@ public abstract class IndexSetSummary {
                                          @JsonProperty("description") @Nullable String description,
                                          @JsonProperty("default") boolean isDefault,
                                          @JsonProperty("writable") boolean isWritable,
-                                         @JsonProperty("index_prefix") @NotBlank String indexPrefix,
+                                         @JsonProperty("index_prefix") @Pattern(regexp = IndexSetConfig.INDEX_PREFIX_REGEX) String indexPrefix,
                                          @JsonProperty("shards") @Min(1) int shards,
                                          @JsonProperty("replicas") @Min(0) int replicas,
                                          @JsonProperty("rotation_strategy_class") @NotNull String rotationStrategyClass,

@@ -32,6 +32,7 @@ import org.mongojack.ObjectId;
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -45,6 +46,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
     public static final String FIELD_INDEX_PREFIX = "index_prefix";
     public static final String FIELD_CREATION_DATE = "creation_date";
+    public static final String INDEX_PREFIX_REGEX = "^[a-z0-9][a-z0-9_+-]*$";
 
     @JsonProperty("id")
     @Nullable
@@ -65,6 +67,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
 
     @JsonProperty(FIELD_INDEX_PREFIX)
     @NotBlank
+    @Pattern(regexp = INDEX_PREFIX_REGEX)
     public abstract String indexPrefix();
 
     @JsonProperty("index_match_pattern")
@@ -123,7 +126,7 @@ public abstract class IndexSetConfig implements Comparable<IndexSetConfig> {
                                         @JsonProperty("title") @NotBlank String title,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("writable") @Nullable Boolean isWritable,
-                                        @JsonProperty(FIELD_INDEX_PREFIX) @NotBlank String indexPrefix,
+                                        @JsonProperty(FIELD_INDEX_PREFIX) @Pattern(regexp = INDEX_PREFIX_REGEX) String indexPrefix,
                                         @JsonProperty("index_match_pattern") @Nullable String indexMatchPattern,
                                         @JsonProperty("index_wildcard") @Nullable String indexWildcard,
                                         @JsonProperty("shards") @Min(1) int shards,

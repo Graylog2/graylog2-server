@@ -35,7 +35,7 @@ const IndexSetConfigurationForm = React.createClass({
   _validateIndexPrefix(event) {
     const value = event.target.value;
 
-    if (value.match(/^[A-Za-z0-9][A-Za-z0-9_\-+]*$/)) {
+    if (value.match(/^[a-z0-9][a-z0-9_\-+]*$/)) {
       if (this.state.validationErrors[event.target.name]) {
         const nextValidationErrors = Object.assign({}, this.state.validationErrors);
         delete nextValidationErrors[event.target.name];
@@ -47,6 +47,8 @@ const IndexSetConfigurationForm = React.createClass({
         nextValidationErrors[event.target.name] = 'Invalid index prefix: cannot be empty';
       } else if (value.indexOf('_') === 0 || value.indexOf('-') === 0 || value.indexOf('+') === 0) {
         nextValidationErrors[event.target.name] = 'Invalid index prefix: must start with a letter or number';
+      } else if (value.toLowerCase() !== value) {
+        nextValidationErrors[event.target.name] = 'Invalid index prefix: must be lower case';
       } else {
         nextValidationErrors[event.target.name] = 'Invalid index prefix: must only contain letters, numbers, \'_\', \'-\' and \'+\'';
       }
