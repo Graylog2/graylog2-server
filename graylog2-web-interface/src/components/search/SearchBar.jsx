@@ -222,7 +222,7 @@ const SearchBar = React.createClass({
   },
 
   _onDateSelected(field) {
-    return (event, date) => {
+    return (date, _, event) => {
       const inputField = this.refs[`${field}Formatted`].getInputDOMNode();
       const midnightDate = date.setHours(0);
       inputField.value = DateTime.ignoreTZ(midnightDate).toString(DateTime.Formats.DATETIME);
