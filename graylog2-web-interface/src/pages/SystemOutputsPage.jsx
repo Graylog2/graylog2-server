@@ -15,7 +15,7 @@ const SystemOutputsPage = React.createClass({
         <span>
           <PageHeader title="Outputs in Cluster">
             <span>
-              Graylog nodes can forward messages via outputs. Launch or terminate as many outputs as you want here
+              Graylog nodes can forward messages via outputs. Launch or terminate as many outputs as you want here{' '}
               <strong>and then assign them to streams to forward all messages of a stream in real-time.</strong>
             </span>
 
