@@ -16,14 +16,14 @@
  */
 package org.graylog2.commands;
 
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
 import com.google.common.collect.ImmutableList;
 import com.google.common.util.concurrent.ServiceManager;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
-import io.airlift.airline.Command;
-import io.airlift.airline.Option;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
 import org.graylog2.audit.AuditActor;

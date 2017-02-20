@@ -16,7 +16,7 @@
  */
 package org.graylog2.bootstrap.commands;
 
-import io.airlift.airline.Help;
+import com.github.rvesse.airline.help.Help;
 import org.graylog2.bootstrap.CliCommand;
 
 /* shallow subclass to make it implement CliCommand */

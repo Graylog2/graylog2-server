@@ -16,9 +16,9 @@
  */
 package org.graylog2.bootstrap;
 
+import com.github.rvesse.airline.Cli;
+import com.github.rvesse.airline.builder.CliBuilder;
 import com.google.common.collect.ImmutableSet;
-import io.airlift.airline.Cli;
-import io.airlift.airline.Cli.CliBuilder;
 import org.graylog2.bootstrap.commands.CliCommandHelp;
 import org.graylog2.bootstrap.commands.ShowVersion;
 
@@ -43,6 +43,4 @@ public class Main {
         final Runnable command = cli.parse(args);
         command.run();
     }
-
-
 }
