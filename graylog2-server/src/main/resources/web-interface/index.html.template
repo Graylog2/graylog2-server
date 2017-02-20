@@ -4,7 +4,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="robots" content="noindex, nofollow">
     <meta charset="UTF-8">
-    <title>${title}</title>
+    <title>USAM</title>
     <link rel="shortcut icon" href="${appPrefix}/assets/favicon.png">
     ${foreach cssFiles cssFile}
     <link href="${appPrefix}/assets/${cssfile}" rel="stylesheet">
