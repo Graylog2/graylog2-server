@@ -11,11 +11,10 @@ const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import 'javascripts/shims/styles/shim.css';
-import 'stylesheets/bootstrap.min.css';
 import 'font-awesome/css/font-awesome.css';
 import 'stylesheets/newfonts.less';
 import 'stylesheets/bootstrap-submenus.less';
-import 'stylesheets/toastr.min.css';
+import 'toastr/toastr.less';
 import 'stylesheets/rickshaw.min.css';
 import 'stylesheets/graylog2.less';
 
