@@ -22,7 +22,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.google.common.base.MoreObjects;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.graylog2.plugin.AbstractDescriptor;
 import org.graylog2.plugin.GlobalMetricNames;
@@ -41,6 +40,7 @@ import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public abstract class MessageInput implements Stoppable {
@@ -264,14 +264,15 @@ public abstract class MessageInput implements Stoppable {
     }
 
     public Map<String, Object> asMap() {
-        final ImmutableMap.Builder<String, Object> map = ImmutableMap.<String, Object>builder()
-                .put(FIELD_TYPE, getClass().getCanonicalName())
-                .put(FIELD_NAME, getName())
-                .put(FIELD_TITLE, getTitle())
-                .put(FIELD_CREATOR_USER_ID, getCreatorUserId())
-                .put(FIELD_GLOBAL, isGlobal())
-                .put(FIELD_CONTENT_PACK, getContentPack())
-                .put(FIELD_CONFIGURATION, getConfiguration().getSource());
+        // This has to be mutable (see #asMapMasked) and support null values!
+        final Map<String, Object> map = new HashMap<>();
+        map.put(FIELD_TYPE, getClass().getCanonicalName());
+        map.put(FIELD_NAME, getName());
+        map.put(FIELD_TITLE, getTitle());
+        map.put(FIELD_CREATOR_USER_ID, getCreatorUserId());
+        map.put(FIELD_GLOBAL, isGlobal());
+        map.put(FIELD_CONTENT_PACK, getContentPack());
+        map.put(FIELD_CONFIGURATION, getConfiguration().getSource());
 
         if (getCreatedAt() != null) {
             map.put(FIELD_CREATED_AT, getCreatedAt());
@@ -288,7 +289,7 @@ public abstract class MessageInput implements Stoppable {
             map.put(FIELD_NODE_ID, getNodeId());
         }
 
-        return map.build();
+        return map;
     }
 
     public void addStaticField(String key, String value) {
