@@ -10,9 +10,9 @@
   },
   "readme": "../README.md",
   "scripts": {
-    "start": "webpack --config webpack.vendor.js && webpack-dev-server --config webpack.combined.config.js",
+    "start": "webpack-dev-server --config webpack.bundled.js --history-api-fallback",
     "start-nohmr": "webpack --config webpack.vendor.js && webpack-dev-server --watch --config webpack.combined.config.js",
-    "build": "webpack -p --config webpack.vendor.js && webpack",
+    "build": "webpack",
     "test": "webpack --config webpack.vendor.js && karma start karma.ci.conf.js",
     "prepare-dev": "./tools/prepare-dev",
     "lint": "eslint --ext js,jsx src"

@@ -74,12 +74,12 @@ public class PluginAssets {
         }
     }
 
-    public List<String> jsFiles() {
+    private List<String> jsFiles() {
         return jsFiles;
     }
 
     // Sort JS files in the intended load order, so templates don't need to care about it.
-    public List<String> sortedJsFiles() {
+    List<String> sortedJsFiles() {
         return jsFiles().stream()
                 .sorted((file1, file2) -> {
                     // Polyfill JS script goes first
@@ -97,7 +97,7 @@ public class PluginAssets {
                 .collect(Collectors.toList());
     }
 
-    public List<String> cssFiles() {
+    List<String> cssFiles() {
         return cssFiles;
     }
 

@@ -24,6 +24,8 @@ const BABELLOADER = { loader: 'babel-loader', options: BABELOPTIONS };
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 
 const webpackConfig = {
+  name: 'app',
+  dependencies: 'vendor',
   entry: {
     app: APP_PATH,
     polyfill: ['babel-polyfill'],
@@ -67,7 +69,7 @@ const webpackConfig = {
       favicon: path.resolve(ROOT_PATH, 'public/images/favicon.png'),
       filename: 'index.html',
       inject: false,
-      template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
+      template: path.resolve(ROOT_PATH, 'templates/index.html.js'),
       chunksSortMode: (c1, c2) => {
         // Render the polyfill chunk first
         if (c1.names[0] === 'polyfill') {
@@ -75,6 +77,12 @@ const webpackConfig = {
         }
         if (c2.names[0] === 'polyfill') {
           return 1;
+        }
+        if (c1.names[0] === 'app') {
+          return 1;
+        }
+        if (c2.names[0] === 'app') {
+          return -1;
         }
         return c2.id - c1.id;
       },
