@@ -13,9 +13,6 @@ import NumberUtils from 'util/NumberUtils';
 import StoreProvider from 'injection/StoreProvider';
 const SearchStore = StoreProvider.getStore('Search');
 
-require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
-require('!script!../../../public/javascripts/bootstrap.min.js');
-
 const QuickValuesVisualization = React.createClass({
   propTypes: {
     id: PropTypes.string,

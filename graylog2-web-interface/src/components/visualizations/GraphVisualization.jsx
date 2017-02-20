@@ -4,8 +4,6 @@ import numeral from 'numeral';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
-// eslint-disable-next-line no-unused-vars
-import jQuery from 'jquery';
 import deepEqual from 'deep-equal';
 
 import DateTime from 'logic/datetimes/DateTime';
@@ -15,9 +13,6 @@ import D3Utils from 'util/D3Utils';
 import NumberUtils from 'util/NumberUtils';
 
 import graphHelper from 'legacy/graphHelper';
-
-require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
-require('!script!../../../public/javascripts/bootstrap.min.js');
 
 const GraphFactory = {
   create(config, domNode, tooltipTitleFormatter) {
