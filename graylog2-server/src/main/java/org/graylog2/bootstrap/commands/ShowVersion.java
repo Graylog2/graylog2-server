@@ -16,7 +16,7 @@
  */
 package org.graylog2.bootstrap.commands;
 
-import io.airlift.airline.Command;
+import com.github.rvesse.airline.annotations.Command;
 import org.graylog2.bootstrap.CliCommand;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.Version;

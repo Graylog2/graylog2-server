@@ -16,10 +16,10 @@
  */
 package org.graylog2.bootstrap;
 
+import com.github.rvesse.airline.Cli;
+import com.github.rvesse.airline.builder.CliBuilder;
 import com.google.common.collect.ImmutableSet;
-import io.airlift.airline.Cli;
-import io.airlift.airline.Cli.CliBuilder;
-import org.graylog2.bootstrap.commands.Help;
+import org.graylog2.bootstrap.commands.CliCommandHelp;
 import org.graylog2.bootstrap.commands.ShowVersion;
 
 import java.util.ServiceLoader;
@@ -28,10 +28,10 @@ public class Main {
     public static void main(String[] args) {
         final CliBuilder<CliCommand> builder = Cli.<CliCommand>builder("graylog")
                 .withDescription("Open source, centralized log management")
-                .withDefaultCommand(Help.class)
+                .withDefaultCommand(CliCommandHelp.class)
                 .withCommands(ImmutableSet.of(
                         ShowVersion.class,
-                        Help.class));
+                        CliCommandHelp.class));
 
         // add rest from classpath
         final ServiceLoader<CliCommandsProvider> commandsProviders = ServiceLoader.load(CliCommandsProvider.class);
@@ -43,6 +43,4 @@ public class Main {
         final Runnable command = cli.parse(args);
         command.run();
     }
-
-
 }
