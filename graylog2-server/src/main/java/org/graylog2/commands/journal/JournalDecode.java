@@ -16,14 +16,15 @@
  */
 package org.graylog2.commands.journal;
 
+import com.github.rvesse.airline.annotations.Arguments;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Range;
 import com.google.inject.Key;
 import com.google.inject.Module;
 import com.google.inject.TypeLiteral;
-import io.airlift.airline.Arguments;
-import io.airlift.airline.Command;
 import org.graylog2.inputs.codecs.CodecsModule;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
@@ -39,7 +40,8 @@ import java.util.Map;
 @Command(name = "decode", description = "Decodes messages from the journal")
 public class JournalDecode extends AbstractJournalCommand {
 
-    @Arguments(required = true, description = "Range of message offsets to decode, e.g. single number 1234567, upper bound ..123456, lower bound 123456..., both 123456..123458")
+    @Arguments(description = "Range of message offsets to decode, e.g. single number 1234567, upper bound ..123456, lower bound 123456..., both 123456..123458")
+    @Required
     private String rangeArg;
 
     public JournalDecode() {

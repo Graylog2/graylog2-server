@@ -16,13 +16,15 @@
  */
 package org.graylog2.commands.journal;
 
-import io.airlift.airline.Command;
-import io.airlift.airline.Option;
+import com.github.rvesse.airline.annotations.Command;
+import com.github.rvesse.airline.annotations.Option;
+import com.github.rvesse.airline.annotations.restrictions.Required;
 
 @Command(name = "truncate", description = "Truncates the journal to a given offset")
 public class JournalTruncate extends AbstractJournalCommand {
 
-    @Option(name = {"-o", "--offset"}, description = "Truncate journal up to this offset, no remaining offset will be larger than the given offset.", required = true)
+    @Option(name = {"-o", "--offset"}, description = "Truncate journal up to this offset, no remaining offset will be larger than the given offset.")
+    @Required
     private long offset = Long.MIN_VALUE;
 
     public JournalTruncate() {
