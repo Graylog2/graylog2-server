@@ -25,6 +25,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
+/**
+ * This class is being used in plugins for testing, DO NOT move it to the test/ directory without changing the plugins.
+ */
 public class TestIndexSet implements IndexSet {
     private static final String SEPARATOR = "_";
     private static final String DEFLECTOR_SUFFIX = "deflector";
