@@ -36,11 +36,11 @@ THE POSSIBILITY OF SUCH DAMAGE.
     <parent>
         <groupId>org.graylog.plugins</groupId>
         <artifactId>graylog-plugin-pipeline-processor-parent</artifactId>
-        <version>2.2.1-SNAPSHOT</version>
+        <version>2.3.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>pipeline-benchmarks</artifactId>
-    <version>2.2.1-SNAPSHOT</version>
+    <version>2.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>Message processing benchmarks</name>
@@ -59,7 +59,7 @@ THE POSSIBILITY OF SUCH DAMAGE.
         <dependency>
             <groupId>org.graylog.plugins</groupId>
             <artifactId>graylog-plugin-pipeline-processor</artifactId>
-            <version>2.2.1-SNAPSHOT</version>
+            <version>2.3.0-SNAPSHOT</version>
         </dependency>
 
         <dependency>
