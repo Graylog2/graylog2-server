@@ -162,7 +162,8 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             + ", check type: " + type.toString().toLowerCase(Locale.ENGLISH)
             + ", threshold_type: " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
             + ", threshold: " + decimalFormat.format(threshold)
-            + ", grace: " + grace;
+            + ", grace: " + grace
+            + ", repeat notifications: " + repeatNotifications;
     }
 
 

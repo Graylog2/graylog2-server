@@ -160,7 +160,8 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         return "time: " + time
             + ", threshold_type: " + thresholdType.toString().toLowerCase(Locale.ENGLISH)
             + ", threshold: " + threshold
-            + ", grace: " + grace;
+            + ", grace: " + grace
+            + ", repeat notifications: " + repeatNotifications;
     }
 
     @Override
