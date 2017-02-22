@@ -46,7 +46,7 @@ const webpackConfig = {
     extensions: ['.js', '.json', '.jsx', '.ts'],
     modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
   },
-  resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ["-loader"] },
+  resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
   devtool: 'source-map',
   plugins: [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: ROOT_PATH }),
@@ -91,8 +91,8 @@ if (TARGET === 'start') {
       path: BUILD_PATH,
       filename: '[name].js',
       publicPath: '/',
-      hotUpdateChunkFilename: "[id].hot-update.js",
-      hotUpdateMainFilename: "hot-update.json",
+      hotUpdateChunkFilename: '[id].hot-update.js',
+      hotUpdateMainFilename: 'hot-update.json',
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
@@ -149,7 +149,7 @@ if (TARGET === 'test') {
   module.exports = merge(webpackConfig, {
     module: {
       rules: [
-        { test: /\.js(x)?$/, enforce: "pre", loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
+        { test: /\.js(x)?$/, enforce: 'pre', loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
       ],
     },
   });
