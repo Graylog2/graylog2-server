@@ -140,6 +140,9 @@ if (TARGET === 'build') {
           except: ['$super', '$', 'exports', 'require'],
         },
       }),
+      new webpack.LoaderOptionsPlugin({
+        minimize: true
+      }),
     ],
   });
 }
