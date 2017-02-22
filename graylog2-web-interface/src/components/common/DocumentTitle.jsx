@@ -10,14 +10,14 @@ const DocumentTitle = React.createClass({
   },
 
   componentDidMount() {
-    document.title = `${document.title} - ${this.props.title}`;
+    document.title = `USAM - ${this.props.title}`;
   },
 
   componentWillUnmount() {
     document.title = this.defaultTitle;
   },
 
-  defaultTitle: 'Graylog',
+  defaultTitle: '',
   render() {
     return this.props.children;
   },
