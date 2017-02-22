@@ -8,13 +8,13 @@
     <parent>
         <groupId>org.graylog.plugins</groupId>
         <artifactId>graylog-plugin-parent</artifactId>
-        <version>2.2.1-SNAPSHOT</version>
+        <version>2.3.0-SNAPSHOT</version>
         <relativePath>../graylog2-server/graylog-plugin-parent</relativePath>
     </parent>
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-beats</artifactId>
-    <version>2.2.1-SNAPSHOT</version>
+    <version>2.3.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -73,7 +73,7 @@
         <maven.install.skip>true</maven.install.skip>
         <maven.deploy.skip>true</maven.deploy.skip>
         <maven.site.skip>true</maven.site.skip>
-        <graylog.version>2.2.1-SNAPSHOT</graylog.version>
+        <graylog.version>2.3.0-SNAPSHOT</graylog.version>
     </properties>
 
     <dependencies>
