@@ -30,7 +30,9 @@ const AlarmCallbackHistoryOverview = React.createClass({
       return <Spinner />;
     }
 
-    const histories = this.state.histories.map(this._formatHistory);
+    const histories = this.state.histories
+      .sort((h1, h2) => h1.created_at.localeCompare(h2.created_at))
+      .map(this._formatHistory);
     return (
       <Row>
         <Col md={12}>
