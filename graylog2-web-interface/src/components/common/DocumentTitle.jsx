@@ -17,7 +17,7 @@ const DocumentTitle = React.createClass({
     document.title = this.defaultTitle;
   },
 
-  defaultTitle: '',
+  defaultTitle: 'USAM',
   render() {
     return this.props.children;
   },
