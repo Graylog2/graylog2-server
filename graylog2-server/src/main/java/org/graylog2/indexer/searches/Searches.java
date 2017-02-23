@@ -263,14 +263,14 @@ public class Searches {
         return new SearchResult(r.getHits(), indices, config.query(), request.source(), r.getTook());
     }
 
-    public TermsResult terms(String field, int size, String query, String filter, TimeRange range, String sorting) {
+    public TermsResult terms(String field, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
         Terms.Order termsOrder;
 
         if (size == 0) {
             size = 50;
         }
 
-        if (sorting.equals("descending")){
+        if (sorting == Sorting.Direction.DESC){
             termsOrder = Terms.Order.count(false);
         } else {
             termsOrder = Terms.Order.count(true);
@@ -312,11 +312,11 @@ public class Searches {
     }
 
     public TermsResult terms(String field, int size, String query, String filter, TimeRange range) {
-        return terms(field, size, query, filter, range, "descending");
+        return terms(field, size, query, filter, range, Sorting.Direction.DESC);
     }
 
     public TermsResult terms(String field, int size, String query, TimeRange range) {
-        return terms(field, size, query, null, range, "descending");
+        return terms(field, size, query, null, range, Sorting.Direction.DESC);
     }
 
     public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, String filter, TimeRange range) {
