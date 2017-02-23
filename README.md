@@ -21,11 +21,18 @@ Restart `graylog-server` and you are done.
 
 ## Usage
 
-__Use this paragraph to document the usage of your plugin__
+### Reading CEF embedded in syslog envelopes
 
+Some systems will send CEF as part of a RFC compliant syslog message. In this case, you can just start a CEF Message Input from `System -> Inputs` and you are done.
 
-Getting started
----------------
+### Parsing raw CEF or CEF embedded in any other envelopes
+
+If the envelope is not syslog or the CEF message is not in an envelope at all, you can use the [Graylog Processing Pipelines](http://docs.graylog.org/en/latest/pages/pipelines.html) and the `parse_cef` function this plugin provides:
+
+1. Use a pipeline rule to parse out the CEF part of the message (for example, using regex) and then apply the `parse_cef()` function on that extracted string.
+1. If desired, use a second pipeline step to rename the `cef_` prefixed message fields to something easier to use and easier to remember.
+
+### Development
 
 This project is using Maven 3 and requires Java 8 or higher.
 
