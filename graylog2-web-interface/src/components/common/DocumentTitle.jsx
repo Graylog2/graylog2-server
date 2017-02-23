@@ -10,7 +10,7 @@ const DocumentTitle = React.createClass({
   },
 
   componentDidMount() {
-    document.title = `USAM - ${this.props.title}`;
+    document.title = `${document.title} - ${this.props.title}`;
   },
 
   componentWillUnmount() {
