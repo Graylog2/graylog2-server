@@ -9,7 +9,7 @@ const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 const { AlarmCallbacksActions } = CombinedProvider.get('AlarmCallbacks');
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
-import { EntityListItem } from 'components/common';
+import { EntityListItem, Spinner } from 'components/common';
 import { UnknownAlertNotification } from 'components/alertnotifications';
 import { ConfigurationForm, ConfigurationWell } from 'components/configurationforms';
 
@@ -59,6 +59,10 @@ const AlertNotification = React.createClass({
   },
 
   render() {
+    if (!this.state.availableNotifications) {
+      return <Spinner />;
+    }
+
     const notification = this.props.alertNotification;
     const stream = this.props.stream;
     const typeDefinition = this.state.availableNotifications[notification.type];
