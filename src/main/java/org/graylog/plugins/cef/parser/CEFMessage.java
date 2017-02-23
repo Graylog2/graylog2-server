@@ -9,6 +9,7 @@ import java.util.Map;
 @AutoValue
 public abstract class CEFMessage {
 
+    @Nullable
     public abstract DateTime timestamp();
 
     public abstract int version();

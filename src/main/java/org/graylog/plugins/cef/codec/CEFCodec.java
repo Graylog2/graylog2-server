@@ -4,7 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.cef.parser.CEFMessage;
-import org.graylog.plugins.cef.parser.CEFParser;
+import org.graylog.plugins.cef.parser.SyslogCEFParser;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.configuration.Configuration;
@@ -33,7 +33,7 @@ public class CEFCodec implements Codec {
     private static final String CK_TIMEZONE = "timezone";
 
     private final Configuration configuration;
-    private final CEFParser parser;
+    private final SyslogCEFParser parser;
 
     @AssistedInject
     public CEFCodec(@Assisted Configuration configuration) {
@@ -47,7 +47,7 @@ public class CEFCodec implements Codec {
             timezone = DateTimeZone.getDefault();
         }
 
-        this.parser = new CEFParser(timezone);
+        this.parser = new SyslogCEFParser(timezone);
     }
 
     @Nullable
