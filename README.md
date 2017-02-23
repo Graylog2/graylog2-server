@@ -10,8 +10,7 @@ This plugin is strictly following the CEF standard and will probably not work wi
 
 **Required Graylog version:** 2.0 and later
 
-Installation
-------------
+## Installation
 
 [Download the plugin](https://github.com/Graylog2/graylog-plugin-cef/releases)
 and place the `.jar` file in your Graylog plugin directory. The plugin directory
@@ -20,8 +19,7 @@ and can be configured in your `graylog.conf` file.
 
 Restart `graylog-server` and you are done.
 
-Usage
------
+## Usage
 
 __Use this paragraph to document the usage of your plugin__
 
@@ -37,8 +35,7 @@ This project is using Maven 3 and requires Java 8 or higher.
 * Copy generated JAR file in target directory to your Graylog plugin directory.
 * Restart Graylog.
 
-Plugin Release
---------------
+## Plugin Release
 
 We are using the maven release plugin:
 
