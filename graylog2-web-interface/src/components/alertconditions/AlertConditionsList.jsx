@@ -22,7 +22,7 @@ const AlertConditionsList = React.createClass({
   },
 
   _paginatedConditions() {
-    return this.props.alertConditions.slice(this.state.currentPage, this.state.currentPage + this.PAGE_SIZE);
+    return this.props.alertConditions.slice(this.state.currentPage * this.PAGE_SIZE, (this.state.currentPage + 1) * this.PAGE_SIZE);
   },
 
   _formatCondition(condition) {
