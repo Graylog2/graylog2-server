@@ -16,7 +16,6 @@
  */
 package org.graylog2.alerts;
 
-import com.google.inject.Inject;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
@@ -28,6 +27,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
 import java.util.List;
 
 public class AlertNotificationsSender {
