@@ -8,9 +8,6 @@ import StoreProvider from 'injection/StoreProvider';
 const SearchStore = StoreProvider.getStore('Search');
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 
-require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
-require('!script!../../../public/javascripts/bootstrap.min.js');
-
 const MessageTablePaginator = React.createClass({
   propTypes: {
     resultCount: PropTypes.number.isRequired,

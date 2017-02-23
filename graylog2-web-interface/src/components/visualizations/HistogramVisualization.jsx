@@ -13,9 +13,6 @@ import D3Utils from 'util/D3Utils';
 
 import graphHelper from 'legacy/graphHelper';
 
-require('!script!../../../public/javascripts/jquery-2.1.1.min.js');
-require('!script!../../../public/javascripts/bootstrap.min.js');
-
 const HistogramVisualization = React.createClass({
   propTypes: {
     id: PropTypes.string.isRequired,
