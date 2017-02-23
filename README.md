@@ -32,7 +32,7 @@ If the envelope is not syslog or the CEF message is not in an envelope at all, y
 1. Use a pipeline rule to parse out the CEF part of the message (for example, using regex) and then apply the `parse_cef()` function on that extracted string.
 1. If desired, use a second pipeline step to rename the `cef_` prefixed message fields to something easier to use and easier to remember.
 
-### Development
+## Development
 
 This project is using Maven 3 and requires Java 8 or higher.
 
