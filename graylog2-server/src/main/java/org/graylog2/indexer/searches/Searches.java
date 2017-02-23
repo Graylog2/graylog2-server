@@ -263,9 +263,17 @@ public class Searches {
         return new SearchResult(r.getHits(), indices, config.query(), request.source(), r.getTook());
     }
 
-    public TermsResult terms(String field, int size, String query, String filter, TimeRange range) {
+    public TermsResult terms(String field, int size, String query, String filter, TimeRange range, String sorting) {
+        Terms.Order termsOrder;
+
         if (size == 0) {
             size = 50;
+        }
+
+        if (sorting.equals("descending")){
+            termsOrder = Terms.Order.count(false);
+        } else {
+            termsOrder = Terms.Order.count(true);
         }
 
         SearchRequestBuilder srb;
@@ -279,7 +287,8 @@ public class Searches {
                 .subAggregation(
                         AggregationBuilders.terms(AGG_TERMS)
                                 .field(field)
-                                .size(size))
+                                .size(size)
+                                .order(termsOrder))
                 .subAggregation(
                         AggregationBuilders.missing("missing")
                                 .field(field))
@@ -302,8 +311,12 @@ public class Searches {
         );
     }
 
+    public TermsResult terms(String field, int size, String query, String filter, TimeRange range) {
+        return terms(field, size, query, filter, range, "descending");
+    }
+
     public TermsResult terms(String field, int size, String query, TimeRange range) {
-        return terms(field, size, query, null, range);
+        return terms(field, size, query, null, range, "descending");
     }
 
     public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, String filter, TimeRange range) {
