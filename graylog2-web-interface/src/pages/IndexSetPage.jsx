@@ -132,12 +132,16 @@ const IndexSetPage = React.createClass({
     if (this.state.indexerOverview && this.state.indexDetails.closedIndices) {
       const deflectorInfo = this.state.indexerOverview.deflector;
 
+      let activeIndex = ".";
+      if (indexSet.writable) {
+        activeIndex = ", current write-active index is <i>{deflectorInfo.current_target}</i>";
+      }
+
       indicesInfo = (
         <span>
           <Alert bsStyle="success" style={{ marginTop: '10' }}>
             <i className="fa fa-th"/> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
-            {numeral(this.state.indexerOverview.counts.events).format('0,0')} messages under management,
-            current write-active index is <i>{deflectorInfo.current_target}</i>.
+            {numeral(this.state.indexerOverview.counts.events).format('0,0')} messages under management{activeIndex}
           </Alert>
           <IndexerClusterHealthSummary health={this.state.indexerOverview.indexer_cluster.health} />
         </span>
