@@ -1,8 +1,9 @@
 import React from 'react';
 import { Alert, Col, Label } from 'react-bootstrap';
 
-import { EntityListItem } from 'components/common';
+import { EntityListItem, Timestamp } from 'components/common';
 import { ConfigurationWell } from 'components/configurationforms';
+import DateTime from 'logic/datetimes/DateTime';
 
 const AlarmCallbackHistory = React.createClass({
   propTypes: {
@@ -25,7 +26,9 @@ const AlarmCallbackHistory = React.createClass({
         <small>({type ? type.name : configuration.type})</small>
       </span>
     );
-    const description = (hadError ? `Error sending notification: ${history.result.error}` : 'Notification was sent successfully.');
+    const description = (hadError ?
+      <span>Error sending notification at <Timestamp dateTime={history.created_at} format={DateTime.Formats.DATETIME} />: {history.result.error}</span> :
+      <span>Notification was sent successfully at <Timestamp dateTime={history.created_at} format={DateTime.Formats.DATETIME} />.</span>);
 
     let configurationWell;
     let configurationInfo;

@@ -2,6 +2,7 @@ import React from 'react';
 
 import GracePeriodSummary from 'components/alertconditions/GracePeriodSummary';
 import BacklogSummary from 'components/alertconditions/BacklogSummary';
+import RepeatNotificationsSummary from 'components/alertconditions/RepeatNotificationsSummary';
 
 const FieldContentConditionSummary = React.createClass({
   propTypes: {
@@ -22,6 +23,8 @@ const FieldContentConditionSummary = React.createClass({
         <GracePeriodSummary alertCondition={alertCondition} />
         {' '}
         <BacklogSummary alertCondition={alertCondition}/>
+        {' '}
+        <RepeatNotificationsSummary alertCondition={alertCondition} />
       </span>
     );
   },

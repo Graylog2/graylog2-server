@@ -1,5 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
+import moment from 'moment';
 import { Row, Col } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -30,7 +31,14 @@ const AlarmCallbackHistoryOverview = React.createClass({
       return <Spinner />;
     }
 
-    const histories = this.state.histories.map(this._formatHistory);
+    const histories = this.state.histories
+      .sort((h1, h2) => {
+        const h1Time = moment(h1.created_at);
+        const h2Time = moment(h2.created_at);
+
+        return (h1Time.isBefore(h2Time) ? -1 : h2Time.isBefore(h1Time) ? 1 : 0);
+      })
+      .map(this._formatHistory);
     return (
       <Row>
         <Col md={12}>

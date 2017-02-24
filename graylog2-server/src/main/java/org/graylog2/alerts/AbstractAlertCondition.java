@@ -23,6 +23,7 @@ import com.google.common.collect.Lists;
 import org.graylog2.plugin.MessageSummary;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.database.EmbeddedPersistable;
@@ -57,6 +58,7 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     protected final String creatorUserId;
     protected final int grace;
     protected final int backlog;
+    protected final boolean repeatNotifications;
     protected final String title;
 
     private Map<String, Object> parameters;
@@ -76,7 +78,8 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         this.parameters = ImmutableMap.copyOf(parameters);
 
         this.grace = Tools.getNumber(this.parameters.get("grace"), 0).intValue();
-        this.backlog = Tools.getNumber(getParameters().get("backlog"), 0).intValue();
+        this.backlog = Tools.getNumber(this.parameters.get("backlog"), 0).intValue();
+        this.repeatNotifications = (boolean) this.parameters.getOrDefault("repeat_notifications", false);
     }
 
     @Override
@@ -147,6 +150,11 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
         return grace;
     }
 
+    @Override
+    public boolean shouldRepeatNotifications() {
+        return repeatNotifications;
+    }
+
     public static class CheckResult implements AlertCondition.CheckResult {
 
         private final boolean isTriggered;
@@ -204,7 +212,8 @@ public abstract class AbstractAlertCondition implements EmbeddedPersistable, Ale
     public static List<ConfigurationField> getDefaultConfigurationFields() {
         return Lists.newArrayList(
             new NumberField("grace", "Grace Period", 0, "Number of minutes to wait after an alert is resolved, to trigger another alert", ConfigurationField.Optional.NOT_OPTIONAL),
-            new NumberField("backlog", "Message Backlog", 0, "The number of messages to be included in alert notifications", ConfigurationField.Optional.NOT_OPTIONAL)
+            new NumberField("backlog", "Message Backlog", 0, "The number of messages to be included in alert notifications", ConfigurationField.Optional.NOT_OPTIONAL),
+            new BooleanField("repeat_notifications", "Repeat notifications", false, "Check this box to send notifications every time the alert condition is evaluated and satisfied regardless of its state.")
         );
     }
 }

@@ -16,19 +16,12 @@
  */
 package org.graylog2.alerts;
 
-import com.google.common.collect.ImmutableList;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
-import org.graylog2.alarmcallbacks.AlarmCallbackHistoryService;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.streams.Stream;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -52,19 +45,15 @@ public class AlertScannerTest {
     @Mock
     private AlertService alertService;
     @Mock
-    private AlarmCallbackConfigurationService alarmCallbackConfigurationService;
-    @Mock
-    private AlarmCallbackFactory alarmCallbackFactory;
-    @Mock
-    private AlarmCallbackHistoryService alarmCallbackHistoryService;
+    private AlertNotificationsSender alertNotificationsSender;
 
     @Before
     public void setUp() throws Exception {
-        this.alertScanner = new AlertScanner(alertService, alarmCallbackConfigurationService, alarmCallbackFactory, alarmCallbackHistoryService);
+        this.alertScanner = new AlertScanner(alertService, alertNotificationsSender);
     }
 
     @Test
-    public void testNoCheckForGracePeriod() throws Exception {
+    public void testNoCheckWhileInGracePeriod() throws Exception {
         final AlertCondition alertCondition = mock(AlertCondition.class);
         final Stream stream = mock(Stream.class);
         when(alertService.inGracePeriod(eq(alertCondition))).thenReturn(true);
@@ -74,7 +63,7 @@ public class AlertScannerTest {
     }
 
     @Test
-    public void testCheckIfNotInGracePeriodWithNegativeResult() throws Exception {
+    public void testCheckWithNegativeResult() throws Exception {
         final AlertCondition alertCondition = mock(AlertCondition.class);
         final Stream stream = mock(Stream.class);
         when(alertService.inGracePeriod(eq(alertCondition))).thenReturn(false);
@@ -85,39 +74,95 @@ public class AlertScannerTest {
     }
 
     @Test
-    public void testCheckIfNotInGracePeriodWIthPositiveResult() throws Exception {
-        final AlertCondition alertCondition = mock(AlertCondition.class);
+    public void testCheckTriggersFirstAlert() throws Exception {
         final Stream stream = mock(Stream.class);
+        final AlertCondition alertCondition = mock(AlertCondition.class);
         when(alertService.inGracePeriod(eq(alertCondition))).thenReturn(false);
         final AlertCondition.CheckResult positiveCheckResult = new AbstractAlertCondition.CheckResult(true, alertCondition, "Mocked positive CheckResult", Tools.nowUTC(), Collections.emptyList());
         when(alertCondition.runCheck()).thenReturn(positiveCheckResult);
 
-        final AlarmCallbackConfiguration alarmCallbackConfiguration = mock(AlarmCallbackConfiguration.class);
-        when(alarmCallbackConfigurationService.getForStream(eq(stream))).thenReturn(ImmutableList.of(alarmCallbackConfiguration));
-        final AlarmCallback alarmCallback = mock(AlarmCallback.class);
-        when(alarmCallbackFactory.create(eq(alarmCallbackConfiguration))).thenReturn(alarmCallback);
-
         final Alert alert = mock(Alert.class);
+        when(alertService.getLastTriggeredAlert(stream.getId(), alertCondition.getId())).thenReturn(Optional.empty());
         when(alertService.factory(eq(positiveCheckResult))).thenReturn(alert);
 
         assertThat(this.alertScanner.checkAlertCondition(stream, alertCondition)).isTrue();
-        verify(alertCondition, times(1)).runCheck();
+
+        when(alertService.getLastTriggeredAlert(stream.getId(), alertCondition.getId())).thenReturn(Optional.of(alert));
+        when(alertService.isResolved(alert)).thenReturn(false);
+        assertThat(this.alertScanner.checkAlertCondition(stream, alertCondition)).isTrue();
+
+        verify(alertCondition, times(2)).runCheck();
+        verify(alertNotificationsSender, times(1)).send(positiveCheckResult, stream, alert, alertCondition);
         verify(alertService, never()).resolveAlert(alert);
+    }
 
-        final ArgumentCaptor<Stream> streamCaptor = ArgumentCaptor.forClass(Stream.class);
-        final ArgumentCaptor<AlertCondition.CheckResult> checkResultCaptor = ArgumentCaptor.forClass(AlertCondition.CheckResult.class);
-        verify(alarmCallback, times(1)).call(streamCaptor.capture(), checkResultCaptor.capture());
-        assertThat(streamCaptor.getValue()).isEqualTo(stream);
-        assertThat(checkResultCaptor.getValue()).isEqualTo(positiveCheckResult);
+    @Test
+    public void testCheckTriggersAlertIfPreviousIsResolved() throws Exception {
+        final Stream stream = mock(Stream.class);
+        final AlertCondition alertCondition = mock(AlertCondition.class);
+        when(alertService.inGracePeriod(eq(alertCondition))).thenReturn(false);
+        final AlertCondition.CheckResult positiveCheckResult = new AbstractAlertCondition.CheckResult(true, alertCondition, "Mocked positive CheckResult", Tools.nowUTC(), Collections.emptyList());
+        when(alertCondition.runCheck()).thenReturn(positiveCheckResult);
 
-        final ArgumentCaptor<AlarmCallbackConfiguration> alarmCallbackConfigurationCaptor = ArgumentCaptor.forClass(AlarmCallbackConfiguration.class);
-        final ArgumentCaptor<Alert> alertCaptor = ArgumentCaptor.forClass(Alert.class);
-        final ArgumentCaptor<AlertCondition> alertConditionCaptor = ArgumentCaptor.forClass(AlertCondition.class);
-        verify(alarmCallbackHistoryService, times(1)).success(alarmCallbackConfigurationCaptor.capture(), alertCaptor.capture(), alertConditionCaptor.capture());
+        final Alert alert = mock(Alert.class);
+        final Alert previousAlert = mock(Alert.class);
+        when(alertService.getLastTriggeredAlert(stream.getId(), alertCondition.getId())).thenReturn(Optional.of(previousAlert));
+        when(alertService.isResolved(previousAlert)).thenReturn(true);
+        when(alertService.factory(eq(positiveCheckResult))).thenReturn(alert);
 
-        assertThat(alarmCallbackConfigurationCaptor.getValue()).isEqualTo(alarmCallbackConfiguration);
-        assertThat(alertCaptor.getValue()).isEqualTo(alert);
-        assertThat(alertConditionCaptor.getValue()).isEqualTo(alertCondition);
+        assertThat(this.alertScanner.checkAlertCondition(stream, alertCondition)).isTrue();
+
+        verify(alertCondition, times(1)).runCheck();
+        verify(alertNotificationsSender, times(1)).send(positiveCheckResult, stream, alert, alertCondition);
+        verify(alertService, never()).resolveAlert(alert);
+    }
+
+    @Test
+    public void testCheckStatefulAlertNotifications() throws Exception {
+        final Stream stream = mock(Stream.class);
+        final AlertCondition alertCondition = mock(AlertCondition.class);
+        when(alertCondition.shouldRepeatNotifications()).thenReturn(false);
+        when(alertService.inGracePeriod(eq(alertCondition))).thenReturn(false);
+        final AlertCondition.CheckResult positiveCheckResult = new AbstractAlertCondition.CheckResult(true, alertCondition, "Mocked positive CheckResult", Tools.nowUTC(), Collections.emptyList());
+        when(alertCondition.runCheck()).thenReturn(positiveCheckResult);
+
+        final Alert alert = mock(Alert.class);
+        when(alertService.getLastTriggeredAlert(stream.getId(), alertCondition.getId())).thenReturn(Optional.empty());
+        when(alertService.factory(eq(positiveCheckResult))).thenReturn(alert);
+
+        assertThat(this.alertScanner.checkAlertCondition(stream, alertCondition)).isTrue();
+
+        when(alertService.getLastTriggeredAlert(stream.getId(), alertCondition.getId())).thenReturn(Optional.of(alert));
+        when(alertService.isResolved(alert)).thenReturn(false);
+        assertThat(this.alertScanner.checkAlertCondition(stream, alertCondition)).isTrue();
+
+        verify(alertCondition, times(2)).runCheck();
+        verify(alertNotificationsSender, times(1)).send(positiveCheckResult, stream, alert, alertCondition);
+        verify(alertService, never()).resolveAlert(alert);
+    }
+
+    @Test
+    public void testCheckRepeatedAlertNotifications() throws Exception {
+        final Stream stream = mock(Stream.class);
+        final AlertCondition alertCondition = mock(AlertCondition.class);
+        when(alertCondition.shouldRepeatNotifications()).thenReturn(true);
+        when(alertService.inGracePeriod(eq(alertCondition))).thenReturn(false);
+        final AlertCondition.CheckResult positiveCheckResult = new AbstractAlertCondition.CheckResult(true, alertCondition, "Mocked positive CheckResult", Tools.nowUTC(), Collections.emptyList());
+        when(alertCondition.runCheck()).thenReturn(positiveCheckResult);
+
+        final Alert alert = mock(Alert.class);
+        when(alertService.getLastTriggeredAlert(stream.getId(), alertCondition.getId())).thenReturn(Optional.empty());
+        when(alertService.factory(eq(positiveCheckResult))).thenReturn(alert);
+
+        assertThat(this.alertScanner.checkAlertCondition(stream, alertCondition)).isTrue();
+
+        when(alertService.getLastTriggeredAlert(stream.getId(), alertCondition.getId())).thenReturn(Optional.of(alert));
+        when(alertService.isResolved(alert)).thenReturn(false);
+        assertThat(this.alertScanner.checkAlertCondition(stream, alertCondition)).isTrue();
+
+        verify(alertCondition, times(2)).runCheck();
+        verify(alertNotificationsSender, times(2)).send(positiveCheckResult, stream, alert, alertCondition);
+        verify(alertService, never()).resolveAlert(alert);
     }
 
     @Test
@@ -127,11 +172,6 @@ public class AlertScannerTest {
         when(alertService.inGracePeriod(eq(alertCondition))).thenReturn(false);
         final AlertCondition.CheckResult positiveCheckResult = new AbstractAlertCondition.CheckResult(true, alertCondition, "Mocked positive CheckResult", Tools.nowUTC(), Collections.emptyList());
         when(alertCondition.runCheck()).thenReturn(positiveCheckResult);
-
-        final AlarmCallbackConfiguration alarmCallbackConfiguration = mock(AlarmCallbackConfiguration.class);
-        when(alarmCallbackConfigurationService.getForStream(eq(stream))).thenReturn(ImmutableList.of(alarmCallbackConfiguration));
-        final AlarmCallback alarmCallback = mock(AlarmCallback.class);
-        when(alarmCallbackFactory.create(eq(alarmCallbackConfiguration))).thenReturn(alarmCallback);
 
         final Alert alert = mock(Alert.class);
         when(alertService.factory(eq(positiveCheckResult))).thenReturn(alert);
