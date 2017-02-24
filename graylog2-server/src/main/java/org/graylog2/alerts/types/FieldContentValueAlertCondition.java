@@ -167,6 +167,9 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
 
     @Override
     public String getDescription() {
-        return "field: " + field + ", value: " + value;
+        return "field: " + field
+                + ", value: " + value
+                + ", grace: " + grace
+                + ", repeat notifications: " + repeatNotifications;
     }
 }
