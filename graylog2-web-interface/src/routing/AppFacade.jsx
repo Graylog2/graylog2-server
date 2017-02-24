@@ -12,7 +12,7 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import 'javascripts/shims/styles/shim.css';
 import 'stylesheets/bootstrap.min.css';
-import 'stylesheets/font-awesome.min.css';
+import 'font-awesome/css/font-awesome.css';
 import 'stylesheets/newfonts.less';
 import 'stylesheets/bootstrap-submenus.less';
 import 'stylesheets/toastr.min.css';
