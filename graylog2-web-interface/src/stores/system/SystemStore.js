@@ -8,12 +8,12 @@ const SystemStore = Reflux.createStore({
   system: undefined,
   init() {
     this.info().then((response) => {
-      this.trigger({system: response});
+      this.trigger({ system: response });
       this.system = response;
     });
   },
   getInitialState() {
-    return {system: this.system};
+    return { system: this.system };
   },
   info() {
     const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.info().url);

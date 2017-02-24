@@ -52,15 +52,15 @@ const AlertConditionsStore = Reflux.createStore({
   listAll() {
     const url = URLUtils.qualifyUrl(ApiRoutes.AlertConditionsApiController.list().url);
     const promise = fetch('GET', url).then(
-      response => {
+      (response) => {
         this.allAlertConditions = response.conditions;
         this.trigger({ allAlertConditions: this.allAlertConditions });
         return this.allAlertConditions;
       },
-      error => {
+      (error) => {
         UserNotification.error(`Fetching alert conditions failed with status: ${error}`,
           'Could not get alert conditions');
-      }
+      },
     );
     AlertConditionsActions.listAll.promise(promise);
   },
@@ -92,7 +92,7 @@ const AlertConditionsStore = Reflux.createStore({
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.create(streamId).url);
-    const promise = fetch('POST', url, alertCondition).then(response => {
+    const promise = fetch('POST', url, alertCondition).then((response) => {
       UserNotification.success('Condition created successfully');
       return response.alert_condition_id;
     }, failCallback);
@@ -107,7 +107,7 @@ const AlertConditionsStore = Reflux.createStore({
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.update(streamId, alertConditionId).url);
-    const promise = fetch('PUT', url, request).then(response => {
+    const promise = fetch('PUT', url, request).then((response) => {
       UserNotification.success('Condition updated successfully');
       return response;
     }, failCallback);
@@ -124,11 +124,11 @@ const AlertConditionsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamAlertsApiController.get(streamId, conditionId).url);
     const promise = fetch('GET', url);
     promise.then(
-      response => {
+      (response) => {
         this.trigger({ alertCondition: response });
         return response;
       },
-      error => {
+      (error) => {
         return (typeof failureCallback === 'function' ? failureCallback(error) : failCallback(error));
       });
 

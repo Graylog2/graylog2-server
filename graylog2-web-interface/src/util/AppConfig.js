@@ -10,7 +10,7 @@ const AppConfig = {
   gl2DevMode() {
     // The DEVELOPMENT variable will be set by webpack via the DefinePlugin.
     // eslint-disable-next-line no-undef
-    return typeof(DEVELOPMENT) !== 'undefined' && DEVELOPMENT;
+    return typeof (DEVELOPMENT) !== 'undefined' && DEVELOPMENT;
   },
 
   rootTimeZone() {

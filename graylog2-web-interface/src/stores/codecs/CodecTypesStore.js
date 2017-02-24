@@ -18,11 +18,11 @@ const CodecTypesStore = Reflux.createStore({
   list() {
     const promise = fetch('GET', URLUtils.qualifyUrl(ApiRoutes.CodecTypesController.list().url));
     promise.then(
-        response => {
+        (response) => {
           this.codecTypes = response;
           this.trigger(this.getInitialState());
         },
-        error => {
+        (error) => {
           UserNotification.error(`Fetching codec types failed with status: ${error}`,
             'Could not retrieve codec types');
         });

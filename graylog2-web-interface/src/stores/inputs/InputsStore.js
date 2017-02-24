@@ -17,7 +17,7 @@ const InputsStore = Reflux.createStore({
   input: undefined,
 
   init() {
-    this.trigger({inputs: this.inputs, input: this.input});
+    this.trigger({ inputs: this.inputs, input: this.input });
     this.listenTo(InputStaticFieldsStore, this.list);
   },
 
@@ -25,14 +25,14 @@ const InputsStore = Reflux.createStore({
     const promise = fetch('GET', URLUtils.qualifyUrl(this.sourceUrl));
     promise
       .then(
-        response => {
+        (response) => {
           this.inputs = response.inputs;
-          this.trigger({inputs: this.inputs});
+          this.trigger({ inputs: this.inputs });
 
           return this.inputs;
         },
-        error => {
-          UserNotification.error('Fetching Inputs failed with status: ' + error,
+        (error) => {
+          UserNotification.error(`Fetching Inputs failed with status: ${error}`,
             'Could not retrieve Inputs');
         });
 
@@ -48,13 +48,13 @@ const InputsStore = Reflux.createStore({
 
     promise
       .then(
-        response => {
+        (response) => {
           this.input = response;
-          this.trigger({input: this.input});
+          this.trigger({ input: this.input });
 
           return this.input;
         },
-        error => {
+        (error) => {
           if (showError) {
             UserNotification.error(`Fetching input ${inputId} failed with status: ${error}`,
                                    'Could not retrieve input');
@@ -74,7 +74,7 @@ const InputsStore = Reflux.createStore({
           UserNotification.success(`Input '${input.title}' launched successfully`);
           InputsActions.list();
         },
-        error => {
+        (error) => {
           UserNotification.error(`Launching input '${input.title}' failed with status: ${error}`,
             'Could not launch input');
         });
@@ -93,7 +93,7 @@ const InputsStore = Reflux.createStore({
           UserNotification.success(`Input '${inputTitle}' deleted successfully`);
           InputsActions.list();
         },
-        error => {
+        (error) => {
           UserNotification.error(`Deleting input '${inputTitle}' failed with status: ${error}`,
             'Could not delete input');
         });
@@ -109,7 +109,7 @@ const InputsStore = Reflux.createStore({
           UserNotification.success(`Input '${input.title}' updated successfully`);
           InputsActions.list();
         },
-        error => {
+        (error) => {
           UserNotification.error(`Updating input '${input.title}' failed with status: ${error}`,
             'Could not update input');
         });
@@ -120,7 +120,7 @@ const InputsStore = Reflux.createStore({
 
 InputsStore.inputsAsMap = (inputsList) => {
   const inputsMap = {};
-  inputsList.forEach(input => {
+  inputsList.forEach((input) => {
     inputsMap[input.id] = input;
   });
   return inputsMap;

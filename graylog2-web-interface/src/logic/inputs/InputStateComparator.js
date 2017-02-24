@@ -1,15 +1,15 @@
 class InputStateComparator {
   constructor() {
     this.mapping = {
-      'CREATED': 0,
-      'INITIALIZED': 1,
-      'INVALID_CONFIGURATION': 2,
-      'STARTING': 3,
-      'RUNNING': 4,
-      'FAILED': 2,
-      'STOPPING': 1,
-      'STOPPED': 0,
-      'TERMINATED': 0,
+      CREATED: 0,
+      INITIALIZED: 1,
+      INVALID_CONFIGURATION: 2,
+      STARTING: 3,
+      RUNNING: 4,
+      FAILED: 2,
+      STOPPING: 1,
+      STOPPED: 0,
+      TERMINATED: 0,
     };
   }
 

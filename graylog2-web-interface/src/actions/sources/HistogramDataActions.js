@@ -1,7 +1,7 @@
 import Reflux from 'reflux';
 
 const HistogramDataActions = Reflux.createActions({
-  'load': {asyncResult: true},
+  load: { asyncResult: true },
 });
 
 export default HistogramDataActions;

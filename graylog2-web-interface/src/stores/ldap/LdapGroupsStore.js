@@ -14,7 +14,7 @@ const LdapGroupsStore = Reflux.createStore({
   mapping: undefined,
 
   getInitialState() {
-    return {groups: this.groups, mapping: this.mapping};
+    return { groups: this.groups, mapping: this.mapping };
   },
 
   loadGroups() {
@@ -22,16 +22,16 @@ const LdapGroupsStore = Reflux.createStore({
 
     const promise = fetch('GET', url);
     promise.then(
-      response => {
+      (response) => {
         this.groups = response;
-        this.trigger({groups: this.groups});
+        this.trigger({ groups: this.groups });
       },
-      error => {
+      (error) => {
         if (error.additional.status !== 400) {
           UserNotification.error(`Loading LDAP group list failed with status: ${error}`,
             'Could not load LDAP group list');
         }
-      }
+      },
     );
 
     LdapGroupsActions.loadGroups.promise(promise);
@@ -42,14 +42,14 @@ const LdapGroupsStore = Reflux.createStore({
 
     const promise = fetch('GET', url);
     promise.then(
-      response => {
+      (response) => {
         this.mapping = response;
-        this.trigger({mapping: this.mapping});
+        this.trigger({ mapping: this.mapping });
       },
-      error => {
+      (error) => {
         UserNotification.error(`Loading LDAP group mapping failed with status: ${error}`,
           'Could not load LDAP group mapping');
-      }
+      },
     );
 
     LdapGroupsActions.loadMapping.promise(promise);
@@ -64,10 +64,10 @@ const LdapGroupsStore = Reflux.createStore({
         this.loadMapping();
         UserNotification.success('LDAP group mapping successfully updated.');
       },
-      error => {
+      (error) => {
         UserNotification.error(`Updating LDAP group mapping failed with status: ${error}`,
           'Could not update LDAP group mapping');
-      }
+      },
     );
 
     LdapGroupsActions.saveMapping.promise(promise);

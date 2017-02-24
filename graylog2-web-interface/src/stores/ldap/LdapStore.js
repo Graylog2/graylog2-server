@@ -13,16 +13,16 @@ const LdapStore = Reflux.createStore({
   ldapSettings: undefined,
 
   getInitialState() {
-    return {ldapSettings: this.ldapSettings};
+    return { ldapSettings: this.ldapSettings };
   },
 
   loadSettings() {
     const url = URLUtils.qualifyUrl(`${this.sourceUrl}/settings`);
 
     const promise = fetch('GET', url);
-    promise.then(response => {
+    promise.then((response) => {
       this.ldapSettings = response;
-      this.trigger({ldapSettings: response});
+      this.trigger({ ldapSettings: response });
     });
 
     LdapActions.loadSettings.promise(promise);
@@ -37,7 +37,7 @@ const LdapStore = Reflux.createStore({
         this.loadSettings();
         UserNotification.success('LDAP settings saved successfully');
       },
-      error => UserNotification.error(`Saving LDAP settings failed: ${error}`, 'Could not save LDAP settings')
+      error => UserNotification.error(`Saving LDAP settings failed: ${error}`, 'Could not save LDAP settings'),
     );
 
     LdapActions.update.promise(promise);
