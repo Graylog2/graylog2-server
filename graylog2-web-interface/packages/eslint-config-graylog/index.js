@@ -2,6 +2,12 @@ module.exports = {
   extends: [
     'eslint:recommended',
     'airbnb',
+    'plugin:import/errors',
+    'plugin:import/warnings',
+    'plugin:import/react',
+  ],
+  plugins: [
+    'import',
   ],
   rules: {
     'arrow-body-style': 0,
@@ -19,5 +25,5 @@ module.exports = {
     'react/jsx-space-before-closing': 0,
     'react/prefer-es6-class': 0,
     'react/prefer-stateless-function': 1,
-  },
+  }
 };
