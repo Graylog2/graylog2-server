@@ -12,3 +12,4 @@ out/
 node_modules
 node
 build
+cache/
