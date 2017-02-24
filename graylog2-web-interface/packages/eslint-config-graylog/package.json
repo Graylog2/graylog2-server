@@ -1,6 +1,6 @@
 {
   "name": "eslint-config-graylog",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Graylog ESLint config for web interface plugin authors",
   "main": "index.js",
   "scripts": {
@@ -13,13 +13,13 @@
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "MIT",
   "dependencies": {
-    "eslint": "^2.10.2",
-    "eslint-config-airbnb": "^9.0.1",
-    "eslint-plugin-import": "^1.10.0",
-    "eslint-plugin-jsx-a11y": "^1.5.3",
-    "eslint-plugin-react": "^5.2.2"
+    "eslint": "^3.16.1",
+    "eslint-config-airbnb": "^14.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "eslint-plugin-jsx-a11y": "^4.0.0",
+    "eslint-plugin-react": "^6.10.0"
   },
   "peerDependencies": {
-    "eslint": "^2.10.2"
+    "eslint": "^3.16.1"
   }
 }
