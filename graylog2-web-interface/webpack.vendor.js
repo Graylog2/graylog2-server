@@ -20,11 +20,6 @@ const webpackConfig = {
     filename: '[name].js',
     library: '__[name]',
   },
-  module: {
-    loaders: [
-      { test: /\.json$/, loader: 'json-loader' },
-    ],
-  },
   plugins: [
     new Clean([path.resolve(BUILD_PATH, 'vendor.*.js')]),
     new webpack.DllPlugin({

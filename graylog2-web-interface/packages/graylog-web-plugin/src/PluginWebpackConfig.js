@@ -31,7 +31,7 @@ function PluginWebpackConfig(fqcn, _options, additionalConfig) {
       },
       plugins: plugins,
       resolve: {
-        modulesDirectories: [ path.resolve(options.entry_path, '..') ],
+        modules: [ path.resolve(options.entry_path, '..') ],
       },
     }
   );

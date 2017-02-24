@@ -105,5 +105,3 @@ export const UsersStore = {
     return promise;
   },
 };
-
-module.exports = UsersStore;

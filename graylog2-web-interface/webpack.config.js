@@ -14,7 +14,12 @@ const TARGET = process.env.npm_lifecycle_event;
 process.env.BABEL_ENV = TARGET;
 
 const BABELRC = path.resolve(ROOT_PATH, '.babelrc');
-const BABELLOADER = 'babel-loader?cacheDirectory&extends=' + BABELRC;
+const BABELOPTIONS = {
+  cacheDirectory: 'cache',
+  'extends': BABELRC,
+};
+
+const BABELLOADER = { loader: 'babel-loader', options: BABELOPTIONS };
 
 const webpackConfig = {
   entry: {
@@ -26,29 +31,22 @@ const webpackConfig = {
     filename: '[name].[hash].js',
   },
   module: {
-    preLoaders: [
-      // { test: /\.js(x)?$/, loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
-    ],
-    loaders: [
-      { test: /pages\/.+\.jsx$/, loader: 'react-proxy', exclude: /node_modules|\.node_cache|ServerUnavailablePage/ },
-      { test: /\.js(x)?$/, loader: BABELLOADER, exclude: /node_modules|\.node_cache/ },
-      { test: /\.json$/, loader: 'json' },
-      { test: /\.ts$/, loaders: [BABELLOADER, 'ts'], exclude: /node_modules|\.node_cache/ },
-      { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, loader: 'file' },
-      { test: /\.png$/, loader: 'url' },
-      { test: /\.less$/, loaders: ['style', 'css', 'less'] },
-      { test: /\.css$/, loaders: ['style', 'css'] },
+    rules: [
+      { test: /pages\/.+\.jsx$/, use: 'react-proxy-loader', exclude: /node_modules|\.node_cache|ServerUnavailablePage/ },
+      { test: /\.js(x)?$/, use: BABELLOADER, exclude: /node_modules|\.node_cache/ },
+      { test: /\.ts$/, use: [BABELLOADER, { loader: 'ts-loader' }], exclude: /node_modules|\.node_cache/ },
+      { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, use: 'file-loader' },
+      { test: /\.png$/, use: 'url-loader' },
+      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] },
+      { test: /\.css$/, use: ['style-loader', 'css-loader'] },
     ],
   },
   resolve: {
     // you can now require('file') instead of require('file.coffee')
-    extensions: ['', '.js', '.json', '.jsx', '.ts'],
-    modulesDirectories: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
+    extensions: ['.js', '.json', '.jsx', '.ts'],
+    modules: [APP_PATH, 'node_modules', path.resolve(ROOT_PATH, 'public')],
   },
-  resolveLoader: { root: path.join(ROOT_PATH, 'node_modules') },
-  eslint: {
-    configFile: '.eslintrc',
-  },
+  resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
   devtool: 'source-map',
   plugins: [
     new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: ROOT_PATH }),
@@ -84,7 +82,7 @@ if (TARGET === 'start') {
       historyApiFallback: true,
       hot: true,
       inline: true,
-      progress: true,
+      lazy: false,
       watchOptions: {
         ignored: /node_modules/,
       },
@@ -93,11 +91,12 @@ if (TARGET === 'start') {
       path: BUILD_PATH,
       filename: '[name].js',
       publicPath: '/',
-      hotUpdateChunkFilename: "[id].hot-update.js",
-      hotUpdateMainFilename: "hot-update.json",
+      hotUpdateChunkFilename: '[id].hot-update.js',
+      hotUpdateMainFilename: 'hot-update.json',
     },
     plugins: [
       new webpack.HotModuleReplacementPlugin(),
+      new webpack.NamedModulesPlugin(),
       new webpack.DefinePlugin({DEVELOPMENT: true}),
     ],
   });
@@ -111,7 +110,6 @@ if (TARGET === 'start-nohmr') {
       historyApiFallback: true,
       hot: false,
       inline: true,
-      progress: true,
       watchOptions: {
         ignored: /node_modules/,
       },
@@ -132,11 +130,6 @@ if (TARGET === 'build') {
   process.env.NODE_ENV = 'production';
   module.exports = merge(webpackConfig, {
     plugins: [
-      new webpack.DefinePlugin({
-        'process.env': {
-          NODE_ENV: JSON.stringify('production'),
-        },
-      }),
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
         sourceMap: true,
@@ -147,7 +140,9 @@ if (TARGET === 'build') {
           except: ['$super', '$', 'exports', 'require'],
         },
       }),
-      new webpack.optimize.OccurenceOrderPlugin(),
+      new webpack.LoaderOptionsPlugin({
+        minimize: true
+      }),
     ],
   });
 }
@@ -156,8 +151,8 @@ if (TARGET === 'test') {
   console.log('Running test/ci mode');
   module.exports = merge(webpackConfig, {
     module: {
-      preLoaders: [
-        { test: /\.js(x)?$/, loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
+      rules: [
+        { test: /\.js(x)?$/, enforce: 'pre', loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
       ],
     },
   });

@@ -10,4 +10,7 @@ build
 node
 manifests/*-manifest.json
 plugin
+cache
+
+yarn.lock
 
