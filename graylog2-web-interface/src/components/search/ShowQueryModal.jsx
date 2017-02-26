@@ -31,7 +31,7 @@ const ShowQueryModal = React.createClass({
           <pre>{queryText}</pre>
         </Modal.Body>
         <Modal.Footer>
-          <ClipboardButton title="Copy query" text={queryText} />
+          <ClipboardButton title="Copy query" target=".modal-body pre" />
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
