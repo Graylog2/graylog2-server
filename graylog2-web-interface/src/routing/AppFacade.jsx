@@ -10,13 +10,12 @@ const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
-import 'javascripts/shims/styles/shim.css';
-import 'stylesheets/bootstrap.min.css';
+import 'bootstrap/dist/css/bootstrap.css';
 import 'font-awesome/css/font-awesome.css';
 import 'stylesheets/newfonts.less';
 import 'stylesheets/bootstrap-submenus.less';
-import 'stylesheets/toastr.min.css';
-import 'stylesheets/rickshaw.min.css';
+import 'toastr/toastr.less';
+import 'rickshaw/rickshaw.css';
 import 'stylesheets/graylog2.less';
 
 const AppFacade = React.createClass({
