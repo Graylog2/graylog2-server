@@ -21,6 +21,8 @@ const BABELOPTIONS = {
 
 const BABELLOADER = { loader: 'babel-loader', options: BABELOPTIONS };
 
+const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
+
 const webpackConfig = {
   entry: {
     app: APP_PATH,
@@ -37,7 +39,17 @@ const webpackConfig = {
       { test: /\.ts$/, use: [BABELLOADER, { loader: 'ts-loader' }], exclude: /node_modules|\.node_cache/ },
       { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, use: 'file-loader' },
       { test: /\.png$/, use: 'url-loader' },
-      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'] },
+      { test: /bootstrap\.less$/, use: [
+        'style-loader',
+        'css-loader',
+        {
+          loader: 'less-loader',
+          options: {
+            modifyVars: BOOTSTRAPVARS,
+          },
+        },
+      ] },
+      { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'], exclude: /bootstrap\.less$/ },
       { test: /\.css$/, use: ['style-loader', 'css-loader'] },
     ],
   },
