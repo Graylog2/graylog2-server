@@ -25,7 +25,7 @@ const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', '
 
 const webpackConfig = {
   name: 'app',
-  dependencies: 'vendor',
+  dependencies: ['vendor'],
   entry: {
     app: APP_PATH,
     polyfill: ['babel-polyfill'],
