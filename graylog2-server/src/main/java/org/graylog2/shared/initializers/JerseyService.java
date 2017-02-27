@@ -33,9 +33,9 @@ import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.model.Resource;
-import org.graylog2.Configuration;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
@@ -91,7 +91,7 @@ public class JerseyService extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(JerseyService.class);
     private static final String RESOURCE_PACKAGE_WEB = "org.graylog2.web.resources";
 
-    private final Configuration configuration;
+    private final HttpConfiguration configuration;
     private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
     private final String[] restControllerPackages;
 
@@ -108,7 +108,7 @@ public class JerseyService extends AbstractIdleService {
     private HttpServer webHttpServer = null;
 
     @Inject
-    public JerseyService(final Configuration configuration,
+    public JerseyService(final HttpConfiguration configuration,
                          Set<Class<? extends DynamicFeature>> dynamicFeatures,
                          Set<Class<? extends ContainerResponseFilter>> containerResponseFilters,
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,

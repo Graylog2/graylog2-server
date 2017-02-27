@@ -19,7 +19,7 @@ package org.graylog2.web;
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.HttpConfiguration;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -43,7 +43,7 @@ public class IndexHtmlGenerator {
                 .put("title", title)
                 .put("cssFiles", pluginAssets.cssFiles())
                 .put("jsFiles", pluginAssets.sortedJsFiles())
-                .put("appPrefix", configuration.getWebPrefix())
+                .put("appPrefix", httpConfiguration.getWebPrefix())
                 .build();
 
         this.content = requireNonNull(templateEngine, "templateEngine").transform(template, model);

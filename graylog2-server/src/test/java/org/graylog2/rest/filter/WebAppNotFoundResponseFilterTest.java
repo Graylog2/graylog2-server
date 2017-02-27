@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest.filter;
 
-import org.graylog2.Configuration;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -50,7 +50,7 @@ public class WebAppNotFoundResponseFilterTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private final Configuration configuration = new Configuration() {
+    private final HttpConfiguration configuration = new HttpConfiguration() {
         @Override
         public URI getRestListenUri() {
             return URI.create("http://example.com/api/");

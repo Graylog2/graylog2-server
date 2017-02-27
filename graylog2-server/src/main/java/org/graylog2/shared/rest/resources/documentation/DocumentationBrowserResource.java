@@ -19,7 +19,7 @@ package org.graylog2.shared.rest.resources.documentation;
 import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.activation.MimetypesFileTypeMap;

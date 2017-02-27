@@ -49,88 +49,6 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void testRestListenUriIsRelativeURI() throws RepositoryException, ValidationException {
-        validProperties.put("rest_listen_uri", "/foo");
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Parameter rest_listen_uri should be an absolute URI (found /foo)");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-    }
-
-    @Test
-    public void testWebListenUriIsRelativeURI() throws RepositoryException, ValidationException {
-        validProperties.put("web_listen_uri", "/foo");
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Parameter web_listen_uri should be an absolute URI (found /foo)");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-    }
-
-    @Test
-    public void testRestListenUriIsAbsoluteURI() throws RepositoryException, ValidationException {
-        validProperties.put("rest_listen_uri", "http://www.example.com:12900/");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        assertThat(configuration.getRestListenUri()).isEqualTo(URI.create("http://www.example.com:12900/"));
-    }
-
-    @Test
-    public void testWebListenUriIsAbsoluteURI() throws RepositoryException, ValidationException {
-        validProperties.put("web_listen_uri", "http://www.example.com:12900/web");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        assertThat(configuration.getWebListenUri()).isEqualTo(URI.create("http://www.example.com:12900/web/"));
-    }
-
-    @Test
-    public void testRestListenUriWithHttpDefaultPort() throws RepositoryException, ValidationException {
-        validProperties.put("rest_listen_uri", "http://example.com/");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        assertThat(configuration.getRestListenUri()).hasPort(80);
-    }
-
-    @Test
-    public void testRestListenUriWithCustomPort() throws RepositoryException, ValidationException {
-        validProperties.put("rest_listen_uri", "http://example.com:12900/");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        assertThat(configuration.getRestListenUri()).hasPort(12900);
-    }
-
-    @Test
-    public void testWebListenUriWithHttpDefaultPort() throws RepositoryException, ValidationException {
-        validProperties.put("web_listen_uri", "http://example.com/");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        assertThat(configuration.getWebListenUri()).hasPort(80);
-    }
-
-    @Test
-    public void testWebListenUriWithCustomPort() throws RepositoryException, ValidationException {
-        validProperties.put("web_listen_uri", "http://example.com:9000/");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        assertThat(configuration.getWebListenUri()).hasPort(9000);
-    }
-
-    @Test
     public void testPasswordSecretIsTooShort() throws ValidationException, RepositoryException {
         validProperties.put("password_secret", "too short");
 
@@ -164,30 +82,6 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void testApiListenerOnRootAndWebListenerOnSubPath() throws ValidationException, RepositoryException {
-        validProperties.put("rest_listen_uri", "http://0.0.0.0:12900/");
-        validProperties.put("web_listen_uri", "http://0.0.0.0:12900/web/");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        assertThat(configuration.getRestListenUri()).isEqualTo(URI.create("http://0.0.0.0:12900/"));
-        assertThat(configuration.getWebListenUri()).isEqualTo(URI.create("http://0.0.0.0:12900/web/"));
-    }
-
-    @Test
-    public void testWebListenerOnRootAndApiListenerOnSubPath() throws ValidationException, RepositoryException {
-        validProperties.put("rest_listen_uri", "http://0.0.0.0:9000/api/");
-        validProperties.put("web_listen_uri", "http://0.0.0.0:9000/");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-
-        assertThat(configuration.getRestListenUri()).isEqualTo(URI.create("http://0.0.0.0:9000/api/"));
-        assertThat(configuration.getWebListenUri()).isEqualTo(URI.create("http://0.0.0.0:9000/"));
-    }
-
-    @Test
     public void testPasswordSecretIsValid() throws ValidationException, RepositoryException {
         validProperties.put("password_secret", "abcdefghijklmnopqrstuvwxyz");
 
@@ -195,29 +89,5 @@ public class ConfigurationTest {
         new JadConfig(new InMemoryRepository(validProperties), configuration).process();
 
         assertThat(configuration.getPasswordSecret()).isEqualTo("abcdefghijklmnopqrstuvwxyz");
-    }
-
-    @Test
-    public void testRestApiListeningOnWildcardOnSamePortAsWebInterface() throws ValidationException, RepositoryException {
-        validProperties.put("rest_listen_uri", "http://0.0.0.0:9000/api/");
-        validProperties.put("web_listen_uri", "http://127.0.0.1:9000/");
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Wildcard IP addresses cannot be used if the Graylog REST API and web interface listen on the same port.");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
-    }
-
-    @Test
-    public void testWebInterfaceListeningOnWildcardOnSamePortAsRestApi() throws ValidationException, RepositoryException {
-        validProperties.put("rest_listen_uri", "http://127.0.0.1:9000/api/");
-        validProperties.put("web_listen_uri", "http://0.0.0.0:9000/");
-
-        expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Wildcard IP addresses cannot be used if the Graylog REST API and web interface listen on the same port.");
-
-        Configuration configuration = new Configuration();
-        new JadConfig(new InMemoryRepository(validProperties), configuration).process();
     }
 }

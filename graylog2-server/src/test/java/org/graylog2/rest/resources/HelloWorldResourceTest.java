@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest.resources;
 
-import org.graylog2.Configuration;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
@@ -39,14 +39,14 @@ public class HelloWorldResourceTest extends RestResourceBaseTest {
     private HelloWorldResource helloWorldResource;
     private NodeId nodeId;
     private ClusterConfigService clusterConfigService;
-    private Configuration configuration;
+    private HttpConfiguration httpConfiguration;
 
     @Before
     public void setUp() throws Exception {
         this.nodeId = mock(NodeId.class);
         this.clusterConfigService = mock(ClusterConfigService.class);
-        this.configuration = mock(Configuration.class);
-        this.helloWorldResource = new HelloWorldResource(nodeId, clusterConfigService, configuration);
+        this.httpConfiguration = mock(HttpConfiguration.class);
+        this.helloWorldResource = new HelloWorldResource(nodeId, clusterConfigService, httpConfiguration);
 
         when(clusterConfigService.getOrDefault(eq(ClusterId.class), any(ClusterId.class))).thenReturn(ClusterId.create(CK_CLUSTER_ID));
         when(nodeId.toString()).thenReturn(CK_NODE_ID);
@@ -64,9 +64,9 @@ public class HelloWorldResourceTest extends RestResourceBaseTest {
 
     @Test
     public void rootResourceShouldRedirectToWebInterfaceIfHtmlIsRequested() throws Exception {
-        when(configuration.isRestAndWebOnSamePort()).thenReturn(true);
+        when(httpConfiguration.isRestAndWebOnSamePort()).thenReturn(true);
         final String pathToWebIf = "/path_to_web_if";
-        when(configuration.getWebPrefix()).thenReturn(pathToWebIf);
+        when(httpConfiguration.getWebPrefix()).thenReturn(pathToWebIf);
 
         final Response response = helloWorldResource.redirectToWebConsole();
 
@@ -78,7 +78,7 @@ public class HelloWorldResourceTest extends RestResourceBaseTest {
 
     @Test
     public void rootResourceShouldNotRedirectToWebInterfaceIfNotRunningOnSamePort() throws Exception {
-        when(configuration.isRestAndWebOnSamePort()).thenReturn(false);
+        when(httpConfiguration.isRestAndWebOnSamePort()).thenReturn(false);
 
         final Response response = helloWorldResource.redirectToWebConsole();
 

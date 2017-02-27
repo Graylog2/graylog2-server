@@ -26,19 +26,15 @@ import com.github.joschi.jadconfig.validators.PositiveDurationValidator;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import com.github.joschi.jadconfig.validators.PositiveLongValidator;
 import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
-import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.utilities.IPSubnetConverter;
 import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
 
-import java.net.URI;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Set;
-
-import static org.graylog2.plugin.Tools.normalizeURI;
 
 /**
  * Helper class to hold configuration of Graylog
@@ -50,12 +46,6 @@ public class Configuration extends BaseConfiguration {
 
     @Parameter(value = "password_secret", required = true, validator = StringNotBlankValidator.class)
     private String passwordSecret;
-
-    @Parameter(value = "rest_listen_uri", required = true, validator = URIAbsoluteValidator.class)
-    private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_PORT + "/api/");
-
-    @Parameter(value = "web_listen_uri", required = true, validator = URIAbsoluteValidator.class)
-    private URI webListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_WEB_PORT + "/");
 
     @Parameter(value = "output_batch_size", required = true, validator = PositiveIntegerValidator.class)
     private int outputBatchSize = 500;
@@ -204,16 +194,6 @@ public class Configuration extends BaseConfiguration {
         return nodeIdFile;
     }
 
-    @Override
-    public URI getRestListenUri() {
-        return normalizeURI(restListenUri, getRestUriScheme(), GRAYLOG_DEFAULT_PORT, "/");
-    }
-
-    @Override
-    public URI getWebListenUri() {
-        return normalizeURI(webListenUri, getWebUriScheme(), GRAYLOG_DEFAULT_WEB_PORT, "/");
-    }
-
     public String getRootUsername() {
         return rootUsername;
     }
@@ -324,19 +304,6 @@ public class Configuration extends BaseConfiguration {
         final String passwordSecret = getPasswordSecret();
         if (passwordSecret == null || passwordSecret.length() < 16) {
             throw new ValidationException("The minimum length for \"password_secret\" is 16 characters.");
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateNetworkInterfaces() throws ValidationException {
-        final URI restListenUri = getRestListenUri();
-        final URI webListenUri = getWebListenUri();
-
-        if (restListenUri.getPort() == webListenUri.getPort() &&
-                !restListenUri.getHost().equals(webListenUri.getHost()) &&
-                (WILDCARD_IP_ADDRESS.equals(restListenUri.getHost()) || WILDCARD_IP_ADDRESS.equals(webListenUri.getHost()))) {
-            throw new ValidationException("Wildcard IP addresses cannot be used if the Graylog REST API and web interface listen on the same port.");
         }
     }
 }
