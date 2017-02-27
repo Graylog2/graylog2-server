@@ -106,7 +106,7 @@
         <HdrHistogram.version>2.1.9</HdrHistogram.version>
         <hibernate-validator.version>5.4.0.Final</hibernate-validator.version>
         <hk2.version>2.5.0-b32</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.8.6</jackson.version>
+        <jackson.version>2.8.7</jackson.version>
         <jadconfig.version>0.13.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javapoet.version>1.8.0</javapoet.version>
@@ -123,7 +123,7 @@
         <jsr305.version>3.0.1</jsr305.version>
         <kafka.version>0.9.0.1</kafka.version>
         <log4j.version>2.8</log4j.version>
-        <metrics.version>3.1.2</metrics.version>
+        <metrics.version>3.2.0</metrics.version>
         <mongodb-driver.version>3.4.2</mongodb-driver.version>
         <mongojack.version>2.6.1</mongojack.version>
         <natty.version>0.13</natty.version>
@@ -137,7 +137,7 @@
         <scala.version>2.11.8</scala.version>
         <shiro.version>1.3.2</shiro.version>
         <sigar.version>1.6.4</sigar.version>
-        <slf4j.version>1.7.22</slf4j.version>
+        <slf4j.version>1.7.24</slf4j.version>
         <swagger.version>1.5.12</swagger.version>
         <syslog4j.version>0.9.58</syslog4j.version>
         <uuid.version>3.2</uuid.version>
