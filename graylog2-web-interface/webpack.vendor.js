@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const path = require('path');
 const Clean = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
@@ -28,7 +29,8 @@ const webpackConfig = {
       path: path.resolve(MANIFESTS_PATH, '[name]-manifest.json'),
       name: '__[name]',
     }),
-    new HtmlWebpackPlugin({ filename: 'vendor-module.json', inject: false, template: path.resolve(ROOT_PATH, 'templates/module.json.template') }),
+    new HtmlWebpackPlugin({ filename: 'vendor-module.json', inject: false, template: path.resolve(ROOT_PATH, 'templates/module.json.template'), alwaysWriteToDisk: true }),
+    new HtmlWebpackHarddiskPlugin({ outputPath: BUILD_PATH }),
   ],
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
