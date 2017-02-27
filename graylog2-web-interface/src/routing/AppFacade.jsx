@@ -12,7 +12,7 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import 'bootstrap/dist/css/bootstrap.css';
 import 'font-awesome/css/font-awesome.css';
-import 'stylesheets/newfonts.less';
+import 'opensans-npm-webfont';
 import 'stylesheets/bootstrap-submenus.less';
 import 'toastr/toastr.less';
 import 'rickshaw/rickshaw.css';
