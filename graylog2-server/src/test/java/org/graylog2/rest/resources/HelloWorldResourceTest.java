@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources;
 
-import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
@@ -39,14 +38,12 @@ public class HelloWorldResourceTest extends RestResourceBaseTest {
     private HelloWorldResource helloWorldResource;
     private NodeId nodeId;
     private ClusterConfigService clusterConfigService;
-    private HttpConfiguration httpConfiguration;
 
     @Before
     public void setUp() throws Exception {
         this.nodeId = mock(NodeId.class);
         this.clusterConfigService = mock(ClusterConfigService.class);
-        this.httpConfiguration = mock(HttpConfiguration.class);
-        this.helloWorldResource = new HelloWorldResource(nodeId, clusterConfigService, httpConfiguration);
+        this.helloWorldResource = new HelloWorldResource(nodeId, clusterConfigService);
 
         when(clusterConfigService.getOrDefault(eq(ClusterId.class), any(ClusterId.class))).thenReturn(ClusterId.create(CK_CLUSTER_ID));
         when(nodeId.toString()).thenReturn(CK_NODE_ID);
@@ -64,27 +61,11 @@ public class HelloWorldResourceTest extends RestResourceBaseTest {
 
     @Test
     public void rootResourceShouldRedirectToWebInterfaceIfHtmlIsRequested() throws Exception {
-        when(httpConfiguration.isRestAndWebOnSamePort()).thenReturn(true);
-        final String pathToWebIf = "/path_to_web_if";
-        when(httpConfiguration.getWebPrefix()).thenReturn(pathToWebIf);
-
         final Response response = helloWorldResource.redirectToWebConsole();
 
         assertThat(response).isNotNull();
 
         final String locationHeader = response.getHeaderString("Location");
-        assertThat(locationHeader).isNotNull().isEqualTo(pathToWebIf);
-    }
-
-    @Test
-    public void rootResourceShouldNotRedirectToWebInterfaceIfNotRunningOnSamePort() throws Exception {
-        when(httpConfiguration.isRestAndWebOnSamePort()).thenReturn(false);
-
-        final Response response = helloWorldResource.redirectToWebConsole();
-
-        assertThat(response).isNotNull();
-
-        final String locationHeader = response.getHeaderString("Location");
-        assertThat(locationHeader).isNull();
+        assertThat(locationHeader).isNotNull().isEqualTo("/");
     }
 }

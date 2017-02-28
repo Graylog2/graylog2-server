@@ -66,7 +66,7 @@ public class AppConfigResource {
         final Map<String, Object> model = ImmutableMap.of(
             "rootTimeZone", configuration.getRootTimeZone(),
             "serverUri", RestTools.buildEndpointUri(headers, httpConfiguration.getWebEndpointUri()),
-            "appPathPrefix", httpConfiguration.getWebPrefix());
+            "appPathPrefix", HttpConfiguration.PATH_WEB);
         return templateEngine.transform(template, model);
     }
 }

@@ -33,12 +33,10 @@ import java.util.List;
 
 @Priority(Priorities.ENTITY_CODER)
 public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
-    private final String webAppPrefix;
     private final IndexHtmlGenerator indexHtmlGenerator;
 
     @Inject
-    public WebAppNotFoundResponseFilter(HttpConfiguration configuration, IndexHtmlGenerator indexHtmlGenerator) {
-        this.webAppPrefix = configuration.getWebListenUri().getPath();
+    public WebAppNotFoundResponseFilter(IndexHtmlGenerator indexHtmlGenerator) {
         this.indexHtmlGenerator = indexHtmlGenerator;
     }
 
@@ -54,7 +52,7 @@ public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
         if (isGetRequest
                 && responseStatus == Response.Status.NOT_FOUND
                 && acceptsHtml
-                && requestPath.startsWith(webAppPrefix)) {
+                && !requestPath.startsWith(HttpConfiguration.PATH_API)) {
             final String entity = indexHtmlGenerator.get();
             responseContext.setStatusInfo(Response.Status.OK);
             responseContext.setEntity(entity, new Annotation[0], MediaType.TEXT_HTML_TYPE);

@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.UnknownHostException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -40,17 +39,15 @@ public class HttpConfiguration {
 
     private static final String WILDCARD_IP_ADDRESS = "0.0.0.0";
     private static final int GRAYLOG_DEFAULT_PORT = 9000;
-    private static final int GRAYLOG_DEFAULT_WEB_PORT = 9000;
+
+    public static final String PATH_WEB = "";
+    public static final String PATH_API = "/api/";
 
     @Parameter(value = "rest_listen_uri", required = true, validator = URIAbsoluteValidator.class)
-    private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_PORT + "/api/");
+    private URI restListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_PORT + PATH_API);
 
     @Parameter(value = "rest_transport_uri", validator = URIAbsoluteValidator.class)
     private URI restTransportUri;
-
-    @Parameter(value = "web_listen_uri", required = true, validator = URIAbsoluteValidator.class)
-    private URI webListenUri = URI.create("http://127.0.0.1:" + GRAYLOG_DEFAULT_WEB_PORT + "/");
-
 
     @Parameter(value = "rest_enable_cors")
     private boolean restEnableCors = true;
@@ -82,56 +79,15 @@ public class HttpConfiguration {
     @Parameter(value = "rest_tls_key_password")
     private String restTlsKeyPassword;
 
-    @Parameter(value = "web_enable")
-    private boolean webEnable = true;
-
     @Parameter(value = "web_endpoint_uri")
     private URI webEndpointUri;
-
-    @Parameter(value = "web_enable_cors")
-    private boolean webEnableCors = false;
-
-    @Parameter(value = "web_enable_gzip")
-    private boolean webEnableGzip = true;
-
-    @Parameter(value = "web_max_initial_line_length", required = true, validator = PositiveIntegerValidator.class)
-    private int webMaxInitialLineLength = 4096;
-
-    @Parameter(value = "web_max_header_size", required = true, validator = PositiveIntegerValidator.class)
-    private int webMaxHeaderSize = 8192;
-
-    @Parameter(value = "web_enable_tls")
-    private boolean webEnableTls = false;
-
-    @Parameter(value = "web_thread_pool_size", required = true, validator = PositiveIntegerValidator.class)
-    private int webThreadPoolSize = 16;
-
-    @Parameter(value = "web_selector_runners_count", required = true, validator = PositiveIntegerValidator.class)
-    private int webSelectorRunnersCount = 1;
-
-    @Parameter(value = "web_tls_cert_file")
-    private Path webTlsCertFile;
-
-    @Parameter(value = "web_tls_key_file")
-    private Path webTlsKeyFile;
-
-    @Parameter(value = "web_tls_key_password")
-    private String webTlsKeyPassword;
 
     public URI getRestListenUri() {
         return normalizeURI(restListenUri, getRestUriScheme(), GRAYLOG_DEFAULT_PORT, "/");
     }
 
-    public URI getWebListenUri() {
-        return normalizeURI(webListenUri, getWebUriScheme(), GRAYLOG_DEFAULT_WEB_PORT, "/");
-    }
-
     public String getRestUriScheme() {
         return getUriScheme(isRestEnableTls());
-    }
-
-    public String getWebUriScheme() {
-        return getUriScheme(isWebEnableTls());
     }
 
     public String getUriScheme(boolean enableTls) {
@@ -233,129 +189,21 @@ public class HttpConfiguration {
         return restTlsKeyPassword;
     }
 
-    public boolean isWebEnable() {
-        return webEnable;
-    }
-
-    public boolean isRestAndWebOnSamePort() {
-        final URI restListenUri = getRestListenUri();
-        final URI webListenUri = getWebListenUri();
-        try {
-            final InetAddress restAddress = InetAddress.getByName(restListenUri.getHost());
-            final InetAddress webAddress = InetAddress.getByName(webListenUri.getHost());
-            return restListenUri.getPort() == webListenUri.getPort() && restAddress.equals(webAddress);
-        } catch (UnknownHostException e) {
-            throw new RuntimeException("Unable to resolve hostnames of rest/web listen uris: ", e);
-        }
-    }
-
-    public boolean isWebEnableCors() {
-        return webEnableCors;
-    }
-
-    public boolean isWebEnableGzip() {
-        return webEnableGzip;
-    }
-
-    public int getWebMaxInitialLineLength() {
-        return webMaxInitialLineLength;
-    }
-
-    public int getWebMaxHeaderSize() {
-        return webMaxHeaderSize;
-    }
-
-    public boolean isWebEnableTls() {
-        return webEnableTls;
-    }
-
-    public int getWebThreadPoolSize() {
-        return webThreadPoolSize;
-    }
-
-    public int getWebSelectorRunnersCount() {
-        return webSelectorRunnersCount;
-    }
-
-    public Path getWebTlsCertFile() {
-        return webTlsCertFile;
-    }
-
-    public Path getWebTlsKeyFile() {
-        return webTlsKeyFile;
-    }
-
-    public String getWebTlsKeyPassword() {
-        return webTlsKeyPassword;
-    }
-
     public URI getWebEndpointUri() {
         return webEndpointUri == null ? getRestTransportUri() : webEndpointUri;
-    }
-
-    public String getWebPrefix() {
-        final String webPrefix = getWebListenUri().getPath();
-        if (webPrefix.endsWith("/")) {
-            return webPrefix.substring(0, webPrefix.length() - 1);
-        }
-        return webPrefix;
     }
 
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validateRestTlsConfig() throws ValidationException {
-        if(isRestEnableTls()) {
-            if(!isRegularFileAndReadable(getRestTlsKeyFile())) {
+        if (isRestEnableTls()) {
+            if (!isRegularFileAndReadable(getRestTlsKeyFile())) {
                 throw new ValidationException("Unreadable or missing REST API private key: " + getRestTlsKeyFile());
             }
 
-            if(!isRegularFileAndReadable(getRestTlsCertFile())) {
+            if (!isRegularFileAndReadable(getRestTlsCertFile())) {
                 throw new ValidationException("Unreadable or missing REST API X.509 certificate: " + getRestTlsCertFile());
             }
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateWebTlsConfig() throws ValidationException {
-        if(isWebEnableTls() && !isRestAndWebOnSamePort()) {
-            if(!isRegularFileAndReadable(getWebTlsKeyFile())) {
-                throw new ValidationException("Unreadable or missing web interface private key: " + getWebTlsKeyFile());
-            }
-
-            if(!isRegularFileAndReadable(getWebTlsCertFile())) {
-                throw new ValidationException("Unreadable or missing web interface X.509 certificate: " + getWebTlsCertFile());
-            }
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateRestAndWebListenConfigConflict() throws ValidationException {
-        if (isRestAndWebOnSamePort() && getRestListenUri().getPath().equals(getWebListenUri().getPath())) {
-            throw new ValidationException("If REST and Web interface are served on the same host/port, the path must be different!");
-        }
-    }
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateWebAndRestHaveSameProtocolIfOnSamePort() throws ValidationException {
-        if (isRestAndWebOnSamePort() && !getWebListenUri().getScheme().equals(getRestListenUri().getScheme())) {
-            throw new ValidationException("If REST and Web interface are served on the same host/port, the protocols must be identical!");
-        }
-    }
-
-
-    @ValidatorMethod
-    @SuppressWarnings("unused")
-    public void validateNetworkInterfaces() throws ValidationException {
-        final URI restListenUri = getRestListenUri();
-        final URI webListenUri = getWebListenUri();
-
-        if (restListenUri.getPort() == webListenUri.getPort() &&
-                !restListenUri.getHost().equals(webListenUri.getHost()) &&
-                (WILDCARD_IP_ADDRESS.equals(restListenUri.getHost()) || WILDCARD_IP_ADDRESS.equals(webListenUri.getHost()))) {
-            throw new ValidationException("Wildcard IP addresses cannot be used if the Graylog REST API and web interface listen on the same port.");
         }
     }
 

@@ -42,15 +42,12 @@ import static java.util.Objects.requireNonNull;
 public class HelloWorldResource extends RestResource {
     private final NodeId nodeId;
     private final ClusterConfigService clusterConfigService;
-    private final HttpConfiguration httpConfiguration;
 
     @Inject
     public HelloWorldResource(NodeId nodeId,
-                              ClusterConfigService clusterConfigService,
-                              HttpConfiguration httpConfiguration) {
+                              ClusterConfigService clusterConfigService) {
         this.nodeId = requireNonNull(nodeId);
         this.clusterConfigService = requireNonNull(clusterConfigService);
-        this.httpConfiguration = requireNonNull(httpConfiguration, "configuration");
     }
 
     @GET
@@ -72,16 +69,8 @@ public class HelloWorldResource extends RestResource {
     @ApiOperation(value = "Redirecting to web console if it runs on same port.")
     @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML})
     public Response redirectToWebConsole() {
-        if (httpConfiguration.isRestAndWebOnSamePort()) {
-            final URI target = URI.create(httpConfiguration.getWebPrefix());
-            return Response
-                .temporaryRedirect(target)
-                .build();
-        }
-
         return Response
-            .ok(helloWorld())
-            .type(MediaType.APPLICATION_JSON)
+            .temporaryRedirect(URI.create(HttpConfiguration.PATH_WEB))
             .build();
     }
 }
