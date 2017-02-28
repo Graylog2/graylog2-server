@@ -22,11 +22,11 @@ import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTr
 import Widget from 'components/widgets/Widget';
 
 const ShowDashboardPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
   propTypes: {
     history: React.PropTypes.object.isRequired,
     params: React.PropTypes.object.isRequired,
   },
+  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
 
   getInitialState() {
     return {
@@ -40,7 +40,8 @@ const ShowDashboardPage = React.createClass({
     this.listenTo(WidgetsStore, this.removeWidget);
     // we use the stream ids to potentially disable search replay buttons for deleted streams
     StreamsStore.load((streams) => {
-      let streamIds2 = streams.reduce((streamIds, stream) => {
+      const streamIds2 = streams.reduce((streamIds, stream) => {
+        // eslint-disable-next-line no-param-reassign
         streamIds[stream.id] = stream.id;
         return streamIds;
       }, {});
