@@ -37,6 +37,7 @@ public class PluginAssets {
     public static final String pathPrefix = "web-interface/assets";
     private static final String pluginPathPrefix = "plugin/";
     private static final String manifestFilename = "module.json";
+    private static final String vendorManifestFilename = "vendor-module.json";
 
     private final ObjectMapper objectMapper;
     private final List<String> jsFiles;
@@ -50,6 +51,20 @@ public class PluginAssets {
         this.jsFiles = new ArrayList<>();
         this.cssFiles = new ArrayList<>();
 
+        final InputStream vendorManifestStream = this.getClass().getResourceAsStream("/" + pathPrefix + "/" + vendorManifestFilename);
+        if (vendorManifestStream != null) {
+            final ModuleManifest vendorManifest;
+            try {
+                vendorManifest = objectMapper.readValue(vendorManifestStream, ModuleManifest.class);
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to read vendor manifest: ", e);
+            }
+            jsFiles.addAll(vendorManifest.files().jsFiles());
+            cssFiles.addAll(vendorManifest.files().cssFiles());
+        } else {
+            throw new IllegalStateException("Unable to find vendor assets. Maybe the web interface was not built into server?");
+        }
+
         plugins.forEach(plugin -> {
             final ModuleManifest pluginManifest = manifestForPlugin(plugin);
             final String pathPrefix = pluginPathPrefix + plugin.metadata().getUniqueId() + "/";
@@ -58,11 +73,12 @@ public class PluginAssets {
                 cssFiles.addAll(prefixFileNames(pluginManifest.files().cssFiles(), pathPrefix));
             }
         });
-        final InputStream packageManifest = this.getClass().getResourceAsStream("/" + pathPrefix + "/" + manifestFilename);
-        if (packageManifest != null) {
+
+        final InputStream packageManifestStream = this.getClass().getResourceAsStream("/" + pathPrefix + "/" + manifestFilename);
+        if (packageManifestStream != null) {
             final ModuleManifest manifest;
             try {
-                manifest = objectMapper.readValue(packageManifest, ModuleManifest.class);
+                manifest = objectMapper.readValue(packageManifestStream, ModuleManifest.class);
             } catch (IOException e) {
                 throw new RuntimeException("Unable to read web interface manifest: ", e);
             }
