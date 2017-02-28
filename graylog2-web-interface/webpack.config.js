@@ -9,7 +9,6 @@ const APP_PATH = path.resolve(ROOT_PATH, 'src');
 const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
-const VENDOR_MANIFEST = require(VENDOR_MANIFEST_PATH);
 const TARGET = process.env.npm_lifecycle_event;
 process.env.BABEL_ENV = TARGET;
 
@@ -63,7 +62,7 @@ const webpackConfig = {
   resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
   devtool: 'source-map',
   plugins: [
-    new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: ROOT_PATH }),
+    new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST_PATH, context: ROOT_PATH }),
     new HtmlWebpackPlugin({
       title: 'Graylog',
       favicon: path.resolve(ROOT_PATH, 'public/images/favicon.png'),
