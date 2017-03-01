@@ -19,9 +19,10 @@ package org.graylog2.configuration;
 import com.github.joschi.jadconfig.JadConfig;
 import com.github.joschi.jadconfig.RepositoryException;
 import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.guava.GuavaConverterFactory;
 import com.github.joschi.jadconfig.repositories.InMemoryRepository;
 import com.google.common.collect.ImmutableMap;
-import org.junit.Assert;
+import com.google.common.net.HostAndPort;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +32,7 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -41,263 +43,332 @@ public class HttpConfigurationTest {
     public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private HttpConfiguration configuration;
+    private JadConfig jadConfig;
 
     @Before
     public void setUp() {
         configuration = new HttpConfiguration();
+        jadConfig = new JadConfig().addConverterFactory(new GuavaConverterFactory());
     }
 
     @Test
-    public void testRestListenUriIsRelativeURI() throws RepositoryException, ValidationException {
+    public void testHttpBindAddressIsIPv6Address() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "[2001:db8::1]:9000")))
+                .addConfigurationBean(configuration)
+                .process();
+
+        assertThat(configuration.getHttpBindAddress()).isEqualTo(HostAndPort.fromParts("[2001:db8::1]", 9000));
+    }
+
+    @Test
+    public void testHttpBindAddressIsIPv6AddressWithoutBrackets() throws RepositoryException, ValidationException {
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Parameter rest_listen_uri should be an absolute URI (found /foo)");
+        expectedException.expectMessage("Possible bracketless IPv6 literal: 2001:db8::1");
 
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_listen_uri", "/foo")), configuration).process();
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "2001:db8::1")))
+                .addConfigurationBean(configuration)
+                .process();
     }
 
     @Test
-    public void testRestListenUriIsAbsoluteURI() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_listen_uri", "http://www.example.com:12900/")), configuration).process();
+    public void testHttpBindAddressIsInvalidIPv6Address() throws RepositoryException, ValidationException {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("Possible bracketless IPv6 literal: ff$$::1");
 
-        assertThat(configuration.getRestListenUri()).isEqualTo(URI.create("http://www.example.com:12900/"));
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "ff$$::1")))
+                .addConfigurationBean(configuration)
+                .process();
     }
 
     @Test
-    public void testRestListenUriWithHttpDefaultPort() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_listen_uri", "http://example.com/")), configuration).process();
+    public void testHttpBindAddressIsIPv4Address() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "10.2.3.4:9000")))
+                .addConfigurationBean(configuration)
+                .process();
 
-        assertThat(configuration.getRestListenUri()).hasPort(80);
+        assertThat(configuration.getHttpBindAddress()).isEqualTo(HostAndPort.fromParts("10.2.3.4", 9000));
     }
 
     @Test
-    public void testRestListenUriWithCustomPort() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_listen_uri", "http://example.com:12900/")), configuration).process();
+    public void testHttpBindAddressIsInvalidIPv4Address() throws RepositoryException, ValidationException {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("1234.5.6.7: ");
 
-        assertThat(configuration.getRestListenUri()).hasPort(12900);
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "1234.5.6.7:9000")))
+                .addConfigurationBean(configuration)
+                .process();
     }
 
     @Test
-    public void testRestTransportUriLocalhost() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_listen_uri", "http://127.0.0.1:12900")), configuration).process();
+    public void testHttpBindAddressIsInvalidHostName() throws RepositoryException, ValidationException {
+        expectedException.expect(ValidationException.class);
+        expectedException.expectMessage("this-does-not-exist-42: ");
 
-        assertThat(configuration.getDefaultRestTransportUri().toString()).isEqualTo("http://127.0.0.1:12900/");
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "this-does-not-exist-42")))
+                .addConfigurationBean(configuration)
+                .process();
     }
 
     @Test
-    public void testRestListenUriWildcard() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_listen_uri", "http://0.0.0.0:12900")), configuration).process();
+    public void testHttpBindAddressIsValidHostname() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "example.com:9000")))
+                .addConfigurationBean(configuration)
+                .process();
 
-        Assert.assertNotEquals("http://0.0.0.0:12900", configuration.getDefaultRestTransportUri().toString());
-        Assert.assertNotNull(configuration.getDefaultRestTransportUri());
+        assertThat(configuration.getHttpBindAddress()).isEqualTo(HostAndPort.fromParts("example.com", 9000));
     }
 
     @Test
-    public void testRestTransportUriWildcard() throws RepositoryException, ValidationException {
-        final ImmutableMap<String, String> properties = ImmutableMap.of(
-                "rest_listen_uri", "http://0.0.0.0:12900",
-                "rest_transport_uri", "http://0.0.0.0:12900");
+    public void testHttpBindAddressWithDefaultPort() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "example.com")))
+                .addConfigurationBean(configuration)
+                .process();
 
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
-
-        Assert.assertNotEquals(URI.create("http://0.0.0.0:12900"), configuration.getRestTransportUri());
+        assertThat(configuration.getHttpBindAddress()).isEqualTo(HostAndPort.fromParts("example.com", 9000));
     }
 
     @Test
-    public void testRestTransportUriWildcardKeepsPath() throws RepositoryException, ValidationException {
-        final ImmutableMap<String, String> properties = ImmutableMap.of(
-                "rest_listen_uri", "http://0.0.0.0:12900/api/",
-                "rest_transport_uri", "http://0.0.0.0:12900/api/");
+    public void testHttpBindAddressWithCustomPort() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "example.com:12345")))
+                .addConfigurationBean(configuration)
+                .process();
 
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
-
-        Assert.assertNotEquals(URI.create("http://0.0.0.0:12900/api/"), configuration.getRestTransportUri());
-        assertThat(configuration.getRestTransportUri().getPath()).isEqualTo("/api/");
+        assertThat(configuration.getHttpBindAddress()).isEqualTo(HostAndPort.fromParts("example.com", 12345));
     }
 
     @Test
-    public void testRestTransportUriCustom() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_listen_uri", "http://10.0.0.1:12900")), configuration).process();
+    public void testHttpPublishUriLocalhost() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "127.0.0.1:9000"))).addConfigurationBean(configuration).process();
 
-        assertThat(configuration.getDefaultRestTransportUri().toString()).isEqualTo("http://10.0.0.1:12900/");
+        assertThat(configuration.getDefaultHttpUri()).isEqualTo(URI.create("http://127.0.0.1:9000/"));
     }
 
     @Test
-    public void testGetRestUriScheme() throws RepositoryException, ValidationException, IOException {
+    public void testHttpBindAddressWildcard() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "0.0.0.0:9000"))).addConfigurationBean(configuration).process();
+
+        assertThat(configuration.getDefaultHttpUri())
+                .isNotNull()
+                .isNotEqualTo(URI.create("http://0.0.0.0:9000"));
+    }
+
+    @Test
+    public void testHttpPublishUriWildcard() throws RepositoryException, ValidationException {
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_bind_address", "0.0.0.0:9000",
+                "http_publish_uri", "http://0.0.0.0:9000/");
+
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+
+        assertThat(configuration.getHttpPublishUri()).isNotEqualTo(URI.create("http://0.0.0.0:9000/"));
+    }
+
+    @Test
+    public void testHttpPublishUriWildcardKeepsPath() throws RepositoryException, ValidationException {
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_bind_address", "0.0.0.0:9000",
+                "http_publish_uri", "http://0.0.0.0:9000/api/");
+
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+
+        assertThat(configuration.getHttpPublishUri())
+                .hasPath("/api/")
+                .isNotEqualTo(URI.create("http://0.0.0.0:9000/api/"));
+    }
+
+    @Test
+    public void testHttpPublishUriCustomAddress() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "10.0.0.1:9000"))).addConfigurationBean(configuration).process();
+
+        assertThat(configuration.getDefaultHttpUri().toString()).isEqualTo("http://10.0.0.1:9000/");
+    }
+
+    @Test
+    public void testGetUriScheme() throws RepositoryException, ValidationException, IOException {
         final HttpConfiguration configWithoutTls = new HttpConfiguration();
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_enable_tls", "false")), configWithoutTls).process();
+        new JadConfig(new InMemoryRepository(ImmutableMap.of("http_enable_tls", "false")), configWithoutTls)
+                .addConverterFactory(new GuavaConverterFactory())
+                .process();
+        assertThat(configWithoutTls.getUriScheme()).isEqualTo("http");
 
-        final ImmutableMap<String, String> properties = ImmutableMap.of(
-                "rest_listen_uri", "http://127.0.0.1:12900/",
-                "rest_enable_tls", "true",
-                "rest_tls_key_file", temporaryFolder.newFile("graylog.key").getAbsolutePath(),
-                "rest_tls_cert_file", temporaryFolder.newFile("graylog.crt").getAbsolutePath());
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_bind_address", "127.0.0.1:9000",
+                "http_enable_tls", "true",
+                "http_tls_key_file", temporaryFolder.newFile("graylog.key").getAbsolutePath(),
+                "http_tls_cert_file", temporaryFolder.newFile("graylog.crt").getAbsolutePath());
         final HttpConfiguration configWithTls = new HttpConfiguration();
-        new JadConfig(new InMemoryRepository(properties), configWithTls).process();
-
-        assertThat(configWithoutTls.getRestUriScheme()).isEqualTo("http");
-        assertThat(configWithTls.getRestUriScheme()).isEqualTo("https");
+        new JadConfig(new InMemoryRepository(properties), configWithTls)
+                .addConverterFactory(new GuavaConverterFactory())
+                .process();
+        assertThat(configWithTls.getUriScheme()).isEqualTo("https");
     }
 
     @Test
-    public void restTlsValidationFailsIfPrivateKeyIsMissing() throws Exception {
+    public void tlsValidationFailsIfPrivateKeyIsMissing() throws Exception {
         final File privateKey = temporaryFolder.newFile("graylog.key");
         final File certificate = temporaryFolder.newFile("graylog.crt");
 
-        final ImmutableMap<String, String> properties = ImmutableMap.of(
-                "rest_enable_tls", "true",
-                "rest_tls_key_file", privateKey.getAbsolutePath(),
-                "rest_tls_cert_file", certificate.getAbsolutePath());
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_enable_tls", "true",
+                "http_tls_key_file", privateKey.getAbsolutePath(),
+                "http_tls_cert_file", certificate.getAbsolutePath());
 
         assertThat(privateKey.delete()).isTrue();
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing REST API private key: ");
+        expectedException.expectMessage("Unreadable or missing HTTP private key: ");
 
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
     }
 
     @Test
-    public void restTlsValidationFailsIfPrivateKeyIsDirectory() throws Exception {
+    public void tlsValidationFailsIfPrivateKeyIsDirectory() throws Exception {
         final File privateKey = temporaryFolder.newFolder("graylog.key");
         final File certificate = temporaryFolder.newFile("graylog.crt");
 
-        final ImmutableMap<String, String> properties = ImmutableMap.of(
-                "rest_enable_tls", "true",
-                "rest_tls_key_file", privateKey.getAbsolutePath(),
-                "rest_tls_cert_file", certificate.getAbsolutePath());
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_enable_tls", "true",
+                "http_tls_key_file", privateKey.getAbsolutePath(),
+                "http_tls_cert_file", certificate.getAbsolutePath());
 
         assertThat(privateKey.isDirectory()).isTrue();
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing REST API private key: ");
+        expectedException.expectMessage("Unreadable or missing HTTP private key: ");
 
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
     }
 
     @Test
-    public void restTlsValidationFailsIfPrivateKeyIsUnreadable() throws Exception {
+    public void tlsValidationFailsIfPrivateKeyIsUnreadable() throws Exception {
         final File privateKey = temporaryFolder.newFile("graylog.key");
         final File certificate = temporaryFolder.newFile("graylog.crt");
 
-        final ImmutableMap<String, String> properties = ImmutableMap.of(
-                "rest_enable_tls", "true",
-                "rest_tls_key_file", privateKey.getAbsolutePath(),
-                "rest_tls_cert_file", certificate.getAbsolutePath());
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_enable_tls", "true",
+                "http_tls_key_file", privateKey.getAbsolutePath(),
+                "http_tls_cert_file", certificate.getAbsolutePath());
 
         assertThat(privateKey.setReadable(false, false)).isTrue();
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing REST API private key: ");
+        expectedException.expectMessage("Unreadable or missing HTTP private key: ");
 
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
     }
 
     @Test
-    public void restTlsValidationFailsIfCertificateIsMissing() throws Exception {
+    public void tlsValidationFailsIfCertificateIsMissing() throws Exception {
         final File privateKey = temporaryFolder.newFile("graylog.key");
         final File certificate = temporaryFolder.newFile("graylog.crt");
 
-        final ImmutableMap<String, String> properties = ImmutableMap.of(
-                "rest_enable_tls", "true",
-                "rest_tls_key_file", privateKey.getAbsolutePath(),
-                "rest_tls_cert_file", certificate.getAbsolutePath());
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_enable_tls", "true",
+                "http_tls_key_file", privateKey.getAbsolutePath(),
+                "http_tls_cert_file", certificate.getAbsolutePath());
 
         assertThat(certificate.delete()).isTrue();
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing REST API X.509 certificate: ");
+        expectedException.expectMessage("Unreadable or missing HTTP X.509 certificate: ");
 
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
     }
 
     @Test
-    public void restTlsValidationFailsIfCertificateIsDirectory() throws Exception {
+    public void tlsValidationFailsIfCertificateIsDirectory() throws Exception {
         final File privateKey = temporaryFolder.newFile("graylog.key");
         final File certificate = temporaryFolder.newFolder("graylog.crt");
 
-        final ImmutableMap<String, String> properties = ImmutableMap.of(
-                "rest_enable_tls", "true",
-                "rest_tls_key_file", privateKey.getAbsolutePath(),
-                "rest_tls_cert_file", certificate.getAbsolutePath());
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_enable_tls", "true",
+                "http_tls_key_file", privateKey.getAbsolutePath(),
+                "http_tls_cert_file", certificate.getAbsolutePath());
 
         assertThat(certificate.isDirectory()).isTrue();
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing REST API X.509 certificate: ");
+        expectedException.expectMessage("Unreadable or missing HTTP X.509 certificate: ");
 
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
     }
 
     @Test
-    public void restTlsValidationFailsIfCertificateIsUnreadable() throws Exception {
+    public void tlsValidationFailsIfCertificateIsUnreadable() throws Exception {
         final File privateKey = temporaryFolder.newFile("graylog.key");
         final File certificate = temporaryFolder.newFile("graylog.crt");
 
-        final ImmutableMap<String, String> properties = ImmutableMap.of(
-                "rest_enable_tls", "true",
-                "rest_tls_key_file", privateKey.getAbsolutePath(),
-                "rest_tls_cert_file", certificate.getAbsolutePath());
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_enable_tls", "true",
+                "http_tls_key_file", privateKey.getAbsolutePath(),
+                "http_tls_cert_file", certificate.getAbsolutePath());
 
         assertThat(certificate.setReadable(false, false)).isTrue();
 
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Unreadable or missing REST API X.509 certificate: ");
+        expectedException.expectMessage("Unreadable or missing HTTP X.509 certificate: ");
 
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
     }
 
     @Test
-    public void testRestTransportUriIsRelativeURI() throws RepositoryException, ValidationException {
+    public void testHttpPublishUriIsRelativeURI() throws RepositoryException, ValidationException {
         expectedException.expect(ValidationException.class);
-        expectedException.expectMessage("Parameter rest_transport_uri should be an absolute URI (found /foo)");
+        expectedException.expectMessage("Parameter http_publish_uri should be an absolute URI (found /foo)");
 
-
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_transport_uri", "/foo")), configuration).process();
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_publish_uri", "/foo"))).addConfigurationBean(configuration).process();
     }
 
     @Test
-    public void testWebEndpointUriIsRelativeURI() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("web_endpoint_uri", "/foo")), configuration).process();
+    public void testHttpExternalUriIsRelativeURI() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_external_uri", "/foo/"))).addConfigurationBean(configuration).process();
 
-        assertThat(configuration.getWebEndpointUri()).isEqualTo(URI.create("/foo"));
+        assertThat(configuration.getHttpExternalUri()).isEqualTo(URI.create("/foo/"));
     }
 
     @Test
-    public void testRestTransportUriIsAbsoluteURI() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_transport_uri", "http://www.example.com:12900/foo")), configuration).process();
+    public void testHttpPublishUriIsAbsoluteURI() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_publish_uri", "http://www.example.com:12900/foo/"))).addConfigurationBean(configuration).process();
 
-        assertThat(configuration.getRestTransportUri()).isEqualTo(URI.create("http://www.example.com:12900/foo/"));
+        assertThat(configuration.getHttpPublishUri()).isEqualTo(URI.create("http://www.example.com:12900/foo/"));
     }
 
     @Test
-    public void testWebEndpointUriIsAbsoluteURI() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("web_endpoint_uri", "http://www.example.com:12900/foo")), configuration).process();
+    public void testHttpPublishUriWithMissingTrailingSlash() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_publish_uri", "http://www.example.com:12900/foo"))).addConfigurationBean(configuration).process();
 
-        assertThat(configuration.getWebEndpointUri()).isEqualTo(URI.create("http://www.example.com:12900/foo"));
+        assertThat(configuration.getHttpPublishUri()).isEqualTo(URI.create("http://www.example.com:12900/foo/"));
     }
 
     @Test
-    public void testRestTransportUriWithHttpDefaultPort() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_transport_uri", "http://example.com/")), configuration).process();
+    public void testHttpExternalUriIsAbsoluteURI() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_external_uri", "http://www.example.com:12900/foo/"))).addConfigurationBean(configuration).process();
 
-        assertThat(configuration.getRestTransportUri()).hasPort(80);
+        assertThat(configuration.getHttpExternalUri()).isEqualTo(URI.create("http://www.example.com:12900/foo/"));
     }
 
     @Test
-    public void testRestTransportUriWithCustomPort() throws RepositoryException, ValidationException {
-        new JadConfig(new InMemoryRepository(ImmutableMap.of("rest_transport_uri", "http://example.com:12900/")), configuration).process();
+    public void testHttpPublishUriWithHttpDefaultPort() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_publish_uri", "http://example.com/"))).addConfigurationBean(configuration).process();
 
-        assertThat(configuration.getRestTransportUri()).hasPort(12900);
+        assertThat(configuration.getHttpPublishUri()).hasPort(80);
     }
 
     @Test
-    public void testRestTransportUriWithCustomScheme() throws RepositoryException, ValidationException {
-        final ImmutableMap<String, String> properties = ImmutableMap.of(
-                "rest_transport_uri", "https://example.com:12900/",
-                "rest_enable_tls", "false");
+    public void testHttpPublishUriWithCustomPort() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_publish_uri", "http://example.com:12900/"))).addConfigurationBean(configuration).process();
 
-        new JadConfig(new InMemoryRepository(properties), configuration).process();
+        assertThat(configuration.getHttpPublishUri()).hasPort(12900);
+    }
 
-        assertThat(configuration.getRestTransportUri()).hasScheme("https");
+    @Test
+    public void testHttpPublishUriWithCustomScheme() throws RepositoryException, ValidationException {
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_publish_uri", "https://example.com:12900/",
+                "http_enable_tls", "false");
+
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+
+        assertThat(configuration.getHttpPublishUri()).hasScheme("https");
     }
 }

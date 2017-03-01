@@ -118,29 +118,30 @@ public class WebInterfaceAssetsResource {
     @Path("assets/{filename: .*}")
     @GET
     public Response get(@Context Request request,
+                        @Context HttpHeaders headers,
                         @PathParam("filename") String filename) {
         if (filename == null || filename.isEmpty() || "/".equals(filename) || "index.html".equals(filename)) {
-            return getDefaultResponse();
+            return getDefaultResponse(headers);
         }
         try {
             final URL resourceUrl = getResourceUri(false, filename, this.getClass());
             return getResponse(request, filename, resourceUrl, false);
         } catch (IOException | URISyntaxException e) {
-            return getDefaultResponse();
+            return getDefaultResponse(headers);
         }
     }
 
     @GET
     @Path("index.html")
-    public Response getIndex() {
-        return getDefaultResponse();
+    public Response getIndex(@Context HttpHeaders headers) {
+        return getDefaultResponse(headers);
     }
 
     @GET
-    public Response getIndex(@Context ContainerRequest request) {
+    public Response getIndex(@Context ContainerRequest request, @Context HttpHeaders headers) {
         final URI originalLocation = request.getRequestUri();
         if (originalLocation.getPath().endsWith("/")) {
-            return get(request, originalLocation.getPath());
+            return get(request, headers, originalLocation.getPath());
         }
         final URI redirect = UriBuilder.fromPath(originalLocation.getPath() + "/").build();
         return Response.temporaryRedirect(redirect).build();
@@ -210,9 +211,9 @@ public class WebInterfaceAssetsResource {
         }
     }
 
-    private Response getDefaultResponse() {
+    private Response getDefaultResponse(HttpHeaders headers) {
         return Response
-                .ok(this.indexHtmlGenerator.get())
+                .ok(indexHtmlGenerator.get(headers.getRequestHeaders()))
                 .header(HttpHeaders.CONTENT_TYPE, MediaType.TEXT_HTML)
                 .header("X-UA-Compatible", "IE=edge")
                 .build();

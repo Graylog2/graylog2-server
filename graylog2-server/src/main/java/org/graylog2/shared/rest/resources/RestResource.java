@@ -149,9 +149,9 @@ public abstract class RestResource {
     }
 
     protected UriBuilder getUriBuilderToSelf() {
-        final URI restTransportUri = configuration.getRestTransportUri();
-        if (restTransportUri != null) {
-            return UriBuilder.fromUri(restTransportUri);
+        final URI httpPublishUri = configuration.getHttpPublishUri();
+        if (httpPublishUri != null) {
+            return UriBuilder.fromUri(httpPublishUri);
         } else {
             return uriInfo.getBaseUriBuilder();
         }

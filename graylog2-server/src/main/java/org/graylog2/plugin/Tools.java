@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.SortedSet;
 import java.util.UUID;
 import java.util.zip.GZIPInputStream;
@@ -443,10 +444,10 @@ public final class Tools {
     }
 
     /**
-     * Try to get the primary {@link java.net.InetAddress} of the primary network interface with
+     * Try to get the primary {@link InetAddress} of the primary network interface with
      * fallback to the local loopback address (usually {@code 127.0.0.1} or {@code ::1}.
      *
-     * @return The primary {@link java.net.InetAddress} of the primary network interface
+     * @return The primary {@link InetAddress} of the primary network interface
      * or the loopback address as fallback.
      * @throws SocketException if the list of network interfaces couldn't be retrieved
      */
@@ -572,15 +573,16 @@ public final class Tools {
 
     @Nullable
     public static URI normalizeURI(@Nullable final URI uri, String scheme, int port, String path) {
-        return com.google.common.base.Optional.fromNullable(uri)
-                .transform(u -> getUriWithScheme(u, scheme))
-                .transform(u -> getUriWithPort(u, port))
-                .transform(u -> getUriWithDefaultPath(u, path))
-                .transform(Tools::uriWithTrailingSlash)
-                .transform(URI::normalize)
-                .orNull();
+        return Optional.ofNullable(uri)
+                .map(u -> getUriWithScheme(u, scheme))
+                .map(u -> getUriWithPort(u, port))
+                .map(u -> getUriWithDefaultPath(u, path))
+                .map(Tools::uriWithTrailingSlash)
+                .map(URI::normalize)
+                .orElse(null);
     }
 
+    @Nullable
     public static <T, E> T getKeyByValue(Map<T, E> map, E value) {
         for (Map.Entry<T, E> entry : map.entrySet()) {
             if (value.equals(entry.getValue())) {

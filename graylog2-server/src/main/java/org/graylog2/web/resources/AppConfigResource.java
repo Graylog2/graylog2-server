@@ -31,6 +31,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -63,10 +64,11 @@ public class AppConfigResource {
             throw new RuntimeException("Unable to read AppConfig template while generating web interface configuration: ", e);
         }
 
+        final URI baseUri = RestTools.buildExternalUri(headers.getRequestHeaders(), httpConfiguration.getHttpExternalUri());
         final Map<String, Object> model = ImmutableMap.of(
             "rootTimeZone", configuration.getRootTimeZone(),
-            "serverUri", RestTools.buildEndpointUri(headers, httpConfiguration.getWebEndpointUri()),
-            "appPathPrefix", HttpConfiguration.PATH_WEB);
+            "serverUri", baseUri.resolve(HttpConfiguration.PATH_API),
+            "appPathPrefix", baseUri.getPath());
         return templateEngine.transform(template, model);
     }
 }

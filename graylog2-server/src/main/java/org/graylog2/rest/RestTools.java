@@ -19,6 +19,7 @@ package org.graylog2.rest;
 import com.google.common.base.Strings;
 import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.jersey.server.model.Resource;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.utilities.IpSubnet;
@@ -27,6 +28,7 @@ import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -37,6 +39,7 @@ import java.util.Optional;
 import java.util.Set;
 
 public class RestTools {
+
     @Nullable
     public static String getUserNameFromRequest(ContainerRequestContext requestContext) {
         final SecurityContext securityContext = requestContext.getSecurityContext();
@@ -81,32 +84,35 @@ public class RestTools {
         return remoteAddr;
     }
 
-    public static String buildEndpointUri(@NotNull HttpHeaders httpHeaders, @NotNull URI defaultEndpointUri) {
-        Optional<String> endpointUri = Optional.empty();
-        final List<String> headers = httpHeaders.getRequestHeader("X-Graylog-Server-URL");
+    public static URI buildExternalUri(@NotNull MultivaluedMap<String, String> httpHeaders, @NotNull URI defaultUri) {
+        Optional<URI> externalUri = Optional.empty();
+        final List<String> headers = httpHeaders.get(HttpConfiguration.OVERRIDE_HEADER);
         if (headers != null && !headers.isEmpty()) {
-            endpointUri = headers.stream().filter(s -> {
-                try {
-                    if (Strings.isNullOrEmpty(s)) {
-                        return false;
-                    }
-                    final URI uri = new URI(s);
-                    if (!uri.isAbsolute()) {
-                        return true;
-                    }
-                    switch (uri.getScheme()) {
-                        case "http":
-                        case "https":
-                            return true;
-                    }
-                    return false;
-                } catch (URISyntaxException e) {
-                    return false;
-                }
-            }).findFirst();
+            externalUri = headers.stream()
+                    .filter(s -> {
+                        try {
+                            if (Strings.isNullOrEmpty(s)) {
+                                return false;
+                            }
+                            final URI uri = new URI(s);
+                            if (!uri.isAbsolute()) {
+                                return true;
+                            }
+                            switch (uri.getScheme()) {
+                                case "http":
+                                case "https":
+                                    return true;
+                            }
+                            return false;
+                        } catch (URISyntaxException e) {
+                            return false;
+                        }
+                    })
+                    .map(URI::create)
+                    .findFirst();
         }
 
-        return endpointUri.orElse(defaultEndpointUri.toString());
+        return externalUri.orElse(defaultUri);
     }
 
     public static String getPathFromResource(Resource resource) {

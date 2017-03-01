@@ -60,12 +60,12 @@ public class NodePingThread extends Periodical {
         final boolean isMaster = serverStatus.hasCapability(ServerStatus.Capability.MASTER);
         try {
             Node node = nodeService.byNodeId(serverStatus.getNodeId());
-            nodeService.markAsAlive(node, isMaster, httpConfiguration.getRestTransportUri());
+            nodeService.markAsAlive(node, isMaster, httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API));
         } catch (NodeNotFoundException e) {
             LOG.warn("Did not find meta info of this node. Re-registering.");
             nodeService.registerServer(serverStatus.getNodeId().toString(),
                     isMaster,
-                    httpConfiguration.getRestTransportUri(),
+                    httpConfiguration.getHttpPublishUri().resolve(HttpConfiguration.PATH_API),
                     Tools.getLocalCanonicalHostname());
         }
         try {

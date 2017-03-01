@@ -16,6 +16,7 @@
  */
 package org.graylog2.rest.resources;
 
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
 import org.graylog2.plugin.system.NodeId;
@@ -66,6 +67,6 @@ public class HelloWorldResourceTest extends RestResourceBaseTest {
         assertThat(response).isNotNull();
 
         final String locationHeader = response.getHeaderString("Location");
-        assertThat(locationHeader).isNotNull().isEqualTo("/");
+        assertThat(locationHeader).isNotNull().isEqualTo(HttpConfiguration.PATH_WEB);
     }
 }

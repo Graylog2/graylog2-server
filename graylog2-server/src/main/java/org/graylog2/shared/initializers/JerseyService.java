@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.jaxrs.json.JacksonJaxbJsonProvider;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+import com.google.common.net.HostAndPort;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.glassfish.grizzly.http.CompressionConfig;
@@ -58,6 +59,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.net.ssl.SSLContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ContextResolver;
@@ -139,12 +141,12 @@ public class JerseyService extends AbstractIdleService {
 
     @Override
     protected void shutDown() throws Exception {
-        shutdownHttpServer(apiHttpServer, configuration.getRestListenUri());
+        shutdownHttpServer(apiHttpServer, configuration.getHttpBindAddress());
     }
 
-    private void shutdownHttpServer(HttpServer httpServer, URI listenUri) {
+    private void shutdownHttpServer(HttpServer httpServer, HostAndPort bindAddress) {
         if (httpServer != null && httpServer.isStarted()) {
-            LOG.info("Shutting down HTTP listener at <{}>", listenUri);
+            LOG.info("Shutting down HTTP listener at <{}>", bindAddress);
             httpServer.shutdownNow();
         }
     }
@@ -157,19 +159,19 @@ public class JerseyService extends AbstractIdleService {
 
         final Set<Resource> pluginResources = prefixPluginResources(PLUGIN_PREFIX, pluginRestResources);
 
-        final SSLEngineConfigurator sslEngineConfigurator = configuration.isRestEnableTls() ?
+        final SSLEngineConfigurator sslEngineConfigurator = configuration.isHttpEnableTls() ?
                 buildSslEngineConfigurator(
-                        configuration.getRestTlsCertFile(),
-                        configuration.getRestTlsKeyFile(),
-                        configuration.getRestTlsKeyPassword()) : null;
+                        configuration.getHttpTlsCertFile(),
+                        configuration.getHttpTlsKeyFile(),
+                        configuration.getHttpTlsKeyPassword()) : null;
 
-        final URI restListenUri = configuration.getRestListenUri();
+        final HostAndPort bindAddress = configuration.getHttpBindAddress();
         final URI listenUri = new URI(
-                restListenUri.getScheme(),
-                restListenUri.getUserInfo(),
-                restListenUri.getHost(),
-                restListenUri.getPort(),
+                configuration.getUriScheme(),
                 null,
+                bindAddress.getHost(),
+                bindAddress.getPort(),
+                "/",
                 null,
                 null
         );
@@ -177,17 +179,17 @@ public class JerseyService extends AbstractIdleService {
         apiHttpServer = setUp("rest",
                 listenUri,
                 sslEngineConfigurator,
-                configuration.getRestThreadPoolSize(),
-                configuration.getRestSelectorRunnersCount(),
-                configuration.getRestMaxHeaderSize(),
-                configuration.isRestEnableGzip(),
-                configuration.isRestEnableCors(),
+                configuration.getHttpThreadPoolSize(),
+                configuration.getHttpSelectorRunnersCount(),
+                configuration.getHttpMaxHeaderSize(),
+                configuration.isHttpEnableGzip(),
+                configuration.isHttpEnableCors(),
                 pluginResources,
                 resourcePackages.toArray(new String[0]));
 
         apiHttpServer.start();
 
-        LOG.info("Started REST API at <{}>", configuration.getRestListenUri());
+        LOG.info("Started REST API at <{}>", configuration.getHttpBindAddress());
     }
 
     private Set<Resource> prefixPluginResources(String pluginPrefix, Map<String, Set<Class<? extends PluginRestResource>>> pluginResourceMap) {
@@ -221,10 +223,10 @@ public class JerseyService extends AbstractIdleService {
                                                final String[] controllerPackages) {
         final Map<String, String> packagePrefixes = new HashMap<>();
         for (String resourcePackage : controllerPackages) {
-            packagePrefixes.put(resourcePackage, configuration.getRestListenUri().getPath());
+            packagePrefixes.put(resourcePackage, HttpConfiguration.PATH_API);
         }
         packagePrefixes.put(RESOURCE_PACKAGE_WEB, HttpConfiguration.PATH_WEB);
-        packagePrefixes.put("", configuration.getRestListenUri().getPath());
+        packagePrefixes.put("", HttpConfiguration.PATH_API);
 
         final ResourceConfig rc = new ResourceConfig()
                 .property(ServerProperties.BV_SEND_ERROR_IN_RESPONSE, true)
@@ -329,17 +331,14 @@ public class JerseyService extends AbstractIdleService {
             throw new CertificateException("Unreadable or missing X.509 certificate: " + certFile);
         }
 
-        final SSLContextConfigurator sslContext = new SSLContextConfigurator();
+        final SSLContextConfigurator sslContextConfigurator = new SSLContextConfigurator();
         final char[] password = firstNonNull(keyPassword, "").toCharArray();
         final KeyStore keyStore = PemKeyStore.buildKeyStore(certFile, keyFile, password);
-        sslContext.setKeyStorePass(password);
-        sslContext.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
+        sslContextConfigurator.setKeyStorePass(password);
+        sslContextConfigurator.setKeyStoreBytes(KeyStoreUtils.getBytes(keyStore, password));
 
-        if (!sslContext.validateConfiguration(true)) {
-            throw new IllegalStateException("Couldn't initialize SSL context for HTTP server");
-        }
-
-        return new SSLEngineConfigurator(sslContext.createSSLContext(false), false, false, false);
+        final SSLContext sslContext = sslContextConfigurator.createSSLContext(true);
+        return new SSLEngineConfigurator(sslContext, false, false, false);
     }
 
     private ExecutorService instrumentedExecutor(final String executorName,

@@ -39,6 +39,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -94,8 +95,8 @@ public class DocumentationResource extends RestResource {
     public Response route(@ApiParam(name = "route", value = "Route to fetch. For example /system", required = true)
                           @PathParam("route") String route,
                           @Context HttpHeaders httpHeaders) {
-        final String basePath = RestTools.buildEndpointUri(httpHeaders, httpConfiguration.getWebEndpointUri());
-        return buildSuccessfulCORSResponse(generator.generateForRoute(route, basePath));
+        final URI baseUri = RestTools.buildExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).resolve(HttpConfiguration.PATH_API);
+        return buildSuccessfulCORSResponse(generator.generateForRoute(route, baseUri.toString()));
     }
 
     private Response buildSuccessfulCORSResponse(Map<String, Object> result) {

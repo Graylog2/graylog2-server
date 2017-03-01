@@ -196,12 +196,12 @@ const qualifyUrls = (routes, appPrefix) => {
   Object.keys(routes).forEach((routeName) => {
     switch (typeof routes[routeName]) {
       case 'string':
-        qualifiedRoutes[routeName] = `${appPrefix}${routes[routeName]}`;
+        qualifiedRoutes[routeName] = URI.joinPaths(appPrefix, routes[routeName]).path();
         break;
       case 'function':
         qualifiedRoutes[routeName] = (...params) => {
           const result = routes[routeName](...params);
-          return `${appPrefix}${result}`;
+          return URI.joinPaths(appPrefix, result).path();
         };
         break;
       case 'object':

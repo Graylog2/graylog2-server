@@ -18,15 +18,16 @@ package org.graylog2.rest;
 
 import com.google.common.collect.ImmutableList;
 import org.glassfish.grizzly.http.server.Request;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.utilities.IpSubnet;
 import org.junit.Test;
 
-import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MultivaluedHashMap;
+import javax.ws.rs.core.MultivaluedMap;
 import java.net.URI;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -59,36 +60,34 @@ public class RestToolsTest {
     }
 
     @Test
-    public void buildEndpointUriReturnsDefaultUriIfHeaderIsMissing() throws Exception {
-        final HttpHeaders httpHeaders = mock(HttpHeaders.class);
-        when(httpHeaders.getRequestHeader(anyString())).thenReturn(ImmutableList.of());
-        final URI endpointUri = URI.create("http://graylog.example.com");
-        assertThat(RestTools.buildEndpointUri(httpHeaders, endpointUri)).isEqualTo(endpointUri.toString());
+    public void buildExternalUriReturnsDefaultUriIfHeaderIsMissing() throws Exception {
+        final MultivaluedMap<String, String> httpHeaders = new MultivaluedHashMap<>();
+        final URI externalUri = URI.create("http://graylog.example.com");
+        assertThat(RestTools.buildExternalUri(httpHeaders, externalUri)).isEqualTo(externalUri);
     }
 
     @Test
-    public void buildEndpointUriReturnsDefaultUriIfHeaderIsEmpty() throws Exception {
-        final HttpHeaders httpHeaders = mock(HttpHeaders.class);
-        when(httpHeaders.getRequestHeader(anyString())).thenReturn(ImmutableList.of(""));
-        final URI endpointUri = URI.create("http://graylog.example.com");
-        assertThat(RestTools.buildEndpointUri(httpHeaders, endpointUri)).isEqualTo(endpointUri.toString());
+    public void buildExternalUriReturnsDefaultUriIfHeaderIsEmpty() throws Exception {
+        final MultivaluedMap<String, String> httpHeaders = new MultivaluedHashMap<>();
+        httpHeaders.putSingle(HttpConfiguration.OVERRIDE_HEADER, "");
+        final URI externalUri = URI.create("http://graylog.example.com");
+        assertThat(RestTools.buildExternalUri(httpHeaders, externalUri)).isEqualTo(externalUri);
     }
 
     @Test
-    public void buildEndpointUriReturnsHeaderValueIfHeaderIsPresent() throws Exception {
-        final HttpHeaders httpHeaders = mock(javax.ws.rs.core.HttpHeaders.class);
-        when(httpHeaders.getRequestHeader(anyString())).thenReturn(ImmutableList.of("http://header.example.com"));
-        final URI endpointUri = URI.create("http://graylog.example.com");
-        assertThat(RestTools.buildEndpointUri(httpHeaders, endpointUri)).isEqualTo("http://header.example.com");
+    public void buildExternalUriReturnsHeaderValueIfHeaderIsPresent() throws Exception {
+        final MultivaluedMap<String, String> httpHeaders = new MultivaluedHashMap<>();
+        httpHeaders.putSingle(HttpConfiguration.OVERRIDE_HEADER, "http://header.example.com");
+        final URI externalUri = URI.create("http://graylog.example.com");
+        assertThat(RestTools.buildExternalUri(httpHeaders, externalUri)).isEqualTo(URI.create("http://header.example.com"));
     }
 
     @Test
     public void buildEndpointUriReturnsFirstHeaderValueIfMultipleHeadersArePresent() throws Exception {
-        final HttpHeaders httpHeaders = mock(HttpHeaders.class);
-        when(httpHeaders.getRequestHeader(anyString())).thenReturn(
-                ImmutableList.of("http://header1.example.com", "http://header2.example.com"));
+        final MultivaluedMap<String, String> httpHeaders = new MultivaluedHashMap<>();
+        httpHeaders.put(HttpConfiguration.OVERRIDE_HEADER, ImmutableList.of("http://header1.example.com", "http://header2.example.com"));
         final URI endpointUri = URI.create("http://graylog.example.com");
-        assertThat(RestTools.buildEndpointUri(httpHeaders, endpointUri)).isEqualTo("http://header1.example.com");
+        assertThat(RestTools.buildExternalUri(httpHeaders, endpointUri)).isEqualTo(URI.create("http://header1.example.com"));
     }
 
     @Test
