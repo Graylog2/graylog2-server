@@ -11,6 +11,7 @@ const ReactGridContainer = React.createClass({
     positions: React.PropTypes.object.isRequired,
     children: React.PropTypes.node.isRequired,
     onPositionsChange: React.PropTypes.func.isRequired,
+    locked: React.PropTypes.bool,
   },
 
   _onLayoutChange(newLayout) {
@@ -38,9 +39,10 @@ const ReactGridContainer = React.createClass({
     });
 
     return (
-      <WidthAdjustedReactGridLayout className={style.reactGridLayout} layout={layout} cols={4} margin={[10, 10]} rowHeight={200}
-                                    onLayoutChange={this._onLayoutChange}>
-        {this.props.children}
+      <WidthAdjustedReactGridLayout className={style.reactGridLayout} layout={layout} cols={4} margin={[10, 10]}
+                                    rowHeight={200} onLayoutChange={this._onLayoutChange}
+                                    isDraggable={!this.props.locked} isResizable={!this.props.locked}>
+      {this.props.children}
       </WidthAdjustedReactGridLayout>
     );
   },

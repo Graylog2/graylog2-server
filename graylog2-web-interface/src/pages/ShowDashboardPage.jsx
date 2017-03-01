@@ -156,7 +156,7 @@ const ShowDashboardPage = React.createClass({
     return (
       <Row>
         <div className="dashboard">
-          <ReactGridContainer positions={positions} onPositionsChange={() => {}}>
+          <ReactGridContainer positions={positions} onPositionsChange={() => {}} locked={this.state.locked}>
             {widgets}
           </ReactGridContainer>
         </div>
@@ -170,14 +170,7 @@ const ShowDashboardPage = React.createClass({
     }
   },
   _toggleUnlock() {
-    const locked = !this.state.locked;
-    this.setState({ locked: locked });
-
-    if (locked) {
-      this.refs.gridsterContainer.lockGrid();
-    } else {
-      this.refs.gridsterContainer.unlockGrid();
-    }
+    this.setState({ locked: !this.state.locked });
   },
   _onPositionsChange(newPositions) {
     DashboardsStore.updatePositions(this.state.dashboard, newPositions);
