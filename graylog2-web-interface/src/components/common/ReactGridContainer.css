@@ -1,3 +1,11 @@
 :local(.reactGridLayout) {
     margin: -10px -10px 0 -10px;
 }
+
+:local(.reactGridLayout) .react-draggable {
+    cursor: move;
+}
+
+:local(.reactGridLayout) .react-grid-placeholder {
+    background: #16ACE3;
+}
