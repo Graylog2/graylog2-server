@@ -22,15 +22,18 @@ const ReactGridContainer = React.createClass({
 
 
   _onLayoutChange(newLayout) {
-    const positions = {};
+    const newPositions = [];
     newLayout.forEach(widget => {
-      positions[widget.i] = {
+      newPositions.push({
+        id: widget.i,
         col: widget.x + 1,
         row: widget.y + 1,
         height: widget.h,
         width: widget.w,
-      };
+      });
     });
+
+    this.props.onPositionsChange(newPositions);
   },
 
   render() {
@@ -46,10 +49,12 @@ const ReactGridContainer = React.createClass({
     });
 
     return (
-      <WidthAdjustedReactGridLayout className={style.reactGridLayout} layout={layout} cols={4} margin={[10, 10]}
-                                    rowHeight={200} onLayoutChange={this._onLayoutChange}
+      <WidthAdjustedReactGridLayout className={style.reactGridLayout} layout={layout} cols={4} rowHeight={200}
+                                    margin={[10, 10]}
+                                    onDragStop={this._onLayoutChange}
+                                    onResizeStop={this._onLayoutChange}
                                     isDraggable={!this.props.locked} isResizable={!this.props.locked}>
-      {this.props.children}
+        {this.props.children}
       </WidthAdjustedReactGridLayout>
     );
   },

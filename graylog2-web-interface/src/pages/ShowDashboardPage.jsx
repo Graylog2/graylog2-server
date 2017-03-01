@@ -156,7 +156,7 @@ const ShowDashboardPage = React.createClass({
     return (
       <Row>
         <div className="dashboard">
-          <ReactGridContainer positions={positions} onPositionsChange={() => {}} locked={this.state.locked}>
+          <ReactGridContainer positions={positions} onPositionsChange={this._onPositionsChange} locked={this.state.locked}>
             {widgets}
           </ReactGridContainer>
         </div>
