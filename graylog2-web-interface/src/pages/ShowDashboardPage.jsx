@@ -15,11 +15,13 @@ import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 
-import { DocumentTitle, GridsterContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
+import { DocumentTitle, ReactGridContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTrigger';
 import Widget from 'components/widgets/Widget';
+
+import style from './ShowDashboardPage.css';
 
 const ShowDashboardPage = React.createClass({
   propTypes: {
@@ -144,17 +146,19 @@ const ShowDashboardPage = React.createClass({
       return position1.col - position2.col;
     }).map((widget) => {
       return (
-        <Widget id={widget.id} key={`widget-${widget.id}`} widget={widget} dashboardId={dashboard.id}
-                locked={this.state.locked} shouldUpdate={this.shouldUpdate()} streamIds={this.state.streamIds}/>
+        <div key={widget.id} className={style.widgetContainer}>
+          <Widget id={widget.id} key={`widget-${widget.id}`} widget={widget} dashboardId={dashboard.id}
+                  locked={this.state.locked} shouldUpdate={this.shouldUpdate()} streamIds={this.state.streamIds}/>
+        </div>
       );
     });
 
     return (
       <Row>
         <div className="dashboard">
-          <GridsterContainer ref="gridsterContainer" positions={positions} onPositionsChange={this._onPositionsChange}>
+          <ReactGridContainer positions={positions} onPositionsChange={() => {}}>
             {widgets}
-          </GridsterContainer>
+          </ReactGridContainer>
         </div>
       </Row>
     );

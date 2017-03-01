@@ -42,6 +42,7 @@
     "react-day-picker": "^5.0.0",
     "react-dnd": "^2.0.2",
     "react-dnd-html5-backend": "^2.0.0",
+    "react-grid-layout": "^0.14.3",
     "react-overlays": "^0.6.5",
     "react-select": "^0.8.2",
     "rickshaw": "^1.5.1",
