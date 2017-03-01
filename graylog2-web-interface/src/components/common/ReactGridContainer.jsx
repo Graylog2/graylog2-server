@@ -32,7 +32,7 @@ const ReactGridContainer = React.createClass({
       return {
         i: id,
         x: Math.max(position.col - 1, 0),
-        y: Math.max(position.row - 1, 0),
+        y: (position.row <= 0 ? Infinity : position.row - 1),
         h: position.height,
         w: position.width,
       };
