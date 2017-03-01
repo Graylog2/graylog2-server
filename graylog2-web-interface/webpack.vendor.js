@@ -24,7 +24,7 @@ const webpackConfig = {
   },
   output: {
     path: BUILD_PATH,
-    filename: '[name].[chunkhash].js',
+    filename: '[name].js',
     library: '__[name]',
   },
   plugins: [
@@ -56,6 +56,9 @@ if (TARGET === 'build') {
         minimize: true
       }),
     ],
+    output: {
+      filename: '[name].[chunkhash].js',
+    },
   });
 } else {
   module.exports = webpackConfig;
