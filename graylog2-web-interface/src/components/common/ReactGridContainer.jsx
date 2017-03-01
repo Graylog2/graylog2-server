@@ -14,6 +14,13 @@ const ReactGridContainer = React.createClass({
     locked: React.PropTypes.bool,
   },
 
+  getDefaultProps() {
+    return {
+      locked: false,
+    };
+  },
+
+
   _onLayoutChange(newLayout) {
     const positions = {};
     newLayout.forEach(widget => {
