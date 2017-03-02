@@ -14,7 +14,8 @@
     "start-nohmr": "webpack --config webpack.vendor.js && webpack-dev-server --watch --config webpack.combined.config.js",
     "build": "webpack -p --config webpack.vendor.js && webpack",
     "test": "webpack --config webpack.vendor.js && karma start karma.ci.conf.js",
-    "prepare-dev": "./tools/prepare-dev"
+    "prepare-dev": "./tools/prepare-dev",
+    "lint": "eslint src"
   },
   "dependencies": {
     "bluebird": "^3.4.0",
