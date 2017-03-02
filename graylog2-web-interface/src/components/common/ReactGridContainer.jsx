@@ -1,10 +1,30 @@
 import React from 'react';
-import ReactGridLayout, { WidthProvider } from 'react-grid-layout';
-const WidthAdjustedReactGridLayout = WidthProvider(ReactGridLayout);
+import { Responsive, WidthProvider } from 'react-grid-layout';
+const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import style from './ReactGridContainer.css';
+
+const COLUMN_WIDTH = 350;
+
+const COLUMNS = {
+  xxl: 6,
+  xl: 5,
+  lg: 4,
+  md: 3,
+  sm: 2,
+  xs: 1,
+};
+
+const BREAKPOINTS = {
+  xxl: COLUMN_WIDTH * COLUMNS.xxl,
+  xl: COLUMN_WIDTH * COLUMNS.xl,
+  lg: COLUMN_WIDTH * COLUMNS.lg,
+  md: COLUMN_WIDTH * COLUMNS.md,
+  sm: COLUMN_WIDTH * COLUMNS.sm,
+  xs: COLUMN_WIDTH * COLUMNS.xs,
+};
 
 const ReactGridContainer = React.createClass({
   propTypes: {
@@ -19,7 +39,6 @@ const ReactGridContainer = React.createClass({
       locked: false,
     };
   },
-
 
   _onLayoutChange(newLayout) {
     const newPositions = [];
@@ -49,7 +68,10 @@ const ReactGridContainer = React.createClass({
     });
 
     return (
-      <WidthAdjustedReactGridLayout className={style.reactGridLayout} layout={layout} cols={4} rowHeight={200}
+      <WidthAdjustedReactGridLayout className={style.reactGridLayout} rowHeight={200}
+                                    layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
+                                    breakpoints={BREAKPOINTS}
+                                    cols={COLUMNS}
                                     margin={[10, 10]}
                                     onDragStop={this._onLayoutChange}
                                     onResizeStop={this._onLayoutChange}
