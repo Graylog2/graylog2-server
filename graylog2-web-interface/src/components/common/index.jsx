@@ -5,8 +5,6 @@ export { default as DatePicker } from './DatePicker';
 export { default as DocumentTitle } from './DocumentTitle';
 export { default as EntityList } from './EntityList';
 export { default as EntityListItem } from './EntityListItem';
-export { default as GridsterContainer } from './GridsterContainer';
-export { default as GridsterWidget } from './GridsterWidget';
 export { default as IfPermitted } from './IfPermitted';
 export { default as ISODurationInput } from './ISODurationInput';
 export { default as LinkToNode } from './LinkToNode';

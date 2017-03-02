@@ -4,7 +4,6 @@ import Navigation from 'components/navigation/Navigation';
 import Spinner from 'components/common/Spinner';
 import Footer from 'components/layout/Footer';
 
-import 'stylesheets/jquery.gridster.min.css';
 import 'stylesheets/jquery.dynatable.css';
 import 'stylesheets/typeahead.less';
 import 'c3/c3.css';

@@ -35,7 +35,6 @@ const Widget = React.createClass({
   componentDidMount() {
     this._loadValue();
     this.loadValueInterval = setInterval(this._loadValue, Math.min(this.props.widget.cache_time * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
-    $(document).on('gridster:resizestop', () => this._calculateWidgetSize());
   },
   componentWillReceiveProps(nextProps) {
     this.widgetPlugin = this._getWidgetPlugin(nextProps.widget.type);
@@ -45,7 +44,6 @@ const Widget = React.createClass({
   },
   componentWillUnmount() {
     clearInterval(this.loadValueInterval);
-    $(document).off('gridster:resizestop', () => this._calculateWidgetSize());
   },
 
   DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
