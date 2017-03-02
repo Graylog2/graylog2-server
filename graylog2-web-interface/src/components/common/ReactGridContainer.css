@@ -2,8 +2,12 @@
     margin: -10px -10px 0 -10px;
 }
 
-:local(.reactGridLayout) .react-draggable {
+:local(.reactGridLayout).unlocked .react-draggable {
     cursor: move;
+}
+
+:local(.reactGridLayout).locked .react-resizable-handle {
+    display: none;
 }
 
 :local(.reactGridLayout) .react-grid-placeholder {

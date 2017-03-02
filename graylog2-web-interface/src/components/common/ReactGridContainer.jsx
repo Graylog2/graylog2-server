@@ -67,15 +67,18 @@ const ReactGridContainer = React.createClass({
       };
     });
 
+    // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
+    // https://github.com/STRML/react-grid-layout/issues/371
     return (
-      <WidthAdjustedReactGridLayout className={style.reactGridLayout} rowHeight={200}
+      <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${this.props.locked ? 'locked' : 'unlocked'}`}
                                     layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
                                     breakpoints={BREAKPOINTS}
                                     cols={COLUMNS}
+                                    rowHeight={200}
                                     margin={[10, 10]}
                                     onDragStop={this._onLayoutChange}
                                     onResizeStop={this._onLayoutChange}
-                                    isDraggable={!this.props.locked} isResizable={!this.props.locked}>
+                                    draggableHandle={this.props.locked ? '.no-handle' : ''}>
         {this.props.children}
       </WidthAdjustedReactGridLayout>
     );
