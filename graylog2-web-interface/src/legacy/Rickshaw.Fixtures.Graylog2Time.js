@@ -47,22 +47,22 @@ const Graylog2Time = function () {
       seconds: 60 * 5,
       formatter(d) { return self.formatDateTime(d); },
     }, {
-    name: 'minute',
-    seconds: 60,
-    formatter(d) { return self.formatDateTime(d); },
-  }, {
-  name: '15 second',
-  seconds: 15,
-  formatter(d) { return self.formatDateTime(d); },
-}, {
-  name: 'second',
-  seconds: 1,
-  formatter(d) { return self.formatDateTime(d); },
-}, {
-  name: 'millisecond',
-  seconds: 1 / 1000,
-  formatter(d) { return self.formatDateTime(d); },
-},
+      name: 'minute',
+      seconds: 60,
+      formatter(d) { return self.formatDateTime(d); },
+    }, {
+      name: '15 second',
+      seconds: 15,
+      formatter(d) { return self.formatDateTime(d); },
+    }, {
+      name: 'second',
+      seconds: 1,
+      formatter(d) { return self.formatDateTime(d); },
+    }, {
+      name: 'millisecond',
+      seconds: 1 / 1000,
+      formatter(d) { return self.formatDateTime(d); },
+    },
   ];
 
   this.unit = function (unitName) {
