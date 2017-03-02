@@ -2295,8 +2295,6 @@
       "521": 521,
       "522": 522,
       "523": 523,
-      "524": 524,
-      "525": 525,
       "526": 526,
       "527": 527,
       "528": 528,
@@ -2499,8 +2497,6 @@
       "725": 725,
       "726": 726,
       "727": 727,
-      "728": 728,
-      "729": 729,
       "730": 730,
       "731": 731,
       "732": 732,
@@ -2762,30 +2758,5 @@
     "usedIds": {
       "0": 0
     }
-  },
-  "html-webpack-plugin for \"vendor-module.json\"": [
-    {
-      "modules": {
-        "byIdentifier": {
-          "node_modules/lodash/lodash.js": 0,
-          "node_modules/webpack/buildin/global.js": 1,
-          "node_modules/webpack/buildin/module.js": 2,
-          "node_modules/html-webpack-plugin/lib/loader.js!templates/module.json.template": 3
-        },
-        "usedIds": {
-          "0": 0,
-          "1": 1,
-          "2": 2,
-          "3": 3
-        }
-      },
-      "chunks": {
-        "byName": {},
-        "byBlocks": {},
-        "usedIds": {
-          "0": 0
-        }
-      }
-    }
-  ]
+  }
 }

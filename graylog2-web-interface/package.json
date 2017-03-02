@@ -12,7 +12,7 @@
   "scripts": {
     "start": "webpack-dev-server --config webpack.bundled.js --history-api-fallback --hot --inline",
     "start-nohmr": "webpack-dev-server --watch --history-api-fallback --config webpack.bundled.js",
-    "build": "disable_plugins=true webpack --config webpack.bundled.js",
+    "build": "webpack --config webpack.bundled.js",
     "test": "webpack --config webpack.vendor.js && karma start karma.ci.conf.js",
     "prepare-dev": "./tools/prepare-dev",
     "lint": "eslint --ext js,jsx src"
