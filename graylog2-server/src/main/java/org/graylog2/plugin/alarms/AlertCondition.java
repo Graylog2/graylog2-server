@@ -51,6 +51,8 @@ public interface AlertCondition {
 
     String getTitle();
 
+    boolean shouldRepeatNotifications();
+
     AlertCondition.CheckResult runCheck();
 
     interface CheckResult {

@@ -16,71 +16,39 @@
  */
 package org.graylog2.alerts;
 
-import org.graylog2.alarmcallbacks.AlarmCallbackConfiguration;
-import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
-import org.graylog2.alarmcallbacks.AlarmCallbackFactory;
-import org.graylog2.alarmcallbacks.AlarmCallbackHistory;
-import org.graylog2.alarmcallbacks.AlarmCallbackHistoryService;
 import org.graylog2.plugin.alarms.AlertCondition;
-import org.graylog2.plugin.alarms.callbacks.AlarmCallback;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
-import java.util.List;
 import java.util.Optional;
 
 public class AlertScanner {
     private static final Logger LOG = LoggerFactory.getLogger(AlertScanner.class);
+
     private final AlertService alertService;
-    private final AlarmCallbackConfigurationService alarmCallbackConfigurationService;
-    private final AlarmCallbackFactory alarmCallbackFactory;
-    private final AlarmCallbackHistoryService alarmCallbackHistoryService;
+    private final AlertNotificationsSender alertNotificationsSender;
 
     @Inject
-    public AlertScanner(AlertService alertService,
-                        AlarmCallbackConfigurationService alarmCallbackConfigurationService,
-                        AlarmCallbackFactory alarmCallbackFactory,
-                        AlarmCallbackHistoryService alarmCallbackHistoryService) {
+    public AlertScanner(AlertService alertService, AlertNotificationsSender alertNotificationsSender) {
         this.alertService = alertService;
-        this.alarmCallbackConfigurationService = alarmCallbackConfigurationService;
-        this.alarmCallbackFactory = alarmCallbackFactory;
-        this.alarmCallbackHistoryService = alarmCallbackHistoryService;
+        this.alertNotificationsSender = alertNotificationsSender;
     }
 
-    private Alert handleTriggeredCheckResult(AlertCondition.CheckResult result, Stream stream, AlertCondition alertCondition) throws ValidationException {
+    private Alert handleTriggeredAlert(AlertCondition.CheckResult result, Stream stream, AlertCondition alertCondition) throws ValidationException {
         // Persist alert.
         final Alert alert = alertService.factory(result);
         alertService.save(alert);
 
-        final List<AlarmCallbackConfiguration> callConfigurations = alarmCallbackConfigurationService.getForStream(stream);
+        alertNotificationsSender.send(result, stream, alert, alertCondition);
 
-        // Checking if alarm callbacks have been defined
-        for (AlarmCallbackConfiguration configuration : callConfigurations) {
-            AlarmCallbackHistory alarmCallbackHistory;
-            AlarmCallback alarmCallback = null;
-            try {
-                alarmCallback = alarmCallbackFactory.create(configuration);
-                alarmCallback.call(stream, result);
-                alarmCallbackHistory = alarmCallbackHistoryService.success(configuration, alert, alertCondition);
-            } catch (Exception e) {
-                if (alarmCallback != null) {
-                    LOG.warn("Alarm callback <" + alarmCallback.getName() + "> failed. Skipping.", e);
-                } else {
-                    LOG.warn("Alarm callback with id " + configuration.getId() + " failed. Skipping.", e);
-                }
-                alarmCallbackHistory = alarmCallbackHistoryService.error(configuration, alert, alertCondition, e.getMessage());
-            }
-
-            try {
-                alarmCallbackHistoryService.save(alarmCallbackHistory);
-            } catch (Exception e) {
-                LOG.warn("Unable to save history of alarm callback run: ", e);
-            }
-        }
         return alert;
+    }
+
+    private void handleRepeatedAlert(Stream stream, AlertCondition alertCondition, AlertCondition.CheckResult result, Alert alert2) {
+        alertNotificationsSender.send(result, stream, alert2, alertCondition);
     }
 
     private void handleResolveAlert(Alert alert) {
@@ -97,10 +65,18 @@ public class AlertScanner {
             final Optional<Alert> alert = alertService.getLastTriggeredAlert(stream.getId(), alertCondition.getId());
             if (result.isTriggered()) {
                 if (!alert.isPresent() || alertService.isResolved(alert.get())) {
+                    // Alert is triggered for the first time
                     LOG.debug("Alert condition [{}] is triggered. Sending alerts.", alertCondition);
-                    handleTriggeredCheckResult(result, stream, alertCondition);
+                    handleTriggeredAlert(result, stream, alertCondition);
                 } else {
-                    LOG.debug("Alert condition [{}] is triggered but alerts were already sent. Nothing to do.", alertCondition);
+                    // There is already an alert for this condition and is unresolved
+                    if (alert.isPresent() && alertCondition.shouldRepeatNotifications()) {
+                        // Repeat notifications because user wants to do that
+                        LOG.debug("Alert condition [{}] is triggered and configured to repeat alert notifications. Sending alerts.", alertCondition);
+                        handleRepeatedAlert(stream, alertCondition, result, alert.get());
+                    } else {
+                        LOG.debug("Alert condition [{}] is triggered but alerts were already sent. Nothing to do.", alertCondition);
+                    }
                 }
                 return true;
             } else {

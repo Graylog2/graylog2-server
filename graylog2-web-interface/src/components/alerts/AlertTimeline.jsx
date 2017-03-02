@@ -78,7 +78,15 @@ const AlertTimeline = React.createClass({
           <dd key="resolution-desc">Condition is no longer satisfied, alert is marked as resolved</dd>,
         );
       } else {
+        const conditionParameters = this.props.alert.condition_parameters || {};
+        const repeatNotifications = conditionParameters.repeat_notifications || false;
+        const notificationsText = (repeatNotifications ?
+          'Condition is configured to repeat notifications, Graylog will send notifications when evaluating the condition until it is no longer satisfied' :
+          'Condition is configured to not repeat notifications');
+
         formattedResolution.push(
+          <dt key="notifications-title"><Timestamp dateTime={new Date()} /></dt>,
+          <dd key="notifications-desc">{notificationsText}</dd>,
           <dt key="resolution-title"><Timestamp dateTime={new Date()} /></dt>,
           <dd key="resolution-desc">Condition is still satisfied, <strong>alert is unresolved</strong></dd>,
         );
