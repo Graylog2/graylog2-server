@@ -1,12 +1,13 @@
 import Reflux from 'reflux';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
+
+const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
 
 const AlarmCallbacksStore = Reflux.createStore({
   listenables: [AlarmCallbacksActions],
