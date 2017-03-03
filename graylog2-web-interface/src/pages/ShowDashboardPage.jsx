@@ -241,7 +241,7 @@ const ShowDashboardPage = React.createClass({
       </span>
     );
     return (
-      <DocumentTitle title={`Rules of Stream ${dashboard.title}`}>
+      <DocumentTitle title={`Dashboard ${dashboard.title}`}>
         <span>
           <PageHeader title={dashboardTitle}>
             <span data-dashboard-id={dashboard.id} className="dashboard-description">{dashboard.description}</span>
