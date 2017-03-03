@@ -28,13 +28,15 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
 @Singleton
 public class IndexHtmlGenerator {
     private static final String title = "Graylog Web Interface";
     private final String content;
 
     @Inject
-    public IndexHtmlGenerator(PluginAssets pluginAssets, Configuration configuration) throws IOException {
+    public IndexHtmlGenerator(PluginAssets pluginAssets, Configuration configuration, Engine templateEngine) throws IOException {
         final URL templateUrl = this.getClass().getResource("/web-interface/index.html.template");
         final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
         final Map<String, Object> model = ImmutableMap.<String, Object>builder()
@@ -44,8 +46,7 @@ public class IndexHtmlGenerator {
                 .put("appPrefix", configuration.getWebPrefix())
                 .build();
 
-        final Engine engine = new Engine();
-        this.content = engine.transform(template, model);
+        this.content = requireNonNull(templateEngine, "templateEngine").transform(template, model);
     }
 
     public String get() {

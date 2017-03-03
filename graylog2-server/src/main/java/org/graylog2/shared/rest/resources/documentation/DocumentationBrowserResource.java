@@ -46,12 +46,13 @@ public class DocumentationBrowserResource extends RestResource {
     private final String apiPrefix;
 
     private final ClassLoader classLoader = ClassLoader.getSystemClassLoader();
-    private final Engine engine = new Engine();
+    private final Engine templateEngine;
 
     @Inject
-    public DocumentationBrowserResource(MimetypesFileTypeMap mimeTypes, Configuration configuration) {
-        this.mimeTypes = requireNonNull(mimeTypes);
-        this.apiPrefix = configuration.getRestListenUri().getPath();
+    public DocumentationBrowserResource(MimetypesFileTypeMap mimeTypes, Configuration configuration, Engine templateEngine) {
+        this.mimeTypes = requireNonNull(mimeTypes, "mimeTypes");
+        this.apiPrefix = requireNonNull(configuration, "configuration").getRestListenUri().getPath();
+        this.templateEngine = requireNonNull(templateEngine, "templateEngine");
     }
 
     @GET
@@ -69,7 +70,7 @@ public class DocumentationBrowserResource extends RestResource {
         final URL templateUrl = this.getClass().getResource("/swagger/index.html.template");
         final String template = Resources.toString(templateUrl, StandardCharsets.UTF_8);
         final Map<String, Object> model = ImmutableMap.of("apiPrefix", apiPrefix);
-        return engine.transform(template, model);
+        return templateEngine.transform(template, model);
     }
 
     @GET

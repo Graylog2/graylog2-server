@@ -48,6 +48,7 @@ import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
 
 public class FormattedEmailAlertSender implements AlertSender {
     private static final Logger LOG = LoggerFactory.getLogger(FormattedEmailAlertSender.class);
@@ -73,7 +74,7 @@ public class FormattedEmailAlertSender implements AlertSender {
             "${end}" +
             "\n";
 
-    private final Engine engine = new Engine();
+    private final Engine templateEngine;
     private final NotificationService notificationService;
     private final NodeId nodeId;
     private Configuration pluginConfig;
@@ -81,10 +82,14 @@ public class FormattedEmailAlertSender implements AlertSender {
     private final EmailConfiguration configuration;
 
     @Inject
-    public FormattedEmailAlertSender(EmailConfiguration configuration, NotificationService notificationService, NodeId nodeId) {
-        this.configuration = configuration;
-        this.notificationService = notificationService;
-        this.nodeId = nodeId;
+    public FormattedEmailAlertSender(EmailConfiguration configuration,
+                                     NotificationService notificationService,
+                                     NodeId nodeId,
+                                     Engine templateEngine) {
+        this.configuration = requireNonNull(configuration, "configuration");
+        this.notificationService = requireNonNull(notificationService, "notificationService");
+        this.nodeId = requireNonNull(nodeId, "nodeId");
+        this.templateEngine = requireNonNull(templateEngine, "templateEngine");
     }
 
     @Override
@@ -102,9 +107,8 @@ public class FormattedEmailAlertSender implements AlertSender {
         }
 
         Map<String, Object> model = getModel(stream, checkResult, backlog);
-        Engine engine = new Engine();
 
-        return engine.transform(template, model);
+        return templateEngine.transform(template, model);
     }
 
     @VisibleForTesting
@@ -117,7 +121,7 @@ public class FormattedEmailAlertSender implements AlertSender {
         }
         Map<String, Object> model = getModel(stream, checkResult, backlog);
 
-        return engine.transform(template, model);
+        return this.templateEngine.transform(template, model);
     }
 
     private Map<String, Object> getModel(Stream stream, AlertCondition.CheckResult checkResult, List<Message> backlog) {

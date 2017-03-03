@@ -23,6 +23,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.Request;
 
+import javax.inject.Inject;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -34,13 +35,14 @@ public class GraylogErrorPageGenerator implements ErrorPageGenerator {
     private final String template;
     private final Engine engine;
 
-    public GraylogErrorPageGenerator() throws IOException {
-        this(Resources.toString(Resources.getResource("error.html.template"), StandardCharsets.UTF_8), new Engine());
+    @Inject
+    public GraylogErrorPageGenerator(Engine templateEngine) throws IOException {
+        this(Resources.toString(Resources.getResource("error.html.template"), StandardCharsets.UTF_8), templateEngine);
     }
 
-    public GraylogErrorPageGenerator(String template, Engine engine) {
-        this.template = requireNonNull(template);
-        this.engine = requireNonNull(engine);
+    private GraylogErrorPageGenerator(String template, Engine templateEngine) {
+        this.template = requireNonNull(template, "template");
+        this.engine = requireNonNull(templateEngine, "templateEngine");
     }
 
     @Override
