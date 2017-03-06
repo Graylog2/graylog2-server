@@ -1,11 +1,12 @@
 import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
-import fetch, { Builder } from 'logic/rest/FetchProvider';
-
-import ActionsProvider from 'injection/ActionsProvider';
-const NodesActions = ActionsProvider.getActions('Nodes');
+import { Builder } from 'logic/rest/FetchProvider';
 
 import ApiRoutes from 'routing/ApiRoutes';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { NodesActions } = CombinedProvider.get('Nodes');
+const { SessionStore } = CombinedProvider.get('Session');
 
 const NodesStore = Reflux.createStore({
   listenables: [NodesActions],
@@ -17,8 +18,14 @@ const NodesStore = Reflux.createStore({
 
   init() {
     if (this.nodes === undefined) {
+      this._triggerList();
+      setInterval(this._triggerList, this.INTERVAL);
+    }
+  },
+
+  _triggerList() {
+    if (SessionStore.isLoggedIn()) {
       NodesActions.list();
-      setInterval(NodesActions.list, this.INTERVAL);
     }
   },
 
