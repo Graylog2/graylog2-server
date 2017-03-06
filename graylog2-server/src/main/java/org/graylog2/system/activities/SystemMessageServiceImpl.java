@@ -16,7 +16,6 @@
  */
 package org.graylog2.system.activities;
 
-import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
