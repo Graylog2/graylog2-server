@@ -1,6 +1,6 @@
 import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
-import fetch from 'logic/rest/FetchProvider';
+import fetch, { Builder } from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const NodesActions = ActionsProvider.getActions('Nodes');
@@ -32,7 +32,11 @@ const NodesStore = Reflux.createStore({
 
   list() {
     const promise = this.promises.list || fetch('GET', URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
-      .then((response) => {
+      .authenticated()
+      .setHeader('X-Graylog-No-Session-Extension', 'true')
+      .json()
+      .build()
+      .then(response => {
         this.nodes = {};
         response.nodes.forEach((node) => {
           this.nodes[node.node_id] = node;
