@@ -267,6 +267,20 @@ public class SearchesTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testTermsAscending() throws Exception {
+        TermsResult result = searches.terms("n", 1, "*", null, AbsoluteRange.create(
+            new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
+            new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)), Sorting.Direction.ASC);
+
+        assertThat(result.getTotal()).isEqualTo(10L);
+        assertThat(result.getMissing()).isEqualTo(2L);
+        assertThat(result.getTerms())
+            .hasSize(1)
+            .containsEntry("4", 1L);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testTermsStats() throws Exception {
         TermsStatsResult r = searches.termsStats("message", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
                 AbsoluteRange.create(
