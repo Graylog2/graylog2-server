@@ -69,7 +69,7 @@ export const UsersStore = {
   },
 
   deleteUser(username: string): Promise<string[]> {
-    const  url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.delete(username).url);
+    const  url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.delete(encodeURIComponent(username)).url);
     const  promise = fetch('DELETE', url);
 
     promise.then(() => {
