@@ -121,9 +121,30 @@ export class Builder {
     return this;
   }
 
+  noSessionExtension() {
+    this.request = this.request.set('X-Graylog-No-Session-Extension', 'true');
+
+    return this;
+  }
+
   build() {
     return this.request;
   }
+}
+
+function queuePromiseIfNotLoggedin(promise) {
+  const SessionStore = StoreProvider.getStore('Session');
+
+  if (!SessionStore.isLoggedIn()) {
+    return () => new BluebirdPromise((resolve, reject) => {
+      const SessionActions = ActionsProvider.getActions('Session');
+      SessionActions.login.completed.listen(() => {
+        promise().then(resolve, reject);
+      });
+    });
+  }
+
+  return promise;
 }
 
 export default function fetch(method, url, body) {
@@ -132,17 +153,7 @@ export default function fetch(method, url, body) {
     .json(body)
     .build();
 
-  const SessionStore = StoreProvider.getStore('Session');
-
-  if (!SessionStore.isLoggedIn()) {
-    return new BluebirdPromise((resolve, reject) => {
-      const SessionActions = ActionsProvider.getActions('Session');
-      SessionActions.login.completed.listen(() => {
-        promise().then(resolve, reject);
-      });
-    });
-  }
-  return promise();
+  return queuePromiseIfNotLoggedin(promise)();
 }
 
 export function fetchPlainText(method, url, body) {
@@ -151,15 +162,15 @@ export function fetchPlainText(method, url, body) {
     .plaintext(body)
     .build();
 
-  const SessionStore = StoreProvider.getStore('Session');
+  return queuePromiseIfNotLoggedin(promise)();
+}
 
-  if (!SessionStore.isLoggedIn()) {
-    return new BluebirdPromise((resolve, reject) => {
-      const SessionActions = ActionsProvider.getActions('Session');
-      SessionActions.login.completed.listen(() => {
-        promise().then(resolve, reject);
-      });
-    });
-  }
-  return promise();
+export function fetchPeriodically(method, url, body) {
+  const promise = () => new Builder(method, url)
+    .authenticated()
+    .noSessionExtension()
+    .json(body)
+    .build();
+
+  return queuePromiseIfNotLoggedin(promise)();
 }
