@@ -118,7 +118,7 @@ const AuthenticationComponent = React.createClass({
 
     if (authenticators.length === 0) {
       // special case, this is a user editing their own profile
-      authenticators = [<LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(this.state.currentUser.username)}>
+      authenticators = [<LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(this.state.currentUser.username))}>
         <NavItem title="Edit User">Edit User</NavItem>
       </LinkContainer>];
     }
