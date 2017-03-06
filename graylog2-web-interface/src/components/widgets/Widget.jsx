@@ -12,6 +12,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 const WidgetsActions = ActionsProvider.getActions('Widgets');
 
 import Routes from 'routing/Routes';
+import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 const Widget = React.createClass({
   propTypes: {
@@ -35,6 +36,14 @@ const Widget = React.createClass({
   componentDidMount() {
     this._loadValue();
     this.loadValueInterval = setInterval(this._loadValue, Math.min(this.props.widget.cache_time * 1000, this.DEFAULT_WIDGET_VALUE_REFRESH));
+
+    // We need an instance per element of the widget component, so all elements get resized
+    this.eventsThrottler = new EventHandlersThrottler();
+
+    // We need to handle the event using jQuery, as the native `addEventListener` does not allow the same function
+    // to be used as event handler more than once. This means that when n widgets are mounted, the same function
+    // is going to be called n times on the same widget, resulting in a single widget being updated n times.
+    $(window).on('resize', this._onResize);
   },
   componentWillReceiveProps(nextProps) {
     this.widgetPlugin = this._getWidgetPlugin(nextProps.widget.type);
@@ -44,6 +53,7 @@ const Widget = React.createClass({
   },
   componentWillUnmount() {
     clearInterval(this.loadValueInterval);
+    $(window).off('resize', this._onResize);
   },
 
   DEFAULT_WIDGET_VALUE_REFRESH: 10 * 1000,
@@ -94,6 +104,9 @@ const Widget = React.createClass({
         errorMessage: `Error loading widget value: ${error}`,
       });
     });
+  },
+  _onResize() {
+    this.eventsThrottler.throttle(this._calculateWidgetSize, undefined, this.props.widget.id);
   },
   _calculateWidgetSize() {
     const $widgetNode = $(this._getWidgetNode());
