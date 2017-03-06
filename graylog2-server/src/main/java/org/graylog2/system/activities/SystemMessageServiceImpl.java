@@ -18,10 +18,12 @@ package org.graylog2.system.activities;
 
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
+import com.mongodb.DBCollection;
 import com.mongodb.DBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
+import org.mongojack.DBSort;
 
 import javax.inject.Inject;
 import java.util.List;
@@ -33,6 +35,8 @@ public class SystemMessageServiceImpl extends PersistedServiceImpl implements Sy
     @Inject
     public SystemMessageServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
+        final DBCollection collection = this.collection(SystemMessageImpl.class);
+        collection.createIndex(DBSort.desc("timestamp"));
     }
 
     @Override
