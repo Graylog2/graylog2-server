@@ -5,7 +5,7 @@ const Reflux = require('reflux');
 const UserNotification = require('util/UserNotification');
 import ApiRoutes = require('routing/ApiRoutes');
 const URLUtils = require('util/URLUtils');
-const Builder = require('logic/rest/FetchProvider').Builder;
+const fetchPeriodically = require('logic/rest/FetchProvider').fetchPeriodically;
 const fetch = require('logic/rest/FetchProvider').default;
 
 const ActionsProvider = require('injection/ActionsProvider');
@@ -54,11 +54,7 @@ const WidgetsStore = Reflux.createStore({
 
     loadWidget(dashboardId: string, widgetId: string): Promise<string[]> {
         var url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.widget(dashboardId, widgetId).url);
-        const promise = new Builder('GET', url)
-            .authenticated()
-            .setHeader('X-Graylog-No-Session-Extension', 'true')
-            .json()
-            .build();
+        const promise = fetchPeriodically('GET', url);
 
         promise.catch((error) => {
             if (error.additional.status !== 404) {
@@ -90,11 +86,7 @@ const WidgetsStore = Reflux.createStore({
     loadValue(dashboardId: string, widgetId: string, resolution: number): Promise<string[]> {
         var url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.widgetValue(dashboardId, widgetId, resolution).url);
 
-        return new Builder('GET', url)
-            .authenticated()
-            .setHeader('X-Graylog-No-Session-Extension', 'true')
-            .json()
-            .build();
+        return fetchPeriodically('GET', url);
     },
 
     removeWidget(dashboardId: string, widgetId: string): Promise<string[]> {
