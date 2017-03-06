@@ -34,14 +34,17 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
+import static java.util.Objects.requireNonNull;
+
 @Path("/config.js")
 public class AppConfigResource {
-    private static final Engine engine = new Engine();
     private final Configuration configuration;
+    private final Engine templateEngine;
 
     @Inject
-    public AppConfigResource(Configuration configuration) {
-        this.configuration = configuration;
+    public AppConfigResource(Configuration configuration, Engine templateEngine) {
+        this.configuration = requireNonNull(configuration, "configuration");
+        this.templateEngine = requireNonNull(templateEngine, "templateEngine");
     }
 
     @GET
@@ -59,6 +62,6 @@ public class AppConfigResource {
             "rootTimeZone", configuration.getRootTimeZone(),
             "serverUri", RestTools.buildEndpointUri(headers, configuration.getWebEndpointUri()),
             "appPathPrefix", configuration.getWebPrefix());
-        return engine.transform(template, model);
+        return templateEngine.transform(template, model);
     }
 }

@@ -16,12 +16,14 @@
  */
 package org.graylog2.bindings;
 
+import com.floreysoft.jmte.Engine;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
+import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
@@ -63,6 +65,7 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.GraylogErrorPageGenerator;
 import org.graylog2.rest.NotFoundExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
@@ -168,6 +171,8 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterStatsModule.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
+        bind(Engine.class).toInstance(Engine.createCompilingEngine());
+        bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
 
         bind(String[].class).annotatedWith(named("RestControllerPackages")).toInstance(new String[]{
                 "org.graylog2.rest.resources",

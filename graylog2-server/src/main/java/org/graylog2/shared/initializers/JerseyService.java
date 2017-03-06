@@ -24,6 +24,7 @@ import com.google.common.base.Strings;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import org.glassfish.grizzly.http.CompressionConfig;
+import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.grizzly.http.server.NetworkListener;
 import org.glassfish.grizzly.ssl.SSLContextConfigurator;
@@ -84,6 +85,7 @@ import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static java.util.Objects.requireNonNull;
 
 public class JerseyService extends AbstractIdleService {
     public static final String PLUGIN_PREFIX = "/plugins";
@@ -101,6 +103,7 @@ public class JerseyService extends AbstractIdleService {
     private final Set<PluginAuditEventTypes> pluginAuditEventTypes;
     private final ObjectMapper objectMapper;
     private final MetricRegistry metricRegistry;
+    private final ErrorPageGenerator errorPageGenerator;
 
     private HttpServer apiHttpServer = null;
     private HttpServer webHttpServer = null;
@@ -115,17 +118,19 @@ public class JerseyService extends AbstractIdleService {
                          @Named("RestControllerPackages") final String[] restControllerPackages,
                          Set<PluginAuditEventTypes> pluginAuditEventTypes,
                          ObjectMapper objectMapper,
-                         MetricRegistry metricRegistry) {
-        this.configuration = configuration;
-        this.dynamicFeatures = dynamicFeatures;
-        this.containerResponseFilters = containerResponseFilters;
-        this.exceptionMappers = exceptionMappers;
-        this.additionalComponents = additionalComponents;
-        this.pluginRestResources = pluginRestResources;
-        this.restControllerPackages = restControllerPackages;
-        this.pluginAuditEventTypes = pluginAuditEventTypes;
-        this.objectMapper = objectMapper;
-        this.metricRegistry = metricRegistry;
+                         MetricRegistry metricRegistry,
+                         ErrorPageGenerator errorPageGenerator) {
+        this.configuration = requireNonNull(configuration, "configuration");
+        this.dynamicFeatures = requireNonNull(dynamicFeatures, "dynamicFeatures");
+        this.containerResponseFilters = requireNonNull(containerResponseFilters, "containerResponseFilters");
+        this.exceptionMappers = requireNonNull(exceptionMappers, "exceptionMappers");
+        this.additionalComponents = requireNonNull(additionalComponents, "additionalComponents");
+        this.pluginRestResources = requireNonNull(pluginRestResources, "pluginResources");
+        this.restControllerPackages = requireNonNull(restControllerPackages, "restControllerPackages");
+        this.pluginAuditEventTypes = requireNonNull(pluginAuditEventTypes, "pluginAuditEventTypes");
+        this.objectMapper = requireNonNull(objectMapper, "objectMapper");
+        this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry");
+        this.errorPageGenerator = requireNonNull(errorPageGenerator, "errorPageGenerator");
     }
 
     @Override
@@ -356,7 +361,7 @@ public class JerseyService extends AbstractIdleService {
         // See "Selector runners count" at https://grizzly.java.net/bestpractices.html for details.
         listener.getTransport().setSelectorRunnersCount(selectorRunnersCount);
 
-        listener.setDefaultErrorPageGenerator(new GraylogErrorPageGenerator());
+        listener.setDefaultErrorPageGenerator(errorPageGenerator);
 
         if(enableGzip) {
             final CompressionConfig compressionConfig = listener.getCompressionConfig();
