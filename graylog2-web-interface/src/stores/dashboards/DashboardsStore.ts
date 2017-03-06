@@ -7,6 +7,7 @@ const UserNotification = require('util/UserNotification');
 import ApiRoutes = require('routing/ApiRoutes');
 const URLUtils = require('util/URLUtils');
 const Builder = require('logic/rest/FetchProvider').Builder;
+const fetchPeriodically = require('logic/rest/FetchProvider').fetchPeriodically;
 const fetch = require('logic/rest/FetchProvider').default;
 const PermissionsMixin = require('util/PermissionsMixin');
 
@@ -108,11 +109,7 @@ class DashboardsStore {
 
   get(id: string): Promise<Dashboard> {
     const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.get(id).url);
-    const promise = new Builder('GET', url)
-      .authenticated()
-      .setHeader('X-Graylog-No-Session-Extension', 'true')
-      .json()
-      .build();
+    const promise = fetchPeriodically('GET', url);
 
     promise.catch((error) => {
       if (error.additional.status !== 404) {

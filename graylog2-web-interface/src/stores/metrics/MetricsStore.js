@@ -2,7 +2,7 @@ import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
+import fetch, { Builder, fetchPeriodically } from 'logic/rest/FetchProvider';
 
 import StoreProvider from 'injection/StoreProvider';
 const SessionStore = StoreProvider.getStore('Session');
@@ -87,7 +87,8 @@ const MetricsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.ClusterMetricsApiController.multipleAllNodes().url);
 
     if (!this.promises.list) {
-      const promise = fetch('POST', url, { metrics: Object.keys(metricsToFetch) }).finally(() => delete this.promises.list);
+      const promise = fetchPeriodically('POST', url, { metrics: Object.keys(metricsToFetch) })
+        .finally(() => delete this.promises.list);
 
       promise.then((response) => {
         this.metrics = this._buildMetricsFromResponse(response);
