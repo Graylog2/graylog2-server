@@ -23,7 +23,7 @@ const MessagesStore = Reflux.createStore({
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
       .then(
         response => MessageFormatter.formatResultMessage(response),
-        errorThrown => {
+        (errorThrown) => {
           UserNotification.error(`Loading message information failed with status: ${errorThrown}`,
             'Could not load message information');
         });
@@ -36,7 +36,7 @@ const MessagesStore = Reflux.createStore({
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
       .then(
         response => response.tokens,
-        error => {
+        (error) => {
           UserNotification.error(`Loading field terms failed with status: ${error}`,
             'Could not load field terms.');
         });
@@ -56,7 +56,7 @@ const MessagesStore = Reflux.createStore({
     const promise = fetch('POST', URLUtils.qualifyUrl(url), payload)
       .then(
         response => MessageFormatter.formatResultMessage(response),
-        error => {
+        (error) => {
           if (error.additional && error.additional.status === 400) {
             UserNotification.error('Please ensure the selected codec and its configuration are right. ' +
               'Check your server logs for more information.', 'Could not load raw message');

@@ -94,9 +94,9 @@ const ApiRoutes = {
     close: (indexName) => { return { url: `/system/indexer/indices/${indexName}/close` }; },
     delete: (indexName) => { return { url: `/system/indexer/indices/${indexName}` }; },
     list: (indexSetId) => { return { url: `/system/indexer/indices/${indexSetId}/list` }; },
-    listAll: () => { return { url: '/system/indexer/indices' };  },
+    listAll: () => { return { url: '/system/indexer/indices' }; },
     listClosed: (indexSetId) => { return { url: `/system/indexer/indices/${indexSetId}/closed` }; },
-    multiple: () => { return { url: `/system/indexer/indices/multiple` }; },
+    multiple: () => { return { url: '/system/indexer/indices/multiple' }; },
     reopen: (indexName) => { return { url: `/system/indexer/indices/${indexName}/reopen` }; },
   },
   InputsApiController: {
@@ -199,13 +199,13 @@ const ApiRoutes = {
     all: (page) => { return { url: `/system/messages?page=${page}` }; },
   },
   ToolsApiController: {
-    grokTest: () => { return { url: '/tools/grok_tester' };},
-    jsonTest: () => { return { url: '/tools/json_tester' };},
+    grokTest: () => { return { url: '/tools/grok_tester' }; },
+    jsonTest: () => { return { url: '/tools/json_tester' }; },
     naturalDateTest: (text) => { return { url: `/tools/natural_date_tester?string=${text}` }; },
-    regexTest: () => { return { url: '/tools/regex_tester' };},
-    regexReplaceTest: () => { return { url: '/tools/regex_replace_tester' };},
-    splitAndIndexTest: () => { return { url: '/tools/split_and_index_tester' };},
-    substringTest: () => { return { url: '/tools/substring_tester' };},
+    regexTest: () => { return { url: '/tools/regex_tester' }; },
+    regexReplaceTest: () => { return { url: '/tools/regex_replace_tester' }; },
+    splitAndIndexTest: () => { return { url: '/tools/split_and_index_tester' }; },
+    substringTest: () => { return { url: '/tools/substring_tester' }; },
     containsStringTest: () => { return { url: '/tools/contains_string_tester' }; },
   },
   UniversalSearchApiController: {
@@ -218,8 +218,8 @@ const ApiRoutes = {
       const streamFilter = this._streamFilter(streamId);
 
       queryString.query = query;
-      Object.keys(timerange).forEach(key => { queryString[key] = timerange[key]; });
-      Object.keys(streamFilter).forEach(key => { queryString[key] = streamFilter[key]; });
+      Object.keys(timerange).forEach((key) => { queryString[key] = timerange[key]; });
+      Object.keys(streamFilter).forEach((key) => { queryString[key] = streamFilter[key]; });
 
       return queryString;
     },

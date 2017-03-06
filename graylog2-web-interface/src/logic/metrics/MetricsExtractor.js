@@ -10,7 +10,7 @@ const MetricsExtractor = {
     }
 
     const metrics = {};
-    Object.keys(metricNames).forEach(metricShortName => {
+    Object.keys(metricNames).forEach((metricShortName) => {
       const metricFullName = metricNames[metricShortName];
       const metricObject = nodeMetrics[metricFullName];
       if (metricObject) {

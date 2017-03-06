@@ -11,7 +11,7 @@ const AlertsAnnotator = {
   streams: [],
 
   initialize() {
-    StreamsStore.listStreams().then(streams => {
+    StreamsStore.listStreams().then((streams) => {
       this.streams = streams;
     });
   },
@@ -30,7 +30,7 @@ const AlertsAnnotator = {
       promise = AlertsActions.listAllStreams.triggerPromise(earliestDataPoint);
     }
 
-    promise.then(response => {
+    promise.then((response) => {
       this._addAnnotations(response.alerts, rickshawAnnotator);
       if (typeof callback === 'function') {
         callback();
@@ -43,7 +43,7 @@ const AlertsAnnotator = {
       console.warn('Could not resolve stream names on alert annotations: stream list was not loaded.');
     }
 
-    alerts.forEach(alert => {
+    alerts.forEach((alert) => {
       const epoch = DateTime.fromUTCDateTime(alert.triggered_at).toMoment().unix();
       annotator.add(epoch, this._getAlertAnnotation(alert));
       annotator.update();

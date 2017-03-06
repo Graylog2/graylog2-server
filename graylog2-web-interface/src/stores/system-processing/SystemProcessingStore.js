@@ -4,7 +4,7 @@ import UserNotification from 'util/UserNotification';
 import fetch from 'logic/rest/FetchProvider';
 
 const SystemProcessingStore = Reflux.createStore({
-  sourceUrl: (nodeId) => `/cluster/${nodeId}/processing`,
+  sourceUrl: nodeId => `/cluster/${nodeId}/processing`,
 
   pause(nodeId) {
     return fetch('POST', URLUtils.qualifyUrl(`${this.sourceUrl(nodeId)}/pause`))
@@ -13,10 +13,10 @@ const SystemProcessingStore = Reflux.createStore({
           this.trigger({});
           UserNotification.success(`Message processing paused successfully in '${nodeId}'`);
         },
-        error => {
+        (error) => {
           UserNotification.error(`Pausing message processing in '${nodeId}' failed: ${error}`,
             `Could not pause message processing in node '${nodeId}'`);
-        }
+        },
       );
   },
 
@@ -27,10 +27,10 @@ const SystemProcessingStore = Reflux.createStore({
           this.trigger({});
           UserNotification.success(`Message processing resumed successfully in '${nodeId}'`);
         },
-        error => {
+        (error) => {
           UserNotification.error(`Resuming message processing in '${nodeId}' failed: ${error}`,
             `Could not resume message processing in node '${nodeId}'`);
-        }
+        },
       );
   },
 });

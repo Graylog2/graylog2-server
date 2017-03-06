@@ -7,7 +7,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 
 class NotificationsFactory {
   static getForNotification(notification) {
-    switch(notification.type) {
+    switch (notification.type) {
       case 'check_server_clocks':
         return {
           title: 'Check the system clocks of your Graylog server nodes.',
@@ -72,7 +72,7 @@ class NotificationsFactory {
               <em>{notification.details.max_file_descriptors}</em> on <em>{notification.details.hostname}</em>;
               should be at least 64000) This will be causing problems
               that can be hard to diagnose. Read how to raise the maximum number of open files in {' '}
-              <DocumentationLink page={DocsHelper.PAGES.ES_OPEN_FILE_LIMITS} text="the Elasticsearch setup documentation"/>.
+              <DocumentationLink page={DocsHelper.PAGES.ES_OPEN_FILE_LIMITS} text="the Elasticsearch setup documentation" />.
             </span>
           ),
         };
@@ -85,7 +85,7 @@ class NotificationsFactory {
               it is working in your network and that Elasticsearch is accessible. Also check that the cluster name setting
               is correct. Read how to fix this in {' '}
               <DocumentationLink page={DocsHelper.PAGES.ES_CLUSTER_UNAVAILABLE}
-                                 text="the Elasticsearch setup documentation."/>
+                                 text="the Elasticsearch setup documentation." />
             </span>
           ),
         };
@@ -112,7 +112,7 @@ class NotificationsFactory {
           description: (
             <span>
               The index ranges are out of sync. Please go to System/Indices and trigger a index range recalculation from
-              the Maintenance menu of {notification.details.index_sets ? (`the following index sets: ${notification.details.index_sets}`) : "all index sets"}
+              the Maintenance menu of {notification.details.index_sets ? (`the following index sets: ${notification.details.index_sets}`) : 'all index sets'}
             </span>
           ),
         };
@@ -222,7 +222,7 @@ class NotificationsFactory {
           ),
         };
       default:
-        return {title: 'unknown (' + notification.type + ')', description: 'unknown'};
+        return { title: `unknown (${notification.type})`, description: 'unknown' };
     }
   }
 }

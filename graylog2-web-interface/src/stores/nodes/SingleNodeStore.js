@@ -19,7 +19,7 @@ const SingleNodeStore = Reflux.createStore({
   },
 
   _getNodeInfo() {
-    return {node: this.node};
+    return { node: this.node };
   },
 
   _propagateState() {
@@ -28,7 +28,7 @@ const SingleNodeStore = Reflux.createStore({
 
   get(nodeId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(nodeId ? URLUtils.concatURLPath(this.sourceUrl, nodeId) : this.sourceUrl))
-      .then(response => {
+      .then((response) => {
         this.node = response;
         this._propagateState();
       });

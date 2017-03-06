@@ -13,7 +13,7 @@ const MessageFieldsStore = Reflux.createStore({
     this.list();
   },
   getInitialState() {
-    return {fields: this.fields};
+    return { fields: this.fields };
   },
   list() {
     const url = URLUtils.qualifyUrl(ApiRoutes.MessageFieldsApiController.list().url);

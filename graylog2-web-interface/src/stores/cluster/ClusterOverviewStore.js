@@ -20,7 +20,7 @@ const ClusterOverviewStore = Reflux.createStore({
   },
 
   getInitialState() {
-    return {clusterOverview: this.clusterOverview};
+    return { clusterOverview: this.clusterOverview };
   },
 
   cluster() {
@@ -28,9 +28,9 @@ const ClusterOverviewStore = Reflux.createStore({
     promise.then(
       (response) => {
         this.clusterOverview = response;
-        this.trigger({clusterOverview: this.clusterOverview});
+        this.trigger({ clusterOverview: this.clusterOverview });
       },
-      (error) => UserNotification.error(`Getting cluster overview failed: ${error}`, 'Could not get cluster overview')
+      error => UserNotification.error(`Getting cluster overview failed: ${error}`, 'Could not get cluster overview'),
     );
 
     return promise;
@@ -42,7 +42,7 @@ const ClusterOverviewStore = Reflux.createStore({
         (response) => {
           return response.threaddump;
         },
-        (error) => UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump')
+        error => UserNotification.error(`Getting thread dump for node '${nodeId}' failed: ${error}`, 'Could not get thread dump'),
       );
 
     return promise;

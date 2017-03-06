@@ -15,7 +15,7 @@ const HistogramDataStore = Reflux.createStore({
   histogram: undefined,
 
   getInitialState() {
-    return {histogram: this.histogram};
+    return { histogram: this.histogram };
   },
 
   load(range, sourceNames, maxDataPoints) {
@@ -23,7 +23,7 @@ const HistogramDataStore = Reflux.createStore({
     const urlQuery = {};
 
     if (typeof sourceNames !== 'undefined' && sourceNames instanceof Array) {
-      urlQuery.query = sourceNames.map((source) => 'source:' + source).join(' OR ');
+      urlQuery.query = sourceNames.map(source => `source:${source}`).join(' OR ');
     } else {
       urlQuery.query = '*';
     }
@@ -45,15 +45,15 @@ const HistogramDataStore = Reflux.createStore({
 
     const promise = fetch('GET', url.toString())
       .then(
-        response => {
+        (response) => {
           response.histogram = HistogramFormatter.format(response.results, response.queried_timerange, interval,
             maxDataPoints, rangeAsNumber === 0, null);
           return response;
         },
-        error => {
+        (error) => {
           UserNotification.warning(`Loading of histogram data failed with status: ${error}`,
             'Could not load histogram data');
-        }
+        },
       );
 
     HistogramDataActions.load.promise(promise);

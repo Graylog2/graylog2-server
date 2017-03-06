@@ -51,13 +51,13 @@ const ConfigurationsStore = Reflux.createStore({
     const promise = fetch('PUT', this._url(`/${configType}`), config);
 
     promise.then(
-      response => {
+      (response) => {
         this.configuration[configType] = response;
         this.trigger({ configuration: this.configuration });
         UserNotification.success('Configuration updated successfully');
         return response;
       },
-      error => {
+      (error) => {
         UserNotification.error(`Search config update failed: ${error}`, `Could not update search config: ${configType}`);
       });
 
@@ -68,13 +68,13 @@ const ConfigurationsStore = Reflux.createStore({
     const promise = fetch('PUT', URLUtils.qualifyUrl('/system/messageprocessors/config'), config);
 
     promise.then(
-      response => {
+      (response) => {
         this.configuration[configType] = response;
         this.trigger({ configuration: this.configuration });
         UserNotification.success('Configuration updated successfully');
         return response;
       },
-      error => {
+      (error) => {
         UserNotification.error(`Message processors config update failed: ${error}`, `Could not update config: ${configType}`);
       });
 

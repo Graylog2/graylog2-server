@@ -1,23 +1,24 @@
 import Reflux from 'reflux';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
+const AlarmCallbacksActions = ActionsProvider.getActions('AlarmCallbacks');
+
 const AlarmCallbacksStore = Reflux.createStore({
   listenables: [AlarmCallbacksActions],
 
   list(streamId) {
-    const failCallback = (error) =>
+    const failCallback = error =>
       UserNotification.error(`Fetching alert notifications failed with status: ${error.message}`,
         'Could not retrieve alert notification');
 
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.list(streamId).url);
-    const promise = fetch('GET', url).then((response) => response.alarmcallbacks, failCallback);
+    const promise = fetch('GET', url).then(response => response.alarmcallbacks, failCallback);
 
     AlarmCallbacksActions.list.promise(promise);
   },
@@ -33,13 +34,13 @@ const AlarmCallbacksStore = Reflux.createStore({
     const promise = fetch('POST', url, alarmCallback);
     promise.then(
       () => UserNotification.success('Alert notification saved successfully'),
-      failCallback
+      failCallback,
     );
 
     AlarmCallbacksActions.save.promise(promise);
   },
   delete(streamId, alarmCallbackId) {
-    const failCallback = (error) =>
+    const failCallback = error =>
       UserNotification.error(`Removing alert notification failed with status: ${error.message}`,
         'Could not remove alert notification');
 
@@ -48,7 +49,7 @@ const AlarmCallbacksStore = Reflux.createStore({
     const promise = fetch('DELETE', url);
     promise.then(
       () => UserNotification.success('Alert notification deleted successfully'),
-      failCallback
+      failCallback,
     );
 
     AlarmCallbacksActions.delete.promise(promise);
@@ -65,7 +66,7 @@ const AlarmCallbacksStore = Reflux.createStore({
     const promise = fetch('PUT', url, deltas);
     promise.then(
       () => UserNotification.success('Alert notification updated successfully'),
-      failCallback
+      failCallback,
     );
 
     AlarmCallbacksActions.update.promise(promise);

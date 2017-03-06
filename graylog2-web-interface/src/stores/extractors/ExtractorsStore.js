@@ -13,7 +13,7 @@ import UserNotification from 'util/UserNotification';
 
 function getExtractorDTO(extractor) {
   const converters = {};
-  extractor.converters.forEach(converter => {
+  extractor.converters.forEach((converter) => {
     converters[converter.type] = converter.config;
   });
 
@@ -40,14 +40,14 @@ const ExtractorsStore = Reflux.createStore({
   extractor: undefined,
 
   init() {
-    this.trigger({extractors: this.extractors, extractor: this.extractor});
+    this.trigger({ extractors: this.extractors, extractor: this.extractor });
   },
 
   list(inputId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors')));
-    promise.then(response => {
+    promise.then((response) => {
       this.extractors = response.extractors;
-      this.trigger({extractors: this.extractors});
+      this.trigger({ extractors: this.extractors });
     });
 
     ExtractorsActions.list.promise(promise);
@@ -56,7 +56,7 @@ const ExtractorsStore = Reflux.createStore({
   // Creates an basic extractor object that we can use to create new extractors.
   new(type, field) {
     if (ExtractorUtils.EXTRACTOR_TYPES.indexOf(type) === -1) {
-      throw new Error('Invalid extractor type provided: ' + type);
+      throw new Error(`Invalid extractor type provided: ${type}`);
     }
 
     return {
@@ -70,9 +70,9 @@ const ExtractorsStore = Reflux.createStore({
 
   get(inputId, extractorId) {
     const promise = fetch('GET', URLUtils.qualifyUrl(URLUtils.concatURLPath(this.sourceUrl, inputId, 'extractors', extractorId)));
-    promise.then(response => {
+    promise.then((response) => {
       this.extractor = response;
-      this.trigger({extractor: this.extractor});
+      this.trigger({ extractor: this.extractor });
     });
 
     ExtractorsActions.get.promise(promise);
@@ -104,8 +104,8 @@ const ExtractorsStore = Reflux.createStore({
           ExtractorsActions.get.triggerPromise(inputId, extractor.id);
         }
       })
-      .catch(error => {
-        UserNotification.error('Creating extractor failed: ' + error,
+      .catch((error) => {
+        UserNotification.error(`Creating extractor failed: ${error}`,
           'Could not create extractor');
       });
 
@@ -126,8 +126,8 @@ const ExtractorsStore = Reflux.createStore({
           ExtractorsActions.get.triggerPromise(inputId, extractor.id);
         }
       })
-      .catch(error => {
-        UserNotification.error('Updating extractor failed: ' + error,
+      .catch((error) => {
+        UserNotification.error(`Updating extractor failed: ${error}`,
           'Could not update extractor');
       });
 
@@ -148,8 +148,8 @@ const ExtractorsStore = Reflux.createStore({
           ExtractorsActions.list.triggerPromise(inputId);
         }
       })
-      .catch(error => {
-        UserNotification.error('Deleting extractor failed: ' + error,
+      .catch((error) => {
+        UserNotification.error(`Deleting extractor failed: ${error}`,
           `Could not delete extractor ${extractor.title}`);
       });
 
@@ -161,15 +161,15 @@ const ExtractorsStore = Reflux.createStore({
     const orderedExtractorsMap = {};
     orderedExtractors.forEach((extractor, idx) => orderedExtractorsMap[idx] = extractor.id);
 
-    const promise = fetch('POST', url, {order: orderedExtractorsMap});
+    const promise = fetch('POST', url, { order: orderedExtractorsMap });
     promise.then(() => {
       UserNotification.success('Extractor positions updated successfully');
       if (this.extractors) {
         ExtractorsActions.list.triggerPromise(inputId);
       }
     });
-    promise.catch(error => {
-      UserNotification.error('Changing extractor positions failed: ' + error,
+    promise.catch((error) => {
+      UserNotification.error(`Changing extractor positions failed: ${error}`,
         'Could not update extractor positions');
     });
 

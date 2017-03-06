@@ -23,19 +23,19 @@ const ServerAvailabilityStore = Reflux.createStore({
       .build()
       .then(
         () => ServerAvailabilityActions.reportSuccess(),
-        (error) => ServerAvailabilityActions.reportError(error)
+        error => ServerAvailabilityActions.reportError(error),
       );
   },
   reportError(error) {
     if (this.server.up) {
-      this.server = {up: false, error: error};
-      this.trigger({server: this.server});
+      this.server = { up: false, error: error };
+      this.trigger({ server: this.server });
     }
   },
   reportSuccess() {
     if (!this.server.up) {
-      this.server = {up: true};
-      this.trigger({server: this.server});
+      this.server = { up: true };
+      this.trigger({ server: this.server });
     }
   },
 });

@@ -25,12 +25,12 @@ const AlertNotificationsStore = Reflux.createStore({
     const promise = fetch('GET', url);
     promise
       .then(
-        response => {
+        (response) => {
           this.availableNotifications = response.types;
           this.trigger({ availableNotifications: this.availableNotifications });
           return this.availableNotifications;
         },
-        error => {
+        (error) => {
           UserNotification.error(`Fetching available alert notification types failed with status: ${error.message}`,
             'Could not retrieve available alert notifications');
         });
@@ -42,7 +42,7 @@ const AlertNotificationsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbacksApiController.listAll().url);
     const promise = fetch('GET', url);
     promise.then(
-      response => {
+      (response) => {
         this.allNotifications = response.alarmcallbacks;
         this.trigger({ allNotifications: this.allNotifications });
         return this.allNotifications;
@@ -65,7 +65,7 @@ const AlertNotificationsStore = Reflux.createStore({
         const message = (error.additional && error.additional.body && error.additional.body.message ? error.additional.body.message : error.message);
         UserNotification.error(`Sending test alert notification failed with message: ${message}`,
           'Could not send test alert notification');
-      }
+      },
     );
 
     AlertNotificationsActions.testAlert.promise(promise);

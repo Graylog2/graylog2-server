@@ -18,7 +18,7 @@ const FileSaver = {
 
     // On IE >= 10, use msSaveOrOpenBlob
     if (window.navigator && typeof window.navigator.msSaveOrOpenBlob === 'function') {
-      const blob = new Blob([data], {type: contentType});
+      const blob = new Blob([data], { type: contentType });
       window.navigator.msSaveOrOpenBlob(blob, filename);
 
       return;

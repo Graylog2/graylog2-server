@@ -2,7 +2,7 @@ import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch, {Builder} from 'logic/rest/FetchProvider';
+import fetch, { Builder } from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const NotificationsActions = ActionsProvider.getActions('Notifications');

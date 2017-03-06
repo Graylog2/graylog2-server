@@ -20,15 +20,15 @@ const AlarmCallbackHistoryStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.AlarmCallbackHistoryApiController.list(streamId, alertId).url);
     const promise = fetch('GET', url)
       .then(
-        response => {
+        (response) => {
           this.histories = response.histories;
           this.trigger({ histories: this.histories });
           return this.histories;
         },
-        error => {
+        (error) => {
           UserNotification.error(`Fetching notification history for alert '${alertId}' failed with status: ${error}`,
             'Could not retrieve notification history.');
-        }
+        },
       );
 
     AlarmCallbackHistoryActions.list.promise(promise);

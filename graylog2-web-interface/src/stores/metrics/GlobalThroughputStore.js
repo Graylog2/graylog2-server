@@ -39,7 +39,7 @@ const GlobalThroughputStore = Reflux.createStore({
       }
     });
 
-    this.trigger({throughput: throughput});
+    this.trigger({ throughput: throughput });
   },
 });
 
