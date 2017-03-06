@@ -84,7 +84,7 @@ const webpackConfig = {
 };
 
 if (TARGET === 'start') {
-  console.log('Running in development mode');
+  console.error('Running in development mode');
   module.exports = merge(webpackConfig, {
     entry: {
       reacthot: 'react-hot-loader/patch',
@@ -115,7 +115,7 @@ if (TARGET === 'start') {
 }
 
 if (TARGET === 'start-nohmr') {
-  console.log('Running in development (no HMR) mode');
+  console.error('Running in development (no HMR) mode');
   module.exports = merge(webpackConfig, {
     devtool: 'eval',
     devServer: {
@@ -138,7 +138,7 @@ if (TARGET === 'start-nohmr') {
 }
 
 if (TARGET === 'build') {
-  console.log('Running in production mode');
+  console.error('Running in production mode');
   process.env.NODE_ENV = 'production';
   module.exports = merge(webpackConfig, {
     plugins: [
@@ -160,7 +160,7 @@ if (TARGET === 'build') {
 }
 
 if (TARGET === 'test') {
-  console.log('Running test/ci mode');
+  console.error('Running test/ci mode');
   module.exports = merge(webpackConfig, {
     module: {
       rules: [
@@ -171,6 +171,6 @@ if (TARGET === 'test') {
 }
 
 if (Object.keys(module.exports).length === 0) {
-  console.log('Running in default mode');
+  console.error('Running in default mode');
   module.exports = webpackConfig;
 }

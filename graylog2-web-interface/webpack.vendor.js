@@ -9,7 +9,7 @@ const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 
 const vendorModules = require('./vendor.modules');
 
-console.log('Building vendor bundle.');
+console.error('Building vendor bundle.');
 
 const webpackConfig = {
   entry: {
