@@ -27,9 +27,9 @@ const PaginatedList = React.createClass({
     this.setState({ pageSize: pageSize });
     this.props.onChange(this.state.currentPage, pageSize);
   },
-  _onChangePage(event, selectedEvent) {
+  _onChangePage(eventKey, event) {
     event.preventDefault();
-    const pageNo = Number(selectedEvent.eventKey);
+    const pageNo = Number(eventKey);
     this.setState({ currentPage: pageNo });
     this.props.onChange(pageNo, this.state.pageSize);
   },

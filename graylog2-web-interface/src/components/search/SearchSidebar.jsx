@@ -127,7 +127,7 @@ const SearchSidebar = React.createClass({
   },
 
   _openModal(ref) {
-    return (event) => {
+    return (_, event) => {
       if (event) {
         event.preventDefault();
       }

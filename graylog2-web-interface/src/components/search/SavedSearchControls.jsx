@@ -65,7 +65,7 @@ const SavedSearchControls = React.createClass({
     }
     promise.then(() => this._hide());
   },
-  _deleteSavedSearch(event) {
+  _deleteSavedSearch(_, event) {
     event.preventDefault();
     if (window.confirm('Do you really want to delete this saved search?')) {
       SavedSearchesActions.delete(this.props.currentSavedSearch);

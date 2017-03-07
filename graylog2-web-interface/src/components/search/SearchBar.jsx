@@ -101,7 +101,7 @@ const SearchBar = React.createClass({
   _queryChanged() {
     SearchStore.query = this.refs.query.getValue();
   },
-  _rangeTypeChanged(event, newRangeType) {
+  _rangeTypeChanged(newRangeType, event) {
     SearchStore.rangeType = newRangeType;
     this._resetKeywordPreview();
   },
