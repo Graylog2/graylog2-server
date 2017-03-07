@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.results;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
@@ -23,7 +24,6 @@ import org.elasticsearch.search.SearchHits;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -58,14 +58,12 @@ public class SearchResult extends IndexQueryResult {
 		return fields;
 	}
 
-    private Set<String> extractFields(List<ResultMessage> hits) {
+	@VisibleForTesting
+    Set<String> extractFields(List<ResultMessage> hits) {
         Set<String> filteredFields = Sets.newHashSet();
-        Set<String> allFields = Sets.newHashSet();
 
         hits.forEach(hit -> {
             final Message message = hit.getMessage();
-            allFields.addAll(message.getFieldNames());
-
             for (String field : message.getFieldNames()) {
                 if (!Message.NON_DISPLAYABLE_FIELDS.contains(field)) {
                     filteredFields.add(field);
