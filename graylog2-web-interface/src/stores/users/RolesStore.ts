@@ -51,7 +51,7 @@ const RolesStore = {
   },
 
   updateRole(rolename: string, role: Role): Promise<Role> {
-    const promise = fetch('PUT', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.updateRole(rolename).url), role);
+    const promise = fetch('PUT', URLUtils.qualifyUrl(ApiRoutes.RolesApiController.updateRole(encodeURIComponent(rolename)).url), role);
 
     promise.then((newRole) => {
       UserNotification.success("Role \"" + newRole.name + "\" was updated successfully");
@@ -66,7 +66,7 @@ const RolesStore = {
   },
 
   deleteRole(rolename: string): Promise<string[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.deleteRole(rolename).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.deleteRole(encodeURIComponent(rolename)).url);
     const promise = fetch('DELETE', url);
 
     promise.then(() => {
@@ -80,7 +80,7 @@ const RolesStore = {
     return promise;
   },
   getMembers(rolename: string): Promise<RoleMembership[]> {
-    const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.loadMembers(rolename).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.RolesApiController.loadMembers(encodeURIComponent(rolename)).url);
     const promise = fetch('GET', url);
     promise.catch((error) => {
       if (error.additional.status !== 404) {
