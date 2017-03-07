@@ -45,15 +45,15 @@ public class SearchResult extends IndexQueryResult {
 		this.totalResults = searchHits.getTotalHits();
         this.usedIndices = usedIndices;
 	}
-	
+
 	public long getTotalResults() {
 		return totalResults;
 	}
-	
+
 	public List<ResultMessage> getResults() {
 		return results;
 	}
-	
+
 	public Set<String> getFields() {
 		return fields;
 	}
@@ -62,28 +62,16 @@ public class SearchResult extends IndexQueryResult {
         Set<String> filteredFields = Sets.newHashSet();
         Set<String> allFields = Sets.newHashSet();
 
-        Iterator<ResultMessage> i = hits.iterator();
-        while(i.hasNext()) {
-            final Message message = i.next().getMessage();
+        hits.forEach(hit -> {
+            final Message message = hit.getMessage();
             allFields.addAll(message.getFieldNames());
 
             for (String field : message.getFieldNames()) {
-                if (!Message.RESERVED_FIELDS.contains(field)) {
+                if (!Message.NON_DISPLAYABLE_FIELDS.contains(field)) {
                     filteredFields.add(field);
                 }
             }
-        }
-
-        // Because some fields actually make sense in this result and some don't.
-        // TODO: This is super awkward. First we do not include RESERVED_FIELDS, then we add some back...
-        if (allFields.contains("message")) {
-            filteredFields.add("message");
-        }
-        if (allFields.contains("source")) {
-            filteredFields.add("source");
-        }
-        filteredFields.remove("streams");
-        filteredFields.remove("full_message");
+        });
 
         return filteredFields;
     }
