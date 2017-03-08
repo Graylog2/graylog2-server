@@ -53,9 +53,9 @@ const EditUsersPage = React.createClass({
     }
 
     const userPreferencesButton = !user.read_only ?
-      <span id="react-user-preferences-button" data-user-name={this.props.params.username}>
+      (<span id="react-user-preferences-button" data-user-name={this.props.params.username}>
         <UserPreferencesButton userName={user.username} />
-      </span>
+      </span>)
       : null;
 
     return (

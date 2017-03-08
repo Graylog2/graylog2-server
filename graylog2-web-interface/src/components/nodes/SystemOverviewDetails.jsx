@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import { Row, Col, Alert, Button } from 'react-bootstrap';
 
 import { IfPermitted } from 'components/common';
@@ -33,13 +33,13 @@ const SystemOverviewDetails = React.createClass({
     if (information.is_processing) {
       processingStatus = (
         <span>
-          <i className="fa fa-info-circle"/>&nbsp; <NodeThroughput nodeId={this.props.node.node_id} longFormat/>
+          <i className="fa fa-info-circle" />&nbsp; <NodeThroughput nodeId={this.props.node.node_id} longFormat />
         </span>
       );
     } else {
       processingStatus = (
         <span>
-          <i className="fa fa-exclamation-triangle"/>&nbsp; Node is <strong>not</strong> processing messages
+          <i className="fa fa-exclamation-triangle" />&nbsp; Node is <strong>not</strong> processing messages
         </span>
       );
     }
@@ -48,15 +48,15 @@ const SystemOverviewDetails = React.createClass({
       <Row>
         <Col md={4}>
           <Alert bsStyle="info">
-            <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?"/></span>
-            <i className="fa fa-exchange"/>&nbsp;
+            <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?" /></span>
+            <i className="fa fa-exchange" />&nbsp;
             Lifecycle state: <strong>{StringUtils.capitalizeFirstLetter(this.props.information.lifecycle)}</strong>
           </Alert>
         </Col>
         <Col md={4}>
           <Alert bsStyle={lbStatus === 'ALIVE' ? 'success' : 'danger'}>
-            <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?"/></span>
-            <i className="fa fa-heart"/>&nbsp;
+            <span className="pull-right"> <DocumentationLink page={DocsHelper.PAGES.LOAD_BALANCERS} text="What does this mean?" /></span>
+            <i className="fa fa-heart" />&nbsp;
             Marked as <strong>{lbStatus}</strong> for load balancers
           </Alert>
         </Col>

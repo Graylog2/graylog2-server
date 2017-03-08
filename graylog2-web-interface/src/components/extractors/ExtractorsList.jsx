@@ -1,6 +1,6 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
-import {Row, Col, Button} from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import Spinner from 'components/common/Spinner';
@@ -27,7 +27,7 @@ const ExtractorsList = React.createClass({
   _formatExtractor(extractor) {
     return (
       <ExtractorsListItem key={extractor.id} extractor={extractor} inputId={this.props.input.id}
-                          nodeId={this.props.node.node_id}/>
+                          nodeId={this.props.node.node_id} />
     );
   },
   _isLoading() {
@@ -38,7 +38,7 @@ const ExtractorsList = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     let sortExtractorsButton;
@@ -56,7 +56,7 @@ const ExtractorsList = React.createClass({
 
     return (
       <div>
-        <AddExtractorWizard inputId={this.props.input.id}/>
+        <AddExtractorWizard inputId={this.props.input.id} />
         <Row className="content extractor-list">
           <Col md={12}>
             <Row className="row-sm">
@@ -68,10 +68,10 @@ const ExtractorsList = React.createClass({
               </Col>
             </Row>
             <EntityList bsNoItemsStyle="info" noItemsText="This input has no configured extractors."
-                        items={formattedExtractors}/>
+                        items={formattedExtractors} />
           </Col>
         </Row>
-        <ExtractorsSortModal ref="sortModal" input={this.props.input} extractors={this.state.extractors}/>
+        <ExtractorsSortModal ref="sortModal" input={this.props.input} extractors={this.state.extractors} />
       </div>
     );
   },

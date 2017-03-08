@@ -15,7 +15,7 @@ const DashboardList = React.createClass({
   mixins: [PermissionsMixin],
   _formatDashboard(dashboard) {
     return (
-      <Dashboard key={`dashboard-${dashboard.id}`} dashboard={dashboard} permissions={this.props.permissions}/>
+      <Dashboard key={`dashboard-${dashboard.id}`} dashboard={dashboard} permissions={this.props.permissions} />
     );
   },
   render() {
@@ -35,13 +35,13 @@ const DashboardList = React.createClass({
       }
       return (
         <Alert bsStyle="warning">
-          <i className="fa fa-info-circle"></i>&nbsp;
+          <i className="fa fa-info-circle" />&nbsp;
           No dashboards configured. {createDashboardButton}
         </Alert>
       );
     }
 
-    const dashboardList = this.props.dashboards.sortBy((dashboard) => dashboard.title).map(this._formatDashboard);
+    const dashboardList = this.props.dashboards.sortBy(dashboard => dashboard.title).map(this._formatDashboard);
 
     return (
       <ul className="streams">

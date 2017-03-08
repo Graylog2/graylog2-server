@@ -81,7 +81,7 @@ const SavedSearchControls = React.createClass({
     return (
       <DropdownButton bsSize="small" title="Saved search" id="saved-search-actions-dropdown" pullRight={this.props.pullRight}>
         <MenuItem onSelect={this._openModal}>Update search criteria</MenuItem>
-        <MenuItem divider/>
+        <MenuItem divider />
         <MenuItem onSelect={this._deleteSavedSearch}>Delete saved search</MenuItem>
       </DropdownButton>
     );
@@ -102,7 +102,7 @@ const SavedSearchControls = React.createClass({
                  onChange={this._titleChanged}
                  bsStyle={this.state.error ? 'error' : null}
                  help={this.state.error ? 'Title was already taken.' : 'Type a name describing the current search.'}
-                 autoFocus/>
+                 autoFocus />
         </BootstrapModalForm>
       </div>
     );

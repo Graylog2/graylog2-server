@@ -24,28 +24,28 @@ const RolesComponent = React.createClass({
   },
   componentDidMount() {
     this.loadRoles();
-    StreamsStore.load(streams => this.setState({streams: Immutable.List(streams)}));
-    DashboardsStore.listDashboards().then(dashboards => this.setState({dashboards: dashboards}));
+    StreamsStore.load(streams => this.setState({ streams: Immutable.List(streams) }));
+    DashboardsStore.listDashboards().then(dashboards => this.setState({ dashboards: dashboards }));
   },
 
   loadRoles() {
     const promise = RolesStore.loadRoles();
-    promise.then(roles => {
-      this.setState({roles: Immutable.Set(roles), rolesLoaded: true});
+    promise.then((roles) => {
+      this.setState({ roles: Immutable.Set(roles), rolesLoaded: true });
     });
   },
 
   _showCreateRole() {
-    this.setState({showEditRole: true});
+    this.setState({ showEditRole: true });
   },
   _showEditRole(role) {
-    this.setState({showEditRole: true, editRole: role});
+    this.setState({ showEditRole: true, editRole: role });
   },
   _deleteRole(role) {
-    if (window.confirm('Do you really want to delete role ' + role.name + '?')) {
+    if (window.confirm(`Do you really want to delete role ${role.name}?`)) {
       RolesStore.getMembers(role.name).then((membership) => {
         if (membership.users.length !== 0) {
-          UserNotification.error('Cannot delete role ' + role.name + '. It is still assigned to ' + membership.users.length + ' users.');
+          UserNotification.error(`Cannot delete role ${role.name}. It is still assigned to ${membership.users.length} users.`);
         } else {
           RolesStore.deleteRole(role.name).then(this.loadRoles);
         }
@@ -60,7 +60,7 @@ const RolesComponent = React.createClass({
     }
   },
   _clearEditRole() {
-    this.setState({showEditRole: false, editRole: null});
+    this.setState({ showEditRole: false, editRole: null });
   },
 
   render() {
@@ -70,7 +70,7 @@ const RolesComponent = React.createClass({
     } else if (this.state.showEditRole) {
       content =
         (<EditRole initialRole={this.state.editRole} streams={this.state.streams} dashboards={this.state.dashboards}
-                  onSave={this._saveRole} cancelEdit={this._clearEditRole}/>);
+                  onSave={this._saveRole} cancelEdit={this._clearEditRole} />);
     } else {
       content = (<RoleList roles={this.state.roles}
                            showEditRole={this._showEditRole}

@@ -11,7 +11,7 @@ const TitleField = React.createClass({
   },
   getDefaultProps() {
     return {
-      helpBlock: <span/>,
+      helpBlock: <span />,
       onChange: () => {},
     };
   },

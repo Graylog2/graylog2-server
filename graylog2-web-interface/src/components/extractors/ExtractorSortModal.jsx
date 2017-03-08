@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {Row, Col, Modal, Button} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Row, Col, Modal, Button } from 'react-bootstrap';
 
 import BootstrapModalWrapper from 'components/bootstrap/BootstrapModalWrapper';
 import SortableList from 'components/common/SortableList';
@@ -40,7 +40,7 @@ const ExtractorSortModal = React.createClass({
           <p>Drag and drop the extractors on the list to change the order in which they will be applied.</p>
           <Row className="row-sm">
             <Col md={12}>
-              <SortableList items={this.props.extractors} onMoveItem={this._updateSorting}/>
+              <SortableList items={this.props.extractors} onMoveItem={this._updateSorting} />
             </Col>
           </Row>
         </Modal.Body>

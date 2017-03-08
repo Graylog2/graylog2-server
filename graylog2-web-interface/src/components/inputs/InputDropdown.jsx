@@ -30,7 +30,7 @@ const InputDropdown = React.createClass({
   },
   _formatStaticInput(input) {
     return (
-      <Input type="select" style={{float: 'left', width: 400, marginRight: 10}} disabled>
+      <Input type="select" style={{ float: 'left', width: 400, marginRight: 10 }} disabled>
         <option>{`${input.title} (${input.type})`}</option>
       </Input>
     );
@@ -52,7 +52,7 @@ const InputDropdown = React.createClass({
       const inputs = this.props.inputs.sort(this._sortByTitle).map(this._formatInput);
       return (
         <div>
-          <Input type="select" style={{float: 'left', width: 400, marginRight: 10}}
+          <Input type="select" style={{ float: 'left', width: 400, marginRight: 10 }}
                  valueLink={this.linkState('selectedInput')} placeholder={this.PLACEHOLDER}>
             <option value={this.PLACEHOLDER}>Select an input</option>
             {inputs.toArray()}
@@ -64,7 +64,7 @@ const InputDropdown = React.createClass({
       );
     }
 
-    return <Spinner/>;
+    return <Spinner />;
   },
 });
 

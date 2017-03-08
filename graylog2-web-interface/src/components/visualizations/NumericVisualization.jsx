@@ -48,7 +48,7 @@ const NumericVisualization = React.createClass({
         percentage: this._calculatePercentage(normalizedNowNumber, normalizedPreviousNumber),
       };
     } else {
-      state = {currentNumber: props};
+      state = { currentNumber: props };
     }
     return state;
   },
@@ -127,12 +127,12 @@ const NumericVisualization = React.createClass({
       return className;
     }
 
-    const lowerClass = Boolean(this.props.config.lower_is_better) ? 'trend-good' : 'trend-bad';
-    const higherClass = Boolean(this.props.config.lower_is_better) ? 'trend-bad' : 'trend-good';
+    const lowerClass = this.props.config.lower_is_better ? 'trend-good' : 'trend-bad';
+    const higherClass = this.props.config.lower_is_better ? 'trend-bad' : 'trend-good';
 
     const activeClass = trendIndicatorType === TrendIndicatorType.HIGHER ? higherClass : lowerClass;
 
-    return className + ' ' + activeClass;
+    return `${className} ${activeClass}`;
   },
   _getHigherIndicatorClass(index) {
     return this._getIndicatorClass(index, TrendIndicatorType.HIGHER);
@@ -143,29 +143,29 @@ const NumericVisualization = React.createClass({
   render() {
     let trendIndicators;
 
-    if (Boolean(this.props.config.trend)) {
+    if (this.props.config.trend) {
       trendIndicators = (
         <div className="trend-indicators">
           <div className="trend-icons-higher">
             <div className={this._getHigherIndicatorClass(0)}>
-              <span className="trend-higher"><i className="fa fa-angle-up"/></span>
+              <span className="trend-higher"><i className="fa fa-angle-up" /></span>
             </div>
             <div className={this._getHigherIndicatorClass(1)}>
-              <span className="trend-higher"><i className="fa fa-angle-up"/></span>
+              <span className="trend-higher"><i className="fa fa-angle-up" /></span>
             </div>
             <div className={this._getHigherIndicatorClass(2)}>
-              <span className="trend-higher"><i className="fa fa-angle-up"/></span>
+              <span className="trend-higher"><i className="fa fa-angle-up" /></span>
             </div>
           </div>
           <div className="trend-icons-lower">
             <div className={this._getLowerIndicatorClass(0)}>
-              <span className="trend-lower"><i className="fa fa-angle-down"/></span>
+              <span className="trend-lower"><i className="fa fa-angle-down" /></span>
             </div>
             <div className={this._getLowerIndicatorClass(1)}>
-              <span className="trend-lower"><i className="fa fa-angle-down"/></span>
+              <span className="trend-lower"><i className="fa fa-angle-down" /></span>
             </div>
             <div className={this._getLowerIndicatorClass(2)}>
-              <span className="trend-lower"><i className="fa fa-angle-down"/></span>
+              <span className="trend-lower"><i className="fa fa-angle-down" /></span>
             </div>
           </div>
         </div>
@@ -175,7 +175,7 @@ const NumericVisualization = React.createClass({
     return (
       <div className="number">
         <div className="text-center">
-          <span className="value" style={{fontSize: this._calculateFontSize()}}>
+          <span className="value" style={{ fontSize: this._calculateFontSize() }}>
             {this._formatData()}
           </span>
           {trendIndicators}

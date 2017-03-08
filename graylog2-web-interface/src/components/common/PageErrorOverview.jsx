@@ -16,7 +16,7 @@ const PageErrorOverview = React.createClass({
   },
 
   _formatErrors(errors) {
-    const formattedErrors = errors ? errors.map((error) => <li>{error.toString()}</li>) : [];
+    const formattedErrors = errors ? errors.map(error => <li>{error.toString()}</li>) : [];
     return (
       <ul>
         {formattedErrors}

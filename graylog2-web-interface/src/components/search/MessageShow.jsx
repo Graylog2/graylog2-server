@@ -40,7 +40,7 @@ const MessageShow = React.createClass({
                                          streams={this.state.streams}
                                          nodes={this.state.nodes}
                                          possiblyHighlight={this.possiblyHighlight}
-                                         showTimestamp/>
+                                         showTimestamp />
         </Col>
       </Row>
     );

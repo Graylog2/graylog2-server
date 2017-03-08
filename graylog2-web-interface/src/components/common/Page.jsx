@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import { PageItem } from 'react-bootstrap';
 
 const Page = React.createClass({

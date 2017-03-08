@@ -43,9 +43,8 @@ const TimeBasedRotationStrategyConfiguration = React.createClass({
   _validationState() {
     if (this._isValidPeriod()) {
       return undefined;
-    } else {
-      return 'error';
     }
+    return 'error';
   },
 
   _formatDuration() {

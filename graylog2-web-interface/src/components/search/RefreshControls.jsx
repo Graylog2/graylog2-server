@@ -29,7 +29,7 @@ const RefreshControls = React.createClass({
   render() {
     const intervalOptions = Object.keys(this.INTERVAL_OPTIONS).map((key) => {
       const interval = this.INTERVAL_OPTIONS[key] * 1000;
-      return <MenuItem key={'RefreshControls-' + key} onClick={() => this._changeInterval(interval)}>{key}</MenuItem>;
+      return <MenuItem key={`RefreshControls-${key}`} onClick={() => this._changeInterval(interval)}>{key}</MenuItem>;
     });
     const intervalDuration = moment.duration(this.state.refresh.interval);
     const naturalInterval = intervalDuration.asSeconds() < 60 ?
@@ -39,7 +39,7 @@ const RefreshControls = React.createClass({
     return (
       <ButtonGroup>
         <Button bsSize="small" onClick={() => this.state.refresh.enabled ? RefreshActions.disable() : RefreshActions.enable()}>
-          {this.state.refresh.enabled ? <i className="fa fa-pause"/> : <i className="fa fa-play"/>}
+          {this.state.refresh.enabled ? <i className="fa fa-pause" /> : <i className="fa fa-play" />}
         </Button>
 
         <DropdownButton bsSize="small" title={this.state.refresh.enabled ? buttonLabel : 'Not updating'} id="refresh-options-dropdown">

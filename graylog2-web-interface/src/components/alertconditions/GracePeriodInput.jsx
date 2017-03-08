@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {Pluralize} from 'components/common';
+import { Pluralize } from 'components/common';
 
 const GracePeriodInput = React.createClass({
   propTypes: {
@@ -25,16 +25,16 @@ const GracePeriodInput = React.createClass({
       <span>
         and <br /> then wait at least{' '}
         <input ref="grace" name="grace" type="number" min="0" className="form-control"
-               value={this.state.grace} onChange={this._onChange} required/>
+               value={this.state.grace} onChange={this._onChange} required />
         {' '}
-        <Pluralize singular="minute" plural="minutes" value={this.state.grace}/> until triggering a new alert. (grace period)
+        <Pluralize singular="minute" plural="minutes" value={this.state.grace} /> until triggering a new alert. (grace period)
         <br />
 
         When sending an alert, include the last{' '}
         <input ref="backlog" name="backlog" type="number" min="0" className="form-control"
-               value={this.state.backlog} onChange={this._onChange} required/>
+               value={this.state.backlog} onChange={this._onChange} required />
         {' '}
-        <Pluralize singular="message" plural="messages" value={this.state.backlog}/> of the stream evaluated for this alert condition.
+        <Pluralize singular="message" plural="messages" value={this.state.backlog} /> of the stream evaluated for this alert condition.
       </span>
     );
   },

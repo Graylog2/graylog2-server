@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {Row, Col, Input, Button} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Row, Col, Input, Button } from 'react-bootstrap';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const ExtractorsActions = ActionsProvider.getActions('Extractors');
@@ -17,7 +17,7 @@ const ImportExtractors = React.createClass({
       const extractors = parsedExtractors.extractors;
       ExtractorsActions.import(this.props.input.id, extractors);
     } catch (error) {
-      UserNotification.error('There was an error while parsing extractors. Are they in JSON format? ' + error,
+      UserNotification.error(`There was an error while parsing extractors. Are they in JSON format? ${error}`,
         'Could not import extractors');
     }
   },
@@ -33,7 +33,7 @@ const ImportExtractors = React.createClass({
           <Row>
             <Col md={12}>
               <form onSubmit={this._onSubmit}>
-                <Input type="textarea" ref="extractorsInput" id="extractor-export-textarea" rows={30}/>
+                <Input type="textarea" ref="extractorsInput" id="extractor-export-textarea" rows={30} />
                 <Button type="submit" bsStyle="success">Add extractors to input</Button>
               </form>
             </Col>

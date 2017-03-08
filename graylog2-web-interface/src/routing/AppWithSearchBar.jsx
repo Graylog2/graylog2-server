@@ -53,7 +53,7 @@ const AppWithSearchBar = React.createClass({
   },
   _loadStream(streamId) {
     if (streamId) {
-      StreamsStore.get(streamId, (stream) => this.setState({ stream: stream }, this._updateSearchParams));
+      StreamsStore.get(streamId, stream => this.setState({ stream: stream }, this._updateSearchParams));
     } else {
       this.setState({ stream: undefined }, this._updateSearchParams);
     }
@@ -82,7 +82,7 @@ const AppWithSearchBar = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     // TODO: Only show search bar if the user has the right permissions

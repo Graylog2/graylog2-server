@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
 import { Input } from 'react-bootstrap';
@@ -78,7 +78,7 @@ const TypeAheadFieldInput = React.createClass({
       <Input ref="fieldInput"
              wrapperClassName="typeahead-wrapper"
              defaultValue={this.props.valueLink ? this.props.valueLink.value : null}
-        {...this._getFilteredProps()}/>
+        {...this._getFilteredProps()} />
     );
   },
 });

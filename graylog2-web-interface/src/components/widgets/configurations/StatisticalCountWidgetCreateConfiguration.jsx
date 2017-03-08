@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import { Input } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
@@ -23,7 +23,7 @@ const StatisticalCountWidgetCreateConfiguration = React.createClass({
 
   componentWillReceiveProps(nextProps) {
     if (this.props.fields !== nextProps.fields) {
-      this.setState({sortedFields: this._sortFields(nextProps.fields)});
+      this.setState({ sortedFields: this._sortFields(nextProps.fields) });
     }
   },
 
@@ -80,7 +80,7 @@ const StatisticalCountWidgetCreateConfiguration = React.createClass({
           })}
         </Input>
 
-        <CountWidgetCreateConfiguration ref="countConfiguration" {...this.props}/>
+        <CountWidgetCreateConfiguration ref="countConfiguration" {...this.props} />
       </fieldset>
     );
   },

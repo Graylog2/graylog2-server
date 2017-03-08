@@ -22,7 +22,7 @@ const MetricDetails = React.createClass({
     MetricsActions.remove(this.props.nodeId, this.props.metric.full_name);
   },
   _formatDetailsForType(type, metric) {
-    switch(type) {
+    switch (type) {
       case 'Counter':
         return <CounterDetails metric={metric} />;
       case 'Gauge':

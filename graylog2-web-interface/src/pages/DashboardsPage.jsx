@@ -13,7 +13,7 @@ const DashboardsPage = React.createClass({
         <DashboardListPage permissions={this.state.currentUser.permissions} />
       </DocumentTitle>
     );
-  }
+  },
 });
 
 export default DashboardsPage;

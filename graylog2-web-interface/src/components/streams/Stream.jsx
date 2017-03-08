@@ -60,7 +60,7 @@ const Stream = React.createClass({
   },
   _onDelete(stream) {
     if (window.confirm('Do you really want to remove this stream?')) {
-      StreamsStore.remove(stream.id, response => {
+      StreamsStore.remove(stream.id, (response) => {
         UserNotification.success(`Stream '${stream.title}' was deleted successfully.`, 'Success');
         return response;
       });
@@ -72,13 +72,13 @@ const Stream = React.createClass({
       .finally(() => this.setState({ loading: false }));
   },
   _onUpdate(streamId, stream) {
-    StreamsStore.update(streamId, stream, response => {
+    StreamsStore.update(streamId, stream, (response) => {
       UserNotification.success(`Stream '${stream.title}' was updated successfully.`, 'Success');
       return response;
     });
   },
   _onClone(streamId, stream) {
-    StreamsStore.cloneStream(streamId, stream, response => {
+    StreamsStore.cloneStream(streamId, stream, (response) => {
       UserNotification.success(`Stream was successfully cloned as '${stream.title}'.`, 'Success');
       return response;
     });
@@ -149,13 +149,13 @@ const Stream = React.createClass({
     }
 
     const createdFromContentPack = (stream.content_pack ?
-      <i className="fa fa-cube" title="Created from content pack"/> : null);
+      <i className="fa fa-cube" title="Created from content pack" /> : null);
 
     const streamRuleList = isDefaultStream ? null :
                            (<CollapsibleStreamRuleList key={`streamRules-${stream.id}`}
                                  stream={stream}
                                  streamRuleTypes={this.props.streamRuleTypes}
-                                 permissions={this.props.permissions}/>);
+                                 permissions={this.props.permissions} />);
     const streamControls = (
       <OverlayElement overlay={defaultStreamTooltip} placement="top" useOverlay={isDefaultStream}>
         <StreamControls stream={stream} permissions={this.props.permissions}
@@ -197,13 +197,13 @@ const Stream = React.createClass({
             {stream.description}
           </div>
           <div className="stream-metadata">
-            <StreamThroughput streamId={stream.id}/>. {this._formatNumberOfStreamRules(stream)}
+            <StreamThroughput streamId={stream.id} />. {this._formatNumberOfStreamRules(stream)}
             {streamRuleList}
           </div>
         </div>
         <StreamRuleForm ref="quickAddStreamRuleForm" title="New Stream Rule"
                         onSubmit={this._onSaveStreamRule}
-                        streamRuleTypes={this.props.streamRuleTypes}/>
+                        streamRuleTypes={this.props.streamRuleTypes} />
       </li>
     );
   },

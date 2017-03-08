@@ -50,7 +50,7 @@ const ConfigurationBundlePreview = React.createClass({
           {deleteAction}
           <h2>Content pack description:</h2>
         </div>
-        <div dangerouslySetInnerHTML={{__html: markdownPreview}}/>
+        <div dangerouslySetInnerHTML={{ __html: markdownPreview }} />
         <div className="preview-actions">
           {applyAction}
         </div>

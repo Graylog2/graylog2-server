@@ -96,7 +96,7 @@ const ShowDashboardPage = React.createClass({
         <Col md={12}>
           <Alert className="no-widgets">
             This dashboard has no widgets yet. Learn how to add widgets in the <DocumentationLink
-            page={DocsHelper.PAGES.DASHBOARDS} text="documentation"/>.
+            page={DocsHelper.PAGES.DASHBOARDS} text="documentation" />.
           </Alert>
         </Col>
       </Row>
@@ -125,7 +125,7 @@ const ShowDashboardPage = React.createClass({
     }
 
     const positions = {};
-    dashboard.widgets.forEach(widget => {
+    dashboard.widgets.forEach((widget) => {
       const persistedDimensions = dashboard.positions[widget.id] || {};
       const defaultDimensions = this._defaultWidgetDimensions(widget);
       positions[widget.id] = {
@@ -148,7 +148,7 @@ const ShowDashboardPage = React.createClass({
       return (
         <div key={widget.id} className={style.widgetContainer}>
           <Widget id={widget.id} key={`widget-${widget.id}`} widget={widget} dashboardId={dashboard.id}
-                  locked={this.state.locked} shouldUpdate={this.shouldUpdate()} streamIds={this.state.streamIds}/>
+                  locked={this.state.locked} shouldUpdate={this.shouldUpdate()} streamIds={this.state.streamIds} />
         </div>
       );
     });
@@ -229,10 +229,10 @@ const ShowDashboardPage = React.createClass({
     }
 
     const editDashboardTrigger = !this.state.locked && !this._dashboardIsEmpty(dashboard) ?
-      <EditDashboardModalTrigger id={dashboard.id} action="edit" title={dashboard.title}
+      (<EditDashboardModalTrigger id={dashboard.id} action="edit" title={dashboard.title}
                                  description={dashboard.description} buttonClass="btn-info btn-xs">
-        <i className="fa fa-pencil"/>
-      </EditDashboardModalTrigger> : null;
+        <i className="fa fa-pencil" />
+      </EditDashboardModalTrigger>) : null;
     const dashboardTitle = (
       <span>
         <span data-dashboard-id={dashboard.id} className="dashboard-title">{dashboard.title}</span>
@@ -250,7 +250,7 @@ const ShowDashboardPage = React.createClass({
           </PageHeader>
 
           {this.formatDashboard(dashboard)}
-          <div className="clearfix"/>
+          <div className="clearfix" />
         </span>
       </DocumentTitle>
     );

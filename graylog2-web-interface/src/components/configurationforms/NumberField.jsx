@@ -15,14 +15,14 @@ const NumberField = React.createClass({
   MAX_SAFE_INTEGER: (Number.MAX_SAFE_INTEGER !== undefined ? Number.MAX_SAFE_INTEGER : Math.pow(2, 53) - 1),
   MIN_SAFE_INTEGER: (Number.MIN_SAFE_INTEGER !== undefined ? Number.MIN_SAFE_INTEGER : -1 * (Math.pow(2, 53) - 1)),
   _getDefaultValidationSpecs() {
-    return {min: this.MIN_SAFE_INTEGER, max: this.MAX_SAFE_INTEGER};
+    return { min: this.MIN_SAFE_INTEGER, max: this.MAX_SAFE_INTEGER };
   },
   mapValidationAttribute(attribute) {
     switch (attribute.toLocaleUpperCase()) {
-    case 'ONLY_NEGATIVE': return {min: this.MIN_SAFE_INTEGER, max: -1};
-    case 'ONLY_POSITIVE': return {min: 0, max: this.MAX_SAFE_INTEGER};
-    case 'IS_PORT_NUMBER': return {min: 0, max: 65535};
-    default: return this._getDefaultValidationSpecs();
+      case 'ONLY_NEGATIVE': return { min: this.MIN_SAFE_INTEGER, max: -1 };
+      case 'ONLY_POSITIVE': return { min: 0, max: this.MAX_SAFE_INTEGER };
+      case 'IS_PORT_NUMBER': return { min: 0, max: 65535 };
+      default: return this._getDefaultValidationSpecs();
     }
   },
   validationSpec(field) {
@@ -48,7 +48,7 @@ const NumberField = React.createClass({
     // TODO: replace with bootstrap input component
     return (
       <div className="form-group">
-        <label htmlFor={typeName + '-' + field.title}>
+        <label htmlFor={`${typeName}-${field.title}`}>
           {field.human_name}
           {FieldHelpers.optionalMarker(field)}
         </label>

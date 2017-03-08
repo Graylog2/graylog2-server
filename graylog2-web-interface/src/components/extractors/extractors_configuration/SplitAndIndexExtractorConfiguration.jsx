@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {Input, Button} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Input, Button } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
 const ToolsStore = StoreProvider.getStore('Tools');
@@ -25,9 +25,9 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
     this.props.onChange(this.state.configuration);
   },
   componentWillReceiveProps(nextProps) {
-    this.setState({configuration: this._getEffectiveConfiguration(nextProps.configuration)});
+    this.setState({ configuration: this._getEffectiveConfiguration(nextProps.configuration) });
   },
-  DEFAULT_CONFIGURATION: {index: 1},
+  DEFAULT_CONFIGURATION: { index: 1 },
   _getEffectiveConfiguration(configuration) {
     return ExtractorUtils.getEffectiveConfiguration(this.DEFAULT_CONFIGURATION, configuration);
   },
@@ -40,12 +40,12 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
     };
   },
   _onTryClick() {
-    this.setState({trying: true});
+    this.setState({ trying: true });
 
     const promise = ToolsStore.testSplitAndIndex(this.state.configuration.split_by, this.state.configuration.index,
       this.props.exampleMessage);
 
-    promise.then(result => {
+    promise.then((result) => {
       if (!result.successful) {
         UserNotification.warning('We were not able to run the split and index extraction. Please check your parameters.');
         return;
@@ -55,7 +55,7 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
       this.props.onExtractorPreviewLoad(preview);
     });
 
-    promise.finally(() => this.setState({trying: false}));
+    promise.finally(() => this.setState({ trying: false }));
   },
   _isTryButtonDisabled() {
     const configuration = this.state.configuration;
@@ -86,7 +86,7 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
                defaultValue={this.state.configuration.split_by}
                onChange={this._onChange('split_by')}
                required
-               help={splitByHelpMessage}/>
+               help={splitByHelpMessage} />
 
         <Input type="number"
                id="index"
@@ -97,11 +97,11 @@ const SplitAndIndexExtractorConfiguration = React.createClass({
                onChange={this._onChange('index')}
                min="1"
                required
-               help={indexHelpMessage}/>
+               help={indexHelpMessage} />
 
         <Input wrapperClassName="col-md-offset-2 col-md-10">
           <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-            {this.state.trying ? <i className="fa fa-spin fa-spinner"/> : 'Try'}
+            {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try'}
           </Button>
         </Input>
       </div>

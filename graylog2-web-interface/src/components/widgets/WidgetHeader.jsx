@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {Timestamp} from 'components/common';
+import React, { PropTypes } from 'react';
+import { Timestamp } from 'components/common';
 
 const WidgetHeader = React.createClass({
   propTypes: {
@@ -14,7 +14,7 @@ const WidgetHeader = React.createClass({
     if (this.props.error) {
       loadErrorElement = (
         <span className="load-error" title={this.props.errorMessage}>
-          <i className="fa fa-exclamation-triangle"></i>
+          <i className="fa fa-exclamation-triangle" />
         </span>
       );
     }
@@ -22,7 +22,7 @@ const WidgetHeader = React.createClass({
     let calculatedAtTime;
 
     if (this.props.calculatedAt) {
-      calculatedAtTime = <span title={this.props.calculatedAt}><Timestamp dateTime={this.props.calculatedAt} relative/></span>;
+      calculatedAtTime = <span title={this.props.calculatedAt}><Timestamp dateTime={this.props.calculatedAt} relative /></span>;
     } else {
       calculatedAtTime = 'Loading...';
     }
@@ -36,7 +36,7 @@ const WidgetHeader = React.createClass({
         <div className="widget-title">
           {this.props.title}
         </div>
-        <div className="clearfix"></div>
+        <div className="clearfix" />
       </div>
     );
   },

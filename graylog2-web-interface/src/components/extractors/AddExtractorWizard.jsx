@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {Row, Col, Button} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Row, Col, Button } from 'react-bootstrap';
 
 import LoaderTabs from 'components/messageloaders/LoaderTabs';
 import MessageFieldExtractorActions from 'components/search/MessageFieldExtractorActions';
@@ -14,14 +14,14 @@ const AddExtractorWizard = React.createClass({
     };
   },
   _showAddExtractorForm() {
-    this.setState({showExtractorForm: !this.state.showExtractorForm});
+    this.setState({ showExtractorForm: !this.state.showExtractorForm });
   },
   render() {
     let extractorForm;
 
     if (this.state.showExtractorForm) {
       // Components using this component, will give it a proper fieldName and message
-      const extractorFieldActions = <MessageFieldExtractorActions fieldName="" message={{}}/>;
+      const extractorFieldActions = <MessageFieldExtractorActions fieldName="" message={{}} />;
       extractorForm = (
         <div className="stream-loader">
           <LoaderTabs selectedInputId={this.props.inputId} customFieldActions={extractorFieldActions} />
@@ -32,7 +32,7 @@ const AddExtractorWizard = React.createClass({
     return (
       <Row className="content">
         <Col md={12}>
-          <h2 style={{marginBottom: 5}}>Add extractor</h2>
+          <h2 style={{ marginBottom: 5 }}>Add extractor</h2>
 
           <p>
             Start by loading a message to have an example to work on. You can decide whether to load a recent message

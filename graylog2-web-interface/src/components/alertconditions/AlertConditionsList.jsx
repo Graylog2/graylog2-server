@@ -27,7 +27,7 @@ const AlertConditionsList = React.createClass({
 
   _formatCondition(condition) {
     const stream = this.props.streams.find(s => s.alert_conditions.find(c => c.id === condition.id));
-    return <AlertCondition key={condition.id} alertCondition={condition} stream={stream}/>;
+    return <AlertCondition key={condition.id} alertCondition={condition} stream={stream} />;
   },
 
   render() {

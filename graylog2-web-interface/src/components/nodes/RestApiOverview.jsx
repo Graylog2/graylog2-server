@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import { Timestamp } from 'components/common';
 
 const RestApiOverview = React.createClass({
@@ -11,7 +11,7 @@ const RestApiOverview = React.createClass({
         <dt>Transport address:</dt>
         <dd>{this.props.node.transport_address}</dd>
         <dt>Last seen:</dt>
-        <dd><Timestamp dateTime={this.props.node.last_seen} relative/></dd>
+        <dd><Timestamp dateTime={this.props.node.last_seen} relative /></dd>
       </dl>
     );
   },

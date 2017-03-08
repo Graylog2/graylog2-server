@@ -14,15 +14,15 @@ const LoggingSubsystem = React.createClass({
   render() {
     return (
       <div className="subsystem-row">
-        <Col md={6} className="subsystem" style={{marginBottom: '10px'}}>
+        <Col md={6} className="subsystem" style={{ marginBottom: '10px' }}>
           <h3 className="u-light">
             Subsystem: {String(this.props.name).capitalize().toString()}
             <ButtonGroup className="pull-right">
-              <LogLevelDropdown nodeId={this.props.nodeId} name={this.props.name} subsystem={this.props.subsystem}/>
+              <LogLevelDropdown nodeId={this.props.nodeId} name={this.props.name} subsystem={this.props.subsystem} />
             </ButtonGroup>
           </h3>
           {this.props.subsystem.description}
-          <br style={{clear: 'both'}} />
+          <br style={{ clear: 'both' }} />
         </Col>
       </div>
     );

@@ -122,7 +122,7 @@ const SearchResult = React.createClass({
     // Get params used in the last executed search.
     const searchParams = SearchStore.getOriginalSearchURLParams().toJS();
     const rangeParams = {};
-    ['relative', 'from', 'to', 'keyword'].forEach(param => {
+    ['relative', 'from', 'to', 'keyword'].forEach((param) => {
       if (searchParams[param]) {
         rangeParams[param] = searchParams[param];
       }
@@ -198,14 +198,14 @@ const SearchResult = React.createClass({
           />
         </Col>
         <Col md={9} sm={12} id="main-content-sidebar">
-          {this._fieldAnalyzerComponents((analyzer) => this._shouldRenderAboveHistogram(analyzer))}
+          {this._fieldAnalyzerComponents(analyzer => this._shouldRenderAboveHistogram(analyzer))}
 
           <LegacyHistogram formattedHistogram={this.props.formattedHistogram}
                            histogram={this.props.histogram}
                            permissions={this.props.permissions}
                            stream={this.props.searchInStream} />
 
-          {this._fieldAnalyzerComponents((analyzer) => this._shouldRenderBelowHistogram(analyzer))}
+          {this._fieldAnalyzerComponents(analyzer => this._shouldRenderBelowHistogram(analyzer))}
 
           <ResultTable messages={this.props.result.messages}
                        page={SearchStore.page}

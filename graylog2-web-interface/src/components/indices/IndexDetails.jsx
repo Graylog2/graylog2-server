@@ -89,7 +89,7 @@ const IndexDetails = React.createClass({
 
         <ShardRoutingOverview routing={index.routing} indexName={indexName} />
 
-        <hr style={{ marginBottom: '5', marginTop: '10' }}/>
+        <hr style={{ marginBottom: '5', marginTop: '10' }} />
 
         {this._formatActionButtons()}
       </div>

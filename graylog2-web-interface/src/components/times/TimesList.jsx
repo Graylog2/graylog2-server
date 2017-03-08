@@ -13,7 +13,7 @@ import { Spinner, Timestamp } from 'components/common';
 const TimesList = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(SystemStore)],
   getInitialState() {
-    return {time: moment()};
+    return { time: moment() };
   },
   componentDidMount() {
     this.interval = setInterval(() => this.setState(this.getInitialState()), 1000);
@@ -41,11 +41,11 @@ const TimesList = React.createClass({
 
           <dl className="system-dl">
             <dt>User <em>{currentUser.username}</em>:</dt>
-            <dd><Timestamp dateTime={time} format={timeFormat}/></dd>
+            <dd><Timestamp dateTime={time} format={timeFormat} /></dd>
             <dt>Your web browser:</dt>
-            <dd><Timestamp dateTime={time} format={timeFormat} tz={'browser'}/></dd>
+            <dd><Timestamp dateTime={time} format={timeFormat} tz={'browser'} /></dd>
             <dt>Graylog server:</dt>
-            <dd><Timestamp dateTime={time} format={timeFormat} tz={serverTimezone}/></dd>
+            <dd><Timestamp dateTime={time} format={timeFormat} tz={serverTimezone} /></dd>
           </dl>
         </Col>
       </Row>

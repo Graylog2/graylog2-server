@@ -24,7 +24,7 @@ const MessageFields = React.createClass({
       const decoratedFields = decorationStats ? Object.keys(decorationStats.changed_fields) : [];
       return Object.keys(fields)
         .sort()
-        .map(key => {
+        .map((key) => {
           return (
             <MessageField key={key} {...this.props} fieldName={key} value={fields[key]}
                                disableFieldActions={this.props.disableFieldActions || decoratedFields.indexOf(key) !== -1} />
@@ -34,7 +34,7 @@ const MessageFields = React.createClass({
 
     const allKeys = Object.keys(decorationStats.removed_fields).concat(Object.keys(fields)).sort();
 
-    return allKeys.map(key => {
+    return allKeys.map((key) => {
       if (decorationStats.added_fields[key]) {
         return <ChangedMessageField key={key} fieldName={key} newValue={fields[key]} />;
       }

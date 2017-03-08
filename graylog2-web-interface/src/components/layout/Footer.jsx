@@ -8,7 +8,7 @@ const SystemStore = StoreProvider.getStore('System');
 const Footer = React.createClass({
   mixins: [Reflux.connect(SystemStore)],
   componentDidMount() {
-    SystemStore.jvm().then(jvmInfo => this.setState({jvm: jvmInfo}));
+    SystemStore.jvm().then(jvmInfo => this.setState({ jvm: jvmInfo }));
   },
   _isLoading() {
     return !(this.state.system && this.state.jvm);

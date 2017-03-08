@@ -65,9 +65,9 @@ const IndexSummary = React.createClass({
   },
   _formatShowDetailsLink() {
     if (this.state.showDetails) {
-      return <span className="index-more-actions"><i className="fa fa-caret-down"/> Hide Details / Actions</span>;
+      return <span className="index-more-actions"><i className="fa fa-caret-down" /> Hide Details / Actions</span>;
     }
-    return <span className="index-more-actions"><i className="fa fa-caret-right"/> Show Details / Actions</span>;
+    return <span className="index-more-actions"><i className="fa fa-caret-right" /> Show Details / Actions</span>;
   },
   _toggleShowDetails(event) {
     event.preventDefault();

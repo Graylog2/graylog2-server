@@ -63,7 +63,7 @@ const IndexSetConfigurationForm = React.createClass({
   },
 
   _onDisableOptimizationClick(event) {
-      this._updateConfig(event.target.name, event.target.checked);
+    this._updateConfig(event.target.name, event.target.checked);
   },
 
   _saveConfiguration(event) {

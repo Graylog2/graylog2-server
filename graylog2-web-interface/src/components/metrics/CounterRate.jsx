@@ -90,7 +90,7 @@ const CounterRate = React.createClass({
     return (<span>
       {rate}
       {this.props.showTotal && <span key="absolute" className="number-format"> ({numeral(count).format('0')} total)</span>}
-      </span>);
+    </span>);
   },
 });
 

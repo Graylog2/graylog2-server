@@ -25,14 +25,14 @@ const LogLevelMetrics = React.createClass({
     MetricsActions.remove(this.props.nodeId, this._metricName());
   },
   _metricName() {
-    return 'org.apache.logging.log4j.core.Appender.' + this.props.loglevel;
+    return `org.apache.logging.log4j.core.Appender.${this.props.loglevel}`;
   },
   render() {
     const { loglevel, nodeId } = this.props;
     const { metrics } = this.state;
     let metricsDetails;
     if (!metrics || !metrics[nodeId] || !metrics[nodeId][this._metricName()]) {
-      metricsDetails =  <Spinner />;
+      metricsDetails = <Spinner />;
     } else {
       const metric = metrics[nodeId][this._metricName()].metric;
       metricsDetails = (

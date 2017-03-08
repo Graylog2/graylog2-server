@@ -50,21 +50,19 @@ const MessageTableEntry = React.createClass({
           }
           chunks.push(<span key={key++} className="result-highlight-colored">{origValue.substring(range.get('start'), range.get('start') + range.get('length'))}</span>);
           if ((idx + 1) < highlights.size) {
-            const nextRange = highlights.get(idx+1);
+            const nextRange = highlights.get(idx + 1);
             chunks.push(<span key={key++}>{origValue.substring(range.get('start') + range.get('length'), nextRange.get('start'))}</span>);
             position = nextRange.get('start');
           } else {
-            chunks.push(<span key={key++}>{origValue.substring(range.get('start')+ range.get('length'))}</span>);
+            chunks.push(<span key={key++}>{origValue.substring(range.get('start') + range.get('length'))}</span>);
             position = range.get('start') + range.get('length');
           }
         });
         return <span>{chunks}</span>;
-      } else {
-        return String(origValue);
       }
-    } else {
       return String(origValue);
     }
+    return String(origValue);
   },
   _toggleDetail() {
     this.props.toggleDetail(`${this.props.message.index}-${this.props.message.id}`);
@@ -72,37 +70,37 @@ const MessageTableEntry = React.createClass({
   render() {
     const colSpanFixup = this.props.selectedFields.size + 1;
 
-    let classes = "message-group";
+    let classes = 'message-group';
     if (this.props.expanded) {
-      classes += " message-group-toggled";
+      classes += ' message-group-toggled';
     }
     if (this.props.message.id === this.props.highlightMessage) {
       classes += ' message-highlight';
     }
     return (
       <tbody className={classes}>
-      <tr className="fields-row" onClick={this._toggleDetail}>
-        <td><strong>
-          <Timestamp dateTime={this.props.message.fields.timestamp}/>
-        </strong></td>
-        { this.props.selectedFields.toSeq().map(selectedFieldName => <td
+        <tr className="fields-row" onClick={this._toggleDetail}>
+          <td><strong>
+            <Timestamp dateTime={this.props.message.fields.timestamp} />
+          </strong></td>
+          { this.props.selectedFields.toSeq().map(selectedFieldName => <td
           key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName, true)}</td>) }
-      </tr>
+        </tr>
 
-      {this.props.showMessageRow &&
-      <tr className="message-row" onClick={this._toggleDetail}>
-        <td colSpan={colSpanFixup}><div className="message-wrapper">{this.possiblyHighlight('message', true)}</div></td>
-      </tr>
+        {this.props.showMessageRow &&
+        <tr className="message-row" onClick={this._toggleDetail}>
+          <td colSpan={colSpanFixup}><div className="message-wrapper">{this.possiblyHighlight('message', true)}</div></td>
+        </tr>
         }
-      {this.props.expanded &&
-      <tr className="message-detail-row" style={{display: "table-row"}}>
-        <td colSpan={colSpanFixup}>
-          <MessageDetail message={this.props.message} inputs={this.props.inputs} streams={this.props.streams}
+        {this.props.expanded &&
+        <tr className="message-detail-row" style={{ display: 'table-row' }}>
+          <td colSpan={colSpanFixup}>
+            <MessageDetail message={this.props.message} inputs={this.props.inputs} streams={this.props.streams}
                          allStreams={this.props.allStreams} allStreamsLoaded={this.props.allStreamsLoaded}
                          nodes={this.props.nodes} possiblyHighlight={this.possiblyHighlight}
                          expandAllRenderAsync={this.props.expandAllRenderAsync} searchConfig={this.props.searchConfig} />
-        </td>
-      </tr>
+          </td>
+        </tr>
         }
       </tbody>
     );

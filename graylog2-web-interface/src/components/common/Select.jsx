@@ -23,7 +23,7 @@ const Select = React.createClass({
   },
   componentWillReceiveProps(nextProps) {
     if (this.props.value !== nextProps.value) {
-      this.setState({value: nextProps.value});
+      this.setState({ value: nextProps.value });
     }
   },
   componentWillUnmount() {
@@ -39,7 +39,7 @@ const Select = React.createClass({
     this.refs.select.clearValue(new CustomEvent('fake'));
   },
   _onChange(value) {
-    this.setState({value: value});
+    this.setState({ value: value });
 
     if (this.props.onValueChange) {
       this.props.onValueChange(value);

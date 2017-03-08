@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
 
@@ -31,7 +31,7 @@ const InputStateControl = React.createClass({
       return false;
     }
 
-    return nodeIDs.some(nodeID => {
+    return nodeIDs.some((nodeID) => {
       const nodeState = this.state.inputState[nodeID];
       return nodeState.state === 'RUNNING';
     });

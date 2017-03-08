@@ -22,7 +22,7 @@ const NodesPage = React.createClass({
               will be persisted to disk, even when processing is disabled.
             </span>
           </PageHeader>
-          <NodesList permissions={this.state.currentUser.permissions}/>
+          <NodesList permissions={this.state.currentUser.permissions} />
         </div>
       </DocumentTitle>
     );

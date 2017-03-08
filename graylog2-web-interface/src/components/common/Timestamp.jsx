@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 
 import DateTime from 'logic/datetimes/DateTime';
 
@@ -18,17 +18,16 @@ const Timestamp = React.createClass({
     const dateTime = new DateTime(this.props.dateTime);
     if (this.props.relative) {
       return dateTime.toRelativeString();
-    } else {
-      switch (this.props.tz) {
-        case null:
-        case undefined:
-          return dateTime.toString(this.props.format);
-        case 'browser':
-          return dateTime.toBrowserLocalTime().toString(this.props.format);
-        default:
-          return dateTime.toTimeZone(this.props.tz).toString(this.props.format);
+    }
+    switch (this.props.tz) {
+      case null:
+      case undefined:
+        return dateTime.toString(this.props.format);
+      case 'browser':
+        return dateTime.toBrowserLocalTime().toString(this.props.format);
+      default:
+        return dateTime.toTimeZone(this.props.tz).toString(this.props.format);
 
-      }
     }
   },
   render() {

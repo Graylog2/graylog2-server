@@ -8,7 +8,7 @@ import {
   ListField,
   NumberField,
   TextField,
-  TitleField
+  TitleField,
 } from 'components/configurationforms';
 
 const ConfigurationForm = React.createClass({
@@ -61,7 +61,7 @@ const ConfigurationForm = React.createClass({
     const defaultValues = {};
 
     if (props.configFields) {
-      Object.keys(props.configFields).forEach(field => {
+      Object.keys(props.configFields).forEach((field) => {
         defaultValues[field] = props.configFields[field].default_value;
       });
     }
@@ -115,7 +115,7 @@ const ConfigurationForm = React.createClass({
                               value={value} onChange={this._handleChange} autoFocus={autoFocus} />);
       case 'dropdown':
         return (<DropdownField key={elementKey} typeName={typeName} title={key} field={configField}
-                               value={value} onChange={this._handleChange} autoFocus={autoFocus} addPlaceholder/>);
+                               value={value} onChange={this._handleChange} autoFocus={autoFocus} addPlaceholder />);
       case 'list':
         return (<ListField key={elementKey} typeName={typeName} title={key} field={configField}
                            value={value} onChange={this._handleChange} autoFocus={autoFocus} addPlaceholder />);

@@ -12,7 +12,7 @@ const GenericAlertConditionSummary = React.createClass({
   render() {
     const alertCondition = this.props.alertCondition;
     const graceSummary = alertCondition.parameters.grace ? <GracePeriodSummary alertCondition={alertCondition} /> : null;
-    const backlogSummary = alertCondition.parameters.backlog ? <BacklogSummary alertCondition={alertCondition}/> : null;
+    const backlogSummary = alertCondition.parameters.backlog ? <BacklogSummary alertCondition={alertCondition} /> : null;
     return (
       <span>
         {graceSummary}

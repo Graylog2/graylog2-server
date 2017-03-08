@@ -74,7 +74,7 @@ const IndexSetDeletionForm = React.createClass({
     if (!this._isDeletable()) {
       const assignedStreams = this.state.assignedStreams
         .sort((s1, s2) => naturalSort(s1.title, s2.title))
-        .map((stream) => <li key={`stream-id-${stream.id}`}>{stream.title}</li>);
+        .map(stream => <li key={`stream-id-${stream.id}`}>{stream.title}</li>);
 
       return (
         <div>
@@ -104,7 +104,7 @@ const IndexSetDeletionForm = React.createClass({
                  label="Remove all data for this index set?"
                  help={<span>All indices related to this index set will be deleted from Elasticsearch.</span>}
                  checked={this.state.deleteIndices}
-                 onChange={this._onRemoveClick}/>
+                 onChange={this._onRemoveClick} />
         </Col>
       </Row>
     );

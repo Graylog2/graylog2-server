@@ -19,7 +19,7 @@ import URI from 'urijs';
  *
  */
 const pluginRoutes = {};
-PluginStore.exports('routes').forEach(pluginRoute => {
+PluginStore.exports('routes').forEach((pluginRoute) => {
   const uri = new URI(pluginRoute.path);
   const segments = uri.segment();
   const key = segments.map(segment => segment.replace(':', '')).join('_').toUpperCase();
@@ -73,17 +73,17 @@ const Routes = {
         }
         return `/system/index_sets/${indexSetId}/configuration`;
       },
-      SHOW: (indexSetId) => `/system/index_sets/${indexSetId}`,
+      SHOW: indexSetId => `/system/index_sets/${indexSetId}`,
       CREATE: '/system/index_sets/create',
     },
     INPUTS: '/system/inputs',
     LOGGING: '/system/logging',
-    METRICS: (nodeId) => `/system/metrics/node/${nodeId}`,
+    METRICS: nodeId => `/system/metrics/node/${nodeId}`,
     NODES: {
       LIST: '/system/nodes',
-      SHOW: (nodeId) => `/system/nodes/${nodeId}`,
+      SHOW: nodeId => `/system/nodes/${nodeId}`,
     },
-    THREADDUMP: (nodeId) => `/system/threaddump/${nodeId}`,
+    THREADDUMP: nodeId => `/system/threaddump/${nodeId}`,
     OUTPUTS: '/system/outputs',
     OVERVIEW: '/system/overview',
     AUTHENTICATION: {
@@ -91,12 +91,12 @@ const Routes = {
       ROLES: '/system/authentication/roles',
       USERS: {
         CREATE: '/system/authentication/users/new',
-        edit: (username) => `/system/authentication/users/edit/${username}`,
+        edit: username => `/system/authentication/users/edit/${username}`,
         LIST: '/system/authentication/users',
       },
       PROVIDERS: {
         CONFIG: '/system/authentication/config',
-        provider: (name) => `/system/authentication/config/${name}`,
+        provider: name => `/system/authentication/config/${name}`,
       },
     },
   },
@@ -119,7 +119,7 @@ const Routes = {
     };
 
     if (timeRange) {
-      Object.keys(timeRange).forEach(key => {
+      Object.keys(timeRange).forEach((key) => {
         queryParams[key] = timeRange[key];
       });
     }
@@ -131,23 +131,23 @@ const Routes = {
     return Routes._common_search_url(Routes.SEARCH, query, timeRange, resolution);
   },
   message_show: (index, messageId) => `/messages/${index}/${messageId}`,
-  stream_edit: (streamId) => `/streams/${streamId}/edit`,
+  stream_edit: streamId => `/streams/${streamId}/edit`,
   stream_edit_example: (streamId, index, messageId) => `${Routes.stream_edit(streamId)}?index=${index}&message_id=${messageId}`,
-  stream_outputs: (streamId) => `/streams/${streamId}/outputs`,
+  stream_outputs: streamId => `/streams/${streamId}/outputs`,
   stream_search: (streamId, query, timeRange, resolution) => {
     return Routes._common_search_url(`${Routes.STREAMS}/${streamId}/search`, query, timeRange, resolution);
   },
-  legacy_stream_search: (streamId) => `/streams/${streamId}/messages`,
+  legacy_stream_search: streamId => `/streams/${streamId}/messages`,
 
-  show_alert: (alertId) => `${Routes.ALERTS.LIST}/${alertId}`,
+  show_alert: alertId => `${Routes.ALERTS.LIST}/${alertId}`,
   show_alert_condition: (streamId, conditionId) => `${Routes.ALERTS.CONDITIONS}/${streamId}/${conditionId}`,
 
-  dashboard_show: (dashboardId) => `/dashboards/${dashboardId}`,
+  dashboard_show: dashboardId => `/dashboards/${dashboardId}`,
 
-  node: (nodeId) => `/system/nodes/${nodeId}`,
+  node: nodeId => `/system/nodes/${nodeId}`,
 
-  node_inputs: (nodeId) => `${Routes.SYSTEM.INPUTS}/${nodeId}`,
-  global_input_extractors: (inputId) => `/system/inputs/${inputId}/extractors`,
+  node_inputs: nodeId => `${Routes.SYSTEM.INPUTS}/${nodeId}`,
+  global_input_extractors: inputId => `/system/inputs/${inputId}/extractors`,
   local_input_extractors: (nodeId, inputId) => `/system/inputs/${nodeId}/${inputId}/extractors`,
   export_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/export`,
   import_extractors: (nodeId, inputId) => `${Routes.local_input_extractors(nodeId, inputId)}/import`,
@@ -166,7 +166,7 @@ const Routes = {
   edit_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
 
   edit_input_extractor: (nodeId, inputId, extractorId) => `/system/inputs/${nodeId}/${inputId}/extractors/${extractorId}/edit`,
-  getting_started: (fromMenu) => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
+  getting_started: fromMenu => `${Routes.GETTING_STARTED}?menu=${fromMenu}`,
   filtered_metrics: (nodeId, filter) => `${Routes.SYSTEM.METRICS(nodeId)}?filter=${filter}`,
 };
 

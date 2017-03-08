@@ -24,14 +24,14 @@ const EditRolesForm = React.createClass({
     };
   },
   componentDidMount() {
-    RolesStore.loadRoles().then(roles => {
+    RolesStore.loadRoles().then((roles) => {
       this.setState({ roles: roles.sort((r1, r2) => r1.name.localeCompare(r2.name)) });
     });
   },
   _updateRoles(evt) {
     evt.preventDefault();
     if (confirm(`Really update roles for "${this.props.user.username}"?`)) {
-      const roles = this.refs.roles.getValue().filter((value) => value !== '');
+      const roles = this.refs.roles.getValue().filter(value => value !== '');
       UsersStore.updateRoles(this.props.user.username, roles).then(() => {
         UserNotification.success('Roles updated successfully.', 'Success!');
         this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);

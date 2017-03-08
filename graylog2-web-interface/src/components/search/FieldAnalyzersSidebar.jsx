@@ -104,7 +104,7 @@ const FieldAnalyzersSidebar = React.createClass({
     const decorationStats = this.props.result.decoration_stats;
     const decoratedFields = decorationStats ? [].concat(decorationStats.added_fields || [], decorationStats.changed_fields || []) : [];
     const messageFields = this.props.fields
-      .filter((field) => field.name.indexOf(this.state.fieldFilter) !== -1)
+      .filter(field => field.name.indexOf(this.state.fieldFilter) !== -1)
       .sort((a, b) => a.name.localeCompare(b.name))
       .map((field) => {
         let messageField;

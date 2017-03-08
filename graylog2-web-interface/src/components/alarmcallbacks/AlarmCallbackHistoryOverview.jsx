@@ -20,7 +20,7 @@ const AlarmCallbackHistoryOverview = React.createClass({
 
   _formatHistory(history) {
     return (
-      <AlarmCallbackHistory key={history.id} alarmCallbackHistory={history} types={this.state.availableNotifications}/>
+      <AlarmCallbackHistory key={history.id} alarmCallbackHistory={history} types={this.state.availableNotifications} />
     );
   },
   _isLoading() {

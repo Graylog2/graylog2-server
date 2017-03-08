@@ -13,7 +13,7 @@ const BacklogSummary = React.createClass({
       return 'Including last message';
     }
 
-    return 'Including last ' + count + ' messages';
+    return `Including last ${count} messages`;
   },
   render() {
     const backlog = this.props.alertCondition.parameters.backlog;

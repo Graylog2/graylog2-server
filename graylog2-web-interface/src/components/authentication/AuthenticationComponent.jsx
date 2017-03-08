@@ -50,9 +50,8 @@ const AuthenticationComponent = React.createClass({
         key: `auth-configuration-${name}`,
         history: this.props.history,
       });
-    } else {
-      return (<Alert bsStyle="danger">Plugin component missing for authenticator <code>{name}</code>, this is an error.</Alert>);
     }
+    return (<Alert bsStyle="danger">Plugin component missing for authenticator <code>{name}</code>, this is an error.</Alert>);
   },
 
   _onUpdateProviders(config) {
@@ -88,16 +87,16 @@ const AuthenticationComponent = React.createClass({
         });
 
         authenticators.unshift(
-          <NavItem key="divider" disabled title="Provider Settings" className={AuthenticationComponentStyle.divider}>Provider Settings</NavItem>
+          <NavItem key="divider" disabled title="Provider Settings" className={AuthenticationComponentStyle.divider}>Provider Settings</NavItem>,
         );
         authenticators.unshift(
           <LinkContainer key="container-settings" to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.CONFIG}>
             <NavItem key="settings" title="Configure Provider Order">Configure Provider Order</NavItem>
-          </LinkContainer>
+          </LinkContainer>,
         );
       }
     } else {
-      authenticators = [<NavItem key={"loading"} disabled title="Loading...">Loading...</NavItem>];
+      authenticators = [<NavItem key={'loading'} disabled title="Loading...">Loading...</NavItem>];
     }
 
     // add submenu items based on permissions
@@ -105,14 +104,14 @@ const AuthenticationComponent = React.createClass({
       authenticators.unshift(
         <LinkContainer key="roles" to={Routes.SYSTEM.AUTHENTICATION.ROLES}>
           <NavItem title="Roles">Roles</NavItem>
-        </LinkContainer>
+        </LinkContainer>,
       );
     }
     if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
       authenticators.unshift(
         <LinkContainer key="users" to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
           <NavItem title="Users">Users</NavItem>
-        </LinkContainer>
+        </LinkContainer>,
       );
     }
 
@@ -128,7 +127,7 @@ const AuthenticationComponent = React.createClass({
       </Nav>
     );
 
-    let contentComponent = React.Children.count(this.props.children) === 1 ? React.Children.only(this.props.children) : this._contentComponent();
+    const contentComponent = React.Children.count(this.props.children) === 1 ? React.Children.only(this.props.children) : this._contentComponent();
 
     return (<Row>
       <Col md={2} className={AuthenticationComponentStyle.subnavigation}>{subnavigation}</Col>

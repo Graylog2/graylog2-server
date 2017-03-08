@@ -39,7 +39,7 @@ const InputStateBadge = React.createClass({
   },
   _textForState(sortedStates) {
     if (this.props.input.global) {
-      return sortedStates.map(state => state.count + ' ' + state.state).join(', ');
+      return sortedStates.map(state => `${state.count} ${state.state}`).join(', ');
     }
     return sortedStates[0].state;
   },
@@ -65,33 +65,32 @@ const InputStateBadge = React.createClass({
       });
     }
 
-    const sorted = Object.keys(inputStates).sort(this.comparator.compare.bind(this.comparator)).map(state => {
-      return {state: state, count: inputStates[state].length};
+    const sorted = Object.keys(inputStates).sort(this.comparator.compare.bind(this.comparator)).map((state) => {
+      return { state: state, count: inputStates[state].length };
     });
 
     if (sorted.length > 0) {
-      const popOverText = sorted.map(state => {
-        return inputStates[state.state].map(node => {
-          return <span><LinkToNode nodeId={node} />: {state.state}<br/></span>;
+      const popOverText = sorted.map((state) => {
+        return inputStates[state.state].map((node) => {
+          return <span><LinkToNode nodeId={node} />: {state.state}<br /></span>;
         });
       });
       const popover = (
-        <Popover id="inputstate-badge-details" title={'Input States for ' + input.title} style={{fontSize: 12}}>
+        <Popover id="inputstate-badge-details" title={`Input States for ${input.title}`} style={{ fontSize: 12 }}>
           {popOverText}
         </Popover>
       );
       return (
         <OverlayTrigger trigger="click" placement="bottom" overlay={popover} rootClose>
           <Label bsStyle={this._labelClassForState(sorted)} title="Click to show details"
-                 bsSize="xsmall" style={{cursor: 'pointer'}}>{this._textForState(sorted)}</Label>
+                 bsSize="xsmall" style={{ cursor: 'pointer' }}>{this._textForState(sorted)}</Label>
         </OverlayTrigger>
       );
-    } else {
-      const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
-      return (
-        <Label bsStyle="danger" bsSize="xsmall">{text}</Label>
-      );
     }
+    const text = input.global || input.node === undefined ? '0 RUNNING' : 'NOT RUNNING';
+    return (
+      <Label bsStyle="danger" bsSize="xsmall">{text}</Label>
+    );
   },
 });
 

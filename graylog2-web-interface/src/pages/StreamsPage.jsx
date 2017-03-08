@@ -39,7 +39,7 @@ const StreamsPage = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     return (

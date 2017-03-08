@@ -13,7 +13,7 @@ const CSVConverterConfiguration = React.createClass({
     this.props.onChange(this.props.type, this._getConverterObject());
   },
   _getConverterObject(configuration) {
-    return {type: this.props.type, config: configuration || this.props.configuration};
+    return { type: this.props.type, config: configuration || this.props.configuration };
   },
   _toggleConverter(event) {
     let converter;
@@ -45,7 +45,7 @@ const CSVConverterConfiguration = React.createClass({
                label="Add CSV columns as fields"
                wrapperClassName="col-md-offset-2 col-md-10"
                defaultChecked
-               onChange={this._toggleConverter}/>
+               onChange={this._toggleConverter} />
 
         <Row className="row-sm">
           <Col md={9} mdOffset={2}>
@@ -58,7 +58,7 @@ const CSVConverterConfiguration = React.createClass({
                      wrapperClassName="col-md-9"
                      placeholder="field1,field2,field3"
                      onChange={this._onChange('column_header')}
-                     required={this.refs.converterEnabled && this.refs.converterEnabled.getChecked()}/>
+                     required={this.refs.converterEnabled && this.refs.converterEnabled.getChecked()} />
 
               <Input type="text"
                      id={`${this.props.type}_converter_separator`}
@@ -68,7 +68,7 @@ const CSVConverterConfiguration = React.createClass({
                      wrapperClassName="col-md-9"
                      maxLength="2"
                      onChange={this._onChange('separator')}
-                     help={separatorHelpMessage}/>
+                     help={separatorHelpMessage} />
 
               <Input type="text"
                      id={`${this.props.type}_converter_quote_char`}
@@ -77,7 +77,7 @@ const CSVConverterConfiguration = React.createClass({
                      labelClassName="col-md-3"
                      wrapperClassName="col-md-9"
                      maxLength="1"
-                     onChange={this._onChange('quote_char')}/>
+                     onChange={this._onChange('quote_char')} />
 
               <Input type="text"
                      id={`${this.props.type}_converter_escape_char`}
@@ -87,7 +87,7 @@ const CSVConverterConfiguration = React.createClass({
                      wrapperClassName="col-md-9"
                      maxLength="1"
                      onChange={this._onChange('escape_char')}
-                     help="Character used to escape the separator and quote characters."/>
+                     help="Character used to escape the separator and quote characters." />
 
               <Input type="checkbox"
                      id={`${this.props.type}_converter_strict_quotes`}
@@ -95,14 +95,14 @@ const CSVConverterConfiguration = React.createClass({
                      wrapperClassName="col-md-offset-3 col-md-9"
                      defaultChecked={this.props.configuration.strict_quotes}
                      onChange={this._onChange('strict_quotes')}
-                     help="Ignore content outside of quotes."/>
+                     help="Ignore content outside of quotes." />
 
               <Input type="checkbox"
                      id={`${this.props.type}_converter_trim_leading_whitespace`}
                      label="Trim leading whitespace"
                      wrapperClassName="col-md-offset-3 col-md-9"
                      defaultChecked={this.props.configuration.trim_leading_whitespace}
-                     onChange={this._onChange('trim_leading_whitespace')}/>
+                     onChange={this._onChange('trim_leading_whitespace')} />
             </div>
           </Col>
         </Row>

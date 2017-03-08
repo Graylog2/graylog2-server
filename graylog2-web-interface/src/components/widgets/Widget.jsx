@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import $ from 'jquery';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -126,7 +126,7 @@ const Widget = React.createClass({
     if (this.state.result === undefined) {
       return (
         <div className="loading">
-          <i className="fa fa-spin fa-3x fa-refresh spinner"/>
+          <i className="fa fa-spin fa-3x fa-refresh spinner" />
         </div>
       );
     }
@@ -136,7 +136,7 @@ const Widget = React.createClass({
     }
 
     if (!this.widgetPlugin) {
-      return <WidgetVisualizationNotFound widgetClassName={this.props.widget.type}/>;
+      return <WidgetVisualizationNotFound widgetClassName={this.props.widget.type} />;
     }
 
     return React.createElement(this.widgetPlugin.visualizationComponent, {
@@ -193,31 +193,31 @@ const Widget = React.createClass({
   },
   deleteWidget() {
     if (window.confirm(`Do you really want to delete "${this.props.widget.description}"?`)) {
-      this.setState({deleted: true});
+      this.setState({ deleted: true });
       WidgetsActions.removeWidget(this.props.dashboardId, this.props.widget.id);
     }
   },
   render() {
     if (this.state.deleted) {
-      return <span/>;
+      return <span />;
     }
     const showConfigModal = (
       <WidgetConfigModal ref="configModal"
                          dashboardId={this.props.dashboardId}
                          widget={this.props.widget}
-                         boundToStream={this._isBoundToStream()}/>
+                         boundToStream={this._isBoundToStream()} />
     );
 
     const editConfigModal = (
       <WidgetEditConfigModal ref="editModal"
                              widget={this.props.widget}
-                             onUpdate={this.updateWidget}/>
+                             onUpdate={this.updateWidget} />
     );
 
     let disabledTooltip = null;
     if (this.props.streamIds != null && this.props.widget.config.stream_id &&
         !this.props.streamIds[this.props.widget.config.stream_id]) {
-      disabledTooltip = "The stream is not available, cannot replay search.";
+      disabledTooltip = 'The stream is not available, cannot replay search.';
     }
     return (
       <div ref="widget" className="widget" data-widget-id={this.props.widget.id}>
@@ -225,7 +225,7 @@ const Widget = React.createClass({
                       title={this.props.widget.description}
                       calculatedAt={this.state.calculatedAt}
                       error={this.state.error}
-                      errorMessage={this.state.errorMessage}/>
+                      errorMessage={this.state.errorMessage} />
 
         {this._getVisualization()}
 
@@ -235,7 +235,7 @@ const Widget = React.createClass({
                       onEditConfig={this._showEditConfig}
                       onDelete={this.deleteWidget}
                       replayHref={this.replayUrl()}
-                      replayToolTip={disabledTooltip}/>
+                      replayToolTip={disabledTooltip} />
         {this.props.locked ? showConfigModal : editConfigModal}
       </div>
     );

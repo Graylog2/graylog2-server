@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import Navigation from 'components/navigation/Navigation';
 import Spinner from 'components/common/Spinner';
@@ -29,12 +29,12 @@ const App = React.createClass({
     return (
       <div>
         <Navigation requestPath={this.props.location.pathname} fullName={this.state.currentUser.full_name}
-                    loginName={this.state.currentUser.username} permissions={this.state.currentUser.permissions}/>
-        <div id="scroll-to-hint" style={{display: 'none'}} className="alpha80">
-          <i className="fa fa-arrow-up"/>
+                    loginName={this.state.currentUser.username} permissions={this.state.currentUser.permissions} />
+        <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
+          <i className="fa fa-arrow-up" />
         </div>
         {this.props.children}
-        <Footer/>
+        <Footer />
       </div>
     );
   },

@@ -47,10 +47,10 @@ const StreamRule = React.createClass({
     return (
       <span>
         <a href="#" onClick={this._onDelete} style={{ marginRight: 5 }}>
-          <i className="fa fa-trash-o"/>
+          <i className="fa fa-trash-o" />
         </a>
         <a href="#" onClick={this._onEdit} style={{ marginRight: 5 }}>
-          <i className="fa fa-edit"/>
+          <i className="fa fa-edit" />
         </a>
       </span>
     );
@@ -69,7 +69,7 @@ const StreamRule = React.createClass({
         {actionItems}
         <HumanReadableStreamRule streamRule={streamRule} streamRuleTypes={streamRuleTypes} />
         <StreamRuleForm ref="streamRuleForm" streamRule={streamRule} streamRuleTypes={streamRuleTypes}
-                        title="Edit Stream Rule" onSubmit={this._onSubmit}/>
+                        title="Edit Stream Rule" onSubmit={this._onSubmit} />
         {description}
       </li>
     );

@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import $ from 'jquery';
 import d3 from 'd3';
 import dc from 'dc';
@@ -41,17 +41,17 @@ const SourceDataTable = React.createClass({
       .dimension(dimension)
       .group((d) => {
         const topValues = group.top(this.props.numberOfTopValues);
-        const dInTopValues = topValues.some((value) => d.name.localeCompare(value.key) === 0);
+        const dInTopValues = topValues.some(value => d.name.localeCompare(value.key) === 0);
         return (dInTopValues ? 'Top sources' : 'Others');
       })
       .size(this.state.numberOfSources)
       .columns([
-        (d) => `<a href="javascript:undefined" class="dc-filter-link" title="Filter this source">${d.name}</a>`,
-        (d) => d.percentage.toFixed(2) + '%',
-        (d) => numeral(d.message_count).format('0,0'),
-        (d) => this._getAddToSearchButton(d.name),
+        d => `<a href="javascript:undefined" class="dc-filter-link" title="Filter this source">${d.name}</a>`,
+        d => `${d.percentage.toFixed(2)}%`,
+        d => numeral(d.message_count).format('0,0'),
+        d => this._getAddToSearchButton(d.name),
       ])
-      .sortBy((d) => d.message_count)
+      .sortBy(d => d.message_count)
       .order(d3.descending)
       .on('renderlet', (table) => {
         table.selectAll('.dc-table-group').classed('info', true);
@@ -99,7 +99,7 @@ const SourceDataTable = React.createClass({
   },
 
   _onNumberOfSourcesChanged(event) {
-    this.setState({numberOfSources: event.target.value}, () => {
+    this.setState({ numberOfSources: event.target.value }, () => {
       this.changeNumberOfSources(this.state.numberOfSources);
     });
   },
@@ -112,12 +112,12 @@ const SourceDataTable = React.createClass({
     const resultTable = (
       <table id="dc-sources-result" className="sources table table-hover">
         <thead>
-        <tr>
-          <th style={{width: '60%'}}>Name</th>
-          <th>Percentage</th>
-          <th>Message count</th>
-          <th style={{width: 10}}></th>
-        </tr>
+          <tr>
+            <th style={{ width: '60%' }}>Name</th>
+            <th>Percentage</th>
+            <th>Message count</th>
+            <th style={{ width: 10 }} />
+          </tr>
         </thead>
       </table>
     );
@@ -132,7 +132,7 @@ const SourceDataTable = React.createClass({
             <div className="form-inline">
               <div className="form-group">
                 <input type="text" className="form-control input-sm" onChange={this._onFilterChanged}
-                       placeholder="Search"/>
+                       placeholder="Search" />
               </div>
             </div>
           </div>

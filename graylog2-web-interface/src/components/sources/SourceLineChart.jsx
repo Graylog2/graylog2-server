@@ -95,7 +95,7 @@ const SourceLineChart = React.createClass({
     };
     const loadingSpinner = (
       <div className="sources overlay" style={loadingSpinnerStyle}>
-        <i className="fa fa-spin fa-refresh spinner"/>
+        <i className="fa fa-spin fa-refresh spinner" />
       </div>
     );
 

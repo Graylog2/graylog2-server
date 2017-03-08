@@ -25,7 +25,7 @@ const NewUserForm = React.createClass({
   },
 
   componentDidMount() {
-    UsersStore.loadUsers().then(users => {
+    UsersStore.loadUsers().then((users) => {
       this.setState({ users });
     });
   },
@@ -111,7 +111,7 @@ const NewUserForm = React.createClass({
         <Input label="Roles" help={rolesHelp}
                labelClassName="col-sm-2" wrapperClassName="col-sm-10">
           <RolesSelect ref="roles" availableRoles={this.props.roles} userRoles={['Reader']}
-                       className="form-control" onValueChange={this._onValueChange}/>
+                       className="form-control" onValueChange={this._onValueChange} />
           {rolesAlert}
         </Input>
 

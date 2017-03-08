@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -21,14 +21,14 @@ const ImportExtractorsPage = React.createClass({
     };
   },
   componentDidMount() {
-    InputsActions.get.triggerPromise(this.props.params.inputId).then(input => this.setState({input: input}));
+    InputsActions.get.triggerPromise(this.props.params.inputId).then(input => this.setState({ input: input }));
   },
   _isLoading() {
     return !this.state.input;
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     return (
@@ -41,7 +41,7 @@ const ImportExtractorsPage = React.createClass({
               Marketplace</a>.
             </span>
           </PageHeader>
-          <ImportExtractors input={this.state.input}/>
+          <ImportExtractors input={this.state.input} />
         </div>
       </DocumentTitle>
     );

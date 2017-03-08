@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import { Col } from 'react-bootstrap';
 
 import { EntityListItem, LinkToNode } from 'components/common';
@@ -15,27 +15,27 @@ const NodeListItem = React.createClass({
   },
   render() {
     const node = this.props.node;
-    const title = <LinkToNode nodeId={node.node_id}/>;
+    const title = <LinkToNode nodeId={node.node_id} />;
 
     if (!this.props.systemOverview) {
       return (
         <EntityListItem key={`entry-list-${node.node_id}`}
                         title={title}
-                        description="System information is currently unavailable."/>
+                        description="System information is currently unavailable." />
       );
     }
 
-    const nodeThroughput = <NodeThroughput nodeId={node.node_id}/>;
-    const journalState = <JournalState nodeId={node.node_id}/>;
-    const actions = <NodesActions node={node} systemOverview={this.props.systemOverview}/>;
+    const nodeThroughput = <NodeThroughput nodeId={node.node_id} />;
+    const journalState = <JournalState nodeId={node.node_id} />;
+    const actions = <NodesActions node={node} systemOverview={this.props.systemOverview} />;
 
     const additionalContent = (
       <div>
         <Col md={3}>
-          <SystemOverviewSummary information={this.props.systemOverview}/>
+          <SystemOverviewSummary information={this.props.systemOverview} />
         </Col>
         <Col md={9}>
-          <JvmHeapUsage nodeId={this.props.node.node_id}/>
+          <JvmHeapUsage nodeId={this.props.node.node_id} />
         </Col>
       </div>
     );
@@ -46,7 +46,7 @@ const NodeListItem = React.createClass({
                       titleSuffix={nodeThroughput}
                       description={journalState}
                       actions={actions}
-                      contentRow={additionalContent}/>
+                      contentRow={additionalContent} />
     );
   },
 });

@@ -1,6 +1,6 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
-import {DropdownButton, MenuItem} from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import PageHeader from 'components/common/PageHeader';
@@ -57,7 +57,7 @@ const ExtractorsPage = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     return (
@@ -73,7 +73,7 @@ const ExtractorsPage = React.createClass({
 
             <span>
               Find more information about extractors in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
+              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
             </span>
 
             <DropdownButton bsStyle="info" bsSize="large" id="extractor-actions-dropdown" title="Actions" pullRight>

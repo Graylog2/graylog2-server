@@ -45,10 +45,10 @@ const TableList = React.createClass({
       <div>
         {bulkHeaderActions}
         <Input type="checkbox" label="Select all" checked={this.state.allSelected} onChange={this._toggleSelectAll}
-               groupClassName="form-group-inline"/>
+               groupClassName="form-group-inline" />
       </div>
     );
-    return <ListGroupItem className="list-group-header" header={header}/>;
+    return <ListGroupItem className="list-group-header" header={header} />;
   },
   _toggleSelectAll(event) {
     const newSelected = event.target.checked ? Immutable.Set(this.state.filteredItems.map(item => item[this.props.idKey])) : Immutable.Set();
@@ -65,7 +65,7 @@ const TableList = React.createClass({
                label={item[this.props.titleKey]}
                checked={this.state.selected.includes(item[this.props.idKey])}
                onChange={this._onItemSelect(item[this.props.idKey])}
-               groupClassName="form-group-inline"/>
+               groupClassName="form-group-inline" />
       </div>
     );
     return (
@@ -103,7 +103,7 @@ const TableList = React.createClass({
                                  displayKey="value"
                                  filterSuggestions={[]}
                                  searchInKeys={this.props.filterKeys}
-                                 onDataFiltered={this._filterItems}/>
+                                 onDataFiltered={this._filterItems} />
           </Col>
         </Row>
       );

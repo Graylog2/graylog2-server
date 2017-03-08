@@ -22,9 +22,9 @@ const NodeOrGlobalSelect = React.createClass({
   },
   _onChangeGlobal(evt) {
     const global = evt.target.checked;
-    this.setState({global: global});
+    this.setState({ global: global });
     if (global) {
-      this.setState({node: 'placeholder'});
+      this.setState({ node: 'placeholder' });
       this.props.onChange('node', undefined);
     } else {
       this.props.onChange('node', this.state.node);
@@ -32,7 +32,7 @@ const NodeOrGlobalSelect = React.createClass({
     this.props.onChange('global', global);
   },
   _onChangeNode(evt) {
-    this.setState({node: evt.target.value});
+    this.setState({ node: evt.target.value });
     this.props.onChange('node', evt.target.value);
   },
   render() {
@@ -41,7 +41,7 @@ const NodeOrGlobalSelect = React.createClass({
     }
 
     const options = Object.keys(this.state.nodes)
-      .map(nodeId => {
+      .map((nodeId) => {
         return <option key={nodeId} value={nodeId}>{this.state.nodes[nodeId].short_node_id} / {this.state.nodes[nodeId].hostname}</option>;
       });
 

@@ -25,7 +25,7 @@ const StreamComponent = React.createClass({
   componentDidMount() {
     this.loadData();
     StreamRulesStore.types().then((types) => {
-      this.setState({streamRuleTypes: types});
+      this.setState({ streamRuleTypes: types });
     });
     StreamsStore.onChange(this.loadData);
     StreamRulesStore.onChange(this.loadData);
@@ -58,7 +58,7 @@ const StreamComponent = React.createClass({
   },
 
   _updateFilteredStreams(filteredStreams) {
-    this.setState({filteredStreams: filteredStreams});
+    this.setState({ filteredStreams: filteredStreams });
   },
 
   _isLoading() {
@@ -68,8 +68,8 @@ const StreamComponent = React.createClass({
   render() {
     if (this._isLoading()) {
       return (
-        <div style={{marginLeft: 10}}>
-          <Spinner/>
+        <div style={{ marginLeft: 10 }}>
+          <Spinner />
         </div>
       );
     }
@@ -80,20 +80,20 @@ const StreamComponent = React.createClass({
           <CreateStreamButton bsSize="small" bsStyle="link" className="btn-text"
                               buttonText="Create one now" ref="createStreamButton"
                               indexSets={this.props.indexSets}
-                              onSave={this.props.onStreamSave}/>
+                              onSave={this.props.onStreamSave} />
         </IfPermitted>
       );
 
       return (
         <Alert bsStyle="warning">
-          <i className="fa fa-info-circle"/>&nbsp;No streams configured. {createStreamButton}
+          <i className="fa fa-info-circle" />&nbsp;No streams configured. {createStreamButton}
         </Alert>
       );
     }
 
     const streamsList = this.state.filteredStreams ? (<StreamList streams={this.state.filteredStreams} streamRuleTypes={this.state.streamRuleTypes}
                                                                   permissions={this.props.currentUser.permissions} user={this.props.currentUser}
-                                                                  onStreamSave={this.props.onStreamSave} indexSets={this.props.indexSets} />) : <Spinner/>;
+                                                                  onStreamSave={this.props.onStreamSave} indexSets={this.props.indexSets} />) : <Spinner />;
 
     return (
       <div>
@@ -105,7 +105,7 @@ const StreamComponent = React.createClass({
                                  displayKey={'title'}
                                  filterSuggestions={[]}
                                  searchInKeys={['title', 'description']}
-                                 onDataFiltered={this._updateFilteredStreams}/>
+                                 onDataFiltered={this._updateFilteredStreams} />
           </Col>
         </Row>
         <Row>

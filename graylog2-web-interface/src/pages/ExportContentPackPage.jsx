@@ -52,13 +52,11 @@ const ExportContentPackPage = React.createClass({
     Object.keys(this.refs).forEach((key) => {
       if (key.indexOf('.') === -1) {
         request[key] = this.refs[key].value;
-      } else {
-        if (this.refs[key].checked) {
-          const group = key.split('.')[0];
-          const id = key.split('.')[1];
+      } else if (this.refs[key].checked) {
+        const group = key.split('.')[0];
+        const id = key.split('.')[1];
 
-          request[group].push(id);
-        }
+        request[group].push(id);
       }
     });
     ConfigurationBundlesActions.export.triggerPromise(request)
@@ -190,12 +188,12 @@ const ExportContentPackPage = React.createClass({
                   </Col>
                   <Col sm={10}>
                     {this.isEmpty(this.state.inputs) ?
-                    <span className="help-block help-standalone">There are no inputs to export.</span>
+                      <span className="help-block help-standalone">There are no inputs to export.</span>
                       :
-                    <span>
-                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllInputs}>Select all</Button>
-                      {this.state.inputs.sort((i1, i2) => {return i1.title.localeCompare(i2.title); }).map(this.formatInput)}
-                    </span>
+                      <span>
+                        <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllInputs}>Select all</Button>
+                        {this.state.inputs.sort((i1, i2) => { return i1.title.localeCompare(i2.title); }).map(this.formatInput)}
+                      </span>
                     }
                   </Col>
                 </div>
@@ -206,12 +204,12 @@ const ExportContentPackPage = React.createClass({
                   </Col>
                   <Col sm={10}>
                     {this.isEmpty(this.state.grok_patterns) ?
-                    <span className="help-block help-standalone">There are no grok patterns to export.</span>
+                      <span className="help-block help-standalone">There are no grok patterns to export.</span>
                       :
-                    <span>
-                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllGrokPatterns}>Select all</Button>
-                      {this.state.grok_patterns.sort((g1, g2) => {return g1.name.localeCompare(g2.name);}).map(this.formatGrokPattern)}
-                    </span>
+                      <span>
+                        <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllGrokPatterns}>Select all</Button>
+                        {this.state.grok_patterns.sort((g1, g2) => { return g1.name.localeCompare(g2.name); }).map(this.formatGrokPattern)}
+                      </span>
                       }
                   </Col>
                 </div>
@@ -222,12 +220,12 @@ const ExportContentPackPage = React.createClass({
                   </Col>
                   <Col sm={10}>
                     {this.isEmpty(this.state.outputs) ?
-                    <span className="help-block help-standalone">There are no outputs to export.</span>
+                      <span className="help-block help-standalone">There are no outputs to export.</span>
                       :
-                    <span>
-                      <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllOutputs}>Select all</Button>
-                      {this.state.outputs.sort((o1, o2) => {return o1.title.localeCompare(o2.title);}).map(this.formatOutput)}
-                    </span>
+                      <span>
+                        <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllOutputs}>Select all</Button>
+                        {this.state.outputs.sort((o1, o2) => { return o1.title.localeCompare(o2.title); }).map(this.formatOutput)}
+                      </span>
                     }
                   </Col>
                 </div>
@@ -238,12 +236,12 @@ const ExportContentPackPage = React.createClass({
                   </Col>
                   <Col sm={10}>
                     {this.isEmpty(this.state.streams) ?
-                    <span className="help-block help-standalone">There are no streams to export.</span>
+                      <span className="help-block help-standalone">There are no streams to export.</span>
                       :
-                    <span>
+                      <span>
                         <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllStreams}>Select all</Button>
-                      {this.state.streams.sort((s1, s2) => { return s1.title.localeCompare(s2.title); }).map(this.formatStream)}
-                    </span>
+                        {this.state.streams.sort((s1, s2) => { return s1.title.localeCompare(s2.title); }).map(this.formatStream)}
+                      </span>
                       }
                   </Col>
                 </div>
@@ -254,11 +252,11 @@ const ExportContentPackPage = React.createClass({
                   </Col>
                   <Col sm={10}>
                     {this.isEmpty(this.state.dashboards) ?
-                    <span className="help-block help-standalone">There are no dashboards to export.</span>
+                      <span className="help-block help-standalone">There are no dashboards to export.</span>
                       :
-                    <span>
+                      <span>
                         <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllDashboards}>Select all</Button>
-                        {this.state.dashboards.sort((d1, d2) => {return d1.title.localeCompare(d2.title); }).map(this.formatDashboard)}
+                        {this.state.dashboards.sort((d1, d2) => { return d1.title.localeCompare(d2.title); }).map(this.formatDashboard)}
                       </span>
                       }
                   </Col>

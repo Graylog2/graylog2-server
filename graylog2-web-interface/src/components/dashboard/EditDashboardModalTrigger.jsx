@@ -15,7 +15,7 @@ const EditDashboardModalTrigger = React.createClass({
     return this.props.action === 'create';
   },
   openModal() {
-    this.refs['modal'].open();
+    this.refs.modal.open();
   },
   render() {
     let triggerButtonContent;
@@ -29,10 +29,10 @@ const EditDashboardModalTrigger = React.createClass({
     return (
       <span>
         <button onClick={this.openModal}
-                className={"btn " + this.props.buttonClass}>
+                className={`btn ${this.props.buttonClass}`}>
           {triggerButtonContent}
         </button>
-        <EditDashboardModal ref="modal" {...this.props}/>
+        <EditDashboardModal ref="modal" {...this.props} />
       </span>
     );
   },

@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import dc from 'dc';
 import numeral from 'numeral';
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 
 import SourceTitle from './SourceTitle';
 import D3Utils from 'util/D3Utils';
@@ -52,7 +52,7 @@ const SourcePieChart = React.createClass({
       .colors(D3Utils.glColourPalette())
       .slicesCap(this.props.numberOfTopValues)
       .title((d) => {
-        return d.key + ': ' + numeral(d.value).format('0,0');
+        return `${d.key}: ${numeral(d.value).format('0,0')}`;
       })
       .on('renderlet', (chart) => {
         chart.selectAll('.pie-slice').on('click', () => {

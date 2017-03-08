@@ -26,7 +26,7 @@ const SystemJobsComponent = React.createClass({
       return <Spinner />;
     }
     const jobs = Object.keys(this.state.jobs)
-      .map((nodeId) => this.state.jobs[nodeId] ? this.state.jobs[nodeId].jobs : [])
+      .map(nodeId => this.state.jobs[nodeId] ? this.state.jobs[nodeId].jobs : [])
       .reduce((a, b) => a.concat(b));
     return (
       <Row className="content">

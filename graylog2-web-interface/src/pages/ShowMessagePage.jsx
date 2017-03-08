@@ -30,11 +30,11 @@ const ShowMessagePage = React.createClass({
     };
   },
   componentDidMount() {
-    MessagesActions.loadMessage.triggerPromise(this.props.params.index, this.props.params.messageId).then(message => {
+    MessagesActions.loadMessage.triggerPromise(this.props.params.index, this.props.params.messageId).then((message) => {
       this.setState({ message: message });
       InputsActions.getOptional.triggerPromise(message.source_input_id);
     });
-    StreamsStore.listStreams().then(streams => {
+    StreamsStore.listStreams().then((streams) => {
       const streamsMap = {};
       streams.forEach((stream) => {
         streamsMap[stream.id] = stream;
@@ -59,9 +59,8 @@ const ShowMessagePage = React.createClass({
                        streams={this.state.streams} allStreamsLoaded searchConfig={this.props.searchConfig} />
         </DocumentTitle>
       );
-    } else {
-      return <Spinner />;
     }
+    return <Spinner />;
   },
 });
 

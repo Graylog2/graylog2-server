@@ -1,6 +1,6 @@
-import React, {PropTypes} from 'react';
-import {Row, Col, Input, Button} from 'react-bootstrap';
-import {LinkContainer} from 'react-router-bootstrap';
+import React, { PropTypes } from 'react';
+import { Row, Col, Input, Button } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
@@ -30,17 +30,17 @@ const GrokExtractorConfiguration = React.createClass({
     };
   },
   _onTryClick() {
-    this.setState({trying: true});
+    this.setState({ trying: true });
 
     const promise = ToolsStore.testGrok(this.props.configuration.grok_pattern, this.props.configuration.named_captures_only, this.props.exampleMessage);
-    promise.then(result => {
+    promise.then((result) => {
       if (!result.matched) {
         UserNotification.warning('We were not able to run the grok extraction. Please check your parameters.');
         return;
       }
 
       const matches = [];
-      result.matches.map(match => {
+      result.matches.map((match) => {
         matches.push(<dt key={`${match.name}-name`}>{match.name}</dt>);
         matches.push(<dd key={`${match.name}-value`}><samp>{match.match}</samp></dd>);
       });
@@ -49,7 +49,7 @@ const GrokExtractorConfiguration = React.createClass({
       this.props.onExtractorPreviewLoad(preview);
     });
 
-    promise.finally(() => this.setState({trying: false}));
+    promise.finally(() => this.setState({ trying: false }));
   },
   _isTryButtonDisabled() {
     return this.state.trying || !this.props.configuration.grok_pattern || !this.props.exampleMessage;
@@ -70,7 +70,7 @@ const GrokExtractorConfiguration = React.createClass({
                wrapperClassName="col-md-offset-2 col-md-10"
                defaultChecked={this.props.configuration.named_captures_only}
                onChange={this._onChange('named_captures_only')}
-               help="Only put the explicitly named captures into the message."/>
+               help="Only put the explicitly named captures into the message." />
 
         <Input id="grok_pattern"
                label="Grok pattern"
@@ -82,11 +82,11 @@ const GrokExtractorConfiguration = React.createClass({
               <input type="text" id="grok_pattern" className="form-control"
                      defaultValue={this.props.configuration.grok_pattern}
                      onChange={this._onChange('grok_pattern')}
-                     required/>
+                     required />
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-                {this.state.trying ? <i className="fa fa-spin fa-spinner"/> : 'Try'}
+                {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try'}
               </Button>
             </Col>
           </Row>

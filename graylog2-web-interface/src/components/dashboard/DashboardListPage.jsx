@@ -35,14 +35,14 @@ const DashboardListPage = React.createClass({
       return;
     }
     if (dashboards) {
-      this.setState({dashboards: dashboards, filteredDashboards: dashboards, dashboardsLoaded: true});
+      this.setState({ dashboards: dashboards, filteredDashboards: dashboards, dashboardsLoaded: true });
     } else {
-      this.setState({dashboardsLoaded: false});
+      this.setState({ dashboardsLoaded: false });
     }
   },
   render() {
     const createDashboardButton = this.isPermitted(this.props.permissions, ['dashboards:create']) ?
-      <EditDashboardModalTrigger action="create" buttonClass="btn-success btn-lg"/> : null;
+      <EditDashboardModalTrigger action="create" buttonClass="btn-success btn-lg" /> : null;
 
     const pageHeader = (
       <PageHeader title="Dashboards">
@@ -53,7 +53,7 @@ const DashboardListPage = React.createClass({
 
         <span>
           Take a look at the
-          {' '}<DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="dashboard tutorial"/>{' '}
+          {' '}<DocumentationLink page={DocsHelper.PAGES.DASHBOARDS} text="dashboard tutorial" />{' '}
           for lots of other useful tips.
         </span>
 
@@ -67,7 +67,7 @@ const DashboardListPage = React.createClass({
           {pageHeader}
 
           <Row className="content">
-            <div style={{marginLeft: 10}}><Spinner/></div>
+            <div style={{ marginLeft: 10 }}><Spinner /></div>
           </Row>
         </div>
       );
@@ -81,7 +81,7 @@ const DashboardListPage = React.createClass({
       dashboardList = (
         <DashboardList dashboards={this.state.filteredDashboards}
                        onDashboardAdd={this._onDashboardAdd}
-                       permissions={this.props.permissions}/>
+                       permissions={this.props.permissions} />
       );
     }
 

@@ -17,15 +17,14 @@ const DecoratedSidebarMessageField = React.createClass({
     </span>);
     return (
       <li>
-        <div className="pull-left">
-        </div>
+        <div className="pull-left" />
         <div className="field-selector">
           <Input type="checkbox"
                  label={label}
                  groupClassName={DecoratorStyles.decoratorFieldWrapper}
                  checked={this.props.selected}
-                 onChange={() => this.props.onToggled(this.props.field.name)}/>
-          <DecoratedMessageFieldMarker className={DecoratorStyles.decoratorMarkerSidebar}/>
+                 onChange={() => this.props.onToggled(this.props.field.name)} />
+          <DecoratedMessageFieldMarker className={DecoratorStyles.decoratorMarkerSidebar} />
         </div>
       </li>
     );

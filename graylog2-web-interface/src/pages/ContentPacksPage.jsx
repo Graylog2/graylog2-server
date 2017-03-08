@@ -32,14 +32,14 @@ const ContentPacksPage = React.createClass({
 
               <h2>Select content packs</h2>
               <div id="react-configuration-bundles">
-                <ConfigurationBundles/>
+                <ConfigurationBundles />
               </div>
             </Col>
           </Row>
         </span>
       </DocumentTitle>
     );
-  }
+  },
 });
 
 export default ContentPacksPage;

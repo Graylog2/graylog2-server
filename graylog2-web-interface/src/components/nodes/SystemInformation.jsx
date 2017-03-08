@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import moment from 'moment';
 
 import { Timestamp } from 'components/common';
@@ -12,7 +12,7 @@ const SystemInformation = React.createClass({
     jvmInformation: PropTypes.object,
   },
   getInitialState() {
-    return {time: moment()};
+    return { time: moment() };
   },
   componentDidMount() {
     this.interval = setInterval(() => this.setState(this.getInitialState()), 1000);
@@ -26,7 +26,7 @@ const SystemInformation = React.createClass({
     if (this.props.jvmInformation) {
       jvmInformation = <span>PID {this.props.jvmInformation.pid}, {this.props.jvmInformation.info}</span>;
     } else {
-      jvmInformation = <span>JMV information for this node is unavailable.</span>
+      jvmInformation = <span>JMV information for this node is unavailable.</span>;
     }
 
     return (
@@ -40,7 +40,7 @@ const SystemInformation = React.createClass({
         <dt>JVM:</dt>
         <dd>{jvmInformation}</dd>
         <dt>Time:</dt>
-        <dd><Timestamp dateTime={this.state.time} format={DateTime.Formats.DATETIME_TZ} tz={systemInformation.timezone}/></dd>
+        <dd><Timestamp dateTime={this.state.time} format={DateTime.Formats.DATETIME_TZ} tz={systemInformation.timezone} /></dd>
       </dl>
     );
   },

@@ -9,7 +9,7 @@ import { SystemMessagesList } from 'components/systemmessages';
 
 const SystemMessagesComponent = React.createClass({
   getInitialState() {
-    return {currentPage: 1};
+    return { currentPage: 1 };
   },
   componentDidMount() {
     this.loadMessages(this.state.currentPage);
@@ -27,7 +27,7 @@ const SystemMessagesComponent = React.createClass({
   _onSelected(event, selectedEvent) {
     const page = selectedEvent.eventKey;
 
-    this.setState({currentPage: page});
+    this.setState({ currentPage: page });
     this.loadMessages(page);
   },
   render() {
@@ -38,14 +38,14 @@ const SystemMessagesComponent = React.createClass({
 
       content = (
         <div>
-          <SystemMessagesList messages={this.state.messages}/>
+          <SystemMessagesList messages={this.state.messages} />
 
-          <nav style={{textAlign: 'center'}}>
+          <nav style={{ textAlign: 'center' }}>
             <Pagination bsSize="small" items={numberPages}
                         activePage={this.state.currentPage}
                         onSelect={this._onSelected}
                         prev next first last
-                        maxButtons={Math.min(paginatorSize, numberPages)}/>
+                        maxButtons={Math.min(paginatorSize, numberPages)} />
           </nav>
         </div>
       );

@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import { Input } from 'react-bootstrap';
 import { substringMatcher } from 'logic/search/UniversalSearch';
@@ -77,7 +77,7 @@ const TypeAheadInput = React.createClass({
     return (<Input type="text" ref="fieldInput"
                    wrapperClassName="typeahead-wrapper"
                    label={this.props.label}
-                   onKeyPress={this.props.onKeyPress}/>);
+                   onKeyPress={this.props.onKeyPress} />);
   },
 });
 

@@ -17,7 +17,7 @@ const LoadingIndicator = React.createClass({
   },
 
   render() {
-    return <Alert bsStyle="info" className={loadingIndicatorStyle.loadingIndicator}><Spinner text={this.props.text}/></Alert>;
+    return <Alert bsStyle="info" className={loadingIndicatorStyle.loadingIndicator}><Spinner text={this.props.text} /></Alert>;
   },
 });
 

@@ -54,10 +54,10 @@ const MessageProcessorsConfig = React.createClass({
     const update = ObjectUtils.clone(this.state.config);
 
     update.processor_order = newSorting.map((item) => {
-      return {class_name: item.id, name: item.title};
+      return { class_name: item.id, name: item.title };
     });
 
-    this.setState({config: update});
+    this.setState({ config: update });
   },
 
   _toggleStatus(className) {
@@ -67,14 +67,12 @@ const MessageProcessorsConfig = React.createClass({
       const checked = this.refs[className].checked;
 
       if (checked) {
-        update.disabled_processors = disabledProcessors.filter((p) => p !== className);
-      } else {
-        if (disabledProcessors.indexOf(className) === -1) {
-          update.disabled_processors.push(className);
-        }
+        update.disabled_processors = disabledProcessors.filter(p => p !== className);
+      } else if (disabledProcessors.indexOf(className) === -1) {
+        update.disabled_processors.push(className);
       }
 
-      this.setState({config: update});
+      this.setState({ config: update });
     };
   },
 
@@ -94,7 +92,7 @@ const MessageProcessorsConfig = React.createClass({
 
   _summary() {
     return this.state.config.processor_order.map((processor, idx) => {
-      const status = this.state.config.disabled_processors.filter((p) => p === processor.class_name).length > 0 ? 'disabled' : 'active';
+      const status = this.state.config.disabled_processors.filter(p => p === processor.class_name).length > 0 ? 'disabled' : 'active';
       return (
         <tr key={idx}>
           <td>{idx + 1}</td>
@@ -107,13 +105,13 @@ const MessageProcessorsConfig = React.createClass({
 
   _sortableItems() {
     return this.state.config.processor_order.map((processor) => {
-      return {id: processor.class_name, title: processor.name};
+      return { id: processor.class_name, title: processor.name };
     });
   },
 
   _statusForm() {
     return ObjectUtils.clone(this.state.config.processor_order).sort((a, b) => naturalSort(a.name, b.name)).map((processor, idx) => {
-      const enabled = this.state.config.disabled_processors.filter((p) => p === processor.class_name).length < 1;
+      const enabled = this.state.config.disabled_processors.filter(p => p === processor.class_name).length < 1;
 
       return (
         <tr key={idx}>
@@ -159,7 +157,7 @@ const MessageProcessorsConfig = React.createClass({
                             submitButtonText="Save">
           <h3>Order</h3>
           <p>Use drag and drop to change the execution order of the message processors.</p>
-          <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting}/>
+          <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} />
 
           <h3>Status</h3>
           <p>Change the checkboxes to change the status of a message processor.</p>

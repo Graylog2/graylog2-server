@@ -59,7 +59,7 @@ const StreamRuleForm = React.createClass({
     const fieldBox = (String(this.state.type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
       <TypeAheadFieldInput ref="fieldInput" type="text" required label="Field" valueLink={this.linkState('field')} autoFocus /> : '');
     const valueBox = (String(this.state.type) !== String(this.FIELD_PRESENCE_RULE_TYPE) && String(this.state.type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
-      <Input type="text" required label="Value" valueLink={this.linkState('value')}/> : '');
+      <Input type="text" required label="Value" valueLink={this.linkState('value')} /> : '');
     return (
       <BootstrapModalForm ref="modal"
                           title={this.props.title}
@@ -72,14 +72,14 @@ const StreamRuleForm = React.createClass({
               {streamRuleTypes}
             </Input>
             {valueBox}
-            <Input type="checkbox" label="Inverted" checkedLink={this.linkState('inverted')}/>
+            <Input type="checkbox" label="Inverted" checkedLink={this.linkState('inverted')} />
 
             <Input type="textarea" label="Description (optional)" valueLink={this.linkState('description')} />
 
             <p>
               <strong>Result:</strong>
               {' '}
-              <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={this.props.streamRuleTypes}/>
+              <HumanReadableStreamRule streamRule={this.state} streamRuleTypes={this.props.streamRuleTypes} />
             </p>
           </Col>
           <Col md={4}>
@@ -88,14 +88,14 @@ const StreamRuleForm = React.createClass({
               can.
 
               <br /><br />
-              <i className="fa fa-github"/>
+              <i className="fa fa-github" />
               <a href={`https://github.com/Graylog2/graylog2-server/tree/${Version.getMajorAndMinorVersion()}/graylog2-server/src/main/java/org/graylog2/streams/matchers`}
                  target="_blank"> Take a look at the matcher code on GitHub
               </a>
               <br /><br />
               Regular expressions use Java syntax. <DocumentationLink page={DocsHelper.PAGES.STREAMS}
                                                                       title="More information"
-                                                                      text={<i className="fa fa-lightbulb-o"/>}/>
+                                                                      text={<i className="fa fa-lightbulb-o" />} />
             </div>
           </Col>
         </div>

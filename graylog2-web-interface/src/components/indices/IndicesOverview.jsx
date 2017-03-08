@@ -25,7 +25,7 @@ const IndicesOverview = React.createClass({
                             indexName={indexName}
                             indexRange={indexRange}
                             indexSetId={this.props.indexSetId}
-                            isDeflector={indexSummary.is_deflector}/>
+                            isDeflector={indexSummary.is_deflector} />
             </span>
           </IndexSummary>
         </Col>

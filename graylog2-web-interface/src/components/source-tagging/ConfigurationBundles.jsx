@@ -40,7 +40,7 @@ const ConfigurationBundles = React.createClass({
           <SourceType id={bundle.id}
                       name={bundle.name}
                       description={bundle.description}
-                      onSelect={this.handleSourceTypeChange}/>
+                      onSelect={this.handleSourceTypeChange} />
         </li>
       );
     }, this);
@@ -91,7 +91,7 @@ const ConfigurationBundles = React.createClass({
     reader.readAsText(this.refs.uploadedFile.files[0]);
   },
   handleSourceTypeChange(sourceTypeId, sourceTypeDescription) {
-    this.setState({sourceTypeId: sourceTypeId, sourceTypeDescription: sourceTypeDescription});
+    this.setState({ sourceTypeId: sourceTypeId, sourceTypeDescription: sourceTypeDescription });
   },
   _resetSelection() {
     this.setState(this.getInitialState());
@@ -101,20 +101,20 @@ const ConfigurationBundles = React.createClass({
       <Row className="configuration-bundles">
         <Col md={6}>
           {this.state.configurationBundles ?
-          <Accordion>
-            {this._getCategoriesHtml()}
-            <Panel header="Import content pack" eventKey={-1}>
-              <form onSubmit={this.onSubmit} className="upload" encType="multipart/form-data">
-                <span className="help-block">Remember to apply the content pack after uploading it, to make the changes effective.</span>
-                <div className="form-group">
-                  <input ref="uploadedFile" type="file" name="bundle"/>
-                </div>
-                <button type="submit" className="btn btn-success">Upload</button>
-              </form>
-            </Panel>
-          </Accordion>
+            <Accordion>
+              {this._getCategoriesHtml()}
+              <Panel header="Import content pack" eventKey={-1}>
+                <form onSubmit={this.onSubmit} className="upload" encType="multipart/form-data">
+                  <span className="help-block">Remember to apply the content pack after uploading it, to make the changes effective.</span>
+                  <div className="form-group">
+                    <input ref="uploadedFile" type="file" name="bundle" />
+                  </div>
+                  <button type="submit" className="btn btn-success">Upload</button>
+                </form>
+              </Panel>
+            </Accordion>
             :
-          <Spinner />
+            <Spinner />
             }
         </Col>
         <Col md={6}>

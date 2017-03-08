@@ -9,7 +9,7 @@ import Reflux from 'reflux';
 import { AppContainer } from 'react-hot-loader';
 
 Promise.config({ cancellation: true });
-Reflux.setPromiseFactory((handlers) => new Promise(handlers));
+Reflux.setPromiseFactory(handlers => new Promise(handlers));
 
 function renderAppContainer(appContainer) {
   // eslint-disable-next-line global-require
@@ -18,7 +18,7 @@ function renderAppContainer(appContainer) {
     <AppContainer>
       <AppFacade />
     </AppContainer>,
-    appContainer
+    appContainer,
   );
 }
 

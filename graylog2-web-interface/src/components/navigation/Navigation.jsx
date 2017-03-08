@@ -47,39 +47,39 @@ const Navigation = React.createClass({
     const prefix = 'System';
 
     if (this._isActive('/system/overview')) {
-      return prefix + ' / Overview';
+      return `${prefix} / Overview`;
     }
     if (this._isActive('/system/nodes')) {
-      return prefix + ' / Nodes';
+      return `${prefix} / Nodes`;
     }
     if (this._isActive('/system/inputs')) {
-      return prefix + ' / Inputs';
+      return `${prefix} / Inputs`;
     }
     if (this._isActive('/system/outputs')) {
-      return prefix + ' / Outputs';
+      return `${prefix} / Outputs`;
     }
     if (this._isActive('/system/indices')) {
-      return prefix + ' / Indices';
+      return `${prefix} / Indices`;
     }
     if (this._isActive('/system/logging')) {
-      return prefix + ' / Logging';
+      return `${prefix} / Logging`;
     }
     if (this._isActive('/system/authentication')) {
-      return prefix + ' / Authentication';
+      return `${prefix} / Authentication`;
     }
     if (this._isActive('/system/contentpacks')) {
-      return prefix + ' / Content Packs';
+      return `${prefix} / Content Packs`;
     }
     if (this._isActive('/system/grokpatterns')) {
-      return prefix + ' / Grok Patterns';
+      return `${prefix} / Grok Patterns`;
     }
     if (this._isActive('/system/configurations')) {
-      return prefix + ' / Configurations';
+      return `${prefix} / Configurations`;
     }
 
     const pluginRoute = PluginStore.exports('systemnavigation').filter(route => this._isActive(route.path))[0];
     if (pluginRoute) {
-      return prefix + ' / ' + pluginRoute.description;
+      return `${prefix} / ${pluginRoute.description}`;
     }
 
     return prefix;
@@ -93,7 +93,7 @@ const Navigation = React.createClass({
     const logoUrl = require('images/toplogo.png');
     const brand = (
       <LinkContainer to={Routes.STARTPAGE}>
-        <a><img src={logoUrl}/></a>
+        <a><img src={logoUrl} /></a>
       </LinkContainer>);
 
     let notificationBadge;
@@ -120,9 +120,8 @@ const Navigation = React.createClass({
               <NavItem>{pluginRoute.description}</NavItem>
             </LinkContainer>
           );
-        } else {
-          return null;
         }
+        return null;
       });
 
     const pluginSystemNavigations = PluginStore.exports('systemnavigation')
@@ -134,9 +133,8 @@ const Navigation = React.createClass({
               <MenuItem>{pluginRoute.description}</MenuItem>
             </LinkContainer>
           );
-        } else {
-          return null;
         }
+        return null;
       });
 
     return (
@@ -241,11 +239,11 @@ const Navigation = React.createClass({
                 </a>
               </LinkContainer>
             </li>
-            <HelpMenu active={this._isActive(Routes.GETTING_STARTED)}/>
-            <UserMenu fullName={this.props.fullName} loginName={this.props.loginName}/>
+            <HelpMenu active={this._isActive(Routes.GETTING_STARTED)} />
+            <UserMenu fullName={this.props.fullName} loginName={this.props.loginName} />
             {AppConfig.gl2DevMode() ?
               <NavItem className="notification-badge-link">
-              <span className="badge" style={{backgroundColor: '#ff3b00'}}>DEV</span>
+                <span className="badge" style={{ backgroundColor: '#ff3b00' }}>DEV</span>
               </NavItem>
               : null}
           </Nav>
