@@ -171,6 +171,5 @@ if (TARGET === 'test') {
 }
 
 if (Object.keys(module.exports).length === 0) {
-  console.error('Running in default mode');
   module.exports = webpackConfig;
 }
