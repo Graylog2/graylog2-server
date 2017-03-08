@@ -1,7 +1,8 @@
 import React from 'react';
 import Immutable from 'immutable';
-import { Col, Input, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
+import { Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import { TypeAheadDataFilter } from 'components/common';
 
 const TableList = React.createClass({

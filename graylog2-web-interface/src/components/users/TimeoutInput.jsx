@@ -1,6 +1,7 @@
 import React from 'react';
-import { Input, Row, Col } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 
 const TimeoutInput = React.createClass({

@@ -1,8 +1,9 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Input, Button, FormGroup, Alert } from 'react-bootstrap';
+import { Row, Button, FormGroup, Alert } from 'react-bootstrap';
 import { DocumentTitle } from 'components/common';
 
+import { Input } from 'components/bootstrap';
 import LoadingPage from './LoadingPage';
 
 import StoreProvider from 'injection/StoreProvider';

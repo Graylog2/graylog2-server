@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
-import { Input } from 'react-bootstrap';
 
-import { BootstrapModalForm } from 'components/bootstrap';
+import { BootstrapModalForm, Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
 const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');

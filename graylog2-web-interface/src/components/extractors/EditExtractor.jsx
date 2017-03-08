@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Input, Button, FormControls } from 'react-bootstrap';
+import { Row, Col, Button, FormControls } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import ExtractorExampleMessage from './ExtractorExampleMessage';
 import EditExtractorConfiguration from './EditExtractorConfiguration';
 import EditExtractorConverters from './EditExtractorConverters';

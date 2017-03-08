@@ -1,7 +1,8 @@
 import React from 'react';
 
-import { Input, Panel } from 'react-bootstrap';
+import { Panel } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
+import { Input } from 'components/bootstrap';
 
 const SidebarMessageField = React.createClass({
   propTypes: {

@@ -1,5 +1,6 @@
 import React from 'react';
-import { Input, Pagination } from 'react-bootstrap';
+import { Pagination } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 
 const PaginatedList = React.createClass({
   propTypes: {

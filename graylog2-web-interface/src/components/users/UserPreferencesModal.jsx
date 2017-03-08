@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
 const PreferencesStore = StoreProvider.getStore('Preferences');

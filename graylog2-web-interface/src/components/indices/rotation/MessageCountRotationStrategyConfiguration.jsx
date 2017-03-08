@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 
 const MessageCountRotationStrategyConfiguration = React.createClass({
   propTypes: {

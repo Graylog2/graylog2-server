@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 
 import { DecoratedSidebarMessageField, SidebarMessageField } from 'components/search';
 

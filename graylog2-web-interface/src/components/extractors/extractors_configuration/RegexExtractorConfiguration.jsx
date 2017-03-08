@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Input, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 

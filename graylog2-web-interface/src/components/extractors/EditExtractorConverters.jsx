@@ -1,5 +1,6 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Input, Button, Panel } from 'react-bootstrap';
+import { Row, Col, Button, Panel } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 
 import {

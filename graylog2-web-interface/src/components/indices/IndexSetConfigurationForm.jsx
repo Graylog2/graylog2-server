@@ -1,7 +1,8 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, Col, Input, Row } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';

@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 
 import { QueryConfiguration } from 'components/widgets/configurations';
 import StoreProvider from 'injection/StoreProvider';

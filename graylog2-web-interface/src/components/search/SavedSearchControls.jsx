@@ -1,8 +1,8 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Button, DropdownButton, MenuItem, Input } from 'react-bootstrap';
+import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import { BootstrapModalForm, Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
 const SavedSearchesStore = StoreProvider.getStore('SavedSearches');

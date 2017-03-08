@@ -1,7 +1,8 @@
 import React from 'react';
 import Immutable from 'immutable';
-import { Alert, Button, Col, FormControls, Input, Row } from 'react-bootstrap';
+import { Alert, Button, Col, FormControls, Row } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import PermissionSelector from 'components/users/PermissionSelector';
 import PermissionsMixin from 'util/PermissionsMixin';
 

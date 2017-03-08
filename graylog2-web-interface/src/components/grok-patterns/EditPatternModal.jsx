@@ -1,7 +1,5 @@
 import React from 'react';
-import { Input } from 'react-bootstrap';
-
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import { BootstrapModalForm, Input } from 'components/bootstrap';
 
 const EditPatternModal = React.createClass({
   propTypes: {

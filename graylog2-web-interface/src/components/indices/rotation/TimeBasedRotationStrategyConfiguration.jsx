@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 import moment from 'moment';
 
 const TimeBasedRotationStrategyConfiguration = React.createClass({

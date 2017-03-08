@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
 const NodesStore = StoreProvider.getStore('Nodes');

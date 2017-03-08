@@ -1,10 +1,11 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Col, Input, Button, Panel } from 'react-bootstrap';
+import { Row, Col, Button, Panel } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import URI from 'urijs';
 import naturalSort from 'javascript-natural-sort';
 
+import { Input } from 'components/bootstrap';
 import { MultiSelect, Spinner } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 import Routes from 'routing/Routes';
