@@ -15,18 +15,20 @@ import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
 import Routes from 'routing/Routes';
 
-import { DocumentTitle, GridsterContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
+import { DocumentTitle, ReactGridContainer, PageHeader, Spinner, IfPermitted } from 'components/common';
 import PermissionsMixin from 'util/PermissionsMixin';
 import DocumentationLink from 'components/support/DocumentationLink';
 import EditDashboardModalTrigger from 'components/dashboard/EditDashboardModalTrigger';
 import Widget from 'components/widgets/Widget';
 
+import style from './ShowDashboardPage.css';
+
 const ShowDashboardPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
   propTypes: {
     history: React.PropTypes.object.isRequired,
     params: React.PropTypes.object.isRequired,
   },
+  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
 
   getInitialState() {
     return {
@@ -40,7 +42,8 @@ const ShowDashboardPage = React.createClass({
     this.listenTo(WidgetsStore, this.removeWidget);
     // we use the stream ids to potentially disable search replay buttons for deleted streams
     StreamsStore.load((streams) => {
-      let streamIds2 = streams.reduce((streamIds, stream) => {
+      const streamIds2 = streams.reduce((streamIds, stream) => {
+        // eslint-disable-next-line no-param-reassign
         streamIds[stream.id] = stream.id;
         return streamIds;
       }, {});
@@ -143,17 +146,19 @@ const ShowDashboardPage = React.createClass({
       return position1.col - position2.col;
     }).map((widget) => {
       return (
-        <Widget id={widget.id} key={`widget-${widget.id}`} widget={widget} dashboardId={dashboard.id}
-                locked={this.state.locked} shouldUpdate={this.shouldUpdate()} streamIds={this.state.streamIds}/>
+        <div key={widget.id} className={style.widgetContainer}>
+          <Widget id={widget.id} key={`widget-${widget.id}`} widget={widget} dashboardId={dashboard.id}
+                  locked={this.state.locked} shouldUpdate={this.shouldUpdate()} streamIds={this.state.streamIds}/>
+        </div>
       );
     });
 
     return (
       <Row>
         <div className="dashboard">
-          <GridsterContainer ref="gridsterContainer" positions={positions} onPositionsChange={this._onPositionsChange}>
+          <ReactGridContainer positions={positions} onPositionsChange={this._onPositionsChange} locked={this.state.locked}>
             {widgets}
-          </GridsterContainer>
+          </ReactGridContainer>
         </div>
       </Row>
     );
@@ -165,14 +170,7 @@ const ShowDashboardPage = React.createClass({
     }
   },
   _toggleUnlock() {
-    const locked = !this.state.locked;
-    this.setState({ locked: locked });
-
-    if (locked) {
-      this.refs.gridsterContainer.lockGrid();
-    } else {
-      this.refs.gridsterContainer.unlockGrid();
-    }
+    this.setState({ locked: !this.state.locked });
   },
   _onPositionsChange(newPositions) {
     DashboardsStore.updatePositions(this.state.dashboard, newPositions);
@@ -243,7 +241,7 @@ const ShowDashboardPage = React.createClass({
       </span>
     );
     return (
-      <DocumentTitle title={`Rules of Stream ${dashboard.title}`}>
+      <DocumentTitle title={`Dashboard ${dashboard.title}`}>
         <span>
           <PageHeader title={dashboardTitle}>
             <span data-dashboard-id={dashboard.id} className="dashboard-description">{dashboard.description}</span>
