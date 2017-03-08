@@ -297,7 +297,7 @@ const SourceOverview = React.createClass({
     if (keepChangeInHistory) {
       window.location.hash = `#${effectiveRange}`;
     } else {
-      window.location.replace(`#${effectiveRange}`);
+      window.location.replace(`sources#${effectiveRange}`);
     }
     this.setState({ range: effectiveRange, histogramDataAvailable: true, loading: true }, () => this.loadData());
   },
