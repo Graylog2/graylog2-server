@@ -2,10 +2,10 @@
   "parser": "babel-eslint",
   "ecmaFeatures": {
     "classes": true,
-    "jsx": true,
+    "jsx": true
   },
   "extends": [
-    "graylog",
+    "graylog"
   ],
   "settings": {
     "import/resolver": {
@@ -15,7 +15,7 @@
     }
   },
   "rules": {
-    "import/no-extraneous-dependencies": 0,
+    "import/no-extraneous-dependencies": 0
   },
   "env": {
     "browser": true
