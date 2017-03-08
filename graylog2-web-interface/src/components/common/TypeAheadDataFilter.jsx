@@ -1,5 +1,5 @@
 import React from 'react';
-import { ButtonInput } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import { TypeAheadInput } from 'components/common';
@@ -118,9 +118,11 @@ const TypeAheadDataFilter = React.createClass({
                           suggestions={suggestions}
                           label={this.props.label}
                           displayKey={this.props.displayKey} />
-          <ButtonInput type="submit" value="Filter" style={{ marginLeft: 5 }} />
-          <ButtonInput type="button" value="Reset" style={{ marginLeft: 5 }} onClick={this._resetFilters}
-                       disabled={this.state.filters.count() === 0 && this.state.filterText === ''} />
+          <Button type="submit" style={{ marginLeft: 5 }}>Filter</Button>
+          <Button type="button" style={{ marginLeft: 5 }} onClick={this._resetFilters}
+                  disabled={this.state.filters.count() === 0 && this.state.filterText === ''}>
+            Reset
+          </Button>
         </form>
         <ul className="pill-list">
           {filters}

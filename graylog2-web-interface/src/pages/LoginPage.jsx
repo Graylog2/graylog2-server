@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Row, Input, ButtonInput, Alert } from 'react-bootstrap';
+import { Row, Input, Button, FormGroup, Alert } from 'react-bootstrap';
 import { DocumentTitle } from 'components/common';
 
 import LoadingPage from './LoadingPage';
@@ -90,9 +90,11 @@ const LoginPage = React.createClass({
 
                 <Input ref="password" type="password" placeholder="Password" />
 
-                <ButtonInput type="submit" bsStyle="info" disabled={this.state.loading}>
-                  {this.state.loading ? 'Signing in...' : 'Sign in'}
-                </ButtonInput>
+                <FormGroup>
+                  <Button type="submit" bsStyle="info" disabled={this.state.loading}>
+                    {this.state.loading ? 'Signing in...' : 'Sign in'}
+                  </Button>
+                </FormGroup>
 
               </form>
             </Row>
