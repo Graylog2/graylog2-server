@@ -23,7 +23,7 @@ const UserMenu = React.createClass({
   },
   render() {
     return (
-      <NavDropdown navItem title={this.props.fullName} id="user-menu-dropdown">
+      <NavDropdown title={this.props.fullName} id="user-menu-dropdown">
         <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(this.props.loginName))}>
           <MenuItem>Edit profile</MenuItem>
         </LinkContainer>
