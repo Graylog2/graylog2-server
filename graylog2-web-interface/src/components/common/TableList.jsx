@@ -98,7 +98,7 @@ const TableList = React.createClass({
     if (this.props.filterKeys.length !== 0) {
       filter = (
         <Row>
-          <Col md={4}>
+          <Col md={5}>
             <TypeAheadDataFilter label={this.props.filterLabel}
                                  data={this.props.items}
                                  displayKey="value"
