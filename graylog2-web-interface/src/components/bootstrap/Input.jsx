@@ -23,7 +23,10 @@ const Input = React.createClass({
       React.PropTypes.element,
       React.PropTypes.string,
     ]),
-    value: React.PropTypes.string,
+    value: React.PropTypes.oneOfType([
+      React.PropTypes.string,
+      React.PropTypes.number,
+    ]),
     multiple: React.PropTypes.bool,
     placeholder: React.PropTypes.string,
     help: React.PropTypes.oneOfType([
