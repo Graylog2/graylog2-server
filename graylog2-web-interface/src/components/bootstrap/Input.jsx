@@ -61,7 +61,7 @@ const Input = React.createClass({
   },
 
   getInputDOMNode() {
-    return ReactDOM.findDOMNode(this.input);
+    return this.input;
   },
 
   getValue() {
@@ -84,7 +84,7 @@ const Input = React.createClass({
 
   _renderFormControl(componentClass, props, children) {
     return (
-      <FormControl ref={(ref) => { this.input = ref; }} componentClass={componentClass} {...props}>
+      <FormControl inputRef={(ref) => { this.input = ref; }} componentClass={componentClass} {...props}>
         {children}
       </FormControl>
     );
@@ -106,7 +106,7 @@ const Input = React.createClass({
     return (
       <FormGroup controlId={id} validationState={validationState}>
         <InputWrapper className={wrapperClassName}>
-          <Checkbox ref={(ref) => { this.input = ref; }} {...props}>{label}</Checkbox>
+          <Checkbox inputRef={(ref) => { this.input = ref; }} {...props}>{label}</Checkbox>
           {help && <HelpBlock>{help}</HelpBlock>}
         </InputWrapper>
       </FormGroup>
@@ -117,7 +117,7 @@ const Input = React.createClass({
     return (
       <FormGroup controlId={id} validationState={validationState}>
         <InputWrapper className={wrapperClassName}>
-          <Radio ref={(ref) => { this.input = ref; }} {...props}>{label}</Radio>
+          <Radio inputRef={(ref) => { this.input = ref; }} {...props}>{label}</Radio>
           {help && <HelpBlock>{help}</HelpBlock>}
         </InputWrapper>
       </FormGroup>
