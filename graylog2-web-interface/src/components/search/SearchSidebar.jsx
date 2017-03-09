@@ -245,7 +245,7 @@ const SearchSidebar = React.createClass({
 
             <hr />
           </div>
-          <Tabs animation={false}>
+          <Tabs id="searchSidebarTabs" animation={false}>
             <Tab eventKey={1} title={<h4>Fields</h4>}>
               <FieldAnalyzersSidebar fields={this.props.fields}
                                      fieldAnalyzers={this.props.fieldAnalyzers}

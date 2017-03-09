@@ -58,7 +58,7 @@ const PermissionSelector = React.createClass({
 
     return (
       <div>
-        <Tabs defaultActiveKey={1} animation={false}>
+        <Tabs id="permissionSelectorTabs" defaultActiveKey={1} animation={false}>
           <Tab eventKey={1} title="Streams">
             <div style={{ marginTop: 10 }}>
               <TableList

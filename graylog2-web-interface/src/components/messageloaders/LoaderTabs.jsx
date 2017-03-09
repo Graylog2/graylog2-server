@@ -165,7 +165,7 @@ const LoaderTabs = React.createClass({
 
     return (
       <div>
-        <Tabs activeKey={this._getActiveTab()} onSelect={this._changeActiveTab} animation={false}>
+        <Tabs id="loaderTabs" activeKey={this._getActiveTab()} onSelect={this._changeActiveTab} animation={false}>
           {this._formatMessageLoaders()}
         </Tabs>
         {displayMessage}
