@@ -123,15 +123,22 @@ const SearchSidebar = React.createClass({
   },
 
   _closeModal(ref) {
-    return () => this.refs[ref].close();
+    return () => ref.close();
   },
 
   _openModal(ref) {
-    return (_, event) => {
-      if (event) {
-        event.preventDefault();
-      }
-      this.refs[ref].open();
+    return (...args) => {
+      // Prevent event propagation that may come as first or second argument, as handlers for `onClick` and `onSelect`
+      // have different signatures.
+      [args[0], args[1]].some((argument) => {
+        if (argument && argument.preventDefault) {
+          argument.preventDefault();
+          return true;
+        }
+        return false;
+      });
+
+      ref.open();
     };
   },
 
@@ -141,7 +148,7 @@ const SearchSidebar = React.createClass({
       'Please click the download link below. Your browser may ask for your username and password to ' +
       'download the CSV file.');
     return (
-      <BootstrapModalWrapper ref="exportModal">
+      <BootstrapModalWrapper ref={(ref) => { this.exportModal = ref; }}>
         <Modal.Header closeButton>
           <Modal.Title>Export search results as CSV</Modal.Title>
         </Modal.Header>
@@ -155,7 +162,7 @@ const SearchSidebar = React.createClass({
           </p>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this._closeModal('exportModal')}>Close</Button>
+          <Button onClick={this._closeModal(this.exportModal)}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
@@ -167,7 +174,7 @@ const SearchSidebar = React.createClass({
       .map(index => <li key={index.index_name}> {index.index_name}</li>);
 
     const indicesModal = (
-      <BootstrapModalWrapper ref="indicesModal">
+      <BootstrapModalWrapper ref={(ref) => { this.indicesModal = ref; }}>
         <Modal.Header closeButton>
           <Modal.Title>Used indices</Modal.Title>
         </Modal.Header>
@@ -182,14 +189,14 @@ const SearchSidebar = React.createClass({
           </ul>
         </Modal.Body>
         <Modal.Footer>
-          <Button onClick={this._closeModal('indicesModal')}>Close</Button>
+          <Button onClick={this._closeModal(this.indicesModal)}>Close</Button>
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
 
     let searchTitle = null;
     const moreActions = [
-      <MenuItem key="export" onSelect={this._openModal('exportModal')}>Export as CSV</MenuItem>,
+      <MenuItem key="export" onSelect={this._openModal(this.exportModal)}>Export as CSV</MenuItem>,
     ];
     if (this.props.searchInStream) {
       searchTitle = <span>{this.props.searchInStream.title}</span>;
@@ -200,7 +207,7 @@ const SearchSidebar = React.createClass({
 
     // always add the debug query link as last elem
     moreActions.push(<MenuItem divider key="div2" />);
-    moreActions.push(<MenuItem key="showQuery" onSelect={this._openModal('showQueryModal')}>Show query</MenuItem>);
+    moreActions.push(<MenuItem key="showQuery" onSelect={this._openModal(this.showQueryModal)}>Show query</MenuItem>);
 
     return (
       <AutoAffix affixClassName="affix">
@@ -213,7 +220,7 @@ const SearchSidebar = React.createClass({
             <p style={{ marginTop: 3 }}>
               Found <strong>{numeral(this.props.result.total_results).format('0,0')} messages</strong>{' '}
               in {numeral(this.props.result.time).format('0,0')} ms, searched in&nbsp;
-              <a href="#" onClick={this._openModal('indicesModal')}>
+              <a href="#" onClick={this._openModal(this.indicesModal)}>
                 {this.props.result.used_indices.length}&nbsp;{this.props.result.used_indices.length === 1 ? 'index' : 'indices'}
               </a>.
               {indicesModal}
@@ -230,7 +237,7 @@ const SearchSidebar = React.createClass({
                 <DropdownButton bsSize="small" title="More actions" id="search-more-actions-dropdown">
                   {moreActions}
                 </DropdownButton>
-                <ShowQueryModal key="debugQuery" ref="showQueryModal" builtQuery={this.props.builtQuery} />
+                <ShowQueryModal key="debugQuery" ref={(ref) => { this.showQueryModal = ref; }} builtQuery={this.props.builtQuery} />
               </div>
             </div>
 
