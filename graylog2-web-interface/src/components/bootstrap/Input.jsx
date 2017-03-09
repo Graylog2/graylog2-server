@@ -78,6 +78,10 @@ const Input = React.createClass({
     }
   },
 
+  getChecked() {
+    return this.getInputDOMNode().checked;
+  },
+
   _renderFormControl(componentClass, props, children) {
     return (
       <FormControl ref={(ref) => { this.input = ref; }} componentClass={componentClass} {...props}>
