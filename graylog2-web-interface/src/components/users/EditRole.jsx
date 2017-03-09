@@ -1,6 +1,6 @@
 import React from 'react';
 import Immutable from 'immutable';
-import { Alert, Button, Col, FormControls, Row } from 'react-bootstrap';
+import { Alert, Button, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
 import PermissionSelector from 'components/users/PermissionSelector';
@@ -93,7 +93,10 @@ const EditRole = React.createClass({
             <Input id="role-description" type="text" label="Description" onChange={this._setDescription}
                    value={this.state.role.description} />
 
-            <FormControls.Static label="Permissions" help="Select the permissions for this role" className="hidden" />
+            <FormGroup>
+              <ControlLabel>Permissions</ControlLabel>
+              <HelpBlock>Select the permissions for this role</HelpBlock>
+            </FormGroup>
             <PermissionSelector streams={this.props.streams}
                                 dashboards={this.props.dashboards}
                                 permissions={Immutable.Set(this.state.role.permissions)}
