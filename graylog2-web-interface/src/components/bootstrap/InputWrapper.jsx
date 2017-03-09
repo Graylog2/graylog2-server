@@ -4,8 +4,9 @@ const InputWrapper = React.createClass({
   propTypes: {
     className: React.PropTypes.string,
     children: React.PropTypes.oneOfType([
-      React.PropTypes.arrayOf(React.PropTypes.element),
+      React.PropTypes.arrayOf(React.PropTypes.oneOfType([React.PropTypes.element, React.PropTypes.string])),
       React.PropTypes.element,
+      React.PropTypes.string,
     ]).isRequired,
   },
 
