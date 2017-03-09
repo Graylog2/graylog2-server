@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
-import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
@@ -36,6 +35,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.time.ZonedDateTime;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -65,7 +65,7 @@ public class SyslogCodecTest {
     @Mock
     private Timer mockedTimer;
 
-    private Codec codec;
+    private SyslogCodec codec;
 
     @Before
     public void setUp() throws Exception {
@@ -351,7 +351,81 @@ public class SyslogCodecTest {
         assertEquals("test", message.getField("application_name"));
     }
 
+    @Test
+    public void testCiscoSyslogMessages() {
+        final int year = ZonedDateTime.now().getYear();
+        final Map<String, Map<String, Object>> messages = ImmutableMap.<String, Map<String, Object>>builder()
+                .put(
+                        "<186>1541800: Feb 27 06:08:59.485: %HARDWARE-2-FAN_ERROR: Fan Failure",
+                        ImmutableMap.<String, Object>builder()
+                                .put("timestamp", new DateTime(year, 2, 27, 6, 8, 59, 485, DateTimeZone.UTC).withZone(DateTimeZone.getDefault()))
+                                .put("source", "127.0.0.1")
+                                .put("level", 2)
+                                .put("facility", "local7")
+                                .put("message", "%HARDWARE-2-FAN_ERROR: Fan Failure")
+                                .put("sequence_number", 1541800)
+                                .build())
+                .put(
+                        "<189>148093: Feb 27 06:07:28.713: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0/15, changed state to down",
+                        ImmutableMap.<String, Object>builder()
+                                .put("timestamp", new DateTime(year, 2, 27, 6, 7, 28, 713, DateTimeZone.UTC).withZone(DateTimeZone.getDefault()))
+                                .put("source", "127.0.0.1")
+                                .put("level", 5)
+                                .put("facility", "local7")
+                                .put("message", "%LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0/15, changed state to down")
+                                .build())
+                .put(
+                        "<190>530470: *Sep 28 17:13:35.098: %SEC-6-IPACCESSLOGP: list MGMT_IN denied udp IP(49964) -> IP(161), 11 packets",
+                        ImmutableMap.<String, Object>builder()
+                                .put("timestamp", new DateTime(year, 9, 28, 17, 13, 35, 98, DateTimeZone.UTC).withZone(DateTimeZone.getDefault()))
+                                .put("source", "127.0.0.1")
+                                .put("level", 6)
+                                .put("facility", "local7")
+                                .put("message", "%SEC-6-IPACCESSLOGP: list MGMT_IN denied udp IP(49964) -> IP(161), 11 packets")
+                                .build())
+                .put(
+                        "<190>: 2017 Mar 06 09:22:34 CET: %AUTHPRIV-6-SYSTEM_MSG: START: rsync pid=4311 from=::ffff:IP - xinetd[6219]",
+                        ImmutableMap.<String, Object>builder()
+                                .put("timestamp", new DateTime(year, 3, 6, 9, 22, 34, DateTimeZone.forID("CET")).withZone(DateTimeZone.getDefault()))
+                                .put("source", "127.0.0.1")
+                                .put("level", 6)
+                                .put("facility", "local7")
+                                .put("message", "%AUTHPRIV-6-SYSTEM_MSG: START: rsync pid=4311 from=::ffff:IP - xinetd[6219]")
+                                .build())
+                .put(
+                        "<134>: 2017 Mar  6 12:53:10 UTC: %POLICY_ENGINE-6-POLICY_LOOKUP_EVENT: policy=POLICYNAME rule=RULENAME action=Permit direction=egress src.net.ip-address=IP src.net.port=38321 dst.net.ip-address=IP dst.net.port=5666 net.protocol=6 net.ethertype=800 net.service=\"protocol 6 port 5666\"",
+                        ImmutableMap.<String, Object>builder()
+                                .put("timestamp", new DateTime(2017, 3, 6, 12, 53, 10, DateTimeZone.UTC).withZone(DateTimeZone.getDefault()))
+                                .put("source", "127.0.0.1")
+                                .put("level", 6)
+                                .put("facility", "local0")
+                                .put("message", "%POLICY_ENGINE-6-POLICY_LOOKUP_EVENT: policy=POLICYNAME rule=RULENAME action=Permit direction=egress src.net.ip-address=IP src.net.port=38321 dst.net.ip-address=IP dst.net.port=5666 net.protocol=6 net.ethertype=800 net.service=\"protocol 6 port 5666\"")
+                                .build())
+                .build();
+
+        for (Map.Entry<String, Map<String, Object>> entry : messages.entrySet()) {
+            final Message message = codec.decode(buildRawMessage(entry.getKey()));
+            assertThat(message).isNotNull();
+            assertThat(message.getFields()).containsAllEntriesOf(entry.getValue());
+        }
+    }
+
+    @Test
+    public void testFortiGateFirewall() {
+        final RawMessage rawMessage = buildRawMessage("<45>date=2017-03-06 time=12:53:10 devname=DEVICENAME devid=DEVICEID logid=0000000013 type=traffic subtype=forward level=notice vd=ALIAS srcip=IP srcport=45748 srcintf=\"IF\" dstip=IP dstport=443 dstintf=\"IF\" sessionid=1122686199 status=close policyid=77 dstcountry=\"COUNTRY\" srccountry=\"COUNTRY\" trandisp=dnat tranip=IP tranport=443 service=HTTPS proto=6 appid=41540 app=\"SSL_TLSv1.2\" appcat=\"Network.Service\" applist=\"ACLNAME\" appact=detected duration=1 sentbyte=2313 rcvdbyte=14883 sentpkt=19 rcvdpkt=19 utmaction=passthrough utmevent=app-ctrl attack=\"SSL\" hostname=\"HOSTNAME\"");
+        final Message message = codec.decode(rawMessage);
+
+        assertThat(message).isNotNull();
+        assertThat(message.getMessage()).isEqualTo("date=2017-03-06 time=12:53:10 devname=DEVICENAME devid=DEVICEID logid=0000000013 type=traffic subtype=forward level=notice vd=ALIAS srcip=IP srcport=45748 srcintf=\"IF\" dstip=IP dstport=443 dstintf=\"IF\" sessionid=1122686199 status=close policyid=77 dstcountry=\"COUNTRY\" srccountry=\"COUNTRY\" trandisp=dnat tranip=IP tranport=443 service=HTTPS proto=6 appid=41540 app=\"SSL_TLSv1.2\" appcat=\"Network.Service\" applist=\"ACLNAME\" appact=detected duration=1 sentbyte=2313 rcvdbyte=14883 sentpkt=19 rcvdpkt=19 utmaction=passthrough utmevent=app-ctrl attack=\"SSL\" hostname=\"HOSTNAME\"");
+        assertThat(message.getTimestamp()).isEqualTo(new DateTime(2017, 3, 6, 12, 53, 10, DateTimeZone.UTC));
+        assertThat(message.getField("source")).isEqualTo("DEVICENAME");
+        assertThat(message.getField("level")).isEqualTo(5);
+        assertThat(message.getField("facility")).isEqualTo("syslogd");
+        assertThat(message.getField("logid")).isEqualTo("0000000013");
+        assertThat(message.getField("app")).isEqualTo("SSL_TLSv1.2");
+    }
+
     private RawMessage buildRawMessage(String message) {
-        return new RawMessage(message.getBytes(StandardCharsets.UTF_8), new InetSocketAddress(5140));
+        return new RawMessage(message.getBytes(StandardCharsets.UTF_8), new InetSocketAddress("127.0.0.1", 5140));
     }
 }
