@@ -176,7 +176,7 @@ public class IndexRangesResource extends RestResource {
 
     @POST
     @Timed
-    @Path("/{index: [a-z_0-9]+}/rebuild")
+    @Path("/{index: [a-z_0-9-]+}/rebuild")
     @ApiOperation(value = "Rebuild/sync index range information.",
             notes = "This triggers a system job that scans an index and stores meta information " +
                     "about what indices contain messages in what time ranges. It atomically overwrites " +
