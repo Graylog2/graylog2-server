@@ -9,8 +9,6 @@ const generateId = () => {
   return `input-${randomNumericId}`;
 };
 
-console.warn('Please consider migrating Input elements into the new react-bootstrap API: https://react-bootstrap.github.io/components.html#forms');
-
 /*
  * Input adapter for react bootstrap.
  *
