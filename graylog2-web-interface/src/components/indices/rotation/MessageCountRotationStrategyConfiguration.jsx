@@ -35,7 +35,6 @@ const MessageCountRotationStrategyConfiguration = React.createClass({
                  onChange={this._onInputUpdate('max_docs_per_index')}
                  value={this.state.max_docs_per_index}
                  help="Maximum number of documents in an index before it gets rotated"
-                 standalone
                  required />
         </fieldset>
       </div>
