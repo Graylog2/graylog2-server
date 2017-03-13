@@ -57,6 +57,7 @@
     "urijs": "^1.17.0"
   },
   "devDependencies": {
+    "assets-webpack-plugin": "^3.5.1",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
     "babel-plugin-add-module-exports": "^0.2.1",
@@ -73,7 +74,6 @@
     "extract-text-webpack-plugin": "^2.0.0-rc.2",
     "file-loader": "^0.10.0",
     "glob": "^7.0.0",
-    "html-webpack-harddisk-plugin": "^0.1.0",
     "jasmine-core": "*",
     "json-loader": "^0.5.3",
     "karma": "^1.1.2",

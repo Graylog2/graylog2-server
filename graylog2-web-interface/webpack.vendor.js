@@ -2,8 +2,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const Clean = require('clean-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
-const HtmlWebpackHarddiskPlugin = require('html-webpack-harddisk-plugin');
+const AssetsPlugin = require('assets-webpack-plugin')
 const merge = require('webpack-merge');
 
 const ROOT_PATH = path.resolve(__dirname);
@@ -33,8 +32,31 @@ const webpackConfig = {
       path: path.resolve(MANIFESTS_PATH, '[name]-manifest.json'),
       name: '__[name]',
     }),
-    new HtmlWebpackPlugin({ filename: 'vendor-module.json', inject: false, template: path.resolve(ROOT_PATH, 'templates/module.json.template'), alwaysWriteToDisk: true }),
-    new HtmlWebpackHarddiskPlugin({ outputPath: BUILD_PATH }),
+    new AssetsPlugin({ filename: 'vendor-module.json', path: BUILD_PATH, processOutput: function (assets) {
+      const jsfiles = [];
+      const cssfiles = [];
+      const chunks = {};
+      Object.keys(assets).forEach((chunk) => {
+        if (assets[chunk].js) {
+          jsfiles.push(assets[chunk].js);
+        }
+        if (assets[chunk].css) {
+          jsfiles.push(assets[chunk].css);
+        }
+        chunks[chunk] = {
+          size: 0,
+          entry: assets[chunk].js,
+          css: assets[chunk].css || []
+        };
+      });
+      return JSON.stringify({
+        files: {
+          js: jsfiles,
+          css: cssfiles,
+          chunks: chunks
+        }
+      });
+    } })
   ],
   recordsPath: path.resolve(ROOT_PATH, 'webpack/vendor-module-ids.json'),
 };
