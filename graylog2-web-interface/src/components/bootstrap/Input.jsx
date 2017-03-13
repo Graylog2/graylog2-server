@@ -1,5 +1,5 @@
 import React from 'react';
-import { Checkbox, ControlLabel, FormControl, FormGroup, HelpBlock, Radio } from 'react-bootstrap';
+import { Checkbox, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup, Radio } from 'react-bootstrap';
 
 import InputWrapper from './InputWrapper';
 
@@ -38,6 +38,10 @@ const Input = React.createClass({
       React.PropTypes.string,
     ]),
     wrapperClassName: React.PropTypes.string,
+    addonAfter: React.PropTypes.oneOfType([
+      React.PropTypes.element,
+      React.PropTypes.string,
+    ]),
     children: React.PropTypes.oneOfType([
       React.PropTypes.array,
       React.PropTypes.element,
@@ -55,6 +59,7 @@ const Input = React.createClass({
       placeholder: '',
       help: '',
       wrapperClassName: undefined,
+      addonAfter: null,
       children: null,
     };
   },
@@ -89,12 +94,24 @@ const Input = React.createClass({
     );
   },
 
-  _renderFormGroup(id, validationState, wrapperClassName, label, labelClassName, help, children) {
+  _renderFormGroup(id, validationState, wrapperClassName, label, labelClassName, help, children, addon) {
+    let input;
+    if (addon) {
+      input = (
+        <InputGroup>
+          {children}
+          <InputGroup.Addon>{addon}</InputGroup.Addon>
+        </InputGroup>
+      );
+    } else {
+      input = children;
+    }
+
     return (
       <FormGroup controlId={id} validationState={validationState}>
         {label && <ControlLabel className={labelClassName}>{label}</ControlLabel>}
         <InputWrapper className={wrapperClassName}>
-          {children}
+          {input}
           {help && <HelpBlock>{help}</HelpBlock>}
         </InputWrapper>
       </FormGroup>
@@ -124,7 +141,7 @@ const Input = React.createClass({
   },
 
   render() {
-    const { id, type, bsStyle, wrapperClassName, label, labelClassName, help, children, ...controlProps } = this.props;
+    const { id, type, bsStyle, wrapperClassName, label, labelClassName, help, children, addonAfter, ...controlProps } = this.props;
     controlProps.type = type;
 
     if (!type) {
@@ -137,7 +154,7 @@ const Input = React.createClass({
       case 'email':
       case 'number':
       case 'file':
-        return this._renderFormGroup(id, bsStyle, wrapperClassName, label, labelClassName, help, this._renderFormControl('input', controlProps));
+        return this._renderFormGroup(id, bsStyle, wrapperClassName, label, labelClassName, help, this._renderFormControl('input', controlProps), addonAfter);
       case 'textarea':
         return this._renderFormGroup(id, bsStyle, wrapperClassName, label, labelClassName, help, this._renderFormControl('textarea', controlProps));
       case 'select':
