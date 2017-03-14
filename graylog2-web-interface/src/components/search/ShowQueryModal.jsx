@@ -23,22 +23,22 @@ var ShowQueryModal = React.createClass({
         this.refs.modal.close();
     },
 
-    render () {
-        var queryText = JSON.stringify(JSON.parse(this.props.builtQuery), null, '  ');
-        return (
-          <BootstrapModalWrapper ref="modal">
-              <Modal.Header closeButton>
-                  <Modal.Title>Elasticsearch Query</Modal.Title>
-              </Modal.Header>
-              <Modal.Body>
-                  <pre>{queryText}</pre>
-              </Modal.Body>
-              <Modal.Footer>
-                <ClipboardButton title="Copy query" text={queryText}/>
-              </Modal.Footer>
-          </BootstrapModalWrapper>
-        );
-    }
+  render() {
+    var queryText = JSON.stringify(JSON.parse(this.props.builtQuery), null, '  ');
+    return (
+      <BootstrapModalWrapper ref="modal">
+        <Modal.Header closeButton>
+          <Modal.Title>Elasticsearch Query</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <pre>{queryText}</pre>
+        </Modal.Body>
+        <Modal.Footer>
+          <ClipboardButton title="Copy query" target=".modal-body pre" />
+        </Modal.Footer>
+      </BootstrapModalWrapper>
+    );
+  }
 });
 
 module.exports = ShowQueryModal;
