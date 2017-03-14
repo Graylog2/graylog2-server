@@ -25,8 +25,8 @@
   "homepage": "https://github.com/Graylog2/graylog-web-plugin#readme",
   "dependencies": {
     "babel-eslint": "^6.1.0",
-    "eslint": "^2.13.1",
-    "eslint-config-graylog": "^1.0.2",
+    "eslint": "^3.16.1",
+    "eslint-config-graylog": "file:../eslint-config-graylog",
     "history": "^1.17.0",
     "html-webpack-plugin": "^2.22.0",
     "javascript-natural-sort": "^0.7.1",
