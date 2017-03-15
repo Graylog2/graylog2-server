@@ -436,7 +436,7 @@ public class StreamResource extends RestResource {
                     stream,
                     creatorUser
                 );
-                streamService.addAlertCondition(stream, clonedAlertConditio n);
+                streamService.addAlertCondition(stream, clonedAlertCondition);
             } catch (ConfigurationException e) {
                 LOG.warn("Unable to clone alert condition <" + alertCondition + "> - skipping: ", e);
             }
