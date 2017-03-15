@@ -22,6 +22,7 @@ import com.codahale.metrics.jvm.ClassLoadingGaugeSet;
 import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
 import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import com.codahale.metrics.jvm.ThreadStatesGaugeSet;
+import org.graylog2.shared.utilities.AggregatedGarbageCollectorMetricSet;
 
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -37,6 +38,7 @@ public class MetricRegistryProvider implements Provider<MetricRegistry> {
         metricRegistry.register("jvm.buffers", new BufferPoolMetricSet(ManagementFactory.getPlatformMBeanServer()));
         metricRegistry.register("jvm.cl", new ClassLoadingGaugeSet());
         metricRegistry.register("jvm.gc", new GarbageCollectorMetricSet());
+        metricRegistry.register("jvm.gc.summary", new AggregatedGarbageCollectorMetricSet());
         metricRegistry.register("jvm.memory", new MemoryUsageGaugeSet());
         metricRegistry.register("jvm.threads", new ThreadStatesGaugeSet());
     }
