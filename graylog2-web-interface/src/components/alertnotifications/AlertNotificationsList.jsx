@@ -24,7 +24,7 @@ const AlertNotificationsList = React.createClass({
   },
 
   _paginatedNotifications() {
-    return this.props.alertNotifications.slice(this.state.currentPage, this.state.currentPage + this.PAGE_SIZE);
+    return this.props.alertNotifications.slice(this.state.currentPage * this.PAGE_SIZE, (this.state.currentPage + 1) * this.PAGE_SIZE);
   },
 
   _formatNotification(notification) {
