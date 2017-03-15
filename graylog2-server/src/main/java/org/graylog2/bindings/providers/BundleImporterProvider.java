@@ -19,6 +19,7 @@ package org.graylog2.bindings.providers;
 import org.graylog2.bundles.BundleImporter;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.inputs.InputService;
@@ -51,6 +52,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     private final InputLauncher inputLauncher;
     private final GrokPatternService grokPatternService;
     private final TimeRangeFactory timeRangeFactory;
+    private final ClusterEventBus clusterBus;
 
     @Inject
     public BundleImporterProvider(final InputService inputService,
@@ -66,7 +68,8 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
                                   final MessageInputFactory messageInputFactory,
                                   final InputLauncher inputLauncher,
                                   final GrokPatternService grokPatternService,
-                                  final TimeRangeFactory timeRangeFactory) {
+                                  final TimeRangeFactory timeRangeFactory,
+                                  final ClusterEventBus clusterBus) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -81,6 +84,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         this.inputLauncher = inputLauncher;
         this.grokPatternService = grokPatternService;
         this.timeRangeFactory = timeRangeFactory;
+        this.clusterBus = clusterBus;
     }
 
     @Override
@@ -88,6 +92,6 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         return new BundleImporter(inputService, inputRegistry, extractorFactory,
                 streamService, streamRuleService, indexSetRegistry, outputService, dashboardService,
                 dashboardWidgetCreator, serverStatus, messageInputFactory,
-                inputLauncher, grokPatternService, timeRangeFactory);
+                inputLauncher, grokPatternService, timeRangeFactory, clusterBus);
     }
 }
