@@ -196,6 +196,28 @@ public class JsonExtractorTest {
     }
 
     @Test
+    public void testRunWithWhitespaceInNestedKey() throws Exception {
+        final String value = "{\"foo\":{\"b a r\":{\"b a z\": 42}}}";
+        final JsonExtractor jsonExtractor = new JsonExtractor(
+                new MetricRegistry(),
+                "json",
+                "title",
+                0L,
+                Extractor.CursorStrategy.COPY,
+                "source",
+                "target",
+                ImmutableMap.of("replace_key_whitespace", true, "key_whitespace_replacement", "-"),
+                "user",
+                Collections.emptyList(),
+                Extractor.ConditionType.NONE,
+                "");
+
+        assertThat(jsonExtractor.run(value)).containsOnly(
+                new Extractor.Result(42, "foo_b-a-r_b-a-z", -1, -1)
+        );
+    }
+
+    @Test
     public void testRunWithKeyPrefix() throws Exception {
         final String value = "{\"text string\": \"foobar\", \"num   b er\": 1234.5678, \"bool\": true, \"null\": null}";
 
