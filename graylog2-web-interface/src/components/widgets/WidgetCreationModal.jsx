@@ -41,7 +41,7 @@ const WidgetCreationModal = React.createClass({
 
     const configKeys = Object.keys(this.state.config);
     if (configKeys.length === 0) {
-      this.setState({config: this.refs.pluginConfiguration.getInitialConfiguration()});
+      this.setState({ config: this.refs.pluginConfiguration.getInitialConfiguration() });
     }
   },
 
@@ -75,7 +75,7 @@ const WidgetCreationModal = React.createClass({
   _setConfigurationSetting(key, value) {
     const newConfig = ObjectUtils.clone(this.state.config);
     newConfig[key] = value;
-    this.setState({config: newConfig});
+    this.setState({ config: newConfig });
   },
 
   _bindConfigurationValue(event) {
@@ -129,7 +129,7 @@ const WidgetCreationModal = React.createClass({
                  defaultValue={this.state.title}
                  onChange={this._bindValue}
                  help="Type a name that describes your widget."
-                 autoFocus/>
+                 autoFocus />
           {this._getSpecificWidgetInputs()}
         </fieldset>
       </BootstrapModalForm>

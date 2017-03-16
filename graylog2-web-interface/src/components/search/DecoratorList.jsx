@@ -21,12 +21,12 @@ const DecoratorList = React.createClass({
     if (!this.props.decorators || this.props.decorators.length === 0) {
       return (
         <Alert bsStyle="info" className={DecoratorStyles.noDecoratorsAlert}>
-          <i className="fa fa-info-circle"/>&nbsp;No decorators configured.
+          <i className="fa fa-info-circle" />&nbsp;No decorators configured.
         </Alert>
       );
     }
     return (
-      <SortableList items={this.props.decorators} onMoveItem={this._onReorderWrapper} disableDragging={this.props.disableDragging}/>
+      <SortableList items={this.props.decorators} onMoveItem={this._onReorderWrapper} disableDragging={this.props.disableDragging} />
     );
   },
 });

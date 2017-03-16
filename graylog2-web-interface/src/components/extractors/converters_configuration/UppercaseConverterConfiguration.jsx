@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {Input} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Input } from 'react-bootstrap';
 
 import FormUtils from 'util/FormsUtils';
 
@@ -13,7 +13,7 @@ const UppercaseConverterConfiguration = React.createClass({
     this.props.onChange(this.props.type, this._getConverterObject());
   },
   _getConverterObject() {
-    return {type: this.props.type, config: this.props.configuration};
+    return { type: this.props.type, config: this.props.configuration };
   },
   _toggleConverter(event) {
     let converter;
@@ -31,7 +31,7 @@ const UppercaseConverterConfiguration = React.createClass({
                label="Transform value to uppercase"
                wrapperClassName="col-md-offset-2 col-md-10"
                defaultChecked
-               onChange={this._toggleConverter}/>
+               onChange={this._toggleConverter} />
       </div>
     );
   },

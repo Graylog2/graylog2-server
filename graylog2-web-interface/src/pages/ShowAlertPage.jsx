@@ -46,10 +46,10 @@ const ShowAlertPage = React.createClass({
   },
 
   _loadAlertDetails(alert) {
-    StreamsStore.get(alert.stream_id, stream => {
+    StreamsStore.get(alert.stream_id, (stream) => {
       this.setState({ stream: stream });
     });
-    AlertConditionsActions.get(alert.stream_id, alert.condition_id, error => {
+    AlertConditionsActions.get(alert.stream_id, alert.condition_id, (error) => {
       if (error.additional && error.additional.status === 404) {
         this.setState({ alertCondition: {} });
       } else {
@@ -65,7 +65,7 @@ const ShowAlertPage = React.createClass({
 
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     const alert = this.state.alert;

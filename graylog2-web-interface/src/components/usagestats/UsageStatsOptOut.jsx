@@ -16,25 +16,25 @@ const UsageStatsOptOut = React.createClass({
   },
   componentDidMount() {
     UsageStatsOptOutStore.pluginEnabled().done((isEnabled) => {
-      this.setState({pluginEnabled: isEnabled}, this._updateOkButtonWidth);
+      this.setState({ pluginEnabled: isEnabled }, this._updateOkButtonWidth);
     });
 
     UsageStatsOptOutStore.getOptOutState().done((optOutState) => {
-      this.setState({optOutStateLoaded: true, optOutState: optOutState}, this._updateOkButtonWidth);
+      this.setState({ optOutStateLoaded: true, optOutState: optOutState }, this._updateOkButtonWidth);
     });
   },
   _updateOkButtonWidth() {
     if (this.refs.dontSendButton) {
-      this.setState({buttonWidth: ReactDOM.findDOMNode(this.refs.dontSendButton).clientWidth});
+      this.setState({ buttonWidth: ReactDOM.findDOMNode(this.refs.dontSendButton).clientWidth });
     }
   },
   _handleClickEnable() {
     UsageStatsOptOutStore.setOptIn(true);
-    this.setState({optOutStateLoaded: true, optOutState: {opt_out: false}});
+    this.setState({ optOutStateLoaded: true, optOutState: { opt_out: false } });
   },
   _handleClickDisable() {
     UsageStatsOptOutStore.setOptOut(true);
-    this.setState({optOutStateLoaded: true, optOutState: {opt_out: true}});
+    this.setState({ optOutStateLoaded: true, optOutState: { opt_out: true } });
   },
   render() {
     let content = null;
@@ -47,8 +47,8 @@ const UsageStatsOptOut = React.createClass({
             <Col md={12}>
               <Row className="row-sm">
                 <Col md={10}>
-                  <div style={{marginTop: 8}}>
-                    <i className="fa fa-info-circle"></i>
+                  <div style={{ marginTop: 8 }}>
+                    <i className="fa fa-info-circle" />
                     &nbsp;
                     Graylog collects completely anonymous usage data to help us improve the product
                     for you.
@@ -60,7 +60,7 @@ const UsageStatsOptOut = React.createClass({
                   <div className="text-right">
                     <Button bsSize="small" bsStyle="success"
                             onClick={this._handleClickEnable}
-                            style={{width: this.state.buttonWidth}}>
+                            style={{ width: this.state.buttonWidth }}>
                       Ok
                     </Button>
                     &nbsp;

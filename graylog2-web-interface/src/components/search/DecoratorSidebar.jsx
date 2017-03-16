@@ -56,13 +56,14 @@ const DecoratorSidebar = React.createClass({
 
   _formatDecorator(decorator) {
     const typeDefinition = this.state.types[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
-    return ({ id: decorator.id, title: <Decorator key={`decorator-${decorator.id}`}
+    return ({ id: decorator.id,
+      title: <Decorator key={`decorator-${decorator.id}`}
                                                    decorator={decorator}
                                                    typeDefinition={typeDefinition} /> });
   },
   _updateOrder(decorators) {
     decorators.forEach((item, idx) => {
-      const decorator = this.state.decorators.find((i) => i.id === item.id);
+      const decorator = this.state.decorators.find(i => i.id === item.id);
       decorator.order = idx;
       DecoratorsActions.update(decorator.id, decorator);
     });
@@ -72,7 +73,7 @@ const DecoratorSidebar = React.createClass({
       return <Spinner />;
     }
     const decorators = this.state.decorators
-      .filter((decorator) => (this.props.stream ? decorator.stream === this.props.stream : !decorator.stream))
+      .filter(decorator => (this.props.stream ? decorator.stream === this.props.stream : !decorator.stream))
       .sort((d1, d2) => d1.order - d2.order);
     const nextDecoratorOrder = decorators.length > 0 ? decorators[decorators.length - 1].order + 1 : 0;
     const decoratorItems = decorators.map(this._formatDecorator);
@@ -86,7 +87,7 @@ const DecoratorSidebar = React.createClass({
           Use drag and drop to modify the order in which decorators are processed.
         </p>
         <p>
-          Read more about message decorators in the <DocumentationLink page={DocsHelper.PAGES.DECORATORS} text="documentation"/>.
+          Read more about message decorators in the <DocumentationLink page={DocsHelper.PAGES.DECORATORS} text="documentation" />.
         </p>
       </Popover>
     );
@@ -94,14 +95,14 @@ const DecoratorSidebar = React.createClass({
     const editPermissions = this.isPermitted(this.state.currentUser.permissions, `decorators:edit:${this.props.stream}`);
     return (
       <div>
-        <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder} disabled={!editPermissions}/>
+        <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder} disabled={!editPermissions} />
         <div className={DecoratorStyles.helpLinkContainer}>
           <OverlayTrigger trigger="click" rootClose placement="right" overlay={popoverHelp}>
             <Button bsStyle="link" className={DecoratorStyles.helpLink}>What are message decorators?</Button>
           </OverlayTrigger>
         </div>
         <div ref="decoratorsContainer" className={DecoratorStyles.decoratorListContainer} style={{ maxHeight: this.state.maxDecoratorsHeight }}>
-          <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} disableDragging={!editPermissions}/>
+          <DecoratorList decorators={decoratorItems} onReorder={this._updateOrder} disableDragging={!editPermissions} />
         </div>
       </div>
     );

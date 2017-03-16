@@ -29,7 +29,7 @@ const GrokPatterns = React.createClass({
   },
   validPatternName(name) {
     // Check if patterns already contain a pattern with the given name.
-    return !this.state.patterns.some((pattern) => pattern.name === name);
+    return !this.state.patterns.some(pattern => pattern.name === name);
   },
   savePattern(pattern, callback) {
     GrokPatternsStore.savePattern(pattern, () => {
@@ -38,7 +38,7 @@ const GrokPatterns = React.createClass({
     });
   },
   confirmedRemove(pattern) {
-    if (window.confirm('Really delete the grok pattern ' + pattern.name + '?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.')) {
+    if (window.confirm(`Really delete the grok pattern ${pattern.name}?\nIt will be removed from the system and unavailable for any extractor. If it is still in use by extractors those will fail to work.`)) {
       GrokPatternsStore.deletePattern(pattern, this.loadData);
     }
   },
@@ -46,14 +46,14 @@ const GrokPatterns = React.createClass({
     let formattedHeaderCell;
 
     switch (header.toLocaleLowerCase()) {
-    case 'name':
-      formattedHeaderCell = <th className="name">{header}</th>;
-      break;
-    case 'actions':
-      formattedHeaderCell = <th className="actions">{header}</th>;
-      break;
-    default:
-      formattedHeaderCell = <th>{header}</th>;
+      case 'name':
+        formattedHeaderCell = <th className="name">{header}</th>;
+        break;
+      case 'actions':
+        formattedHeaderCell = <th className="actions">{header}</th>;
+        break;
+      default:
+        formattedHeaderCell = <th>{header}</th>;
     }
 
     return formattedHeaderCell;
@@ -64,13 +64,13 @@ const GrokPatterns = React.createClass({
         <td>{pattern.name}</td>
         <td>{pattern.pattern}</td>
         <td>
-          <Button style={{marginRight: 5}} bsStyle="primary" bsSize="xs"
+          <Button style={{ marginRight: 5 }} bsStyle="primary" bsSize="xs"
                   onClick={this.confirmedRemove.bind(this, pattern)}>
             Delete
           </Button>
           <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false}
                             reload={this.loadData} savePattern={this.savePattern}
-                            validPatternName={this.validPatternName}/>
+                            validPatternName={this.validPatternName} />
         </td>
       </tr>
     );
@@ -88,11 +88,11 @@ const GrokPatterns = React.createClass({
           </span>
           {null}
           <span>
-            <BulkLoadPatternModal onSuccess={this.loadData}/>
-            <EditPatternModal id={""} name={""} pattern={""} create
+            <BulkLoadPatternModal onSuccess={this.loadData} />
+            <EditPatternModal id={''} name={''} pattern={''} create
                               reload={this.loadData}
                               savePattern={this.savePattern}
-                              validPatternName={this.validPatternName}/>
+                              validPatternName={this.validPatternName} />
           </span>
         </PageHeader>
 
@@ -102,11 +102,11 @@ const GrokPatterns = React.createClass({
                        className="table-striped table-hover"
                        headers={headers}
                        headerCellFormatter={this._headerCellFormatter}
-                       sortByKey={"name"}
+                       sortByKey={'name'}
                        rows={this.state.patterns}
                        dataRowFormatter={this._patternFormatter}
                        filterLabel="Filter patterns"
-                       filterKeys={filterKeys}/>
+                       filterKeys={filterKeys} />
           </Col>
         </Row>
       </div>

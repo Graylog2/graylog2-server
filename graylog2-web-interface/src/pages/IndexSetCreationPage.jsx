@@ -44,7 +44,7 @@ const IndexSetCreationPage = React.createClass({
         },
         index_analyzer: 'standard',
         index_optimization_max_num_segments: 1,
-        index_optimization_disabled: false
+        index_optimization_disabled: false,
       },
     };
   },
@@ -68,7 +68,7 @@ const IndexSetCreationPage = React.createClass({
 
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     const indexSet = this.state.indexSet;

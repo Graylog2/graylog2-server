@@ -55,7 +55,7 @@ const IndexSetConfigurationPage = React.createClass({
 
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     const indexSet = this.state.indexSet;

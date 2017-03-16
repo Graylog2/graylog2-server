@@ -39,11 +39,11 @@ const ShowNodePage = React.createClass({
       ClusterOverviewStore.jvm(this.props.params.nodeId)
         .then(jvmInformation => this.setState({ jvmInformation: jvmInformation })),
       PluginsStore.list(this.props.params.nodeId).then(plugins => this.setState({ plugins: plugins })),
-      InputStatesStore.list().then(inputStates => {
+      InputStatesStore.list().then((inputStates) => {
         // We only want the input states for the current node
         const inputIds = Object.keys(inputStates);
         const filteredInputStates = [];
-        inputIds.forEach(inputId => {
+        inputIds.forEach((inputId) => {
           const inputObject = inputStates[inputId][this.props.params.nodeId];
           if (inputObject) {
             filteredInputStates.push(inputObject);
@@ -52,7 +52,7 @@ const ShowNodePage = React.createClass({
 
         this.setState({ inputStates: filteredInputStates });
       }),
-    ]).then(() => {}, (errors) => this.setState({ errors: errors }));
+    ]).then(() => {}, errors => this.setState({ errors: errors }));
   },
   _isLoading() {
     return !(this.state.node && this.state.systemOverview);
@@ -62,7 +62,7 @@ const ShowNodePage = React.createClass({
       return <PageErrorOverview errors={[this.state.errors]} />;
     }
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
     const node = this.state.node;
     const title = <span>Node {node.short_node_id} / {node.hostname}</span>;
@@ -77,11 +77,11 @@ const ShowNodePage = React.createClass({
             <span>
               {node.is_master ? <span>This is the master node.</span> : <span>This is <em>not</em> the master node.</span>}
             </span>
-            <span><NodeMaintenanceDropdown node={node}/></span>
+            <span><NodeMaintenanceDropdown node={node} /></span>
           </PageHeader>
           <NodeOverview node={node} systemOverview={this.state.systemOverview}
                         jvmInformation={this.state.jvmInformation} plugins={this.state.plugins}
-                        inputStates={this.state.inputStates} inputDescriptions={this.state.inputDescriptions}/>
+                        inputStates={this.state.inputStates} inputDescriptions={this.state.inputDescriptions} />
         </div>
       </DocumentTitle>
     );

@@ -27,7 +27,7 @@ const AlertConditionsComponent = React.createClass({
   },
 
   _loadData() {
-    StreamsStore.listStreams().then(streams => {
+    StreamsStore.listStreams().then((streams) => {
       this.setState({ streams: streams });
     });
 

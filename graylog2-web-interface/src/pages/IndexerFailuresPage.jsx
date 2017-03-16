@@ -18,14 +18,14 @@ const IndexerFailuresPage = React.createClass({
   },
   componentDidMount() {
     IndexerFailuresStore.count(moment().subtract(10, 'years')).then((response) => {
-      this.setState({total: response.count});
+      this.setState({ total: response.count });
     });
     this.loadData(1, this.defaultPageSize);
   },
   defaultPageSize: 50,
   loadData(page, size) {
-    IndexerFailuresStore.list(size, (page-1)*size).then((response) => {
-      this.setState({failures: response.failures});
+    IndexerFailuresStore.list(size, (page - 1) * size).then((response) => {
+      this.setState({ failures: response.failures });
     });
   },
   _onChangePaginatedList(page, size) {
@@ -53,7 +53,7 @@ const IndexerFailuresPage = React.createClass({
           <Row className="content">
             <Col md={12}>
               <PaginatedList totalItems={this.state.total} onChange={this._onChangePaginatedList} pageSize={this.defaultPageSize}>
-                <IndexerFailuresList failures={this.state.failures}/>
+                <IndexerFailuresList failures={this.state.failures} />
               </PaginatedList>
             </Col>
           </Row>

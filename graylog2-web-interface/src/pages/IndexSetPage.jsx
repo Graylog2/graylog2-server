@@ -87,7 +87,7 @@ const IndexSetPage = React.createClass({
 
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     const indexSet = this.state.indexSet;
@@ -135,7 +135,7 @@ const IndexSetPage = React.createClass({
       indicesInfo = (
         <span>
           <Alert bsStyle="success" style={{ marginTop: '10' }}>
-            <i className="fa fa-th"/> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
+            <i className="fa fa-th" /> &nbsp;{this._totalIndexCount()} indices with a total of{' '}
             {numeral(this.state.indexerOverview.counts.events).format('0,0')} messages under management,
             current write-active index is <i>{deflectorInfo.current_target}</i>.
           </Alert>
@@ -147,7 +147,7 @@ const IndexSetPage = React.createClass({
                          indexDetails={this.state.indexDetails.indices}
                          indexSetId={this.props.params.indexSetId}
                          closedIndices={this.state.indexDetails.closedIndices}
-                         deflector={this.state.indexerOverview.deflector}/>
+                         deflector={this.state.indexerOverview.deflector} />
       );
     } else {
       indicesInfo = <Spinner />;

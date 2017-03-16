@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -28,7 +28,7 @@ const ExportExtractorsPage = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     return (
@@ -40,7 +40,7 @@ const ExportExtractorsPage = React.createClass({
               or sharing in <a href="https://marketplace.graylog.org/" target="_blank">the Graylog Marketplace</a>.
             </span>
           </PageHeader>
-          <ExportExtractors input={this.state.input}/>
+          <ExportExtractors input={this.state.input} />
         </div>
       </DocumentTitle>
     );

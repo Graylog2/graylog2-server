@@ -30,22 +30,22 @@ const LdapGroupsComponent = React.createClass({
   },
 
   componentDidMount() {
-    LdapGroupsActions.loadMapping.triggerPromise().then(mapping => this.setState({mapping: Immutable.Map(mapping)}));
+    LdapGroupsActions.loadMapping.triggerPromise().then(mapping => this.setState({ mapping: Immutable.Map(mapping) }));
     LdapGroupsActions.loadGroups.triggerPromise()
       .then(
-        groups => this.setState({groups: Immutable.Set(groups)}),
-        error => this.setState({groupsErrorMessage: error})
+        groups => this.setState({ groups: Immutable.Set(groups) }),
+        error => this.setState({ groupsErrorMessage: error }),
       );
-    RolesStore.loadRoles().then(roles => this.setState({roles: Immutable.Set(roles)}));
+    RolesStore.loadRoles().then(roles => this.setState({ roles: Immutable.Set(roles) }));
   },
 
   _updateMapping(event) {
     const role = event.target.value;
     const group = event.target.getAttribute('data-group');
     if (role === '') {
-      this.setState({mapping: this.state.mapping.delete(group)});
+      this.setState({ mapping: this.state.mapping.delete(group) });
     } else {
-      this.setState({mapping: this.state.mapping.set(group, role)});
+      this.setState({ mapping: this.state.mapping.set(group, role) });
     }
   },
 
@@ -66,18 +66,18 @@ const LdapGroupsComponent = React.createClass({
     if (this.state.groupsErrorMessage !== null) {
       return (
         <Panel header="Error: Unable to load LDAP groups" bsStyle="danger">
-          The error message was:<br/>{this.state.groupsErrorMessage}
+          The error message was:<br />{this.state.groupsErrorMessage}
         </Panel>
       );
     }
 
     naturalSort.insensitive = true; // sigh
 
-    const options = this.state.roles.sort(naturalSort).map(role => {
+    const options = this.state.roles.sort(naturalSort).map((role) => {
       return <option key={role.name} value={role.name}>{role.name}</option>;
     });
 
-    const content = this.state.groups.sort(naturalSort).map(group => {
+    const content = this.state.groups.sort(naturalSort).map((group) => {
       return (
         <li key={group}>
           <Input label={group} data-group={group} type="select" value={this.state.mapping.get(group, '')}
@@ -99,21 +99,20 @@ const LdapGroupsComponent = React.createClass({
           settings are correct.
         </p>
       );
-    } else {
-      return (
-        <form className="form-horizontal" onSubmit={this._saveMapping}>
-          <Row>
-            <Col md={12}>
-              <ul style={{padding: 0}}>{content}</ul>
-            </Col>
-            <Col md={10} mdPush={2}>
-              <Button type="submit" bsStyle="primary" className="save-button-margin">Save</Button>
-              <Button onClick={this.props.onCancel}>Cancel</Button>
-            </Col>
-          </Row>
-        </form>
-      );
     }
+    return (
+      <form className="form-horizontal" onSubmit={this._saveMapping}>
+        <Row>
+          <Col md={12}>
+            <ul style={{ padding: 0 }}>{content}</ul>
+          </Col>
+          <Col md={10} mdPush={2}>
+            <Button type="submit" bsStyle="primary" className="save-button-margin">Save</Button>
+            <Button onClick={this.props.onCancel}>Cancel</Button>
+          </Col>
+        </Row>
+      </form>
+    );
   },
 });
 

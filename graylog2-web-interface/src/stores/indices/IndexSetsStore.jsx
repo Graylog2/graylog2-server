@@ -22,7 +22,7 @@ const IndexSetsStore = Reflux.createStore({
           indexSets: response.index_sets,
           indexSetStats: response.stats,
         }),
-        error => {
+        (error) => {
           UserNotification.error(`Fetching index sets list failed: ${error.message}`,
             'Could not retrieve index sets.');
         });
@@ -40,7 +40,7 @@ const IndexSetsStore = Reflux.createStore({
           indexSets: response.index_sets,
           indexSetStats: response.stats,
         }),
-        error => {
+        (error) => {
           UserNotification.error(`Fetching index sets list failed: ${this._errorMessage(error)}`,
             'Could not retrieve index sets.');
         });
@@ -52,13 +52,13 @@ const IndexSetsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSetId).url);
     const promise = fetch('GET', url);
     promise.then(
-      response => {
+      (response) => {
         this.trigger({ indexSet: response });
         return response;
       },
-      error => {
+      (error) => {
         UserNotification.error(`Fetching index set '${indexSetId}' failed with status: ${this._errorMessage(error)}`, 'Could not retrieve index set.');
-      }
+      },
     );
 
     IndexSetsActions.get.promise(promise);
@@ -68,14 +68,14 @@ const IndexSetsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.get(indexSet.id).url);
     const promise = fetch('PUT', url, indexSet);
     promise.then(
-      response => {
+      (response) => {
         UserNotification.success(`Successfully updated index set '${indexSet.title}'`, 'Success');
         this.trigger({ indexSet: response });
         return response;
       },
-      error => {
+      (error) => {
         UserNotification.error(`Updating index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`, 'Could not update index set.');
-      }
+      },
     );
 
     IndexSetsActions.update.promise(promise);
@@ -85,14 +85,14 @@ const IndexSetsStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.create().url);
     const promise = fetch('POST', url, indexSet);
     promise.then(
-      response => {
+      (response) => {
         UserNotification.success(`Successfully created index set '${indexSet.title}'`, 'Success');
         this.trigger({ indexSet: response });
         return response;
       },
-      error => {
+      (error) => {
         UserNotification.error(`Creating index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`, 'Could not create index set.');
-      }
+      },
     );
 
     IndexSetsActions.create.promise(promise);
@@ -105,9 +105,9 @@ const IndexSetsStore = Reflux.createStore({
       () => {
         UserNotification.success(`Successfully deleted index set '${indexSet.title}'`, 'Success');
       },
-      error => {
+      (error) => {
         UserNotification.error(`Deleting index set '${indexSet.title}' failed with status: ${this._errorMessage(error)}`, 'Could not delete index set.');
-      }
+      },
     );
 
     IndexSetsActions.delete.promise(promise);
@@ -120,9 +120,9 @@ const IndexSetsStore = Reflux.createStore({
       () => {
         UserNotification.success(`Successfully set index set '${indexSet.title}' as default`, 'Success');
       },
-      error => {
+      (error) => {
         UserNotification.error(`Setting index set '${indexSet.title}' as default failed with status: ${this._errorMessage(error)}`, 'Could not set default index set.');
-      }
+      },
     );
 
     IndexSetsActions.setDefault.promise(promise);

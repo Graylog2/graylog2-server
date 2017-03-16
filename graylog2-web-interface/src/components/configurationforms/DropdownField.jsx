@@ -37,7 +37,7 @@ const DropdownField = React.createClass({
   },
   handleChange(evt) {
     this.props.onChange(this.state.title, evt.target.value);
-    this.setState({value: evt.target.value});
+    this.setState({ value: evt.target.value });
   },
   render() {
     const field = this.state.field;
@@ -48,7 +48,7 @@ const DropdownField = React.createClass({
     const typeName = this.state.typeName;
     return (
       <div className="form-group">
-        <label htmlFor={typeName + '-' + field.title}>
+        <label htmlFor={`${typeName}-${field.title}`}>
           {field.human_name}
 
           {FieldHelpers.optionalMarker(field)}

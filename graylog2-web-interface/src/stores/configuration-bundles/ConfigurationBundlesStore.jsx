@@ -67,7 +67,7 @@ const ConfigurationBundlesStore = Reflux.createStore({
   list() {
     const promise = fetch('GET', URLUtils.qualifyUrl(ApiRoutes.BundlesApiController.list().url))
       .then((result) => {
-        this.trigger({configurationBundles: result});
+        this.trigger({ configurationBundles: result });
 
         return result;
       });

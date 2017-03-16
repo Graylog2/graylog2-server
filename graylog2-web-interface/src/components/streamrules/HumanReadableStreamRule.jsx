@@ -37,15 +37,14 @@ const HumanReadableStreamRule = React.createClass({
     const streamRuleType = this._getTypeForInteger(streamRule.type, this.props.streamRuleTypes);
     const negation = (streamRule.inverted ? 'not ' : null);
     const longDesc = (streamRuleType ? streamRuleType.long_desc : null);
-    if(String(streamRule.type) === String(this.ALWAYS_MATCH_RULE_TYPE)) {
+    if (String(streamRule.type) === String(this.ALWAYS_MATCH_RULE_TYPE)) {
       return (
-          <span>Rule always matches</span>
-      );
-    } else {
-      return (
-        <span>Field <em>{this._formatRuleField(streamRule)}</em> must {negation}{longDesc} <em>{this._formatRuleValue(streamRule)}</em></span>
+        <span>Rule always matches</span>
       );
     }
+    return (
+      <span>Field <em>{this._formatRuleField(streamRule)}</em> must {negation}{longDesc} <em>{this._formatRuleValue(streamRule)}</em></span>
+    );
   },
 });
 

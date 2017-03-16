@@ -38,7 +38,7 @@ const TimezoneSelect = React.createClass({
           .map((location) => {
             const timezone = (area === this._UNCLASSIFIED_AREA ? location : `${area}/${location}`);
             return { value: timezone, label: location.replace('_', ' ') };
-          })
+          }),
         );
     }));
   },

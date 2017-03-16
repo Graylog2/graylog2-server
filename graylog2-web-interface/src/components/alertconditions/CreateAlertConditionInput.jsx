@@ -24,7 +24,7 @@ const CreateAlertConditionInput = React.createClass({
   },
 
   componentDidMount() {
-    StreamsStore.listStreams().then(streams => {
+    StreamsStore.listStreams().then((streams) => {
       this.setState({ streams: streams });
     });
   },
@@ -44,7 +44,7 @@ const CreateAlertConditionInput = React.createClass({
       UserNotification.error('Please select the stream that the condition should check.', 'Could not save condition');
     }
 
-    AlertConditionsActions.save(this.state.selectedStream.id, data).then(conditionId => {
+    AlertConditionsActions.save(this.state.selectedStream.id, data).then((conditionId) => {
       history.pushState(null, Routes.show_alert_condition(this.state.selectedStream.id, conditionId));
     });
   },
@@ -74,7 +74,7 @@ const CreateAlertConditionInput = React.createClass({
     }
 
     const conditionForm = (this.state.type !== this.PLACEHOLDER ? this._formatConditionForm(this.state.type) : null);
-    const availableTypes = Object.keys(this.state.types).map(value => {
+    const availableTypes = Object.keys(this.state.types).map((value) => {
       return <option key={`type-option-${value}`} value={value}>{this.state.types[value].name}</option>;
     });
     const formattedStreams = this.state.streams

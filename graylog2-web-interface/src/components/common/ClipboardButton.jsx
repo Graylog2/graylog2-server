@@ -1,6 +1,6 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import {Button, Tooltip, OverlayTrigger} from 'react-bootstrap';
+import { Button, Tooltip, OverlayTrigger } from 'react-bootstrap';
 import Clipboard from 'clipboard';
 
 const ClipboardButton = React.createClass({
@@ -36,7 +36,7 @@ const ClipboardButton = React.createClass({
     }
   },
   _onSuccess(event) {
-    this.setState({tooltipMessage: 'Copied!'});
+    this.setState({ tooltipMessage: 'Copied!' });
 
     if (this.props.onSuccess) {
       this.props.onSuccess(event);
@@ -46,10 +46,10 @@ const ClipboardButton = React.createClass({
   },
   _onError(event) {
     const key = event.action === 'cut' ? 'K' : 'C';
-    this.setState({tooltipMessage: `Press Ctrl+${key} to ${event.action}`});
+    this.setState({ tooltipMessage: `Press Ctrl+${key} to ${event.action}` });
   },
   _getFilteredProps() {
-    const {className, style, bsStyle, bsSize} = this.props;
+    const { className, style, bsStyle, bsSize } = this.props;
     return {
       className: className,
       style: style,
@@ -59,7 +59,7 @@ const ClipboardButton = React.createClass({
   },
   render() {
     const filteredProps = this._getFilteredProps();
-    const tooltip = <Tooltip id={`copy-button-tooltip`}>{this.state.tooltipMessage}</Tooltip>;
+    const tooltip = <Tooltip id={'copy-button-tooltip'}>{this.state.tooltipMessage}</Tooltip>;
 
     if (this.props.text) {
       filteredProps['data-clipboard-text'] = this.props.text;

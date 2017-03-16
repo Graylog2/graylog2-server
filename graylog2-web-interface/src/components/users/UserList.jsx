@@ -29,7 +29,7 @@ const UserList = React.createClass({
   },
   componentDidMount() {
     this.loadUsers();
-    RolesStore.loadRoles().done(roles => {
+    RolesStore.loadRoles().done((roles) => {
       this.setState({ roles: roles.map(role => role.name) });
     });
   },
@@ -76,7 +76,7 @@ const UserList = React.createClass({
         formattedHeaderCell = (<th>
           {header}
           <OverlayTrigger trigger="click" rootClose placement="top" overlay={popover}>
-            <Button bsStyle="link" className={UserListStyle.helpHeaderRow}><i className="fa fa-fw fa-question-circle"/></Button>
+            <Button bsStyle="link" className={UserListStyle.helpHeaderRow}><i className="fa fa-fw fa-question-circle" /></Button>
           </OverlayTrigger>
         </th>);
         break;
@@ -96,16 +96,16 @@ const UserList = React.createClass({
     if (user.session_active) {
       const popover = (
         <Popover id="session-badge-details" title="Logged in" className={UserListStyle.sessionBadgeDetails}>
-          <div>Last activity: <Timestamp dateTime={user.last_activity} relative/></div>
+          <div>Last activity: <Timestamp dateTime={user.last_activity} relative /></div>
           <div>Client address: {user.client_address}</div>
         </Popover>
       );
       userBadge = (<OverlayTrigger trigger={['hover', 'focus']} placement="left" overlay={popover} rootClose>
-        <i className={`fa fa-circle ${UserListStyle.activeSession}`}/>
+        <i className={`fa fa-circle ${UserListStyle.activeSession}`} />
       </OverlayTrigger>);
     }
 
-    const roleBadges = user.roles.map((role) => <span key={role} className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
+    const roleBadges = user.roles.map(role => <span key={role} className={`${UserListStyle.roleBadgeFixes} label label-${role === 'Admin' ? 'info' : 'default'}`}>{role}</span>);
 
     let actions = null;
     if (user.read_only) {
@@ -165,13 +165,13 @@ const UserList = React.createClass({
                      className="table-hover"
                      headers={headers}
                      headerCellFormatter={this._headerCellFormatter}
-                     sortByKey={"full_name"}
+                     sortByKey={'full_name'}
                      rows={this.state.users}
                      filterBy="role"
                      filterSuggestions={this.state.roles}
                      dataRowFormatter={this._userInfoFormatter}
                      filterLabel="Filter Users"
-                     filterKeys={filterKeys}/>
+                     filterKeys={filterKeys} />
         </div>
       );
     }

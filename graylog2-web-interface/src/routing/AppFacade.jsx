@@ -39,7 +39,7 @@ const AppFacade = React.createClass({
       return <LoginPage />;
     }
     if (!this.state.currentUser) {
-      return <LoadingPage text="We are preparing Graylog for you..."/>;
+      return <LoadingPage text="We are preparing Graylog for you..." />;
     }
     return <LoggedInPage />;
   },

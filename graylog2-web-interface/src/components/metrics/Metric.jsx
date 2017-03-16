@@ -50,7 +50,7 @@ const Metric = React.createClass({
     return (
       <span>
         <div className="name">
-          <i className={'fa fa-' + this._formatIcon(metric.type)} />{' '}
+          <i className={`fa fa-${this._formatIcon(metric.type)}`} />{' '}
           <a className="open" href="#" onClick={this._showDetails}>{this._formatName(metric.full_name)}</a>
         </div>
         {details}

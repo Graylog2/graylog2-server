@@ -35,7 +35,7 @@ const ShowQueryModal = React.createClass({
         </Modal.Footer>
       </BootstrapModalWrapper>
     );
-  }
+  },
 });
 
 export default ShowQueryModal;

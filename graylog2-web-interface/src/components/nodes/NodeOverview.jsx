@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Button } from 'react-bootstrap';
 
@@ -41,14 +41,14 @@ const NodeOverview = React.createClass({
       <div>
         <Row className="content">
           <Col md={12}>
-            <SystemOverviewDetails node={node} information={systemOverview}/>
+            <SystemOverviewDetails node={node} information={systemOverview} />
           </Col>
         </Row>
 
         <Row className="content">
           <Col md={12}>
-            <h2 style={{marginBottom: 5}}>Memory/Heap usage</h2>
-            <JvmHeapUsage nodeId={node.node_id}/>
+            <h2 style={{ marginBottom: 5 }}>Memory/Heap usage</h2>
+            <JvmHeapUsage nodeId={node.node_id} />
           </Col>
         </Row>
 
@@ -61,13 +61,13 @@ const NodeOverview = React.createClass({
             </p>
             <Row>
               <Col md={4}>
-                <BufferUsage nodeId={node.node_id} title="Input buffer" bufferType="input"/>
+                <BufferUsage nodeId={node.node_id} title="Input buffer" bufferType="input" />
               </Col>
               <Col md={4}>
-                <BufferUsage nodeId={node.node_id} title="Process buffer" bufferType="process"/>
+                <BufferUsage nodeId={node.node_id} title="Process buffer" bufferType="process" />
               </Col>
               <Col md={4}>
-                <BufferUsage nodeId={node.node_id} title="Output buffer" bufferType="output"/>
+                <BufferUsage nodeId={node.node_id} title="Output buffer" bufferType="output" />
               </Col>
             </Row>
           </Col>
@@ -83,25 +83,25 @@ const NodeOverview = React.createClass({
               Graylog does not buffer all of those messages in main memory and avoids overly long garbage
               collection pauses that way.
             </p>
-            <JournalDetails nodeId={node.node_id}/>
+            <JournalDetails nodeId={node.node_id} />
           </Col>
         </Row>
 
         <Row className="content">
           <Col md={6}>
             <h2>System</h2>
-            <SystemInformation node={node} systemInformation={systemOverview} jvmInformation={this.props.jvmInformation}/>
+            <SystemInformation node={node} systemInformation={systemOverview} jvmInformation={this.props.jvmInformation} />
           </Col>
           <Col md={6}>
             <h2>REST API</h2>
-            <RestApiOverview node={node}/>
+            <RestApiOverview node={node} />
           </Col>
         </Row>
 
         <Row className="content">
           <Col md={12}>
             <h2>Installed plugins <small>{pluginCount}</small></h2>
-            <PluginsDataTable plugins={this.props.plugins}/>
+            <PluginsDataTable plugins={this.props.plugins} />
           </Col>
         </Row>
 
@@ -112,8 +112,8 @@ const NodeOverview = React.createClass({
                 <Button bsStyle="success" bsSize="small">Manage inputs</Button>
               </LinkContainer>
             </span>
-            <h2 style={{marginBottom: 15}}>Available input types <small>{inputCount}</small></h2>
-            <InputTypesDataTable inputDescriptions={this.props.inputDescriptions}/>
+            <h2 style={{ marginBottom: 15 }}>Available input types <small>{inputCount}</small></h2>
+            <InputTypesDataTable inputDescriptions={this.props.inputDescriptions} />
           </Col>
         </Row>
       </div>

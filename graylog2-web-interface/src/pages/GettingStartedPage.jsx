@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 
 import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
@@ -25,7 +25,7 @@ const GettingStartedPage = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     return (
@@ -39,7 +39,7 @@ const GettingStartedPage = React.createClass({
                           masterVersion={this.state.system.version}
                           gettingStartedUrl={GETTING_STARTED_URL}
                           noDismissButton={Boolean(this.props.location.query.menu)}
-                          onDismiss={this._onDismiss}/>
+                          onDismiss={this._onDismiss} />
         </div>
       </DocumentTitle>
     );

@@ -60,7 +60,7 @@ const AuthProvidersConfig = React.createClass({
   _updateSorting(newSorting) {
     const update = ObjectUtils.clone(this.state.config);
 
-    update.realm_order = newSorting.map((entry) => entry.id);
+    update.realm_order = newSorting.map(entry => entry.id);
 
     this.setState({ config: update });
   },
@@ -72,11 +72,9 @@ const AuthProvidersConfig = React.createClass({
       const checked = this.refs[realmName].checked;
 
       if (checked) {
-        update.disabled_realms = disabledProcessors.filter((p) => p !== realmName);
-      } else {
-        if (disabledProcessors.indexOf(realmName) === -1) {
-          update.disabled_realms.push(realmName);
-        }
+        update.disabled_realms = disabledProcessors.filter(p => p !== realmName);
+      } else if (disabledProcessors.indexOf(realmName) === -1) {
+        update.disabled_realms.push(realmName);
       }
 
       this.setState({ config: update });
@@ -94,14 +92,13 @@ const AuthProvidersConfig = React.createClass({
           <strong>ERROR:</strong> No active authentication provider!
         </Alert>
       );
-    } else {
-      return null;
     }
+    return null;
   },
 
   _summary() {
     return this.state.config.realm_order.map((name, idx) => {
-      const status = this.state.config.disabled_realms.filter((disabledName) => disabledName === name).length > 0 ? 'disabled' : 'active';
+      const status = this.state.config.disabled_realms.filter(disabledName => disabledName === name).length > 0 ? 'disabled' : 'active';
       const realm = (this.props.descriptors[name] || { id: name, title: 'Unavailable' });
       return (
         <tr key={idx}>
@@ -123,7 +120,7 @@ const AuthProvidersConfig = React.createClass({
 
   _statusForm() {
     return ObjectUtils.clone(this.state.config.realm_order).sort((a, b) => naturalSort(a.displayName, b.displayName)).map((realmName, idx) => {
-      const enabled = this.state.config.disabled_realms.filter((disabledName) => disabledName === realmName).length < 1;
+      const enabled = this.state.config.disabled_realms.filter(disabledName => disabledName === realmName).length < 1;
       const realm = (this.props.descriptors[realmName] || { id: realmName, displayName: 'Unavailable' });
 
       return (
@@ -134,7 +131,7 @@ const AuthProvidersConfig = React.createClass({
                    type="checkbox"
                    checked={enabled}
                    disabled={!realm.canBeDisabled}
-                   onChange={this._toggleStatus(realm.name)}/>
+                   onChange={this._toggleStatus(realm.name)} />
           </td>
         </tr>
       );
@@ -147,7 +144,7 @@ const AuthProvidersConfig = React.createClass({
         <span>
           <PageHeader title="Authentication Providers" subpage>
             <span>The following authentication providers executed in order during login. Disabled providers will be
-              skipped.<br/>A user is authenticated by the first matching provider, a successful match can cause a Graylog account for
+              skipped.<br />A user is authenticated by the first matching provider, a successful match can cause a Graylog account for
               this user to be created.
             </span>
           </PageHeader>
@@ -163,7 +160,7 @@ const AuthProvidersConfig = React.createClass({
                   </tr>
                 </thead>
                 <tbody>
-                {this._summary()}
+                  {this._summary()}
                 </tbody>
               </Table>
 
@@ -179,7 +176,7 @@ const AuthProvidersConfig = React.createClass({
                                   submitButtonText="Save">
                 <h3>Order</h3>
                 <p>Use drag and drop to change the execution order of the authentication providers.</p>
-                <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting}/>
+                <SortableList items={this._sortableItems()} onMoveItem={this._updateSorting} />
 
                 <h3>Status</h3>
                 <p>Change the checkboxes to change the status of an authentication provider.</p>
@@ -191,7 +188,7 @@ const AuthProvidersConfig = React.createClass({
                     </tr>
                   </thead>
                   <tbody>
-                  {this._statusForm()}
+                    {this._statusForm()}
                   </tbody>
                 </Table>
                 {this._noActiveRealmWarning()}

@@ -9,7 +9,7 @@ const SystemJobsList = React.createClass({
   },
   _formatSystemJob(job) {
     return (
-      <div className="systemjob systemjob-progress systemjob-active" key={'job-' + job.id}>
+      <div className="systemjob systemjob-progress systemjob-active" key={`job-${job.id}`}>
         <SystemJob job={job} />
       </div>
     );
@@ -19,10 +19,10 @@ const SystemJobsList = React.createClass({
     if (jobs.length === 0) {
       return (
         <Alert bsStyle="info" className="systemjobs-none">
-          <i className="fa fa-info-circle"/>{' '}
+          <i className="fa fa-info-circle" />{' '}
           &nbsp;No active system jobs.
         </Alert>
-    );
+      );
     }
     return (
       <span>

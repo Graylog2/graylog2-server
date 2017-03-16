@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -33,12 +33,12 @@ const EditExtractorsPage = React.createClass({
   componentDidMount() {
     InputsActions.get.triggerPromise(this.props.params.inputId);
     ExtractorsActions.get.triggerPromise(this.props.params.inputId, this.props.params.extractorId);
-    UniversalSearchstore.search('relative', 'gl2_source_input:' + this.props.params.inputId + ' OR gl2_source_radio_input:' + this.props.params.inputId, { range: 0 }, undefined, 1)
+    UniversalSearchstore.search('relative', `gl2_source_input:${this.props.params.inputId} OR gl2_source_radio_input:${this.props.params.inputId}`, { range: 0 }, undefined, 1)
       .then((response) => {
         if (response.total_results > 0) {
-          this.setState({exampleMessage: response.messages[0]});
+          this.setState({ exampleMessage: response.messages[0] });
         } else {
-          this.setState({exampleMessage: {}});
+          this.setState({ exampleMessage: {} });
         }
       });
   },
@@ -60,7 +60,7 @@ const EditExtractorsPage = React.createClass({
     // - Redirect when extractor or input were deleted
 
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     return (
@@ -75,14 +75,14 @@ const EditExtractorsPage = React.createClass({
 
             <span>
               Find more information about extractors in the
-              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
+              {' '}<DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
             </span>
           </PageHeader>
           <EditExtractor action="edit"
                          extractor={this.state.extractor}
                          inputId={this.state.input.id}
                          exampleMessage={this.state.exampleMessage.fields ? this.state.exampleMessage.fields[this.state.extractor.source_field] : undefined}
-                         onSave={this._extractorSaved}/>
+                         onSave={this._extractorSaved} />
         </div>
       </DocumentTitle>
     );

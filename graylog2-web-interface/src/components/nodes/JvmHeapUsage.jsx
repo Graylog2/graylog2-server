@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import { ProgressBar } from 'react-bootstrap';
 
@@ -48,33 +48,33 @@ const JvmHeapUsage = React.createClass({
       const metrics = this._extractMetricValues();
 
       if (Object.keys(metrics).length === 0) {
-        progressBar = <div className="progress"></div>;
+        progressBar = <div className="progress" />;
         detail = <p>Heap information unavailable.</p>;
       } else {
         progressBar = (
           <ProgressBar>
-            <ProgressBar className="used-memory" now={metrics.usedPercentage}/>
-            <ProgressBar className="committed-memory" now={metrics.committedPercentage - metrics.usedPercentage}/>
+            <ProgressBar className="used-memory" now={metrics.usedPercentage} />
+            <ProgressBar className="committed-memory" now={metrics.committedPercentage - metrics.usedPercentage} />
           </ProgressBar>
         );
 
         detail = (
           <p>
             The JVM is using{' '}
-            <span className="blob used-memory"/>
+            <span className="blob used-memory" />
             <strong> {NumberUtils.formatBytes(metrics.usedMemory)}</strong>
             {' '}of{' '}
-            <span className="blob committed-memory"/>
+            <span className="blob committed-memory" />
             <strong> {NumberUtils.formatBytes(metrics.committedMemory)}</strong>
             {' '}heap space and will not attempt to use more than{' '}
-            <span className="blob max-memory" style={{border: '1px solid #ccc'}}/>
+            <span className="blob max-memory" style={{ border: '1px solid #ccc' }} />
             <strong> {NumberUtils.formatBytes(metrics.maxMemory)}</strong>
           </p>
         );
       }
     } else {
-      progressBar = <ProgressBar/>;
-      detail = <p><Spinner text="Loading heap usage information..."/></p>;
+      progressBar = <ProgressBar />;
+      detail = <p><Spinner text="Loading heap usage information..." /></p>;
     }
 
     return (

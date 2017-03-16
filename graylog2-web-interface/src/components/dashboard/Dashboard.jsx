@@ -37,11 +37,11 @@ const Dashboard = React.createClass({
       dashboardActions = (
         <div className="stream-actions">
           <EditDashboardModalTrigger id={this.props.dashboard.id} action="edit" title={this.props.dashboard.title}
-                                     description={this.props.dashboard.description} buttonClass="btn-info"/>
+                                     description={this.props.dashboard.description} buttonClass="btn-info" />
           &nbsp;
           <DropdownButton title="More actions" pullRight id={`more-actions-dropdown-${this.props.dashboard.id}`}>
             {setAsStartpageMenuItem}
-            <MenuItem divider/>
+            <MenuItem divider />
             <MenuItem onSelect={this._onDashboardDelete}>Delete this dashboard</MenuItem>
           </DropdownButton>
         </div>
@@ -60,7 +60,7 @@ const Dashboard = React.createClass({
   },
   render() {
     const createdFromContentPack = (this.props.dashboard.content_pack ?
-      <i className="fa fa-cube" title="Created from content pack"/> : null);
+      <i className="fa fa-cube" title="Created from content pack" /> : null);
 
     return (
       <li className="stream">

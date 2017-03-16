@@ -20,7 +20,7 @@ const OutputsComponent = React.createClass({
   loadData() {
     const callback = (resp) => {
       this.setState({
-        outputs: resp.outputs
+        outputs: resp.outputs,
       });
       if (this.props.streamId) {
         this._fetchAssignableOutputs(resp.outputs);
@@ -33,7 +33,7 @@ const OutputsComponent = React.createClass({
     }
 
     OutputsStore.loadAvailableTypes((resp) => {
-      this.setState({types: resp.types});
+      this.setState({ types: resp.types });
     });
   },
   getInitialState() {
@@ -45,9 +45,9 @@ const OutputsComponent = React.createClass({
   },
   _handleCreateOutput(data) {
     OutputsStore.save(data, (result) => {
-      this.setState({typeName: "placeholder"});
+      this.setState({ typeName: 'placeholder' });
       if (this.props.streamId) {
-        StreamsStore.addOutput(this.props.streamId, result.id, response => {
+        StreamsStore.addOutput(this.props.streamId, result.id, (response) => {
           this._handleUpdate();
           return response;
         });
@@ -59,32 +59,32 @@ const OutputsComponent = React.createClass({
   },
   _fetchAssignableOutputs(outputs) {
     OutputsStore.load((resp) => {
-      const streamOutputIds = outputs.map((output) => {return output.id;});
+      const streamOutputIds = outputs.map((output) => { return output.id; });
       const assignableOutputs = resp.outputs
         .filter((output) => { return streamOutputIds.indexOf(output.id) === -1; })
-        .sort((output1, output2) => { return output1.title.localeCompare(output2.title);});
-      this.setState({assignableOutputs: assignableOutputs});
+        .sort((output1, output2) => { return output1.title.localeCompare(output2.title); });
+      this.setState({ assignableOutputs: assignableOutputs });
     });
   },
   _handleAssignOutput(outputId) {
-    StreamsStore.addOutput(this.props.streamId, outputId, response => {
+    StreamsStore.addOutput(this.props.streamId, outputId, (response) => {
       this._handleUpdate();
       return response;
     });
   },
   _removeOutputGlobally(outputId) {
-    if (window.confirm("Do you really want to terminate this output?")) {
-      OutputsStore.remove(outputId, response => {
-        UserNotification.success("Output was terminated.", "Success");
+    if (window.confirm('Do you really want to terminate this output?')) {
+      OutputsStore.remove(outputId, (response) => {
+        UserNotification.success('Output was terminated.', 'Success');
         this._handleUpdate();
         return response;
       });
     }
   },
   _removeOutputFromStream(outputId, streamId) {
-    if (window.confirm("Do you really want to remove this output from the stream?")) {
-      StreamsStore.removeOutput(streamId, outputId, response => {
-        UserNotification.success("Output was removed from stream.", "Success");
+    if (window.confirm('Do you really want to remove this output from the stream?')) {
+      StreamsStore.removeOutput(streamId, outputId, (response) => {
+        UserNotification.success('Output was removed from stream.', 'Success');
         this._handleUpdate();
         return response;
       });
@@ -99,13 +99,13 @@ const OutputsComponent = React.createClass({
     if (this.state.outputs && this.state.types && (!this.props.streamId || this.state.assignableOutputs)) {
       const permissions = this.props.permissions;
       const streamId = this.props.streamId;
-      const createOutputDropdown = (this.isPermitted(permissions, ["outputs:create"]) ?
-        <CreateOutputDropdown types={this.state.types} onSubmit={this._handleCreateOutput}
-                              getTypeDefinition={OutputsStore.loadAvailable} streamId={streamId}/> : null);
+      const createOutputDropdown = (this.isPermitted(permissions, ['outputs:create']) ?
+        (<CreateOutputDropdown types={this.state.types} onSubmit={this._handleCreateOutput}
+                              getTypeDefinition={OutputsStore.loadAvailable} streamId={streamId} />) : null);
       const assignOutputDropdown = (streamId ?
-        <AssignOutputDropdown ref="assignOutputDropdown" streamId={streamId}
+        (<AssignOutputDropdown ref="assignOutputDropdown" streamId={streamId}
                               outputs={this.state.assignableOutputs}
-                              onSubmit={this._handleAssignOutput}/> : null);
+                              onSubmit={this._handleAssignOutput} />) : null);
       return (
         <div className="outputs">
           <Row className="content">
@@ -120,12 +120,11 @@ const OutputsComponent = React.createClass({
           <OutputList ref="outputList" streamId={streamId} outputs={this.state.outputs} permissions={permissions}
                       getTypeDefinition={OutputsStore.loadAvailable} types={this.state.types}
                       onRemove={this._removeOutputFromStream} onTerminate={this._removeOutputGlobally}
-                      onUpdate={this._handleOutputUpdate}/>
+                      onUpdate={this._handleOutputUpdate} />
         </div>
       );
-    } else {
-      return <Spinner />;
     }
-  }
+    return <Spinner />;
+  },
 });
 export default OutputsComponent;

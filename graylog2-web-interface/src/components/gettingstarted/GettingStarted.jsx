@@ -58,7 +58,7 @@ const GettingStarted = React.createClass({
     }
   },
   _displayFallbackContent() {
-    this.setState({showStaticContent: true});
+    this.setState({ showStaticContent: true });
   },
   _dismissGuide() {
     GettingStartedActions.dismiss.triggerPromise().then(() => {
@@ -72,7 +72,7 @@ const GettingStarted = React.createClass({
     if (!this.props.noDismissButton) {
       dismissButton = (
         <Button bsStyle="default" bsSize="small" onClick={this._dismissGuide}>
-          <i className="fa fa-times"></i> Dismiss guide
+          <i className="fa fa-times" /> Dismiss guide
         </Button>
       );
     }
@@ -81,7 +81,7 @@ const GettingStarted = React.createClass({
       gettingStartedContent = (
         <Grid>
           <Row>
-            <Col mdPush={3} md={6} className="content content-head text-center" style={{paddingBottom: '15px'}}>
+            <Col mdPush={3} md={6} className="content content-head text-center" style={{ paddingBottom: '15px' }}>
               <span>
                 We could not load the{' '}
                 <a target="_blank" href="https://gettingstarted.graylog.org/assets/index.html">Graylog Getting Started Guide</a>.
@@ -109,14 +109,14 @@ const GettingStarted = React.createClass({
         iframeStyles.display = 'none';
       }
 
-      const url = this.state.guideUrl === '' ? (this.props.gettingStartedUrl + '?' + query) : this.state.guideUrl;
+      const url = this.state.guideUrl === '' ? (`${this.props.gettingStartedUrl}?${query}`) : this.state.guideUrl;
       let spinner = null;
       if (!this.state.guideLoaded) {
         spinner = (
           <Grid>
             <Row>
-              <Col mdPush={3} md={6} className="content content-head text-center" style={{paddingBottom: '15px'}}>
-                <Spinner text="Loading Graylog Getting started guide ..."/>
+              <Col mdPush={3} md={6} className="content content-head text-center" style={{ paddingBottom: '15px' }}>
+                <Spinner text="Loading Graylog Getting started guide ..." />
               </Col>
             </Row>
           </Grid>

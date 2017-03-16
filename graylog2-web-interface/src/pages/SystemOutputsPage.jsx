@@ -24,7 +24,7 @@ const SystemOutputsPage = React.createClass({
             </span>
           </PageHeader>
 
-          <OutputsComponent permissions={this.state.currentUser.permissions}/>
+          <OutputsComponent permissions={this.state.currentUser.permissions} />
         </span>
       </DocumentTitle>
     );

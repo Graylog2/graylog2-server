@@ -20,7 +20,7 @@ const EntityList = React.createClass({
     if (this.props.items.length === 0) {
       return (
         <Alert bsStyle={this.props.bsNoItemsStyle}>
-          <i className="fa fa-info-circle"/>&nbsp;
+          <i className="fa fa-info-circle" />&nbsp;
           {this.props.noItemsText}
         </Alert>
       );

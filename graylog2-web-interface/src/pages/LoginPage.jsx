@@ -42,9 +42,9 @@ const LoginPage = React.createClass({
     const promise = SessionActions.login.triggerPromise(username, password, location);
     promise.catch((error) => {
       if (error.additional.status === 401) {
-        this.setState({lastError: 'Invalid credentials, please verify them and retry.'});
+        this.setState({ lastError: 'Invalid credentials, please verify them and retry.' });
       } else {
-        this.setState({lastError: 'Error - the server returned: ' + error.additional.status + ' - ' + error.message});
+        this.setState({ lastError: `Error - the server returned: ${error.additional.status} - ${error.message}` });
       }
     });
     promise.finally(() => {
@@ -66,7 +66,7 @@ const LoginPage = React.createClass({
     return null;
   },
   resetLastError() {
-    this.setState({lastError: undefined});
+    this.setState({ lastError: undefined });
   },
   render() {
     if (this.state.validatingSession) {
@@ -82,7 +82,7 @@ const LoginPage = React.createClass({
           <div className="container" id="login-box">
             <Row>
               <form className="col-md-4 col-md-offset-4 well" id="login-box-content" onSubmit={this.onSignInClicked}>
-                <legend><i className="fa fa-group"/> Welcome to Graylog</legend>
+                <legend><i className="fa fa-group" /> Welcome to Graylog</legend>
 
                 {alert}
 

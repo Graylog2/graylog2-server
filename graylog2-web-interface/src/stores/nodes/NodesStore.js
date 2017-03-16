@@ -39,7 +39,7 @@ const NodesStore = Reflux.createStore({
 
   list() {
     const promise = this.promises.list || fetchPeriodically('GET', URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.list().url))
-      .then(response => {
+      .then((response) => {
         this.nodes = {};
         response.nodes.forEach((node) => {
           this.nodes[node.node_id] = node;

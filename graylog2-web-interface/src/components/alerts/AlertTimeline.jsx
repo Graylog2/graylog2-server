@@ -41,7 +41,7 @@ const AlertTimeline = React.createClass({
 
         return (h1Time.isBefore(h2Time) ? -1 : h2Time.isBefore(h1Time) ? 1 : 0);
       })
-      .forEach(history => {
+      .forEach((history) => {
         const configuration = history.alarmcallbackconfiguration;
         const type = this.state.availableNotifications[configuration.type];
         let title;
@@ -71,26 +71,24 @@ const AlertTimeline = React.createClass({
         <dt key="resolution-title"><Timestamp dateTime={this.props.alert.triggered_at} /></dt>,
         <dd key="resolution-desc">This alert does not support resolution. It was marked as resolved when triggered.</dd>,
       );
-    } else {
-      if (this.props.alert.resolved_at) {
-        formattedResolution.push(
-          <dt key="resolution-title"><Timestamp dateTime={this.props.alert.resolved_at} /></dt>,
-          <dd key="resolution-desc">Condition is no longer satisfied, alert is marked as resolved</dd>,
+    } else if (this.props.alert.resolved_at) {
+      formattedResolution.push(
+        <dt key="resolution-title"><Timestamp dateTime={this.props.alert.resolved_at} /></dt>,
+        <dd key="resolution-desc">Condition is no longer satisfied, alert is marked as resolved</dd>,
         );
-      } else {
-        const conditionParameters = this.props.alert.condition_parameters || {};
-        const repeatNotifications = conditionParameters.repeat_notifications || false;
-        const notificationsText = (repeatNotifications ?
+    } else {
+      const conditionParameters = this.props.alert.condition_parameters || {};
+      const repeatNotifications = conditionParameters.repeat_notifications || false;
+      const notificationsText = (repeatNotifications ?
           'Condition is configured to repeat notifications, Graylog will send notifications when evaluating the condition until it is no longer satisfied' :
           'Condition is configured to not repeat notifications');
 
-        formattedResolution.push(
-          <dt key="notifications-title"><Timestamp dateTime={new Date()} /></dt>,
-          <dd key="notifications-desc">{notificationsText}</dd>,
-          <dt key="resolution-title"><Timestamp dateTime={new Date()} /></dt>,
-          <dd key="resolution-desc">Condition is still satisfied, <strong>alert is unresolved</strong></dd>,
+      formattedResolution.push(
+        <dt key="notifications-title"><Timestamp dateTime={new Date()} /></dt>,
+        <dd key="notifications-desc">{notificationsText}</dd>,
+        <dt key="resolution-title"><Timestamp dateTime={new Date()} /></dt>,
+        <dd key="resolution-desc">Condition is still satisfied, <strong>alert is unresolved</strong></dd>,
         );
-      }
     }
 
     return formattedResolution;

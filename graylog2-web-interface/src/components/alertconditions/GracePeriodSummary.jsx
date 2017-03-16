@@ -9,7 +9,7 @@ const GracePeriodSummary = React.createClass({
       return '1 minute';
     }
 
-    return time + ' minutes';
+    return `${time} minutes`;
   },
   render() {
     const time = this.props.alertCondition.parameters.grace;

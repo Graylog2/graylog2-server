@@ -8,7 +8,7 @@ const DebugHandler = React.createClass({
         {this.props.location.pathname}
       </div>
     );
-  }
+  },
 });
 
 export default DebugHandler;

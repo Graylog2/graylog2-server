@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {Row, Col, Input} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Row, Col, Input } from 'react-bootstrap';
 
 import FormUtils from 'util/FormsUtils';
 
@@ -13,7 +13,7 @@ const SplitAndCountConverterConfiguration = React.createClass({
     this.props.onChange(this.props.type, this._getConverterObject());
   },
   _getConverterObject(configuration) {
-    return {type: this.props.type, config: configuration || this.props.configuration};
+    return { type: this.props.type, config: configuration || this.props.configuration };
   },
   _toggleConverter(event) {
     let converter;
@@ -47,7 +47,7 @@ const SplitAndCountConverterConfiguration = React.createClass({
                label="Split & Count"
                wrapperClassName="col-md-offset-2 col-md-10"
                defaultChecked
-               onChange={this._toggleConverter}/>
+               onChange={this._toggleConverter} />
         <Row className="row-sm">
           <Col md={9} mdOffset={2}>
             <div className="xtrc-converter-subfields">
@@ -59,7 +59,7 @@ const SplitAndCountConverterConfiguration = React.createClass({
                      wrapperClassName="col-md-9"
                      onChange={this._onChange('split_by')}
                      required={this.refs.converterEnabled && this.refs.converterEnabled.getChecked()}
-                     help={splitByHelpMessage}/>
+                     help={splitByHelpMessage} />
             </div>
           </Col>
         </Row>

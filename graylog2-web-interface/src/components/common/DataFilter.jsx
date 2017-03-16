@@ -26,7 +26,7 @@ const DataFilter = React.createClass({
     }, this.filterData);
   },
   onFilterUpdate(event) {
-    this.setState({filter: event.target.value}, this.filterData);
+    this.setState({ filter: event.target.value }, this.filterData);
   },
   filterData() {
     const filteredData = this.state.data.filter((datum) => {
@@ -39,13 +39,13 @@ const DataFilter = React.createClass({
   },
   render() {
     return (
-      <form className="form-inline" onSubmit={(e) => e.preventDefault()}>
+      <form className="form-inline" onSubmit={e => e.preventDefault()}>
         <Input type="text"
                groupClassName="form-group-sm"
                label={this.props.label}
                name="filter"
                value={this.state.filter}
-               onChange={this.onFilterUpdate}/>
+               onChange={this.onFilterUpdate} />
       </form>
     );
   },

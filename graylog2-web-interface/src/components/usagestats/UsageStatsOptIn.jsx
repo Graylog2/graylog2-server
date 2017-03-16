@@ -9,36 +9,36 @@ const UsageStatsOptIn = React.createClass({
     return {
       optOutStateLoaded: false,
       optOutState: null,
-      pluginEnabled: false
+      pluginEnabled: false,
     };
   },
   componentDidMount() {
     UsageStatsOptOutStore.pluginEnabled().done((isEnabled) => {
-      this.setState({pluginEnabled: isEnabled});
+      this.setState({ pluginEnabled: isEnabled });
     });
 
     UsageStatsOptOutStore.getOptOutState().done((optOutState) => {
-      this.setState({optOutStateLoaded: true, optOutState: optOutState});
+      this.setState({ optOutStateLoaded: true, optOutState: optOutState });
     });
   },
   _handleClickEnable() {
     UsageStatsOptOutStore.setOptIn(false);
-    this.setState({optOutState: {opt_out: false}});
+    this.setState({ optOutState: { opt_out: false } });
   },
   _handleClickDisable() {
     UsageStatsOptOutStore.setOptOut(false);
-    this.setState({optOutState: {opt_out: true}});
+    this.setState({ optOutState: { opt_out: true } });
   },
   render() {
-    var content = null;
+    let content = null;
 
     if (this.state.optOutStateLoaded && this.state.pluginEnabled === true) {
-      var form = null;
+      let form = null;
 
       if (this.state.optOutState !== null && this.state.optOutState.opt_out === true) {
         form = (
           <span>
-            <i className="fa fa-info-circle"></i>
+            <i className="fa fa-info-circle" />
             &nbsp;
             You have currently <strong>disabled</strong> sending usage statistics to Graylog. Please consider turning
             it back on to provide anonymous statistics that will help us make Graylog better for you.
@@ -48,7 +48,7 @@ const UsageStatsOptIn = React.createClass({
       } else {
         form = (
           <span>
-            <i className="fa fa-info-circle"></i>
+            <i className="fa fa-info-circle" />
             &nbsp;
             You have currently <strong>enabled</strong> sending anonymous usage statistics to Graylog. Thank you! User
             statistics help us make Graylog better. If you've changed your mind, click "Disable".

@@ -54,17 +54,17 @@ const AlertMessages = React.createClass({
     const promise = UniversalSearchStore.search('absolute', '*', searchParams, this.props.stream.id, this.PAGE_SIZE,
       page || 1, 'timestamp', 'asc', undefined, false);
     promise.then(
-      response => {
+      (response) => {
         if (response.total_results > 0) {
           this.setState({ messages: response.messages, totalMessages: response.total_results });
         } else {
           this.setState({ messages: [], totalMessages: 0 });
         }
       },
-      error => {
+      (error) => {
         UserNotification.error(`Fetching messages during alert failed with error: ${error}`,
           'Could not get messages during alert');
-      }
+      },
     );
   },
 
@@ -78,7 +78,7 @@ const AlertMessages = React.createClass({
 
   _formatMessages(messages) {
     return messages
-      .map(message => {
+      .map((message) => {
         return (
           <tr key={`${message.index}-${message.id}`}>
             <td><Timestamp dateTime={message.formatted_fields.timestamp} /></td>

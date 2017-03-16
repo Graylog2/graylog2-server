@@ -1,11 +1,11 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
-import {Row, Col} from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import EntityList from 'components/common/EntityList';
 import InputListItem from './InputListItem';
-import {IfPermitted, Spinner} from 'components/common';
+import { IfPermitted, Spinner } from 'components/common';
 import CreateInputControl from './CreateInputControl';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -40,34 +40,34 @@ const InputsList = React.createClass({
       .filter(input => input.global === true)
       .sort((inputA, inputB) => naturalSort(inputA.title, inputB.title));
     let localInputs = inputs
-      .filter((input) => input.global === false)
+      .filter(input => input.global === false)
       .sort((inputA, inputB) => naturalSort(inputA.title, inputB.title));
 
     if (this.props.node) {
       localInputs = localInputs.filter(input => input.node === this.props.node.node_id);
     }
 
-    this.setState({globalInputs: globalInputs, localInputs: localInputs});
+    this.setState({ globalInputs: globalInputs, localInputs: localInputs });
   },
   _isLoading() {
     return !(this.state.localInputs && this.state.globalInputs && this.state.node);
   },
   _formatInput(input) {
-    return <InputListItem key={input.id} input={input} currentNode={this.state.node} permissions={this.props.permissions}/>;
+    return <InputListItem key={input.id} input={input} currentNode={this.state.node} permissions={this.props.permissions} />;
   },
   _nodeAffix() {
     return (this.props.node ? ' on this node' : '');
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     return (
       <div>
         {!this.props.node &&
         <IfPermitted permissions="inputs:create">
-          <CreateInputControl/>
+          <CreateInputControl />
         </IfPermitted>
         }
 

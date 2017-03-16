@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -32,7 +32,7 @@ const NodeInputsPage = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     const title = <span>Inputs of node {this.state.node.short_node_id} / {this.state.node.hostname}</span>;

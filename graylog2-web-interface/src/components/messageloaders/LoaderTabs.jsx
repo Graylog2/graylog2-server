@@ -117,7 +117,7 @@ const LoaderTabs = React.createClass({
           <RecentMessageLoader inputs={this.state.inputs}
                                selectedInputId={this.props.selectedInputId}
                                onMessageLoaded={this.onMessageLoaded} />
-        </Tab>
+        </Tab>,
       );
     }
 
@@ -129,7 +129,7 @@ const LoaderTabs = React.createClass({
           </div>
 
           <MessageLoader ref="messageLoader" onMessageLoaded={this.onMessageLoaded} hidden={false} hideText />
-        </Tab>
+        </Tab>,
       );
     }
 
@@ -141,7 +141,7 @@ const LoaderTabs = React.createClass({
           </div>
 
           <RawMessageLoader onMessageLoaded={this.onMessageLoaded} />
-        </Tab>
+        </Tab>,
       );
     }
 

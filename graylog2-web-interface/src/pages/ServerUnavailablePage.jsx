@@ -26,7 +26,7 @@ const ServerUnavailablePage = React.createClass({
   },
 
   _toggleDetails() {
-    this.setState({showDetails: !this.state.showDetails});
+    this.setState({ showDetails: !this.state.showDetails });
   },
 
   _formatErrorMessage() {
@@ -36,7 +36,7 @@ const ServerUnavailablePage = React.createClass({
 
     const noInformationMessage = (
       <div>
-        <hr/>
+        <hr />
         <p>There is no information available.</p>
       </div>
     );
@@ -55,17 +55,17 @@ const ServerUnavailablePage = React.createClass({
       const originalError = error.originalError;
       errorDetails.push(
         <dt key="status-original-request-title">Original Request</dt>,
-        <dd key="status-original-request-content">{String(originalError.method)} {String(originalError.url)}</dd>
+        <dd key="status-original-request-content">{String(originalError.method)} {String(originalError.url)}</dd>,
       );
       errorDetails.push(
         <dt key="status-code-title">Status code</dt>,
-        <dd key="status-code-desc">{String(originalError.status)}</dd>
+        <dd key="status-code-desc">{String(originalError.status)}</dd>,
       );
 
       if (typeof originalError.toString === 'function') {
         errorDetails.push(
           <dt key="full-error-title">Full error message</dt>,
-          <dd key="full-error-desc">{originalError.toString()}</dd>
+          <dd key="full-error-desc">{originalError.toString()}</dd>,
         );
       }
     }
@@ -76,10 +76,10 @@ const ServerUnavailablePage = React.createClass({
 
     return (
       <div>
-        <hr style={{marginTop: 10, marginBottom: 10}}/>
+        <hr style={{ marginTop: 10, marginBottom: 10 }} />
         <p>This is the last response we received from the server:</p>
-        <Well bsSize="small" style={{whiteSpace: 'pre-line'}}>
-          <dl style={{marginBottom: 0}}>
+        <Well bsSize="small" style={{ whiteSpace: 'pre-line' }}>
+          <dl style={{ marginBottom: 0 }}>
             {errorDetails}
           </dl>
         </Well>
@@ -92,7 +92,7 @@ const ServerUnavailablePage = React.createClass({
       <DocumentTitle title="Server unavailable">
         <Modal show>
           <Modal.Header>
-            <Modal.Title><i className="fa fa-exclamation-triangle"/> Server currently unavailable</Modal.Title>
+            <Modal.Title><i className="fa fa-exclamation-triangle" /> Server currently unavailable</Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div>

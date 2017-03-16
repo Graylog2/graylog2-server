@@ -29,7 +29,7 @@ const EditAlertConditionPage = React.createClass({
   },
 
   componentDidMount() {
-    StreamsStore.get(this.props.params.streamId, stream => {
+    StreamsStore.get(this.props.params.streamId, (stream) => {
       this.setState({ stream: stream });
     });
 

@@ -14,13 +14,13 @@ const IndexMaintenanceStrategiesSummary = React.createClass({
     }
 
     const activeStrategy = this.props.config.strategy;
-    const strategy = this.props.pluginExports.filter((exportedStrategy) => exportedStrategy.type === activeStrategy)[0];
+    const strategy = this.props.pluginExports.filter(exportedStrategy => exportedStrategy.type === activeStrategy)[0];
 
     if (!strategy || !strategy.summaryComponent) {
       return (<Alert bsStyle="danger">Summary for strategy {activeStrategy} not found!</Alert>);
     }
 
-    const element = React.createElement(strategy.summaryComponent, {config: this.props.config.config});
+    const element = React.createElement(strategy.summaryComponent, { config: this.props.config.config });
 
     return (<span key={strategy.type}>{element}</span>);
   },

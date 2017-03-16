@@ -30,7 +30,7 @@ const SearchPage = React.createClass({
     Reflux.connect(CurrentUserStore),
     Reflux.listenTo(InputsStore, '_formatInputs'),
     Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'),
-    Reflux.listenTo(DecoratorsStore, '_refreshDataFromDecoratorStore', '_refreshDataFromDecoratorStore')
+    Reflux.listenTo(DecoratorsStore, '_refreshDataFromDecoratorStore', '_refreshDataFromDecoratorStore'),
   ],
   getInitialState() {
     return {
@@ -89,7 +89,7 @@ const SearchPage = React.createClass({
     this.setState({ updatingSearch: true });
     this.promise = UniversalSearchStore.search(SearchStore.originalRangeType, query, SearchStore.originalRangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
       .then(
-        response => {
+        (response) => {
           if (this.isMounted()) {
             this.setState({ searchResult: response, error: undefined });
           }
@@ -98,7 +98,7 @@ const SearchPage = React.createClass({
 
           this.setState({ updatingHistogram: true });
           UniversalSearchStore.histogram(SearchStore.originalRangeType, query, SearchStore.originalRangeParams.toJS(), interval, streamId)
-            .then(histogram => {
+            .then((histogram) => {
               this.setState({ histogram: histogram });
               return histogram;
             })
@@ -106,14 +106,14 @@ const SearchPage = React.createClass({
 
           return response;
         },
-        error => {
+        (error) => {
           // Treat searches with a malformed query
           if (error.additional) {
             if (error.additional.status) {
               this.setState({ error: error.additional });
             }
           }
-        }
+        },
       )
       .finally(() => {
         this.setState({ updatingSearch: false });

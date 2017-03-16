@@ -27,7 +27,7 @@ const TestLdapLogin = React.createClass({
   componentWillReceiveProps(nextProps) {
     // Reset login status if ldapSettings changed
     if (JSON.stringify(this.props.ldapSettings) !== JSON.stringify(nextProps.ldapSettings)) {
-      this.setState({loginStatus: {}});
+      this.setState({ loginStatus: {} });
     }
   },
 
@@ -54,11 +54,11 @@ const TestLdapLogin = React.createClass({
   _testLogin() {
     LdapActions.testLogin.triggerPromise(this.props.ldapSettings, this.state.loginUser, this.state.loginPassword)
       .then(
-        result => {
+        (result) => {
           if (result.connected && (result.login_authenticated || !ObjectUtils.isEmpty(result.entry))) {
-            this.setState({loginStatus: {loading: false, success: true, result: result}});
+            this.setState({ loginStatus: { loading: false, success: true, result: result } });
           } else {
-            this.setState({loginStatus: {loading: false, error: true, result: result}});
+            this.setState({ loginStatus: { loading: false, error: true, result: result } });
           }
         },
         () => {
@@ -71,10 +71,10 @@ const TestLdapLogin = React.createClass({
               },
             },
           });
-        }
+        },
       );
 
-    this.setState({loginStatus: {loading: true}});
+    this.setState({ loginStatus: { loading: true } });
   },
 
   _loginTestButtonStyle() {
@@ -99,20 +99,18 @@ const TestLdapLogin = React.createClass({
 
     let userFound;
     if (ObjectUtils.isEmpty(loginStatus.result.entry)) {
-      userFound = <i className="fa fa-times ldap-failure"/>;
+      userFound = <i className="fa fa-times ldap-failure" />;
     } else {
-      userFound = <i className="fa fa-check ldap-success"/>;
+      userFound = <i className="fa fa-check ldap-success" />;
     }
 
     let loginCheck;
     if (loginStatus.result.login_authenticated) {
-      loginCheck = <i className="fa fa-check ldap-success"/>;
+      loginCheck = <i className="fa fa-check ldap-success" />;
+    } else if (this.state.loginPassword === '') {
+      loginCheck = <i className="fa fa-question ldap-info" />;
     } else {
-      if (this.state.loginPassword === '') {
-        loginCheck = <i className="fa fa-question ldap-info"/>;
-      } else {
-        loginCheck = <i className="fa fa-times ldap-failure"/>;
-      }
+      loginCheck = <i className="fa fa-times ldap-failure" />;
     }
 
     let serverResponse;
@@ -120,18 +118,18 @@ const TestLdapLogin = React.createClass({
       serverResponse = <pre>{loginStatus.result.exception}</pre>;
     }
 
-    const attributes = Object.keys(loginStatus.result.entry).map(key => {
+    const attributes = Object.keys(loginStatus.result.entry).map((key) => {
       return [
         <dt>{key}</dt>,
         <dd>{loginStatus.result.entry[key]}</dd>,
       ];
     });
     const formattedEntry = (attributes.length > 0 ? <dl>{attributes}</dl> :
-      <p>LDAP server did not return any attributes for the user.</p>);
+    <p>LDAP server did not return any attributes for the user.</p>);
 
     const groups = (loginStatus.result.groups ? loginStatus.result.groups.map(group => <li key={group}>{group}</li>) : []);
-    const formattedGroups = (groups.length > 0 ? <ul style={{padding: 0}}>{groups}</ul> :
-      <p>LDAP server did not return any groups for the user.</p>);
+    const formattedGroups = (groups.length > 0 ? <ul style={{ padding: 0 }}>{groups}</ul> :
+    <p>LDAP server did not return any groups for the user.</p>);
 
     return (
       <Row>
@@ -166,13 +164,13 @@ const TestLdapLogin = React.createClass({
               <input type="text" id="test_login_username" name="test_login_username" className="form-control"
                      value={this.state.loginUser} onChange={this._changeLoginForm}
                      onKeyPress={this._disableSubmitOnEnter}
-                     placeholder="Username for login test" disabled={this.props.disabled}/>
+                     placeholder="Username for login test" disabled={this.props.disabled} />
             </Col>
             <Col sm={5}>
               <input type="password" id="test_login_password" name="test_login_password" className="form-control"
                      value={this.state.testLoginPassword} onChange={this._changeLoginForm}
                      onKeyPress={this._disableSubmitOnEnter}
-                     placeholder="Password" disabled={this.props.disabled}/>
+                     placeholder="Password" disabled={this.props.disabled} />
             </Col>
             <Col sm={2}>
               <Button bsStyle={this._loginTestButtonStyle()} disabled={loginDisabled}

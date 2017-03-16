@@ -18,7 +18,7 @@ const SystemJob = React.createClass({
   render() {
     const job = this.props.job;
     const progress = job.percent_complete < 100 ?
-      (<ProgressBar bsStyle="info" active now={job.percent_complete}/>) : <span className="label label-success finished">Finished!</span>;
+      (<ProgressBar bsStyle="info" active now={job.percent_complete} />) : <span className="label label-success finished">Finished!</span>;
     const cancel = job.is_cancelable ?
       (<button type="button" className="btn btn-primary btn-xs pull-right" onClick={this._onCancel(job)}>Cancel Job</button>) : null;
 
@@ -27,8 +27,8 @@ const SystemJob = React.createClass({
         <div style={{ lineHeight: 1.5, marginBottom: 5 }}>
           <i className="fa fa-cog" />{' '}
           <span data-toggle="tooltip" title={job.name}>{job.info}</span>{' '}
-          - Started on <LinkToNode nodeId={job.node_id}/>{' '}
-          <Timestamp dateTime={job.started_at} relative/>{' '}
+          - Started on <LinkToNode nodeId={job.node_id} />{' '}
+          <Timestamp dateTime={job.started_at} relative />{' '}
           {cancel}
         </div>
 

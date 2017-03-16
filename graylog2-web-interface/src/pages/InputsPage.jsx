@@ -23,7 +23,7 @@ const InputsPage = React.createClass({
           <PageHeader title="Inputs">
             <span>Graylog nodes accept data via inputs. Launch or terminate as many inputs as you want here.</span>
           </PageHeader>
-          <InputsList permissions={this.state.currentUser.permissions}/>
+          <InputsList permissions={this.state.currentUser.permissions} />
         </div>
       </DocumentTitle>
     );

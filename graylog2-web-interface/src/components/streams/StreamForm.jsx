@@ -74,7 +74,7 @@ const StreamForm = React.createClass({
   },
 
   _formatSelectOptions() {
-    return this.props.indexSets.filter(indexSet => indexSet.writable).map(indexSet => {
+    return this.props.indexSets.filter(indexSet => indexSet.writable).map((indexSet) => {
       return { value: indexSet.id, label: indexSet.title };
     });
   },
@@ -90,7 +90,7 @@ const StreamForm = React.createClass({
         <div className="form-group">
           <label>Index Set</label>
           <Select placeholder="Select index set" options={this._formatSelectOptions()} matchProp="label"
-                  onValueChange={this._onIndexSetSelect} value={this.state.index_set_id}/>
+                  onValueChange={this._onIndexSetSelect} value={this.state.index_set_id} />
           <p className="help-block">Messages that match this stream will be written to the configured index set.</p>
         </div>
       );
@@ -104,14 +104,14 @@ const StreamForm = React.createClass({
                           onSubmitForm={this._onSubmit}
                           submitButtonText="Save">
         <Input type="text" required label="Title" placeholder="A descriptive name of the new stream"
-               valueLink={this.linkState('title')} autoFocus/>
+               valueLink={this.linkState('title')} autoFocus />
         <Input type="text" required label="Description"
                placeholder="What kind of messages are routed into this stream?"
-               valueLink={this.linkState('description')}/>
+               valueLink={this.linkState('description')} />
         {indexSetSelect}
         <Input type="checkbox" label="Remove matches from 'All messages' stream"
                help={<span>Remove messages that match this stream from the 'All messages' stream which is assigned to every message by default.</span>}
-               checkedLink={this.linkState('remove_matches_from_default_stream')}/>
+               checkedLink={this.linkState('remove_matches_from_default_stream')} />
       </BootstrapModalForm>
     );
   },

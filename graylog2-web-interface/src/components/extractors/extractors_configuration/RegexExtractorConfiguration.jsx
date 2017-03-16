@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {Row, Col, Input, Button} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Row, Col, Input, Button } from 'react-bootstrap';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
@@ -31,10 +31,10 @@ const RegexExtractorConfiguration = React.createClass({
     };
   },
   _onTryClick() {
-    this.setState({trying: true});
+    this.setState({ trying: true });
 
     const promise = ToolsStore.testRegex(this.props.configuration.regex_value, this.props.exampleMessage);
-    promise.then(result => {
+    promise.then((result) => {
       if (!result.matched) {
         UserNotification.warning('Regular expression did not match.');
         return;
@@ -49,7 +49,7 @@ const RegexExtractorConfiguration = React.createClass({
       this.props.onExtractorPreviewLoad(preview);
     });
 
-    promise.finally(() => this.setState({trying: false}));
+    promise.finally(() => this.setState({ trying: false }));
   },
   _isTryButtonDisabled() {
     return this.state.trying || !this.props.configuration.regex_value || !this.props.exampleMessage;
@@ -58,7 +58,7 @@ const RegexExtractorConfiguration = React.createClass({
     const helpMessage = (
       <span>
         The regular expression used for extraction. First matcher group is used.{' '}
-        Learn more in the <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation"/>.
+        Learn more in the <DocumentationLink page={DocsHelper.PAGES.EXTRACTORS} text="documentation" />.
       </span>
     );
 
@@ -74,11 +74,11 @@ const RegexExtractorConfiguration = React.createClass({
                      defaultValue={this.props.configuration.regex_value}
                      placeholder="^.*string(.+)$"
                      onChange={this._onChange('regex_value')}
-                     required/>
+                     required />
             </Col>
             <Col md={1} className="text-right">
               <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-                {this.state.trying ? <i className="fa fa-spin fa-spinner"/> : 'Try'}
+                {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try'}
               </Button>
             </Col>
           </Row>

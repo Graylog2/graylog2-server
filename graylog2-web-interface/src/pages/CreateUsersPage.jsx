@@ -24,7 +24,7 @@ const CreateUsersPage = React.createClass({
   },
 
   componentDidMount() {
-    RolesStore.loadRoles().then(roles => {
+    RolesStore.loadRoles().then((roles) => {
       this.setState({ roles: roles });
     });
   },
@@ -60,7 +60,7 @@ const CreateUsersPage = React.createClass({
           </PageHeader>
           <Row>
             <Col lg={8}>
-              <NewUserForm roles={this.state.roles} onSubmit={this._onSubmit} onCancel={this._onCancel}/>
+              <NewUserForm roles={this.state.roles} onSubmit={this._onSubmit} onCancel={this._onCancel} />
             </Col>
           </Row>
         </span>

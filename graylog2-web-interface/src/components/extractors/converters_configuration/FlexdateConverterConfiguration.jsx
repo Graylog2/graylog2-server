@@ -1,7 +1,7 @@
-import React, {PropTypes} from 'react';
-import {Row, Col, Input} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Row, Col, Input } from 'react-bootstrap';
 
-import {TimezoneSelect} from 'components/common';
+import { TimezoneSelect } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import DocsHelper from 'util/DocsHelper';
@@ -17,7 +17,7 @@ const FlexdateConverterConfiguration = React.createClass({
     this.props.onChange(this.props.type, this._getConverterObject());
   },
   _getConverterObject(configuration) {
-    return {type: this.props.type, config: configuration || this.props.configuration};
+    return { type: this.props.type, config: configuration || this.props.configuration };
   },
   _toggleConverter(event) {
     let converter;
@@ -39,7 +39,7 @@ const FlexdateConverterConfiguration = React.createClass({
     const timezoneHelpMessage = (
       <span>
         Time zone to apply to date. Read more in the <DocumentationLink
-        page={DocsHelper.PAGES.PAGE_FLEXIBLE_DATE_CONVERTER} text="documentation"/>.
+        page={DocsHelper.PAGES.PAGE_FLEXIBLE_DATE_CONVERTER} text="documentation" />.
       </span>
     );
 
@@ -50,7 +50,7 @@ const FlexdateConverterConfiguration = React.createClass({
                label="Flexibly parse date"
                wrapperClassName="col-md-offset-2 col-md-10"
                defaultChecked
-               onChange={this._toggleConverter}/>
+               onChange={this._toggleConverter} />
         <Row className="row-sm">
           <Col md={9} mdOffset={2}>
             <div className="xtrc-converter-subfields">
@@ -63,7 +63,7 @@ const FlexdateConverterConfiguration = React.createClass({
                                 id={`${this.props.type}_converter_timezone`}
                                 className="timezone-select"
                                 value={this.props.configuration.time_zone}
-                                onChange={this._onChange('time_zone')}/>
+                                onChange={this._onChange('time_zone')} />
               </Input>
             </div>
           </Col>

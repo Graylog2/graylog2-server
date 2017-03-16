@@ -23,8 +23,8 @@ const SearchStore = StoreProvider.getStore('Search');
 import ActionsProvider from 'injection/ActionsProvider';
 const HistogramDataActions = ActionsProvider.getActions('HistogramData');
 
-const daysToSeconds = (days) => moment.duration(days, 'days').as('seconds');
-const hoursToSeconds = (hours) => moment.duration(hours, 'hours').as('seconds');
+const daysToSeconds = days => moment.duration(days, 'days').as('seconds');
+const hoursToSeconds = hours => moment.duration(hours, 'hours').as('seconds');
 
 const DEFAULT_RANGE_IN_SECS = hoursToSeconds(1);
 const SUPPORTED_RANGES_IN_SECS = [hoursToSeconds(1), daysToSeconds(1), daysToSeconds(7), daysToSeconds(31), daysToSeconds(365), 0];
@@ -34,15 +34,15 @@ let SCREEN_RESOLUTION = $(window).width();
 const SourceOverview = React.createClass({
   getInitialState() {
     this.sourcesData = crossfilter();
-    this.filterDimension = this.sourcesData.dimension((d) => d.name);
-    this.nameDimension = this.sourcesData.dimension((d) => d.name);
-    this.nameMessageGroup = this.nameDimension.group().reduceSum((d) => d.message_count);
+    this.filterDimension = this.sourcesData.dimension(d => d.name);
+    this.nameDimension = this.sourcesData.dimension(d => d.name);
+    this.nameMessageGroup = this.nameDimension.group().reduceSum(d => d.message_count);
 
-    this.messageCountDimension = this.sourcesData.dimension((d) => d.message_count);
+    this.messageCountDimension = this.sourcesData.dimension(d => d.message_count);
 
     this.histogramData = crossfilter();
-    this.valueDimension = this.histogramData.dimension((d) => new Date(d.x));
-    this.valueGroup = this.valueDimension.group().reduceSum((d) => d.y);
+    this.valueDimension = this.histogramData.dimension(d => new Date(d.x));
+    this.valueGroup = this.valueDimension.group().reduceSum(d => d.y);
 
     return {
       range: null,
@@ -100,7 +100,7 @@ const SourceOverview = React.createClass({
   },
 
   setSearchFilter(filter) {
-    this.setState({filter: filter}, () => {
+    this.setState({ filter: filter }, () => {
       this._filterSources();
       this.refs.sourceDataTable.redraw();
       this.refs.sourcePieChart.redraw();
@@ -118,7 +118,7 @@ const SourceOverview = React.createClass({
   loadSources() {
     const onLoaded = (sources) => {
       this._resetSources(sources);
-      this.setState({renderResultTable: this.sourcesData.size() !== 0, loading: false});
+      this.setState({ renderResultTable: this.sourcesData.size() !== 0, loading: false });
       this._updateWidth();
     };
 
@@ -142,8 +142,8 @@ const SourceOverview = React.createClass({
     this.sourcesData.remove();
     this.sourcesData.add(sources);
 
-    pieChartFilters.forEach((filter) => this.refs.sourcePieChart.setFilter(filter));
-    dataTableFilters.forEach((filter) => this.refs.sourceDataTable.setFilter(filter));
+    pieChartFilters.forEach(filter => this.refs.sourcePieChart.setFilter(filter));
+    dataTableFilters.forEach(filter => this.refs.sourceDataTable.setFilter(filter));
     this._filterSources();
 
     dc.redrawAll();
@@ -153,11 +153,11 @@ const SourceOverview = React.createClass({
     let filters;
 
     if (this.refs.sourcePieChart.getFilters().length !== 0 || this.refs.sourceDataTable.getFilters().length !== 0) {
-      filters = this.nameDimension.top(Infinity).map((source) => UniversalSearch.escape(source.name));
+      filters = this.nameDimension.top(Infinity).map(source => UniversalSearch.escape(source.name));
     }
 
     HistogramDataActions.load(this.state.range, filters, SCREEN_RESOLUTION)
-      .then(histogramData => {
+      .then((histogramData) => {
         this.setState({
           resolution: histogramData.interval,
           reloadingHistogram: false,
@@ -166,7 +166,7 @@ const SourceOverview = React.createClass({
         this._resetHistogram(histogramData.histogram);
       });
 
-    this.setState({reloadingHistogram: true});
+    this.setState({ reloadingHistogram: true });
   },
 
   _resetHistogram(histogram) {
@@ -176,7 +176,7 @@ const SourceOverview = React.createClass({
     this.histogramData.remove();
     this.histogramData.add(histogram);
 
-    lineChartFilters.forEach((filter) => this.refs.sourceLineChart.setFilter(filter));
+    lineChartFilters.forEach(filter => this.refs.sourceLineChart.setFilter(filter));
 
     dc.redrawAll();
   },
@@ -188,7 +188,7 @@ const SourceOverview = React.createClass({
   // redirect old range format (as query parameter) to new format (deep link)
   _redirectToRange(range) {
     // if range is ill formatted, we take care of it in the deep link handling
-    window.location.replace('sources#' + range);
+    window.location.replace(`sources#${range}`);
   },
 
   _getRangeFromOldQueryFormat() {
@@ -223,16 +223,15 @@ const SourceOverview = React.createClass({
     const hash = window.location.hash;
     if (hash.indexOf('#') !== 0) {
       return DEFAULT_RANGE_IN_SECS;
-    } else {
-      const hashContent = hash.substring(1);
-      if (hash.indexOf('&') < 0) {
-        // If there is only one param in the hash, return it
-        return hashContent;
-      }
-      // If there are more than one params in the hash, return the numeric one
-      const match = hashContent.match(/(\d+)=&/);
-      return (match && match.length > 0) ? match[1] : DEFAULT_RANGE_IN_SECS;
     }
+    const hashContent = hash.substring(1);
+    if (hash.indexOf('&') < 0) {
+        // If there is only one param in the hash, return it
+      return hashContent;
+    }
+      // If there are more than one params in the hash, return the numeric one
+    const match = hashContent.match(/(\d+)=&/);
+    return (match && match.length > 0) ? match[1] : DEFAULT_RANGE_IN_SECS;
   },
 
   resetSourcesFilters() {
@@ -259,11 +258,11 @@ const SourceOverview = React.createClass({
   syncRangeWithQuery() {
     const rangeSelectBox = this.refs.rangeSelector;
     if (Number(rangeSelectBox.value) === 0) {
-      SearchStore.changeTimeRange('relative', {relative: 0});
+      SearchStore.changeTimeRange('relative', { relative: 0 });
     } else {
       const $selectedOptions = $(':selected', rangeSelectBox);
       const text = $selectedOptions && $selectedOptions[0] && $selectedOptions[0].text;
-      SearchStore.changeTimeRange('keyword', {keyword: text});
+      SearchStore.changeTimeRange('keyword', { keyword: text });
     }
   },
 
@@ -300,7 +299,7 @@ const SourceOverview = React.createClass({
     } else {
       window.location.replace(`#${effectiveRange}`);
     }
-    this.setState({range: effectiveRange, histogramDataAvailable: true, loading: true}, () => this.loadData());
+    this.setState({ range: effectiveRange, histogramDataAvailable: true, loading: true }, () => this.loadData());
   },
 
   _onRangeChanged(event) {
@@ -325,7 +324,7 @@ const SourceOverview = React.createClass({
       </div>
     );
 
-    const resultsStyle = (this.state.renderResultTable ? null : {display: 'none'});
+    const resultsStyle = (this.state.renderResultTable ? null : { display: 'none' });
     const results = (
       <div style={resultsStyle}>
         <div className="row content">
@@ -333,19 +332,19 @@ const SourceOverview = React.createClass({
                            reloadingHistogram={this.state.reloadingHistogram}
                            histogramDataAvailable={this.state.histogramDataAvailable}
                            resolution={this.state.resolution}
-                           resetFilters={this.resetHistogramFilters}/>
+                           resetFilters={this.resetHistogramFilters} />
         </div>
         {this.state.loading ?
-          <div className="row content"><div style={{marginLeft: 10}}><Spinner/></div></div> :
+          <div className="row content"><div style={{ marginLeft: 10 }}><Spinner /></div></div> :
           null}
-        <div className="row content" style={{display: this.state.loading ? 'none' : 'block'}}>
+        <div className="row content" style={{ display: this.state.loading ? 'none' : 'block' }}>
           <div className="col-md-7">
             <SourceDataTable ref="sourceDataTable" resetFilters={this.resetSourcesFilters}
-                             setSearchFilter={this.setSearchFilter} numberOfTopValues={this.NUMBER_OF_TOP_VALUES}/>
+                             setSearchFilter={this.setSearchFilter} numberOfTopValues={this.NUMBER_OF_TOP_VALUES} />
           </div>
           <div className="col-md-3 col-md-offset-1">
             <SourcePieChart ref="sourcePieChart" resetFilters={this.resetSourcesFilters}
-                            numberOfTopValues={this.NUMBER_OF_TOP_VALUES}/>
+                            numberOfTopValues={this.NUMBER_OF_TOP_VALUES} />
           </div>
         </div>
       </div>

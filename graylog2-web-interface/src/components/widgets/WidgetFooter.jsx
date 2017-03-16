@@ -24,11 +24,11 @@ const WidgetFooter = React.createClass({
   },
   render() {
     // if we have a tooltip, we disable the button link and instead show a tooltip on hover
-    const title = this.props.replayToolTip ? null : "Replay search";
+    const title = this.props.replayToolTip ? null : 'Replay search';
     const href = this.props.replayToolTip ? null : this.props.replayHref;
     let replay = (
       <Button bsStyle="link" className="btn-text" title={title} href={href}>
-        <i className="fa fa-play"/>
+        <i className="fa fa-play" />
       </Button>
     );
     if (this.props.replayToolTip) {
@@ -45,7 +45,7 @@ const WidgetFooter = React.createClass({
         </div>
         <div className="widget-info">
           <Button bsStyle="link" className="btn-text" title="Show widget configuration" onClick={this._showConfig}>
-            <i className="fa fa-info-circle"/>
+            <i className="fa fa-info-circle" />
           </Button>
         </div>
       </div>
@@ -55,12 +55,12 @@ const WidgetFooter = React.createClass({
       <div className="actions">
         <div className="widget-delete">
           <Button bsStyle="link" className="btn-text" title="Delete widget" onClick={this._delete}>
-            <i className="fa fa-trash"/>
+            <i className="fa fa-trash" />
           </Button>
         </div>
         <div className="widget-edit">
           <Button bsStyle="link" className="btn-text" title="Edit widget" onClick={this._editConfig}>
-            <i className="fa fa-pencil"/>
+            <i className="fa fa-pencil" />
           </Button>
         </div>
       </div>

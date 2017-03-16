@@ -59,7 +59,7 @@ const WidgetEditConfigModal = React.createClass({
 
   save() {
     const errorKeys = Object.keys(this.state.errors);
-    if (!errorKeys.some((key) => this.state.errors[key] === true)) {
+    if (!errorKeys.some(key => this.state.errors[key] === true)) {
       this.props.onUpdate(this._getWidgetData());
     }
     this.hide();
@@ -78,7 +78,7 @@ const WidgetEditConfigModal = React.createClass({
   _setConfigurationSetting(key, value) {
     const newConfig = ObjectUtils.clone(this.state.config);
     newConfig[key] = value;
-    this.setState({config: newConfig});
+    this.setState({ config: newConfig });
   },
 
   _bindConfigurationValue(event) {
@@ -115,7 +115,7 @@ const WidgetEditConfigModal = React.createClass({
           errors[key] = true;
         }
 
-        this.setState({errors: errors});
+        this.setState({ errors: errors });
         break;
       default:
         newTimeRange[key] = value;
@@ -142,7 +142,7 @@ const WidgetEditConfigModal = React.createClass({
              label="Time range type"
              disabled
              value={StringUtils.capitalizeFirstLetter(this.state.config.timerange.type)}
-             help="Type of time range to use in the widget."/>
+             help="Type of time range to use in the widget." />
     );
 
     let rangeValueInput;
@@ -158,7 +158,7 @@ const WidgetEditConfigModal = React.createClass({
                  min="0"
                  defaultValue={this.state.config.timerange.range}
                  onChange={this._bindTimeRangeValue}
-                 help="Number of seconds relative to the moment the search executes. 0 searches in all messages."/>
+                 help="Number of seconds relative to the moment the search executes. 0 searches in all messages." />
         );
         break;
       case 'absolute':
@@ -172,7 +172,7 @@ const WidgetEditConfigModal = React.createClass({
                    bsStyle={this.state.errors.from === true ? 'error' : null}
                    defaultValue={this._formatDateTime(this.state.config.timerange.from)}
                    onChange={this._bindTimeRangeValue}
-                   help="Earliest time to be included in the search. E.g. 2015-03-27 13:23:41"/>
+                   help="Earliest time to be included in the search. E.g. 2015-03-27 13:23:41" />
             <Input type="text"
                    id="timerange-absolute-to"
                    name="to"
@@ -181,7 +181,7 @@ const WidgetEditConfigModal = React.createClass({
                    bsStyle={this.state.errors.to === true ? 'error' : null}
                    defaultValue={this._formatDateTime(this.state.config.timerange.to)}
                    onChange={this._bindTimeRangeValue}
-                   help="Latest time to be included in the search. E.g. 2015-03-27 13:23:41"/>
+                   help="Latest time to be included in the search. E.g. 2015-03-27 13:23:41" />
           </div>
         );
         break;
@@ -194,7 +194,7 @@ const WidgetEditConfigModal = React.createClass({
                  required
                  defaultValue={this.state.config.timerange.keyword}
                  onChange={this._bindTimeRangeValue}
-                 help="Search keyword representing the time to be included in the search. E.g. last day"/>
+                 help="Search keyword representing the time to be included in the search. E.g. last day" />
         );
         break;
       default:
@@ -236,7 +236,7 @@ const WidgetEditConfigModal = React.createClass({
                  defaultValue={this.state.description}
                  onChange={this._bindValue}
                  help="Type a name that describes your widget."
-                 autoFocus/>
+                 autoFocus />
           <Input type="number"
                  min="1"
                  required
@@ -245,7 +245,7 @@ const WidgetEditConfigModal = React.createClass({
                  label="Cache time"
                  defaultValue={this.state.cache_time}
                  onChange={this._bindValue}
-                 help="Number of seconds the widget value will be cached."/>
+                 help="Number of seconds the widget value will be cached." />
           {this._getTimeRangeFormControls()}
           {this._getSpecificConfigurationControls()}
         </fieldset>

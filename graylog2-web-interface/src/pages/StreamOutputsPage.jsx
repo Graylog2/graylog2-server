@@ -15,11 +15,11 @@ import Routes from 'routing/Routes';
 const StreamOutputsPage = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
   getInitialState() {
-    return {stream: undefined};
+    return { stream: undefined };
   },
   componentDidMount() {
     StreamsStore.get(this.props.params.streamId, (stream) => {
-      this.setState({stream: stream});
+      this.setState({ stream: stream });
     });
   },
   render() {
@@ -50,11 +50,11 @@ const StreamOutputsPage = React.createClass({
               </SupportLink>
             </Col>
           </Row>
-          <OutputsComponent streamId={this.state.stream.id} permissions={this.state.currentUser.permissions}/>
+          <OutputsComponent streamId={this.state.stream.id} permissions={this.state.currentUser.permissions} />
         </div>
       </DocumentTitle>
     );
-  }
+  },
 });
 
 export default StreamOutputsPage;

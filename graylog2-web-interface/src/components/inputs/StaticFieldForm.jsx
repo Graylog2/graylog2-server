@@ -1,7 +1,7 @@
-import React, {PropTypes} from 'react';
-import {Input} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Input } from 'react-bootstrap';
 
-import {BootstrapModalForm} from 'components/bootstrap';
+import { BootstrapModalForm } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
 const InputStaticFieldsStore = StoreProvider.getStore('InputStaticFields');
@@ -27,8 +27,8 @@ const StaticFieldForm = React.createClass({
           overwritten If the message already has that key. Key must only contain alphanumeric characters or
           underscores and not be a reserved field.</p>
         <Input ref="fieldName" type="text" id="field-name" label="Field name" className="validatable"
-               data-validate="alphanum_underscore" required autoFocus/>
-        <Input ref="fieldValue" type="text" id="field-value" label="Field value" required/>
+               data-validate="alphanum_underscore" required autoFocus />
+        <Input ref="fieldValue" type="text" id="field-value" label="Field value" required />
       </BootstrapModalForm>
     );
   },

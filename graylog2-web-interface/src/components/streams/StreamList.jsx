@@ -21,7 +21,7 @@ const StreamList = React.createClass({
 
   _formatStream(stream) {
     return (
-      <Stream key={'stream-' + stream.id} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
+      <Stream key={`stream-${stream.id}`} stream={stream} streamRuleTypes={this.props.streamRuleTypes}
                    permissions={this.props.permissions} user={this.props.user} indexSets={this.props.indexSets} />
     );
   },
@@ -39,13 +39,12 @@ const StreamList = React.createClass({
           {streamList}
         </ul>
       );
-    } else {
-      return (
-        <Alert bsStyle="info">
-          <i className="fa fa-info-circle"/>&nbsp;No streams match your search filter.
-        </Alert>
-      );
     }
+    return (
+      <Alert bsStyle="info">
+        <i className="fa fa-info-circle" />&nbsp;No streams match your search filter.
+        </Alert>
+    );
   },
 });
 

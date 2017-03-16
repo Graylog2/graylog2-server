@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import URI from 'urijs';
@@ -51,7 +51,7 @@ const NodesActions = React.createClass({
         </LinkContainer>
 
         <Button bsStyle="info" href={apiBrowserURI} target="_blank">
-          <i className="fa fa-external-link"/>&nbsp; API browser
+          <i className="fa fa-external-link" />&nbsp; API browser
         </Button>
 
         <DropdownButton title="More actions" id={`more-actions-dropdown-${this.props.node.node_id}`} pullRight>
@@ -77,7 +77,7 @@ const NodesActions = React.createClass({
 
           <IfPermitted permissions={['processing:changestate', 'lbstatus:change', 'node:shutdown']} anyPermissions>
             <IfPermitted permissions={['inputs:read', 'threads:dump']} anyPermissions>
-              <MenuItem divider/>
+              <MenuItem divider />
             </IfPermitted>
           </IfPermitted>
 

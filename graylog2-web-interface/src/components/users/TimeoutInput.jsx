@@ -75,7 +75,7 @@ const TimeoutInput = React.createClass({
         <Input ref="session_timeout_never" type="checkbox" id="session-timeout-never" name="session_timeout_never"
                labelClassName={`col-sm-${this.props.controlSize}`} wrapperClassName={`col-sm-offset-${this.props.labelSize} col-sm-${this.props.controlSize}`}
                label="Sessions do not time out" help="When checked sessions never time out due to inactivity."
-               onClick={this._onClick} checked={this.state.sessionTimeoutNever}/>
+               onClick={this._onClick} checked={this.state.sessionTimeoutNever} />
 
         <Input label="Timeout"
                help="Session automatically end after this amount of time, unless they are actively used."
@@ -85,12 +85,12 @@ const TimeoutInput = React.createClass({
               <input ref="timeout" type="number" id="timeout"
                      className="session-timeout-fields validatable form-control"
                      name="timeout" min={1} data-validate="positive_number" disabled={this.state.sessionTimeoutNever}
-                     value={this.state.value} onChange={this._onChangeValue}/>
+                     value={this.state.value} onChange={this._onChangeValue} />
             </Col>
             <Col sm={3}>
               <TimeoutUnitSelect ref="session_timeout_unit" className="form-control session-timeout-fields"
                                  disabled={this.state.sessionTimeoutNever}
-                                 value={this.state.unit} onChange={this._onChangeUnit}/>
+                                 value={this.state.unit} onChange={this._onChangeUnit} />
             </Col>
           </Row>
         </Input>

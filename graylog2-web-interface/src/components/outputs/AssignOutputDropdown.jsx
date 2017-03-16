@@ -25,7 +25,7 @@ const AssignOutputDropdown = React.createClass({
   render() {
     const outputs = this.props.outputs;
     const outputList = (outputs.length > 0 ? outputs.map(this._formatOutput) :
-      <option disabled>No outputs available</option>);
+    <option disabled>No outputs available</option>);
     return (
       <div className="output-add">
         <div className="form-inline">

@@ -26,7 +26,7 @@ const FieldValueConditionSummary = React.createClass({
         {' '}
         <GracePeriodSummary alertCondition={alertCondition} />
         {' '}
-        <BacklogSummary alertCondition={alertCondition}/>
+        <BacklogSummary alertCondition={alertCondition} />
         {' '}
         <RepeatNotificationsSummary alertCondition={alertCondition} />
       </span>

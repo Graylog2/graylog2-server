@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
@@ -42,7 +42,7 @@ const CreateExtractorsPage = React.createClass({
   componentDidMount() {
     InputsActions.get.triggerPromise(this.props.params.inputId);
     MessagesActions.loadMessage.triggerPromise(this.state.exampleIndex, this.state.exampleId)
-      .then(message => this.setState({exampleMessage: message}));
+      .then(message => this.setState({ exampleMessage: message }));
   },
   _isLoading() {
     return !(this.state.input && this.state.exampleMessage);
@@ -59,7 +59,7 @@ const CreateExtractorsPage = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner/>;
+      return <Spinner />;
     }
 
     const exampleMessage = StringUtils.stringify(this.state.exampleMessage.fields[this.state.field]);

@@ -39,7 +39,7 @@ const ResultTable = React.createClass({
       return;
     }
     const promise = StreamsStore.listStreams();
-    promise.done((streams) => this._onStreamsLoaded(streams));
+    promise.done(streams => this._onStreamsLoaded(streams));
   },
   componentDidUpdate() {
     if (this.state.expandAllRenderAsync) {
@@ -78,7 +78,7 @@ const ResultTable = React.createClass({
     const expandedChangeRatio = (this.props.messages.length - this.state.expandedMessages.size) / 100;
     const renderLoadingIndicator = expandedChangeRatio > 0.3;
 
-    const newSet = Immutable.Set(this.props.messages.map((message) => `${message.index}-${message.id}`));
+    const newSet = Immutable.Set(this.props.messages.map(message => `${message.index}-${message.id}`));
     this.setState({ expandedMessages: newSet, expandAllRenderAsync: renderLoadingIndicator });
   },
   collapseAll() {
@@ -102,14 +102,14 @@ const ResultTable = React.createClass({
         sortLinks = (
           <span>
             <i className={`${classesDesc} sort-order-active`} />
-            <a href="#" onClick={(e) => this._handleSort(e, fieldName, 'asc')}><i className={classesAsc} /></a>
+            <a href="#" onClick={e => this._handleSort(e, fieldName, 'asc')}><i className={classesAsc} /></a>
           </span>
         );
       } else {
         sortLinks = (
           <span>
             <i className={`${classesAsc} sort-order-active`} />
-            <a href="#" onClick={(e) => this._handleSort(e, fieldName, 'desc')}><i className={classesDesc} /></a>
+            <a href="#" onClick={e => this._handleSort(e, fieldName, 'desc')}><i className={classesDesc} /></a>
           </span>
         );
       }
@@ -117,8 +117,8 @@ const ResultTable = React.createClass({
       // the given fieldname is not being sorted on
       sortLinks = (
         <span className="sort-order">
-          <a href="#" onClick={(e) => this._handleSort(e, fieldName, 'asc')}><i className={classesAsc} /></a>
-          <a href="#" onClick={(e) => this._handleSort(e, fieldName, 'desc')}><i className={classesDesc} /></a>
+          <a href="#" onClick={e => this._handleSort(e, fieldName, 'asc')}><i className={classesAsc} /></a>
+          <a href="#" onClick={e => this._handleSort(e, fieldName, 'desc')}><i className={classesDesc} /></a>
         </span>
       );
     }
@@ -148,7 +148,7 @@ const ResultTable = React.createClass({
                 <thead>
                   <tr>
                     <th style={{ width: 180 }}>Timestamp {this._sortIcons('timestamp')}</th>
-                    {selectedColumns.toSeq().map(selectedFieldName => {
+                    {selectedColumns.toSeq().map((selectedFieldName) => {
                       return (
                         <th key={selectedFieldName}
                             style={this._columnStyle(selectedFieldName)}>

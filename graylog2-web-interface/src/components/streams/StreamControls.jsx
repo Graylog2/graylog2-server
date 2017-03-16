@@ -66,7 +66,7 @@ const StreamControls = React.createClass({
             Set as startpage
           </MenuItem>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
-            <MenuItem key={`divider-${stream.id}`} divider/>
+            <MenuItem key={`divider-${stream.id}`} divider />
           </IfPermitted>
           <IfPermitted permissions={`streams:edit:${stream.id}`}>
             <MenuItem key={`deleteStream-${stream.id}`} onSelect={this._onDelete}>
@@ -74,8 +74,8 @@ const StreamControls = React.createClass({
             </MenuItem>
           </IfPermitted>
         </DropdownButton>
-        <StreamForm ref="streamForm" title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream} indexSets={this.props.indexSets}/>
-        <StreamForm ref="cloneForm" title="Cloning Stream" onSubmit={this._onCloneSubmit} indexSets={this.props.indexSets}/>
+        <StreamForm ref="streamForm" title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream} indexSets={this.props.indexSets} />
+        <StreamForm ref="cloneForm" title="Cloning Stream" onSubmit={this._onCloneSubmit} indexSets={this.props.indexSets} />
       </span>
     );
   },

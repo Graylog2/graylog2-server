@@ -43,9 +43,8 @@ const ConfigurationsPage = React.createClass({
   _getConfig(configType) {
     if (this.state.configuration && this.state.configuration[configType]) {
       return this.state.configuration[configType];
-    } else {
-      return null;
     }
+    return null;
   },
 
   _onUpdate(configType) {
@@ -85,7 +84,7 @@ const ConfigurationsPage = React.createClass({
           <Col md={6}>
             {pluginConfigs.shift() || (<span>&nbsp;</span>)}
           </Col>
-        </Row>
+        </Row>,
       );
     }
 

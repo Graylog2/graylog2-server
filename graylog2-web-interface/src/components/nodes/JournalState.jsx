@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
 import numeral from 'numeral';
 
@@ -34,7 +34,7 @@ const JournalState = React.createClass({
   },
   render() {
     if (this._isLoading()) {
-      return <Spinner text="Loading journal metrics..."/>;
+      return <Spinner text="Loading journal metrics..." />;
     }
 
     const nodeId = this.props.nodeId;
@@ -48,9 +48,9 @@ const JournalState = React.createClass({
     return (
       <span>
         The journal contains <strong>{numeral(metrics.entriesUncommitted).format('0,0')} unprocessed messages</strong> in {metrics.segments}
-        {' '}<Pluralize value={metrics.segments} singular="segment" plural="segments"/>.{' '}
+        {' '}<Pluralize value={metrics.segments} singular="segment" plural="segments" />.{' '}
         <strong>{numeral(metrics.append).format('0,0')} messages</strong> appended, <strong>
-        {numeral(metrics.read).format('0,0')} messages</strong> read in the last second.
+          {numeral(metrics.read).format('0,0')} messages</strong> read in the last second.
       </span>
     );
   },

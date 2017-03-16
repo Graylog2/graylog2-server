@@ -25,7 +25,7 @@ const StreamThroughput = React.createClass({
   },
   _calculateThroughput() {
     return Object.keys(this.state.metrics)
-      .map(nodeId => {
+      .map((nodeId) => {
         const metricDefinition = this.state.metrics[nodeId][this._metricName()];
         return metricDefinition !== undefined ? metricDefinition.metric.value : 0;
       })

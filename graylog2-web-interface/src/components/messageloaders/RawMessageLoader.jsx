@@ -57,7 +57,7 @@ const RawMessageLoader = React.createClass({
     this.setState({ loading: true });
     const promise = MessagesActions.loadRawMessage.triggerPromise(message, remoteAddress || this.DEFAULT_REMOTE_ADDRESS,
       codec, codecConfiguration);
-    promise.then(loadedMessage => {
+    promise.then((loadedMessage) => {
       this.props.onMessageLoaded(
         loadedMessage,
         {
@@ -89,7 +89,7 @@ const RawMessageLoader = React.createClass({
 
     return codecTypesIds
       .filter(id => id !== 'random-http-msg') // Skip Random HTTP codec, as nobody wants to enter a raw random message.
-      .map(id => {
+      .map((id) => {
         const name = this.state.codecTypes[id].name;
         // Add id as label on codecs not having a descriptor name
         return { value: id, label: name === '' ? id : name };
@@ -108,7 +108,7 @@ const RawMessageLoader = React.createClass({
     }
 
     return inputIds
-      .map(id => {
+      .map((id) => {
         const inputId = this.state.inputs[id].id;
         const label = `${inputId} / ${this.state.inputs[id].title} / ${this.state.inputs[id].name}`;
         return { value: inputId, label: label };

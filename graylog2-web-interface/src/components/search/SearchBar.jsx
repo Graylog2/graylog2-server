@@ -48,7 +48,7 @@ const SearchBar = React.createClass({
     };
   },
   componentDidMount() {
-    SearchStore.onParamsChanged = (newParams) => this.setState(newParams);
+    SearchStore.onParamsChanged = newParams => this.setState(newParams);
     SearchStore.onSubmitSearch = () => {
       this._performSearch();
     };
@@ -136,7 +136,7 @@ const SearchBar = React.createClass({
       this._resetKeywordPreview();
     } else {
       ToolsStore.testNaturalDate(value)
-        .then((data) => this._onKeywordPreviewLoaded(data))
+        .then(data => this._onKeywordPreviewLoaded(data))
         .catch(() => this._resetKeywordPreview());
     }
   },
@@ -254,9 +254,8 @@ const SearchBar = React.createClass({
             if (key === 'PT0S') {
               all = option;
               return null;
-            } else {
-              return option;
             }
+            return option;
           });
 
           if (all) {
@@ -297,7 +296,7 @@ const SearchBar = React.createClass({
                          value={this._formattedDateStringInUserTZ('from')}
                          onChange={this._rangeParamsChanged('from')}
                          placeholder={DateTime.Formats.DATETIME}
-                         buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('from')}><i className="fa fa-magic"></i></Button>}
+                         buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('from')}><i className="fa fa-magic" /></Button>}
                          bsStyle={this._isValidDateField('from') ? null : 'error'}
                          bsSize="small"
                          required />
@@ -318,7 +317,7 @@ const SearchBar = React.createClass({
                          value={this._formattedDateStringInUserTZ('to')}
                          onChange={this._rangeParamsChanged('to')}
                          placeholder={DateTime.Formats.DATETIME}
-                         buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('to')}><i className="fa fa-magic"></i></Button>}
+                         buttonAfter={<Button bsSize="small" onClick={this._setDateTimeToNow('to')}><i className="fa fa-magic" /></Button>}
                          bsStyle={this._isValidDateField('to') ? null : 'error'}
                          bsSize="small"
                          required />
@@ -366,7 +365,7 @@ const SearchBar = React.createClass({
   _getSavedSearchesSelector() {
     const formattedSavedSearches = this.props.savedSearches
       .sort((searchA, searchB) => searchA.title.toLowerCase().localeCompare(searchB.title.toLowerCase()))
-      .map(savedSearch => {
+      .map((savedSearch) => {
         return { value: savedSearch.id, label: savedSearch.title };
       });
 
@@ -397,7 +396,7 @@ const SearchBar = React.createClass({
                     <div className="col-md-6">
                       <ButtonToolbar className="timerange-chooser pull-left">
                         <DropdownButton bsStyle="info"
-                                        title={<i className="fa fa-clock-o"/>}
+                                        title={<i className="fa fa-clock-o" />}
                                         onSelect={this._rangeTypeChanged}
                                         id="dropdown-timerange-selector">
                           <MenuItem eventKey="relative"
@@ -437,7 +436,7 @@ const SearchBar = React.createClass({
                   <div className="pull-right search-help">
                     <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                        title="Search query syntax documentation"
-                                       text={<i className="fa fa-lightbulb-o"/>} />
+                                       text={<i className="fa fa-lightbulb-o" />} />
                   </div>
 
                   <Button type="submit" bsStyle="success" className="pull-left">

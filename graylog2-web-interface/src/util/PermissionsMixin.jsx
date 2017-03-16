@@ -16,7 +16,7 @@ const PermissionsMixin = {
       return true;
     }
     if (permissions.every) {
-      return permissions.every((p) => this._permissionPredicate(permissionSet, p));
+      return permissions.every(p => this._permissionPredicate(permissionSet, p));
     }
     return this._permissionPredicate(permissionSet, permissions);
   },
@@ -25,7 +25,7 @@ const PermissionsMixin = {
     if (this._isWildCard(permissionSet)) {
       return true;
     }
-    return permissions.some((p) => this._permissionPredicate(permissionSet, p));
+    return permissions.some(p => this._permissionPredicate(permissionSet, p));
   },
 };
 

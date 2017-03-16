@@ -20,8 +20,8 @@ const RecentMessageLoader = React.createClass({
   onClick(inputId) {
     const input = this.props.inputs.get(inputId);
     if (!input) {
-      UserNotification.error('Invalid input selected: ' + inputId,
-        'Could not load message from invalid Input ' + inputId);
+      UserNotification.error(`Invalid input selected: ${inputId}`,
+        `Could not load message from invalid Input ${inputId}`);
     }
     this.setState({ loading: true });
     const promise = UniversalSearchStore.search('relative', `gl2_source_input:${inputId} OR gl2_source_radio_input:${inputId}`,
@@ -44,7 +44,7 @@ const RecentMessageLoader = React.createClass({
       helpMessage = 'Select an Input from the list below and click "Load Message" to load the most recent message received by this input within the last hour.';
     }
     return (
-      <div style={{marginTop: 5}}>
+      <div style={{ marginTop: 5 }}>
         {helpMessage}
         <InputDropdown inputs={this.props.inputs} preselectedInputId={this.props.selectedInputId}
                        onLoadMessage={this.onClick} title={this.state.loading ? 'Loading message...' : 'Load Message'}

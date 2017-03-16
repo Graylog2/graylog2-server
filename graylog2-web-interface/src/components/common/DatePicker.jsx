@@ -1,5 +1,5 @@
-import React, {PropTypes} from 'react';
-import {OverlayTrigger, Popover} from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { OverlayTrigger, Popover } from 'react-bootstrap';
 import DateTime from 'logic/datetimes/DateTime';
 import DayPicker from 'react-day-picker';
 
@@ -25,7 +25,7 @@ const DatePicker = React.createClass({
     }
 
     const modifiers = {
-      selected: date => {
+      selected: (date) => {
         if (!selectedDate) {
           return false;
         }
@@ -39,7 +39,7 @@ const DatePicker = React.createClass({
         <DayPicker initialMonth={selectedDate ? selectedDate.toDate() : undefined}
                    onDayClick={this.props.onChange}
                    modifiers={modifiers}
-                   enableOutsideDays/>
+                   enableOutsideDays />
       </Popover>
     );
 

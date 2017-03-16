@@ -29,8 +29,8 @@ const QuickValuesVisualization = React.createClass({
     this.shouldUpdateData = true;
     this.dcGroupName = `quickvalue-${this.props.id}`;
     this.quickValuesData = crossfilter();
-    this.dimension = this.quickValuesData.dimension((d) => d.term);
-    this.group = this.dimension.group().reduceSum((d) => d.count);
+    this.dimension = this.quickValuesData.dimension(d => d.term);
+    this.group = this.dimension.group().reduceSum(d => d.count);
 
     return {
       total: undefined,
@@ -108,11 +108,11 @@ const QuickValuesVisualization = React.createClass({
       (d) => {
         return NumberUtils.formatPercentage(d.percentage);
       },
-      (d) => NumberUtils.formatNumber(d.count),
+      d => NumberUtils.formatNumber(d.count),
     ];
 
     if (this.props.displayAddToSearchButton) {
-      columns.push((d) => this._getAddToSearchButton(d.term));
+      columns.push(d => this._getAddToSearchButton(d.term));
     }
 
     return columns;
@@ -125,12 +125,12 @@ const QuickValuesVisualization = React.createClass({
       .dimension(this.dimension)
       .group((d) => {
         const topValues = this.group.top(this.NUMBER_OF_TOP_VALUES);
-        const dInTopValues = topValues.some((value) => d.term.localeCompare(value.key) === 0);
+        const dInTopValues = topValues.some(value => d.term.localeCompare(value.key) === 0);
         return dInTopValues ? 'Top values' : 'Others';
       })
       .size(50)
       .columns(this._getDataTableColumns())
-      .sortBy((d) => d.count)
+      .sortBy(d => d.count)
       .order(d3.descending)
       .on('renderlet', (table) => {
         table.selectAll('.dc-table-group').classed('info', true);
@@ -159,12 +159,12 @@ const QuickValuesVisualization = React.createClass({
         const topRowsSum = d3.sum(topRows, dc.pluck('value'));
         const otherCount = this.state.total - this.state.missing - topRowsSum;
 
-        return topRows.concat([{ others: allKeys.filter((d) => !topSet.has(d)), key: 'Others', value: otherCount }]);
+        return topRows.concat([{ others: allKeys.filter(d => !topSet.has(d)), key: 'Others', value: otherCount }]);
       })
       .renderLabel(false)
       .renderTitle(false)
       .slicesCap(this.NUMBER_OF_TOP_VALUES)
-      .ordering((d) => d.value)
+      .ordering(d => d.value)
       .colors(D3Utils.glColourPalette());
 
     this._resizeVisualization(this.props.width, this.props.height, this.props.config.show_data_table);
@@ -219,7 +219,7 @@ const QuickValuesVisualization = React.createClass({
   },
   _restoreDataFilters() {
     if (this.pieChart !== undefined) {
-      this.filters.forEach((filter) => this.pieChart.filter(filter));
+      this.filters.forEach(filter => this.pieChart.filter(filter));
       this.filters = [];
     }
   },
@@ -256,7 +256,7 @@ const QuickValuesVisualization = React.createClass({
       analysisInformation.push(` and <em>${NumberUtils.formatNumber(this.state.others)}</em> other values`);
     }
 
-    return <span dangerouslySetInnerHTML={{ __html: `${analysisInformation.join(',')}.` }}/>;
+    return <span dangerouslySetInnerHTML={{ __html: `${analysisInformation.join(',')}.` }} />;
   },
   render() {
     let pieChartClassName;
@@ -291,7 +291,7 @@ const QuickValuesVisualization = React.createClass({
         <Panel>
           <ListGroup fill>
             <ListGroupItem>
-              <div ref="graph" className="quickvalues-graph"/>
+              <div ref="graph" className="quickvalues-graph" />
             </ListGroupItem>
             <ListGroupItem>
               {this._getAnalysisInformation()}
@@ -300,7 +300,7 @@ const QuickValuesVisualization = React.createClass({
         </Panel>
       );
     } else {
-      pieChart = <div ref="graph" className="quickvalues-graph"/>;
+      pieChart = <div ref="graph" className="quickvalues-graph" />;
     }
 
     return (
@@ -315,14 +315,14 @@ const QuickValuesVisualization = React.createClass({
               <div className="quickvalues-table">
                 <table ref="table" className="table table-condensed table-hover">
                   <thead>
-                  <tr>
-                    <th style={{ width: '60%' }}>Value</th>
-                    <th>%</th>
-                    <th>Count</th>
-                    {this.props.displayAddToSearchButton &&
-                    <th style={{ width: 30 }}>&nbsp;</th>
+                    <tr>
+                      <th style={{ width: '60%' }}>Value</th>
+                      <th>%</th>
+                      <th>Count</th>
+                      {this.props.displayAddToSearchButton &&
+                      <th style={{ width: 30 }}>&nbsp;</th>
                       }
-                  </tr>
+                    </tr>
                   </thead>
                 </table>
               </div>

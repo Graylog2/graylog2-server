@@ -27,7 +27,7 @@ const BufferUsage = React.createClass({
       `${prefix}.usage`,
       `${prefix}.size`,
     ];
-    metricNames.forEach((metricName) => MetricsActions.add(this.props.nodeId, metricName));
+    metricNames.forEach(metricName => MetricsActions.add(this.props.nodeId, metricName));
   },
   _metricPrefix() {
     return `org.graylog2.buffers.${this.props.bufferType}`;

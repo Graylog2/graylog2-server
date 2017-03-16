@@ -19,7 +19,7 @@ const StreamRuleList = React.createClass({
         return (
           <StreamRule key={streamRule.id} permissions={this.props.permissions} matchData={this.props.matchData}
                       onSubmit={this.props.onSubmit} onDelete={this.props.onDelete}
-                      stream={this.props.stream} streamRule={streamRule} streamRuleTypes={this.props.streamRuleTypes}/>
+                      stream={this.props.stream} streamRule={streamRule} streamRuleTypes={this.props.streamRuleTypes} />
         );
       });
     }
@@ -35,7 +35,7 @@ const StreamRuleList = React.createClass({
       );
     }
     return (
-      <Spinner/>
+      <Spinner />
     );
   },
 });

@@ -101,10 +101,10 @@ const DataTable = React.createClass({
       data = (
         <table className={`table ${this.props.className}`}>
           <thead>
-          {this.getFormattedHeaders()}
+            {this.getFormattedHeaders()}
           </thead>
           <tbody>
-          {this.getFormattedDataRows()}
+            {this.getFormattedDataRows()}
           </tbody>
         </table>
       );

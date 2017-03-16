@@ -25,7 +25,7 @@ const CreateAlertNotificationInput = React.createClass({
   },
 
   componentDidMount() {
-    StreamsStore.listStreams().then(streams => {
+    StreamsStore.listStreams().then((streams) => {
       this.setState({ streams: streams });
     });
     AlertNotificationsActions.available();
@@ -86,7 +86,7 @@ const CreateAlertNotificationInput = React.createClass({
     }
 
     const notificationForm = (this.state.type !== this.PLACEHOLDER ? this._formatNotificationForm(this.state.type) : null);
-    const availableTypes = Object.keys(this.state.availableNotifications).map(value => {
+    const availableTypes = Object.keys(this.state.availableNotifications).map((value) => {
       return (
         <option key={`type-option-${value}`} value={value}>
           {this.state.availableNotifications[value].name}

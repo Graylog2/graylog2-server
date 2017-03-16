@@ -18,8 +18,7 @@ const NotificationsList = React.createClass({
       return 'is one notification';
     }
 
-    return 'are ' + count + ' notifications';
-
+    return `are ${count} notifications`;
   },
   render() {
     if (!this.state.notifications) {
@@ -35,7 +34,7 @@ const NotificationsList = React.createClass({
       title = 'No notifications';
       content = (
         <Alert bsStyle="success" className="notifications-none">
-          <i className="fa fa-check-circle"/>{' '}
+          <i className="fa fa-check-circle" />{' '}
           &nbsp;No notifications
         </Alert>
       );

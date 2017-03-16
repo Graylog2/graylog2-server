@@ -15,7 +15,7 @@ const IndexSizeSummary = React.createClass({
       );
     }
 
-    return <span></span>;
+    return <span />;
   },
 });
 

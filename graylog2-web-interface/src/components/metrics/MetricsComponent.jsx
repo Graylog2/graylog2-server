@@ -25,7 +25,7 @@ const MetricsComponent = React.createClass({
     try {
       const filter = new RegExp(this.state.filter, 'i');
       filteredNames = this.props.names
-        .filter((metric) => String(metric.full_name).match(filter));
+        .filter(metric => String(metric.full_name).match(filter));
     } catch (e) {
       filteredNames = [];
     }
@@ -33,7 +33,7 @@ const MetricsComponent = React.createClass({
       <Row className="content">
         <Col md={12}>
           <MetricsFilterInput valueLink={this.linkState('filter')} />
-          <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId}/>
+          <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId} />
         </Col>
       </Row>
     );

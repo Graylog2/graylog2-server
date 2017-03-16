@@ -27,7 +27,7 @@ const PermissionSelector = React.createClass({
 
     const multiStreamButtons = (streamIds) => {
       return (
-        <div className="pull-right" style={{marginTop: 10, marginBottom: 10}}>
+        <div className="pull-right" style={{ marginTop: 10, marginBottom: 10 }}>
           <Button bsSize="xsmall" bsStyle="info" onClick={() => this._toggleAllStreamsRead(streamIds)}>Toggle read permissions</Button>
           &nbsp;
           <Button bsSize="xsmall" bsStyle="info" onClick={() => this._toggleAllStreamsEdit(streamIds)}>Toggle edit permissions</Button>
@@ -48,7 +48,7 @@ const PermissionSelector = React.createClass({
 
     const multiDashboardButtons = (dashboardIds) => {
       return (
-        <div className="pull-right" style={{marginTop: 10, marginBottom: 10}}>
+        <div className="pull-right" style={{ marginTop: 10, marginBottom: 10 }}>
           <Button bsSize="xsmall" bsStyle="info" onClick={() => this._toggleAllDashboardsRead(dashboardIds)}>Toggle read permissions</Button>
           &nbsp;
           <Button bsSize="xsmall" bsStyle="info" onClick={() => this._toggleAllDashboardsEdit(dashboardIds)}>Toggle edit permissions</Button>
@@ -60,7 +60,7 @@ const PermissionSelector = React.createClass({
       <div>
         <Tabs defaultActiveKey={1} animation={false}>
           <Tab eventKey={1} title="Streams">
-            <div style={{marginTop: 10}}>
+            <div style={{ marginTop: 10 }}>
               <TableList
                 items={this.props.streams}
                 filterLabel="Filter Streams"
@@ -71,7 +71,7 @@ const PermissionSelector = React.createClass({
             </div>
           </Tab>
           <Tab eventKey={2} title="Dashboards">
-            <div style={{marginTop: 10}}>
+            <div style={{ marginTop: 10 }}>
               <TableList
                 items={this.props.dashboards}
                 filterLabel="Filter Dashboards"
@@ -130,8 +130,8 @@ const PermissionSelector = React.createClass({
     let deleted = Immutable.Set.of();
 
     idList.forEach((id) => {
-      const readTarget = target + ':read:' + id;
-      const editTarget = target + ':edit:' + id;
+      const readTarget = `${target}:read:${id}`;
+      const editTarget = `${target}:edit:${id}`;
 
       if (this.props.permissions.contains(readTarget)) {
         deleted = deleted.add(readTarget).add(editTarget);
@@ -146,8 +146,8 @@ const PermissionSelector = React.createClass({
     let deleted = Immutable.Set.of();
 
     idList.forEach((id) => {
-      const readTarget = target + ':read:' + id;
-      const editTarget = target + ':edit:' + id;
+      const readTarget = `${target}:read:${id}`;
+      const editTarget = `${target}:edit:${id}`;
 
       if (this.props.permissions.contains(editTarget)) {
         deleted = deleted.add(editTarget);

@@ -21,13 +21,13 @@ const IndexerFailuresComponent = React.createClass({
     const since = moment().subtract(24, 'hours');
 
     IndexerFailuresStore.count(since).then((response) => {
-      this.setState({total: response.count});
+      this.setState({ total: response.count });
     });
   },
   _formatFailuresSummary() {
     return (
       <Alert bsStyle={this.state.total === 0 ? 'success' : 'danger'}>
-        <i className={'fa fa-' + this._iconForFailureCount(this.state.total)} /> {this._formatTextForFailureCount(this.state.total)}
+        <i className={`fa fa-${this._iconForFailureCount(this.state.total)}`} /> {this._formatTextForFailureCount(this.state.total)}
 
         <LinkContainer to={Routes.SYSTEM.INDICES.FAILURES}>
           <Button bsStyle="info" bsSize="xs" className="pull-right">
@@ -64,7 +64,7 @@ const IndexerFailuresComponent = React.createClass({
 
           <SmallSupportLink>
             Every message that was not successfully indexed will be logged as an indexer failure. You can learn more about this feature in the{' '}
-            <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text="Graylog documentation"/>.
+            <DocumentationLink page={DocsHelper.PAGES.INDEXER_FAILURES} text="Graylog documentation" />.
           </SmallSupportLink>
 
           {content}

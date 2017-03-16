@@ -1,4 +1,4 @@
-import React, {PropTypes} from 'react';
+import React, { PropTypes } from 'react';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const MessagesActions = ActionsProvider.getActions('Messages');
@@ -26,7 +26,7 @@ const MessageLoader = React.createClass({
   },
 
   toggleMessageForm() {
-    this.setState({hidden: !this.state.hidden}, this._focusMessageLoaderForm);
+    this.setState({ hidden: !this.state.hidden }, this._focusMessageLoaderForm);
   },
   _focusMessageLoaderForm() {
     if (!this.state.hidden) {
@@ -64,8 +64,8 @@ const MessageLoader = React.createClass({
     const loadMessageForm = (
       <div>
         <form className="form-inline message-loader-form" onSubmit={this.loadMessage}>
-          <input type="text" ref="messageId" className="form-control message-id-input" placeholder="Message ID" required/>
-          <input type="text" ref="index" className="form-control" placeholder="Index" required/>
+          <input type="text" ref="messageId" className="form-control message-id-input" placeholder="Message ID" required />
+          <input type="text" ref="index" className="form-control" placeholder="Index" required />
           <button ref="submitButton" type="submit" className="btn btn-info" disabled={this.state.loading}>
             {this.state.loading ? 'Loading message...' : 'Load message'}
           </button>

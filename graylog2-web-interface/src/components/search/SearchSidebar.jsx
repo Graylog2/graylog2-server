@@ -110,7 +110,7 @@ const SearchSidebar = React.createClass({
     }
 
     const url = new URI(URLUtils.qualifyUrl(
-      ApiRoutes.UniversalSearchApiController.export(rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url
+      ApiRoutes.UniversalSearchApiController.export(rangeType, query, timeRange, streamId, 0, 0, fields.toJS()).url,
     ));
 
     if (URLUtils.areCredentialsInURLSupported()) {
@@ -149,7 +149,7 @@ const SearchSidebar = React.createClass({
           <p>{infoText}</p>
           <p>
             <a href={this._getURLForExportAsCSV()} target="_blank">
-              <i className="fa fa-cloud-download"/>&nbsp;
+              <i className="fa fa-cloud-download" />&nbsp;
               Download
             </a>
           </p>
@@ -164,7 +164,7 @@ const SearchSidebar = React.createClass({
   render() {
     const formattedIndices = this.props.result.used_indices
       .sort((i1, i2) => naturalSort(i1.index_name.toLowerCase(), i2.index_name.toLowerCase()))
-      .map((index) => <li key={index.index_name}> {index.index_name}</li>);
+      .map(index => <li key={index.index_name}> {index.index_name}</li>);
 
     const indicesModal = (
       <BootstrapModalWrapper ref="indicesModal">
@@ -199,7 +199,7 @@ const SearchSidebar = React.createClass({
     }
 
     // always add the debug query link as last elem
-    moreActions.push(<MenuItem divider key="div2"/>);
+    moreActions.push(<MenuItem divider key="div2" />);
     moreActions.push(<MenuItem key="showQuery" onSelect={this._openModal('showQueryModal')}>Show query</MenuItem>);
 
     return (
@@ -217,20 +217,20 @@ const SearchSidebar = React.createClass({
                 {this.props.result.used_indices.length}&nbsp;{this.props.result.used_indices.length === 1 ? 'index' : 'indices'}
               </a>.
               {indicesModal}
-              <br/>
-              Results retrieved at <Timestamp dateTime={this.state.lastResultsUpdate} format={DateTime.Formats.DATETIME}/>.
+              <br />
+              Results retrieved at <Timestamp dateTime={this.state.lastResultsUpdate} format={DateTime.Formats.DATETIME} />.
             </p>
 
             <div className="actions">
-              <AddSearchCountToDashboard searchInStream={this.props.searchInStream} permissions={this.props.permissions}/>
+              <AddSearchCountToDashboard searchInStream={this.props.searchInStream} permissions={this.props.permissions} />
 
-              <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch}/>
+              <SavedSearchControls currentSavedSearch={this.props.currentSavedSearch} />
 
               <div style={{ display: 'inline-block' }}>
                 <DropdownButton bsSize="small" title="More actions" id="search-more-actions-dropdown">
                   {moreActions}
                 </DropdownButton>
-                <ShowQueryModal key="debugQuery" ref="showQueryModal" builtQuery={this.props.builtQuery}/>
+                <ShowQueryModal key="debugQuery" ref="showQueryModal" builtQuery={this.props.builtQuery} />
               </div>
             </div>
 
