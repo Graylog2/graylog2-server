@@ -15,7 +15,7 @@
     "build": "webpack -p --config webpack.vendor.js && webpack",
     "test": "webpack --config webpack.vendor.js && karma start karma.ci.conf.js",
     "prepare-dev": "./tools/prepare-dev",
-    "lint": "eslint src"
+    "lint": "eslint --ext js,jsx src"
   },
   "dependencies": {
     "bluebird": "^3.4.0",
