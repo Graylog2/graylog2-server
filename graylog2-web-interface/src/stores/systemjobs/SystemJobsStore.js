@@ -2,7 +2,7 @@ import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
+import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
@@ -17,7 +17,7 @@ const SystemJobsStore = Reflux.createStore({
   },
   list() {
     const url = URLUtils.qualifyUrl(ApiRoutes.SystemJobsApiController.list().url);
-    const promise = fetch('GET', url).then((response) => {
+    const promise = fetchPeriodically('GET', url).then((response) => {
       this.jobs = response;
       this.trigger({jobs: response});
 
