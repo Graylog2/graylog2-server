@@ -2,8 +2,7 @@ import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch from 'logic/rest/FetchProvider';
-import fetchPeriodically from 'logic/rest/FetchProvider';
+import {fetch, fetchPeriodically} from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const SystemJobsActions = ActionsProvider.getActions('SystemJobs');
