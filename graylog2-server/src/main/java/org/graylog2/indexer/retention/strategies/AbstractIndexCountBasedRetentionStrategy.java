@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
@@ -85,7 +86,7 @@ public abstract class AbstractIndexCountBasedRetentionStrategy implements Retent
     private void runRetention(IndexSet indexSet, Map<String, Set<String>> deflectorIndices, int removeCount) {
         final Set<String> orderedIndices = Arrays.stream(indexSet.getManagedIndices())
             .filter(indexName -> !indices.isReopened(indexName))
-            .filter(indexName -> !(deflectorIndices.get(indexName).contains(indexSet.getWriteIndexAlias())))
+            .filter(indexName -> !(deflectorIndices.getOrDefault(indexName, Collections.emptySet()).contains(indexSet.getWriteIndexAlias())))
             .sorted((indexName1, indexName2) -> indexSet.extractIndexNumber(indexName2).orElse(0).compareTo(indexSet.extractIndexNumber(indexName1).orElse(0)))
             .collect(Collectors.toCollection(LinkedHashSet::new));
         orderedIndices
