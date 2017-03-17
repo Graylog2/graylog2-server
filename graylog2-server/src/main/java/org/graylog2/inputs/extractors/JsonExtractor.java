@@ -38,6 +38,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -51,6 +52,7 @@ public class JsonExtractor extends Extractor {
     private static final String CK_REPLACE_KEY_WHITESPACE = "replace_key_whitespace";
     private static final String CK_KEY_WHITESPACE_REPLACEMENT = "key_whitespace_replacement";
     private static final String CK_KEY_PREFIX = "key_prefix";
+    private static final Pattern WHITE_SPACE_PATTERN = Pattern.compile("\\s");
     private static final RemoveNullPredicate REMOVE_NULL_PREDICATE = new RemoveNullPredicate();
 
     private final ObjectMapper mapper = new ObjectMapper();
@@ -115,17 +117,7 @@ public class JsonExtractor extends Extractor {
 
         final Map<String, Object> results = new HashMap<>(json.size());
         for (Map.Entry<String, Object> mapEntry : json.entrySet()) {
-            String key = keyPrefix + mapEntry.getKey();
-            if (replaceKeyWhitespace && key.contains(" ")) {
-                key = key.replace(" ", keyWhitespaceReplacement);
-            } else {
-                if (LOG.isDebugEnabled()) {
-                    if (key.contains(" ")) {
-                        LOG.debug("Invalid key \"{}\" in JSON object!", key);
-                    }
-                }
-            }
-            for (Entry entry : parseValue(key, mapEntry.getValue())) {
+            for (Entry entry : parseValue(keyPrefix + mapEntry.getKey(), mapEntry.getValue())) {
                 results.put(entry.key(), entry.value());
             }
         }
@@ -133,24 +125,37 @@ public class JsonExtractor extends Extractor {
         return results;
     }
 
+    private String parseKey(String key) {
+        if (replaceKeyWhitespace && key.contains(" ")) {
+            return WHITE_SPACE_PATTERN.matcher(key).replaceAll(keyWhitespaceReplacement);
+        } else {
+            if (LOG.isDebugEnabled() && key.contains(" ")) {
+                LOG.debug("Invalid key \"{}\" in JSON object!", key);
+            }
+
+            return key;
+        }
+    }
+
     private Collection<Entry> parseValue(String key, Object value) {
+        final String processedKey = parseKey(key);
         if (value instanceof Boolean) {
-            return Collections.singleton(Entry.create(key, value));
+            return Collections.singleton(Entry.create(processedKey, value));
         } else if (value instanceof Number) {
-            return Collections.singleton(Entry.create(key, value));
+            return Collections.singleton(Entry.create(processedKey, value));
         } else if (value instanceof String) {
-            return Collections.singleton(Entry.create(key, value));
+            return Collections.singleton(Entry.create(processedKey, value));
         } else if (value instanceof Map) {
             @SuppressWarnings("unchecked")
             final Map<String, Object> map = (Map<String, Object>) value;
             final Map<String, Object> withoutNull = Maps.filterEntries(map, REMOVE_NULL_PREDICATE);
             if (flatten) {
                 final Joiner.MapJoiner joiner = Joiner.on(listSeparator).withKeyValueSeparator(kvSeparator);
-                return Collections.singleton(Entry.create(key, joiner.join(withoutNull)));
+                return Collections.singleton(Entry.create(processedKey, joiner.join(withoutNull)));
             } else {
                 final List<Entry> result = new ArrayList<>(map.size());
                 for (Map.Entry<String, Object> entry : map.entrySet()) {
-                    result.addAll(parseValue(key + keySeparator + entry.getKey(), entry.getValue()));
+                    result.addAll(parseValue(processedKey + keySeparator + entry.getKey(), entry.getValue()));
                 }
 
                 return result;
@@ -158,7 +163,7 @@ public class JsonExtractor extends Extractor {
         } else if (value instanceof List) {
             final List values = (List) value;
             final Joiner joiner = Joiner.on(listSeparator).skipNulls();
-            return Collections.singleton(Entry.create(key, joiner.join(values)));
+            return Collections.singleton(Entry.create(processedKey, joiner.join(values)));
         } else if (value == null) {
             // Ignore null values so we don't try to create fields for that in the message.
             return Collections.emptySet();
