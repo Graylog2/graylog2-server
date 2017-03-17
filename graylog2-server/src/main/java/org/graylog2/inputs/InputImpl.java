@@ -80,7 +80,7 @@ public class InputImpl extends PersistedImpl implements Input {
             validations.put(Extractor.FIELD_TITLE, new FilledStringValidator());
             validations.put(Extractor.FIELD_TYPE, new FilledStringValidator());
             validations.put(Extractor.FIELD_CURSOR_STRATEGY, new FilledStringValidator());
-            validations.put(Extractor.FIELD_TARGET_FIELD, new FilledStringValidator());
+            validations.put(Extractor.FIELD_TARGET_FIELD, new OptionalStringValidator());
             validations.put(Extractor.FIELD_SOURCE_FIELD, new FilledStringValidator());
             validations.put(Extractor.FIELD_CREATOR_USER_ID, new FilledStringValidator());
             validations.put(Extractor.FIELD_EXTRACTOR_CONFIG, new MapValidator());
