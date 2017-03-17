@@ -43,7 +43,7 @@ public final class MongoJodaDateTimeDeserializer extends StdScalarDeserializer<D
                 final Object embeddedObject = jsonParser.getEmbeddedObject();
                 if (embeddedObject instanceof Date) {
                     final Date date = (Date) embeddedObject;
-                    return new DateTime(date);
+                    return new DateTime(date, DateTimeZone.UTC);
                 } else {
                     throw new IllegalStateException("Unsupported token: " + jsonParser.currentToken());
                 }
