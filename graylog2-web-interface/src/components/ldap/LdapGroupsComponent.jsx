@@ -33,7 +33,11 @@ const LdapGroupsComponent = React.createClass({
     LdapGroupsActions.loadGroups.triggerPromise()
       .then(
         groups => this.setState({ groups: Immutable.Set(groups) }),
-        error => this.setState({ groupsErrorMessage: error }),
+        error => {
+          if (error.additional.status !== 400) {
+            this.setState({ groupsErrorMessage: error });
+          }
+        },
       );
     RolesStore.loadRoles().then(roles => this.setState({ roles: Immutable.Set(roles) }));
   },
@@ -67,10 +71,10 @@ const LdapGroupsComponent = React.createClass({
       return <Spinner />;
     }
 
-    if (this.state.groupsErrorMessage !== null) {
+    if (this.state.groupsErrorMessage) {
       return (
         <Panel header="Error: Unable to load LDAP groups" bsStyle="danger">
-          The error message was:<br />{this.state.groupsErrorMessage}
+          The error message was:<br />{this.state.groupsErrorMessage.message}
         </Panel>
       );
     }
