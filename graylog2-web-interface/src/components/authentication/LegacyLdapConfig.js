@@ -12,7 +12,6 @@ import Routes from 'routing/Routes';
 
 const LegacyLdapConfig = React.createClass({
   propTypes: {
-    config: PropTypes.object,
     history: PropTypes.object.isRequired,
   },
   getInitialState() {
