@@ -162,17 +162,20 @@ const SearchResult = React.createClass({
   render() {
     const anyHighlightRanges = Immutable.fromJS(this.props.result.messages).some(message => message.get('highlight_ranges') !== null);
 
-    // short circuit if the result turned up empty
-    if (this.props.result.total_results === 0) {
-      return (
-        <NoSearchResults builtQuery={this.props.builtQuery} histogram={this.props.histogram}
-                         permissions={this.props.permissions} searchInStream={this.props.searchInStream} />
-      );
-    }
-
     let loadingIndicator;
     if (this.props.loadingSearch) {
       loadingIndicator = <LoadingIndicator text="Updating search results..." />;
+    }
+
+    // short circuit if the result turned up empty
+    if (this.props.result.total_results === 0) {
+      return (
+        <div>
+          <NoSearchResults builtQuery={this.props.builtQuery} histogram={this.props.histogram}
+                           permissions={this.props.permissions} searchInStream={this.props.searchInStream} />
+          {loadingIndicator}
+        </div>
+      );
     }
 
     return (
