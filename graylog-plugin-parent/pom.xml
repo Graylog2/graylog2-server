@@ -154,6 +154,8 @@
                 <artifactId>rpm-maven-plugin</artifactId>
                 <configuration>
                     <group>Application/Internet</group>
+                    <needarch>noarch</needarch>
+                    <targetOS>linux</targetOS>
                     <prefixes>
                         <prefix>/usr</prefix>
                     </prefixes>
