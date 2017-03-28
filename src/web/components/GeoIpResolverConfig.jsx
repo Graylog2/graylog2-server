@@ -1,6 +1,6 @@
 import React from 'react';
-import { Input, Button } from 'react-bootstrap';
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import { Button } from 'react-bootstrap';
+import { BootstrapModalForm, Input } from 'components/bootstrap';
 import { IfPermitted, Select } from 'components/common';
 import { DocumentationLink } from 'components/support';
 import ObjectUtils from 'util/ObjectUtils';
