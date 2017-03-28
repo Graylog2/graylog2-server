@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 import ISODurationUtils from 'util/ISODurationUtils';
 
 const ISODurationInput = React.createClass({

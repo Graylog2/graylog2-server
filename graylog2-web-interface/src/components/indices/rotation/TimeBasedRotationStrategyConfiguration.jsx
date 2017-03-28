@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 import moment from 'moment';
 
 const TimeBasedRotationStrategyConfiguration = React.createClass({
@@ -62,7 +62,6 @@ const TimeBasedRotationStrategyConfiguration = React.createClass({
                help={'How long an index gets written to before it is rotated. (i.e. "P1D" for 1 day, "PT6H" for 6 hours)'}
                addonAfter={this._formatDuration()}
                bsStyle={this._validationState()}
-               standalone
                required />
       </div>
     );

@@ -1,8 +1,9 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Input, Button, Row, Col, Alert, Panel } from 'react-bootstrap';
+import { Button, Row, Col, Alert, Panel } from 'react-bootstrap';
 import Routes from 'routing/Routes';
 
+import { Input } from 'components/bootstrap';
 import PermissionsMixin from 'util/PermissionsMixin';
 import UserNotification from 'util/UserNotification';
 import ValidationsUtils from 'util/ValidationsUtils';

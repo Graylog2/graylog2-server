@@ -67,7 +67,7 @@ const AddToDashboardMenu = React.createClass({
   _updateDashboards(newDashboards) {
     this.setState({ dashboards: newDashboards });
   },
-  _selectDashboard(event, dashboardId) {
+  _selectDashboard(dashboardId) {
     this.setState({ selectedDashboard: dashboardId });
     this.refs.widgetModal.open();
   },

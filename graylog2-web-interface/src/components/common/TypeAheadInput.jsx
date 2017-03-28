@@ -1,8 +1,9 @@
 import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
-import { Input } from 'react-bootstrap';
-import { substringMatcher } from 'logic/search/UniversalSearch';
+import { Input } from 'components/bootstrap';
+import UniversalSearch from 'logic/search/UniversalSearch';
 import $ from 'jquery';
+// eslint-disable-next-line no-unused-vars
 import Typeahead from 'typeahead.js';
 
 const TypeAheadInput = React.createClass({
@@ -51,7 +52,7 @@ const TypeAheadInput = React.createClass({
       {
         name: 'dataset-name',
         displayKey: props.displayKey,
-        source: substringMatcher(props.suggestions, props.displayKey, 6),
+        source: UniversalSearch.substringMatcher(props.suggestions, props.displayKey, 6),
         templates: {
           suggestion: (value) => {
             if (props.suggestionText) {

@@ -1,9 +1,10 @@
 import React from 'react';
 import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Row, Col, Input, Panel, Button } from 'react-bootstrap';
+import { Row, Col, Panel, Button } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
+import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 
 import Routes from 'routing/Routes';

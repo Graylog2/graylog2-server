@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Input } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import { TimezoneSelect } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 

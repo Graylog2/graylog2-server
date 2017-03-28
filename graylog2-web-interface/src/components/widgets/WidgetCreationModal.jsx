@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';

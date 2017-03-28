@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Input, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
 import FormUtils from 'util/FormsUtils';

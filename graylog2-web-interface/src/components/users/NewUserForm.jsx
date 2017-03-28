@@ -1,6 +1,7 @@
 import React from 'react';
-import { Alert, Row, Col, Input, Button } from 'react-bootstrap';
+import { Alert, Row, Col, Button } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import RolesSelect from 'components/users/RolesSelect';
 import TimeoutInput from 'components/users/TimeoutInput';
 import { TimezoneSelect } from 'components/common';

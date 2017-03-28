@@ -1,8 +1,9 @@
 import React, { PropTypes } from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
-import { Input } from 'react-bootstrap';
 import $ from 'jquery';
+import { Input } from 'components/bootstrap';
+// eslint-disable-next-line no-unused-vars
 import Typeahead from 'typeahead.js'; // Need to import this to load typeahead, even if the variable is never used
 
 import UniversalSearch from 'logic/search/UniversalSearch';

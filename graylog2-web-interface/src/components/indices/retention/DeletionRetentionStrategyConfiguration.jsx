@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 
 const DeletionRetentionStrategyConfiguration = React.createClass({
   propTypes: {
@@ -34,7 +34,6 @@ const DeletionRetentionStrategyConfiguration = React.createClass({
                  onChange={this._onInputUpdate('max_number_of_indices')}
                  value={this.state.max_number_of_indices}
                  help={<span>Maximum number of indices to keep before <strong>deleting</strong> the oldest ones</span>}
-                 standalone
                  required />
         </fieldset>
       </div>

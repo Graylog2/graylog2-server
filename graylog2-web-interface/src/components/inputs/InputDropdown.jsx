@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
-import { Button, Input } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import Spinner from 'components/common/Spinner';
 
 const InputDropdown = React.createClass({

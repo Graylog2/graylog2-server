@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 
 import NumberUtils from 'util/NumberUtils';
 
@@ -41,7 +41,6 @@ const SizeBasedRotationStrategyConfiguration = React.createClass({
                  value={this.state.max_size}
                  help="Maximum size of an index before it gets rotated"
                  addonAfter={this._formatSize()}
-                 standalone
                  required />
         </fieldset>
       </div>

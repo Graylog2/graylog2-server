@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import { CountWidgetCreateConfiguration } from 'components/widgets/configurations';

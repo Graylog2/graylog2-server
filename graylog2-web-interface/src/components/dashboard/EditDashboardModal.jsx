@@ -1,7 +1,7 @@
 import $ from 'jquery';
 
 import React from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 
 import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
 

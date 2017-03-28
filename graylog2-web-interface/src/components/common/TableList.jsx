@@ -1,7 +1,8 @@
 import React from 'react';
 import Immutable from 'immutable';
-import { Col, Input, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
+import { Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import { TypeAheadDataFilter } from 'components/common';
 
 const TableList = React.createClass({
@@ -97,7 +98,7 @@ const TableList = React.createClass({
     if (this.props.filterKeys.length !== 0) {
       filter = (
         <Row>
-          <Col md={4}>
+          <Col md={5}>
             <TypeAheadDataFilter label={this.props.filterLabel}
                                  data={this.props.items}
                                  displayKey="value"

@@ -1,7 +1,8 @@
 import React from 'react';
-import { Alert, Col, Button, Input, Row } from 'react-bootstrap';
+import { Alert, Col, Button, Row } from 'react-bootstrap';
 import Routes from 'routing/Routes';
 
+import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 
 import StoreProvider from 'injection/StoreProvider';

@@ -1,8 +1,9 @@
 import React from 'react';
 import Reflux from 'reflux';
 import naturalSort from 'javascript-natural-sort';
-import { Button, Col, Input, Row } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
 import { ConfigurationForm } from 'components/configurationforms';
 import Routes from 'routing/Routes';

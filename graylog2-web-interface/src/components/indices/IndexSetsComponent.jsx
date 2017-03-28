@@ -46,7 +46,7 @@ const IndexSetsComponent = React.createClass({
   },
 
   _onDelete(indexSet) {
-    return (e) => {
+    return (_, e) => {
       e.preventDefault();
 
       this.refs[`index-set-deletion-form-${indexSet.id}`].open();

@@ -11,7 +11,7 @@ const HelpMenu = React.createClass({
   },
   render() {
     return (
-      <NavDropdown navItem title="Help" id="help-menu-dropdown" active={this.props.active}>
+      <NavDropdown title="Help" id="help-menu-dropdown" active={this.props.active}>
         <LinkContainer to={Routes.getting_started(true)}>
           <MenuItem>Getting Started</MenuItem>
         </LinkContainer>

@@ -24,11 +24,9 @@ const SystemMessagesComponent = React.createClass({
       this.setState(response);
     });
   },
-  _onSelected(event, selectedEvent) {
-    const page = selectedEvent.eventKey;
-
-    this.setState({ currentPage: page });
-    this.loadMessages(page);
+  _onSelected(selectedPage) {
+    this.setState({ currentPage: selectedPage });
+    this.loadMessages(selectedPage);
   },
   render() {
     let content;

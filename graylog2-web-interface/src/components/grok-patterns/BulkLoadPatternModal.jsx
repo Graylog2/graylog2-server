@@ -1,6 +1,7 @@
 import React from 'react';
-import { Input, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 
 import StoreProvider from 'injection/StoreProvider';

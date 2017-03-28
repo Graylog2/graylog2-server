@@ -1,7 +1,8 @@
 import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
-import { Row, Col, Input } from 'react-bootstrap';
+import { Row, Col } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import { ClipboardButton, Spinner } from 'components/common';
 import Version from 'util/Version';
 

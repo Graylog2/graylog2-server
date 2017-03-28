@@ -23,26 +23,26 @@ const StreamControls = React.createClass({
   getInitialState() {
     return {};
   },
-  _onDelete(event) {
+  _onDelete(_, event) {
     event.preventDefault();
     this.props.onDelete(this.props.stream);
   },
-  _onEdit(event) {
+  _onEdit(_, event) {
     event.preventDefault();
     this.refs.streamForm.open();
   },
-  _onClone(event) {
+  _onClone(_, event) {
     event.preventDefault();
     this.refs.cloneForm.open();
   },
   _onCloneSubmit(_, stream) {
     this.props.onClone(this.props.stream.id, stream);
   },
-  _onQuickAdd(event) {
+  _onQuickAdd(_, event) {
     event.preventDefault();
     this.props.onQuickAdd(this.props.stream.id);
   },
-  _setStartpage(event) {
+  _setStartpage(_, event) {
     event.preventDefault();
     StartpageStore.set(this.props.user.username, 'stream', this.props.stream.id);
   },

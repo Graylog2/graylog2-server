@@ -1,6 +1,6 @@
 import React from 'react';
 import { PropTypes, Component } from 'react';
-import { Input } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
 const StreamsStore = StoreProvider.getStore('Streams');

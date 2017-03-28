@@ -176,7 +176,7 @@ const Navigation = React.createClass({
              * props down to them. NavDropdown is passing some props needed in MenuItems that are being blocked
              * by IfPermitted.
              */}
-            <NavDropdown navItem title={this._systemTitle()} id="system-menu-dropdown">
+            <NavDropdown title={this._systemTitle()} id="system-menu-dropdown">
               <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
                 <MenuItem>Overview</MenuItem>
               </LinkContainer>

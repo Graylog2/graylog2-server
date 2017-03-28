@@ -1,6 +1,6 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { FormControls } from 'react-bootstrap';
+import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
 
 import { ConfigurationForm } from 'components/configurationforms';
 
@@ -65,9 +65,10 @@ const AlertConditionForm = React.createClass({
                          titleValue={alertCondition ? alertCondition.title : ''}
                          helpBlock="The alert condition title"
                          values={alertCondition ? alertCondition.parameters : {}}>
-        <FormControls.Static label={`${typeDefinition.name} description`}>
-          {typeDefinition.human_name}
-        </FormControls.Static>
+        <FormGroup>
+          <ControlLabel>{`${typeDefinition.name} description`}</ControlLabel>
+          <FormControl.Static>{typeDefinition.human_name}</FormControl.Static>
+        </FormGroup>
       </ConfigurationForm>
     );
   },

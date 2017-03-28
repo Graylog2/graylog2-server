@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { PageItem } from 'react-bootstrap';
+import { Pager } from 'react-bootstrap';
 
 const Page = React.createClass({
   propTypes: {
@@ -19,12 +19,12 @@ const Page = React.createClass({
     }
 
     return (
-      <PageItem href={this.props.href}
+      <Pager.Item href={this.props.href}
                 className={className}
                 disabled={this.props.isDisabled}
                 onSelect={() => this.props.onPageChanged(this.props.page)}>
         {this.props.page}
-      </PageItem>
+      </Pager.Item>
     );
   },
 });

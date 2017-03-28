@@ -1,6 +1,7 @@
 import React, { PropTypes } from 'react';
-import { Row, Col, Input, Button, FormControls } from 'react-bootstrap';
+import { Button, Col, ControlLabel, FormControl, FormGroup, Row } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import ExtractorExampleMessage from './ExtractorExampleMessage';
 import EditExtractorConfiguration from './EditExtractorConfiguration';
 import EditExtractorConverters from './EditExtractorConverters';
@@ -150,6 +151,20 @@ const EditExtractor = React.createClass({
     ExtractorsActions.save.triggerPromise(this.props.inputId, this.state.updatedExtractor)
       .then(() => this.props.onSave());
   },
+
+  _staticField(label, text) {
+    return (
+      <FormGroup>
+        <Col componentClass={ControlLabel} md={2}>
+          {label}
+        </Col>
+        <Col md={10}>
+          <FormControl.Static>{text}</FormControl.Static>
+        </Col>
+      </FormGroup>
+    );
+  },
+
   render() {
     const conditionTypeHelpMessage = 'Extracting only from messages that match a certain condition helps you ' +
       'avoiding wrong or unnecessary extractions and can also save CPU resources.';
@@ -198,11 +213,8 @@ const EditExtractor = React.createClass({
             <Row>
               <Col md={8}>
                 <form className="extractor-form form-horizontal" method="POST" onSubmit={this._saveExtractor}>
-                  <FormControls.Static label="Extractor type"
-                                       value={ExtractorUtils.getReadableExtractorTypeName(this.state.updatedExtractor.type)}
-                                       labelClassName="col-md-2" wrapperClassName="col-md-10" />
-                  <FormControls.Static label="Source field" value={this.state.updatedExtractor.source_field}
-                                       labelClassName="col-md-2" wrapperClassName="col-md-10" />
+                  {this._staticField('Extractor type', ExtractorUtils.getReadableExtractorTypeName(this.state.updatedExtractor.type))}
+                  {this._staticField('Source field', this.state.updatedExtractor.source_field)}
 
                   <EditExtractorConfiguration ref="extractorConfiguration"
                                               extractorType={this.state.updatedExtractor.type}

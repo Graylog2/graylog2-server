@@ -1,5 +1,6 @@
 import React from 'react';
-import { Alert, Row, Col, Input } from 'react-bootstrap';
+import { Alert, Row, Col } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
 import { Spinner } from 'components/common';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import naturalSort from 'javascript-natural-sort';

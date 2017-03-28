@@ -1,7 +1,8 @@
 import React from 'react';
-import { Col, Input } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 
+import { Input } from 'components/bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { TypeAheadFieldInput } from 'components/common';
 import { DocumentationLink } from 'components/support';

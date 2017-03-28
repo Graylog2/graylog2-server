@@ -1,7 +1,8 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Button, Col, Input, Row } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 
+import { Input } from 'components/bootstrap';
 import { Select } from 'components/common';
 import { BooleanField, DropdownField, NumberField, TextField } from 'components/configurationforms';
 
