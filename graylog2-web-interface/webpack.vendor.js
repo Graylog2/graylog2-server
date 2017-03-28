@@ -27,7 +27,6 @@ const webpackConfig = {
     library: '__[name]',
   },
   plugins: [
-    new Clean([path.resolve(BUILD_PATH)]),
     new webpack.DllPlugin({
       path: path.resolve(MANIFESTS_PATH, '[name]-manifest.json'),
       name: '__[name]',
@@ -64,6 +63,7 @@ const webpackConfig = {
 if (TARGET === 'build') {
   module.exports = merge(webpackConfig, {
     plugins: [
+      new Clean([path.resolve(BUILD_PATH)]),
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
         sourceMap: true,
