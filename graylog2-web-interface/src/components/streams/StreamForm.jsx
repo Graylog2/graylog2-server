@@ -103,13 +103,14 @@ const StreamForm = React.createClass({
                           title={this.props.title}
                           onSubmitForm={this._onSubmit}
                           submitButtonText="Save">
-        <Input type="text" required label="Title" placeholder="A descriptive name of the new stream"
+        <Input type="text" required label="Title" name="Title"
+               placeholder="A descriptive name of the new stream"
                valueLink={this.linkState('title')} autoFocus />
-        <Input type="text" required label="Description"
+        <Input type="text" required label="Description" name="Description"
                placeholder="What kind of messages are routed into this stream?"
                valueLink={this.linkState('description')} />
         {indexSetSelect}
-        <Input type="checkbox" label="Remove matches from 'All messages' stream"
+        <Input type="checkbox" label="Remove matches from 'All messages' stream" name="Remove from All messages"
                help={<span>Remove messages that match this stream from the 'All messages' stream which is assigned to every message by default.</span>}
                checkedLink={this.linkState('remove_matches_from_default_stream')} />
       </BootstrapModalForm>
