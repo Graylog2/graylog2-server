@@ -69,6 +69,7 @@ const webpackConfig = {
       filename: 'index.html',
       inject: false,
       template: path.resolve(ROOT_PATH, 'templates/index.html.js'),
+      vendorModulePath: path.resolve(ROOT_PATH, 'build/vendor-module.json'),
       chunksSortMode: (c1, c2) => {
         // Render the polyfill chunk first
         if (c1.names[0] === 'polyfill') {

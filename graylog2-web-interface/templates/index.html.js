@@ -1,5 +1,4 @@
 const fs = require('fs');
-const vendorModule = JSON.parse(fs.readFileSync('build/vendor-module.json', 'utf8'));
 
 function linkTagForCssFile(cssFile) {
   return '<link href="' + cssFile + '" rel="stylesheet">';
@@ -11,20 +10,21 @@ function scriptTagForJsFile(jsFile) {
 
 module.exports = function (templateParams) {
   const htmlWebpackPlugin = templateParams.htmlWebpackPlugin;
+  const vendorModule = JSON.parse(fs.readFileSync(htmlWebpackPlugin.options.vendorModulePath, 'utf8'));
   const manifest = htmlWebpackPlugin.files.manifest ? ' manifest="' + htmlWebpackPlugin.files.manifest + '"' : '';
   const title = htmlWebpackPlugin.options.title ? htmlWebpackPlugin.options.title : 'Webpack App';
   const favIcon = htmlWebpackPlugin.files.favicon ? '<link rel="shortcut icon" href="' + htmlWebpackPlugin.files.favicon + '">' : '';
 
   const cssFiles = htmlWebpackPlugin.files.css.map(function(css) {
     return linkTagForCssFile(htmlWebpackPlugin.files.css[css]);
-  }).join("\n");
+  }).join('\n');
 
   const vendorFiles = Object.keys(vendorModule.files.chunks).map(function(chunk) {
-    return "\t" + scriptTagForJsFile('/' + vendorModule.files.chunks[chunk].entry);
+    return '\t' + scriptTagForJsFile('/' + vendorModule.files.chunks[chunk].entry);
   });
   const jsFiles = Object.keys(htmlWebpackPlugin.files.chunks).map(function(chunk) {
-    return "\t" + scriptTagForJsFile(htmlWebpackPlugin.files.chunks[chunk].entry);
-  }).join("\n");
+    return '\t' + scriptTagForJsFile(htmlWebpackPlugin.files.chunks[chunk].entry);
+  }).join('\n');
 
   return '\
   <!DOCTYPE html>\n\
