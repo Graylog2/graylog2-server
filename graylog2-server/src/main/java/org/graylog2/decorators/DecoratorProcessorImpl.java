@@ -95,7 +95,7 @@ public class DecoratorProcessorImpl implements DecoratorProcessor {
     private Set<String> extractFields(List<ResultMessageSummary> messages) {
         return messages.stream()
                 .flatMap(message -> message.message().keySet().stream())
-                .filter(field -> !Message.NON_DISPLAYABLE_FIELDS.contains(field))
+                .filter(field -> !Message.FILTERED_FIELDS.contains(field))
                 .collect(Collectors.toSet());
     }
 

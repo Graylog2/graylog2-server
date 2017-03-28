@@ -109,7 +109,7 @@ public class Message implements Messages {
         .addAll(ES_FIELDS)
         .build();
 
-    public static final ImmutableSet<String> NON_DISPLAYABLE_FIELDS = new ImmutableSet.Builder<String>()
+    public static final ImmutableSet<String> FILTERED_FIELDS = new ImmutableSet.Builder<String>()
         .addAll(GRAYLOG_FIELDS)
         .addAll(ES_FIELDS)
         .add(FIELD_STREAMS)

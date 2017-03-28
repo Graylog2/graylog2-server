@@ -65,7 +65,7 @@ public class SearchResult extends IndexQueryResult {
         hits.forEach(hit -> {
             final Message message = hit.getMessage();
             for (String field : message.getFieldNames()) {
-                if (!Message.NON_DISPLAYABLE_FIELDS.contains(field)) {
+                if (!Message.FILTERED_FIELDS.contains(field)) {
                     filteredFields.add(field);
                 }
             }
