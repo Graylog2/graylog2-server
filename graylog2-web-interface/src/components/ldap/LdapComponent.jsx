@@ -1,13 +1,11 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Input, Button, Panel } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
 import URI from 'urijs';
 import naturalSort from 'javascript-natural-sort';
 
 import { MultiSelect, Spinner } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
-import Routes from 'routing/Routes';
 
 import TestLdapConnection from './TestLdapConnection';
 import TestLdapLogin from './TestLdapLogin';
@@ -60,11 +58,11 @@ const HelperText = {
     GROUP_ID: (
       <span>Which Active Directory attribute to use for the full name of the group, usually <code>cn</code>.</span>
     ),
-    DEFAULT_GROUP: (
+    defaultGroup: onClickHandler => (
       <span>
         The default Graylog role determines whether a user created via Active Directory can access the entire system, or has limited access.<br/>
         You can assign additional permissions by{' '}
-        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider('legacy-ldap-groups')}><a>mapping Active Directory groups to Graylog roles</a></LinkContainer>,{' '}
+        <a href="#" onClick={onClickHandler}>mapping Active Directory groups to Graylog roles</a>,{' '}
         or you can assign additional Graylog roles to Active Directory users below.
       </span>
     ),
@@ -114,11 +112,11 @@ const HelperText = {
     GROUP_ID: (
       <span>Which LDAP attribute to use for the full name of the group, usually <code>cn</code>.</span>
     ),
-    DEFAULT_GROUP: (
+    defaultGroup: onClickHandler => (
       <span>
         The default Graylog role determines whether a user created via LDAP can access the entire system, or has limited access.<br/>
         You can assign additional permissions by{' '}
-        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider('legacy-ldap-groups')}><a>mapping LDAP groups to Graylog roles</a></LinkContainer>,{' '}
+        <a href="#" onClick={onClickHandler}>mapping LDAP groups to Graylog roles</a>,{' '}
         or you can assign additional Graylog roles to LDAP users below.
       </span>
     ),
@@ -133,6 +131,7 @@ const LdapComponent = React.createClass({
 
   propTypes: {
     onCancel: React.PropTypes.func.isRequired,
+    onShowGroups: React.PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -242,6 +241,11 @@ const LdapComponent = React.createClass({
   _saveSettings(event) {
     event.preventDefault();
     LdapActions.update(this.state.ldapSettings);
+  },
+
+  _onShowGroups(event) {
+    event.preventDefault();
+    this.props.onShowGroups();
   },
 
   render() {
@@ -383,7 +387,7 @@ const LdapComponent = React.createClass({
 
               <Input id="default_group" labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" label="Default User Role"
-                     help={help.DEFAULT_GROUP}>
+                     help={help.defaultGroup(this._onShowGroups)}>
                 <Row>
                   <Col sm={4}>
                     <select id="default_group" name="default_group" className="form-control" required

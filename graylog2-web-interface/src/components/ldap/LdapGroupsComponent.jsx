@@ -1,12 +1,9 @@
 import React from 'react';
 import Immutable from 'immutable';
-import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Input, Panel, Button } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
 import { Spinner } from 'components/common';
-
-import Routes from 'routing/Routes';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const LdapGroupsActions = ActionsProvider.getActions('LdapGroups');
@@ -18,6 +15,7 @@ const LdapGroupsStore = StoreProvider.getStore('LdapGroups');
 const LdapGroupsComponent = React.createClass({
   propTypes: {
     onCancel: React.PropTypes.func.isRequired,
+    onShowConfig: React.PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -33,8 +31,12 @@ const LdapGroupsComponent = React.createClass({
     LdapGroupsActions.loadMapping.triggerPromise().then(mapping => this.setState({mapping: Immutable.Map(mapping)}));
     LdapGroupsActions.loadGroups.triggerPromise()
       .then(
-        groups => this.setState({groups: Immutable.Set(groups)}),
-        error => this.setState({groupsErrorMessage: error})
+        groups => this.setState({ groups: Immutable.Set(groups) }),
+        error => {
+          if (error.additional.status !== 400) {
+            this.setState({ groupsErrorMessage: error });
+          }
+        },
       );
     RolesStore.loadRoles().then(roles => this.setState({roles: Immutable.Set(roles)}));
   },
@@ -54,6 +56,11 @@ const LdapGroupsComponent = React.createClass({
     LdapGroupsActions.saveMapping(this.state.mapping.toJS());
   },
 
+  _onShowConfig(event) {
+    event.preventDefault();
+    this.props.onShowConfig();
+  },
+
   _isLoading() {
     return !(this.state.mapping && this.state.groups && this.state.roles);
   },
@@ -63,10 +70,10 @@ const LdapGroupsComponent = React.createClass({
       return <Spinner />;
     }
 
-    if (this.state.groupsErrorMessage !== null) {
+    if (this.state.groupsErrorMessage) {
       return (
         <Panel header="Error: Unable to load LDAP groups" bsStyle="danger">
-          The error message was:<br/>{this.state.groupsErrorMessage}
+          The error message was:<br />{this.state.groupsErrorMessage.message}
         </Panel>
       );
     }
@@ -95,7 +102,7 @@ const LdapGroupsComponent = React.createClass({
       return (
         <p>
           No LDAP/Active Directory groups found. Please verify that your{' '}
-          <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.PROVIDERS.provider('legacy-ldap')}><a>LDAP group mapping</a></LinkContainer>{' '}
+          <a href="#" onClick={this._onShowConfig}>LDAP group mapping</a>{' '}
           settings are correct.
         </p>
       );
