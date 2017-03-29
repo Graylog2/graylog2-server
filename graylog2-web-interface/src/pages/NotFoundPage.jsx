@@ -20,8 +20,8 @@ const NotFoundPage = React.createClass({
           <Col mdOffset={2} md={8}>
             <Jumbotron>
               <h1>404 - Page not found</h1>
-              <p>The party gorilla was just here, but had another party to rock.</p>
-              <p>Oh, party gorilla! How we miss you! Will we ever see you again?</p>
+              <p>The URL requested does not exist.</p>
+              <p>Please consult the Militus USAM User's Guide!</p>
             </Jumbotron>
           </Col>
         </Row>
