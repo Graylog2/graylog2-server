@@ -70,7 +70,7 @@ public class AlertScanner {
                     handleTriggeredAlert(result, stream, alertCondition);
                 } else {
                     // There is already an alert for this condition and is unresolved
-                    if (alert.isPresent() && alertCondition.shouldRepeatNotifications()) {
+                    if (alertCondition.shouldRepeatNotifications()) {
                         // Repeat notifications because user wants to do that
                         LOG.debug("Alert condition [{}] is triggered and configured to repeat alert notifications. Sending alerts.", alertCondition);
                         handleRepeatedAlert(stream, alertCondition, result, alert.get());
