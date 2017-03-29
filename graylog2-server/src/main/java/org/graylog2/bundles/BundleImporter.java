@@ -25,7 +25,9 @@ import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPatternService;
+import org.graylog2.grok.GrokPatternsChangedEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.inputs.InputService;
@@ -85,6 +87,7 @@ public class BundleImporter {
     private final InputLauncher inputLauncher;
     private final GrokPatternService grokPatternService;
     private final TimeRangeFactory timeRangeFactory;
+    private final ClusterEventBus clusterBus;
 
     private final Map<String, org.graylog2.grok.GrokPattern> createdGrokPatterns = new HashMap<>();
     private final Map<String, MessageInput> createdInputs = new HashMap<>();
@@ -108,7 +111,8 @@ public class BundleImporter {
                           final MessageInputFactory messageInputFactory,
                           final InputLauncher inputLauncher,
                           final GrokPatternService grokPatternService,
-                          final TimeRangeFactory timeRangeFactory) {
+                          final TimeRangeFactory timeRangeFactory,
+                          final ClusterEventBus clusterBus) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -123,6 +127,7 @@ public class BundleImporter {
         this.inputLauncher = inputLauncher;
         this.grokPatternService = grokPatternService;
         this.timeRangeFactory = timeRangeFactory;
+        this.clusterBus = clusterBus;
     }
 
     public void runImport(final ConfigurationBundle bundle, final String userName) {
@@ -236,6 +241,8 @@ public class BundleImporter {
             final org.graylog2.grok.GrokPattern createdGrokPattern = createGrokPattern(bundleId, grokPattern);
             createdGrokPatterns.put(grokPattern.name(), createdGrokPattern);
         }
+
+        clusterBus.post(GrokPatternsChangedEvent.create(Collections.emptySet(), createdGrokPatterns.keySet()));
     }
 
     private org.graylog2.grok.GrokPattern createGrokPattern(String bundleId, GrokPattern grokPattern) throws ValidationException {
