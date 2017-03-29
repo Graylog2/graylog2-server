@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-import { Input, Button } from 'react-bootstrap';
+import { Button, ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
@@ -87,13 +87,14 @@ const PipelineConnectionsForm = React.createClass({
         <BootstrapModalForm ref="modal" title={<span>Edit connections for <em>{this.props.pipeline.title}</em></span>}
                             onSubmitForm={this._save} onCancel={this._resetForm} submitButtonText="Save">
           <fieldset>
-            <Input label="Streams"
-                   help={streamsHelp}>
+            <FormGroup id="streamsConnections">
+              <ControlLabel>Streams</ControlLabel>
               <SelectableList options={this._getFormattedStreams(this._getFilteredStreams(this.props.streams))}
                               onChange={this._onStreamsChange}
                               selectedOptionsType="object"
                               selectedOptions={this.state.connectedStreams} />
-            </Input>
+              <HelpBlock>{streamsHelp}</HelpBlock>
+            </FormGroup>
           </fieldset>
         </BootstrapModalForm>
       </span>

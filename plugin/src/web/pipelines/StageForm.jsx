@@ -1,10 +1,10 @@
 import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
-import { Input, Button } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { SelectableList } from 'components/common';
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import { BootstrapModalForm, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
 

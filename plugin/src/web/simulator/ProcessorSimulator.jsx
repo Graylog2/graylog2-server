@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, Input, Panel, Row } from 'react-bootstrap';
+import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -100,11 +100,12 @@ const ProcessorSimulator = React.createClass({
             </p>
             <Row className="row-sm">
               <Col md={7}>
-                <Input label="Stream"
-                       help={streamHelp}>
+                <FormGroup id="streamSelectorSimulation">
+                  <ControlLabel>Stream</ControlLabel>
                   <Select options={this._getFormattedStreams(this.props.streams)}
                           onValueChange={this._onStreamSelect} value={this.state.stream.id} clearable={false} />
-                </Input>
+                  <HelpBlock>{streamHelp}</HelpBlock>
+                </FormGroup>
               </Col>
             </Row>
             <RawMessageLoader onMessageLoaded={this._onMessageLoad} inputIdSelector />

@@ -1,7 +1,7 @@
 import React from 'react';
-import { Row, Col, Input, Button } from 'react-bootstrap';
+import { Row, Col, Button } from 'react-bootstrap';
 
-import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
+import { BootstrapModalForm, Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
 

@@ -100,4 +100,5 @@ buildNumber.properties
 node_modules
 node
 build
+plugin/cache
 

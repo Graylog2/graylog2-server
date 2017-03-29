@@ -1,5 +1,5 @@
 import React from 'react';
-import { FormControls, Row, Col, Button, Input } from 'react-bootstrap';
+import { Button, Col, ControlLabel, FormControl, FormGroup, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import AceEditor from 'react-ace';
@@ -8,6 +8,7 @@ import brace from 'brace';
 import 'brace/mode/text';
 import 'brace/theme/chrome';
 
+import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 
 import RuleFormStyle from './RuleForm.css';
@@ -156,9 +157,10 @@ const RuleForm = React.createClass({
     return (
       <form ref="form" onSubmit={this._submit}>
         <fieldset>
-          <FormControls.Static type="static"
-                               label="Title"
-                               value="You can set the rule title in the rule source. See the quick reference for more information." />
+          <FormGroup id="ruleTitleInformation">
+            <ControlLabel>Title</ControlLabel>
+            <FormControl.Static>You can set the rule title in the rule source. See the quick reference for more information.</FormControl.Static>
+          </FormGroup>
 
           <Input type="textarea"
                  id={this._getId('description')}

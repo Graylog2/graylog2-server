@@ -41,7 +41,7 @@ const SimulationResults = React.createClass({
 
   style: require('!style/useable!css!./SimulationResults.css'),
 
-  _changeViewOptions(_, eventKey) {
+  _changeViewOptions(eventKey) {
     const selectedOption = Object.keys(this.VIEW_OPTIONS).find(key => this.VIEW_OPTIONS[key] === eventKey);
     this.setState({ viewOption: this.VIEW_OPTIONS[selectedOption] });
   },

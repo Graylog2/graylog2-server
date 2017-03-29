@@ -126,7 +126,7 @@ end`,
         </Row>
         <Row className="row-sm">
           <Col md={12}>
-            <Tabs defaultActiveKey={1} animation={false}>
+            <Tabs id="functionsHelper" defaultActiveKey={1} animation={false}>
               <Tab eventKey={1} title="Functions">
                 <p className={RuleHelperStyle.marginTab}>
                   This is a list of all available functions in pipeline rules. Click on a row to see more information
