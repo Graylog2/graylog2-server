@@ -33,7 +33,7 @@ const LoadingPage = React.createClass({
         <div className="container" id="login-box">
           <Row>
             <Col md={4} mdOffset={4} className="well" id="login-box-content">
-              <legend><i className="fa fa-group"/> Welcome to Graylog</legend>
+              <legend><i className="fa fa-group"/> Welcome to USAM</legend>
               <p className="loading-text">
                 <Spinner text={this.props.text}/>
               </p>
