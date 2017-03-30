@@ -19,6 +19,7 @@ package org.graylog2.inputs.codecs;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.plugin.Message;
@@ -35,6 +36,8 @@ import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.syslog4j.server.SyslogServerEventIF;
+import org.graylog2.syslog4j.server.impl.event.CiscoSyslogServerEvent;
+import org.graylog2.syslog4j.server.impl.event.FortiGateSyslogEvent;
 import org.graylog2.syslog4j.server.impl.event.SyslogServerEvent;
 import org.graylog2.syslog4j.server.impl.event.structured.StructuredSyslogServerEvent;
 import org.joda.time.DateTime;
@@ -60,6 +63,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class SyslogCodec extends AbstractCodec {
     private static final Logger LOG = LoggerFactory.getLogger(SyslogCodec.class);
     private static final Pattern STRUCTURED_SYSLOG_PATTERN = Pattern.compile("<\\d{1,3}>[0-9]\\d{0,2}\\s.*", Pattern.DOTALL);
+    private static final Pattern CISCO_WITH_SEQUENCE_NUMBERS_PATTERN = Pattern.compile("<\\d{1,3}>\\d*:\\s.*", Pattern.DOTALL);
+    private static final Pattern FORTIGATE_PATTERN = Pattern.compile("<\\d{1,3}>date=.*", Pattern.DOTALL);
 
     static final String CK_FORCE_RDNS = "force_rdns";
     static final String CK_ALLOW_OVERRIDE_DATE = "allow_override_date";
@@ -88,7 +93,7 @@ public class SyslogCodec extends AbstractCodec {
             } else {
                 remoteAddress = address.getInetSocketAddress();
             }
-            return parse(msg, remoteAddress == null ? null: remoteAddress.getAddress(), rawMessage.getTimestamp());
+            return parse(msg, remoteAddress == null ? null : remoteAddress.getAddress(), rawMessage.getTimestamp());
         }
     }
 
@@ -119,9 +124,12 @@ public class SyslogCodec extends AbstractCodec {
         final SyslogServerEventIF e;
         if (STRUCTURED_SYSLOG_PATTERN.matcher(msg).matches()) {
             e = new StructuredSyslogServerEvent(msg, remoteAddress);
+        } else if (CISCO_WITH_SEQUENCE_NUMBERS_PATTERN.matcher(msg).matches()) {
+            e = new CiscoSyslogServerEvent(msg, remoteAddress);
+        } else if (FORTIGATE_PATTERN.matcher(msg).matches()) {
+            e = new FortiGateSyslogEvent(msg);
         } else {
             e = new SyslogServerEvent(msg, remoteAddress);
-
         }
 
         // If the message is a structured one, we do not want the message ID and the structured data in the
@@ -137,6 +145,17 @@ public class SyslogCodec extends AbstractCodec {
         final Message m = new Message(syslogMessage, parseHost(e, remoteAddress), parseDate(e, receivedTimestamp));
         m.addField("facility", Tools.syslogFacilityToReadable(e.getFacility()));
         m.addField("level", e.getLevel());
+
+        // I can haz pattern matching?
+        if (e instanceof CiscoSyslogServerEvent) {
+            m.addField("sequence_number", ((CiscoSyslogServerEvent) e).getSequenceNumber());
+        }
+        if (e instanceof FortiGateSyslogEvent) {
+            final HashMap<String, Object> fields = new HashMap<>(((FortiGateSyslogEvent) e).getFields());
+            // The FortiGate "level" field is a string, Graylog requires a numeric value.
+            fields.remove("level");
+            m.addFields(fields);
+        }
 
         // Store full message if configured.
         if (configuration.getBoolean(CK_STORE_FULL_MESSAGE)) {
@@ -180,7 +199,8 @@ public class SyslogCodec extends AbstractCodec {
             }
         }
 
-        return msg.getHost();
+        final String host = msg.getHost();
+        return isNullOrEmpty(host) && remoteAddress != null ? InetAddresses.toAddrString(remoteAddress) : host;
     }
 
     private DateTime parseDate(SyslogServerEventIF msg, DateTime receivedTimestamp) throws IllegalStateException {
