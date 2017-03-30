@@ -40,7 +40,7 @@ public abstract class TimezoneAwareFunction extends AbstractFunction<DateTime> {
     protected TimezoneAwareFunction() {
         timeZoneParam = ParameterDescriptor
                 .string(TIMEZONE, DateTimeZone.class)
-                .transform(id -> DateTimeZone.forID(UPPER_ZONE_MAP.get(id)))
+                .transform(id -> DateTimeZone.forID(UPPER_ZONE_MAP.getOrDefault(id.toUpperCase(Locale.ENGLISH), "UTC")))
                 .optional()
                 .description("The timezone to apply to the date, defaults to UTC")
                 .build();
