@@ -78,7 +78,7 @@ const LoginPage = React.createClass({
           <div className="container" id="login-box">
             <Row>
               <form className="col-md-4 col-md-offset-4 well" id="login-box-content" onSubmit={this.onSignInClicked}>
-                <legend><i className="fa fa-group"/> Welcome to Graylog</legend>
+                <legend><i className="fa fa-group"/> Welcome to USAM</legend>
 
                 {alert}
 
