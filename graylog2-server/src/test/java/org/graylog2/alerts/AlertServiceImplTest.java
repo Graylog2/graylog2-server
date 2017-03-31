@@ -299,12 +299,12 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
         assertThat(alertService.shouldRepeatNotifications(alertCondition, alert)).isTrue();
 
         final AlarmCallbackHistory alarmCallbackHistory = mock(AlarmCallbackHistory.class);
-        when(alarmCallbackHistory.createdAt()).thenReturn(DateTime.now().minusMinutes(14));
+        when(alarmCallbackHistory.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minusMinutes(14));
         when(alarmCallbackHistoryService.getForAlertId(ALERT_ID)).thenReturn(ImmutableList.of(alarmCallbackHistory));
         // Should not repeat notification if a notification was sent during grace period
         assertThat(alertService.shouldRepeatNotifications(alertCondition, alert)).isFalse();
 
-        when(alarmCallbackHistory.createdAt()).thenReturn(DateTime.now().minusMinutes(15));
+        when(alarmCallbackHistory.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minusMinutes(15));
         when(alarmCallbackHistoryService.getForAlertId(ALERT_ID)).thenReturn(ImmutableList.of(alarmCallbackHistory));
         // Should repeat notification after grace period passed
         assertThat(alertService.shouldRepeatNotifications(alertCondition, alert)).isTrue();
