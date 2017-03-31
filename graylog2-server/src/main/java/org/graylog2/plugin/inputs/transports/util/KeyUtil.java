@@ -36,7 +36,6 @@ import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -88,7 +87,7 @@ public class KeyUtil {
     protected static void loadCertificates(KeyStore trustStore, File certFile, CertificateFactory cf)
             throws CertificateException, KeyStoreException, IOException {
             if (certFile.isFile()) {
-                try (FileInputStream fis = new FileInputStream(certFile);) {
+                try (InputStream fis = Files.newInputStream(certFile.toPath())) {
                     final Collection<? extends Certificate> certificates = cf.generateCertificates(fis);
                     int i = 0;
                     for (Certificate cert : certificates) {
@@ -112,7 +111,10 @@ public class KeyUtil {
         final KeyStore ks = KeyStore.getInstance("JKS");
         ks.load(null, null);
         final CertificateFactory cf = CertificateFactory.getInstance("X.509");
-        final Collection<? extends Certificate> certChain = cf.generateCertificates(new FileInputStream(tlsCertFile));
+        final Collection<? extends Certificate> certChain;
+        try (InputStream inputStream = Files.newInputStream(tlsCertFile.toPath())) {
+            certChain = cf.generateCertificates(inputStream);
+        }
         final PrivateKey privateKey = loadPrivateKey(tlsKeyFile, tlsKeyPassword);
         final char[] password = Strings.nullToEmpty(tlsKeyPassword).toCharArray();
         ks.setKeyEntry("key", privateKey, password, certChain.toArray(new Certificate[certChain.size()]));
@@ -135,7 +137,7 @@ public class KeyUtil {
 
     @VisibleForTesting
     protected static PrivateKey loadPrivateKey(File file, String password) throws IOException, GeneralSecurityException {
-        try (final InputStream is = new FileInputStream(file)) {
+        try (final InputStream is = Files.newInputStream(file.toPath())) {
             final byte[] keyBytes = ByteStreams.toByteArray(is);
             final String keyString = new String(keyBytes, StandardCharsets.US_ASCII);
             final Matcher m = KEY_PATTERN.matcher(keyString);
