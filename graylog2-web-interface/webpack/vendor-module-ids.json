@@ -1767,7 +1767,8 @@
       "node_modules/react-bootstrap/es/utils/PropTypes.js": 923,
       "node_modules/react-bootstrap/es/utils/TransitionEvents.js": 924,
       "node_modules/react-bootstrap/es/utils/deprecationWarning.js": 925,
-      "node_modules/react-bootstrap/es/utils/index.js": 926
+      "node_modules/react-bootstrap/es/utils/index.js": 926,
+      "node_modules/webpack/node_modules/timers-browserify/main.js": 927
     },
     "usedIds": {
       "0": 0,
@@ -2697,6 +2698,7 @@
       "924": 924,
       "925": 925,
       "926": 926,
+      "927": 927,
       "1371": 1371,
       "1372": 1372,
       "1373": 1373,
