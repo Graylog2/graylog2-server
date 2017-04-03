@@ -27,6 +27,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.bson.types.ObjectId;
@@ -175,6 +176,8 @@ public class StreamResource extends RestResource {
     @ApiOperation(value = "Get a list of all streams")
     @Produces(MediaType.APPLICATION_JSON)
     public StreamListResponse get() {
+        final StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
         final List<Stream> allStreams = streamService.loadAll();
         final List<Stream> streams = new ArrayList<>(allStreams.size());
         for (Stream stream : allStreams) {
@@ -183,7 +186,12 @@ public class StreamResource extends RestResource {
             }
         }
 
-        return StreamListResponse.create(streams.size(), streams.stream().map(this::streamToResponse).collect(Collectors.toSet()));
+        final StreamListResponse streamListResponse = streamsToResponse(streams);
+        stopWatch.stop();
+
+        System.out.println("StreamResource get: " + stopWatch.getTime());
+
+        return streamListResponse;
     }
 
     @GET
@@ -460,6 +468,61 @@ public class StreamResource extends RestResource {
             .build(id);
 
         return Response.created(streamUri).entity(result).build();
+    }
+
+    private StreamListResponse streamsToResponse(Collection<Stream> streams) {
+        Collection<String> streamIds = Lists.newArrayList();
+        Collection<String> conditionIds = Lists.newArrayList();
+
+        streams.forEach(stream -> {
+            streamIds.add(stream.getId());
+
+            streamService.getAlertConditions(stream)
+                .forEach(alertCondition -> {
+                    conditionIds.add(alertCondition.getId());
+                });
+        });
+
+        final Map<String, Map<String, DateTime>> lastTriggeredAts = alertService.getLastTriggeredAt(streamIds, conditionIds);
+
+        final List<StreamResponse> streamResponses = streams.stream().map(stream -> {
+            final List<String> emailAlertReceivers = stream.getAlertReceivers().get("emails");
+            final List<String> usersAlertReceivers = stream.getAlertReceivers().get("users");
+            final Collection<AlertConditionSummary> alertConditions = streamService.getAlertConditions(stream)
+                .stream()
+                .map((alertCondition) -> AlertConditionSummary.create(
+                    alertCondition.getId(),
+                    alertCondition.getType(),
+                    alertCondition.getCreatorUserId(),
+                    alertCondition.getCreatedAt().toDate(),
+                    alertCondition.getParameters(),
+                    alertService.inGracePeriod(alertCondition, lastTriggeredAts),
+                    alertCondition.getTitle()))
+                .collect(Collectors.toList());
+            return StreamResponse.create(
+                stream.getId(),
+                (String) stream.getFields().get(StreamImpl.FIELD_CREATOR_USER_ID),
+                outputsToSummaries(stream.getOutputs()),
+                stream.getMatchingType().name(),
+                stream.getDescription(),
+                stream.getFields().get(StreamImpl.FIELD_CREATED_AT).toString(),
+                stream.getDisabled(),
+                stream.getStreamRules(),
+                alertConditions,
+                AlertReceivers.create(
+                    firstNonNull(emailAlertReceivers, Collections.emptyList()),
+                    firstNonNull(usersAlertReceivers, Collections.emptyList())
+                ),
+                stream.getTitle(),
+                stream.getContentPack(),
+                stream.isDefaultStream(),
+                stream.getRemoveMatchesFromDefaultStream(),
+                stream.getIndexSetId()
+            );
+        })
+            .collect(Collectors.toList());
+
+        return StreamListResponse.create(streamResponses.size(), streamResponses);
     }
 
     private StreamResponse streamToResponse(Stream stream) {

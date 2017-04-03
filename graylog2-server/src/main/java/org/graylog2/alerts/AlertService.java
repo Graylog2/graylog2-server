@@ -25,6 +25,7 @@ import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.models.streams.alerts.requests.CreateConditionRequest;
 import org.joda.time.DateTime;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -34,6 +35,8 @@ public interface AlertService {
 
     List<Alert> loadRecentOfStreams(List<String> streamIds, DateTime since, int limit);
     List<Alert> loadRecentOfStream(String streamId, DateTime since, int limit);
+
+    Map<String, Map<String, DateTime>> getLastTriggeredAt(Collection<String> streamIds, Collection<String> conditionIds);
 
     Optional<Alert> getLastTriggeredAlert(String streamId, String conditionId);
 
@@ -47,6 +50,7 @@ public interface AlertService {
     AlertCondition updateFromRequest(AlertCondition alertCondition, CreateConditionRequest ccr) throws ConfigurationException;
 
     boolean inGracePeriod(AlertCondition alertCondition);
+    boolean inGracePeriod(AlertCondition alertCondition, Map<String, Map<String,DateTime>> lastTriggeredAts);
 
     List<Alert> listForStreamId(String streamId, int skip, int limit);
     List<Alert> listForStreamIds(List<String> streamIds, AlertState state, int skip, int limit);
