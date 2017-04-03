@@ -21,6 +21,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCollection;
+import org.graylog2.alarmcallbacks.AlarmCallbackHistory;
+import org.graylog2.alarmcallbacks.AlarmCallbackHistoryService;
 import org.graylog2.alerts.Alert.AlertState;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.CollectionName;
@@ -52,12 +54,15 @@ import static com.google.common.base.Preconditions.checkArgument;
 public class AlertServiceImpl implements AlertService {
     private final JacksonDBCollection<AlertImpl, String> coll;
     private final AlertConditionFactory alertConditionFactory;
+    private final AlarmCallbackHistoryService alarmCallbackHistoryService;
 
     @Inject
     public AlertServiceImpl(MongoConnection mongoConnection,
                             MongoJackObjectMapperProvider mapperProvider,
-                            AlertConditionFactory alertConditionFactory) {
+                            AlertConditionFactory alertConditionFactory,
+                            AlarmCallbackHistoryService alarmCallbackHistoryService) {
         this.alertConditionFactory = alertConditionFactory;
+        this.alarmCallbackHistoryService = alarmCallbackHistoryService;
         final String collectionName = AlertImpl.class.getAnnotation(CollectionName.class).value();
         final DBCollection dbCollection = mongoConnection.getDatabase().getCollection(collectionName);
 
@@ -205,6 +210,35 @@ public class AlertServiceImpl implements AlertService {
         }
 
         return lastAlertSecondsAgo < alertCondition.getGrace() * 60;
+    }
+
+    @Override
+    public boolean shouldRepeatNotifications(AlertCondition alertCondition, Alert alert) {
+        // Do not repeat notifications if alert has no state, is resolved or the option to repeat notifications is disabled
+        if (!alert.isInterval() || isResolved(alert) || !alertCondition.shouldRepeatNotifications()) {
+            return false;
+        }
+
+        // Repeat notifications if no grace period is set, avoiding looking through the notification history
+        if (alertCondition.getGrace() == 0) {
+            return true;
+        }
+
+        AlarmCallbackHistory lastTriggeredAlertHistory = null;
+        for (AlarmCallbackHistory history : alarmCallbackHistoryService.getForAlertId(alert.getId())) {
+            if (lastTriggeredAlertHistory == null || lastTriggeredAlertHistory.createdAt().isBefore(history.createdAt())) {
+                lastTriggeredAlertHistory = history;
+            }
+        }
+
+        // Repeat notifications if no alert was ever triggered for this condition
+        if (lastTriggeredAlertHistory == null) {
+            return true;
+        }
+
+        final int lastAlertSecondsAgo = Seconds.secondsBetween(lastTriggeredAlertHistory.createdAt(), Tools.nowUTC()).getSeconds();
+
+        return lastAlertSecondsAgo >= alertCondition.getGrace() * 60;
     }
 
     @Override
