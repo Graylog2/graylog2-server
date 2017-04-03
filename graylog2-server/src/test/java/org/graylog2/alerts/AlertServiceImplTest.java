@@ -20,8 +20,11 @@ package org.graylog2.alerts;
 import com.google.common.collect.ImmutableList;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import org.graylog2.alarmcallbacks.AlarmCallbackHistory;
+import org.graylog2.alarmcallbacks.AlarmCallbackHistoryService;
 import org.graylog2.database.MongoDBServiceTest;
 import org.graylog2.plugin.Tools;
+import org.graylog2.plugin.alarms.AlertCondition;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.joda.time.Seconds;
@@ -32,6 +35,8 @@ import org.mockito.Mock;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class AlertServiceImplTest extends MongoDBServiceTest {
     private final String ALERT_ID = "581b3bff8e4dc4270055dfca";
@@ -41,10 +46,13 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
     private AlertServiceImpl alertService;
     @Mock
     private AlertConditionFactory alertConditionFactory;
+    @Mock
+    private AlarmCallbackHistoryService alarmCallbackHistoryService;
 
     @Before
     public void setUpService() throws Exception {
-        this.alertService = new AlertServiceImpl(mongoRule.getMongoConnection(), mapperProvider, alertConditionFactory);
+        this.alarmCallbackHistoryService = mock(AlarmCallbackHistoryService.class);
+        this.alertService = new AlertServiceImpl(mongoRule.getMongoConnection(), mapperProvider, alertConditionFactory, alarmCallbackHistoryService);
     }
 
     @Test
@@ -262,4 +270,52 @@ public class AlertServiceImplTest extends MongoDBServiceTest {
         assertThat(alertService.isResolved(alert)).isFalse();
     }
 
+    @Test
+    @UsingDataSet(locations = "non-interval-alert.json")
+    public void nonIntervalAlertShouldNotRepeatNotifications() throws Exception {
+        final AlertCondition alertCondition = mock(AlertCondition.class);
+        when(alertCondition.shouldRepeatNotifications()).thenReturn(true);
+        final Alert alert = alertService.load(ALERT_ID, STREAM_ID);
+        assertThat(alertService.shouldRepeatNotifications(alertCondition, alert)).isFalse();
+    }
+
+    @Test
+    @UsingDataSet(locations = "unresolved-alert.json")
+    public void shouldNotRepeatNotificationsWhenOptionIsDisabled() throws Exception {
+        final AlertCondition alertCondition = mock(AlertCondition.class);
+        when(alertCondition.shouldRepeatNotifications()).thenReturn(false);
+        final Alert alert = alertService.load(ALERT_ID, STREAM_ID);
+        assertThat(alertService.shouldRepeatNotifications(alertCondition, alert)).isFalse();
+    }
+
+    @Test
+    @UsingDataSet(locations = "unresolved-alert.json")
+    public void repeatNotificationsOptionShouldComplyWithGracePeriod() throws Exception {
+        final AlertCondition alertCondition = mock(AlertCondition.class);
+        when(alertCondition.getGrace()).thenReturn(15);
+        when(alertCondition.shouldRepeatNotifications()).thenReturn(true);
+        final Alert alert = alertService.load(ALERT_ID, STREAM_ID);
+        // Should repeat notification when there was no previous alert
+        assertThat(alertService.shouldRepeatNotifications(alertCondition, alert)).isTrue();
+
+        final AlarmCallbackHistory alarmCallbackHistory = mock(AlarmCallbackHistory.class);
+        when(alarmCallbackHistory.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minusMinutes(14));
+        when(alarmCallbackHistoryService.getForAlertId(ALERT_ID)).thenReturn(ImmutableList.of(alarmCallbackHistory));
+        // Should not repeat notification if a notification was sent during grace period
+        assertThat(alertService.shouldRepeatNotifications(alertCondition, alert)).isFalse();
+
+        when(alarmCallbackHistory.createdAt()).thenReturn(DateTime.now(DateTimeZone.UTC).minusMinutes(15));
+        when(alarmCallbackHistoryService.getForAlertId(ALERT_ID)).thenReturn(ImmutableList.of(alarmCallbackHistory));
+        // Should repeat notification after grace period passed
+        assertThat(alertService.shouldRepeatNotifications(alertCondition, alert)).isTrue();
+    }
+
+    @Test
+    @UsingDataSet(locations = "unresolved-alert.json")
+    public void shouldRepeatNotificationsWhenOptionIsEnabled() throws Exception {
+        final AlertCondition alertCondition = mock(AlertCondition.class);
+        when(alertCondition.shouldRepeatNotifications()).thenReturn(true);
+        final Alert alert = alertService.load(ALERT_ID, STREAM_ID);
+        assertThat(alertService.shouldRepeatNotifications(alertCondition, alert)).isTrue();
+    }
 }
