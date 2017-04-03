@@ -158,6 +158,7 @@ public class AlertScannerTest {
 
         when(alertService.getLastTriggeredAlert(stream.getId(), alertCondition.getId())).thenReturn(Optional.of(alert));
         when(alertService.isResolved(alert)).thenReturn(false);
+        when(alertService.shouldRepeatNotifications(alertCondition, alert)).thenReturn(true);
         assertThat(this.alertScanner.checkAlertCondition(stream, alertCondition)).isTrue();
 
         verify(alertCondition, times(2)).runCheck();
