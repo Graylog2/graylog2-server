@@ -180,7 +180,7 @@ public class UserImpl extends PersistedImpl implements User {
         final List<String> perms = Lists.newArrayList(permissions);
         // Do not store the dynamic user self edit permissions
         perms.removeAll(this.permissions.userSelfEditPermissions(getName()));
-        fields.put(PERMISSIONS, permissions);
+        fields.put(PERMISSIONS, perms);
     }
 
     @Override
