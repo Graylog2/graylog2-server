@@ -27,7 +27,7 @@ import org.graylog.autovalue.WithBeanGetter;
 import javax.annotation.Nonnull;
 import java.util.List;
 
-import static org.elasticsearch.common.Strings.isNullOrEmpty;
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 /**
  * Represents an audit event with namespace, object and action.

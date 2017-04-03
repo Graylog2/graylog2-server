@@ -22,8 +22,8 @@ import org.graylog2.plugin.system.NodeId;
 
 import javax.annotation.Nonnull;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
-import static org.elasticsearch.common.Strings.isNullOrEmpty;
 
 @AutoValue
 @WithBeanGetter
