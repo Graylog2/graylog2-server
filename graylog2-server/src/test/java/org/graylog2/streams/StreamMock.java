@@ -21,11 +21,19 @@ import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategy;
+import org.graylog2.indexer.retention.strategies.NoopRetentionStrategyConfig;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.plugin.database.validators.Validator;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -44,6 +52,7 @@ public class StreamMock implements Stream {
     private MatchingType matchingType;
     private boolean defaultStream;
     private boolean removeMatchesFromDefaultStream;
+    private IndexSet indexSet;
 
     public StreamMock(Map<String, Object> stream) {
         this(stream, Collections.emptyList());
@@ -61,6 +70,23 @@ public class StreamMock implements Stream {
         this.matchingType = (MatchingType) stream.getOrDefault(StreamImpl.FIELD_MATCHING_TYPE, MatchingType.AND);
         this.defaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_DEFAULT_STREAM, false);
         this.removeMatchesFromDefaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false);
+        this.indexSet = new TestIndexSet(IndexSetConfig.create(
+                "index-set-id",
+                "title",
+                "description",
+                true,
+                "prefix",
+                1,
+                0,
+                MessageCountRotationStrategy.class.getCanonicalName(),
+                MessageCountRotationStrategyConfig.createDefault(),
+                NoopRetentionStrategy.class.getCanonicalName(),
+                NoopRetentionStrategyConfig.createDefault(),
+                ZonedDateTime.of(2017, 3, 29, 12, 0, 0, 0, ZoneOffset.UTC),
+                "standard",
+                "template",
+                1,
+                false));
     }
 
     @Override
@@ -222,7 +248,7 @@ public class StreamMock implements Stream {
 
     @Override
     public String getIndexSetId() {
-        return null;
+        return "index-set-id";
     }
 
     @Override
@@ -231,6 +257,6 @@ public class StreamMock implements Stream {
 
     @Override
     public IndexSet getIndexSet() {
-        return mock(IndexSet.class);
+        return indexSet;
     }
 }

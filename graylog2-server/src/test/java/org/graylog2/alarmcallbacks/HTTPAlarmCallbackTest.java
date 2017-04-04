@@ -48,6 +48,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -151,15 +152,21 @@ public class HTTPAlarmCallbackTest {
         alarmCallback.initialize(configuration);
         alarmCallback.checkConfiguration();
 
-        final Stream stream = mock(Stream.class);
-        final AlertCondition alertCondition = mock(AlertCondition.class);
-        final List<MessageSummary> messageSummaries = ImmutableList.of();
+        final Stream stream = new StreamMock(Collections.singletonMap("_id", "stream-id"));
+        final AlertCondition alertCondition = new DummyAlertCondition(
+                stream,
+                "alert-id",
+                new DateTime(2017, 3, 29, 12, 0, DateTimeZone.UTC),
+                "user",
+                Collections.emptyMap(),
+                "title"
+        );
         final AlertCondition.CheckResult checkResult = new AbstractAlertCondition.CheckResult(
                 true,
                 alertCondition,
                 "Result Description",
                 new DateTime(2016, 9, 6, 17, 0, DateTimeZone.UTC),
-                messageSummaries
+                Collections.emptyList()
         );
 
         expectedException.expect(AlarmCallbackException.class);
@@ -178,15 +185,21 @@ public class HTTPAlarmCallbackTest {
         final Configuration configuration = new Configuration(ImmutableMap.of("url", "!FOOBAR"));
         alarmCallback.initialize(configuration);
 
-        final Stream stream = mock(Stream.class);
-        final AlertCondition alertCondition = mock(AlertCondition.class);
-        final List<MessageSummary> messageSummaries = ImmutableList.of();
+        final Stream stream = new StreamMock(Collections.singletonMap("_id", "stream-id"));
+        final AlertCondition alertCondition = new DummyAlertCondition(
+                stream,
+                "alert-id",
+                new DateTime(2017, 3, 29, 12, 0, DateTimeZone.UTC),
+                "user",
+                Collections.emptyMap(),
+                "title"
+        );
         final AlertCondition.CheckResult checkResult = new AbstractAlertCondition.CheckResult(
                 true,
                 alertCondition,
                 "Result Description",
                 new DateTime(2016, 9, 6, 17, 0, DateTimeZone.UTC),
-                messageSummaries
+                Collections.emptyList()
         );
 
         expectedException.expect(AlarmCallbackException.class);
