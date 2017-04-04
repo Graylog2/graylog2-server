@@ -21,7 +21,6 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.Hashing;
-import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import org.glassfish.jersey.server.ContainerRequest;
 import org.graylog2.plugin.Plugin;
@@ -44,11 +43,8 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -56,6 +52,8 @@ import java.nio.file.FileSystem;
 import java.nio.file.FileSystemAlreadyExistsException;
 import java.nio.file.FileSystemNotFoundException;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.attribute.FileTime;
 import java.util.Collections;
 import java.util.Date;
@@ -79,7 +77,7 @@ public class WebInterfaceAssetsResource {
         this.indexHtmlGenerator = indexHtmlGenerator;
         this.plugins = plugins;
         this.mimeTypes = requireNonNull(mimeTypes);
-        fileSystemCache = CacheBuilder.newBuilder()
+        this.fileSystemCache = CacheBuilder.newBuilder()
                 .maximumSize(1024)
                 .build(new CacheLoader<URI, FileSystem>() {
                     @Override
@@ -150,30 +148,29 @@ public class WebInterfaceAssetsResource {
 
     private Response getResponse(Request request, String filename,
                                  URL resourceUrl, boolean fromPlugin) throws IOException, URISyntaxException {
-        final Date lastModified;
-        final InputStream stream;
-        final HashCode hashCode;
+        final URI uri = resourceUrl.toURI();
 
+        final java.nio.file.Path path;
+        final byte[] fileContents;
         switch (resourceUrl.getProtocol()) {
-            case "file":
-                final File file = new File(resourceUrl.toURI());
-                lastModified = new Date(file.lastModified());
-                stream = new FileInputStream(file);
-                hashCode = Files.hash(file, Hashing.sha256());
+            case "file": {
+                path = Paths.get(uri);
+                fileContents = Files.readAllBytes(path);
                 break;
-            case "jar":
-                final URI uri = resourceUrl.toURI();
+            }
+            case "jar": {
                 final FileSystem fileSystem = fileSystemCache.getUnchecked(uri);
-                final java.nio.file.Path path = fileSystem.getPath(pluginPrefixFilename(fromPlugin, filename));
-                final FileTime lastModifiedTime = java.nio.file.Files.getLastModifiedTime(path);
-                lastModified = new Date(lastModifiedTime.toMillis());
-                stream = resourceUrl.openStream();
-                hashCode = Resources.asByteSource(resourceUrl).hash(Hashing.sha256());
+                path = fileSystem.getPath(pluginPrefixFilename(fromPlugin, filename));
+                fileContents = Resources.toByteArray(resourceUrl);
                 break;
+            }
             default:
                 throw new IllegalArgumentException("Not a JAR or local file: " + resourceUrl);
         }
 
+        final FileTime lastModifiedTime = Files.getLastModifiedTime(path);
+        final Date lastModified = Date.from(lastModifiedTime.toInstant());
+        final HashCode hashCode = Hashing.sha256().hashBytes(fileContents);
         final EntityTag entityTag = new EntityTag(hashCode.toString());
 
         final Response.ResponseBuilder response = request.evaluatePreconditions(lastModified, entityTag);
@@ -186,9 +183,9 @@ public class WebInterfaceAssetsResource {
         cacheControl.setMaxAge((int) TimeUnit.DAYS.toSeconds(365));
         cacheControl.setNoCache(false);
         cacheControl.setPrivate(false);
+
         return Response
-                .ok(stream)
-                .header(HttpHeaders.CONTENT_TYPE, contentType)
+                .ok(fileContents, contentType)
                 .tag(entityTag)
                 .cacheControl(cacheControl)
                 .lastModified(lastModified)
