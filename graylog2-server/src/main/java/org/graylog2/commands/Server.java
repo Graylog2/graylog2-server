@@ -42,6 +42,7 @@ import org.graylog2.bindings.WidgetStrategyBindings;
 import org.graylog2.bootstrap.Main;
 import org.graylog2.bootstrap.ServerBootstrap;
 import org.graylog2.cluster.NodeService;
+import org.graylog2.configuration.ElasticsearchClientConfiguration;
 import org.graylog2.configuration.ElasticsearchConfiguration;
 import org.graylog2.configuration.EmailConfiguration;
 import org.graylog2.configuration.MongoDbConfiguration;
@@ -84,6 +85,7 @@ public class Server extends ServerBootstrap {
 
     private static final Configuration configuration = new Configuration();
     private final ElasticsearchConfiguration elasticsearchConfiguration = new ElasticsearchConfiguration();
+    private final ElasticsearchClientConfiguration elasticsearchClientConfiguration = new ElasticsearchClientConfiguration();
     private final EmailConfiguration emailConfiguration = new EmailConfiguration();
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
@@ -134,6 +136,7 @@ public class Server extends ServerBootstrap {
     protected List<Object> getCommandConfigurationBeans() {
         return Arrays.asList(configuration,
                 elasticsearchConfiguration,
+                elasticsearchClientConfiguration,
                 emailConfiguration,
                 mongoDbConfiguration,
                 versionCheckConfiguration,
