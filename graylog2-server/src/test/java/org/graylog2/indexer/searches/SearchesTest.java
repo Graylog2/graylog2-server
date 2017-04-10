@@ -22,10 +22,8 @@ import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableSortedSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
-import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.index.query.RangeQueryBuilder;
+import org.graylog2.AbstractESTest;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexSet;
@@ -56,14 +54,12 @@ import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -71,7 +67,6 @@ import java.util.Map;
 import java.util.SortedSet;
 
 import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
-import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.ArgumentMatchers.any;
@@ -80,14 +75,9 @@ import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SearchesTest {
-    @ClassRule
-    public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
+public class SearchesTest extends AbstractESTest {
     private static final String REQUEST_TIMER_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.requests";
     private static final String RANGES_HISTOGRAM_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.ranges";
-
-    @Rule
-    public final ElasticsearchRule elasticsearchRule;
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
@@ -139,9 +129,6 @@ public class SearchesTest {
     private MetricRegistry metricRegistry;
     private Searches searches;
 
-    @Inject
-    private Client client;
-
     public SearchesTest() {
         this.indexSetConfig = IndexSetConfig.builder()
                 .id("index-set-1")
@@ -161,7 +148,6 @@ public class SearchesTest {
                 .indexOptimizationDisabled(false)
                 .build();
         this.indexSet = new TestIndexSet(indexSetConfig);
-        this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
         this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
     }
 
