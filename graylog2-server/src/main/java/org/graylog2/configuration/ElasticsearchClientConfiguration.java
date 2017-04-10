@@ -23,6 +23,8 @@ import org.graylog2.configuration.validators.ListOfURIsWithHostAndSchemeValidato
 import org.graylog2.configuration.validators.NonEmptyListValidator;
 
 import java.net.URI;
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 
@@ -36,6 +38,6 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_socket_timeout", validators = { PositiveIntegerValidator.class })
     private int elasticsearchSocketTimeout = 60000;
 
-    @Parameter(value = "elasticsearch_max_retry_timeout", validators = { PositiveIntegerValidator.class })
-    private int elasticsearchMaxRetryTimeout = 60000;
+    @Parameter(value = "elasticsearch_idle_timeout")
+    private Duration elasticsearchIdleTimeout = Duration.of(-1L, ChronoUnit.SECONDS);
 }

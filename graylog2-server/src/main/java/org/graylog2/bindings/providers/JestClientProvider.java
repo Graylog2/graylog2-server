@@ -30,8 +30,10 @@ import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.net.URI;
+import java.time.Duration;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Singleton
@@ -42,7 +44,7 @@ public class JestClientProvider implements Provider<JestClient> {
     public JestClientProvider(@Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
                               @Named("elasticsearch_connect_timeout") int elasticsearchConnectTimeout,
                               @Named("elasticsearch_socket_timeout") int elasticsearchSocketTimeout,
-                              @Named("elasticsearch_max_retry_timeout") int elasticsearchMaxRetryTimeout) {
+                              @Named("elasticsearch_idle_timeout") Duration elasticsearchIdleTimeout) {
         this.factory = new JestClientFactory();
         this.credentialsProvider = new BasicCredentialsProvider();
         final List<String> hosts = elasticsearchHosts.stream()
@@ -68,6 +70,7 @@ public class JestClientProvider implements Provider<JestClient> {
             .Builder(hosts)
             .connTimeout(elasticsearchConnectTimeout)
             .readTimeout(elasticsearchSocketTimeout)
+            .maxConnectionIdleTime(elasticsearchIdleTimeout.getSeconds(), TimeUnit.SECONDS)
             .multiThreaded(true)
             .build());
     }
