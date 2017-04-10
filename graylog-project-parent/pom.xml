@@ -115,6 +115,11 @@
                 <artifactId>rest</artifactId>
                 <version>${elasticsearch.client.version}</version>
             </dependency>
+            <dependency>
+                <groupId>io.searchbox</groupId>
+                <artifactId>jest</artifactId>
+                <version>${jest.version}</version>
+            </dependency>
 
             <dependency>
                 <groupId>net.java.dev.jna</groupId>
