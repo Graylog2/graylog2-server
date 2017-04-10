@@ -24,8 +24,6 @@ import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
-import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
@@ -38,12 +36,12 @@ import org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplat
 import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesRequest;
 import org.elasticsearch.action.admin.indices.template.get.GetIndexTemplatesResponse;
 import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateResponse;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.compress.CompressedXContent;
 import org.elasticsearch.index.IndexNotFoundException;
+import org.graylog2.AbstractESTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
@@ -61,41 +59,30 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.inject.Inject;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
-import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class IndicesTest {
-    @ClassRule
-    public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
-
+public class IndicesTest extends AbstractESTest {
     private static final long ES_TIMEOUT = TimeUnit.SECONDS.toMillis(1L);
     private static final String INDEX_NAME = "graylog_0";
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public ElasticsearchRule elasticsearchRule;
 
     private final IndexSetConfig indexSetConfig;
     private final IndexSet indexSet;
 
-    @Inject
-    private Client client;
     private Indices indices;
 
     public IndicesTest() {
@@ -117,7 +104,6 @@ public class IndicesTest {
                 .indexOptimizationDisabled(false)
                 .build();
         this.indexSet = new TestIndexSet(indexSetConfig);
-        this.elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
         this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
     }
 

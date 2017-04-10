@@ -19,51 +19,37 @@ package org.graylog2.indexer.indices;
 import com.codahale.metrics.MetricRegistry;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
-import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
-import org.elasticsearch.client.Client;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.system.NodeId;
+import org.graylog2.AbstractESTest;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.ClassRule;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import javax.inject.Inject;
 import java.util.Map;
 import java.util.Set;
 
-import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
-import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class IndicesGetAllMessageFieldsTest {
-    @ClassRule
-    public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
-
+public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public ElasticsearchRule elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
 
-    @Inject
-    private Client client;
     private Indices indices;
 
     @Before
     public void setUp() throws Exception {
-        elasticsearchRule.getDatabaseOperation().deleteAll();
         indices = new Indices(client, new IndexMapping(), new Messages(client, new MetricRegistry()), mock(NodeId.class), new NullAuditEventSender());
     }
 
