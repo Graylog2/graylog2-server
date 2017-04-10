@@ -12,6 +12,8 @@ import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 
 public class GuavaLookupCache extends LookupCache {
 
+    public static final String NAME = "guava_cache";
+
     @Override
     public Class<? extends LookupCacheConfiguration> configurationClass() {
         return GuavaLookupCache.Config.class;
@@ -28,7 +30,7 @@ public class GuavaLookupCache extends LookupCache {
     @JsonAutoDetect
     @AutoValue
     @WithBeanGetter
-    @JsonTypeName("guava_cache")
+    @JsonTypeName(NAME)
     public abstract static class Config implements LookupCacheConfiguration {
 
         @JsonProperty("max_size")

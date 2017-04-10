@@ -22,9 +22,9 @@ public abstract class LookupTable {
 
     public abstract String name();
 
-    public abstract LookupCache cacheProvider();
+    public abstract LookupCache cache();
 
-    public abstract LookupDataAdapter dataProvider();
+    public abstract LookupDataAdapter dataAdapter();
 
     public static Builder builder() {
         return new AutoValue_LookupTable.Builder();
@@ -33,7 +33,7 @@ public abstract class LookupTable {
     @Nullable
     public Object lookup(@Nonnull Object key) {
 
-        return dataProvider().get(key);
+        return dataAdapter().get(key);
     }
 
     @AutoValue.Builder
@@ -46,9 +46,9 @@ public abstract class LookupTable {
 
         public abstract Builder name(String name);
 
-        public abstract Builder cacheProvider(LookupCache cacheProvider);
+        public abstract Builder cache(LookupCache cache);
 
-        public abstract Builder dataProvider(LookupDataAdapter dataProvider);
+        public abstract Builder dataAdapter(LookupDataAdapter dataAdapter);
 
         public abstract LookupTable build();
     }

@@ -5,17 +5,15 @@ import com.google.auto.value.AutoValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.lookup.LookupCache;
+import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 import org.mongojack.Id;
-import org.mongojack.MongoCollection;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
 @AutoValue
 @WithBeanGetter
-@MongoCollection(name = "lut_caches")
-public abstract class CacheConfigurationDto {
+public abstract class CacheDto {
 
     @Id
     @ObjectId
@@ -32,14 +30,12 @@ public abstract class CacheConfigurationDto {
     @JsonProperty("name")
     public abstract String name();
 
+    @JsonProperty("config")
+    public abstract LookupCacheConfiguration config();
+
     public static Builder builder() {
-        return new AutoValue_CacheConfigurationDto.Builder();
+        return new AutoValue_CacheDto.Builder();
     }
-
-    public static LookupCache toDomainObject(CacheConfigurationDto cacheConfigurationDto) {
-        return null;
-    }
-
 
     @AutoValue.Builder
     public abstract static class Builder {
@@ -51,6 +47,8 @@ public abstract class CacheConfigurationDto {
 
         public abstract Builder name(String name);
 
-        public abstract CacheConfigurationDto build();
+        public abstract Builder config(LookupCacheConfiguration config);
+
+        public abstract CacheDto build();
     }
 }

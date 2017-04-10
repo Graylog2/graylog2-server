@@ -6,19 +6,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.lookup.LookupTable;
 import org.mongojack.Id;
-import org.mongojack.MongoCollection;
 import org.mongojack.ObjectId;
-
-import java.util.Map;
 
 import javax.annotation.Nullable;
 
 @AutoValue
 @WithBeanGetter
-@JsonDeserialize(builder = LookupTableDto.Builder.class)
-@MongoCollection(name = "lut_tables")
+@JsonDeserialize(builder = AutoValue_LookupTableDto.Builder.class)
 public abstract class LookupTableDto {
 
     @Id
@@ -41,42 +36,11 @@ public abstract class LookupTableDto {
     public abstract String cacheId();
 
     @ObjectId
-    @JsonProperty("data_provider")
-    public abstract String dataProviderId();
+    @JsonProperty("data_adapter")
+    public abstract String dataAdapterId();
 
     public static Builder builder() {
         return new AutoValue_LookupTableDto.Builder();
-    }
-
-    public static LookupTableDto fromDomainObject(LookupTable table) {
-        return builder()
-                .id(table.id())
-                .title(table.title())
-                .description(table.description())
-                .name(table.name())
-                .cacheId(table.cacheProvider().id())
-                .dataProviderId(table.dataProvider().id())
-                .build();
-    }
-
-    public static LookupTable toDomainObject(LookupTableDto savedObject) {
-        return LookupTable.builder()
-                .id(savedObject.id())
-                .title(savedObject.title())
-                .description(savedObject.description())
-                .name(savedObject.name())
-                .build();
-    }
-
-    public LookupTable toDomainObject(Map<String, CacheConfigurationDto> cacheMap, Map<String, DataProviderDto> dataProviderMap) {
-        return LookupTable.builder()
-                .id(id())
-                .title(title())
-                .description(description())
-                .name(name())
-                .cacheProvider(CacheConfigurationDto.toDomainObject(cacheMap.get(cacheId())))
-                .dataProvider(DataProviderDto.toDomainObject(dataProviderMap.get(dataProviderId())))
-                .build();
     }
 
 
@@ -97,8 +61,8 @@ public abstract class LookupTableDto {
         @JsonProperty("cache")
         public abstract Builder cacheId(String id);
 
-        @JsonProperty("data_provider")
-        public abstract Builder dataProviderId(String id);
+        @JsonProperty("data_adapter")
+        public abstract Builder dataAdapterId(String id);
 
         public abstract LookupTableDto build();
     }

@@ -5,17 +5,15 @@ import com.google.auto.value.AutoValue;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import org.graylog.autovalue.WithBeanGetter;
-import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.mongojack.Id;
-import org.mongojack.MongoCollection;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
 
 @AutoValue
 @WithBeanGetter
-@MongoCollection(name = "lut_dataproviders")
-public abstract class DataProviderDto {
+public abstract class DataAdapterDto {
 
     @Id
     @ObjectId
@@ -32,12 +30,11 @@ public abstract class DataProviderDto {
     @JsonProperty("name")
     public abstract String name();
 
-    public static Builder builder() {
-        return new AutoValue_DataProviderDto.Builder();
-    }
+    @JsonProperty("config")
+    public abstract LookupDataAdapterConfiguration config();
 
-    public static LookupDataAdapter toDomainObject(DataProviderDto dataProviderDto) {
-        return null;
+    public static Builder builder() {
+        return new AutoValue_DataAdapterDto.Builder();
     }
 
     @AutoValue.Builder
@@ -50,6 +47,8 @@ public abstract class DataProviderDto {
 
         public abstract Builder name(String name);
 
-        public abstract DataProviderDto build();
+        public abstract Builder config(LookupDataAdapterConfiguration config);
+
+        public abstract DataAdapterDto build();
     }
 }
