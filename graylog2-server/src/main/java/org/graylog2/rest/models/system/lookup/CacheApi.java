@@ -61,7 +61,7 @@ public abstract class CacheApi {
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty("id")
-        public abstract Builder id(String id);
+        public abstract Builder id(@Nullable String id);
 
         @JsonProperty("title")
         public abstract Builder title(String title);

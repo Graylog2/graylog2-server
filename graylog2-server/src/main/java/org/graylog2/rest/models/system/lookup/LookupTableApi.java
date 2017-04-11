@@ -64,17 +64,23 @@ public abstract class LookupTableApi {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder id(String id);
+        @JsonProperty("id")
+        public abstract Builder id(@Nullable String id);
 
+        @JsonProperty("title")
         public abstract Builder title(String title);
 
+        @JsonProperty("description")
         public abstract Builder description(String description);
 
+        @JsonProperty("name")
         public abstract Builder name(String name);
 
-        public abstract Builder dataAdapterId(String id);
-
+        @JsonProperty("cache_id")
         public abstract Builder cacheId(String cacheId);
+
+        @JsonProperty("data_adapter_id")
+        public abstract Builder dataAdapterId(String id);
 
         public abstract LookupTableApi build();
     }
