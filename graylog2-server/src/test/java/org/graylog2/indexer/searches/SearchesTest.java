@@ -66,7 +66,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
-import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.ArgumentMatchers.any;
@@ -148,14 +147,14 @@ public class SearchesTest extends AbstractESTest {
                 .indexOptimizationDisabled(false)
                 .build();
         this.indexSet = new TestIndexSet(indexSetConfig);
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME), jestClient()));
     }
 
     @Before
     public void setUp() throws Exception {
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         metricRegistry = new MetricRegistry();
-        searches = new Searches(new Configuration(), indexRangeService, client, metricRegistry, streamService, mock(Indices.class));
+        searches = new Searches(new Configuration(), indexRangeService, client(), metricRegistry, streamService, mock(Indices.class), jestClient());
     }
 
     @Test
