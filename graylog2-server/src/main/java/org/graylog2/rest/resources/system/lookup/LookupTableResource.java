@@ -10,6 +10,7 @@ import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.rest.models.PaginatedList;
 import org.graylog2.rest.models.system.lookup.LookupTableApi;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
@@ -85,9 +86,9 @@ public class LookupTableResource extends RestResource {
     }
 
     @DELETE
-    @Path("{id}")
+    @Path("{idOrName}")
     @ApiOperation(value = "Delete the lookup table")
-    public void removeTable(@PathParam("id") String idOrName) {
+    public void removeTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         // TODO validate that table isn't in use
         lookupTableService.delete(idOrName);
     }

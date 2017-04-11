@@ -264,7 +264,8 @@ public abstract class Graylog2Module extends AbstractModule {
     }
 
     protected MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyBinder() {
-        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<WidgetStrategy.Factory<? extends WidgetStrategy>>(){});
+        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<WidgetStrategy.Factory<? extends WidgetStrategy>>() {
+        });
     }
 
     protected void installWidgetStrategy(MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyBinder,
@@ -352,8 +353,8 @@ public abstract class Graylog2Module extends AbstractModule {
     }
 
     protected void installSearchResponseDecorator(MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder,
-                                           Class<? extends SearchResponseDecorator> searchResponseDecoratorClass,
-                                           Class<? extends SearchResponseDecorator.Factory> searchResponseDecoratorFactoryClass) {
+                                                  Class<? extends SearchResponseDecorator> searchResponseDecoratorClass,
+                                                  Class<? extends SearchResponseDecorator.Factory> searchResponseDecoratorFactoryClass) {
         install(new FactoryModuleBuilder().implement(SearchResponseDecorator.class, searchResponseDecoratorClass).build(searchResponseDecoratorFactoryClass));
         searchResponseDecoratorBinder.addBinding(searchResponseDecoratorClass.getCanonicalName()).to(searchResponseDecoratorFactoryClass);
     }
@@ -383,6 +384,10 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<String, LookupDataAdapter> lookupDataAdapterBinder() {
         return MapBinder.newMapBinder(binder(), String.class, LookupDataAdapter.class);
+    }
+
+    protected MapBinder<String, Object> jacksonSubTypesBinder() {
+        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), TypeLiteral.get(Object.class), JacksonSubTypes.class);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}

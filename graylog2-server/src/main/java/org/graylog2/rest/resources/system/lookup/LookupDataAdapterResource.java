@@ -16,6 +16,7 @@ import org.mongojack.DBSort;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -24,6 +25,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -78,11 +80,12 @@ public class LookupDataAdapterResource extends RestResource {
     @GET
     @Path("{idOrName}")
     @ApiOperation(value = "List the given data adapter")
-    public DataAdapterApi get(@ApiParam("idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-
-        // TODO allow name query
-        DataAdapterDto dataAdapterDto = adapterService.get(idOrName);
-        return DataAdapterApi.fromDto(dataAdapterDto);
+    public DataAdapterApi get(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
+        Optional<DataAdapterDto> dataAdapterDto = adapterService.get(idOrName);
+        if (dataAdapterDto.isPresent()) {
+            return DataAdapterApi.fromDto(dataAdapterDto.get());
+        }
+        throw new NotFoundException();
     }
 
     @POST
@@ -96,7 +99,8 @@ public class LookupDataAdapterResource extends RestResource {
     @DELETE
     @Path("{idOrName}")
     @ApiOperation(value = "Delete the given data adapter", notes = "The data adapter cannot be in use by any lookup table, otherwise the request will fail.")
-    public void delete(@ApiParam("idOrName") @PathParam("idOrName") String idOrName) {
+    public void delete(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
+        // TODO validate that adapter isn't in use
         adapterService.delete(idOrName);
     }
 

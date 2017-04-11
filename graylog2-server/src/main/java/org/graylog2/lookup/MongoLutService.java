@@ -16,37 +16,44 @@ import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
 public class MongoLutService {
 
-    private final JacksonDBCollection<LookupTableDto, ObjectId> lutDb;
+    private final JacksonDBCollection<LookupTableDto, ObjectId> db;
 
     @Inject
     public MongoLutService(MongoConnection mongoConnection,
                            MongoJackObjectMapperProvider mapper) {
 
-        lutDb = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_tables"),
+        db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_tables"),
                 LookupTableDto.class,
                 ObjectId.class,
                 mapper.get());
 
-        lutDb.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
+        db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
-    public LookupTableDto get(String id) {
-        return lutDb.findOneById(new ObjectId(id));
+    public Optional<LookupTableDto> get(String idOrName) {
+        try {
+            return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
+        } catch (IllegalArgumentException e) {
+            // not an ObjectId, try again with name
+            return Optional.ofNullable(db.findOne(DBQuery.is("name", idOrName)));
+
+        }
     }
 
     public LookupTableDto save(LookupTableDto table) {
-        WriteResult<LookupTableDto, ObjectId> save = lutDb.save(table);
+        WriteResult<LookupTableDto, ObjectId> save = db.save(table);
         return save.getSavedObject();
     }
 
     public PaginatedList<LookupTableDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {
 
-        final DBCursor<LookupTableDto> cursor = lutDb.find(query)
+        final DBCursor<LookupTableDto> cursor = db.find(query)
                 .sort(sort)
                 .limit(perPage)
                 .skip(perPage * Math.max(0, page - 1));
@@ -59,6 +66,11 @@ public class MongoLutService {
     }
 
     public void delete(String idOrName) {
-        lutDb.remove(DBQuery.or(DBQuery.is("_id", idOrName), DBQuery.is("name", idOrName)));
+        try {
+            db.removeById(new ObjectId(idOrName));
+        } catch (IllegalArgumentException e) {
+            // not an ObjectId, try again with name
+            db.remove(DBQuery.is("name", idOrName));
+        }
     }
 }

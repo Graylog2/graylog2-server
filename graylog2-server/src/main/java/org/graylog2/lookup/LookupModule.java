@@ -10,5 +10,8 @@ public class LookupModule extends Graylog2Module {
 
         lookupCacheBinder().addBinding(GuavaLookupCache.NAME).to(GuavaLookupCache.class);
         lookupDataAdapterBinder().addBinding(DevZeroDataAdapter.NAME).to(DevZeroDataAdapter.class);
+
+        jacksonSubTypesBinder().addBinding(DevZeroDataAdapter.NAME).toInstance((Class) DevZeroDataAdapter.Config.class);
+        jacksonSubTypesBinder().addBinding(GuavaLookupCache.NAME).toInstance((Class)GuavaLookupCache.Config.class);
     }
 }

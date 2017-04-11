@@ -2,6 +2,7 @@ package org.graylog2.lookup.dto;
 
 import com.google.auto.value.AutoValue;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
@@ -44,8 +45,11 @@ public abstract class LookupTableDto {
     }
 
 
+    @JsonAutoDetect
     @AutoValue.Builder
     public abstract static class Builder {
+        @Id
+        @ObjectId
         @JsonProperty("id")
         public abstract Builder id(@Nullable String id);
 

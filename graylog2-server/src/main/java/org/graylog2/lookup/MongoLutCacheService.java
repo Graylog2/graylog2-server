@@ -16,6 +16,7 @@ import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import java.util.Iterator;
+import java.util.Optional;
 
 import javax.inject.Inject;
 
@@ -34,8 +35,14 @@ public class MongoLutCacheService {
         db.createIndex(new BasicDBObject("name", 1), new BasicDBObject("unique", true));
     }
 
-    public CacheDto get(String id) {
-        return db.findOneById(new ObjectId(id));
+    public Optional<CacheDto> get(String idOrName) {
+        try {
+            return Optional.ofNullable(db.findOneById(new ObjectId(idOrName)));
+        } catch (IllegalArgumentException e) {
+            // not an ObjectId, try again with name
+            return Optional.ofNullable(db.findOne(DBQuery.is("name", idOrName)));
+
+        }
     }
 
     public CacheDto save(CacheDto table) {
@@ -58,6 +65,11 @@ public class MongoLutCacheService {
     }
 
     public void delete(String idOrName) {
-        db.remove(DBQuery.or(DBQuery.is("_id", idOrName), DBQuery.is("name", idOrName)));
+        try {
+            db.removeById(new ObjectId(idOrName));
+        } catch (IllegalArgumentException e) {
+            // not an ObjectId, try again with name
+            db.remove(DBQuery.is("name", idOrName));
+        }
     }
 }

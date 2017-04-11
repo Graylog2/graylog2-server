@@ -16,10 +16,12 @@
  */
 package org.graylog2.bindings;
 
-import com.floreysoft.jmte.Engine;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
+
+import com.floreysoft.jmte.Engine;
+
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
@@ -60,6 +62,7 @@ import org.graylog2.indexer.ranges.RebuildIndexRangesJob;
 import org.graylog2.inputs.InputEventListener;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
+import org.graylog2.lookup.LookupModule;
 import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -120,6 +123,7 @@ public class ServerBindings extends Graylog2Module {
         install(new AuthenticatingRealmModule());
         bindSearchResponseDecorators();
         install(new GrokModule());
+        install(new LookupModule());
     }
 
     private void bindProviders() {

@@ -4,7 +4,6 @@ import com.google.auto.value.AutoValue;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
@@ -30,7 +29,6 @@ public class GuavaLookupCache extends LookupCache {
     @JsonAutoDetect
     @AutoValue
     @WithBeanGetter
-    @JsonTypeName(NAME)
     public abstract static class Config implements LookupCacheConfiguration {
 
         @JsonProperty("max_size")
@@ -42,8 +40,10 @@ public class GuavaLookupCache extends LookupCache {
 
         @AutoValue.Builder
         public abstract static class Builder {
+            @JsonProperty("type")
             public abstract Builder type(String type);
 
+            @JsonProperty("max_size")
             public abstract Builder maxSize(int maxSize);
 
             public abstract Config build();

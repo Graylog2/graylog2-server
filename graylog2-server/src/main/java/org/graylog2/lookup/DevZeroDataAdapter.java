@@ -3,6 +3,8 @@ package org.graylog2.lookup;
 import com.google.auto.value.AutoValue;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import org.graylog.autovalue.WithBeanGetter;
@@ -37,9 +39,11 @@ public class DevZeroDataAdapter extends LookupDataAdapter {
     @WithBeanGetter
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_DevZeroDataAdapter_Config.Builder.class)
+    @JsonTypeName(NAME)
     public static abstract class Config implements LookupDataAdapterConfiguration {
 
         @Override
+        @JsonProperty(TYPE_FIELD)
         public abstract String type();
 
         public static Builder builder() {
@@ -48,6 +52,7 @@ public class DevZeroDataAdapter extends LookupDataAdapter {
 
         @AutoValue.Builder
         public abstract static class Builder {
+            @JsonProperty(TYPE_FIELD)
             public abstract Builder type(String type);
 
             public abstract Config build();

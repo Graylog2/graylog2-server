@@ -17,6 +17,7 @@ import org.mongojack.DBSort;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -25,6 +26,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
@@ -78,8 +80,12 @@ public class LookupCacheResource extends RestResource {
     @GET
     @Path("{idOrName}")
     @ApiOperation(value = "List the given cache")
-    public CacheApi get(@ApiParam("idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        return CacheApi.fromDto(cacheService.get(idOrName));
+    public CacheApi get(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
+        Optional<CacheDto> cacheDto = cacheService.get(idOrName);
+        if (cacheDto.isPresent()) {
+            return CacheApi.fromDto(cacheDto.get());
+        }
+        throw new NotFoundException();
     }
 
     @POST
@@ -91,7 +97,8 @@ public class LookupCacheResource extends RestResource {
     @DELETE
     @Path("{idOrName}")
     @ApiOperation(value = "Delete the given cache", notes = "The cache cannot be in use by any lookup table, otherwise the request will fail.")
-    public void delete(@ApiParam("idOrName") @PathParam("idOrName") String idOrName) {
+    public void delete(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
+        // TODO validate that cache isn't in use
         cacheService.delete(idOrName);
     }
 
