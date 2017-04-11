@@ -60,14 +60,19 @@ public abstract class CacheApi {
 
     @AutoValue.Builder
     public abstract static class Builder {
+        @JsonProperty("id")
         public abstract Builder id(String id);
 
+        @JsonProperty("title")
         public abstract Builder title(String title);
 
+        @JsonProperty("description")
         public abstract Builder description(String description);
 
+        @JsonProperty("name")
         public abstract Builder name(String name);
 
+        @JsonProperty("config")
         public abstract Builder config(LookupCacheConfiguration config);
 
         public abstract CacheApi build();
