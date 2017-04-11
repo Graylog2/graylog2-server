@@ -24,7 +24,6 @@ import org.graylog2.configuration.validators.NonEmptyListValidator;
 
 import java.net.URI;
 import java.time.Duration;
-import java.time.temporal.ChronoUnit;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,12 +31,18 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_hosts", converter = URIListConverter.class, validators = { NonEmptyListValidator.class, ListOfURIsWithHostAndSchemeValidator.class })
     private List<URI> elasticsearchHosts = Collections.singletonList(URI.create("http://127.0.0.1:9200"));
 
-    @Parameter(value = "elasticsearch_connect_timeout", validators = { PositiveIntegerValidator.class })
-    private int elasticsearchConnectTimeout = 1000;
+    @Parameter(value = "elasticsearch_connect_timeout")
+    private Duration elasticsearchConnectTimeout = Duration.ofSeconds(10);
 
     @Parameter(value = "elasticsearch_socket_timeout", validators = { PositiveIntegerValidator.class })
-    private int elasticsearchSocketTimeout = 60000;
+    private Duration elasticsearchSocketTimeout = Duration.ofSeconds(60);
 
     @Parameter(value = "elasticsearch_idle_timeout")
-    private Duration elasticsearchIdleTimeout = Duration.of(-1L, ChronoUnit.SECONDS);
+    private Duration elasticsearchIdleTimeout = Duration.ofSeconds(-1L);
+
+    @Parameter(value = "elasticsearch_max_total_connections", validators = { PositiveIntegerValidator.class })
+    private int elasticsearchMaxTotalConnections = 20;
+
+    @Parameter(value = "elasticsearch_max_total_connections_per_route", validators = { PositiveIntegerValidator.class })
+    private int elasticsearchMaxTotalConnectionsPerRoute = 2;
 }
