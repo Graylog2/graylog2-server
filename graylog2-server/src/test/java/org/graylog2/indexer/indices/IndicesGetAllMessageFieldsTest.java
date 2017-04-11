@@ -50,7 +50,7 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
 
     @Before
     public void setUp() throws Exception {
-        indices = new Indices(client, new IndexMapping(), new Messages(client, new MetricRegistry()), mock(NodeId.class), new NullAuditEventSender());
+        indices = new Indices(client(), new IndexMapping(), new Messages(new MetricRegistry(), jestClient(), client()), mock(NodeId.class), new NullAuditEventSender());
     }
 
     @Test
@@ -108,7 +108,7 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void GetAllMessageFieldsForIndicesForNonexistingIndexShouldReturnEmptySet() throws Exception {
         final String[] indexNames = new String[] { "graylog_0" };
-        final IndicesExistsResponse response = client.admin().indices().exists(new IndicesExistsRequest("graylog_0")).get();
+        final IndicesExistsResponse response = client().admin().indices().exists(new IndicesExistsRequest("graylog_0")).get();
         assertThat(response.isExists()).isFalse();
         final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(indexNames);
 
@@ -183,9 +183,9 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
 
     @After
     public void tearDown() throws Exception {
-        final GetIndexResponse response = client.admin().indices().getIndex(new GetIndexRequest()).get();
+        final GetIndexResponse response = client().admin().indices().getIndex(new GetIndexRequest()).get();
         for (String index : response.indices()) {
-            client.admin().indices().delete(new DeleteIndexRequest(index)).get();
+            client().admin().indices().delete(new DeleteIndexRequest(index)).get();
         }
     }
 }
