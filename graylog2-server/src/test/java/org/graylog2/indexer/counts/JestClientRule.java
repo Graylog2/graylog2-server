@@ -18,7 +18,14 @@ public class JestClientRule extends ExternalResource {
 
     public JestClient getJestClient() {
         final URI esUri = URI.create("http://localhost:" + esHttpPort);
-        final JestClientProvider jestClientProvider = new JestClientProvider(ImmutableList.of(esUri), 10000, 60000, Duration.of(60, ChronoUnit.SECONDS));
+        final JestClientProvider jestClientProvider = new JestClientProvider(
+            ImmutableList.of(esUri),
+            Duration.ofSeconds(10),
+            Duration.ofSeconds(60),
+            Duration.of(60, ChronoUnit.SECONDS),
+            20,
+            2
+        );
         return jestClientProvider.get();
     }
 
