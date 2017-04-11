@@ -26,6 +26,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
 import javax.inject.Singleton;
@@ -41,6 +42,7 @@ public class JestClientProvider implements Provider<JestClient> {
     private final JestClientFactory factory;
     private final CredentialsProvider credentialsProvider;
 
+    @Inject
     public JestClientProvider(@Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
                               @Named("elasticsearch_connect_timeout") Duration elasticsearchConnectTimeout,
                               @Named("elasticsearch_socket_timeout") Duration elasticsearchSocketTimeout,
