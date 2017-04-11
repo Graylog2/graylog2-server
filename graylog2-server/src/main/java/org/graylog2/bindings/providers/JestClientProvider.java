@@ -42,9 +42,11 @@ public class JestClientProvider implements Provider<JestClient> {
     private final CredentialsProvider credentialsProvider;
 
     public JestClientProvider(@Named("elasticsearch_hosts") List<URI> elasticsearchHosts,
-                              @Named("elasticsearch_connect_timeout") int elasticsearchConnectTimeout,
-                              @Named("elasticsearch_socket_timeout") int elasticsearchSocketTimeout,
-                              @Named("elasticsearch_idle_timeout") Duration elasticsearchIdleTimeout) {
+                              @Named("elasticsearch_connect_timeout") Duration elasticsearchConnectTimeout,
+                              @Named("elasticsearch_socket_timeout") Duration elasticsearchSocketTimeout,
+                              @Named("elasticsearch_idle_timeout") Duration elasticsearchIdleTimeout,
+                              @Named("elasticsearch_max_total_connections") int elasticsearchMaxTotalConnections,
+                              @Named("elasticsearch_max_total_connections_per_route") int elasticsearchMaxTotalConnectionsPerRoute) {
         this.factory = new JestClientFactory();
         this.credentialsProvider = new BasicCredentialsProvider();
         final List<String> hosts = elasticsearchHosts.stream()
@@ -68,9 +70,11 @@ public class JestClientProvider implements Provider<JestClient> {
 
         factory.setHttpClientConfig(new HttpClientConfig
             .Builder(hosts)
-            .connTimeout(elasticsearchConnectTimeout)
-            .readTimeout(elasticsearchSocketTimeout)
+            .connTimeout(Math.toIntExact(elasticsearchConnectTimeout.toMillis()))
+            .readTimeout(Math.toIntExact(elasticsearchSocketTimeout.toMillis()))
             .maxConnectionIdleTime(elasticsearchIdleTimeout.getSeconds(), TimeUnit.SECONDS)
+            .maxTotalConnection(elasticsearchMaxTotalConnections)
+            .defaultMaxTotalConnectionPerRoute(elasticsearchMaxTotalConnectionsPerRoute)
             .multiThreaded(true)
             .build());
     }
