@@ -13,6 +13,7 @@ const PermissionsMixin = require('util/PermissionsMixin');
 
 const StoreProvider = require('injection/StoreProvider');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const SessionStore = StoreProvider.getStore('Session');
 
 interface Dashboard {
   id: string;
@@ -28,8 +29,19 @@ class DashboardsStore {
   private _onDashboardsChanged: {(dashboards: Immutable.List<Dashboard>): void; }[] = [];
 
   constructor() {
+    this._initializeDashboards();
+    SessionStore.listen(this.onSessionChange, this);
+  }
+
+  _initializeDashboards() {
     this._dashboards = Immutable.List<Dashboard>();
     this._writableDashboards = Immutable.Map<string, Dashboard>();
+  }
+
+  onSessionChange() {
+    if (!SessionStore.isLoggedIn()) {
+      this._initializeDashboards();
+    }
   }
 
   get dashboards(): Immutable.List<Dashboard> {
