@@ -2,27 +2,29 @@ package org.graylog2.lookup;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
+
 import org.graylog2.lookup.events.LookupTablesDeleted;
 import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 @Singleton
 public class LookupTableService {
     private static final Logger LOG = LoggerFactory.getLogger(LookupTableService.class);
 
-    private final MongoDbLookupTableService mongoLutService;
+    private final MongoLutService mongoLutService;
     private final ConcurrentMap<String, LookupTable> lookupTables = new ConcurrentHashMap<>();
 
     @Inject
-    public LookupTableService(MongoDbLookupTableService mongoLutService, EventBus serverEventBus) {
+    public LookupTableService(MongoLutService mongoLutService, EventBus serverEventBus) {
         this.mongoLutService = mongoLutService;
 
         // Initialize all lookup tables before subscribing to events
