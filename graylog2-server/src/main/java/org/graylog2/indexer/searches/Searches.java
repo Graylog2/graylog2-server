@@ -21,6 +21,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Sets;
+import io.searchbox.client.JestClient;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchRequestBuilder;
 import org.elasticsearch.action.search.SearchResponse;
@@ -162,6 +163,7 @@ public class Searches {
     private final Histogram esTimeRangeHistogram;
     private final StreamService streamService;
     private final Indices indices;
+    private final JestClient jestClient;
 
     @Inject
     public Searches(Configuration configuration,
@@ -169,7 +171,8 @@ public class Searches {
                     Client client,
                     MetricRegistry metricRegistry,
                     StreamService streamService,
-                    Indices indices) {
+                    Indices indices,
+                    JestClient jestClient) {
         this.configuration = checkNotNull(configuration);
         this.indexRangeService = checkNotNull(indexRangeService);
         this.c = checkNotNull(client);
@@ -178,6 +181,7 @@ public class Searches {
         this.esTimeRangeHistogram = metricRegistry.histogram(name(Searches.class, "elasticsearch", "ranges"));
         this.streamService = streamService;
         this.indices = indices;
+        this.jestClient = jestClient;
     }
 
     public CountResult count(String query, TimeRange range) {

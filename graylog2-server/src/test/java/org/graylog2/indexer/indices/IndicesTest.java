@@ -104,12 +104,12 @@ public class IndicesTest extends AbstractESTest {
                 .indexOptimizationDisabled(false)
                 .build();
         this.indexSet = new TestIndexSet(indexSetConfig);
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME), jestClient()));
     }
 
     @Before
     public void setUp() throws Exception {
-        indices = new Indices(client, new IndexMapping(), new Messages(client, new MetricRegistry()), mock(NodeId.class), new NullAuditEventSender());
+        indices = new Indices(client(), new IndexMapping(), new Messages(new MetricRegistry(), jestClient(), client()), mock(NodeId.class), new NullAuditEventSender());
     }
 
     @Test
@@ -120,15 +120,15 @@ public class IndicesTest extends AbstractESTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testDelete() throws Exception {
-        final IndicesExistsRequest beforeRequest = client.admin().indices().prepareExists(INDEX_NAME).request();
-        final IndicesExistsResponse beforeResponse = client.admin().indices().exists(beforeRequest).actionGet(ES_TIMEOUT);
+        final IndicesExistsRequest beforeRequest = client().admin().indices().prepareExists(INDEX_NAME).request();
+        final IndicesExistsResponse beforeResponse = client().admin().indices().exists(beforeRequest).actionGet(ES_TIMEOUT);
 
         assertThat(beforeResponse.isExists()).isTrue();
 
         indices.delete(INDEX_NAME);
 
-        final IndicesExistsRequest request = client.admin().indices().prepareExists(INDEX_NAME).request();
-        final IndicesExistsResponse response = client.admin().indices().exists(request).actionGet(ES_TIMEOUT);
+        final IndicesExistsRequest request = client().admin().indices().prepareExists(INDEX_NAME).request();
+        final IndicesExistsResponse response = client().admin().indices().exists(request).actionGet(ES_TIMEOUT);
 
         assertThat(response.isExists()).isFalse();
     }
@@ -136,14 +136,14 @@ public class IndicesTest extends AbstractESTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testClose() throws Exception {
-        final ClusterStateRequest beforeRequest = client.admin().cluster().prepareState().setIndices(INDEX_NAME).request();
-        final ClusterStateResponse beforeResponse = client.admin().cluster().state(beforeRequest).actionGet(ES_TIMEOUT);
+        final ClusterStateRequest beforeRequest = client().admin().cluster().prepareState().setIndices(INDEX_NAME).request();
+        final ClusterStateResponse beforeResponse = client().admin().cluster().state(beforeRequest).actionGet(ES_TIMEOUT);
         assertThat(beforeResponse.getState().getMetaData().getConcreteAllOpenIndices()).containsExactly(INDEX_NAME);
 
         indices.close(INDEX_NAME);
 
-        final ClusterStateRequest request = client.admin().cluster().prepareState().setIndices(INDEX_NAME).request();
-        final ClusterStateResponse response = client.admin().cluster().state(request).actionGet(ES_TIMEOUT);
+        final ClusterStateRequest request = client().admin().cluster().prepareState().setIndices(INDEX_NAME).request();
+        final ClusterStateResponse response = client().admin().cluster().state(request).actionGet(ES_TIMEOUT);
         assertThat(response.getState().getMetaData().getConcreteAllClosedIndices()).containsExactly(INDEX_NAME);
     }
 
@@ -152,7 +152,7 @@ public class IndicesTest extends AbstractESTest {
     public void testAliasExists() throws Exception {
         assertThat(indices.aliasExists("graylog_alias")).isFalse();
 
-        final IndicesAdminClient adminClient = client.admin().indices();
+        final IndicesAdminClient adminClient = client().admin().indices();
         final IndicesAliasesRequest request = adminClient.prepareAliases().addAlias(INDEX_NAME, "graylog_alias").request();
         final IndicesAliasesResponse response = adminClient.aliases(request).actionGet(ES_TIMEOUT);
         assertThat(response.isAcknowledged()).isTrue();
@@ -164,7 +164,7 @@ public class IndicesTest extends AbstractESTest {
     public void testAliasTarget() throws Exception {
         assertThat(indices.aliasTarget("graylog_alias")).isNull();
 
-        final IndicesAdminClient adminClient = client.admin().indices();
+        final IndicesAdminClient adminClient = client().admin().indices();
         final IndicesAliasesRequest request = adminClient.prepareAliases().addAlias(INDEX_NAME, "graylog_alias").request();
         final IndicesAliasesResponse response = adminClient.aliases(request).actionGet(ES_TIMEOUT);
         assertThat(response.isAcknowledged()).isTrue();
@@ -197,7 +197,7 @@ public class IndicesTest extends AbstractESTest {
     @Test
     public void testCreateEnsuresIndexTemplateExists() throws Exception {
         final String templateName = indexSetConfig.indexTemplateName();
-        final IndicesAdminClient client = this.client.admin().indices();
+        final IndicesAdminClient client = this.client().admin().indices();
         final GetIndexTemplatesRequest request = client.prepareGetTemplates(templateName).request();
         final GetIndexTemplatesResponse responseBefore = client.getTemplates(request).actionGet();
 
@@ -222,7 +222,7 @@ public class IndicesTest extends AbstractESTest {
     public void testCreateOverwritesIndexTemplate() throws Exception {
         final ObjectMapper mapper = new ObjectMapperProvider().get();
         final String templateName = indexSetConfig.indexTemplateName();
-        final IndicesAdminClient client = this.client.admin().indices();
+        final IndicesAdminClient client = this.client().admin().indices();
 
         final ImmutableMap<String, Object> beforeMapping = ImmutableMap.of(
             "_source", ImmutableMap.of("enabled", false),
@@ -285,7 +285,7 @@ public class IndicesTest extends AbstractESTest {
     @Test
     public void testIndexTemplateCanBeOverridden() throws Exception {
         final String customTemplateName = "custom-template";
-        final IndicesAdminClient client = this.client.admin().indices();
+        final IndicesAdminClient client = client().admin().indices();
 
         // Create custom index template
         final Map<String, Object> customMapping = ImmutableMap.of(

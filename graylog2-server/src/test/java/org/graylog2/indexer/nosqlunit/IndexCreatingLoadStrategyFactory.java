@@ -22,6 +22,7 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.core.LoadStrategyFactory;
 import com.lordofthejars.nosqlunit.core.LoadStrategyOperation;
 import com.lordofthejars.nosqlunit.core.ReflectionLoadStrategyFactory;
+import io.searchbox.client.JestClient;
 import org.graylog2.indexer.IndexSet;
 
 import java.util.Set;
@@ -30,9 +31,11 @@ public class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {
     private final LoadStrategyFactory loadStrategyFactory;
     private final Set<String> indexNames;
     private final IndexSet indexSet;
+    private final JestClient jestClient;
 
-    public IndexCreatingLoadStrategyFactory(IndexSet indexSet, Set<String> indexNames) {
+    public IndexCreatingLoadStrategyFactory(IndexSet indexSet, Set<String> indexNames, JestClient jestClient) {
         this.indexSet = indexSet;
+        this.jestClient = jestClient;
         this.loadStrategyFactory = new ReflectionLoadStrategyFactory();
         this.indexNames = ImmutableSet.copyOf(indexNames);
     }
@@ -42,6 +45,6 @@ public class IndexCreatingLoadStrategyFactory implements LoadStrategyFactory {
     public LoadStrategyOperation getLoadStrategyInstance(LoadStrategyEnum loadStrategyEnum, DatabaseOperation databaseOperation) {
         return loadStrategyFactory.getLoadStrategyInstance(
                 loadStrategyEnum,
-                new IndexCreatingDatabaseOperation(databaseOperation, indexSet, indexNames));
+                new IndexCreatingDatabaseOperation(databaseOperation, indexSet, indexNames, jestClient));
     }
 }
