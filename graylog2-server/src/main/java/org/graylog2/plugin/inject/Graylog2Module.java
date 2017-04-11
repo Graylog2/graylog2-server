@@ -382,8 +382,8 @@ public abstract class Graylog2Module extends AbstractModule {
         return MapBinder.newMapBinder(binder(), String.class, LookupCache.class);
     }
 
-    protected MapBinder<String, LookupDataAdapter> lookupDataAdapterBinder() {
-        return MapBinder.newMapBinder(binder(), String.class, LookupDataAdapter.class);
+    protected MapBinder<String, LookupDataAdapter.Factory> lookupDataAdapterBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, LookupDataAdapter.Factory.class);
     }
 
     protected MapBinder<String, Object> jacksonSubTypesBinder() {

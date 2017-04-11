@@ -1,5 +1,7 @@
 package org.graylog2.plugin.lookup;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.annotation.Nullable;
 
 public abstract class LookupDataAdapter {
@@ -18,8 +20,35 @@ public abstract class LookupDataAdapter {
 
     public abstract void set(Object key, Object value);
 
-    public abstract Class<? extends LookupDataAdapterConfiguration> configurationClass();
+    public interface Factory<T> {
+        T create(LookupDataAdapterConfiguration configuration);
 
-    public abstract LookupDataAdapterConfiguration defaultConfiguration();
+        Descriptor getDescriptor();
+    }
+
+    public abstract static class Descriptor<C extends LookupDataAdapterConfiguration> {
+
+        private final String type;
+        private final Class<C> configClass;
+
+        public Descriptor(String type, Class<C> configClass) {
+            this.type = type;
+            this.configClass = configClass;
+        }
+
+        @JsonProperty("type")
+        public String getType() {
+            return type;
+        }
+
+        @JsonProperty("config_class")
+        public Class<C> getConfigClass() {
+            return configClass;
+        }
+
+        @JsonProperty("default_config")
+        public abstract C defaultConfiguration();
+
+    }
 
 }

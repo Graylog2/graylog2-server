@@ -11,6 +11,8 @@ import org.graylog2.lookup.MongoLutService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
+import org.graylog2.plugin.lookup.LookupCache;
+import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.rest.models.PaginatedList;
 import org.graylog2.rest.models.system.lookup.CacheApi;
 import org.graylog2.rest.models.system.lookup.DataAdapterApi;
@@ -20,9 +22,11 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
@@ -53,14 +57,20 @@ public class LookupTableResource extends RestResource {
     private final MongoLutService lookupTableService;
     private final MongoLutDataAdapterService adapterService;
     private final MongoLutCacheService cacheService;
+    private final Map<String, LookupCache> cacheTypes;
+    private final Map<String, LookupDataAdapter.Factory> dataAdapterTypes;
 
     @Inject
     public LookupTableResource(MongoLutService lookupTableService,
                                MongoLutDataAdapterService adapterService,
-                               MongoLutCacheService cacheService) {
+                               MongoLutCacheService cacheService,
+                               Map<String, LookupCache> cacheTypes,
+                               Map<String, LookupDataAdapter.Factory> dataAdapterTypes) {
         this.lookupTableService = lookupTableService;
         this.adapterService = adapterService;
         this.cacheService = cacheService;
+        this.cacheTypes = cacheTypes;
+        this.dataAdapterTypes = dataAdapterTypes;
     }
 
     @GET
@@ -154,8 +164,12 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("types/adapters")
     @ApiOperation(value = "List available data adapter types")
-    public List<String> availableAdapterTypes() {
-        return Collections.emptyList();
+    public Map<String, LookupDataAdapter.Descriptor> availableAdapterTypes() {
+
+        return dataAdapterTypes.values().stream()
+                .map(LookupDataAdapter.Factory::getDescriptor)
+                .collect(Collectors.toMap(LookupDataAdapter.Descriptor::getType, Function.identity()));
+
     }
 
     @GET
@@ -235,8 +249,8 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("types/caches")
     @ApiOperation(value = "List available caches types")
-    public List<String> availableCacheTypes() {
-        return Collections.emptyList();
+    public Set<String> availableCacheTypes() {
+        return cacheTypes.keySet();
     }
 
     @GET

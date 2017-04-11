@@ -1,6 +1,7 @@
 package org.graylog2.lookup;
 
 import com.google.auto.value.AutoValue;
+import com.google.inject.assistedinject.Assisted;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -22,17 +23,25 @@ public class DevZeroDataAdapter extends LookupDataAdapter {
 
     @Override
     public void set(Object key, Object value) {
-
     }
 
-    @Override
-    public Class<? extends LookupDataAdapterConfiguration> configurationClass() {
-        return Config.class;
+    public interface Factory extends LookupDataAdapter.Factory<DevZeroDataAdapter> {
+        @Override
+        DevZeroDataAdapter create(@Assisted LookupDataAdapterConfiguration configuration);
+
+        @Override
+        Descriptor getDescriptor();
     }
 
-    @Override
-    public LookupDataAdapterConfiguration defaultConfiguration() {
-        return Config.builder().build();
+    public static class Descriptor extends LookupDataAdapter.Descriptor<Config> {
+        public Descriptor() {
+            super(NAME, Config.class);
+        }
+
+        @Override
+        public Config defaultConfiguration() {
+            return Config.builder().type(NAME).build();
+        }
     }
 
     @AutoValue
