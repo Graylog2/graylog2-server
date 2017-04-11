@@ -19,6 +19,7 @@ package org.graylog2.indexer.nosqlunit;
 import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
+import io.searchbox.client.JestClient;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
@@ -40,12 +41,14 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
     private final IndexSet indexSet;
     private final Client client;
     private final Set<String> indexes;
+    private final JestClient jestClient;
 
-    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, IndexSet indexSet, Set<String> indexes) {
+    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, IndexSet indexSet, Set<String> indexes, JestClient jestClient) {
         this.databaseOperation = databaseOperation;
         this.indexSet = indexSet;
         this.client = databaseOperation.connectionManager();
         this.indexes = ImmutableSet.copyOf(indexes);
+        this.jestClient = jestClient;
     }
 
     @Override
@@ -61,7 +64,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }
 
-            final Messages messages = new Messages(client, new MetricRegistry());
+            final Messages messages = new Messages(new MetricRegistry(), jestClient, client);
             final Indices indices = new Indices(client, new IndexMapping(), messages, mock(NodeId.class), new NullAuditEventSender());
 
             if (!indices.create(index, indexSet)) {

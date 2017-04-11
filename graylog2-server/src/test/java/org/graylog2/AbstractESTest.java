@@ -18,28 +18,58 @@ package org.graylog2;
 
 import com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule;
 import com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch;
+import io.searchbox.client.JestClient;
 import org.elasticsearch.client.Client;
+import org.elasticsearch.common.settings.Settings;
+import org.graylog2.indexer.counts.JestClientRule;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.net.ServerSocket;
 
 import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static com.lordofthejars.nosqlunit.elasticsearch2.EmbeddedElasticsearch.EmbeddedElasticsearchRuleBuilder.newEmbeddedElasticsearchRule;
 
 public abstract class AbstractESTest {
+    private static final Integer ES_HTTP_PORT = getFreePort();
+
     @ClassRule
-    public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule().build();
+    public static final EmbeddedElasticsearch EMBEDDED_ELASTICSEARCH = newEmbeddedElasticsearchRule()
+        .settings(Settings.builder().put("http.port", ES_HTTP_PORT).build())
+        .build();
 
     @Rule
     public ElasticsearchRule elasticsearchRule = newElasticsearchRule().defaultEmbeddedElasticsearch();
 
+    @Rule
+    public JestClientRule jestClientRule = JestClientRule.forEsHttpPort(ES_HTTP_PORT);
+
     @Inject
-    protected Client client;
+    private Client client;
+
+    private JestClient jestClient = jestClientRule.getJestClient();
 
     @Before
     public void setUp() throws Exception {
         elasticsearchRule.getDatabaseOperation().deleteAll();
+    }
+
+    public Client client() {
+        return client;
+    }
+
+    public JestClient jestClient() {
+        return jestClient;
+    }
+
+    private static Integer getFreePort() {
+        try (ServerSocket socket = new ServerSocket(0)) {
+            return socket.getLocalPort();
+        } catch (IOException e) {
+            throw new RuntimeException("Unable to find free http port for embedded elasticsearch, aborting test: ", e);
+        }
     }
 }

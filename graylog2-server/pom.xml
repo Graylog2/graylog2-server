@@ -270,7 +270,6 @@
             <artifactId>jest</artifactId>
         </dependency>
 
-
         <dependency>
             <groupId>net.java.dev.jna</groupId>
             <artifactId>jna</artifactId>
@@ -493,6 +492,12 @@
         <dependency>
             <groupId>com.jayway.awaitility</groupId>
             <artifactId>awaitility</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.fakemongo</groupId>
+            <artifactId>fongo</artifactId>
+            <version>2.0.11</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

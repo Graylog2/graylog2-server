@@ -70,7 +70,7 @@ public class CountsTest extends AbstractESTest {
         final Map<String, Object> settings = ImmutableMap.of(
                 "number_of_shards", 1,
                 "index.number_of_replicas", 0);
-        final CreateIndexResponse createIndexResponse1 = client.admin().indices()
+        final CreateIndexResponse createIndexResponse1 = client().admin().indices()
                 .prepareCreate(INDEX_NAME_1)
                 .setSettings(settings)
                 .setTimeout(TimeValue.timeValueSeconds(10L))
@@ -78,7 +78,7 @@ public class CountsTest extends AbstractESTest {
                 .get();
         assumeTrue(createIndexResponse1.isAcknowledged());
 
-        final CreateIndexResponse createIndexResponse2 = client.admin().indices()
+        final CreateIndexResponse createIndexResponse2 = client().admin().indices()
                 .prepareCreate(INDEX_NAME_2)
                 .setSettings(settings)
                 .setTimeout(TimeValue.timeValueSeconds(10L))
@@ -86,21 +86,21 @@ public class CountsTest extends AbstractESTest {
                 .get();
         assumeTrue(createIndexResponse2.isAcknowledged());
 
-        final ClusterHealthResponse clusterHealthResponse1 = client.admin().cluster()
+        final ClusterHealthResponse clusterHealthResponse1 = client().admin().cluster()
                 .prepareHealth(INDEX_NAME_1)
                 .setWaitForGreenStatus()
                 .execute()
                 .get();
         assumeTrue(clusterHealthResponse1.getStatus() == ClusterHealthStatus.GREEN);
 
-        final ClusterHealthResponse clusterHealthResponse2 = client.admin().cluster()
+        final ClusterHealthResponse clusterHealthResponse2 = client().admin().cluster()
                 .prepareHealth(INDEX_NAME_2)
                 .setWaitForGreenStatus()
                 .execute()
                 .get();
         assumeTrue(clusterHealthResponse2.getStatus() == ClusterHealthStatus.GREEN);
 
-        counts = new Counts(client, indexSetRegistry);
+        counts = new Counts(client(), indexSetRegistry);
 
         indexSetConfig1 = IndexSetConfig.builder()
                 .id("id-1")
@@ -145,14 +145,14 @@ public class CountsTest extends AbstractESTest {
 
     @After
     public void tearDown() throws Exception {
-        final DeleteIndexResponse deleteIndexResponse1 = client.admin().indices()
+        final DeleteIndexResponse deleteIndexResponse1 = client().admin().indices()
                 .prepareDelete(INDEX_NAME_1)
                 .setTimeout(TimeValue.timeValueSeconds(10L))
                 .execute()
                 .get();
         assumeTrue(deleteIndexResponse1.isAcknowledged());
 
-        final DeleteIndexResponse deleteIndexResponse2 = client.admin().indices()
+        final DeleteIndexResponse deleteIndexResponse2 = client().admin().indices()
                 .prepareDelete(INDEX_NAME_2)
                 .setTimeout(TimeValue.timeValueSeconds(10L))
                 .execute()
@@ -170,7 +170,7 @@ public class CountsTest extends AbstractESTest {
     @Test
     public void totalReturnsZeroWithNoIndices() throws Exception {
         for (int i = 0; i < 10; i++) {
-            final IndexResponse indexResponse = client.prepareIndex()
+            final IndexResponse indexResponse = client().prepareIndex()
                     .setIndex(INDEX_NAME_1)
                     .setRefresh(true)
                     .setType("test")
@@ -196,7 +196,7 @@ public class CountsTest extends AbstractESTest {
         final int count1 = 10;
         final int count2 = 5;
         for (int i = 0; i < count1; i++) {
-            final IndexResponse indexResponse = client.prepareIndex()
+            final IndexResponse indexResponse = client().prepareIndex()
                     .setIndex(INDEX_NAME_1)
                     .setRefresh(true)
                     .setType("test")
@@ -205,7 +205,7 @@ public class CountsTest extends AbstractESTest {
             assumeTrue(indexResponse.isCreated());
         }
         for (int i = 0; i < count2; i++) {
-            final IndexResponse indexResponse = client.prepareIndex()
+            final IndexResponse indexResponse = client().prepareIndex()
                     .setIndex(INDEX_NAME_2)
                     .setRefresh(true)
                     .setType("test")

@@ -66,6 +66,14 @@ public class ResultMessage {
         return m;
     }
 
+    public static ResultMessage parseFromSource(String id, String index, Map<String, Object> message) {
+        final ResultMessage m = new ResultMessage();
+        m.setMessage(id, message);
+        m.setIndex(index);
+
+        return m;
+    }
+
     public static ResultMessage parseFromSource(GetResponse r) {
         ResultMessage m = new ResultMessage();
         m.setMessage(r.getId(), r.getSource());
