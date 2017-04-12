@@ -74,21 +74,6 @@ public class ResultMessage {
         return m;
     }
 
-    public static ResultMessage parseFromSource(GetResponse r) {
-        ResultMessage m = new ResultMessage();
-        m.setMessage(r.getId(), r.getSource());
-        m.setIndex(r.getIndex());
-        return m;
-    }
-
-    public static ResultMessage createFromMessage(Message message, String index, Multimap<String, Range<Integer>> highlightFieldMap) {
-        final ResultMessage result = createFromMessage(message);
-        result.setIndex(index);
-        result.setHighlightRanges(highlightFieldMap);
-
-        return result;
-    }
-
     public static ResultMessage createFromMessage(Message message) {
         ResultMessage m = new ResultMessage();
         m.setMessage(message);
