@@ -16,11 +16,15 @@
  */
 package org.graylog2;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 public class AbstractESTestTest extends AbstractESTest {
-    public AbstractESTestTest() {
+    @Override
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
         assertThat(jestClient()).isNotNull();
     }
 
