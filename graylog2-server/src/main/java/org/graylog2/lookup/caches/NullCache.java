@@ -1,6 +1,8 @@
 package org.graylog2.lookup.caches;
 
 import com.google.auto.value.AutoValue;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,6 +19,11 @@ import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 public class NullCache extends LookupCache {
 
     public static final String NAME = "none";
+
+    @Inject
+    public NullCache(@Assisted LookupCacheConfiguration c) {
+        super(c);
+    }
 
     @Override
     public Object get(Object key) {

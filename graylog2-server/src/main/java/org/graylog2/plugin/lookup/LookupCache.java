@@ -12,6 +12,12 @@ public abstract class LookupCache {
 
     private LookupTable lookupTable;
 
+    private final LookupCacheConfiguration config;
+
+    protected LookupCache(LookupCacheConfiguration config) {
+        this.config = config;
+    }
+
     @Nullable
     public String id() {
         return id;
@@ -37,6 +43,10 @@ public abstract class LookupCache {
     public abstract void purge();
 
     public abstract void purge(Object key);
+
+    public LookupCacheConfiguration getConfig() {
+        return config;
+    }
 
     public interface Factory<T extends LookupCache> {
         T create(LookupCacheConfiguration configuration);

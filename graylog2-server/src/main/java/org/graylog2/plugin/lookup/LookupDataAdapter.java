@@ -12,6 +12,12 @@ public abstract class LookupDataAdapter {
 
     private LookupTable lookupTable;
 
+    private final LookupDataAdapterConfiguration config;
+
+    protected LookupDataAdapter(LookupDataAdapterConfiguration config) {
+        this.config = config;
+    }
+
     @Nullable
     public String id() {
         return id;
@@ -33,6 +39,10 @@ public abstract class LookupDataAdapter {
     public abstract Object get(Object key);
 
     public abstract void set(Object key, Object value);
+
+    public LookupDataAdapterConfiguration getConfig() {
+        return config;
+    }
 
     public interface Factory<T extends LookupDataAdapter> {
         T create(LookupDataAdapterConfiguration configuration);

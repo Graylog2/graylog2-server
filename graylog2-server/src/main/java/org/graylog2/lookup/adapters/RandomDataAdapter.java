@@ -1,6 +1,7 @@
 package org.graylog2.lookup.adapters;
 
 import com.google.auto.value.AutoValue;
+import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -19,7 +20,9 @@ public class RandomDataAdapter extends LookupDataAdapter {
     public static final String NAME = "random";
     private final SecureRandom secureRandom;
 
-    public RandomDataAdapter() {
+    @Inject
+    public RandomDataAdapter(@Assisted LookupDataAdapterConfiguration config) {
+        super(config);
         secureRandom = new SecureRandom();
     }
 

@@ -22,6 +22,7 @@ public class GuavaLookupCache extends LookupCache {
 
     @Inject
     public GuavaLookupCache(@Assisted LookupCacheConfiguration c) {
+        super(c);
         Config config = (Config) c;
         cache = CacheBuilder.newBuilder()
                 .maximumSize(config.maxSize())

@@ -118,7 +118,7 @@ public class LookupTableService {
     }
 
     @Nonnull
-    private Optional<LookupTable> createTable(String name) {
+    private Optional<LookupTable> createTable(String name, LookupTable existingTable) {
         Optional<LookupTableDto> dtoOptional = mongoLutService.get(name);
         if (!dtoOptional.isPresent()) {
             LOG.warn("Update event received for missing lookup table '{}', remove this event.", name);
@@ -139,7 +139,13 @@ public class LookupTableService {
             LOG.warn("Missing lookup cache implementation for type {} in lookup table {}. Not loading lookup table.", cacheDto.config().type(), dto.name());
             return Optional.empty();
         }
-        LookupCache cache = cacheFactory.create(cacheDto.config());
+        LookupCache cache;
+        if (existingTable.cache().getConfig().equals(cacheDto.config())) {
+            // configuration is the same, we do not need to recreate the cache (so it can retain its state)
+            cache = existingTable.cache();
+        } else {
+            cache = cacheFactory.create(cacheDto.config());
+        }
 
         DataAdapterDto adapterDto = dataAdapterDtoOptional.get();
         LookupDataAdapter.Factory adapterFactory = adapterFactories.get(adapterDto.config().type());
@@ -148,7 +154,13 @@ public class LookupTableService {
             return Optional.empty();
         }
 
-        LookupDataAdapter dataAdapter = adapterFactory.create(adapterDto.config());
+        LookupDataAdapter dataAdapter;
+        if (existingTable.dataAdapter().getConfig().equals(adapterDto.config())) {
+            // configuration is the same, do not recreate the adapter (so it can retain its connections etc)
+            dataAdapter = existingTable.dataAdapter();
+        } else {
+            dataAdapter = adapterFactory.create(adapterDto.config());
+        }
 
         // finally put the table together
         LookupTable lookupTable = LookupTable.builder()
@@ -170,7 +182,7 @@ public class LookupTableService {
     public void handleLookupTableUpdate(LookupTablesUpdated event) {
         // TODO use executor and call initialize/update/start or similar on lookup table
         event.lookupTableNames().forEach(name -> {
-            Optional<LookupTable> table = createTable(name);
+            Optional<LookupTable> table = createTable(name, lookupTables.get(name));
             table.ifPresent(lookupTable -> lookupTables.put(name, lookupTable));
         });
     }
