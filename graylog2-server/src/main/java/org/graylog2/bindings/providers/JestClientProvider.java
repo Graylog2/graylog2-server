@@ -72,6 +72,7 @@ public class JestClientProvider implements Provider<JestClient> {
 
         factory.setHttpClientConfig(new HttpClientConfig
             .Builder(hosts)
+            .credentialsProvider(credentialsProvider)
             .connTimeout(Math.toIntExact(elasticsearchConnectTimeout.toMillis()))
             .readTimeout(Math.toIntExact(elasticsearchSocketTimeout.toMillis()))
             .maxConnectionIdleTime(elasticsearchIdleTimeout.getSeconds(), TimeUnit.SECONDS)
