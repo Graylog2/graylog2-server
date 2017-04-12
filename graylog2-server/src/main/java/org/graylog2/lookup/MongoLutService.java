@@ -18,6 +18,7 @@ import org.mongojack.WriteResult;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -64,6 +65,14 @@ public class MongoLutService {
                 .skip(perPage * Math.max(0, page - 1));
 
         return new PaginatedList<>(asImmutableList(cursor), cursor.count(), page, perPage);
+    }
+
+    public Collection<LookupTableDto> findByCacheIds(Collection<String> cacheIds) {
+        return asImmutableList(db.find(DBQuery.in("_id", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()))));
+    }
+
+    public Collection<LookupTableDto> findByDataAdapterIds(Collection<String> dataAdapterIds) {
+        return asImmutableList(db.find(DBQuery.in("_id", dataAdapterIds.stream().map(ObjectId::new).collect(Collectors.toList()))));
     }
 
     private ImmutableList<LookupTableDto> asImmutableList(Iterator<? extends LookupTableDto> cursor) {

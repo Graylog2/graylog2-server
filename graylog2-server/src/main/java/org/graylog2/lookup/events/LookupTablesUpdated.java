@@ -1,10 +1,16 @@
 package org.graylog2.lookup.events;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import org.graylog2.lookup.dto.LookupTableDto;
+
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @AutoValue
 public abstract class LookupTablesUpdated {
@@ -18,5 +24,14 @@ public abstract class LookupTablesUpdated {
     public static LookupTablesUpdated create(@JsonProperty("lookup_table_ids") Set<String> lookupTableIds,
                                              @JsonProperty("lookup_table_names") Set<String> lookupTableNames) {
         return new AutoValue_LookupTablesUpdated(lookupTableIds, lookupTableNames);
+    }
+
+    public static LookupTablesUpdated create(LookupTableDto dto) {
+        return create(Collections.singleton(dto.id()), Collections.singleton(dto.name()));
+    }
+
+    public static LookupTablesUpdated create(Collection<LookupTableDto> dtos) {
+        return create(dtos.stream().map(LookupTableDto::id).collect(Collectors.toSet()),
+                dtos.stream().map(LookupTableDto::name).collect(Collectors.toSet()));
     }
 }

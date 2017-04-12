@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.MongoLutCacheService;
 import org.graylog2.lookup.MongoLutDataAdapterService;
@@ -12,6 +13,8 @@ import org.graylog2.lookup.MongoLutService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
+import org.graylog2.lookup.events.LookupTablesDeleted;
+import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.rest.models.PaginatedList;
@@ -23,6 +26,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -31,6 +35,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -47,6 +52,8 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 
+import static java.util.Collections.singleton;
+
 @RequiresAuthentication
 @Path("/system/lookup")
 @Produces("application/json")
@@ -60,6 +67,7 @@ public class LookupTableResource extends RestResource {
     private final Map<String, LookupCache.Factory> cacheTypes;
     private final Map<String, LookupDataAdapter.Factory> dataAdapterTypes;
     private LookupTableService lookupTables;
+    private ClusterEventBus clusterBus;
 
     @Inject
     public LookupTableResource(MongoLutService lookupTableService,
@@ -67,13 +75,15 @@ public class LookupTableResource extends RestResource {
                                MongoLutCacheService cacheService,
                                Map<String, LookupCache.Factory> cacheTypes,
                                Map<String, LookupDataAdapter.Factory> dataAdapterTypes,
-                               LookupTableService lookupTables) {
+                               LookupTableService lookupTables,
+                               ClusterEventBus clusterBus) {
         this.lookupTableService = lookupTableService;
         this.adapterService = adapterService;
         this.cacheService = cacheService;
         this.cacheTypes = cacheTypes;
         this.dataAdapterTypes = dataAdapterTypes;
         this.lookupTables = lookupTables;
+        this.clusterBus = clusterBus;
     }
 
     @GET
@@ -121,15 +131,25 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Create a new lookup table")
     public LookupTableApi createTable(@ApiParam LookupTableApi lookupTable) {
         LookupTableDto saved = lookupTableService.save(lookupTable.toDto());
-        return LookupTableApi.fromDto(saved);
+        LookupTableApi table = LookupTableApi.fromDto(saved);
+
+        clusterBus.post(LookupTablesUpdated.create(saved));
+
+        return table;
     }
 
     @DELETE
     @Path("tables/{idOrName}")
     @ApiOperation(value = "Delete the lookup table")
     public void removeTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        // TODO validate that table isn't in use
+        // TODO validate that table isn't in use, how?
+        Optional<LookupTableDto> lookupTableDto = lookupTableService.get(idOrName);
+        if (!lookupTableDto.isPresent()) {
+            throw new NotFoundException();
+        }
         lookupTableService.delete(idOrName);
+        clusterBus.post(LookupTablesDeleted.create(lookupTableDto.get()));
+
     }
 
     @JsonAutoDetect
@@ -207,7 +227,15 @@ public class LookupTableResource extends RestResource {
     @Path("adapters/{idOrName}")
     @ApiOperation(value = "Delete the given data adapter", notes = "The data adapter cannot be in use by any lookup table, otherwise the request will fail.")
     public void deleteAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        // TODO validate that adapter isn't in use
+        Optional<DataAdapterDto> dataAdapterDto = adapterService.get(idOrName);
+        if (!dataAdapterDto.isPresent()) {
+            throw new NotFoundException();
+        }
+        DataAdapterDto dto = dataAdapterDto.get();
+        boolean unused = lookupTableService.findByDataAdapterIds(singleton(dto.id())).isEmpty();
+        if (!unused) {
+            throw new BadRequestException("The adapter is still in use, cannot delete.");
+        }
         adapterService.delete(idOrName);
     }
 
@@ -216,6 +244,10 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Update the given data adapter settings")
     public DataAdapterApi updateAdapter(@ApiParam DataAdapterApi toUpdate) {
         DataAdapterDto saved = adapterService.save(toUpdate.toDto());
+        Collection<LookupTableDto> adapterUsages = lookupTableService.findByDataAdapterIds(singleton(saved.id()));
+        if (!adapterUsages.isEmpty()) {
+            clusterBus.post(LookupTablesUpdated.create(adapterUsages));
+        }
         return DataAdapterApi.fromDto(saved);
     }
 
@@ -289,15 +321,29 @@ public class LookupTableResource extends RestResource {
     @Path("caches/{idOrName}")
     @ApiOperation(value = "Delete the given cache", notes = "The cache cannot be in use by any lookup table, otherwise the request will fail.")
     public void deleteCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        // TODO validate that cache isn't in use
+        Optional<CacheDto> cacheDto = cacheService.get(idOrName);
+        if (!cacheDto.isPresent()) {
+            throw new NotFoundException();
+        }
+        CacheDto dto = cacheDto.get();
+        boolean unused = lookupTableService.findByCacheIds(singleton(dto.id())).isEmpty();
+        if (!unused) {
+            throw new BadRequestException("The cache is still in use, cannot delete.");
+        }
         cacheService.delete(idOrName);
+
     }
 
     @PUT
     @Path("caches")
     @ApiOperation(value = "Update the given cache settings")
     public CacheApi updateCache(@ApiParam CacheApi toUpdate) {
-        return CacheApi.fromDto(cacheService.save(toUpdate.toDto()));
+        CacheDto saved = cacheService.save(toUpdate.toDto());
+        Collection<LookupTableDto> cacheUsages = lookupTableService.findByCacheIds(singleton(saved.id()));
+        if (!cacheUsages.isEmpty()) {
+            clusterBus.post(LookupTablesUpdated.create(cacheUsages));
+        }
+        return CacheApi.fromDto(saved);
     }
 
     @JsonAutoDetect
