@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -88,13 +89,13 @@ public class LookupTableService {
 
             DataAdapterDto adapterDto = adapterIdMap.get(dto.dataAdapterId());
             if (adapterDto == null) {
-                LOG.warn("Missing lookup data adapter configuration for ID {} in lookup table {}. Not loading lookup table.", dto.cacheId(), dto.name());
+                LOG.warn("Missing lookup data adapter configuration for ID {} in lookup table {}. Not loading lookup table.", dto.dataAdapterId(), dto.name());
                 return;
             }
             String adapterType = adapterDto.config().type();
             LookupDataAdapter.Factory adapterFactory = adapterFactories.get(adapterType);
             if (adapterFactory == null) {
-                LOG.warn("Missing lookup data adapter implementation for type {} in lookup table {}. Not loading lookup table.", cacheType, dto.name());
+                LOG.warn("Missing lookup data adapter implementation for type {} in lookup table {}. Not loading lookup table.", adapterType, dto.name());
                 return;
             }
             LookupDataAdapter dataAdapter = adapterFactory.create(adapterDto.config());
@@ -116,18 +117,67 @@ public class LookupTableService {
         });
     }
 
-    private LookupTable compute(String name) {
-        // Build the actual lookup table object tree and store in the concurrent map
-        return null;
+    @Nonnull
+    private Optional<LookupTable> createTable(String name) {
+        Optional<LookupTableDto> dtoOptional = mongoLutService.get(name);
+        if (!dtoOptional.isPresent()) {
+            LOG.warn("Update event received for missing lookup table '{}', remove this event.", name);
+            return Optional.empty();
+        }
+
+        LookupTableDto dto = dtoOptional.get();
+        Optional<CacheDto> cacheDtoOptional = cacheService.get(dto.cacheId());
+        Optional<DataAdapterDto> dataAdapterDtoOptional = dataAdapterService.get(dto.dataAdapterId());
+        if (!cacheDtoOptional.isPresent() || !dataAdapterDtoOptional.isPresent()) {
+            LOG.warn("Missing cache or data adapter for lookup table {}. Not loading lookup table.", name);
+            return Optional.empty();
+        }
+
+        CacheDto cacheDto = cacheDtoOptional.get();
+        LookupCache.Factory cacheFactory = cacheFactories.get(cacheDto.config().type());
+        if (cacheFactory == null) {
+            LOG.warn("Missing lookup cache implementation for type {} in lookup table {}. Not loading lookup table.", cacheDto.config().type(), dto.name());
+            return Optional.empty();
+        }
+        LookupCache cache = cacheFactory.create(cacheDto.config());
+
+        DataAdapterDto adapterDto = dataAdapterDtoOptional.get();
+        LookupDataAdapter.Factory adapterFactory = adapterFactories.get(adapterDto.config().type());
+        if (adapterFactory == null) {
+            LOG.warn("Missing lookup data adapter implementation for type {} in lookup table {}. Not loading lookup table.", adapterDto.config().type(), dto.name());
+            return Optional.empty();
+        }
+
+        LookupDataAdapter dataAdapter = adapterFactory.create(adapterDto.config());
+
+        // finally put the table together
+        LookupTable lookupTable = LookupTable.builder()
+                .id(dto.id())
+                .name(dto.name())
+                .title(dto.title())
+                .description(dto.description())
+                .cache(cache)
+                .dataAdapter(dataAdapter)
+                .build();
+        // set up back references so the cache can interact with the adapter (e.g. lazily loading values)
+        lookupTable.cache().setLookupTable(lookupTable);
+        lookupTable.dataAdapter().setLookupTable(lookupTable);
+        // make the table available
+        return Optional.of(lookupTable);
     }
 
     @Subscribe
     public void handleLookupTableUpdate(LookupTablesUpdated event) {
-        event.lookupTableNames().forEach(name -> lookupTables.put(name, compute(name)));
+        // TODO use executor and call initialize/update/start or similar on lookup table
+        event.lookupTableNames().forEach(name -> {
+            Optional<LookupTable> table = createTable(name);
+            table.ifPresent(lookupTable -> lookupTables.put(name, lookupTable));
+        });
     }
 
     @Subscribe
     public void handleLookupTableDeletion(LookupTablesDeleted event) {
+        // TODO use executor and call stop/clean/teardown on lookup table
         event.lookupTableNames().forEach(lookupTables::remove);
     }
 

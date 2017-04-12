@@ -68,11 +68,11 @@ public class MongoLutService {
     }
 
     public Collection<LookupTableDto> findByCacheIds(Collection<String> cacheIds) {
-        return asImmutableList(db.find(DBQuery.in("_id", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()))));
+        return asImmutableList(db.find(DBQuery.in("cache", cacheIds.stream().map(ObjectId::new).collect(Collectors.toList()))));
     }
 
     public Collection<LookupTableDto> findByDataAdapterIds(Collection<String> dataAdapterIds) {
-        return asImmutableList(db.find(DBQuery.in("_id", dataAdapterIds.stream().map(ObjectId::new).collect(Collectors.toList()))));
+        return asImmutableList(db.find(DBQuery.in("data_adapter", dataAdapterIds.stream().map(ObjectId::new).collect(Collectors.toList()))));
     }
 
     private ImmutableList<LookupTableDto> asImmutableList(Iterator<? extends LookupTableDto> cursor) {
