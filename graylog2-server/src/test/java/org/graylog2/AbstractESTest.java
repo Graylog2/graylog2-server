@@ -50,18 +50,19 @@ public abstract class AbstractESTest {
     @Inject
     private Client client;
 
-    private JestClient jestClient = jestClientRule.getJestClient();
+    private JestClient jestClient;
 
     @Before
     public void setUp() throws Exception {
         elasticsearchRule.getDatabaseOperation().deleteAll();
+        this.jestClient = jestClientRule.getJestClient();
     }
 
-    public Client client() {
+    protected Client client() {
         return client;
     }
 
-    public JestClient jestClient() {
+    protected JestClient jestClient() {
         return jestClient;
     }
 
