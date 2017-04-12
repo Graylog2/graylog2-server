@@ -27,12 +27,23 @@ import java.time.temporal.ChronoUnit;
 
 public class JestClientRule extends ExternalResource {
     private final Integer esHttpPort;
+    private JestClient jestClient;
 
     private JestClientRule(Integer esHttpPort) {
         this.esHttpPort = esHttpPort;
     }
 
     public JestClient getJestClient() {
+        return jestClient;
+    }
+
+    public static JestClientRule forEsHttpPort(Integer esHttpPort) {
+        return new JestClientRule(esHttpPort);
+    }
+
+    @Override
+    protected void before() throws Throwable {
+        super.before();
         final URI esUri = URI.create("http://localhost:" + esHttpPort);
         final JestClientProvider jestClientProvider = new JestClientProvider(
             ImmutableList.of(esUri),
@@ -42,10 +53,12 @@ public class JestClientRule extends ExternalResource {
             20,
             2
         );
-        return jestClientProvider.get();
+        this.jestClient = jestClientProvider.get();
     }
 
-    public static JestClientRule forEsHttpPort(Integer esHttpPort) {
-        return new JestClientRule(esHttpPort);
+    @Override
+    protected void after() {
+        super.after();
+        this.jestClient.shutdownClient();
     }
 }
