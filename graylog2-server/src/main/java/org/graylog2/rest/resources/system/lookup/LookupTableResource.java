@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.MongoLutCacheService;
 import org.graylog2.lookup.MongoLutDataAdapterService;
 import org.graylog2.lookup.MongoLutService;
@@ -58,18 +59,29 @@ public class LookupTableResource extends RestResource {
     private final MongoLutCacheService cacheService;
     private final Map<String, LookupCache.Factory> cacheTypes;
     private final Map<String, LookupDataAdapter.Factory> dataAdapterTypes;
+    private LookupTableService lookupTables;
 
     @Inject
     public LookupTableResource(MongoLutService lookupTableService,
                                MongoLutDataAdapterService adapterService,
                                MongoLutCacheService cacheService,
                                Map<String, LookupCache.Factory> cacheTypes,
-                               Map<String, LookupDataAdapter.Factory> dataAdapterTypes) {
+                               Map<String, LookupDataAdapter.Factory> dataAdapterTypes,
+                               LookupTableService lookupTables) {
         this.lookupTableService = lookupTableService;
         this.adapterService = adapterService;
         this.cacheService = cacheService;
         this.cacheTypes = cacheTypes;
         this.dataAdapterTypes = dataAdapterTypes;
+        this.lookupTables = lookupTables;
+    }
+
+    @GET
+    @Path("data/{name}")
+    @ApiOperation(value = "Query a lookup table")
+    public Object performLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
+                                @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
+        return lookupTables.newBuilder().lookupTable(name).build().lookup(key);
     }
 
     @GET

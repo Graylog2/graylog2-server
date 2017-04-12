@@ -2,11 +2,15 @@ package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import org.graylog2.lookup.LookupTable;
+
 import javax.annotation.Nullable;
 
 public abstract class LookupCache {
 
     private String id;
+
+    private LookupTable lookupTable;
 
     @Nullable
     public String id() {
@@ -17,7 +21,24 @@ public abstract class LookupCache {
         this.id = id;
     }
 
-    public interface Factory<T> {
+    @Nullable
+    public LookupTable getLookupTable() {
+        return lookupTable;
+    }
+
+    public void setLookupTable(LookupTable lookupTable) {
+        this.lookupTable = lookupTable;
+    }
+
+    public abstract Object get(Object key);
+
+    public abstract void set(Object key, Object retrievedValue);
+
+    public abstract void purge();
+
+    public abstract void purge(Object key);
+
+    public interface Factory<T extends LookupCache> {
         T create(LookupCacheConfiguration configuration);
 
         Descriptor getDescriptor();

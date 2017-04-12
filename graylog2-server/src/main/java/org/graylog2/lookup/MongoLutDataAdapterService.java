@@ -15,8 +15,11 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
@@ -73,4 +76,9 @@ public class MongoLutDataAdapterService {
             db.remove(DBQuery.is("name", idOrName));
         }
     }
+
+    public Collection<DataAdapterDto> findByIds(Set<String> idSet) {
+        return asImmutableList(db.find(DBQuery.in("_id", idSet.stream().map(ObjectId::new).collect(Collectors.toList()))));
+    }
+
 }

@@ -1,4 +1,4 @@
-package org.graylog2.lookup;
+package org.graylog2.lookup.adapters;
 
 import com.google.auto.value.AutoValue;
 import com.google.inject.assistedinject.Assisted;
@@ -12,22 +12,30 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 
-public class DevZeroDataAdapter extends LookupDataAdapter {
+import java.security.SecureRandom;
 
-    public static final String NAME = "dev_zero";
+public class RandomDataAdapter extends LookupDataAdapter {
+
+    public static final String NAME = "random";
+    private final SecureRandom secureRandom;
+
+    public RandomDataAdapter() {
+        secureRandom = new SecureRandom();
+    }
 
     @Override
     public Object get(Object key) {
-        return null;
+        return secureRandom.nextInt();
     }
 
     @Override
     public void set(Object key, Object value) {
+        throw new UnsupportedOperationException();
     }
 
-    public interface Factory extends LookupDataAdapter.Factory<DevZeroDataAdapter> {
+    public interface Factory extends LookupDataAdapter.Factory<RandomDataAdapter> {
         @Override
-        DevZeroDataAdapter create(@Assisted LookupDataAdapterConfiguration configuration);
+        RandomDataAdapter create(@Assisted LookupDataAdapterConfiguration configuration);
 
         @Override
         Descriptor getDescriptor();
@@ -47,7 +55,7 @@ public class DevZeroDataAdapter extends LookupDataAdapter {
     @AutoValue
     @WithBeanGetter
     @JsonAutoDetect
-    @JsonDeserialize(builder = AutoValue_DevZeroDataAdapter_Config.Builder.class)
+    @JsonDeserialize(builder = AutoValue_RandomDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)
     public static abstract class Config implements LookupDataAdapterConfiguration {
 
@@ -56,7 +64,7 @@ public class DevZeroDataAdapter extends LookupDataAdapter {
         public abstract String type();
 
         public static Builder builder() {
-            return new AutoValue_DevZeroDataAdapter_Config.Builder();
+            return new AutoValue_RandomDataAdapter_Config.Builder();
         }
 
         @AutoValue.Builder

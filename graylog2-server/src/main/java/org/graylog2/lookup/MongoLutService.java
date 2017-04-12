@@ -15,6 +15,7 @@ import org.mongojack.DBSort;
 import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 
@@ -49,6 +50,10 @@ public class MongoLutService {
     public LookupTableDto save(LookupTableDto table) {
         WriteResult<LookupTableDto, ObjectId> save = db.save(table);
         return save.getSavedObject();
+    }
+
+    public Collection<LookupTableDto> findAll() {
+        return asImmutableList(db.find());
     }
 
     public PaginatedList<LookupTableDto> findPaginated(DBQuery.Query query, DBSort.SortBuilder sort, int page, int perPage) {

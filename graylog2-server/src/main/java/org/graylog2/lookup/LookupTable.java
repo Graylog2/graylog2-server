@@ -32,8 +32,15 @@ public abstract class LookupTable {
 
     @Nullable
     public Object lookup(@Nonnull Object key) {
-
-        return dataAdapter().get(key);
+        Object cachedValue = cache().get(key);
+        if (cachedValue == null) {
+            Object retrievedValue = dataAdapter().get(key);
+            if (retrievedValue != null) {
+                cache().set(key, retrievedValue);
+                return retrievedValue;
+            }
+        }
+        return cachedValue;
     }
 
     @AutoValue.Builder
