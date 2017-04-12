@@ -118,7 +118,7 @@ public class LookupTableService {
     }
 
     @Nonnull
-    private Optional<LookupTable> createTable(String name, LookupTable existingTable) {
+    private Optional<LookupTable> createTable(String name, @Nullable LookupTable existingTable) {
         Optional<LookupTableDto> dtoOptional = mongoLutService.get(name);
         if (!dtoOptional.isPresent()) {
             LOG.warn("Update event received for missing lookup table '{}', remove this event.", name);
@@ -140,7 +140,7 @@ public class LookupTableService {
             return Optional.empty();
         }
         LookupCache cache;
-        if (existingTable.cache().getConfig().equals(cacheDto.config())) {
+        if (existingTable != null && existingTable.cache().getConfig().equals(cacheDto.config())) {
             // configuration is the same, we do not need to recreate the cache (so it can retain its state)
             cache = existingTable.cache();
         } else {
@@ -155,7 +155,7 @@ public class LookupTableService {
         }
 
         LookupDataAdapter dataAdapter;
-        if (existingTable.dataAdapter().getConfig().equals(adapterDto.config())) {
+        if (existingTable != null && existingTable.dataAdapter().getConfig().equals(adapterDto.config())) {
             // configuration is the same, do not recreate the adapter (so it can retain its connections etc)
             dataAdapter = existingTable.dataAdapter();
         } else {
