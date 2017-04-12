@@ -12,8 +12,10 @@ public class LookupModule extends Graylog2Module {
     protected void configure() {
         bind(LookupTableService.class).asEagerSingleton();
 
-        lookupCacheBinder().addBinding(GuavaLookupCache.NAME).to(GuavaLookupCache.class);
-        jacksonSubTypesBinder().addBinding(GuavaLookupCache.NAME).toInstance((Class) GuavaLookupCache.Config.class);
+        installLookupCache(GuavaLookupCache.NAME,
+                GuavaLookupCache.class,
+                GuavaLookupCache.Factory.class,
+                GuavaLookupCache.Config.class);
 
         installLookupDataAdapter(DevZeroDataAdapter.NAME,
                 DevZeroDataAdapter.class,
@@ -22,12 +24,4 @@ public class LookupModule extends Graylog2Module {
 
     }
 
-    private void installLookupDataAdapter(String name,
-                                          Class<? extends LookupDataAdapter> adapterClass,
-                                          Class<? extends LookupDataAdapter.Factory> factoryClass,
-                                          Class<? extends LookupDataAdapterConfiguration> configClass) {
-        install(new FactoryModuleBuilder().implement(LookupDataAdapter.class, adapterClass).build(factoryClass));
-        lookupDataAdapterBinder().addBinding(name).to(factoryClass);
-        jacksonSubTypesBinder().addBinding(DevZeroDataAdapter.NAME).toInstance(configClass);
-    }
 }

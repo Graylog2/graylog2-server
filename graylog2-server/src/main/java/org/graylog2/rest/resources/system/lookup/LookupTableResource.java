@@ -25,7 +25,6 @@ import org.mongojack.DBSort;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -57,14 +56,14 @@ public class LookupTableResource extends RestResource {
     private final MongoLutService lookupTableService;
     private final MongoLutDataAdapterService adapterService;
     private final MongoLutCacheService cacheService;
-    private final Map<String, LookupCache> cacheTypes;
+    private final Map<String, LookupCache.Factory> cacheTypes;
     private final Map<String, LookupDataAdapter.Factory> dataAdapterTypes;
 
     @Inject
     public LookupTableResource(MongoLutService lookupTableService,
                                MongoLutDataAdapterService adapterService,
                                MongoLutCacheService cacheService,
-                               Map<String, LookupCache> cacheTypes,
+                               Map<String, LookupCache.Factory> cacheTypes,
                                Map<String, LookupDataAdapter.Factory> dataAdapterTypes) {
         this.lookupTableService = lookupTableService;
         this.adapterService = adapterService;
@@ -249,8 +248,11 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("types/caches")
     @ApiOperation(value = "List available caches types")
-    public Set<String> availableCacheTypes() {
-        return cacheTypes.keySet();
+    public Map<String, LookupCache.Descriptor> availableCacheTypes() {
+        return cacheTypes.values().stream()
+                .map(LookupCache.Factory::getDescriptor)
+                .collect(Collectors.toMap(LookupCache.Descriptor::getType, Function.identity()));
+
     }
 
     @GET

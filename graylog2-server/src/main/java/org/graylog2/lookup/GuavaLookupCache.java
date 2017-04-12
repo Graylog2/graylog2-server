@@ -1,6 +1,7 @@
 package org.graylog2.lookup;
 
 import com.google.auto.value.AutoValue;
+import com.google.inject.assistedinject.Assisted;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -15,18 +16,27 @@ public class GuavaLookupCache extends LookupCache {
 
     public static final String NAME = "guava_cache";
 
-    @Override
-    public Class<? extends LookupCacheConfiguration> configurationClass() {
-        return GuavaLookupCache.Config.class;
+    public interface Factory extends LookupCache.Factory<GuavaLookupCache> {
+        @Override
+        GuavaLookupCache create(@Assisted LookupCacheConfiguration configuration);
+
+        @Override
+        Descriptor getDescriptor();
     }
 
-    @Override
-    public LookupCacheConfiguration defaultConfiguration() {
-        return Config.builder()
-                .maxSize(10)
-                .build();
-    }
+    public static class Descriptor extends LookupCache.Descriptor<GuavaLookupCache.Config> {
+        public Descriptor() {
+            super(NAME, GuavaLookupCache.Config.class);
+        }
 
+        @Override
+        public Config defaultConfiguration() {
+            return Config.builder()
+                    .type(NAME)
+                    .maxSize(10)
+                    .build();
+        }
+    }
 
     @JsonAutoDetect
     @AutoValue
