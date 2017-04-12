@@ -241,7 +241,7 @@ public class LookupTableService {
         }
 
         @Nullable
-        public Object lookup(@Nonnull String key) {
+        public Object lookup(@Nonnull Object key) {
             if (lookupTable == null) {
                 return defaultValue;
             }
