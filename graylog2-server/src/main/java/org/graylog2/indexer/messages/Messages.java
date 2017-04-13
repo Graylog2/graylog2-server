@@ -96,7 +96,10 @@ public class Messages {
             throw new DocumentNotFoundException(index, messageId);
         }
 
-        return ResultMessage.parseFromSource(result.getId(), result.getIndex(), (Map<String, Object>)result.getSourceAsObject(Map.class));
+        @SuppressWarnings("unchecked")
+        final Map<String, Object> message = (Map<String, Object>) result.getSourceAsObject(Map.class, false);
+
+        return ResultMessage.parseFromSource(result.getId(), result.getIndex(), message);
     }
 
     public List<String> analyze(String toAnalyze, String index, String analyzer) throws IOException {
