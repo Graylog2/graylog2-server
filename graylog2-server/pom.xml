@@ -266,7 +266,7 @@
             <artifactId>elasticsearch</artifactId>
         </dependency>
         <dependency>
-            <groupId>io.searchbox</groupId>
+            <groupId>org.graylog.jest</groupId>
             <artifactId>jest</artifactId>
         </dependency>
 
