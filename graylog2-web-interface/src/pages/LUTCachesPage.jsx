@@ -33,7 +33,7 @@ const LUTCachesPage = React.createClass({
               )}
               &nbsp;
               <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} onlyActiveOnIndex>
-                 <Button bsStyle="info">Lookup Tables</Button>
+                <Button bsStyle="info">Lookup Tables</Button>
               </LinkContainer>
               &nbsp;
               <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW} onlyActiveOnIndex>

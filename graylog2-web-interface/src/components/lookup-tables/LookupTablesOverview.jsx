@@ -59,7 +59,7 @@ const LookupTablesOverview = React.createClass({
             Configured lookup tables
             <span>&nbsp;<small>{this.state.pagination.total} total</small></span>
           </h2>
-          <PaginatedList onChange={this._onPageChange} totalItems={this.state.pagination.total || 0}>
+          <PaginatedList onChange={this._onPageChange} totalItems={this.state.pagination.total}>
             <SearchForm onSearch={this._onSearch} />
             <Table condensed hover>
               <thead>
@@ -67,8 +67,8 @@ const LookupTablesOverview = React.createClass({
                   <th>Title</th>
                   <th>Description</th>
                   <th>Name</th>
-                  <th>Data Provider</th>
                   <th>Cache</th>
+                  <th>Data Provider</th>
                 </tr>
               </thead>
               {lookupTables}
