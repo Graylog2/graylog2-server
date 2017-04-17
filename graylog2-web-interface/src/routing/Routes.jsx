@@ -99,6 +99,18 @@ const Routes = {
         provider: name => `/system/authentication/config/${name}`,
       },
     },
+    LOOKUPTABLES: {
+      OVERVIEW: '/system/lookuptables',
+      show: tableName => `/system/lookuptables/table/${tableName}`,
+      CACHES: {
+        OVERVIEW: '/system/lookuptables/caches',
+        show: cacheName => `/system/lookuptables/cache/${cacheName}`,
+      },
+      DATA_ADAPTERS: {
+        OVERVIEW: '/system/lookuptables/data_adapters',
+        show: adapterName => `/system/lookuptables/data_adapter/${adapterName}`,
+      },
+    },
   },
   search_with_query: (query, rangeType, timeRange) => {
     const route = new URI(Routes.SEARCH);

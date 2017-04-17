@@ -1,5 +1,8 @@
 package org.graylog2.rest.resources.system.lookup;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
@@ -106,7 +109,8 @@ public class LookupTableResource extends RestResource {
                                   @DefaultValue("created_at") @QueryParam("sort") String sort,
                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                   @DefaultValue("desc") @QueryParam("order") String order,
-                                  @ApiParam(name = "query") @QueryParam("query") String query) {
+                                  @ApiParam(name = "query") @QueryParam("query") String query,
+                                  @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
         // TODO hoist SearchQueryParser for this
         DBQuery.Query dbQuery = DBQuery.empty();
@@ -121,9 +125,27 @@ public class LookupTableResource extends RestResource {
         }
 
         PaginatedList<LookupTableDto> paginated = lookupTableService.findPaginated(dbQuery, sortBuilder, page, perPage);
+
+        ImmutableSet.Builder<CacheApi> caches = ImmutableSet.builder();
+        ImmutableSet.Builder<DataAdapterApi> dataAdapters = ImmutableSet.builder();
+        if (resolveObjects) {
+            ImmutableSet.Builder<String> cacheIds = ImmutableSet.builder();
+            ImmutableSet.Builder<String> dataAdapterIds = ImmutableSet.builder();
+
+            paginated.forEach(dto -> {
+                cacheIds.add(dto.cacheId());
+                dataAdapterIds.add(dto.dataAdapterId());
+            });
+
+            cacheService.findByIds(cacheIds.build()).forEach(cacheDto -> caches.add(CacheApi.fromDto(cacheDto)));
+            adapterService.findByIds(dataAdapterIds.build()).forEach(dataAdapterDto -> dataAdapters.add(DataAdapterApi.fromDto(dataAdapterDto)));
+        }
+
         return new LookupTablePage(query,
                 paginated.pagination(),
-                paginated.stream().map(LookupTableApi::fromDto).collect(Collectors.toList()));
+                paginated.stream().map(LookupTableApi::fromDto).collect(Collectors.toList()),
+                caches.build(),
+                dataAdapters.build());
     }
 
     @POST
@@ -165,10 +187,22 @@ public class LookupTableResource extends RestResource {
         @JsonProperty("lookup_tables")
         private final List<LookupTableApi> lookupTables;
 
-        public LookupTablePage(@Nullable String query, PaginatedList.PaginationInfo paginationInfo, List<LookupTableApi> lookupTables) {
+        @JsonProperty("caches")
+        private final Map<String, CacheApi> cacheApiMap;
+
+        @JsonProperty("data_adapters")
+        private final Map<String, DataAdapterApi> dataAdapterMap;
+
+        public LookupTablePage(@Nullable String query,
+                               PaginatedList.PaginationInfo paginationInfo,
+                               List<LookupTableApi> lookupTables,
+                               Collection<CacheApi> caches,
+                               Collection<DataAdapterApi> dataAdapters) {
             this.query = query;
             this.paginationInfo = paginationInfo;
             this.lookupTables = lookupTables;
+            this.cacheApiMap = Maps.uniqueIndex(caches, CacheApi::id);
+            this.dataAdapterMap = Maps.uniqueIndex(dataAdapters, DataAdapterApi::id);
         }
     }
 
