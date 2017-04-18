@@ -6,30 +6,26 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 import { PaginatedList, SearchForm } from 'components/common';
 
-import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
+import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 
-const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
+const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
-const CachesOverview = React.createClass({
+const DataAdaptersOverview = React.createClass({
 
   mixins: [
-    Reflux.connect(LookupTableCachesStore),
+    Reflux.connect(LookupTableDataAdaptersStore),
   ],
-
-  getInitialState() {
-    return {};
-  },
 
   componentDidMount() {
     this.loadData();
   },
 
   loadData() {
-    LookupTableCachesActions.searchPaginated(this.state.pagination.page, this.state.pagination.per_page, this.state.pagination.query);
+    LookupTableDataAdaptersActions.searchPaginated(this.state.pagination.page, this.state.pagination.per_page, this.state.pagination.query);
   },
 
   _onPageChange(newPage, newPerPage) {
-    LookupTableCachesActions.searchPaginated(newPage, newPerPage, this.state.pagination.query);
+    LookupTableDataAdaptersActions.searchPaginated(newPage, newPerPage, this.state.pagination.query);
   },
 
   _onSearch() {
@@ -37,15 +33,15 @@ const CachesOverview = React.createClass({
   },
 
   render() {
-    const caches = this.state.caches.map((cache) => {
-      return (<CacheTableEntry key={cache.id} cache={cache} />);
+    const dataAdapters = this.state.dataAdapters.map((dataAdapter) => {
+      return (<DataAdapterTableEntry key={dataAdapter.id} adapter={dataAdapter} />);
     });
 
     return (<div>
       <Row className="content">
         <Col md={12}>
           <h2>
-            Configured lookup caches
+            Configured lookup dataAdapters
             <span>&nbsp;<small>{this.state.pagination.total} total</small></span>
           </h2>
           <PaginatedList onChange={this._onPageChange} totalItems={this.state.pagination.total}>
@@ -60,7 +56,7 @@ const CachesOverview = React.createClass({
                   <th>Hit rate</th>
                 </tr>
               </thead>
-              {caches}
+              {dataAdapters}
             </Table>
           </PaginatedList>
         </Col>
@@ -69,4 +65,4 @@ const CachesOverview = React.createClass({
   },
 });
 
-export default CachesOverview;
+export default DataAdaptersOverview;
