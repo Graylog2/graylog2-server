@@ -58,6 +58,10 @@ public class PaginatedList<E> extends ForwardingList<E> {
         return new PaginatedList<>(Collections.emptyList(), 0, page, perPage);
     }
 
+    public static <T> PaginatedList<T> singleton(T entry, int page, int perPage) {
+        return new PaginatedList<T>(Collections.singletonList(entry), 1, page, perPage);
+    }
+
     @JsonAutoDetect
     public class PaginationInfo {
         @JsonProperty("total")

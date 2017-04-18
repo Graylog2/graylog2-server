@@ -30,9 +30,11 @@ import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -147,6 +149,35 @@ public class LookupTableResource extends RestResource {
                 caches.build(),
                 dataAdapters.build());
     }
+
+    @GET
+    @Path("tables/{idOrName}")
+    @ApiOperation(value = "Retrieve the named lookup table")
+    public LookupTablePage get(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                               @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
+
+        Optional<LookupTableDto> lookupTableDto = lookupTableService.get(idOrName);
+        if (!lookupTableDto.isPresent()) {
+            throw new NotFoundException();
+        }
+        LookupTableDto tableDto = lookupTableDto.get();
+
+        Set<CacheApi> caches = Collections.emptySet();
+        Set<DataAdapterApi> adapters = Collections.emptySet();
+
+        if (resolveObjects) {
+            caches = cacheService.findByIds(Collections.singleton(tableDto.cacheId())).stream().map(CacheApi::fromDto).collect(Collectors.toSet());
+            adapters = adapterService.findByIds(Collections.singleton(tableDto.dataAdapterId())).stream().map(DataAdapterApi::fromDto).collect(Collectors.toSet());
+        }
+
+        final PaginatedList<LookupTableApi> result = PaginatedList.singleton(LookupTableApi.fromDto(tableDto), 1, 1);
+        return new LookupTablePage(null,
+                result.pagination(),
+                result,
+                caches,
+                adapters);
+    }
+
 
     @POST
     @Path("tables")

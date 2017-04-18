@@ -2,7 +2,6 @@ import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
-import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -58,6 +57,27 @@ const LookupTablesStore = Reflux.createStore({
     }, this._errorHandler('Fetching lookup tables failed', 'Could not retrieve the lookup tables'));
 
     LookupTablesActions.searchPaginated.promise(promise);
+  },
+
+  get(idOrName) {
+    const url = this._url(`tables/${idOrName}?resolve=true`);
+    const promise = fetch('GET', url);
+
+    promise.then((response) => {
+      this.pagination = {
+        count: response.count,
+        total: response.total,
+        page: response.page,
+        per_page: response.per_page,
+        query: response.query,
+      };
+      this.tables = response.lookup_tables;
+      this.caches = response.caches;
+      this.dataAdapters = response.data_adapters;
+      this.trigger({ tables: this.tables, pagination: this.pagination, caches: this.caches, dataAdapters: this.dataAdapters });
+    }, this._errorHandler(`Fetching lookup table ${idOrName} failed`, 'Could not retrieve lookup table'));
+
+    LookupTablesActions.get.promise(promise);
   },
 
   _errorHandler(message, title, cb) {

@@ -2,7 +2,6 @@ import React, { PropTypes } from 'react';
 
 import { DocumentTitle } from 'components/common';
 
-
 const LookupTablesPage = React.createClass({
   propTypes: {
     children: PropTypes.oneOfType([
