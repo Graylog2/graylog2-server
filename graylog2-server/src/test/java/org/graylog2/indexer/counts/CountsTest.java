@@ -67,6 +67,8 @@ public class CountsTest extends AbstractESTest {
 
     @Before
     public void setUp() throws Exception {
+        super.setUp();
+
         final Map<String, Object> settings = ImmutableMap.of(
                 "number_of_shards", 1,
                 "index.number_of_replicas", 0);
@@ -100,7 +102,7 @@ public class CountsTest extends AbstractESTest {
                 .get();
         assumeTrue(clusterHealthResponse2.getStatus() == ClusterHealthStatus.GREEN);
 
-        counts = new Counts(client(), indexSetRegistry);
+        counts = new Counts(jestClient(), indexSetRegistry);
 
         indexSetConfig1 = IndexSetConfig.builder()
                 .id("id-1")

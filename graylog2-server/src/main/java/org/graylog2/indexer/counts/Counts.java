@@ -16,22 +16,29 @@
  */
 package org.graylog2.indexer.counts;
 
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.client.Client;
+import io.searchbox.client.JestClient;
+import io.searchbox.core.Count;
+import io.searchbox.core.CountResult;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.IOException;
+import java.util.Arrays;
 
 @Singleton
 public class Counts {
-    private final Client c;
+    private static final Logger LOG = LoggerFactory.getLogger(Counts.class);
+
+    private final JestClient jestClient;
     private final IndexSetRegistry indexSetRegistry;
 
     @Inject
-    public Counts(Client client, IndexSetRegistry indexSetRegistry) {
-        this.c = client;
+    public Counts(JestClient jestClient, IndexSetRegistry indexSetRegistry) {
+        this.jestClient = jestClient;
         this.indexSetRegistry = indexSetRegistry;
     }
 
@@ -50,13 +57,22 @@ public class Counts {
             return 0L;
         }
 
+        final Count request = new Count.Builder()
+                .query("{\"query\":{\"match_all\":{}}}")
+                .addIndex(Arrays.asList(indexNames))
+                .build();
+        final CountResult result;
         try {
-            return c.prepareSearch(indexNames)
-                    .setSize(0)
-                    .get()
-                    .getHits()
-                    .getTotalHits();
-        } catch (ElasticsearchException e) {
+            result = jestClient.execute(request);
+        } catch (IOException e) {
+            LOG.error("Couldn't fetch message count", e);
+            return -1L;
+        }
+
+        if (result.isSucceeded()) {
+            return result.getCount().longValue();
+        } else {
+            LOG.error("Fetching message count failed: {}", result.getErrorMessage());
             return -1L;
         }
     }
