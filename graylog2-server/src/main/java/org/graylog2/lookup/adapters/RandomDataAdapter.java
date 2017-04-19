@@ -19,16 +19,18 @@ public class RandomDataAdapter extends LookupDataAdapter {
 
     public static final String NAME = "random";
     private final SecureRandom secureRandom;
+    private final Config config;
 
     @Inject
     public RandomDataAdapter(@Assisted LookupDataAdapterConfiguration config) {
         super(config);
+        this.config = (Config) config;
         secureRandom = new SecureRandom();
     }
 
     @Override
     public Object get(Object key) {
-        return secureRandom.nextInt();
+        return secureRandom.ints(config.lowerBound(), config.upperBound()).findAny().getAsInt();
     }
 
     @Override
@@ -51,7 +53,7 @@ public class RandomDataAdapter extends LookupDataAdapter {
 
         @Override
         public Config defaultConfiguration() {
-            return Config.builder().type(NAME).build();
+            return Config.builder().type(NAME).lowerBound(0).upperBound(Integer.MAX_VALUE).build();
         }
     }
 
@@ -66,6 +68,12 @@ public class RandomDataAdapter extends LookupDataAdapter {
         @JsonProperty(TYPE_FIELD)
         public abstract String type();
 
+        @JsonProperty("lower_bound")
+        public abstract int lowerBound();
+
+        @JsonProperty("upper_bound")
+        public abstract int upperBound();
+
         public static Builder builder() {
             return new AutoValue_RandomDataAdapter_Config.Builder();
         }
@@ -74,6 +82,12 @@ public class RandomDataAdapter extends LookupDataAdapter {
         public abstract static class Builder {
             @JsonProperty(TYPE_FIELD)
             public abstract Builder type(String type);
+
+            @JsonProperty("lower_bound")
+            public abstract Builder lowerBound(int lowerBound);
+
+            @JsonProperty("upper_bound")
+            public abstract Builder upperBound(int upperBound);
 
             public abstract Config build();
         }

@@ -108,7 +108,9 @@ const Routes = {
       },
       DATA_ADAPTERS: {
         OVERVIEW: '/system/lookuptables/data_adapters',
+        CREATE: '/system/lookuptables/data_adapters/create',
         show: adapterName => `/system/lookuptables/data_adapter/${adapterName}`,
+        edit: adapterName => `/system/lookuptables/data_adapter/${adapterName}/edit`,
       },
     },
   },

@@ -1,12 +1,11 @@
 import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
-import { Button } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
-
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
-import { DataAdaptersOverview, DataAdapter } from 'components/lookup-tables';
+import { DataAdaptersOverview, DataAdapter, DataAdapterForm } from 'components/lookup-tables';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -15,6 +14,7 @@ const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = Combine
 const LUTDataAdaptersPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
+    route: PropTypes.object.isRequired,
   },
 
   mixins: [
@@ -40,9 +40,21 @@ const LUTDataAdaptersPage = React.createClass({
   render() {
     let content;
     const showDetail = this.props.params && this.props.params.adapterName;
+    const isEditing = (this.props.route.path || '').endsWith('/edit');
     if (showDetail) {
       if (this.state.dataAdapters.length > 0) {
-        content = <DataAdapter dataAdapter={this.state.dataAdapters[0]} />;
+        if (isEditing) {
+          content = (
+            <Row className="content">
+              <Col lg={8}>
+                <h2>Data Adapter</h2>
+                <DataAdapterForm dataAdapter={this.state.dataAdapters[0]} save={() => {}} type={this.state.dataAdapters[0].config.type} />
+              </Col>
+            </Row>
+          );
+        } else {
+          content = <DataAdapter dataAdapter={this.state.dataAdapters[0]} />;
+        }
       } else {
         content = <Spinner text="Loading Lookup Table DataAdapter" />;
       }

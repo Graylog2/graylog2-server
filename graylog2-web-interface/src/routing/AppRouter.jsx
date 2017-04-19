@@ -116,6 +116,7 @@ const AppRouter = React.createClass({
               <Route path={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(':cacheName')} component={LUTCachesPage} />
               <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW} component={LUTDataAdaptersPage} />
               <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(':adapterName')} component={LUTDataAdaptersPage} />
+              <Route path={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(':adapterName')} component={LUTDataAdaptersPage} />
             </Route>
             <Route path={Routes.SYSTEM.LOGGING} component={LoggersPage} />
             <Route path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />
