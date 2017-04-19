@@ -17,13 +17,21 @@
 package org.graylog2.database.validators;
 
 import org.graylog2.plugin.database.validators.ValidationResult;
+import org.graylog2.plugin.database.validators.Validator;
 
-public class OptionalStringValidator extends FilledStringValidator {
+public class OptionalStringValidator implements Validator {
+    /**
+     * Validates: Object is null or of type String.
+     *
+     * @param value The object to check
+     * @return validation result
+     */
     @Override
     public ValidationResult validate(Object value) {
-        if (value == null) {
+        if (value == null || value instanceof String) {
             return new ValidationResult.ValidationPassed();
+        } else {
+            return new ValidationResult.ValidationFailed("Value \"" + value + "\" is not a valid string!");
         }
-        return super.validate(value);
     }
 }

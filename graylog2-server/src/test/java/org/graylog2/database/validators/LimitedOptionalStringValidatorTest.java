@@ -41,7 +41,7 @@ public class LimitedOptionalStringValidatorTest {
     @Test
     public void testValidateEmptyValue() {
         assertThat(new LimitedOptionalStringValidator(1).validate(""))
-                .isInstanceOf(ValidationResult.ValidationFailed.class);
+                .isInstanceOf(ValidationResult.ValidationPassed.class);
     }
 
     @Test
