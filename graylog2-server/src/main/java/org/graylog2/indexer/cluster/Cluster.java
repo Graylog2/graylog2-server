@@ -17,54 +17,55 @@
 package org.graylog2.indexer.cluster;
 
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.collect.ImmutableMap;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.cluster.node.info.NodeInfo;
-import org.elasticsearch.action.admin.cluster.node.info.NodesInfoRequest;
-import org.elasticsearch.action.admin.cluster.node.info.NodesInfoResponse;
-import org.elasticsearch.action.admin.cluster.node.stats.NodeStats;
-import org.elasticsearch.action.admin.cluster.node.stats.NodesStatsRequest;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.ClusterAdminClient;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
-import org.elasticsearch.cluster.node.DiscoveryNode;
+import com.google.common.primitives.Ints;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.cluster.Health;
+import io.searchbox.cluster.NodesInfo;
+import io.searchbox.core.Cat;
+import io.searchbox.core.CatResult;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.esplugin.ClusterStateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 
 @Singleton
 public class Cluster {
     private static final Logger LOG = LoggerFactory.getLogger(Cluster.class);
 
-    private final Client c;
+    private final JestClient jestClient;
     private final IndexSetRegistry indexSetRegistry;
     private final ScheduledExecutorService scheduler;
     private final Duration requestTimeout;
-    private final AtomicReference<Map<String, DiscoveryNode>> nodes = new AtomicReference<>();
+    private final AtomicReference<Map> nodes = new AtomicReference<>();
 
     @Inject
-    public Cluster(Client client,
+    public Cluster(JestClient jestClient,
                    IndexSetRegistry indexSetRegistry,
                    @Named("daemonScheduler") ScheduledExecutorService scheduler,
                    @Named("elasticsearch_request_timeout") Duration requestTimeout) {
         this.scheduler = scheduler;
-        this.c = client;
+        this.jestClient = jestClient;
         this.indexSetRegistry = indexSetRegistry;
         this.requestTimeout = requestTimeout;
         // unfortunately we can't use guice here, because elasticsearch and graylog2 use different injectors and we can't
@@ -72,14 +73,26 @@ public class Cluster {
         ClusterStateMonitor.setCluster(this);
     }
 
+    @Nullable
+    private JsonObject clusterHealth(Collection<? extends String> indices) {
+        final Health request = new Health.Builder()
+                .addIndex(indices)
+                .build();
+        try {
+            return jestClient.execute(request).getJsonObject();
+        } catch (IOException e) {
+            LOG.error("Couldn't read cluster health", e);
+            return null;
+        }
+    }
+
     /**
      * Requests the cluster health for all indices managed by Graylog. (default: graylog_*)
      *
      * @return the cluster health response
      */
-    public ClusterHealthResponse health() {
-        ClusterHealthRequest request = new ClusterHealthRequest(indexSetRegistry.getIndexWildcards());
-        return c.admin().cluster().health(request).actionGet();
+    public Optional<JsonObject> health() {
+        return Optional.ofNullable(clusterHealth(Arrays.asList(indexSetRegistry.getIndexWildcards())));
     }
 
     /**
@@ -90,63 +103,54 @@ public class Cluster {
      *
      * @return the cluster health response
      */
-    public ClusterHealthResponse deflectorHealth() {
-        ClusterHealthRequest request = new ClusterHealthRequest(indexSetRegistry.getWriteIndexAliases());
-        return c.admin().cluster().health(request).actionGet();
+    public Optional<JsonObject> deflectorHealth() {
+        return Optional.ofNullable(clusterHealth(Arrays.asList(indexSetRegistry.getWriteIndexAliases())));
     }
 
-    public Map<String, NodeInfo> getDataNodes() {
-        return getAllNodes().entrySet().stream()
-                .filter(n -> n.getValue().getSettings().getAsBoolean("node.data", true))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
-    public Map<String, NodeInfo> getAllNodes() {
-        final ClusterAdminClient clusterAdminClient = c.admin().cluster();
-        final NodesInfoRequest request = clusterAdminClient.prepareNodesInfo()
-                .all()
-                .request();
-
-        final ImmutableMap.Builder<String, NodeInfo> builder = ImmutableMap.builder();
-        for (NodeInfo nodeInfo : clusterAdminClient.nodesInfo(request).actionGet().getNodes()) {
-            builder.put(nodeInfo.getNode().id(), nodeInfo);
+    /**
+     * Retrieve the response for the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-nodes.html">cat nodes</a> request from Elasticsearch.
+     *
+     * @param fields The fields to show, see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-nodes.html">cat nodes API</a>.
+     * @return A {@link JsonArray} with the result of the cat nodes request.
+     */
+    public JsonArray catNodes(String fields) {
+        final Cat request = new Cat.NodesBuilder()
+                .setParameter("h", fields)
+                .setParameter("full_id", true)
+                .build();
+        final CatResult response;
+        try {
+            response = jestClient.execute(request);
+        } catch (IOException e) {
+            LOG.error("Unable to read Elasticsearch node file descriptors", e);
+            return new JsonArray();
         }
 
-        return builder.build();
-    }
-
-    public Map<String, NodeStats> getNodesStats(String... nodesIds) {
-        final ClusterAdminClient clusterAdminClient = c.admin().cluster();
-        final NodesStatsRequest request = clusterAdminClient.prepareNodesStats(nodesIds).request();
-        final ImmutableMap.Builder<String, NodeStats> builder = ImmutableMap.builder();
-        for (NodeStats nodeStats : clusterAdminClient.nodesStats(request).actionGet().getNodes()) {
-            builder.put(nodeStats.getNode().id(), nodeStats);
-        }
-
-        return builder.build();
+        return response.getJsonObject().getAsJsonArray("result");
     }
 
     public String nodeIdToName(String nodeId) {
-        final NodeInfo nodeInfo = getNodeInfo(nodeId);
-        return nodeInfo == null ? "UNKNOWN" : nodeInfo.getNode().getName();
+        final JsonObject nodeInfo = getNodeInfo(nodeId);
+        return nodeInfo == null ? "UNKNOWN" : nodeInfo.getAsJsonPrimitive("name").getAsString();
 
     }
 
     public String nodeIdToHostName(String nodeId) {
-        final NodeInfo nodeInfo = getNodeInfo(nodeId);
-        return nodeInfo == null ? "UNKNOWN" : nodeInfo.getHostname();
+        final JsonObject nodeInfo = getNodeInfo(nodeId);
+        return nodeInfo == null ? "UNKNOWN" : nodeInfo.getAsJsonPrimitive("host").getAsString();
     }
 
-    private NodeInfo getNodeInfo(String nodeId) {
+    @Nullable
+    private JsonObject getNodeInfo(String nodeId) {
         if (nodeId == null || nodeId.isEmpty()) {
             return null;
         }
 
         try {
-            NodesInfoResponse r = c.admin().cluster().nodesInfo(new NodesInfoRequest(nodeId).all()).actionGet();
-            return r.getNodesMap().get(nodeId);
-        } catch (Exception e) {
-            LOG.error("Could not read name of ES node.", e);
+            final JestResult result = jestClient.execute(new NodesInfo.Builder().addNode(nodeId).build());
+            return result.getJsonObject().getAsJsonObject("nodes").getAsJsonObject(nodeId);
+        } catch (IOException e) {
+            LOG.error("Couldn't read information of Elasticsearch node.", e);
             return null;
         }
     }
@@ -158,45 +162,55 @@ public class Cluster {
      * @return {@code true} if the Elasticsearch client is up and the cluster contains other nodes, {@code false} otherwise
      */
     public boolean isConnected() {
-        Map<String, DiscoveryNode> nodeMap = nodes.get();
-        return nodeMap != null && !nodeMap.isEmpty();
+        final Health request = new Health.Builder()
+                .local()
+                .timeout(Ints.saturatedCast(requestTimeout.toSeconds()))
+                .build();
+
+        try {
+            final JestResult result = jestClient.execute(request);
+            final Map nodeMap = nodes.get();
+            return result.isSucceeded() && nodeMap != null && !nodeMap.isEmpty();
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     /**
-     * Check if the cluster health status is not {@link ClusterHealthStatus#RED} and that the
+     * Check if the cluster health status is not {@literal RED} and that the
      * {@link IndexSetRegistry#isUp() deflector is up}.
      *
      * @return {@code true} if the the cluster is healthy and the deflector is up, {@code false} otherwise
      */
     public boolean isHealthy() {
-        try {
-            return health().getStatus() != ClusterHealthStatus.RED && indexSetRegistry.isUp();
-        } catch (ElasticsearchException e) {
-            LOG.trace("Couldn't determine Elasticsearch health properly", e);
-            return false;
-        }
+        return health()
+                .map(health -> health.get("status"))
+                .map(JsonElement::getAsString)
+                .map(status -> !status.equals("red"))
+                .map(healthy -> healthy && indexSetRegistry.isUp())
+                .orElse(false);
     }
 
     /**
-     * Check if the deflector (write index) health status is not {@link ClusterHealthStatus#RED} and that the
+     * Check if the deflector (write index) health status is not {@literal RED} and that the
      * {@link IndexSetRegistry#isUp() deflector is up}.
      *
      * @return {@code true} if the deflector is healthy and up, {@code false} otherwise
      */
     public boolean isDeflectorHealthy() {
-        try {
-            return deflectorHealth().getStatus() != ClusterHealthStatus.RED && indexSetRegistry.isUp();
-        } catch (ElasticsearchException e) {
-            LOG.trace("Couldn't determine deflector index health properly", e);
-            return false;
-        }
+        return deflectorHealth()
+                .map(health -> health.get("status"))
+                .map(JsonElement::getAsString)
+                .map(status -> !status.equals("red"))
+                .map(healthy -> healthy && indexSetRegistry.isUp())
+                .orElse(false);
     }
 
     /**
      * Blocks until the Elasticsearch cluster and current write index is healthy again or the given timeout fires.
      *
      * @param timeout the timeout value
-     * @param unit the timeout unit
+     * @param unit    the timeout unit
      * @throws InterruptedException
      * @throws TimeoutException
      */
@@ -232,7 +246,8 @@ public class Cluster {
         waitForConnectedAndDeflectorHealthy(requestTimeout.getQuantity(), requestTimeout.getUnit());
     }
 
-    public void updateDataNodeList(Map<String, DiscoveryNode> nodes) {
+    @Deprecated
+    public void updateDataNodeList(Map nodes) {
         LOG.debug("{} data nodes in cluster", nodes.size());
         this.nodes.set(nodes);
     }
