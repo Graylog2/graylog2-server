@@ -17,80 +17,116 @@
 package org.graylog2.system.stats.elasticsearch;
 
 import com.google.common.collect.Lists;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.inject.Singleton;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.cluster.stats.ClusterStatsNodes;
-import org.elasticsearch.action.admin.cluster.stats.ClusterStatsRequest;
-import org.elasticsearch.action.admin.cluster.stats.ClusterStatsResponse;
-import org.elasticsearch.action.admin.cluster.tasks.PendingClusterTasksRequest;
-import org.elasticsearch.action.admin.cluster.tasks.PendingClusterTasksResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.ClusterAdminClient;
-import org.elasticsearch.cluster.service.PendingClusterTask;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.cluster.Health;
+import io.searchbox.cluster.PendingClusterTasks;
+import io.searchbox.cluster.Stats;
 import org.graylog2.indexer.IndexSetRegistry;
 
 import javax.inject.Inject;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 @Singleton
 public class ElasticsearchProbe {
-    private final Client client;
+    private final JestClient jestClient;
     private final IndexSetRegistry indexSetRegistry;
 
     @Inject
-    public ElasticsearchProbe(Client client, IndexSetRegistry indexSetRegistry) {
-        this.client = client;
+    public ElasticsearchProbe(JestClient jestClient, IndexSetRegistry indexSetRegistry) {
+        this.jestClient = jestClient;
         this.indexSetRegistry = indexSetRegistry;
     }
 
     public ElasticsearchStats elasticsearchStats() {
-        final ClusterAdminClient adminClient = client.admin().cluster();
-
-        final ClusterStatsResponse clusterStatsResponse = adminClient.clusterStats(new ClusterStatsRequest()).actionGet();
-        final String clusterName = clusterStatsResponse.getClusterNameAsString();
-
-        final ClusterStatsNodes clusterNodesStats = clusterStatsResponse.getNodesStats();
-        final NodesStats nodesStats = NodesStats.create(
-                clusterNodesStats.getCounts().getTotal(),
-                clusterNodesStats.getCounts().getMasterOnly(),
-                clusterNodesStats.getCounts().getDataOnly(),
-                clusterNodesStats.getCounts().getMasterData(),
-                clusterNodesStats.getCounts().getClient()
-        );
-
-        final IndicesStats indicesStats = IndicesStats.create(
-                clusterStatsResponse.getIndicesStats().getIndexCount(),
-                clusterStatsResponse.getIndicesStats().getStore().sizeInBytes(),
-                clusterStatsResponse.getIndicesStats().getFieldData().getMemorySizeInBytes()
-        );
-
-        final PendingClusterTasksResponse pendingClusterTasksResponse = adminClient.pendingClusterTasks(new PendingClusterTasksRequest()).actionGet();
-        final int pendingTasksSize = pendingClusterTasksResponse.pendingTasks().size();
-        final List<Long> pendingTasksTimeInQueue = Lists.newArrayListWithCapacity(pendingTasksSize);
-        for (PendingClusterTask pendingClusterTask : pendingClusterTasksResponse) {
-            pendingTasksTimeInQueue.add(pendingClusterTask.getTimeInQueueInMillis());
+        final JestResult clusterStatsResponse;
+        try {
+            clusterStatsResponse = jestClient.execute(new Stats.Builder().build());
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
 
-        final ClusterHealthResponse clusterHealthResponse = adminClient.health(new ClusterHealthRequest(indexSetRegistry.getIndexWildcards())).actionGet();
+        final JsonObject json = clusterStatsResponse.getJsonObject();
+        final String clusterName = json.get("cluster_name").getAsString();
+
+        final JsonObject clusterNodesStats = json.getAsJsonObject("nodes");
+        final JsonObject countStats = clusterNodesStats.getAsJsonObject("count");
+        final NodesStats nodesStats = NodesStats.create(
+                countStats.get("total").getAsInt(),
+                countStats.get("master_only").getAsInt(),
+                countStats.get("data_only").getAsInt(),
+                countStats.get("master_data").getAsInt(),
+                countStats.get("client").getAsInt()
+        );
+
+        final JsonObject clusterIndicesStats = json.getAsJsonObject("indices");
+        final IndicesStats indicesStats = IndicesStats.create(
+                clusterIndicesStats.get("count").getAsInt(),
+                clusterIndicesStats.getAsJsonObject("store").get("size_in_bytes").getAsLong(),
+                clusterIndicesStats.getAsJsonObject("fielddata").get("memory_size_in_bytes").getAsLong()
+        );
+
+        final JestResult pendingClusterTasksResponse;
+        try {
+            pendingClusterTasksResponse = jestClient.execute(new PendingClusterTasks.Builder().build()
+            );
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        final JsonArray pendingClusterTasks = pendingClusterTasksResponse.getJsonObject().getAsJsonArray("tasks");
+        final int pendingTasksSize = pendingClusterTasks.size();
+        final List<Long> pendingTasksTimeInQueue = Lists.newArrayListWithCapacity(pendingTasksSize);
+        for (JsonElement jsonElement : pendingClusterTasks) {
+            if (jsonElement.isJsonObject()) {
+                final JsonObject pendingClusterTask = jsonElement.getAsJsonObject();
+                pendingTasksTimeInQueue.add(pendingClusterTask.get("time_in_queue_millis").getAsLong());
+            }
+        }
+
+        final Health clusterHealthRequest = new Health.Builder()
+                .addIndex(Arrays.asList(indexSetRegistry.getIndexWildcards()))
+                .build();
+        final JestResult clusterHealthResponse;
+        try {
+            clusterHealthResponse = jestClient.execute(clusterHealthRequest);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+
+        final JsonObject clusterHealthJson = clusterHealthResponse.getJsonObject();
         final ClusterHealth clusterHealth = ClusterHealth.create(
-                clusterHealthResponse.getNumberOfNodes(),
-                clusterHealthResponse.getNumberOfDataNodes(),
-                clusterHealthResponse.getActiveShards(),
-                clusterHealthResponse.getRelocatingShards(),
-                clusterHealthResponse.getActivePrimaryShards(),
-                clusterHealthResponse.getInitializingShards(),
-                clusterHealthResponse.getUnassignedShards(),
-                clusterHealthResponse.isTimedOut(),
+                clusterHealthJson.get("number_of_nodes").getAsInt(),
+                clusterHealthJson.get("number_of_data_nodes").getAsInt(),
+                clusterHealthJson.get("active_shards").getAsInt(),
+                clusterHealthJson.get("relocating_shards").getAsInt(),
+                clusterHealthJson.get("active_primary_shards").getAsInt(),
+                clusterHealthJson.get("initializing_shards").getAsInt(),
+                clusterHealthJson.get("unassigned_shards").getAsInt(),
+                clusterHealthJson.get("timed_out").getAsBoolean(),
                 pendingTasksSize,
                 pendingTasksTimeInQueue
         );
 
+        final ElasticsearchStats.HealthStatus healthStatus = getHealthStatus(clusterHealthJson.get("status").getAsString());
+
         return ElasticsearchStats.create(
                 clusterName,
-                clusterHealthResponse.getStatus(),
+                healthStatus,
                 clusterHealth,
                 nodesStats,
                 indicesStats);
+    }
+
+    private ElasticsearchStats.HealthStatus getHealthStatus(String status) {
+        return ElasticsearchStats.HealthStatus.valueOf(status.toUpperCase(Locale.ENGLISH));
     }
 }
