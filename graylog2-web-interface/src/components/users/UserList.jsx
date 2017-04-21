@@ -127,7 +127,7 @@ const UserList = React.createClass({
 
       const editAction = (
         <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(user.username))}>
-          <Button bsStyle="info" bsSize="xs" title={`Edit user ${user.username}`}>
+          <Button id={`edit-user-${user.username}`} bsStyle="info" bsSize="xs" title={`Edit user ${user.username}`}>
             Edit
           </Button>
         </LinkContainer>
