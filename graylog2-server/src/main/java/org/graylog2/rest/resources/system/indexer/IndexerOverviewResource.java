@@ -17,14 +17,16 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.elasticsearch.action.admin.indices.stats.IndexStats;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.gson.GsonUtils;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
@@ -48,7 +50,11 @@ import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.core.MediaType;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
+import static org.graylog2.indexer.gson.GsonUtils.asLong;
 
 @RequiresAuthentication
 @Api(value = "Indexer/Overview", description = "Indexing overview")
@@ -116,27 +122,15 @@ public class IndexerOverviewResource extends RestResource {
 
         final DeflectorSummary deflectorSummary = deflectorResource.deflector(indexSetId);
         final List<IndexRangeSummary> indexRanges = indexRangesResource.list().ranges();
-        final Map<String, IndexStats> allDocCounts = indices.getAllDocCounts(indexSet).entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-        final Map<String, Boolean> areReopened = indices.areReopened(allDocCounts.keySet());
-        final Map<String, IndexSummary> indicesSummaries = allDocCounts.values()
-                .stream()
-                .parallel()
-                .collect(Collectors.toMap(IndexStats::getIndex,
-                        (indexStats) -> IndexSummary.create(
-                                IndexSizeSummary.create(indexStats.getPrimaries().getDocs().getCount(),
-                                        indexStats.getPrimaries().getDocs().getDeleted(),
-                                        indexStats.getPrimaries().getStore().sizeInBytes()),
-                                indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexStats.getIndex())).findFirst().orElse(null),
-                                deflectorSummary.currentTarget() != null && deflectorSummary.currentTarget().equals(indexStats.getIndex()),
-                                false,
-                                areReopened.get(indexStats.getIndex()))
-                ));
+        final Map<String, JsonElement> indexStats = indices.getIndexStats(indexSet);
+        final Map<String, Boolean> areReopened = indices.areReopened(indexStats.keySet());
+        final Map<String, IndexSummary> indicesSummaries = indexStats.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, x -> buildIndexSummary(x, indexRanges, deflectorSummary,areReopened)));
 
         indices.getClosedIndices(indexSet).forEach(indexName -> indicesSummaries.put(indexName, IndexSummary.create(
                 null,
                 indexRanges.stream().filter((indexRangeSummary) -> indexRangeSummary.indexName().equals(indexName)).findFirst().orElse(null),
-                deflectorSummary.currentTarget() != null && deflectorSummary.currentTarget().equals(indexName),
+                indexName.equals(deflectorSummary.currentTarget()),
                 true,
                 false
         )));
@@ -144,6 +138,34 @@ public class IndexerOverviewResource extends RestResource {
         return IndexerOverview.create(deflectorSummary,
                 IndexerClusterOverview.create(indexerClusterResource.clusterHealth(), indexerClusterResource.clusterName().name()),
                 countResource.total(indexSetId),indicesSummaries);
+    }
+
+    private IndexSummary buildIndexSummary(Map.Entry<String, JsonElement> indexStats,
+                                           List<IndexRangeSummary> indexRanges,
+                                           DeflectorSummary deflectorSummary,
+                                           Map<String, Boolean> areReopened) {
+        final String index = indexStats.getKey();
+        final Optional<JsonObject> primaries = Optional.of(indexStats.getValue())
+                .map(GsonUtils::asJsonObject)
+                .map(json -> asJsonObject(json.get("primaries")));
+        final Optional<JsonObject> docs = primaries.map(json -> asJsonObject(json.get("docs")));
+        final long count = docs.map(json -> asLong(json.get("count"))).orElse(0L);
+        final long deleted = docs.map(json -> asLong(json.get("deleted"))).orElse(0L);
+        final Optional<JsonObject> store = primaries.map(json -> asJsonObject(json.get("store")));
+        final long sizeInBytes = store.map(json -> asLong(json.get("size_in_bytes"))).orElse(0L);
+
+        final Optional<IndexRangeSummary> range = indexRanges.stream()
+                .filter(indexRangeSummary -> indexRangeSummary.indexName().equals(index))
+                .findFirst();
+        final boolean isDeflector = index.equals(deflectorSummary.currentTarget());
+        final boolean isReopened = areReopened.get(index);
+
+        return IndexSummary.create(
+                IndexSizeSummary.create(count, deleted, sizeInBytes),
+                range.orElse(null),
+                isDeflector,
+                false,
+                isReopened);
     }
 
 }

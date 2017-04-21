@@ -17,27 +17,124 @@
 package org.graylog2.indexer.indices;
 
 import com.google.auto.value.AutoValue;
-import org.elasticsearch.action.admin.indices.stats.CommonStats;
-import org.elasticsearch.cluster.routing.ShardRouting;
-import org.graylog.autovalue.WithBeanGetter;
+import com.google.common.collect.ImmutableList;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
+import org.graylog2.rest.models.system.indexer.responses.IndexStats;
+import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+
+import static com.google.common.base.MoreObjects.firstNonNull;
+import static org.graylog2.indexer.gson.GsonUtils.asBoolean;
+import static org.graylog2.indexer.gson.GsonUtils.asJsonArray;
+import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
+import static org.graylog2.indexer.gson.GsonUtils.asLong;
+import static org.graylog2.indexer.gson.GsonUtils.asString;
 
 @AutoValue
-@WithBeanGetter
 public abstract class IndexStatistics {
     public abstract String indexName();
 
-    public abstract CommonStats primaries();
+    public abstract JsonObject primaries();
 
-    public abstract CommonStats total();
+    public abstract JsonObject total();
 
-    public abstract List<ShardRouting> shardRoutings();
+    public abstract JsonObject shardRoutings();
 
     public static IndexStatistics create(String indexName,
-                                         CommonStats primaries,
-                                         CommonStats total,
-                                         List<ShardRouting> shardRoutings) {
+                                         JsonObject primaries,
+                                         JsonObject total,
+                                         JsonObject shardRoutings) {
         return new AutoValue_IndexStatistics(indexName, primaries, total, shardRoutings);
+    }
+
+    public IndexInfo toIndexInfo(boolean isReopened) {
+        return IndexInfo.create(buildIndexStats(primaries()), buildIndexStats(total()), buildShardRoutings(shardRoutings()), isReopened);
+    }
+
+    private IndexStats buildIndexStats(final JsonObject stats) {
+        final Optional<JsonObject> flush = Optional.of(stats).map(json -> asJsonObject(json.get("flush")));
+        final long flushTotal = flush.map(json -> asLong(json.get("total"))).orElse(0L);
+        final long flushTotalTimeSeconds = flush.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+
+        final Optional<JsonObject> get = Optional.of(stats).map(json -> asJsonObject(json.get("get")));
+        final long getTotal = get.map(json -> asLong(json.get("total"))).orElse(0L);
+        final long getTotalTimeSeconds = get.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+
+        final Optional<JsonObject> indexing = Optional.of(stats).map(json -> asJsonObject(json.get("indexing")));
+        final long indexingTotal = indexing.map(json -> asLong(json.get("total"))).orElse(0L);
+        final long indexingTotalTimeSeconds = indexing.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+
+        final Optional<JsonObject> merge = Optional.of(stats).map(json -> asJsonObject(json.get("merge")));
+        final long mergeTotal = merge.map(json -> asLong(json.get("total"))).orElse(0L);
+        final long mergeTotalTimeSeconds = merge.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+
+        final Optional<JsonObject> refresh = Optional.of(stats).map(json -> asJsonObject(json.get("refresh")));
+        final long refreshTotal = refresh.map(json -> asLong(json.get("total"))).orElse(0L);
+        final long refreshTotalTimeSeconds = refresh.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+
+        final Optional<JsonObject> search = Optional.of(stats).map(json -> asJsonObject(json.get("search")));
+        final long searchQueryTotal = search.map(json -> asLong(json.get("query_total"))).orElse(0L);
+        final long searchQueryTotalTimeSeconds = search.map(json -> asLong(json.get("query_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+        final long searchFetchTotal = search.map(json -> asLong(json.get("fetch_total"))).orElse(0L);
+        final long searchFetchTotalTimeSeconds = search.map(json -> asLong(json.get("fetch_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+        final long searchOpenContexts = search.map(json -> asLong(json.get("open_contexts"))).orElse(0L);
+
+        final long storeSizeInBytes = Optional.of(stats)
+                .map(json -> asJsonObject(json.get("store")))
+                .map(json -> asLong(json.get("size_in_bytes")))
+                .orElse(0L);
+
+        final long segmentsCount = Optional.of(stats)
+                .map(json -> asJsonObject(json.get("segments")))
+                .map(json -> asLong(json.get("count")))
+                .orElse(0L);
+
+        final Optional<JsonObject> docs = Optional.of(stats).map(json -> asJsonObject(json.get("docs")));
+        final long docsCount = docs.map(json -> asLong(json.get("count"))).orElse(0L);
+        final long docsDeleted = docs.map(json -> asLong(json.get("deleted"))).orElse(0L);
+
+        return IndexStats.create(
+                IndexStats.TimeAndTotalStats.create(flushTotal, flushTotalTimeSeconds),
+                IndexStats.TimeAndTotalStats.create(getTotal, getTotalTimeSeconds),
+                IndexStats.TimeAndTotalStats.create(indexingTotal, indexingTotalTimeSeconds),
+                IndexStats.TimeAndTotalStats.create(mergeTotal, mergeTotalTimeSeconds),
+                IndexStats.TimeAndTotalStats.create(refreshTotal, refreshTotalTimeSeconds),
+                IndexStats.TimeAndTotalStats.create(searchQueryTotal, searchQueryTotalTimeSeconds),
+                IndexStats.TimeAndTotalStats.create(searchFetchTotal, searchFetchTotalTimeSeconds),
+                searchOpenContexts,
+                storeSizeInBytes,
+                segmentsCount,
+                IndexStats.DocsStats.create(docsCount, docsDeleted)
+        );
+    }
+
+    private List<ShardRouting> buildShardRoutings(JsonObject shardRoutings) {
+        final ImmutableList.Builder<ShardRouting> shardRoutingsBuilder = ImmutableList.builder();
+        for(Map.Entry<String, JsonElement> entry : shardRoutings.entrySet()) {
+            final int shardId = Integer.parseInt(entry.getKey());
+            final JsonArray shards = firstNonNull(asJsonArray(entry.getValue()), new JsonArray());
+
+            for(JsonElement jsonElement : shards) {
+                final Optional<JsonObject> routing = Optional.ofNullable(asJsonObject(jsonElement))
+                        .map(json -> asJsonObject(json.get("routing")));
+                final String state = routing.map(json -> asString(json.get("state"))).orElse("UNKNOWN");
+                final boolean primary = routing.map(json -> asBoolean(json.get("primary"))).orElse(false);
+                final String nodeId = routing.map(json -> asString(json.get("node"))).orElse("UNKNOWN");
+                final String relocatingNode = routing.map(json -> asString(json.get("relocating_node"))).orElse(null);
+
+                // TODO: Where to get active, nodeName, and nodeHostname?
+                final ShardRouting shardRouting = ShardRouting.create(shardId, state, true, primary, nodeId, null, null, relocatingNode);
+                shardRoutingsBuilder.add(shardRouting);
+            }
+
+
+        }
+        return shardRoutingsBuilder.build();
     }
 }

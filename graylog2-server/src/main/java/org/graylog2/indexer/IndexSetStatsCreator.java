@@ -16,13 +16,14 @@
  */
 package org.graylog2.indexer;
 
-import org.elasticsearch.action.admin.indices.stats.IndexStats;
+import com.google.gson.JsonObject;
+import org.graylog2.indexer.gson.GsonUtils;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 
 import javax.inject.Inject;
-import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class IndexSetStatsCreator {
     private final Indices indices;
@@ -33,17 +34,19 @@ public class IndexSetStatsCreator {
     }
 
     public IndexSetStats getForIndexSet(final IndexSet indexSet) {
-        final Map<String, IndexStats> docCounts = indices.getAllDocCounts(indexSet);
+        final Stream<JsonObject> primaries = indices.getIndexStats(indexSet).values().stream()
+                .map(GsonUtils::asJsonObject)
+                .map(json -> GsonUtils.asJsonObject(json.get("primaries")));
         final Set<String> closedIndices = indices.getClosedIndices(indexSet);
-        final long documents = docCounts.values()
-                .stream()
-                .mapToLong(indexStats -> indexStats.getPrimaries().getDocs().getCount())
-                .sum();
-        final long size = docCounts.values()
-                .stream()
-                .mapToLong(indexStats -> indexStats.getPrimaries().getStore().sizeInBytes())
-                .sum();
+        final long documents = primaries
+                .map(json -> GsonUtils.asJsonObject(json.get("docs")))
+                .map(json -> GsonUtils.asLong(json.get("count")))
+                .reduce(0L, Long::sum);
+        final long size = primaries
+                .map(json -> GsonUtils.asJsonObject(json.get("store")))
+                .map(json -> GsonUtils.asLong(json.get("size_in_bytes")))
+                .reduce(0L, Long::sum);
 
-        return IndexSetStats.create(docCounts.size() + closedIndices.size(), documents, size);
+        return IndexSetStats.create(primaries.count() + closedIndices.size(), documents, size);
     }
 }

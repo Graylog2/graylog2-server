@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -98,20 +97,9 @@ public class IndicesResource extends RestResource {
             throw new NotFoundException(msg);
         }
 
-        final IndexStatistics stats = indices.getIndexStats(index);
-        if (stats == null) {
-            final String msg = "Index [" + index + "] not found.";
-            LOG.error(msg);
-            throw new NotFoundException(msg);
-        }
-
-        final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
-        for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : stats.shardRoutings()) {
-            routing.add(shardRouting(shardRouting));
-        }
-
-        return IndexInfo.create(indexStats(stats.primaries()), indexStats(stats.total()),
-            routing.build(), indices.isReopened(index));
+        return indices.getIndexStats(index)
+                .orElseThrow(() -> new NotFoundException("Index [" + index + "] not found."))
+                .toIndexInfo(indices.isReopened(index));
     }
 
     @POST
@@ -340,17 +328,7 @@ public class IndicesResource extends RestResource {
         final Map<String, IndexInfo> indexInfos = new HashMap<>();
         final Map<String, Boolean> areReopened = indices.areReopened(indicesStats.stream().map(IndexStatistics::indexName).collect(Collectors.toSet()));
         for (IndexStatistics indexStatistics : indicesStats) {
-            final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
-            for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : indexStatistics.shardRoutings()) {
-                routing.add(shardRouting(shardRouting));
-            }
-
-            final IndexInfo indexInfo = IndexInfo.create(
-                    indexStats(indexStatistics.primaries()),
-                    indexStats(indexStatistics.total()),
-                    routing.build(),
-                    areReopened.get(indexStatistics.indexName()));
-
+            final IndexInfo indexInfo = indexStatistics.toIndexInfo(areReopened.get(indexStatistics.indexName()));
             indexInfos.put(indexStatistics.indexName(), indexInfo);
         }
 

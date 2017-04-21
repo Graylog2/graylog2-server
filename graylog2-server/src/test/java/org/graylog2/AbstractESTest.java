@@ -54,7 +54,6 @@ public abstract class AbstractESTest {
 
     @Before
     public void setUp() throws Exception {
-        elasticsearchRule.getDatabaseOperation().deleteAll();
         this.jestClient = jestClientRule.getJestClient();
     }
 
