@@ -16,20 +16,17 @@
  */
 package org.graylog2.lookup.caches;
 
-import com.google.auto.value.AutoValue;
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
+import com.google.auto.value.AutoValue;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
-
-import javax.annotation.Nullable;
+import org.graylog2.plugin.lookup.LookupResult;
 
 /**
  * The cache that doesn't. Used in place when no cache is wanted, having a null implementation saves us ugly null checks.
@@ -43,9 +40,8 @@ public class NullCache extends LookupCache {
         super(c);
     }
 
-    @Nullable
     @Override
-    public Object get(Object key) {
+    public LookupResult get(Object key) {
         return getDataAdapter().get(key);
     }
 
