@@ -18,6 +18,7 @@ const DataAdapterCreate = React.createClass({
   getInitialState() {
     return {
       dataAdapter: undefined,
+      type: undefined,
     };
   },
 
@@ -76,7 +77,6 @@ const DataAdapterCreate = React.createClass({
     </div>);
   },
 });
-
 
 
 export default DataAdapterCreate;

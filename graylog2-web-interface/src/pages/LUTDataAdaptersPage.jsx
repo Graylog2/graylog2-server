@@ -67,8 +67,8 @@ const LUTDataAdaptersPage = React.createClass({
           <Row className="content">
             <Col lg={8}>
               <h2>Data Adapter</h2>
-              <DataAdapterForm dataAdapter={this.state.dataAdapters[0]}
-                               type={this.state.dataAdapters[0].config.type}
+              <DataAdapterForm dataAdapter={this.state.dataAdapter}
+                               type={this.state.dataAdapter.config.type}
                                create={false}
                                saved={this._saved} />
             </Col>

@@ -81,7 +81,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
       this.trigger({ dataAdapter: response });
     });
 
-    LookupTableDataAdaptersActions.create.promise(promise);
+    LookupTableDataAdaptersActions.update.promise(promise);
   },
 
   getTypes() {
