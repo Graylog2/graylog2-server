@@ -5,7 +5,6 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -16,16 +15,15 @@ import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Singleton;
 
 @Singleton
 public class LookupTableService {
@@ -100,6 +98,9 @@ public class LookupTableService {
             }
             LookupDataAdapter dataAdapter = adapterFactory.create(adapterDto.config());
 
+            // The cache needs access to the data adapter
+            cache.setDataAdapter(dataAdapter);
+
             // finally put the table together
             LookupTable lookupTable = LookupTable.builder()
                     .id(dto.id())
@@ -161,6 +162,9 @@ public class LookupTableService {
         } else {
             dataAdapter = adapterFactory.create(adapterDto.config());
         }
+
+        // The cache needs access to the data adapter
+        cache.setDataAdapter(dataAdapter);
 
         // finally put the table together
         LookupTable lookupTable = LookupTable.builder()

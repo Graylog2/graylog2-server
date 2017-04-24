@@ -1,24 +1,30 @@
 package org.graylog2.lookup.caches;
 
-import com.google.auto.value.AutoValue;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
+import com.google.auto.value.AutoValue;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import java.util.concurrent.ExecutionException;
 
 public class GuavaLookupCache extends LookupCache {
+    private static final Logger LOG = LoggerFactory.getLogger(GuavaLookupCache.class);
 
     public static final String NAME = "guava_cache";
-    private final Cache<Object, Object> cache;
+    private final LoadingCache<Object, Object> cache;
 
     @Inject
     public GuavaLookupCache(@Assisted LookupCacheConfiguration c) {
@@ -27,17 +33,29 @@ public class GuavaLookupCache extends LookupCache {
         cache = CacheBuilder.newBuilder()
                 .maximumSize(config.maxSize())
                 .recordStats()
-                .build();
+                .build(new CacheLoader<Object, Object>() {
+                    @Override
+                    public Object load(@Nonnull Object key) throws Exception {
+                        return getDataAdapter().get(key);
+                    }
+                });
     }
 
+    @Nullable
     @Override
     public Object get(Object key) {
-        return cache.getIfPresent(key);
+        try {
+            return cache.get(key);
+        } catch (ExecutionException e) {
+            LOG.error("Loading cache value from data adapter failed", e);
+            return null;
+        }
     }
 
     @Override
     public void set(Object key, Object retrievedValue) {
         cache.put(key, retrievedValue);
+        getDataAdapter().set(key, retrievedValue);
     }
 
     @Override

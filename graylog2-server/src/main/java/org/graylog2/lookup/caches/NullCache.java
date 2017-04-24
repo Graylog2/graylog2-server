@@ -13,6 +13,8 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 
+import javax.annotation.Nullable;
+
 /**
  * The cache that doesn't. Used in place when no cache is wanted, having a null implementation saves us ugly null checks.
  */
@@ -25,13 +27,15 @@ public class NullCache extends LookupCache {
         super(c);
     }
 
+    @Nullable
     @Override
     public Object get(Object key) {
-        return null;
+        return getDataAdapter().get(key);
     }
 
     @Override
     public void set(Object key, Object retrievedValue) {
+        getDataAdapter().set(key, retrievedValue);
     }
 
     @Override

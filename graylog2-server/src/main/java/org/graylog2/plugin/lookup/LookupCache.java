@@ -1,16 +1,18 @@
 package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.graylog2.lookup.LookupTable;
 
 import javax.annotation.Nullable;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public abstract class LookupCache {
 
     private String id;
 
     private LookupTable lookupTable;
+    private LookupDataAdapter dataAdapter;
 
     private final LookupCacheConfiguration config;
 
@@ -27,8 +29,8 @@ public abstract class LookupCache {
         this.id = id;
     }
 
-    @Nullable
     public LookupTable getLookupTable() {
+        checkState(lookupTable != null, "lookup table cannot be null");
         return lookupTable;
     }
 
@@ -36,6 +38,16 @@ public abstract class LookupCache {
         this.lookupTable = lookupTable;
     }
 
+    public LookupDataAdapter getDataAdapter() {
+        checkState(lookupTable != null, "lookup table cannot be null");
+        return dataAdapter;
+    }
+
+    public void setDataAdapter(LookupDataAdapter dataAdapter) {
+        this.dataAdapter = dataAdapter;
+    }
+
+    @Nullable
     public abstract Object get(Object key);
 
     public abstract void set(Object key, Object retrievedValue);
