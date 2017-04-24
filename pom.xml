@@ -154,7 +154,7 @@
         <fongo.version>2.0.12</fongo.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.12</junit.version>
-        <mockito.version>2.7.20</mockito.version>
+        <mockito.version>2.7.22</mockito.version>
         <nosqlunit.version>0.10.0</nosqlunit.version>
         <restassured.version>2.9.0</restassured.version>
         <system-rules.version>1.16.1</system-rules.version>
