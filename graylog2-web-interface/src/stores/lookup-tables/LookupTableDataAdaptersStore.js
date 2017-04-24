@@ -12,7 +12,6 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
   listenables: [LookupTableDataAdaptersActions],
 
   init() {
-    this.dataAdapters = [];
     this.pagination = {
       page: 1,
       per_page: 10,
@@ -24,7 +23,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
 
   getInitialState() {
     return {
-      dataAdapters: this.dataAdapters,
+      dataAdapters: undefined,
       pagination: this.pagination,
     };
   },
@@ -46,8 +45,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
         per_page: response.per_page,
         query: response.query,
       };
-      this.dataAdapters = response.data_adapters;
-      this.trigger({ pagination: this.pagination, dataAdapters: this.dataAdapters });
+      this.trigger({ pagination: this.pagination, dataAdapters: response.data_adapters });
     }, this._errorHandler('Fetching lookup table data adapters failed', 'Could not retrieve the lookup dataAdapters'));
 
     LookupTableDataAdaptersActions.searchPaginated.promise(promise);
@@ -58,8 +56,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then((response) => {
-      this.dataAdapters = [response];
-      this.trigger({ dataAdapters: this.dataAdapters });
+      this.trigger({ dataAdapter: response });
     }, this._errorHandler(`Fetching lookup table data adapter ${idOrName} failed`, 'Could not retrieve lookup table data adapter'));
 
     LookupTableDataAdaptersActions.get.promise(promise);
@@ -70,8 +67,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('POST', url, dataAdapter);
 
     promise.then((response) => {
-      this.dataAdapters.push(response);
-      this.trigger({ dataAdapters: this.dataAdapters });
+      this.trigger({ dataAdapter: response });
     });
 
     LookupTableDataAdaptersActions.create.promise(promise);
@@ -82,12 +78,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('PUT', url, dataAdapter);
 
     promise.then((response) => {
-      this.dataAdapters = this.dataAdapters.push(response);
-      const index = this.dataAdapters.findIndex(e => e.id === response.id);
-      if (index !== -1) {
-        this.dataAdapters[index] = response;
-      }
-      this.trigger({ dataAdapters: this.dataAdapters });
+      this.trigger({ dataAdapter: response });
     });
 
     LookupTableDataAdaptersActions.create.promise(promise);
@@ -98,8 +89,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then((response) => {
-      this.types = response;
-      this.trigger({ types: this.types });
+      this.trigger({ types: response });
     });
 
     LookupTableDataAdaptersActions.getTypes.promise(promise);
@@ -111,6 +101,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
 
     LookupTableDataAdaptersActions.delete.promise(promise);
   },
+
   _errorHandler(message, title, cb) {
     return (error) => {
       let errorMessage;

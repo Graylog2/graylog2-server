@@ -1,54 +1,64 @@
-import React from 'react';
-import Reflux from 'reflux';
+import React, { PropTypes } from 'react';
 import { Button, Row, Col, Table } from 'react-bootstrap';
 import Routes from 'routing/Routes';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { PaginatedList, SearchForm } from 'components/common';
+import { PaginatedList, SearchForm, Spinner } from 'components/common';
 
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 
 import Styles from './DataAdaptersOverview.css';
 
-const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
+const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
 const DataAdaptersOverview = React.createClass({
 
-  mixins: [
-    Reflux.connect(LookupTableDataAdaptersStore),
-  ],
-
-  componentDidMount() {
-    this.loadData();
+  propTypes: {
+    dataAdapters: PropTypes.array.isRequired,
+    pagination: PropTypes.object.isRequired,
   },
 
-  loadData() {
-    LookupTableDataAdaptersActions.searchPaginated(this.state.pagination.page, this.state.pagination.per_page, this.state.pagination.query);
+  componentDidMount() {
+    this._loadPage();
+  },
+
+  _loadPage() {
+    LookupTableDataAdaptersActions.searchPaginated(this.props.pagination.page,
+      this.props.pagination.per_page, this.props.pagination.query);
   },
 
   _onPageChange(newPage, newPerPage) {
-    LookupTableDataAdaptersActions.searchPaginated(newPage, newPerPage, this.state.pagination.query);
+    LookupTableDataAdaptersActions.searchPaginated(newPage, newPerPage,
+      this.props.pagination.query);
   },
 
-  _onSearch() {
-
+  _onSearch(query, resetLoadingStateCb) {
+    LookupTableDataAdaptersActions
+      .searchPaginated(this.props.pagination.page, this.props.pagination.per_page, query)
+      .then(resetLoadingStateCb);
   },
 
   render() {
-    const dataAdapters = this.state.dataAdapters.map((dataAdapter) => {
-      return (<DataAdapterTableEntry key={dataAdapter.id} adapter={dataAdapter} refresh={this.loadData}/>);
+    if (!this.props.dataAdapters) {
+      return <Spinner text="Loading data adapters" />;
+    }
+    const dataAdapters = this.props.dataAdapters.map((dataAdapter) => {
+      return (<DataAdapterTableEntry key={dataAdapter.id}
+                                     adapter={dataAdapter}
+                                     refresh={this._loadPage} />);
     });
 
     return (<div>
       <Row className="content">
         <Col md={12}>
           <h2>
-            Configured lookup dataAdapters
-            <span>&nbsp;<small>{this.state.pagination.total} total</small></span>
+            Configured lookup Data Adapters
+            <span>&nbsp;
+              <small>{this.props.pagination.total} total</small></span>
           </h2>
-          <PaginatedList onChange={this._onPageChange} totalItems={this.state.pagination.total}>
+          <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
             <SearchForm onSearch={this._onSearch}>
               <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
                 <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>

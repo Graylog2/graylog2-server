@@ -1,49 +1,25 @@
-import React from 'react';
-import Reflux from 'reflux';
+import React, { PropTypes } from 'react';
 import naturalSort from 'javascript-natural-sort';
-
-import Routes from 'routing/Routes';
 
 import { Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
-import { Spinner, Select } from 'components/common';
+import { Select } from 'components/common';
 import { DataAdapterForm } from 'components/lookup-tables';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-import CombinedProvider from 'injection/CombinedProvider';
 import ObjectUtils from 'util/ObjectUtils';
-
-const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
-  'LookupTableDataAdapters');
-
-function filterTypes(types) {
-  return types ? types.types : null;
-}
 
 const DataAdapterCreate = React.createClass({
 
   propTypes: {
-    history: React.PropTypes.object.isRequired,
+    saved: PropTypes.func.isRequired,
+    types: PropTypes.object.isRequired,
   },
-
-  mixins: [
-    Reflux.connectFilter(LookupTableDataAdaptersStore, 'types', filterTypes),
-  ],
 
   getInitialState() {
     return {
       dataAdapter: undefined,
     };
   },
-
-  componentDidMount() {
-    LookupTableDataAdaptersActions.getTypes();
-    const plugins = PluginStore.exports('lookupTableAdapters');
-    plugins.forEach((p) => {
-      this.adapterPlugins[p.type] = p;
-    });
-  },
-
-  adapterPlugins: {},
 
   _onTypeSelect(adapterType) {
     this.setState({
@@ -53,24 +29,20 @@ const DataAdapterCreate = React.createClass({
         title: '',
         name: '',
         description: '',
-        config: ObjectUtils.clone(this.state.types[adapterType].default_config),
+        config: ObjectUtils.clone(this.props.types[adapterType].default_config),
       },
     });
   },
 
-  _saved() {
-    this.props.history.pushState(null, Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
-  },
-
   render() {
-    if (!this.state.types) {
-      return <Spinner text="Loading available data adapter types" />;
-    }
-    //
+    const adapterPlugins = {};
+    PluginStore.exports('lookupTableAdapters').forEach((p) => {
+      adapterPlugins[p.type] = p;
+    });
 
-    const sortedAdapters = Object.keys(this.state.types).map((key) => {
-      const type = this.state.types[key];
-      return { value: type.type, label: this.adapterPlugins[type.type].displayName };
+    const sortedAdapters = Object.keys(this.props.types).map((key) => {
+      const type = this.props.types[key];
+      return { value: type.type, label: adapterPlugins[type.type].displayName };
     }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
     return (<div>
@@ -97,12 +69,14 @@ const DataAdapterCreate = React.createClass({
         <Row className="content">
           <Col lg={8}>
             <h3>Configure Adapter</h3>
-            <DataAdapterForm dataAdapter={this.state.dataAdapter} type={this.state.type} create saved={this._saved} />
+            <DataAdapterForm dataAdapter={this.state.dataAdapter} type={this.state.type} create saved={this.props.saved} />
           </Col>
         </Row>
       )}
     </div>);
   },
 });
+
+
 
 export default DataAdapterCreate;
