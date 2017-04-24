@@ -14,7 +14,7 @@ PluginStore.register(new PluginManifest({}, {
       summaryComponent: NullCacheSummary,
     },
     {
-      type: 'guava',
+      type: 'guava_cache',
       displayName: 'Node-local, in-memory cache',
       formComponent: GuavaCacheFieldSet,
       summaryComponent: GuavaCacheSummary,
