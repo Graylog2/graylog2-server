@@ -17,7 +17,7 @@ const LUTTableEntry = React.createClass({
 
   _onDelete() {
 // eslint-disable-next-line no-alert
-    if (window.confirm(`Are you sure you want to delete data adapter "${this.props.cache.title}"?`)) {
+    if (window.confirm(`Are you sure you want to delete cache "${this.props.cache.title}"?`)) {
       LookupTableCachesActions.delete(this.props.cache.id).then(() => this.props.refresh());
     }
   },
@@ -33,7 +33,7 @@ const LUTTableEntry = React.createClass({
           <td>TODO: <em>0</em></td>
           <td>TODO: <em>0 %</em></td>
           <td>
-            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(this.props.adapter.name)}>
+            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(this.props.cache.name)}>
               <Button bsSize="xsmall" bsStyle="info">Edit</Button>
             </LinkContainer>
             &nbsp;
