@@ -16,8 +16,25 @@
  */
 package org.graylog2.indexer;
 
-public class IndexNotFoundException extends ElasticsearchException {
-    public IndexNotFoundException(String message) {
+/**
+ * {@code ElasticsearchException} is the superclass of those
+ * exceptions that can be thrown during the normal interaction
+ * with Elasticsearch.
+ */
+public class ElasticsearchException extends RuntimeException {
+    public ElasticsearchException() {
+        super();
+    }
+
+    public ElasticsearchException(String message) {
         super(message);
+    }
+
+    public ElasticsearchException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public ElasticsearchException(Throwable cause) {
+        super(cause);
     }
 }
