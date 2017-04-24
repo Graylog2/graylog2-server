@@ -12,3 +12,4 @@ export { default as DataAdaptersOverview } from './DataAdaptersOverview';
 export { default as DataAdapterTableEntry } from './DataAdapterTableEntry';
 export { default as DataAdapter } from './DataAdapter';
 export { default as DataAdapterForm } from './DataAdapterForm';
+export { default as DataAdapterCreate } from './DataAdapterCreate';

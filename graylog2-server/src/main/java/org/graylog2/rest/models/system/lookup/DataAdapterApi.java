@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 
@@ -23,15 +24,18 @@ public abstract class DataAdapterApi {
     public abstract String id();
 
     @JsonProperty("title")
+    @NotEmpty
     public abstract String title();
 
     @JsonProperty("description")
     public abstract String description();
 
     @JsonProperty("name")
+    @NotEmpty
     public abstract String name();
 
     @JsonProperty("config")
+    @NotEmpty
     public abstract LookupDataAdapterConfiguration config();
 
     public static Builder builder() {

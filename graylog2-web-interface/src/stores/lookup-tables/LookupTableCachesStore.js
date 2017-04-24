@@ -50,7 +50,7 @@ const LookupTableCachesStore = Reflux.createStore({
       this.trigger({ pagination: this.pagination, caches: this.caches });
     }, this._errorHandler('Fetching lookup table caches failed', 'Could not retrieve the lookup caches'));
 
-    LookupTableCachesActions.searchCachesPaginated.promise(promise);
+    LookupTableCachesActions.searchPaginated.promise(promise);
   },
 
   get(idOrName) {

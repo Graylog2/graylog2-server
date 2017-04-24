@@ -5,7 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
-import { DataAdaptersOverview, DataAdapter, DataAdapterForm } from 'components/lookup-tables';
+import { DataAdaptersOverview, DataAdapter, DataAdapterForm, DataAdapterCreate } from 'components/lookup-tables';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -15,6 +15,7 @@ const LUTDataAdaptersPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
     route: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   },
 
   mixins: [
@@ -41,6 +42,7 @@ const LUTDataAdaptersPage = React.createClass({
     let content;
     const showDetail = this.props.params && this.props.params.adapterName;
     const isEditing = (this.props.route.path || '').endsWith('/edit');
+    const isCreating = (this.props.route.path || '').endsWith('/create');
     if (showDetail) {
       if (this.state.dataAdapters.length > 0) {
         if (isEditing) {
@@ -48,7 +50,7 @@ const LUTDataAdaptersPage = React.createClass({
             <Row className="content">
               <Col lg={8}>
                 <h2>Data Adapter</h2>
-                <DataAdapterForm dataAdapter={this.state.dataAdapters[0]} save={() => {}} type={this.state.dataAdapters[0].config.type} />
+                <DataAdapterForm dataAdapter={this.state.dataAdapters[0]} type={this.state.dataAdapters[0].config.type} create={false} />
               </Col>
             </Row>
           );
@@ -58,6 +60,8 @@ const LUTDataAdaptersPage = React.createClass({
       } else {
         content = <Spinner text="Loading Lookup Table DataAdapter" />;
       }
+    } else if (isCreating) {
+      content = <DataAdapterCreate history={this.props.history} />;
     } else {
       content = <DataAdaptersOverview />;
     }

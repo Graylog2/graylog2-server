@@ -38,7 +38,7 @@ const DataAdaptersOverview = React.createClass({
 
   render() {
     const dataAdapters = this.state.dataAdapters.map((dataAdapter) => {
-      return (<DataAdapterTableEntry key={dataAdapter.id} adapter={dataAdapter} />);
+      return (<DataAdapterTableEntry key={dataAdapter.id} adapter={dataAdapter} refresh={this.loadData}/>);
     });
 
     return (<div>

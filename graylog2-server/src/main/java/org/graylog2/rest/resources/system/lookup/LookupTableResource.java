@@ -40,6 +40,7 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.validation.Valid;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -282,7 +283,7 @@ public class LookupTableResource extends RestResource {
     @POST
     @Path("adapters")
     @ApiOperation(value = "Create a new data adapter")
-    public DataAdapterApi createAdapter(@ApiParam DataAdapterApi newAdapter) {
+    public DataAdapterApi createAdapter(@Valid @ApiParam DataAdapterApi newAdapter) {
         DataAdapterDto dto = newAdapter.toDto();
         DataAdapterDto saved = adapterService.save(dto);
         return DataAdapterApi.fromDto(saved);
@@ -307,7 +308,7 @@ public class LookupTableResource extends RestResource {
     @PUT
     @Path("adapters")
     @ApiOperation(value = "Update the given data adapter settings")
-    public DataAdapterApi updateAdapter(@ApiParam DataAdapterApi toUpdate) {
+    public DataAdapterApi updateAdapter(@Valid @ApiParam DataAdapterApi toUpdate) {
         DataAdapterDto saved = adapterService.save(toUpdate.toDto());
         Collection<LookupTableDto> adapterUsages = lookupTableService.findByDataAdapterIds(singleton(saved.id()));
         if (!adapterUsages.isEmpty()) {

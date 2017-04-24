@@ -6,6 +6,8 @@ const LookupTableDataAdaptersActions = Reflux.createActions({
   get: { asyncResult: true },
   create: { asyncResult: true },
   delete: { asyncResult: true },
+  update: { asyncResult: true },
+  getTypes: { asyncResult: true },
 
 });
 

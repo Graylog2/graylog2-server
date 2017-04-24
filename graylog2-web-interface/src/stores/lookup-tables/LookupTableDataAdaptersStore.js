@@ -65,6 +65,52 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     LookupTableDataAdaptersActions.get.promise(promise);
   },
 
+  create(dataAdapter) {
+    const url = this._url('adapters');
+    const promise = fetch('POST', url, dataAdapter);
+
+    promise.then((response) => {
+      this.dataAdapters.push(response);
+      this.trigger({ dataAdapters: this.dataAdapters });
+    });
+
+    LookupTableDataAdaptersActions.create.promise(promise);
+  },
+
+  update(dataAdapter) {
+    const url = this._url('adapters');
+    const promise = fetch('PUT', url, dataAdapter);
+
+    promise.then((response) => {
+      this.dataAdapters = this.dataAdapters.push(response);
+      const index = this.dataAdapters.findIndex(e => e.id === response.id);
+      if (index !== -1) {
+        this.dataAdapters[index] = response;
+      }
+      this.trigger({ dataAdapters: this.dataAdapters });
+    });
+
+    LookupTableDataAdaptersActions.create.promise(promise);
+  },
+
+  getTypes() {
+    const url = this._url('types/adapters');
+    const promise = fetch('GET', url);
+
+    promise.then((response) => {
+      this.types = response;
+      this.trigger({ types: this.types });
+    });
+
+    LookupTableDataAdaptersActions.getTypes.promise(promise);
+  },
+
+  delete(idOrName) {
+    const url = this._url(`adapters/${idOrName}`);
+    const promise = fetch('DELETE', url);
+
+    LookupTableDataAdaptersActions.delete.promise(promise);
+  },
   _errorHandler(message, title, cb) {
     return (error) => {
       let errorMessage;

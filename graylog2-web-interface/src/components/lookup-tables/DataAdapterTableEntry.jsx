@@ -4,11 +4,22 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Button } from 'react-bootstrap';
 
 import Routes from 'routing/Routes';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
 const DataAdapterTableEntry = React.createClass({
 
   propTypes: {
     adapter: React.PropTypes.object.isRequired,
+    refresh: React.PropTypes.func.isRequired,
+  },
+
+  _onDelete() {
+// eslint-disable-next-line no-alert
+    if (window.confirm(`Are you sure you want to delete data adapter "${this.props.adapter.title}"?`)) {
+      LookupTableDataAdaptersActions.delete(this.props.adapter.id).then(() => this.props.refresh());
+    }
   },
 
   render() {
@@ -25,6 +36,8 @@ const DataAdapterTableEntry = React.createClass({
             <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(this.props.adapter.name)}>
               <Button bsSize="xsmall" bsStyle="info">Edit</Button>
             </LinkContainer>
+            &nbsp;
+            <Button bsSize="xsmall" bsStyle="primary" onClick={this._onDelete}>Delete</Button>
           </td>
         </tr>
       </tbody>
