@@ -17,7 +17,6 @@
 package org.graylog2.alerts.types;
 
 import org.graylog2.alerts.AlertConditionTest;
-import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.Tools;
@@ -158,7 +157,7 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
                 anyBoolean(),
                 anyBoolean(),
                 anyBoolean())).thenReturn(fieldStatsResult);
-        } catch (InvalidRangeFormatException | Searches.FieldTypeException e) {
+        } catch (Searches.FieldTypeException e) {
             assertNotNull("This should not return an exception!", e);
         }
     }
