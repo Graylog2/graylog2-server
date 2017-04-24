@@ -26,7 +26,6 @@ import org.apache.lucene.queryparser.classic.Token;
 import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.decorators.DecoratorProcessor;
-import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
@@ -120,7 +119,7 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected org.graylog2.indexer.results.FieldStatsResult fieldStats(String field, String query, String filter,
-                                                                       org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange) throws InvalidRangeFormatException {
+                                                                       org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange) {
         try {
             return searches.fieldStats(field, query, filter, timeRange);
         } catch (Searches.FieldTypeException e) {
@@ -139,7 +138,7 @@ public abstract class SearchResource extends RestResource {
                                                                           String interval,
                                                                           String filter,
                                                                           org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange,
-                                                                          boolean includeCardinality) throws InvalidRangeFormatException {
+                                                                          boolean includeCardinality) {
         try {
             return searches.fieldHistogram(
                 query,

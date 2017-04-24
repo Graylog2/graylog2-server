@@ -26,7 +26,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.indexer.searches.timeranges.InvalidRangeParametersException;
@@ -91,7 +90,7 @@ public class SourcesResource extends RestResource {
                 public TermsResult call() throws Exception {
                     try {
                         return searches.terms("source", size, "*", RelativeRange.create(range));
-                    } catch (InvalidRangeParametersException | InvalidRangeFormatException e) {
+                    } catch (InvalidRangeParametersException e) {
                         throw new ExecutionException(e);
                     }
                 }

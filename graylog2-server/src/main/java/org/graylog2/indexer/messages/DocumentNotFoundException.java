@@ -16,12 +16,10 @@
  */
 package org.graylog2.indexer.messages;
 
-public class DocumentNotFoundException extends Exception {
+import org.graylog2.indexer.ElasticsearchException;
+
+public class DocumentNotFoundException extends ElasticsearchException {
     public DocumentNotFoundException(String index, String messageId) {
         super("Couldn't find message <" + messageId + "> in index <" + index + ">");
-    }
-
-    public DocumentNotFoundException() {
-        super("Couldn't find message in index");
     }
 }
