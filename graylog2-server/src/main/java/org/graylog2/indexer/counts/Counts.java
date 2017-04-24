@@ -19,10 +19,10 @@ package org.graylog2.indexer.counts;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
-import org.elasticsearch.action.support.QuerySourceBuilder;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.slf4j.Logger;
@@ -32,6 +32,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 @Singleton
 public class Counts {
@@ -61,26 +62,25 @@ public class Counts {
             return 0L;
         }
 
+        final List<String> indices = Arrays.asList(indexNames);
         final String query = new SearchSourceBuilder()
                 .query(QueryBuilders.matchAllQuery().buildAsBytes(XContentType.JSON))
                 .toString();
         final Count request = new Count.Builder()
                 .query(query)
-                .addIndex(Arrays.asList(indexNames))
+                .addIndex(indices)
                 .build();
         final CountResult result;
         try {
             result = jestClient.execute(request);
         } catch (IOException e) {
-            LOG.error("Couldn't fetch message count", e);
-            return -1L;
+            throw new ElasticsearchException("Fetching message count failed for indices " + indices, e);
         }
 
         if (result.isSucceeded()) {
             return result.getCount().longValue();
         } else {
-            LOG.error("Fetching message count failed: {}", result.getErrorMessage());
-            return -1L;
+            throw new ElasticsearchException("Fetching message count failed for indices " + indices);
         }
     }
 }

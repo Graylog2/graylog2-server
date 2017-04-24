@@ -24,6 +24,7 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.AbstractESTest;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -35,6 +36,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -54,6 +56,8 @@ public class CountsTest extends AbstractESTest {
     private static final String INDEX_NAME_2 = "index_set_2_counts_test_0";
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private IndexSetRegistry indexSetRegistry;
@@ -222,9 +226,12 @@ public class CountsTest extends AbstractESTest {
     }
 
     @Test
-    public void totalReturnsMinusOneIfIndexDoesNotExist() throws Exception {
+    public void totalThrowsElasticsearchExceptionIfIndexDoesNotExist() throws Exception {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
+        expectedException.expect(ElasticsearchException.class);
+        expectedException.expectMessage("Fetching message count failed for indices [does_not_exist]");
+
         assertThat(counts.total(indexSet)).isEqualTo(-1L);
     }
 }
