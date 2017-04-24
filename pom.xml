@@ -120,7 +120,7 @@
         <jna.version>4.1.0</jna.version> <!-- for ES, make sure to use the version that ES uses -->
         <joda-time.version>2.9.9</joda-time.version>
         <json-path.version>2.2.0</json-path.version>
-        <jsr305.version>3.0.1</jsr305.version>
+        <jsr305.version>3.0.2</jsr305.version>
         <kafka.version>0.9.0.1</kafka.version>
         <log4j.version>2.8.2</log4j.version>
         <metrics.version>3.2.2</metrics.version>
