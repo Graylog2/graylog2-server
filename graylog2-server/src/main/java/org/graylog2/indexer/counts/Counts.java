@@ -19,6 +19,10 @@ package org.graylog2.indexer.counts;
 import io.searchbox.client.JestClient;
 import io.searchbox.core.Count;
 import io.searchbox.core.CountResult;
+import org.elasticsearch.action.support.QuerySourceBuilder;
+import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.slf4j.Logger;
@@ -57,8 +61,11 @@ public class Counts {
             return 0L;
         }
 
+        final String query = new SearchSourceBuilder()
+                .query(QueryBuilders.matchAllQuery().buildAsBytes(XContentType.JSON))
+                .toString();
         final Count request = new Count.Builder()
-                .query("{\"query\":{\"match_all\":{}}}")
+                .query(query)
                 .addIndex(Arrays.asList(indexNames))
                 .build();
         final CountResult result;
