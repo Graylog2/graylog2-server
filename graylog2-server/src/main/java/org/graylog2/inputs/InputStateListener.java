@@ -64,6 +64,7 @@ public class InputStateListener {
                 break;
             case RUNNING:
                 notificationService.fixed(Notification.Type.NO_INPUT_RUNNING);
+                // fall through
             default:
                 final String msg = "Input [" + input.getName() + "/" + input.getId() + "] is now " + event.newState().toString();
                 activityWriter.write(new Activity(msg, InputStateListener.class));
