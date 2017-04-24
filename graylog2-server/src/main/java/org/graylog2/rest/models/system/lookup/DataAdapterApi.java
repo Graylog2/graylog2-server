@@ -12,6 +12,7 @@ import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 
 @AutoValue
 @JsonAutoDetect
@@ -35,7 +36,7 @@ public abstract class DataAdapterApi {
     public abstract String name();
 
     @JsonProperty("config")
-    @NotEmpty
+    @NotNull
     public abstract LookupDataAdapterConfiguration config();
 
     public static Builder builder() {
