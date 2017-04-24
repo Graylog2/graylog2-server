@@ -7,6 +7,10 @@ public class SearchException extends ElasticsearchException {
         super(message);
     }
 
+    public SearchException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
     public SearchException(Throwable cause) {
         super(cause);
     }

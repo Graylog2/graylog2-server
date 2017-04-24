@@ -25,8 +25,8 @@ import io.searchbox.core.ClearScroll;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.SearchScroll;
 import org.apache.shiro.crypto.hash.Md5Hash;
-import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.common.unit.TimeValue;
+import org.graylog2.indexer.searches.SearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +50,6 @@ public class ScrollResult extends IndexQueryResult {
     private final List<String> fields;
     private final String queryHash; // used in log output only
     private final long totalHits;
-    private SearchResponse firstResponse;
 
     private String scrollId;
     private int chunkId = 0;
@@ -83,7 +82,7 @@ public class ScrollResult extends IndexQueryResult {
                     try {
                         return objectMapper.readValue(hit.getAsString(), Map.class);
                     } catch (IOException e) {
-                        return null;
+                        throw new SearchException("Unable to deserialize search hits during scrolling: ", e);
                     }
                 })
                 .filter(Objects::nonNull)
