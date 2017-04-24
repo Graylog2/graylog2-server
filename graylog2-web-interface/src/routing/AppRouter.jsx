@@ -57,7 +57,6 @@ import AuthenticationPage from 'pages/AuthenticationPage';
 import IndexSetPage from 'pages/IndexSetPage';
 import IndexSetConfigurationPage from 'pages/IndexSetConfigurationPage';
 import IndexSetCreationPage from 'pages/IndexSetCreationPage';
-import LookupTablesPage from 'pages/LookupTablesPage';
 import LUTTablesPage from 'pages/LUTTablesPage';
 import LUTCachesPage from 'pages/LUTCachesPage';
 import LUTDataAdaptersPage from 'pages/LUTDataAdaptersPage';
