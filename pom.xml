@@ -125,7 +125,7 @@
         <log4j.version>2.8.2</log4j.version>
         <metrics.version>3.2.2</metrics.version>
         <mongodb-driver.version>3.4.2</mongodb-driver.version>
-        <mongojack.version>2.6.1</mongojack.version>
+        <mongojack.version>2.7.0</mongojack.version>
         <natty.version>0.13</natty.version>
         <netty.version>3.10.6.Final</netty.version>
         <okhttp.version>3.7.0</okhttp.version>
