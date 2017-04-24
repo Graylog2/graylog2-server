@@ -12,7 +12,6 @@ const LookupTableCachesStore = Reflux.createStore({
   listenables: [LookupTableCachesActions],
 
   init() {
-    this.caches = [];
     this.pagination = {
       page: 1,
       per_page: 10,
@@ -24,7 +23,7 @@ const LookupTableCachesStore = Reflux.createStore({
 
   getInitialState() {
     return {
-      caches: this.caches,
+      caches: undefined,
       pagination: this.pagination,
     };
   },
@@ -46,8 +45,7 @@ const LookupTableCachesStore = Reflux.createStore({
         per_page: response.per_page,
         query: response.query,
       };
-      this.caches = response.caches;
-      this.trigger({ pagination: this.pagination, caches: this.caches });
+      this.trigger({ pagination: this.pagination, caches: response.caches });
     }, this._errorHandler('Fetching lookup table caches failed', 'Could not retrieve the lookup caches'));
 
     LookupTableCachesActions.searchPaginated.promise(promise);
@@ -58,11 +56,50 @@ const LookupTableCachesStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then((response) => {
-      this.caches = [response];
-      this.trigger({ caches: this.caches });
+      this.trigger({ cache: response });
     }, this._errorHandler(`Fetching lookup table cache ${idOrName} failed`, 'Could not retrieve lookup table cache'));
 
     LookupTableCachesActions.get.promise(promise);
+  },
+
+  create(cache) {
+    const url = this._url('caches');
+    const promise = fetch('POST', url, cache);
+
+    promise.then((response) => {
+      this.trigger({ cache: response });
+    });
+
+    LookupTableCachesActions.create.promise(promise);
+  },
+
+  update(cache) {
+    const url = this._url('caches');
+    const promise = fetch('PUT', url, cache);
+
+    promise.then((response) => {
+      this.trigger({ cache: response });
+    });
+
+    LookupTableCachesActions.update.promise(promise);
+  },
+
+  getTypes() {
+    const url = this._url('types/caches');
+    const promise = fetch('GET', url);
+
+    promise.then((response) => {
+      this.trigger({ types: response });
+    });
+
+    LookupTableCachesActions.getTypes.promise(promise);
+  },
+
+  delete(idOrName) {
+    const url = this._url(`caches/${idOrName}`);
+    const promise = fetch('DELETE', url);
+
+    LookupTableCachesActions.delete.promise(promise);
   },
 
   _errorHandler(message, title, cb) {

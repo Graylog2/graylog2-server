@@ -1,55 +1,68 @@
-import React from 'react';
-import Reflux from 'reflux';
-import { Row, Col, Table } from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Button, Row, Col, Table } from 'react-bootstrap';
+import Routes from 'routing/Routes';
 
 import CombinedProvider from 'injection/CombinedProvider';
+import { LinkContainer } from 'react-router-bootstrap';
 
-import { PaginatedList, SearchForm } from 'components/common';
+import { PaginatedList, SearchForm, Spinner } from 'components/common';
 
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
 
-const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
+import Styles from './CachesOverview.css';
+
+const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
 
 const CachesOverview = React.createClass({
 
-  mixins: [
-    Reflux.connect(LookupTableCachesStore),
-  ],
-
-  getInitialState() {
-    return {};
+  propTypes: {
+    caches: PropTypes.array.isRequired,
+    pagination: PropTypes.object.isRequired,
   },
 
   componentDidMount() {
-    this.loadData();
+    this._loadPage();
   },
 
-  loadData() {
-    LookupTableCachesActions.searchPaginated(this.state.pagination.page, this.state.pagination.per_page, this.state.pagination.query);
+  _loadPage() {
+    LookupTableCachesActions.searchPaginated(this.props.pagination.page,
+      this.props.pagination.per_page, this.props.pagination.query);
   },
 
   _onPageChange(newPage, newPerPage) {
-    LookupTableCachesActions.searchPaginated(newPage, newPerPage, this.state.pagination.query);
+    LookupTableCachesActions.searchPaginated(newPage, newPerPage, this.props.pagination.query);
   },
 
-  _onSearch() {
-
+  _onSearch(query, resetLoadingStateCb) {
+    LookupTableCachesActions
+      .searchPaginated(this.props.pagination.page, this.props.pagination.per_page, query)
+      .then(resetLoadingStateCb);
   },
 
   render() {
-    const caches = this.state.caches.map((cache) => {
-      return (<CacheTableEntry key={cache.id} cache={cache} />);
+    if (!this.props.caches) {
+      return <Spinner text="Loading caches" />;
+    }
+    const caches = this.props.caches.map((cache) => {
+      return (<CacheTableEntry key={cache.id}
+                               cache={cache}
+                               refresh={this._loadPage} />);
     });
 
     return (<div>
       <Row className="content">
         <Col md={12}>
           <h2>
-            Configured lookup caches
-            <span>&nbsp;<small>{this.state.pagination.total} total</small></span>
+            Configured lookup Caches
+            <span>&nbsp;
+              <small>{this.props.pagination.total} total</small></span>
           </h2>
-          <PaginatedList onChange={this._onPageChange} totalItems={this.state.pagination.total}>
-            <SearchForm onSearch={this._onSearch} />
+          <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
+            <SearchForm onSearch={this._onSearch}>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
+                <Button bsStyle="success" style={{ marginLeft: 5 }}>Create cache</Button>
+              </LinkContainer>
+            </SearchForm>
             <Table condensed hover>
               <thead>
                 <tr>
@@ -58,6 +71,7 @@ const CachesOverview = React.createClass({
                   <th>Name</th>
                   <th>Entries</th>
                   <th>Hit rate</th>
+                  <th className={Styles.actions}>Actions</th>
                 </tr>
               </thead>
               {caches}
