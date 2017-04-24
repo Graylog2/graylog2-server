@@ -64,7 +64,7 @@ public class Counts {
 
         final List<String> indices = Arrays.asList(indexNames);
         final String query = new SearchSourceBuilder()
-                .query(QueryBuilders.matchAllQuery().buildAsBytes(XContentType.JSON))
+                .query(QueryBuilders.matchAllQuery())
                 .toString();
         final Count request = new Count.Builder()
                 .query(query)
