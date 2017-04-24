@@ -16,6 +16,9 @@
  */
 package org.graylog2.indexer.results;
 
+import io.searchbox.core.search.aggregation.CardinalityAggregation;
+import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
+import io.searchbox.core.search.aggregation.ValueCountAggregation;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHits;
@@ -27,15 +30,17 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class FieldStatsResult extends IndexQueryResult {
-
-    @Nullable
-    private final ValueCount valueCount;
-    @Nullable
-    private final ExtendedStats extendedStats;
-    @Nullable
-    private final Cardinality cardinality;
     private List<ResultMessage> searchHits;
 
+    private final long count;
+    private final double sum;
+    private final double sumOfSquares;
+    private final double mean;
+    private final double min;
+    private final double max;
+    private final double variance;
+    private final double stdDeviation;
+    private final long cardinality;
 
     public FieldStatsResult(@Nullable ValueCount valueCount,
                             @Nullable ExtendedStats extendedStats,
@@ -44,13 +49,71 @@ public class FieldStatsResult extends IndexQueryResult {
                             String query,
                             BytesReference source, TimeValue took) {
         super(query, source, took);
-        this.valueCount = valueCount;
-        this.extendedStats = extendedStats;
-        this.cardinality = cardinality;
+        this.count = getValueCount(valueCount, extendedStats);
+        this.cardinality = cardinality == null ? Long.MIN_VALUE : cardinality.getValue();
+
+        if (extendedStats != null) {
+            sum = extendedStats.getSum();
+            sumOfSquares = extendedStats.getSumOfSquares();
+            mean = extendedStats.getAvg();
+            min = extendedStats.getMin();
+            max = extendedStats.getMax();
+            variance = extendedStats.getVariance();
+            stdDeviation = extendedStats.getStdDeviation();
+        } else {
+            sum = Double.NaN;
+            sumOfSquares = Double.NaN;
+            mean = Double.NaN;
+            min = Double.NaN;
+            max = Double.NaN;
+            variance = Double.NaN;
+            stdDeviation = Double.NaN;
+        }
         this.searchHits = buildResults(hits);
     }
 
-    public long getCount() {
+    public FieldStatsResult(ValueCountAggregation valueCountAggregation,
+                            ExtendedStatsAggregation extendedStatsAggregation,
+                            CardinalityAggregation cardinalityAggregation,
+                            List<ResultMessage> hits,
+                            String query,
+                            BytesReference source,
+                            TimeValue took) {
+        super(query, source, took);
+        this.count = getValueCount(valueCountAggregation, extendedStatsAggregation);
+        this.cardinality = cardinalityAggregation == null ? Long.MIN_VALUE : cardinalityAggregation.getCardinality();
+
+        if (extendedStatsAggregation != null) {
+            sum = extendedStatsAggregation.getSum();
+            sumOfSquares = extendedStatsAggregation.getSumOfSquares();
+            mean = extendedStatsAggregation.getAvg();
+            min = extendedStatsAggregation.getMin();
+            max = extendedStatsAggregation.getMax();
+            variance = extendedStatsAggregation.getVariance();
+            stdDeviation = extendedStatsAggregation.getStdDeviation();
+        } else {
+            sum = Double.NaN;
+            sumOfSquares = Double.NaN;
+            mean = Double.NaN;
+            min = Double.NaN;
+            max = Double.NaN;
+            variance = Double.NaN;
+            stdDeviation = Double.NaN;
+        }
+
+        this.searchHits = hits;
+    }
+
+    private long getValueCount(ValueCountAggregation valueCountAggregation, ExtendedStatsAggregation extendedStatsAggregation) {
+        if (valueCountAggregation != null) {
+            return valueCountAggregation.getValueCount();
+        } else if (extendedStatsAggregation != null) {
+            return extendedStatsAggregation.getCount();
+        }
+        return Long.MIN_VALUE;
+    }
+
+    private long getValueCount(ValueCount valueCount, ExtendedStats extendedStats) {
         if (valueCount != null) {
             return valueCount.getValue();
         } else if (extendedStats != null) {
@@ -59,37 +122,40 @@ public class FieldStatsResult extends IndexQueryResult {
         return Long.MIN_VALUE;
     }
 
+    public long getCount() {
+        return count;
+    }
+
     public double getSum() {
-        return extendedStats != null ? extendedStats.getSum() : Double.NaN;
+        return sum;
     }
 
     public double getSumOfSquares() {
-        return extendedStats != null ? extendedStats.getSumOfSquares() : Double.NaN;
+        return sumOfSquares;
     }
 
     public double getMean() {
-        return extendedStats != null ? extendedStats.getAvg() : Double.NaN;
+        return mean;
     }
 
     public double getMin() {
-        return extendedStats != null ? extendedStats.getMin() : Double.NaN;
+        return min;
     }
 
     public double getMax() {
-        return extendedStats != null ? extendedStats.getMax() : Double.NaN;
+        return max;
     }
 
     public double getVariance() {
-        return extendedStats != null ? extendedStats.getVariance() : Double.NaN;
+        return variance;
     }
 
     public double getStdDeviation() {
-        return extendedStats != null ? extendedStats.getStdDeviation() : Double.NaN;
+        return stdDeviation;
     }
 
-
     public long getCardinality() {
-        return cardinality != null ? cardinality.getValue() : Long.MIN_VALUE;
+        return cardinality;
     }
 
     public List<ResultMessage> getSearchHits() {

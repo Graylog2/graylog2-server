@@ -30,6 +30,7 @@ import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.indexer.searches.SearchException;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.indexer.searches.Sorting;

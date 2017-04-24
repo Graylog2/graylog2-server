@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.Spliterators;
 import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
@@ -77,7 +78,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         when(searchHit.getId()).thenReturn("some id");
         when(searchHit.getSource()).thenReturn(source);
         when(searchHit.getIndex()).thenReturn("graylog_test");
-        when(searchHits.iterator()).thenReturn(Iterators.singletonIterator(searchHit));
+        when(searchHits.spliterator()).thenReturn(Collections.singletonList(searchHit).spliterator());
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final IndexRange indexRange = MongoIndexRange.create("graylog_test", now.minusDays(1), now, now, 0);
@@ -107,7 +108,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
     @Test
     public void testRunNoMatchingMessages() throws Exception {
         final SearchHits searchHits = mock(SearchHits.class);
-        when(searchHits.iterator()).thenReturn(Collections.<SearchHit>emptyIterator());
+        when(searchHits.spliterator()).thenReturn(Spliterators.emptySpliterator());
 
         final DateTime now = DateTime.now(DateTimeZone.UTC);
         final IndexRange indexRange = MongoIndexRange.create("graylog_test", now.minusDays(1), now, now, 0);
