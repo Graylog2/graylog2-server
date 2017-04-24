@@ -20,7 +20,6 @@ import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.alerts.AbstractAlertCondition;
-import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
@@ -214,10 +213,6 @@ public class MessageCountAlertCondition extends AbstractAlertCondition {
         } catch (InvalidRangeParametersException e) {
             // cannot happen lol
             LOG.error("Invalid timerange.", e);
-            return null;
-        } catch (InvalidRangeFormatException e) {
-            // lol same here
-            LOG.error("Invalid timerange format.", e);
             return null;
         }
     }

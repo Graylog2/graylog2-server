@@ -47,7 +47,7 @@ public class IndexHelper {
     }
 
     @Nullable
-    public static QueryBuilder getTimestampRangeFilter(TimeRange range) throws InvalidRangeFormatException {
+    public static QueryBuilder getTimestampRangeFilter(TimeRange range) {
         if (range == null) {
             return null;
         }
