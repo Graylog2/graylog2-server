@@ -29,18 +29,18 @@ import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
+import org.graylog2.plugin.lookup.LookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.concurrent.ExecutionException;
 
 public class GuavaLookupCache extends LookupCache {
     private static final Logger LOG = LoggerFactory.getLogger(GuavaLookupCache.class);
 
     public static final String NAME = "guava_cache";
-    private final LoadingCache<Object, Object> cache;
+    private final LoadingCache<Object, LookupResult> cache;
 
     @Inject
     public GuavaLookupCache(@Assisted LookupCacheConfiguration c) {
@@ -49,29 +49,28 @@ public class GuavaLookupCache extends LookupCache {
         cache = CacheBuilder.newBuilder()
                 .maximumSize(config.maxSize())
                 .recordStats()
-                .build(new CacheLoader<Object, Object>() {
+                .build(new CacheLoader<Object, LookupResult>() {
                     @Override
-                    public Object load(@Nonnull Object key) throws Exception {
+                    public LookupResult load(@Nonnull Object key) throws Exception {
                         return getDataAdapter().get(key);
                     }
                 });
     }
 
-    @Nullable
     @Override
-    public Object get(Object key) {
+    public LookupResult get(Object key) {
         try {
             return cache.get(key);
         } catch (ExecutionException e) {
-            LOG.error("Loading cache value from data adapter failed", e);
-            return null;
+            LOG.warn("Loading value from data adapter failed, returning empty result", e);
+            return LookupResult.empty();
         }
     }
 
     @Override
     public void set(Object key, Object retrievedValue) {
-        cache.put(key, retrievedValue);
         getDataAdapter().set(key, retrievedValue);
+        cache.put(key, getDataAdapter().get(key));
     }
 
     @Override

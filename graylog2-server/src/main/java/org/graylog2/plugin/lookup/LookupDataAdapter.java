@@ -52,7 +52,7 @@ public abstract class LookupDataAdapter {
         this.lookupTable = lookupTable;
     }
 
-    public abstract Object get(Object key);
+    public abstract LookupResult get(Object key);
 
     public abstract void set(Object key, Object value);
 

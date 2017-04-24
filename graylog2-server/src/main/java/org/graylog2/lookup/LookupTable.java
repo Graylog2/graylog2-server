@@ -17,10 +17,10 @@
 package org.graylog2.lookup;
 
 import com.google.auto.value.AutoValue;
-
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupResult;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -47,7 +47,7 @@ public abstract class LookupTable {
     }
 
     @Nullable
-    public Object lookup(@Nonnull Object key) {
+    public LookupResult lookup(@Nonnull Object key) {
         return cache().get(key);
     }
 

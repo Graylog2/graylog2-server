@@ -28,6 +28,7 @@ import org.graylog2.lookup.events.LookupTablesDeleted;
 import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -261,18 +262,21 @@ public class LookupTableService {
         }
 
         @Nullable
-        public Object lookup(@Nonnull Object key) {
+        public LookupResult lookup(@Nonnull Object key) {
             if (lookupTable == null) {
-                return defaultValue;
+                return LookupResult.single(key, defaultValue);
             }
 
-            final Object value = lookupTable.lookup(key);
+            final LookupResult result = lookupTable.lookup(key);
 
-            if (value == null) {
-                return defaultValue;
+            if (result == null || result.isEmpty()) {
+                if (defaultValue == null) {
+                    return LookupResult.empty();
+                }
+                return LookupResult.single(key, defaultValue);
             }
 
-            return value;
+            return result;
         }
     }
 }

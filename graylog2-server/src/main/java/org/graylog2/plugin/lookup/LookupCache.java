@@ -63,8 +63,7 @@ public abstract class LookupCache {
         this.dataAdapter = dataAdapter;
     }
 
-    @Nullable
-    public abstract Object get(Object key);
+    public abstract LookupResult get(Object key);
 
     public abstract void set(Object key, Object retrievedValue);
 
