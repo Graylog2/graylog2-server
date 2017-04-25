@@ -21,18 +21,19 @@ import com.google.common.primitives.Ints;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.NodesInfo;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.esplugin.ClusterStateMonitor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
@@ -73,16 +74,21 @@ public class Cluster {
         ClusterStateMonitor.setCluster(this);
     }
 
-    @Nullable
     private JsonObject clusterHealth(Collection<? extends String> indices) {
         final Health request = new Health.Builder()
                 .addIndex(indices)
                 .build();
+        final JestResult jestResult;
         try {
-            return jestClient.execute(request).getJsonObject();
+            jestResult = jestClient.execute(request);
         } catch (IOException e) {
-            LOG.error("Couldn't read cluster health", e);
-            return null;
+            throw new ElasticsearchException("Couldn't read cluster health for indices " + indices, e);
+        }
+
+        if (jestResult.isSucceeded()) {
+            return jestResult.getJsonObject();
+        } else {
+            throw new ElasticsearchException("Couldn't read cluster health for indices " + indices);
         }
     }
 
@@ -92,7 +98,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public Optional<JsonObject> health() {
-        return Optional.ofNullable(clusterHealth(Arrays.asList(indexSetRegistry.getIndexWildcards())));
+        return Optional.of(clusterHealth(Arrays.asList(indexSetRegistry.getIndexWildcards())));
     }
 
     /**
@@ -104,7 +110,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public Optional<JsonObject> deflectorHealth() {
-        return Optional.ofNullable(clusterHealth(Arrays.asList(indexSetRegistry.getWriteIndexAliases())));
+        return Optional.of(clusterHealth(Arrays.asList(indexSetRegistry.getWriteIndexAliases())));
     }
 
     /**
@@ -130,28 +136,48 @@ public class Cluster {
     }
 
     public String nodeIdToName(String nodeId) {
-        final JsonObject nodeInfo = getNodeInfo(nodeId);
-        return nodeInfo == null ? "UNKNOWN" : nodeInfo.getAsJsonPrimitive("name").getAsString();
-
+        return getNodeInfo(nodeId)
+                .map(nodeInfo -> nodeInfo.get("name"))
+                .filter(JsonElement::isJsonPrimitive)
+                .map(JsonElement::getAsJsonPrimitive)
+                .filter(JsonPrimitive::isString)
+                .map(JsonPrimitive::getAsString)
+                .orElse("UNKNOWN");
     }
 
     public String nodeIdToHostName(String nodeId) {
-        final JsonObject nodeInfo = getNodeInfo(nodeId);
-        return nodeInfo == null ? "UNKNOWN" : nodeInfo.getAsJsonPrimitive("host").getAsString();
+        return getNodeInfo(nodeId)
+                .map(nodeInfo -> nodeInfo.get("host"))
+                .filter(JsonElement::isJsonPrimitive)
+                .map(JsonElement::getAsJsonPrimitive)
+                .filter(JsonPrimitive::isString)
+                .map(JsonPrimitive::getAsString)
+                .orElse("UNKNOWN");
     }
 
-    @Nullable
-    private JsonObject getNodeInfo(String nodeId) {
+    private Optional<JsonObject> getNodeInfo(String nodeId) {
         if (nodeId == null || nodeId.isEmpty()) {
-            return null;
+            return Optional.empty();
         }
 
+        final NodesInfo request = new NodesInfo.Builder().addNode(nodeId).build();
+        final JestResult result;
         try {
-            final JestResult result = jestClient.execute(new NodesInfo.Builder().addNode(nodeId).build());
-            return result.getJsonObject().getAsJsonObject("nodes").getAsJsonObject(nodeId);
+            result = jestClient.execute(request);
         } catch (IOException e) {
-            LOG.error("Couldn't read information of Elasticsearch node.", e);
-            return null;
+            throw new ElasticsearchException("Couldn't read information of Elasticsearch node " + nodeId, e);
+        }
+
+        if (result.isSucceeded()) {
+            return Optional.ofNullable(result.getJsonObject())
+                    .map(json -> json.get("nodes"))
+                    .filter(JsonElement::isJsonObject)
+                    .map(JsonElement::getAsJsonObject)
+                    .map(nodes -> nodes.get(nodeId))
+                    .filter(JsonElement::isJsonObject)
+                    .map(JsonElement::getAsJsonObject);
+        } else {
+            throw new ElasticsearchException("Couldn't read information of Elasticsearch node " + nodeId);
         }
     }
 
