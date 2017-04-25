@@ -22,7 +22,6 @@ import com.google.common.primitives.Ints;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
@@ -33,6 +32,7 @@ import joptsimple.internal.Strings;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.esplugin.ClusterStateMonitor;
+import org.graylog2.indexer.gson.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,8 +135,8 @@ public class Cluster {
             throw new ElasticsearchException("Unable to read Elasticsearch node information", e);
         }
 
-        if(response.isSucceeded()) {
-        return response.getJsonObject().getAsJsonArray("result");
+        if (response.isSucceeded()) {
+            return GsonUtils.asJsonArray(response.getJsonObject().get("result"));
         } else {
             throw new ElasticsearchException("Unable to read Elasticsearch node information");
         }
@@ -148,15 +148,9 @@ public class Cluster {
         for (JsonElement jsonElement : nodes) {
             if (jsonElement.isJsonObject()) {
                 final JsonObject jsonObject = jsonElement.getAsJsonObject();
-                final String name = jsonObject.get("name").getAsString();
-                final String host = jsonObject.get("host").getAsString();
-                final Long maxFileDescriptors = Optional.of(jsonObject)
-                        .map(json -> json.get("fileDescriptorMax"))
-                        .filter(JsonElement::isJsonPrimitive)
-                        .map(JsonElement::getAsJsonPrimitive)
-                        .filter(JsonPrimitive::isNumber)
-                        .map(JsonPrimitive::getAsLong)
-                        .orElse(null);
+                final String name = GsonUtils.asString(jsonObject.get("name"));
+                final String host = GsonUtils.asString(jsonObject.get("host"));
+                final Long maxFileDescriptors = GsonUtils.asLong(jsonObject.get("fileDescriptorMax"));
                 setBuilder.add(NodeFileDescriptorStats.create(name, host, maxFileDescriptors));
             }
         }
@@ -166,21 +160,13 @@ public class Cluster {
 
     public String nodeIdToName(String nodeId) {
         return getNodeInfo(nodeId)
-                .map(nodeInfo -> nodeInfo.get("name"))
-                .filter(JsonElement::isJsonPrimitive)
-                .map(JsonElement::getAsJsonPrimitive)
-                .filter(JsonPrimitive::isString)
-                .map(JsonPrimitive::getAsString)
+                .map(nodeInfo -> GsonUtils.asString(nodeInfo.get("name")))
                 .orElse("UNKNOWN");
     }
 
     public String nodeIdToHostName(String nodeId) {
         return getNodeInfo(nodeId)
-                .map(nodeInfo -> nodeInfo.get("host"))
-                .filter(JsonElement::isJsonPrimitive)
-                .map(JsonElement::getAsJsonPrimitive)
-                .filter(JsonPrimitive::isString)
-                .map(JsonPrimitive::getAsString)
+                .map(nodeInfo -> GsonUtils.asString(nodeInfo.get("host")))
                 .orElse("UNKNOWN");
     }
 
@@ -199,12 +185,8 @@ public class Cluster {
 
         if (result.isSucceeded()) {
             return Optional.ofNullable(result.getJsonObject())
-                    .map(json -> json.get("nodes"))
-                    .filter(JsonElement::isJsonObject)
-                    .map(JsonElement::getAsJsonObject)
-                    .map(nodes -> nodes.get(nodeId))
-                    .filter(JsonElement::isJsonObject)
-                    .map(JsonElement::getAsJsonObject);
+                    .map(json -> GsonUtils.asJsonObject(json.get("nodes")))
+                    .map(nodes -> GsonUtils.asJsonObject(nodes.get(nodeId)));
         } else {
             throw new ElasticsearchException("Couldn't read information of Elasticsearch node " + nodeId);
         }
@@ -239,8 +221,7 @@ public class Cluster {
      */
     public boolean isHealthy() {
         return health()
-                .map(health -> health.get("status"))
-                .map(JsonElement::getAsString)
+                .map(health -> GsonUtils.asString(health.get("status")))
                 .map(status -> !status.equals("red"))
                 .map(healthy -> healthy && indexSetRegistry.isUp())
                 .orElse(false);
@@ -254,8 +235,7 @@ public class Cluster {
      */
     public boolean isDeflectorHealthy() {
         return deflectorHealth()
-                .map(health -> health.get("status"))
-                .map(JsonElement::getAsString)
+                .map(health -> GsonUtils.asString(health.get("status")))
                 .map(status -> !status.equals("red"))
                 .map(healthy -> healthy && indexSetRegistry.isUp())
                 .orElse(false);
