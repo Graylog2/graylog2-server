@@ -9,7 +9,7 @@ import { PaginatedList, SearchForm, Spinner } from 'components/common';
 
 import DataAdapterTableEntry from 'components/lookup-tables/DataAdapterTableEntry';
 
-import Styles from './DataAdaptersOverview.css';
+import Styles from './Overview.css';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
@@ -18,15 +18,6 @@ const DataAdaptersOverview = React.createClass({
   propTypes: {
     dataAdapters: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
-  },
-
-  componentDidMount() {
-    this._loadPage();
-  },
-
-  _loadPage() {
-    LookupTableDataAdaptersActions.searchPaginated(this.props.pagination.page,
-      this.props.pagination.per_page, this.props.pagination.query);
   },
 
   _onPageChange(newPage, newPerPage) {
@@ -46,8 +37,7 @@ const DataAdaptersOverview = React.createClass({
     }
     const dataAdapters = this.props.dataAdapters.map((dataAdapter) => {
       return (<DataAdapterTableEntry key={dataAdapter.id}
-                                     adapter={dataAdapter}
-                                     refresh={this._loadPage} />);
+                                     adapter={dataAdapter} />);
     });
 
     return (<div>

@@ -12,13 +12,12 @@ const LUTTableEntry = React.createClass({
 
   propTypes: {
     cache: React.PropTypes.object.isRequired,
-    refresh: React.PropTypes.func.isRequired,
   },
 
   _onDelete() {
 // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete cache "${this.props.cache.title}"?`)) {
-      LookupTableCachesActions.delete(this.props.cache.id).then(() => this.props.refresh());
+      LookupTableCachesActions.delete(this.props.cache.id).then(() => LookupTableCachesActions.reloadPage());
     }
   },
   render() {

@@ -12,13 +12,12 @@ const DataAdapterTableEntry = React.createClass({
 
   propTypes: {
     adapter: React.PropTypes.object.isRequired,
-    refresh: React.PropTypes.func.isRequired,
   },
 
   _onDelete() {
 // eslint-disable-next-line no-alert
     if (window.confirm(`Are you sure you want to delete data adapter "${this.props.adapter.title}"?`)) {
-      LookupTableDataAdaptersActions.delete(this.props.adapter.id).then(() => this.props.refresh());
+      LookupTableDataAdaptersActions.delete(this.props.adapter.id).then(() => LookupTableDataAdaptersActions.reloadPage());
     }
   },
 

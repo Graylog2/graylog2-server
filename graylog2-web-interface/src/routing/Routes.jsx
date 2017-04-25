@@ -101,7 +101,9 @@ const Routes = {
     },
     LOOKUPTABLES: {
       OVERVIEW: '/system/lookuptables',
+      CREATE: '/system/lookuptables/create',
       show: tableName => `/system/lookuptables/table/${tableName}`,
+      edit: tableName => `/system/lookuptables/table/${tableName}/edit`,
       CACHES: {
         OVERVIEW: '/system/lookuptables/caches',
         CREATE: '/system/lookuptables/caches/create',

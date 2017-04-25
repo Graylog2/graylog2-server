@@ -28,6 +28,10 @@ const LookupTableCachesStore = Reflux.createStore({
     };
   },
 
+  reloadPage() {
+    LookupTableCachesActions.reloadPage.promise(this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query));
+  },
+
   searchPaginated(page, perPage, query) {
     let url;
     if (query) {

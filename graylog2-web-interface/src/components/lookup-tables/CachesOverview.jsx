@@ -9,7 +9,7 @@ import { PaginatedList, SearchForm, Spinner } from 'components/common';
 
 import CacheTableEntry from 'components/lookup-tables/CacheTableEntry';
 
-import Styles from './CachesOverview.css';
+import Styles from './Overview.css';
 
 const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
 
@@ -18,15 +18,6 @@ const CachesOverview = React.createClass({
   propTypes: {
     caches: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
-  },
-
-  componentDidMount() {
-    this._loadPage();
-  },
-
-  _loadPage() {
-    LookupTableCachesActions.searchPaginated(this.props.pagination.page,
-      this.props.pagination.per_page, this.props.pagination.query);
   },
 
   _onPageChange(newPage, newPerPage) {
@@ -45,8 +36,7 @@ const CachesOverview = React.createClass({
     }
     const caches = this.props.caches.map((cache) => {
       return (<CacheTableEntry key={cache.id}
-                               cache={cache}
-                               refresh={this._loadPage} />);
+                               cache={cache} />);
     });
 
     return (<div>

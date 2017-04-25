@@ -12,9 +12,6 @@ const LookupTablesStore = Reflux.createStore({
   listenables: [LookupTablesActions],
 
   init() {
-    this.tables = [];
-    this.caches = {};
-    this.dataAdapters = {};
     this.pagination = {
       page: 1,
       per_page: 10,
@@ -26,11 +23,12 @@ const LookupTablesStore = Reflux.createStore({
 
   getInitialState() {
     return {
-      tables: this.tables,
-      caches: this.caches,
-      dataAdapters: this.dataAdapters,
       pagination: this.pagination,
     };
+  },
+
+  reloadPage() {
+    LookupTablesActions.reloadPage.promise(this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query));
   },
 
   searchPaginated(page, perPage, query) {
@@ -50,10 +48,12 @@ const LookupTablesStore = Reflux.createStore({
         per_page: response.per_page,
         query: response.query,
       };
-      this.tables = response.lookup_tables;
-      this.caches = response.caches;
-      this.dataAdapters = response.data_adapters;
-      this.trigger({ tables: this.tables, pagination: this.pagination, caches: this.caches, dataAdapters: this.dataAdapters });
+      this.trigger({
+        tables: response.lookup_tables,
+        caches: response.caches,
+        dataAdapters: response.data_adapters,
+        pagination: this.pagination,
+      });
     }, this._errorHandler('Fetching lookup tables failed', 'Could not retrieve the lookup tables'));
 
     LookupTablesActions.searchPaginated.promise(promise);
@@ -71,10 +71,12 @@ const LookupTablesStore = Reflux.createStore({
         per_page: response.per_page,
         query: response.query,
       };
-      this.tables = response.lookup_tables;
-      this.caches = response.caches;
-      this.dataAdapters = response.data_adapters;
-      this.trigger({ tables: this.tables, pagination: this.pagination, caches: this.caches, dataAdapters: this.dataAdapters });
+      this.trigger({
+        table: response.lookup_tables[0],
+        cache: response.caches,
+        dataAdapter: response.data_adapters,
+        pagination: this.pagination,
+      });
     }, this._errorHandler(`Fetching lookup table ${idOrName} failed`, 'Could not retrieve lookup table'));
 
     LookupTablesActions.get.promise(promise);

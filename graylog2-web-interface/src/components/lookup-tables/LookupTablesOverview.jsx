@@ -1,39 +1,34 @@
-import React from 'react';
-import Reflux from 'reflux';
-import { Row, Col, Table } from 'react-bootstrap';
+import React, { PropTypes } from 'react';
+import { Button, Row, Col, Table } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import Routes from 'routing/Routes';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
 import { PaginatedList, SearchForm } from 'components/common';
-
 import LUTTableEntry from 'components/lookup-tables/LUTTableEntry';
 
-const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
+import Styles from './Overview.css';
+
+const { LookupTablesActions } = CombinedProvider.get('LookupTables');
 
 const LookupTablesOverview = React.createClass({
 
-  mixins: [
-    Reflux.connect(LookupTablesStore),
-  ],
-
-  getInitialState() {
-    return {};
-  },
-
-  componentDidMount() {
-    this.loadData();
-  },
-
-  loadData() {
-    LookupTablesActions.searchPaginated(this.state.pagination.page, this.state.pagination.per_page, this.state.pagination.query);
+  propTypes: {
+    tables: PropTypes.arrayOf(PropTypes.object).isRequired,
+    caches: PropTypes.objectOf(PropTypes.object).isRequired,
+    dataAdapters: PropTypes.objectOf(PropTypes.object).isRequired,
+    pagination: PropTypes.object.isRequired,
   },
 
   _onPageChange(newPage, newPerPage) {
-    LookupTablesActions.searchPaginated(newPage, newPerPage, this.state.pagination.query);
+    LookupTablesActions.searchPaginated(newPage, newPerPage, this.props.pagination.query);
   },
 
-  _onSearch() {
-
+  _onSearch(query, resetLoadingStateCb) {
+    LookupTablesActions
+      .searchPaginated(this.props.pagination.page, this.props.pagination.per_page, query)
+      .then(resetLoadingStateCb);
   },
 
   _lookupName(id, map) {
@@ -45,9 +40,9 @@ const LookupTablesOverview = React.createClass({
   },
 
   render() {
-    const lookupTables = this.state.tables.map((table) => {
-      const cache = this._lookupName(table.cache_id, this.state.caches);
-      const dataAdapter = this._lookupName(table.data_adapter_id, this.state.dataAdapters);
+    const lookupTables = this.props.tables.map((table) => {
+      const cache = this._lookupName(table.cache_id, this.props.caches);
+      const dataAdapter = this._lookupName(table.data_adapter_id, this.props.dataAdapters);
 
       return (<LUTTableEntry key={table.id} table={table} cache={cache} dataAdapter={dataAdapter} />);
     });
@@ -57,10 +52,14 @@ const LookupTablesOverview = React.createClass({
         <Col md={12}>
           <h2>
             Configured lookup tables
-            <span>&nbsp;<small>{this.state.pagination.total} total</small></span>
+            <span>&nbsp;<small>{this.props.pagination.total} total</small></span>
           </h2>
-          <PaginatedList onChange={this._onPageChange} totalItems={this.state.pagination.total}>
-            <SearchForm onSearch={this._onSearch} />
+          <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
+            <SearchForm onSearch={this._onSearch}>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
+                <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
+              </LinkContainer>
+            </SearchForm>
             <Table condensed hover>
               <thead>
                 <tr>
@@ -68,7 +67,8 @@ const LookupTablesOverview = React.createClass({
                   <th>Description</th>
                   <th>Name</th>
                   <th>Cache</th>
-                  <th>Data Provider</th>
+                  <th>Data Adapter</th>
+                  <th className={Styles.actions}>Actions</th>
                 </tr>
               </thead>
               {lookupTables}
