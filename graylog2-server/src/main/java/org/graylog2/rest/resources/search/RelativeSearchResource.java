@@ -45,6 +45,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DefaultValue;
@@ -192,7 +194,13 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
-        final Sorting.Direction sortOrder = (order.equals("asc")) ? Sorting.Direction.ASC : Sorting.Direction.DESC;
+        final Sorting.Direction sortOrder;
+
+        if (isNullOrEmpty(order)) {
+            sortOrder = Sorting.Direction.DESC;
+        } else {
+            sortOrder = (order.equals("asc")) ? Sorting.Direction.ASC : Sorting.Direction.DESC;
+        }
 
         try {
             return buildTermsResult(searches.terms(field, size, query, filter, buildRelativeTimeRange(range), sortOrder));
