@@ -43,6 +43,7 @@ public class PluginAssets {
     private final List<String> jsFiles;
     private final List<String> cssFiles;
     private final String polyfillJsFile;
+    private final List<String> vendorJsFiles;
 
     @Inject
     public PluginAssets(Set<Plugin> plugins,
@@ -59,6 +60,7 @@ public class PluginAssets {
             } catch (IOException e) {
                 throw new RuntimeException("Unable to read vendor manifest: ", e);
             }
+            this.vendorJsFiles = vendorManifest.files().jsFiles();
             jsFiles.addAll(vendorManifest.files().jsFiles());
             cssFiles.addAll(vendorManifest.files().cssFiles());
         } else {
@@ -98,7 +100,14 @@ public class PluginAssets {
     List<String> sortedJsFiles() {
         return jsFiles().stream()
                 .sorted((file1, file2) -> {
-                    // Polyfill JS script goes first
+                    // Vendor JS scripts go first
+                    if (vendorJsFiles.contains(file1)) {
+                        return -1;
+                    }
+                    if (vendorJsFiles.contains(file2)) {
+                        return 1;
+                    }
+                    // Polyfill JS script goes second
                     if (file1.equals(polyfillJsFile)) {
                         return -1;
                     }
