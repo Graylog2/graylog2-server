@@ -26,11 +26,15 @@ import org.graylog.autovalue.WithBeanGetter;
 @AutoValue
 @WithBeanGetter
 public abstract class ElasticsearchStats {
+    enum HealthStatus {
+        RED, YELLOW, GREEN
+    }
+
     @JsonProperty
     public abstract String clusterName();
 
     @JsonProperty
-    public abstract ClusterHealthStatus status();
+    public abstract HealthStatus status();
 
     @JsonProperty
     public abstract ClusterHealth clusterHealth();
@@ -42,7 +46,7 @@ public abstract class ElasticsearchStats {
     public abstract IndicesStats indicesStats();
 
     public static ElasticsearchStats create(String clusterName,
-                                            ClusterHealthStatus status,
+                                            HealthStatus status,
                                             ClusterHealth clusterHealth,
                                             NodesStats nodesStats,
                                             IndicesStats indicesStats) {
