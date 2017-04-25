@@ -50,8 +50,8 @@ public class AuditActorTest {
         assertThat(actor.urn()).isEqualTo("urn:graylog:node:28164cbe-4ad9-4c9c-a76e-088655aa78892");
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testNullSystem() throws Exception {
-        AuditActor.system(null);
-    }
+//    @Test(expected = NullPointerException.class)
+//    public void testNullSystem() throws Exception {
+//        AuditActor.system(null);
+//    }
 }

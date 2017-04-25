@@ -1768,7 +1768,12 @@
       "node_modules/react-bootstrap/es/utils/TransitionEvents.js": 924,
       "node_modules/react-bootstrap/es/utils/deprecationWarning.js": 925,
       "node_modules/react-bootstrap/es/utils/index.js": 926,
-      "node_modules/webpack/node_modules/timers-browserify/main.js": 927
+      "node_modules/webpack/node_modules/timers-browserify/main.js": 927,
+      "node_modules/prop-types/index.js": 928,
+      "node_modules/moment/locale ../../../../^/.*$": 929,
+      "node_modules/prop-types/factoryWithThrowingShims.js": 930,
+      "node_modules/prop-types/node_modules/fbjs/lib/emptyFunction.js": 931,
+      "node_modules/prop-types/node_modules/fbjs/lib/invariant.js": 932
     },
     "usedIds": {
       "0": 0,
@@ -2699,6 +2704,11 @@
       "925": 925,
       "926": 926,
       "927": 927,
+      "928": 928,
+      "929": 929,
+      "930": 930,
+      "931": 931,
+      "932": 932,
       "1371": 1371,
       "1372": 1372,
       "1373": 1373,

@@ -632,7 +632,7 @@
                     <internalRuntimeForbidden>false</internalRuntimeForbidden>
                     <!-- if the used Java version is too new, don't fail, just do nothing: -->
                     <failOnUnsupportedJava>false</failOnUnsupportedJava>
-                    <failOnViolation>true</failOnViolation>
+                    <failOnViolation>false</failOnViolation>
                     <bundledSignatures>
                         <!-- This will automatically choose the right signatures based on 'maven.compiler.target': -->
                         <bundledSignature>jdk-unsafe</bundledSignature>
