@@ -12,7 +12,6 @@
   </head>
   <body>
     <script src="${appPrefix}/config.js"></script>
-    <script src="${appPrefix}/assets/vendor.js"></script>
     ${foreach jsFiles jsFile}
     <script src="${appPrefix}/assets/${jsFile}"></script>
     ${end}

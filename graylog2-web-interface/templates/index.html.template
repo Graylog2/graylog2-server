@@ -12,7 +12,9 @@
   </head>
   <body>
     <script src="/config.js"></script>
-    <script src="/build/vendor.js"></script>
+    <% for (var vendorChunk in htmlWebpackPlugin.options.vendorModule().files.chunks) { %>
+    <script src="/<%= htmlWebpackPlugin.options.vendorModule().files.chunks[vendorChunk].entry %>"></script>
+    <% } %>
     <% for (var chunk in htmlWebpackPlugin.files.chunks) { %>
     <script src="<%=htmlWebpackPlugin.files.chunks[chunk].entry %>"></script>
     <% } %>
