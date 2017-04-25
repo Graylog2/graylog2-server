@@ -242,21 +242,27 @@ public class LookupTableService {
         }
 
         public Function build() {
-            return new Function(lookupTableService.getTable(lookupTableName), defaultValue);
+            return new Function(lookupTableService, lookupTableName, defaultValue);
         }
     }
 
     public static class Function {
-        private final LookupTable lookupTable;
+        private final LookupTableService lookupTableService;
+        private final String lookupTableName;
         private final Object defaultValue;
 
-        public Function(@Nullable LookupTable lookupTable, @Nullable Object defaultValue) {
-            this.lookupTable = lookupTable;
+        public Function(LookupTableService lookupTableService, String lookupTableName, @Nullable Object defaultValue) {
+            this.lookupTableService = lookupTableService;
+            this.lookupTableName = lookupTableName;
             this.defaultValue = defaultValue;
         }
 
         @Nullable
         public LookupResult lookup(@Nonnull Object key) {
+            // Always get the lookup table from the service when the actual lookup is executed to minimize the time
+            // we are holding a reference to it.
+            // Otherwise we might hold on to an old lookup table instance when this function object is cached somewhere.
+            final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
             if (lookupTable == null) {
                 return LookupResult.single(key, defaultValue);
             }
