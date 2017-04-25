@@ -16,6 +16,7 @@
  */
 package org.graylog2.lookup;
 
+import com.google.inject.assistedinject.FactoryModuleBuilder;
 import org.graylog2.lookup.adapters.RandomDataAdapter;
 import org.graylog2.lookup.caches.GuavaLookupCache;
 import org.graylog2.lookup.caches.NullCache;
@@ -26,6 +27,9 @@ public class LookupModule extends Graylog2Module {
     @Override
     protected void configure() {
         bind(LookupTableService.class).asEagerSingleton();
+
+        install(new FactoryModuleBuilder().build(DtoLoader.Factory.class));
+        install(new FactoryModuleBuilder().build(LookupTableCreator.Factory.class));
 
         installLookupCache(NullCache.NAME,
                 NullCache.class,
