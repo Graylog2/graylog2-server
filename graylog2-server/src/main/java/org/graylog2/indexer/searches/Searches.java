@@ -309,6 +309,8 @@ public class Searches {
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
+            .ignoreUnavailable(true)
+            .allowNoIndices(true)
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices);
 
