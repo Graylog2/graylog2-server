@@ -158,16 +158,12 @@ public class Cluster {
         return setBuilder.build();
     }
 
-    public String nodeIdToName(String nodeId) {
-        return getNodeInfo(nodeId)
-                .map(nodeInfo -> GsonUtils.asString(nodeInfo.get("name")))
-                .orElse("UNKNOWN");
+    public Optional<String> nodeIdToName(String nodeId) {
+        return getNodeInfo(nodeId).map(nodeInfo -> GsonUtils.asString(nodeInfo.get("name")));
     }
 
-    public String nodeIdToHostName(String nodeId) {
-        return getNodeInfo(nodeId)
-                .map(nodeInfo -> GsonUtils.asString(nodeInfo.get("host")))
-                .orElse("UNKNOWN");
+    public Optional<String> nodeIdToHostName(String nodeId) {
+        return getNodeInfo(nodeId).map(nodeInfo -> GsonUtils.asString(nodeInfo.get("host")));
     }
 
     private Optional<JsonObject> getNodeInfo(String nodeId) {

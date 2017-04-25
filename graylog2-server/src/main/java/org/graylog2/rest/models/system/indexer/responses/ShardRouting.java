@@ -44,9 +44,11 @@ public abstract class ShardRouting {
     public abstract String nodeId();
 
     @JsonProperty("node_name")
+    @Nullable
     public abstract String nodeName();
 
     @JsonProperty("node_hostname")
+    @Nullable
     public abstract String nodeHostname();
 
     @JsonProperty("relocating_to")
@@ -59,8 +61,8 @@ public abstract class ShardRouting {
                                       @JsonProperty("active") boolean active,
                                       @JsonProperty("primary") boolean primary,
                                       @JsonProperty("node_id") String nodeId,
-                                      @JsonProperty("node_name") String nodeName,
-                                      @JsonProperty("node_hostname") String nodeHostname,
+                                      @JsonProperty("node_name") @Nullable String nodeName,
+                                      @JsonProperty("node_hostname") @Nullable String nodeHostname,
                                       @JsonProperty("relocating_to") @Nullable String relocatingTo) {
         return new AutoValue_ShardRouting(id, state, active, primary, nodeId, nodeName, nodeHostname, relocatingTo);
     }

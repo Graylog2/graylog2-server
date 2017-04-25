@@ -315,8 +315,8 @@ public class IndicesResource extends RestResource {
             route.active(),
             route.primary(),
             route.currentNodeId(),
-            cluster.nodeIdToName(route.currentNodeId()),
-            cluster.nodeIdToHostName(route.currentNodeId()),
+            cluster.nodeIdToName(route.currentNodeId()).orElse(null),
+            cluster.nodeIdToHostName(route.currentNodeId()).orElse(null),
             route.relocatingNodeId());
     }
 
