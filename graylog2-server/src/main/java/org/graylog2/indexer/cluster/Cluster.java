@@ -17,6 +17,7 @@
 package org.graylog2.indexer.cluster;
 
 import com.github.joschi.jadconfig.util.Duration;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -28,6 +29,7 @@ import io.searchbox.cluster.Health;
 import io.searchbox.cluster.NodesInfo;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
+import joptsimple.internal.Strings;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.esplugin.ClusterStateMonitor;
@@ -42,6 +44,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -119,20 +122,46 @@ public class Cluster {
      * @param fields The fields to show, see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-nodes.html">cat nodes API</a>.
      * @return A {@link JsonArray} with the result of the cat nodes request.
      */
-    public JsonArray catNodes(String fields) {
+    private JsonArray catNodes(String... fields) {
+        final String fieldNames = Strings.join(fields, ",");
         final Cat request = new Cat.NodesBuilder()
-                .setParameter("h", fields)
+                .setParameter("h", fieldNames)
                 .setParameter("full_id", true)
                 .build();
         final CatResult response;
         try {
             response = jestClient.execute(request);
         } catch (IOException e) {
-            LOG.error("Unable to read Elasticsearch node file descriptors", e);
-            return new JsonArray();
+            throw new ElasticsearchException("Unable to read Elasticsearch node information", e);
         }
 
+        if(response.isSucceeded()) {
         return response.getJsonObject().getAsJsonArray("result");
+        } else {
+            throw new ElasticsearchException("Unable to read Elasticsearch node information");
+        }
+    }
+
+    public Set<NodeFileDescriptorStats> getFileDescriptorStats() {
+        final JsonArray nodes = catNodes("name", "host", "fileDescriptorMax");
+        final ImmutableSet.Builder<NodeFileDescriptorStats> setBuilder = ImmutableSet.builder();
+        for (JsonElement jsonElement : nodes) {
+            if (jsonElement.isJsonObject()) {
+                final JsonObject jsonObject = jsonElement.getAsJsonObject();
+                final String name = jsonObject.get("name").getAsString();
+                final String host = jsonObject.get("host").getAsString();
+                final Long maxFileDescriptors = Optional.of(jsonObject)
+                        .map(json -> json.get("fileDescriptorMax"))
+                        .filter(JsonElement::isJsonPrimitive)
+                        .map(JsonElement::getAsJsonPrimitive)
+                        .filter(JsonPrimitive::isNumber)
+                        .map(JsonPrimitive::getAsLong)
+                        .orElse(null);
+                setBuilder.add(NodeFileDescriptorStats.create(name, host, maxFileDescriptors));
+            }
+        }
+
+        return setBuilder.build();
     }
 
     public String nodeIdToName(String nodeId) {

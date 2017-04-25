@@ -16,9 +16,8 @@
  */
 package org.graylog2.periodical;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import org.graylog2.indexer.cluster.Cluster;
+import org.graylog2.indexer.cluster.NodeFileDescriptorStats;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.periodical.Periodical;
@@ -26,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.Set;
 
 public class IndexerClusterCheckerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerClusterCheckerThread.class);
@@ -53,30 +53,27 @@ public class IndexerClusterCheckerThread extends Periodical {
         }
 
         boolean allHigher = true;
-        final JsonArray nodes = cluster.catNodes("name,host,fileDescriptorMax");
+        final Set<NodeFileDescriptorStats> fileDescriptorStats = cluster.getFileDescriptorStats();
+        for (NodeFileDescriptorStats nodeFileDescriptorStats : fileDescriptorStats) {
+            final String name = nodeFileDescriptorStats.name();
+            final String host = nodeFileDescriptorStats.host();
+            final long maxFileDescriptors = nodeFileDescriptorStats.fileDescriptorMax().orElse(-1L);
 
-        for (JsonElement jsonElement : nodes) {
-            if (jsonElement.isJsonObject()) {
-                final String name = jsonElement.getAsJsonObject().get("name").getAsString();
-                final String host = jsonElement.getAsJsonObject().get("host").getAsString();
-                final long maxFileDescriptors = jsonElement.getAsJsonObject().get("fileDescriptorMax").getAsLong();
+            if (maxFileDescriptors != -1L && maxFileDescriptors < MINIMUM_OPEN_FILES_LIMIT) {
+                // Write notification.
+                final Notification notification = notificationService.buildNow()
+                        .addType(Notification.Type.ES_OPEN_FILES)
+                        .addSeverity(Notification.Severity.URGENT)
+                        .addDetail("hostname", host)
+                        .addDetail("max_file_descriptors", maxFileDescriptors);
 
-                if (maxFileDescriptors != -1 && maxFileDescriptors < MINIMUM_OPEN_FILES_LIMIT) {
-                    // Write notification.
-                    final Notification notification = notificationService.buildNow()
-                            .addType(Notification.Type.ES_OPEN_FILES)
-                            .addSeverity(Notification.Severity.URGENT)
-                            .addDetail("hostname", host)
-                            .addDetail("max_file_descriptors", maxFileDescriptors);
-
-                    if (notificationService.publishIfFirst(notification)) {
-                        LOG.warn("Indexer node <{}> open file limit is too low: [{}]. Set it to at least {}.",
-                                name,
-                                maxFileDescriptors,
-                                MINIMUM_OPEN_FILES_LIMIT);
-                    }
-                    allHigher = false;
+                if (notificationService.publishIfFirst(notification)) {
+                    LOG.warn("Indexer node <{}> open file limit is too low: [{}]. Set it to at least {}.",
+                            name,
+                            maxFileDescriptors,
+                            MINIMUM_OPEN_FILES_LIMIT);
                 }
+                allHigher = false;
             }
         }
 
