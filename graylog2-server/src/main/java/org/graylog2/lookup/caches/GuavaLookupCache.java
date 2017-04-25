@@ -29,6 +29,7 @@ import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
+import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,7 +53,7 @@ public class GuavaLookupCache extends LookupCache {
                 .build(new CacheLoader<Object, LookupResult>() {
                     @Override
                     public LookupResult load(@Nonnull Object key) throws Exception {
-                        return getDataAdapter().get(key);
+                        return getLookupTable().dataAdapter().get(key);
                     }
                 });
     }
@@ -69,8 +70,9 @@ public class GuavaLookupCache extends LookupCache {
 
     @Override
     public void set(Object key, Object retrievedValue) {
-        getDataAdapter().set(key, retrievedValue);
-        cache.put(key, getDataAdapter().get(key));
+        final LookupDataAdapter dataAdapter = getLookupTable().dataAdapter();
+        dataAdapter.set(key, retrievedValue);
+        cache.put(key, dataAdapter.get(key));
     }
 
     @Override

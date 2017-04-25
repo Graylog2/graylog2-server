@@ -28,7 +28,6 @@ public abstract class LookupCache {
     private String id;
 
     private LookupTable lookupTable;
-    private LookupDataAdapter dataAdapter;
 
     private final LookupCacheConfiguration config;
 
@@ -52,15 +51,6 @@ public abstract class LookupCache {
 
     public void setLookupTable(LookupTable lookupTable) {
         this.lookupTable = lookupTable;
-    }
-
-    public LookupDataAdapter getDataAdapter() {
-        checkState(lookupTable != null, "lookup table cannot be null");
-        return dataAdapter;
-    }
-
-    public void setDataAdapter(LookupDataAdapter dataAdapter) {
-        this.dataAdapter = dataAdapter;
     }
 
     public abstract LookupResult get(Object key);

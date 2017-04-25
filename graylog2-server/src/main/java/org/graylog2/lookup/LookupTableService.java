@@ -115,9 +115,6 @@ public class LookupTableService {
             }
             LookupDataAdapter dataAdapter = adapterFactory.create(adapterDto.config());
 
-            // The cache needs access to the data adapter
-            cache.setDataAdapter(dataAdapter);
-
             // finally put the table together
             LookupTable lookupTable = LookupTable.builder()
                     .id(dto.id())
@@ -179,9 +176,6 @@ public class LookupTableService {
         } else {
             dataAdapter = adapterFactory.create(adapterDto.config());
         }
-
-        // The cache needs access to the data adapter
-        cache.setDataAdapter(dataAdapter);
 
         // finally put the table together
         LookupTable lookupTable = LookupTable.builder()

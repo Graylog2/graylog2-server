@@ -43,8 +43,8 @@ public abstract class LookupDataAdapter {
         this.id = id;
     }
 
-    @Nullable
     public LookupTable getLookupTable() {
+        checkState(lookupTable != null, "lookup table cannot be null");
         return lookupTable;
     }
 

@@ -42,12 +42,12 @@ public class NullCache extends LookupCache {
 
     @Override
     public LookupResult get(Object key) {
-        return getDataAdapter().get(key);
+        return getLookupTable().dataAdapter().get(key);
     }
 
     @Override
     public void set(Object key, Object retrievedValue) {
-        getDataAdapter().set(key, retrievedValue);
+        getLookupTable().dataAdapter().set(key, retrievedValue);
     }
 
     @Override
