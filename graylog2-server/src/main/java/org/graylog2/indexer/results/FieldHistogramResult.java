@@ -50,15 +50,15 @@ public class FieldHistogramResult extends HistogramResult {
     public FieldHistogramResult(Histogram result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
-        this.result = getResultsFromHistogram(result);
         this.interval = interval;
+        this.result = getResultsFromHistogram(result);
     }
 
     public FieldHistogramResult(HistogramAggregation histogramAggregation, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
-        this.result = getResultsFromHistogramAggregation(histogramAggregation);
         this.interval = interval;
+        this.result = getResultsFromHistogramAggregation(histogramAggregation);
     }
 
     @Override
@@ -83,10 +83,10 @@ public class FieldHistogramResult extends HistogramResult {
 
             final StatsAggregation stats = b.getStatsAggregation(Searches.AGG_STATS);
             resultMap.put("count", stats.getCount());
-            resultMap.put("min", stats.getMin());
-            resultMap.put("max", stats.getMax());
-            resultMap.put("total", stats.getSum());
-            resultMap.put("mean", stats.getAvg());
+            resultMap.put("min", stats.getMin() == null ? 0D : stats.getMin());
+            resultMap.put("max", stats.getMax() == null ? 0D : stats.getMax());
+            resultMap.put("total", stats.getSum() == null ? 0D : stats.getSum());
+            resultMap.put("mean", stats.getAvg() == null ? 0D : stats.getAvg());
 
             // cardinality is only calculated if it was explicitly requested, so this might be null
             final CardinalityAggregation cardinality = b.getCardinalityAggregation(Searches.AGG_CARDINALITY);
