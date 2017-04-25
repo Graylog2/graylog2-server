@@ -46,6 +46,8 @@ public class Sorting {
         return SortOrder.valueOf(direction.toString().toUpperCase(Locale.ENGLISH));
     }
 
+    public Direction getDirection() { return this.direction; }
+
     public static Sorting fromApiParam(String param) {
         if (param == null || !param.contains(":")) {
             throw new IllegalArgumentException("Invalid sorting parameter: " + param);
