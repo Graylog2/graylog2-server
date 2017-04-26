@@ -17,11 +17,11 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.rest.models.system.indexer.responses.ClusterHealth;
 import org.graylog2.rest.models.system.indexer.responses.ClusterName;
@@ -30,6 +30,7 @@ import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
@@ -50,7 +51,10 @@ public class IndexerClusterResource extends RestResource {
     @ApiOperation(value = "Get the cluster name")
     @Produces(MediaType.APPLICATION_JSON)
     public ClusterName clusterName() {
-        return ClusterName.create(cluster.health().getClusterName());
+        final String clusterName = cluster.health()
+                .map(health -> health.get("cluster_name").getAsString())
+                .orElse("<unknown>");
+        return ClusterName.create(clusterName);
     }
 
     @GET
@@ -60,13 +64,14 @@ public class IndexerClusterResource extends RestResource {
     @RequiresPermissions(RestPermissions.INDEXERCLUSTER_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public ClusterHealth clusterHealth() {
-        final ClusterHealthResponse health = cluster.health();
+        final JsonObject health = cluster.health()
+                .orElseThrow(() -> new InternalServerErrorException("Couldn't read Elasticsearch cluster health"));
         final ClusterHealth.ShardStatus shards = ClusterHealth.ShardStatus.create(
-                health.getActiveShards(),
-                health.getInitializingShards(),
-                health.getRelocatingShards(),
-                health.getUnassignedShards());
+                health.get("active_shards").getAsInt(),
+                health.get("initializing_shards").getAsInt(),
+                health.get("relocating_shards").getAsInt(),
+                health.get("unassigned_shards").getAsInt());
 
-        return ClusterHealth.create(health.getStatus().toString().toLowerCase(Locale.ENGLISH), shards);
+        return ClusterHealth.create(health.get("status").getAsString().toLowerCase(Locale.ENGLISH), shards);
     }
 }
