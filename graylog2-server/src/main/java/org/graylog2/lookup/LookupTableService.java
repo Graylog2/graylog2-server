@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -69,7 +70,18 @@ public class LookupTableService {
     }
 
     private void activateTable(String name, @Nullable LookupTable existingTable, LookupTable newTable) {
+        // Always start the new data adapter before taking it live, it's a no-op if the adapter is already started
+        newTable.dataAdapter().start();
+
         lookupTables.put(name, newTable);
+
+        if (existingTable != null) {
+            // If the new table has a new data adapter, stop the old one to free up resources
+            // This needs to happen after the new table is live
+            if (!Objects.equals(existingTable.dataAdapter(), newTable.dataAdapter())) {
+                existingTable.dataAdapter().stop();
+            }
+        }
     }
 
     private void initialize() {

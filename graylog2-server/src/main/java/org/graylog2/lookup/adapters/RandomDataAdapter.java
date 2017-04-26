@@ -44,7 +44,15 @@ public class RandomDataAdapter extends LookupDataAdapter {
     }
 
     @Override
-    public LookupResult get(Object key) {
+    public void doStart() {
+    }
+
+    @Override
+    public void doStop() {
+    }
+
+    @Override
+    public LookupResult doGet(Object key) {
         return LookupResult.single(key, secureRandom.ints(config.lowerBound(), config.upperBound()).findAny().orElse(0));
     }
 

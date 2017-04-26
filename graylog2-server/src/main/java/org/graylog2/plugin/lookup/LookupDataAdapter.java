@@ -17,22 +17,72 @@
 package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import org.graylog2.lookup.LookupTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.concurrent.locks.ReentrantLock;
+
+import static com.google.common.base.Preconditions.checkState;
 
 public abstract class LookupDataAdapter {
+    private static final Logger LOG = LoggerFactory.getLogger(LookupDataAdapter.class);
 
     private String id;
-
+    private volatile boolean started = false;
+    private volatile boolean failed = false;
     private LookupTable lookupTable;
+    private ReentrantLock lock = new ReentrantLock();
 
     private final LookupDataAdapterConfiguration config;
 
     protected LookupDataAdapter(LookupDataAdapterConfiguration config) {
         this.config = config;
     }
+
+    public boolean isStarted() {
+        return started;
+    }
+
+    public boolean isFailed() {
+        return failed;
+    }
+
+    public void start() {
+        lock.lock();
+        if (started) {
+            return;
+        }
+        try {
+            doStart();
+            started = true;
+            failed = false;
+        } catch (Exception e) {
+            LOG.error("Couldn't start data adapter", e);
+            failed = true;
+        } finally {
+            lock.unlock();
+        }
+    }
+    protected abstract void doStart() throws Exception;
+
+    public void stop() {
+        lock.lock();
+        if (!started) {
+            return;
+        }
+        try {
+            doStop();
+            started = false;
+        } catch (Exception e) {
+            LOG.error("Couldn't stop data adapter", e);
+            failed = true;
+        } finally {
+            lock.unlock();
+        }
+    }
+    protected abstract void doStop() throws Exception;
 
     @Nullable
     public String id() {
@@ -52,7 +102,14 @@ public abstract class LookupDataAdapter {
         this.lookupTable = lookupTable;
     }
 
-    public abstract LookupResult get(Object key);
+    public LookupResult get(Object key) {
+        if (failed) {
+            return LookupResult.empty();
+        }
+        checkState(started, "Data adapter needs to be started before it can be used");
+        return doGet(key);
+    }
+    protected abstract LookupResult doGet(Object key);
 
     public abstract void set(Object key, Object value);
 
