@@ -152,6 +152,7 @@ public class SearchesTest extends AbstractESTest {
 
     @Before
     public void setUp() throws Exception {
+        super.setUp();
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         metricRegistry = new MetricRegistry();
         searches = new Searches(new Configuration(), indexRangeService, client(), metricRegistry, streamService, mock(Indices.class), jestClient());
