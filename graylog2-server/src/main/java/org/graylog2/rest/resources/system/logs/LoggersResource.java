@@ -240,7 +240,7 @@ public class LoggersResource extends RestResource {
             if (thrownProxy == null) {
                 throwable = null;
             } else {
-                throwable = thrownProxy.getExtendedStackTraceAsString();
+                throwable = thrownProxy.getExtendedStackTraceAsString("");
             }
 
             final Marker marker = event.getMarker();

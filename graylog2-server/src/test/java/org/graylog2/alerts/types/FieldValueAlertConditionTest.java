@@ -172,14 +172,19 @@ public class FieldValueAlertConditionTest extends AlertConditionTest {
         switch (type) {
             case MIN:
                 when(fieldStatsResult.getMin()).thenReturn(value);
+                break;
             case MAX:
                 when(fieldStatsResult.getMax()).thenReturn(value);
+                break;
             case MEAN:
                 when(fieldStatsResult.getMean()).thenReturn(value);
+                break;
             case STDDEV:
                 when(fieldStatsResult.getStdDeviation()).thenReturn(value);
+                break;
             case SUM:
                 when(fieldStatsResult.getSum()).thenReturn(value);
+                break;
         }
         return fieldStatsResult;
     }

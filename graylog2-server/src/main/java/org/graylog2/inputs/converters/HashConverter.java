@@ -16,7 +16,6 @@
  */
 package org.graylog2.inputs.converters;
 
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.graylog2.plugin.inputs.Converter;
 
@@ -28,7 +27,7 @@ public class HashConverter extends Converter {
         super(Type.HASH, config);
     }
 
-    @SuppressFBWarnings("WEAK_MESSAGE_DIGEST_MD5")
+    @SuppressWarnings("WEAK_MESSAGE_DIGEST_MD5")
     @Override
     public Object convert(String value) {
         if (value == null || value.isEmpty()) {
