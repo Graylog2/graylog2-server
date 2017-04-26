@@ -29,7 +29,9 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
   },
 
   reloadPage() {
-    LookupTableDataAdaptersActions.reloadPage.promise(this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query));
+    const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query);
+    LookupTableDataAdaptersActions.reloadPage.promise(promise);
+    return promise;
   },
 
   searchPaginated(page, perPage, query) {
@@ -53,6 +55,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     }, this._errorHandler('Fetching lookup table data adapters failed', 'Could not retrieve the lookup dataAdapters'));
 
     LookupTableDataAdaptersActions.searchPaginated.promise(promise);
+    return promise;
   },
 
   get(idOrName) {
@@ -64,6 +67,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     }, this._errorHandler(`Fetching lookup table data adapter ${idOrName} failed`, 'Could not retrieve lookup table data adapter'));
 
     LookupTableDataAdaptersActions.get.promise(promise);
+    return promise;
   },
 
   create(dataAdapter) {
@@ -75,6 +79,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     });
 
     LookupTableDataAdaptersActions.create.promise(promise);
+    return promise;
   },
 
   update(dataAdapter) {
@@ -86,6 +91,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     });
 
     LookupTableDataAdaptersActions.update.promise(promise);
+    return promise;
   },
 
   getTypes() {
@@ -97,6 +103,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     });
 
     LookupTableDataAdaptersActions.getTypes.promise(promise);
+    return promise;
   },
 
   delete(idOrName) {
@@ -104,6 +111,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const promise = fetch('DELETE', url);
 
     LookupTableDataAdaptersActions.delete.promise(promise);
+    return promise;
   },
 
   _errorHandler(message, title, cb) {

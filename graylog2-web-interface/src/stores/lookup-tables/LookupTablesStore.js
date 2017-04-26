@@ -28,7 +28,9 @@ const LookupTablesStore = Reflux.createStore({
   },
 
   reloadPage() {
-    LookupTablesActions.reloadPage.promise(this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query));
+    const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query);
+    LookupTablesActions.reloadPage.promise(promise);
+    return promise;
   },
 
   searchPaginated(page, perPage, query) {
@@ -57,6 +59,7 @@ const LookupTablesStore = Reflux.createStore({
     }, this._errorHandler('Fetching lookup tables failed', 'Could not retrieve the lookup tables'));
 
     LookupTablesActions.searchPaginated.promise(promise);
+    return promise;
   },
 
   get(idOrName) {
@@ -80,6 +83,7 @@ const LookupTablesStore = Reflux.createStore({
     }, this._errorHandler(`Fetching lookup table ${idOrName} failed`, 'Could not retrieve lookup table'));
 
     LookupTablesActions.get.promise(promise);
+    return promise;
   },
 
   _errorHandler(message, title, cb) {

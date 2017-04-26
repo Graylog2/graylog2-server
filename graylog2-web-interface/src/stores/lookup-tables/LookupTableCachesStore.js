@@ -29,7 +29,9 @@ const LookupTableCachesStore = Reflux.createStore({
   },
 
   reloadPage() {
-    LookupTableCachesActions.reloadPage.promise(this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query));
+    const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query);
+    LookupTableCachesActions.reloadPage.promise(promise);
+    return promise;
   },
 
   searchPaginated(page, perPage, query) {
@@ -53,6 +55,7 @@ const LookupTableCachesStore = Reflux.createStore({
     }, this._errorHandler('Fetching lookup table caches failed', 'Could not retrieve the lookup caches'));
 
     LookupTableCachesActions.searchPaginated.promise(promise);
+    return promise;
   },
 
   get(idOrName) {
@@ -64,6 +67,7 @@ const LookupTableCachesStore = Reflux.createStore({
     }, this._errorHandler(`Fetching lookup table cache ${idOrName} failed`, 'Could not retrieve lookup table cache'));
 
     LookupTableCachesActions.get.promise(promise);
+    return promise;
   },
 
   create(cache) {
@@ -75,6 +79,7 @@ const LookupTableCachesStore = Reflux.createStore({
     });
 
     LookupTableCachesActions.create.promise(promise);
+    return promise;
   },
 
   update(cache) {
@@ -86,6 +91,7 @@ const LookupTableCachesStore = Reflux.createStore({
     });
 
     LookupTableCachesActions.update.promise(promise);
+    return promise;
   },
 
   getTypes() {
@@ -97,6 +103,7 @@ const LookupTableCachesStore = Reflux.createStore({
     });
 
     LookupTableCachesActions.getTypes.promise(promise);
+    return promise;
   },
 
   delete(idOrName) {
@@ -104,6 +111,7 @@ const LookupTableCachesStore = Reflux.createStore({
     const promise = fetch('DELETE', url);
 
     LookupTableCachesActions.delete.promise(promise);
+    return promise;
   },
 
   _errorHandler(message, title, cb) {
