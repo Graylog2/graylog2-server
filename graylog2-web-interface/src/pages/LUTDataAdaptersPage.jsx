@@ -47,6 +47,8 @@ const LUTDataAdaptersPage = React.createClass({
   },
 
   _saved() {
+    // reset detail state
+    this.setState({ dataAdapter: undefined });
     this.props.history.pushState(null, Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW);
   },
 

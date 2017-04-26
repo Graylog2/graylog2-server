@@ -26,6 +26,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import static com.google.common.base.Preconditions.checkState;
+
 public abstract class LookupDataAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(LookupDataAdapter.class);
 

@@ -12,7 +12,6 @@ const LookupTableCreate = React.createClass({
 
   propTypes: {
     saved: PropTypes.func.isRequired,
-    history: PropTypes.object,
   },
 
   getInitialState() {

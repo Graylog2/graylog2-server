@@ -208,6 +208,16 @@ public class LookupTableResource extends RestResource {
         return table;
     }
 
+    @PUT
+    @Path("tables")
+    @ApiOperation(value = "Update the given lookup table")
+    public LookupTableApi updateAdapter(@Valid @ApiParam LookupTableApi toUpdate) {
+        LookupTableDto saved = lookupTableService.save(toUpdate.toDto());
+        clusterBus.post(LookupTablesUpdated.create(saved));
+
+        return LookupTableApi.fromDto(saved);
+    }
+
     @DELETE
     @Path("tables/{idOrName}")
     @ApiOperation(value = "Delete the lookup table")

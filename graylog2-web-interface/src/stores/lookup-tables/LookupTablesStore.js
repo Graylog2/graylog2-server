@@ -67,22 +67,39 @@ const LookupTablesStore = Reflux.createStore({
     const promise = fetch('GET', url);
 
     promise.then((response) => {
-      this.pagination = {
-        count: response.count,
-        total: response.total,
-        page: response.page,
-        per_page: response.per_page,
-        query: response.query,
-      };
+      // do not propagate pagination! it will destroy the subsequent overview page's state.
       this.trigger({
         table: response.lookup_tables[0],
         cache: response.caches,
         dataAdapter: response.data_adapters,
-        pagination: this.pagination,
       });
     }, this._errorHandler(`Fetching lookup table ${idOrName} failed`, 'Could not retrieve lookup table'));
 
     LookupTablesActions.get.promise(promise);
+    return promise;
+  },
+
+  create(table) {
+    const url = this._url('tables');
+    const promise = fetch('POST', url, table);
+
+    LookupTablesActions.create.promise(promise);
+    return promise;
+  },
+
+  update(table) {
+    const url = this._url('tables');
+    const promise = fetch('PUT', url, table);
+
+    LookupTablesActions.update.promise(promise);
+    return promise;
+  },
+
+  delete(idOrName) {
+    const url = this._url(`tables/${idOrName}`);
+    const promise = fetch('DELETE', url);
+
+    LookupTablesActions.delete.promise(promise);
     return promise;
   },
 

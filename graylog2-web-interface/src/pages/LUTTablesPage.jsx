@@ -45,6 +45,8 @@ const LUTTablesPage = React.createClass({
   },
 
   _saved() {
+    // reset detail state
+    this.setState({ table: undefined });
     this.props.history.pushState(null, Routes.SYSTEM.LOOKUPTABLES.OVERVIEW);
   },
 

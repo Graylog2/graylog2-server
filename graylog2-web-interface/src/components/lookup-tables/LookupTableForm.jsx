@@ -8,6 +8,8 @@ import FormsUtils from 'util/FormsUtils';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
+
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
@@ -27,8 +29,8 @@ const LookupTableForm = React.createClass({
         title: '',
         description: '',
         name: '',
-        cacheId: undefined,
-        tableId: undefined,
+        cache_id: undefined,
+        data_adapter_id: undefined,
       },
     };
   },
@@ -42,8 +44,8 @@ const LookupTableForm = React.createClass({
         title: table.title,
         description: table.description,
         name: table.name,
-        cacheId: undefined,
-        tableId: undefined,
+        cache_id: table.cache_id,
+        data_adapter_id: table.data_adapter_id,
       },
     };
   },
@@ -75,6 +77,18 @@ const LookupTableForm = React.createClass({
     promise.then(() => {
       this.props.saved();
     });
+  },
+
+  _onAdapterSelect(id) {
+    const table = ObjectUtils.clone(this.state.table);
+    table.data_adapter_id = id;
+    this.setState({ table: table });
+  },
+
+  _onCacheSelect(id) {
+    const table = ObjectUtils.clone(this.state.table);
+    table.cache_id = id;
+    this.setState({ table: table });
   },
 
   render() {
@@ -115,6 +129,20 @@ const LookupTableForm = React.createClass({
                  value={table.name}
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9" />
+        </fieldset>
+
+        <DataAdaptersContainer>
+          <DataAdapterPicker onSelect={this._onAdapterSelect} selectedId={this.state.table.data_adapter_id} />
+        </DataAdaptersContainer>
+
+        <CachesContainer>
+          <CachePicker onSelect={this._onCacheSelect} selectedId={this.state.table.cache_id} />
+        </CachesContainer>
+
+        <fieldset>
+          <Input wrapperClassName="col-sm-offset-3 col-sm-9">
+            <Button type="submit" bsStyle="success">{this.props.create ? 'Create Lookup Table' : 'Update Lookup Table'}</Button>
+          </Input>
         </fieldset>
       </form>
     );

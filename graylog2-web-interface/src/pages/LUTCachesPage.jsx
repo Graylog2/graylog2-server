@@ -45,6 +45,8 @@ const LUTCachesPage = React.createClass({
   },
 
   _saved() {
+    // reset detail state
+    this.setState({ cache: undefined });
     this.props.history.pushState(null, Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW);
   },
 
