@@ -104,10 +104,13 @@ public class IndicesTest extends AbstractESTest {
 
     private Indices indices;
 
+    public IndicesTest() {
+        elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
+    }
+
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME), jestClient()));
         indices = new Indices(jestClient(), new Gson(), new IndexMapping(), new Messages(new MetricRegistry(), jestClient()), mock(NodeId.class), new NullAuditEventSender());
     }
 

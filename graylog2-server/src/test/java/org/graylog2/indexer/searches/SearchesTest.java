@@ -147,7 +147,7 @@ public class SearchesTest extends AbstractESTest {
                 .indexOptimizationDisabled(false)
                 .build();
         this.indexSet = new TestIndexSet(indexSetConfig);
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME), jestClient()));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
     }
 
     @Before
