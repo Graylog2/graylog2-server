@@ -24,6 +24,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
 
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.graylog2.audit.AuditEventTypes;
+import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.MongoLutCacheService;
@@ -198,6 +200,7 @@ public class LookupTableResource extends RestResource {
 
     @POST
     @Path("tables")
+    @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_CREATE)
     @ApiOperation(value = "Create a new lookup table")
     public LookupTableApi createTable(@ApiParam LookupTableApi lookupTable) {
         LookupTableDto saved = lookupTableService.save(lookupTable.toDto());
@@ -210,8 +213,9 @@ public class LookupTableResource extends RestResource {
 
     @PUT
     @Path("tables")
+    @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_UPDATE)
     @ApiOperation(value = "Update the given lookup table")
-    public LookupTableApi updateAdapter(@Valid @ApiParam LookupTableApi toUpdate) {
+    public LookupTableApi updateTable(@Valid @ApiParam LookupTableApi toUpdate) {
         LookupTableDto saved = lookupTableService.save(toUpdate.toDto());
         clusterBus.post(LookupTablesUpdated.create(saved));
 
@@ -220,6 +224,7 @@ public class LookupTableResource extends RestResource {
 
     @DELETE
     @Path("tables/{idOrName}")
+    @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_DELETE)
     @ApiOperation(value = "Delete the lookup table")
     public void removeTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         // TODO validate that table isn't in use, how?
@@ -308,6 +313,7 @@ public class LookupTableResource extends RestResource {
 
     @POST
     @Path("adapters")
+    @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_CREATE)
     @ApiOperation(value = "Create a new data adapter")
     public DataAdapterApi createAdapter(@Valid @ApiParam DataAdapterApi newAdapter) {
         DataAdapterDto dto = newAdapter.toDto();
@@ -317,6 +323,7 @@ public class LookupTableResource extends RestResource {
 
     @DELETE
     @Path("adapters/{idOrName}")
+    @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_DELETE)
     @ApiOperation(value = "Delete the given data adapter", notes = "The data adapter cannot be in use by any lookup table, otherwise the request will fail.")
     public void deleteAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<DataAdapterDto> dataAdapterDto = adapterService.get(idOrName);
@@ -333,6 +340,7 @@ public class LookupTableResource extends RestResource {
 
     @PUT
     @Path("adapters")
+    @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_UPDATE)
     @ApiOperation(value = "Update the given data adapter settings")
     public DataAdapterApi updateAdapter(@Valid @ApiParam DataAdapterApi toUpdate) {
         DataAdapterDto saved = adapterService.save(toUpdate.toDto());
@@ -404,6 +412,7 @@ public class LookupTableResource extends RestResource {
 
     @POST
     @Path("caches")
+    @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_CREATE)
     @ApiOperation(value = "Create a new cache")
     public CacheApi createCache(@ApiParam CacheApi newCache) {
         return CacheApi.fromDto(cacheService.save(newCache.toDto()));
@@ -411,6 +420,7 @@ public class LookupTableResource extends RestResource {
 
     @DELETE
     @Path("caches/{idOrName}")
+    @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_DELETE)
     @ApiOperation(value = "Delete the given cache", notes = "The cache cannot be in use by any lookup table, otherwise the request will fail.")
     public void deleteCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<CacheDto> cacheDto = cacheService.get(idOrName);
@@ -428,6 +438,7 @@ public class LookupTableResource extends RestResource {
 
     @PUT
     @Path("caches")
+    @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_UPDATE)
     @ApiOperation(value = "Update the given cache settings")
     public CacheApi updateCache(@ApiParam CacheApi toUpdate) {
         CacheDto saved = cacheService.save(toUpdate.toDto());
