@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -38,9 +37,7 @@ import org.graylog2.rest.models.system.indexer.requests.IndicesReadRequest;
 import org.graylog2.rest.models.system.indexer.responses.AllIndices;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
-import org.graylog2.rest.models.system.indexer.responses.IndexStats;
 import org.graylog2.rest.models.system.indexer.responses.OpenIndicesInfo;
-import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.slf4j.Logger;
@@ -60,7 +57,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -99,7 +95,7 @@ public class IndicesResource extends RestResource {
 
         return indices.getIndexStats(index)
                 .orElseThrow(() -> new NotFoundException("Index [" + index + "] not found."))
-                .toIndexInfo(indices.isReopened(index));
+                .toIndexInfo(indices.isReopened(index), cluster);
     }
 
     @POST
@@ -297,38 +293,11 @@ public class IndicesResource extends RestResource {
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
     }
 
-    private ShardRouting shardRouting(org.elasticsearch.cluster.routing.ShardRouting route) {
-        return ShardRouting.create(route.shardId().getId(),
-            route.state().name().toLowerCase(Locale.ENGLISH),
-            route.active(),
-            route.primary(),
-            route.currentNodeId(),
-            cluster.nodeIdToName(route.currentNodeId()).orElse(null),
-            cluster.nodeIdToHostName(route.currentNodeId()).orElse(null),
-            route.relocatingNodeId());
-    }
-
-    private IndexStats indexStats(final CommonStats stats) {
-        return IndexStats.create(
-            IndexStats.TimeAndTotalStats.create(stats.getFlush().getTotal(), stats.getFlush().getTotalTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getGet().getCount(), stats.getGet().getTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getIndexing().getTotal().getIndexCount(), stats.getIndexing().getTotal().getIndexTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getMerge().getTotal(), stats.getMerge().getTotalTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getRefresh().getTotal(), stats.getRefresh().getTotalTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getQueryCount(), stats.getSearch().getTotal().getQueryTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getFetchCount(), stats.getSearch().getTotal().getFetchTime().getSeconds()),
-            stats.getSearch().getOpenContexts(),
-            stats.getStore().getSize().getBytes(),
-            stats.getSegments().getCount(),
-            IndexStats.DocsStats.create(stats.getDocs().getCount(), stats.getDocs().getDeleted())
-        );
-    }
-
     private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStats) {
         final Map<String, IndexInfo> indexInfos = new HashMap<>();
         final Map<String, Boolean> areReopened = indices.areReopened(indicesStats.stream().map(IndexStatistics::indexName).collect(Collectors.toSet()));
         for (IndexStatistics indexStatistics : indicesStats) {
-            final IndexInfo indexInfo = indexStatistics.toIndexInfo(areReopened.get(indexStatistics.indexName()));
+            final IndexInfo indexInfo = indexStatistics.toIndexInfo(areReopened.get(indexStatistics.indexName()), cluster);
             indexInfos.put(indexStatistics.indexName(), indexInfo);
         }
 
