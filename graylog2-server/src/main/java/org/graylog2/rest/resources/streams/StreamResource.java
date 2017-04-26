@@ -467,13 +467,12 @@ public class StreamResource extends RestResource {
         final List<String> usersAlertReceivers = stream.getAlertReceivers().get("users");
         final Collection<AlertConditionSummary> alertConditions = streamService.getAlertConditions(stream)
             .stream()
-            .map((alertCondition) -> AlertConditionSummary.create(
+            .map((alertCondition) -> AlertConditionSummary.createWithoutGrace(
                 alertCondition.getId(),
                 alertCondition.getType(),
                 alertCondition.getCreatorUserId(),
                 alertCondition.getCreatedAt().toDate(),
                 alertCondition.getParameters(),
-                alertService.inGracePeriod(alertCondition),
                 alertCondition.getTitle()))
             .collect(Collectors.toList());
         return StreamResponse.create(

@@ -18,6 +18,7 @@ package org.graylog2.rest.models.streams.alerts;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
@@ -25,6 +26,8 @@ import org.graylog.autovalue.WithBeanGetter;
 import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @AutoValue
 @WithBeanGetter
@@ -46,6 +49,8 @@ public abstract class AlertConditionSummary {
     public abstract Map<String, Object> parameters();
 
     @JsonProperty("in_grace")
+    @Nullable
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     public abstract Boolean inGrace();
 
     @JsonProperty("title")
@@ -60,6 +65,17 @@ public abstract class AlertConditionSummary {
                                                @JsonProperty("parameters") Map<String, Object> parameters,
                                                @JsonProperty("in_grace") Boolean inGrace,
                                                @JsonProperty("title") @Nullable String title) {
+        checkNotNull(inGrace);
         return new AutoValue_AlertConditionSummary(id, type, creatorUserId, createdAt, parameters, inGrace, title);
+    }
+
+    @JsonCreator
+    public static AlertConditionSummary createWithoutGrace(@JsonProperty("id") String id,
+                                               @JsonProperty("type") String type,
+                                               @JsonProperty("creator_user_id") String creatorUserId,
+                                               @JsonProperty("created_at") Date createdAt,
+                                               @JsonProperty("parameters") Map<String, Object> parameters,
+                                               @JsonProperty("title") @Nullable String title) {
+        return new AutoValue_AlertConditionSummary(id, type, creatorUserId, createdAt, parameters, null, title);
     }
 }
