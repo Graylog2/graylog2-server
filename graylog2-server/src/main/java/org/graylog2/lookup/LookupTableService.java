@@ -91,6 +91,8 @@ public class LookupTableService {
     }
 
     private void updateTable(String name, @Nullable LookupTable existingTable) {
+        LOG.debug("Updating lookup table: {}", name);
+
         Optional<LookupTableDto> dtoOptional = mongoLutService.get(name);
         if (!dtoOptional.isPresent()) {
             LOG.warn("Update event received for missing lookup table '{}', remove this event.", name);
@@ -113,28 +115,35 @@ public class LookupTableService {
 
         Optional<LookupTable> tableOptional;
         if (existingTable == null) {
+            LOG.debug("Creating new lookup table instance: {}", name);
             // If there is no existing table, we just create a completely new one
             tableOptional = tableCreator.createLookupTable(dto);
         } else {
             // Otherwise we check if we have to re-create the cache or the data adapter objects
             LookupCache cache;
             if (existingTable.cache().getConfig().equals(cacheDto.config())) {
+                LOG.debug("Reusing existing cache instance: {}", cacheDto.name());
                 // configuration is the same, we do not need to recreate the cache (so it can retain its state)
                 cache = existingTable.cache();
             } else {
+                LOG.debug("Creating new cache instance: {}");
                 Optional<LookupCache> newCache = tableCreator.createCache(dto);
                 if (!newCache.isPresent()) {
+                    LOG.warn("Cache creation failed. Not creating new lookup table.");
                     return;
                 }
                 cache = newCache.get();
             }
             LookupDataAdapter dataAdapter;
             if (existingTable.dataAdapter().getConfig().equals(adapterDto.config())) {
+                LOG.debug("Reusing existing data adapter instance: {}", adapterDto.name());
                 // configuration is the same, do not recreate the adapter (so it can retain its connections etc)
                 dataAdapter = existingTable.dataAdapter();
             } else {
+                LOG.debug("Creating new data adapter instance: {}", adapterDto.name());
                 Optional<LookupDataAdapter> newAdapter = tableCreator.createDataAdapter(dto);
                 if (!newAdapter.isPresent()) {
+                    LOG.warn("Data adapter creation failed. Not creating new lookup table.");
                     return;
                 }
                 dataAdapter = newAdapter.get();
