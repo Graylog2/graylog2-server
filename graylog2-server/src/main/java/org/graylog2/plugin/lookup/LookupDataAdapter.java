@@ -26,8 +26,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import static com.google.common.base.Preconditions.checkState;
 
-import static com.google.common.base.Preconditions.checkState;
-
 public abstract class LookupDataAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(LookupDataAdapter.class);
 
@@ -52,10 +50,10 @@ public abstract class LookupDataAdapter {
     }
 
     public void start() {
-        lock.lock();
         if (started) {
             return;
         }
+        lock.lock();
         try {
             doStart();
             started = true;
@@ -70,10 +68,10 @@ public abstract class LookupDataAdapter {
     protected abstract void doStart() throws Exception;
 
     public void stop() {
-        lock.lock();
         if (!started) {
             return;
         }
+        lock.lock();
         try {
             doStop();
             started = false;
