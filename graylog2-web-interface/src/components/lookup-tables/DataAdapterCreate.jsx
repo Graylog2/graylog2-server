@@ -68,7 +68,7 @@ const DataAdapterCreate = React.createClass({
       </Row>
       {this.state.dataAdapter && (
         <Row className="content">
-          <Col lg={8}>
+          <Col lg={12}>
             <h3>Configure Adapter</h3>
             <DataAdapterForm dataAdapter={this.state.dataAdapter} type={this.state.type} create saved={this.props.saved} />
           </Col>

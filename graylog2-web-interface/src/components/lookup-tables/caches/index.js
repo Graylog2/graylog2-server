@@ -12,12 +12,14 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'Do not cache values',
       formComponent: NullCacheFieldSet,
       summaryComponent: NullCacheSummary,
+      documentationComponent: null,
     },
     {
       type: 'guava_cache',
       displayName: 'Node-local, in-memory cache',
       formComponent: GuavaCacheFieldSet,
       summaryComponent: GuavaCacheSummary,
+      documentationComponent: null,
     },
   ],
 }));

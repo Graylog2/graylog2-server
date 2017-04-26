@@ -68,7 +68,7 @@ const CacheCreate = React.createClass({
       </Row>
       {this.state.cache && (
         <Row className="content">
-          <Col lg={8}>
+          <Col lg={12}>
             <h3>Configure Cache</h3>
             <CacheForm cache={this.state.cache} type={this.state.type} create saved={this.props.saved} />
           </Col>

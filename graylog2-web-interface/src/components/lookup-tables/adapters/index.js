@@ -10,6 +10,7 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'Random 32bit integer source',
       formComponent: RandomAdapterFieldSet,
       summaryComponent: RandomAdapterSummary,
+      documentationComponent: null,
     },
   ],
 }));

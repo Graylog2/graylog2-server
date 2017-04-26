@@ -65,7 +65,7 @@ const LUTCachesPage = React.createClass({
       } else if (isEditing) {
         content = (
           <Row className="content">
-            <Col lg={8}>
+            <Col lg={12}>
               <h2>Data Cache</h2>
               <CacheForm cache={this.state.cache}
                          type={this.state.cache.config.type}

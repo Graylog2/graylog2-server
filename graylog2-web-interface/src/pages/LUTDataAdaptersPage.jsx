@@ -67,7 +67,7 @@ const LUTDataAdaptersPage = React.createClass({
       } else if (isEditing) {
         content = (
           <Row className="content">
-            <Col lg={8}>
+            <Col lg={12}>
               <h2>Data Adapter</h2>
               <DataAdapterForm dataAdapter={this.state.dataAdapter}
                                type={this.state.dataAdapter.config.type}
