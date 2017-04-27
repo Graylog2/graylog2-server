@@ -86,7 +86,9 @@ const SearchPage = React.createClass({
     if (this.promise && !this.promise.isCancelled()) {
       return this.promise;
     }
-    this.setState({ updatingSearch: true });
+    if (!RefreshStore.enabled || RefreshStore.enabled && parseInt(RefreshStore.interval) > 5000) {
+      this.setState({ updatingSearch: true });
+    }
     this.promise = UniversalSearchStore.search(SearchStore.originalRangeType, query, SearchStore.originalRangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
       .then(
         (response) => {
@@ -96,7 +98,9 @@ const SearchPage = React.createClass({
 
           const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
 
-          this.setState({ updatingHistogram: true });
+          if (!RefreshStore.enabled || RefreshStore.enabled && parseInt(RefreshStore.interval) > 5000) {
+             this.setState({ updatingHistogram: true });
+          }
           UniversalSearchStore.histogram(SearchStore.originalRangeType, query, SearchStore.originalRangeParams.toJS(), interval, streamId)
             .then((histogram) => {
               this.setState({ histogram: histogram });
