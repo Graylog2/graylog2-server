@@ -501,7 +501,8 @@ public class Indices {
 
     private boolean checkForReopened(@Nullable JsonObject indexSettings) {
         return Optional.ofNullable(indexSettings)
-                .map(settings -> asBoolean(settings.get(REOPENED_INDEX_SETTING)))
+                .map(settings -> asString(settings.get(REOPENED_INDEX_SETTING))) // WTF, why is this a string?
+                .map(Boolean::parseBoolean)
                 .orElse(false);
     }
 
