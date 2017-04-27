@@ -19,7 +19,7 @@ const CSVFileAdapterDocumentation = React.createClass({
       <p>Please make sure your CSV file is formatted according to your configuration settings.</p>
 
       <Alert style={{ marginBottom: 10 }}>
-        Make sure the first line in the CSV file is a list of field/column names!
+        Make sure the first line in the CSV file is a list of field/column names and that the file uses <strong>utf-8</strong> encoding!
       </Alert>
 
       <h3 style={{ marginBottom: 10 }}>Example 1</h3>
