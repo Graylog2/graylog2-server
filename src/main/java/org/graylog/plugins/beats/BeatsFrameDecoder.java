@@ -91,6 +91,7 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
             case PROTOCOL_VERSION:
                 checkVersion(buffer);
                 checkpoint(DecodingState.FRAME_TYPE);
+                // fall through
             case FRAME_TYPE:
                 final byte frameType = buffer.readByte();
                 switch (frameType) {
