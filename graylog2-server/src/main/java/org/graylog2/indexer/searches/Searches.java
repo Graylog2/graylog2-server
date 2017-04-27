@@ -49,6 +49,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
@@ -750,7 +751,7 @@ public class Searches {
         return filterBuilder;
     }
 
-    public static class FieldTypeException extends SearchException {
+    public static class FieldTypeException extends ElasticsearchException {
         public FieldTypeException(Throwable e) {
             super(e);
         }
@@ -837,9 +838,9 @@ public class Searches {
                 return result;
             }
 
-            throw new SearchException("Performing search request failed: " + result.getErrorMessage());
+            throw new ElasticsearchException("Performing search request failed: " + result.getErrorMessage());
         } catch (IOException e) {
-            throw new SearchException(e);
+            throw new ElasticsearchException(e);
         }
     }
 }
