@@ -61,7 +61,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
 
             final String templateName = "graylog-test-internal";
             final PutIndexTemplateResponse putIndexTemplateResponse = indicesAdminClient.preparePutTemplate(templateName)
-                    .setSource(indexMapping.messageTemplate(templateName, "standard"))
+                    .setSource(indexMapping.messageTemplate("*", "standard"))
                     .get();
 
             if(!putIndexTemplateResponse.isAcknowledged()) {
