@@ -32,6 +32,8 @@ import io.searchbox.cluster.Health;
 import io.searchbox.cluster.State;
 import io.searchbox.core.Bulk;
 import io.searchbox.core.BulkResult;
+import io.searchbox.core.Cat;
+import io.searchbox.core.CatResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.SearchScroll;
@@ -506,30 +508,39 @@ public class Indices {
     }
 
     public Set<String> getClosedIndices(final IndexSet indexSet) {
-        final State request = new State.Builder()
-                .withMetadata()
-                .build();
+        final JsonArray indices = catIndices(indexSet.getIndexWildcard(), "index", "status");
 
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster state for closed indices with pattern " + indexSet.getIndexWildcard());
-        final JsonObject indicesJson = getClusterStateIndicesMetadata(jestResult.getJsonObject());
-
-        final String indexPrefix = indexSet.getIndexPrefix();
         final ImmutableSet.Builder<String> closedIndices = ImmutableSet.builder();
-        for (Map.Entry<String, JsonElement> entry : indicesJson.entrySet()) {
-            final String indexName = entry.getKey();
-            if (indexName.startsWith(indexPrefix)) {
-                final boolean isClosed = Optional.ofNullable(asJsonObject(entry.getValue()))
-                        .map(metaData -> asString(metaData.get("state")))
-                        .map("close"::equals)
-                        .orElse(false);
-
-                if (isClosed) {
-                    closedIndices.add(indexName);
+        for (JsonElement jsonElement : indices) {
+            if (jsonElement.isJsonObject()) {
+                final JsonObject jsonObject = jsonElement.getAsJsonObject();
+                final String index = GsonUtils.asString(jsonObject.get("index"));
+                final String status = GsonUtils.asString(jsonObject.get("status"));
+                if(index != null && "close".equals(status)){
+                    closedIndices.add(index);
                 }
             }
         }
 
         return closedIndices.build();
+    }
+
+    /**
+     * Retrieve the response for the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html">cat indices</a> request from Elasticsearch.
+     *
+     * @param fields The fields to show, see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html">cat indices API</a>.
+     * @return A {@link JsonArray} with the result of the cat indices request.
+     */
+    private JsonArray catIndices(String index, String... fields) {
+        final String fieldNames = String.join(",", fields);
+        final Cat request = new Cat.IndicesBuilder()
+                .addIndex(index)
+                .setParameter("h", fieldNames)
+                .build();
+        final CatResult response = JestUtils.execute(jestClient, request, () -> "Unable to read information for index " + index);
+        return Optional.of(response.getJsonObject())
+                .map(json -> GsonUtils.asJsonArray(json.get("result")))
+                .orElse(new JsonArray());
     }
 
     private JsonObject getClusterStateIndicesMetadata(JsonObject clusterStateJson) {
