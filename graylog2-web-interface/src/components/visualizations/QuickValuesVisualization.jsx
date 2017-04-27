@@ -137,7 +137,6 @@ const QuickValuesVisualization = React.createClass({
       .sortBy(d => d.count)
       .order(d3.descending)
       .on('renderlet', (table) => {
-        table.selectAll('.dc-table-group').classed('info', true);
         table.selectAll('td.dc-table-column button').on('click', () => {
           // noinspection Eslint
           const term = $(d3.event.target).closest('button').data('term');
