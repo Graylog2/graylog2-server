@@ -28,7 +28,6 @@ import io.searchbox.cluster.Health;
 import io.searchbox.cluster.NodesInfo;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
-import joptsimple.internal.Strings;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.esplugin.ClusterStateMonitor;
@@ -123,7 +122,7 @@ public class Cluster {
      * @return A {@link JsonArray} with the result of the cat nodes request.
      */
     private JsonArray catNodes(String... fields) {
-        final String fieldNames = Strings.join(fields, ",");
+        final String fieldNames = String.join(",", fields);
         final Cat request = new Cat.NodesBuilder()
                 .setParameter("h", fieldNames)
                 .setParameter("full_id", true)
