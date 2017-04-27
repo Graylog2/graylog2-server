@@ -285,7 +285,12 @@ public class Searches {
     }
 
     private long tookMsFromSearchResult(io.searchbox.core.SearchResult searchResult) {
-        return new Double(searchResult.getValue("took").toString()).longValue();
+        final Object tookMs = searchResult.getValue("took");
+        if (tookMs != null) {
+            return new Double(tookMs.toString()).longValue();
+        } else {
+            throw new ElasticsearchException("Unexpected response structure: " + searchResult.getJsonString());
+        }
     }
 
     public TermsResult terms(String field, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
