@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.indices;
+package org.graylog2.indexer.indices.stats;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
 import org.graylog2.rest.models.system.indexer.responses.IndexStats;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 
@@ -40,26 +38,37 @@ import static org.graylog2.indexer.gson.GsonUtils.asString;
 
 @AutoValue
 public abstract class IndexStatistics {
-    public abstract String indexName();
+    public abstract String index();
 
-    public abstract JsonObject primaries();
+    public abstract IndexStats primaryShards();
 
-    public abstract JsonObject total();
+    public abstract IndexStats allShards();
 
-    public abstract JsonObject shardRoutings();
+    public abstract List<ShardRouting> routing();
 
-    public static IndexStatistics create(String indexName,
-                                         JsonObject primaries,
-                                         JsonObject total,
-                                         JsonObject shardRoutings) {
-        return new AutoValue_IndexStatistics(indexName, primaries, total, shardRoutings);
+    public static IndexStatistics create(String index,
+                                         IndexStats primaryShards,
+                                         IndexStats allShards,
+                                         List<ShardRouting> routing) {
+        return new AutoValue_IndexStatistics(index, primaryShards, allShards, routing);
     }
 
-    public IndexInfo toIndexInfo(boolean isReopened, Cluster cluster) {
-        return IndexInfo.create(buildIndexStats(primaries()), buildIndexStats(total()), buildShardRoutings(shardRoutings(), cluster), isReopened);
+    public static IndexStatistics create(String index, JsonObject indexStats) {
+        final JsonObject primaries = Optional.of(indexStats)
+                .map(json -> asJsonObject(json.get("primaries")))
+                .orElse(new JsonObject());
+        final JsonObject total = Optional.of(indexStats)
+                .map(json -> asJsonObject(json.get("total")))
+                .orElse(new JsonObject());
+        final JsonObject shards = Optional.of(indexStats)
+                .map(json -> asJsonObject(json.get("shards")))
+                .orElse(new JsonObject());
+
+
+        return create(index, buildIndexStats(primaries), buildIndexStats(total), buildShardRoutings(shards));
     }
 
-    private IndexStats buildIndexStats(final JsonObject stats) {
+    private static IndexStats buildIndexStats(final JsonObject stats) {
         final Optional<JsonObject> flush = Optional.of(stats).map(json -> asJsonObject(json.get("flush")));
         final long flushTotal = flush.map(json -> asLong(json.get("total"))).orElse(0L);
         final long flushTotalTimeSeconds = flush.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
@@ -116,7 +125,7 @@ public abstract class IndexStatistics {
         );
     }
 
-    private List<ShardRouting> buildShardRoutings(JsonObject shardRoutings, Cluster cluster) {
+    private static List<ShardRouting> buildShardRoutings(JsonObject shardRoutings) {
         final ImmutableList.Builder<ShardRouting> shardRoutingsBuilder = ImmutableList.builder();
         for (Map.Entry<String, JsonElement> entry : shardRoutings.entrySet()) {
             final int shardId = Integer.parseInt(entry.getKey());
@@ -134,16 +143,15 @@ public abstract class IndexStatistics {
                 final boolean primary = routing.map(json -> asBoolean(json.get("primary"))).orElse(false);
                 final String nodeId = routing.map(json -> asString(json.get("node"))).orElse("Unknown");
 
-                final String nodeName = cluster.nodeIdToName(nodeId).orElse(null);
-                final String nodeHostname = cluster.nodeIdToHostName(nodeId).orElse(null);
+                // Node name and hostname should be filled when necessary (requiring an additional round trip to Elasticsearch)
+                final String nodeName = null;
+                final String nodeHostname = null;
 
                 final String relocatingNode = routing.map(json -> asString(json.get("relocating_node"))).orElse(null);
 
                 final ShardRouting shardRouting = ShardRouting.create(shardId, state, active, primary, nodeId, nodeName, nodeHostname, relocatingNode);
                 shardRoutingsBuilder.add(shardRouting);
             }
-
-
         }
         return shardRoutingsBuilder.build();
     }

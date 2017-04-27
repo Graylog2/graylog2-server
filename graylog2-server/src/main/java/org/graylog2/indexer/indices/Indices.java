@@ -76,6 +76,7 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.gson.GsonUtils;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
@@ -575,21 +576,11 @@ public class Indices {
 
     public Optional<IndexStatistics> getIndexStats(String index) {
         return indexStatsWithShardLevel(index)
-                .map(indexStats -> buildIndexStats(index, indexStats));
+                .map(indexStats -> buildIndexStatistics(index, indexStats));
     }
 
-    private IndexStatistics buildIndexStats(String index, JsonObject indexStats) {
-        final JsonObject primaries = Optional.of(indexStats)
-                .map(json -> asJsonObject(json.get("primaries")))
-                .orElse(new JsonObject());
-        final JsonObject total = Optional.of(indexStats)
-                .map(json -> asJsonObject(json.get("total")))
-                .orElse(new JsonObject());
-        final JsonObject shards = Optional.of(indexStats)
-                .map(json -> asJsonObject(json.get("shards")))
-                .orElse(new JsonObject());
-
-        return IndexStatistics.create(index, primaries, total, shards);
+    private IndexStatistics buildIndexStatistics(String index, JsonObject indexStats) {
+        return IndexStatistics.create(index, indexStats);
     }
 
     public Optional<Long> getStoreSizeInBytes(String index) {
@@ -613,7 +604,7 @@ public class Indices {
         for (Map.Entry<String, JsonElement> entry : getAllWithShardLevel(indexSet).entrySet()) {
             final String index = entry.getKey();
             Optional.ofNullable(asJsonObject(entry.getValue()))
-                    .map(indexStats -> buildIndexStats(index, indexStats))
+                    .map(indexStats -> buildIndexStatistics(index, indexStats))
                     .ifPresent(result::add);
         }
 
