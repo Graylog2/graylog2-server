@@ -105,7 +105,6 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
-import static org.graylog2.indexer.gson.GsonUtils.asBoolean;
 import static org.graylog2.indexer.gson.GsonUtils.asInteger;
 import static org.graylog2.indexer.gson.GsonUtils.asJsonArray;
 import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
@@ -507,22 +506,26 @@ public class Indices {
     }
 
     public Set<String> getClosedIndices(final IndexSet indexSet) {
-        final String indexWildcard = indexSet.getIndexWildcard();
-        final State request = new State.Builder().withMetadata().indices(indexWildcard).build();
+        final State request = new State.Builder()
+                .withMetadata()
+                .build();
 
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster state for closed indices with pattern " + indexWildcard);
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster state for closed indices with pattern " + indexSet.getIndexWildcard());
         final JsonObject indicesJson = getClusterStateIndicesMetadata(jestResult.getJsonObject());
 
+        final String indexPrefix = indexSet.getIndexPrefix();
         final ImmutableSet.Builder<String> closedIndices = ImmutableSet.builder();
         for (Map.Entry<String, JsonElement> entry : indicesJson.entrySet()) {
             final String indexName = entry.getKey();
-            final boolean isClosed = Optional.ofNullable(asJsonObject(entry.getValue()))
-                    .map(metaData -> asString(metaData.get("state")))
-                    .map("close"::equals)
-                    .orElse(false);
+            if (indexName.startsWith(indexPrefix)) {
+                final boolean isClosed = Optional.ofNullable(asJsonObject(entry.getValue()))
+                        .map(metaData -> asString(metaData.get("state")))
+                        .map("close"::equals)
+                        .orElse(false);
 
-            if (isClosed) {
-                closedIndices.add(indexName);
+                if (isClosed) {
+                    closedIndices.add(indexName);
+                }
             }
         }
 
