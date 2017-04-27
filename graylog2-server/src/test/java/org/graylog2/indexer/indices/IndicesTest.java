@@ -29,7 +29,6 @@ import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
@@ -42,7 +41,6 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.compress.CompressedXContent;
-import org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.AbstractESTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
@@ -71,13 +69,11 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 public class IndicesTest extends AbstractESTest {
-    private static final long ES_TIMEOUT = TimeUnit.SECONDS.toMillis(1L);
     private static final String INDEX_NAME = "graylog_0";
 
     @Rule
@@ -138,19 +134,22 @@ public class IndicesTest extends AbstractESTest {
     @Test
     public void testClose() throws Exception {
         final String index = "test_close";
-        final CreateIndexResponse createIndexResponse = client().admin().indices().prepareCreate(index)
-                .get(TimeValue.timeValueSeconds(ES_TIMEOUT));
-        assertThat(createIndexResponse.isAcknowledged()).isTrue();
+        try {
+            createIndex(index);
+            waitForGreenStatus(index);
 
-        final ClusterStateRequest beforeRequest = client().admin().cluster().prepareState().setIndices(index).request();
-        final ClusterStateResponse beforeResponse = client().admin().cluster().state(beforeRequest).actionGet(ES_TIMEOUT);
-        assertThat(beforeResponse.getState().getMetaData().getConcreteAllOpenIndices()).containsExactly(index);
+            final ClusterStateRequest beforeRequest = client().admin().cluster().prepareState().setIndices(index).request();
+            final ClusterStateResponse beforeResponse = client().admin().cluster().state(beforeRequest).actionGet(ES_TIMEOUT);
+            assertThat(beforeResponse.getState().getMetaData().getConcreteAllOpenIndices()).containsExactly(index);
 
-        indices.close(index);
+            indices.close(index);
 
-        final ClusterStateRequest request = client().admin().cluster().prepareState().setIndices(index).request();
-        final ClusterStateResponse response = client().admin().cluster().state(request).actionGet(ES_TIMEOUT);
-        assertThat(response.getState().getMetaData().getConcreteAllClosedIndices()).containsExactly(index);
+            final ClusterStateRequest request = client().admin().cluster().prepareState().setIndices(index).request();
+            final ClusterStateResponse response = client().admin().cluster().state(request).actionGet(ES_TIMEOUT);
+            assertThat(response.getState().getMetaData().getConcreteAllClosedIndices()).containsExactly(index);
+        } finally {
+            deleteIndex(index);
+        }
     }
 
     @Test
