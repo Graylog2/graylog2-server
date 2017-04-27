@@ -34,8 +34,13 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
+
+import static org.graylog2.indexer.gson.GsonUtils.asJsonArray;
+import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
 
 public class ScrollResult extends IndexQueryResult {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
@@ -73,11 +78,15 @@ public class ScrollResult extends IndexQueryResult {
     public ScrollChunk nextChunk() throws IOException {
 
         final JestResult search;
-        // make sure to return the initial hits, see https://github.com/Graylog2/graylog2-server/issues/2126
         final List<ResultMessage> hits;
         if (initialResult == null) {
             search = getNextScrollResult();
-            hits = StreamSupport.stream(search.getJsonObject().getAsJsonObject("hits").getAsJsonArray("hits").spliterator(), false)
+            hits = Optional.of(search.getJsonObject())
+                .map(json -> asJsonObject(json.get("hits")))
+                .map(json -> asJsonArray(json.get("hits")))
+                .map(Iterable::spliterator)
+                .map(spliterator -> StreamSupport.stream(spliterator, false))
+                .orElse(Stream.empty())
                 .map(hit -> {
                     try {
                         return objectMapper.readValue(hit.getAsString(), Map.class);
@@ -89,6 +98,7 @@ public class ScrollResult extends IndexQueryResult {
                 .map(hit -> ResultMessage.parseFromSource((String)hit.get("id"), (String)hit.get("index"), (Map<String, Object>)hit.get("source")))
                 .collect(Collectors.toList());
         } else {
+            // make sure to return the initial hits, see https://github.com/Graylog2/graylog2-server/issues/2126
             search = initialResult;
             hits = initialResult.getHits(Map.class).stream()
                 .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
