@@ -18,9 +18,16 @@ const CSVFileAdapterDocumentation = React.createClass({
       <p>The CSV data adapter can read key value pairs from a CSV file.</p>
       <p>Please make sure your CSV file is formatted according to your configuration settings.</p>
 
-      <Alert style={{ marginBottom: 10 }}>
-        Make sure the first line in the CSV file is a list of field/column names and that the file uses <strong>utf-8</strong> encoding!
+      <Alert style={{ marginBottom: 10 }} bsStyle="info">
+        <h4 style={{ marginBottom: 10 }}>CSV file requirements:</h4>
+        <ul className="no-padding">
+          <li>The first line in the CSV file needs to be a list of field/column names</li>
+          <li>The file uses <strong>utf-8</strong> encoding</li>
+          <li>The file is readable by <strong>every</strong> Graylog server node</li>
+        </ul>
       </Alert>
+
+      <hr />
 
       <h3 style={{ marginBottom: 10 }}>Example 1</h3>
 
