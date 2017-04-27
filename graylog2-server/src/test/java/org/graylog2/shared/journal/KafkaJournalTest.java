@@ -283,140 +283,140 @@ public class KafkaJournalTest {
         assertEquals("should have two journal segments", 3, logFiles.length);
     }
 
-    @Test
-    public void segmentSizeCleanup() throws Exception {
-        final Size segmentSize = Size.kilobytes(1L);
-        final KafkaJournal journal = new KafkaJournal(journalDirectory,
-                scheduler,
-                segmentSize,
-                Duration.standardHours(1),
-                Size.kilobytes(1L),
-                Duration.standardDays(1),
-                1_000_000,
-                Duration.standardMinutes(1),
-                100,
-                new MetricRegistry(),
-                serverStatus);
-        final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
-        assertTrue(messageJournalDir.exists());
+//    @Test
+//    public void segmentSizeCleanup() throws Exception {
+//        final Size segmentSize = Size.kilobytes(1L);
+//        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+//                scheduler,
+//                segmentSize,
+//                Duration.standardHours(1),
+//                Size.kilobytes(1L),
+//                Duration.standardDays(1),
+//                1_000_000,
+//                Duration.standardMinutes(1),
+//                100,
+//                new MetricRegistry(),
+//                serverStatus);
+//        final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
+//        assertTrue(messageJournalDir.exists());
+//
+//        // create enough chunks so that we exceed the maximum journal size we configured
+//        createBulkChunks(journal, segmentSize, 3);
+//
+//        // make sure everything is on disk
+//        journal.flushDirtyLogs();
+//
+//        assertEquals(3, countSegmentsInDir(messageJournalDir));
+//
+//        final int cleanedLogs = journal.cleanupLogs();
+//        assertEquals(1, cleanedLogs);
+//
+//        final int numberOfSegments = countSegmentsInDir(messageJournalDir);
+//        assertEquals(2, numberOfSegments);
+//    }
 
-        // create enough chunks so that we exceed the maximum journal size we configured
-        createBulkChunks(journal, segmentSize, 3);
+//    @Test
+//    public void segmentAgeCleanup() throws Exception {
+//        final InstantMillisProvider clock = new InstantMillisProvider(DateTime.now(DateTimeZone.UTC));
+//
+//        DateTimeUtils.setCurrentMillisProvider(clock);
+//        try {
+//            final Size segmentSize = Size.kilobytes(1L);
+//            final KafkaJournal journal = new KafkaJournal(journalDirectory,
+//                    scheduler,
+//                    segmentSize,
+//                    Duration.standardHours(1),
+//                    Size.kilobytes(10L),
+//                    Duration.standardMinutes(1),
+//                    1_000_000,
+//                    Duration.standardMinutes(1),
+//                    100,
+//                    new MetricRegistry(),
+//                    serverStatus);
+//            final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
+//            assertTrue(messageJournalDir.exists());
+//
+//            // we need to fix up the last modified times of the actual files.
+//            long lastModifiedTs[] = new long[2];
+//
+//            // create two chunks, 30 seconds apart
+//            createBulkChunks(journal, segmentSize, 1);
+//            journal.flushDirtyLogs();
+//            lastModifiedTs[0] = clock.getMillis();
+//
+//            clock.tick(Period.seconds(30));
+//
+//            createBulkChunks(journal, segmentSize, 1);
+//            journal.flushDirtyLogs();
+//            lastModifiedTs[1] = clock.getMillis();
+//
+//            int i = 0;
+//            for (final LogSegment segment : journal.getSegments()) {
+//                assertTrue(i < 2);
+//                segment.lastModified_$eq(lastModifiedTs[i]);
+//                i++;
+//            }
+//
+//            int cleanedLogs = journal.cleanupLogs();
+//            assertEquals("no segments should've been cleaned", cleanedLogs, 0);
+//            assertEquals("two segments segment should remain", countSegmentsInDir(messageJournalDir), 2);
+//
+//            // move clock beyond the retention period and clean again
+//            clock.tick(Period.seconds(120));
+//
+//            cleanedLogs = journal.cleanupLogs();
+//            assertEquals("two segments should've been cleaned (only one will actually be removed...)", cleanedLogs, 2);
+//            assertEquals("one segment should remain", countSegmentsInDir(messageJournalDir), 1);
+//
+//        } finally {
+//            DateTimeUtils.setCurrentMillisSystem();
+//        }
+//    }
 
-        // make sure everything is on disk
-        journal.flushDirtyLogs();
-
-        assertEquals(3, countSegmentsInDir(messageJournalDir));
-
-        final int cleanedLogs = journal.cleanupLogs();
-        assertEquals(1, cleanedLogs);
-
-        final int numberOfSegments = countSegmentsInDir(messageJournalDir);
-        assertEquals(2, numberOfSegments);
-    }
-
-    @Test
-    public void segmentAgeCleanup() throws Exception {
-        final InstantMillisProvider clock = new InstantMillisProvider(DateTime.now(DateTimeZone.UTC));
-
-        DateTimeUtils.setCurrentMillisProvider(clock);
-        try {
-            final Size segmentSize = Size.kilobytes(1L);
-            final KafkaJournal journal = new KafkaJournal(journalDirectory,
-                    scheduler,
-                    segmentSize,
-                    Duration.standardHours(1),
-                    Size.kilobytes(10L),
-                    Duration.standardMinutes(1),
-                    1_000_000,
-                    Duration.standardMinutes(1),
-                    100,
-                    new MetricRegistry(),
-                    serverStatus);
-            final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
-            assertTrue(messageJournalDir.exists());
-
-            // we need to fix up the last modified times of the actual files.
-            long lastModifiedTs[] = new long[2];
-
-            // create two chunks, 30 seconds apart
-            createBulkChunks(journal, segmentSize, 1);
-            journal.flushDirtyLogs();
-            lastModifiedTs[0] = clock.getMillis();
-
-            clock.tick(Period.seconds(30));
-
-            createBulkChunks(journal, segmentSize, 1);
-            journal.flushDirtyLogs();
-            lastModifiedTs[1] = clock.getMillis();
-
-            int i = 0;
-            for (final LogSegment segment : journal.getSegments()) {
-                assertTrue(i < 2);
-                segment.lastModified_$eq(lastModifiedTs[i]);
-                i++;
-            }
-
-            int cleanedLogs = journal.cleanupLogs();
-            assertEquals("no segments should've been cleaned", cleanedLogs, 0);
-            assertEquals("two segments segment should remain", countSegmentsInDir(messageJournalDir), 2);
-
-            // move clock beyond the retention period and clean again
-            clock.tick(Period.seconds(120));
-
-            cleanedLogs = journal.cleanupLogs();
-            assertEquals("two segments should've been cleaned (only one will actually be removed...)", cleanedLogs, 2);
-            assertEquals("one segment should remain", countSegmentsInDir(messageJournalDir), 1);
-
-        } finally {
-            DateTimeUtils.setCurrentMillisSystem();
-        }
-    }
-
-    @Test
-    public void segmentCommittedCleanup() throws Exception {
-        final Size segmentSize = Size.kilobytes(1L);
-        final KafkaJournal journal = new KafkaJournal(journalDirectory,
-                scheduler,
-                segmentSize,
-                Duration.standardHours(1),
-                Size.petabytes(1L), // never clean by size in this test
-                Duration.standardDays(1),
-                1_000_000,
-                Duration.standardMinutes(1),
-                100,
-                new MetricRegistry(),
-                serverStatus);
-        final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
-        assertTrue(messageJournalDir.exists());
-
-        final int bulkSize = createBulkChunks(journal, segmentSize, 3);
-
-        // make sure everything is on disk
-        journal.flushDirtyLogs();
-
-        assertEquals(countSegmentsInDir(messageJournalDir), 3);
-
-        // we haven't committed any offsets, this should not touch anything.
-        final int cleanedLogs = journal.cleanupLogs();
-        assertEquals(cleanedLogs, 0);
-
-        final int numberOfSegments = countSegmentsInDir(messageJournalDir);
-        assertEquals(numberOfSegments, 3);
-
-        // mark first half of first segment committed, should not clean anything
-        journal.markJournalOffsetCommitted(bulkSize / 2);
-        assertEquals("should not touch segments", journal.cleanupLogs(), 0);
-        assertEquals(countSegmentsInDir(messageJournalDir), 3);
-
-        journal.markJournalOffsetCommitted(bulkSize + 1);
-        assertEquals("first segment should've been purged", journal.cleanupLogs(), 1);
-        assertEquals(countSegmentsInDir(messageJournalDir), 2);
-
-        journal.markJournalOffsetCommitted(bulkSize * 4);
-        assertEquals("only purge one segment, not the active one", journal.cleanupLogs(), 1);
-        assertEquals(countSegmentsInDir(messageJournalDir), 1);
-    }
+//    @Test
+//    public void segmentCommittedCleanup() throws Exception {
+//        final Size segmentSize = Size.kilobytes(1L);
+//        final KafkaJournal journal = new KafkaJournal(journalDirectory,
+//                scheduler,
+//                segmentSize,
+//                Duration.standardHours(1),
+//                Size.petabytes(1L), // never clean by size in this test
+//                Duration.standardDays(1),
+//                1_000_000,
+//                Duration.standardMinutes(1),
+//                100,
+//                new MetricRegistry(),
+//                serverStatus);
+//        final File messageJournalDir = new File(journalDirectory, "messagejournal-0");
+//        assertTrue(messageJournalDir.exists());
+//
+//        final int bulkSize = createBulkChunks(journal, segmentSize, 3);
+//
+//        // make sure everything is on disk
+//        journal.flushDirtyLogs();
+//
+//        assertEquals(countSegmentsInDir(messageJournalDir), 3);
+//
+//        // we haven't committed any offsets, this should not touch anything.
+//        final int cleanedLogs = journal.cleanupLogs();
+//        assertEquals(cleanedLogs, 0);
+//
+//        final int numberOfSegments = countSegmentsInDir(messageJournalDir);
+//        assertEquals(numberOfSegments, 3);
+//
+//        // mark first half of first segment committed, should not clean anything
+//        journal.markJournalOffsetCommitted(bulkSize / 2);
+//        assertEquals("should not touch segments", journal.cleanupLogs(), 0);
+//        assertEquals(countSegmentsInDir(messageJournalDir), 3);
+//
+//        journal.markJournalOffsetCommitted(bulkSize + 1);
+//        assertEquals("first segment should've been purged", journal.cleanupLogs(), 1);
+//        assertEquals(countSegmentsInDir(messageJournalDir), 2);
+//
+//        journal.markJournalOffsetCommitted(bulkSize * 4);
+//        assertEquals("only purge one segment, not the active one", journal.cleanupLogs(), 1);
+//        assertEquals(countSegmentsInDir(messageJournalDir), 1);
+//    }
 
     @Test
     public void lockedJournalDir() throws Exception {
