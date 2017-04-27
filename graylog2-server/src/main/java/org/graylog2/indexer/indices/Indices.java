@@ -268,6 +268,7 @@ public class Indices {
         final Stats request = new Stats.Builder()
                 .addIndex(indexName)
                 .setParameter("level", "shards")
+                .ignoreUnavailable(true)
                 .build();
 
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check stats of index " + indexName);
