@@ -22,6 +22,7 @@ import io.searchbox.client.JestClient;
 import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
+import org.elasticsearch.action.support.IndicesOptions;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.settings.Settings;
@@ -103,6 +104,7 @@ public abstract class AbstractESTest {
 
     public void deleteIndex(String... indices) {
         final DeleteIndexResponse deleteIndexResponse = client().admin().indices().prepareDelete(indices)
+                .setIndicesOptions(IndicesOptions.lenientExpandOpen())
                 .setTimeout(ES_TIMEOUT)
                 .get();
         assertThat(deleteIndexResponse.isAcknowledged()).isTrue();

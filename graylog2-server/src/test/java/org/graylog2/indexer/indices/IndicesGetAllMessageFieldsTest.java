@@ -17,6 +17,7 @@
 package org.graylog2.indexer.indices;
 
 import com.codahale.metrics.MetricRegistry;
+import com.google.common.eventbus.EventBus;
 import com.google.gson.Gson;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -52,7 +53,13 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        indices = new Indices(jestClient(), new Gson(), new IndexMapping(), new Messages(new MetricRegistry(), jestClient()), mock(NodeId.class), new NullAuditEventSender());
+        indices = new Indices(jestClient(),
+                new Gson(),
+                new IndexMapping(),
+                new Messages(new MetricRegistry(), jestClient()),
+                mock(NodeId.class),
+                new NullAuditEventSender(),
+                new EventBus());
     }
 
     @Test

@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.esplugin;
+package org.graylog2.indexer.indices.events;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
@@ -29,5 +29,9 @@ public abstract class IndicesDeletedEvent {
 
     public static IndicesDeletedEvent create(Set<String> indices) {
         return new AutoValue_IndicesDeletedEvent(ImmutableSet.copyOf(indices));
+    }
+
+    public static IndicesDeletedEvent create(String index) {
+        return new AutoValue_IndicesDeletedEvent(ImmutableSet.of(index));
     }
 }
