@@ -51,6 +51,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.graylog2.indexer.gson.GsonUtils.asInteger;
 
 @Singleton
 public class Cluster {
@@ -201,8 +202,10 @@ public class Cluster {
 
         try {
             final JestResult result = jestClient.execute(request);
-            final Map nodeMap = nodes.get();
-            return result.isSucceeded() && nodeMap != null && !nodeMap.isEmpty();
+            final int numberOfDataNodes = Optional.of(result.getJsonObject())
+                .map(json -> asInteger(json.get("number_of_data_nodes")))
+                .orElse(0);
+            return result.isSucceeded() && numberOfDataNodes > 0;
         } catch (IOException e) {
             return false;
         }
