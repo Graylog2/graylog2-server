@@ -52,6 +52,7 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
@@ -171,6 +172,9 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(SyslogLevelConversion.NAME, SyslogLevelConversion.class);
         addMessageProcessorFunction(SyslogPriorityConversion.NAME, SyslogPriorityConversion.class);
         addMessageProcessorFunction(SyslogPriorityToStringConversion.NAME, SyslogPriorityToStringConversion.class);
+
+        // Lookup tables
+        addMessageProcessorFunction(Lookup.NAME, Lookup.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {
