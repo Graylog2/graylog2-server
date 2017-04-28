@@ -19,7 +19,7 @@ const GuavaCacheFieldSet = React.createClass({
   },
 
   updateAfterAccess(value, unit, enabled) {
-    this._update(value, unit, enabled, 'refresh_after_access');
+    this._update(value, unit, enabled, 'expire_after_access');
   },
 
   updateAfterWrite(value, unit, enabled) {
