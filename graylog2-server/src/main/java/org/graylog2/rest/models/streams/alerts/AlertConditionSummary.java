@@ -69,7 +69,6 @@ public abstract class AlertConditionSummary {
         return new AutoValue_AlertConditionSummary(id, type, creatorUserId, createdAt, parameters, inGrace, title);
     }
 
-    @JsonCreator
     public static AlertConditionSummary createWithoutGrace(@JsonProperty("id") String id,
                                                @JsonProperty("type") String type,
                                                @JsonProperty("creator_user_id") String creatorUserId,
