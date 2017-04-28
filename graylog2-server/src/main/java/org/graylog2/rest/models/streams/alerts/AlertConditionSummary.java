@@ -69,12 +69,12 @@ public abstract class AlertConditionSummary {
         return new AutoValue_AlertConditionSummary(id, type, creatorUserId, createdAt, parameters, inGrace, title);
     }
 
-    public static AlertConditionSummary createWithoutGrace(@JsonProperty("id") String id,
-                                               @JsonProperty("type") String type,
-                                               @JsonProperty("creator_user_id") String creatorUserId,
-                                               @JsonProperty("created_at") Date createdAt,
-                                               @JsonProperty("parameters") Map<String, Object> parameters,
-                                               @JsonProperty("title") @Nullable String title) {
+    public static AlertConditionSummary createWithoutGrace(String id,
+                                                           String type,
+                                                           String creatorUserId,
+                                                           Date createdAt,
+                                                           Map<String, Object> parameters,
+                                                           @Nullable String title) {
         return new AutoValue_AlertConditionSummary(id, type, creatorUserId, createdAt, parameters, null, title);
     }
 }
