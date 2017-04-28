@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.gson;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -139,6 +140,22 @@ public class GsonUtilsTest {
 
     @Test
     public void entrySetAsMapWithNull() throws Exception {
-        assertThat(GsonUtils.entrySetAsMap(null)).isEmpty();
+        assertThat(GsonUtils.entrySetAsMap(null)).isNull();
+    }
+
+    @Test
+    public void asMap() throws Exception {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("foo", "bar");
+        jsonObject.addProperty("question", 42L);
+
+        assertThat(GsonUtils.asMap(new Gson(), jsonObject))
+                .containsEntry("foo", "bar")
+                .containsEntry("question", 42.0D);
+    }
+
+    @Test
+    public void asMapWithNull() throws Exception {
+        assertThat(GsonUtils.asMap(new Gson(), null)).isNull();
     }
 }

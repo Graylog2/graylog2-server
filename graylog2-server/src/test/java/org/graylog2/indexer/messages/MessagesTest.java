@@ -18,7 +18,8 @@ package org.graylog2.indexer.messages;
 
 import com.codahale.metrics.MetricRegistry;
 import io.searchbox.client.JestResult;
-import org.elasticsearch.action.index.IndexResponse;
+import io.searchbox.core.DocumentResult;
+import io.searchbox.core.Index;
 import org.graylog2.AbstractESTest;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.plugin.Message;
@@ -39,7 +40,7 @@ public class MessagesTest extends AbstractESTest {
     public void setUp() throws Exception {
         super.setUp();
 
-        messages = new Messages(new MetricRegistry(), jestClient(), client());
+        messages = new Messages(new MetricRegistry(), jestClient());
     }
 
     @Test
@@ -49,8 +50,9 @@ public class MessagesTest extends AbstractESTest {
         source.put("message", "message");
         source.put("source", "source");
         source.put("timestamp", "2017-04-13 15:29:00.000");
-        final IndexResponse indexResponse = client().index(messages.buildIndexRequest(index, source, "1")).get();
-        assumeTrue(indexResponse.isCreated());
+        final Index indexRequest = messages.prepareIndexRequest(index, source, "1");
+        final DocumentResult indexResponse = jestClient().execute(indexRequest);
+        assumeTrue(indexResponse.isSucceeded());
 
         final ResultMessage resultMessage = messages.get("1", index);
         final Message message = resultMessage.getMessage();

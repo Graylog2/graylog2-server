@@ -147,11 +147,12 @@ public class SearchesTest extends AbstractESTest {
                 .indexOptimizationDisabled(false)
                 .build();
         this.indexSet = new TestIndexSet(indexSetConfig);
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME), jestClient()));
+        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
     }
 
     @Before
     public void setUp() throws Exception {
+        super.setUp();
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         metricRegistry = new MetricRegistry();
         searches = new Searches(new Configuration(), indexRangeService, client(), metricRegistry, streamService, mock(Indices.class), jestClient());

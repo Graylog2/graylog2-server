@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.common.collect.ImmutableList;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -25,21 +24,19 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.elasticsearch.action.admin.indices.stats.CommonStats;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
+import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.rest.models.system.indexer.requests.IndicesReadRequest;
 import org.graylog2.rest.models.system.indexer.responses.AllIndices;
 import org.graylog2.rest.models.system.indexer.responses.ClosedIndices;
 import org.graylog2.rest.models.system.indexer.responses.IndexInfo;
-import org.graylog2.rest.models.system.indexer.responses.IndexStats;
 import org.graylog2.rest.models.system.indexer.responses.OpenIndicesInfo;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -61,7 +58,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.HashMap;
-import java.util.Locale;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
@@ -98,20 +95,9 @@ public class IndicesResource extends RestResource {
             throw new NotFoundException(msg);
         }
 
-        final IndexStatistics stats = indices.getIndexStats(index);
-        if (stats == null) {
-            final String msg = "Index [" + index + "] not found.";
-            LOG.error(msg);
-            throw new NotFoundException(msg);
-        }
-
-        final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
-        for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : stats.shardRoutings()) {
-            routing.add(shardRouting(shardRouting));
-        }
-
-        return IndexInfo.create(indexStats(stats.primaries()), indexStats(stats.total()),
-            routing.build(), indices.isReopened(index));
+        return indices.getIndexStats(index)
+                .map(this::toIndexInfo)
+                .orElseThrow(() -> new NotFoundException("Index [" + index + "] not found."));
     }
 
     @POST
@@ -270,11 +256,11 @@ public class IndicesResource extends RestResource {
     @Produces(MediaType.APPLICATION_JSON)
     public OpenIndicesInfo indexSetOpen(@ApiParam(name = "indexSetId") @PathParam("indexSetId") String indexSetId) {
         final IndexSet indexSet = getIndexSet(indexSetRegistry, indexSetId);
-        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(indexSet).stream()
-                .filter(indexStats -> indexSetRegistry.isManagedIndex(indexStats.indexName()))
+        final Set<IndexStatistics> indicesInfos = indices.getIndicesStats(indexSet).stream()
+                .filter(indexStats -> indexSetRegistry.isManagedIndex(indexStats.index()))
                 .collect(Collectors.toSet());
 
-        return getOpenIndicesInfo(indicesStats);
+        return getOpenIndicesInfo(indicesInfos);
     }
 
     @GET
@@ -309,51 +295,40 @@ public class IndicesResource extends RestResource {
         return ClosedIndices.create(reopenedIndices, reopenedIndices.size());
     }
 
-    private ShardRouting shardRouting(org.elasticsearch.cluster.routing.ShardRouting route) {
-        return ShardRouting.create(route.shardId().getId(),
-            route.state().name().toLowerCase(Locale.ENGLISH),
-            route.active(),
-            route.primary(),
-            route.currentNodeId(),
-            cluster.nodeIdToName(route.currentNodeId()).orElse(null),
-            cluster.nodeIdToHostName(route.currentNodeId()).orElse(null),
-            route.relocatingNodeId());
-    }
-
-    private IndexStats indexStats(final CommonStats stats) {
-        return IndexStats.create(
-            IndexStats.TimeAndTotalStats.create(stats.getFlush().getTotal(), stats.getFlush().getTotalTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getGet().getCount(), stats.getGet().getTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getIndexing().getTotal().getIndexCount(), stats.getIndexing().getTotal().getIndexTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getMerge().getTotal(), stats.getMerge().getTotalTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getRefresh().getTotal(), stats.getRefresh().getTotalTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getQueryCount(), stats.getSearch().getTotal().getQueryTime().getSeconds()),
-            IndexStats.TimeAndTotalStats.create(stats.getSearch().getTotal().getFetchCount(), stats.getSearch().getTotal().getFetchTime().getSeconds()),
-            stats.getSearch().getOpenContexts(),
-            stats.getStore().getSize().getBytes(),
-            stats.getSegments().getCount(),
-            IndexStats.DocsStats.create(stats.getDocs().getCount(), stats.getDocs().getDeleted())
-        );
-    }
-
-    private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStats) {
+    private OpenIndicesInfo getOpenIndicesInfo(Set<IndexStatistics> indicesStatistics) {
         final Map<String, IndexInfo> indexInfos = new HashMap<>();
-        final Map<String, Boolean> areReopened = indices.areReopened(indicesStats.stream().map(IndexStatistics::indexName).collect(Collectors.toSet()));
-        for (IndexStatistics indexStatistics : indicesStats) {
-            final ImmutableList.Builder<ShardRouting> routing = ImmutableList.builder();
-            for (org.elasticsearch.cluster.routing.ShardRouting shardRouting : indexStatistics.shardRoutings()) {
-                routing.add(shardRouting(shardRouting));
-            }
+        final Map<String, Boolean> areReopened = indices.areReopened(indicesStatistics.stream()
+                .map(IndexStatistics::index)
+                .collect(Collectors.toSet()));
 
+        for (IndexStatistics indexStatistics : indicesStatistics) {
             final IndexInfo indexInfo = IndexInfo.create(
-                    indexStats(indexStatistics.primaries()),
-                    indexStats(indexStatistics.total()),
-                    routing.build(),
-                    areReopened.get(indexStatistics.indexName()));
+                    indexStatistics.primaryShards(),
+                    indexStatistics.allShards(),
+                    fillShardRoutings(indexStatistics.routing()),
+                    areReopened.get(indexStatistics.index()));
 
-            indexInfos.put(indexStatistics.indexName(), indexInfo);
+            indexInfos.put(indexStatistics.index(), indexInfo);
         }
 
         return OpenIndicesInfo.create(indexInfos);
+    }
+
+    private List<ShardRouting> fillShardRoutings(List<ShardRouting> shardRoutings) {
+        return shardRoutings.stream()
+                .map(shardRouting ->
+                        shardRouting.withNodeDetails(
+                                cluster.nodeIdToName(shardRouting.nodeId()).orElse(null),
+                                cluster.nodeIdToHostName(shardRouting.nodeId()).orElse(null))
+                ).collect(Collectors.toList());
+    }
+
+    private IndexInfo toIndexInfo(IndexStatistics indexStatistics) {
+        return IndexInfo.create(
+                indexStatistics.primaryShards(),
+                indexStatistics.allShards(),
+                fillShardRoutings(indexStatistics.routing()),
+                indices.isReopened(indexStatistics.index())
+        );
     }
 }
