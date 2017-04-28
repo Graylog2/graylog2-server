@@ -18,6 +18,9 @@ package org.graylog2.indexer.results;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import io.searchbox.core.search.aggregation.CardinalityAggregation;
+import io.searchbox.core.search.aggregation.HistogramAggregation;
+import io.searchbox.core.search.aggregation.StatsAggregation;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
@@ -41,14 +44,21 @@ public class FieldHistogramResult extends HistogramResult {
             .put("mean", 0)
             .build();
 
-    private final Histogram result;
+    private final Map<Long, Map<String, Number>> result;
     private final Searches.DateHistogramInterval interval;
 
     public FieldHistogramResult(Histogram result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
-        this.result = result;
         this.interval = interval;
+        this.result = getResultsFromHistogram(result);
+    }
+
+    public FieldHistogramResult(HistogramAggregation histogramAggregation, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
+        super(originalQuery, builtQuery, took);
+
+        this.interval = interval;
+        this.result = getResultsFromHistogramAggregation(histogramAggregation);
     }
 
     @Override
@@ -57,13 +67,47 @@ public class FieldHistogramResult extends HistogramResult {
     }
 
     @Override
-    public Map<Long, Map<String, Number>> getResults() {
-        if (result.getBuckets().isEmpty()) {
+    public Map getResults() {
+        return result;
+    }
+
+    private Map<Long, Map<String, Number>> getResultsFromHistogramAggregation(HistogramAggregation histogramAggregation) {
+        if (histogramAggregation.getBuckets().isEmpty()) {
             return Collections.emptyMap();
         }
 
         final Map<Long, Map<String, Number>> results = Maps.newTreeMap();
-        for (Histogram.Bucket b : result.getBuckets()) {
+        for (HistogramAggregation.Histogram b : histogramAggregation.getBuckets()) {
+            final ImmutableMap.Builder<String, Number> resultMap = ImmutableMap.builder();
+            resultMap.put("total_count", b.getCount());
+
+            final StatsAggregation stats = b.getStatsAggregation(Searches.AGG_STATS);
+            resultMap.put("count", stats.getCount());
+            resultMap.put("min", stats.getMin() == null ? 0D : stats.getMin());
+            resultMap.put("max", stats.getMax() == null ? 0D : stats.getMax());
+            resultMap.put("total", stats.getSum() == null ? 0D : stats.getSum());
+            resultMap.put("mean", stats.getAvg() == null ? 0D : stats.getAvg());
+
+            // cardinality is only calculated if it was explicitly requested, so this might be null
+            final CardinalityAggregation cardinality = b.getCardinalityAggregation(Searches.AGG_CARDINALITY);
+            resultMap.put("cardinality", cardinality == null ? 0 : cardinality.getCardinality());
+
+            final DateTime keyAsDate = new DateTime(b.getKey());
+            final long timestamp = keyAsDate.getMillis() / 1000L;
+            results.put(timestamp, resultMap.build());
+        }
+
+        fillEmptyTimestamps(results);
+        return results;
+    }
+
+    private Map<Long, Map<String, Number>> getResultsFromHistogram(Histogram histogram) {
+        if (histogram.getBuckets().isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        final Map<Long, Map<String, Number>> results = Maps.newTreeMap();
+        for (Histogram.Bucket b : histogram.getBuckets()) {
             final ImmutableMap.Builder<String, Number> resultMap = ImmutableMap.builder();
             resultMap.put("total_count", b.getDocCount());
 
@@ -83,6 +127,11 @@ public class FieldHistogramResult extends HistogramResult {
             results.put(timestamp, resultMap.build());
         }
 
+        fillEmptyTimestamps(results);
+        return results;
+    }
+
+    private void fillEmptyTimestamps(Map<Long, Map<String, Number>> results) {
         final long minTimestamp = Collections.min(results.keySet());
         final long maxTimestamp = Collections.max(results.keySet());
         final MutableDateTime currentTime = new MutableDateTime(minTimestamp, DateTimeZone.UTC);
@@ -98,6 +147,5 @@ public class FieldHistogramResult extends HistogramResult {
                 results.put(currentTime.getMillis(), EMPTY_RESULT);
             }
         }
-        return results;
     }
 }
