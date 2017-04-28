@@ -32,10 +32,7 @@ import io.searchbox.core.DocumentResult;
 import io.searchbox.core.Get;
 import io.searchbox.core.Index;
 import io.searchbox.indices.Analyze;
-import org.elasticsearch.ElasticsearchTimeoutException;
-import org.elasticsearch.action.WriteConsistencyLevel;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.client.Client;
+import io.searchbox.params.Parameters;
 import org.graylog2.indexer.IndexFailure;
 import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexMapping;
@@ -48,6 +45,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -67,22 +65,19 @@ public class Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Messages.class);
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
     private static final Retryer<BulkResult> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResult>newBuilder()
-            .retryIfException(t -> t instanceof ElasticsearchTimeoutException)
+            .retryIfException(t -> t instanceof SocketTimeoutException)
             .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
             .build();
 
     private final Meter invalidTimestampMeter;
     private final JestClient client;
-    private final Client c;
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
 
     @Inject
     public Messages(MetricRegistry metricRegistry,
-                    JestClient client,
-                    Client c) {
+                    JestClient client) {
         invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
         this.client = client;
-        this.c = c;
 
         // TODO: Magic number
         this.indexFailureQueue =  new LinkedBlockingQueue<>(1000);
@@ -106,7 +101,8 @@ public class Messages {
         final Analyze analyze = new Analyze.Builder().index(index).analyzer(analyzer).text(toAnalyze).build();
         final JestResult result = client.execute(analyze);
 
-        final List<Map<String, Object>> tokens = (List<Map<String, Object>>)result.getValue("tokens");
+        @SuppressWarnings("unchecked")
+        final List<Map<String, Object>> tokens = (List<Map<String, Object>>) result.getValue("tokens");
         final List<String> terms = new ArrayList<>(tokens.size());
         tokens.forEach(token -> terms.add((String)token.get("token")));
 
@@ -186,13 +182,15 @@ public class Messages {
         }
     }
 
-    public IndexRequest buildIndexRequest(String index, Map<String, Object> source, String id) {
+    public Index prepareIndexRequest(String index, Map<String, Object> source, String id) {
         source.remove(Message.FIELD_ID);
 
-        return c.prepareIndex(index, IndexMapping.TYPE_MESSAGE, id)
-                .setSource(source)
-                .setConsistencyLevel(WriteConsistencyLevel.ONE)
-                .request();
+        return new Index.Builder(source)
+                .index(index)
+                .type(IndexMapping.TYPE_MESSAGE)
+                .id(id)
+                .setParameter(Parameters.CONSISTENCY, "one")
+                .build();
     }
 
     public LinkedBlockingQueue<List<IndexFailure>> getIndexFailureQueue() {

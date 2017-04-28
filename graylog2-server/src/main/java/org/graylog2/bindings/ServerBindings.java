@@ -17,6 +17,8 @@
 package org.graylog2.bindings;
 
 import com.floreysoft.jmte.Engine;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
@@ -158,6 +160,8 @@ public class ServerBindings extends Graylog2Module {
         } else {
             install(new NoopJournalModule());
         }
+
+        bind(Gson.class).toInstance(new GsonBuilder().create());
         bind(Node.class).toProvider(EsNodeProvider.class).asEagerSingleton();
         bind(Client.class).toProvider(EsClientProvider.class).asEagerSingleton();
         bind(JestClient.class).toProvider(JestClientProvider.class).asEagerSingleton();
