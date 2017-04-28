@@ -30,7 +30,6 @@ import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.esplugin.ClusterStateMonitor;
 import org.graylog2.indexer.gson.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,9 +71,6 @@ public class Cluster {
         this.jestClient = jestClient;
         this.indexSetRegistry = indexSetRegistry;
         this.requestTimeout = requestTimeout;
-        // unfortunately we can't use guice here, because elasticsearch and graylog2 use different injectors and we can't
-        // get to the instance to bridge.
-        ClusterStateMonitor.setCluster(this);
     }
 
     private JsonObject clusterHealth(Collection<? extends String> indices) {

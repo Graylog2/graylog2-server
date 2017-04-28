@@ -20,6 +20,7 @@ import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.eventbus.EventBus;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -76,6 +77,9 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.gson.GsonUtils;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.events.IndicesClosedEvent;
+import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
+import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.IndexRangeStats;
@@ -125,15 +129,19 @@ public class Indices {
     private final Messages messages;
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
+    private final EventBus eventBus;
 
     @Inject
-    public Indices(JestClient jestClient, Gson gson, IndexMapping indexMapping, Messages messages, NodeId nodeId, AuditEventSender auditEventSender) {
+    public Indices(JestClient jestClient, Gson gson, IndexMapping indexMapping,
+                   Messages messages, NodeId nodeId, AuditEventSender auditEventSender,
+                   EventBus eventBus) {
         this.jestClient = jestClient;
         this.gson = gson;
         this.indexMapping = indexMapping;
         this.messages = messages;
         this.nodeId = nodeId;
         this.auditEventSender = auditEventSender;
+        this.eventBus = eventBus;
     }
 
     public void move(String source, String target) {
@@ -202,10 +210,12 @@ public class Indices {
 
     public void delete(String indexName) {
         JestUtils.execute(jestClient, new DeleteIndex.Builder(indexName).build(), () -> "Couldn't delete index " + indexName);
+        eventBus.post(IndicesDeletedEvent.create(indexName));
     }
 
     public void close(String indexName) {
         JestUtils.execute(jestClient, new CloseIndex.Builder(indexName).build(), () -> "Couldn't close index " + indexName);
+        eventBus.post(IndicesClosedEvent.create(indexName));
     }
 
     public long numberOfMessages(String indexName) throws IndexNotFoundException {
@@ -470,6 +480,7 @@ public class Indices {
 
     private void openIndex(String index) {
         JestUtils.execute(jestClient, new OpenIndex.Builder(index).build(), () -> "Couldn't open index " + index);
+        eventBus.post(IndicesReopenedEvent.create(index));
     }
 
     public boolean isReopened(String indexName) {

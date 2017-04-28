@@ -20,6 +20,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
@@ -29,6 +31,7 @@ import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
 import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesRequest;
 import org.elasticsearch.action.admin.indices.alias.IndicesAliasesResponse;
+import org.elasticsearch.action.admin.indices.close.CloseIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.mapping.get.GetMappingsResponse;
@@ -48,6 +51,9 @@ import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.events.IndicesClosedEvent;
+import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
+import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
@@ -66,6 +72,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -98,6 +105,7 @@ public class IndicesTest extends AbstractESTest {
             .build();
     private final IndexSet indexSet = new TestIndexSet(indexSetConfig);
 
+    private EventBus eventBus;
     private Indices indices;
 
     public IndicesTest() {
@@ -107,7 +115,14 @@ public class IndicesTest extends AbstractESTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        indices = new Indices(jestClient(), new Gson(), new IndexMapping(), new Messages(new MetricRegistry(), jestClient()), mock(NodeId.class), new NullAuditEventSender());
+        eventBus = new EventBus("indices-test");
+        indices = new Indices(jestClient(),
+                new Gson(),
+                new IndexMapping(),
+                new Messages(new MetricRegistry(), jestClient()),
+                mock(NodeId.class),
+                new NullAuditEventSender(),
+                eventBus);
     }
 
     @Test
@@ -340,5 +355,89 @@ public class IndicesTest extends AbstractESTest {
         assertThat(deleteResponse.isAcknowledged()).isTrue();
 
         indices.delete(testIndexName);
+    }
+
+    @Test
+    public void closePostsIndicesClosedEvent() {
+        final String index = "close_event";
+        final IndicesEventListener listener = new IndicesEventListener();
+        eventBus.register(listener);
+
+        try {
+            createIndex(index);
+            waitForGreenStatus(index);
+
+            indices.close(index);
+        } finally {
+            deleteIndex(index);
+        }
+
+        assertThat(listener.indicesClosedEvents).containsOnly(IndicesClosedEvent.create(index));
+        assertThat(listener.indicesDeletedEvents).isEmpty();
+        assertThat(listener.indicesReopenedEvents).isEmpty();
+    }
+
+    @Test
+    public void deletePostsIndicesDeletedEvent() {
+        final String index = "delete_event";
+        final IndicesEventListener listener = new IndicesEventListener();
+        eventBus.register(listener);
+
+        try {
+            createIndex(index);
+            waitForGreenStatus(index);
+
+            indices.delete(index);
+        } finally {
+            deleteIndex(index);
+        }
+
+        assertThat(listener.indicesDeletedEvents).containsOnly(IndicesDeletedEvent.create(index));
+        assertThat(listener.indicesClosedEvents).isEmpty();
+        assertThat(listener.indicesReopenedEvents).isEmpty();
+    }
+
+    @Test
+    public void reopenIndexPostsIndicesReopenedEvent() {
+        final String index = "delete_event";
+        final IndicesEventListener listener = new IndicesEventListener();
+        eventBus.register(listener);
+
+        try {
+            createIndex(index);
+            waitForGreenStatus(index);
+
+            final CloseIndexResponse closeIndexResponse = client().admin().indices().prepareClose(index).get(ES_TIMEOUT);
+            assertThat(closeIndexResponse.isAcknowledged()).isTrue();
+
+            indices.reopenIndex(index);
+        } finally {
+            deleteIndex(index);
+        }
+
+        assertThat(listener.indicesReopenedEvents).containsOnly(IndicesReopenedEvent.create(index));
+        assertThat(listener.indicesClosedEvents).isEmpty();
+        assertThat(listener.indicesDeletedEvents).isEmpty();
+    }
+
+    public static final class IndicesEventListener {
+        final List<IndicesClosedEvent> indicesClosedEvents = Collections.synchronizedList(new ArrayList<>());
+        final List<IndicesDeletedEvent> indicesDeletedEvents = Collections.synchronizedList(new ArrayList<>());
+        final List<IndicesReopenedEvent> indicesReopenedEvents = Collections.synchronizedList(new ArrayList<>());
+
+        @Subscribe
+        public void handleIndicesClosedEvent(IndicesClosedEvent event) {
+            indicesClosedEvents.add(event);
+        }
+
+        @Subscribe
+        public void handleIndicesDeletedEvent(IndicesDeletedEvent event) {
+            indicesDeletedEvents.add(event);
+        }
+
+        @Subscribe
+        public void handleIndicesReopenedEvent(IndicesReopenedEvent event) {
+            indicesReopenedEvents.add(event);
+        }
     }
 }
