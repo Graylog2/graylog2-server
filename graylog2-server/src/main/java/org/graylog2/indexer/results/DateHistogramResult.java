@@ -17,22 +17,30 @@
 package org.graylog2.indexer.results;
 
 import com.google.common.collect.Maps;
+import io.searchbox.core.search.aggregation.HistogramAggregation;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.graylog2.indexer.searches.Searches;
 import org.joda.time.DateTime;
 
+import java.util.Date;
 import java.util.Map;
 
 public class DateHistogramResult extends HistogramResult {
-    private final Histogram result;
+    private final Map<Long, Long> result;
     private final Searches.DateHistogramInterval interval;
 
-    public DateHistogramResult(Histogram result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
+    public DateHistogramResult(HistogramAggregation result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
-        this.result = result;
+        this.result = Maps.newTreeMap();
+
+        for (HistogramAggregation.Histogram histogram : result.getBuckets()) {
+            final DateTime keyAsDate = new DateTime(histogram.getKey());
+            this.result.put(keyAsDate.getMillis() / 1000L, histogram.getCount());
+        }
+
         this.interval = interval;
     }
 
@@ -43,13 +51,6 @@ public class DateHistogramResult extends HistogramResult {
 
     @Override
     public Map<Long, Long> getResults() {
-        Map<Long, Long> results = Maps.newTreeMap();
-
-        for (Histogram.Bucket bucket : result.getBuckets()) {
-            final DateTime keyAsDate = (DateTime) bucket.getKey();
-            results.put(keyAsDate.getMillis() / 1000L, bucket.getDocCount());
-        }
-
-        return results;
+        return result;
     }
 }

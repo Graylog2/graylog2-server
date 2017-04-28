@@ -19,9 +19,11 @@ package org.graylog2.indexer.searches;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSortedSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
+import io.searchbox.core.SearchResult;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog2.AbstractESTest;
 import org.graylog2.Configuration;
@@ -38,6 +40,7 @@ import org.graylog2.indexer.ranges.MongoIndexRange;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.HistogramResult;
+import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
@@ -155,7 +158,15 @@ public class SearchesTest extends AbstractESTest {
         super.setUp();
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         metricRegistry = new MetricRegistry();
-        searches = new Searches(new Configuration(), indexRangeService, client(), metricRegistry, streamService, mock(Indices.class), jestClient());
+        searches = new Searches(
+            new Configuration(),
+            indexRangeService,
+            metricRegistry,
+            streamService,
+            mock(Indices.class),
+            jestClient(),
+            (initialResult, query, fields) -> new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields)
+        );
     }
 
     @Test

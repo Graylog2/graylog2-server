@@ -17,13 +17,17 @@
 package org.graylog2.indexer.results;
 
 import com.google.common.collect.Maps;
+import io.searchbox.core.search.aggregation.Bucket;
+import io.searchbox.core.search.aggregation.TermsAggregation;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.aggregations.bucket.missing.Missing;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TermsResult extends IndexQueryResult {
 
@@ -39,6 +43,16 @@ public class TermsResult extends IndexQueryResult {
         this.missing = m.getDocCount();
         this.other = f.getSumOfOtherDocCounts();
         this.terms = buildTermsMap(f.getBuckets());
+    }
+
+    public TermsResult(TermsAggregation terms, long missingCount, long totalCount, String originalQuery, BytesReference builtQuery, TimeValue took) {
+        super(originalQuery, builtQuery, took);
+
+        this.total = totalCount;
+        this.missing = missingCount;
+        this.other = terms.getSumOtherDocCount();
+        this.terms = terms.getBuckets().stream()
+            .collect(Collectors.toMap(TermsAggregation.Entry::getKey, Bucket::getCount));
     }
 
     private Map<String, Long> buildTermsMap(List<Terms.Bucket> entries) {
