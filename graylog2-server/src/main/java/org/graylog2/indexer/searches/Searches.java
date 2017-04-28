@@ -20,7 +20,10 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableSortedSet;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
 import io.searchbox.core.Search;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
@@ -32,8 +35,6 @@ import io.searchbox.core.search.aggregation.TermsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
 import io.searchbox.core.search.sort.Sort;
 import io.searchbox.params.Parameters;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.ShardSearchFailure;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -52,6 +53,7 @@ import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog2.indexer.gson.GsonUtils;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -70,15 +72,13 @@ import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
 import org.joda.time.Period;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -86,12 +86,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
+import static org.graylog2.indexer.gson.GsonUtils.asJsonArray;
+import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
+import static org.graylog2.indexer.gson.GsonUtils.asString;
 
 @Singleton
 public class Searches {
@@ -210,7 +214,7 @@ public class Searches {
 
         final Count count = builder.build();
 
-        final io.searchbox.core.CountResult countResult = JestUtils.execute(jestClient, count, () -> "Unable to perform count query.");
+        final io.searchbox.core.CountResult countResult = checkForFailedShards(JestUtils.execute(jestClient, count, () -> "Unable to perform count query."));
         // TODO: fix usage of tookms
         recordEsMetrics(0, range);
         return CountResult.create(countResult.getCount().longValue(), 0);
@@ -236,7 +240,7 @@ public class Searches {
             .addIndex(indices);
         fields.forEach(initialSearchBuilder::addSourceIncludePattern);
 
-        final io.searchbox.core.SearchResult initialResult = JestUtils.execute(jestClient, initialSearchBuilder.build(), () -> "Unable to perform scrolling search.");
+        final io.searchbox.core.SearchResult initialResult = checkForFailedShards(JestUtils.execute(jestClient, initialSearchBuilder.build(), () -> "Unable to perform scrolling search."));
         final long tookMs = tookMsFromSearchResult(initialResult);
         recordEsMetrics(tookMs, range);
 
@@ -270,7 +274,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(indices);
 
-        final io.searchbox.core.SearchResult searchResult = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform search query.");
+        final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform search query."));
         final List<ResultMessage> hits = searchResult.getHits(Map.class).stream()
             .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
             .collect(Collectors.toList());
@@ -316,7 +320,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices);
 
-        final io.searchbox.core.SearchResult searchResult = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform terms query.");
+        final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform terms query."));
         final long tookMs = tookMsFromSearchResult(searchResult);
 
         recordEsMetrics(tookMs, range);
@@ -416,7 +420,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices);
 
-        final io.searchbox.core.SearchResult searchResult = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve terms stats.");
+        final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve terms stats."));
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, range);
 
@@ -479,7 +483,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(indices);
 
-        final io.searchbox.core.SearchResult searchResponse = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve fields stats.");
+        final io.searchbox.core.SearchResult searchResponse = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve fields stats."));
         final List<ResultMessage> hits = searchResponse.getHits(Map.class).stream()
             .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
             .collect(Collectors.toList());
@@ -541,7 +545,7 @@ public class Searches {
             .ignoreUnavailable(true)
             .allowNoIndices(true);
 
-        final io.searchbox.core.SearchResult searchResult = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve histogram.");
+        final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve histogram."));
 
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, range);
@@ -589,7 +593,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices);
 
-        final io.searchbox.core.SearchResult searchResult = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve field histogram.");
+        final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve field histogram."));
 
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, range);
@@ -605,19 +609,38 @@ public class Searches {
                 new TimeValue(tookMs));
     }
 
-    private void checkForFailedShards(SearchResponse r) throws FieldTypeException {
+    private <T extends JestResult> T checkForFailedShards(T result) throws FieldTypeException {
         // unwrap shard failure due to non-numeric mapping. this happens when searching across index sets
         // if at least one of the index sets comes back with a result, the overall result will have the aggregation
         // but not considered failed entirely. however, if one shard has the error, we will refuse to respond
         // otherwise we would be showing empty graphs for non-numeric fields.
-        if (r.getFailedShards() > 0) {
-            final Optional<ShardSearchFailure> failure = Arrays.stream(r.getShardFailures())
-                    .filter(shardSearchFailure -> shardSearchFailure.getCause() instanceof IllegalArgumentException)
-                    .findFirst();
-            if (failure.isPresent()) {
-                throw new FieldTypeException(failure.get().getCause());
-            }
+        final JsonObject jsonObject = result.getJsonObject();
+        final Optional<JsonElement> shards = Optional.of(jsonObject.get("_shards"));
+        final double failedShards = shards
+            .map(JsonElement::getAsJsonObject)
+            .map(json -> json.get("failed"))
+            .map(JsonElement::getAsDouble)
+            .orElse(0.0);
+
+        if (failedShards > 0) {
+            final List<String> errors = shards
+                .map(GsonUtils::asJsonObject)
+                .map(json -> asJsonArray(json.get("failures")))
+                .map(Iterable::spliterator)
+                .map(x -> StreamSupport.stream(x, false))
+                .orElse(java.util.stream.Stream.empty())
+                .map(GsonUtils::asJsonObject)
+                .map(failure -> Optional.ofNullable(asJsonObject(failure.get("reason")))
+                    .map(reason -> asString(reason.get("reason")))
+                    .orElse(null)
+                )
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+            throw new ElasticsearchException("Unable to perform search query.", errors);
         }
+
+        return result;
     }
 
     private SearchSourceBuilder searchRequest(SearchesConfig config) {
