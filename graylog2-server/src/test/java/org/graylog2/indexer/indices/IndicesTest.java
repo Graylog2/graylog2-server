@@ -20,6 +20,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
@@ -40,10 +41,10 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.cluster.metadata.IndexTemplateMetaData;
 import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.compress.CompressedXContent;
-import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.AbstractESTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -68,48 +69,45 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 public class IndicesTest extends AbstractESTest {
-    private static final long ES_TIMEOUT = TimeUnit.SECONDS.toMillis(1L);
     private static final String INDEX_NAME = "graylog_0";
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private final IndexSetConfig indexSetConfig;
-    private final IndexSet indexSet;
+    private final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
+            .id("index-set-1")
+            .title("Index set 1")
+            .description("For testing")
+            .indexPrefix("graylog")
+            .creationDate(ZonedDateTime.now())
+            .shards(1)
+            .replicas(0)
+            .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+            .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+            .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
+            .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+            .indexAnalyzer("standard")
+            .indexTemplateName("template-1")
+            .indexOptimizationMaxNumSegments(1)
+            .indexOptimizationDisabled(false)
+            .build();
+    private final IndexSet indexSet = new TestIndexSet(indexSetConfig);
 
     private Indices indices;
 
     public IndicesTest() {
-        this.indexSetConfig = IndexSetConfig.builder()
-                .id("index-set-1")
-                .title("Index set 1")
-                .description("For testing")
-                .indexPrefix("graylog")
-                .creationDate(ZonedDateTime.now())
-                .shards(1)
-                .replicas(0)
-                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
-                .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
-                .indexAnalyzer("standard")
-                .indexTemplateName("template-1")
-                .indexOptimizationMaxNumSegments(1)
-                .indexOptimizationDisabled(false)
-                .build();
-        this.indexSet = new TestIndexSet(indexSetConfig);
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME), jestClient()));
+        elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
     }
 
     @Before
     public void setUp() throws Exception {
-        indices = new Indices(client(), new IndexMapping(), new Messages(new MetricRegistry(), jestClient(), client()), mock(NodeId.class), new NullAuditEventSender());
+        super.setUp();
+        indices = new Indices(jestClient(), new Gson(), new IndexMapping(), new Messages(new MetricRegistry(), jestClient()), mock(NodeId.class), new NullAuditEventSender());
     }
 
     @Test
@@ -134,41 +132,50 @@ public class IndicesTest extends AbstractESTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testClose() throws Exception {
-        final ClusterStateRequest beforeRequest = client().admin().cluster().prepareState().setIndices(INDEX_NAME).request();
-        final ClusterStateResponse beforeResponse = client().admin().cluster().state(beforeRequest).actionGet(ES_TIMEOUT);
-        assertThat(beforeResponse.getState().getMetaData().getConcreteAllOpenIndices()).containsExactly(INDEX_NAME);
+        final String index = "test_close";
+        try {
+            createIndex(index);
+            waitForGreenStatus(index);
 
-        indices.close(INDEX_NAME);
+            final ClusterStateRequest beforeRequest = client().admin().cluster().prepareState().setIndices(index).request();
+            final ClusterStateResponse beforeResponse = client().admin().cluster().state(beforeRequest).actionGet(ES_TIMEOUT);
+            assertThat(beforeResponse.getState().getMetaData().getConcreteAllOpenIndices()).containsExactly(index);
 
-        final ClusterStateRequest request = client().admin().cluster().prepareState().setIndices(INDEX_NAME).request();
-        final ClusterStateResponse response = client().admin().cluster().state(request).actionGet(ES_TIMEOUT);
-        assertThat(response.getState().getMetaData().getConcreteAllClosedIndices()).containsExactly(INDEX_NAME);
+            indices.close(index);
+
+            final ClusterStateRequest request = client().admin().cluster().prepareState().setIndices(index).request();
+            final ClusterStateResponse response = client().admin().cluster().state(request).actionGet(ES_TIMEOUT);
+            assertThat(response.getState().getMetaData().getConcreteAllClosedIndices()).containsExactly(index);
+        } finally {
+            deleteIndex(index);
+        }
     }
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testAliasExists() throws Exception {
-        assertThat(indices.aliasExists("graylog_alias")).isFalse();
+        final String alias = "graylog_alias_exists";
+        assertThat(indices.aliasExists(alias)).isFalse();
 
         final IndicesAdminClient adminClient = client().admin().indices();
-        final IndicesAliasesRequest request = adminClient.prepareAliases().addAlias(INDEX_NAME, "graylog_alias").request();
+        final IndicesAliasesRequest request = adminClient.prepareAliases().addAlias(INDEX_NAME, alias).request();
         final IndicesAliasesResponse response = adminClient.aliases(request).actionGet(ES_TIMEOUT);
         assertThat(response.isAcknowledged()).isTrue();
-        assertThat(indices.aliasExists("graylog_alias")).isTrue();
+        assertThat(indices.aliasExists(alias)).isTrue();
     }
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testAliasTarget() throws Exception {
-        assertThat(indices.aliasTarget("graylog_alias")).isNull();
+        final String alias = "graylog_alias_target";
+        assertThat(indices.aliasTarget(alias)).isEmpty();
 
         final IndicesAdminClient adminClient = client().admin().indices();
-        final IndicesAliasesRequest request = adminClient.prepareAliases().addAlias(INDEX_NAME, "graylog_alias").request();
+        final IndicesAliasesRequest request = adminClient.prepareAliases().addAlias(INDEX_NAME, alias).request();
         final IndicesAliasesResponse response = adminClient.aliases(request).actionGet(ES_TIMEOUT);
         assertThat(response.isAcknowledged()).isTrue();
-        assertThat(indices.aliasTarget("graylog_alias")).isEqualTo(INDEX_NAME);
+        assertThat(indices.aliasTarget(alias)).contains(INDEX_NAME);
     }
 
     @Test
@@ -266,20 +273,22 @@ public class IndicesTest extends AbstractESTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() {
+        final String indexName = "index_creation_date_test";
         final DateTime now = DateTime.now(DateTimeZone.UTC);
-        indices.create("index_creation_date_test", indexSet);
-
-        final DateTime indexCreationDate = indices.indexCreationDate("index_creation_date_test");
-        org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now);
-
-        indices.delete("index_creation_date_test");
+        try {
+            indices.create(indexName, indexSet);
+            indices.indexCreationDate(indexName).ifPresent(
+                    indexCreationDate -> org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now)
+            );
+        } finally {
+            indices.delete(indexName);
+        }
     }
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    public void indexCreationDateReturnsNullForNonExistingIndex() {
-        final DateTime indexCreationDate = indices.indexCreationDate("index_missing");
-        assertThat(indexCreationDate).isNull();
+    public void indexCreationDateReturnsEmptyOptionalForNonExistingIndex() {
+        assertThat(indices.indexCreationDate("index_missing")).isEmpty();
     }
 
     @Test

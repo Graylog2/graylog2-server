@@ -18,6 +18,7 @@ package org.graylog2.bindings.providers;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import com.google.gson.Gson;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
@@ -48,7 +49,8 @@ public class JestClientProvider implements Provider<JestClient> {
                               @Named("elasticsearch_socket_timeout") Duration elasticsearchSocketTimeout,
                               @Named("elasticsearch_idle_timeout") Duration elasticsearchIdleTimeout,
                               @Named("elasticsearch_max_total_connections") int elasticsearchMaxTotalConnections,
-                              @Named("elasticsearch_max_total_connections_per_route") int elasticsearchMaxTotalConnectionsPerRoute) {
+                              @Named("elasticsearch_max_total_connections_per_route") int elasticsearchMaxTotalConnectionsPerRoute,
+                              Gson gson) {
         this.factory = new JestClientFactory();
         this.credentialsProvider = new BasicCredentialsProvider();
         final List<String> hosts = elasticsearchHosts.stream()
@@ -79,6 +81,7 @@ public class JestClientProvider implements Provider<JestClient> {
             .maxTotalConnection(elasticsearchMaxTotalConnections)
             .defaultMaxTotalConnectionPerRoute(elasticsearchMaxTotalConnectionsPerRoute)
             .multiThreaded(true)
+            .gson(gson)
             .build());
     }
 

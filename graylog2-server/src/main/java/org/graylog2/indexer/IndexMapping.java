@@ -34,6 +34,10 @@ public class IndexMapping {
     public static final String TYPE_MESSAGE = "message";
 
     public Map<String, Object> messageTemplate(final String template, final String analyzer) {
+        return messageTemplate(template, analyzer, -1);
+    }
+
+    public Map<String, Object> messageTemplate(final String template, final String analyzer, final int order) {
         final Map<String, Object> analyzerKeyword = ImmutableMap.of("analyzer_keyword", ImmutableMap.of(
             "tokenizer", "keyword",
             "filter", "lowercase"));
@@ -43,6 +47,7 @@ public class IndexMapping {
 
         return ImmutableMap.of(
                 "template", template,
+                "order", order,
                 "settings", settings,
                 "mappings", mappings
         );

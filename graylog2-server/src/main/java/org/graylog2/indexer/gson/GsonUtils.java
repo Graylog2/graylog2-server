@@ -17,56 +17,72 @@
 package org.graylog2.indexer.gson;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import javax.annotation.Nullable;
+import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.Set;
 
 public final class GsonUtils {
+
+    public static final Type MAP_STRING_OBJECT_TYPE = new TypeToken<Map<String, Object>>() {
+    }.getType();
+
     private GsonUtils() {
     }
 
     @Nullable
     public static JsonObject asJsonObject(JsonElement jsonElement) {
-        return jsonElement != null && jsonElement.isJsonObject() ? jsonElement.getAsJsonObject() : null;
+        return jsonElement instanceof JsonObject ? (JsonObject) jsonElement : null;
     }
 
     @Nullable
     public static JsonArray asJsonArray(JsonElement jsonElement) {
-        return jsonElement != null && jsonElement.isJsonArray() ? jsonElement.getAsJsonArray() : null;
+        return jsonElement instanceof JsonArray ? (JsonArray) jsonElement : null;
     }
 
     @Nullable
     public static String asString(JsonElement jsonElement) {
-        return jsonElement != null && jsonElement.isJsonPrimitive() ? jsonElement.getAsString() : null;
+        return jsonElement instanceof JsonPrimitive ? jsonElement.getAsString() : null;
     }
 
     @Nullable
     public static Boolean asBoolean(JsonElement jsonElement) {
-        return jsonElement != null && jsonElement.isJsonPrimitive() && jsonElement.getAsJsonPrimitive().isBoolean() ? jsonElement.getAsBoolean() : null;
+        return jsonElement instanceof JsonPrimitive && ((JsonPrimitive) jsonElement).isBoolean() ? jsonElement.getAsBoolean() : null;
     }
 
     @Nullable
     public static Long asLong(JsonElement jsonElement) {
-        return jsonElement != null && jsonElement.isJsonPrimitive() && jsonElement.getAsJsonPrimitive().isNumber() ? jsonElement.getAsLong() : null;
+        return jsonElement instanceof JsonPrimitive && ((JsonPrimitive) jsonElement).isNumber() ? jsonElement.getAsLong() : null;
     }
 
     @Nullable
     public static Integer asInteger(JsonElement jsonElement) {
-        return jsonElement != null && jsonElement.isJsonPrimitive() && jsonElement.getAsJsonPrimitive().isNumber() ? jsonElement.getAsInt() : null;
+        return jsonElement instanceof JsonPrimitive && ((JsonPrimitive) jsonElement).isNumber() ? jsonElement.getAsInt() : null;
     }
 
+    @Nullable
     public static Map<String, JsonElement> entrySetAsMap(JsonObject jsonObject) {
-        final ImmutableMap.Builder<String, JsonElement> mapBuilder = ImmutableMap.builder();
-        if (jsonObject != null) {
+        if (jsonObject == null) {
+            return null;
+        } else {
+            final ImmutableMap.Builder<String, JsonElement> mapBuilder = ImmutableMap.builder();
             final Set<Map.Entry<String, JsonElement>> entrySet = jsonObject.entrySet();
             for (Map.Entry<String, JsonElement> entry : entrySet) {
                 mapBuilder.put(entry.getKey(), entry.getValue());
             }
+            return mapBuilder.build();
         }
-        return mapBuilder.build();
+    }
+
+    @Nullable
+    public static Map<String, Object> asMap(Gson gson, JsonObject jsonObject) {
+        return gson.fromJson(jsonObject, MAP_STRING_OBJECT_TYPE);
     }
 }
