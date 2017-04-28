@@ -20,9 +20,7 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.collect.ImmutableSortedSet;
-import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
-import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
 import io.searchbox.core.Search;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
@@ -53,6 +51,7 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -77,7 +76,6 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -97,8 +95,6 @@ import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
 @Singleton
 public class Searches {
-    private static final Logger LOG = LoggerFactory.getLogger(Searches.class);
-
     public final static String AGG_TERMS = "gl2_terms";
     public final static String AGG_STATS = "gl2_stats";
     public final static String AGG_TERMS_STATS = "gl2_termsstats";
@@ -214,7 +210,7 @@ public class Searches {
 
         final Count count = builder.build();
 
-        final io.searchbox.core.CountResult countResult = execute(count);
+        final io.searchbox.core.CountResult countResult = JestUtils.execute(jestClient, count, () -> "Unable to perform count query.");
         // TODO: fix usage of tookms
         recordEsMetrics(0, range);
         return CountResult.create(countResult.getCount().longValue(), 0);
@@ -240,7 +236,7 @@ public class Searches {
             .addIndex(indices);
         fields.forEach(initialSearchBuilder::addSourceIncludePattern);
 
-        final io.searchbox.core.SearchResult initialResult = execute(initialSearchBuilder.build());
+        final io.searchbox.core.SearchResult initialResult = JestUtils.execute(jestClient, initialSearchBuilder.build(), () -> "Unable to perform scrolling search.");
         final long tookMs = tookMsFromSearchResult(initialResult);
         recordEsMetrics(tookMs, range);
 
@@ -274,7 +270,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(indices);
 
-        final io.searchbox.core.SearchResult searchResult = execute(searchBuilder.build());
+        final io.searchbox.core.SearchResult searchResult = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform search query.");
         final List<ResultMessage> hits = searchResult.getHits(Map.class).stream()
             .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
             .collect(Collectors.toList());
@@ -320,7 +316,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices);
 
-        final io.searchbox.core.SearchResult searchResult = execute(searchBuilder.build());
+        final io.searchbox.core.SearchResult searchResult = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform terms query.");
         final long tookMs = tookMsFromSearchResult(searchResult);
 
         recordEsMetrics(tookMs, range);
@@ -420,7 +416,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices);
 
-        final io.searchbox.core.SearchResult searchResult = execute(searchBuilder.build());
+        final io.searchbox.core.SearchResult searchResult = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve terms stats.");
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, range);
 
@@ -483,7 +479,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(indices);
 
-        final io.searchbox.core.SearchResult searchResponse = execute(searchBuilder.build());
+        final io.searchbox.core.SearchResult searchResponse = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve fields stats.");
         final List<ResultMessage> hits = searchResponse.getHits(Map.class).stream()
             .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
             .collect(Collectors.toList());
@@ -545,7 +541,7 @@ public class Searches {
             .ignoreUnavailable(true)
             .allowNoIndices(true);
 
-        final io.searchbox.core.SearchResult searchResult = execute(searchBuilder.build());
+        final io.searchbox.core.SearchResult searchResult = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve histogram.");
 
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, range);
@@ -593,7 +589,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices);
 
-        final io.searchbox.core.SearchResult searchResult = execute(searchBuilder.build());
+        final io.searchbox.core.SearchResult searchResult = JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve field histogram.");
 
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, range);
@@ -834,18 +830,5 @@ public class Searches {
         }
 
         return indices.build();
-    }
-
-    private <T extends JestResult> T execute(Action<T> clientRequest) {
-        try {
-            final T result = jestClient.execute(clientRequest);
-            if (result.isSucceeded()) {
-                return result;
-            }
-
-            throw new ElasticsearchException("Performing search request failed: " + result.getErrorMessage());
-        } catch (IOException e) {
-            throw new ElasticsearchException(e);
-        }
     }
 }
