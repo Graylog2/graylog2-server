@@ -17,8 +17,8 @@
 package org.graylog2.lookup;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
+
 import org.graylog2.lookup.adapters.CSVFileDataAdapter;
-import org.graylog2.lookup.adapters.RandomDataAdapter;
 import org.graylog2.lookup.caches.GuavaLookupCache;
 import org.graylog2.lookup.caches.NullCache;
 import org.graylog2.plugin.inject.Graylog2Module;
@@ -41,11 +41,6 @@ public class LookupModule extends Graylog2Module {
                 GuavaLookupCache.class,
                 GuavaLookupCache.Factory.class,
                 GuavaLookupCache.Config.class);
-
-        installLookupDataAdapter(RandomDataAdapter.NAME,
-                RandomDataAdapter.class,
-                RandomDataAdapter.Factory.class,
-                RandomDataAdapter.Config.class);
 
         installLookupDataAdapter(CSVFileDataAdapter.NAME,
                 CSVFileDataAdapter.class,
