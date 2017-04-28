@@ -5,7 +5,9 @@ import { Input } from 'components/bootstrap';
 const RandomAdapterFieldSet = React.createClass({
   propTypes: {
     config: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
+// eslint-disable-next-line react/no-unused-prop-types
+    updateConfig: PropTypes.func.isRequired,
+    handleFormEvent: PropTypes.func.isRequired,
   },
 
   render() {
@@ -18,7 +20,7 @@ const RandomAdapterFieldSet = React.createClass({
              label="Minimum value"
              autoFocus
              required
-             onChange={this.props.onChange}
+             onChange={this.props.handleFormEvent}
              help="The minimum integer this data adapter generates."
              value={config.lower_bound}
              labelClassName="col-sm-3"
@@ -29,7 +31,7 @@ const RandomAdapterFieldSet = React.createClass({
              label="Upper bound"
              autoFocus
              required
-             onChange={this.props.onChange}
+             onChange={this.props.handleFormEvent}
              help="All generated integers are lower than this value."
              value={config.upper_bound}
              labelClassName="col-sm-3"

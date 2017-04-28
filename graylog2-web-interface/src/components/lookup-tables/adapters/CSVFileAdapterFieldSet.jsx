@@ -5,7 +5,9 @@ import { Input } from 'components/bootstrap';
 const CSVFileAdapterFieldSet = React.createClass({
   propTypes: {
     config: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
+// eslint-disable-next-line react/no-unused-prop-types
+    updateConfig: PropTypes.func.isRequired,
+    handleFormEvent: PropTypes.func.isRequired,
   },
 
   render() {
@@ -18,7 +20,7 @@ const CSVFileAdapterFieldSet = React.createClass({
              label="File path"
              autoFocus
              required
-             onChange={this.props.onChange}
+             onChange={this.props.handleFormEvent}
              help="The path to the CSV file."
              value={config.path}
              labelClassName="col-sm-3"
@@ -28,7 +30,7 @@ const CSVFileAdapterFieldSet = React.createClass({
              name="check_interval"
              label="Check interval"
              required
-             onChange={this.props.onChange}
+             onChange={this.props.handleFormEvent}
              help="The interval to check if the CSV file needs a reload. (in seconds)"
              value={config.check_interval}
              labelClassName="col-sm-3"
@@ -38,7 +40,7 @@ const CSVFileAdapterFieldSet = React.createClass({
              name="separator"
              label="Separator"
              required
-             onChange={this.props.onChange}
+             onChange={this.props.handleFormEvent}
              help="The delimiter to use for separating entries."
              value={config.separator}
              labelClassName="col-sm-3"
@@ -48,7 +50,7 @@ const CSVFileAdapterFieldSet = React.createClass({
              name="quotechar"
              label="Quote character"
              required
-             onChange={this.props.onChange}
+             onChange={this.props.handleFormEvent}
              help="The character to use for quoted elements."
              value={config.quotechar}
              labelClassName="col-sm-3"
@@ -58,7 +60,7 @@ const CSVFileAdapterFieldSet = React.createClass({
              name="key_column"
              label="Key column"
              required
-             onChange={this.props.onChange}
+             onChange={this.props.handleFormEvent}
              help="The column name that should be used for the key lookup."
              value={config.key_column}
              labelClassName="col-sm-3"
@@ -68,7 +70,7 @@ const CSVFileAdapterFieldSet = React.createClass({
              name="value_column"
              label="Value column"
              required
-             onChange={this.props.onChange}
+             onChange={this.props.handleFormEvent}
              help="The column name that should be used as the value for a key."
              value={config.value_column}
              labelClassName="col-sm-3"

@@ -4,6 +4,7 @@ import NullCacheFieldSet from './NullCacheFieldSet';
 import NullCacheSummary from './NullCacheSummary';
 import GuavaCacheFieldSet from './GuavaCacheFieldSet';
 import GuavaCacheSummary from './GuavaCacheSummary';
+import GuavaCacheDocumentation from './GuavaCacheDocumentation';
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableCaches: [
@@ -19,7 +20,7 @@ PluginStore.register(new PluginManifest({}, {
       displayName: 'Node-local, in-memory cache',
       formComponent: GuavaCacheFieldSet,
       summaryComponent: GuavaCacheSummary,
-      documentationComponent: null,
+      documentationComponent: GuavaCacheDocumentation,
     },
   ],
 }));

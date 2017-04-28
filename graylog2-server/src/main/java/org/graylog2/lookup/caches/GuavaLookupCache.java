@@ -16,16 +16,18 @@
  */
 package org.graylog2.lookup.caches;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
+
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
@@ -34,8 +36,13 @@ import org.graylog2.plugin.lookup.LookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
+
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
+import javax.inject.Named;
+import javax.validation.constraints.Min;
 
 public class GuavaLookupCache extends LookupCache {
     private static final Logger LOG = LoggerFactory.getLogger(GuavaLookupCache.class);
@@ -44,18 +51,36 @@ public class GuavaLookupCache extends LookupCache {
     private final LoadingCache<Object, LookupResult> cache;
 
     @Inject
-    public GuavaLookupCache(@Assisted LookupCacheConfiguration c) {
+    public GuavaLookupCache(@Assisted LookupCacheConfiguration c,
+                            @Named("processbuffer_processors") int processorCount) {
         super(c);
         Config config = (Config) c;
-        cache = CacheBuilder.newBuilder()
-                .maximumSize(config.maxSize())
-                .recordStats()
-                .build(new CacheLoader<Object, LookupResult>() {
-                    @Override
-                    public LookupResult load(@Nonnull Object key) throws Exception {
-                        return getLookupTable().dataAdapter().get(key);
-                    }
-                });
+        CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
+
+        // the theory is that typically only processors will affect the cache concurrency, whereas decorator usage is less critical
+        builder.concurrencyLevel(processorCount)
+                .recordStats();
+
+        builder.maximumSize(config.maxSize());
+        if (config.expireAfterAccess() > 0 && config.expireAfterAccessUnit() != null) {
+            //noinspection ConstantConditions
+            builder.expireAfterAccess(config.expireAfterAccess(), config.expireAfterAccessUnit());
+        }
+        if (config.expireAfterWrite() > 0 && config.expireAfterWriteUnit() != null) {
+            //noinspection ConstantConditions
+            builder.expireAfterWrite(config.expireAfterWrite(), config.expireAfterWriteUnit());
+        }
+        if (config.refreshAfterWrite() > 0 && config.refreshAfterWriteUnit() != null) {
+            //noinspection ConstantConditions
+            builder.refreshAfterWrite(config.refreshAfterWrite(), config.refreshAfterWriteUnit());
+        }
+
+        cache = builder.build(new CacheLoader<Object, LookupResult>() {
+            @Override
+            public LookupResult load(@Nonnull Object key) throws Exception {
+                return getLookupTable().dataAdapter().get(key);
+            }
+        });
     }
 
     @Override
@@ -102,7 +127,11 @@ public class GuavaLookupCache extends LookupCache {
         public Config defaultConfiguration() {
             return Config.builder()
                     .type(NAME)
-                    .maxSize(10)
+                    .maxSize(1000)
+                    .expireAfterAccess(60)
+                    .expireAfterAccessUnit(TimeUnit.SECONDS)
+                    .expireAfterWrite(0)
+                    .refreshAfterWrite(0)
                     .build();
         }
     }
@@ -114,8 +143,33 @@ public class GuavaLookupCache extends LookupCache {
     @JsonTypeName(NAME)
     public abstract static class Config implements LookupCacheConfiguration {
 
+        @Min(0)
         @JsonProperty("max_size")
         public abstract int maxSize();
+
+        @Min(0)
+        @JsonProperty("expire_after_access")
+        public abstract long expireAfterAccess();
+
+        @Nullable
+        @JsonProperty("expire_after_access_unit")
+        public abstract TimeUnit expireAfterAccessUnit();
+
+        @Min(0)
+        @JsonProperty("expire_after_write")
+        public abstract long expireAfterWrite();
+
+        @Nullable
+        @JsonProperty("expire_after_write_unit")
+        public abstract TimeUnit expireAfterWriteUnit();
+
+        @Min(0)
+        @JsonProperty("refresh_after_write")
+        public abstract long refreshAfterWrite();
+
+        @Nullable
+        @JsonProperty("refresh_after_write_unit")
+        public abstract TimeUnit refreshAfterWriteUnit();
 
         public static Builder builder() {
             return new AutoValue_GuavaLookupCache_Config.Builder();
@@ -128,6 +182,24 @@ public class GuavaLookupCache extends LookupCache {
 
             @JsonProperty("max_size")
             public abstract Builder maxSize(int maxSize);
+
+            @JsonProperty("expire_after_access")
+            public abstract Builder expireAfterAccess(long expireAfterAccess);
+
+            @JsonProperty("expire_after_access_unit")
+            public abstract Builder expireAfterAccessUnit(@Nullable TimeUnit expireAfterAccessUnit);
+
+            @JsonProperty("expire_after_write")
+            public abstract Builder expireAfterWrite(long expireAfterWrite);
+
+            @JsonProperty("expire_after_write_unit")
+            public abstract Builder expireAfterWriteUnit(@Nullable TimeUnit expireAfterWriteUnit);
+
+            @JsonProperty("refresh_after_write")
+            public abstract Builder refreshAfterWrite(long refreshAfterWrite);
+
+            @JsonProperty("refresh_after_write_unit")
+            public abstract Builder refreshAfterWriteUnit(@Nullable TimeUnit refreshAfterWriteUnit);
 
             public abstract Config build();
         }

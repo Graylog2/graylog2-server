@@ -1,7 +1,6 @@
 import React, { PropTypes } from 'react';
 
 import { Button, Row, Col } from 'react-bootstrap';
-// import { LinkContainer } from 'react-router';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
@@ -59,6 +58,12 @@ const CacheForm = React.createClass({
     this.setState({ cache: cache });
   },
 
+  _updateConfig(newConfig) {
+    const cache = ObjectUtils.clone(this.state.cache);
+    cache.config = newConfig;
+    this.setState({ cache: cache });
+  },
+
   _save(event) {
     if (event) {
       event.preventDefault();
@@ -86,7 +91,8 @@ const CacheForm = React.createClass({
       const p = plugin[0];
       configFieldSet = React.createElement(p.formComponent, {
         config: cache.config,
-        onChange: this._onConfigChange,
+        handleFormEvent: this._onConfigChange,
+        updateConfig: this._updateConfig,
       });
       if (p.documentationComponent) {
         documentationComponent = React.createElement(p.documentationComponent);

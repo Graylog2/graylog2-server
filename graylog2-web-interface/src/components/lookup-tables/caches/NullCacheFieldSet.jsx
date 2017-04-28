@@ -3,7 +3,8 @@ import React, { PropTypes } from 'react';
 const NullCacheFieldSet = React.createClass({
   propTypes: {
     config: PropTypes.object.isRequired,
-    onChange: PropTypes.func.isRequired,
+    updateConfig: PropTypes.func.isRequired,
+    handleFormEvent: PropTypes.func.isRequired,
   },
 
   render() {
