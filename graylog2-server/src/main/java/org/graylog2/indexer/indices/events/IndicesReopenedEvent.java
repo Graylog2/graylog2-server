@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.esplugin;
+package org.graylog2.indexer.indices.events;
 
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableSet;
@@ -24,10 +24,14 @@ import java.util.Set;
 
 @AutoValue
 @WithBeanGetter
-public abstract class IndicesClosedEvent {
+public abstract class IndicesReopenedEvent {
     public abstract Set<String> indices();
 
-    public static IndicesClosedEvent create(Set<String> indices) {
-        return new AutoValue_IndicesClosedEvent(ImmutableSet.copyOf(indices));
+    public static IndicesReopenedEvent create(Set<String> indices) {
+        return new AutoValue_IndicesReopenedEvent(ImmutableSet.copyOf(indices));
+    }
+
+    public static IndicesReopenedEvent create(String index) {
+        return new AutoValue_IndicesReopenedEvent(ImmutableSet.of(index));
     }
 }

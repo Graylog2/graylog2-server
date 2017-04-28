@@ -14,14 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.esplugin;
+package org.graylog2.indexer.indices.events;
 
-import org.elasticsearch.common.inject.AbstractModule;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableSet;
+import org.graylog.autovalue.WithBeanGetter;
 
-public class MonitorModule extends AbstractModule {
-    @Override
-    protected void configure() {
-        bind(ClusterStateMonitor.class).asEagerSingleton();
-        bind(IndexChangeMonitor.class).asEagerSingleton();
+import java.util.Set;
+
+@AutoValue
+@WithBeanGetter
+public abstract class IndicesClosedEvent {
+    public abstract Set<String> indices();
+
+    public static IndicesClosedEvent create(Set<String> indices) {
+        return new AutoValue_IndicesClosedEvent(ImmutableSet.copyOf(indices));
+    }
+
+    public static IndicesClosedEvent create(String index) {
+        return new AutoValue_IndicesClosedEvent(ImmutableSet.of(index));
     }
 }

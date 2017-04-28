@@ -37,11 +37,10 @@ import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.indexer.esplugin.IndexChangeMonitor;
-import org.graylog2.indexer.esplugin.IndicesClosedEvent;
-import org.graylog2.indexer.esplugin.IndicesDeletedEvent;
-import org.graylog2.indexer.esplugin.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.indexer.indices.events.IndicesClosedEvent;
+import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
+import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.searches.IndexRangeStats;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
@@ -89,8 +88,6 @@ public class MongoIndexRangeService implements IndexRangeService {
             ObjectId.class,
             objectMapperProvider.get());
 
-        // This sucks. We need to bridge Elasticsearch's and our own Guice injector.
-        IndexChangeMonitor.setEventBus(eventBus);
         eventBus.register(this);
 
         collection.createIndex(new BasicDBObject(MongoIndexRange.FIELD_INDEX_NAME, 1));
