@@ -23,7 +23,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
@@ -41,6 +40,7 @@ import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.attribute.BasicFileAttributes;
@@ -119,7 +119,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     private Map<Object, Object> parseCSVFile() throws IOException {
         final InputStream inputStream = Files.newInputStream(Paths.get(config.path()));
-        final InputStreamReader fileReader = new InputStreamReader(inputStream, Charsets.UTF_8);
+        final InputStreamReader fileReader = new InputStreamReader(inputStream, StandardCharsets.UTF_8);
         final ImmutableMap.Builder<Object, Object> newLookupBuilder = ImmutableMap.builder();
 
         try (final CSVReader csvReader = new CSVReader(fileReader, config.separatorAsChar(), config.quotecharAsChar())) {
