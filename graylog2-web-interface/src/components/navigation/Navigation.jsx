@@ -73,6 +73,9 @@ const Navigation = React.createClass({
     if (this._isActive('/system/grokpatterns')) {
       return `${prefix} / Grok Patterns`;
     }
+    if (this._isActive('/system/lookuptables')) {
+      return `${prefix} / Lookup Tables`;
+    }
     if (this._isActive('/system/configurations')) {
       return `${prefix} / Configurations`;
     }
@@ -219,9 +222,14 @@ const Navigation = React.createClass({
               </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['inputs:edit']) &&
-              <LinkContainer to={Routes.SYSTEM.GROKPATTERNS}>
-                <MenuItem>Grok Patterns</MenuItem>
-              </LinkContainer>
+               <LinkContainer to={Routes.SYSTEM.GROKPATTERNS}>
+                 <MenuItem>Grok Patterns</MenuItem>
+               </LinkContainer>
+              }
+              {this.isPermitted(this.props.permissions, ['inputs:edit']) &&
+                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
+                <MenuItem>Lookup Tables</MenuItem>
+                </LinkContainer>
               }
               {pluginSystemNavigations}
             </NavDropdown>

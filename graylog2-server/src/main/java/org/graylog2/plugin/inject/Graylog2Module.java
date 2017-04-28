@@ -25,6 +25,7 @@ import com.google.inject.multibindings.MapBinder;
 import com.google.inject.multibindings.Multibinder;
 import com.google.inject.multibindings.OptionalBinder;
 import com.google.inject.name.Names;
+
 import org.apache.shiro.realm.AuthenticatingRealm;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
@@ -40,18 +41,23 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.transports.Transport;
+import org.graylog2.plugin.lookup.LookupCache;
+import org.graylog2.plugin.lookup.LookupCacheConfiguration;
+import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.security.PasswordAlgorithm;
 import org.graylog2.plugin.security.PluginPermissions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
+
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
-import java.lang.annotation.Annotation;
 
 public abstract class Graylog2Module extends AbstractModule {
     private static final Logger LOG = LoggerFactory.getLogger(Graylog2Module.class);
@@ -260,7 +266,8 @@ public abstract class Graylog2Module extends AbstractModule {
     }
 
     protected MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyBinder() {
-        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<WidgetStrategy.Factory<? extends WidgetStrategy>>(){});
+        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), new TypeLiteral<WidgetStrategy.Factory<? extends WidgetStrategy>>() {
+        });
     }
 
     protected void installWidgetStrategy(MapBinder<String, WidgetStrategy.Factory<? extends WidgetStrategy>> widgetStrategyBinder,
@@ -348,8 +355,8 @@ public abstract class Graylog2Module extends AbstractModule {
     }
 
     protected void installSearchResponseDecorator(MapBinder<String, SearchResponseDecorator.Factory> searchResponseDecoratorBinder,
-                                           Class<? extends SearchResponseDecorator> searchResponseDecoratorClass,
-                                           Class<? extends SearchResponseDecorator.Factory> searchResponseDecoratorFactoryClass) {
+                                                  Class<? extends SearchResponseDecorator> searchResponseDecoratorClass,
+                                                  Class<? extends SearchResponseDecorator.Factory> searchResponseDecoratorFactoryClass) {
         install(new FactoryModuleBuilder().implement(SearchResponseDecorator.class, searchResponseDecoratorClass).build(searchResponseDecoratorFactoryClass));
         searchResponseDecoratorBinder.addBinding(searchResponseDecoratorClass.getCanonicalName()).to(searchResponseDecoratorFactoryClass);
     }
@@ -371,6 +378,37 @@ public abstract class Graylog2Module extends AbstractModule {
                                                        Class<? extends AlertCondition.Factory> alertConditionFactoryClass) {
         install(new FactoryModuleBuilder().implement(AlertCondition.class, alertConditionClass).build(alertConditionFactoryClass));
         alertConditionBinder.addBinding(identifier).to(alertConditionFactoryClass);
+    }
+
+    protected MapBinder<String, LookupCache.Factory> lookupCacheBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, LookupCache.Factory.class);
+    }
+
+    protected void installLookupCache(String name,
+                                      Class<? extends LookupCache> adapterClass,
+                                      Class<? extends LookupCache.Factory> factoryClass,
+                                      Class<? extends LookupCacheConfiguration> configClass) {
+        install(new FactoryModuleBuilder().implement(LookupCache.class, adapterClass).build(factoryClass));
+        lookupCacheBinder().addBinding(name).to(factoryClass);
+        jacksonSubTypesBinder().addBinding(name).toInstance(configClass);
+    }
+
+
+    protected MapBinder<String, LookupDataAdapter.Factory> lookupDataAdapterBinder() {
+        return MapBinder.newMapBinder(binder(), String.class, LookupDataAdapter.Factory.class);
+    }
+
+    protected void installLookupDataAdapter(String name,
+                                            Class<? extends LookupDataAdapter> adapterClass,
+                                            Class<? extends LookupDataAdapter.Factory> factoryClass,
+                                            Class<? extends LookupDataAdapterConfiguration> configClass) {
+        install(new FactoryModuleBuilder().implement(LookupDataAdapter.class, adapterClass).build(factoryClass));
+        lookupDataAdapterBinder().addBinding(name).to(factoryClass);
+        jacksonSubTypesBinder().addBinding(name).toInstance(configClass);
+    }
+
+    protected MapBinder<String, Object> jacksonSubTypesBinder() {
+        return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), TypeLiteral.get(Object.class), JacksonSubTypes.class);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}

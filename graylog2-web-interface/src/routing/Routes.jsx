@@ -99,6 +99,24 @@ const Routes = {
         provider: name => `/system/authentication/config/${name}`,
       },
     },
+    LOOKUPTABLES: {
+      OVERVIEW: '/system/lookuptables',
+      CREATE: '/system/lookuptables/create',
+      show: tableName => `/system/lookuptables/table/${tableName}`,
+      edit: tableName => `/system/lookuptables/table/${tableName}/edit`,
+      CACHES: {
+        OVERVIEW: '/system/lookuptables/caches',
+        CREATE: '/system/lookuptables/caches/create',
+        show: cacheName => `/system/lookuptables/caches/${cacheName}`,
+        edit: cacheName => `/system/lookuptables/caches/${cacheName}/edit`,
+      },
+      DATA_ADAPTERS: {
+        OVERVIEW: '/system/lookuptables/data_adapters',
+        CREATE: '/system/lookuptables/data_adapters/create',
+        show: adapterName => `/system/lookuptables/data_adapter/${adapterName}`,
+        edit: adapterName => `/system/lookuptables/data_adapter/${adapterName}/edit`,
+      },
+    },
   },
   search_with_query: (query, rangeType, timeRange) => {
     const route = new URI(Routes.SEARCH);

@@ -83,6 +83,15 @@ public class AuditEventTypes implements PluginAuditEventTypes {
     public static final String LDAP_GROUP_MAPPING_UPDATE = PREFIX + "ldap_group_mapping:update";
     public static final String LOAD_BALANCER_STATUS_UPDATE = PREFIX + "load_balancer_status:update";
     public static final String LOG_LEVEL_UPDATE = PREFIX + "log_level:update";
+    public static final String LOOKUP_ADAPTER_CREATE = PREFIX + "lut_adapter:create";
+    public static final String LOOKUP_ADAPTER_DELETE = PREFIX + "lut_adapter:delete";
+    public static final String LOOKUP_ADAPTER_UPDATE = PREFIX + "lut_adapter:update";
+    public static final String LOOKUP_CACHE_CREATE = PREFIX + "lut_cache:create";
+    public static final String LOOKUP_CACHE_DELETE = PREFIX + "lut_cache:delete";
+    public static final String LOOKUP_CACHE_UPDATE = PREFIX + "lut_cache:update";
+    public static final String LOOKUP_TABLE_CREATE = PREFIX + "lut_table:create";
+    public static final String LOOKUP_TABLE_DELETE = PREFIX + "lut_table:delete";
+    public static final String LOOKUP_TABLE_UPDATE = PREFIX + "lut_table:update";
     public static final String MESSAGE_DECORATOR_CREATE = PREFIX + "message_decorator:create";
     public static final String MESSAGE_DECORATOR_DELETE = PREFIX + "message_decorator:delete";
     public static final String MESSAGE_DECORATOR_UPDATE = PREFIX + "message_decorator:update";
@@ -201,6 +210,15 @@ public class AuditEventTypes implements PluginAuditEventTypes {
             .add(LDAP_GROUP_MAPPING_UPDATE)
             .add(LOAD_BALANCER_STATUS_UPDATE)
             .add(LOG_LEVEL_UPDATE)
+            .add(LOOKUP_ADAPTER_CREATE)
+            .add(LOOKUP_ADAPTER_DELETE)
+            .add(LOOKUP_ADAPTER_UPDATE)
+            .add(LOOKUP_CACHE_CREATE)
+            .add(LOOKUP_CACHE_DELETE)
+            .add(LOOKUP_CACHE_UPDATE)
+            .add(LOOKUP_TABLE_CREATE)
+            .add(LOOKUP_TABLE_DELETE)
+            .add(LOOKUP_TABLE_UPDATE)
             .add(MESSAGE_DECORATOR_CREATE)
             .add(MESSAGE_DECORATOR_DELETE)
             .add(MESSAGE_DECORATOR_UPDATE)
