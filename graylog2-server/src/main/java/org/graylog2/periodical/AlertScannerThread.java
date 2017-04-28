@@ -18,7 +18,6 @@ package org.graylog2.periodical;
 
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertScanner;
-import org.graylog2.initializers.IndexerSetupService;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
@@ -32,28 +31,20 @@ public class AlertScannerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(AlertScannerThread.class);
 
     private final StreamService streamService;
-    private final IndexerSetupService indexerSetupService;
     private final Configuration configuration;
     private final AlertScanner alertScanner;
 
     @Inject
     public AlertScannerThread(final StreamService streamService,
-                              final IndexerSetupService indexerSetupService,
                               final Configuration configuration,
                               final AlertScanner alertScanner) {
         this.streamService = streamService;
-        this.indexerSetupService = indexerSetupService;
         this.configuration = configuration;
         this.alertScanner = alertScanner;
     }
 
     @Override
     public void doRun() {
-        if (!indexerSetupService.isRunning()) {
-            LOG.error("Indexer is not running, not checking streams for alerts.");
-            return;
-        }
-
         LOG.debug("Running alert checks.");
         final List<Stream> alertedStreams = streamService.loadAllWithConfiguredAlertConditions();
 
