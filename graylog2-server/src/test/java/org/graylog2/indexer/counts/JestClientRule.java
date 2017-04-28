@@ -19,6 +19,7 @@ package org.graylog2.indexer.counts;
 import com.google.common.collect.ImmutableList;
 import com.google.gson.Gson;
 import io.searchbox.client.JestClient;
+import io.searchbox.indices.Refresh;
 import org.graylog2.bindings.providers.JestClientProvider;
 import org.junit.rules.ExternalResource;
 
@@ -55,6 +56,7 @@ public class JestClientRule extends ExternalResource {
     protected void before() throws Throwable {
         super.before();
         this.jestClient = jestClientProvider.get();
+        this.jestClient.execute(new Refresh.Builder().build());
     }
 
     @Override

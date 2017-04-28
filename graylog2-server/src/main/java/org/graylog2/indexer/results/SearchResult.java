@@ -38,13 +38,16 @@ public class SearchResult extends IndexQueryResult {
     private final Set<IndexRange> usedIndices;
 
 	public SearchResult(SearchHits searchHits, Set<IndexRange> usedIndices, String originalQuery, BytesReference builtQuery, TimeValue took) {
-        super(originalQuery, builtQuery, took);
-
-		this.results = buildResults(searchHits);
-		this.fields = extractFields(results);
-		this.totalResults = searchHits.getTotalHits();
-        this.usedIndices = usedIndices;
+        this(buildResults(searchHits), usedIndices, originalQuery, builtQuery, took);
 	}
+
+	public SearchResult(List<ResultMessage> hits, Set<IndexRange> usedIndices, String originalQuery, BytesReference builtQuery, TimeValue took) {
+	    super(originalQuery, builtQuery, took);
+	    this.results = hits;
+        this.fields = extractFields(hits);
+        this.totalResults = hits.size();
+        this.usedIndices = usedIndices;
+    }
 
 	public long getTotalResults() {
 		return totalResults;

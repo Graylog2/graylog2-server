@@ -16,8 +16,11 @@
  */
 package org.graylog2.indexer.results;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import io.searchbox.core.search.aggregation.StatsAggregation;
+import io.searchbox.core.search.aggregation.TermsAggregation;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -28,6 +31,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TermsStatsResult extends IndexQueryResult {
     private static final Comparator<Map<String, Object>> COMPARATOR = new Comparator<Map<String, Object>>() {
@@ -43,37 +47,57 @@ public class TermsStatsResult extends IndexQueryResult {
             return 0;
         }
     };
-    private final Terms facet;
+    private final List<Map<String, Object>> terms;
 
     public TermsStatsResult(Terms facet, String originalQuery, BytesReference builtQuery, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
-        this.facet = facet;
+        this.terms = facet.getBuckets().stream()
+            .map(e -> {
+                final Map<String, Object> resultMap = Maps.newHashMap();
+
+                resultMap.put("key_field", e.getKey());
+
+                resultMap.put("count", e.getDocCount());
+
+                final Stats stats = e.getAggregations().get(Searches.AGG_STATS);
+                resultMap.put("min", stats.getMin());
+                resultMap.put("max", stats.getMax());
+                resultMap.put("total", stats.getSum());
+                resultMap.put("total_count", stats.getCount());
+                resultMap.put("mean", stats.getAvg());
+
+                return resultMap;
+            })
+            .sorted(COMPARATOR)
+            .collect(Collectors.toList());
+    }
+
+    public TermsStatsResult(TermsAggregation terms, String originalQuery, BytesReference builtQuery, TimeValue took) {
+        super(originalQuery, builtQuery, took);
+
+        this.terms = terms.getBuckets().stream()
+            .map(e -> {
+                final Map<String, Object> resultMap = Maps.newHashMap();
+
+                resultMap.put("key_field", e.getKey());
+
+                resultMap.put("count", e.getCount());
+
+                final StatsAggregation stats = e.getStatsAggregation(Searches.AGG_STATS);
+                resultMap.put("min", stats.getMin());
+                resultMap.put("max", stats.getMax());
+                resultMap.put("total", stats.getSum());
+                resultMap.put("total_count", stats.getCount());
+                resultMap.put("mean", stats.getAvg());
+
+                return resultMap;
+            })
+            .sorted(COMPARATOR)
+            .collect(Collectors.toList());
     }
 
     public List<Map<String, Object>> getResults() {
-        List<Map<String, Object>> results = Lists.newArrayList();
-
-        for (Terms.Bucket e : facet.getBuckets()) {
-            Map<String, Object> resultMap = Maps.newHashMap();
-
-            resultMap.put("key_field", e.getKey());
-
-            resultMap.put("count", e.getDocCount());
-
-            final Stats stats = e.getAggregations().get(Searches.AGG_STATS);
-            resultMap.put("min", stats.getMin());
-            resultMap.put("max", stats.getMax());
-            resultMap.put("total", stats.getSum());
-            resultMap.put("total_count", stats.getCount());
-            resultMap.put("mean", stats.getAvg());
-
-            results.add(resultMap);
-        }
-
-        // Sort results by descending mean value
-        Collections.sort(results, COMPARATOR);
-
-        return results;
+        return this.terms;
     }
 }

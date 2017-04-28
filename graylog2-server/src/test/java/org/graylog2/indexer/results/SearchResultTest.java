@@ -25,6 +25,7 @@ import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Set;
+import java.util.Spliterators;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -37,6 +38,7 @@ public class SearchResultTest {
     public void setUp() throws Exception {
         final SearchHits searchHits = mock(SearchHits.class);
         when(searchHits.iterator()).thenReturn(Collections.emptyIterator());
+        when(searchHits.spliterator()).thenReturn(Spliterators.emptySpliterator());
         this.searchResult = new SearchResult(searchHits, null, null, null, null);
     }
 
