@@ -178,7 +178,7 @@ public class Messages {
     public IndexRequest buildIndexRequest(String index, Map<String, Object> source, String id) {
         source.remove(Message.FIELD_ID);
 
-        return c.prepareIndex(index, IndexMapping.TYPE_MESSAGE, id)
+        return c.prepareIndex(index, source.get("doctype_") == null ? IndexMapping.TYPE_MESSAGE : String.valueOf(source.get("doctype_")), id)
                 .setSource(source)
                 .setConsistencyLevel(WriteConsistencyLevel.ONE)
                 .request();
