@@ -108,7 +108,7 @@ public abstract class LookupDataAdapter {
     protected abstract void doStop() throws Exception;
 
     /**
-     * Returns the refresh interval for this data adapter. Use {@link Duration.ZERO} if refresh should be disabled.
+     * Returns the refresh interval for this data adapter. Use {@link Duration#ZERO} if refresh should be disabled.
      * @return the refresh interval
      */
     protected abstract Duration refreshInterval();
