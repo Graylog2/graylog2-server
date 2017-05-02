@@ -40,8 +40,8 @@ public class SearchResult extends IndexQueryResult {
         this.usedIndices = usedIndices;
     }
 
-    private SearchResult(String query, BytesReference bytesReference) {
-        super(query, bytesReference, new TimeValue(0));
+    private SearchResult(String query, String originalQuery) {
+        super(query, originalQuery, 0);
         this.results = Collections.emptyList();
         this.fields = Collections.emptySet();
         this.usedIndices = Collections.emptySet();
@@ -80,7 +80,7 @@ public class SearchResult extends IndexQueryResult {
         return usedIndices;
     }
 
-    public static SearchResult empty(String query, BytesReference bytesReference) {
-        return new SearchResult(query, bytesReference);
+    public static SearchResult empty(String query, String originalQuery) {
+        return new SearchResult(query, originalQuery);
     }
 }

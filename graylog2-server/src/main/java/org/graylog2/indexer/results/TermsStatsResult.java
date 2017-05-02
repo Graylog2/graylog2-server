@@ -21,6 +21,7 @@ import io.searchbox.core.search.aggregation.StatsAggregation;
 import io.searchbox.core.search.aggregation.TermsAggregation;
 import org.graylog2.indexer.searches.Searches;
 
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -63,13 +64,13 @@ public class TermsStatsResult extends IndexQueryResult {
             .collect(Collectors.toList());
     }
 
-    private TermsStatsResult(String originalQuery, BytesReference builtQuery) {
-        super(originalQuery, builtQuery, new TimeValue(0));
+    private TermsStatsResult(String originalQuery, String builtQuery) {
+        super(originalQuery, builtQuery, 0);
 
         this.terms = Collections.emptyList();
     }
 
-    public static TermsStatsResult empty(String originalQuery, BytesReference builtQuery) {
+    public static TermsStatsResult empty(String originalQuery, String builtQuery) {
         return new TermsStatsResult(originalQuery, builtQuery);
     }
 

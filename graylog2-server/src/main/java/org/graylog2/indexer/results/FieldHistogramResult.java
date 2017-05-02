@@ -107,13 +107,13 @@ public class FieldHistogramResult extends HistogramResult {
         }
     }
 
-    private FieldHistogramResult(String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
-        super(originalQuery, builtQuery, took);
+    private FieldHistogramResult(String originalQuery, String builtQuery, Searches.DateHistogramInterval interval) {
+        super(originalQuery, builtQuery, 0);
 
         this.result = Collections.emptyMap();
         this.interval = interval;
     }
-    public static HistogramResult empty(String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
-        return new FieldHistogramResult(originalQuery, builtQuery, interval, took);
+    public static HistogramResult empty(String originalQuery, String builtQuery, Searches.DateHistogramInterval interval) {
+        return new FieldHistogramResult(originalQuery, builtQuery, interval);
     }
 }

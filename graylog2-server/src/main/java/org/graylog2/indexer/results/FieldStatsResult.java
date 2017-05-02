@@ -67,8 +67,8 @@ public class FieldStatsResult extends IndexQueryResult {
         this.searchHits = hits;
     }
 
-    private FieldStatsResult(String query, BytesReference bytesReference) {
-        super(query, bytesReference, new TimeValue(0));
+    private FieldStatsResult(String query, String bytesReference) {
+        super(query, bytesReference, 0);
 
         this.count = Long.MIN_VALUE;
         this.cardinality = Long.MIN_VALUE;
@@ -130,7 +130,7 @@ public class FieldStatsResult extends IndexQueryResult {
         return searchHits;
     }
 
-    public static FieldStatsResult empty(String query, BytesReference bytesReference) {
+    public static FieldStatsResult empty(String query, String bytesReference) {
         return new FieldStatsResult(query, bytesReference);
     }
 }
