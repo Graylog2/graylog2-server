@@ -8,6 +8,51 @@ This file only contains the upgrade note for the upcoming release.
 Please see `our documentation <http://docs.graylog.org/en/latest/pages/upgrade.html>`_
 for the complete upgrade notes.
 
+Graylog switches to Elasticsearch http client
+=============================================
+
+In all prior versions, Graylog used the Elasticsearch node client to connect to an Elasticsearch cluster, which was acting as a client-only Elasticsearch node. For compatibility reasons of the used binary transfer protocol, the range of Elasticsearch versions Graylog could connect to, was limited. For more information and differences between the different ways to connect to Elasticsearch, you can check the `Elasticsearch documentation <https://www.elastic.co/guide/en/elasticsearch/guide/current/_talking_to_elasticsearch.html>`_.
+
+Starting with version 2.3.0, we are switching over to the more lightweight http client, which is almost version-agnostic. The biggest change is that it does not connect to the Elasticsearch native protocol port (defaulting to tcp/9300), but the Elasticsearch http port (defaulting to tcp/9200).
+
+Due to the differences in connecting to the Elasticsearch cluster, configuring Graylog has changed. These configuration settings have been removed::
+
+  elasticsearch_cluster_discovery_timeout
+  elasticsearch_cluster_name
+  elasticsearch_config_file
+  elasticsearch_discovery_initial_state_timeout
+  elasticsearch_discovery_zen_ping_unicast_hosts
+  elasticsearch_http_enabled
+  elasticsearch_network_bind_host
+  elasticsearch_network_host
+  elasticsearch_network_publish_host
+  elasticsearch_node_data
+  elasticsearch_node_master
+  elasticsearch_node_name_prefix
+  elasticsearch_path_data
+  elasticsearch_path_home
+  elasticsearch_transport_tcp_port
+
+The following configuration options are now being used to configure connectivity to Elasticsearch:
+
++------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| Config Setting                                 | Type      | Comments                                                     | Default                     |
++================================================+===========+==============================================================+=============================+
+| elasticsearch_connect_timeout                  | Duration  | Timeout when connection to individual Elasticsearch hosts    | ``10s`` (10 Seconds)        |
++------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| elasticsearch_hosts                            | List<URI> | Comma-separated list of URIs of Elasticsearch hosts          | ``"http://127.0.0.1:9200"`` |
++------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| elasticsearch_idle_timeout                     | Duration  | Timeout after which idle connections are terminated          | ``-1s`` (Never)             |
++------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| elasticsearch_max_total_connections            | int       | Maximum number of total Elasticsearch connections            | ``20``                      |
++------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| elasticsearch_max_total_connections_per_route  | int       | Maximum number of Elasticsearch connections per route/host   | ``2``                       |
++------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| elasticsearch_socket_timeout                   | Duration  | Timeout when sending/receiving from Elasticsearch connection | ``60s`` (60 Seconds)        |
++------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+
+In most cases, the only configuration setting that needs to be set explicitly is ``elasticsearch_hosts``. All other configuration settings should be tweaked only in case of errors.
+
 Graylog REST API
 ================
 
