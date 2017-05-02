@@ -19,12 +19,7 @@ package org.graylog2.indexer.results;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
-import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStats;
-import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCount;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public class FieldStatsResult extends IndexQueryResult {
@@ -39,36 +34,6 @@ public class FieldStatsResult extends IndexQueryResult {
     private final double variance;
     private final double stdDeviation;
     private final long cardinality;
-
-    public FieldStatsResult(@Nullable ValueCount valueCount,
-                            @Nullable ExtendedStats extendedStats,
-                            @Nullable Cardinality cardinality,
-                            SearchHits hits,
-                            String query,
-                            String source, long tookMs) {
-        super(query, source, tookMs);
-        this.count = getValueCount(valueCount, extendedStats);
-        this.cardinality = cardinality == null ? Long.MIN_VALUE : cardinality.getValue();
-
-        if (extendedStats != null) {
-            sum = extendedStats.getSum();
-            sumOfSquares = extendedStats.getSumOfSquares();
-            mean = extendedStats.getAvg();
-            min = extendedStats.getMin();
-            max = extendedStats.getMax();
-            variance = extendedStats.getVariance();
-            stdDeviation = extendedStats.getStdDeviation();
-        } else {
-            sum = Double.NaN;
-            sumOfSquares = Double.NaN;
-            mean = Double.NaN;
-            min = Double.NaN;
-            max = Double.NaN;
-            variance = Double.NaN;
-            stdDeviation = Double.NaN;
-        }
-        this.searchHits = buildResults(hits);
-    }
 
     public FieldStatsResult(ValueCountAggregation valueCountAggregation,
                             ExtendedStatsAggregation extendedStatsAggregation,
@@ -121,15 +86,6 @@ public class FieldStatsResult extends IndexQueryResult {
             return valueCountAggregation.getValueCount();
         } else if (extendedStatsAggregation != null) {
             return extendedStatsAggregation.getCount();
-        }
-        return Long.MIN_VALUE;
-    }
-
-    private long getValueCount(ValueCount valueCount, ExtendedStats extendedStats) {
-        if (valueCount != null) {
-            return valueCount.getValue();
-        } else if (extendedStats != null) {
-            return extendedStats.getCount();
         }
         return Long.MIN_VALUE;
     }

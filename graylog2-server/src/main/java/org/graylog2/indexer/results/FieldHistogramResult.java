@@ -21,9 +21,6 @@ import com.google.common.collect.Maps;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.HistogramAggregation;
 import io.searchbox.core.search.aggregation.StatsAggregation;
-import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
-import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
-import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.indexer.searches.Searches;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -44,13 +41,6 @@ public class FieldHistogramResult extends HistogramResult {
 
     private final Map<Long, Map<String, Number>> result;
     private final Searches.DateHistogramInterval interval;
-
-    public FieldHistogramResult(Histogram result, String originalQuery, String builtQuery, Searches.DateHistogramInterval interval, long tookMs) {
-        super(originalQuery, builtQuery, tookMs);
-
-        this.interval = interval;
-        this.result = getResultsFromHistogram(result);
-    }
 
     public FieldHistogramResult(HistogramAggregation histogramAggregation, String originalQuery, String builtQuery, Searches.DateHistogramInterval interval, long tookMs) {
         super(originalQuery, builtQuery, tookMs);
@@ -91,36 +81,6 @@ public class FieldHistogramResult extends HistogramResult {
             resultMap.put("cardinality", cardinality == null ? 0 : cardinality.getCardinality());
 
             final DateTime keyAsDate = new DateTime(b.getKey());
-            final long timestamp = keyAsDate.getMillis() / 1000L;
-            results.put(timestamp, resultMap.build());
-        }
-
-        fillEmptyTimestamps(results);
-        return results;
-    }
-
-    private Map<Long, Map<String, Number>> getResultsFromHistogram(Histogram histogram) {
-        if (histogram.getBuckets().isEmpty()) {
-            return Collections.emptyMap();
-        }
-
-        final Map<Long, Map<String, Number>> results = Maps.newTreeMap();
-        for (Histogram.Bucket b : histogram.getBuckets()) {
-            final ImmutableMap.Builder<String, Number> resultMap = ImmutableMap.builder();
-            resultMap.put("total_count", b.getDocCount());
-
-            final Stats stats = b.getAggregations().get(Searches.AGG_STATS);
-            resultMap.put("count", stats.getCount());
-            resultMap.put("min", stats.getMin());
-            resultMap.put("max", stats.getMax());
-            resultMap.put("total", stats.getSum());
-            resultMap.put("mean", stats.getAvg());
-
-            // cardinality is only calculated if it was explicitly requested, so this might be null
-            final Cardinality cardinality = b.getAggregations().get(Searches.AGG_CARDINALITY);
-            resultMap.put("cardinality", cardinality == null ? 0 : cardinality.getValue());
-
-            final DateTime keyAsDate = (DateTime) b.getKey();
             final long timestamp = keyAsDate.getMillis() / 1000L;
             results.put(timestamp, resultMap.build());
         }
