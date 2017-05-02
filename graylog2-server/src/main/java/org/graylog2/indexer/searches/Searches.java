@@ -262,7 +262,7 @@ public class Searches {
             .addIndex(indices);
 
         if (indices.isEmpty()) {
-            return SearchResult.empty(config.query(), requestBuilder.buildAsBytes());
+            return SearchResult.empty(config.query(), requestBuilder.toString());
         }
         final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform search query."));
         final List<ResultMessage> hits = searchResult.getHits(Map.class).stream()
@@ -305,7 +305,7 @@ public class Searches {
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         if (affectedIndices.isEmpty()) {
-            return TermsResult.empty(query, searchSourceBuilder.buildAsBytes());
+            return TermsResult.empty(query, searchSourceBuilder.toString());
         }
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .ignoreUnavailable(true)
@@ -410,7 +410,7 @@ public class Searches {
         searchSourceBuilder.aggregation(builder);
 
         if (affectedIndices.isEmpty()) {
-            return TermsStatsResult.empty(query, searchSourceBuilder.buildAsBytes());
+            return TermsStatsResult.empty(query, searchSourceBuilder.toString());
         }
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .addType(IndexMapping.TYPE_MESSAGE)
@@ -480,7 +480,7 @@ public class Searches {
             .addIndex(affectedIndices);
 
         if (affectedIndices.isEmpty()) {
-            return FieldStatsResult.empty(query, searchSourceBuilder.buildAsBytes());
+            return FieldStatsResult.empty(query, searchSourceBuilder.toString());
         }
 
         final io.searchbox.core.SearchResult searchResponse = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve fields stats."));
@@ -538,7 +538,7 @@ public class Searches {
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         if (affectedIndices.isEmpty()) {
-            return DateHistogramResult.empty(query, searchSourceBuilder.buildAsBytes(), interval, new TimeValue(0));
+            return DateHistogramResult.empty(query, searchSourceBuilder.toString(), interval);
         }
 
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
@@ -592,7 +592,7 @@ public class Searches {
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         if (affectedIndices.isEmpty()) {
-            return FieldHistogramResult.empty(query, searchSourceBuilder.buildAsBytes(), interval, new TimeValue(0));
+            return FieldHistogramResult.empty(query, searchSourceBuilder.toString(), interval);
         }
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .addType(IndexMapping.TYPE_MESSAGE)

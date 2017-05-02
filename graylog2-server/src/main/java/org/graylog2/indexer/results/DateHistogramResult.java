@@ -28,12 +28,12 @@ public class DateHistogramResult extends HistogramResult {
     private final Map<Long, Long> result;
     private final Searches.DateHistogramInterval interval;
 
-    public static DateHistogramResult empty(String originalQuery, String builtQuery, Searches.DateHistogramInterval interval, long tookMs) {
-        return new DateHistogramResult(originalQuery, builtQuery, interval, tookMs);
+    public static DateHistogramResult empty(String originalQuery, String builtQuery, Searches.DateHistogramInterval interval) {
+        return new DateHistogramResult(originalQuery, builtQuery, interval);
     }
 
-    private DateHistogramResult(String originalQuery, String builtQuery, Searches.DateHistogramInterval interval, long tookMs) {
-        super(originalQuery, builtQuery, tookMs);
+    private DateHistogramResult(String originalQuery, String builtQuery, Searches.DateHistogramInterval interval) {
+        super(originalQuery, builtQuery, 0);
 
         this.result = Collections.emptyMap();
         this.interval = interval;
