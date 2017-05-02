@@ -16,9 +16,12 @@
  */
 package org.graylog2.plugin.lookup;
 
-import javax.annotation.Nullable;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.Collections;
 import java.util.Map;
+
+import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
@@ -47,10 +50,12 @@ public class LookupResult {
         this.cacheTTL = cacheTTL;
     }
 
+    @JsonProperty
     public boolean isEmpty() {
         return isEmpty;
     }
 
+    @JsonProperty("ttl")
     public long cacheTTL() {
         return cacheTTL;
     }
@@ -60,6 +65,7 @@ public class LookupResult {
         return values.get(key);
     }
 
+    @JsonProperty("values")
     public Map<Object, Object> asMap() {
         return values;
     }

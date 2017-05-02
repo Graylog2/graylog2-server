@@ -1,5 +1,8 @@
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
+import { PluginStore } from 'graylog-web-plugin/plugin';
+
+import Styles from './ConfigSummary.css';
 
 const Cache = React.createClass({
 
@@ -8,11 +11,32 @@ const Cache = React.createClass({
   },
 
   render() {
+    const plugins = {};
+    PluginStore.exports('lookupTableCaches').forEach((p) => {
+      plugins[p.type] = p;
+    });
+
+    const cache = this.props.cache;
+    const plugin = plugins[cache.config.type];
+    if (!plugin) {
+      return <p>Unknown cache type {cache.config.type}. Is the plugin missing?</p>;
+    }
+
+    const summary = plugin.summaryComponent;
     return (
       <Row className="content">
         <Col md={6}>
-          <h3>{this.props.cache.title}</h3>
-          <span>{this.props.cache.description}</span>
+          <h2>{cache.title} <small>({plugin.displayName})</small></h2>
+          <div className={Styles.config}>
+            <dl>
+              <dt>Description</dt>
+              <dd>{cache.description || <em>No description.</em>}</dd>
+            </dl>
+          </div>
+          <h4>Configuration</h4>
+          <div className={Styles.config}>
+            {React.createElement(summary, { cache: cache })}
+          </div>
         </Col>
         <Col md={6}>
           <h3>Cached data</h3>
