@@ -19,11 +19,6 @@ package org.graylog2.rest.resources.search;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
-import org.apache.lucene.queryparser.classic.Token;
-import org.elasticsearch.action.search.SearchPhaseExecutionException;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.decorators.DecoratorProcessor;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -43,7 +38,6 @@ import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.models.search.responses.TimeRange;
 import org.graylog2.rest.models.system.indexer.responses.IndexRangeSummary;
-import org.graylog2.rest.resources.search.responses.QueryParseError;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
@@ -55,9 +49,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.InternalServerErrorException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -240,67 +231,6 @@ public abstract class SearchResource extends RestResource {
         // TODO use a shared executor for async responses here instead of a single thread that's not limited
         new Thread(scrollIterationAction).start();
         return output;
-    }
-
-    protected WebApplicationException createRequestExceptionForParseFailure(String query, SearchPhaseExecutionException e) {
-        LOG.warn("Unable to execute search: {}", e.getMessage());
-
-        QueryParseError errorMessage = QueryParseError.create(query, "Unable to execute search", e.getClass().getCanonicalName());
-
-        // We're so going to hell for this…
-        if (e.toString().contains("nested: QueryParsingException")) {
-            final QueryParser queryParser = new QueryParser("", new StandardAnalyzer());
-            try {
-                queryParser.parse(query);
-            } catch (ParseException parseException) {
-                Token currentToken = null;
-                try {
-                    // FIXME I have no idea why this is necessary but without that call currentToken will be null.
-                    final ParseException exception = queryParser.generateParseException();
-                    currentToken = exception.currentToken;
-                } catch (NullPointerException npe) {
-                    // "Normal" exception and no need to spam the logs with it.
-                    LOG.debug("Exception thrown while generating parse exception.", npe);
-                }
-
-                if (currentToken == null) {
-                    LOG.warn("No position/token available for ParseException.", parseException);
-                    errorMessage = QueryParseError.create(
-                        query,
-                        parseException.getMessage(),
-                        parseException.getClass().getCanonicalName());
-                } else {
-                    // scan for first usable token with position information
-                    int beginColumn = 0;
-                    int beginLine = 0;
-                    int endColumn = 0;
-                    int endLine = 0;
-                    while (currentToken != null && beginLine == 0) {
-                        beginColumn = currentToken.beginColumn;
-                        beginLine = currentToken.beginLine;
-                        endColumn = currentToken.endColumn;
-                        endLine = currentToken.endLine;
-                        currentToken = currentToken.next;
-                    }
-
-                    errorMessage = QueryParseError.create(
-                        query,
-                        beginColumn,
-                        beginLine,
-                        endColumn,
-                        endLine,
-                        parseException.getMessage(),
-                        parseException.getClass().getCanonicalName());
-                }
-            }
-
-        return new BadRequestException(Response
-            .status(Response.Status.BAD_REQUEST)
-            .entity(errorMessage)
-            .build());
-        } else {
-            return new InternalServerErrorException("Unable to fulfill search request", e);
-        }
     }
 
     public void checkSearchPermission(String filter, String searchPermission) {

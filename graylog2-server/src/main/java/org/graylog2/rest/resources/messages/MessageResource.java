@@ -26,7 +26,6 @@ import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
-import org.elasticsearch.index.IndexNotFoundException;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.messages.DocumentNotFoundException;
@@ -104,10 +103,6 @@ public class MessageResource extends RestResource {
             checkMessageReadPermission(message);
 
             return resultMessage;
-        } catch (IndexNotFoundException e) {
-            final String msg = "Index " + e.getIndex() + " does not exist.";
-            LOG.error(msg, e);
-            throw new NotFoundException(msg, e);
         } catch (DocumentNotFoundException e) {
             final String msg = "Message " + messageId + " does not exist in index " + index;
             LOG.error(msg, e);
@@ -210,12 +205,6 @@ public class MessageResource extends RestResource {
                 .orElse("standard");
         final String messageAnalyzer = analyzer == null ? indexAnalyzer : analyzer;
 
-        try {
-            return MessageTokens.create(messages.analyze(string, index, messageAnalyzer));
-        } catch (IndexNotFoundException e) {
-            final String message = "Index " + index + " does not exist.";
-            LOG.error(message, e);
-            throw new NotFoundException(message);
-        }
+        return MessageTokens.create(messages.analyze(string, index, messageAnalyzer));
     }
 }

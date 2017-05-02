@@ -1,11 +1,17 @@
-import React from 'react';
-import { Col, Panel, Row } from 'react-bootstrap';
+import React from "react";
+import {Col, Panel, Row} from "react-bootstrap";
 
-import { ContactUs } from 'components/support';
+import {ContactUs} from "components/support";
 
 const SearchExecutionError = React.createClass({
   propTypes: {
     error: React.PropTypes.object.isRequired,
+  },
+
+  _getFormattedErrorDetails(details) {
+      return details.map(function(detail) {
+          return <li><code>{detail}</code></li>
+      });
   },
 
   render() {
@@ -24,9 +30,13 @@ const SearchExecutionError = React.createClass({
               <Panel bsStyle="danger">
                 <dl style={{ marginBottom: 0 }}>
                   <dt>Error Message:</dt>
-                  <dd>{error.body.message ? `${error.body.message}: ` : ''}{error.message}</dd>
+                  <dd>{error.body.message ? error.body.message : ''}</dd>
+                  <dt>Details:</dt>
+                  <dd>{error.body.message ? this._getFormattedErrorDetails(error.body.details) : ''}</dd>
                   <dt>Search status code:</dt>
                   <dd>{error.status}</dd>
+                  <dt>Search response:</dt>
+                  <dd>{error.message}</dd>
                 </dl>
               </Panel>
             </div>

@@ -17,7 +17,6 @@
 package org.graylog2.indexer.indices.jobs;
 
 import com.google.inject.assistedinject.Assisted;
-import org.elasticsearch.indices.IndexTemplateMissingException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
@@ -63,8 +62,6 @@ public class IndexSetCleanupJob extends SystemJob {
         try {
             LOG.info("Deleting index template <{}> from Elasticsearch", config.indexTemplateName());
             indices.deleteIndexTemplate(indexSet);
-        } catch (IndexTemplateMissingException ignored) {
-            LOG.debug("Unable to delete index template <{}> because it does not exist.", config.indexTemplateName());
         } catch (Exception e) {
             LOG.error("Unable to delete index template <{}>", config.indexTemplateName(), e);
         }
