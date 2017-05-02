@@ -33,6 +33,7 @@ import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.SearchesClusterConfig;
 import org.graylog2.indexer.searches.Sorting;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
@@ -105,11 +106,11 @@ public abstract class SearchResource extends RestResource {
         }
 
         final Iterable<String> split = Splitter.on(',').omitEmptyStrings().trimResults().split(fields);
-        final ArrayList<String> fieldList = Lists.newArrayList("timestamp");
+        final ArrayList<String> fieldList = Lists.newArrayList(Message.FIELD_TIMESTAMP);
 
         // skip the mandatory field timestamp
         for (String field : split) {
-            if ("timestamp".equals(field)) {
+            if (Message.FIELD_TIMESTAMP.equals(field)) {
                 continue;
             }
             fieldList.add(field);

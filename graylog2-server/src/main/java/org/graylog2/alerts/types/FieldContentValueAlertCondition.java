@@ -131,7 +131,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
                 RelativeRange.create(configuration.getAlertCheckInterval()),
                 searchLimit,
                 0,
-                new Sorting("timestamp", Sorting.Direction.DESC)
+                new Sorting(Message.FIELD_TIMESTAMP, Sorting.Direction.DESC)
             );
 
             final List<MessageSummary> summaries;
