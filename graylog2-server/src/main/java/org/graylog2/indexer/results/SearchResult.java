@@ -55,6 +55,7 @@ public class SearchResult extends IndexQueryResult {
         this.results = Collections.emptyList();
         this.fields = Collections.emptySet();
         this.usedIndices = Collections.emptySet();
+        this.totalResults = 0;
     }
 
     public long getTotalResults() {
