@@ -20,10 +20,10 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import io.searchbox.core.SearchResult;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog2.AbstractESTest;
 import org.graylog2.Configuration;
@@ -128,6 +128,9 @@ public class SearchesTest extends AbstractESTest {
     @Mock
     private StreamService streamService;
 
+    @Mock
+    private Indices indices;
+
     private MetricRegistry metricRegistry;
     private Searches searches;
 
@@ -157,13 +160,14 @@ public class SearchesTest extends AbstractESTest {
     public void setUp() throws Exception {
         super.setUp();
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
+        when(indices.getAllMessageFieldsForIndices(any(String[].class))).thenReturn(ImmutableMap.of(INDEX_NAME, Collections.singleton("n")));
         metricRegistry = new MetricRegistry();
         searches = new Searches(
             new Configuration(),
             indexRangeService,
             metricRegistry,
             streamService,
-            mock(Indices.class),
+            indices,
             jestClient(),
             (initialResult, query, fields) -> new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields)
         );
