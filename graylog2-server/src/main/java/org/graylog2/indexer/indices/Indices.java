@@ -330,7 +330,7 @@ public class Indices {
     }
 
     public Optional<String> aliasTarget(String alias) throws TooManyAliasesException {
-        final GetAliases request = new GetAliases.Builder().addCleanApiParameter(alias).build();
+        final GetAliases request = new GetAliases.Builder().build();
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect indices for alias " + alias);
 
         // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
@@ -342,6 +342,7 @@ public class Indices {
                     .map(json -> asJsonObject(json.get("aliases")))
                     .map(JsonObject::entrySet)
                     .filter(aliases -> !aliases.isEmpty())
+                    .filter(aliases -> aliases.stream().anyMatch(aliasEntry -> aliasEntry.getKey().equals(alias)))
                     .ifPresent(x -> indicesBuilder.add(indexName));
         }
 
