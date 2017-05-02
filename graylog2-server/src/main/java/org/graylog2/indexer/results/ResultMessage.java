@@ -87,11 +87,11 @@ public class ResultMessage {
     public void setMessage(String id, Map<String, Object> message) {
         Map<String, Object> tmp = Maps.newHashMap();
         tmp.putAll(message);
-        tmp.put("_id", id);
-        if (tmp.containsKey("timestamp")) {
-            final Object tsField = tmp.get("timestamp");
+        tmp.put(Message.FIELD_ID, id);
+        if (tmp.containsKey(Message.FIELD_TIMESTAMP)) {
+            final Object tsField = tmp.get(Message.FIELD_TIMESTAMP);
             try {
-                tmp.put("timestamp", ES_DATE_FORMAT_FORMATTER.parseDateTime(String.valueOf(tsField)));
+                tmp.put(Message.FIELD_TIMESTAMP, ES_DATE_FORMAT_FORMATTER.parseDateTime(String.valueOf(tsField)));
             } catch (IllegalArgumentException e) {
                 // could not parse date string, this is likely a bug, but we will leave the original value alone
                 LOG.warn("Could not parse timestamp of message {}", message.get("id"), e);

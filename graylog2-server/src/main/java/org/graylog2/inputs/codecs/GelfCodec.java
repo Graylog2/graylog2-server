@@ -125,7 +125,7 @@ public class GelfCodec extends AbstractCodec {
         }
 
         // Timestamp.
-        final double messageTimestamp = doubleValue(node, "timestamp");
+        final double messageTimestamp = doubleValue(node, Message.FIELD_TIMESTAMP);
         final DateTime timestamp;
         if (messageTimestamp <= 0) {
             timestamp = rawMessage.getTimestamp();
@@ -140,7 +140,7 @@ public class GelfCodec extends AbstractCodec {
                 timestamp
         );
 
-        message.addField("full_message", stringValue(node, "full_message"));
+        message.addField(Message.FIELD_FULL_MESSAGE, stringValue(node, "full_message"));
 
         final String file = stringValue(node, "file");
 

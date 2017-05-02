@@ -19,6 +19,7 @@ package org.graylog2.indexer;
 import com.google.common.collect.ImmutableSet;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
@@ -52,7 +53,7 @@ public class IndexHelper {
             return null;
         }
 
-        return QueryBuilders.rangeQuery("timestamp")
+        return QueryBuilders.rangeQuery(Message.FIELD_TIMESTAMP)
                 .gte(Tools.buildElasticSearchTimeFormat(range.getFrom()))
                 .lte(Tools.buildElasticSearchTimeFormat(range.getTo()));
     }
