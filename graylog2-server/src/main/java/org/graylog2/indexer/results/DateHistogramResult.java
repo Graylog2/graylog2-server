@@ -23,6 +23,7 @@ import org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.indexer.searches.Searches;
 import org.joda.time.DateTime;
 
+import java.util.Collections;
 import java.util.Map;
 
 public class DateHistogramResult extends HistogramResult {
@@ -36,7 +37,7 @@ public class DateHistogramResult extends HistogramResult {
     private DateHistogramResult(String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
-        this.result = Maps.newTreeMap();
+        this.result = Collections.emptyMap();
         this.interval = interval;
     }
 
