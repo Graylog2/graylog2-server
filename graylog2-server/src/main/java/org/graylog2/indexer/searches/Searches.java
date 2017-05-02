@@ -276,6 +276,9 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(indices);
 
+        if (indices.isEmpty()) {
+            return SearchResult.empty(config.query(), requestBuilder.buildAsBytes());
+        }
         final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform search query."));
         final List<ResultMessage> hits = searchResult.getHits(Map.class).stream()
             .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
