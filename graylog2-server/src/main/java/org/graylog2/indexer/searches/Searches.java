@@ -206,7 +206,7 @@ public class Searches {
         }
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
-        if (affectedIndices.size() == 0) {
+        if (affectedIndices.isEmpty()) {
             return CountResult.empty();
         }
 

@@ -152,7 +152,7 @@ public class FieldHistogramResult extends HistogramResult {
     private FieldHistogramResult(String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);
 
-        this.result = Maps.newTreeMap();
+        this.result = Collections.emptyMap();
         this.interval = interval;
     }
     public static HistogramResult empty(String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
