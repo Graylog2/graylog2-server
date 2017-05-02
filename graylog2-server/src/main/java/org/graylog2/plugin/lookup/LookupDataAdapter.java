@@ -18,10 +18,15 @@ package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.graylog2.lookup.LookupTable;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import javax.inject.Named;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -36,9 +41,13 @@ public abstract class LookupDataAdapter {
     private ReentrantLock lock = new ReentrantLock();
 
     private final LookupDataAdapterConfiguration config;
+    private final ScheduledExecutorService scheduler;
+    private ScheduledFuture<?> refreshFuture = null;
 
-    protected LookupDataAdapter(LookupDataAdapterConfiguration config) {
+    protected LookupDataAdapter(LookupDataAdapterConfiguration config,
+                                @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.config = config;
+        this.scheduler = scheduler;
     }
 
     public boolean isStarted() {
@@ -58,6 +67,17 @@ public abstract class LookupDataAdapter {
             doStart();
             started = true;
             failed = false;
+
+            try {
+                final Duration interval = refreshInterval();
+                if (!interval.equals(Duration.ZERO)) {
+                    LOG.debug("Schedule data adapter refresh method every {}ms", interval.getMillis());
+                    this.refreshFuture = scheduler.scheduleAtFixedRate(this::refresh, interval.getMillis(), interval.getMillis(), TimeUnit.MILLISECONDS);
+                }
+            } catch (Exception e) {
+                // XXX Should this set the data adapter into failed state?
+                LOG.error("Couldn't start data adapter refresh job", e);
+            }
         } catch (Exception e) {
             LOG.error("Couldn't start data adapter", e);
             failed = true;
@@ -73,6 +93,9 @@ public abstract class LookupDataAdapter {
         }
         lock.lock();
         try {
+            if (refreshFuture != null && !refreshFuture.isCancelled()) {
+                refreshFuture.cancel(true);
+            }
             doStop();
             started = false;
         } catch (Exception e) {
@@ -83,6 +106,21 @@ public abstract class LookupDataAdapter {
         }
     }
     protected abstract void doStop() throws Exception;
+
+    /**
+     * Returns the refresh interval for this data adapter. Use {@link Duration.ZERO} if refresh should be disabled.
+     * @return the refresh interval
+     */
+    protected abstract Duration refreshInterval();
+
+    public void refresh() {
+        try {
+            doRefresh();
+        } catch (Exception e) {
+            LOG.error("Couldn't refresh data adapter", e);
+        }
+    }
+    protected abstract void doRefresh() throws Exception;
 
     @Nullable
     public String id() {

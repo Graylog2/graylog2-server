@@ -24,12 +24,14 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.hibernate.validator.constraints.NotEmpty;
+import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,8 +49,6 @@ import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -58,18 +58,15 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     public static final String NAME = "csvfile";
 
-    private final ScheduledExecutorService scheduler;
     private final Config config;
     private final AtomicReference<Map<Object, Object>> lookupRef = new AtomicReference<>(ImmutableMap.of());
 
     private FileInfo prevFileInfo;
-    private ScheduledFuture<?> future;
 
     @Inject
     public CSVFileDataAdapter(@Named("daemonScheduler") ScheduledExecutorService scheduler,
                               @Assisted LookupDataAdapterConfiguration config) {
-        super(config);
-        this.scheduler = scheduler;
+        super(config, scheduler);
         this.config = (Config) config;
     }
 
@@ -87,10 +84,15 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         if (config.checkInterval() < 1) {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
         }
-        this.future = scheduler.scheduleAtFixedRate(this::checkFile, config.checkInterval(), config.checkInterval(), TimeUnit.SECONDS);
     }
 
-    private void checkFile() {
+    @Override
+    protected Duration refreshInterval() {
+        return Duration.standardSeconds(Ints.saturatedCast(config.checkInterval()));
+    }
+
+    @Override
+    protected void doRefresh() throws Exception {
         try {
             final FileInfo newFileInfo = getFileInfo(config.path());
 
@@ -166,9 +168,6 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     @Override
     public void doStop() throws Exception {
         LOG.debug("Stopping CSV data adapter for file: {}", config.path());
-        if (future != null && !future.isCancelled()) {
-            future.cancel(true);
-        }
     }
 
     @Override
