@@ -22,6 +22,7 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Ping;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.QueryParsingException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -32,6 +33,7 @@ import org.mockito.junit.MockitoRule;
 import java.io.IOException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -89,10 +91,17 @@ public class JestUtilsTest {
         when(resultMock.getJsonObject()).thenReturn(responseStub);
         when(clientMock.execute(request)).thenReturn(resultMock);
 
-        expectedException.expect(ElasticsearchException.class);
-        expectedException.expectMessage("BOOM\n\nReasons:\nfoobar");
-
-        JestUtils.execute(clientMock, request, () -> "BOOM");
+        try {
+            JestUtils.execute(clientMock, request, () -> "BOOM");
+            fail("Expected ElasticsearchException to be thrown");
+        } catch (ElasticsearchException e) {
+            assertThat(e)
+                    .hasMessage("BOOM")
+                    .hasNoSuppressedExceptions();
+            assertThat(e.getErrorDetails()).containsExactly("foobar");
+        } catch (Exception e) {
+            fail("Expected ElasticsearchException to be thrown");
+        }
     }
 
     @Test
@@ -104,5 +113,44 @@ public class JestUtilsTest {
         expectedException.expectMessage("BOOM");
 
         JestUtils.execute(clientMock, request, () -> "BOOM");
+    }
+
+    @Test
+    public void executeWithQueryParsingException() throws Exception {
+        final Ping request = new Ping.Builder().build();
+
+        final JestResult resultMock = mock(JestResult.class);
+        when(resultMock.isSucceeded()).thenReturn(false);
+
+        final JsonObject rootCauseStub = new JsonObject();
+        rootCauseStub.addProperty("type", "query_parsing_exception");
+        rootCauseStub.addProperty("reason", "foobar");
+        rootCauseStub.addProperty("line", 23);
+        rootCauseStub.addProperty("col", 42);
+        rootCauseStub.addProperty("index", "my_index");
+        final JsonArray rootCausesStub = new JsonArray();
+        rootCausesStub.add(rootCauseStub);
+        final JsonObject errorStub = new JsonObject();
+        errorStub.add("root_cause", rootCausesStub);
+        final JsonObject responseStub = new JsonObject();
+        responseStub.add("error", errorStub);
+
+        when(resultMock.getJsonObject()).thenReturn(responseStub);
+        when(clientMock.execute(request)).thenReturn(resultMock);
+
+        try {
+            JestUtils.execute(clientMock, request, () -> "BOOM");
+            fail("Expected QueryParsingException to be thrown");
+        } catch (QueryParsingException e) {
+            assertThat(e)
+                    .hasMessage("BOOM")
+                    .hasNoSuppressedExceptions();
+            assertThat(e.getErrorDetails()).containsExactly("foobar");
+            assertThat(e.getLine()).contains(23);
+            assertThat(e.getColumn()).contains(42);
+            assertThat(e.getIndex()).contains("my_index");
+        } catch (Exception e) {
+            fail("Expected QueryParsingException to be thrown");
+        }
     }
 }
