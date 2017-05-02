@@ -83,6 +83,7 @@ import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -694,10 +695,10 @@ public class Indices {
      */
     public IndexRangeStats indexRangeStatsOfIndex(String index) {
         final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
-                .filter(QueryBuilders.existsQuery("timestamp"))
-                .subAggregation(AggregationBuilders.min("ts_min").field("timestamp"))
-                .subAggregation(AggregationBuilders.max("ts_max").field("timestamp"))
-                .subAggregation(AggregationBuilders.terms("streams").field("streams"));
+                .filter(QueryBuilders.existsQuery(Message.FIELD_TIMESTAMP))
+                .subAggregation(AggregationBuilders.min("ts_min").field(Message.FIELD_TIMESTAMP))
+                .subAggregation(AggregationBuilders.max("ts_max").field(Message.FIELD_TIMESTAMP))
+                .subAggregation(AggregationBuilders.terms("streams").field(Message.FIELD_STREAMS));
         final String query = searchSource()
                 .aggregation(builder)
                 .size(0)

@@ -68,6 +68,7 @@ import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.timeranges.TimeRanges;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamService;
@@ -524,7 +525,7 @@ public class Searches {
         final FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
             .subAggregation(
                 AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
-                    .field("timestamp")
+                    .field(Message.FIELD_TIMESTAMP)
                     .interval(interval.toESInterval())
             )
             .filter(standardAggregationFilters(range, filter));
@@ -569,7 +570,7 @@ public class Searches {
                                           TimeRange range,
                                           boolean includeCardinality) {
         final DateHistogramBuilder dateHistogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
-                .field("timestamp")
+                .field(Message.FIELD_TIMESTAMP)
                 .subAggregation(AggregationBuilders.stats(AGG_STATS).field(field))
                 .interval(interval.toESInterval());
 
