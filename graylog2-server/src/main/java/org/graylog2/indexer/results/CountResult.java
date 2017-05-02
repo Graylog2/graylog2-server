@@ -29,4 +29,8 @@ public abstract class CountResult {
     public static CountResult create(long count, long tookMs) {
         return new AutoValue_CountResult(count, tookMs);
     }
+
+    public static CountResult empty() {
+        return create(0, 0);
+    }
 }

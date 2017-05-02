@@ -24,6 +24,7 @@ import org.elasticsearch.search.SearchHits;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -49,7 +50,15 @@ public class SearchResult extends IndexQueryResult {
         this.usedIndices = usedIndices;
     }
 
-	public long getTotalResults() {
+    private SearchResult(String query, BytesReference bytesReference) {
+        super(query, bytesReference, new TimeValue(0));
+        this.results = Collections.emptyList();
+        this.fields = Collections.emptySet();
+        this.usedIndices = Collections.emptySet();
+        this.totalResults = 0;
+    }
+
+    public long getTotalResults() {
 		return totalResults;
 	}
 
@@ -81,4 +90,7 @@ public class SearchResult extends IndexQueryResult {
         return usedIndices;
     }
 
+    public static SearchResult empty(String query, BytesReference bytesReference) {
+        return new SearchResult(query, bytesReference);
+    }
 }
