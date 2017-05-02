@@ -16,8 +16,6 @@
  */
 package org.graylog2.indexer.results;
 
-import org.elasticsearch.common.bytes.BytesArray;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.graylog2.indexer.searches.Searches;
 import org.junit.Test;
@@ -34,9 +32,9 @@ public class FieldHistogramResultTest {
         final FieldHistogramResult fieldHistogramResult = new FieldHistogramResult(
                 mock(Histogram.class),
                 "",
-                BytesArray.EMPTY,
+                "",
                 Searches.DateHistogramInterval.MINUTE,
-                TimeValue.timeValueMillis(42L)
+                42L
         );
 
         assertThat(fieldHistogramResult.getInterval()).isEqualTo(Searches.DateHistogramInterval.MINUTE);
@@ -50,9 +48,9 @@ public class FieldHistogramResultTest {
         final FieldHistogramResult fieldHistogramResult = new FieldHistogramResult(
                 dateHistogram,
                 "",
-                BytesArray.EMPTY,
+                "",
                 Searches.DateHistogramInterval.MINUTE,
-                TimeValue.timeValueMillis(42L)
+                42L
         );
 
         assertThat(fieldHistogramResult.getResults()).isEmpty();

@@ -19,8 +19,6 @@ package org.graylog2.indexer.results;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
-import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
 import org.elasticsearch.search.aggregations.metrics.stats.extended.ExtendedStats;
@@ -47,8 +45,8 @@ public class FieldStatsResult extends IndexQueryResult {
                             @Nullable Cardinality cardinality,
                             SearchHits hits,
                             String query,
-                            BytesReference source, TimeValue took) {
-        super(query, source, took);
+                            String source, long tookMs) {
+        super(query, source, tookMs);
         this.count = getValueCount(valueCount, extendedStats);
         this.cardinality = cardinality == null ? Long.MIN_VALUE : cardinality.getValue();
 
@@ -77,9 +75,9 @@ public class FieldStatsResult extends IndexQueryResult {
                             CardinalityAggregation cardinalityAggregation,
                             List<ResultMessage> hits,
                             String query,
-                            BytesReference source,
-                            TimeValue took) {
-        super(query, source, took);
+                            String source,
+                            long tookMs) {
+        super(query, source, tookMs);
         this.count = getValueCount(valueCountAggregation, extendedStatsAggregation);
         this.cardinality = cardinalityAggregation == null ? Long.MIN_VALUE : cardinalityAggregation.getCardinality();
 

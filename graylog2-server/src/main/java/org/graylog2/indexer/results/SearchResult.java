@@ -18,8 +18,6 @@ package org.graylog2.indexer.results;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
-import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHits;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
@@ -28,9 +26,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-/**
- * @author Lennart Koopmann <lennart@socketfeed.com>
- */
 public class SearchResult extends IndexQueryResult {
 
 	private final long totalResults;
@@ -38,12 +33,12 @@ public class SearchResult extends IndexQueryResult {
 	private final Set<String> fields;
     private final Set<IndexRange> usedIndices;
 
-	public SearchResult(SearchHits searchHits, Set<IndexRange> usedIndices, String originalQuery, BytesReference builtQuery, TimeValue took) {
-        this(buildResults(searchHits), usedIndices, originalQuery, builtQuery, took);
+	public SearchResult(SearchHits searchHits, Set<IndexRange> usedIndices, String originalQuery, String builtQuery, long tookMs) {
+        this(buildResults(searchHits), usedIndices, originalQuery, builtQuery, tookMs);
 	}
 
-	public SearchResult(List<ResultMessage> hits, Set<IndexRange> usedIndices, String originalQuery, BytesReference builtQuery, TimeValue took) {
-	    super(originalQuery, builtQuery, took);
+	public SearchResult(List<ResultMessage> hits, Set<IndexRange> usedIndices, String originalQuery, String builtQuery, long tookMs) {
+	    super(originalQuery, builtQuery, tookMs);
 	    this.results = hits;
         this.fields = extractFields(hits);
         this.totalResults = hits.size();

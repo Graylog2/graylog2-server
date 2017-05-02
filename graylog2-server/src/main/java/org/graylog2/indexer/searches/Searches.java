@@ -35,7 +35,6 @@ import io.searchbox.core.search.aggregation.TermsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
 import io.searchbox.core.search.sort.Sort;
 import io.searchbox.params.Parameters;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -287,7 +286,7 @@ public class Searches {
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, config.range());
 
-        return new SearchResult(hits, indexRanges, config.query(), requestBuilder.buildAsBytes(), new TimeValue(tookMs));
+        return new SearchResult(hits, indexRanges, config.query(), requestBuilder.toString(), tookMs);
     }
 
     private long tookMsFromSearchResult(io.searchbox.core.SearchResult searchResult) {
@@ -343,8 +342,8 @@ public class Searches {
                 missing.getMissing(),
                 filterAggregation.getCount(),
                 query,
-                searchSourceBuilder.buildAsBytes(),
-                new TimeValue(tookMs)
+                searchSourceBuilder.toString(),
+                tookMs
         );
     }
 
@@ -441,8 +440,8 @@ public class Searches {
         return new TermsStatsResult(
             termsAggregation,
             query,
-            searchSourceBuilder.buildAsBytes(),
-            new TimeValue(tookMs)
+            searchSourceBuilder.toString(),
+            tookMs
         );
     }
 
@@ -518,8 +517,8 @@ public class Searches {
                 cardinalityAggregation,
                 hits,
                 query,
-                searchSourceBuilder.buildAsBytes(),
-                new TimeValue(tookMs)
+                searchSourceBuilder.toString(),
+                tookMs
         );
     }
 
@@ -574,9 +573,9 @@ public class Searches {
         return new DateHistogramResult(
             histogramAggregation,
             query,
-            searchSourceBuilder.buildAsBytes(),
+            searchSourceBuilder.toString(),
             interval,
-            new TimeValue(tookMs)
+            tookMs
         );
     }
 
@@ -625,9 +624,9 @@ public class Searches {
         return new FieldHistogramResult(
                 histogramAggregation,
                 query,
-                searchSourceBuilder.buildAsBytes(),
+                searchSourceBuilder.toString(),
                 interval,
-                new TimeValue(tookMs));
+                tookMs);
     }
 
     private <T extends JestResult> T checkForFailedShards(T result) throws FieldTypeException {

@@ -86,7 +86,7 @@ public class FieldChartWidgetStrategy extends ChartWidgetStrategy {
                     this.timeRange,
                     "cardinality".equalsIgnoreCase(statisticalFunction));
 
-            return new ComputationResult(histogramResult.getResults(), histogramResult.took().millis(), histogramResult.getHistogramBoundaries());
+            return new ComputationResult(histogramResult.getResults(), histogramResult.tookMs(), histogramResult.getHistogramBoundaries());
         } catch (Searches.FieldTypeException e) {
             String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + this.widgetId + ">. Not a numeric field? The field was [" + field + "]";
             LOG.error(msg, e);

@@ -21,8 +21,6 @@ import com.google.common.collect.Maps;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.HistogramAggregation;
 import io.searchbox.core.search.aggregation.StatsAggregation;
-import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.elasticsearch.search.aggregations.metrics.cardinality.Cardinality;
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
@@ -47,15 +45,15 @@ public class FieldHistogramResult extends HistogramResult {
     private final Map<Long, Map<String, Number>> result;
     private final Searches.DateHistogramInterval interval;
 
-    public FieldHistogramResult(Histogram result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
-        super(originalQuery, builtQuery, took);
+    public FieldHistogramResult(Histogram result, String originalQuery, String builtQuery, Searches.DateHistogramInterval interval, long tookMs) {
+        super(originalQuery, builtQuery, tookMs);
 
         this.interval = interval;
         this.result = getResultsFromHistogram(result);
     }
 
-    public FieldHistogramResult(HistogramAggregation histogramAggregation, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
-        super(originalQuery, builtQuery, took);
+    public FieldHistogramResult(HistogramAggregation histogramAggregation, String originalQuery, String builtQuery, Searches.DateHistogramInterval interval, long tookMs) {
+        super(originalQuery, builtQuery, tookMs);
 
         this.interval = interval;
         this.result = getResultsFromHistogramAggregation(histogramAggregation);

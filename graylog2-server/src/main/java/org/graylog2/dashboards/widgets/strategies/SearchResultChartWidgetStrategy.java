@@ -65,6 +65,6 @@ public class SearchResultChartWidgetStrategy extends ChartWidgetStrategy {
         }
 
         final HistogramResult histogram = searches.histogram(query, interval, filter, this.timeRange);
-        return new ComputationResult(histogram.getResults(), histogram.took().millis(), histogram.getHistogramBoundaries());
+        return new ComputationResult(histogram.getResults(), histogram.tookMs(), histogram.getHistogramBoundaries());
     }
 }

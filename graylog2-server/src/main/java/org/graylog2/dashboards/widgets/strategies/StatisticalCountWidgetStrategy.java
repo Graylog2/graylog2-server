@@ -156,11 +156,11 @@ public class StatisticalCountWidgetStrategy extends SearchResultCountWidgetStrat
                 Map<String, Object> results = Maps.newHashMap();
                 results.put("now", getStatisticalValue(fieldStatsResult));
                 results.put("previous", getStatisticalValue(previousFieldStatsResult));
-                long tookMs = fieldStatsResult.took().millis() + previousFieldStatsResult.took().millis();
+                long tookMs = fieldStatsResult.tookMs() + previousFieldStatsResult.tookMs();
 
                 return new ComputationResult(results, tookMs);
             } else {
-                return new ComputationResult(getStatisticalValue(fieldStatsResult), fieldStatsResult.took().millis());
+                return new ComputationResult(getStatisticalValue(fieldStatsResult), fieldStatsResult.tookMs());
             }
         } catch (Searches.FieldTypeException e) {
             log.warn("Invalid field provided, returning 'NaN'", e);

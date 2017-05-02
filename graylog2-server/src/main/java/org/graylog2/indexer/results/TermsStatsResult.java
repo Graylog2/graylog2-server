@@ -19,13 +19,10 @@ package org.graylog2.indexer.results;
 import com.google.common.collect.Maps;
 import io.searchbox.core.search.aggregation.StatsAggregation;
 import io.searchbox.core.search.aggregation.TermsAggregation;
-import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.metrics.stats.Stats;
 import org.graylog2.indexer.searches.Searches;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +44,8 @@ public class TermsStatsResult extends IndexQueryResult {
     };
     private final List<Map<String, Object>> terms;
 
-    public TermsStatsResult(Terms facet, String originalQuery, BytesReference builtQuery, TimeValue took) {
-        super(originalQuery, builtQuery, took);
+    public TermsStatsResult(Terms facet, String originalQuery, String builtQuery, long tookMs) {
+        super(originalQuery, builtQuery, tookMs);
 
         this.terms = facet.getBuckets().stream()
             .map(e -> {
@@ -71,8 +68,8 @@ public class TermsStatsResult extends IndexQueryResult {
             .collect(Collectors.toList());
     }
 
-    public TermsStatsResult(TermsAggregation terms, String originalQuery, BytesReference builtQuery, TimeValue took) {
-        super(originalQuery, builtQuery, took);
+    public TermsStatsResult(TermsAggregation terms, String originalQuery, String builtQuery, long tookMs) {
+        super(originalQuery, builtQuery, tookMs);
 
         this.terms = terms.getBuckets().stream()
             .map(e -> {

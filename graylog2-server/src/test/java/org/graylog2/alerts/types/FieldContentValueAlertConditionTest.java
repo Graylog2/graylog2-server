@@ -17,10 +17,8 @@
 package org.graylog2.alerts.types;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterators;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.graylog2.Configuration;
@@ -44,7 +42,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.Spliterators;
-import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -87,7 +84,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
             indexRanges,
             "message:something",
             null,
-            new TimeValue(100, TimeUnit.MILLISECONDS)));
+            100L));
         when(searchResult.getTotalResults()).thenReturn(1L);
         when(searches.search(
             anyString(),
@@ -117,7 +114,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
             indexRanges,
             "message:something",
             null,
-            new TimeValue(100, TimeUnit.MILLISECONDS)));
+            100L));
         when(searches.search(
             anyString(),
             anyString(),
