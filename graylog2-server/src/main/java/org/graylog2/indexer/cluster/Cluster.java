@@ -28,8 +28,8 @@ import io.searchbox.cluster.Health;
 import io.searchbox.cluster.NodesInfo;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
-import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.gson.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,18 +74,8 @@ public class Cluster {
         final Health request = new Health.Builder()
                 .addIndex(indices)
                 .build();
-        final JestResult jestResult;
-        try {
-            jestResult = jestClient.execute(request);
-        } catch (IOException e) {
-            throw new ElasticsearchException("Couldn't read cluster health for indices " + indices, e);
-        }
-
-        if (jestResult.isSucceeded()) {
-            return jestResult.getJsonObject();
-        } else {
-            throw new ElasticsearchException("Couldn't read cluster health for indices " + indices);
-        }
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster health for indices " + indices);
+        return jestResult.getJsonObject();
     }
 
     /**
@@ -121,18 +111,8 @@ public class Cluster {
                 .setParameter("h", fieldNames)
                 .setParameter("full_id", true)
                 .build();
-        final CatResult response;
-        try {
-            response = jestClient.execute(request);
-        } catch (IOException e) {
-            throw new ElasticsearchException("Unable to read Elasticsearch node information", e);
-        }
-
-        if (response.isSucceeded()) {
-            return GsonUtils.asJsonArray(response.getJsonObject().get("result"));
-        } else {
-            throw new ElasticsearchException("Unable to read Elasticsearch node information");
-        }
+        final CatResult response = JestUtils.execute(jestClient, request, () -> "Unable to read Elasticsearch node information");
+        return GsonUtils.asJsonArray(response.getJsonObject().get("result"));
     }
 
     public Set<NodeFileDescriptorStats> getFileDescriptorStats() {
@@ -165,20 +145,10 @@ public class Cluster {
         }
 
         final NodesInfo request = new NodesInfo.Builder().addNode(nodeId).build();
-        final JestResult result;
-        try {
-            result = jestClient.execute(request);
-        } catch (IOException e) {
-            throw new ElasticsearchException("Couldn't read information of Elasticsearch node " + nodeId, e);
-        }
-
-        if (result.isSucceeded()) {
-            return Optional.ofNullable(result.getJsonObject())
-                    .map(json -> GsonUtils.asJsonObject(json.get("nodes")))
-                    .map(nodes -> GsonUtils.asJsonObject(nodes.get(nodeId)));
-        } else {
-            throw new ElasticsearchException("Couldn't read information of Elasticsearch node " + nodeId);
-        }
+        final JestResult result = JestUtils.execute(jestClient, request, () -> "Couldn't read information of Elasticsearch node " + nodeId);
+        return Optional.ofNullable(result.getJsonObject())
+                .map(json -> GsonUtils.asJsonObject(json.get("nodes")))
+                .map(nodes -> GsonUtils.asJsonObject(nodes.get(nodeId)));
     }
 
     /**
@@ -199,6 +169,7 @@ public class Cluster {
                 .orElse(0);
             return result.isSucceeded() && numberOfDataNodes > 0;
         } catch (IOException e) {
+            LOG.warn("Couldn't check connection status of Elasticsearch", e);
             return false;
         }
     }
