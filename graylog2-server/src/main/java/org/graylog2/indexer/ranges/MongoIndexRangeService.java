@@ -30,7 +30,6 @@ import com.google.common.primitives.Ints;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import org.bson.types.ObjectId;
-import org.elasticsearch.indices.IndexClosedException;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
@@ -210,25 +209,15 @@ public class MongoIndexRangeService implements IndexRangeService {
 
             indices.waitForRecovery(index);
 
-            final Retryer<IndexRange> retryer = RetryerBuilder.<IndexRange>newBuilder()
-                .retryIfException(input -> !(input instanceof IndexClosedException))
-                .withWaitStrategy(WaitStrategies.exponentialWait())
-                .withStopStrategy(StopStrategies.stopAfterDelay(5, TimeUnit.MINUTES))
-                .build();
-
             final IndexRange indexRange;
             try {
-                indexRange = retryer.call(() -> calculateRange(index));
+                indexRange = calculateRange(index);
                 auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
             } catch (Exception e) {
-                if (e.getCause() instanceof IndexClosedException) {
-                    LOG.debug("Couldn't calculate index range for closed index \"" + index + "\"", e.getCause());
-                    auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
-                    return;
-                }
-                LOG.error("Couldn't calculate index range for index \"" + index + "\"", e.getCause());
+                final String message = "Couldn't calculate index range for index \"" + index + "\"";
+                LOG.error(message, e);
                 auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_RANGE_CREATE, ImmutableMap.of("index_name", index));
-                throw new RuntimeException("Couldn't calculate index range for index \"" + index + "\"", e);
+                throw new RuntimeException(message, e);
             }
 
             save(indexRange);

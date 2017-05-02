@@ -20,32 +20,19 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
-import javax.annotation.Nullable;
 import java.util.Collection;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class QueryParseError {
+public abstract class SearchError {
     @JsonProperty
-    @Nullable
     public abstract String message();
 
     @JsonProperty
     public abstract Collection<String> details();
 
-    @JsonProperty
-    @Nullable
-    public abstract Integer line();
-
-    @JsonProperty
-    @Nullable
-    public abstract Integer column();
-
-
-    public static QueryParseError create(String message,
-                                         Collection<String> details,
-                                         @Nullable Integer line,
-                                         @Nullable Integer column) {
-        return new AutoValue_QueryParseError(message, details, line, column);
+    public static SearchError create(String message,
+                                     Collection<String> details) {
+        return new AutoValue_SearchError(message, details);
     }
 }

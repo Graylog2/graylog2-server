@@ -21,6 +21,7 @@ import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.QueryParsingException;
 import org.graylog2.indexer.gson.GsonUtils;
 
 import java.io.IOException;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static org.graylog2.indexer.gson.GsonUtils.asInteger;
 import static org.graylog2.indexer.gson.GsonUtils.asJsonArray;
 import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
 import static org.graylog2.indexer.gson.GsonUtils.asString;
@@ -50,11 +52,31 @@ public class JestUtils {
         if (result.isSucceeded()) {
             return result;
         } else {
-            throw new ElasticsearchException(errorMessage.get(), extractErrorDetails(result.getJsonObject()));
+            throw specificException(errorMessage, result.getJsonObject());
         }
     }
 
-    private static List<String> extractErrorDetails(JsonObject jsonObject) {
+    private static ElasticsearchException specificException(Supplier<String> errorMessage, JsonObject jsonObject) {
+        final List<JsonObject> rootCauses = extractRootCauses(jsonObject);
+        final List<String> reasons = extractReasons(rootCauses);
+
+        for(JsonObject rootCause : rootCauses) {
+            final String type = asString(rootCause.get("type"));
+            if("query_parsing_exception".equals(type)) {
+                return buildQueryParsingException(errorMessage, rootCause, reasons);
+            }
+        }
+
+        return new ElasticsearchException(errorMessage.get(), reasons);
+    }
+
+    private static List<String> extractReasons(List<JsonObject> rootCauses) {
+        return rootCauses.stream()
+                .map(rootCause -> asString(rootCause.get("reason")))
+                .collect(Collectors.toList());
+    }
+
+    private static List<JsonObject> extractRootCauses(JsonObject jsonObject) {
         return Optional.of(jsonObject)
                 .map(json -> asJsonObject(json.get("error")))
                 .map(error -> asJsonArray(error.get("root_cause")))
@@ -62,7 +84,16 @@ public class JestUtils {
                 .map(x -> StreamSupport.stream(x, false))
                 .orElse(Stream.empty())
                 .map(GsonUtils::asJsonObject)
-                .map(rootCause -> asString(rootCause.get("reason")))
                 .collect(Collectors.toList());
+    }
+
+    private static QueryParsingException buildQueryParsingException(Supplier<String> errorMessage,
+                                                                    JsonObject rootCause,
+                                                                    List<String> reasons) {
+        final Integer line = asInteger(rootCause.get("line"));
+        final Integer column = asInteger(rootCause.get("col"));
+        final String index = asString(rootCause.get("index"));
+
+        return new QueryParsingException(errorMessage.get(), line, column, index, reasons);
     }
 }

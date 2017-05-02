@@ -22,7 +22,6 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.inject.assistedinject.Assisted;
 import io.searchbox.cluster.Health;
-import org.elasticsearch.indices.InvalidAliasNameException;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -260,8 +259,6 @@ public class MongoIndexSet implements IndexSet {
                 activityWriter.write(new Activity(msg, IndexSet.class));
 
                 cycle(); // No index, so automatically cycling to a new one.
-            } catch (InvalidAliasNameException e) {
-                LOG.error("Seems like there already is an index called <{}>", getWriteIndexAlias());
             }
         }
     }

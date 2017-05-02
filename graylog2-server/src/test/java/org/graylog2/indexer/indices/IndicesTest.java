@@ -212,6 +212,20 @@ public class IndicesTest extends AbstractESTest {
     }
 
     @Test(expected = IndexNotFoundException.class)
+    public void testTimestampStatsOfIndexWithClosedIndex() throws Exception {
+        final String index = "timestamp_stats_closed";
+        try {
+            createIndex(index);
+            waitForGreenStatus(index);
+            assertThat(client().admin().indices().prepareClose(index).get(ES_TIMEOUT).isAcknowledged()).isTrue();
+
+            indices.indexRangeStatsOfIndex(index);
+        } finally {
+            deleteIndex(index);
+        }
+    }
+
+    @Test(expected = IndexNotFoundException.class)
     public void testTimestampStatsOfIndexWithNonExistingIndex() throws Exception {
         indices.indexRangeStatsOfIndex("does-not-exist");
     }

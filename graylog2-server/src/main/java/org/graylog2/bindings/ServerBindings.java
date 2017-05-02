@@ -65,8 +65,10 @@ import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.streams.DefaultStream;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.rest.ElasticsearchExceptionMapper;
 import org.graylog2.rest.GraylogErrorPageGenerator;
 import org.graylog2.rest.NotFoundExceptionMapper;
+import org.graylog2.rest.QueryParsingExceptionMapper;
 import org.graylog2.rest.ScrollChunkWriter;
 import org.graylog2.rest.ValidationExceptionMapper;
 import org.graylog2.security.ldap.LdapConnector;
@@ -203,6 +205,8 @@ public class ServerBindings extends Graylog2Module {
         final Multibinder<Class<? extends ExceptionMapper>> exceptionMappers = jerseyExceptionMapperBinder();
         exceptionMappers.addBinding().toInstance(NotFoundExceptionMapper.class);
         exceptionMappers.addBinding().toInstance(ValidationExceptionMapper.class);
+        exceptionMappers.addBinding().toInstance(ElasticsearchExceptionMapper.class);
+        exceptionMappers.addBinding().toInstance(QueryParsingExceptionMapper.class);
     }
 
     private void bindAdditionalJerseyComponents() {
