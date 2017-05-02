@@ -18,17 +18,19 @@ package org.graylog2.indexer.cluster;
 
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
 import java.util.Optional;
 
 @AutoValue
 public abstract class NodeFileDescriptorStats {
     public abstract String name();
 
+    @Nullable
     public abstract String host();
 
     public abstract Optional<Long> fileDescriptorMax();
 
-    public static NodeFileDescriptorStats create(String name, String host, Long fileDescriptorMax) {
+    public static NodeFileDescriptorStats create(String name, @Nullable String host, Long fileDescriptorMax) {
         return new AutoValue_NodeFileDescriptorStats(name, host, Optional.ofNullable(fileDescriptorMax));
     }
 }
