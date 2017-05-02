@@ -26,11 +26,10 @@ import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
 import io.searchbox.cluster.PendingClusterTasks;
 import io.searchbox.cluster.Stats;
-import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.cluster.jest.JestUtils;
 
 import javax.inject.Inject;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -55,17 +54,7 @@ public class ElasticsearchProbe {
     }
 
     public ElasticsearchStats elasticsearchStats() {
-        final JestResult clusterStatsResponse;
-        try {
-            clusterStatsResponse = jestClient.execute(new Stats.Builder().build());
-        } catch (IOException e) {
-            throw new ElasticsearchException("Couldn't read Elastiscearch cluster stats", e);
-        }
-
-        if (!clusterStatsResponse.isSucceeded()) {
-            throw new ElasticsearchException("Couldn't read Elastiscearch cluster stats");
-        }
-
+        final JestResult clusterStatsResponse = JestUtils.execute(jestClient, new Stats.Builder().build(), () -> "Couldn't read Elasticsearch cluster stats");
         final JsonObject clusterStatsResponseJson = clusterStatsResponse.getJsonObject();
         final String clusterName = asString(clusterStatsResponseJson.get("cluster_name"));
 
@@ -93,17 +82,7 @@ public class ElasticsearchProbe {
                         .orElse(-1L)
         );
 
-        final JestResult pendingClusterTasksResponse;
-        try {
-            pendingClusterTasksResponse = jestClient.execute(new PendingClusterTasks.Builder().build());
-        } catch (IOException e) {
-            throw new ElasticsearchException("Couldn't read Elastiscearch pending cluster tasks", e);
-        }
-
-        if (!pendingClusterTasksResponse.isSucceeded()) {
-            throw new ElasticsearchException("Couldn't read Elastiscearch pending cluster tasks");
-        }
-
+        final JestResult pendingClusterTasksResponse = JestUtils.execute(jestClient, new PendingClusterTasks.Builder().build(), () -> "Couldn't read Elasticsearch pending cluster tasks");
         final JsonArray pendingClusterTasks = Optional.of(pendingClusterTasksResponse.getJsonObject())
                 .map(json -> asJsonArray(json.get("tasks")))
                 .orElse(new JsonArray());
@@ -118,17 +97,7 @@ public class ElasticsearchProbe {
         final Health clusterHealthRequest = new Health.Builder()
                 .addIndex(Arrays.asList(indexSetRegistry.getIndexWildcards()))
                 .build();
-        final JestResult clusterHealthResponse;
-        try {
-            clusterHealthResponse = jestClient.execute(clusterHealthRequest);
-        } catch (IOException e) {
-            throw new ElasticsearchException("Couldn't read Elastiscearch cluster health", e);
-        }
-
-        if (!clusterHealthResponse.isSucceeded()) {
-            throw new ElasticsearchException("Couldn't read Elastiscearch cluster health");
-        }
-
+        final JestResult clusterHealthResponse = JestUtils.execute(jestClient, clusterHealthRequest, () -> "Couldn't read Elasticsearch cluster health");
         final Optional<JsonObject> clusterHealthJson = Optional.of(clusterHealthResponse.getJsonObject());
         final ClusterHealth clusterHealth = ClusterHealth.create(
                 clusterHealthJson.map(json -> asInteger(json.get("number_of_nodes"))).orElse(-1),
