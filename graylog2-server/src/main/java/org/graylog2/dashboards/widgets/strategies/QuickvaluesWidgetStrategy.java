@@ -76,7 +76,7 @@ public class QuickvaluesWidgetStrategy implements WidgetStrategy {
         result.put("other", terms.getOther());
         result.put("missing", terms.getMissing());
 
-        return new ComputationResult(result, terms.took().millis());
+        return new ComputationResult(result, terms.tookMs());
     }
 
     private boolean checkConfig(Map<String, Object> config) {

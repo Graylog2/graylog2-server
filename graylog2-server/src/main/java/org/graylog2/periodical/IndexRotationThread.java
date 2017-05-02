@@ -17,7 +17,6 @@
 package org.graylog2.periodical;
 
 import io.searchbox.cluster.Health;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.NoTargetIndexException;

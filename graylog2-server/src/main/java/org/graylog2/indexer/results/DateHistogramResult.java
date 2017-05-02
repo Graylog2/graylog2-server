@@ -18,8 +18,6 @@ package org.graylog2.indexer.results;
 
 import com.google.common.collect.Maps;
 import io.searchbox.core.search.aggregation.HistogramAggregation;
-import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.indexer.searches.Searches;
 import org.joda.time.DateTime;
 
@@ -30,19 +28,19 @@ public class DateHistogramResult extends HistogramResult {
     private final Map<Long, Long> result;
     private final Searches.DateHistogramInterval interval;
 
-    public static DateHistogramResult empty(String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
-        return new DateHistogramResult(originalQuery, builtQuery, interval, took);
+    public static DateHistogramResult empty(String originalQuery, String builtQuery, Searches.DateHistogramInterval interval) {
+        return new DateHistogramResult(originalQuery, builtQuery, interval);
     }
 
-    private DateHistogramResult(String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
-        super(originalQuery, builtQuery, took);
+    private DateHistogramResult(String originalQuery, String builtQuery, Searches.DateHistogramInterval interval) {
+        super(originalQuery, builtQuery, 0);
 
         this.result = Collections.emptyMap();
         this.interval = interval;
     }
 
-    public DateHistogramResult(HistogramAggregation result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
-        super(originalQuery, builtQuery, took);
+    public DateHistogramResult(HistogramAggregation result, String originalQuery, String builtQuery, Searches.DateHistogramInterval interval, long tookMs) {
+        super(originalQuery, builtQuery, tookMs);
 
         this.result = Maps.newTreeMap();
 

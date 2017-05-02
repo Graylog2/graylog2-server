@@ -25,7 +25,6 @@ import io.searchbox.core.ClearScroll;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.SearchScroll;
 import org.apache.shiro.crypto.hash.Md5Hash;
-import org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.indexer.ElasticsearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,7 +60,7 @@ public class ScrollResult extends IndexQueryResult {
 
     @AssistedInject
     public ScrollResult(JestClient jestClient, ObjectMapper objectMapper, @Assisted SearchResult initialResult, @Assisted String query, @Assisted List<String> fields) {
-        super(query, null, new TimeValue(initialResult.getJsonObject().get("took").getAsLong()));
+        super(query, null, initialResult.getJsonObject().get("took").getAsLong());
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
         this.initialResult = initialResult;
