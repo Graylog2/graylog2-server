@@ -104,6 +104,20 @@ public class FieldStatsResult extends IndexQueryResult {
         this.searchHits = hits;
     }
 
+    private FieldStatsResult(String query, BytesReference bytesReference) {
+        super(query, bytesReference, new TimeValue(0));
+
+        this.count = Long.MIN_VALUE;
+        this.cardinality = Long.MIN_VALUE;
+        sum = Double.NaN;
+        sumOfSquares = Double.NaN;
+        mean = Double.NaN;
+        min = Double.NaN;
+        max = Double.NaN;
+        variance = Double.NaN;
+        stdDeviation = Double.NaN;
+    }
+
     private long getValueCount(ValueCountAggregation valueCountAggregation, ExtendedStatsAggregation extendedStatsAggregation) {
         if (valueCountAggregation != null) {
             return valueCountAggregation.getValueCount();
@@ -160,5 +174,9 @@ public class FieldStatsResult extends IndexQueryResult {
 
     public List<ResultMessage> getSearchHits() {
         return searchHits;
+    }
+
+    public static FieldStatsResult empty(String query, BytesReference bytesReference) {
+        return new FieldStatsResult(query, bytesReference);
     }
 }

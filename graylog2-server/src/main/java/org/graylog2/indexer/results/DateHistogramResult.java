@@ -20,16 +20,25 @@ import com.google.common.collect.Maps;
 import io.searchbox.core.search.aggregation.HistogramAggregation;
 import org.elasticsearch.common.bytes.BytesReference;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.search.aggregations.bucket.histogram.Histogram;
 import org.graylog2.indexer.searches.Searches;
 import org.joda.time.DateTime;
 
-import java.util.Date;
 import java.util.Map;
 
 public class DateHistogramResult extends HistogramResult {
     private final Map<Long, Long> result;
     private final Searches.DateHistogramInterval interval;
+
+    public static DateHistogramResult empty(String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
+        return new DateHistogramResult(originalQuery, builtQuery, interval, took);
+    }
+
+    private DateHistogramResult(String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
+        super(originalQuery, builtQuery, took);
+
+        this.result = Maps.newTreeMap();
+        this.interval = interval;
+    }
 
     public DateHistogramResult(HistogramAggregation result, String originalQuery, BytesReference builtQuery, Searches.DateHistogramInterval interval, TimeValue took) {
         super(originalQuery, builtQuery, took);

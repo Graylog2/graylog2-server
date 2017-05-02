@@ -16,8 +16,6 @@
  */
 package org.graylog2.indexer.results;
 
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import io.searchbox.core.search.aggregation.StatsAggregation;
 import io.searchbox.core.search.aggregation.TermsAggregation;
@@ -95,6 +93,16 @@ public class TermsStatsResult extends IndexQueryResult {
             })
             .sorted(COMPARATOR)
             .collect(Collectors.toList());
+    }
+
+    private TermsStatsResult(String originalQuery, BytesReference builtQuery) {
+        super(originalQuery, builtQuery, new TimeValue(0));
+
+        this.terms = Collections.emptyList();
+    }
+
+    public static TermsStatsResult empty(String originalQuery, BytesReference builtQuery) {
+        return new TermsStatsResult(originalQuery, builtQuery);
     }
 
     public List<Map<String, Object>> getResults() {

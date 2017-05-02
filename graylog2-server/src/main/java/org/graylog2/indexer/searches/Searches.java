@@ -204,13 +204,15 @@ public class Searches {
         } else {
             searchSourceBuilder = filteredSearchRequest(query, filter, range);
         }
-        searchSourceBuilder.size(0);
 
-        final Set<String> indices = determineAffectedIndices(range, filter);
+        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
+        if (affectedIndices.size() == 0) {
+            return CountResult.empty();
+        }
 
         final Count.Builder builder = new Count.Builder()
             .query(searchSourceBuilder.toString())
-            .addIndex(indices);
+            .addIndex(affectedIndices);
 
         final Count count = builder.build();
 
@@ -221,7 +223,7 @@ public class Searches {
     }
 
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) {
-        final Set<String> indices = determineAffectedIndices(range, filter);
+        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
 
         // only request the fields we asked for otherwise we can't figure out which fields will be in the result set
         // until we've scrolled through the entire set.
@@ -237,7 +239,7 @@ public class Searches {
             .setParameter(Parameters.SCROLL, "1m")
             .addSort(new Sort(SortParseElement.DOC_FIELD_NAME))
             .addSourceIncludePattern("_source")
-            .addIndex(indices);
+            .addIndex(affectedIndices);
         fields.forEach(initialSearchBuilder::addSourceIncludePattern);
 
         final io.searchbox.core.SearchResult initialResult = checkForFailedShards(JestUtils.execute(jestClient, initialSearchBuilder.build(), () -> "Unable to perform scrolling search."));
@@ -314,6 +316,9 @@ public class Searches {
         searchSourceBuilder.aggregation(filterBuilder);
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
+        if (affectedIndices.isEmpty()) {
+            return TermsResult.empty(query, searchSourceBuilder.buildAsBytes());
+        }
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .ignoreUnavailable(true)
             .allowNoIndices(true)
@@ -416,6 +421,9 @@ public class Searches {
 
         searchSourceBuilder.aggregation(builder);
 
+        if (affectedIndices.isEmpty()) {
+            return TermsStatsResult.empty(query, searchSourceBuilder.buildAsBytes());
+        }
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices);
@@ -457,7 +465,7 @@ public class Searches {
         {
         SearchSourceBuilder searchSourceBuilder;
 
-        final Set<String> indices = indicesContainingField(determineAffectedIndices(range, filter), field);
+        final Set<String> affectedIndices = indicesContainingField(determineAffectedIndices(range, filter), field);
 
         if (filter == null) {
             searchSourceBuilder = standardSearchRequest(query, range);
@@ -481,7 +489,11 @@ public class Searches {
 
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .addType(IndexMapping.TYPE_MESSAGE)
-            .addIndex(indices);
+            .addIndex(affectedIndices);
+
+        if (affectedIndices.isEmpty()) {
+            return FieldStatsResult.empty(query, searchSourceBuilder.buildAsBytes());
+        }
 
         final io.searchbox.core.SearchResult searchResponse = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve fields stats."));
         final List<ResultMessage> hits = searchResponse.getHits(Map.class).stream()
@@ -537,11 +549,13 @@ public class Searches {
             .aggregation(builder);
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
+        if (affectedIndices.isEmpty()) {
+            return DateHistogramResult.empty(query, searchSourceBuilder.buildAsBytes(), interval, new TimeValue(0));
+        }
+
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices)
-            .refresh(true)
-            .addType(IndexMapping.TYPE_MESSAGE)
             .ignoreUnavailable(true)
             .allowNoIndices(true);
 
@@ -589,6 +603,9 @@ public class Searches {
             .aggregation(filterBuilder);
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
+        if (affectedIndices.isEmpty()) {
+            return FieldHistogramResult.empty(query, searchSourceBuilder.buildAsBytes(), interval, new TimeValue(0));
+        }
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices);
@@ -706,8 +723,11 @@ public class Searches {
         }
 
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
-            .query(QueryBuilders.boolQuery().must(queryBuilder).filter(standardFilters(range, filter)))
-            .from(offset);
+            .query(QueryBuilders.boolQuery().must(queryBuilder).filter(standardFilters(range, filter)));
+
+        if (offset > 0) {
+            searchSourceBuilder.from(0);
+        }
 
         if (limit > 0) {
             searchSourceBuilder.size(limit);

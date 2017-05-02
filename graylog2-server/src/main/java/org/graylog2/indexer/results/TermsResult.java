@@ -25,6 +25,7 @@ import org.elasticsearch.search.aggregations.bucket.missing.Missing;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregator;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,6 +54,19 @@ public class TermsResult extends IndexQueryResult {
         this.other = terms.getSumOtherDocCount();
         this.terms = terms.getBuckets().stream()
             .collect(Collectors.toMap(TermsAggregation.Entry::getKey, Bucket::getCount));
+    }
+
+    private TermsResult(String originalQuery, BytesReference builtQuery) {
+        super(originalQuery, builtQuery, new TimeValue(0));
+
+        this.total = 0;
+        this.missing = 0;
+        this.other = 0;
+        this.terms = Collections.emptyMap();
+    }
+
+    public static TermsResult empty(String originalQuery, BytesReference builtQuery) {
+        return new TermsResult(originalQuery, builtQuery);
     }
 
     private Map<String, Long> buildTermsMap(List<Terms.Bucket> entries) {
