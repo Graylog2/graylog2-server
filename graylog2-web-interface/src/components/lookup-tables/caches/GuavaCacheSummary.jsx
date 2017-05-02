@@ -1,15 +1,23 @@
 import React, { PropTypes } from 'react';
+import { TimeUnit } from 'components/common';
 
 const GuavaCacheSummary = React.createClass({
   propTypes: {
-    config: PropTypes.object.isRequired,
+    cache: PropTypes.object.isRequired,
   },
 
   render() {
-    return (<div>
-      <h2>Node-local, in-memory cache.</h2>
-      <p>TODO: describe configuration.</p>
-    </div>);
+    const config = this.props.cache.config;
+    return (<dl>
+      <dt>Maximum entries</dt>
+      <dd>{config.max_size}</dd>
+      <dt>Expire after access</dt>
+      <dd><TimeUnit value={config.expire_after_access} unit={config.expire_after_access_unit} /></dd>
+      <dt>Expire after write</dt>
+      <dd><TimeUnit value={config.expire_after_write} unit={config.expire_after_write_unit} /></dd>
+      <dt>Refresh after write</dt>
+      <dd><TimeUnit value={config.refresh_after_write} unit={config.refresh_after_write_unit} /></dd>
+    </dl>);
   },
 });
 
