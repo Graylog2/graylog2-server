@@ -40,7 +40,6 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CountDownLatch;
@@ -48,7 +47,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static org.graylog2.indexer.gson.GsonUtils.asInteger;
 
@@ -60,7 +58,6 @@ public class Cluster {
     private final IndexSetRegistry indexSetRegistry;
     private final ScheduledExecutorService scheduler;
     private final Duration requestTimeout;
-    private final AtomicReference<Map> nodes = new AtomicReference<>();
 
     @Inject
     public Cluster(JestClient jestClient,
@@ -185,10 +182,9 @@ public class Cluster {
     }
 
     /**
-     * Check if the Elasticsearch {@link org.elasticsearch.node.Node} is connected and that there are other nodes
-     * in the cluster.
+     * Check if Elasticsearch is available and that there are data nodes in the cluster.
      *
-     * @return {@code true} if the Elasticsearch client is up and the cluster contains other nodes, {@code false} otherwise
+     * @return {@code true} if the Elasticsearch client is up and the cluster contains data nodes, {@code false} otherwise
      */
     public boolean isConnected() {
         final Health request = new Health.Builder()
@@ -273,11 +269,5 @@ public class Cluster {
      */
     public void waitForConnectedAndDeflectorHealthy() throws InterruptedException, TimeoutException {
         waitForConnectedAndDeflectorHealthy(requestTimeout.getQuantity(), requestTimeout.getUnit());
-    }
-
-    @Deprecated
-    public void updateDataNodeList(Map nodes) {
-        LOG.debug("{} data nodes in cluster", nodes.size());
-        this.nodes.set(nodes);
     }
 }
