@@ -147,11 +147,11 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected TermsResult buildTermsResult(org.graylog2.indexer.results.TermsResult tr) {
-        return TermsResult.create(tr.took().millis(), tr.getTerms(), tr.getMissing(), tr.getOther(), tr.getTotal(), tr.getBuiltQuery());
+        return TermsResult.create(tr.tookMs(), tr.getTerms(), tr.getMissing(), tr.getOther(), tr.getTotal(), tr.getBuiltQuery());
     }
 
     protected TermsStatsResult buildTermsStatsResult(org.graylog2.indexer.results.TermsStatsResult tr) {
-        return TermsStatsResult.create(tr.took().millis(), tr.getResults(), tr.getBuiltQuery());
+        return TermsStatsResult.create(tr.tookMs(), tr.getResults(), tr.getBuiltQuery());
     }
 
     protected SearchResponse buildSearchResponse(SearchResult sr,
@@ -163,7 +163,7 @@ public abstract class SearchResource extends RestResource {
             indexRangeListToValueList(sr.getUsedIndices()),
             resultMessageListtoValueList(sr.getResults()),
             sr.getFields(),
-            sr.took().millis(),
+            sr.tookMs(),
             sr.getTotalResults(),
             timeRange.getFrom(),
             timeRange.getTo());
@@ -195,7 +195,7 @@ public abstract class SearchResource extends RestResource {
 
     protected FieldStatsResult buildFieldStatsResult(org.graylog2.indexer.results.FieldStatsResult sr) {
         return FieldStatsResult.create(
-            sr.took().millis(), sr.getCount(), sr.getSum(), sr.getSumOfSquares(), sr.getMean(),
+            sr.tookMs(), sr.getCount(), sr.getSum(), sr.getSumOfSquares(), sr.getMean(),
             sr.getMin(), sr.getMax(), sr.getVariance(), sr.getStdDeviation(), sr.getBuiltQuery(), sr.getCardinality());
 
     }
@@ -205,7 +205,7 @@ public abstract class SearchResource extends RestResource {
         return HistogramResult.create(
             histogram.getInterval().toString().toLowerCase(Locale.ENGLISH),
             histogram.getResults(),
-            histogram.took().millis(),
+            histogram.tookMs(),
             histogram.getBuiltQuery(),
             TimeRange.create(histogramBoundaries.getFrom(), histogramBoundaries.getTo()));
     }

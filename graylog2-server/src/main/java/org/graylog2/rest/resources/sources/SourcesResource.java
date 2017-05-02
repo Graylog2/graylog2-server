@@ -105,6 +105,6 @@ public class SourcesResource extends RestResource {
             }
         }
 
-        return SourcesList.create(sources.getTerms().size(), sources.getTerms(), sources.took().millis(), range);
+        return SourcesList.create(sources.getTerms().size(), sources.getTerms(), sources.tookMs(), range);
     }
 }

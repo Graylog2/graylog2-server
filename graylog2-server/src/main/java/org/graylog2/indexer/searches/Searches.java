@@ -35,7 +35,6 @@ import io.searchbox.core.search.aggregation.TermsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
 import io.searchbox.core.search.sort.Sort;
 import io.searchbox.params.Parameters;
-import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -145,23 +144,8 @@ public class Searches {
             return period;
         }
 
-        public org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval toESInterval() {
-            switch (this.name()) {
-                case "MINUTE":
-                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.MINUTE;
-                case "HOUR":
-                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.HOUR;
-                case "DAY":
-                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.DAY;
-                case "WEEK":
-                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.WEEK;
-                case "MONTH":
-                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.MONTH;
-                case "QUARTER":
-                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.QUARTER;
-                default:
-                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.YEAR;
-            }
+        public long getMillis() {
+            return period.toStandardSeconds().getSeconds() * 1000L;
         }
     }
 
@@ -278,7 +262,7 @@ public class Searches {
             .addIndex(indices);
 
         if (indices.isEmpty()) {
-            return SearchResult.empty(config.query(), requestBuilder.buildAsBytes());
+            return SearchResult.empty(config.query(), requestBuilder.toString());
         }
         final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform search query."));
         final List<ResultMessage> hits = searchResult.getHits(Map.class).stream()
@@ -287,7 +271,7 @@ public class Searches {
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, config.range());
 
-        return new SearchResult(hits, indexRanges, config.query(), requestBuilder.buildAsBytes(), new TimeValue(tookMs));
+        return new SearchResult(hits, indexRanges, config.query(), requestBuilder.toString(), tookMs);
     }
 
     private long tookMsFromSearchResult(io.searchbox.core.SearchResult searchResult) {
@@ -321,7 +305,7 @@ public class Searches {
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         if (affectedIndices.isEmpty()) {
-            return TermsResult.empty(query, searchSourceBuilder.buildAsBytes());
+            return TermsResult.empty(query, searchSourceBuilder.toString());
         }
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .ignoreUnavailable(true)
@@ -343,8 +327,8 @@ public class Searches {
                 missing.getMissing(),
                 filterAggregation.getCount(),
                 query,
-                searchSourceBuilder.buildAsBytes(),
-                new TimeValue(tookMs)
+                searchSourceBuilder.toString(),
+                tookMs
         );
     }
 
@@ -426,7 +410,7 @@ public class Searches {
         searchSourceBuilder.aggregation(builder);
 
         if (affectedIndices.isEmpty()) {
-            return TermsStatsResult.empty(query, searchSourceBuilder.buildAsBytes());
+            return TermsStatsResult.empty(query, searchSourceBuilder.toString());
         }
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .addType(IndexMapping.TYPE_MESSAGE)
@@ -441,8 +425,8 @@ public class Searches {
         return new TermsStatsResult(
             termsAggregation,
             query,
-            searchSourceBuilder.buildAsBytes(),
-            new TimeValue(tookMs)
+            searchSourceBuilder.toString(),
+            tookMs
         );
     }
 
@@ -496,7 +480,7 @@ public class Searches {
             .addIndex(affectedIndices);
 
         if (affectedIndices.isEmpty()) {
-            return FieldStatsResult.empty(query, searchSourceBuilder.buildAsBytes());
+            return FieldStatsResult.empty(query, searchSourceBuilder.toString());
         }
 
         final io.searchbox.core.SearchResult searchResponse = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve fields stats."));
@@ -518,8 +502,8 @@ public class Searches {
                 cardinalityAggregation,
                 hits,
                 query,
-                searchSourceBuilder.buildAsBytes(),
-                new TimeValue(tookMs)
+                searchSourceBuilder.toString(),
+                tookMs
         );
     }
 
@@ -541,7 +525,7 @@ public class Searches {
             .subAggregation(
                 AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                     .field(Message.FIELD_TIMESTAMP)
-                    .interval(interval.toESInterval())
+                    .interval(interval.getMillis())
             )
             .filter(standardAggregationFilters(range, filter));
 
@@ -554,7 +538,7 @@ public class Searches {
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         if (affectedIndices.isEmpty()) {
-            return DateHistogramResult.empty(query, searchSourceBuilder.buildAsBytes(), interval, new TimeValue(0));
+            return DateHistogramResult.empty(query, searchSourceBuilder.toString(), interval);
         }
 
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
@@ -574,9 +558,9 @@ public class Searches {
         return new DateHistogramResult(
             histogramAggregation,
             query,
-            searchSourceBuilder.buildAsBytes(),
+            searchSourceBuilder.toString(),
             interval,
-            new TimeValue(tookMs)
+            tookMs
         );
     }
 
@@ -589,7 +573,7 @@ public class Searches {
         final DateHistogramBuilder dateHistogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                 .field(Message.FIELD_TIMESTAMP)
                 .subAggregation(AggregationBuilders.stats(AGG_STATS).field(field))
-                .interval(interval.toESInterval());
+                .interval(interval.getMillis());
 
         if (includeCardinality) {
             dateHistogramBuilder.subAggregation(AggregationBuilders.cardinality(AGG_CARDINALITY).field(field));
@@ -608,7 +592,7 @@ public class Searches {
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         if (affectedIndices.isEmpty()) {
-            return FieldHistogramResult.empty(query, searchSourceBuilder.buildAsBytes(), interval, new TimeValue(0));
+            return FieldHistogramResult.empty(query, searchSourceBuilder.toString(), interval);
         }
         final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
             .addType(IndexMapping.TYPE_MESSAGE)
@@ -625,9 +609,9 @@ public class Searches {
         return new FieldHistogramResult(
                 histogramAggregation,
                 query,
-                searchSourceBuilder.buildAsBytes(),
+                searchSourceBuilder.toString(),
                 interval,
-                new TimeValue(tookMs));
+                tookMs);
     }
 
     private <T extends JestResult> T checkForFailedShards(T result) throws FieldTypeException {

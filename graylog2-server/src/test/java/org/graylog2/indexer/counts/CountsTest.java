@@ -17,12 +17,7 @@
 package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
-import org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.AbstractESTest;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
@@ -76,35 +71,9 @@ public class CountsTest extends AbstractESTest {
         final Map<String, Object> settings = ImmutableMap.of(
                 "number_of_shards", 1,
                 "index.number_of_replicas", 0);
-        final CreateIndexResponse createIndexResponse1 = client().admin().indices()
-                .prepareCreate(INDEX_NAME_1)
-                .setSettings(settings)
-                .setTimeout(TimeValue.timeValueSeconds(10L))
-                .execute()
-                .get();
-        assumeTrue(createIndexResponse1.isAcknowledged());
-
-        final CreateIndexResponse createIndexResponse2 = client().admin().indices()
-                .prepareCreate(INDEX_NAME_2)
-                .setSettings(settings)
-                .setTimeout(TimeValue.timeValueSeconds(10L))
-                .execute()
-                .get();
-        assumeTrue(createIndexResponse2.isAcknowledged());
-
-        final ClusterHealthResponse clusterHealthResponse1 = client().admin().cluster()
-                .prepareHealth(INDEX_NAME_1)
-                .setWaitForGreenStatus()
-                .execute()
-                .get();
-        assumeTrue(clusterHealthResponse1.getStatus() == ClusterHealthStatus.GREEN);
-
-        final ClusterHealthResponse clusterHealthResponse2 = client().admin().cluster()
-                .prepareHealth(INDEX_NAME_2)
-                .setWaitForGreenStatus()
-                .execute()
-                .get();
-        assumeTrue(clusterHealthResponse2.getStatus() == ClusterHealthStatus.GREEN);
+        createIndex(INDEX_NAME_1);
+        createIndex(INDEX_NAME_2);
+        waitForGreenStatus(INDEX_NAME_1, INDEX_NAME_2);
 
         counts = new Counts(jestClient(), indexSetRegistry);
 
@@ -151,19 +120,7 @@ public class CountsTest extends AbstractESTest {
 
     @After
     public void tearDown() throws Exception {
-        final DeleteIndexResponse deleteIndexResponse1 = client().admin().indices()
-                .prepareDelete(INDEX_NAME_1)
-                .setTimeout(TimeValue.timeValueSeconds(10L))
-                .execute()
-                .get();
-        assumeTrue(deleteIndexResponse1.isAcknowledged());
-
-        final DeleteIndexResponse deleteIndexResponse2 = client().admin().indices()
-                .prepareDelete(INDEX_NAME_2)
-                .setTimeout(TimeValue.timeValueSeconds(10L))
-                .execute()
-                .get();
-        assumeTrue(deleteIndexResponse2.isAcknowledged());
+        deleteIndex(INDEX_NAME_1, INDEX_NAME_2);
     }
 
     @Test
