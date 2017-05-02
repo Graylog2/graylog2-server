@@ -18,14 +18,12 @@ package org.graylog2.indexer.results;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import org.elasticsearch.search.SearchHits;
 import org.graylog2.plugin.Message;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
 import java.util.Set;
-import java.util.Spliterators;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -36,10 +34,7 @@ public class SearchResultTest {
 
     @Before
     public void setUp() throws Exception {
-        final SearchHits searchHits = mock(SearchHits.class);
-        when(searchHits.iterator()).thenReturn(Collections.emptyIterator());
-        when(searchHits.spliterator()).thenReturn(Spliterators.emptySpliterator());
-        this.searchResult = new SearchResult(searchHits, null, null, null, 0L);
+        this.searchResult = new SearchResult(Collections.emptyList(), null, null, null, 0L);
     }
 
     @Test

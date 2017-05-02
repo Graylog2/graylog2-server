@@ -16,12 +16,6 @@
  */
 package org.graylog2.indexer.results;
 
-import org.elasticsearch.search.SearchHits;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
-
 public class IndexQueryResult {
     private final String originalQuery;
     private final long tookMs;
@@ -43,9 +37,5 @@ public class IndexQueryResult {
 
     public long tookMs() {
         return tookMs;
-    }
-
-    static List<ResultMessage> buildResults(SearchHits hits) {
-        return StreamSupport.stream(hits.spliterator(), false).map(ResultMessage::parseFromSource).collect(Collectors.toList());
     }
 }

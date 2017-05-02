@@ -18,7 +18,6 @@ package org.graylog2.indexer.results;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
-import org.elasticsearch.search.SearchHits;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 
@@ -32,10 +31,6 @@ public class SearchResult extends IndexQueryResult {
 	private final List<ResultMessage> results;
 	private final Set<String> fields;
     private final Set<IndexRange> usedIndices;
-
-	public SearchResult(SearchHits searchHits, Set<IndexRange> usedIndices, String originalQuery, String builtQuery, long tookMs) {
-        this(buildResults(searchHits), usedIndices, originalQuery, builtQuery, tookMs);
-	}
 
 	public SearchResult(List<ResultMessage> hits, Set<IndexRange> usedIndices, String originalQuery, String builtQuery, long tookMs) {
 	    super(originalQuery, builtQuery, tookMs);
