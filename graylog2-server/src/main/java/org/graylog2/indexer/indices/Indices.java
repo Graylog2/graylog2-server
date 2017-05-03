@@ -227,12 +227,12 @@ public class Indices {
                 .orElse(0L);
     }
 
-    private Map<String, JsonElement> getAllWithShardLevel(final IndexSet indexSet) {
+    private Map<String, JsonElement> getAllWithShardLevel(final Collection<String> indices) {
         final Stats request = new Stats.Builder()
-                .addIndex(indexSet.getIndexWildcard())
+                .addIndex(indices)
                 .setParameter("level", "shards")
                 .build();
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't fetch index stats of " + indexSet);
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't fetch index stats of indices " + indices);
         final JsonObject responseJson = jestResult.getJsonObject();
         final int failedShards = Optional.ofNullable(responseJson)
                 .map(json -> asJsonObject(json.get("_shards")))
@@ -250,14 +250,17 @@ public class Indices {
     }
 
     public Map<String, JsonElement> getIndexStats(final IndexSet indexSet) {
-        final String indexWildcard = indexSet.getIndexWildcard();
+        return getIndexStats(Collections.singleton(indexSet.getIndexWildcard()));
+    }
+
+    public Map<String, JsonElement> getIndexStats(final Collection<String> indices) {
         final Stats request = new Stats.Builder()
-                .addIndex(indexWildcard)
+                .addIndex(indices)
                 .docs(true)
                 .store(true)
                 .build();
 
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check stats of indices " + indexWildcard);
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check stats of indices " + indices);
 
         return Optional.ofNullable(asJsonObject(jestResult.getJsonObject()))
                 .map(json -> asJsonObject(json.get("indices")))
@@ -521,11 +524,11 @@ public class Indices {
                 .orElse(false);
     }
 
-    public Set<String> getClosedIndices(final IndexSet indexSet) {
-        final JsonArray indices = catIndices(indexSet.getIndexWildcard(), "index", "status");
+    public Set<String> getClosedIndices(final Collection<String> indices) {
+        final JsonArray catIndices = catIndices(indices, "index", "status");
 
         final ImmutableSet.Builder<String> closedIndices = ImmutableSet.builder();
-        for (JsonElement jsonElement : indices) {
+        for (JsonElement jsonElement : catIndices) {
             if (jsonElement.isJsonObject()) {
                 final JsonObject jsonObject = jsonElement.getAsJsonObject();
                 final String index = GsonUtils.asString(jsonObject.get("index"));
@@ -539,19 +542,23 @@ public class Indices {
         return closedIndices.build();
     }
 
+    public Set<String> getClosedIndices(final IndexSet indexSet) {
+        return getClosedIndices(Collections.singleton(indexSet.getIndexWildcard()));
+    }
+
     /**
      * Retrieve the response for the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html">cat indices</a> request from Elasticsearch.
      *
      * @param fields The fields to show, see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html">cat indices API</a>.
      * @return A {@link JsonArray} with the result of the cat indices request.
      */
-    private JsonArray catIndices(String index, String... fields) {
+    private JsonArray catIndices(Collection<String> indices, String... fields) {
         final String fieldNames = String.join(",", fields);
         final Cat request = new Cat.IndicesBuilder()
-                .addIndex(index)
+                .addIndex(indices)
                 .setParameter("h", fieldNames)
                 .build();
-        final CatResult response = JestUtils.execute(jestClient, request, () -> "Unable to read information for index " + index);
+        final CatResult response = JestUtils.execute(jestClient, request, () -> "Unable to read information for indices " + indices);
         return Optional.of(response.getJsonObject())
                 .map(json -> GsonUtils.asJsonArray(json.get("result")))
                 .orElse(new JsonArray());
@@ -564,11 +571,11 @@ public class Indices {
                 .orElse(new JsonObject());
     }
 
-    public Set<String> getReopenedIndices(final IndexSet indexSet) {
-        final String indexWildcard = indexSet.getIndexWildcard();
-        final State request = new State.Builder().withMetadata().indices(indexWildcard).build();
+    public Set<String> getReopenedIndices(final Collection<String> indices) {
+        final String indexList = String.join(",", indices);
+        final State request = new State.Builder().withMetadata().indices(indexList).build();
 
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster state for reopened indices with pattern " + indexWildcard);
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster state for reopened indices " + indices);
         final JsonObject indicesJson = getClusterStateIndicesMetadata(jestResult.getJsonObject());
         final ImmutableSet.Builder<String> reopenedIndices = ImmutableSet.builder();
 
@@ -585,6 +592,10 @@ public class Indices {
         }
 
         return reopenedIndices.build();
+    }
+
+    public Set<String> getReopenedIndices(final IndexSet indexSet) {
+        return getReopenedIndices(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
     public Optional<IndexStatistics> getIndexStats(String index) {
@@ -613,8 +624,12 @@ public class Indices {
     }
 
     public Set<IndexStatistics> getIndicesStats(final IndexSet indexSet) {
+        return getIndicesStats(Collections.singleton(indexSet.getIndexWildcard()));
+    }
+
+    public Set<IndexStatistics> getIndicesStats(final Collection<String> indices) {
         final ImmutableSet.Builder<IndexStatistics> result = ImmutableSet.builder();
-        for (Map.Entry<String, JsonElement> entry : getAllWithShardLevel(indexSet).entrySet()) {
+        for (Map.Entry<String, JsonElement> entry : getAllWithShardLevel(indices).entrySet()) {
             final String index = entry.getKey();
             Optional.ofNullable(asJsonObject(entry.getValue()))
                     .map(indexStats -> buildIndexStatistics(index, indexStats))
