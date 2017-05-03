@@ -18,7 +18,6 @@ package org.graylog2.indexer;
 
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.guava.FunctionCacheLoader;
@@ -30,30 +29,18 @@ import java.util.Optional;
 @Singleton
 public class NodeInfoCache {
     private static final Duration EXPIRE_DURATION = Duration.minutes(1L);
+    
     private final LoadingCache<String, Optional<String>> nodeNameCache;
     private final LoadingCache<String, Optional<String>> hostNameCache;
 
     @Inject
     public NodeInfoCache(Cluster cluster) {
-        this(new FunctionCacheLoader<>(cluster::nodeIdToName), new FunctionCacheLoader<>(cluster::nodeIdToHostName));
-    }
-
-    private NodeInfoCache(CacheLoader<String, Optional<String>> nodeNameCache,
-                          CacheLoader<String, Optional<String>> hostNameCache) {
-        this(
-                CacheBuilder.newBuilder()
-                        .expireAfterWrite(EXPIRE_DURATION.getQuantity(), EXPIRE_DURATION.getUnit())
-                        .build(nodeNameCache),
-                CacheBuilder.newBuilder()
-                        .expireAfterWrite(EXPIRE_DURATION.getQuantity(), EXPIRE_DURATION.getUnit())
-                        .build(hostNameCache)
-        );
-    }
-
-    private NodeInfoCache(LoadingCache<String, Optional<String>> nodeNameCache,
-                          LoadingCache<String, Optional<String>> hostNameCache) {
-        this.nodeNameCache = nodeNameCache;
-        this.hostNameCache = hostNameCache;
+        this.nodeNameCache = CacheBuilder.newBuilder()
+                .expireAfterWrite(EXPIRE_DURATION.getQuantity(), EXPIRE_DURATION.getUnit())
+                .build(new FunctionCacheLoader<>(cluster::nodeIdToName));
+        this.hostNameCache = CacheBuilder.newBuilder()
+                .expireAfterWrite(EXPIRE_DURATION.getQuantity(), EXPIRE_DURATION.getUnit())
+                .build(new FunctionCacheLoader<>(cluster::nodeIdToHostName));
     }
 
     public Optional<String> getNodeName(String nodeId) {
