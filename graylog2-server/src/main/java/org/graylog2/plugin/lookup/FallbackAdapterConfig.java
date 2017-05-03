@@ -16,19 +16,27 @@
  */
 package org.graylog2.plugin.lookup;
 
+import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.PROPERTY,
-        property = LookupDataAdapterConfiguration.TYPE_FIELD,
-        visible = true,
-        defaultImpl = FallbackAdapterConfig.class)
-public interface LookupDataAdapterConfiguration {
-    String TYPE_FIELD = "type";
+/**
+ * This is the dummy config that accepts anything and has a marker method to detect a missing plugin.
+ * Otherwise loading the config from the database fails hard.
+ */
+@JsonAutoDetect
+public class FallbackAdapterConfig implements LookupDataAdapterConfiguration {
 
-    @JsonProperty(TYPE_FIELD)
-    String type();
+    @JsonProperty
+    private String type;
 
+    @Override
+    public String type() {
+        return type;
+    }
+
+    @JsonAnySetter
+    public void setType(String key, Object value) {
+        // we ignore all the other values, we only want to be able to deserialize unknown configs
+    }
 }
