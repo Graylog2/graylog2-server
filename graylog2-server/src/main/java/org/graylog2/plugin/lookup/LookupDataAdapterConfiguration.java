@@ -19,7 +19,12 @@ package org.graylog2.plugin.lookup;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = LookupDataAdapterConfiguration.TYPE_FIELD, visible = true)
+@JsonTypeInfo(
+        use = JsonTypeInfo.Id.NAME,
+        include = JsonTypeInfo.As.PROPERTY,
+        property = LookupDataAdapterConfiguration.TYPE_FIELD,
+        visible = true,
+        defaultImpl = FallbackAdapterConfig.class)
 public interface LookupDataAdapterConfiguration {
     String TYPE_FIELD = "type";
 
