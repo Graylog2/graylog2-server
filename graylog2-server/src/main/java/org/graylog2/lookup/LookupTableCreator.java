@@ -17,6 +17,7 @@
 package org.graylog2.lookup;
 
 import com.google.inject.assistedinject.Assisted;
+
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -25,10 +26,11 @@ import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+
+import javax.inject.Inject;
 
 /**
  * Responsible for creating correct {@link LookupTable} objects including data adapters and caches.
@@ -100,7 +102,11 @@ class LookupTableCreator {
         }
         final DataAdapterDto adapterDto = adapterDtoOptional.get();
         return getDataAdapterFactory(dto.name(), adapterDto)
-                .map(factory -> factory.create(adapterDto.config()));
+                .map(factory -> {
+                    final LookupDataAdapter adapter = factory.create(adapterDto.config());
+                    adapter.setId(adapterDto.id());
+                    return adapter;
+                });
     }
 
     private Optional<LookupCache.Factory> getCacheFactory(String lutName, CacheDto cacheDto) {
