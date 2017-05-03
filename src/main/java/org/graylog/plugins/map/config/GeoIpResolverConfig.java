@@ -16,19 +16,17 @@
  */
 package org.graylog.plugins.map.config;
 
+import com.google.auto.value.AutoValue;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.auto.value.AutoValue;
 
 @JsonAutoDetect
 @JsonIgnoreProperties(ignoreUnknown = true)
 @AutoValue
 public abstract class GeoIpResolverConfig {
-    public enum DatabaseType {
-        MAXMIND_CITY, MAXMIND_COUNTRY
-    }
 
     @JsonProperty("enabled")
     public abstract boolean enabled();

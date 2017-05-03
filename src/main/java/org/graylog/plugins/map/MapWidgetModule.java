@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.map;
 
+import org.graylog.plugins.map.geoip.MaxmindDataAdapter;
 import org.graylog.plugins.map.geoip.processor.GeoIpProcessor;
 import org.graylog.plugins.map.rest.MapDataResource;
 import org.graylog.plugins.map.widget.strategy.MapWidgetStrategy;
@@ -27,5 +28,10 @@ public class MapWidgetModule extends PluginModule {
         addMessageProcessor(GeoIpProcessor.class, GeoIpProcessor.Descriptor.class);
         addWidgetStrategy(MapWidgetStrategy.class, MapWidgetStrategy.Factory.class);
         addRestResource(MapDataResource.class);
+
+        installLookupDataAdapter(MaxmindDataAdapter.NAME,
+                MaxmindDataAdapter.class,
+                MaxmindDataAdapter.Factory.class,
+                MaxmindDataAdapter.Config.class);
     }
 }

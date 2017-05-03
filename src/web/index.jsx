@@ -6,6 +6,9 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import MapVisualization from 'components/MapVisualization';
 import FieldAnalyzerMapComponent from 'components/FieldAnalyzerMapComponent';
 import GeoIpResolverConfig from 'components/GeoIpResolverConfig';
+import MaxmindAdapterFieldSet from 'components/adapter/MaxmindAdapterFieldSet';
+import MaxmindAdapterSummary from 'components/adapter/MaxmindAdapterSummary';
+import MaxmindAdapterDocumentation from 'components/adapter/MaxmindAdapterDocumentation';
 
 PluginStore.register(new PluginManifest(packageJson, {
   widgets: [
@@ -31,4 +34,13 @@ PluginStore.register(new PluginManifest(packageJson, {
       configType: 'org.graylog.plugins.map.config.GeoIpResolverConfig',
     },
   ],
+  lookupTableAdapters: [
+    {
+      type: 'maxmind_geoip',
+      displayName: 'Geo IP - MaxMind\u2122 Databases',
+      formComponent: MaxmindAdapterFieldSet,
+      summaryComponent: MaxmindAdapterSummary,
+      documentationComponent: MaxmindAdapterDocumentation,
+    },
+  ]
 }));
