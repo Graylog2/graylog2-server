@@ -472,9 +472,13 @@ public class Indices {
         JestUtils.execute(jestClient, new Flush.Builder().addIndex(index).force().build(), () -> "Couldn't flush index " + index);
     }
 
+    public Map<String, Object> reopenIndexSettings() {
+        return ImmutableMap.of("index", ImmutableMap.of(REOPENED_INDEX_SETTING, true));
+    }
+
     public void reopenIndex(String index) {
         // Mark this index as re-opened. It will never be touched by retention.
-        final Map<String, Object> settings = ImmutableMap.of("index", ImmutableMap.of(REOPENED_INDEX_SETTING, true));
+        final Map<String, Object> settings = reopenIndexSettings();
         final UpdateSettings request = new UpdateSettings.Builder(settings).addIndex(index).build();
 
         JestUtils.execute(jestClient, request, () -> "Couldn't update settings of index " + index);
