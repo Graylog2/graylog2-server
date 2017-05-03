@@ -174,7 +174,7 @@ public class Searches {
 
         this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
         this.esTimeRangeHistogram = metricRegistry.histogram(name(Searches.class, "elasticsearch", "ranges"));
-        this.esTotalSearchesCounter = metricRegistry.counter(name(Searches.class, "elasticsearch", "searches"));
+        this.esTotalSearchesCounter = metricRegistry.counter(name(Searches.class, "elasticsearch", "total-searches"));
         this.streamService = streamService;
         this.indices = indices;
         this.jestClient = jestClient;
