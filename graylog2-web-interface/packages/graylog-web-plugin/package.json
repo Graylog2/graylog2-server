@@ -6,6 +6,7 @@
   "scripts": {
     "test": "eslint src/*",
     "compile": "babel -d lib/ src/",
+    "prepare": "npm i --only=dev --ignore-scripts && npm run compile",
     "prepublish": "npm i --only=dev --ignore-scripts && npm run compile"
   },
   "repository": {
