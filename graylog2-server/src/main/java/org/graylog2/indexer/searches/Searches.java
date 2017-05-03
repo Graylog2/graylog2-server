@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.searches;
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
@@ -154,6 +155,7 @@ public class Searches {
     private final IndexRangeService indexRangeService;
     private final Timer esRequestTimer;
     private final Histogram esTimeRangeHistogram;
+    private final Counter esTotalSearchesCounter;
     private final StreamService streamService;
     private final Indices indices;
     private final JestClient jestClient;
@@ -172,6 +174,7 @@ public class Searches {
 
         this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
         this.esTimeRangeHistogram = metricRegistry.histogram(name(Searches.class, "elasticsearch", "ranges"));
+        this.esTotalSearchesCounter = metricRegistry.counter(name(Searches.class, "elasticsearch", "total-searches"));
         this.streamService = streamService;
         this.indices = indices;
         this.jestClient = jestClient;
@@ -745,6 +748,7 @@ public class Searches {
     }
 
     private void recordEsMetrics(long tookMs, @Nullable TimeRange range) {
+        esTotalSearchesCounter.inc();
         esRequestTimer.update(tookMs, TimeUnit.MILLISECONDS);
 
         if (range != null) {
