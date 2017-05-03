@@ -16,40 +16,43 @@
  */
 package org.graylog2.lookup.adapters;
 
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.Ints;
+import com.google.inject.assistedinject.Assisted;
+
 import au.com.bytecode.opencsv.CSVReader;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.primitives.Ints;
-import com.google.inject.assistedinject.Assisted;
+
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.plugin.utilities.FileInfo;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.FileTime;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -61,7 +64,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private final Config config;
     private final AtomicReference<Map<Object, Object>> lookupRef = new AtomicReference<>(ImmutableMap.of());
 
-    private FileInfo prevFileInfo;
+    private FileInfo fileInfo;
 
     @Inject
     public CSVFileDataAdapter(@Named("daemonScheduler") ScheduledExecutorService scheduler,
@@ -78,7 +81,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         }
 
         // Set file info before parsing the data for the first time
-        prevFileInfo = getFileInfo(config.path());
+        fileInfo = FileInfo.forPath(Paths.get(config.path()));
         lookupRef.set(parseCSVFile());
 
         if (config.checkInterval() < 1) {
@@ -94,9 +97,8 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     @Override
     protected void doRefresh() throws Exception {
         try {
-            final FileInfo newFileInfo = getFileInfo(config.path());
-
-            if (newFileInfo.equals(prevFileInfo)) {
+            final FileInfo.Change fileChanged = fileInfo.checkForChange();
+            if (!fileChanged.isChanged()) {
                 // Nothing to do, file did not change
                 return;
             }
@@ -104,19 +106,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             LOG.debug("CSV file {} has changed, updating data", config.path());
             lookupRef.set(parseCSVFile());
             getLookupTable().cache().purge();
-            prevFileInfo = newFileInfo;
+            fileInfo = fileChanged.fileInfo();
         } catch (IOException e) {
             LOG.error("Couldn't check CSV file {} for updates", config.path(), e);
         }
-    }
-
-    private FileInfo getFileInfo(String path) throws IOException {
-        final BasicFileAttributes attributes = Files.readAttributes(Paths.get(path), BasicFileAttributes.class);
-        return FileInfo.builder()
-                .key(attributes.fileKey())
-                .size(attributes.size())
-                .modificationTime(attributes.lastModifiedTime())
-                .build();
     }
 
     private Map<Object, Object> parseCSVFile() throws IOException {
@@ -292,25 +285,6 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             public abstract Builder checkInterval(long checkInterval);
 
             public abstract Config build();
-        }
-    }
-
-    @AutoValue
-    public static abstract class FileInfo {
-        public abstract Object key();
-        public abstract long size();
-        public abstract FileTime modificationTime();
-
-        public static Builder builder() {
-            return new AutoValue_CSVFileDataAdapter_FileInfo.Builder();
-        }
-
-        @AutoValue.Builder
-        public abstract static class Builder {
-            public abstract Builder key(Object key);
-            public abstract Builder size(long size);
-            public abstract Builder modificationTime(FileTime modificationTime);
-            public abstract FileInfo build();
         }
     }
 }
