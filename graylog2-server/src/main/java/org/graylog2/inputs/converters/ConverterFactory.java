@@ -17,14 +17,18 @@
 package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
+import org.graylog2.lookup.LookupTableService;
 import org.graylog2.plugin.inputs.Converter;
 
 import javax.inject.Inject;
 import java.util.Map;
 
 public class ConverterFactory {
+    private final LookupTableService lookupTableService;
+
     @Inject
-    public ConverterFactory() {
+    public ConverterFactory(final LookupTableService lookupTableService) {
+        this.lookupTableService = lookupTableService;
     }
 
     public Converter create(Converter.Type type, Map<String, Object> config) throws NoSuchConverterException, ConfigurationException {
@@ -53,6 +57,8 @@ public class ConverterFactory {
                 return new UppercaseConverter(config);
             case FLEXDATE:
                 return new FlexibleDateConverter(config);
+            case LOOKUP_TABLE:
+                return new LookupTableConverter(config, lookupTableService);
             default:
                 throw new NoSuchConverterException();
         }

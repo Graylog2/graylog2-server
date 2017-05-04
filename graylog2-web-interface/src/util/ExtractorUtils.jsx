@@ -25,6 +25,7 @@ const ExtractorUtils = {
     LOWERCASE: 'lowercase',
     UPPERCASE: 'uppercase',
     FLEXDATE: 'flexdate',
+    LOOKUP_TABLE: 'lookup_table',
   }),
   ExtractorTypes: ExtractorTypes,
   EXTRACTOR_TYPES: Object.keys(ExtractorTypes).map(type => type.toLocaleLowerCase()),
@@ -87,6 +88,8 @@ const ExtractorUtils = {
         return 'Syslog Level From PRI';
       case this.ConverterTypes.SYSLOG_PRI_FACILITY:
         return 'Syslog Facility From PRI';
+      case this.ConverterTypes.LOOKUP_TABLE:
+        return 'Lookup Table';
       default:
         return converterType;
     }
