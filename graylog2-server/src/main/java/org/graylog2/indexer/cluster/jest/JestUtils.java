@@ -20,6 +20,8 @@ import com.google.gson.JsonObject;
 import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
+import io.searchbox.client.http.JestHttpClient;
+import org.apache.http.client.config.RequestConfig;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.QueryParsingException;
 import org.graylog2.indexer.gson.GsonUtils;
@@ -41,10 +43,15 @@ public class JestUtils {
     private JestUtils() {
     }
 
-    public static <T extends JestResult> T execute(JestClient client, Action<T> request, Supplier<String> errorMessage) {
+    public static <T extends JestResult> T execute(JestClient client, RequestConfig requestConfig,
+                                                   Action<T> request, Supplier<String> errorMessage) {
         final T result;
         try {
-            result = client.execute(request);
+            if (client instanceof JestHttpClient) {
+                result = ((JestHttpClient) client).execute(request, requestConfig);
+            } else {
+                result = client.execute(request);
+            }
         } catch (IOException e) {
             throw new ElasticsearchException(errorMessage.get(), e);
         }
@@ -56,13 +63,17 @@ public class JestUtils {
         }
     }
 
+    public static <T extends JestResult> T execute(JestClient client, Action<T> request, Supplier<String> errorMessage) {
+        return execute(client, null, request, errorMessage);
+    }
+
     private static ElasticsearchException specificException(Supplier<String> errorMessage, JsonObject jsonObject) {
         final List<JsonObject> rootCauses = extractRootCauses(jsonObject);
         final List<String> reasons = extractReasons(rootCauses);
 
-        for(JsonObject rootCause : rootCauses) {
+        for (JsonObject rootCause : rootCauses) {
             final String type = asString(rootCause.get("type"));
-            if("query_parsing_exception".equals(type)) {
+            if ("query_parsing_exception".equals(type)) {
                 return buildQueryParsingException(errorMessage, rootCause, reasons);
             }
         }
