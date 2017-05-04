@@ -63,6 +63,6 @@ public class MapWidgetStrategy implements WidgetStrategy {
         result.put("other", terms.getOther());
         result.put("missing", terms.getMissing());
 
-        return new ComputationResult(result, terms.tookMs());
+        return new ComputationResult(result, terms.took().millis());
     }
 }

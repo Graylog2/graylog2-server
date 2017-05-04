@@ -51,7 +51,7 @@ public class MapDataSearch {
             final org.graylog2.indexer.results.TermsResult terms = searches.terms(field, request.limit(), request.query(), filter, request.timerange());
             // TODO: Validate data!
             final Map<String, Long> validatedTerms = validateTerms(field, terms.getTerms());
-            final TermsResult result = TermsResult.create(terms.tookMs(), validatedTerms, terms.getMissing(), terms.getOther(), terms.getTotal(), terms.getBuiltQuery());
+            final TermsResult result = TermsResult.create(terms.took().millis(), validatedTerms, terms.getMissing(), terms.getOther(), terms.getTotal(), terms.getBuiltQuery());
             termResults.put(field, result);
         }
 
