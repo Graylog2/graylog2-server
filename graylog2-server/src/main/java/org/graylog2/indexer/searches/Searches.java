@@ -316,7 +316,7 @@ public class Searches {
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(affectedIndices);
 
-        final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform terms query."));
+        final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform terms query"));
         final long tookMs = tookMsFromSearchResult(searchResult);
 
         recordEsMetrics(tookMs, range);
