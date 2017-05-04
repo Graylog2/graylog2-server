@@ -195,6 +195,10 @@ public class LookupTableService {
         return lookupTable;
     }
 
+    public boolean hasTable(String name) {
+       return lookupTables.get(name) != null;
+    }
+
     public static class Builder {
         private final LookupTableService lookupTableService;
 

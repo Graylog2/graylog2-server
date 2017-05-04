@@ -8,6 +8,7 @@ const ExtractorTypes = Object.freeze({
   REGEX_REPLACE: 'regex_replace',
   SPLIT_AND_INDEX: 'split_and_index',
   SUBSTRING: 'substring',
+  LOOKUP_TABLE: 'lookup_table',
 });
 
 const ExtractorUtils = {
@@ -53,6 +54,8 @@ const ExtractorUtils = {
         return 'Split & Index';
       case ExtractorTypes.SUBSTRING:
         return 'Substring';
+      case ExtractorTypes.LOOKUP_TABLE:
+        return 'Lookup Table';
       default:
         return extractorType;
     }
