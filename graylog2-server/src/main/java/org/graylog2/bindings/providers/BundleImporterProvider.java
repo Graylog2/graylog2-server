@@ -23,6 +23,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.inputs.InputLauncher;
@@ -41,6 +42,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     private final InputService inputService;
     private final InputRegistry inputRegistry;
     private final ExtractorFactory extractorFactory;
+    private final ConverterFactory converterFactory;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final IndexSetRegistry indexSetRegistry;
@@ -58,6 +60,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     public BundleImporterProvider(final InputService inputService,
                                   final InputRegistry inputRegistry,
                                   final ExtractorFactory extractorFactory,
+                                  final ConverterFactory converterFactory,
                                   final StreamService streamService,
                                   final StreamRuleService streamRuleService,
                                   final IndexSetRegistry indexSetRegistry,
@@ -73,6 +76,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
+        this.converterFactory = converterFactory;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.indexSetRegistry = indexSetRegistry;
@@ -89,7 +93,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
 
     @Override
     public BundleImporter get() {
-        return new BundleImporter(inputService, inputRegistry, extractorFactory,
+        return new BundleImporter(inputService, inputRegistry, extractorFactory, converterFactory,
                 streamService, streamRuleService, indexSetRegistry, outputService, dashboardService,
                 dashboardWidgetCreator, serverStatus, messageInputFactory,
                 inputLauncher, grokPatternService, timeRangeFactory, clusterBus);

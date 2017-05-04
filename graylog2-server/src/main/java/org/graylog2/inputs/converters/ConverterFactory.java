@@ -19,11 +19,15 @@ package org.graylog2.inputs.converters;
 import org.graylog2.ConfigurationException;
 import org.graylog2.plugin.inputs.Converter;
 
+import javax.inject.Inject;
 import java.util.Map;
 
 public class ConverterFactory {
+    @Inject
+    public ConverterFactory() {
+    }
 
-    public static Converter factory(Converter.Type type, Map<String, Object> config) throws NoSuchConverterException, ConfigurationException {
+    public Converter create(Converter.Type type, Map<String, Object> config) throws NoSuchConverterException, ConfigurationException {
         switch (type) {
             case NUMERIC:
                 return new NumericConverter(config);
