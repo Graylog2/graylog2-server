@@ -19,9 +19,7 @@ package org.graylog2.plugin.utilities;
 import com.google.auto.value.AutoValue;
 
 import java.io.IOException;
-import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
-import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
@@ -41,10 +39,12 @@ import javax.validation.constraints.NotNull;
 @AutoValue
 public abstract class FileInfo {
 
+    @Nullable
     public abstract Object key();
 
     public abstract long size();
 
+    @Nullable
     public abstract FileTime modificationTime();
 
     public abstract Path path();
@@ -58,11 +58,9 @@ public abstract class FileInfo {
      *
      * @param path the path must exist, otherwise an IllegalArgumentException is thrown
      * @return the file info object
-     * @throws IOException if any IO error occurs
-     * @throws IllegalArgumentException if the path does not exist or is not readable
      */
     @NotNull
-    public static FileInfo forPath(Path path) throws IOException {
+    public static FileInfo forPath(Path path) {
         try {
             final BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
             return FileInfo.builder()
@@ -71,12 +69,18 @@ public abstract class FileInfo {
                     .size(attributes.size())
                     .modificationTime(attributes.lastModifiedTime())
                     .build();
-        } catch (AccessDeniedException | NoSuchFileException e) {
-            throw new IllegalArgumentException(e);
+        } catch (IOException e) {
+            return FileInfo.builder()
+                    .key(null)
+                    .modificationTime(null)
+                    .size(-1L)
+                    .path(path)
+                    .build();
         }
     }
 
-    public FileInfo.Change checkForChange() throws IOException {
+    @NotNull
+    public FileInfo.Change checkForChange() {
         final FileInfo newFileInfo = forPath(path());
         if (newFileInfo.equals(this)) {
             return Change.none();
@@ -86,11 +90,11 @@ public abstract class FileInfo {
 
     @AutoValue.Builder
     public abstract static class Builder {
-        public abstract Builder key(Object key);
+        public abstract Builder key(@Nullable Object key);
 
         public abstract Builder size(long size);
 
-        public abstract Builder modificationTime(FileTime modificationTime);
+        public abstract Builder modificationTime(@Nullable FileTime modificationTime);
 
         public abstract Builder path(Path path);
 
