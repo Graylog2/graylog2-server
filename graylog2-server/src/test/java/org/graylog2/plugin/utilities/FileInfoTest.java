@@ -21,6 +21,7 @@ import com.google.common.io.Files;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
@@ -82,14 +83,14 @@ public class FileInfoTest {
         assertThat(change.isChanged()).isTrue();
 
         // writing data into the file marks it as changed
-        Files.write("test".getBytes(), tempFile);
+        Files.write("test".getBytes(StandardCharsets.US_ASCII), tempFile);
         change = fileInfo.checkForChange();
         assertThat(change.isChanged()).isTrue();
 
         // file modification time only has second resolution, so need to sleep a bit longer than a second
         sleepUninterruptibly(1100, TimeUnit.MILLISECONDS);
         // replacing the entire content with identical content is considered a change (because modtime changes!).
-        Files.write("test".getBytes(), tempFile);
+        Files.write("test".getBytes(StandardCharsets.US_ASCII), tempFile);
         change = fileInfo.checkForChange();
         assertThat(change.isChanged()).isTrue();
     }
