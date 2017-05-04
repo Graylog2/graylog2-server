@@ -64,6 +64,6 @@ public abstract class LookupTableTesterResponse {
     }
 
     public static LookupTableTesterResponse result(String string, LookupResult result) {
-        return create(result.isEmpty(), false, "", string, result.getSingleValue());
+        return create(result.isEmpty(), false, "", string, result.singleValue());
     }
 }

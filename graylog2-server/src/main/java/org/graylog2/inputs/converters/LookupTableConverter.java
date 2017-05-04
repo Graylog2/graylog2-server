@@ -52,7 +52,7 @@ public class LookupTableConverter extends Converter {
         if (result == null || result.isEmpty()) {
             return value;
         }
-        return result.getSingleValue();
+        return result.singleValue();
     }
 
     @Override
