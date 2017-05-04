@@ -14,7 +14,7 @@ Graylog REST API
 Rotation and Retention strategies
 ---------------------------------
 
-The deprecated HTTP resources at ``/system/indices/rotation`` and ``/system/indices/retention``, which didn't work since Graylog 2.2.0, have been removed.
+The deprecated HTTP resources at ``/system/indices/rotation/config`` and ``/system/indices/retention/config``, which didn't work since Graylog 2.2.0, have been removed.
 
 These settings are part of the index set configuration and can be configured under ``/system/indices/index_sets``.
 
