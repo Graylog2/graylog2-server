@@ -21,6 +21,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
+import com.google.common.primitives.Ints;
 import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -62,6 +63,7 @@ import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.PutTemplate;
 import io.searchbox.params.Parameters;
 import io.searchbox.params.SearchType;
+import org.apache.http.client.config.RequestConfig;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
@@ -663,7 +665,10 @@ public class Indices {
     }
 
     public void optimizeIndex(String index, int maxNumSegments, Duration timeout) {
-        // TODO: Individual timeout?
+        final RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout(Ints.saturatedCast(timeout.toMilliseconds()))
+                .build();
+
         final ForceMerge request = new ForceMerge.Builder()
                 .addIndex(index)
                 .maxNumSegments(maxNumSegments)
@@ -671,7 +676,7 @@ public class Indices {
                 .onlyExpungeDeletes(false)
                 .build();
 
-        JestUtils.execute(jestClient, request, () -> "Couldn't force merge index " + index);
+        JestUtils.execute(jestClient, requestConfig, request, () -> "Couldn't force merge index " + index);
     }
 
     public Health.Status waitForRecovery(String index) {
