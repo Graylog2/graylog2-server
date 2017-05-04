@@ -1,19 +1,17 @@
 package org.graylog.plugins.map.geoip;
 
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.net.InetAddresses;
-import com.google.inject.assistedinject.Assisted;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.net.InetAddresses;
+import com.google.inject.assistedinject.Assisted;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.exception.AddressNotFoundException;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.model.CountryResponse;
-
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
@@ -24,6 +22,11 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 
+import javax.annotation.Nullable;
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
@@ -33,12 +36,6 @@ import java.nio.file.Paths;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.annotation.Nullable;
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotNull;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -129,6 +126,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
             case MAXMIND_CITY:
                 try {
                     final CityResponse city = reader.city(addr);
+                    final String singleValue = String.join(",", city.getLocation().getLatitude().toString(), city.getLocation().getLongitude().toString());
                     final ImmutableMap.Builder<Object, Object> map = ImmutableMap.builder();
                     map.put("city", city.getCity());
                     map.put("continent", city.getContinent());
@@ -139,7 +137,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                     map.put("represented_country", city.getRepresentedCountry());
                     map.put("subdivisions", city.getSubdivisions());
                     map.put("traits", city.getTraits());
-                    return new LookupResult(map.build());
+                    return LookupResult.multi(singleValue, map.build());
                 } catch (AddressNotFoundException nfe) {
                     return LookupResult.empty();
                 } catch (Exception e) {
@@ -149,13 +147,14 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
             case MAXMIND_COUNTRY:
                 try {
                     final CountryResponse country = reader.country(addr);
+                    final String singleValue = country.getCountry().getIsoCode();
                     final ImmutableMap.Builder<Object, Object> map = ImmutableMap.builder();
                     map.put("continent", country.getContinent());
                     map.put("country", country.getCountry());
                     map.put("registered_country", country.getRegisteredCountry());
                     map.put("represented_country", country.getRepresentedCountry());
                     map.put("traits", country.getTraits());
-                    return new LookupResult(map.build());
+                    return LookupResult.multi(singleValue, map.build());
                 } catch (AddressNotFoundException nfe) {
                     return LookupResult.empty();
                 } catch (Exception e) {
