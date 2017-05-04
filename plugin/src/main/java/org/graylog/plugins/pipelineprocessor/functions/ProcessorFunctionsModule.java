@@ -53,6 +53,7 @@ import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
+import org.graylog.plugins.pipelineprocessor.functions.lookup.LookupValue;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
@@ -175,6 +176,7 @@ public class ProcessorFunctionsModule extends PluginModule {
 
         // Lookup tables
         addMessageProcessorFunction(Lookup.NAME, Lookup.class);
+        addMessageProcessorFunction(LookupValue.NAME, LookupValue.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {
