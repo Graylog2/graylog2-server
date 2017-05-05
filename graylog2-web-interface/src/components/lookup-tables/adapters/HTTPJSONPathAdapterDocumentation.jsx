@@ -1,59 +1,179 @@
-/* eslint-disable react/no-unescaped-entities */
+/* eslint-disable react/no-unescaped-entities, no-template-curly-in-string */
 import React from 'react';
-import { Alert } from 'react-bootstrap';
+import { Alert, Col, Row } from 'react-bootstrap';
 
 const HTTPJSONPathAdapterDocumentation = React.createClass({
   render() {
-    const csvFile1 = `"ipaddr","hostname"
-"127.0.0.1","localhost"
-"10.0.0.1","server1"
-"10.0.0.2","server2"`;
-
-    const csvFile2 = `'ipaddr';'lladdr';'hostname'
-'127.0.0.1';'e4:b2:11:d1:38:14';'localhost'
-'10.0.0.1';'e4:b2:12:d1:48:28';'server1'
-'10.0.0.2';'e4:b2:11:d1:58:34';'server2'`;
+    const exampleJSON = `{
+  "user": {
+    "login": "jane",
+    "full_name": "Jane Doe",
+    "roles": ["admin", "developer"],
+    "contact": {
+      "email": "jane@example.com",
+      "cellphone": "+49123456789"
+    }
+  }
+}`;
+    const noMultiResult = '{"value": "Jane Doe"}';
+    const mapResult = `{
+  "login": "jane",
+  "full_name": "Jane Doe",
+  "roles": ["admin", "developer"],
+  "contact": {
+    "email": "jane@example.com",
+    "cellphone": "+49123456789"
+  }
+}`;
+    const smallMapResult = `{
+  "email": "jane@example.com",
+  "cellphone": "+49123456789"
+}`;
+    const listResult = `{
+  "value": ["admin", "developer"]
+}`;
+    const pipelineRule = `rule "lookup user"
+when has_field("user_login")
+then
+  // Get the user login from the message
+  let userLogin = to_string($message.user_login);
+  // Lookup the single value, in our case the full name, in the user-api lookup table
+  let userName = lookup_value("user-api", userLogin);
+  // Set the field "user_name" in the message
+  set_field("user_name", userName)
+  
+  // Lookup the multi value in the user-api lookup table
+  let userData = lookup("user-api", userLogin);
+  // Set the email and cellphone as fields in the message
+  set_field("user_email", userData["email"]);
+  set_field("user_cellphone", userData["cellphone"]);
+end`;
 
     return (<div>
-      <p>The CSV data adapter can read key value pairs from a CSV file.</p>
-      <p>Please make sure your CSV file is formatted according to your configuration settings.</p>
+      <p>
+        The HTTPJSONPath data adapter executes <em>HTTP GET</em> requests to lookup a key and parses the result based on
+        configured JSONPath expressions.
+      </p>
 
       <Alert style={{ marginBottom: 10 }} bsStyle="info">
-        <h4 style={{ marginBottom: 10 }}>CSV file requirements:</h4>
-        <ul className="no-padding">
-          <li>The first line in the CSV file needs to be a list of field/column names</li>
-          <li>The file uses <strong>utf-8</strong> encoding</li>
-          <li>The file is readable by <strong>every</strong> Graylog server node</li>
-        </ul>
+        Every lookup table result has two values. A <em>single value</em> and a <em>multi value</em>. The single
+        value will be used when the lookup result is expected to be a string, number or boolean. The multi value
+        will be used when the lookup result is expected to be a map or list.
       </Alert>
+
+      <h3 style={{ marginBottom: 10 }}>Configuration</h3>
+
+      <h5 style={{ marginBottom: 10 }}>Lookup URL</h5>
+      <p style={{ marginBottom: 10, padding: 0 }}>
+        The URL that will be used for the HTTP request. To use the <em>lookup key</em> in the URL, the <code>{'${key}'}</code>
+        value can be used. This variable will be replaced by the actual key that is passed to a lookup function. <br />
+        (example: <code>{'https://example.com/api/lookup?key=${key}'}</code>)
+      </p>
+
+      <h5 style={{ marginBottom: 10 }}>Single value JSONPath</h5>
+      <p style={{ marginBottom: 10, padding: 0 }}>
+        This JSONPath expression will be used to parse the <em>single value</em> of the lookup result.
+        (example: <code>$.user.full_name</code>)
+      </p>
+
+      <h5 style={{ marginBottom: 10 }}>Multi value JSONPath</h5>
+      <p style={{ marginBottom: 10, padding: 0 }}>
+        This JSONPath expression will be used to parse the <em>multi value</em> of the lookup result.
+        (example: <code>$.users[*]</code>)
+        The multi value JSONPath setting is <em>optional</em>. Without it, the single value is also present in the
+        multi value result.
+      </p>
+
+      <h5 style={{ marginBottom: 10 }}>HTTP User-Agent</h5>
+      <p style={{ marginBottom: 10, padding: 0 }}>
+        This is the <em>User-Agent</em> header that will be used for the HTTP requests. You should include some
+        contact details so owners of the services you query know whom to contact if issues arise.
+        (like excessive API requests from your Graylog cluster)
+      </p>
 
       <hr />
 
-      <h3 style={{ marginBottom: 10 }}>Example 1</h3>
-
-      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>,</code><br />
-        Quote character: <code>"</code><br />
-        Key column: <code>ipaddr</code><br />
-        Value column: <code>hostname</code>
+      <h3 style={{ marginBottom: 10 }}>Example</h3>
+      <p>
+        This shows an example configuration and the values that will be returned from a lookup.<br />
+        The configured URL is <strong>{'https://example.com/api/users/${key}'}</strong> and the <code>{'${key}'}</code>
+        gets replaced by <strong>jane</strong> during the lookup request.
       </p>
-
-      <h5 style={{ marginBottom: 10 }}>CSV File</h5>
-      <pre>{csvFile1}</pre>
-
-      <h3 style={{ marginBottom: 10 }}>Example 2</h3>
-
-      <h5 style={{ marginBottom: 10 }}>Configuration</h5>
-      <p style={{ marginBottom: 10, padding: 0 }}>
-        Separator: <code>;</code><br />
-        Quote character: <code>'</code><br />
-        Key column: <code>ipaddr</code><br />
-        Value column: <code>hostname</code>
+      <p>
+        This is the resulting JSON document:
       </p>
+      <pre>{exampleJSON}</pre>
 
-      <h5 style={{ marginBottom: 10 }}>CSV File</h5>
-      <pre>{csvFile2}</pre>
+      <Row>
+        <Col md={4}>
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Single value JSONPath: <code>$.user.full_name</code><br />
+            Multi value JSONPath: <em>empty</em><br />
+          </p>
+        </Col>
+        <Col md={8}>
+          <h5 style={{ marginBottom: 10 }}>Result</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Single value: <code>Jane Doe</code><br />
+            Multi value: <pre>{noMultiResult}</pre>
+          </p>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={4}>
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Single value JSONPath: <code>$.user.full_name</code><br />
+            Multi value JSONPath: <code>$.user</code><br />
+          </p>
+        </Col>
+        <Col md={8}>
+          <h5 style={{ marginBottom: 10 }}>Result</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Single value: <code>Jane Doe</code><br />
+            Multi value: <pre>{mapResult}</pre>
+          </p>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={4}>
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Single value JSONPath: <code>$.user.contact.email</code><br />
+            Multi value JSONPath: <code>$.user.roles[*]</code><br />
+          </p>
+        </Col>
+        <Col md={8}>
+          <h5 style={{ marginBottom: 10 }}>Result</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Single value: <code>jane@example.com</code><br />
+            Multi value: <pre>{listResult}</pre>
+          </p>
+        </Col>
+      </Row>
+      <Row>
+        <Col md={4}>
+          <h5 style={{ marginBottom: 10 }}>Configuration</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Single value JSONPath: <code>$.user.full_name</code><br />
+            Multi value JSONPath: <code>$.user.contact</code><br />
+          </p>
+        </Col>
+        <Col md={8}>
+          <h5 style={{ marginBottom: 10 }}>Result</h5>
+          <p style={{ marginBottom: 10, padding: 0 }}>
+            Single value: <code>Jane Doe</code><br />
+            Multi value: <pre>{smallMapResult}</pre>
+          </p>
+        </Col>
+      </Row>
+
+      <h5 style={{ marginBottom: 10 }}>Pipeline Rule</h5>
+      <p>
+        This is an example pipeline rule that uses the example data from our last configuration example.
+      </p>
+      <pre>{pipelineRule}</pre>
     </div>);
   },
 });
