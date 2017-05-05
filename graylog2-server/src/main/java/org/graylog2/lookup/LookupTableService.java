@@ -35,9 +35,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -56,6 +58,8 @@ public class LookupTableService {
     private final ScheduledExecutorService scheduler;
 
     private final ConcurrentMap<String, LookupTable> lookupTables = new ConcurrentHashMap<>();
+
+    private final ConcurrentMap<String, LookupDataAdapter> liveAdapters = new ConcurrentHashMap<>();
 
     @Inject
     public LookupTableService(MongoLutService mongoLutService,
@@ -91,13 +95,17 @@ public class LookupTableService {
                 public void running() {
                     LOG.info("Adapter {} RUNNING", newAdapter.id());
                     lookupTables.put(name, newTable);
-
+                    liveAdapters.put(newAdapter.name(), newAdapter);
                     if (existingTable != null) {
                         // If the new table has a new data adapter, stop the old one to free up resources
                         // This needs to happen after the new table is live
                         final LookupDataAdapter existingAdapter = existingTable.dataAdapter();
                         if (!Objects.equals(existingAdapter, newAdapter) && existingAdapter.isRunning()) {
                             existingAdapter.stopAsync().awaitTerminated();
+                            if (!existingAdapter.name().equals(newAdapter.name())) {
+                                // adapter names are different, remove the old one from being live
+                                liveAdapters.remove(existingAdapter.name());
+                            }
                         }
                     }
                 }
@@ -234,7 +242,14 @@ public class LookupTableService {
     }
 
     public boolean hasTable(String name) {
-       return lookupTables.get(name) != null;
+        return lookupTables.get(name) != null;
+    }
+
+    public Collection<LookupDataAdapter> getDataAdapters(Set<String> adapterNames) {
+        return liveAdapters.entrySet().stream()
+                .filter(e -> adapterNames.contains(e.getKey()))
+                .map(e -> e.getValue())
+                .collect(Collectors.toSet());
     }
 
     public static class Builder {
@@ -282,6 +297,10 @@ public class LookupTableService {
             }
 
             return result;
+        }
+
+        public LookupTable getTable() {
+            return lookupTableService.getTable(lookupTableName);
         }
     }
 }

@@ -102,11 +102,7 @@ class LookupTableCreator {
         }
         final DataAdapterDto adapterDto = adapterDtoOptional.get();
         return getDataAdapterFactory(dto.name(), adapterDto)
-                .map(factory -> {
-                    final LookupDataAdapter adapter = factory.create(adapterDto.config());
-                    adapter.setId(adapterDto.id());
-                    return adapter;
-                });
+                .map(factory -> factory.create(adapterDto.id(), adapterDto.name(), adapterDto.config()));
     }
 
     private Optional<LookupCache.Factory> getCacheFactory(String lutName, CacheDto cacheDto) {

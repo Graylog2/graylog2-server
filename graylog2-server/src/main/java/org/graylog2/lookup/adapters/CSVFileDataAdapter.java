@@ -16,16 +16,19 @@
  */
 package org.graylog2.lookup.adapters;
 
+import com.google.auto.value.AutoValue;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.primitives.Ints;
+import com.google.inject.assistedinject.Assisted;
+
 import au.com.bytecode.opencsv.CSVReader;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.primitives.Ints;
-import com.google.inject.assistedinject.Assisted;
+
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
@@ -36,10 +39,6 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -49,6 +48,11 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -64,8 +68,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     @Inject
     public CSVFileDataAdapter(@Named("daemonScheduler") ScheduledExecutorService scheduler,
+                              @Assisted("id") String id,
+                              @Assisted("name") String name,
                               @Assisted LookupDataAdapterConfiguration config) {
-        super(config, scheduler);
+        super(id, name, config, scheduler);
         this.config = (Config) config;
     }
 
@@ -76,10 +82,14 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             throw new IllegalStateException("File path needs to be set");
         }
 
-        // Set file info before parsing the data for the first time
-        fileInfo = FileInfo.forPath(Paths.get(config.path()));
-        lookupRef.set(parseCSVFile());
+        try {
+            // Set file info before parsing the data for the first time
+            fileInfo = FileInfo.forPath(Paths.get(config.path()));
+            lookupRef.set(parseCSVFile());
 
+        } catch (Exception e) {
+            setError(e);
+        }
         if (config.checkInterval() < 1) {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
         }
@@ -93,6 +103,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     @Override
     protected void doRefresh() throws Exception {
         try {
+            clearError();
             final FileInfo.Change fileChanged = fileInfo.checkForChange();
             if (!fileChanged.isChanged()) {
                 // Nothing to do, file did not change
@@ -105,6 +116,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             fileInfo = fileChanged.fileInfo();
         } catch (IOException e) {
             LOG.error("Couldn't check CSV file {} for updates", config.path(), e);
+            setError(e);
         }
     }
 
@@ -149,6 +161,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         } catch (Exception e) {
             LOG.error("Couldn't parse CSV file {} (settings separator=<{}> quotechar=<{}> key_column=<{}> value_column=<{}>)", config.path(),
                     config.separator(), config.quotechar(), config.keyColumn(), config.valueColumn(), e);
+            setError(e);
         }
 
         return newLookupBuilder.build();
@@ -177,7 +190,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     public interface Factory extends LookupDataAdapter.Factory<CSVFileDataAdapter> {
         @Override
-        CSVFileDataAdapter create(LookupDataAdapterConfiguration configuration);
+        CSVFileDataAdapter create(@Assisted("id") String id,
+                                  @Assisted("name") String name,
+                                  LookupDataAdapterConfiguration configuration);
 
         @Override
         Descriptor getDescriptor();

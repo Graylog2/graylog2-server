@@ -47,6 +47,11 @@ public abstract class LookupTable {
     }
 
     @Nullable
+    public String error() {
+        return dataAdapter().getError().map(Throwable::getMessage).orElse(null);
+    }
+
+    @Nullable
     public LookupResult lookup(@Nonnull Object key) {
         return cache().get(key);
     }
