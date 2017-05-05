@@ -16,18 +16,19 @@
  */
 package org.graylog2.rest.resources.system.lookup;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Maps;
+
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
+import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.MongoLutCacheService;
 import org.graylog2.lookup.MongoLutDataAdapterService;
@@ -42,11 +43,23 @@ import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.rest.models.PaginatedList;
 import org.graylog2.rest.models.system.lookup.CacheApi;
 import org.graylog2.rest.models.system.lookup.DataAdapterApi;
+import org.graylog2.rest.models.system.lookup.ErrorStates;
+import org.graylog2.rest.models.system.lookup.ErrorStatesRequest;
 import org.graylog2.rest.models.system.lookup.LookupTableApi;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
+import org.slf4j.Logger;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -63,16 +76,13 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 
 import static java.util.Collections.singleton;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @RequiresAuthentication
 @Path("/system/lookup")
@@ -80,6 +90,7 @@ import static java.util.Collections.singleton;
 @Consumes("application/json")
 @Api(value = "System/Lookup", description = "Lookup tables")
 public class LookupTableResource extends RestResource {
+    private static final Logger LOG = getLogger(LookupTableResource.class);
 
     private final MongoLutService lookupTableService;
     private final MongoLutDataAdapterService adapterService;
@@ -297,6 +308,28 @@ public class LookupTableResource extends RestResource {
 
     }
 
+    @POST
+    @NoAuditEvent("Bulk read call")
+    @Path("states")
+    @ApiOperation(value = "Retrieve the runtime error states of the given lookup tables")
+    public ErrorStates adapterErrorStates(@ApiParam(name = "tables") @Valid ErrorStatesRequest request) {
+        final ErrorStates.Builder errorStates = ErrorStates.builder();
+        if (request.tables() != null) {
+            //noinspection ConstantConditions
+            for (String tableName : request.tables()) {
+
+                final LookupTable table = lookupTables.newBuilder().lookupTable(tableName).build().getTable();
+                if (table != null) {
+                    errorStates.tables().put(tableName, table.error());
+                }
+            }
+        }
+        lookupTables.getDataAdapters(request.dataAdapters()).forEach(adapter -> {
+            errorStates.dataAdapters().put(adapter.name(), adapter.getError().map(Throwable::getMessage).orElse(null));
+        });
+        return errorStates.build();
+    }
+
     @GET
     @Path("adapters/{idOrName}")
     @ApiOperation(value = "List the given data adapter")
@@ -467,4 +500,5 @@ public class LookupTableResource extends RestResource {
             this.caches = caches;
         }
     }
+
 }

@@ -17,6 +17,7 @@
 package org.graylog2.plugin.lookup;
 
 import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.inject.assistedinject.Assisted;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -25,11 +26,12 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicReference;
 
-import javax.annotation.Nullable;
 import javax.inject.Named;
 
 import static com.google.common.base.Preconditions.checkState;
@@ -37,27 +39,33 @@ import static com.google.common.base.Preconditions.checkState;
 public abstract class LookupDataAdapter extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(LookupDataAdapter.class);
 
-    private String id;
+    private final String id;
     private LookupTable lookupTable;
+    private final String name;
 
     private final LookupDataAdapterConfiguration config;
     private final ScheduledExecutorService scheduler;
     private ScheduledFuture<?> refreshFuture = null;
 
-    protected LookupDataAdapter(LookupDataAdapterConfiguration config,
+    private AtomicReference<Throwable> dataSourceError = new AtomicReference<>();
+
+    protected LookupDataAdapter(String id, String name, LookupDataAdapterConfiguration config,
                                 @Named("daemonScheduler") ScheduledExecutorService scheduler) {
+        this.id = id;
+        this.name = name;
         this.config = config;
         this.scheduler = scheduler;
     }
 
     @Override
     protected void startUp() throws Exception {
+        doStart();
+
         final Duration interval = refreshInterval();
         if (!interval.equals(Duration.ZERO)) {
             LOG.debug("Schedule data adapter refresh method every {}ms", interval.getMillis());
             this.refreshFuture = scheduler.scheduleAtFixedRate(this::refresh, interval.getMillis(), interval.getMillis(), TimeUnit.MILLISECONDS);
         }
-        doStart();
     }
 
     protected abstract void doStart() throws Exception;
@@ -85,17 +93,28 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
             LOG.error("Couldn't refresh data adapter", e);
         }
     }
+
     protected abstract void doRefresh() throws Exception;
 
-    @Nullable
+    protected void clearError() {
+        dataSourceError.set(null);
+    }
+
+    public Optional<Throwable> getError() {
+        return Optional.ofNullable(dataSourceError.get());
+    }
+
+    protected void setError(Throwable throwable) {
+        dataSourceError.set(throwable);
+    }
+
     public String id() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public String name() {
+        return name;
     }
-
     public LookupTable getLookupTable() {
         checkState(lookupTable != null, "lookup table cannot be null");
         return lookupTable;
@@ -120,8 +139,9 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
         return config;
     }
 
+
     public interface Factory<T extends LookupDataAdapter> {
-        T create(LookupDataAdapterConfiguration configuration);
+        T create(@Assisted("id") String id, @Assisted("name") String name, LookupDataAdapterConfiguration configuration);
 
         Descriptor getDescriptor();
     }
