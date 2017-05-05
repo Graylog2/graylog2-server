@@ -162,16 +162,11 @@ public class Cluster {
                 .timeout(Ints.saturatedCast(requestTimeout.toSeconds()))
                 .build();
 
-        try {
-            final JestResult result = jestClient.execute(request);
-            final int numberOfDataNodes = Optional.of(result.getJsonObject())
-                .map(json -> asInteger(json.get("number_of_data_nodes")))
-                .orElse(0);
-            return result.isSucceeded() && numberOfDataNodes > 0;
-        } catch (IOException e) {
-            LOG.warn("Couldn't check connection status of Elasticsearch", e);
-            return false;
-        }
+        final JestResult result = JestUtils.execute(jestClient, request, () -> "Couldn't check connection status of Elasticsearch");
+        final int numberOfDataNodes = Optional.of(result.getJsonObject())
+            .map(json -> asInteger(json.get("number_of_data_nodes")))
+            .orElse(0);
+        return numberOfDataNodes > 0;
     }
 
     /**
