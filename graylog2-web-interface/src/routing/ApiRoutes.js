@@ -207,6 +207,7 @@ const ApiRoutes = {
     splitAndIndexTest: () => { return { url: '/tools/split_and_index_tester' }; },
     substringTest: () => { return { url: '/tools/substring_tester' }; },
     containsStringTest: () => { return { url: '/tools/contains_string_tester' }; },
+    lookupTableTest: () => { return { url: '/tools/lookup_table_tester' }; },
   },
   UniversalSearchApiController: {
     _streamFilter(streamId) {

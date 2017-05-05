@@ -10,3 +10,4 @@ export { default as SyslogPriFacilityConverterConfiguration } from './SyslogPriF
 export { default as SyslogPriLevelConverterConfiguration } from './SyslogPriLevelConverterConfiguration';
 export { default as TokenizerConverterConfiguration } from './TokenizerConverterConfiguration';
 export { default as UppercaseConverterConfiguration } from './UppercaseConverterConfiguration';
+export { default as LookupTableConverterConfiguration } from './LookupTableConverterConfiguration';
