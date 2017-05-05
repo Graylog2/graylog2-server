@@ -88,13 +88,13 @@ public class ScrollResult extends IndexQueryResult {
                 .orElse(Stream.empty())
                 .map(hit -> {
                     try {
-                        return objectMapper.readValue(hit.getAsString(), Map.class);
+                        return objectMapper.readValue(hit.toString(), Map.class);
                     } catch (IOException e) {
                         throw new ElasticsearchException("Unable to deserialize search hits during scrolling: ", e);
                     }
                 })
                 .filter(Objects::nonNull)
-                .map(hit -> ResultMessage.parseFromSource((String)hit.get("id"), (String)hit.get("index"), (Map<String, Object>)hit.get("source")))
+                .map(hit -> ResultMessage.parseFromSource((String)hit.get("_id"), (String)hit.get("_index"), (Map<String, Object>)hit.get("_source")))
                 .collect(Collectors.toList());
         } else {
             // make sure to return the initial hits, see https://github.com/Graylog2/graylog2-server/issues/2126
