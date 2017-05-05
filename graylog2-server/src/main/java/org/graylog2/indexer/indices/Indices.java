@@ -298,7 +298,14 @@ public class Indices {
 
     public boolean exists(String indexName) {
         try {
-            return jestClient.execute(new IndicesExists.Builder(indexName).build()).isSucceeded();
+            final JestResult result = jestClient.execute(new GetSettings.Builder().addIndex(indexName).build());
+            if (!result.isSucceeded()) {
+                return false;
+            }
+            return Optional.of(result.getJsonObject())
+                .map(GsonUtils::entrySetAsMap)
+                .map(map -> map.containsKey(indexName))
+                .orElse(false);
         } catch (IOException e) {
             throw new ElasticsearchException("Couldn't check existence of index " + indexName, e);
         }
@@ -306,7 +313,14 @@ public class Indices {
 
     public boolean aliasExists(String alias) {
         try {
-            return jestClient.execute(new AliasExists.Builder().alias(alias).build()).isSucceeded();
+            final JestResult result = jestClient.execute(new GetSettings.Builder().addIndex(alias).build());
+            if (!result.isSucceeded()) {
+                return false;
+            }
+            return Optional.of(result.getJsonObject())
+                .map(GsonUtils::entrySetAsMap)
+                .map(map -> !map.containsKey(alias))
+                .orElse(false);
         } catch (IOException e) {
             throw new ElasticsearchException("Couldn't check existence of alias " + alias, e);
         }

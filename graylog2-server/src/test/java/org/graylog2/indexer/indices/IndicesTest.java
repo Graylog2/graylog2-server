@@ -178,6 +178,7 @@ public class IndicesTest extends AbstractESTest {
         final IndicesAliasesResponse response = adminClient.aliases(request).actionGet(ES_TIMEOUT);
         assertThat(response.isAcknowledged()).isTrue();
         assertThat(indices.aliasExists(alias)).isTrue();
+        assertThat(indices.exists(alias)).isFalse();
     }
 
     @Test
