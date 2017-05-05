@@ -69,7 +69,7 @@ public class SystemFieldsResource extends RestResource {
         if (unlimited) {
             fields = indices.getAllMessageFields(writeIndexWildcards);
         } else {
-            fields = Sets.newHashSet();
+            fields = Sets.newHashSetWithExpectedSize(limit);
             addStandardFields(fields);
             int i = 0;
             for (String field : indices.getAllMessageFields(writeIndexWildcards)) {
