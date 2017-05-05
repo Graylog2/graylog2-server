@@ -213,20 +213,17 @@ public class Searches {
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
 
-        // only request the fields we asked for otherwise we can't figure out which fields will be in the result set
-        // until we've scrolled through the entire set.
-        // TODO: Check if we can get away without loading the _source field.
-        // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-fields.html#search-request-fields
-        // "For backwards compatibility, if the fields parameter specifies fields which are not stored , it will
-        // load the _source and extract it from it. This functionality has been replaced by the source filtering
-        // parameter." -- So we should look at the source filtering parameter once we switched to ES 1.x.
+        final String searchQuery;
+        final Sorting sorting = new Sorting("_doc", Sorting.Direction.ASC);
+        if (filter == null) {
+            searchQuery = standardSearchRequest(query, limit, offset, range, sorting).toString();
+        } else {
+            searchQuery = filteredSearchRequest(query, filter, limit, offset, range, sorting).toString();
+        }
 
-        final Search.Builder initialSearchBuilder = new Search.Builder(query)
+        final Search.Builder initialSearchBuilder = new Search.Builder(searchQuery)
             .addType(IndexMapping.TYPE_MESSAGE)
-            .setParameter(Parameters.SIZE, limit)
             .setParameter(Parameters.SCROLL, "1m")
-            .addSort(new Sort(SortParseElement.DOC_FIELD_NAME))
-            .addSourceIncludePattern("_source")
             .addIndex(affectedIndices);
         fields.forEach(initialSearchBuilder::addSourceIncludePattern);
 
