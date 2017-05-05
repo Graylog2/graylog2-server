@@ -268,7 +268,7 @@ public class Searches {
             return SearchResult.empty(config.query(), requestBuilder.toString());
         }
         final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform search query."));
-        final List<ResultMessage> hits = searchResult.getHits(Map.class).stream()
+        final List<ResultMessage> hits = searchResult.getHits(Map.class, false).stream()
             .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
             .collect(Collectors.toList());
         final long tookMs = tookMsFromSearchResult(searchResult);
@@ -487,7 +487,7 @@ public class Searches {
         }
 
         final io.searchbox.core.SearchResult searchResponse = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve fields stats."));
-        final List<ResultMessage> hits = searchResponse.getHits(Map.class).stream()
+        final List<ResultMessage> hits = searchResponse.getHits(Map.class, false).stream()
             .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
             .collect(Collectors.toList());
 
