@@ -40,7 +40,9 @@ import org.graylog2.indexer.ranges.MongoIndexRange;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.HistogramResult;
+import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
@@ -601,5 +603,29 @@ public class SearchesTest extends AbstractESTest {
 
         assertThat(searches.determineAffectedIndices(absoluteRange, "streams:123456789ABCDEF"))
                 .containsOnly(b0.indexName(), b1.indexName());
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void searchDoesNotIncludeJestMetadata() throws Exception {
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final SearchResult searchResult = searches.search("_id:1", range, 0, 0, Sorting.DEFAULT);
+
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getTotalResults()).isEqualTo(1L);
+        assertThat(searchResult.getFields()).doesNotContain("es_metadata_id", "es_metadata_version");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void fieldStatsDoesNotIncludeJestMetadata() throws Exception {
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final FieldStatsResult fieldStatsResult = searches.fieldStats("n", "_id:1", range);
+
+        assertThat(fieldStatsResult).isNotNull();
+        assertThat(fieldStatsResult.getSearchHits()).isNotNull();
+        assertThat(fieldStatsResult.getSearchHits()).hasSize(1);
+        final ResultMessage resultMessage = fieldStatsResult.getSearchHits().get(0);
+        assertThat(resultMessage.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version");
     }
 }

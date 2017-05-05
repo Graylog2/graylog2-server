@@ -99,7 +99,7 @@ public class ScrollResult extends IndexQueryResult {
         } else {
             // make sure to return the initial hits, see https://github.com/Graylog2/graylog2-server/issues/2126
             search = initialResult;
-            hits = initialResult.getHits(Map.class).stream()
+            hits = initialResult.getHits(Map.class, false).stream()
                 .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
                 .collect(Collectors.toList());
             this.initialResult = null;
