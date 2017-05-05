@@ -178,6 +178,28 @@ public class IndicesTest extends AbstractESTest {
         final IndicesAliasesResponse response = adminClient.aliases(request).actionGet(ES_TIMEOUT);
         assertThat(response.isAcknowledged()).isTrue();
         assertThat(indices.aliasExists(alias)).isTrue();
+        assertThat(indices.exists(alias)).isFalse();
+    }
+
+    @Test
+    @UsingDataSet(locations = "IndicesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testAliasExistsForIndex() throws Exception {
+        final String indexNotAlias = "graylog_0";
+        assertThat(indices.aliasExists(indexNotAlias)).isFalse();
+    }
+
+    @Test
+    @UsingDataSet(locations = "IndicesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testIndexIfIndexExists() throws Exception {
+        final String indexNotAlias = "graylog_0";
+        assertThat(indices.exists(indexNotAlias)).isTrue();
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testExistsIfIndexDoesNotExist() throws Exception {
+        final String indexNotAlias = "graylog_index_does_not_exist";
+        assertThat(indices.exists(indexNotAlias)).isFalse();
     }
 
     @Test
@@ -344,7 +366,7 @@ public class IndicesTest extends AbstractESTest {
         final List<IndexTemplateMetaData> indexTemplates = getTemplatesResponse.getIndexTemplates();
         assertThat(indexTemplates)
                 .extracting(IndexTemplateMetaData::getName)
-                .containsExactly(customTemplateName);
+                .contains(customTemplateName);
 
         // Create index with custom template
         final String testIndexName = "graylog_override_template";
