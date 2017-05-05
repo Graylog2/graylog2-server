@@ -166,7 +166,7 @@ public class Cluster {
         final int numberOfDataNodes = Optional.of(result.getJsonObject())
             .map(json -> asInteger(json.get("number_of_data_nodes")))
             .orElse(0);
-        return result.isSucceeded() && numberOfDataNodes > 0;
+        return numberOfDataNodes > 0;
     }
 
     /**
