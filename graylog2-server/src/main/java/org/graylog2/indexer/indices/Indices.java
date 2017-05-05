@@ -296,6 +296,11 @@ public class Indices {
                 .map(indices -> asJsonObject(indices.get(indexName)));
     }
 
+    /**
+     * Check if a given name is an existing index.
+     * @param indexName Name of the index to check presence for.
+     * @return {@code true} if indexName is an existing index, {@code false} if it is non-existing or an alias.
+     */
     public boolean exists(String indexName) {
         try {
             final JestResult result = jestClient.execute(new GetSettings.Builder().addIndex(indexName).build());
@@ -311,6 +316,11 @@ public class Indices {
         }
     }
 
+    /**
+     * Check if a given name is an existing alias.
+     * @param alias Name of the alias to check presence for.
+     * @return {@code true} if alias is an existing alias, {@code false} if it is non-existing or an index.
+     */
     public boolean aliasExists(String alias) {
         try {
             final JestResult result = jestClient.execute(new GetSettings.Builder().addIndex(alias).build());
