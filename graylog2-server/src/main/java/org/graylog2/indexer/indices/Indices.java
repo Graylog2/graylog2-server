@@ -448,11 +448,12 @@ public class Indices {
     }
 
     public Set<String> getAllMessageFields(final String[] writeIndexWildcards) {
-        return getAllMessageFieldsForIndices(writeIndexWildcards)
-                .values()
-                .stream()
-                .reduce((strings, strings2) -> ImmutableSet.<String>builder().addAll(strings).addAll(strings2).build())
-                .orElse(Collections.emptySet());
+        final Map<String, Set<String>> fieldsForIndices = getAllMessageFieldsForIndices(writeIndexWildcards);
+        final ImmutableSet.Builder<String> result = ImmutableSet.builder();
+        for (Set<String> fields : fieldsForIndices.values()) {
+            result.addAll(fields);
+        }
+        return result.build();
     }
 
     public void setReadOnly(String index) {
