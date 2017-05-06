@@ -64,6 +64,8 @@ public class StreamRouterEngine {
     private final Provider<Stream> defaultStreamProvider;
 
     private final List<Rule> rulesList;
+    private final Map<String,Map<String,List<Stream>>> exactStreamsMap;
+    private final Map<String,List<Stream>> presenceStreamsMap;
 
     public interface Factory {
         StreamRouterEngine create(List<Stream> streams, ExecutorService executorService);
@@ -82,6 +84,8 @@ public class StreamRouterEngine {
         this.streamProcessingTimeout = streamFaultManager.getStreamProcessingTimeout();
         this.fingerprint = new StreamListFingerprint(streams).getFingerprint();
         this.defaultStreamProvider = defaultStreamProvider;
+        this.exactStreamsMap = Maps.newHashMap();
+        this.presenceStreamsMap = Maps.newHashMap();
 
         final List<Rule> alwaysMatchRules = Lists.newArrayList();
         final List<Rule> presenceRules = Lists.newArrayList();
@@ -105,10 +109,37 @@ public class StreamRouterEngine {
                         alwaysMatchRules.add(rule);
                         break;
                     case PRESENCE:
-                        presenceRules.add(rule);
+                        if (!streamRule.getInverted()
+                            && (stream.getStreamRules().size() == 1 || stream.getMatchingType() == Stream.MatchingType.OR)) {
+                            List<Stream> presenceStreamsList = presenceStreamsMap.get(streamRule.getField());
+                            if (presenceStreamsList == null) {
+                                presenceStreamsList = Lists.newArrayList();
+                                presenceStreamsMap.put(streamRule.getField(), presenceStreamsList);
+                            }
+                            presenceStreamsList.add(stream);
+                        } else {
+                            presenceRules.add(rule);
+                        }
                         break;
                     case EXACT:
-                        exactRules.add(rule);
+                        if (!streamRule.getInverted()
+                            && (stream.getStreamRules().size() == 1 || stream.getMatchingType() == Stream.MatchingType.OR)) {
+                            List<Stream> exactStreamsList = null;
+                            Map<String,List<Stream>> exactValueMap = exactStreamsMap.get(streamRule.getField());
+                            if (exactValueMap == null) {
+                                exactValueMap = Maps.newHashMap();
+                                exactStreamsMap.put(streamRule.getField(), exactValueMap);
+                            } else {
+                                exactStreamsList = exactValueMap.get(streamRule.getValue());
+                            }
+                            if (exactStreamsList == null) {
+                                exactStreamsList = Lists.newArrayList();
+                                exactValueMap.put(streamRule.getValue(), exactStreamsList);
+                            }
+                            exactStreamsList.add(stream);
+                        } else {
+                            exactRules.add(rule);
+                        }
                         break;
                     case GREATER:
                         greaterRules.add(rule);
@@ -164,6 +195,33 @@ public class StreamRouterEngine {
     public List<Stream> match(Message message) {
         final Set<Stream> result = Sets.newHashSet();
         final Set<Stream> blackList = Sets.newHashSet();
+
+        for (Map.Entry<String,List<Stream>> entry : presenceStreamsMap.entrySet()) {
+            final Object rawField = message.getField(entry.getKey());
+            if (rawField != null) {
+                if (rawField instanceof String) {
+                    final String field = (String) rawField;
+                    if (field.trim().isEmpty()) continue;
+                }
+                final List<Stream> presenceStreamsList = entry.getValue();
+                if (presenceStreamsList != null) {
+                    result.addAll(presenceStreamsList);
+                }
+            }
+        }
+
+        for (Map.Entry<String,Map<String,List<Stream>>> entry : exactStreamsMap.entrySet()) {
+            final Object value = message.getField(entry.getKey());
+            if (value != null) {
+                final Map<String,List<Stream>> exactValueMap = entry.getValue();
+                if (exactValueMap != null) {
+                    final List<Stream> exactStreamsList = exactValueMap.get(value.toString().trim());
+                    if (exactStreamsList != null) {
+                        result.addAll(exactStreamsList);
+                    }
+                }
+            }
+        }
 
         for (final Rule rule : rulesList) {
             if (blackList.contains(rule.getStream())) {
