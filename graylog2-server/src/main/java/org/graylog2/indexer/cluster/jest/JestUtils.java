@@ -27,6 +27,7 @@ import org.graylog2.indexer.QueryParsingException;
 import org.graylog2.indexer.gson.GsonUtils;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -76,6 +77,10 @@ public class JestUtils {
             if ("query_parsing_exception".equals(type)) {
                 return buildQueryParsingException(errorMessage, rootCause, reasons);
             }
+        }
+
+        if (reasons.isEmpty()) {
+            return new ElasticsearchException(errorMessage.get(), Collections.singletonList(jsonObject.toString()));
         }
 
         return new ElasticsearchException(errorMessage.get(), reasons);

@@ -116,6 +116,32 @@ public class JestUtilsTest {
     }
 
     @Test
+    public void executeFailsWithCustomMessage() throws Exception {
+        final Ping request = new Ping.Builder().build();
+
+        final JestResult resultMock = mock(JestResult.class);
+        when(resultMock.isSucceeded()).thenReturn(false);
+
+        final JsonObject responseStub = new JsonObject();
+        responseStub.addProperty("Message", "Authorization header requires 'Credential' parameter.");
+
+        when(resultMock.getJsonObject()).thenReturn(responseStub);
+
+        when(clientMock.execute(request)).thenReturn(resultMock);
+
+        try {
+            JestUtils.execute(clientMock, request, () -> "BOOM");
+        } catch (ElasticsearchException e) {
+            assertThat(e)
+                .hasMessage("BOOM")
+                .hasNoSuppressedExceptions();
+            assertThat(e.getErrorDetails()).containsExactly("{\"Message\":\"Authorization header requires 'Credential' parameter.\"}");
+        } catch (Exception e) {
+            fail("Expected QueryParsingException to be thrown");
+        }
+    }
+
+    @Test
     public void executeWithQueryParsingException() throws Exception {
         final Ping request = new Ping.Builder().build();
 
