@@ -29,7 +29,7 @@ deploy:
   skip_cleanup: true
   local-dir: target/assembly
   on:
-    repo: anthonyn31195/graylog2-server
+    repo: yellowbyte/graylog2-server
     jdk: oraclejdk8
     branch:
       - master
