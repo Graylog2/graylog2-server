@@ -74,8 +74,12 @@ public class JestUtils {
 
         for (JsonObject rootCause : rootCauses) {
             final String type = asString(rootCause.get("type"));
-            if ("query_parsing_exception".equals(type)) {
-                return buildQueryParsingException(errorMessage, rootCause, reasons);
+            switch(type) {
+                case "query_parsing_exception":
+                    return buildQueryParsingException(errorMessage, rootCause, reasons);
+                case "index_not_found_exception":
+                    final String indexName = asString(rootCause.get("resource.id"));
+                    return new ElasticsearchException("Index not found for query: " + indexName + ". Try recalculating your index ranges.");
             }
         }
 
