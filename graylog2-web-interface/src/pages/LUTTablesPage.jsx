@@ -26,11 +26,29 @@ const LUTTablesPage = React.createClass({
 
   componentDidMount() {
     this._loadData(this.props);
+
+    this.errorStatesTimer = setInterval(() => {
+      let tableNames = null;
+      if (this.state.tables) {
+        tableNames = this.state.tables.map(t => t.name);
+      }
+      if (tableNames) {
+        const adapterNames = Object.values(this.state.dataAdapters).map(a => a.name);
+        LookupTablesActions.getErrors(tableNames, null, adapterNames || null);
+      }
+    }, this.errorStatesInterval);
   },
 
   componentWillReceiveProps(nextProps) {
     this._loadData(nextProps);
   },
+
+  componentWillUnmount() {
+    clearInterval(this.errorStatesTimer);
+  },
+
+  errorStatesTimer: undefined,
+  errorStatesInterval: 1000,
 
   _loadData(props) {
     if (props.params && props.params.tableName) {
@@ -80,13 +98,14 @@ const LUTTablesPage = React.createClass({
       }
     } else if (this._isCreating(this.props)) {
       content = (<LookupTableCreate history={this.props.history} saved={this._saved} />);
-    } else if (!this.state.tables) {
+    } else if (!this.state || !this.state.tables) {
       content = <Spinner text="Loading lookup tables" />;
     } else {
       content = (<LookupTablesOverview tables={this.state.tables}
                                        caches={this.state.caches}
                                        dataAdapters={this.state.dataAdapters}
-                                       pagination={this.state.pagination} />);
+                                       pagination={this.state.pagination}
+                                       errorStates={this.state.errorStates} />);
     }
 
     return (
@@ -96,6 +115,13 @@ const LUTTablesPage = React.createClass({
             <span>Looking things up</span>
             {null}
             <span>
+              {isShowing && (
+                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.edit(this.props.params.tableName)}
+                               onlyActiveOnIndex>
+                  <Button bsStyle="success">Edit</Button>
+                </LinkContainer>
+              )}
+              &nbsp;
               {(isShowing || isEditing) && (
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} onlyActiveOnIndex>
                   <Button bsStyle="info">Lookup Tables</Button>

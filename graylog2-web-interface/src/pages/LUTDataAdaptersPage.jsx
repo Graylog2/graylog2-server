@@ -13,6 +13,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
   'LookupTableDataAdapters');
+const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
 const LUTDataAdaptersPage = React.createClass({
   propTypes: {
@@ -24,15 +25,33 @@ const LUTDataAdaptersPage = React.createClass({
 
   mixins: [
     Reflux.connect(LookupTableDataAdaptersStore),
+    Reflux.connect(LookupTablesStore, 'tableStore'),
   ],
 
   componentDidMount() {
     this._loadData(this.props);
+
+    this.errorStatesTimer = setInterval(() => {
+      let names = null;
+      if (this.state.dataAdapters) {
+        names = this.state.dataAdapters.map(t => t.name);
+      }
+      if (names) {
+        LookupTablesActions.getErrors(null, null, names || null);
+      }
+    }, this.errorStatesInterval);
   },
 
   componentWillReceiveProps(nextProps) {
     this._loadData(nextProps);
   },
+
+  componentWillUnmount() {
+    clearInterval(this.errorStatesTimer);
+  },
+
+  errorStatesTimer: undefined,
+  errorStatesInterval: 1000,
 
   _loadData(props) {
     if (props.params && props.params.adapterName) {
@@ -89,7 +108,7 @@ const LUTDataAdaptersPage = React.createClass({
       content = <Spinner text="Loading data adapters" />;
     } else {
       content = (<DataAdaptersOverview dataAdapters={this.state.dataAdapters}
-                                       pagination={this.state.pagination} />);
+                                       pagination={this.state.pagination} errorStates={this.state.tableStore.errorStates} />);
     }
 
     return (
@@ -99,6 +118,13 @@ const LUTDataAdaptersPage = React.createClass({
             <span>Data adapters provide the actual values for lookup tables</span>
             {null}
             <span>
+              {isShowing && (
+                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(this.props.params.adapterName)}
+                               onlyActiveOnIndex>
+                  <Button bsStyle="success">Edit</Button>
+                </LinkContainer>
+              )}
+              &nbsp;
               {(isShowing || isEditing) && (
                 <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}
                                onlyActiveOnIndex>

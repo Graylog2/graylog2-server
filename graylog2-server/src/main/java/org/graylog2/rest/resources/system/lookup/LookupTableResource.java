@@ -310,9 +310,9 @@ public class LookupTableResource extends RestResource {
 
     @POST
     @NoAuditEvent("Bulk read call")
-    @Path("states")
-    @ApiOperation(value = "Retrieve the runtime error states of the given lookup tables")
-    public ErrorStates adapterErrorStates(@ApiParam(name = "tables") @Valid ErrorStatesRequest request) {
+    @Path("errorstates")
+    @ApiOperation(value = "Retrieve the runtime error states of the given lookup tables, caches and adapters")
+    public ErrorStates errorStates(@ApiParam(name = "request") @Valid ErrorStatesRequest request) {
         final ErrorStates.Builder errorStates = ErrorStates.builder();
         if (request.tables() != null) {
             //noinspection ConstantConditions
@@ -324,9 +324,11 @@ public class LookupTableResource extends RestResource {
                 }
             }
         }
-        lookupTables.getDataAdapters(request.dataAdapters()).forEach(adapter -> {
-            errorStates.dataAdapters().put(adapter.name(), adapter.getError().map(Throwable::getMessage).orElse(null));
-        });
+        if (request.dataAdapters() != null) {
+            lookupTables.getDataAdapters(request.dataAdapters()).forEach(adapter -> {
+                errorStates.dataAdapters().put(adapter.name(), adapter.getError().map(Throwable::getMessage).orElse(null));
+            });
+        }
         return errorStates.build();
     }
 

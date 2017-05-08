@@ -19,6 +19,7 @@ const LookupTablesOverview = React.createClass({
     caches: PropTypes.objectOf(PropTypes.object).isRequired,
     dataAdapters: PropTypes.objectOf(PropTypes.object).isRequired,
     pagination: PropTypes.object.isRequired,
+    errorStates: PropTypes.object.isRequired,
   },
 
   _onPageChange(newPage, newPerPage) {
@@ -39,12 +40,32 @@ const LookupTablesOverview = React.createClass({
     return map[id] || empty;
   },
 
+  _lookupAdapterError(table) {
+    if (this.props.errorStates.dataAdapters && this.props.dataAdapters) {
+      const adapter = this.props.dataAdapters[table.data_adapter_id];
+      if (!adapter) {
+        return null;
+      }
+      return this.props.errorStates.dataAdapters[adapter.name];
+    }
+    return null;
+  },
+
   render() {
     const lookupTables = this.props.tables.map((table) => {
       const cache = this._lookupName(table.cache_id, this.props.caches);
       const dataAdapter = this._lookupName(table.data_adapter_id, this.props.dataAdapters);
+      const errors = {
+        table: this.props.errorStates.tables[table.name],
+        cache: null,
+        dataAdapter: this._lookupAdapterError(table),
+      };
 
-      return (<LUTTableEntry key={table.id} table={table} cache={cache} dataAdapter={dataAdapter} />);
+      return (<LUTTableEntry key={table.id}
+                             table={table}
+                             cache={cache}
+                             dataAdapter={dataAdapter}
+                             errors={errors} />);
     });
 
     return (<div>

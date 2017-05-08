@@ -19,16 +19,23 @@ const LookupTablesStore = Reflux.createStore({
       count: 0,
       query: null,
     };
+    this.errorStates = {
+      tables: {},
+      caches: {},
+      dataAdapters: {},
+    };
   },
 
   getInitialState() {
     return {
       pagination: this.pagination,
+      errorStates: this.errorStates,
     };
   },
 
   reloadPage() {
-    const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page, this.pagination.query);
+    const promise = this.searchPaginated(this.pagination.page, this.pagination.per_page,
+      this.pagination.query);
     LookupTablesActions.reloadPage.promise(promise);
     return promise;
   },
@@ -36,7 +43,8 @@ const LookupTablesStore = Reflux.createStore({
   searchPaginated(page, perPage, query) {
     let url;
     if (query) {
-      url = this._url(`tables?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}&resolve=true`);
+      url = this._url(
+        `tables?page=${page}&per_page=${perPage}&query=${encodeURIComponent(query)}&resolve=true`);
     } else {
       url = this._url(`tables?page=${page}&per_page=${perPage}&resolve=true`);
     }
@@ -73,7 +81,8 @@ const LookupTablesStore = Reflux.createStore({
         cache: response.caches,
         dataAdapter: response.data_adapters,
       });
-    }, this._errorHandler(`Fetching lookup table ${idOrName} failed`, 'Could not retrieve lookup table'));
+    }, this._errorHandler(`Fetching lookup table ${idOrName} failed`,
+      'Could not retrieve lookup table'));
 
     LookupTablesActions.get.promise(promise);
     return promise;
@@ -100,6 +109,34 @@ const LookupTablesStore = Reflux.createStore({
     const promise = fetch('DELETE', url);
 
     LookupTablesActions.delete.promise(promise);
+    return promise;
+  },
+
+  getErrors(tableNames, cacheNames, dataAdapterNames) {
+    const request = {};
+    if (tableNames) {
+      request.tables = tableNames;
+    }
+    if (cacheNames) {
+      request.caches = cacheNames;
+    }
+    if (dataAdapterNames) {
+      request.data_adapters = dataAdapterNames;
+    }
+
+    const promise = fetch('POST', this._url('errorstates'), request);
+
+    promise.then((response) => {
+      this.trigger({
+        errorStates: {
+          tables: response.tables || [],
+          caches: response.caches || [],
+          dataAdapters: response.data_adapters || [],
+        },
+      });
+    }, this._errorHandler('Fetching lookup table error state failed.', 'Could not error states'));
+
+    LookupTablesActions.getErrors.promise(promise);
     return promise;
   },
 
