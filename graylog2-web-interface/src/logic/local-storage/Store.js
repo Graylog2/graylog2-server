@@ -1,3 +1,5 @@
+const localStorage = window.localStorage;
+
 const Store = {
   set(key, value) {
     localStorage.setItem(key, JSON.stringify(value));

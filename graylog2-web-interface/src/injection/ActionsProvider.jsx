@@ -1,7 +1,5 @@
 import CombinedProvider from 'injection/CombinedProvider';
 
-/* global actionsProvider */
-
 class ActionsProvider {
   getActions(actionsName) {
     const result = CombinedProvider.get(actionsName);
@@ -12,8 +10,8 @@ class ActionsProvider {
   }
 }
 
-if (typeof actionsProvider === 'undefined') {
+if (typeof window.actionsProvider === 'undefined') {
   window.actionsProvider = new ActionsProvider();
 }
 
-export default actionsProvider;
+export default window.actionsProvider;
