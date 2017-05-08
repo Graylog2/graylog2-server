@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -246,9 +247,12 @@ public class LookupTableService {
     }
 
     public Collection<LookupDataAdapter> getDataAdapters(Set<String> adapterNames) {
+        if (adapterNames == null) {
+            return Collections.emptySet();
+        }
         return liveAdapters.entrySet().stream()
                 .filter(e -> adapterNames.contains(e.getKey()))
-                .map(e -> e.getValue())
+                .map(Map.Entry::getValue)
                 .collect(Collectors.toSet());
     }
 

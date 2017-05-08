@@ -18,6 +18,7 @@ const DataAdaptersOverview = React.createClass({
   propTypes: {
     dataAdapters: PropTypes.array.isRequired,
     pagination: PropTypes.object.isRequired,
+    errorStates: PropTypes.object.isRequired,
   },
 
   _onPageChange(newPage, newPerPage) {
@@ -37,7 +38,8 @@ const DataAdaptersOverview = React.createClass({
     }
     const dataAdapters = this.props.dataAdapters.map((dataAdapter) => {
       return (<DataAdapterTableEntry key={dataAdapter.id}
-                                     adapter={dataAdapter} />);
+                                     adapter={dataAdapter}
+                                     error={this.props.errorStates.dataAdapters[dataAdapter.name]} />);
     });
 
     return (<div>
