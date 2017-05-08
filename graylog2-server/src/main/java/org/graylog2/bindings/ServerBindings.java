@@ -17,12 +17,9 @@
 package org.graylog2.bindings;
 
 import com.floreysoft.jmte.Engine;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.inject.Scopes;
 import com.google.inject.assistedinject.FactoryModuleBuilder;
 import com.google.inject.multibindings.Multibinder;
-import io.searchbox.client.JestClient;
 import org.apache.shiro.mgt.DefaultSecurityManager;
 import org.glassfish.grizzly.http.server.ErrorPageGenerator;
 import org.graylog2.Configuration;
@@ -34,7 +31,6 @@ import org.graylog2.bindings.providers.BundleImporterProvider;
 import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
-import org.graylog2.bindings.providers.JestClientProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
 import org.graylog2.bindings.providers.RulesEngineProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
@@ -161,8 +157,6 @@ public class ServerBindings extends Graylog2Module {
             install(new NoopJournalModule());
         }
 
-        bind(Gson.class).toInstance(new GsonBuilder().create());
-        bind(JestClient.class).toProvider(JestClientProvider.class).asEagerSingleton();
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
         bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
         bind(LdapConnector.class).in(Scopes.SINGLETON);

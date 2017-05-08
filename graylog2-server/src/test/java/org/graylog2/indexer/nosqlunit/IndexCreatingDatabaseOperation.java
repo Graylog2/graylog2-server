@@ -26,6 +26,7 @@ import org.elasticsearch.client.IndicesAdminClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.IndexMapping2;
 import org.graylog2.indexer.IndexSet;
 
 import java.io.InputStream;
@@ -57,7 +58,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }
 
-            final IndexMapping indexMapping = new IndexMapping();
+            final IndexMapping indexMapping = new IndexMapping2();
 
             final String templateName = "graylog-test-internal";
             final PutIndexTemplateResponse putIndexTemplateResponse = indicesAdminClient.preparePutTemplate(templateName)
