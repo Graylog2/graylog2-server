@@ -120,7 +120,7 @@ const ShowDashboardPage = React.createClass({
     return dashboard.widgets.length === 0;
   },
   _validDimension(dimension) {
-    return dimension !== null && dimension !== undefined && dimension !== 0;
+    return Number.isInteger(dimension) && dimension > 0;
   },
   formatDashboard(dashboard) {
     if (this._dashboardIsEmpty(dashboard)) {
