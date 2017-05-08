@@ -74,6 +74,9 @@ public class JestUtils {
 
         for (JsonObject rootCause : rootCauses) {
             final String type = asString(rootCause.get("type"));
+            if (type == null) {
+                continue;
+            }
             switch(type) {
                 case "query_parsing_exception":
                     return buildQueryParsingException(errorMessage, rootCause, reasons);
