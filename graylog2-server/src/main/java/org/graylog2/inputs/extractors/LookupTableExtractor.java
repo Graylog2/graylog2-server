@@ -74,7 +74,7 @@ public class LookupTableExtractor extends Extractor {
             return null;
         }
 
-        final Object value = result.getSingleValue();
+        final Object value = result.singleValue();
         if (value == null) {
             return null;
         }

@@ -17,20 +17,35 @@
 package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 
-public class LookupResult {
-    private static final LookupResult EMPTY_LOOKUP_RESULT = new LookupResult(null, null);
+@AutoValue
+public abstract class LookupResult {
+    private static final LookupResult EMPTY_LOOKUP_RESULT = builder()
+            .cacheTTL(Long.MAX_VALUE)
+            .build();
 
     public static final String SINGLE_VALUE_KEY = "value";
 
-    private final Object singleValue;
-    private final Map<Object, Object> multiValue;
-    private final long cacheTTL;
-    private final boolean isEmpty;
+    @JsonProperty("single_value")
+    @Nullable
+    public abstract Object singleValue();
+
+    @JsonProperty("multi_value")
+    @Nullable
+    public abstract Map<Object, Object> multiValue();
+
+    @JsonProperty("ttl")
+    public abstract long cacheTTL();
+
+    @JsonProperty("empty")
+    public boolean isEmpty() {
+        return singleValue() == null && multiValue() == null;
+    }
 
     public static LookupResult empty() {
         return EMPTY_LOOKUP_RESULT;
@@ -48,46 +63,47 @@ public class LookupResult {
     }
 
     public static LookupResult multi(final CharSequence singleValue, final Map<Object, Object> multiValue) {
-        return new LookupResult(singleValue, multiValue);
+        return withoutTTL().single(singleValue).multiValue(multiValue).build();
     }
     public static LookupResult multi(final Number singleValue, final Map<Object, Object> multiValue) {
-        return new LookupResult(singleValue, multiValue);
+        return withoutTTL().single(singleValue).multiValue(multiValue).build();
     }
 
     public static LookupResult multi(final Boolean singleValue, final Map<Object, Object> multiValue) {
-        return new LookupResult(singleValue, multiValue);
+        return withoutTTL().single(singleValue).multiValue(multiValue).build();
     }
 
-    private LookupResult(@Nullable final Object singleValue, @Nullable final Map<Object, Object> multiValue) {
-        this(singleValue, multiValue, Long.MAX_VALUE);
+    private static Builder withoutTTL() {
+        return builder().cacheTTL(Long.MAX_VALUE);
     }
 
-    private LookupResult(@Nullable final Object singleValue, @Nullable final Map<Object, Object> multiValue, final long cacheTTL) {
-        this.singleValue = singleValue;
-        this.multiValue = multiValue;
-        this.isEmpty = singleValue == null && multiValue == null;
-        this.cacheTTL = cacheTTL;
+    public static Builder builder() {
+        return new AutoValue_LookupResult.Builder();
     }
 
-    @JsonProperty("empty")
-    public boolean isEmpty() {
-        return isEmpty;
-    }
+    @AutoValue.Builder
+    public static abstract class Builder {
+        // We don't want users of this class to set a generic Object single value
+        abstract Builder singleValue(Object singleValue);
+        public abstract Builder multiValue(Map<Object, Object> multiValue);
+        public abstract Builder cacheTTL(long cacheTTL);
 
-    @JsonProperty("ttl")
-    public long cacheTTL() {
-        return cacheTTL;
-    }
+        public Builder single(CharSequence singleValue) {
+            return singleValue(singleValue);
+        }
 
-    @JsonProperty("multi_value")
-    @Nullable
-    public Map<Object, Object> getMultiValue() {
-        return multiValue;
-    }
+        public Builder single(Number singleValue) {
+            return singleValue(singleValue);
+        }
 
-    @JsonProperty("single_value")
-    @Nullable
-    public Object getSingleValue() {
-        return singleValue;
+        public Builder single(Boolean singleValue) {
+            return singleValue(singleValue);
+        }
+
+        public Builder multiSingleton(Object value) {
+            return multiValue(Collections.singletonMap(SINGLE_VALUE_KEY, value));
+        }
+
+        public abstract LookupResult build();
     }
 }
