@@ -11,7 +11,6 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get(
   'LookupTableCaches');
-const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 
 const LUTCachesPage = React.createClass({
   propTypes: {
@@ -23,33 +22,15 @@ const LUTCachesPage = React.createClass({
 
   mixins: [
     Reflux.connect(LookupTableCachesStore),
-    Reflux.connect(LookupTablesStore, 'tableStore'),
   ],
 
   componentDidMount() {
     this._loadData(this.props);
-
-    this.errorStatesTimer = setInterval(() => {
-      let names = null;
-      if (this.state.caches) {
-        names = this.state.caches.map(t => t.name);
-      }
-      if (names) {
-        LookupTablesActions.getErrors(null, names || null, null);
-      }
-    }, this.errorStatesInterval);
   },
 
   componentWillReceiveProps(nextProps) {
     this._loadData(nextProps);
   },
-
-  componentWillUnmount() {
-    clearInterval(this.errorStatesTimer);
-  },
-
-  errorStatesTimer: undefined,
-  errorStatesInterval: 1000,
 
   _loadData(props) {
     if (props.params && props.params.cacheName) {
