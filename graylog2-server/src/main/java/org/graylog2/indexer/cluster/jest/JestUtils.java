@@ -23,6 +23,7 @@ import io.searchbox.client.JestResult;
 import io.searchbox.client.http.JestHttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.QueryParsingException;
 import org.graylog2.indexer.gson.GsonUtils;
 
@@ -82,7 +83,7 @@ public class JestUtils {
                     return buildQueryParsingException(errorMessage, rootCause, reasons);
                 case "index_not_found_exception":
                     final String indexName = asString(rootCause.get("resource.id"));
-                    return new ElasticsearchException("Index not found for query: " + indexName + ". Try recalculating your index ranges.");
+                    return new IndexNotFoundException("Index not found for query: " + indexName + ". Try recalculating your index ranges.");
             }
         }
 
