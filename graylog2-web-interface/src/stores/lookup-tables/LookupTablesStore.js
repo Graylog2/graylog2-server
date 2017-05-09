@@ -19,17 +19,16 @@ const LookupTablesStore = Reflux.createStore({
       count: 0,
       query: null,
     };
-    this.errorStates = {
-      tables: {},
-      caches: {},
-      dataAdapters: {},
-    };
   },
 
   getInitialState() {
     return {
       pagination: this.pagination,
-      errorStates: this.errorStates,
+      errorStates: {
+        tables: {},
+        caches: {},
+        dataAdapters: {},
+      },
     };
   },
 
@@ -129,9 +128,9 @@ const LookupTablesStore = Reflux.createStore({
     promise.then((response) => {
       this.trigger({
         errorStates: {
-          tables: response.tables || [],
-          caches: response.caches || [],
-          dataAdapters: response.data_adapters || [],
+          tables: response.tables || {},
+          caches: response.caches || {},
+          dataAdapters: response.data_adapters || {},
         },
       });
     }, this._errorHandler('Fetching lookup table error state failed.', 'Could not error states'));
