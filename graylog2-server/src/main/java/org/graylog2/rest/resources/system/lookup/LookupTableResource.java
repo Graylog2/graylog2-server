@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.system.lookup;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -40,6 +41,7 @@ import org.graylog2.lookup.events.LookupTablesDeleted;
 import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
+import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.rest.models.PaginatedList;
 import org.graylog2.rest.models.system.lookup.CacheApi;
 import org.graylog2.rest.models.system.lookup.DataAdapterApi;
@@ -118,10 +120,10 @@ public class LookupTableResource extends RestResource {
     }
 
     @GET
-    @Path("data/{name}")
+    @Path("tables/{name}/query")
     @ApiOperation(value = "Query a lookup table")
-    public Object performLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
-                                @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
+    public LookupResult performLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
+                                      @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
         return lookupTables.newBuilder().lookupTable(name).build().lookup(key);
     }
 
@@ -341,6 +343,40 @@ public class LookupTableResource extends RestResource {
             return DataAdapterApi.fromDto(dataAdapterDto.get());
         }
         throw new NotFoundException();
+    }
+
+    @GET
+    @Path("adapters/{name}/query")
+    @ApiOperation(value = "Query a lookup table")
+    public LookupResult performAdapterLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
+                                             @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
+        final Collection<LookupDataAdapter> dataAdapters = lookupTables.getDataAdapters(singleton(name));
+        if (!dataAdapters.isEmpty()) {
+            return Iterables.getOnlyElement(dataAdapters).get(key);
+        } else {
+            // not a currently running adapter, we'll have to manually start it to query it
+            final Optional<DataAdapterDto> dtoOptional = adapterService.get(name);
+            if (!dtoOptional.isPresent()) {
+                throw new NotFoundException();
+            }
+            final DataAdapterDto adapterDto = dtoOptional.get();
+            final LookupDataAdapter.Factory factory = dataAdapterTypes.get(adapterDto.config().type());
+            if (factory == null) {
+                LOG.error("Unable to find data adapter factory for type {}, is a plugin missing?", adapterDto.config().type());
+                throw new NotFoundException();
+            }
+            final LookupDataAdapter lookupDataAdapter = factory.create(adapterDto.id(), adapterDto.name(), adapterDto.config());
+            final LookupResult lookupResult;
+            try {
+                lookupDataAdapter.startAsync().awaitRunning();
+                lookupResult = lookupDataAdapter.get(key);
+                lookupDataAdapter.stopAsync();
+            } catch (Exception e) {
+                LOG.error("Unable to start data adapter {}", name, e);
+                return LookupResult.empty();
+            }
+            return lookupResult;
+        }
     }
 
     @POST

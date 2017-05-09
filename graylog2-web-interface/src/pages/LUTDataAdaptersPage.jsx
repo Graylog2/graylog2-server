@@ -96,7 +96,7 @@ const LUTDataAdaptersPage = React.createClass({
           </Row>
         );
       } else {
-        content = <DataAdapter dataAdapter={this.state.dataAdapter} />;
+        content = <DataAdapter dataAdapter={this.state.dataAdapter} lookupResult={this.state.lookupResult} />;
       }
     } else if (this._isCreating(this.props)) {
       if (!this.state.types) {

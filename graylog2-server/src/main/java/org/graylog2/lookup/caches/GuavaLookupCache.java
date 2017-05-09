@@ -94,6 +94,15 @@ public class GuavaLookupCache extends LookupCache {
     }
 
     @Override
+    public LookupResult getIfPresent(Object key) {
+        final LookupResult cacheEntry = cache.getIfPresent(key);
+        if (cacheEntry == null) {
+            return LookupResult.empty();
+        }
+        return cacheEntry;
+    }
+
+    @Override
     public void set(Object key, Object retrievedValue) {
         final LookupDataAdapter dataAdapter = getLookupTable().dataAdapter();
         dataAdapter.set(key, retrievedValue);
