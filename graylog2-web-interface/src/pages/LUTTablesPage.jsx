@@ -112,7 +112,7 @@ const LUTTablesPage = React.createClass({
       <DocumentTitle title="Lookup Tables">
         <span>
           <PageHeader title="Lookup Tables">
-            <span>Looking things up</span>
+            <span>Lookup tables can be used in extractors, converters and processing pipelines to translate message fields or to enrich messages.</span>
             {null}
             <span>
               {isShowing && (
