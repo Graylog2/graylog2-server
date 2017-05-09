@@ -76,6 +76,7 @@ public class BundleImporter {
     private final InputService inputService;
     private final InputRegistry inputRegistry;
     private final ExtractorFactory extractorFactory;
+    private final ConverterFactory converterFactory;
     private final StreamService streamService;
     private final StreamRuleService streamRuleService;
     private final IndexSetRegistry indexSetRegistry;
@@ -101,6 +102,7 @@ public class BundleImporter {
     public BundleImporter(final InputService inputService,
                           final InputRegistry inputRegistry,
                           final ExtractorFactory extractorFactory,
+                          final ConverterFactory converterFactory,
                           final StreamService streamService,
                           final StreamRuleService streamRuleService,
                           final IndexSetRegistry indexSetRegistry,
@@ -116,6 +118,7 @@ public class BundleImporter {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
+        this.converterFactory = converterFactory;
         this.streamService = streamService;
         this.streamRuleService = streamRuleService;
         this.indexSetRegistry = indexSetRegistry;
@@ -357,7 +360,7 @@ public class BundleImporter {
 
         for (final Converter converter : requestedConverters) {
             try {
-                converters.add(ConverterFactory.factory(converter.getType(), converter.getConfiguration()));
+                converters.add(converterFactory.create(converter.getType(), converter.getConfiguration()));
             } catch (ConverterFactory.NoSuchConverterException e) {
                 LOG.warn("No such converter [" + converter.getType() + "]. Skipping.", e);
             } catch (org.graylog2.ConfigurationException e) {

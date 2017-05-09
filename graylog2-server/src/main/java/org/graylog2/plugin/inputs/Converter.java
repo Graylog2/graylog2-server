@@ -36,7 +36,8 @@ public abstract class Converter {
         CSV,
         LOWERCASE,
         UPPERCASE,
-        FLEXDATE
+        FLEXDATE,
+        LOOKUP_TABLE
     }
 
     private final Type type;

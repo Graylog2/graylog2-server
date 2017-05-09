@@ -60,16 +60,19 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     private static final Logger LOG = LoggerFactory.getLogger(InputServiceImpl.class);
 
     private final ExtractorFactory extractorFactory;
+    private final ConverterFactory converterFactory;
     private final MessageInputFactory messageInputFactory;
     private final EventBus clusterEventBus;
 
     @Inject
     public InputServiceImpl(MongoConnection mongoConnection,
                             ExtractorFactory extractorFactory,
+                            ConverterFactory converterFactory,
                             MessageInputFactory messageInputFactory,
                             ClusterEventBus clusterEventBus) {
         super(mongoConnection);
         this.extractorFactory = extractorFactory;
+        this.converterFactory = converterFactory;
         this.messageInputFactory = messageInputFactory;
         this.clusterEventBus = clusterEventBus;
     }
@@ -295,7 +298,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
             final DBObject c = (BasicDBObject) element;
 
             try {
-                listBuilder.add(ConverterFactory.factory(
+                listBuilder.add(converterFactory.create(
                         Converter.Type.valueOf(((String) c.get(Extractor.FIELD_CONVERTER_TYPE)).toUpperCase(Locale.ENGLISH)),
                         (Map<String, Object>) c.get(Extractor.FIELD_CONVERTER_CONFIG)
                 ));

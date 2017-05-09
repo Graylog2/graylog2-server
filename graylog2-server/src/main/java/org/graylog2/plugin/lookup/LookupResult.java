@@ -18,17 +18,17 @@ package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 
-import javax.annotation.Nullable;
-
-import static com.google.common.base.Preconditions.checkNotNull;
-
 public class LookupResult {
-    private static final LookupResult EMPTY_LOOKUP_RESULT = new LookupResult(Collections.emptyMap());
+    private static final LookupResult EMPTY_LOOKUP_RESULT = new LookupResult(null, null);
 
-    private final Map<Object, Object> values;
+    public static final String SINGLE_VALUE_KEY = "value";
+
+    private final Object singleValue;
+    private final Map<Object, Object> multiValue;
     private final long cacheTTL;
     private final boolean isEmpty;
 
@@ -36,21 +36,40 @@ public class LookupResult {
         return EMPTY_LOOKUP_RESULT;
     }
 
-    public static LookupResult single(final Object key, final Object value) {
-        return new LookupResult(Collections.singletonMap(key, value));
+    public static LookupResult single(final CharSequence singleValue) {
+        return multi(singleValue, Collections.singletonMap(SINGLE_VALUE_KEY, singleValue));
+    }
+    public static LookupResult single(final Number singleValue) {
+        return multi(singleValue, Collections.singletonMap(SINGLE_VALUE_KEY, singleValue));
     }
 
-    public LookupResult(final Map<Object, Object> values) {
-        this(values, Long.MAX_VALUE);
+    public static LookupResult single(final Boolean singleValue) {
+        return multi(singleValue, Collections.singletonMap(SINGLE_VALUE_KEY, singleValue));
     }
 
-    public LookupResult(final Map<Object, Object> values, final long cacheTTL) {
-        this.values = checkNotNull(values);
-        this.isEmpty = values.size() == 0;
+    public static LookupResult multi(final CharSequence singleValue, final Map<Object, Object> multiValue) {
+        return new LookupResult(singleValue, multiValue);
+    }
+    public static LookupResult multi(final Number singleValue, final Map<Object, Object> multiValue) {
+        return new LookupResult(singleValue, multiValue);
+    }
+
+    public static LookupResult multi(final Boolean singleValue, final Map<Object, Object> multiValue) {
+        return new LookupResult(singleValue, multiValue);
+    }
+
+    private LookupResult(@Nullable final Object singleValue, @Nullable final Map<Object, Object> multiValue) {
+        this(singleValue, multiValue, Long.MAX_VALUE);
+    }
+
+    private LookupResult(@Nullable final Object singleValue, @Nullable final Map<Object, Object> multiValue, final long cacheTTL) {
+        this.singleValue = singleValue;
+        this.multiValue = multiValue;
+        this.isEmpty = singleValue == null && multiValue == null;
         this.cacheTTL = cacheTTL;
     }
 
-    @JsonProperty
+    @JsonProperty("empty")
     public boolean isEmpty() {
         return isEmpty;
     }
@@ -60,13 +79,15 @@ public class LookupResult {
         return cacheTTL;
     }
 
+    @JsonProperty("multi_value")
     @Nullable
-    public Object get(final Object key) {
-        return values.get(key);
+    public Map<Object, Object> getMultiValue() {
+        return multiValue;
     }
 
-    @JsonProperty("values")
-    public Map<Object, Object> asMap() {
-        return values;
+    @JsonProperty("single_value")
+    @Nullable
+    public Object getSingleValue() {
+        return singleValue;
     }
 }

@@ -178,7 +178,7 @@ const AddToDashboardMenu = React.createClass({
                         id="no-dashboards-available-dropdown">
           {option}
         </DropdownButton>
-        <EditDashboardModal ref="createDashboardModal" onSaved={id => this._selectDashboard(undefined, id)} />
+        <EditDashboardModal ref="createDashboardModal" onSaved={this._selectDashboard} />
       </div>
     );
   },

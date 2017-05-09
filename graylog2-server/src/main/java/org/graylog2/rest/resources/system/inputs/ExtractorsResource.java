@@ -82,6 +82,7 @@ public class ExtractorsResource extends RestResource {
     private final ActivityWriter activityWriter;
     private final MetricRegistry metricRegistry;
     private final ExtractorFactory extractorFactory;
+    private final ConverterFactory converterFactory;
     private final PersistedInputs persistedInputs;
 
     @Inject
@@ -89,11 +90,13 @@ public class ExtractorsResource extends RestResource {
                               final ActivityWriter activityWriter,
                               final MetricRegistry metricRegistry,
                               final ExtractorFactory extractorFactory,
+                              final ConverterFactory converterFactory,
                               final PersistedInputs persistedInputs) {
         this.inputService = inputService;
         this.activityWriter = activityWriter;
         this.metricRegistry = metricRegistry;
         this.extractorFactory = extractorFactory;
+        this.converterFactory = converterFactory;
         this.persistedInputs = persistedInputs;
     }
 
@@ -329,7 +332,7 @@ public class ExtractorsResource extends RestResource {
 
         for (Map.Entry<String, Map<String, Object>> c : requestConverters.entrySet()) {
             try {
-                converters.add(ConverterFactory.factory(Converter.Type.valueOf(c.getKey().toUpperCase(Locale.ENGLISH)), c.getValue()));
+                converters.add(converterFactory.create(Converter.Type.valueOf(c.getKey().toUpperCase(Locale.ENGLISH)), c.getValue()));
             } catch (ConverterFactory.NoSuchConverterException e) {
                 LOG.warn("No such converter [" + c.getKey() + "]. Skipping.", e);
             } catch (ConfigurationException e) {

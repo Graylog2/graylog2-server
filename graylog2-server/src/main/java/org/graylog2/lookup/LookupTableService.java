@@ -195,11 +195,14 @@ public class LookupTableService {
         return lookupTable;
     }
 
+    public boolean hasTable(String name) {
+       return lookupTables.get(name) != null;
+    }
+
     public static class Builder {
         private final LookupTableService lookupTableService;
 
         private String lookupTableName;
-        private Object defaultValue = null;
 
         public Builder(LookupTableService lookupTableService) {
             this.lookupTableService = lookupTableService;
@@ -210,25 +213,18 @@ public class LookupTableService {
             return this;
         }
 
-        public Builder defaultValue(Object value) {
-            this.defaultValue = value;
-            return this;
-        }
-
         public Function build() {
-            return new Function(lookupTableService, lookupTableName, defaultValue);
+            return new Function(lookupTableService, lookupTableName);
         }
     }
 
     public static class Function {
         private final LookupTableService lookupTableService;
         private final String lookupTableName;
-        private final Object defaultValue;
 
-        public Function(LookupTableService lookupTableService, String lookupTableName, @Nullable Object defaultValue) {
+        public Function(LookupTableService lookupTableService, String lookupTableName) {
             this.lookupTableService = lookupTableService;
             this.lookupTableName = lookupTableName;
-            this.defaultValue = defaultValue;
         }
 
         @Nullable
@@ -238,16 +234,13 @@ public class LookupTableService {
             // Otherwise we might hold on to an old lookup table instance when this function object is cached somewhere.
             final LookupTable lookupTable = lookupTableService.getTable(lookupTableName);
             if (lookupTable == null) {
-                return LookupResult.single(key, defaultValue);
+                return LookupResult.empty();
             }
 
             final LookupResult result = lookupTable.lookup(key);
 
             if (result == null || result.isEmpty()) {
-                if (defaultValue == null) {
-                    return LookupResult.empty();
-                }
-                return LookupResult.single(key, defaultValue);
+                return LookupResult.empty();
             }
 
             return result;

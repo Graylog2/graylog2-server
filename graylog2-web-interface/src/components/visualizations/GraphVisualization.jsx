@@ -14,6 +14,10 @@ import NumberUtils from 'util/NumberUtils';
 
 import graphHelper from 'legacy/graphHelper';
 
+import $ from 'jquery';
+global.jQuery = $;
+require('bootstrap/js/tooltip');
+
 const GraphFactory = {
   create(config, domNode, tooltipTitleFormatter) {
     let graph;
