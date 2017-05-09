@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import org.elasticsearch.action.index.IndexResponse;
 import org.graylog2.AbstractESTest;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -186,9 +188,18 @@ public class CountsTest extends AbstractESTest {
     public void totalThrowsElasticsearchExceptionIfIndexDoesNotExist() throws Exception {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
-        expectedException.expect(ElasticsearchException.class);
-        expectedException.expectMessage("Fetching message count failed for indices [does_not_exist]");
 
-        assertThat(counts.total(indexSet)).isEqualTo(-1L);
+        try {
+            assertThat(counts.total(indexSet)).isEqualTo(-1L);
+        } catch (IndexNotFoundException e) {
+            final String expectedErrorDetail = "Index not found for query: does_not_exist. Try recalculating your index ranges.";
+            assertThat(e)
+                .hasMessageStartingWith("Fetching message count failed for indices [does_not_exist]")
+                .hasMessageEndingWith(expectedErrorDetail)
+                .hasNoSuppressedExceptions();
+            assertThat(e.getErrorDetails()).containsExactly(expectedErrorDetail);
+        } catch (Exception e) {
+            fail("Expected IndexNotFoundException to be thrown");
+        }
     }
 }

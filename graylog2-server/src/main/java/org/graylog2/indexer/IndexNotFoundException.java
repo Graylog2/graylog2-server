@@ -16,8 +16,14 @@
  */
 package org.graylog2.indexer;
 
+import java.util.List;
+
 public class IndexNotFoundException extends ElasticsearchException {
     public IndexNotFoundException(String message) {
         super(message);
+    }
+
+    public IndexNotFoundException(String message, List<String> errorDetails) {
+        super(message, errorDetails);
     }
 }

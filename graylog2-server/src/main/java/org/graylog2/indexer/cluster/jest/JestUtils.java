@@ -23,6 +23,7 @@ import io.searchbox.client.JestResult;
 import io.searchbox.client.http.JestHttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.QueryParsingException;
 import org.graylog2.indexer.gson.GsonUtils;
 
@@ -74,8 +75,15 @@ public class JestUtils {
 
         for (JsonObject rootCause : rootCauses) {
             final String type = asString(rootCause.get("type"));
-            if ("query_parsing_exception".equals(type)) {
-                return buildQueryParsingException(errorMessage, rootCause, reasons);
+            if (type == null) {
+                continue;
+            }
+            switch(type) {
+                case "query_parsing_exception":
+                    return buildQueryParsingException(errorMessage, rootCause, reasons);
+                case "index_not_found_exception":
+                    final String indexName = asString(rootCause.get("resource.id"));
+                    return buildIndexNotFoundException(errorMessage, indexName);
             }
         }
 
@@ -111,5 +119,9 @@ public class JestUtils {
         final String index = asString(rootCause.get("index"));
 
         return new QueryParsingException(errorMessage.get(), line, column, index, reasons);
+    }
+
+    private static IndexNotFoundException buildIndexNotFoundException(Supplier<String> errorMessage, String index) {
+        return new IndexNotFoundException(errorMessage.get(), Collections.singletonList("Index not found for query: " + index + ". Try recalculating your index ranges."));
     }
 }
