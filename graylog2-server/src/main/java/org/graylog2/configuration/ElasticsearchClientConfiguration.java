@@ -51,34 +51,11 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_version")
     private int elasticsearchVersion = 5;
 
-    public List<URI> getHosts() {
-        return elasticsearchHosts;
-    }
-
-    public Duration getConnectTimeout() {
-        return elasticsearchConnectTimeout;
-    }
-
-    public Duration getSocketTimeout() {
-        return elasticsearchSocketTimeout;
-    }
-
-    public Duration getIdleTimeout() {
-        return elasticsearchIdleTimeout;
-    }
-
-    public int getMaxTotalConnections() {
-        return elasticsearchMaxTotalConnections;
-    }
-
-    public int getMaxTotalConnectionsPerRoute() {
-        return elasticsearchMaxTotalConnectionsPerRoute;
-    }
-
     public int getVersion() {
         return elasticsearchVersion;
     }
 
+    @SuppressWarnings("unused")
     @ValidatorMethod
     public void validateElasticsearchVersion() throws ValidationException {
         switch (elasticsearchVersion) {
