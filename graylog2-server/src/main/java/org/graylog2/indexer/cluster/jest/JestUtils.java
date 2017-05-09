@@ -83,7 +83,7 @@ public class JestUtils {
                     return buildQueryParsingException(errorMessage, rootCause, reasons);
                 case "index_not_found_exception":
                     final String indexName = asString(rootCause.get("resource.id"));
-                    return new IndexNotFoundException("Index not found for query: " + indexName + ". Try recalculating your index ranges.");
+                    return buildIndexNotFoundException(errorMessage, indexName);
             }
         }
 
@@ -119,5 +119,9 @@ public class JestUtils {
         final String index = asString(rootCause.get("index"));
 
         return new QueryParsingException(errorMessage.get(), line, column, index, reasons);
+    }
+
+    private static IndexNotFoundException buildIndexNotFoundException(Supplier<String> errorMessage, String index) {
+        return new IndexNotFoundException(errorMessage.get(), Collections.singletonList("Index not found for query: " + index + ". Try recalculating your index ranges."));
     }
 }
