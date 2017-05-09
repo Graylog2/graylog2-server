@@ -1,10 +1,12 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
 import Routes from 'routing/Routes';
+
+import { ErrorPopover } from 'components/lookup-tables';
 
 const { LookupTablesActions } = CombinedProvider.get('LookupTables');
 
@@ -33,50 +35,22 @@ const LUTTableEntry = React.createClass({
       LookupTablesActions.delete(this.props.table.id).then(() => LookupTablesActions.reloadPage());
     }
   },
+
   render() {
-    let tableErrorOverlay = null;
-    if (this.props.errors.table) {
-      tableErrorOverlay = (<Popover id="popover-table-error" title="Lookup Table problem" style={{ maxWidth: 400 }}>
-        {this.props.errors.table}
-      </Popover>);
-    }
-
-    let dataAdapterErrorOverlay = null;
-    if (this.props.errors.dataAdapter) {
-      dataAdapterErrorOverlay = (<Popover id="popover-adapter-error" title="Data adapter problem" style={{ maxWidth: 400 }}>
-        {this.props.errors.dataAdapter}
-      </Popover>);
-    }
-    let cacheErrorOverlay = null;
-    if (this.props.errors.cache) {
-      cacheErrorOverlay = (<Popover id="popover-adapter-error" title="Cache problem" style={{ maxWidth: 400 }}>
-        {this.props.errors.cache}
-      </Popover>);
-    }
-
     return (<tbody>
       <tr>
         <td>
-          {this.props.errors.table && (
-            <OverlayTrigger trigger={['hover', 'focus']} placement="right" overlay={tableErrorOverlay}>
-              <i className="fa fa-warning text-danger" style={{ marginRight: 5 }} />
-            </OverlayTrigger>)}
+          {this.props.errors.table && (<ErrorPopover placement="right" errorText={this.props.errors.table} title="Lookup Table problem" />) }
           <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.show(this.props.table.name)}><a>{this.props.table.title}</a></LinkContainer>
         </td>
         <td>{this.props.table.description}</td>
         <td>{this.props.table.name}</td>
         <td>
-          {this.props.errors.cache && (
-            <OverlayTrigger trigger={['hover', 'focus']} placement="bottom" overlay={cacheErrorOverlay}>
-              <i className="fa fa-warning text-danger" style={{ marginRight: 5 }} />
-            </OverlayTrigger>)}
+          {this.props.errors.cache && (<ErrorPopover placement="bottom" errorText={this.props.errors.cache} title="Cache problem" />) }
           <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(this.props.cache.name)}><a>{this.props.cache.title}</a></LinkContainer>
         </td>
         <td>
-          {this.props.errors.dataAdapter && (
-            <OverlayTrigger trigger={['hover', 'focus']} placement="bottom" overlay={dataAdapterErrorOverlay}>
-              <i className="fa fa-warning text-danger" style={{ marginRight: 5 }} />
-            </OverlayTrigger>)}
+          {this.props.errors.dataAdapter && (<ErrorPopover placement="bottom" errorText={this.props.errors.dataAdapter} title="Data adapter problem" />) }
           <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(this.props.dataAdapter.name)}><a>{this.props.dataAdapter.title}</a></LinkContainer>
         </td>
         <td>
