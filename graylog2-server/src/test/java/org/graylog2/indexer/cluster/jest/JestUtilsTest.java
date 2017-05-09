@@ -96,7 +96,8 @@ public class JestUtilsTest {
             fail("Expected ElasticsearchException to be thrown");
         } catch (ElasticsearchException e) {
             assertThat(e)
-                    .hasMessage("BOOM")
+                    .hasMessageStartingWith("BOOM")
+                    .hasMessageEndingWith("foobar")
                     .hasNoSuppressedExceptions();
             assertThat(e.getErrorDetails()).containsExactly("foobar");
         } catch (Exception e) {
@@ -133,7 +134,8 @@ public class JestUtilsTest {
             JestUtils.execute(clientMock, request, () -> "BOOM");
         } catch (ElasticsearchException e) {
             assertThat(e)
-                .hasMessage("BOOM")
+                .hasMessageStartingWith("BOOM")
+                .hasMessageEndingWith("{\"Message\":\"Authorization header requires 'Credential' parameter.\"}")
                 .hasNoSuppressedExceptions();
             assertThat(e.getErrorDetails()).containsExactly("{\"Message\":\"Authorization header requires 'Credential' parameter.\"}");
         } catch (Exception e) {
@@ -169,7 +171,8 @@ public class JestUtilsTest {
             fail("Expected QueryParsingException to be thrown");
         } catch (QueryParsingException e) {
             assertThat(e)
-                    .hasMessage("BOOM")
+                    .hasMessageStartingWith("BOOM")
+                    .hasMessageEndingWith("foobar")
                     .hasNoSuppressedExceptions();
             assertThat(e.getErrorDetails()).containsExactly("foobar");
             assertThat(e.getLine()).contains(23);
