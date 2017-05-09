@@ -43,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -187,9 +188,16 @@ public class CountsTest extends AbstractESTest {
     public void totalThrowsElasticsearchExceptionIfIndexDoesNotExist() throws Exception {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
-        expectedException.expect(IndexNotFoundException.class);
-        expectedException.expectMessage("Index not found for query: does_not_exist. Try recalculating your index ranges.");
 
-        assertThat(counts.total(indexSet)).isEqualTo(-1L);
+        try {
+            assertThat(counts.total(indexSet)).isEqualTo(-1L);
+        } catch (IndexNotFoundException e) {
+            assertThat(e)
+                .hasMessage("Fetching message count failed for indices [does_not_exist]")
+                .hasNoSuppressedExceptions();
+            assertThat(e.getErrorDetails()).containsExactly("Index not found for query: does_not_exist. Try recalculating your index ranges.");
+        } catch (Exception e) {
+            fail("Expected IndexNotFoundException to be thrown");
+        }
     }
 }
