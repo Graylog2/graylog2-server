@@ -26,11 +26,11 @@ import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsReques
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
+import org.graylog2.AbstractESTest;
 import org.graylog2.audit.NullAuditEventSender;
-import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.IndexMapping2;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.system.NodeId;
-import org.graylog2.AbstractESTest;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -55,7 +55,7 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
         super.setUp();
         indices = new Indices(jestClient(),
                 new Gson(),
-                new IndexMapping(),
+                new IndexMapping2(),
                 new Messages(new MetricRegistry(), jestClient()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),

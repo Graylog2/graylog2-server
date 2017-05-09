@@ -47,6 +47,7 @@ import org.elasticsearch.common.compress.CompressedXContent;
 import org.graylog2.AbstractESTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.IndexMapping2;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
@@ -118,7 +119,7 @@ public class IndicesTest extends AbstractESTest {
         eventBus = new EventBus("indices-test");
         indices = new Indices(jestClient(),
                 new Gson(),
-                new IndexMapping(),
+                new IndexMapping2(),
                 new Messages(new MetricRegistry(), jestClient()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
@@ -311,7 +312,7 @@ public class IndicesTest extends AbstractESTest {
         assertThat(templateMetaData.getMappings().keysIt()).containsExactly(IndexMapping.TYPE_MESSAGE);
 
         final Map<String, Object> mapping = mapper.readValue(templateMetaData.getMappings().get(IndexMapping.TYPE_MESSAGE).uncompressed(), new TypeReference<Map<String, Object>>() {});
-        final Map<String, Object> expectedTemplate = new IndexMapping().messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer());
+        final Map<String, Object> expectedTemplate = new IndexMapping2().messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer());
         assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
 
         final DeleteIndexTemplateRequest deleteRequest = client.prepareDeleteTemplate(templateName).request();

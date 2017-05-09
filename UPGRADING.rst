@@ -50,8 +50,10 @@ The following configuration options are now being used to configure connectivity
 +----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
 | ``elasticsearch_socket_timeout``                   | Duration  | Timeout when sending/receiving from Elasticsearch connection | ``60s`` (60 Seconds)        |
 +----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| ``elasticsearch_version``                          | (2 or 5)  | Major version of Elasticsearch being used in the cluster     | ``5``                       |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
 
-In most cases, the only configuration setting that needs to be set explicitly is ``elasticsearch_hosts``. All other configuration settings should be tweaked only in case of errors.
+In most cases, the only configuration setting that needs to be set explicitly is ``elasticsearch_hosts``, unless you use Elasticsearch 2.x (or earlier). In the latter case you would need to set ``elasticsearch_version`` to ``2``. All other configuration settings should be tweaked only in case of errors.
 
 .. caution:: Graylog does not react to externally triggered index changes (creating/closing/reopening/deleting an index) anymore. All of these actions need to be performed through the Graylog REST API in order to retain index consistency.
 
