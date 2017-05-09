@@ -8,6 +8,7 @@ const LookupTablesActions = Reflux.createActions({
   delete: { asyncResult: true },
   update: { asyncResult: true },
   getErrors: { asyncResult: true },
+  lookup: { asyncResult: true },
 });
 
 export default LookupTablesActions;

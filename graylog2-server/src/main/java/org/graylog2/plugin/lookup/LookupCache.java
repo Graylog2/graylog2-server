@@ -55,6 +55,8 @@ public abstract class LookupCache {
 
     public abstract LookupResult get(Object key);
 
+    public abstract LookupResult getIfPresent(Object key);
+
     public abstract void set(Object key, Object retrievedValue);
 
     public abstract void purge();

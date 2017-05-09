@@ -1,13 +1,39 @@
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
+import { Input } from 'components/bootstrap';
+import FormsUtils from 'util/FormsUtils';
 import { PluginStore } from 'graylog-web-plugin/plugin';
-
+import CombinedProvider from 'injection/CombinedProvider';
 import Styles from './ConfigSummary.css';
+
+const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
 const DataAdapter = React.createClass({
 
   propTypes: {
     dataAdapter: React.PropTypes.object.isRequired,
+    lookupResult: React.PropTypes.object,
+  },
+
+  getDefaultProps() {
+    return {
+      lookupResult: null,
+    };
+  },
+
+  getInitialState() {
+    return {
+      lookupKey: null,
+    };
+  },
+
+  _onChange(event) {
+    this.setState({ lookupKey: FormsUtils.getValueFromInput(event.target) });
+  },
+
+  _lookupKey(e) {
+    e.preventDefault();
+    LookupTableDataAdaptersActions.lookup(this.props.dataAdapter.name, this.state.lookupKey);
   },
 
   render() {
@@ -39,8 +65,31 @@ const DataAdapter = React.createClass({
           </div>
         </Col>
         <Col md={6}>
-          <h3>Retrieve data</h3>
-          <p>Use this to manually trigger the data adapter.</p>
+          <h3>Test lookup</h3>
+          <p>You can manually trigger the data adapter using this form. The data will be not cached.</p>
+          <form onSubmit={this._lookupKey}>
+            <fieldset>
+              <Input type="text"
+                     id="key"
+                     name="key"
+                     label="Key"
+                     required
+                     onChange={this._onChange}
+                     help="Key to look up a value for."
+                     value={this.state.lookupKey} />
+            </fieldset>
+            <fieldset>
+              <Input>
+                <Button type="submit" bsStyle="success">Look up</Button>
+              </Input>
+            </fieldset>
+          </form>
+          { this.props.lookupResult && (
+            <div>
+              <h4>Lookup result</h4>
+              <pre>{JSON.stringify(this.props.lookupResult, null, 2)}</pre>
+            </div>
+          )}
         </Col>
       </Row>
     );

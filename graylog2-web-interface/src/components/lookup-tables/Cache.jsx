@@ -39,7 +39,7 @@ const Cache = React.createClass({
           </div>
         </Col>
         <Col md={6}>
-          <h3>Cached data</h3>
+          <h3>TODO: Cached data</h3>
           <p>Use this to inspect the lookup table cache.</p>
         </Col>
       </Row>

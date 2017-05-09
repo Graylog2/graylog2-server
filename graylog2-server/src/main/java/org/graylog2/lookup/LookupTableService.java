@@ -61,6 +61,7 @@ public class LookupTableService {
     private final ConcurrentMap<String, LookupTable> lookupTables = new ConcurrentHashMap<>();
 
     private final ConcurrentMap<String, LookupDataAdapter> liveAdapters = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, LookupCache> liveCaches = new ConcurrentHashMap<>();
 
     @Inject
     public LookupTableService(MongoLutService mongoLutService,
@@ -252,6 +253,16 @@ public class LookupTableService {
         }
         return liveAdapters.entrySet().stream()
                 .filter(e -> adapterNames.contains(e.getKey()))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toSet());
+    }
+
+    public Collection<LookupCache> getCaches(Set<String> cacheNames) {
+        if (cacheNames == null) {
+            return Collections.emptySet();
+        }
+        return liveCaches.entrySet().stream()
+                .filter(e -> cacheNames.contains(e.getKey()))
                 .map(Map.Entry::getValue)
                 .collect(Collectors.toSet());
     }
