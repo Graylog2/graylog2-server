@@ -16,11 +16,9 @@
  */
 package org.graylog2.indexer;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import javax.inject.Singleton;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,22 +29,7 @@ import java.util.Map;
  */
 @Singleton
 public class IndexMapping5 extends IndexMapping {
-    protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
-        final Map<String, Object> defaultInternal = ImmutableMap.of(
-                "match", "gl2_*",
-                "mapping", notAnalyzedString());
-        final Map<String, Map<String, Object>> templateInternal = ImmutableMap.of("internal_fields", defaultInternal);
-
-        final Map<String, Object> defaultAll = ImmutableMap.of(
-                // Match all
-                "match", "*",
-                // Analyze nothing by default
-                "mapping", ImmutableMap.of("index", "not_analyzed"));
-        final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", defaultAll);
-
-        return ImmutableList.of(templateInternal, templateAll);
-    }
-
+    @Override
     protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
         return ImmutableMap.of(
                 "message", analyzedString(analyzer, false),
@@ -59,7 +42,8 @@ public class IndexMapping5 extends IndexMapping {
                 "streams", notAnalyzedString());
     }
 
-    private Map<String, Object> notAnalyzedString() {
+    @Override
+    protected Map<String, Object> notAnalyzedString() {
         return ImmutableMap.of("type", "keyword");
     }
 

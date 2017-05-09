@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 
@@ -57,9 +58,25 @@ public abstract class IndexMapping {
                 "_source", enabled());
     }
 
-    protected abstract List<Map<String, Map<String, Object>>> dynamicTemplate();
+    protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
+        final Map<String, Object> defaultInternal = ImmutableMap.of(
+                "match", "gl2_*",
+                "mapping", notAnalyzedString());
+        final Map<String, Map<String, Object>> templateInternal = ImmutableMap.of("internal_fields", defaultInternal);
+
+        final Map<String, Object> defaultAll = ImmutableMap.of(
+                // Match all
+                "match", "*",
+                // Analyze nothing by default
+                "mapping", ImmutableMap.of("index", "not_analyzed"));
+        final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", defaultAll);
+
+        return ImmutableList.of(templateInternal, templateAll);
+    }
 
     protected abstract Map<String, Map<String, Object>> fieldProperties(String analyzer);
+
+    protected abstract Map<String, Object> notAnalyzedString();
 
     protected Map<String, Object> typeTimeWithMillis() {
         return ImmutableMap.of(

@@ -32,23 +32,6 @@ import java.util.Map;
 @Singleton
 public class IndexMapping2 extends IndexMapping {
     @Override
-    protected List<Map<String, Map<String, Object>>> dynamicTemplate() {
-        final Map<String, Object> defaultInternal = ImmutableMap.of(
-                "match", "gl2_*",
-                "mapping", notAnalyzedString());
-        final Map<String, Map<String, Object>> templateInternal = ImmutableMap.of("internal_fields", defaultInternal);
-
-        final Map<String, Object> defaultAll = ImmutableMap.of(
-                // Match all
-                "match", "*",
-                // Analyze nothing by default
-                "mapping", ImmutableMap.of("index", "not_analyzed"));
-        final Map<String, Map<String, Object>> templateAll = ImmutableMap.of("store_generic", defaultAll);
-
-        return ImmutableList.of(templateInternal, templateAll);
-    }
-
-    @Override
     protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {
         return ImmutableMap.of(
                 "message", analyzedString(analyzer),
@@ -61,7 +44,8 @@ public class IndexMapping2 extends IndexMapping {
                 "streams", notAnalyzedString());
     }
 
-    private Map<String, Object> notAnalyzedString() {
+    @Override
+    protected Map<String, Object> notAnalyzedString() {
         return ImmutableMap.of(
                 "index", "not_analyzed",
                 "type", "string");
