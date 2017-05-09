@@ -45,6 +45,8 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 import javax.inject.Inject;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DefaultValue;
@@ -188,11 +190,14 @@ public class RelativeSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
+        final Sorting.Direction sortOrder = buildSorting(order).getDirection();
+
         try {
-            return buildTermsResult(searches.terms(field, size, query, filter, buildRelativeTimeRange(range)));
+            return buildTermsResult(searches.terms(field, size, query, filter, buildRelativeTimeRange(range), sortOrder));
         } catch (SearchPhaseExecutionException e) {
             throw createRequestExceptionForParseFailure(query, e);
         }
