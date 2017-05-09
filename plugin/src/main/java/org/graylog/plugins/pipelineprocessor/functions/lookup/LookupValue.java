@@ -43,7 +43,7 @@ public class LookupValue extends AbstractFunction<Object> {
         if (result == null || result.isEmpty()) {
             return defaultParam.optional(args, context);
         }
-        return result.getSingleValue();
+        return result.singleValue();
     }
 
     @Override

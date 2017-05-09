@@ -48,7 +48,7 @@ public class Lookup extends AbstractFunction<Map<Object, Object>> {
         if (result == null || result.isEmpty()) {
             return Collections.singletonMap(SINGLE_VALUE_KEY, defaultParam.optional(args, context));
         }
-        return result.getMultiValue();
+        return result.multiValue();
     }
 
     @Override
