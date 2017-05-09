@@ -14,22 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer;
+package org.graylog2.indexer.cluster;
 
-public class InvalidRangeFormatException extends RuntimeException {
-    public InvalidRangeFormatException() {
-        super("Invalid timerange parameters provided");
-    }
+import com.google.auto.value.AutoValue;
 
-    public InvalidRangeFormatException(String message) {
-        super(message);
-    }
+import javax.annotation.Nullable;
+import java.util.Optional;
 
-    public InvalidRangeFormatException(String message, Throwable cause) {
-        super(message, cause);
-    }
+@AutoValue
+public abstract class NodeFileDescriptorStats {
+    public abstract String name();
 
-    public InvalidRangeFormatException(Throwable cause) {
-        super("Invalid timerange parameters provided", cause);
+    @Nullable
+    public abstract String host();
+
+    public abstract Optional<Long> fileDescriptorMax();
+
+    public static NodeFileDescriptorStats create(String name, @Nullable String host, Long fileDescriptorMax) {
+        return new AutoValue_NodeFileDescriptorStats(name, host, Optional.ofNullable(fileDescriptorMax));
     }
 }

@@ -14,20 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.esplugin;
+package org.graylog2.rest;
 
-import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
-import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.rest.resources.search.responses.SearchError;
 
-import java.util.Set;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ExceptionMapper;
 
-@AutoValue
-@WithBeanGetter
-public abstract class IndicesDeletedEvent {
-    public abstract Set<String> indices();
+public class ElasticsearchExceptionMapper implements ExceptionMapper<ElasticsearchException> {
+    @Override
+    public Response toResponse(ElasticsearchException exception) {
+        final SearchError searchError = SearchError.create(exception.getMessage(), exception.getErrorDetails());
 
-    public static IndicesDeletedEvent create(Set<String> indices) {
-        return new AutoValue_IndicesDeletedEvent(ImmutableSet.copyOf(indices));
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(searchError).build();
     }
 }

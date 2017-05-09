@@ -16,78 +16,76 @@
  */
 package org.graylog2.indexer.indices;
 
-import com.carrotsearch.hppc.cursors.ObjectObjectCursor;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
-import com.google.common.collect.UnmodifiableIterator;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.action.ActionFuture;
-import org.elasticsearch.action.WriteConsistencyLevel;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.cluster.state.ClusterStateRequest;
-import org.elasticsearch.action.admin.cluster.state.ClusterStateResponse;
-import org.elasticsearch.action.admin.indices.alias.get.GetAliasesRequest;
-import org.elasticsearch.action.admin.indices.alias.get.GetAliasesResponse;
-import org.elasticsearch.action.admin.indices.close.CloseIndexRequest;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.admin.indices.flush.FlushRequest;
-import org.elasticsearch.action.admin.indices.forcemerge.ForceMergeRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequestBuilder;
-import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
-import org.elasticsearch.action.admin.indices.open.OpenIndexRequest;
-import org.elasticsearch.action.admin.indices.settings.put.UpdateSettingsRequest;
-import org.elasticsearch.action.admin.indices.stats.IndexStats;
-import org.elasticsearch.action.admin.indices.stats.IndicesStatsRequest;
-import org.elasticsearch.action.admin.indices.stats.IndicesStatsResponse;
-import org.elasticsearch.action.admin.indices.stats.ShardStats;
-import org.elasticsearch.action.admin.indices.template.delete.DeleteIndexTemplateRequest;
-import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateRequest;
-import org.elasticsearch.action.bulk.BulkRequestBuilder;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchRequestBuilder;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.cluster.ClusterState;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
-import org.elasticsearch.cluster.metadata.AliasMetaData;
-import org.elasticsearch.cluster.metadata.IndexMetaData;
-import org.elasticsearch.cluster.metadata.MappingMetaData;
-import org.elasticsearch.cluster.routing.ShardRouting;
-import org.elasticsearch.common.collect.ImmutableOpenMap;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.common.xcontent.XContentHelper;
+import com.google.common.eventbus.EventBus;
+import com.google.common.primitives.Ints;
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.cluster.Health;
+import io.searchbox.cluster.State;
+import io.searchbox.core.Bulk;
+import io.searchbox.core.BulkResult;
+import io.searchbox.core.Cat;
+import io.searchbox.core.CatResult;
+import io.searchbox.core.Search;
+import io.searchbox.core.SearchResult;
+import io.searchbox.core.SearchScroll;
+import io.searchbox.core.search.aggregation.FilterAggregation;
+import io.searchbox.core.search.aggregation.MaxAggregation;
+import io.searchbox.core.search.aggregation.MinAggregation;
+import io.searchbox.core.search.aggregation.TermsAggregation;
+import io.searchbox.indices.CloseIndex;
+import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.DeleteIndex;
+import io.searchbox.indices.Flush;
+import io.searchbox.indices.ForceMerge;
+import io.searchbox.indices.IndicesExists;
+import io.searchbox.indices.OpenIndex;
+import io.searchbox.indices.Stats;
+import io.searchbox.indices.aliases.AddAliasMapping;
+import io.searchbox.indices.aliases.AliasExists;
+import io.searchbox.indices.aliases.AliasMapping;
+import io.searchbox.indices.aliases.GetAliases;
+import io.searchbox.indices.aliases.ModifyAliases;
+import io.searchbox.indices.aliases.RemoveAliasMapping;
+import io.searchbox.indices.settings.GetSettings;
+import io.searchbox.indices.settings.UpdateSettings;
+import io.searchbox.indices.template.DeleteTemplate;
+import io.searchbox.indices.template.PutTemplate;
+import io.searchbox.params.Parameters;
+import io.searchbox.params.SearchType;
+import org.apache.http.client.config.RequestConfig;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.shard.DocsStats;
-import org.elasticsearch.indices.IndexClosedException;
-import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.filter.Filter;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.metrics.max.Max;
-import org.elasticsearch.search.aggregations.metrics.min.Min;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.graylog2.indexer.gson.GsonUtils;
+import org.graylog2.indexer.indexset.IndexSetConfig;
+import org.graylog2.indexer.indices.events.IndicesClosedEvent;
+import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
+import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
+import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.indexer.searches.IndexRangeStats;
+import org.graylog2.plugin.Message;
 import org.graylog2.plugin.system.NodeId;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -99,505 +97,643 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
-import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
+import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
 import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
+import static org.graylog2.indexer.gson.GsonUtils.asInteger;
+import static org.graylog2.indexer.gson.GsonUtils.asJsonArray;
+import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
+import static org.graylog2.indexer.gson.GsonUtils.asLong;
+import static org.graylog2.indexer.gson.GsonUtils.asString;
 
 @Singleton
 public class Indices {
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
     private static final String REOPENED_INDEX_SETTING = "graylog2_reopened";
 
-    private final Client c;
+    private final JestClient jestClient;
+    private final Gson gson;
     private final IndexMapping indexMapping;
     private final Messages messages;
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
+    private final EventBus eventBus;
 
     @Inject
-    public Indices(Client client, IndexMapping indexMapping, Messages messages, NodeId nodeId, AuditEventSender auditEventSender) {
-        this.c = client;
+    public Indices(JestClient jestClient, Gson gson, IndexMapping indexMapping,
+                   Messages messages, NodeId nodeId, AuditEventSender auditEventSender,
+                   EventBus eventBus) {
+        this.jestClient = jestClient;
+        this.gson = gson;
         this.indexMapping = indexMapping;
         this.messages = messages;
         this.nodeId = nodeId;
         this.auditEventSender = auditEventSender;
+        this.eventBus = eventBus;
     }
 
     public void move(String source, String target) {
-        SearchResponse scrollResp = c.prepareSearch(source)
-                .setScroll(TimeValue.timeValueSeconds(10L))
-                .setQuery(matchAllQuery())
-                .addSort(SortBuilders.fieldSort(SortParseElement.DOC_FIELD_NAME))
-                .setSize(350)
-                .execute()
-                .actionGet();
+        // TODO: This method should use the Re-index API: https://www.elastic.co/guide/en/elasticsearch/reference/5.3/docs-reindex.html
+        final String query = SearchSourceBuilder.searchSource()
+                .query(QueryBuilders.matchAllQuery())
+                .size(350)
+                .sort(SortBuilders.fieldSort(SortParseElement.DOC_FIELD_NAME))
+                .toString();
 
+        final Search request = new Search.Builder(query)
+                .setParameter(Parameters.SCROLL, "10s")
+                .addIndex(source)
+                .build();
+
+        final SearchResult searchResult = JestUtils.execute(jestClient, request, () -> "Couldn't process search query response");
+
+        final String scrollId = Optional.of(searchResult.getJsonObject())
+                .map(json -> asString(json.get("_scroll_id")))
+                .orElseThrow(() -> new ElasticsearchException("Couldn't find scroll ID in search query response"));
+
+
+        final Type type = new TypeToken<Map<String, Object>>() {
+        }.getType();
         while (true) {
-            scrollResp = c.prepareSearchScroll(scrollResp.getScrollId()).setScroll(new TimeValue(60000)).execute().actionGet();
+            final SearchScroll scrollRequest = new SearchScroll.Builder(scrollId, "1m").build();
+            final JestResult scrollResult = JestUtils.execute(jestClient, scrollRequest, () -> "Couldn't process result of scroll query");
+            final JsonArray scrollHits = Optional.of(scrollResult.getJsonObject())
+                    .map(json -> asJsonObject(json.get("hits")))
+                    .map(hits -> asJsonArray(hits.get("hits")))
+                    .orElse(new JsonArray());
 
             // No more hits.
-            if (scrollResp.getHits().hits().length == 0) {
+            if (scrollHits.size() == 0) {
                 break;
             }
 
-            final BulkRequestBuilder request = c.prepareBulk();
-            for (SearchHit hit : scrollResp.getHits()) {
-                Map<String, Object> doc = hit.getSource();
-                String id = (String) doc.remove("_id");
+            final Bulk.Builder bulkRequestBuilder = new Bulk.Builder();
+            for (JsonElement jsonElement : scrollHits) {
+                final Map<String, Object> doc = Optional.ofNullable(asJsonObject(jsonElement))
+                        .map(hitsJson -> asJsonObject(hitsJson.get("_source")))
+                        .map(sourceJson -> gson.<Map<String, Object>>fromJson(sourceJson, type))
+                        .orElse(Collections.emptyMap());
+                final String id = (String) doc.remove("_id");
 
-                request.add(messages.buildIndexRequest(target, doc, id));
+                bulkRequestBuilder.addAction(messages.prepareIndexRequest(target, doc, id));
             }
 
-            request.setConsistencyLevel(WriteConsistencyLevel.ONE);
+            bulkRequestBuilder.setParameter(Parameters.CONSISTENCY, "one");
 
-            if (request.numberOfActions() > 0) {
-                BulkResponse response = c.bulk(request.request()).actionGet();
+            final BulkResult bulkResult = JestUtils.execute(jestClient, bulkRequestBuilder.build(), () -> "Couldn't bulk index messages into index " + target);
 
-                LOG.info("Moving index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
-                        source,
-                        target,
-                        response.getItems().length,
-                        response.getTookInMillis(),
-                        response.hasFailures());
+            final boolean hasFailedItems = !bulkResult.getFailedItems().isEmpty();
+            LOG.info("Moving index <{}> to <{}>: Bulk indexed {} messages, took {} ms, failures: {}",
+                    source,
+                    target,
+                    bulkResult.getItems().size(),
+                    asLong(bulkResult.getJsonObject().get("took")),
+                    hasFailedItems);
 
-                if (response.hasFailures()) {
-                    throw new RuntimeException("Failed to move a message. Check your indexer log.");
-                }
+            if (hasFailedItems) {
+                throw new ElasticsearchException("Failed to move a message. Check your indexer log.");
             }
         }
-
     }
 
     public void delete(String indexName) {
-        c.admin().indices().delete(new DeleteIndexRequest(indexName)).actionGet();
+        JestUtils.execute(jestClient, new DeleteIndex.Builder(indexName).build(), () -> "Couldn't delete index " + indexName);
+        eventBus.post(IndicesDeletedEvent.create(indexName));
     }
 
     public void close(String indexName) {
-        c.admin().indices().close(new CloseIndexRequest(indexName)).actionGet();
+        JestUtils.execute(jestClient, new CloseIndex.Builder(indexName).build(), () -> "Couldn't close index " + indexName);
+        eventBus.post(IndicesClosedEvent.create(indexName));
     }
 
     public long numberOfMessages(String indexName) throws IndexNotFoundException {
-        final IndexStats index = indexStats(indexName);
-        if (index == null) {
-            throw new IndexNotFoundException("Couldn't find index " + indexName);
+        return indexStats(indexName)
+                .map(index -> asJsonObject(index.get("primaries")))
+                .map(primaries -> asJsonObject(primaries.get("docs")))
+                .map(docs -> asLong(docs.get("count")))
+                .orElse(0L);
+    }
+
+    private Map<String, JsonElement> getAllWithShardLevel(final Collection<String> indices) {
+        final Stats request = new Stats.Builder()
+                .addIndex(indices)
+                .setParameter("level", "shards")
+                .build();
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't fetch index stats of indices " + indices);
+        final JsonObject responseJson = jestResult.getJsonObject();
+        final int failedShards = Optional.ofNullable(responseJson)
+                .map(json -> asJsonObject(json.get("_shards")))
+                .map(json -> asInteger(json.get("failed")))
+                .orElse(0);
+
+        if (failedShards > 0) {
+            throw new ElasticsearchException("Index stats response contains failed shards, response is incomplete");
         }
 
-        final DocsStats docsStats = index.getPrimaries().getDocs();
-
-        return docsStats == null ? 0L : docsStats.getCount();
+        return Optional.ofNullable(responseJson)
+                .map(json -> asJsonObject(json.get("indices")))
+                .map(GsonUtils::entrySetAsMap)
+                .orElse(Collections.emptyMap());
     }
 
-    public Map<String, IndexStats> getAll(final IndexSet indexSet) {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexSet.getIndexWildcard()).request();
-        final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
+    public Map<String, JsonElement> getIndexStats(final IndexSet indexSet) {
+        return getIndexStats(Collections.singleton(indexSet.getIndexWildcard()));
+    }
 
-        if (response.getFailedShards() > 0) {
-            LOG.warn("IndexStats response contains failed shards, response is incomplete: {}", (Object) response.getShardFailures());
+    public Map<String, JsonElement> getIndexStats(final Collection<String> indices) {
+        final Stats request = new Stats.Builder()
+                .addIndex(indices)
+                .docs(true)
+                .store(true)
+                .build();
+
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check stats of indices " + indices);
+
+        return Optional.ofNullable(asJsonObject(jestResult.getJsonObject()))
+                .map(json -> asJsonObject(json.get("indices")))
+                .map(GsonUtils::entrySetAsMap)
+                .orElse(Collections.emptyMap());
+    }
+
+    private Optional<JsonObject> indexStats(final String indexName) {
+        final Stats request = new Stats.Builder()
+                .addIndex(indexName)
+                .build();
+
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check stats of index " + indexName);
+
+        return Optional.ofNullable(asJsonObject(jestResult.getJsonObject()))
+                .map(json -> asJsonObject(json.get("indices")))
+                .map(indices -> asJsonObject(indices.get(indexName)));
+    }
+
+    private Optional<JsonObject> indexStatsWithShardLevel(final String indexName) {
+        final Stats request = new Stats.Builder()
+                .addIndex(indexName)
+                .setParameter("level", "shards")
+                .ignoreUnavailable(true)
+                .build();
+
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check stats of index " + indexName);
+
+        return Optional.ofNullable(asJsonObject(jestResult.getJsonObject()))
+                .map(json -> asJsonObject(json.get("indices")))
+                .map(indices -> asJsonObject(indices.get(indexName)));
+    }
+
+    /**
+     * Check if a given name is an existing index.
+     * @param indexName Name of the index to check presence for.
+     * @return {@code true} if indexName is an existing index, {@code false} if it is non-existing or an alias.
+     */
+    public boolean exists(String indexName) {
+        try {
+            final JestResult result = jestClient.execute(new GetSettings.Builder().addIndex(indexName).build());
+            if (!result.isSucceeded()) {
+                return false;
+            }
+            return Optional.of(result.getJsonObject())
+                .map(GsonUtils::entrySetAsMap)
+                .map(map -> map.containsKey(indexName))
+                .orElse(false);
+        } catch (IOException e) {
+            throw new ElasticsearchException("Couldn't check existence of index " + indexName, e);
         }
-        return response.getIndices();
     }
 
-    public Map<String, IndexStats> getAllDocCounts(final IndexSet indexSet) {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexSet.getIndexWildcard()).setDocs(true).request();
-        final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
-
-        return response.getIndices();
-    }
-
-    @Nullable
-    public IndexStats indexStats(final String indexName) {
-        final IndicesStatsRequest request = c.admin().indices().prepareStats(indexName).request();
-        final IndicesStatsResponse response = c.admin().indices().stats(request).actionGet();
-
-        return response.getIndex(indexName);
-    }
-
-    public boolean exists(String index) {
-        ActionFuture<IndicesExistsResponse> existsFuture = c.admin().indices().exists(new IndicesExistsRequest(index));
-        return existsFuture.actionGet().isExists();
-    }
-
+    /**
+     * Check if a given name is an existing alias.
+     * @param alias Name of the alias to check presence for.
+     * @return {@code true} if alias is an existing alias, {@code false} if it is non-existing or an index.
+     */
     public boolean aliasExists(String alias) {
-        return c.admin().indices().aliasesExist(new GetAliasesRequest(alias)).actionGet().exists();
+        try {
+            final JestResult result = jestClient.execute(new GetSettings.Builder().addIndex(alias).build());
+            if (!result.isSucceeded()) {
+                return false;
+            }
+            return Optional.of(result.getJsonObject())
+                .map(GsonUtils::entrySetAsMap)
+                .map(map -> !map.containsKey(alias))
+                .orElse(false);
+        } catch (IOException e) {
+            throw new ElasticsearchException("Couldn't check existence of alias " + alias, e);
+        }
     }
 
     @NotNull
     public Map<String, Set<String>> getIndexNamesAndAliases(String indexPattern) {
-
         // only request indices matching the name or pattern in `indexPattern` and only get the alias names for each index,
         // not the settings or mappings
-        final GetIndexRequestBuilder getIndexRequestBuilder = c.admin().indices().prepareGetIndex();
-        getIndexRequestBuilder.addFeatures(GetIndexRequest.Feature.ALIASES);
-        getIndexRequestBuilder.setIndices(indexPattern);
+        final GetAliases request = new GetAliases.Builder().addIndex(indexPattern).build();
 
-        final GetIndexResponse getIndexResponse = c.admin().indices().getIndex(getIndexRequestBuilder.request()).actionGet();
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect aliases for index pattern " + indexPattern);
 
-        final String[] indices = getIndexResponse.indices();
-        final ImmutableOpenMap<String, List<AliasMetaData>> aliases = getIndexResponse.aliases();
-        final Map<String, Set<String>> indexAliases = Maps.newHashMap();
-        for (String index : indices) {
-            final List<AliasMetaData> aliasMetaData = aliases.get(index);
-            if (aliasMetaData == null) {
-                indexAliases.put(index, Collections.emptySet());
-            } else {
-                indexAliases.put(index,
-                                 aliasMetaData.stream()
-                                         .map(AliasMetaData::alias)
-                                         .collect(toSet()));
+        final ImmutableMap.Builder<String, Set<String>> indexAliasesBuilder = ImmutableMap.builder();
+        for (Map.Entry<String, JsonElement> entry : jestResult.getJsonObject().entrySet()) {
+            final JsonObject aliasMetaData = asJsonObject(entry.getValue());
+            if (aliasMetaData != null) {
+                final ImmutableSet.Builder<String> aliasesBuilder = ImmutableSet.builder();
+                for (Map.Entry<String, JsonElement> aliasesEntry : aliasMetaData.entrySet()) {
+                    aliasesBuilder.add(aliasesEntry.getKey());
+                }
+                indexAliasesBuilder.put(entry.getKey(), aliasesBuilder.build());
             }
         }
 
-        return indexAliases;
+        return indexAliasesBuilder.build();
     }
 
-    @Nullable
-    public String aliasTarget(String alias) throws TooManyAliasesException {
-        final IndicesAdminClient indicesAdminClient = c.admin().indices();
-
-        final GetAliasesRequest request = indicesAdminClient.prepareGetAliases(alias).request();
-        final GetAliasesResponse response = indicesAdminClient.getAliases(request).actionGet();
+    public Optional<String> aliasTarget(String alias) throws TooManyAliasesException {
+        final GetAliases request = new GetAliases.Builder().build();
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't collect indices for alias " + alias);
 
         // The ES return value of this has an awkward format: The first key of the hash is the target index. Thanks.
-        final ImmutableOpenMap<String, List<AliasMetaData>> aliases = response.getAliases();
-
-        if (aliases.size() > 1) {
-            throw new TooManyAliasesException(Sets.newHashSet(aliases.keysIt()));
+        final ImmutableSet.Builder<String> indicesBuilder = ImmutableSet.builder();
+        for (Map.Entry<String, JsonElement> entry : jestResult.getJsonObject().entrySet()) {
+            final String indexName = entry.getKey();
+            Optional.of(entry.getValue())
+                    .map(GsonUtils::asJsonObject)
+                    .map(json -> asJsonObject(json.get("aliases")))
+                    .map(JsonObject::entrySet)
+                    .filter(aliases -> !aliases.isEmpty())
+                    .filter(aliases -> aliases.stream().anyMatch(aliasEntry -> aliasEntry.getKey().equals(alias)))
+                    .ifPresent(x -> indicesBuilder.add(indexName));
         }
-        return aliases.isEmpty() ? null : aliases.keysIt().next();
+
+        final Set<String> indices = indicesBuilder.build();
+        if (indices.size() > 1) {
+            throw new TooManyAliasesException(indices);
+        }
+
+        return indices.stream().findFirst();
     }
 
     private void ensureIndexTemplate(IndexSet indexSet) {
-        final Map<String, Object> template = indexMapping.messageTemplate(indexSet.getIndexWildcard(), indexSet.getConfig().indexAnalyzer());
-        final PutIndexTemplateRequest itr = c.admin().indices().preparePutTemplate(indexSet.getConfig().indexTemplateName())
-                .setOrder(-1) // Make sure templates with "order: 0" and higher are applied after our template!
-                .setSource(template)
-                .request();
+        final IndexSetConfig indexSetConfig = indexSet.getConfig();
+        final String templateName = indexSetConfig.indexTemplateName();
+        final Map<String, Object> template = indexMapping.messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer(), -1);
 
-        try {
-            final boolean acknowledged = c.admin().indices().putTemplate(itr).actionGet().isAcknowledged();
-            if (acknowledged) {
-                LOG.info("Created Graylog index template \"{}\" in Elasticsearch.", indexSet.getConfig().indexTemplateName());
-            }
-        } catch (Exception e) {
-            LOG.error("Unable to create the Graylog index template: " + indexSet.getConfig().indexTemplateName(), e);
+        final PutTemplate request = new PutTemplate.Builder(templateName, template).build();
+
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to create index template " + templateName);
+
+        if (jestResult.isSucceeded()) {
+            LOG.info("Successfully created index template {}", templateName);
         }
     }
 
     public void deleteIndexTemplate(IndexSet indexSet) {
         final String templateName = indexSet.getConfig().indexTemplateName();
-
-        final DeleteIndexTemplateRequest deleteRequest = c.admin()
-                .indices()
-                .prepareDeleteTemplate(templateName)
-                .request();
-
-        try {
-            final boolean acknowledged = c.admin()
-                    .indices()
-                    .deleteTemplate(deleteRequest)
-                    .actionGet()
-                    .isAcknowledged();
-            if (acknowledged) {
-                LOG.info("Deleted Graylog index template \"{}\" in Elasticsearch.", templateName);
-            }
-        } catch (Exception e) {
-            LOG.error("Unable to delete the Graylog index template: " + templateName, e);
+        final JestResult result = JestUtils.execute(jestClient, new DeleteTemplate.Builder(templateName).build(), () -> "Unable to delete the Graylog index template " + templateName);
+        if (result.isSucceeded()) {
+            LOG.info("Successfully deleted index template {}", templateName);
         }
     }
 
     public boolean create(String indexName, IndexSet indexSet) {
-        return create(indexName, indexSet, Settings.EMPTY);
+        return create(indexName, indexSet, Collections.emptyMap());
     }
 
-    public boolean create(String indexName, IndexSet indexSet, Settings customSettings) {
-        final Settings settings = Settings.builder()
-                .put("number_of_shards", indexSet.getConfig().shards())
-                .put("number_of_replicas", indexSet.getConfig().replicas())
-                .put(customSettings)
+    public boolean create(String indexName, IndexSet indexSet, Map<String, Object> customSettings) {
+        final Map<String, Object> settings = new HashMap<>();
+        settings.put("number_of_shards", indexSet.getConfig().shards());
+        settings.put("number_of_replicas", indexSet.getConfig().replicas());
+        settings.putAll(customSettings);
+
+        final CreateIndex request = new CreateIndex.Builder(indexName)
+                .settings(settings)
                 .build();
 
         // Make sure our index template exists before creating an index!
         ensureIndexTemplate(indexSet);
 
-        final CreateIndexRequest cir = c.admin().indices().prepareCreate(indexName)
-                .setSettings(settings)
-                .request();
+        final JestResult jestResult;
+        try {
+            jestResult = jestClient.execute(request);
+        } catch (IOException e) {
+            throw new ElasticsearchException("Couldn't create index " + indexName, e);
+        }
 
-        final boolean acknowledged = c.admin().indices().create(cir).actionGet().isAcknowledged();
-        if (acknowledged) {
+        final boolean succeeded = jestResult.isSucceeded();
+        if (succeeded) {
             auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         } else {
+            LOG.warn("Couldn't create index {}", indexName);
             auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         }
-        return acknowledged;
+        return succeeded;
     }
 
     public Map<String, Set<String>> getAllMessageFieldsForIndices(final String[] writeIndexWildcards) {
-        final Map<String, Set<String>> fields = new HashMap<>();
+        final String indices = String.join(",", writeIndexWildcards);
+        final State request = new State.Builder()
+                .indices(indices)
+                .withMetadata()
+                .build();
 
-        final ClusterStateRequest csr = new ClusterStateRequest().blocks(true).nodes(true).indices(writeIndexWildcards);
-        final ClusterState cs = c.admin().cluster().state(csr).actionGet().getState();
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster state for indices " + indices);
 
-        for (ObjectObjectCursor<String, IndexMetaData> m : cs.getMetaData().indices()) {
-            try {
-                MappingMetaData mmd = m.value.mapping(IndexMapping.TYPE_MESSAGE);
-                if (mmd == null) {
-                    // There is no mapping if there are no messages in the index.
-                    continue;
-                }
-                @SuppressWarnings("unchecked")
-                final Map<String, Object> mapping = (Map<String, Object>) mmd.getSourceAsMap().get("properties");
+        final JsonObject indicesJson = getClusterStateIndicesMetadata(jestResult.getJsonObject());
+        final ImmutableMap.Builder<String, Set<String>> fields = ImmutableMap.builder();
+        for (Map.Entry<String, JsonElement> entry : indicesJson.entrySet()) {
+            final String indexName = entry.getKey();
+            final Set<String> fieldNames = Optional.ofNullable(asJsonObject(entry.getValue()))
+                    .map(index -> asJsonObject(index.get("mappings")))
+                    .map(mappings -> asJsonObject(mappings.get(IndexMapping.TYPE_MESSAGE)))
+                    .map(messageType -> asJsonObject(messageType.get("properties")))
+                    .map(JsonObject::entrySet)
+                    .map(Set::stream)
+                    .orElseGet(Stream::empty)
+                    .map(Map.Entry::getKey)
+                    .collect(toSet());
 
-                if (mapping != null) {
-                    fields.put(m.key, mapping.keySet());
-                }
-            } catch (Exception e) {
-                LOG.error("Error while trying to get fields of <" + m.index + ">", e);
+            if (!fieldNames.isEmpty()) {
+                fields.put(indexName, fieldNames);
             }
         }
 
-        return fields;
+        return fields.build();
     }
 
     public Set<String> getAllMessageFields(final String[] writeIndexWildcards) {
-        final Optional<Set<String>> result = getAllMessageFieldsForIndices(writeIndexWildcards)
-            .values()
-            .stream()
-            .reduce((strings, strings2) -> ImmutableSet.<String>builder().addAll(strings).addAll(strings2).build());
-
-        return result.orElse(Collections.emptySet());
+        final Map<String, Set<String>> fieldsForIndices = getAllMessageFieldsForIndices(writeIndexWildcards);
+        final ImmutableSet.Builder<String> result = ImmutableSet.builder();
+        for (Set<String> fields : fieldsForIndices.values()) {
+            result.addAll(fields);
+        }
+        return result.build();
     }
 
     public void setReadOnly(String index) {
-        final Settings.Builder sb = Settings.builder()
-                // https://www.elastic.co/guide/en/elasticsearch/reference/2.0/indices-update-settings.html
-                .put("index.blocks.write", true) // Block writing.
-                .put("index.blocks.read", false) // Allow reading.
-                .put("index.blocks.metadata", false); // Allow getting metadata.
+        // https://www.elastic.co/guide/en/elasticsearch/reference/2.4/indices-update-settings.html
+        final Map<String, Object> settings = ImmutableMap.of(
+                "index", ImmutableMap.of("blocks",
+                        ImmutableMap.of(
+                                "write", true, // Block writing.
+                                "read", false, // Allow reading.
+                                "metadata", false) // Allow getting metadata.
+                )
+        );
 
-        final UpdateSettingsRequest request = c.admin().indices().prepareUpdateSettings(index)
-                .setSettings(sb)
-                .request();
-        c.admin().indices().updateSettings(request).actionGet();
+        final UpdateSettings request = new UpdateSettings.Builder(settings).addIndex(index).build();
+        JestUtils.execute(jestClient, request, () -> "Couldn't set index " + index + " to read-only");
     }
 
     public void flush(String index) {
-        FlushRequest flush = new FlushRequest(index);
-        flush.force(true); // Just flushes. Even if it is not necessary.
-
-        c.admin().indices().flush(new FlushRequest(index).force(true)).actionGet();
+        JestUtils.execute(jestClient, new Flush.Builder().addIndex(index).force().build(), () -> "Couldn't flush index " + index);
     }
 
-    public Settings reopenIndexSettings() {
-        return Settings.builder().put(REOPENED_INDEX_SETTING, true).build();
+    public Map<String, Object> reopenIndexSettings() {
+        return ImmutableMap.of("index", ImmutableMap.of(REOPENED_INDEX_SETTING, true));
     }
 
     public void reopenIndex(String index) {
         // Mark this index as re-opened. It will never be touched by retention.
-        UpdateSettingsRequest settings = new UpdateSettingsRequest(index);
-        settings.settings(reopenIndexSettings());
-        c.admin().indices().updateSettings(settings).actionGet();
+        final Map<String, Object> settings = reopenIndexSettings();
+        final UpdateSettings request = new UpdateSettings.Builder(settings).addIndex(index).build();
+
+        JestUtils.execute(jestClient, request, () -> "Couldn't update settings of index " + index);
 
         // Open index.
-        c.admin().indices().open(new OpenIndexRequest(index)).actionGet();
+        openIndex(index);
+    }
+
+    private void openIndex(String index) {
+        JestUtils.execute(jestClient, new OpenIndex.Builder(index).build(), () -> "Couldn't open index " + index);
+        eventBus.post(IndicesReopenedEvent.create(index));
     }
 
     public boolean isReopened(String indexName) {
-        final ClusterState clusterState = c.admin().cluster().state(new ClusterStateRequest()).actionGet().getState();
-        final IndexMetaData metaData = clusterState.getMetaData().getIndices().get(indexName);
+        final JestResult jestResult = JestUtils.execute(jestClient, new State.Builder().withMetadata().build(), () -> "Couldn't read cluster state for index " + indexName);
 
-        return checkForReopened(metaData);
+        final JsonObject indexJson = Optional.ofNullable(asJsonObject(jestResult.getJsonObject()))
+                .map(response -> asJsonObject(response.get("metadata")))
+                .map(metadata -> asJsonObject(metadata.get("indices")))
+                .map(indices -> getIndexSettings(indices, indexName))
+                .orElse(new JsonObject());
+
+        return checkForReopened(indexJson);
     }
 
     public Map<String, Boolean> areReopened(Collection<String> indices) {
-        final ClusterStateResponse clusterState = c.admin().cluster().prepareState().all().get();
-        final ImmutableOpenMap<String, IndexMetaData> indicesMetaData = clusterState.getState().getMetaData().getIndices();
+        final JestResult jestResult = JestUtils.execute(jestClient, new State.Builder().withMetadata().build(), () -> "Couldn't read cluster state for indices " + indices);
+
+        final JsonObject indicesJson = getClusterStateIndicesMetadata(jestResult.getJsonObject());
         return indices.stream().collect(
-            Collectors.toMap(index -> index, index -> checkForReopened(indicesMetaData.get(index)))
+                Collectors.toMap(Function.identity(), index -> checkForReopened(getIndexSettings(indicesJson, index)))
         );
     }
 
-    private boolean checkForReopened(@Nullable IndexMetaData metaData) {
-        return Optional.ofNullable(metaData)
-                .map(IndexMetaData::getSettings)
-                .map(settings -> settings.getAsBoolean("index." + REOPENED_INDEX_SETTING, false))
+    private JsonObject getIndexSettings(JsonObject indicesJson, String index) {
+        return Optional.ofNullable(asJsonObject(indicesJson))
+                .map(indices -> asJsonObject(indices.get(index)))
+                .map(idx -> asJsonObject(idx.get("settings")))
+                .map(settings -> asJsonObject(settings.get("index")))
+                .orElse(new JsonObject());
+    }
+
+    private boolean checkForReopened(@Nullable JsonObject indexSettings) {
+        return Optional.ofNullable(indexSettings)
+                .map(settings -> asString(settings.get(REOPENED_INDEX_SETTING))) // WTF, why is this a string?
+                .map(Boolean::parseBoolean)
                 .orElse(false);
     }
 
-    public Set<String> getClosedIndices(final IndexSet indexSet) {
-        final Set<String> closedIndices = Sets.newHashSet();
+    public Set<String> getClosedIndices(final Collection<String> indices) {
+        final JsonArray catIndices = catIndices(indices, "index", "status");
 
-        ClusterStateRequest csr = new ClusterStateRequest()
-                .nodes(false)
-                .routingTable(false)
-                .blocks(false)
-                .metaData(true);
-
-        ClusterState state = c.admin().cluster().state(csr).actionGet().getState();
-
-        UnmodifiableIterator<IndexMetaData> it = state.getMetaData().getIndices().valuesIt();
-
-        while (it.hasNext()) {
-            IndexMetaData indexMeta = it.next();
-            // Only search in our indices.
-            if (!indexMeta.getIndex().startsWith(indexSet.getIndexPrefix())) {
-                continue;
-            }
-            if (indexMeta.getState().equals(IndexMetaData.State.CLOSE)) {
-                closedIndices.add(indexMeta.getIndex());
+        final ImmutableSet.Builder<String> closedIndices = ImmutableSet.builder();
+        for (JsonElement jsonElement : catIndices) {
+            if (jsonElement.isJsonObject()) {
+                final JsonObject jsonObject = jsonElement.getAsJsonObject();
+                final String index = GsonUtils.asString(jsonObject.get("index"));
+                final String status = GsonUtils.asString(jsonObject.get("status"));
+                if(index != null && "close".equals(status)){
+                    closedIndices.add(index);
+                }
             }
         }
-        return closedIndices;
+
+        return closedIndices.build();
+    }
+
+    public Set<String> getClosedIndices(final IndexSet indexSet) {
+        return getClosedIndices(Collections.singleton(indexSet.getIndexWildcard()));
+    }
+
+    /**
+     * Retrieve the response for the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html">cat indices</a> request from Elasticsearch.
+     *
+     * @param fields The fields to show, see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-indices.html">cat indices API</a>.
+     * @return A {@link JsonArray} with the result of the cat indices request.
+     */
+    private JsonArray catIndices(Collection<String> indices, String... fields) {
+        final String fieldNames = String.join(",", fields);
+        final Cat request = new Cat.IndicesBuilder()
+                .addIndex(indices)
+                .setParameter("h", fieldNames)
+                .build();
+        final CatResult response = JestUtils.execute(jestClient, request, () -> "Unable to read information for indices " + indices);
+        return Optional.of(response.getJsonObject())
+                .map(json -> GsonUtils.asJsonArray(json.get("result")))
+                .orElse(new JsonArray());
+    }
+
+    private JsonObject getClusterStateIndicesMetadata(JsonObject clusterStateJson) {
+        return Optional.ofNullable(clusterStateJson)
+                .map(json -> asJsonObject(json.get("metadata")))
+                .map(metadata -> asJsonObject(metadata.get("indices")))
+                .orElse(new JsonObject());
+    }
+
+    public Set<String> getReopenedIndices(final Collection<String> indices) {
+        final String indexList = String.join(",", indices);
+        final State request = new State.Builder().withMetadata().indices(indexList).build();
+
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster state for reopened indices " + indices);
+        final JsonObject indicesJson = getClusterStateIndicesMetadata(jestResult.getJsonObject());
+        final ImmutableSet.Builder<String> reopenedIndices = ImmutableSet.builder();
+
+        for (Map.Entry<String, JsonElement> entry : indicesJson.entrySet()) {
+            final String indexName = entry.getKey();
+            final JsonElement value = entry.getValue();
+            if (value.isJsonObject()) {
+                final JsonObject indexSettingsJson = value.getAsJsonObject();
+                final JsonObject indexSettings = getIndexSettings(indexSettingsJson, indexName);
+                if (checkForReopened(indexSettings)) {
+                    reopenedIndices.add(indexName);
+                }
+            }
+        }
+
+        return reopenedIndices.build();
     }
 
     public Set<String> getReopenedIndices(final IndexSet indexSet) {
-        final Set<String> reopenedIndices = Sets.newHashSet();
-
-        ClusterStateRequest csr = new ClusterStateRequest()
-                .nodes(false)
-                .routingTable(false)
-                .blocks(false)
-                .metaData(true);
-
-        ClusterState state = c.admin().cluster().state(csr).actionGet().getState();
-
-        UnmodifiableIterator<IndexMetaData> it = state.getMetaData().getIndices().valuesIt();
-
-        while (it.hasNext()) {
-            IndexMetaData indexMeta = it.next();
-            // Only search in our indices.
-            if (!indexMeta.getIndex().startsWith(indexSet.getIndexPrefix())) {
-                continue;
-            }
-            if (checkForReopened(indexMeta)) {
-                reopenedIndices.add(indexMeta.getIndex());
-            }
-        }
-        return reopenedIndices;
+        return getReopenedIndices(Collections.singleton(indexSet.getIndexWildcard()));
     }
 
-    @Nullable
-    public IndexStatistics getIndexStats(String index) {
-        final IndexStats indexStats;
-        try {
-            indexStats = indexStats(index);
-        } catch (ElasticsearchException e) {
-            return null;
-        }
+    public Optional<IndexStatistics> getIndexStats(String index) {
+        return indexStatsWithShardLevel(index)
+                .map(indexStats -> buildIndexStatistics(index, indexStats));
+    }
 
-        if (indexStats == null) {
-            return null;
-        }
+    private IndexStatistics buildIndexStatistics(String index, JsonObject indexStats) {
+        return IndexStatistics.create(index, indexStats);
+    }
 
-        final ImmutableList.Builder<ShardRouting> shardRouting = ImmutableList.builder();
-        for (ShardStats shardStats : indexStats.getShards()) {
-            shardRouting.add(shardStats.getShardRouting());
-        }
+    public Optional<Long> getStoreSizeInBytes(String index) {
+        final Stats request = new Stats.Builder()
+                .addIndex(index)
+                .store(true)
+                .build();
 
-        return IndexStatistics.create(indexStats.getIndex(), indexStats.getPrimaries(), indexStats.getTotal(), shardRouting.build());
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't check store stats of index " + index);
+
+        return Optional.ofNullable(jestResult.getJsonObject())
+                .map(json -> asJsonObject(json.get("indices")))
+                .map(json -> asJsonObject(json.get(index)))
+                .map(json -> asJsonObject(json.get("primaries")))
+                .map(json -> asJsonObject(json.get("store")))
+                .map(json -> asLong(json.get("size_in_bytes")));
     }
 
     public Set<IndexStatistics> getIndicesStats(final IndexSet indexSet) {
-        final Map<String, IndexStats> responseIndices;
-        try {
-            responseIndices = getAll(indexSet);
-        } catch (ElasticsearchException e) {
-            return Collections.emptySet();
-        }
+        return getIndicesStats(Collections.singleton(indexSet.getIndexWildcard()));
+    }
 
+    public Set<IndexStatistics> getIndicesStats(final Collection<String> indices) {
         final ImmutableSet.Builder<IndexStatistics> result = ImmutableSet.builder();
-        for (IndexStats indexStats : responseIndices.values()) {
-            final ImmutableList.Builder<ShardRouting> shardRouting = ImmutableList.builder();
-            for (ShardStats shardStats : indexStats.getShards()) {
-                shardRouting.add(shardStats.getShardRouting());
-            }
-
-            final IndexStatistics stats = IndexStatistics.create(
-                    indexStats.getIndex(),
-                    indexStats.getPrimaries(),
-                    indexStats.getTotal(),
-                    shardRouting.build());
-
-            result.add(stats);
+        for (Map.Entry<String, JsonElement> entry : getAllWithShardLevel(indices).entrySet()) {
+            final String index = entry.getKey();
+            Optional.ofNullable(asJsonObject(entry.getValue()))
+                    .map(indexStats -> buildIndexStatistics(index, indexStats))
+                    .ifPresent(result::add);
         }
 
         return result.build();
     }
 
-    public boolean cycleAlias(String aliasName, String targetIndex) {
-        return c.admin().indices().prepareAliases()
-                .addAlias(targetIndex, aliasName)
-                .execute().actionGet().isAcknowledged();
+    public void cycleAlias(String aliasName, String targetIndex) {
+        final AddAliasMapping addAliasMapping = new AddAliasMapping.Builder(targetIndex, aliasName).build();
+        JestUtils.execute(jestClient, new ModifyAliases.Builder(addAliasMapping).build(), () -> "Couldn't point alias " + aliasName + " to index " + targetIndex);
     }
 
-    public boolean cycleAlias(String aliasName, String targetIndex, String oldIndex) {
-        return c.admin().indices().prepareAliases()
-                .removeAlias(oldIndex, aliasName)
-                .addAlias(targetIndex, aliasName)
-                .execute().actionGet().isAcknowledged();
+    public void cycleAlias(String aliasName, String targetIndex, String oldIndex) {
+        final AliasMapping addAliasMapping = new AddAliasMapping.Builder(targetIndex, aliasName).build();
+        final AliasMapping removeAliasMapping = new RemoveAliasMapping.Builder(oldIndex, aliasName).build();
+        final ModifyAliases request = new ModifyAliases.Builder(Arrays.asList(removeAliasMapping, addAliasMapping)).build();
+
+        JestUtils.execute(jestClient, request, () -> "Couldn't switch alias " + aliasName + " from index " + oldIndex + " to index " + targetIndex);
     }
 
-    public boolean removeAliases(String alias, Set<String> indices) {
-        return c.admin().indices().prepareAliases()
-                .removeAlias(indices.toArray(new String[0]), alias)
-                .execute().actionGet().isAcknowledged();
+    public void removeAliases(String alias, Set<String> indices) {
+        final AliasMapping removeAliasMapping = new RemoveAliasMapping.Builder(ImmutableList.copyOf(indices), alias).build();
+        final ModifyAliases request = new ModifyAliases.Builder(removeAliasMapping).build();
+        JestUtils.execute(jestClient, request, () -> "Couldn't remove alias " + alias + " from indices " + indices);
     }
 
     public void optimizeIndex(String index, int maxNumSegments, Duration timeout) {
-        // https://www.elastic.co/guide/en/elasticsearch/reference/2.1/indices-forcemerge.html
-        final ForceMergeRequest request = c.admin().indices().prepareForceMerge(index)
-                .setMaxNumSegments(maxNumSegments)
-                .setOnlyExpungeDeletes(false)
-                .setFlush(true)
-                .request();
+        final RequestConfig requestConfig = RequestConfig.custom()
+                .setSocketTimeout(Ints.saturatedCast(timeout.toMilliseconds()))
+                .build();
 
-        // Using a specific timeout to override the global Elasticsearch request timeout
-        c.admin().indices().forceMerge(request).actionGet(timeout.getQuantity(), timeout.getUnit());
+        final ForceMerge request = new ForceMerge.Builder()
+                .addIndex(index)
+                .maxNumSegments(maxNumSegments)
+                .flush(true)
+                .onlyExpungeDeletes(false)
+                .build();
+
+        JestUtils.execute(jestClient, requestConfig, request, () -> "Couldn't force merge index " + index);
     }
 
-    public ClusterHealthStatus waitForRecovery(String index) {
-        return waitForStatus(index, ClusterHealthStatus.YELLOW);
+    public Health.Status waitForRecovery(String index) {
+        return waitForStatus(index, Health.Status.YELLOW);
     }
 
-    public ClusterHealthStatus waitForStatus(String index, ClusterHealthStatus clusterHealthStatus) {
-        final ClusterHealthRequest request = c.admin().cluster().prepareHealth(index)
-                .setWaitForStatus(clusterHealthStatus)
-                .request();
-
+    private Health.Status waitForStatus(String index, Health.Status clusterHealthStatus) {
         LOG.debug("Waiting until index health status of index {} is {}", index, clusterHealthStatus);
+        final Health request = new Health.Builder()
+                .addIndex(index)
+                .waitForStatus(clusterHealthStatus)
+                .build();
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read health status for index " + index);
 
-        final ClusterHealthResponse response = c.admin().cluster().health(request).actionGet(5L, TimeUnit.MINUTES);
-        return response.getStatus();
+        final String status = jestResult.getJsonObject().get("status").getAsString();
+        return Health.Status.valueOf(status.toUpperCase(Locale.ENGLISH));
     }
 
-    @Nullable
-    public DateTime indexCreationDate(String index) {
-        final GetIndexRequest indexRequest = c.admin().indices().prepareGetIndex()
-                .addFeatures(GetIndexRequest.Feature.SETTINGS)
-                .addIndices(index)
-                .request();
-        try {
-            final GetIndexResponse response = c.admin().indices()
-                    .getIndex(indexRequest).actionGet();
-            final Settings settings = response.settings().get(index);
-            if (settings == null) {
-                return null;
-            }
-            return new DateTime(settings.getAsLong("index.creation_date", 0L), DateTimeZone.UTC);
-        } catch (ElasticsearchException e) {
-            LOG.warn("Unable to read creation_date for index " + index, e.getRootCause());
-            return null;
-        }
+    public Optional<DateTime> indexCreationDate(String index) {
+        final GetSettings request = new GetSettings.Builder()
+                .addIndex(index)
+                .ignoreUnavailable(true)
+                .build();
+        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read settings of index " + index);
+
+        return Optional.of(jestResult.getJsonObject())
+                .map(json -> asJsonObject(json.get(index)))
+                .map(json -> asJsonObject(json.get("settings")))
+                .map(json -> asJsonObject(json.get("index")))
+                .map(json -> asString(json.get("creation_date")))  // WTF, why is this a string?
+                .map(Long::parseLong)
+                .map(creationDate -> new DateTime(creationDate, DateTimeZone.UTC));
     }
 
     /**
@@ -609,59 +745,50 @@ public class Indices {
      */
     public IndexRangeStats indexRangeStatsOfIndex(String index) {
         final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
-                .filter(QueryBuilders.existsQuery("timestamp"))
-                .subAggregation(AggregationBuilders.min("ts_min").field("timestamp"))
-                .subAggregation(AggregationBuilders.max("ts_max").field("timestamp"))
-                .subAggregation(AggregationBuilders.terms("streams").field("streams"));
-        final SearchRequestBuilder srb = c.prepareSearch()
-                .setIndices(index)
-                .setSearchType(SearchType.QUERY_THEN_FETCH)
-                .setSize(0)
-                .addAggregation(builder);
+                .filter(QueryBuilders.existsQuery(Message.FIELD_TIMESTAMP))
+                .subAggregation(AggregationBuilders.min("ts_min").field(Message.FIELD_TIMESTAMP))
+                .subAggregation(AggregationBuilders.max("ts_max").field(Message.FIELD_TIMESTAMP))
+                .subAggregation(AggregationBuilders.terms("streams").field(Message.FIELD_STREAMS));
+        final String query = searchSource()
+                .aggregation(builder)
+                .size(0)
+                .toString();
 
-        final SearchResponse response;
-        try {
-            final SearchRequest request = srb.request();
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("Index range query: _search/{}: {}",
-                        index,
-                        XContentHelper.convertToJson(request.source(), false));
-            }
-            response = c.search(request).actionGet();
-        } catch (IndexClosedException e) {
-            throw e;
-        } catch (org.elasticsearch.index.IndexNotFoundException e) {
-            LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
-            throw e;
-        } catch (ElasticsearchException e) {
-            LOG.error("Error while calculating timestamp stats in index <" + index + ">", e);
-            throw new org.elasticsearch.index.IndexNotFoundException("Index " + index + " not found", e);
-        } catch (IOException e) {
-            // can potentially happen when recreating the source of
-            // the index range aggregation query on DEBUG (via XContentHelper)
-            throw new RuntimeException(e);
+        final Search request = new Search.Builder(query)
+                .addIndex(index)
+                .setSearchType(SearchType.DFS_QUERY_THEN_FETCH)
+                .ignoreUnavailable(true)
+                .build();
+
+        if (LOG.isDebugEnabled()) {
+            final Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            LOG.debug("Index range query: _search/{}: {}",
+                    index,
+                    request.getData(gson));
         }
 
-        final Filter f = response.getAggregations().get("agg");
-        if (f.getDocCount() == 0L) {
+        final SearchResult result = JestUtils.execute(jestClient, request, () -> "Couldn't build index range of index " + index);
+
+        final FilterAggregation f = result.getAggregations().getFilterAggregation("agg");
+        if(f == null) {
+            throw new IndexNotFoundException("Couldn't build index range of index " + index + " because it doesn't exist.");
+        } else if (f.getCount() == 0L) {
             LOG.debug("No documents with attribute \"timestamp\" found in index <{}>", index);
             return IndexRangeStats.EMPTY;
         }
 
-        final Min minAgg = f.getAggregations().get("ts_min");
-        final DateTime min = new DateTime((long) minAgg.getValue(), DateTimeZone.UTC);
-        final Max maxAgg = f.getAggregations().get("ts_max");
-        final DateTime max = new DateTime((long) maxAgg.getValue(), DateTimeZone.UTC);
+        final MinAggregation minAgg = f.getMinAggregation("ts_min");
+        final DateTime min = new DateTime(minAgg.getMin().longValue(), DateTimeZone.UTC);
+        final MaxAggregation maxAgg = f.getMaxAggregation("ts_max");
+        final DateTime max = new DateTime(maxAgg.getMax().longValue(), DateTimeZone.UTC);
         // make sure we return an empty list, so we can differentiate between old indices that don't have this information
         // and newer ones that simply have no streams.
-        ImmutableList.Builder<String> streamIds = ImmutableList.builder();
-        final Terms streams = f.getAggregations().get("streams");
-        if (!streams.getBuckets().isEmpty()) {
-            streamIds.addAll(streams.getBuckets().stream()
-                    .map(Terms.Bucket::getKeyAsString)
-                    .collect(toSet()));
-        }
+        final TermsAggregation streams = f.getTermsAggregation("streams");
+        final List<String> streamIds = streams.getBuckets().stream()
+                .map(TermsAggregation.Entry::getKeyAsString)
+                .collect(toList());
 
-        return IndexRangeStats.create(min, max, streamIds.build());
+
+        return IndexRangeStats.create(min, max, streamIds);
     }
 }

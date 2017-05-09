@@ -64,7 +64,7 @@ public class SearchResultChartWidgetStrategy extends ChartWidgetStrategy {
             filter = "streams:" + streamId;
         }
 
-        HistogramResult histogram = searches.histogram(query, interval, filter, this.timeRange);
-        return new ComputationResult(histogram.getResults(), histogram.took().millis(), histogram.getHistogramBoundaries());
+        final HistogramResult histogram = searches.histogram(query, interval, filter, this.timeRange);
+        return new ComputationResult(histogram.getResults(), histogram.tookMs(), histogram.getHistogramBoundaries());
     }
 }

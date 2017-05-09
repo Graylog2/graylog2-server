@@ -26,6 +26,7 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.plugin.Message;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 
@@ -68,7 +69,7 @@ public class SystemFieldsResource extends RestResource {
         if (unlimited) {
             fields = indices.getAllMessageFields(writeIndexWildcards);
         } else {
-            fields = Sets.newHashSet();
+            fields = Sets.newHashSetWithExpectedSize(limit);
             addStandardFields(fields);
             int i = 0;
             for (String field : indices.getAllMessageFields(writeIndexWildcards)) {
@@ -84,8 +85,8 @@ public class SystemFieldsResource extends RestResource {
     }
 
     private void addStandardFields(Set<String> fields) {
-        fields.add("source");
-        fields.add("message");
-        fields.add("timestamp");
+        fields.add(Message.FIELD_SOURCE);
+        fields.add(Message.FIELD_MESSAGE);
+        fields.add(Message.FIELD_TIMESTAMP);
     }
 }

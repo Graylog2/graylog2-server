@@ -14,20 +14,25 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.esplugin;
+package org.graylog2.rest.resources.search.responses;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableSet;
-import org.graylog.autovalue.WithBeanGetter;
 
-import java.util.Set;
+import java.util.Collection;
 
+@JsonAutoDetect
 @AutoValue
-@WithBeanGetter
-public abstract class IndicesReopenedEvent {
-    public abstract Set<String> indices();
+public abstract class SearchError {
+    @JsonProperty
+    public abstract String message();
 
-    public static IndicesReopenedEvent create(Set<String> indices) {
-        return new AutoValue_IndicesReopenedEvent(ImmutableSet.copyOf(indices));
+    @JsonProperty
+    public abstract Collection<String> details();
+
+    public static SearchError create(String message,
+                                     Collection<String> details) {
+        return new AutoValue_SearchError(message, details);
     }
 }

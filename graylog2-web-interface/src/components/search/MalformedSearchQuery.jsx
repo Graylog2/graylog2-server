@@ -10,24 +10,13 @@ const MalformedSearchQuery = React.createClass({
   },
 
   _isGenericError(error) {
-    return error.begin_column === null
-      || error.begin_line === null
-      || error.end_column === null
-      || error.end_line === null;
+    return error.column === null || error.line === null;
   },
 
-  _highlightQueryError(error) {
-    if (error.begin_line > 1 || error.begin_line !== error.end_line) {
-      return error.query;
-    }
-
-    return (
-      <span>
-        {error.query.substring(0, error.begin_column)}
-        <span className="parse-error">{error.query.substring(error.begin_column, error.end_column)}</span>
-        {error.query.substring(error.end_column, error.query.length)}
-      </span>
-    );
+  _getFormattedErrorDetails(details) {
+    return details.map(function(detail) {
+        return <li><code>{detail}</code></li>
+    });
   },
 
   _getFormattedErrorDescription(error) {
@@ -36,8 +25,8 @@ const MalformedSearchQuery = React.createClass({
         <dl style={{ marginBottom: 0 }}>
           <dt>Error Message:</dt>
           <dd>{error.message}</dd>
-          <dt>Exception:</dt>
-          <dd><code>{error.exception_name}</code></dd>
+          <dt>Details:</dt>
+          <dd>{this._getFormattedErrorDetails(error.details)}</dd>
         </dl>
       </Panel>
     );
@@ -57,8 +46,6 @@ const MalformedSearchQuery = React.createClass({
     } else {
       explanation = (
         <div>
-          <p>The given query was malformed at the following position:</p>
-          <pre>{this._highlightQueryError(error)}</pre>
           {this._getFormattedErrorDescription(error)}
         </div>
       );

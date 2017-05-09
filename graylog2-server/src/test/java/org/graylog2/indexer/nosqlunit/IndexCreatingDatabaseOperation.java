@@ -16,24 +16,21 @@
  */
 package org.graylog2.indexer.nosqlunit;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
+import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
+import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.IndicesAdminClient;
+import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
-import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.IndexMapping2;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.messages.Messages;
-import org.graylog2.plugin.system.NodeId;
 
 import java.io.InputStream;
 import java.util.Set;
-
-import static org.mockito.Mockito.mock;
 
 public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client> {
     private final DatabaseOperation<Client> databaseOperation;
@@ -61,10 +58,25 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }
 
-            final Messages messages = new Messages(client, new MetricRegistry());
-            final Indices indices = new Indices(client, new IndexMapping(), messages, mock(NodeId.class), new NullAuditEventSender());
+            final IndexMapping indexMapping = new IndexMapping2();
 
-            if (!indices.create(index, indexSet)) {
+            final String templateName = "graylog-test-internal";
+            final PutIndexTemplateResponse putIndexTemplateResponse = indicesAdminClient.preparePutTemplate(templateName)
+                    .setSource(indexMapping.messageTemplate("*", "standard"))
+                    .get();
+
+            if(!putIndexTemplateResponse.isAcknowledged()) {
+                throw new IllegalStateException("Couldn't create index template " + templateName);
+            }
+
+            final CreateIndexResponse createIndexResponse = indicesAdminClient.prepareCreate(index)
+                    .setSettings(Settings.builder()
+                            .put("number_of_shards", indexSet.getConfig().shards())
+                            .put("number_of_replicas", indexSet.getConfig().replicas())
+                            .build())
+                    .get();
+
+            if (!createIndexResponse.isAcknowledged()) {
                 throw new IllegalStateException("Couldn't create index " + index);
             }
         }

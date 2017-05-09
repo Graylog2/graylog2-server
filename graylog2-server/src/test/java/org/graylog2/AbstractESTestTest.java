@@ -14,14 +14,22 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.esplugin;
+package org.graylog2;
 
-import org.elasticsearch.common.inject.AbstractModule;
+import org.junit.Before;
+import org.junit.Test;
 
-public class MonitorModule extends AbstractModule {
+import static org.assertj.core.api.Assertions.assertThat;
+public class AbstractESTestTest extends AbstractESTest {
     @Override
-    protected void configure() {
-        bind(ClusterStateMonitor.class).asEagerSingleton();
-        bind(IndexChangeMonitor.class).asEagerSingleton();
+    @Before
+    public void setUp() throws Exception {
+        super.setUp();
+        assertThat(jestClient()).isNotNull();
+    }
+
+    @Test
+    public void testIfJestClientIsNotNull() throws Exception {
+        assertThat(jestClient()).isNotNull();
     }
 }

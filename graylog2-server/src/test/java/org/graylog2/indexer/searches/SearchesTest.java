@@ -19,6 +19,8 @@ package org.graylog2.indexer.searches;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
@@ -38,6 +40,9 @@ import org.graylog2.indexer.ranges.MongoIndexRange;
 import org.graylog2.indexer.results.CountResult;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.HistogramResult;
+import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.indexer.results.ScrollResult;
+import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
@@ -66,7 +71,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
 
-import static com.lordofthejars.nosqlunit.elasticsearch2.ElasticsearchRule.ElasticsearchRuleBuilder.newElasticsearchRule;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.ArgumentMatchers.any;
@@ -126,6 +130,9 @@ public class SearchesTest extends AbstractESTest {
     @Mock
     private StreamService streamService;
 
+    @Mock
+    private Indices indices;
+
     private MetricRegistry metricRegistry;
     private Searches searches;
 
@@ -153,9 +160,19 @@ public class SearchesTest extends AbstractESTest {
 
     @Before
     public void setUp() throws Exception {
+        super.setUp();
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
+        when(indices.getAllMessageFieldsForIndices(any(String[].class))).thenReturn(ImmutableMap.of(INDEX_NAME, Collections.singleton("n")));
         metricRegistry = new MetricRegistry();
-        searches = new Searches(new Configuration(), indexRangeService, client, metricRegistry, streamService, mock(Indices.class));
+        searches = new Searches(
+            new Configuration(),
+            indexRangeService,
+            metricRegistry,
+            streamService,
+            indices,
+            jestClient(),
+            (initialResult, query, fields) -> new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields)
+        );
     }
 
     @Test
@@ -586,5 +603,29 @@ public class SearchesTest extends AbstractESTest {
 
         assertThat(searches.determineAffectedIndices(absoluteRange, "streams:123456789ABCDEF"))
                 .containsOnly(b0.indexName(), b1.indexName());
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void searchDoesNotIncludeJestMetadata() throws Exception {
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final SearchResult searchResult = searches.search("_id:1", range, 0, 0, Sorting.DEFAULT);
+
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getTotalResults()).isEqualTo(1L);
+        assertThat(searchResult.getFields()).doesNotContain("es_metadata_id", "es_metadata_version");
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void fieldStatsDoesNotIncludeJestMetadata() throws Exception {
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final FieldStatsResult fieldStatsResult = searches.fieldStats("n", "_id:1", range);
+
+        assertThat(fieldStatsResult).isNotNull();
+        assertThat(fieldStatsResult.getSearchHits()).isNotNull();
+        assertThat(fieldStatsResult.getSearchHits()).hasSize(1);
+        final ResultMessage resultMessage = fieldStatsResult.getSearchHits().get(0);
+        assertThat(resultMessage.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version");
     }
 }

@@ -20,6 +20,7 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import org.graylog2.plugin.Message;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.slf4j.Logger;
@@ -60,7 +61,7 @@ public class SearchResponseCsvWriter implements MessageBodyWriter<SearchResponse
             throws IOException, WebApplicationException {
         final CSVWriter csvWriter = new CSVWriter(new OutputStreamWriter(entityStream, StandardCharsets.UTF_8));
         final ImmutableSortedSet<String> sortedFields = ImmutableSortedSet.copyOf(
-                Iterables.concat(searchResponse.fields(), Lists.newArrayList("source", "timestamp")));
+                Iterables.concat(searchResponse.fields(), Lists.newArrayList(Message.FIELD_SOURCE, Message.FIELD_TIMESTAMP)));
 
         // write field headers
         csvWriter.writeNext(sortedFields.toArray(new String[sortedFields.size()]));

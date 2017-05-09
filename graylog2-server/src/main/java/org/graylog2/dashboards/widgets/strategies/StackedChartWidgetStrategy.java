@@ -105,7 +105,7 @@ public class StackedChartWidgetStrategy extends ChartWidgetStrategy {
                 to = histogramResult.getHistogramBoundaries().getTo();
 
                 results.add(histogramResult.getResults());
-                tookMs += histogramResult.took().millis();
+                tookMs += histogramResult.tookMs();
             } catch (Searches.FieldTypeException e) {
                 String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + widgetId + ">. Not a numeric field? The field was [" + series.field + "]";
                 LOG.error(msg, e);

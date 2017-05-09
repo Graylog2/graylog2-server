@@ -16,64 +16,65 @@
  */
 package org.graylog2.indexer.results;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.metrics.stats.Stats;
+import io.searchbox.core.search.aggregation.StatsAggregation;
+import io.searchbox.core.search.aggregation.TermsAggregation;
 import org.graylog2.indexer.searches.Searches;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class TermsStatsResult extends IndexQueryResult {
-    private static final Comparator<Map<String, Object>> COMPARATOR = new Comparator<Map<String, Object>>() {
-        @Override
-        public int compare(Map<String, Object> o1, Map<String, Object> o2) {
-            double o1Mean = (double) o1.get("mean");
-            double o2Mean = (double) o2.get("mean");
-            if (o1Mean > o2Mean) {
-                return -1;
-            } else if (o1Mean < o2Mean) {
-                return 1;
-            }
-            return 0;
+    private static final Comparator<Map<String, Object>> COMPARATOR = (o1, o2) -> {
+        double o1Mean = (double) o1.get("mean");
+        double o2Mean = (double) o2.get("mean");
+        if (o1Mean > o2Mean) {
+            return -1;
+        } else if (o1Mean < o2Mean) {
+            return 1;
         }
+        return 0;
     };
-    private final Terms facet;
+    private final List<Map<String, Object>> terms;
 
-    public TermsStatsResult(Terms facet, String originalQuery, BytesReference builtQuery, TimeValue took) {
-        super(originalQuery, builtQuery, took);
+    public TermsStatsResult(TermsAggregation terms, String originalQuery, String builtQuery, long tookMs) {
+        super(originalQuery, builtQuery, tookMs);
 
-        this.facet = facet;
+        this.terms = terms.getBuckets().stream()
+            .map(e -> {
+                final Map<String, Object> resultMap = Maps.newHashMap();
+
+                resultMap.put("key_field", e.getKey());
+
+                resultMap.put("count", e.getCount());
+
+                final StatsAggregation stats = e.getStatsAggregation(Searches.AGG_STATS);
+                resultMap.put("min", stats.getMin());
+                resultMap.put("max", stats.getMax());
+                resultMap.put("total", stats.getSum());
+                resultMap.put("total_count", stats.getCount());
+                resultMap.put("mean", stats.getAvg());
+
+                return resultMap;
+            })
+            .sorted(COMPARATOR)
+            .collect(Collectors.toList());
+    }
+
+    private TermsStatsResult(String originalQuery, String builtQuery) {
+        super(originalQuery, builtQuery, 0);
+
+        this.terms = Collections.emptyList();
+    }
+
+    public static TermsStatsResult empty(String originalQuery, String builtQuery) {
+        return new TermsStatsResult(originalQuery, builtQuery);
     }
 
     public List<Map<String, Object>> getResults() {
-        List<Map<String, Object>> results = Lists.newArrayList();
-
-        for (Terms.Bucket e : facet.getBuckets()) {
-            Map<String, Object> resultMap = Maps.newHashMap();
-
-            resultMap.put("key_field", e.getKey());
-
-            resultMap.put("count", e.getDocCount());
-
-            final Stats stats = e.getAggregations().get(Searches.AGG_STATS);
-            resultMap.put("min", stats.getMin());
-            resultMap.put("max", stats.getMax());
-            resultMap.put("total", stats.getSum());
-            resultMap.put("total_count", stats.getCount());
-            resultMap.put("mean", stats.getAvg());
-
-            results.add(resultMap);
-        }
-
-        // Sort results by descending mean value
-        Collections.sort(results, COMPARATOR);
-
-        return results;
+        return this.terms;
     }
 }

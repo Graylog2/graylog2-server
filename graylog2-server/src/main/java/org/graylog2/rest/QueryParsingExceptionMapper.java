@@ -16,22 +16,23 @@
  */
 package org.graylog2.rest;
 
-import org.graylog2.indexer.InvalidRangeFormatException;
-import org.graylog2.plugin.rest.ApiError;
+import org.graylog2.indexer.QueryParsingException;
+import org.graylog2.rest.resources.search.responses.QueryParseError;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
 
-@Provider
-public class InvalidRangeFormatExceptionMapper implements ExceptionMapper<InvalidRangeFormatException> {
+public class QueryParsingExceptionMapper implements ExceptionMapper<QueryParsingException> {
     @Override
-    public Response toResponse(InvalidRangeFormatException exception) {
-        return Response
-                .status(Response.Status.BAD_REQUEST)
-                .type(MediaType.APPLICATION_JSON_TYPE)
-                .entity(new ApiError(exception.getMessage()))
+    public Response toResponse(QueryParsingException exception) {
+        final QueryParseError errorMessage = QueryParseError.create(
+                exception.getMessage(),
+                exception.getErrorDetails(),
+                exception.getLine().orElse(null),
+                exception.getColumn().orElse(null));
+
+        return Response.status(Response.Status.BAD_REQUEST)
+                .entity(errorMessage)
                 .build();
     }
 }

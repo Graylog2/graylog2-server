@@ -14,30 +14,24 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer.indices;
+package org.graylog2.indexer.indices.events;
 
 import com.google.auto.value.AutoValue;
-import org.elasticsearch.action.admin.indices.stats.CommonStats;
-import org.elasticsearch.cluster.routing.ShardRouting;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 
-import java.util.List;
+import java.util.Set;
 
 @AutoValue
 @WithBeanGetter
-public abstract class IndexStatistics {
-    public abstract String indexName();
+public abstract class IndicesClosedEvent {
+    public abstract Set<String> indices();
 
-    public abstract CommonStats primaries();
+    public static IndicesClosedEvent create(Set<String> indices) {
+        return new AutoValue_IndicesClosedEvent(ImmutableSet.copyOf(indices));
+    }
 
-    public abstract CommonStats total();
-
-    public abstract List<ShardRouting> shardRoutings();
-
-    public static IndexStatistics create(String indexName,
-                                         CommonStats primaries,
-                                         CommonStats total,
-                                         List<ShardRouting> shardRoutings) {
-        return new AutoValue_IndexStatistics(indexName, primaries, total, shardRoutings);
+    public static IndicesClosedEvent create(String index) {
+        return new AutoValue_IndicesClosedEvent(ImmutableSet.of(index));
     }
 }

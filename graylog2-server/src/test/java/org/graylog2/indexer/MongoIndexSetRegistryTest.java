@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer;
 
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
@@ -30,6 +31,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -41,7 +43,7 @@ public class MongoIndexSetRegistryTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private IndexSetRegistry indexSetRegistry;
+    private MongoIndexSetRegistry indexSetRegistry;
     private MongoIndexSetRegistry.IndexSetsCache indexSetsCache;
     @Mock
     private IndexSetService indexSetService;
@@ -223,5 +225,45 @@ public class MongoIndexSetRegistryTest {
             .containsExactly(indexSet);
 
         verify(indexSetService, times(2)).findAll();
+    }
+
+    @Test
+    public void isManagedIndexReturnsAMapOfIndices() {
+        final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
+        final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
+        final MongoIndexSet indexSet = mock(MongoIndexSet.class);
+        when(mongoIndexSetFactory.create(indexSetConfig)).thenReturn(indexSet);
+        when(indexSetService.findAll()).thenReturn(indexSetConfigs);
+        when(indexSet.isManagedIndex("index1")).thenReturn(true);
+        when(indexSet.isManagedIndex("index2")).thenReturn(false);
+
+        final Map<String, Boolean> managedStatus = indexSetRegistry.isManagedIndex(ImmutableSet.of("index1", "index2"));
+        assertThat(managedStatus)
+                .containsEntry("index1", true)
+                .containsEntry("index2", false);
+    }
+
+    @Test
+    public void isManagedIndexWithManagedIndexReturnsTrue() {
+        final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
+        final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
+        final MongoIndexSet indexSet = mock(MongoIndexSet.class);
+        when(mongoIndexSetFactory.create(indexSetConfig)).thenReturn(indexSet);
+        when(indexSetService.findAll()).thenReturn(indexSetConfigs);
+        when(indexSet.isManagedIndex("index")).thenReturn(true);
+
+        assertThat(indexSetRegistry.isManagedIndex("index")).isTrue();
+    }
+
+    @Test
+    public void isManagedIndexWithUnmanagedIndexReturnsFalse() {
+        final IndexSetConfig indexSetConfig = mock(IndexSetConfig.class);
+        final List<IndexSetConfig> indexSetConfigs = Collections.singletonList(indexSetConfig);
+        final MongoIndexSet indexSet = mock(MongoIndexSet.class);
+        when(mongoIndexSetFactory.create(indexSetConfig)).thenReturn(indexSet);
+        when(indexSetService.findAll()).thenReturn(indexSetConfigs);
+        when(indexSet.isManagedIndex("index")).thenReturn(false);
+
+        assertThat(indexSetRegistry.isManagedIndex("index")).isFalse();
     }
 }

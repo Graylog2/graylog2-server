@@ -17,13 +17,9 @@
 
 package org.graylog2.indexer.rotation.strategies;
 
-import org.elasticsearch.action.admin.indices.stats.CommonStats;
-import org.elasticsearch.cluster.routing.ShardRouting;
-import org.elasticsearch.index.store.StoreStats;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.indices.IndexStatistics;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.plugin.system.NodeId;
 import org.junit.Rule;
@@ -32,7 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Collections;
+import java.util.Optional;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -61,11 +57,7 @@ public class SizeBasedRotationStrategyTest {
 
     @Test
     public void testRotate() throws Exception {
-        final CommonStats commonStats = new CommonStats();
-        commonStats.store = new StoreStats(1000, 0);
-        final IndexStatistics stats = IndexStatistics.create("name", commonStats, commonStats, Collections.<ShardRouting>emptyList());
-
-        when(indices.getIndexStats("name")).thenReturn(stats);
+        when(indices.getStoreSizeInBytes("name")).thenReturn(Optional.of(1000L));
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100L));
@@ -80,11 +72,7 @@ public class SizeBasedRotationStrategyTest {
 
     @Test
     public void testDontRotate() throws Exception {
-        final CommonStats commonStats = new CommonStats();
-        commonStats.store = new StoreStats(1000, 0);
-        final IndexStatistics stats = IndexStatistics.create("name", commonStats, commonStats, Collections.<ShardRouting>emptyList());
-
-        when(indices.getIndexStats("name")).thenReturn(stats);
+        when(indices.getStoreSizeInBytes("name")).thenReturn(Optional.of(1000L));
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100000L));
@@ -99,7 +87,7 @@ public class SizeBasedRotationStrategyTest {
 
     @Test
     public void testRotateFailed() throws Exception {
-        when(indices.getIndexStats("name")).thenReturn(null);
+        when(indices.getStoreSizeInBytes("name")).thenReturn(Optional.empty());
         when(indexSet.getNewestIndex()).thenReturn("name");
         when(indexSet.getConfig()).thenReturn(indexSetConfig);
         when(indexSetConfig.rotationStrategy()).thenReturn(SizeBasedRotationStrategyConfig.create(100L));

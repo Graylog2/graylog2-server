@@ -14,16 +14,23 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.indexer;
+package org.graylog2.indexer.guava;
 
-public class EmptyIndexException extends Exception {
+import com.google.common.cache.CacheLoader;
 
-    public EmptyIndexException() {
-        super();
+import java.util.function.Function;
+
+import static java.util.Objects.requireNonNull;
+
+public class FunctionCacheLoader<K, V> extends CacheLoader<K, V> {
+    private final Function<K, V> loadingFunction;
+
+    public FunctionCacheLoader(Function<K, V> loadingFunction) {
+        this.loadingFunction = requireNonNull(loadingFunction, "loadingFunction must not be null");
     }
 
-    public EmptyIndexException(String msg) {
-        super(msg);
+    @Override
+    public V load(K key) throws Exception {
+        return loadingFunction.apply(key);
     }
-
 }

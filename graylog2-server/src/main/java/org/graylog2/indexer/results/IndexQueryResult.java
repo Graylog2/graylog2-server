@@ -16,27 +16,14 @@
  */
 package org.graylog2.indexer.results;
 
-import com.google.common.collect.Lists;
-import org.elasticsearch.common.bytes.BytesReference;
-import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.common.xcontent.XContentHelper;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-
-import java.io.IOException;
-import java.util.List;
-
-/**
- * @author Lennart Koopmann <lennart@torch.sh>
- */
 public class IndexQueryResult {
     private final String originalQuery;
-    private final TimeValue took;
-    private final BytesReference builtQuery;
+    private final long tookMs;
+    private final String builtQuery;
 
-    public IndexQueryResult(String originalQuery, BytesReference builtQuery, TimeValue took) {
+    public IndexQueryResult(String originalQuery, String builtQuery, long tookMs) {
         this.originalQuery = originalQuery;
-        this.took = took;
+        this.tookMs = tookMs;
         this.builtQuery = builtQuery;
     }
 
@@ -45,24 +32,10 @@ public class IndexQueryResult {
     }
 
     public String getBuiltQuery() {
-        try {
-            return XContentHelper.convertToJson(builtQuery, false);
-        } catch (IOException ignored) {
-            // exception comes from InputStream, but that stream is from a byte array, so won't do IO.
-        }
-        return null;
+        return builtQuery;
     }
 
-    public TimeValue took() {
-        return took;
-    }
-
-    protected List<ResultMessage> buildResults(SearchHits hits) {
-        List<ResultMessage> r = Lists.newArrayList();
-
-        for (SearchHit hit : hits) {
-            r.add(ResultMessage.parseFromSource(hit));
-        }
-        return r;
+    public long tookMs() {
+        return tookMs;
     }
 }
