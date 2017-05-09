@@ -1,10 +1,12 @@
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+
+import { ErrorPopover } from 'components/lookup-tables';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
@@ -29,18 +31,11 @@ const DataAdapterTableEntry = React.createClass({
   },
 
   render() {
-    const errorOverlay = !this.props.error ? null : (
-      <Popover id="popover-table-error" title="Lookup Table problem" style={{ maxWidth: 400 }}>
-        {this.props.error}
-      </Popover>);
     return (
       <tbody>
         <tr>
           <td>
-            {this.props.error && (
-              <OverlayTrigger trigger={['hover', 'focus']} placement="right" overlay={errorOverlay}>
-                <i className="fa fa-warning text-danger" style={{ marginRight: 5 }} />
-              </OverlayTrigger>)}
+            {this.props.error && <ErrorPopover errorText={this.props.error} title="Lookup table problem" placement="right" />}
             <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(this.props.adapter.name)}><a>{this.props.adapter.title}</a></LinkContainer>
           </td>
           <td>{this.props.adapter.description}</td>

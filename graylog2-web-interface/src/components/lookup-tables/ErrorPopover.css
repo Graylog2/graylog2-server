@@ -1,0 +1,7 @@
+:local(.overlay) {
+    max-width: 400px;
+}
+
+:local(.trigger) {
+    margin-right: 5px;
+}
