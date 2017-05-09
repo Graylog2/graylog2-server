@@ -71,6 +71,18 @@ public class ElasticsearchException extends RuntimeException {
     }
 
     @Override
+    public String getMessage() {
+        final StringBuilder sb = new StringBuilder(super.getMessage());
+
+        if(!errorDetails.isEmpty()) {
+            sb.append("\n\n");
+            errorDetails.forEach(sb::append);
+        }
+
+        return sb.toString();
+    }
+
+    @Override
     public String toString() {
         return MoreObjects.toStringHelper(this)
                 .add("message", getMessage())
