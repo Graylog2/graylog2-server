@@ -63,7 +63,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
@@ -85,18 +84,20 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
     @Inject
     protected HTTPJSONPathDataAdapter(@Assisted LookupDataAdapterConfiguration config,
                                       @Named("daemonScheduler") ScheduledExecutorService scheduler,
+                                      @Assisted("id") String id,
+                                      @Assisted("name") String name,
                                       Engine templateEngine,
                                       OkHttpClient httpClient,
                                       MetricRegistry metricRegistry) {
-        super(config, scheduler);
+        super(id, name, config, scheduler);
         this.config = (Config) config;
         this.templateEngine = templateEngine;
         // TODO Add config options: caching, timeouts, custom headers, basic auth (See: https://github.com/square/okhttp/wiki/Recipes)
         this.httpClient = httpClient.newBuilder().build(); // Copy HTTP client to be able to modify it
 
-        this.httpRequestTimer = metricRegistry.timer(name(getClass(), "httpRequestTime"));
-        this.httpRequestErrors = metricRegistry.meter(name(getClass(), "httpRequestErrors"));
-        this.httpURLErrors = metricRegistry.meter(name(getClass(), "httpURLErrors"));
+        this.httpRequestTimer = metricRegistry.timer(MetricRegistry.name(getClass(), "httpRequestTime"));
+        this.httpRequestErrors = metricRegistry.meter(MetricRegistry.name(getClass(), "httpRequestErrors"));
+        this.httpURLErrors = metricRegistry.meter(MetricRegistry.name(getClass(), "httpURLErrors"));
     }
 
     @Override
@@ -236,7 +237,9 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
 
     public interface Factory extends LookupDataAdapter.Factory<HTTPJSONPathDataAdapter> {
         @Override
-        HTTPJSONPathDataAdapter create(LookupDataAdapterConfiguration configuration);
+        HTTPJSONPathDataAdapter create(@Assisted("id") String id,
+                                       @Assisted("name") String name,
+                                       LookupDataAdapterConfiguration configuration);
 
         @Override
         Descriptor getDescriptor();
