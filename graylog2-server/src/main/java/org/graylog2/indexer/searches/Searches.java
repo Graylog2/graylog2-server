@@ -144,8 +144,23 @@ public class Searches {
             return period;
         }
 
-        public long getMillis() {
-            return period.toStandardSeconds().getSeconds() * 1000L;
+        public org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval toESInterval() {
+            switch (this) {
+                case MINUTE:
+                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.MINUTE;
+                case HOUR:
+                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.HOUR;
+                case DAY:
+                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.DAY;
+                case WEEK:
+                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.WEEK;
+                case MONTH:
+                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.MONTH;
+                case QUARTER:
+                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.QUARTER;
+                default:
+                    return org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramInterval.YEAR;
+            }
         }
     }
 
@@ -524,7 +539,7 @@ public class Searches {
             .subAggregation(
                 AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                     .field(Message.FIELD_TIMESTAMP)
-                    .interval(interval.getMillis())
+                    .interval(interval.toESInterval())
             )
             .filter(standardAggregationFilters(range, filter));
 
@@ -572,7 +587,7 @@ public class Searches {
         final DateHistogramBuilder dateHistogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                 .field(Message.FIELD_TIMESTAMP)
                 .subAggregation(AggregationBuilders.stats(AGG_STATS).field(field))
-                .interval(interval.getMillis());
+                .interval(interval.toESInterval());
 
         if (includeCardinality) {
             dateHistogramBuilder.subAggregation(AggregationBuilders.cardinality(AGG_CARDINALITY).field(field));

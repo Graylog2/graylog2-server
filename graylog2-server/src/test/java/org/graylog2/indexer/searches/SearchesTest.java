@@ -444,6 +444,57 @@ public class SearchesTest extends AbstractESTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @SuppressWarnings("unchecked")
+    public void testFieldHistogramWithMonth() throws Exception {
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MONTH, null, range, false);
+
+        assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.MONTH);
+        assertThat(h.getHistogramBoundaries()).isEqualTo(range);
+        assertThat(h.getResults()).hasSize(1);
+        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 0, 0, UTC).getMillis() / 1000L))
+                .containsEntry("total_count", 10L)
+                .containsEntry("total", 19.0)
+                .containsEntry("min", 1.0)
+                .containsEntry("max", 4.0);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @SuppressWarnings("unchecked")
+    public void testFieldHistogramWithQuarter() throws Exception {
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.QUARTER, null, range, false);
+
+        assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.QUARTER);
+        assertThat(h.getHistogramBoundaries()).isEqualTo(range);
+        assertThat(h.getResults()).hasSize(1);
+        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 0, 0, UTC).getMillis() / 1000L))
+                .containsEntry("total_count", 10L)
+                .containsEntry("total", 19.0)
+                .containsEntry("min", 1.0)
+                .containsEntry("max", 4.0);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @SuppressWarnings("unchecked")
+    public void testFieldHistogramWithYear() throws Exception {
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.YEAR, null, range, false);
+
+        assertThat(h.getInterval()).isEqualTo(Searches.DateHistogramInterval.YEAR);
+        assertThat(h.getHistogramBoundaries()).isEqualTo(range);
+        assertThat(h.getResults()).hasSize(1);
+        assertThat((Map<String, Number>) h.getResults().get(new DateTime(2015, 1, 1, 0, 0, UTC).getMillis() / 1000L))
+                .containsEntry("total_count", 10L)
+                .containsEntry("total", 19.0)
+                .containsEntry("min", 1.0)
+                .containsEntry("max", 4.0);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void fieldHistogramRecordsMetrics() throws Exception {
         final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC));
         HistogramResult h = searches.fieldHistogram("*", "n", Searches.DateHistogramInterval.MINUTE, null, range, false);
