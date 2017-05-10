@@ -16,22 +16,28 @@
  */
 package org.graylog2.indexer.counts;
 
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.client.Client;
+import io.searchbox.client.JestClient;
+import io.searchbox.core.Count;
+import io.searchbox.core.CountResult;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
+import org.graylog2.indexer.cluster.jest.JestUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Arrays;
+import java.util.List;
 
 @Singleton
 public class Counts {
-    private final Client c;
+    private final JestClient jestClient;
     private final IndexSetRegistry indexSetRegistry;
 
     @Inject
-    public Counts(Client client, IndexSetRegistry indexSetRegistry) {
-        this.c = client;
+    public Counts(JestClient jestClient, IndexSetRegistry indexSetRegistry) {
+        this.jestClient = jestClient;
         this.indexSetRegistry = indexSetRegistry;
     }
 
@@ -50,14 +56,15 @@ public class Counts {
             return 0L;
         }
 
-        try {
-            return c.prepareSearch(indexNames)
-                    .setSize(0)
-                    .get()
-                    .getHits()
-                    .getTotalHits();
-        } catch (ElasticsearchException e) {
-            return -1L;
-        }
+        final List<String> indices = Arrays.asList(indexNames);
+        final String query = new SearchSourceBuilder()
+                .query(QueryBuilders.matchAllQuery())
+                .toString();
+        final Count request = new Count.Builder()
+                .query(query)
+                .addIndex(indices)
+                .build();
+        final CountResult result = JestUtils.execute(jestClient, request, () -> "Fetching message count failed for indices " + indices);
+        return result.getCount().longValue();
     }
 }

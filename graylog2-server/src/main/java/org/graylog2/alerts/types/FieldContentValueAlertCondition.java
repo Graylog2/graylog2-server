@@ -22,7 +22,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AbstractAlertCondition;
-import org.graylog2.indexer.InvalidRangeFormatException;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.SearchResult;
 import org.graylog2.indexer.searches.Searches;
@@ -132,7 +131,7 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
                 RelativeRange.create(configuration.getAlertCheckInterval()),
                 searchLimit,
                 0,
-                new Sorting("timestamp", Sorting.Direction.DESC)
+                new Sorting(Message.FIELD_TIMESTAMP, Sorting.Direction.DESC)
             );
 
             final List<MessageSummary> summaries;
@@ -161,10 +160,6 @@ public class FieldContentValueAlertCondition extends AbstractAlertCondition {
         } catch (InvalidRangeParametersException e) {
             // cannot happen lol
             LOG.error("Invalid timerange.", e);
-            return null;
-        } catch (InvalidRangeFormatException e) {
-            // lol same here
-            LOG.error("Invalid timerange format.", e);
             return null;
         }
     }

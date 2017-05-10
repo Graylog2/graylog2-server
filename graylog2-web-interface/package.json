@@ -10,16 +10,16 @@
   },
   "readme": "../README.md",
   "scripts": {
-    "start": "webpack --config webpack.vendor.js && webpack-dev-server --config webpack.combined.config.js",
-    "start-nohmr": "webpack --config webpack.vendor.js && webpack-dev-server --watch --config webpack.combined.config.js",
-    "build": "webpack -p --config webpack.vendor.js && webpack",
+    "start": "webpack-dev-server --config webpack.bundled.js --history-api-fallback --hot --inline",
+    "start-nohmr": "webpack-dev-server --watch --history-api-fallback --config webpack.bundled.js",
+    "build": "disable_plugins=true webpack --config webpack.bundled.js",
     "test": "webpack --config webpack.vendor.js && karma start karma.ci.conf.js",
     "prepare-dev": "./tools/prepare-dev",
     "lint": "eslint --ext js,jsx src"
   },
   "dependencies": {
     "bluebird": "^3.4.0",
-    "bootstrap": "^3.3.7",
+    "bootstrap": "3.3.6",
     "c3": "^0.4.11-rc4",
     "classnames": "^2.2.0",
     "clipboard": "^1.5.5",
@@ -57,6 +57,7 @@
     "urijs": "^1.17.0"
   },
   "devDependencies": {
+    "assets-webpack-plugin": "^3.5.1",
     "babel-core": "^6.22.1",
     "babel-loader": "^6.2.10",
     "babel-plugin-add-module-exports": "^0.2.1",

@@ -21,8 +21,7 @@ import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.inject.assistedinject.Assisted;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
-import org.elasticsearch.indices.InvalidAliasNameException;
+import io.searchbox.cluster.Health;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -202,7 +201,7 @@ public class MongoIndexSet implements IndexSet {
     @Override
     @Nullable
     public String getActiveWriteIndex() throws TooManyAliasesException {
-        return indices.aliasTarget(getWriteIndexAlias());
+        return indices.aliasTarget(getWriteIndexAlias()).orElse(null);
     }
 
     @Override
@@ -260,8 +259,6 @@ public class MongoIndexSet implements IndexSet {
                 activityWriter.write(new Activity(msg, IndexSet.class));
 
                 cycle(); // No index, so automatically cycling to a new one.
-            } catch (InvalidAliasNameException e) {
-                LOG.error("Seems like there already is an index called <{}>", getWriteIndexAlias());
             }
         }
     }
@@ -298,7 +295,7 @@ public class MongoIndexSet implements IndexSet {
         }
 
         LOG.info("Waiting for allocation of index <{}>.", newTarget);
-        ClusterHealthStatus healthStatus = indices.waitForRecovery(newTarget);
+        Health.Status healthStatus = indices.waitForRecovery(newTarget);
         LOG.debug("Health status of index <{}>: {}", newTarget, healthStatus);
 
         addDeflectorIndexRange(newTarget);

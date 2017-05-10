@@ -1,4 +1,4 @@
-// webpack.config.js
+const fs = require('fs');
 const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -9,7 +9,6 @@ const APP_PATH = path.resolve(ROOT_PATH, 'src');
 const BUILD_PATH = path.resolve(ROOT_PATH, 'build');
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
-const VENDOR_MANIFEST = require(VENDOR_MANIFEST_PATH);
 const TARGET = process.env.npm_lifecycle_event;
 process.env.BABEL_ENV = TARGET;
 
@@ -24,6 +23,8 @@ const BABELLOADER = { loader: 'babel-loader', options: BABELOPTIONS };
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 
 const webpackConfig = {
+  name: 'app',
+  dependencies: ['vendor'],
   entry: {
     app: APP_PATH,
     polyfill: ['babel-polyfill'],
@@ -61,13 +62,14 @@ const webpackConfig = {
   resolveLoader: { modules: [path.join(ROOT_PATH, 'node_modules')], moduleExtensions: ['-loader'] },
   devtool: 'source-map',
   plugins: [
-    new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST, context: ROOT_PATH }),
+    new webpack.DllReferencePlugin({ manifest: VENDOR_MANIFEST_PATH, context: ROOT_PATH }),
     new HtmlWebpackPlugin({
       title: 'Graylog',
       favicon: path.resolve(ROOT_PATH, 'public/images/favicon.png'),
       filename: 'index.html',
       inject: false,
       template: path.resolve(ROOT_PATH, 'templates/index.html.template'),
+      vendorModule: () => JSON.parse(fs.readFileSync(path.resolve(ROOT_PATH, 'build/vendor-module.json'), 'utf8')),
       chunksSortMode: (c1, c2) => {
         // Render the polyfill chunk first
         if (c1.names[0] === 'polyfill') {
@@ -75,6 +77,12 @@ const webpackConfig = {
         }
         if (c2.names[0] === 'polyfill') {
           return 1;
+        }
+        if (c1.names[0] === 'app') {
+          return 1;
+        }
+        if (c2.names[0] === 'app') {
+          return -1;
         }
         return c2.id - c1.id;
       },
@@ -107,7 +115,6 @@ if (TARGET === 'start') {
       hotUpdateMainFilename: 'hot-update.json',
     },
     plugins: [
-      new webpack.HotModuleReplacementPlugin(),
       new webpack.NamedModulesPlugin(),
       new webpack.DefinePlugin({DEVELOPMENT: true}),
     ],

@@ -17,13 +17,10 @@
 package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexResponse;
 import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
-import org.elasticsearch.common.unit.TimeValue;
 import org.graylog2.AbstractESTest;
+import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.indexset.IndexSetConfig;
@@ -35,6 +32,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -45,6 +43,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.fail;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -54,6 +53,8 @@ public class CountsTest extends AbstractESTest {
     private static final String INDEX_NAME_2 = "index_set_2_counts_test_0";
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
+    @Rule
+    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private IndexSetRegistry indexSetRegistry;
@@ -67,40 +68,16 @@ public class CountsTest extends AbstractESTest {
 
     @Before
     public void setUp() throws Exception {
+        super.setUp();
+
         final Map<String, Object> settings = ImmutableMap.of(
                 "number_of_shards", 1,
                 "index.number_of_replicas", 0);
-        final CreateIndexResponse createIndexResponse1 = client.admin().indices()
-                .prepareCreate(INDEX_NAME_1)
-                .setSettings(settings)
-                .setTimeout(TimeValue.timeValueSeconds(10L))
-                .execute()
-                .get();
-        assumeTrue(createIndexResponse1.isAcknowledged());
+        createIndex(INDEX_NAME_1);
+        createIndex(INDEX_NAME_2);
+        waitForGreenStatus(INDEX_NAME_1, INDEX_NAME_2);
 
-        final CreateIndexResponse createIndexResponse2 = client.admin().indices()
-                .prepareCreate(INDEX_NAME_2)
-                .setSettings(settings)
-                .setTimeout(TimeValue.timeValueSeconds(10L))
-                .execute()
-                .get();
-        assumeTrue(createIndexResponse2.isAcknowledged());
-
-        final ClusterHealthResponse clusterHealthResponse1 = client.admin().cluster()
-                .prepareHealth(INDEX_NAME_1)
-                .setWaitForGreenStatus()
-                .execute()
-                .get();
-        assumeTrue(clusterHealthResponse1.getStatus() == ClusterHealthStatus.GREEN);
-
-        final ClusterHealthResponse clusterHealthResponse2 = client.admin().cluster()
-                .prepareHealth(INDEX_NAME_2)
-                .setWaitForGreenStatus()
-                .execute()
-                .get();
-        assumeTrue(clusterHealthResponse2.getStatus() == ClusterHealthStatus.GREEN);
-
-        counts = new Counts(client, indexSetRegistry);
+        counts = new Counts(jestClient(), indexSetRegistry);
 
         indexSetConfig1 = IndexSetConfig.builder()
                 .id("id-1")
@@ -145,19 +122,7 @@ public class CountsTest extends AbstractESTest {
 
     @After
     public void tearDown() throws Exception {
-        final DeleteIndexResponse deleteIndexResponse1 = client.admin().indices()
-                .prepareDelete(INDEX_NAME_1)
-                .setTimeout(TimeValue.timeValueSeconds(10L))
-                .execute()
-                .get();
-        assumeTrue(deleteIndexResponse1.isAcknowledged());
-
-        final DeleteIndexResponse deleteIndexResponse2 = client.admin().indices()
-                .prepareDelete(INDEX_NAME_2)
-                .setTimeout(TimeValue.timeValueSeconds(10L))
-                .execute()
-                .get();
-        assumeTrue(deleteIndexResponse2.isAcknowledged());
+        deleteIndex(INDEX_NAME_1, INDEX_NAME_2);
     }
 
     @Test
@@ -170,7 +135,7 @@ public class CountsTest extends AbstractESTest {
     @Test
     public void totalReturnsZeroWithNoIndices() throws Exception {
         for (int i = 0; i < 10; i++) {
-            final IndexResponse indexResponse = client.prepareIndex()
+            final IndexResponse indexResponse = client().prepareIndex()
                     .setIndex(INDEX_NAME_1)
                     .setRefresh(true)
                     .setType("test")
@@ -196,7 +161,7 @@ public class CountsTest extends AbstractESTest {
         final int count1 = 10;
         final int count2 = 5;
         for (int i = 0; i < count1; i++) {
-            final IndexResponse indexResponse = client.prepareIndex()
+            final IndexResponse indexResponse = client().prepareIndex()
                     .setIndex(INDEX_NAME_1)
                     .setRefresh(true)
                     .setType("test")
@@ -205,7 +170,7 @@ public class CountsTest extends AbstractESTest {
             assumeTrue(indexResponse.isCreated());
         }
         for (int i = 0; i < count2; i++) {
-            final IndexResponse indexResponse = client.prepareIndex()
+            final IndexResponse indexResponse = client().prepareIndex()
                     .setIndex(INDEX_NAME_2)
                     .setRefresh(true)
                     .setType("test")
@@ -220,9 +185,21 @@ public class CountsTest extends AbstractESTest {
     }
 
     @Test
-    public void totalReturnsMinusOneIfIndexDoesNotExist() throws Exception {
+    public void totalThrowsElasticsearchExceptionIfIndexDoesNotExist() throws Exception {
         final IndexSet indexSet = mock(IndexSet.class);
         when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
-        assertThat(counts.total(indexSet)).isEqualTo(-1L);
+
+        try {
+            assertThat(counts.total(indexSet)).isEqualTo(-1L);
+        } catch (IndexNotFoundException e) {
+            final String expectedErrorDetail = "Index not found for query: does_not_exist. Try recalculating your index ranges.";
+            assertThat(e)
+                .hasMessageStartingWith("Fetching message count failed for indices [does_not_exist]")
+                .hasMessageEndingWith(expectedErrorDetail)
+                .hasNoSuppressedExceptions();
+            assertThat(e.getErrorDetails()).containsExactly(expectedErrorDetail);
+        } catch (Exception e) {
+            fail("Expected IndexNotFoundException to be thrown");
+        }
     }
 }

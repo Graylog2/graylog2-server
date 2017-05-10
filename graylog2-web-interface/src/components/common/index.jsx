@@ -30,3 +30,5 @@ export { default as TimezoneSelect } from './TimezoneSelect';
 export { default as TypeAheadDataFilter } from './TypeAheadDataFilter';
 export { default as TypeAheadFieldInput } from './TypeAheadFieldInput';
 export { default as TypeAheadInput } from './TypeAheadInput';
+export { default as TimeUnitInput } from './TimeUnitInput';
+export { default as TimeUnit } from './TimeUnit';

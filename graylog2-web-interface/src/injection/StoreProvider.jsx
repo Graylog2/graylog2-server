@@ -1,7 +1,5 @@
 import CombinedProvider from 'injection/CombinedProvider';
 
-/* global storeProvider */
-
 class StoreProvider {
   getStore(storeName) {
     const result = CombinedProvider.get(storeName);
@@ -12,8 +10,8 @@ class StoreProvider {
   }
 }
 
-if (typeof storeProvider === 'undefined') {
+if (typeof window.storeProvider === 'undefined') {
   window.storeProvider = new StoreProvider();
 }
 
-export default storeProvider;
+export default window.storeProvider;

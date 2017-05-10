@@ -192,6 +192,9 @@ public class Message implements Messages {
 
         for (Map.Entry<String, Object> entry : fields.entrySet()) {
             final String key = entry.getKey();
+            if (key.equals(FIELD_ID)) {
+                continue;
+            }
 
             // Elasticsearch does not allow "." characters in keys since version 2.0.
             // See: https://www.elastic.co/guide/en/elasticsearch/reference/2.0/breaking_20_mapping_changes.html#_field_names_may_not_contain_dots

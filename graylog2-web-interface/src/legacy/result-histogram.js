@@ -1,3 +1,4 @@
+import $ from 'jquery';
 import Rickshaw from 'rickshaw';
 import DateTime from 'logic/datetimes/DateTime';
 import AlertsAnnotator from 'logic/alerts/AlertsAnnotator';

@@ -6,6 +6,10 @@ import dc from 'dc';
 import d3 from 'd3';
 import deepEqual from 'deep-equal';
 
+import $ from 'jquery';
+global.jQuery = $;
+require('bootstrap/js/tooltip');
+
 import D3Utils from 'util/D3Utils';
 import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';

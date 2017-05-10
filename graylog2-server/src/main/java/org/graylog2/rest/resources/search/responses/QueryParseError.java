@@ -19,51 +19,33 @@ package org.graylog2.rest.resources.search.responses;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.graylog.autovalue.WithBeanGetter;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
 
 @JsonAutoDetect
 @AutoValue
-@WithBeanGetter
 public abstract class QueryParseError {
-    @JsonProperty
-    public abstract String query();
-
-    @JsonProperty
-    @Nullable
-    public abstract Integer beginColumn();
-
-    @JsonProperty
-    @Nullable
-    public abstract Integer beginLine();
-
-    @JsonProperty
-    @Nullable
-    public abstract Integer endColumn();
-
-    @JsonProperty
-    @Nullable
-    public abstract Integer endLine();
-
     @JsonProperty
     @Nullable
     public abstract String message();
 
     @JsonProperty
-    public abstract String exceptionName();
+    public abstract Collection<String> details();
 
-    public static QueryParseError create(String query,
-                                         @Nullable Integer beginColumn,
-                                         @Nullable Integer beginLine,
-                                         @Nullable Integer endColumn,
-                                         @Nullable Integer endLine,
-                                         @Nullable String message,
-                                         String exceptionName) {
-        return new AutoValue_QueryParseError(query, beginColumn, beginLine, endColumn, endLine, message, exceptionName);
-    }
+    @JsonProperty
+    @Nullable
+    public abstract Integer line();
 
-    public static QueryParseError create(String query, @Nullable String message, String exceptionName) {
-        return create(query, null, null, null, null, message, exceptionName);
+    @JsonProperty
+    @Nullable
+    public abstract Integer column();
+
+
+    public static QueryParseError create(String message,
+                                         Collection<String> details,
+                                         @Nullable Integer line,
+                                         @Nullable Integer column) {
+        return new AutoValue_QueryParseError(message, details, line, column);
     }
 }

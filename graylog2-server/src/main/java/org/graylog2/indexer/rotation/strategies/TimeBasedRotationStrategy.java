@@ -153,12 +153,11 @@ public class TimeBasedRotationStrategy extends AbstractRotationStrategy {
         final DateTime now = Tools.nowUTC();
         // when first started, we might not know the last rotation time, look up the creation time of the index instead.
         if (!lastRotation.containsKey(indexSetId)) {
-            final DateTime creationDate = indices.indexCreationDate(index);
-            if(creationDate != null) {
+            indices.indexCreationDate(index).ifPresent(creationDate -> {
                 final DateTime currentAnchor = determineRotationPeriodAnchor(creationDate, rotationPeriod);
                 anchor.put(indexSetId, currentAnchor);
                 lastRotation.put(indexSetId, creationDate);
-            }
+            });
 
             // still not able to figure out the last rotation time, we'll rotate forcibly
             if (!lastRotation.containsKey(indexSetId)) {

@@ -1,90 +1,75 @@
 **************************
-Upgrading to Graylog 2.2.x
+Upgrading to Graylog 2.3.x
 **************************
 
-.. _upgrade-from-21-to-22:
+.. _upgrade-from-22-to-23:
 
 This file only contains the upgrade note for the upcoming release.
 Please see `our documentation <http://docs.graylog.org/en/latest/pages/upgrade.html>`_
 for the complete upgrade notes.
 
-Email Alarm Callback
-====================
+Graylog switches to Elasticsearch HTTP client
+=============================================
 
-In previous Graylog versions, creating an alert condition on a stream and adding an alert receiver meant that, if no alarm callback existed for that stream, Graylog would use an Email alarm callback by default.
+In all prior versions, Graylog used the Elasticsearch node client to connect to an Elasticsearch cluster, which was acting as a client-only Elasticsearch node. For compatibility reasons of the used binary transfer protocol, the range of Elasticsearch versions Graylog could connect to was limited. For more information and differences between the different ways to connect to Elasticsearch, you can check the `Elasticsearch documentation <https://www.elastic.co/guide/en/elasticsearch/guide/current/_talking_to_elasticsearch.html>`_.
 
-Due to the extensive rework done in alerting, this behaviour has been modified to be explicit, and more consistent with other entities within Graylog: from now on **there will not be a default alarm callback**.
+Starting with version 2.3.0, we are switching over to using a lightweight HTTP client, which is almost version-agnostic. The biggest change is that it does not connect to the Elasticsearch native protocol port (defaulting to 9300/tcp), but the Elasticsearch HTTP port (defaulting to 9200/tcp).
 
-To easy the transition to people relying on this behaviour, we have added a migration step that will create an Email alarm callback for each stream that has alert conditions, has alert receivers, but has no associated alarm callbacks.
+Due to the differences in connecting to the Elasticsearch cluster, configuring Graylog has changed. These configuration settings have been removed::
 
-Alert Notifications (previously known as Alarm Callbacks)
-=========================================================
+  elasticsearch_cluster_discovery_timeout
+  elasticsearch_cluster_name
+  elasticsearch_config_file
+  elasticsearch_discovery_initial_state_timeout
+  elasticsearch_discovery_zen_ping_unicast_hosts
+  elasticsearch_http_enabled
+  elasticsearch_network_bind_host
+  elasticsearch_network_host
+  elasticsearch_network_publish_host
+  elasticsearch_node_data
+  elasticsearch_node_master
+  elasticsearch_node_name_prefix
+  elasticsearch_path_data
+  elasticsearch_path_home
+  elasticsearch_transport_tcp_port
 
-Graylog 2.2.0 introduces some changes in alerting. Alerts have now states, helping you to know in an easier way if something requires your attention.
+The following configuration options are now being used to configure connectivity to Elasticsearch:
 
-These changes also affect the way we send notifications: Starting in Graylog 2.2.0, alert notifications are only executed **once**, just when a new alert is triggered. As long as the alert is unresolved or in grace period, **Graylog will not send further notifications**. This will help you reducing the noise and annoyance of getting notified way too often when a problem persists for a while.
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| Config Setting                                     | Type      | Comments                                                     | Default                     |
++====================================================+===========+==============================================================+=============================+
+| ``elasticsearch_connect_timeout``                  | Duration  | Timeout when connection to individual Elasticsearch hosts    | ``10s`` (10 Seconds)        |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| ``elasticsearch_hosts``                            | List<URI> | Comma-separated list of URIs of Elasticsearch hosts          | ``"http://127.0.0.1:9200"`` |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| ``elasticsearch_idle_timeout``                     | Duration  | Timeout after which idle connections are terminated          | ``-1s`` (Never)             |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| ``elasticsearch_max_total_connections``            | int       | Maximum number of total Elasticsearch connections            | ``20``                      |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| ``elasticsearch_max_total_connections_per_route``  | int       | Maximum number of Elasticsearch connections per route/host   | ``2``                       |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| ``elasticsearch_socket_timeout``                   | Duration  | Timeout when sending/receiving from Elasticsearch connection | ``60s`` (60 Seconds)        |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| ``elasticsearch_version``                          | (2 or 5)  | Major version of Elasticsearch being used in the cluster     | ``5``                       |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
 
-If you are using Graylog for alerting, please take a moment to ensure this change will not break any of your processes when an alert occurs.
+In most cases, the only configuration setting that needs to be set explicitly is ``elasticsearch_hosts``, unless you use Elasticsearch 2.x (or earlier). In the latter case you would need to set ``elasticsearch_version`` to ``2``. All other configuration settings should be tweaked only in case of errors.
 
-Default stream/Index Sets
-=========================
-
-With the introduction of index sets, and the ability to change a stream's write target, the default stream needs additional information, which is calculated when starting a new Graylog 2.2 master node.
-
-It requires recalculation of the index ranges of the default stream's index set, which when updating from pre-2.2 versions is stored in the `graylog_` index. This is potentially expensive, because it has to calculate three aggregations across every open index to detect which streams are stored in which index.
-
-Please be advised that this necessary migration can put additional load on your cluster.
-
-.. warning:: Make sure that all rotation and retention strategy plugins you had installed in 2.1 are updated to a version that is compatible with 2.2 before you start the Graylog 2.2 version for the first time. (e.g. Graylog Enterprise) This is needed so the required data migrations will run without problems.
-
-.. warning:: The option to remove a message from the default stream is currently not available when using the pipeline function `route_to_stream`. This will be fixed in a subsequent bug fix release. Please see `the corresponding Github issue <https://github.com/Graylog2/graylog-plugin-pipeline-processor/issues/117>`_.
-
-RotationStrategy & RetentionStrategy Interfaces
-===============================================
-
-The Java interfaces for ``RetentionStrategy`` and ``RotationStrategy`` changed in 2.2. The ``#rotate()`` and ``#retain()`` methods are now getting an ``IndexSet`` as first parameter.
-
-This only affects you if you are using custom rotation or retention strategies.
-
-Changes in Exposed Configuration
-================================
-
-The exposed configuration settings on the ``/system/configuration`` resource of the Graylog REST API doesn't contain the following (deprecated) Elasticsearch-related settings anymore:
-
-* ``elasticsearch_shards``
-* ``elasticsearch_replicas``
-* ``index_optimization_max_num_segments``
-* ``disable_index_optimization``
-
-Changes in Split & Count Converter
-==================================
-
-The behavior of the split & count converter has been changed to that it resembles typical ``split()`` functions.
-
-Previously, the split & count converter returned 0, if the split pattern didn't occur in the string. Now it will return 1.
-
-Examples:
-
-+-------------+---------------+------------+------------+
-| String      | Split Pattern | Old Result | New Result |
-+=============+===============+===========+=============+
-| <empty>     | ``-``         | 0         | 0           |
-+-------------+---------------+-----------+-------------+
-| ``foo``     | ``-``         | 0         | 1           |
-+-------------+---------------+-----------+-------------+
-| ``foo-bar`` | ``-``         | 2         | 2           |
-+-------------+---------------+-----------+-------------+
+.. caution:: Graylog does not react to externally triggered index changes (creating/closing/reopening/deleting an index) anymore. All of these actions need to be performed through the Graylog REST API in order to retain index consistency.
 
 Graylog REST API
 ================
 
-Streams API
------------
+Rotation and Retention strategies
+---------------------------------
 
-Due to the introduction of index sets, the payload for creating, updating and cloning of streams now requires the ``index_set_id`` field. The value for this needs to be the ID of an existing index set.
+The deprecated HTTP resources at ``/system/indices/rotation/config`` and ``/system/indices/retention/config``, which didn't work since Graylog 2.2.0, have been removed.
 
-Affected endpoints:
+These settings are part of the index set configuration and can be configured under ``/system/indices/index_sets``.
 
-* ``POST /streams``
-* ``PUT  /streams/{streamId}``
-* ``POST /streams/{streamId}/clone``
+Stream List Response structure does not include `in_grace` field anymore
+------------------------------------------------------------------------
+
+The response to ``GET /streams``, ``GET /streams/<id>`` & ``PUT /streams/<id>`` does not contain the ``in_grace`` field for configured alert conditions anymore.
+
+The value of this flag can be retrieved using the ``GET /alerts/conditions`` endpoint, or per stream using the ``GET /streams/<streamId>/alerts/conditions`` endpoint.
