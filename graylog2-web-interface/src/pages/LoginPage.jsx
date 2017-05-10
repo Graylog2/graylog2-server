@@ -77,15 +77,17 @@ const LoginPage = React.createClass({
     }
 
     const alert = this.formatLastError(this.state.lastError);
+    const logoUrl = require('images/login-logo-white.png');
+
     return (
       <DocumentTitle title="Sign in">
         <div>
           <div className="container" id="login-box">
             <Row>
-              <form className="col-md-4 col-md-offset-4 well" id="login-box-content" onSubmit={this.onSignInClicked}>
-                <legend><i className="fa fa-group" /> Welcome to Graylog</legend>
-
+              <form className="col-md-4 col-md-offset-4" id="login-box-content" onSubmit={this.onSignInClicked}>
                 {alert}
+
+                <img id="login-logo" src={logoUrl} />
 
                 <Input ref="username" type="text" placeholder="Username" autoFocus />
 

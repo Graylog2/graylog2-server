@@ -1,23 +1,21 @@
+body, html {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     font-family: 'Open Sans', sans-serif;
-
-    /* we love science */
-    background: url('~images/auth/loginbg.jpg') no-repeat center center fixed;
-    -moz-background-size: cover;
-    -webkit-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
+    background: #2980b9;
+    background: -webkit-linear-gradient(top,#2980b9,#2c3e50);
+    background: -o-linear-gradient(top,#2980b9,#2c3e50);
+    background: -moz-linear-gradient(top,#2980b9,#2c3e50);
+    background: linear-gradient(to bottom, #2980b9, #2c3e50);
 }
 
 #disconnected-box {
     margin-top: 120px;
-}
-
-#disconnected-box-content {
-    background-color: #fff;
-    -moz-box-shadow: 0 0 5px #888;
-    -webkit-box-shadow: 0 0 5px#888;
-    box-shadow: 0 0 40px #000;
 }
 
 .never-seen-warning {
@@ -52,4 +50,12 @@ hr {
 
 .loading-text {
     font-size: 14px;
+}
+
+.well {
+    margin-bottom: 0;
+}
+
+.well dd {
+    margin-bottom: 8px;
 }

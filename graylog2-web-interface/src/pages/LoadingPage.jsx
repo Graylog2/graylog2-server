@@ -13,7 +13,7 @@ const LoadingPage = React.createClass({
 
   getDefaultProps() {
     return {
-      text: 'Loading, please wait...',
+      text: 'Preparing Graylog for you ...',
     };
   },
 
@@ -32,8 +32,7 @@ const LoadingPage = React.createClass({
       <DocumentTitle title="Loading...">
         <div className="container" id="login-box">
           <Row>
-            <Col md={4} mdOffset={4} className="well" id="login-box-content">
-              <legend><i className="fa fa-group" /> Welcome to Graylog</legend>
+            <Col md={4} mdOffset={4} id="login-box-content">
               <p className="loading-text">
                 <Spinner text={this.props.text} />
               </p>
