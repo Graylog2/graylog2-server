@@ -80,7 +80,7 @@ const HistogramVisualization = React.createClass({
     this.histogram
       .width(this.props.width)
       .height(this.props.height)
-      .margins({ left: 50, right: 15, top: 10, bottom: 30 })
+      .margins({ left: 25, right: 0, top: 15, bottom: 16 })
       .dimension(this.dimension)
       .group(this.group)
       .x(d3.time.scale())
@@ -89,8 +89,6 @@ const HistogramVisualization = React.createClass({
       .centerBar(true)
       .renderHorizontalGridLines(true)
       .brushOn(false)
-      .xAxisLabel('Time')
-      .yAxisLabel('Messages')
       .renderTitle(false)
       .colors(D3Utils.glColourPalette())
       .on('renderlet', () => {

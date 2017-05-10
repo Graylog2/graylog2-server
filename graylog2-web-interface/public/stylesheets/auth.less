@@ -1,36 +1,31 @@
-body {
-    font-family: 'Open Sans', sans-serif;
-
-    /* we love science */
-    background: url('../images/auth/loginbg.jpg') no-repeat center center fixed;
-    -moz-background-size: cover;
-    -webkit-background-size: cover;
-    -o-background-size: cover;
-    background-size: cover;
+body, html {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
 }
 
-#login-box {
-    margin-top: 120px;
+body {
+    font-family: 'Open Sans', sans-serif;
+    background: #2980b9;
+    background: -webkit-linear-gradient(top,#2980b9,#2c3e50);
+    background: -o-linear-gradient(top,#2980b9,#2c3e50);
+    background: -moz-linear-gradient(top,#2980b9,#2c3e50);
+    background: linear-gradient(to bottom, #2980b9, #2c3e50);
 }
 
 #login-box .form-group {
-  margin-bottom: 10px;
+  margin-bottom: 13px;
 }
 
-#login-box-content {
-    background-color: #fff;
-    -moz-box-shadow: 0 0 5px #888;
-    -webkit-box-shadow: 0 0 5px#888;
-    box-shadow: 0 0 40px #000;
+#login-logo {
+    width: 130px;
+    height: 38px;
+    margin-bottom: 13px;
 }
 
-.well {
-    padding-top: 8px;
-    padding-bottom: 2px;
-}
-
-#login-box form {
-    margin-bottom: 10px;
+#login-box {
+    margin-top: 20%;
 }
 
 .footer {
@@ -55,4 +50,13 @@ body {
     position: relative;
     top: -2px;
     margin-right: 3px;
+}
+
+.loading-text {
+    color: #fff;
+    text-align: center;
+}
+
+.loading-text i.fa {
+    margin-right: 2px;
 }

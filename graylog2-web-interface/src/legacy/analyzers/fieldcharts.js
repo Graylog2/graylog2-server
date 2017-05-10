@@ -157,7 +157,7 @@ export const FieldChart = {
       series: [{
         name: opts.chartid,
         data: data.values,
-        color: '#26ADE4',
+        color: '#2980b9',
         gl2_query: opts.query,
         valuetype: GraphVisualization.getReadableFieldChartStatisticalFunction(opts.valuetype),
         field: opts.field,

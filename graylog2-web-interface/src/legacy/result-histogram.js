@@ -53,7 +53,7 @@ const resultHistogram = {
       series: [{
         name: 'Messages',
         data: this._histogram,
-        color: '#26ADE4',
+        color: '#2980B9',
       }],
     });
 

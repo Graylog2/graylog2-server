@@ -108,7 +108,7 @@ const FieldQuickValues = React.createClass({
               <Button bsSize="small" onClick={() => this._resetStatus()}>Dismiss</Button>
             </AddToDashboardMenu>
           </div>
-          <h1>Quick Values for <strong>{this.state.field}</strong> {this.state.loadPending && <i
+          <h1>Quick Values for <span className="field-fieldname">{this.state.field}</span> {this.state.loadPending && <i
             className="fa fa-spin fa-spinner" />}</h1>
 
           <div style={{ maxHeight: 400, overflow: 'auto', marginTop: 5 }}>{inner}</div>

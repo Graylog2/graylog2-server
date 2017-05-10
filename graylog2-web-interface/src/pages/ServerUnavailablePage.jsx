@@ -77,7 +77,7 @@ const ServerUnavailablePage = React.createClass({
     return (
       <div>
         <hr style={{ marginTop: 10, marginBottom: 10 }} />
-        <p>This is the last response we received from the server:</p>
+        <p><strong>This is the last response we received from the server:</strong></p>
         <Well bsSize="small" style={{ whiteSpace: 'pre-line' }}>
           <dl style={{ marginBottom: 0 }}>
             {errorDetails}
@@ -92,7 +92,11 @@ const ServerUnavailablePage = React.createClass({
       <DocumentTitle title="Server unavailable">
         <Modal show>
           <Modal.Header>
-            <Modal.Title><i className="fa fa-exclamation-triangle" /> Server currently unavailable</Modal.Title>
+            <Modal.Title>
+              <a href="https://www.graylog.org/enterprise" className="btn btn-success btn-sm pull-right" target="_blank">Get Help</a>
+
+              <i className="fa fa-exclamation-triangle" /> Server currently unavailable
+            </Modal.Title>
           </Modal.Header>
           <Modal.Body>
             <div>
@@ -100,11 +104,13 @@ const ServerUnavailablePage = React.createClass({
                 We are experiencing problems connecting to the Graylog server running on <i>{URLUtils.qualifyUrl('')}</i>.
                 Please verify that the server is healthy and working correctly.
               </p>
-              <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
               <p>
-                Do you need a hand?{' '}
-                <a href="https://www.graylog.org/community-support" target="_blank">We can help you</a>.
+                <strong>If you are running Graylog for the first time:</strong> Remember that your browser has to be
+                able to connect to the <code>graylog-server</code> REST APIs. Check the <code>listen</code> and
+                <code>transport</code> URIs in your <code>server.conf</code> file.
               </p>
+              <p>You will be automatically redirected to the previous page once we can connect to the server.</p>
+
               <div>
                 <a href="#" onClick={this._toggleDetails}>
                   {this.state.showDetails ? 'Less details' : 'More details'}

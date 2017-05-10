@@ -55,7 +55,7 @@ h4 {
 }
 
 a {
-  color: #16ace3;
+  color: #2980b9;
 }
 
 /* Remove boostrap outline */
@@ -80,6 +80,21 @@ label {
 legend small {
   color: #aaa;
   margin-left: 5px;
+}
+
+h1 small, h2 small, h3 small, h4 small, h5 small, h6 small,
+.h1 small, .h2 small, .h3 small, .h4 small, .h5 small, .h6 small,
+h1 .small, h2 .small, h3 .small, h4 .small, h5 .small, h6 .small,
+.h1 .small, .h2 .small, .h3 .small, .h4 .small, .h5 .small, .h6 .small {
+  color: #aaa;
+}
+
+.dropdown-menu > li > a {
+  color: #000;
+}
+
+.dropdown-menu > li > a:hover {
+  color: #000;
 }
 
 .btn:focus {
@@ -112,6 +127,10 @@ legend small {
 
 .navbar-brand {
   width: 155px;
+}
+
+.navbar-inverse .navbar-nav > li > a {
+  color: #fff !important;
 }
 
 #universalsearch {
@@ -701,7 +720,7 @@ s
   font-size: 16px;
   position: relative;
   top: 4px;
-  color: #16ACE3;
+  color: #2980b9;
 }
 
 .open-analyze-field-active {
@@ -1148,9 +1167,11 @@ td.limited {
 
 .tooltip .tooltip-inner .datapoint-info {
   text-align: left;
+  font-weight: bold;
 }
 
 .tooltip .tooltip-inner .datapoint-info .date {
+  font-weight: normal;
   color: #E3E5E5;
 }
 
@@ -1661,6 +1682,10 @@ input.required-input-highlight {
 
 .widget .replay-link:hover {
   text-decoration: none;
+}
+
+.widget .quickvalues-visualization .col-md-12 {
+  padding-left: 0 !important;
 }
 
 .zeroclipboard-is-hover {
@@ -2195,7 +2220,7 @@ table.messages tbody.message-group {
 }
 
 table.messages tbody.message-group-toggled {
-  border-left: 7px solid #16ace3;
+  border-left: 7px solid #2980b9;
 }
 
 table.messages tbody.message-highlight {
@@ -2215,7 +2240,7 @@ table.messages tr.message-row td {
   padding-top: 0;
   padding-bottom: 5px;
   font-family: monospace;
-  color: #16ace3;
+  color: #2980b9;
 }
 
 table.messages tr.message-row {
@@ -2588,6 +2613,10 @@ i.error-icon {
 
 #field-statistics table {
   margin-top: 10px;
+}
+
+.field-fieldname {
+  font-weight: 700;
 }
 
 .quickvalues-visualization {

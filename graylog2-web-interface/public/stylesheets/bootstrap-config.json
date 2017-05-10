@@ -1,19 +1,19 @@
 {
   "vars": {
-    "@gray-base": "#333",
+    "@gray-base": "#2c3e50",
     "@gray-darker": "lighten(@gray-base, 13.5%)",
     "@gray-dark": "lighten(@gray-base, 20%)",
     "@gray": "lighten(@gray-base, 33.5%)",
     "@gray-light": "lighten(@gray-base, 46.7%)",
     "@gray-lighter": "lighten(@gray-base, 93.5%)",
-    "@brand-primary": "#9E1F63",
-    "@brand-success": "#8DC63F",
-    "@brand-info": "#16ACE3",
-    "@brand-warning": "#F7941E",
-    "@brand-danger": "#FF3B00",
+    "@brand-primary": "#34495e",
+    "@brand-success": "#27ae60",
+    "@brand-info": "#2980b9",
+    "@brand-warning": "#d35400",
+    "@brand-danger": "#c0392b",
     "@body-bg": "#fff",
-    "@text-color": "@gray-dark",
-    "@link-color": "@brand-primary",
+    "@text-color": "#333",
+    "@link-color": "@brand-info",
     "@link-hover-color": "darken(@link-color, 15%)",
     "@link-hover-decoration": "underline",
     "@font-family-sans-serif": "\"Open Sans\", \"Helvetica Neue\", Helvetica, Arial, sans-serif",
@@ -82,6 +82,9 @@
     "@btn-danger-bg": "@brand-danger",
     "@btn-danger-border": "darken(@btn-danger-bg, 5%)",
     "@btn-link-disabled-color": "@gray-light",
+    "@btn-border-radius-base": "@border-radius-base",
+    "@btn-border-radius-large": "@border-radius-large",
+    "@btn-border-radius-small": "@border-radius-small",
     "@input-bg": "#fff",
     "@input-bg-disabled": "@gray-lighter",
     "@input-color": "@gray",
@@ -94,6 +97,7 @@
     "@input-height-base": "(@line-height-computed + (@padding-base-vertical * 2) + 2)",
     "@input-height-large": "(ceil(@font-size-large * @line-height-large) + (@padding-large-vertical * 2) + 2)",
     "@input-height-small": "(floor(@font-size-small * @line-height-small) + (@padding-small-vertical * 2) + 2)",
+    "@form-group-margin-bottom": "15px",
     "@legend-color": "@gray-dark",
     "@legend-border-color": "#e5e5e5",
     "@input-group-addon-bg": "@gray-lighter",
@@ -212,6 +216,7 @@
     "@jumbotron-bg": "@gray-lighter",
     "@jumbotron-heading-color": "inherit",
     "@jumbotron-font-size": "ceil((@font-size-base * 1.5))",
+    "@jumbotron-heading-font-size": "ceil((@font-size-base * 4.5))",
     "@state-success-text": "#3c763d",
     "@state-success-bg": "#dff0d8",
     "@state-success-border": "darken(spin(@state-success-bg, -10), 5%)",
@@ -373,6 +378,7 @@
     "@blockquote-border-color": "@gray-lighter",
     "@page-header-border-color": "@gray-lighter",
     "@dl-horizontal-offset": "@component-offset-horizontal",
+    "@dl-horizontal-breakpoint": "@grid-float-breakpoint",
     "@hr-border": "@gray-lighter"
   },
   "css": [
@@ -423,6 +429,6 @@
     "collapse.js",
     "scrollspy.js",
     "transition.js"
-  ]
+  ],
+  "customizerUrl": "http://getbootstrap.com/customize/?id=b53a6c2ef39e200c44420d10640680a3"
 }
-
