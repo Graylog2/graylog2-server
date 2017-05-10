@@ -21,6 +21,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.glassfish.jersey.server.ChunkedOutput;
 import org.graylog2.decorators.DecoratorProcessor;
+import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
@@ -114,11 +115,11 @@ public abstract class SearchResource extends RestResource {
                                                                        org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange) {
         try {
             return searches.fieldStats(field, query, filter, timeRange);
-        } catch (Searches.FieldTypeException e) {
+        } catch (FieldTypeException e) {
             try {
                 LOG.debug("Stats query failed, make sure that field [{}] is a numeric type. Retrying without numeric statistics to calculate the field's cardinality.", field);
                 return searches.fieldStats(field, query, filter, timeRange, true, false, true);
-            } catch (Searches.FieldTypeException e1) {
+            } catch (FieldTypeException e1) {
                 LOG.error("Retrieving field statistics for field {} failed while calculating the cardinality. Cause: {}", field, ExceptionUtils.getRootCauseMessage(e1));
                 throw new BadRequestException("Field " + field + " is not of a numeric type and the cardinality could not be calculated either.", e1);
             }
@@ -139,7 +140,7 @@ public abstract class SearchResource extends RestResource {
                 filter,
                 timeRange,
                 includeCardinality);
-        } catch (Searches.FieldTypeException e) {
+        } catch (FieldTypeException e) {
             final String msg = "Field histogram query failed. Make sure that field [" + field + "] is a numeric type.";
             LOG.error(msg);
             throw new BadRequestException(msg, e);

@@ -23,6 +23,7 @@ import io.searchbox.client.JestResult;
 import io.searchbox.client.http.JestHttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.QueryParsingException;
 import org.graylog2.indexer.gson.GsonUtils;
@@ -84,6 +85,12 @@ public class JestUtils {
                 case "index_not_found_exception":
                     final String indexName = asString(rootCause.get("resource.id"));
                     return buildIndexNotFoundException(errorMessage, indexName);
+                case "illegal_argument_exception":
+                    final String reason = asString(rootCause.get("reason"));
+                    if (reason != null && reason.startsWith("Expected numeric type on field")) {
+                        return buildFieldTypeException(errorMessage, reason);
+                    }
+                    break;
             }
         }
 
@@ -92,6 +99,10 @@ public class JestUtils {
         }
 
         return new ElasticsearchException(errorMessage.get(), reasons);
+    }
+
+    private static FieldTypeException buildFieldTypeException(Supplier<String> errorMessage, String reason) {
+        return new FieldTypeException(errorMessage.get(), reason);
     }
 
     private static List<String> extractReasons(List<JsonObject> rootCauses) {

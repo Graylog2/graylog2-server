@@ -34,7 +34,6 @@ import io.searchbox.core.search.aggregation.HistogramAggregation;
 import io.searchbox.core.search.aggregation.MissingAggregation;
 import io.searchbox.core.search.aggregation.TermsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
-import io.searchbox.core.search.sort.Sort;
 import io.searchbox.params.Parameters;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -45,10 +44,10 @@ import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuil
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
@@ -642,6 +641,13 @@ public class Searches {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
+            final List<String> nonNumericFieldErrors = errors.stream()
+                .filter(error -> error.startsWith("Expected numeric type on field"))
+                .collect(Collectors.toList());
+            if (!nonNumericFieldErrors.isEmpty()) {
+                throw new FieldTypeException("Unable to perform search query.", nonNumericFieldErrors);
+            }
+
             throw new ElasticsearchException("Unable to perform search query.", errors);
         }
 
@@ -782,12 +788,6 @@ public class Searches {
         }
 
         return filterBuilder;
-    }
-
-    public static class FieldTypeException extends ElasticsearchException {
-        public FieldTypeException(Throwable e) {
-            super(e);
-        }
     }
 
 
