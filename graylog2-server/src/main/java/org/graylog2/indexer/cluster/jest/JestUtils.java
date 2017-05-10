@@ -90,6 +90,7 @@ public class JestUtils {
                     if (reason != null && reason.startsWith("Expected numeric type on field")) {
                         return buildFieldTypeException(errorMessage, reason);
                     }
+                    break;
             }
         }
 

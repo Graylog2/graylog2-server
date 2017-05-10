@@ -641,9 +641,11 @@ public class Searches {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
 
-            final Optional<String> nonNumericFieldError = errors.stream().filter(error -> error.startsWith("Expected numeric type on field")).findAny();
-            if (nonNumericFieldError.isPresent()) {
-                throw new FieldTypeException(nonNumericFieldError.get());
+            final List<String> nonNumericFieldErrors = errors.stream()
+                .filter(error -> error.startsWith("Expected numeric type on field"))
+                .collect(Collectors.toList());
+            if (!nonNumericFieldErrors.isEmpty()) {
+                throw new FieldTypeException("Unable to perform search query.", nonNumericFieldErrors);
             }
 
             throw new ElasticsearchException("Unable to perform search query.", errors);
