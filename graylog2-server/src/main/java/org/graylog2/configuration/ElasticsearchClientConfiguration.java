@@ -51,6 +51,15 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_version")
     private int elasticsearchVersion = 5;
 
+    @Parameter(value = "elasticsearch_discovery_enabled")
+    private boolean discoveryEnabled = false;
+
+    @Parameter(value = "elasticsearch_discovery_filter")
+    private String discoveryFilter = null;
+
+    @Parameter(value = "elasticsearch_discovery_frequency")
+    private Duration discoveryFrequency = Duration.ofSeconds(30L);
+
     public int getVersion() {
         return elasticsearchVersion;
     }

@@ -27,6 +27,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Provider;
@@ -50,6 +51,9 @@ public class JestClientProvider implements Provider<JestClient> {
                               @Named("elasticsearch_idle_timeout") Duration elasticsearchIdleTimeout,
                               @Named("elasticsearch_max_total_connections") int elasticsearchMaxTotalConnections,
                               @Named("elasticsearch_max_total_connections_per_route") int elasticsearchMaxTotalConnectionsPerRoute,
+                              @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled,
+                              @Named("elasticsearch_discovery_filter") @Nullable String discoveryFilter,
+                              @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
                               Gson gson) {
         this.factory = new JestClientFactory();
         this.credentialsProvider = new BasicCredentialsProvider();
@@ -72,17 +76,21 @@ public class JestClientProvider implements Provider<JestClient> {
             })
             .collect(Collectors.toList());
 
-        factory.setHttpClientConfig(new HttpClientConfig
-            .Builder(hosts)
-            .credentialsProvider(credentialsProvider)
-            .connTimeout(Math.toIntExact(elasticsearchConnectTimeout.toMillis()))
-            .readTimeout(Math.toIntExact(elasticsearchSocketTimeout.toMillis()))
-            .maxConnectionIdleTime(elasticsearchIdleTimeout.getSeconds(), TimeUnit.SECONDS)
-            .maxTotalConnection(elasticsearchMaxTotalConnections)
-            .defaultMaxTotalConnectionPerRoute(elasticsearchMaxTotalConnectionsPerRoute)
-            .multiThreaded(true)
-            .gson(gson)
-            .build());
+        final HttpClientConfig.Builder httpClientConfigBuilder = new HttpClientConfig
+                .Builder(hosts)
+                .credentialsProvider(credentialsProvider)
+                .connTimeout(Math.toIntExact(elasticsearchConnectTimeout.toMillis()))
+                .readTimeout(Math.toIntExact(elasticsearchSocketTimeout.toMillis()))
+                .maxConnectionIdleTime(elasticsearchIdleTimeout.getSeconds(), TimeUnit.SECONDS)
+                .maxTotalConnection(elasticsearchMaxTotalConnections)
+                .defaultMaxTotalConnectionPerRoute(elasticsearchMaxTotalConnectionsPerRoute)
+                .multiThreaded(true)
+                .discoveryEnabled(discoveryEnabled)
+                .discoveryFilter(discoveryFilter)
+                .discoveryFrequency(discoveryFrequency.getSeconds(), TimeUnit.SECONDS)
+                .gson(gson);
+
+        factory.setHttpClientConfig(httpClientConfigBuilder.build());
     }
 
     @Override
