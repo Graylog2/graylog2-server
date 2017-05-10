@@ -19,6 +19,7 @@ package org.graylog2.dashboards.widgets.strategies;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
+import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
@@ -87,7 +88,7 @@ public class FieldChartWidgetStrategy extends ChartWidgetStrategy {
                     "cardinality".equalsIgnoreCase(statisticalFunction));
 
             return new ComputationResult(histogramResult.getResults(), histogramResult.tookMs(), histogramResult.getHistogramBoundaries());
-        } catch (Searches.FieldTypeException e) {
+        } catch (FieldTypeException e) {
             String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + this.widgetId + ">. Not a numeric field? The field was [" + field + "]";
             LOG.error(msg, e);
             throw new RuntimeException(msg, e);

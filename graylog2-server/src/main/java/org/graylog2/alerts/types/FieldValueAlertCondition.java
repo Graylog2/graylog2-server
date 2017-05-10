@@ -20,6 +20,7 @@ import com.google.common.collect.Lists;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.alerts.AbstractAlertCondition;
+import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.results.FieldStatsResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.searches.Searches;
@@ -247,7 +248,7 @@ public class FieldValueAlertCondition extends AbstractAlertCondition {
             // cannot happen lol
             LOG.error("Invalid timerange.", e);
             return null;
-        } catch (Searches.FieldTypeException e) {
+        } catch (FieldTypeException e) {
             LOG.debug("Field [{}] seems not to have a numerical type or doesn't even exist at all. Returning not triggered.", field, e);
             return new NegativeCheckResult();
         }
