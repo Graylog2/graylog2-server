@@ -7,7 +7,7 @@
 # This box is used as a Windows development and testing environment for Beats.
 #
 # Usage and Features:
-#   - Two users exist: Administartor and Vagrant. Both have the password: vagrant
+#   - Two users exist: Administrator and Vagrant. Both have the password: vagrant
 #   - Use 'vagrant ssh' to open a Windows command prompt.
 #   - Use 'vagrant rdp' to open a Windows Remote Deskop session. Mac users must
 #     install the Microsoft Remote Desktop Client from the App Store.
@@ -27,9 +27,9 @@ $Shortcut.Arguments = "/K cd /d C:\\graylog"
 $Shortcut.Save()
 
 echo "Disable automatic updates"
-$AUSettigns = (New-Object -com "Microsoft.Update.AutoUpdate").Settings
-$AUSettigns.NotificationLevel = 1
-$AUSettigns.Save()
+$AUSettings = (New-Object -com "Microsoft.Update.AutoUpdate").Settings
+$AUSettings.NotificationLevel = 1
+$AUSettings.Save()
 SCRIPT
 
 Vagrant.configure(2) do |config|
