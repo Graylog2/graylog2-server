@@ -116,25 +116,21 @@ const LUTTablesPage = React.createClass({
             {null}
             <span>
               {isShowing && (
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.edit(this.props.params.tableName)}
-                               onlyActiveOnIndex>
+                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.edit(this.props.params.tableName)}>
                   <Button bsStyle="success">Edit</Button>
                 </LinkContainer>
               )}
               &nbsp;
-              {(isShowing || isEditing) && (
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} onlyActiveOnIndex>
-                  <Button bsStyle="info">Lookup Tables</Button>
-                </LinkContainer>
-              )}
-              &nbsp;
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW} onlyActiveOnIndex>
-                <Button bsStyle="info">Caches</Button>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
+                <Button bsStyle="info active">Lookup Tables</Button>
               </LinkContainer>
               &nbsp;
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}
-                             onlyActiveOnIndex>
-                <Button bsStyle="info">Data Adapters</Button>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
+                <Button bsStyle="info">Configure Caches</Button>
+              </LinkContainer>
+              &nbsp;
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
+                <Button bsStyle="info">Configure Data Adapters</Button>
               </LinkContainer>
             </span>
           </PageHeader>
