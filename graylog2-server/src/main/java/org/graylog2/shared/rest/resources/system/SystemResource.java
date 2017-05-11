@@ -28,6 +28,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
+import org.graylog2.rest.models.system.responses.LocalesResponse;
 import org.graylog2.rest.models.system.responses.SystemJVMResponse;
 import org.graylog2.rest.models.system.responses.SystemOverviewResponse;
 import org.graylog2.rest.models.system.responses.SystemThreadDumpResponse;
@@ -123,6 +124,14 @@ public class SystemResource extends RestResource {
     public StreamingOutput threadDumpAsText() {
         checkPermission(RestPermissions.THREADS_DUMP, serverStatus.getNodeId().toString());
         return output -> new ThreadDump(ManagementFactory.getThreadMXBean()).dump(output);
+    }
+
+    @GET
+    @ApiOperation(value = "Get supported locales")
+    @Path("/locales")
+    @Timed
+    public LocalesResponse locales() {
+        return LocalesResponse.create(Locale.getAvailableLocales());
     }
 
     private Map<String, Long> bytesToValueMap(long bytes) {
