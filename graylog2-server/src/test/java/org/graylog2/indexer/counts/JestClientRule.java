@@ -40,6 +40,9 @@ public class JestClientRule extends ExternalResource {
             Duration.of(60, ChronoUnit.SECONDS),
             20,
             2,
+            false,
+            null,
+            Duration.ofSeconds(30),
             new Gson()
         );
     }

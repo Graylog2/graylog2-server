@@ -52,8 +52,16 @@ The following configuration options are now being used to configure connectivity
 +----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
 | ``elasticsearch_version``                          | (2 or 5)  | Major version of Elasticsearch being used in the cluster     | ``5``                       |
 +----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| ``elasticsearch_discovery_enabled``                | boolean   | Enable automatic Elasticsearch node discovery                | ``false``                   |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| ``elasticsearch_discovery_filter``                 | String    | Filter by node attributes for the discovered nodes           | empty (use all nodes)       |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
+| ``elasticsearch_discovery_frequency``              | Duration  | Frequency of the Elasticsearch node discovery                | ``30s`` (30 Seconds)        |
++----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
 
 In most cases, the only configuration setting that needs to be set explicitly is ``elasticsearch_hosts``, unless you use Elasticsearch 2.x (or earlier). In the latter case you would need to set ``elasticsearch_version`` to ``2``. All other configuration settings should be tweaked only in case of errors.
+
+.. warn:: The automatic node discovery does not work if Elasticsearch requires authentication, e. g. when using Shield (X-Pack).
 
 .. caution:: Graylog does not react to externally triggered index changes (creating/closing/reopening/deleting an index) anymore. All of these actions need to be performed through the Graylog REST API in order to retain index consistency.
 
