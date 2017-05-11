@@ -16,6 +16,9 @@
  */
 package org.graylog2.outputs;
 
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
@@ -49,8 +52,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static com.google.common.base.Preconditions.checkNotNull;
+import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
 
 public class GelfOutput implements MessageOutput {
     private static final Logger LOG = LoggerFactory.getLogger(GelfOutput.class);
@@ -70,27 +74,60 @@ public class GelfOutput implements MessageOutput {
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
 
     private final GelfTransport transport;
+    private final String id;
+    private final String streamId;
+    private final MetricRegistry metricRegistry;
+    private final String writesMetricName;
+    private final Meter writes;
+    private final String processTimeMetricName;
+    private final Timer processTime;
 
     @Inject
-    public GelfOutput(@Assisted Configuration configuration) throws MessageOutputConfigurationException {
-        this(buildTransport(configuration));
+    public GelfOutput(@Assisted Stream stream,
+                      @Assisted Configuration configuration,
+                      @Assisted @Nullable String id,
+                      MetricRegistry metricRegistry) throws MessageOutputConfigurationException {
+        this(buildTransport(configuration), stream.getId(), id, metricRegistry);
     }
 
     @VisibleForTesting
-    GelfOutput(GelfTransport gelfTransport) {
-        this.transport = checkNotNull(gelfTransport);
+    GelfOutput(GelfTransport gelfTransport, String streamId, @Nullable String id, MetricRegistry metricRegistry) {
+        this.transport = requireNonNull(gelfTransport, "gelfTransport must not be null");
+        this.streamId = streamId;
+        this.id = id;
+        this.metricRegistry = requireNonNull(metricRegistry, "metricRegistry must not be null");
+
+        this.writesMetricName = buildMetricName(streamId, id, "writes");
+        this.writes = metricRegistry.meter(writesMetricName);
+        this.processTimeMetricName = buildMetricName(streamId, id, "processTime");
+        this.processTime = metricRegistry.timer(processTimeMetricName);
+
         isRunning.set(true);
+    }
+
+    private String buildMetricName(String streamId, String id, String name) {
+        return isNullOrEmpty(id)
+                ? name(GelfOutput.class, "stream", streamId, name)
+                : name(GelfOutput.class, id, "stream", streamId, name);
     }
 
     @Override
     public void stop() {
-        LOG.debug("Stopping {}", transport.getClass().getName());
+        LOG.debug("Stopping {} [{}] on stream [{}]", transport.getClass().getName(), id, streamId);
         try {
             transport.stop();
+            cleanupMetrics();
         } catch (Exception e) {
-            LOG.error("Error stopping " + transport.getClass().getName(), e);
+            LOG.error("Error stopping {} [{}] on stream [{}]", transport.getClass().getName(), id, streamId, e);
         }
         isRunning.set(false);
+    }
+
+    private void cleanupMetrics() {
+        if (metricRegistry != null && metricRegistry.getMetrics() != null) {
+            metricRegistry.remove(writesMetricName);
+            metricRegistry.remove(processTimeMetricName);
+        }
     }
 
     @Override
@@ -181,7 +218,10 @@ public class GelfOutput implements MessageOutput {
 
     @Override
     public void write(final Message message) throws Exception {
-        transport.send(toGELFMessage(message));
+        writes.mark();
+        try (final Timer.Context ignored = processTime.time()) {
+            transport.send(toGELFMessage(message));
+        }
     }
 
     @Override
@@ -267,7 +307,7 @@ public class GelfOutput implements MessageOutput {
 
     public interface Factory extends MessageOutput.Factory<GelfOutput> {
         @Override
-        GelfOutput create(Stream stream, Configuration configuration);
+        GelfOutput create(Stream stream, Configuration configuration, @Nullable String id);
 
         @Override
         Config getConfig();

@@ -21,8 +21,6 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
-import com.google.inject.assistedinject.Assisted;
-import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
@@ -34,6 +32,7 @@ import org.graylog2.shared.journal.Journal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.Collections;
 import java.util.List;
@@ -55,15 +54,6 @@ public class ElasticSearchOutput implements MessageOutput {
     private final Messages messages;
     private final Journal journal;
     private final AtomicBoolean isRunning = new AtomicBoolean(false);
-
-    @AssistedInject
-    public ElasticSearchOutput(MetricRegistry metricRegistry,
-                               Messages messages,
-                               Journal journal,
-                               @Assisted Stream stream,
-                               @Assisted Configuration configuration) {
-        this(metricRegistry, messages, journal);
-    }
 
     @Inject
     public ElasticSearchOutput(MetricRegistry metricRegistry,
@@ -122,7 +112,7 @@ public class ElasticSearchOutput implements MessageOutput {
 
     public interface Factory extends MessageOutput.Factory<ElasticSearchOutput> {
         @Override
-        ElasticSearchOutput create(Stream stream, Configuration configuration);
+        ElasticSearchOutput create(Stream stream, Configuration configuration, @Nullable String id);
 
         @Override
         Config getConfig();
