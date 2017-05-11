@@ -608,7 +608,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("bool_3")).isEqualTo(false);
         assertThat(message.getField("bool_4")).isEqualTo(true);
 
-        // the is wrapped in our own class for safey in rules
+        // the is wrapped in our own class for safety in rules
         assertThat(message.getField("ip_1")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
         assertThat(message.getField("ip_2")).isEqualTo(new IpAddress(InetAddresses.forString("127.0.0.1")));
         assertThat(message.getField("ip_3")).isEqualTo(new IpAddress(InetAddresses.forString("0.0.0.0")));
