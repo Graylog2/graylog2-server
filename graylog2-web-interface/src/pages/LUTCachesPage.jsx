@@ -99,26 +99,21 @@ const LUTCachesPage = React.createClass({
             {null}
             <span>
               {(isShowing || isEditing) && (
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(this.props.params.cacheName)}
-                               onlyActiveOnIndex>
+                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(this.props.params.cacheName)}>
                   <Button bsStyle="success">Edit</Button>
                 </LinkContainer>
               )}
               &nbsp;
-              {(isShowing || isEditing) && (
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}
-                               onlyActiveOnIndex>
-                  <Button bsStyle="info">Caches</Button>
-                </LinkContainer>
-              )}
-              &nbsp;
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} onlyActiveOnIndex>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
                 <Button bsStyle="info">Lookup Tables</Button>
               </LinkContainer>
               &nbsp;
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}
-                             onlyActiveOnIndex>
-                <Button bsStyle="info">Data Adapters</Button>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
+                <Button bsStyle="info active">Configure Caches</Button>
+              </LinkContainer>
+              &nbsp;
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
+                <Button bsStyle="info">Configure Data Adapters</Button>
               </LinkContainer>
             </span>
           </PageHeader>

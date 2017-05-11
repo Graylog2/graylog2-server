@@ -137,19 +137,16 @@ const LUTDataAdaptersPage = React.createClass({
                 </LinkContainer>
               )}
               &nbsp;
-              {(isShowing || isEditing) && (
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}
-                               onlyActiveOnIndex>
-                  <Button bsStyle="info">Data Adapters</Button>
-                </LinkContainer>
-              )}
-              &nbsp;
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} onlyActiveOnIndex>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
                 <Button bsStyle="info">Lookup Tables</Button>
               </LinkContainer>
               &nbsp;
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW} onlyActiveOnIndex>
-                <Button bsStyle="info">Caches</Button>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
+                <Button bsStyle="info">Configure Caches</Button>
+              </LinkContainer>
+              &nbsp;
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
+                <Button bsStyle="info active">Configure Data Adapters</Button>
               </LinkContainer>
             </span>
           </PageHeader>
