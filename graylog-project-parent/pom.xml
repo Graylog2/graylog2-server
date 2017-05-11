@@ -115,6 +115,12 @@
                 <groupId>org.graylog.jest</groupId>
                 <artifactId>jest</artifactId>
                 <version>${jest.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
 
             <dependency>
@@ -516,6 +522,12 @@
                 <artifactId>rest-assured</artifactId>
                 <version>${restassured.version}</version>
                 <scope>test</scope>
+                <exclusions>
+                    <exclusion>
+                        <groupId>commons-logging</groupId>
+                        <artifactId>commons-logging</artifactId>
+                    </exclusion>
+                </exclusions>
             </dependency>
             <dependency>
                 <groupId>com.jayway.restassured</groupId>
