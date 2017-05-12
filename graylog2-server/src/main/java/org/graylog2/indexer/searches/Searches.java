@@ -285,7 +285,7 @@ public class Searches {
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, config.range());
 
-        return new SearchResult(hits, indexRanges, config.query(), requestBuilder.toString(), tookMs);
+        return new SearchResult(hits, searchResult.getTotal().longValue(), indexRanges, config.query(), requestBuilder.toString(), tookMs);
     }
 
     private long tookMsFromSearchResult(io.searchbox.core.SearchResult searchResult) {
@@ -734,8 +734,8 @@ public class Searches {
         final SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder()
             .query(QueryBuilders.boolQuery().must(queryBuilder).filter(standardFilters(range, filter)));
 
-        if (offset > 0) {
-            searchSourceBuilder.from(0);
+        if (offset >= 0) {
+            searchSourceBuilder.from(offset);
         }
 
         if (limit > 0) {
