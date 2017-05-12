@@ -245,7 +245,7 @@ public class MongoIndexSet implements IndexSet {
         if (isUp()) {
             LOG.info("Found deflector alias <{}>. Using it.", getWriteIndexAlias());
         } else {
-            LOG.info("Did not find an deflector alias. Setting one up now.");
+            LOG.info("Did not find a deflector alias. Setting one up now.");
 
             // Do we have a target index to point to?
             try {
