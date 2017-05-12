@@ -40,7 +40,7 @@ The following configuration options are now being used to configure connectivity
 +====================================================+===========+==============================================================+=============================+
 | ``elasticsearch_connect_timeout``                  | Duration  | Timeout when connection to individual Elasticsearch hosts    | ``10s`` (10 Seconds)        |
 +----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
-| ``elasticsearch_hosts``                            | List<URI> | Comma-separated list of URIs of Elasticsearch hosts          | ``"http://127.0.0.1:9200"`` |
+| ``elasticsearch_hosts``                            | List<URI> | Comma-separated list of URIs of Elasticsearch hosts          | ``http://127.0.0.1:9200``   |
 +----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
 | ``elasticsearch_idle_timeout``                     | Duration  | Timeout after which idle connections are terminated          | ``-1s`` (Never)             |
 +----------------------------------------------------+-----------+--------------------------------------------------------------+-----------------------------+
