@@ -679,4 +679,16 @@ public class SearchesTest extends AbstractESTest {
         final ResultMessage resultMessage = fieldStatsResult.getSearchHits().get(0);
         assertThat(resultMessage.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version");
     }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void searchReturnsCorrectTotalHits() throws Exception {
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final SearchResult searchResult = searches.search("*", range, 5, 0, Sorting.DEFAULT);
+
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getResults()).hasSize(5);
+        assertThat(searchResult.getTotalResults()).isEqualTo(10L);
+        assertThat(searchResult.getFields()).doesNotContain("es_metadata_id", "es_metadata_version");
+    }
 }
