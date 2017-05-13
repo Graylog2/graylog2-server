@@ -1,0 +1,21 @@
+Simple set of script to help work with elasticsearch
+
+-- reallocate_shards.sh
+
+when for any reason your cluster fails or what ever happens to it starts with a lot of
+shard in unassigned state, you can use this script to force allocation on nodes.
+Difference between of waiting and using this can be few minutes to few hours of cluster not
+be in usable state...
+
+-- set_index_writable.sh
+
+By default graylog will set index to non writable state after cycling to next index
+This script will connect to elasticsearch node and set given index to writable state.
+
+
+-- remove_from_index.sh
+
+After using set_index_writable.sh you can now use this to query index and delete specific stuff
+from you elasticsearch index, of course because it can be used to delete almost everything from
+your elasticsearch index. You must edit it every time you need to delete something specific to
+minimize that chance :)
