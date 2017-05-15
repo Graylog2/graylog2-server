@@ -34,7 +34,7 @@ public class SearchResultTest {
 
     @Before
     public void setUp() throws Exception {
-        this.searchResult = new SearchResult(Collections.emptyList(), null, null, null, 0L);
+        this.searchResult = new SearchResult(Collections.emptyList(), 0L, null, null, null, 0L);
     }
 
     @Test

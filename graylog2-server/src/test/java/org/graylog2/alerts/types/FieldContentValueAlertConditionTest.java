@@ -70,6 +70,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final IndexRange indexRange = MongoIndexRange.create("graylog_test", now.minusDays(1), now, now, 0);
         final Set<IndexRange> indexRanges = Sets.newHashSet(indexRange);
         final SearchResult searchResult = spy(new SearchResult(Collections.singletonList(searchHit),
+            1L,
             indexRanges,
             "message:something",
             null,
@@ -97,6 +98,7 @@ public class FieldContentValueAlertConditionTest extends AlertConditionTest {
         final IndexRange indexRange = MongoIndexRange.create("graylog_test", now.minusDays(1), now, now, 0);
         final Set<IndexRange> indexRanges = Sets.newHashSet(indexRange);
         final SearchResult searchResult = spy(new SearchResult(Collections.emptyList(),
+            0L,
             indexRanges,
             "message:something",
             null,
