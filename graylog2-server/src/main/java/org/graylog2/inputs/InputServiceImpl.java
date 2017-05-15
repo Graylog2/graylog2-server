@@ -114,6 +114,15 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
+    public String update(Input model) throws ValidationException {
+        final String resultId = super.save(model);
+        if (resultId != null && !resultId.isEmpty()) {
+            publishChange(InputUpdated.create(resultId));
+        }
+        return resultId;
+    }
+
+    @Override
     public <T extends Persisted> String saveWithoutValidation(T model) {
         final String resultId = super.saveWithoutValidation(model);
         if (resultId != null && !resultId.isEmpty()) {
