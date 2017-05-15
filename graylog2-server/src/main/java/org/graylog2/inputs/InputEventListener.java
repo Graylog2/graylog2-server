@@ -70,11 +70,9 @@ public class InputEventListener {
             inputRegistry.remove(inputState);
         }
 
-        if (!input.isGlobal() && !this.nodeId.toString().equals(input.getNodeId())) {
-            return;
+        if (input.isGlobal() || this.nodeId.toString().equals(input.getNodeId())) {
+            startInput(input);
         }
-
-        startInput(input);
     }
 
     @Subscribe
@@ -98,11 +96,9 @@ public class InputEventListener {
             startInput = false;
         }
 
-        if (!startInput || (!input.isGlobal() && !this.nodeId.toString().equals(input.getNodeId()))) {
-            return;
+        if (startInput && (input.isGlobal() || this.nodeId.toString().equals(input.getNodeId()))) {
+            startInput(input);
         }
-
-        startInput(input);
     }
 
     private void startInput(Input input) {
