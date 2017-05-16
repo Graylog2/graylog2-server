@@ -141,6 +141,7 @@ const Input = React.createClass({
   render() {
     const { id, type, bsStyle, wrapperClassName, label, labelClassName, help, children, addonAfter, ...controlProps } = this.props;
     controlProps.type = type;
+    controlProps.label = label;
 
     if (!type) {
       return this._renderFormGroup(id, bsStyle, wrapperClassName, label, labelClassName, help, children);

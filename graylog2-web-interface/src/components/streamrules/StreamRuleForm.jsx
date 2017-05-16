@@ -60,22 +60,23 @@ const StreamRuleForm = React.createClass({
     const fieldBox = (String(this.state.type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
       <TypeAheadFieldInput ref="fieldInput" type="text" required label="Field" valueLink={this.linkState('field')} autoFocus /> : '');
     const valueBox = (String(this.state.type) !== String(this.FIELD_PRESENCE_RULE_TYPE) && String(this.state.type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
-      <Input type="text" required label="Value" name="Value" valueLink={this.linkState('value')} /> : '');
+      <Input id="Value" type="text" required label="Value" name="Value" valueLink={this.linkState('value')} /> : '');
     return (
       <BootstrapModalForm ref="modal"
                           title={this.props.title}
                           onSubmitForm={this._onSubmit}
-                          submitButtonText="Save">
+                          submitButtonText="Save"
+                          formProps={{id: 'StreamRuleForm'}}>
         <div>
           <Col md={8}>
             {fieldBox}
-            <Input type="select" required label="Type" name="Type" valueLink={this.linkState('type')}>
+            <Input id="Type" type="select" required label="Type" name="Type" valueLink={this.linkState('type')}>
               {streamRuleTypes}
             </Input>
             {valueBox}
-            <Input type="checkbox" label="Inverted" name="Inverted" checkedLink={this.linkState('inverted')} />
+            <Input id="Inverted" type="checkbox" label="Inverted" name="Inverted" checkedLink={this.linkState('inverted')} />
 
-            <Input type="textarea" label="Description (optional)" name="Description" valueLink={this.linkState('description')} />
+            <Input id="Description" type="textarea" label="Description (optional)" name="Description" valueLink={this.linkState('description')} />
 
             <p>
               <strong>Result:</strong>
