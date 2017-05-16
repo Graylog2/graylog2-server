@@ -25,6 +25,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     return {
       dataAdapters: undefined,
       pagination: this.pagination,
+      validationErrors: [],
     };
   },
 
@@ -124,6 +125,15 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     });
 
     LookupTableDataAdaptersActions.lookup.promise(promise);
+
+    return promise;
+  },
+
+  validate(adapter) {
+    const url = this._url('adapters/validate');
+    const promise = fetch('POST', url, adapter);
+
+    LookupTableDataAdaptersActions.validate.promise(promise);
     return promise;
   },
 

@@ -87,6 +87,10 @@ const LUTDataAdaptersPage = React.createClass({
     return props.route.action === 'create';
   },
 
+  _validateAdapter(adapter) {
+    LookupTableDataAdaptersActions.validate(adapter);
+  },
+
   render() {
     let content;
     const isShowing = this.props.route.action === 'show';
@@ -103,7 +107,9 @@ const LUTDataAdaptersPage = React.createClass({
               <DataAdapterForm dataAdapter={this.state.dataAdapter}
                                type={this.state.dataAdapter.config.type}
                                create={false}
-                               saved={this._saved} />
+                               saved={this._saved}
+                               validate={this._validateAdapter}
+                               validationErrors={this.state.validationErrors} />
             </Col>
           </Row>
         );
@@ -114,7 +120,11 @@ const LUTDataAdaptersPage = React.createClass({
       if (!this.state.types) {
         content = <Spinner text="Loading data adapter types" />;
       } else {
-        content = <DataAdapterCreate history={this.props.history} types={this.state.types} saved={this._saved} />;
+        content = (<DataAdapterCreate history={this.props.history}
+                                      types={this.state.types}
+                                      saved={this._saved}
+                                      validate={this._validateAdapter}
+                                      validationErrors={this.state.validationErrors} />);
       }
     } else if (!this.state.dataAdapters) {
       content = <Spinner text="Loading data adapters" />;

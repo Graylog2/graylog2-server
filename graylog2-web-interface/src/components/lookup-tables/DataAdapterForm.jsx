@@ -19,6 +19,8 @@ const DataAdapterForm = React.createClass({
     saved: PropTypes.func.isRequired,
     create: PropTypes.bool,
     dataAdapter: PropTypes.object,
+    validate: PropTypes.func,
+    validationErrors: PropTypes.array,
   },
 
   getDefaultProps() {
@@ -31,6 +33,8 @@ const DataAdapterForm = React.createClass({
         name: '',
         config: {},
       },
+      validate: null,
+      validationErrors: [],
     };
   },
 
@@ -50,6 +54,9 @@ const DataAdapterForm = React.createClass({
     const adapter = ObjectUtils.clone(dataAdapter);
 
     return {
+      // when creating always initially auto-generate the adapter name,
+      // this will be false if the user changed the adapter name manually
+      generateAdapterName: this.props.create,
       dataAdapter: {
         id: adapter.id,
         title: adapter.title,
@@ -60,10 +67,40 @@ const DataAdapterForm = React.createClass({
     };
   },
 
+  componentWillUnmount() {
+    this._clearTimer();
+  },
+
+  validationCheckTimer: undefined,
+
+  _clearTimer() {
+    if (this.validationCheckTimer !== undefined) {
+      clearTimeout(this.validationCheckTimer);
+      this.validationCheckTimer = undefined;
+    }
+  },
+
   _onChange(event) {
+    this._clearTimer();
+
     const dataAdapter = ObjectUtils.clone(this.state.dataAdapter);
     dataAdapter[event.target.name] = FormsUtils.getValueFromInput(event.target);
-    this.setState({ dataAdapter: dataAdapter });
+    let generateAdapterName = this.state.generateAdapterName;
+    if (generateAdapterName && event.target.name === 'title') {
+      // generate the name
+      dataAdapter.name = this._sanitizeTitle(dataAdapter.title);
+      if (this.props.validate) {
+        this.validationCheckTimer = setTimeout(() => this.props.validate(dataAdapter), 500);
+      }
+    }
+    if (event.target.name === 'name') {
+      // the adapter name has been changed manually, no longer automatically change it
+      generateAdapterName = false;
+      if (this.props.validate) {
+        this.validationCheckTimer = setTimeout(() => this.props.validate(dataAdapter), 500);
+      }
+    }
+    this.setState({ dataAdapter: dataAdapter, generateAdapterName: generateAdapterName });
   },
 
   _onConfigChange(event) {
@@ -91,6 +128,10 @@ const DataAdapterForm = React.createClass({
     }
 
     promise.then(() => { this.props.saved(); });
+  },
+
+  _sanitizeTitle(title) {
+    return title.trim().replace(/\W+/g, '-').toLowerCase();
   },
 
   render() {

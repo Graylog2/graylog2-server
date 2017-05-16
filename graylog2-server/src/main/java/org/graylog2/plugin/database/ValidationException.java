@@ -18,6 +18,7 @@ package org.graylog2.plugin.database;
 
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableMap;
+
 import org.graylog2.plugin.database.validators.ValidationResult;
 
 import java.util.Collections;

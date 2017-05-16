@@ -16,9 +16,11 @@
  */
 package org.graylog2.rest.resources.system.lookup;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -421,6 +423,30 @@ public class LookupTableResource extends RestResource {
         return DataAdapterApi.fromDto(saved);
     }
 
+    @POST
+    @Path("adapters/validate")
+    @NoAuditEvent("Validation only")
+    @ApiOperation(value = "Validate the data adapter config")
+    public ValidationResult validateAdapter(@Valid @ApiParam DataAdapterApi toValidate) {
+        final ValidationResult validation = new ValidationResult();
+
+        final Optional<DataAdapterDto> dtoOptional = adapterService.get(toValidate.name());
+        if (dtoOptional.isPresent()) {
+            // an adapter exist with the given name, check that the IDs are the same, this might be an update
+            final DataAdapterDto adapterDto = dtoOptional.get();
+            //noinspection ConstantConditions
+            if (!adapterDto.id().equals(toValidate.id())) {
+                // an adapter exists with a different id, so the name is already in use, fail validation
+                validation.addError("name", "The data adapter name must be unique.");
+            }
+        }
+
+        final Optional<Multimap<String, String>> configValidations = toValidate.config().validate();
+        configValidations.ifPresent(validation::addAll);
+
+        return validation;
+    }
+
     @JsonAutoDetect
     public static class DataAdapterPage {
         @Nullable
@@ -539,4 +565,28 @@ public class LookupTableResource extends RestResource {
         }
     }
 
+    @JsonAutoDetect
+    public static class ValidationResult {
+
+        private final Multimap<String, String> errors = ArrayListMultimap.create();
+
+
+        public void addError(String fieldName, String error) {
+            errors.put(fieldName, error);
+        }
+
+        public void addAll(Multimap<String, String> extraErrors) {
+            errors.putAll(extraErrors);
+        }
+
+        @JsonProperty("failed")
+        public boolean failed() {
+            return !errors.isEmpty();
+        }
+
+        @JsonProperty("errors")
+        public Map<String, Collection<String>> getErrors() {
+            return errors.asMap();
+        }
+    }
 }
