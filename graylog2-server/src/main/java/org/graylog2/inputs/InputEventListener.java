@@ -24,6 +24,7 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.inputs.responses.InputCreated;
 import org.graylog2.rest.models.system.inputs.responses.InputDeleted;
+import org.graylog2.rest.models.system.inputs.responses.InputUpdated;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.inputs.NoSuchInputTypeException;
@@ -52,39 +53,71 @@ public class InputEventListener {
         eventBus.register(this);
     }
 
-    @Subscribe public void inputCreated(InputCreated inputCreatedEvent) {
-        LOG.debug("Input created/changed: " + inputCreatedEvent.id());
+    @Subscribe
+    public void inputCreated(InputCreated inputCreatedEvent) {
+        final String inputId = inputCreatedEvent.id();
+        LOG.debug("Input created: {}", inputId);
         final Input input;
         try {
-            input = inputService.find(inputCreatedEvent.id());
+            input = inputService.find(inputId);
         } catch (NotFoundException e) {
-            LOG.warn("Received InputCreated event but could not find Input: ", e);
+            LOG.warn("Received InputCreated event but could not find input {}", inputId, e);
             return;
         }
 
-        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputCreatedEvent.id());
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
         if (inputState != null) {
             inputRegistry.remove(inputState);
         }
 
-        if (!input.isGlobal() && !this.nodeId.toString().equals(input.getNodeId())) {
+        if (input.isGlobal() || this.nodeId.toString().equals(input.getNodeId())) {
+            startInput(input);
+        }
+    }
+
+    @Subscribe
+    public void inputUpdated(InputUpdated inputUpdatedEvent) {
+        final String inputId = inputUpdatedEvent.id();
+        LOG.debug("Input updated: {}", inputId);
+        final Input input;
+        try {
+            input = inputService.find(inputId);
+        } catch (NotFoundException e) {
+            LOG.warn("Received InputUpdated event but could not find input {}", inputId, e);
             return;
         }
 
+        final boolean startInput;
+        final IOState<MessageInput> inputState = inputRegistry.getInputState(inputId);
+        if (inputState != null) {
+            startInput = inputState.getState() == IOState.Type.RUNNING;
+            inputRegistry.remove(inputState);
+        } else {
+            startInput = false;
+        }
+
+        if (startInput && (input.isGlobal() || this.nodeId.toString().equals(input.getNodeId()))) {
+            startInput(input);
+        }
+    }
+
+    private void startInput(Input input) {
         final MessageInput messageInput;
         try {
             messageInput = inputService.getMessageInput(input);
-            messageInput.initialize();
         } catch (NoSuchInputTypeException e) {
-            LOG.warn("Newly created input is of invalid type: " + input.getType(), e);
+            LOG.warn("Input {} ({}) is of invalid type {}", input.getTitle(), input.getId(), input.getType(), e);
             return;
         }
+        messageInput.initialize();
+
         final IOState<MessageInput> newInputState = inputLauncher.launch(messageInput);
         inputRegistry.add(newInputState);
     }
 
-    @Subscribe public void inputDeleted(InputDeleted inputDeletedEvent) {
-        LOG.debug("Input deleted: " + inputDeletedEvent.id());
+    @Subscribe
+    public void inputDeleted(InputDeleted inputDeletedEvent) {
+        LOG.debug("Input deleted: {}", inputDeletedEvent.id());
         final IOState<MessageInput> inputState = inputRegistry.getInputState(inputDeletedEvent.id());
         if (inputState != null) {
             inputRegistry.remove(inputState);
