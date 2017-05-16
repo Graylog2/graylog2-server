@@ -33,7 +33,15 @@ const CacheForm = React.createClass({
   },
 
   getInitialState() {
-    const cache = ObjectUtils.clone(this.props.cache);
+    return this._initialState(this.props.cache);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    this.setState(this._initialState(nextProps.cache));
+  },
+
+  _initialState(c) {
+    const cache = ObjectUtils.clone(c);
 
     return {
       cache: {

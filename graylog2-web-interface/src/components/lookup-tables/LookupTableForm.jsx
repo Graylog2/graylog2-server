@@ -36,7 +36,15 @@ const LookupTableForm = React.createClass({
   },
 
   getInitialState() {
-    const table = ObjectUtils.clone(this.props.table);
+    return this._initialState(this.props.table);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    this.setState(this._initialState(nextProps.table));
+  },
+
+  _initialState(t) {
+    const table = ObjectUtils.clone(t);
 
     return {
       table: {

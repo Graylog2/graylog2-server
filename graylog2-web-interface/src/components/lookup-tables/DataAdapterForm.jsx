@@ -33,7 +33,15 @@ const DataAdapterForm = React.createClass({
   },
 
   getInitialState() {
-    const adapter = ObjectUtils.clone(this.props.dataAdapter);
+    return this._initialState(this.props.dataAdapter);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    this.setState(this._initialState(nextProps.dataAdapter));
+  },
+
+  _initialState(dataAdapter) {
+    const adapter = ObjectUtils.clone(dataAdapter);
 
     return {
       dataAdapter: {
