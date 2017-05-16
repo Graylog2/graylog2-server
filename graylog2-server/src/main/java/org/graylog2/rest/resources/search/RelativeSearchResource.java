@@ -179,10 +179,12 @@ public class RelativeSearchResource extends SearchResource {
             @QueryParam("query") @NotEmpty String query,
             @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
-        return buildTermsResult(searches.terms(field, size, query, filter, buildRelativeTimeRange(range)));
+        final Sorting sortOrder = buildSorting(order);
+        return buildTermsResult(searches.terms(field, size, query, filter, buildRelativeTimeRange(range), sortOrder.getDirection()));
     }
 
     @GET
