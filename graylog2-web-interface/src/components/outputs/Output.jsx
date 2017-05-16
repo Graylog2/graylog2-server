@@ -59,6 +59,21 @@ const Output = React.createClass({
       );
     }
 
+    const streamId = this.props.streamId;
+    let deleteFromStreamButton;
+    if (streamId !== null && streamId !== undefined) {
+      deleteFromStreamButton = (
+        <IfPermitted permissions="stream_outputs:delete">
+          {' '}
+          <Button bsStyle="info" onClick={this._onDeleteFromStream}>
+            Delete from stream
+          </Button>
+        </IfPermitted>
+      );
+    } else {
+      deleteFromStreamButton = '';
+    }
+
     return (
       <div key={output.id} className="row content node-row">
         <Col md={12}>
@@ -76,14 +91,9 @@ const Output = React.createClass({
                   <EditOutputButton disabled={this._typeNotAvailable()} output={output} onUpdate={this.props.onUpdate}
                                     getTypeDefinition={this.props.getTypeDefinition} />
                 </IfPermitted>
-                {' '}
-                <IfPermitted permissions="stream_outputs:delete">
-                  <Button bsStyle="info" onClick={this._onDeleteFromStream}>
-                    Delete from stream
-                  </Button>
-                </IfPermitted>
-                {' '}
+                {deleteFromStreamButton}
                 <IfPermitted permissions="outputs:terminate">
+                  {' '}
                   <Button bsStyle="primary" onClick={this._onDeleteGlobally}>
                     Delete globally
                   </Button>
