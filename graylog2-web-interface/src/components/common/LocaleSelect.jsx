@@ -1,5 +1,5 @@
 import React from "react";
-import Reflux from 'reflux';
+import Reflux from "reflux";
 
 import Select from "components/common/Select";
 
@@ -15,9 +15,12 @@ const LocaleSelect = React.createClass({
     return this.refs.locale.getValue();
   },
   _formatLocales(locales) {
-    return Object.values(locales).map(locale => {
-      return {value: locale['language_tag'], label: locale['display_name']}
-    }).sort(function(a, b) {
+    const sortedLocales = Object.values(locales)
+        .filter(locale => locale['language_tag'] !== 'und')
+        .map(locale => {
+          return {value: locale['language_tag'], label: locale['display_name']}
+        })
+        .sort(function(a, b) {
         const nameA = a.label.toUpperCase();
         const nameB = b.label.toUpperCase();
         if (nameA < nameB) {
@@ -29,6 +32,8 @@ const LocaleSelect = React.createClass({
 
         return 0;
     });
+
+    return [{value: 'und', label:'Default locale'}].concat(sortedLocales);
   },
   _renderOption(option) {
       return <span key={option.value} title="{option.value} [{option.value}]">{option.label} [{option.value}]</span>;
