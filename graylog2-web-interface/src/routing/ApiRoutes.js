@@ -189,6 +189,7 @@ const ApiRoutes = {
     info: () => { return { url: '/system' }; },
     jvm: () => { return { url: '/system/jvm' }; },
     fields: () => { return { url: '/system/fields' }; },
+    locales: () => { return { url: '/system/locales' }; },
   },
   SystemJobsApiController: {
     list: () => { return { url: '/cluster/jobs' }; },

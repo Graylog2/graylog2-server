@@ -18,6 +18,7 @@ package org.graylog2.inputs.converters;
 
 import org.graylog2.ConfigurationException;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.joda.time.YearMonth;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -25,14 +26,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Map;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Strings.emptyToNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 public class DateConverter extends AbstractDateConverter {
     private static final Logger LOG = LoggerFactory.getLogger(DateConverter.class);
+    private static final Locale DEFAULT_LOCALE = Locale.ENGLISH;
 
     private final String dateFormat;
+    private final Locale locale;
 
     public DateConverter(Map<String, Object> config) throws ConfigurationException {
         super(Type.DATE, config);
@@ -42,6 +48,19 @@ public class DateConverter extends AbstractDateConverter {
         }
 
         this.dateFormat = ((String) config.get("date_format")).trim();
+        this.locale = buildLocale(config.get("locale"));
+    }
+
+    private static Locale buildLocale(Object languageTag) {
+        if (languageTag instanceof String) {
+            try {
+                return Locale.forLanguageTag((String) languageTag);
+            } catch (IllegalArgumentException e) {
+                return DEFAULT_LOCALE;
+            }
+        } else {
+            return DEFAULT_LOCALE;
+        }
     }
 
     @Override
@@ -54,6 +73,7 @@ public class DateConverter extends AbstractDateConverter {
         LOG.debug("Trying to parse date <{}> with pattern <{}> and timezone <{}>.", value, dateFormat, timeZone);
         final DateTimeFormatter formatter = DateTimeFormat
                 .forPattern(dateFormat)
+                .withLocale(locale)
                 .withDefaultYear(YearMonth.now(timeZone).getYear())
                 .withZone(timeZone);
         return DateTime.parse(value, formatter);

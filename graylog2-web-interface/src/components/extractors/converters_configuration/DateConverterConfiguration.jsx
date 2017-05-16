@@ -2,7 +2,7 @@ import React, { PropTypes } from 'react';
 import { Row, Col } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
-import { TimezoneSelect } from 'components/common';
+import { LocaleSelect, TimezoneSelect } from 'components/common';
 import DocumentationLink from 'components/support/DocumentationLink';
 
 import DocsHelper from 'util/DocsHelper';
@@ -51,6 +51,13 @@ const DateConverterConfiguration = React.createClass({
       </span>
     );
 
+    const localeHelpMessage = (
+      <span>
+        Locale to use when parsing the date. Read more in the <DocumentationLink
+        page={DocsHelper.PAGES.PAGE_STANDARD_DATE_CONVERTER} text="documentation" />.
+      </span>
+    );
+
     return (
       <div className="xtrc-converter">
         <Input type="checkbox"
@@ -84,6 +91,17 @@ const DateConverterConfiguration = React.createClass({
                                 className="timezone-select"
                                 value={this.props.configuration.time_zone}
                                 onChange={this._onChange('time_zone')} />
+              </Input>
+              <Input label="Locale"
+                     id={`${this.props.type}_converter_locale`}
+                     labelClassName="col-sm-3"
+                     wrapperClassName="col-sm-9"
+                     help={localeHelpMessage}>
+                <LocaleSelect ref="locale"
+                              id={`${this.props.type}_converter_locale`}
+                              className="locale-select"
+                              value={this.props.configuration.locale}
+                              onChange={this._onChange('locale')} />
               </Input>
             </div>
           </Col>
