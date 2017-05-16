@@ -31,6 +31,7 @@ import org.graylog2.plugin.outputs.MessageOutput;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.shared.journal.Journal;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.File;
 import java.util.List;
@@ -47,14 +48,6 @@ public class BenchmarkOutput implements MessageOutput {
     private final Meter messagesWritten;
     private final CsvReporter csvReporter;
     private final Journal journal;
-
-    @AssistedInject
-    public BenchmarkOutput(final MetricRegistry metricRegistry,
-                           final Journal journal,
-                           @Assisted Stream stream,
-                           @Assisted Configuration configuration) {
-        this(metricRegistry, journal);
-    }
 
     @Inject
     public BenchmarkOutput(final MetricRegistry metricRegistry, final Journal journal) {
@@ -109,7 +102,7 @@ public class BenchmarkOutput implements MessageOutput {
 
     public interface Factory extends MessageOutput.Factory<GelfOutput> {
         @Override
-        GelfOutput create(Stream stream, Configuration configuration);
+        GelfOutput create(Stream stream, Configuration configuration, @Nullable String id);
 
         @Override
         Config getConfig();
