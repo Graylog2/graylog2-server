@@ -30,16 +30,6 @@ const LUTDataAdaptersPage = React.createClass({
 
   componentDidMount() {
     this._loadData(this.props);
-
-    this.errorStatesTimer = setInterval(() => {
-      let names = null;
-      if (this.state.dataAdapters) {
-        names = this.state.dataAdapters.map(t => t.name);
-      }
-      if (names) {
-        LookupTablesActions.getErrors(null, null, names || null);
-      }
-    }, this.errorStatesInterval);
   },
 
   componentWillReceiveProps(nextProps) {
@@ -53,12 +43,34 @@ const LUTDataAdaptersPage = React.createClass({
   errorStatesTimer: undefined,
   errorStatesInterval: 1000,
 
+  _startErrorStatesTimer() {
+    this._stopErrorStatesTimer();
+    this.errorStatesTimer = setInterval(() => {
+      let names = null;
+      if (this.state.dataAdapters) {
+        names = this.state.dataAdapters.map(t => t.name);
+      }
+      if (names) {
+        LookupTablesActions.getErrors(null, null, names || null);
+      }
+    }, this.errorStatesInterval);
+  },
+
+  _stopErrorStatesTimer() {
+    if (this.errorStatesTimer) {
+      clearInterval(this.errorStatesTimer);
+      this.errorStatesTimer = undefined;
+    }
+  },
+
   _loadData(props) {
+    this._stopErrorStatesTimer();
     if (props.params && props.params.adapterName) {
       LookupTableDataAdaptersActions.get(props.params.adapterName);
     } else {
       const p = this.state.pagination;
       LookupTableDataAdaptersActions.searchPaginated(p.page, p.per_page, p.query);
+      this._startErrorStatesTimer();
     }
     if (this._isCreating(props)) {
       LookupTableDataAdaptersActions.getTypes();

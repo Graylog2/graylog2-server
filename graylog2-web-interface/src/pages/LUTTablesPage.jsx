@@ -26,17 +26,6 @@ const LUTTablesPage = React.createClass({
 
   componentDidMount() {
     this._loadData(this.props);
-
-    this.errorStatesTimer = setInterval(() => {
-      let tableNames = null;
-      if (this.state.tables) {
-        tableNames = this.state.tables.map(t => t.name);
-      }
-      if (tableNames) {
-        const adapterNames = Object.values(this.state.dataAdapters).map(a => a.name);
-        LookupTablesActions.getErrors(tableNames, null, adapterNames || null);
-      }
-    }, this.errorStatesInterval);
   },
 
   componentWillReceiveProps(nextProps) {
@@ -50,12 +39,35 @@ const LUTTablesPage = React.createClass({
   errorStatesTimer: undefined,
   errorStatesInterval: 1000,
 
+  _startErrorStatesTimer() {
+    this._stopErrorStatesTimer();
+    this.errorStatesTimer = setInterval(() => {
+      let tableNames = null;
+      if (this.state.tables) {
+        tableNames = this.state.tables.map(t => t.name);
+      }
+      if (tableNames) {
+        const adapterNames = Object.values(this.state.dataAdapters).map(a => a.name);
+        LookupTablesActions.getErrors(tableNames, null, adapterNames || null);
+      }
+    }, this.errorStatesInterval);
+  },
+
+  _stopErrorStatesTimer() {
+    if (this.errorStatesTimer) {
+      clearInterval(this.errorStatesTimer);
+      this.errorStatesTimer = undefined;
+    }
+  },
+
   _loadData(props) {
+    this._stopErrorStatesTimer();
     if (props.params && props.params.tableName) {
       LookupTablesActions.get(props.params.tableName);
     } else {
       const p = this.state.pagination;
       LookupTablesActions.searchPaginated(p.page, p.per_page, p.query);
+      this._startErrorStatesTimer();
     }
     if (this._isCreating(props)) {
       // nothing to do, the intermediate data container will take care of loading the caches and adapters
