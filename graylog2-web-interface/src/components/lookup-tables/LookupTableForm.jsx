@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-
+import _ from 'lodash';
 import { Button } from 'react-bootstrap';
 // import { LinkContainer } from 'react-router';
 import { Input } from 'components/bootstrap';
@@ -36,7 +36,19 @@ const LookupTableForm = React.createClass({
   },
 
   getInitialState() {
-    const table = ObjectUtils.clone(this.props.table);
+    return this._initialState(this.props.table);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (_.isEqual(this.props, nextProps)) {
+      // props haven't change, don't update our state from them
+      return;
+    }
+    this.setState(this._initialState(nextProps.table));
+  },
+
+  _initialState(t) {
+    const table = ObjectUtils.clone(t);
 
     return {
       table: {

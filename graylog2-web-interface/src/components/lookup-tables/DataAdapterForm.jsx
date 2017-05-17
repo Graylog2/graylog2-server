@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
 
+import _ from 'lodash';
+
 import { Button, Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
@@ -33,7 +35,19 @@ const DataAdapterForm = React.createClass({
   },
 
   getInitialState() {
-    const adapter = ObjectUtils.clone(this.props.dataAdapter);
+    return this._initialState(this.props.dataAdapter);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (_.isEqual(this.props, nextProps)) {
+      // props haven't change, don't update our state from them
+      return;
+    }
+    this.setState(this._initialState(nextProps.dataAdapter));
+  },
+
+  _initialState(dataAdapter) {
+    const adapter = ObjectUtils.clone(dataAdapter);
 
     return {
       dataAdapter: {

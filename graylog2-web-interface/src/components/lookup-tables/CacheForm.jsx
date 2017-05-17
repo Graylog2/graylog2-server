@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-
+import _ from 'lodash';
 import { Button, Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
@@ -33,7 +33,19 @@ const CacheForm = React.createClass({
   },
 
   getInitialState() {
-    const cache = ObjectUtils.clone(this.props.cache);
+    return this._initialState(this.props.cache);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (_.isEqual(this.props, nextProps)) {
+      // props haven't change, don't update our state from them
+      return;
+    }
+    this.setState(this._initialState(nextProps.cache));
+  },
+
+  _initialState(c) {
+    const cache = ObjectUtils.clone(c);
 
     return {
       cache: {
