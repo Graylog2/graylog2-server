@@ -37,6 +37,10 @@ const DataAdapterForm = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
+    if (ObjectUtils.isShallowEqual(this.props, nextProps)) {
+      // props haven't change, don't update our state from them
+      return;
+    }
     this.setState(this._initialState(nextProps.dataAdapter));
   },
 
