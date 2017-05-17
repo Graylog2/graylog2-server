@@ -1,5 +1,7 @@
 import React, { PropTypes } from 'react';
 
+import _ from 'lodash';
+
 import { Button, Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
@@ -37,7 +39,7 @@ const DataAdapterForm = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    if (ObjectUtils.isShallowEqual(this.props, nextProps)) {
+    if (_.isEqual(this.props, nextProps)) {
       // props haven't change, don't update our state from them
       return;
     }
