@@ -44,6 +44,7 @@ const LUTDataAdaptersPage = React.createClass({
   errorStatesInterval: 1000,
 
   _startErrorStatesTimer() {
+    this._stopErrorStatesTimer();
     this.errorStatesTimer = setInterval(() => {
       let names = null;
       if (this.state.dataAdapters) {

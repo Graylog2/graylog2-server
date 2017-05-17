@@ -40,6 +40,7 @@ const LUTTablesPage = React.createClass({
   errorStatesInterval: 1000,
 
   _startErrorStatesTimer() {
+    this._stopErrorStatesTimer();
     this.errorStatesTimer = setInterval(() => {
       let tableNames = null;
       if (this.state.tables) {
