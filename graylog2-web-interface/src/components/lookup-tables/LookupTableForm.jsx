@@ -1,5 +1,5 @@
 import React, { PropTypes } from 'react';
-
+import _ from 'lodash';
 import { Button } from 'react-bootstrap';
 // import { LinkContainer } from 'react-router';
 import { Input } from 'components/bootstrap';
@@ -40,7 +40,7 @@ const LookupTableForm = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    if (ObjectUtils.isShallowEqual(this.props, nextProps)) {
+    if (_.isEqual(this.props, nextProps)) {
       // props haven't change, don't update our state from them
       return;
     }
