@@ -437,7 +437,7 @@ public class LookupTableResource extends RestResource {
             //noinspection ConstantConditions
             if (!adapterDto.id().equals(toValidate.id())) {
                 // an adapter exists with a different id, so the name is already in use, fail validation
-                validation.addError("name", "The data adapter name must be unique.");
+                validation.addError("name", "The data adapter name is already in use.");
             }
         }
 

@@ -282,9 +282,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
             final Path path = Paths.get(path());
             if (!Files.exists(path)) {
-                errors.put("path", "The file does not exist");
+                errors.put("path", "The file does not exist.");
             } else if (!Files.isReadable(path)) {
-                errors.put("path", "The file cannot be read");
+                errors.put("path", "The file cannot be read.");
             }
 
             return errors.isEmpty() ? Optional.empty() : Optional.of(errors);

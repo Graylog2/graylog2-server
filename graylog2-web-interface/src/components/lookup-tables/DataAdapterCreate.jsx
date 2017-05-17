@@ -14,13 +14,13 @@ const DataAdapterCreate = React.createClass({
     saved: PropTypes.func.isRequired,
     types: PropTypes.object.isRequired,
     validate: PropTypes.func,
-    validationErrors: PropTypes.array,
+    validationErrors: PropTypes.object,
   },
 
   getDefaultProps() {
     return {
       validate: null,
-      validationErrors: [],
+      validationErrors: {},
     };
   },
 

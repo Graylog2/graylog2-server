@@ -8,6 +8,8 @@ const CSVFileAdapterFieldSet = React.createClass({
 // eslint-disable-next-line react/no-unused-prop-types
     updateConfig: PropTypes.func.isRequired,
     handleFormEvent: PropTypes.func.isRequired,
+    validationState: PropTypes.func.isRequired,
+    validationMessage: PropTypes.func.isRequired,
   },
 
   render() {
@@ -21,10 +23,10 @@ const CSVFileAdapterFieldSet = React.createClass({
              autoFocus
              required
              onChange={this.props.handleFormEvent}
-             help="The path to the CSV file."
+             help={this.props.validationMessage('path', 'The path to the CSV file.')}
              value={config.path}
              labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9" />
+             wrapperClassName="col-sm-9" bsStyle={this.props.validationState('path')} />
       <Input type="number"
              id="check_interval"
              name="check_interval"
