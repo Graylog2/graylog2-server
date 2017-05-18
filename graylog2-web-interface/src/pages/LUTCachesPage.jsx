@@ -54,6 +54,10 @@ const LUTCachesPage = React.createClass({
     return props.route.action === 'create';
   },
 
+  _validateCache(adapter) {
+    LookupTableCachesActions.validate(adapter);
+  },
+
   render() {
     let content;
     const isShowing = this.props.route.action === 'show';
@@ -70,7 +74,9 @@ const LUTCachesPage = React.createClass({
               <CacheForm cache={this.state.cache}
                          type={this.state.cache.config.type}
                          create={false}
-                         saved={this._saved} />
+                         saved={this._saved}
+                         validate={this._validateCache}
+                         validationErrors={this.state.validationErrors} />
             </Col>
           </Row>
         );
@@ -82,7 +88,11 @@ const LUTCachesPage = React.createClass({
         content = <Spinner text="Loading data cache types" />;
       } else {
         content =
-          <CacheCreate history={this.props.history} types={this.state.types} saved={this._saved} />;
+          <CacheCreate history={this.props.history}
+                       types={this.state.types}
+                       saved={this._saved}
+                       validate={this._validateCache}
+                       validationErrors={this.state.validationErrors} />;
       }
     } else if (!this.state.caches) {
       content = <Spinner text="Loading caches" />;

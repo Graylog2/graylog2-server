@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.resources.system.lookup;
 
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -44,6 +43,7 @@ import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.PaginatedList;
 import org.graylog2.rest.models.system.lookup.CacheApi;
 import org.graylog2.rest.models.system.lookup.DataAdapterApi;
@@ -546,6 +546,30 @@ public class LookupTableResource extends RestResource {
         return CacheApi.fromDto(saved);
     }
 
+    @POST
+    @Path("caches/validate")
+    @NoAuditEvent("Validation only")
+    @ApiOperation(value = "Validate the cache config")
+    public ValidationResult validateCache(@Valid @ApiParam CacheApi toValidate) {
+        final ValidationResult validation = new ValidationResult();
+
+        final Optional<CacheDto> dtoOptional = cacheService.get(toValidate.name());
+        if (dtoOptional.isPresent()) {
+            // a cache exist with the given name, check that the IDs are the same, this might be an update
+            final CacheDto cacheDto = dtoOptional.get();
+            //noinspection ConstantConditions
+            if (!cacheDto.id().equals(toValidate.id())) {
+                // a ache exists with a different id, so the name is already in use, fail validation
+                validation.addError("name", "The cache name is already in use.");
+            }
+        }
+
+        final Optional<Multimap<String, String>> configValidations = toValidate.config().validate();
+        configValidations.ifPresent(validation::addAll);
+
+        return validation;
+    }
+
     @JsonAutoDetect
     public static class CachesPage {
         @Nullable
@@ -565,28 +589,4 @@ public class LookupTableResource extends RestResource {
         }
     }
 
-    @JsonAutoDetect
-    public static class ValidationResult {
-
-        private final Multimap<String, String> errors = ArrayListMultimap.create();
-
-
-        public void addError(String fieldName, String error) {
-            errors.put(fieldName, error);
-        }
-
-        public void addAll(Multimap<String, String> extraErrors) {
-            errors.putAll(extraErrors);
-        }
-
-        @JsonProperty("failed")
-        public boolean failed() {
-            return !errors.isEmpty();
-        }
-
-        @JsonProperty("errors")
-        public Map<String, Collection<String>> getErrors() {
-            return errors.asMap();
-        }
-    }
 }

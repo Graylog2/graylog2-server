@@ -8,6 +8,10 @@ const HTTPJSONPathAdapterFieldSet = React.createClass({
     // eslint-disable-next-line react/no-unused-prop-types
     updateConfig: PropTypes.func.isRequired,
     handleFormEvent: PropTypes.func.isRequired,
+    // eslint-disable-next-line react/no-unused-prop-types
+    validationState: PropTypes.func.isRequired,
+    // eslint-disable-next-line react/no-unused-prop-types
+    validationMessage: PropTypes.func.isRequired,
   },
 
   render() {

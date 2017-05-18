@@ -25,6 +25,7 @@ const LookupTableCachesStore = Reflux.createStore({
     return {
       caches: undefined,
       pagination: this.pagination,
+      validationErrors: {},
     };
   },
 
@@ -111,6 +112,19 @@ const LookupTableCachesStore = Reflux.createStore({
     const promise = fetch('DELETE', url);
 
     LookupTableCachesActions.delete.promise(promise);
+    return promise;
+  },
+
+  validate(cache) {
+    const url = this._url('caches/validate');
+    const promise = fetch('POST', url, cache);
+
+    promise.then((response) => {
+      this.trigger({
+        validationErrors: response.errors,
+      });
+    });
+    LookupTableCachesActions.validate.promise(promise);
     return promise;
   },
 
