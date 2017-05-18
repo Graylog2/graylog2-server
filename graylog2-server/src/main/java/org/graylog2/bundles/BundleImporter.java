@@ -19,6 +19,7 @@ package org.graylog2.bundles;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.bson.types.ObjectId;
 import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardService;
@@ -53,6 +54,8 @@ import org.graylog2.streams.StreamImpl;
 import org.graylog2.streams.StreamRuleImpl;
 import org.graylog2.streams.StreamRuleService;
 import org.graylog2.streams.StreamService;
+import org.graylog2.streams.events.StreamDeletedEvent;
+import org.graylog2.streams.events.StreamsChangedEvent;
 import org.graylog2.timeranges.TimeRangeFactory;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -225,8 +228,10 @@ public class BundleImporter {
 
     private void deleteCreatedStreams() throws NotFoundException {
         for (Map.Entry<String, org.graylog2.plugin.streams.Stream> entry : createdStreams.entrySet()) {
-            LOG.debug("Deleting stream {} from database", entry.getKey());
+            final String streamId = entry.getKey();
+            LOG.debug("Deleting stream {} from database", streamId);
             streamService.destroy(entry.getValue());
+            clusterBus.post(streamId);
         }
     }
 
@@ -465,6 +470,9 @@ public class BundleImporter {
                 streamsByReferenceId.put(referenceId, stream);
             }
         }
+
+        final ImmutableSet<String> streamIds = ImmutableSet.copyOf(createdStreams.keySet());
+        clusterBus.post(StreamsChangedEvent.create(streamIds));
     }
 
     private org.graylog2.plugin.streams.Stream createStream(final String bundleId, final Stream streamDescription, final String userName)
