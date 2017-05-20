@@ -434,7 +434,7 @@ public class Indices {
         if (succeeded) {
             auditEventSender.success(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         } else {
-            LOG.warn("Couldn't create index {}", indexName);
+            LOG.warn("Couldn't create index {}. Error: {}", indexName, jestResult.getErrorMessage());
             auditEventSender.failure(AuditActor.system(nodeId), ES_INDEX_CREATE, ImmutableMap.of("indexName", indexName));
         }
         return succeeded;
