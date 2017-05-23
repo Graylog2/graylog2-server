@@ -47,13 +47,14 @@ public class EmailAlarmCallbackTest {
     private EmailRecipients.Factory emailRecipientsFactory = mock(EmailRecipients.Factory.class);
     private UserService userService = mock(UserService.class);
     private EmailConfiguration emailConfiguration = mock(EmailConfiguration.class);
+    private org.graylog2.Configuration graylogConfig = mock(org.graylog2.Configuration.class);
 
     private AlarmCallback alarmCallback;
 
     @Before
     public void setUp() throws Exception {
         alarmCallback = new EmailAlarmCallback(alertSender, notificationService, nodeId, emailRecipientsFactory,
-                userService, emailConfiguration);
+                userService, emailConfiguration, graylogConfig);
     }
 
     @Test
