@@ -48,9 +48,6 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_max_total_connections_per_route", validators = { PositiveIntegerValidator.class })
     private int elasticsearchMaxTotalConnectionsPerRoute = 2;
 
-    @Parameter(value = "elasticsearch_version")
-    private int elasticsearchVersion = 5;
-
     @Parameter(value = "elasticsearch_discovery_enabled")
     private boolean discoveryEnabled = false;
 
@@ -59,20 +56,4 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "elasticsearch_discovery_frequency")
     private Duration discoveryFrequency = Duration.ofSeconds(30L);
-
-    public int getVersion() {
-        return elasticsearchVersion;
-    }
-
-    @SuppressWarnings("unused")
-    @ValidatorMethod
-    public void validateElasticsearchVersion() throws ValidationException {
-        switch (elasticsearchVersion) {
-            case 2:
-            case 5:
-                return;
-            default:
-                throw new ValidationException("Valid values for \"elasticsearch_version\" are 2 and 5, value was " + elasticsearchVersion);
-        }
-    }
 }
