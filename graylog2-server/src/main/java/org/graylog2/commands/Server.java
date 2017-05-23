@@ -109,7 +109,7 @@ public class Server extends ServerBootstrap {
         modules.add(
             new ConfigurationModule(configuration),
             new ServerBindings(configuration),
-            new ElasticsearchModule(elasticsearchClientConfiguration),
+            new ElasticsearchModule(),
             new PersistenceServicesBindings(),
             new MessageFilterBindings(),
             new MessageProcessorModule(),

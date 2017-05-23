@@ -48,11 +48,9 @@ import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.Flush;
 import io.searchbox.indices.ForceMerge;
-import io.searchbox.indices.IndicesExists;
 import io.searchbox.indices.OpenIndex;
 import io.searchbox.indices.Stats;
 import io.searchbox.indices.aliases.AddAliasMapping;
-import io.searchbox.indices.aliases.AliasExists;
 import io.searchbox.indices.aliases.AliasMapping;
 import io.searchbox.indices.aliases.GetAliases;
 import io.searchbox.indices.aliases.ModifyAliases;
@@ -74,6 +72,7 @@ import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.jest.JestUtils;
@@ -128,19 +127,19 @@ public class Indices {
 
     private final JestClient jestClient;
     private final Gson gson;
-    private final IndexMapping indexMapping;
+    private final IndexMappingFactory indexMappingFactory;
     private final Messages messages;
     private final NodeId nodeId;
     private final AuditEventSender auditEventSender;
     private final EventBus eventBus;
 
     @Inject
-    public Indices(JestClient jestClient, Gson gson, IndexMapping indexMapping,
+    public Indices(JestClient jestClient, Gson gson, IndexMappingFactory indexMappingFactory,
                    Messages messages, NodeId nodeId, AuditEventSender auditEventSender,
                    EventBus eventBus) {
         this.jestClient = jestClient;
         this.gson = gson;
-        this.indexMapping = indexMapping;
+        this.indexMappingFactory = indexMappingFactory;
         this.messages = messages;
         this.nodeId = nodeId;
         this.auditEventSender = auditEventSender;
@@ -387,6 +386,7 @@ public class Indices {
     private void ensureIndexTemplate(IndexSet indexSet) {
         final IndexSetConfig indexSetConfig = indexSet.getConfig();
         final String templateName = indexSetConfig.indexTemplateName();
+        final IndexMapping indexMapping = indexMappingFactory.createIndexMapping();
         final Map<String, Object> template = indexMapping.messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer(), -1);
 
         final PutTemplate request = new PutTemplate.Builder(templateName, template).build();
