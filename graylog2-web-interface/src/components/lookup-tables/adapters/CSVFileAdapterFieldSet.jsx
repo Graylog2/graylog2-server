@@ -24,9 +24,10 @@ const CSVFileAdapterFieldSet = React.createClass({
              required
              onChange={this.props.handleFormEvent}
              help={this.props.validationMessage('path', 'The path to the CSV file.')}
+             bsStyle={this.props.validationState('path')}
              value={config.path}
              labelClassName="col-sm-3"
-             wrapperClassName="col-sm-9" bsStyle={this.props.validationState('path')} />
+             wrapperClassName="col-sm-9" />
       <Input type="number"
              id="check_interval"
              name="check_interval"

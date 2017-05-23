@@ -25,8 +25,11 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 @AutoValue
 @JsonAutoDetect
@@ -39,15 +42,18 @@ public abstract class CacheApi {
     public abstract String id();
 
     @JsonProperty("title")
+    @NotEmpty
     public abstract String title();
 
     @JsonProperty("description")
     public abstract String description();
 
     @JsonProperty("name")
+    @NotEmpty
     public abstract String name();
 
     @JsonProperty
+    @NotNull
     public abstract LookupCacheConfiguration config();
 
     public static Builder builder() {
@@ -89,7 +95,7 @@ public abstract class CacheApi {
         public abstract Builder name(String name);
 
         @JsonProperty("config")
-        public abstract Builder config(LookupCacheConfiguration config);
+        public abstract Builder config(@Valid LookupCacheConfiguration config);
 
         public abstract CacheApi build();
     }
