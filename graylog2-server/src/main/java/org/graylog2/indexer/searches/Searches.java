@@ -201,7 +201,7 @@ public class Searches {
 
     public CountResult count(String query, TimeRange range, String filter) {
         // limit, offset, and highlight are *NOT* supported by count queries
-        final SearchSourceBuilder searchSourceBuilder = standardSearchRequest(query, -1, -1, range, null, null, false);
+        final SearchSourceBuilder searchSourceBuilder = standardSearchRequest(query, -1, -1, range, filter, null, false);
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
         if (affectedIndices.isEmpty()) {
             return CountResult.empty();
