@@ -20,4 +20,20 @@ then
     let date = parse_date("2010-07-30T18:03:25+02:00", "yyyy-MM-dd'T'HH:mm:ssZZ");
     set_field("year", date.year);
     set_field("timezone", to_string(date.zone));
+
+    // Date parsing locales
+    let germanDate = parse_date(value: "24. Juli 1983", pattern: "dd. MMM yyyy", locale: "de");
+    set_field("german_day", germanDate.dayOfMonth);
+    set_field("german_month", germanDate.monthOfYear);
+    set_field("german_year", germanDate.year);
+
+    let englishDate = parse_date(value: "July 24, 1983", pattern: "MMM dd, yyyy", locale: "en");
+    set_field("english_day", englishDate.dayOfMonth);
+    set_field("english_month", englishDate.monthOfYear);
+    set_field("english_year", englishDate.year);
+
+    let frenchDate = parse_date(value: "24 juillet 1983", pattern: "dd MMM yyyy", locale: "fr");
+    set_field("french_day", frenchDate.dayOfMonth);
+    set_field("french_month", frenchDate.monthOfYear);
+    set_field("french_year", frenchDate.year);
 end

@@ -329,6 +329,18 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message.hasField("year")).isTrue();
             assertThat(message.getField("year")).isEqualTo(2010);
             assertThat(message.getField("timezone")).isEqualTo("UTC");
+
+            // Date parsing locales
+            assertThat(message.getField("german_year")).isEqualTo(1983);
+            assertThat(message.getField("german_month")).isEqualTo(7);
+            assertThat(message.getField("german_day")).isEqualTo(24);
+            assertThat(message.getField("english_year")).isEqualTo(1983);
+            assertThat(message.getField("english_month")).isEqualTo(7);
+            assertThat(message.getField("english_day")).isEqualTo(24);
+            assertThat(message.getField("french_year")).isEqualTo(1983);
+            assertThat(message.getField("french_month")).isEqualTo(7);
+            assertThat(message.getField("french_day")).isEqualTo(24);
+
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }
