@@ -58,6 +58,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
                 client.admin().indices().prepareDelete(index).execute().actionGet();
             }
 
+            // TODO: Use IndexMappingFactory if another version than Elasticsearch 2.x is being used (depends on NoSQLUnit).
             final IndexMapping indexMapping = new IndexMapping2();
 
             final String templateName = "graylog-test-internal";

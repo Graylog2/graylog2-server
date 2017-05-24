@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.graylog2.plugin.Tools;
 
-import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 

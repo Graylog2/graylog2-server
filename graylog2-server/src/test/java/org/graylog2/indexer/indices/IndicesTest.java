@@ -47,7 +47,7 @@ import org.elasticsearch.common.compress.CompressedXContent;
 import org.graylog2.AbstractESTest;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.IndexMapping2;
+import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
@@ -108,6 +108,7 @@ public class IndicesTest extends AbstractESTest {
 
     private EventBus eventBus;
     private Indices indices;
+    private IndexMappingFactory indexMappingFactory;
 
     public IndicesTest() {
         elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
@@ -117,9 +118,10 @@ public class IndicesTest extends AbstractESTest {
     public void setUp() throws Exception {
         super.setUp();
         eventBus = new EventBus("indices-test");
+        indexMappingFactory = new IndexMappingFactory(jestClient());
         indices = new Indices(jestClient(),
                 new Gson(),
-                new IndexMapping2(),
+                indexMappingFactory,
                 new Messages(new MetricRegistry(), jestClient()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
@@ -312,7 +314,7 @@ public class IndicesTest extends AbstractESTest {
         assertThat(templateMetaData.getMappings().keysIt()).containsExactly(IndexMapping.TYPE_MESSAGE);
 
         final Map<String, Object> mapping = mapper.readValue(templateMetaData.getMappings().get(IndexMapping.TYPE_MESSAGE).uncompressed(), new TypeReference<Map<String, Object>>() {});
-        final Map<String, Object> expectedTemplate = new IndexMapping2().messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer());
+        final Map<String, Object> expectedTemplate = indexMappingFactory.createIndexMapping().messageTemplate(indexSet.getIndexWildcard(), indexSetConfig.indexAnalyzer());
         assertThat(mapping).isEqualTo(expectedTemplate.get("mappings"));
 
         final DeleteIndexTemplateRequest deleteRequest = client.prepareDeleteTemplate(templateName).request();
