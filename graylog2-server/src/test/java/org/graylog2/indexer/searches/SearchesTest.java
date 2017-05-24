@@ -27,6 +27,7 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.graylog2.AbstractESTest;
 import org.graylog2.Configuration;
+import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
@@ -65,6 +66,7 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
@@ -87,6 +89,7 @@ public class SearchesTest extends AbstractESTest {
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     private static final String INDEX_NAME = "graylog_0";
+    private static final String STREAM_ID = "000000000000000000000001";
     private static final SortedSet<IndexRange> INDEX_RANGES = ImmutableSortedSet
             .orderedBy(new IndexRangeComparator())
             .add(new IndexRange() {
@@ -112,7 +115,7 @@ public class SearchesTest extends AbstractESTest {
 
                 @Override
                 public List<String> streamIds() {
-                    return null;
+                    return Collections.singletonList(STREAM_ID);
                 }
 
                 @Override
@@ -177,12 +180,57 @@ public class SearchesTest extends AbstractESTest {
 
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
-    public void testCount() throws Exception {
+    public void testCountWithoutFilter() throws Exception {
         CountResult result = searches.count("*", AbsoluteRange.create(
                 new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                 new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)));
 
         assertThat(result.count()).isEqualTo(10L);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testCountWithFilter() throws Exception {
+        final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
+                .id("id")
+                .title("title")
+                .indexPrefix("prefix")
+                .shards(1)
+                .replicas(0)
+                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+                .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
+                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+                .creationDate(ZonedDateTime.of(2017, 5, 24, 0, 0, 0, 0, ZoneOffset.UTC))
+                .indexAnalyzer("standard")
+                .indexTemplateName("template")
+                .indexOptimizationMaxNumSegments(1)
+                .indexOptimizationDisabled(false)
+                .build();
+        final IndexSet indexSet = new TestIndexSet(indexSetConfig);
+        final Stream stream = new FakeStream("test") {
+            @Override
+            public IndexSet getIndexSet() {
+                return indexSet;
+            }
+        };
+        when(streamService.load(STREAM_ID)).thenReturn(stream);
+        CountResult result = searches.count("*", AbsoluteRange.create(
+                new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
+                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                "streams:" + STREAM_ID);
+
+        assertThat(result.count()).isEqualTo(5L);
+    }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void testCountWithInvalidFilter() throws Exception {
+        CountResult result = searches.count("*", AbsoluteRange.create(
+                new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
+                new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC)),
+                "foobar-not-a-filter");
+
+        assertThat(result.count()).isEqualTo(0L);
     }
 
     @Test
