@@ -16,6 +16,7 @@
  */
 package org.graylog2.alarmcallbacks;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import org.graylog2.alerts.AlertSender;
 import org.graylog2.alerts.EmailRecipients;
@@ -64,6 +65,7 @@ public class EmailAlarmCallback implements AlarmCallback {
     private final UserService userService;
     private final EmailConfiguration emailConfiguration;
     private Configuration configuration;
+    private org.graylog2.Configuration graylogConfig;
 
     @Inject
     public EmailAlarmCallback(AlertSender alertSender,
@@ -71,13 +73,15 @@ public class EmailAlarmCallback implements AlarmCallback {
                               NodeId nodeId,
                               EmailRecipients.Factory emailRecipientsFactory,
                               UserService userService,
-                              EmailConfiguration emailConfiguration) {
+                              EmailConfiguration emailConfiguration,
+                              org.graylog2.Configuration graylogConfig) {
         this.alertSender = alertSender;
         this.notificationService = notificationService;
         this.nodeId = nodeId;
         this.emailRecipientsFactory = emailRecipientsFactory;
         this.userService = userService;
         this.emailConfiguration = emailConfiguration;
+        this.graylogConfig = graylogConfig;
     }
 
     @Override
@@ -212,8 +216,13 @@ public class EmailAlarmCallback implements AlarmCallback {
 
     /* This method should be used when we want to provide user auto-completion to users that have permissions for it */
     public ConfigurationRequest getEnrichedRequestedConfiguration() {
-        final Map<String, String> userNames = userService.loadAll().stream()
+        final Map<String, String> regularUsers = userService.loadAll().stream()
                 .collect(Collectors.toMap(User::getName, User::getName));
+
+        final Map<String, String> userNames = ImmutableMap.<String, String>builder()
+                .put(graylogConfig.getRootUsername(), graylogConfig.getRootUsername())
+                .putAll(regularUsers)
+                .build();
 
         return getConfigurationRequest(userNames);
     }

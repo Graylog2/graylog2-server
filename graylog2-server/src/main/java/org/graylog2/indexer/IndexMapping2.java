@@ -16,11 +16,8 @@
  */
 package org.graylog2.indexer;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
-import javax.inject.Singleton;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -29,7 +26,6 @@ import java.util.Map;
  *
  * @see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/2.4/mapping.html">Elasticsearch Reference / Mapping</a>
  */
-@Singleton
 public class IndexMapping2 extends IndexMapping {
     @Override
     protected Map<String, Map<String, Object>> fieldProperties(String analyzer) {

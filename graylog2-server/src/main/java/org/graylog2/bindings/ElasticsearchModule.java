@@ -21,32 +21,13 @@ import com.google.gson.GsonBuilder;
 import com.google.inject.AbstractModule;
 import io.searchbox.client.JestClient;
 import org.graylog2.bindings.providers.JestClientProvider;
-import org.graylog2.configuration.ElasticsearchClientConfiguration;
-import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.IndexMapping2;
-import org.graylog2.indexer.IndexMapping5;
+import org.graylog2.indexer.IndexMappingFactory;
 
 public class ElasticsearchModule extends AbstractModule {
-    private final ElasticsearchClientConfiguration elasticsearchClientConfiguration;
-
-    public ElasticsearchModule(ElasticsearchClientConfiguration elasticsearchClientConfiguration) {
-        this.elasticsearchClientConfiguration = elasticsearchClientConfiguration;
-    }
-
     @Override
     protected void configure() {
         bind(Gson.class).toInstance(new GsonBuilder().create());
         bind(JestClient.class).toProvider(JestClientProvider.class).asEagerSingleton();
-
-        switch (elasticsearchClientConfiguration.getVersion()) {
-            case 2:
-                bind(IndexMapping.class).to(IndexMapping2.class).asEagerSingleton();
-                break;
-            case 5:
-                bind(IndexMapping.class).to(IndexMapping5.class).asEagerSingleton();
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid Elasticsearch version: " + elasticsearchClientConfiguration.getVersion());
-        }
+        bind(IndexMappingFactory.class).asEagerSingleton();
     }
 }
