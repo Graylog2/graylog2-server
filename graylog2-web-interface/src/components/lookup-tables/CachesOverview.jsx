@@ -53,7 +53,7 @@ const CachesOverview = React.createClass({
                 <Button bsStyle="success" style={{ marginLeft: 5 }}>Create cache</Button>
               </LinkContainer>
             </SearchForm>
-            <Table condensed hover>
+            <Table condensed hover style={{marginTop:8}}>
               <thead>
                 <tr>
                   <th>Title</th>

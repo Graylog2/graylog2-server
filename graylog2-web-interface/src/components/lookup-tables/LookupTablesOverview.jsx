@@ -81,7 +81,7 @@ const LookupTablesOverview = React.createClass({
                 <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
               </LinkContainer>
             </SearchForm>
-            <Table condensed hover>
+            <Table condensed hover style={{marginTop:8}}>
               <thead>
                 <tr>
                   <th>Title</th>

@@ -56,7 +56,7 @@ const DataAdaptersOverview = React.createClass({
                 <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>
               </LinkContainer>
             </SearchForm>
-            <Table condensed hover>
+            <Table condensed hover style={{marginTop:8}}>
               <thead>
                 <tr>
                   <th>Title</th>
