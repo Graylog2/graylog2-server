@@ -74,7 +74,7 @@ const PipelineConnectionsForm = React.createClass({
   render() {
     const streamsHelp = (
       <span>
-        Select the streams you want to connect this pipeline, or create one in the{' '}
+        Select the streams you want to connect to this pipeline, or create one in the{' '}
         <LinkContainer to={Routes.STREAMS}><a>Streams page</a></LinkContainer>.
       </span>
     );

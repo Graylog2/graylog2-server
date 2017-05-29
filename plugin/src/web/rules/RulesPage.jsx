@@ -42,6 +42,14 @@ const RulesPage = React.createClass({
               <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
                 <Button bsStyle="info">Manage pipelines</Button>
               </LinkContainer>
+              &nbsp;
+              <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>
+                <Button bsStyle="info active">Manage rules</Button>
+              </LinkContainer>
+              &nbsp;
+              <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_SIMULATE')}>
+                <Button bsStyle="info">Simulator</Button>
+              </LinkContainer>
             </span>
           </PageHeader>
 

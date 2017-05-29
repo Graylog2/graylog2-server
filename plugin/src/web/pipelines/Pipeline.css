@@ -22,3 +22,7 @@ dl.pipeline-dl > dd {
 .description-margin-top {
     margin-top: 5px;
 }
+
+.pipeline-no-connections-warning {
+    margin-bottom: 13px;
+}

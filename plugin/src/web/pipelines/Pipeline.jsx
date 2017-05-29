@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Row, Col, Alert } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import { EntityList, Pluralize } from 'components/common';
@@ -30,6 +30,18 @@ const Pipeline = React.createClass({
   },
 
   style: require('!style/useable!css!./Pipeline.css'),
+
+  _connections_warning() {
+    if(this.props.connections.length == 0) {
+      return (
+          <Alert bsStyle="danger" className="pipeline-no-connections-warning">
+            This pipeline is currently not connected to any streams. You have to connect a pipeline to at least one
+            stream to make it process incoming messages. Note that this is not required if you intend to use this
+            pipeline only for search result transformation using decorators.
+          </Alert>
+      );
+    }
+  },
 
   _saveStage(stage, callback) {
     const newStages = this.props.pipeline.stages.slice();
@@ -83,14 +95,11 @@ const Pipeline = React.createClass({
 
     return (
       <div>
+        {this._connections_warning()}
         <PipelineDetails pipeline={pipeline} onChange={this.props.onPipelineChange} />
         <Row className="row-sm row-margin-top">
           <Col md={12}>
             <div className="pull-right">
-              <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_SIMULATE')}>
-                <Button bsStyle="info">Simulate processing</Button>
-              </LinkContainer>
-              &nbsp;
               <PipelineConnectionsForm pipeline={pipeline} connections={this.props.connections}
                                        streams={this.props.streams} save={this.props.onConnectionsChange} />
             </div>
