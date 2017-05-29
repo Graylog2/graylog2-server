@@ -38,8 +38,20 @@ public class NullCache extends LookupCache {
     public static final String NAME = "none";
 
     @Inject
-    public NullCache(@Assisted LookupCacheConfiguration c) {
-        super(c);
+    public NullCache(@Assisted("id") String id,
+                     @Assisted("name") String name,
+                     @Assisted LookupCacheConfiguration c) {
+        super(id, name, c);
+    }
+
+    @Override
+    protected void doStart() throws Exception {
+        // nothing to do
+    }
+
+    @Override
+    protected void doStop() throws Exception {
+        // nothing to do
     }
 
     @Override
@@ -59,16 +71,17 @@ public class NullCache extends LookupCache {
 
     @Override
     public void purge() {
+        // nothing to do
     }
 
     @Override
     public void purge(Object key) {
+        // nothing to do
     }
-
 
     public interface Factory extends LookupCache.Factory {
         @Override
-        NullCache create(LookupCacheConfiguration configuration);
+        NullCache create(@Assisted("id") String id, @Assisted("name") String name, LookupCacheConfiguration configuration);
 
         @Override
         NullCache.Descriptor getDescriptor();

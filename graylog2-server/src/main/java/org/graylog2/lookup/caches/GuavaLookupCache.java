@@ -51,9 +51,11 @@ public class GuavaLookupCache extends LookupCache {
     private final LoadingCache<Object, LookupResult> cache;
 
     @Inject
-    public GuavaLookupCache(@Assisted LookupCacheConfiguration c,
+    public GuavaLookupCache(@Assisted("id") String id,
+                            @Assisted("name") String name,
+                            @Assisted LookupCacheConfiguration c,
                             @Named("processbuffer_processors") int processorCount) {
-        super(c);
+        super(id, name, c);
         Config config = (Config) c;
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
 
@@ -81,6 +83,14 @@ public class GuavaLookupCache extends LookupCache {
                 return getLookupTable().dataAdapter().get(key);
             }
         });
+    }
+
+    @Override
+    protected void doStart() throws Exception {
+    }
+
+    @Override
+    protected void doStop() throws Exception {
     }
 
     @Override
@@ -121,7 +131,7 @@ public class GuavaLookupCache extends LookupCache {
 
     public interface Factory extends LookupCache.Factory {
         @Override
-        GuavaLookupCache create(LookupCacheConfiguration configuration);
+        GuavaLookupCache create(@Assisted("id") String id, @Assisted("name") String name, LookupCacheConfiguration configuration);
 
         @Override
         Descriptor getDescriptor();

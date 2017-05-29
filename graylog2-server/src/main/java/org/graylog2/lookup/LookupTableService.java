@@ -1,25 +1,28 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.graylog2.lookup;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.Service;
 
+import com.google.common.util.concurrent.ServiceManager;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -37,9 +40,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -84,52 +89,77 @@ public class LookupTableService {
     }
 
     private void activateTable(String name, @Nullable LookupTable existingTable, LookupTable newTable) {
-        // Always start the new data adapter before taking it live, if it is new
-        final LookupDataAdapter newAdapter = newTable.dataAdapter();
-        if (newAdapter.state() == Service.State.NEW) {
-            newAdapter.addListener(new Service.Listener() {
-                @Override
-                public void starting() {
-                    LOG.info("Adapter {} STARTING", newAdapter.id());
-                }
 
-                @Override
-                public void running() {
-                    LOG.info("Adapter {} RUNNING", newAdapter.id());
-                    lookupTables.put(name, newTable);
-                    liveAdapters.put(newAdapter.name(), newAdapter);
-                    if (existingTable != null) {
-                        // If the new table has a new data adapter, stop the old one to free up resources
-                        // This needs to happen after the new table is live
-                        final LookupDataAdapter existingAdapter = existingTable.dataAdapter();
-                        if (!Objects.equals(existingAdapter, newAdapter) && existingAdapter.isRunning()) {
-                            existingAdapter.stopAsync().awaitTerminated();
-                            if (!existingAdapter.name().equals(newAdapter.name())) {
-                                // adapter names are different, remove the old one from being live
-                                liveAdapters.remove(existingAdapter.name());
-                            }
+        ServiceManager serviceManager;
+        if (existingTable == null) {
+            // no prior table, we just need to start the services
+            serviceManager = new ServiceManager(ImmutableSet.of(newTable.cache(), newTable.dataAdapter()));
+        } else {
+            // the table existed before, check if we need to start adapter and/or cache
+            LookupCache newCache = newTable.cache();
+            LookupDataAdapter newAdapter = newTable.dataAdapter();
+
+            ImmutableSet.Builder<Service> services = ImmutableSet.builder();
+            if (newCache.state() == Service.State.NEW) {
+                services.add(newCache);
+                newCache.addListener(new LoggingServiceListener("Cache",
+                                newCache.id(),
+                                () -> liveCaches.put(newCache.name(), newCache)),
+                        scheduler);
+            }
+            if (newAdapter.state() == Service.State.NEW) {
+                services.add(newAdapter);
+                newAdapter.addListener(new LoggingServiceListener("Cache",
+                                newCache.id(),
+                                () -> liveAdapters.put(newAdapter.name(), newAdapter)),
+                        scheduler);
+            }
+            serviceManager = new ServiceManager(services.build());
+        }
+
+        serviceManager.addListener(new ServiceManager.Listener() {
+            @Override
+            public void healthy() {
+                // services all started, lookup table is ready to be used
+                lookupTables.put(name, newTable);
+
+                // If the new table has a new data adapter, stop the old one to free up resources
+                // This needs to happen after the new table is live
+                LookupCache newCache = newTable.cache();
+                if (existingTable != null) {
+                    final LookupCache existingCache = existingTable.cache();
+                    if (!Objects.equals(existingCache, newCache) && existingCache.isRunning()) {
+                        existingCache.stopAsync().awaitTerminated();
+                        if (!existingCache.name().equals(newCache.name())) {
+                            // adapter names are different, remove the old one from being live
+                            liveAdapters.remove(existingCache.name());
                         }
                     }
                 }
 
-                @Override
-                public void stopping(Service.State from) {
-                    LOG.info("Adapter {} FAILED, was {}", newAdapter.id(), from);
+                // If the new table has a new data adapter, stop the old one to free up resources
+                // This needs to happen after the new table is live
+                LookupDataAdapter newAdapter = newTable.dataAdapter();
+                if (existingTable != null) {
+                    final LookupDataAdapter existingAdapter = existingTable.dataAdapter();
+                    if (!Objects.equals(existingAdapter, newAdapter) && existingAdapter.isRunning()) {
+                        existingAdapter.stopAsync().awaitTerminated();
+                        if (!existingAdapter.name().equals(newAdapter.name())) {
+                            // adapter names are different, remove the old one from being live
+                            liveAdapters.remove(existingAdapter.name());
+                        }
+                    }
                 }
+            }
 
-                @Override
-                public void terminated(Service.State from) {
-                    LOG.info("Adapter {} TERMINATED, was {}", newAdapter.id(), from);
-                }
+            @Override
+            public void failure(Service service) {
+                super.failure(service);
+            }
+        });
 
-                @Override
-                public void failed(Service.State from, Throwable failure) {
-                    LOG.info("Adapter {} FAILED, was {}", newAdapter.id(), from);
-                }
-            }, scheduler);
-
-            newAdapter.startAsync();
-        }
+        // start the lookup table, the listeners take care of the state changes
+        serviceManager.startAsync();
     }
 
     private void initialize() {
@@ -316,6 +346,44 @@ public class LookupTableService {
 
         public LookupTable getTable() {
             return lookupTableService.getTable(lookupTableName);
+        }
+    }
+
+    private static class LoggingServiceListener extends Service.Listener {
+        private final String type;
+        private String id;
+        private Runnable action;
+
+        LoggingServiceListener(String type, String id, Runnable action) {
+            this.type = type;
+            this.id = id;
+            this.action = Preconditions.checkNotNull(action);
+        }
+
+        @Override
+        public void starting() {
+            LOG.info("{} {} STARTING", type, id);
+        }
+
+        @Override
+        public void running() {
+            LOG.info("{} {} RUNNING", type, id);
+            action.run();
+        }
+
+        @Override
+        public void stopping(Service.State from) {
+            LOG.info("{} {} FAILED, was {}", type, id, from);
+        }
+
+        @Override
+        public void terminated(Service.State from) {
+            LOG.info("{} {} TERMINATED, was {}", type, id, from);
+        }
+
+        @Override
+        public void failed(Service.State from, Throwable failure) {
+            LOG.info("{} {} FAILED, was {}", type, id, from);
         }
     }
 }

@@ -17,23 +17,44 @@
 package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.inject.assistedinject.Assisted;
 import org.graylog2.lookup.LookupTable;
 
 import javax.annotation.Nullable;
 
 import static com.google.common.base.Preconditions.checkState;
 
-public abstract class LookupCache {
+public abstract class LookupCache extends AbstractIdleService {
 
     private String id;
 
     private LookupTable lookupTable;
 
+    private final String name;
     private final LookupCacheConfiguration config;
 
-    protected LookupCache(LookupCacheConfiguration config) {
+    protected LookupCache(String id,
+                          String name,
+                          LookupCacheConfiguration config) {
+        this.id = id;
+        this.name = name;
         this.config = config;
     }
+
+    @Override
+    protected void startUp() throws Exception {
+        doStart();
+    }
+
+    protected abstract void doStart() throws Exception;
+
+    @Override
+    protected void shutDown() throws Exception {
+        doStop();
+    }
+
+    protected abstract void doStop() throws Exception;
 
     @Nullable
     public String id() {
@@ -67,8 +88,12 @@ public abstract class LookupCache {
         return config;
     }
 
+    public String name() {
+        return name;
+    }
+
     public interface Factory<T extends LookupCache> {
-        T create(LookupCacheConfiguration configuration);
+        T create(@Assisted("id") String id, @Assisted("name") String name, LookupCacheConfiguration configuration);
 
         Descriptor getDescriptor();
     }

@@ -91,7 +91,7 @@ class LookupTableCreator {
         }
         final CacheDto cacheDto = cacheDtoOptional.get();
         return getCacheFactory(dto.name(), cacheDto)
-                .map(factory -> factory.create(cacheDto.config()));
+                .map(factory -> factory.create(cacheDto.id(), cacheDto.name(), cacheDto.config()));
     }
 
     Optional<LookupDataAdapter> createDataAdapter(LookupTableDto dto) {
