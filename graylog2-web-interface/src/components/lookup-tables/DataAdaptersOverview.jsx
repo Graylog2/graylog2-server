@@ -32,6 +32,10 @@ const DataAdaptersOverview = React.createClass({
       .then(resetLoadingStateCb);
   },
 
+  _onReset() {
+    LookupTableDataAdaptersActions.searchPaginated(this.props.pagination.page, this.props.pagination.per_page);
+  },
+
   render() {
     if (!this.props.dataAdapters) {
       return <Spinner text="Loading data adapters" />;
@@ -51,7 +55,7 @@ const DataAdaptersOverview = React.createClass({
               <small>{this.props.pagination.total} total</small></span>
           </h2>
           <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
-            <SearchForm onSearch={this._onSearch}>
+            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
               <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.CREATE}>
                 <Button bsStyle="success" style={{ marginLeft: 5 }}>Create data adapter</Button>
               </LinkContainer>

@@ -33,19 +33,24 @@ import javax.annotation.Nullable;
 @JsonDeserialize(builder = AutoValue_LookupTableDto.Builder.class)
 public abstract class LookupTableDto {
 
+    public static final String FIELD_ID = "id";
+    public static final String FIELD_TITLE = "title";
+    public static final String FIELD_DESCRIPTION = "description";
+    public static final String FIELD_NAME = "name";
+
     @Id
     @ObjectId
     @Nullable
-    @JsonProperty("id")
+    @JsonProperty(FIELD_ID)
     public abstract String id();
 
-    @JsonProperty("title")
+    @JsonProperty(FIELD_TITLE)
     public abstract String title();
 
-    @JsonProperty("description")
+    @JsonProperty(FIELD_DESCRIPTION)
     public abstract String description();
 
-    @JsonProperty("name")
+    @JsonProperty(FIELD_NAME)
     public abstract String name();
 
     @ObjectId
@@ -66,16 +71,16 @@ public abstract class LookupTableDto {
     public abstract static class Builder {
         @Id
         @ObjectId
-        @JsonProperty("id")
+        @JsonProperty(FIELD_ID)
         public abstract Builder id(@Nullable String id);
 
-        @JsonProperty("title")
+        @JsonProperty(FIELD_TITLE)
         public abstract Builder title(String title);
 
-        @JsonProperty("description")
+        @JsonProperty(FIELD_DESCRIPTION)
         public abstract Builder description(String description);
 
-        @JsonProperty("name")
+        @JsonProperty(FIELD_NAME)
         public abstract Builder name(String name);
 
         @JsonProperty("cache")

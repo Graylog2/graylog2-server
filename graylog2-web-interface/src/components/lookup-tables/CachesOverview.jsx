@@ -30,6 +30,10 @@ const CachesOverview = React.createClass({
       .then(resetLoadingStateCb);
   },
 
+  _onReset() {
+    LookupTableCachesActions.searchPaginated(this.props.pagination.page, this.props.pagination.per_page);
+  },
+
   render() {
     if (!this.props.caches) {
       return <Spinner text="Loading caches" />;
@@ -48,7 +52,7 @@ const CachesOverview = React.createClass({
               <small>{this.props.pagination.total} total</small></span>
           </h2>
           <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
-            <SearchForm onSearch={this._onSearch}>
+            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
               <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.CREATE}>
                 <Button bsStyle="success" style={{ marginLeft: 5 }}>Create cache</Button>
               </LinkContainer>

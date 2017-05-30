@@ -32,6 +32,10 @@ const LookupTablesOverview = React.createClass({
       .then(resetLoadingStateCb);
   },
 
+  _onReset() {
+    LookupTablesActions.searchPaginated(this.props.pagination.page, this.props.pagination.per_page);
+  },
+
   _lookupName(id, map) {
     const empty = { title: 'None' };
     if (!map) {
@@ -76,7 +80,7 @@ const LookupTablesOverview = React.createClass({
             <span>&nbsp;<small>{this.props.pagination.total} total</small></span>
           </h2>
           <PaginatedList onChange={this._onPageChange} totalItems={this.props.pagination.total}>
-            <SearchForm onSearch={this._onSearch}>
+            <SearchForm onSearch={this._onSearch} onReset={this._onReset} useLoadingState>
               <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CREATE}>
                 <Button bsStyle="success" style={{ marginLeft: 5 }}>Create lookup table</Button>
               </LinkContainer>
