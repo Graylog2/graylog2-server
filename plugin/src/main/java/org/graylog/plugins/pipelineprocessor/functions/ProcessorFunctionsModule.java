@@ -40,6 +40,7 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.periods.PeriodParse
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
+import org.graylog.plugins.pipelineprocessor.functions.debug.Debug;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32C;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
@@ -177,6 +178,9 @@ public class ProcessorFunctionsModule extends PluginModule {
         // Lookup tables
         addMessageProcessorFunction(Lookup.NAME, Lookup.class);
         addMessageProcessorFunction(LookupValue.NAME, LookupValue.class);
+
+        // Debug
+        addMessageProcessorFunction(Debug.NAME, Debug.class);
     }
 
     protected void addMessageProcessorFunction(String name, Class<? extends Function<?>> functionClass) {
