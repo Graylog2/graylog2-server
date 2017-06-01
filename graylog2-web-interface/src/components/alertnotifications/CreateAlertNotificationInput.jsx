@@ -99,6 +99,10 @@ const CreateAlertNotificationInput = React.createClass({
       .sort((s1, s2) => naturalSort(s1.label.toLowerCase(), s2.label.toLowerCase()));
     return (
       <div>
+        <Button bsStyle="info" className="pull-right" href="https://marketplace.graylog.org/" target="_blank">
+          <i className="fa fa-external-link" />&nbsp; Find notification plugins
+        </Button>
+
         <h2>Notification</h2>
         <p className="description">
           Define the notification that will be triggered from the alert conditions in a stream.

@@ -27,13 +27,17 @@ const AlertNotificationsPage = React.createClass({
             </span>
 
             <span>
-              <LinkContainer to={Routes.ALERTS.CONDITIONS}>
-                <Button bsStyle="info">Manage conditions</Button>
+              <LinkContainer to={Routes.ALERTS.LIST}>
+                <Button bsStyle="info">Active Alerts</Button>
               </LinkContainer>
               &nbsp;
-              <Button bsStyle="info" href="https://marketplace.graylog.org/" target="_blank">
-                <i className="fa fa-external-link" />&nbsp; Find more notifications
-              </Button>
+              <LinkContainer to={Routes.ALERTS.CONDITIONS}>
+                <Button bsStyle="info">Conditions</Button>
+              </LinkContainer>
+              &nbsp;
+              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS}>
+                <Button bsStyle="info active">Notifications</Button>
+              </LinkContainer>
             </span>
           </PageHeader>
 

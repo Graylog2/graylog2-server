@@ -31,12 +31,16 @@ const AlertsPage = React.createClass({
             </span>
 
             <span>
+              <LinkContainer to={Routes.ALERTS.LIST}>
+                <Button bsStyle="info active">Active Alerts</Button>
+              </LinkContainer>
+              &nbsp;
               <LinkContainer to={Routes.ALERTS.CONDITIONS}>
-                <Button bsStyle="info">Manage conditions</Button>
+                <Button bsStyle="info">Conditions</Button>
               </LinkContainer>
               &nbsp;
               <LinkContainer to={Routes.ALERTS.NOTIFICATIONS}>
-                <Button bsStyle="info">Manage notifications</Button>
+                <Button bsStyle="info">Notifications</Button>
               </LinkContainer>
             </span>
           </PageHeader>
