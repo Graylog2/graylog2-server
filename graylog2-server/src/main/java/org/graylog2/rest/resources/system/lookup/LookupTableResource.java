@@ -80,6 +80,7 @@ import javax.ws.rs.QueryParam;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -188,7 +189,7 @@ public class LookupTableResource extends RestResource {
                                   @ApiParam(name = "query") @QueryParam("query") String query,
                                   @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
-        if (!LUT_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase())) {
+        if (!LUT_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
             sort = LookupTableDto.FIELD_TITLE;
         }
         DBSort.SortBuilder sortBuilder;
@@ -349,7 +350,7 @@ public class LookupTableResource extends RestResource {
                                 @DefaultValue("desc") @QueryParam("order") String order,
                                 @ApiParam(name = "query") @QueryParam("query") String query) {
 
-        if (!ADAPTER_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase())) {
+        if (!ADAPTER_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
             sort = DataAdapterDto.FIELD_TITLE;
         }
         DBSort.SortBuilder sortBuilder;
@@ -554,7 +555,7 @@ public class LookupTableResource extends RestResource {
                              @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                              @DefaultValue("desc") @QueryParam("order") String order,
                              @ApiParam(name = "query") @QueryParam("query") String query) {
-        if (!CACHE_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase())) {
+        if (!CACHE_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
             sort = CacheDto.FIELD_TITLE;
         }
         DBSort.SortBuilder sortBuilder;
