@@ -48,7 +48,7 @@ public class MessageOutputFactory {
 
         Preconditions.checkArgument(factory != null, "Output type is not supported: %s!", outputType);
 
-        return factory.create(stream, configuration, output.getId());
+        return factory.create(stream, configuration);
     }
 
 
