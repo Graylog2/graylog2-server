@@ -28,7 +28,6 @@ import org.graylog2.plugin.streams.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -70,7 +69,7 @@ public class LoggingOutput implements MessageOutput {
 
     public interface Factory extends MessageOutput.Factory<LoggingOutput> {
         @Override
-        LoggingOutput create(Stream stream, Configuration configuration, @Nullable String id);
+        LoggingOutput create(Stream stream, Configuration configuration);
 
         @Override
         Config getConfig();

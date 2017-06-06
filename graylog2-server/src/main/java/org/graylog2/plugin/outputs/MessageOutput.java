@@ -23,12 +23,11 @@ import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.streams.Stream;
 
-import javax.annotation.Nullable;
 import java.util.List;
 
 public interface MessageOutput extends Stoppable {
     interface Factory<T> {
-        T create(Stream stream, Configuration configuration, @Nullable String id);
+        T create(Stream stream, Configuration configuration);
         Config getConfig();
         Descriptor getDescriptor();
     }
