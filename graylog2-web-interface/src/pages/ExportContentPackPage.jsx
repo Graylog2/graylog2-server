@@ -11,6 +11,9 @@ const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 const InputsStore = StoreProvider.getStore('Inputs');
 const OutputsStore = StoreProvider.getStore('Outputs');
 const StreamsStore = StoreProvider.getStore('Streams');
+const LookupTablesStore = StoreProvider.getStore('LookupTables');
+const LookupTableCachesStore = StoreProvider.getStore('LookupTableCaches');
+const LookupTableDataAdaptersStore = StoreProvider.getStore('LookupTableDataAdapters');
 // eslint-disable-next-line no-unused-vars
 const ConfigurationBundlesStore = StoreProvider.getStore('ConfigurationBundles');
 
@@ -39,6 +42,18 @@ const ExportContentPackPage = React.createClass({
     StreamsStore.listStreams().then((streams) => {
       this.setState({ streams });
     });
+    // TODO the 10k items is bad. we need a searchable/scrollable long list select box
+    LookupTablesStore.searchPaginated(1, 10000, null).then((result) => {
+      this.setState({ lookup_tables: result.lookup_tables });
+    });
+    // TODO the 10k items is bad. we need a searchable/scrollable long list select box
+    LookupTableCachesStore.searchPaginated(1, 10000, null).then((result) => {
+      this.setState({ lookup_caches: result.caches });
+    });
+    // TODO the 10k items is bad. we need a searchable/scrollable long list select box
+    LookupTableDataAdaptersStore.searchPaginated(1, 10000, null).then((result) => {
+      this.setState({ lookup_data_adapters: result.data_adapters });
+    });
   },
   onSubmit(evt) {
     evt.preventDefault();
@@ -47,6 +62,9 @@ const ExportContentPackPage = React.createClass({
       inputs: [],
       outputs: [],
       dashboards: [],
+      lookup_tables: [],
+      lookup_caches: [],
+      lookup_data_adapters: [],
       grok_patterns: [],
     };
     Object.keys(this.refs).forEach((key) => {
@@ -116,6 +134,27 @@ const ExportContentPackPage = React.createClass({
       </div>
     );
   },
+  formatLookupTable(lookupTable) {
+    return (
+      <div className="checkbox" key={`lookup_table_checkbox-${lookupTable.id}`}>
+        <label className="checkbox"><input ref={`lookup_tables.${lookupTable.id}`} type="checkbox" name="lookup_tables" id={`lookup_table_${lookupTable.id}`} value={lookupTable.id} />{lookupTable.title}</label>
+      </div>
+    );
+  },
+  formatLookupCache(lookupCache) {
+    return (
+      <div className="checkbox" key={`lookup_cache_checkbox-${lookupCache.id}`}>
+        <label className="checkbox"><input ref={`lookup_caches.${lookupCache.id}`} type="checkbox" name="lookup_caches" id={`lookup_cache_${lookupCache.id}`} value={lookupCache.id} />{lookupCache.title}</label>
+      </div>
+    );
+  },
+  formatLookupDataAdapter(lookupDataAdapter) {
+    return (
+      <div className="checkbox" key={`lookup_data_adapter_checkbox-${lookupDataAdapter.id}`}>
+        <label className="checkbox"><input ref={`lookup_data_adapters.${lookupDataAdapter.id}`} type="checkbox" name="lookup_data_adapters" id={`lookup_data_adapter_${lookupDataAdapter.id}`} value={lookupDataAdapter.id} />{lookupDataAdapter.title}</label>
+      </div>
+    );
+  },
   selectAll(group) {
     Object.keys(this.refs).forEach((key) => {
       if (key.indexOf(group) === 0) {
@@ -137,6 +176,15 @@ const ExportContentPackPage = React.createClass({
   },
   selectAllDashboards() {
     this.selectAll('dashboard');
+  },
+  selectAllLookupTables() {
+    this.selectAll('lookup_table');
+  },
+  selectAllLookupCaches() {
+    this.selectAll('lookup_cache');
+  },
+  selectAllLookupDataAdapters() {
+    this.selectAll('lookup_data_adapter');
   },
   render() {
     return (
@@ -259,6 +307,54 @@ const ExportContentPackPage = React.createClass({
                         {this.state.dashboards.sort((d1, d2) => { return d1.title.localeCompare(d2.title); }).map(this.formatDashboard)}
                       </span>
                       }
+                  </Col>
+                </div>
+
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="lookup_tables">Lookup Tables</label>
+                  </Col>
+                  <Col sm={10}>
+                    {this.isEmpty(this.state.lookup_tables) ?
+                      <span className="help-block help-standalone">There are no lookup tables to export.</span>
+                      :
+                      <span>
+                        <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllLookupTables}>Select all</Button>
+                        {this.state.lookup_tables.sort((t1, t2) => { return t1.title.localeCompare(t2.title); }).map(this.formatLookupTable)}
+                      </span>
+                    }
+                  </Col>
+                </div>
+
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="lookup_caches">Lookup Caches</label>
+                  </Col>
+                  <Col sm={10}>
+                    {this.isEmpty(this.state.lookup_caches) ?
+                      <span className="help-block help-standalone">There are no lookup caches to export.</span>
+                      :
+                      <span>
+                        <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllLookupCaches}>Select all</Button>
+                        {this.state.lookup_caches.sort((c1, c2) => { return c1.title.localeCompare(c2.title); }).map(this.formatLookupCache)}
+                      </span>
+                    }
+                  </Col>
+                </div>
+
+                <div className="form-group">
+                  <Col sm={2}>
+                    <label className="control-label" htmlFor="lookup_data_adapters">Lookup Data Adapters</label>
+                  </Col>
+                  <Col sm={10}>
+                    {this.isEmpty(this.state.lookup_data_adapters) ?
+                      <span className="help-block help-standalone">There are no lookup data adapters to export.</span>
+                      :
+                      <span>
+                        <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllLookupDataAdapters}>Select all</Button>
+                        {this.state.lookup_data_adapters.sort((a1, a2) => { return a1.title.localeCompare(a2.title); }).map(this.formatLookupDataAdapter)}
+                      </span>
+                    }
                   </Col>
                 </div>
 

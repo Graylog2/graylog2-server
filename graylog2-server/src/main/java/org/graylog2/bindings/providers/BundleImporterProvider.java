@@ -16,6 +16,7 @@
  */
 package org.graylog2.bindings.providers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.bundles.BundleImporter;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
@@ -25,6 +26,9 @@ import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.lookup.MongoLutCacheService;
+import org.graylog2.lookup.MongoLutDataAdapterService;
+import org.graylog2.lookup.MongoLutService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -53,8 +57,12 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
     private final GrokPatternService grokPatternService;
+    private final MongoLutService mongoLutService;
+    private final MongoLutCacheService mongoLutCacheService;
+    private final MongoLutDataAdapterService mongoLutDataAdapterService;
     private final TimeRangeFactory timeRangeFactory;
     private final ClusterEventBus clusterBus;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public BundleImporterProvider(final InputService inputService,
@@ -71,8 +79,12 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
                                   final MessageInputFactory messageInputFactory,
                                   final InputLauncher inputLauncher,
                                   final GrokPatternService grokPatternService,
+                                  final MongoLutService mongoLutService,
+                                  final MongoLutCacheService mongoLutCacheService,
+                                  final MongoLutDataAdapterService mongoLutDataAdapterService,
                                   final TimeRangeFactory timeRangeFactory,
-                                  final ClusterEventBus clusterBus) {
+                                  final ClusterEventBus clusterBus,
+                                  final ObjectMapper objectMapper) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -87,8 +99,12 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
         this.grokPatternService = grokPatternService;
+        this.mongoLutService = mongoLutService;
+        this.mongoLutCacheService = mongoLutCacheService;
+        this.mongoLutDataAdapterService = mongoLutDataAdapterService;
         this.timeRangeFactory = timeRangeFactory;
         this.clusterBus = clusterBus;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -96,6 +112,8 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         return new BundleImporter(inputService, inputRegistry, extractorFactory, converterFactory,
                 streamService, streamRuleService, indexSetRegistry, outputService, dashboardService,
                 dashboardWidgetCreator, serverStatus, messageInputFactory,
-                inputLauncher, grokPatternService, timeRangeFactory, clusterBus);
+                inputLauncher, grokPatternService,
+                mongoLutService, mongoLutCacheService, mongoLutDataAdapterService,
+                timeRangeFactory, clusterBus, objectMapper);
     }
 }
