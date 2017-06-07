@@ -41,6 +41,10 @@ import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
+import org.graylog2.lookup.events.CachesDeleted;
+import org.graylog2.lookup.events.CachesUpdated;
+import org.graylog2.lookup.events.DataAdaptersDeleted;
+import org.graylog2.lookup.events.DataAdaptersUpdated;
 import org.graylog2.lookup.events.LookupTablesDeleted;
 import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.lookup.LookupCache;
@@ -466,6 +470,8 @@ public class LookupTableResource extends RestResource {
         try {
             DataAdapterDto dto = newAdapter.toDto();
             DataAdapterDto saved = dbDataAdapterService.save(dto);
+            clusterBus.post(DataAdaptersUpdated.create(saved.id()));
+
             return DataAdapterApi.fromDto(saved);
         } catch (DuplicateKeyException e) {
             throw new BadRequestException(e.getMessage());
@@ -487,6 +493,7 @@ public class LookupTableResource extends RestResource {
             throw new BadRequestException("The adapter is still in use, cannot delete.");
         }
         dbDataAdapterService.delete(idOrName);
+        clusterBus.post(DataAdaptersDeleted.create(dto.id()));
 
         return DataAdapterApi.fromDto(dto);
     }
@@ -497,10 +504,9 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Update the given data adapter settings")
     public DataAdapterApi updateAdapter(@Valid @ApiParam DataAdapterApi toUpdate) {
         DataAdapterDto saved = dbDataAdapterService.save(toUpdate.toDto());
-        Collection<LookupTableDto> adapterUsages = dbTableService.findByDataAdapterIds(singleton(saved.id()));
-        if (!adapterUsages.isEmpty()) {
-            clusterBus.post(LookupTablesUpdated.create(adapterUsages));
-        }
+        // the linked lookup tables will be updated by the service
+        clusterBus.post(DataAdaptersUpdated.create(saved.id()));
+
         return DataAdapterApi.fromDto(saved);
     }
 
@@ -611,7 +617,9 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Create a new cache")
     public CacheApi createCache(@ApiParam CacheApi newCache) {
         try {
-            return CacheApi.fromDto(dbCacheService.save(newCache.toDto()));
+            final CacheDto saved = dbCacheService.save(newCache.toDto());
+            clusterBus.post(CachesUpdated.create(saved.id()));
+            return CacheApi.fromDto(saved);
         } catch (DuplicateKeyException e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -632,6 +640,7 @@ public class LookupTableResource extends RestResource {
             throw new BadRequestException("The cache is still in use, cannot delete.");
         }
         dbCacheService.delete(idOrName);
+        clusterBus.post(CachesDeleted.create(dto.id()));
 
         return CacheApi.fromDto(dto);
     }
@@ -642,10 +651,7 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Update the given cache settings")
     public CacheApi updateCache(@ApiParam CacheApi toUpdate) {
         CacheDto saved = dbCacheService.save(toUpdate.toDto());
-        Collection<LookupTableDto> cacheUsages = dbTableService.findByCacheIds(singleton(saved.id()));
-        if (!cacheUsages.isEmpty()) {
-            clusterBus.post(LookupTablesUpdated.create(cacheUsages));
-        }
+        clusterBus.post(CachesUpdated.create(saved.id()));
         return CacheApi.fromDto(saved);
     }
 
