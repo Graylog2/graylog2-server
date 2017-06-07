@@ -45,6 +45,7 @@ import org.elasticsearch.common.collect.ImmutableOpenMap;
 import org.elasticsearch.common.compress.CompressedXContent;
 import org.graylog2.AbstractESTest;
 import org.graylog2.audit.NullAuditEventSender;
+import org.graylog2.bindings.providers.ElasticsearchVersionProvider;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -118,8 +119,8 @@ public class IndicesTest extends AbstractESTest {
     public void setUp() throws Exception {
         super.setUp();
         eventBus = new EventBus("indices-test");
-        final Node node = new Node(jestClient());
-        indexMappingFactory = new IndexMappingFactory(node);
+        final ElasticsearchVersionProvider elasticsearchVersionProvider = new ElasticsearchVersionProvider(jestClient());
+        indexMappingFactory = new IndexMappingFactory(elasticsearchVersionProvider.get());
         indices = new Indices(jestClient(),
                 new ObjectMapper(),
                 indexMappingFactory,
