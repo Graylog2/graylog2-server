@@ -41,6 +41,8 @@ import org.graylog2.lookup.MongoLutService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
+import org.graylog2.lookup.events.LookupTablesDeleted;
+import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
@@ -298,6 +300,8 @@ public class BundleImporter {
             LOG.debug("Deleting lookup table {} from database", id);
             mongoLutService.delete(id);
         }
+
+        clusterBus.post(LookupTablesDeleted.create(createdLookupTables.values()));
     }
 
     private void deleteCreatedLookupCaches() {
@@ -686,6 +690,8 @@ public class BundleImporter {
                     .build());
             createdLookupTables.put(dto.id(), dto);
         }
+
+        clusterBus.post(LookupTablesUpdated.create(createdLookupTables.values()));
     }
 
     private void createLookupCaches(String bundleId, Set<LookupCacheBundle> lookupCaches) {
