@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.lookup;
+package org.graylog2.lookup.db;
 
 import com.google.common.collect.ImmutableList;
 
+import com.google.common.collect.Streams;
 import com.mongodb.BasicDBObject;
 
 import org.bson.types.ObjectId;
@@ -35,17 +36,19 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
-public class MongoLutDataAdapterService {
+public class DBDataAdapterService {
 
     private final JacksonDBCollection<DataAdapterDto, ObjectId> db;
 
     @Inject
-    public MongoLutDataAdapterService(MongoConnection mongoConnection,
-                                      MongoJackObjectMapperProvider mapper) {
+    public DBDataAdapterService(MongoConnection mongoConnection,
+                                MongoJackObjectMapperProvider mapper) {
 
         db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("lut_data_adapters"),
                 DataAdapterDto.class,
@@ -97,4 +100,7 @@ public class MongoLutDataAdapterService {
         return asImmutableList(db.find(DBQuery.in("_id", idSet.stream().map(ObjectId::new).collect(Collectors.toList()))));
     }
 
+    public Stream<DataAdapterDto> streamAll() {
+        return Streams.stream((Iterable<DataAdapterDto>) db.find());
+    }
 }

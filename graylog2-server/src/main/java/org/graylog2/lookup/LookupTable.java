@@ -17,6 +17,7 @@
 package org.graylog2.lookup;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
@@ -25,6 +26,11 @@ import org.graylog2.plugin.lookup.LookupResult;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+/**
+ * A LookupTable references a {@link LookupCache} and a {@link LookupDataAdapter}, which both have their own lifecycle.
+ *
+ * Multiple lookup tables can use the same caches and adapters.
+ */
 @AutoValue
 @WithBeanGetter
 public abstract class LookupTable {

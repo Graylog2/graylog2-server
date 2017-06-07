@@ -19,7 +19,7 @@ package org.graylog2.decorators;
 import com.google.common.collect.ImmutableMap;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog2.lookup.LookupTableService;
-import org.graylog2.lookup.MongoLutService;
+import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.LookupTableDto;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -59,10 +59,10 @@ public class LookupTableDecorator implements SearchResponseDecorator {
     }
 
     public static class Config implements SearchResponseDecorator.Config {
-        private final MongoLutService lookupTableService;
+        private final DBLookupTableService lookupTableService;
 
         @Inject
-        public Config(MongoLutService lookupTableService) {
+        public Config(DBLookupTableService lookupTableService) {
             this.lookupTableService = lookupTableService;
         }
 

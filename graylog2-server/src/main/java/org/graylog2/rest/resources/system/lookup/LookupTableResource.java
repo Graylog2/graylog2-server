@@ -35,9 +35,9 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
-import org.graylog2.lookup.MongoLutCacheService;
-import org.graylog2.lookup.MongoLutDataAdapterService;
-import org.graylog2.lookup.MongoLutService;
+import org.graylog2.lookup.db.DBCacheService;
+import org.graylog2.lookup.db.DBDataAdapterService;
+import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -135,31 +135,32 @@ public class LookupTableResource extends RestResource {
             .put("name", SearchQueryField.create(CacheDto.FIELD_NAME))
             .build();
 
-    private final MongoLutService lookupTableService;
-    private final MongoLutDataAdapterService adapterService;
-    private final MongoLutCacheService cacheService;
+    private final DBLookupTableService dbTableService;
+    private final DBDataAdapterService dbDataAdapterService;
+    private final DBCacheService dbCacheService;
     private final Map<String, LookupCache.Factory> cacheTypes;
     private final Map<String, LookupDataAdapter.Factory> dataAdapterTypes;
     private final SearchQueryParser lutSearchQueryParser;
     private final SearchQueryParser adapterSearchQueryParser;
     private final SearchQueryParser cacheSearchQueryParser;
+    private final LookupTableService lookupTableService;
     private LookupTableService lookupTables;
     private ClusterEventBus clusterBus;
 
     @Inject
-    public LookupTableResource(MongoLutService lookupTableService,
-                               MongoLutDataAdapterService adapterService,
-                               MongoLutCacheService cacheService,
+    public LookupTableResource(DBLookupTableService dbTableService,
+                               DBDataAdapterService dbDataAdapterService,
+                               DBCacheService dbCacheService,
                                Map<String, LookupCache.Factory> cacheTypes,
                                Map<String, LookupDataAdapter.Factory> dataAdapterTypes,
-                               LookupTableService lookupTables,
+                               LookupTableService lookupTableService,
                                ClusterEventBus clusterBus) {
-        this.lookupTableService = lookupTableService;
-        this.adapterService = adapterService;
-        this.cacheService = cacheService;
+        this.dbTableService = dbTableService;
+        this.dbDataAdapterService = dbDataAdapterService;
+        this.dbCacheService = dbCacheService;
         this.cacheTypes = cacheTypes;
         this.dataAdapterTypes = dataAdapterTypes;
-        this.lookupTables = lookupTables;
+        this.lookupTableService = lookupTableService;
         this.clusterBus = clusterBus;
         this.lutSearchQueryParser = new SearchQueryParser(LookupTableDto.FIELD_TITLE, LUT_SEARCH_FIELD_MAPPING);
         this.adapterSearchQueryParser = new SearchQueryParser(DataAdapterDto.FIELD_TITLE, ADAPTER_SEARCH_FIELD_MAPPING);
@@ -171,7 +172,7 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Query a lookup table")
     public LookupResult performLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
                                       @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
-        return lookupTables.newBuilder().lookupTable(name).build().lookup(key);
+        return lookupTableService.newBuilder().lookupTable(name).build().lookup(key);
     }
 
     @GET
@@ -203,8 +204,7 @@ public class LookupTableResource extends RestResource {
             final SearchQuery searchQuery = lutSearchQueryParser.parse(query);
             final DBQuery.Query dbQuery = searchQuery.toDBQuery();
 
-
-            PaginatedList<LookupTableDto> paginated = lookupTableService.findPaginated(dbQuery, sortBuilder, page, perPage);
+            PaginatedList<LookupTableDto> paginated = dbTableService.findPaginated(dbQuery, sortBuilder, page, perPage);
 
             ImmutableSet.Builder<CacheApi> caches = ImmutableSet.builder();
             ImmutableSet.Builder<DataAdapterApi> dataAdapters = ImmutableSet.builder();
@@ -217,8 +217,8 @@ public class LookupTableResource extends RestResource {
                     dataAdapterIds.add(dto.dataAdapterId());
                 });
 
-                cacheService.findByIds(cacheIds.build()).forEach(cacheDto -> caches.add(CacheApi.fromDto(cacheDto)));
-                adapterService.findByIds(dataAdapterIds.build()).forEach(dataAdapterDto -> dataAdapters.add(DataAdapterApi.fromDto(dataAdapterDto)));
+                dbCacheService.findByIds(cacheIds.build()).forEach(cacheDto -> caches.add(CacheApi.fromDto(cacheDto)));
+                dbDataAdapterService.findByIds(dataAdapterIds.build()).forEach(dataAdapterDto -> dataAdapters.add(DataAdapterApi.fromDto(dataAdapterDto)));
             }
 
             return new LookupTablePage(query,
@@ -237,7 +237,7 @@ public class LookupTableResource extends RestResource {
     public LookupTablePage get(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                                @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
-        Optional<LookupTableDto> lookupTableDto = lookupTableService.get(idOrName);
+        Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
         if (!lookupTableDto.isPresent()) {
             throw new NotFoundException();
         }
@@ -247,8 +247,8 @@ public class LookupTableResource extends RestResource {
         Set<DataAdapterApi> adapters = Collections.emptySet();
 
         if (resolveObjects) {
-            caches = cacheService.findByIds(Collections.singleton(tableDto.cacheId())).stream().map(CacheApi::fromDto).collect(Collectors.toSet());
-            adapters = adapterService.findByIds(Collections.singleton(tableDto.dataAdapterId())).stream().map(DataAdapterApi::fromDto).collect(Collectors.toSet());
+            caches = dbCacheService.findByIds(Collections.singleton(tableDto.cacheId())).stream().map(CacheApi::fromDto).collect(Collectors.toSet());
+            adapters = dbDataAdapterService.findByIds(Collections.singleton(tableDto.dataAdapterId())).stream().map(DataAdapterApi::fromDto).collect(Collectors.toSet());
         }
 
         final PaginatedList<LookupTableApi> result = PaginatedList.singleton(LookupTableApi.fromDto(tableDto), 1, 1);
@@ -266,7 +266,7 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Create a new lookup table")
     public LookupTableApi createTable(@ApiParam LookupTableApi lookupTable) {
         try {
-            LookupTableDto saved = lookupTableService.save(lookupTable.toDto());
+            LookupTableDto saved = dbTableService.save(lookupTable.toDto());
             LookupTableApi table = LookupTableApi.fromDto(saved);
 
             clusterBus.post(LookupTablesUpdated.create(saved));
@@ -282,7 +282,7 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_UPDATE)
     @ApiOperation(value = "Update the given lookup table")
     public LookupTableApi updateTable(@Valid @ApiParam LookupTableApi toUpdate) {
-        LookupTableDto saved = lookupTableService.save(toUpdate.toDto());
+        LookupTableDto saved = dbTableService.save(toUpdate.toDto());
         clusterBus.post(LookupTablesUpdated.create(saved));
 
         return LookupTableApi.fromDto(saved);
@@ -294,11 +294,11 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Delete the lookup table")
     public LookupTableApi removeTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         // TODO validate that table isn't in use, how?
-        Optional<LookupTableDto> lookupTableDto = lookupTableService.get(idOrName);
+        Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
         if (!lookupTableDto.isPresent()) {
             throw new NotFoundException();
         }
-        lookupTableService.delete(idOrName);
+        dbTableService.delete(idOrName);
         clusterBus.post(LookupTablesDeleted.create(lookupTableDto.get()));
 
         return LookupTableApi.fromDto(lookupTableDto.get());
@@ -364,7 +364,7 @@ public class LookupTableResource extends RestResource {
             final SearchQuery searchQuery = adapterSearchQueryParser.parse(query);
             final DBQuery.Query dbQuery = searchQuery.toDBQuery();
 
-            PaginatedList<DataAdapterDto> paginated = adapterService.findPaginated(dbQuery, sortBuilder, page, perPage);
+            PaginatedList<DataAdapterDto> paginated = dbDataAdapterService.findPaginated(dbQuery, sortBuilder, page, perPage);
             return new DataAdapterPage(query,
                     paginated.pagination(),
                     paginated.stream().map(DataAdapterApi::fromDto).collect(Collectors.toList()));
@@ -394,14 +394,14 @@ public class LookupTableResource extends RestResource {
             //noinspection ConstantConditions
             for (String tableName : request.tables()) {
 
-                final LookupTable table = lookupTables.newBuilder().lookupTable(tableName).build().getTable();
+                final LookupTable table = lookupTableService.newBuilder().lookupTable(tableName).build().getTable();
                 if (table != null) {
                     errorStates.tables().put(tableName, table.error());
                 }
             }
         }
         if (request.dataAdapters() != null) {
-            lookupTables.getDataAdapters(request.dataAdapters()).forEach(adapter -> {
+            lookupTableService.getDataAdapters(request.dataAdapters()).forEach(adapter -> {
                 errorStates.dataAdapters().put(adapter.name(), adapter.getError().map(Throwable::getMessage).orElse(null));
             });
         }
@@ -412,7 +412,7 @@ public class LookupTableResource extends RestResource {
     @Path("adapters/{idOrName}")
     @ApiOperation(value = "List the given data adapter")
     public DataAdapterApi getAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        Optional<DataAdapterDto> dataAdapterDto = adapterService.get(idOrName);
+        Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
         if (dataAdapterDto.isPresent()) {
             return DataAdapterApi.fromDto(dataAdapterDto.get());
         }
@@ -424,12 +424,12 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Query a lookup table")
     public LookupResult performAdapterLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
                                              @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
-        final Collection<LookupDataAdapter> dataAdapters = lookupTables.getDataAdapters(singleton(name));
+        final Collection<LookupDataAdapter> dataAdapters = lookupTableService.getDataAdapters(singleton(name));
         if (!dataAdapters.isEmpty()) {
             return Iterables.getOnlyElement(dataAdapters).get(key);
         } else {
             // not a currently running adapter, we'll have to manually start it to query it
-            final Optional<DataAdapterDto> dtoOptional = adapterService.get(name);
+            final Optional<DataAdapterDto> dtoOptional = dbDataAdapterService.get(name);
             if (!dtoOptional.isPresent()) {
                 throw new NotFoundException();
             }
@@ -460,7 +460,7 @@ public class LookupTableResource extends RestResource {
     public DataAdapterApi createAdapter(@Valid @ApiParam DataAdapterApi newAdapter) {
         try {
             DataAdapterDto dto = newAdapter.toDto();
-            DataAdapterDto saved = adapterService.save(dto);
+            DataAdapterDto saved = dbDataAdapterService.save(dto);
             return DataAdapterApi.fromDto(saved);
         } catch (DuplicateKeyException e) {
             throw new BadRequestException(e.getMessage());
@@ -472,16 +472,16 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_DELETE)
     @ApiOperation(value = "Delete the given data adapter", notes = "The data adapter cannot be in use by any lookup table, otherwise the request will fail.")
     public DataAdapterApi deleteAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        Optional<DataAdapterDto> dataAdapterDto = adapterService.get(idOrName);
+        Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
         if (!dataAdapterDto.isPresent()) {
             throw new NotFoundException();
         }
         DataAdapterDto dto = dataAdapterDto.get();
-        boolean unused = lookupTableService.findByDataAdapterIds(singleton(dto.id())).isEmpty();
+        boolean unused = dbTableService.findByDataAdapterIds(singleton(dto.id())).isEmpty();
         if (!unused) {
             throw new BadRequestException("The adapter is still in use, cannot delete.");
         }
-        adapterService.delete(idOrName);
+        dbDataAdapterService.delete(idOrName);
 
         return DataAdapterApi.fromDto(dto);
     }
@@ -491,8 +491,8 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_UPDATE)
     @ApiOperation(value = "Update the given data adapter settings")
     public DataAdapterApi updateAdapter(@Valid @ApiParam DataAdapterApi toUpdate) {
-        DataAdapterDto saved = adapterService.save(toUpdate.toDto());
-        Collection<LookupTableDto> adapterUsages = lookupTableService.findByDataAdapterIds(singleton(saved.id()));
+        DataAdapterDto saved = dbDataAdapterService.save(toUpdate.toDto());
+        Collection<LookupTableDto> adapterUsages = dbTableService.findByDataAdapterIds(singleton(saved.id()));
         if (!adapterUsages.isEmpty()) {
             clusterBus.post(LookupTablesUpdated.create(adapterUsages));
         }
@@ -506,7 +506,7 @@ public class LookupTableResource extends RestResource {
     public ValidationResult validateAdapter(@Valid @ApiParam DataAdapterApi toValidate) {
         final ValidationResult validation = new ValidationResult();
 
-        final Optional<DataAdapterDto> dtoOptional = adapterService.get(toValidate.name());
+        final Optional<DataAdapterDto> dtoOptional = dbDataAdapterService.get(toValidate.name());
         if (dtoOptional.isPresent()) {
             // an adapter exist with the given name, check that the IDs are the same, this might be an update
             final DataAdapterDto adapterDto = dtoOptional.get();
@@ -570,7 +570,7 @@ public class LookupTableResource extends RestResource {
             final DBQuery.Query dbQuery = searchQuery.toDBQuery();
 
 
-            PaginatedList<CacheDto> paginated = cacheService.findPaginated(dbQuery, sortBuilder, page, perPage);
+            PaginatedList<CacheDto> paginated = dbCacheService.findPaginated(dbQuery, sortBuilder, page, perPage);
             return new CachesPage(query,
                     paginated.pagination(),
                     paginated.stream().map(CacheApi::fromDto).collect(Collectors.toList()));
@@ -593,7 +593,7 @@ public class LookupTableResource extends RestResource {
     @Path("caches/{idOrName}")
     @ApiOperation(value = "List the given cache")
     public CacheApi getCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        Optional<CacheDto> cacheDto = cacheService.get(idOrName);
+        Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
         if (cacheDto.isPresent()) {
             return CacheApi.fromDto(cacheDto.get());
         }
@@ -606,7 +606,7 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Create a new cache")
     public CacheApi createCache(@ApiParam CacheApi newCache) {
         try {
-            return CacheApi.fromDto(cacheService.save(newCache.toDto()));
+            return CacheApi.fromDto(dbCacheService.save(newCache.toDto()));
         } catch (DuplicateKeyException e) {
             throw new BadRequestException(e.getMessage());
         }
@@ -617,16 +617,16 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_DELETE)
     @ApiOperation(value = "Delete the given cache", notes = "The cache cannot be in use by any lookup table, otherwise the request will fail.")
     public CacheApi deleteCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        Optional<CacheDto> cacheDto = cacheService.get(idOrName);
+        Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
         if (!cacheDto.isPresent()) {
             throw new NotFoundException();
         }
         CacheDto dto = cacheDto.get();
-        boolean unused = lookupTableService.findByCacheIds(singleton(dto.id())).isEmpty();
+        boolean unused = dbTableService.findByCacheIds(singleton(dto.id())).isEmpty();
         if (!unused) {
             throw new BadRequestException("The cache is still in use, cannot delete.");
         }
-        cacheService.delete(idOrName);
+        dbCacheService.delete(idOrName);
 
         return CacheApi.fromDto(dto);
     }
@@ -636,8 +636,8 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_UPDATE)
     @ApiOperation(value = "Update the given cache settings")
     public CacheApi updateCache(@ApiParam CacheApi toUpdate) {
-        CacheDto saved = cacheService.save(toUpdate.toDto());
-        Collection<LookupTableDto> cacheUsages = lookupTableService.findByCacheIds(singleton(saved.id()));
+        CacheDto saved = dbCacheService.save(toUpdate.toDto());
+        Collection<LookupTableDto> cacheUsages = dbTableService.findByCacheIds(singleton(saved.id()));
         if (!cacheUsages.isEmpty()) {
             clusterBus.post(LookupTablesUpdated.create(cacheUsages));
         }
@@ -651,7 +651,7 @@ public class LookupTableResource extends RestResource {
     public ValidationResult validateCache(@Valid @ApiParam CacheApi toValidate) {
         final ValidationResult validation = new ValidationResult();
 
-        final Optional<CacheDto> dtoOptional = cacheService.get(toValidate.name());
+        final Optional<CacheDto> dtoOptional = dbCacheService.get(toValidate.name());
         if (dtoOptional.isPresent()) {
             // a cache exist with the given name, check that the IDs are the same, this might be an update
             final CacheDto cacheDto = dtoOptional.get();
