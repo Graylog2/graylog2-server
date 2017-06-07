@@ -75,6 +75,7 @@ public class KafkaTransport extends ThrottleableTransport {
     public static final String CK_ZOOKEEPER = "zookeeper";
     public static final String CK_TOPIC_FILTER = "topic_filter";
     public static final String CK_THREADS = "threads";
+    public static final String CK_OFFSET_RESET = "offset_reset";
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaTransport.class);
 
@@ -179,6 +180,7 @@ public class KafkaTransport extends ThrottleableTransport {
         props.put("fetch.min.bytes", String.valueOf(configuration.getInt(CK_FETCH_MIN_BYTES)));
         props.put("fetch.wait.max.ms", String.valueOf(configuration.getInt(CK_FETCH_WAIT_MAX)));
         props.put("zookeeper.connect", configuration.getString(CK_ZOOKEEPER));
+        props.put("auto.offset.reset", configuration.getString(CK_OFFSET_RESET));
         // Default auto commit interval is 60 seconds. Reduce to 1 second to minimize message duplication
         // if something breaks.
         props.put("auto.commit.interval.ms", "1000");
@@ -360,6 +362,13 @@ public class KafkaTransport extends ThrottleableTransport {
                     2,
                     "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
                     ConfigurationField.Optional.NOT_OPTIONAL));
+
+            cr.addField(new TextField(
+                    CK_OFFSET_RESET,
+                    "Auto offset reset",
+                    "largest",
+                    "What to do when there is no initial offset in ZooKeeper or if an offset is out of range",
+                    ConfigurationField.Optional.OPTIONAL));
 
             return cr;
         }
