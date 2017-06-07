@@ -671,7 +671,6 @@ public class BundleImporter {
     }
 
     private void createLookupTables(String bundleId, Set<LookupTableBundle> lookupTables) {
-        // TODO: Save bundleId in DTO!
         for (LookupTableBundle bundle : lookupTables) {
             final Optional<CacheDto> cacheDto = mongoLutCacheService.get(bundle.getCacheName());
             final Optional<DataAdapterDto> adapterDto = mongoLutDataAdapterService.get(bundle.getDataAdapterName());
@@ -687,6 +686,7 @@ public class BundleImporter {
                     .name(bundle.getName())
                     .cacheId(cacheDto.get().id())
                     .dataAdapterId(adapterDto.get().id())
+                    .contentPack(bundleId)
                     .build());
             createdLookupTables.put(dto.id(), dto);
         }
@@ -695,12 +695,12 @@ public class BundleImporter {
     }
 
     private void createLookupCaches(String bundleId, Set<LookupCacheBundle> lookupCaches) {
-        // TODO: Save bundleId in DTO!
         for (LookupCacheBundle bundle : lookupCaches) {
             final CacheDto dto = mongoLutCacheService.save(CacheDto.builder()
                     .title(bundle.getTitle())
                     .description(bundle.getDescription())
                     .name(bundle.getName())
+                    .contentPack(bundleId)
                     .config(objectMapper.convertValue(bundle.getConfig(), LookupCacheConfiguration.class))
                     .build());
             createdLookupCaches.put(dto.id(), dto);
@@ -708,12 +708,12 @@ public class BundleImporter {
     }
 
     private void createLookupDataAdapters(String bundleId, Set<LookupDataAdapterBundle> lookupDataAdapters) {
-        // TODO: Save bundleId in DTO!
         for (LookupDataAdapterBundle bundle : lookupDataAdapters) {
             final DataAdapterDto dto = mongoLutDataAdapterService.save(DataAdapterDto.builder()
                     .title(bundle.getTitle())
                     .description(bundle.getDescription())
                     .name(bundle.getName())
+                    .contentPack(bundleId)
                     .config(objectMapper.convertValue(bundle.getConfig(), LookupDataAdapterConfiguration.class))
                     .build());
             createdLookupDataAdapters.put(dto.id(), dto);

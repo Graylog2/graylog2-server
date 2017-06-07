@@ -52,6 +52,10 @@ public abstract class CacheApi {
     @NotEmpty
     public abstract String name();
 
+    @JsonProperty("content_pack")
+    @Nullable
+    public abstract String contentPack();
+
     @JsonProperty
     @NotNull
     public abstract LookupCacheConfiguration config();
@@ -66,6 +70,7 @@ public abstract class CacheApi {
                 .title(dto.title())
                 .description(dto.description())
                 .name(dto.name())
+                .contentPack(dto.contentPack())
                 .config(dto.config())
                 .build();
     }
@@ -76,6 +81,7 @@ public abstract class CacheApi {
                 .title(title())
                 .description(description())
                 .name(name())
+                .contentPack(contentPack())
                 .config(config())
                 .build();
     }
@@ -93,6 +99,9 @@ public abstract class CacheApi {
 
         @JsonProperty("name")
         public abstract Builder name(String name);
+
+        @JsonProperty("content_pack")
+        public abstract Builder contentPack(@Nullable String contentPack);
 
         @JsonProperty("config")
         public abstract Builder config(@Valid LookupCacheConfiguration config);

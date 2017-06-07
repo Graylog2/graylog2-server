@@ -5,6 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 
 import FormsUtils from 'util/FormsUtils';
+import { ContentPackMarker } from 'components/common';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -40,7 +41,10 @@ const LookupTable = React.createClass({
     return (
       <Row className="content">
         <Col md={6}>
-          <h3>{this.props.table.title}</h3>
+          <h3>
+            {this.props.table.title}
+            <ContentPackMarker contentPack={this.props.table.content_pack} marginLeft={5} />
+          </h3>
           <span>{this.props.table.description}</span>
           <dl>
             <dt>Data adapter</dt>

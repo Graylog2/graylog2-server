@@ -61,6 +61,10 @@ public abstract class LookupTableDto {
     @JsonProperty("data_adapter")
     public abstract String dataAdapterId();
 
+    @JsonProperty("content_pack")
+    @Nullable
+    public abstract String contentPack();
+
     public static Builder builder() {
         return new AutoValue_LookupTableDto.Builder();
     }
@@ -88,6 +92,9 @@ public abstract class LookupTableDto {
 
         @JsonProperty("data_adapter")
         public abstract Builder dataAdapterId(String id);
+
+        @JsonProperty("content_pack")
+        public abstract Builder contentPack(@Nullable String contentPack);
 
         public abstract LookupTableDto build();
     }
