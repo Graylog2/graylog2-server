@@ -16,8 +16,11 @@
  */
 package org.graylog2.bindings;
 
+import com.github.zafarkhaja.semver.Version;
 import com.google.inject.AbstractModule;
 import io.searchbox.client.JestClient;
+import org.graylog2.bindings.annotations.ElasticsearchVersion;
+import org.graylog2.bindings.providers.ElasticsearchVersionProvider;
 import org.graylog2.bindings.providers.JestClientProvider;
 import org.graylog2.indexer.IndexMappingFactory;
 
@@ -26,5 +29,6 @@ public class ElasticsearchModule extends AbstractModule {
     protected void configure() {
         bind(JestClient.class).toProvider(JestClientProvider.class).asEagerSingleton();
         bind(IndexMappingFactory.class).asEagerSingleton();
+        bind(Version.class).annotatedWith(ElasticsearchVersion.class).toProvider(ElasticsearchVersionProvider.class);
     }
 }

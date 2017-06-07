@@ -17,22 +17,21 @@
 package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
-import org.graylog2.indexer.cluster.Node;
+import org.graylog2.bindings.annotations.ElasticsearchVersion;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
 public class IndexMappingFactory {
-    private final Node node;
+    private final Version elasticsearchVersion;
 
     @Inject
-    public IndexMappingFactory(Node node) {
-        this.node = node;
+    public IndexMappingFactory(@ElasticsearchVersion Version elasticsearchVersion) {
+        this.elasticsearchVersion = elasticsearchVersion;
     }
 
     public IndexMapping createIndexMapping() {
-        final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
         if (elasticsearchVersion.satisfies(">=2.1.0 & <5.0.0")) {
             return new IndexMapping2();
         } else if (elasticsearchVersion.satisfies("^5.0.0")) {
