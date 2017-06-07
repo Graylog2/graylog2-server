@@ -165,7 +165,9 @@ public class LookupTableService extends AbstractIdleService {
             // create new adapter and lookup table instances
             dbAdapters.findByIds(updated.ids()).stream()
                     .map(dto -> createAdapter(dto, existingAdapters))
-                    .forEach(newCache -> tablesToUpdate.forEach(this::createLookupTable));
+                    .filter(Objects::nonNull)
+                    .forEach(adapter -> adapter.startAsync().awaitRunning());
+            tablesToUpdate.forEach(this::createLookupTable);
 
             // stop old adapters
             existingAdapters.build().forEach(AbstractIdleService::stopAsync);
@@ -200,7 +202,9 @@ public class LookupTableService extends AbstractIdleService {
             // create new cache and lookup table instances
             dbCaches.findByIds(updated.ids()).stream()
                     .map(dto -> createCache(dto, existingCaches))
-                    .forEach(newCache -> tablesToUpdate.forEach(this::createLookupTable));
+                    .filter(Objects::nonNull)
+                    .forEach(cache -> cache.startAsync().awaitRunning());
+            tablesToUpdate.forEach(this::createLookupTable);
 
             // stop old caches
             existingCaches.build().forEach(AbstractIdleService::stopAsync);
