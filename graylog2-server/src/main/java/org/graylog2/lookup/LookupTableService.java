@@ -363,7 +363,13 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     public boolean hasTable(String name) {
-        return liveTables.containsKey(name);
+        // Do a quick check in the live tables first
+        if (liveTables.containsKey(name)) {
+            return true;
+        } else {
+            // Do a more expensive DB lookup as fallback (live tables might not be populated yet)
+            return dbTables.get(name).isPresent();
+        }
     }
 
     public Collection<LookupDataAdapter> getDataAdapters(Set<String> adapterNames) {
