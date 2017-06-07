@@ -405,6 +405,11 @@ public class LookupTableResource extends RestResource {
                 errorStates.dataAdapters().put(adapter.name(), adapter.getError().map(Throwable::getMessage).orElse(null));
             });
         }
+        if (request.caches() != null) {
+            lookupTableService.getCaches(request.caches()).forEach(cache -> {
+                errorStates.caches().put(cache.name(), cache.getError().map(Throwable::getMessage).orElse(null));
+            });
+        }
         return errorStates.build();
     }
 

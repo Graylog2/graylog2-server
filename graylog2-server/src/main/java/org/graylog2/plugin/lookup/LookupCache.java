@@ -23,6 +23,9 @@ import org.graylog2.lookup.LookupTable;
 
 import javax.annotation.Nullable;
 
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+
 import static com.google.common.base.Preconditions.checkState;
 
 public abstract class LookupCache extends AbstractIdleService {
@@ -33,6 +36,8 @@ public abstract class LookupCache extends AbstractIdleService {
 
     private final String name;
     private final LookupCacheConfiguration config;
+
+    private AtomicReference<Throwable> error = new AtomicReference<>();
 
     protected LookupCache(String id,
                           String name,
@@ -55,6 +60,18 @@ public abstract class LookupCache extends AbstractIdleService {
     }
 
     protected abstract void doStop() throws Exception;
+
+    protected void clearError() {
+        error.set(null);
+    }
+
+    public Optional<Throwable> getError() {
+        return Optional.ofNullable(error.get());
+    }
+
+    protected void setError(Throwable throwable) {
+        error.set(throwable);
+    }
 
     @Nullable
     public String id() {
