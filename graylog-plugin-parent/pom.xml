@@ -37,6 +37,7 @@
 
     <properties>
         <graylog.plugin-dir>/usr/share/graylog-server/plugin</graylog.plugin-dir>
+        <graylog.version>${project.parent.version}</graylog.version>
 
         <!-- Dependencies -->
         <auto-service.version>1.0-rc2</auto-service.version>
