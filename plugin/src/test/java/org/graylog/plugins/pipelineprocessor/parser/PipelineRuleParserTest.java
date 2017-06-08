@@ -98,6 +98,7 @@ public class PipelineRuleParserTest extends BaseParserTest {
         functions.put("trigger_test", new TriggerTestFunction());
         functions.put("optional", new OptionalFunction());
         functions.put("customObject", new CustomObjectFunction());
+        functions.put("beanObject", new BeanObjectFunction());
         functions.put("keys", new KeysFunction());
         functions.put("sort", new SortFunction());
         functions.put(LongConversion.NAME, new LongConversion());
@@ -289,6 +290,17 @@ public class PipelineRuleParserTest extends BaseParserTest {
     }
 
     @Test
+    public void nestedFieldAccess() throws Exception {
+        try {
+            final Rule rule = parseRuleWithOptionalCodegen();
+            evaluateRule(rule, new Message("hello", "world", DateTime.now()));
+            assertTrue("condition should be true", actionsTriggered.get());
+        } catch (ParseException e) {
+            fail(e.getMessage());
+        }
+    }
+
+    @Test
     public void pipelineDeclaration() throws Exception {
         final List<Pipeline> pipelines = parser.parsePipelines(ruleForTest());
         assertEquals(1, pipelines.size());
@@ -411,6 +423,42 @@ public class PipelineRuleParserTest extends BaseParserTest {
 
         public String getId() {
             return id;
+        }
+    }
+
+    public static class BeanObject {
+        private final String id;
+        private final NestedBeanObject theName;
+
+        public BeanObject(String id, String firstName, String lastName) {
+            this.id = id;
+            this.theName = new NestedBeanObject(firstName, lastName);
+        }
+
+        public String getId() {
+            return id;
+        }
+
+        public NestedBeanObject getTheName() {
+            return theName;
+        }
+
+        public static class NestedBeanObject {
+            private final String firstName;
+            private final String lastName;
+
+            NestedBeanObject(String firstName, String lastName) {
+                this.firstName = firstName;
+                this.lastName = lastName;
+            }
+
+            public String getFirstName() {
+                return firstName;
+            }
+
+            public String getLastName() {
+                return lastName;
+            }
         }
     }
 
@@ -562,6 +610,31 @@ public class PipelineRuleParserTest extends BaseParserTest {
                     .name("customObject")
                     .returnType(CustomObject.class)
                     .params(of(aDefault))
+                    .build();
+        }
+    }
+
+    public static class BeanObjectFunction extends AbstractFunction<BeanObject> {
+
+        private final ParameterDescriptor<String, String> id = ParameterDescriptor.string("id").build();
+        private final ParameterDescriptor<String, String> firstName = ParameterDescriptor.string("firstName").build();
+        private final ParameterDescriptor<String, String> lastName = ParameterDescriptor.string("lastName").build();
+
+        @Override
+        public BeanObject evaluate(FunctionArgs args, EvaluationContext context) {
+            return new BeanObject(
+                    id.optional(args, context).orElse(""),
+                    firstName.optional(args, context).orElse(""),
+                    lastName.optional(args, context).orElse("")
+            );
+        }
+
+        @Override
+        public FunctionDescriptor<BeanObject> descriptor() {
+            return FunctionDescriptor.<BeanObject>builder()
+                    .name("beanObject")
+                    .returnType(BeanObject.class)
+                    .params(of(id, firstName, lastName))
                     .build();
         }
     }

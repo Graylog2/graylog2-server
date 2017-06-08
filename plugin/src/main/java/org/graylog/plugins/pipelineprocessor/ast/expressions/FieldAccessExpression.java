@@ -16,8 +16,8 @@
  */
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
+import com.google.common.base.CaseFormat;
 import com.google.common.collect.ImmutableList;
-
 import org.antlr.v4.runtime.Token;
 import org.apache.commons.beanutils.PropertyUtils;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
@@ -51,6 +51,18 @@ public class FieldAccessExpression extends BaseExpression {
             return null;
         }
         final String fieldName = fieldValue.toString();
+
+        // First try to access the field using the given field name
+        final Object property = getProperty(bean, fieldName);
+        if (property == null) {
+            // If the given field name does not work, try to convert it to camel case to make JSON-like access
+            // to fields possible. Example: "geo.location.metro_code" => "geo.getLocation().getMetroCode()"
+            return getProperty(bean, CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.LOWER_CAMEL, fieldName));
+        }
+        return property;
+    }
+
+    private Object getProperty(Object bean, String fieldName) {
         try {
             Object property = PropertyUtils.getProperty(bean, fieldName);
             if (property == null) {
