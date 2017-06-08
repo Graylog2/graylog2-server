@@ -494,7 +494,7 @@
             <dependency>
                 <groupId>org.slieb</groupId>
                 <artifactId>throwable-interfaces</artifactId>
-                <version>1.13</version>
+                <version>${throwable-interfaces.version}</version>
             </dependency>
 
             <!-- Test dependencies -->
