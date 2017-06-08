@@ -77,7 +77,7 @@ public class LoggingServiceListener extends Service.Listener {
 
     @Override
     public void stopping(Service.State from) {
-        logger.info("{} {} FAILED, was {}", serviceName, id, from);
+        logger.info("{} {} STOPPING, was {}", serviceName, id, from);
     }
 
     @Override

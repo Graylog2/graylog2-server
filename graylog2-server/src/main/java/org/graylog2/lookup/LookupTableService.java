@@ -257,7 +257,11 @@ public class LookupTableService extends AbstractIdleService {
             return null;
         }
         final LookupDataAdapter adapter = factory.create(dto.id(), dto.name(), dto.config());
-        adapter.addListener(new LoggingServiceListener("Data Adapter", String.format("%s [%s]", dto.name(), dto.id()), LOG), scheduler);
+        adapter.addListener(new LoggingServiceListener(
+                        "Data Adapter",
+                        String.format("%s/%s [@%s]", dto.name(), dto.id(), Integer.toHexString(adapter.hashCode())),
+                        LOG),
+                scheduler);
         adapter.addListener(new Listener() {
             @Override
             public void running() {
@@ -298,7 +302,11 @@ public class LookupTableService extends AbstractIdleService {
             return null;
         }
         final LookupCache cache = factory.create(dto.id(), dto.name(), dto.config());
-        cache.addListener(new LoggingServiceListener("Cache", String.format("%s [%s]", dto.name(), dto.id()), LOG), scheduler);
+        cache.addListener(new LoggingServiceListener(
+                        "Cache",
+                        String.format("%s/%s [@%s]", dto.name(), dto.id(), Integer.toHexString(cache.hashCode())),
+                        LOG),
+                scheduler);
         cache.addListener(new Listener() {
             @Override
             public void running() {
