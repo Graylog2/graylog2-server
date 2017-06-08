@@ -59,6 +59,9 @@ import java.util.stream.Collectors;
 
 import static java.lang.Math.toIntExact;
 import static org.graylog2.shared.utilities.ExceptionUtils.getRootCauseMessage;
+import static org.graylog2.utilities.ObjectUtils.objectId;
+import static org.slieb.throwables.ConsumerWithThrowable.asConsumerWithThrowable;
+import static org.slieb.throwables.ConsumerWithThrowable.castConsumerWithThrowable;
 
 /**
  * This service maintains the in-memory adapters, caches and lookup table instances.
@@ -157,7 +160,7 @@ public class LookupTableService extends AbstractIdleService {
             // then we retrieve the old one so we can safely stop it later
             // then we build a new lookup table instance with the new adapter instance
             // last we can remove the old lookup table instance and stop the original adapter
-            final Collection<LookupTableDto> tablesToUpdate = dbTables.findByCacheIds(updated.ids());
+            final Collection<LookupTableDto> tablesToUpdate = dbTables.findByDataAdapterIds(updated.ids());
 
             // collect old adapter instances
             final ImmutableSet.Builder<LookupDataAdapter> existingAdapters = ImmutableSet.builder();
@@ -166,7 +169,9 @@ public class LookupTableService extends AbstractIdleService {
             dbAdapters.findByIds(updated.ids()).stream()
                     .map(dto -> createAdapter(dto, existingAdapters))
                     .filter(Objects::nonNull)
-                    .forEach(adapter -> adapter.startAsync().awaitRunning());
+                    .forEach(asConsumerWithThrowable((LookupDataAdapter adapter) -> adapter.startAsync().awaitRunning())
+                            .withLogging(LOG)
+                            .thatThrowsNothing());
             tablesToUpdate.forEach(this::createLookupTable);
 
             // stop old adapters
@@ -203,7 +208,9 @@ public class LookupTableService extends AbstractIdleService {
             dbCaches.findByIds(updated.ids()).stream()
                     .map(dto -> createCache(dto, existingCaches))
                     .filter(Objects::nonNull)
-                    .forEach(cache -> cache.startAsync().awaitRunning());
+                    .forEach(castConsumerWithThrowable((LookupCache cache) -> cache.startAsync().awaitRunning())
+                            .withLogging(LOG)
+                            .thatThrowsNothing());
             tablesToUpdate.forEach(this::createLookupTable);
 
             // stop old caches
@@ -259,7 +266,7 @@ public class LookupTableService extends AbstractIdleService {
         final LookupDataAdapter adapter = factory.create(dto.id(), dto.name(), dto.config());
         adapter.addListener(new LoggingServiceListener(
                         "Data Adapter",
-                        String.format("%s/%s [@%s]", dto.name(), dto.id(), Integer.toHexString(adapter.hashCode())),
+                        String.format("%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
                         LOG),
                 scheduler);
         adapter.addListener(new Listener() {
@@ -304,7 +311,7 @@ public class LookupTableService extends AbstractIdleService {
         final LookupCache cache = factory.create(dto.id(), dto.name(), dto.config());
         cache.addListener(new LoggingServiceListener(
                         "Cache",
-                        String.format("%s/%s [@%s]", dto.name(), dto.id(), Integer.toHexString(cache.hashCode())),
+                        String.format("%s/%s [@%s]", dto.name(), dto.id(), objectId(cache)),
                         LOG),
                 scheduler);
         cache.addListener(new Listener() {
@@ -350,10 +357,14 @@ public class LookupTableService extends AbstractIdleService {
                 .cache(cache)
                 .dataAdapter(adapter)
                 .build();
-        LOG.info("Starting lookup table {} [{}] using cache {}, data adapter {}",
-                table.name(), table.id(), table.cache().name(), table.dataAdapter().name());
-        liveTables.put(dto.name(), table);
-
+        LOG.info("Starting lookup table {}/{} [@{}] using cache {}, data adapter {}",
+                table.name(), table.id(), objectId(table),
+                table.cache().name(),
+                table.dataAdapter().name());
+        final LookupTable previous = liveTables.put(dto.name(), table);
+        if (previous != null) {
+            LOG.info("Replaced previous lookup table {} [@{}]", previous.name(), objectId(previous));
+        }
         return table;
     }
 

@@ -17,7 +17,6 @@
 package org.graylog2.lookup;
 
 import com.google.auto.value.AutoValue;
-import com.google.common.util.concurrent.AbstractIdleService;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
