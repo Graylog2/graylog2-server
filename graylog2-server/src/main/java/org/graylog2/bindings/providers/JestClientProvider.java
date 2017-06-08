@@ -22,6 +22,7 @@ import com.google.gson.Gson;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
+import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
@@ -34,8 +35,10 @@ import javax.inject.Provider;
 import javax.inject.Singleton;
 import java.net.URI;
 import java.time.Duration;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -57,6 +60,7 @@ public class JestClientProvider implements Provider<JestClient> {
                               Gson gson) {
         this.factory = new JestClientFactory();
         this.credentialsProvider = new BasicCredentialsProvider();
+        final Set<HttpHost> preemptiveAuthHosts = new HashSet<>();
         final List<String> hosts = elasticsearchHosts.stream()
             .map(hostUri -> {
                 if (!Strings.isNullOrEmpty(hostUri.getUserInfo())) {
@@ -70,6 +74,10 @@ public class JestClientProvider implements Provider<JestClient> {
                             new AuthScope(hostUri.getHost(), hostUri.getPort(), AuthScope.ANY_REALM, hostUri.getScheme()),
                             new UsernamePasswordCredentials(username, password)
                         );
+
+                        if (!Strings.isNullOrEmpty(username) || !Strings.isNullOrEmpty(password)) {
+                            preemptiveAuthHosts.add(HttpHost.create(hostUri.toString()));
+                        }
                     }
                 }
                 return hostUri.toString();
@@ -88,6 +96,7 @@ public class JestClientProvider implements Provider<JestClient> {
                 .discoveryEnabled(discoveryEnabled)
                 .discoveryFilter(discoveryFilter)
                 .discoveryFrequency(discoveryFrequency.getSeconds(), TimeUnit.SECONDS)
+                .preemptiveAuthTargetHosts(preemptiveAuthHosts)
                 .gson(gson);
 
         factory.setHttpClientConfig(httpClientConfigBuilder.build());
