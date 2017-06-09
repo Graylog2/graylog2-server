@@ -1,3 +1,14 @@
 :local(.actions) {
     max-width: 150px;
 }
+
+:local(.searchHelpButton) {
+    cursor: help;
+    padding: 0 0 0 2px;
+    margin-left: 5px;
+}
+
+:local(.popoverWide) {
+    max-width: 500px;
+    min-width: 350px;
+}

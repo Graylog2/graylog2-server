@@ -19,6 +19,7 @@ package org.graylog2.rest.resources.system.lookup;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Maps;
@@ -52,6 +53,9 @@ import org.graylog2.rest.models.system.lookup.DataAdapterApi;
 import org.graylog2.rest.models.system.lookup.ErrorStates;
 import org.graylog2.rest.models.system.lookup.ErrorStatesRequest;
 import org.graylog2.rest.models.system.lookup.LookupTableApi;
+import org.graylog2.search.SearchQuery;
+import org.graylog2.search.SearchQueryField;
+import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.mongojack.DBQuery;
@@ -76,6 +80,7 @@ import javax.ws.rs.QueryParam;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -93,11 +98,51 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class LookupTableResource extends RestResource {
     private static final Logger LOG = getLogger(LookupTableResource.class);
 
+    private static final ImmutableSet<String> LUT_ALLOWABLE_SORT_FIELDS = ImmutableSet.of(
+            LookupTableDto.FIELD_ID,
+            LookupTableDto.FIELD_TITLE,
+            LookupTableDto.FIELD_DESCRIPTION,
+            LookupTableDto.FIELD_NAME
+    );
+    private static final ImmutableSet<String> ADAPTER_ALLOWABLE_SORT_FIELDS = ImmutableSet.of(
+            DataAdapterDto.FIELD_ID,
+            DataAdapterDto.FIELD_TITLE,
+            DataAdapterDto.FIELD_DESCRIPTION,
+            DataAdapterDto.FIELD_NAME
+    );
+    private static final ImmutableSet<String> CACHE_ALLOWABLE_SORT_FIELDS = ImmutableSet.of(
+            CacheDto.FIELD_ID,
+            CacheDto.FIELD_TITLE,
+            CacheDto.FIELD_DESCRIPTION,
+            CacheDto.FIELD_NAME
+    );
+    private static final ImmutableMap<String, SearchQueryField> LUT_SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put("id", SearchQueryField.create(LookupTableDto.FIELD_ID))
+            .put("title", SearchQueryField.create(LookupTableDto.FIELD_TITLE))
+            .put("description", SearchQueryField.create(LookupTableDto.FIELD_DESCRIPTION))
+            .put("name", SearchQueryField.create(LookupTableDto.FIELD_NAME))
+            .build();
+    private static final ImmutableMap<String, SearchQueryField> ADAPTER_SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put("id", SearchQueryField.create(DataAdapterDto.FIELD_ID))
+            .put("title", SearchQueryField.create(DataAdapterDto.FIELD_TITLE))
+            .put("description", SearchQueryField.create(DataAdapterDto.FIELD_DESCRIPTION))
+            .put("name", SearchQueryField.create(DataAdapterDto.FIELD_NAME))
+            .build();
+    private static final ImmutableMap<String, SearchQueryField> CACHE_SEARCH_FIELD_MAPPING = ImmutableMap.<String, SearchQueryField>builder()
+            .put("id", SearchQueryField.create(CacheDto.FIELD_ID))
+            .put("title", SearchQueryField.create(CacheDto.FIELD_TITLE))
+            .put("description", SearchQueryField.create(CacheDto.FIELD_DESCRIPTION))
+            .put("name", SearchQueryField.create(CacheDto.FIELD_NAME))
+            .build();
+
     private final MongoLutService lookupTableService;
     private final MongoLutDataAdapterService adapterService;
     private final MongoLutCacheService cacheService;
     private final Map<String, LookupCache.Factory> cacheTypes;
     private final Map<String, LookupDataAdapter.Factory> dataAdapterTypes;
+    private final SearchQueryParser lutSearchQueryParser;
+    private final SearchQueryParser adapterSearchQueryParser;
+    private final SearchQueryParser cacheSearchQueryParser;
     private LookupTableService lookupTables;
     private ClusterEventBus clusterBus;
 
@@ -116,6 +161,9 @@ public class LookupTableResource extends RestResource {
         this.dataAdapterTypes = dataAdapterTypes;
         this.lookupTables = lookupTables;
         this.clusterBus = clusterBus;
+        this.lutSearchQueryParser = new SearchQueryParser(LookupTableDto.FIELD_TITLE, LUT_SEARCH_FIELD_MAPPING);
+        this.adapterSearchQueryParser = new SearchQueryParser(DataAdapterDto.FIELD_TITLE, ADAPTER_SEARCH_FIELD_MAPPING);
+        this.cacheSearchQueryParser = new SearchQueryParser(CacheDto.FIELD_TITLE, CACHE_SEARCH_FIELD_MAPPING);
     }
 
     @GET
@@ -134,18 +182,16 @@ public class LookupTableResource extends RestResource {
                                   @ApiParam(name = "sort",
                                           value = "The field to sort the result on",
                                           required = true,
-                                          allowableValues = "title")
-                                  @DefaultValue("created_at") @QueryParam("sort") String sort,
+                                          allowableValues = "title,description,name,id")
+                                  @DefaultValue(LookupTableDto.FIELD_TITLE) @QueryParam("sort") String sort,
                                   @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                   @DefaultValue("desc") @QueryParam("order") String order,
                                   @ApiParam(name = "query") @QueryParam("query") String query,
                                   @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
-        // TODO hoist SearchQueryParser for this
-        DBQuery.Query dbQuery = DBQuery.empty();
-
-        // TODO determine sortable fields
-        sort = "title";
+        if (!LUT_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
+            sort = LookupTableDto.FIELD_TITLE;
+        }
         DBSort.SortBuilder sortBuilder;
         if ("desc".equalsIgnoreCase(order)) {
             sortBuilder = DBSort.desc(sort);
@@ -153,28 +199,36 @@ public class LookupTableResource extends RestResource {
             sortBuilder = DBSort.asc(sort);
         }
 
-        PaginatedList<LookupTableDto> paginated = lookupTableService.findPaginated(dbQuery, sortBuilder, page, perPage);
+        try {
+            final SearchQuery searchQuery = lutSearchQueryParser.parse(query);
+            final DBQuery.Query dbQuery = searchQuery.toDBQuery();
 
-        ImmutableSet.Builder<CacheApi> caches = ImmutableSet.builder();
-        ImmutableSet.Builder<DataAdapterApi> dataAdapters = ImmutableSet.builder();
-        if (resolveObjects) {
-            ImmutableSet.Builder<String> cacheIds = ImmutableSet.builder();
-            ImmutableSet.Builder<String> dataAdapterIds = ImmutableSet.builder();
 
-            paginated.forEach(dto -> {
-                cacheIds.add(dto.cacheId());
-                dataAdapterIds.add(dto.dataAdapterId());
-            });
+            PaginatedList<LookupTableDto> paginated = lookupTableService.findPaginated(dbQuery, sortBuilder, page, perPage);
 
-            cacheService.findByIds(cacheIds.build()).forEach(cacheDto -> caches.add(CacheApi.fromDto(cacheDto)));
-            adapterService.findByIds(dataAdapterIds.build()).forEach(dataAdapterDto -> dataAdapters.add(DataAdapterApi.fromDto(dataAdapterDto)));
+            ImmutableSet.Builder<CacheApi> caches = ImmutableSet.builder();
+            ImmutableSet.Builder<DataAdapterApi> dataAdapters = ImmutableSet.builder();
+            if (resolveObjects) {
+                ImmutableSet.Builder<String> cacheIds = ImmutableSet.builder();
+                ImmutableSet.Builder<String> dataAdapterIds = ImmutableSet.builder();
+
+                paginated.forEach(dto -> {
+                    cacheIds.add(dto.cacheId());
+                    dataAdapterIds.add(dto.dataAdapterId());
+                });
+
+                cacheService.findByIds(cacheIds.build()).forEach(cacheDto -> caches.add(CacheApi.fromDto(cacheDto)));
+                adapterService.findByIds(dataAdapterIds.build()).forEach(dataAdapterDto -> dataAdapters.add(DataAdapterApi.fromDto(dataAdapterDto)));
+            }
+
+            return new LookupTablePage(query,
+                    paginated.pagination(),
+                    paginated.stream().map(LookupTableApi::fromDto).collect(Collectors.toList()),
+                    caches.build(),
+                    dataAdapters.build());
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
         }
-
-        return new LookupTablePage(query,
-                paginated.pagination(),
-                paginated.stream().map(LookupTableApi::fromDto).collect(Collectors.toList()),
-                caches.build(),
-                dataAdapters.build());
     }
 
     @GET
@@ -290,16 +344,33 @@ public class LookupTableResource extends RestResource {
                                 @ApiParam(name = "sort",
                                         value = "The field to sort the result on",
                                         required = true,
-                                        allowableValues = "title")
-                                @DefaultValue("title") @QueryParam("sort") String sort,
+                                        allowableValues = "title,description,name,id")
+                                @DefaultValue(DataAdapterDto.FIELD_TITLE) @QueryParam("sort") String sort,
                                 @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                                 @DefaultValue("desc") @QueryParam("order") String order,
                                 @ApiParam(name = "query") @QueryParam("query") String query) {
 
-        PaginatedList<DataAdapterDto> paginated = adapterService.findPaginated(DBQuery.empty(), DBSort.asc(sort), page, perPage);
-        return new DataAdapterPage(query,
-                paginated.pagination(),
-                paginated.stream().map(DataAdapterApi::fromDto).collect(Collectors.toList()));
+        if (!ADAPTER_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
+            sort = DataAdapterDto.FIELD_TITLE;
+        }
+        DBSort.SortBuilder sortBuilder;
+        if ("desc".equalsIgnoreCase(order)) {
+            sortBuilder = DBSort.desc(sort);
+        } else {
+            sortBuilder = DBSort.asc(sort);
+        }
+
+        try {
+            final SearchQuery searchQuery = adapterSearchQueryParser.parse(query);
+            final DBQuery.Query dbQuery = searchQuery.toDBQuery();
+
+            PaginatedList<DataAdapterDto> paginated = adapterService.findPaginated(dbQuery, sortBuilder, page, perPage);
+            return new DataAdapterPage(query,
+                    paginated.pagination(),
+                    paginated.stream().map(DataAdapterApi::fromDto).collect(Collectors.toList()));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
     }
 
     @GET
@@ -479,15 +550,33 @@ public class LookupTableResource extends RestResource {
                              @ApiParam(name = "sort",
                                      value = "The field to sort the result on",
                                      required = true,
-                                     allowableValues = "title")
-                             @DefaultValue("created_at") @QueryParam("sort") String sort,
+                                     allowableValues = "title,description,name,id")
+                             @DefaultValue(CacheDto.FIELD_TITLE) @QueryParam("sort") String sort,
                              @ApiParam(name = "order", value = "The sort direction", allowableValues = "asc, desc")
                              @DefaultValue("desc") @QueryParam("order") String order,
                              @ApiParam(name = "query") @QueryParam("query") String query) {
-        PaginatedList<CacheDto> paginated = cacheService.findPaginated(DBQuery.empty(), DBSort.asc(sort), page, perPage);
-        return new CachesPage(query,
-                paginated.pagination(),
-                paginated.stream().map(CacheApi::fromDto).collect(Collectors.toList()));
+        if (!CACHE_ALLOWABLE_SORT_FIELDS.contains(sort.toLowerCase(Locale.ENGLISH))) {
+            sort = CacheDto.FIELD_TITLE;
+        }
+        DBSort.SortBuilder sortBuilder;
+        if ("desc".equalsIgnoreCase(order)) {
+            sortBuilder = DBSort.desc(sort);
+        } else {
+            sortBuilder = DBSort.asc(sort);
+        }
+
+        try {
+            final SearchQuery searchQuery = cacheSearchQueryParser.parse(query);
+            final DBQuery.Query dbQuery = searchQuery.toDBQuery();
+
+
+            PaginatedList<CacheDto> paginated = cacheService.findPaginated(dbQuery, sortBuilder, page, perPage);
+            return new CachesPage(query,
+                    paginated.pagination(),
+                    paginated.stream().map(CacheApi::fromDto).collect(Collectors.toList()));
+        } catch (IllegalArgumentException e) {
+            throw new BadRequestException(e.getMessage(), e);
+        }
     }
 
     @GET
