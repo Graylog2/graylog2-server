@@ -491,11 +491,6 @@
                 <artifactId>javapoet</artifactId>
                 <version>${javapoet.version}</version>
             </dependency>
-            <dependency>
-                <groupId>org.slieb</groupId>
-                <artifactId>throwable-interfaces</artifactId>
-                <version>${throwable-interfaces.version}</version>
-            </dependency>
 
             <!-- Test dependencies -->
             <dependency>

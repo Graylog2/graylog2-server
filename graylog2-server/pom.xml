@@ -489,10 +489,6 @@
             <groupId>com.jayway.awaitility</groupId>
             <artifactId>awaitility</artifactId>
         </dependency>
-        <dependency>
-            <groupId>org.slieb</groupId>
-            <artifactId>throwable-interfaces</artifactId>
-        </dependency>
     </dependencies>
 
     <build>
