@@ -1,13 +1,13 @@
-import React, {PropTypes} from "react";
-import Reflux from "reflux";
-import {Button, Col, Row} from "react-bootstrap";
-import {LinkContainer} from "react-router-bootstrap";
-import Routes from "routing/Routes";
-import {DocumentTitle, PageHeader, Spinner} from "components/common";
+import React, { PropTypes } from 'react';
+import Reflux from 'reflux';
+import { Button, Col, Row } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import Routes from 'routing/Routes';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
-import {Cache, CacheCreate, CacheForm, CachesOverview} from "components/lookup-tables";
+import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup-tables';
 
-import CombinedProvider from "injection/CombinedProvider";
+import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get(
   'LookupTableCaches');
@@ -87,11 +87,11 @@ const LUTCachesPage = React.createClass({
         content = <Spinner text="Loading data cache types" />;
       } else {
         content =
-          <CacheCreate history={this.props.history}
+          (<CacheCreate history={this.props.history}
                        types={this.state.types}
                        saved={this._saved}
                        validate={this._validateCache}
-                       validationErrors={this.state.validationErrors} />;
+                       validationErrors={this.state.validationErrors} />);
       }
     } else if (!this.state.caches) {
       content = <Spinner text="Loading caches" />;

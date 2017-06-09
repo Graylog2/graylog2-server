@@ -1,14 +1,14 @@
-import React, {PropTypes} from "react";
-import Reflux from "reflux";
-import {Button, Col, Row} from "react-bootstrap";
-import {LinkContainer} from "react-router-bootstrap";
-import Routes from "routing/Routes";
+import React, { PropTypes } from 'react';
+import Reflux from 'reflux';
+import { Button, Col, Row } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import Routes from 'routing/Routes';
 
-import {DocumentTitle, PageHeader, Spinner} from "components/common";
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
-import {LookupTable, LookupTableCreate, LookupTableForm, LookupTablesOverview} from "components/lookup-tables";
+import { LookupTable, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
 
-import CombinedProvider from "injection/CombinedProvider";
+import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTablesStore, LookupTablesActions } = CombinedProvider.get('LookupTables');
 

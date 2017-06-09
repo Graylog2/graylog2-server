@@ -1,13 +1,13 @@
-import React, {PropTypes} from "react";
-import Reflux from "reflux";
-import {Button, Col, Row} from "react-bootstrap";
-import {LinkContainer} from "react-router-bootstrap";
-import Routes from "routing/Routes";
-import {DocumentTitle, PageHeader, Spinner} from "components/common";
+import React, { PropTypes } from 'react';
+import Reflux from 'reflux';
+import { Button, Col, Row } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import Routes from 'routing/Routes';
+import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
-import {DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview} from "components/lookup-tables";
+import { DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview } from 'components/lookup-tables';
 
-import CombinedProvider from "injection/CombinedProvider";
+import CombinedProvider from 'injection/CombinedProvider';
 
 const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
   'LookupTableDataAdapters');
@@ -43,7 +43,6 @@ const LUTDataAdaptersPage = React.createClass({
 
   _startErrorStatesTimer() {
     this._stopErrorStatesTimer();
-    console.log("Starting errorstates retrieval");
 
     this.errorStatesTimer = setInterval(() => {
       let names = null;
@@ -58,7 +57,6 @@ const LUTDataAdaptersPage = React.createClass({
 
   _stopErrorStatesTimer() {
     if (this.errorStatesTimer) {
-      console.log("Stopping errorstates retrieval");
       clearInterval(this.errorStatesTimer);
       this.errorStatesTimer = undefined;
     }
