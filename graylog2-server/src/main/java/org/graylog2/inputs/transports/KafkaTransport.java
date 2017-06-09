@@ -20,6 +20,7 @@ import com.codahale.metrics.Gauge;
 import com.codahale.metrics.InstrumentedExecutorService;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
@@ -40,6 +41,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
@@ -57,6 +59,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Named;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -76,6 +79,14 @@ public class KafkaTransport extends ThrottleableTransport {
     public static final String CK_TOPIC_FILTER = "topic_filter";
     public static final String CK_THREADS = "threads";
     public static final String CK_OFFSET_RESET = "offset_reset";
+
+    // See https://kafka.apache.org/090/documentation.html for available values for "auto.offset.reset".
+    private static final Map<String, String> OFFSET_RESET_VALUES = ImmutableMap.of(
+            "largest", "Automatically reset the offset to the largest offset",
+            "smallest", "Automatically reset the offset to the smallest offset"
+    );
+
+    private static final String DEFAULT_OFFSET_RESET = "largest";
 
     private static final Logger LOG = LoggerFactory.getLogger(KafkaTransport.class);
 
@@ -180,7 +191,7 @@ public class KafkaTransport extends ThrottleableTransport {
         props.put("fetch.min.bytes", String.valueOf(configuration.getInt(CK_FETCH_MIN_BYTES)));
         props.put("fetch.wait.max.ms", String.valueOf(configuration.getInt(CK_FETCH_WAIT_MAX)));
         props.put("zookeeper.connect", configuration.getString(CK_ZOOKEEPER));
-        props.put("auto.offset.reset", configuration.getString(CK_OFFSET_RESET));
+        props.put("auto.offset.reset", configuration.getString(CK_OFFSET_RESET, DEFAULT_OFFSET_RESET));
         // Default auto commit interval is 60 seconds. Reduce to 1 second to minimize message duplication
         // if something breaks.
         props.put("auto.commit.interval.ms", "1000");
@@ -363,10 +374,11 @@ public class KafkaTransport extends ThrottleableTransport {
                     "Number of processor threads to spawn. Use one thread per Kafka topic partition.",
                     ConfigurationField.Optional.NOT_OPTIONAL));
 
-            cr.addField(new TextField(
+            cr.addField(new DropdownField(
                     CK_OFFSET_RESET,
                     "Auto offset reset",
-                    "largest",
+                    DEFAULT_OFFSET_RESET,
+                    OFFSET_RESET_VALUES,
                     "What to do when there is no initial offset in ZooKeeper or if an offset is out of range",
                     ConfigurationField.Optional.OPTIONAL));
 
