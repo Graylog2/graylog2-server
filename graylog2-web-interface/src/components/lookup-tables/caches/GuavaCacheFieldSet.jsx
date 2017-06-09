@@ -1,8 +1,8 @@
-import React, { PropTypes } from 'react';
-import ObjectUtils from 'util/ObjectUtils';
+import React, {PropTypes} from "react";
+import ObjectUtils from "util/ObjectUtils";
 
-import { Input } from 'components/bootstrap';
-import { TimeUnitInput } from 'components/common';
+import {Input} from "components/bootstrap";
+import {TimeUnitInput} from "components/common";
 
 const GuavaCacheFieldSet = React.createClass({
   propTypes: {
@@ -63,14 +63,6 @@ const GuavaCacheFieldSet = React.createClass({
                      value={config.expire_after_write}
                      unit={config.expire_after_write_unit || 'SECONDS'}
                      enabled={config.expire_after_write > 0}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
-      <TimeUnitInput label="Refresh after write"
-                     help="If enabled, entries are refreshed from the data adapter after the specified time from when they were first used."
-                     update={this.updateRefresh}
-                     value={config.refresh_after_write}
-                     unit={config.refresh_after_write_unit || 'SECONDS'}
-                     enabled={config.refresh_after_write > 0}
                      labelClassName="col-sm-3"
                      wrapperClassName="col-sm-9" />
     </fieldset>);

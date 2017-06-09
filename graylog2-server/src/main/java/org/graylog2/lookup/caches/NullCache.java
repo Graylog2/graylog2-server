@@ -16,24 +16,27 @@
  */
 package org.graylog2.lookup.caches;
 
-import com.google.auto.value.AutoValue;
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
+import com.google.auto.value.AutoValue;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.Callable;
 
 /**
  * The cache that doesn't. Used in place when no cache is wanted, having a null implementation saves us ugly null checks.
  */
 public class NullCache extends LookupCache {
+    private static final Logger LOG = LoggerFactory.getLogger(NullCache.class);
 
     public static final String NAME = "none";
 
@@ -55,18 +58,18 @@ public class NullCache extends LookupCache {
     }
 
     @Override
-    public LookupResult get(Object key) {
-        return getLookupTable().dataAdapter().get(key);
+    public LookupResult get(Object key, Callable<LookupResult> loader) {
+        try {
+            return loader.call();
+        } catch (Exception e) {
+            LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
+            return LookupResult.empty();
+        }
     }
 
     @Override
     public LookupResult getIfPresent(Object key) {
         return LookupResult.empty();
-    }
-
-    @Override
-    public void set(Object key, Object retrievedValue) {
-        getLookupTable().dataAdapter().set(key, retrievedValue);
     }
 
     @Override

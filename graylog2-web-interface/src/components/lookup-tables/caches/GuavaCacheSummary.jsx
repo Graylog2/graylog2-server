@@ -1,5 +1,5 @@
-import React, { PropTypes } from 'react';
-import { TimeUnit } from 'components/common';
+import React, {PropTypes} from "react";
+import {TimeUnit} from "components/common";
 
 const GuavaCacheSummary = React.createClass({
   propTypes: {
@@ -15,8 +15,6 @@ const GuavaCacheSummary = React.createClass({
       <dd><TimeUnit value={config.expire_after_access} unit={config.expire_after_access_unit} /></dd>
       <dt>Expire after write</dt>
       <dd><TimeUnit value={config.expire_after_write} unit={config.expire_after_write_unit} /></dd>
-      <dt>Refresh after write</dt>
-      <dd><TimeUnit value={config.refresh_after_write} unit={config.refresh_after_write_unit} /></dd>
     </dl>);
   },
 });

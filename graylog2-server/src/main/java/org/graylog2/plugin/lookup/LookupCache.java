@@ -19,20 +19,17 @@ package org.graylog2.plugin.lookup;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.assistedinject.Assisted;
-import org.graylog2.lookup.LookupTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static com.google.common.base.Preconditions.checkState;
-
 public abstract class LookupCache extends AbstractIdleService {
-
+    private static final Logger LOG = LoggerFactory.getLogger(LookupCache.class);
     private String id;
-
-    private LookupTable lookupTable;
 
     private final String name;
     private final LookupCacheConfiguration config;
@@ -82,20 +79,9 @@ public abstract class LookupCache extends AbstractIdleService {
         this.id = id;
     }
 
-    public LookupTable getLookupTable() {
-        checkState(lookupTable != null, "lookup table cannot be null");
-        return lookupTable;
-    }
-
-    public void setLookupTable(LookupTable lookupTable) {
-        this.lookupTable = lookupTable;
-    }
-
-    public abstract LookupResult get(Object key);
+    public abstract LookupResult get(Object key, Callable<LookupResult> loader);
 
     public abstract LookupResult getIfPresent(Object key);
-
-    public abstract void set(Object key, Object retrievedValue);
 
     public abstract void purge();
 

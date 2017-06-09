@@ -16,39 +16,34 @@
  */
 package org.graylog2.lookup.caches;
 
-import com.google.auto.value.AutoValue;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.inject.Inject;
-import com.google.inject.assistedinject.Assisted;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
+import com.google.auto.value.AutoValue;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.inject.Inject;
+import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
-import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.validation.constraints.Min;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class GuavaLookupCache extends LookupCache {
     private static final Logger LOG = LoggerFactory.getLogger(GuavaLookupCache.class);
 
     public static final String NAME = "guava_cache";
-    private final LoadingCache<Object, LookupResult> cache;
+    private final Cache<Object, LookupResult> cache;
 
     @Inject
     public GuavaLookupCache(@Assisted("id") String id,
@@ -72,17 +67,8 @@ public class GuavaLookupCache extends LookupCache {
             //noinspection ConstantConditions
             builder.expireAfterWrite(config.expireAfterWrite(), config.expireAfterWriteUnit());
         }
-        if (config.refreshAfterWrite() > 0 && config.refreshAfterWriteUnit() != null) {
-            //noinspection ConstantConditions
-            builder.refreshAfterWrite(config.refreshAfterWrite(), config.refreshAfterWriteUnit());
-        }
 
-        cache = builder.build(new CacheLoader<Object, LookupResult>() {
-            @Override
-            public LookupResult load(@Nonnull Object key) throws Exception {
-                return getLookupTable().dataAdapter().get(key);
-            }
-        });
+        cache = builder.build();
     }
 
     @Override
@@ -94,11 +80,11 @@ public class GuavaLookupCache extends LookupCache {
     }
 
     @Override
-    public LookupResult get(Object key) {
+    public LookupResult get(Object key, Callable<LookupResult> loader) {
         try {
-            return cache.get(key);
+            return cache.get(key, loader);
         } catch (ExecutionException e) {
-            LOG.warn("Loading value from data adapter failed, returning empty result", e);
+            LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
             return LookupResult.empty();
         }
     }
@@ -110,13 +96,6 @@ public class GuavaLookupCache extends LookupCache {
             return LookupResult.empty();
         }
         return cacheEntry;
-    }
-
-    @Override
-    public void set(Object key, Object retrievedValue) {
-        final LookupDataAdapter dataAdapter = getLookupTable().dataAdapter();
-        dataAdapter.set(key, retrievedValue);
-        cache.put(key, dataAdapter.get(key));
     }
 
     @Override
@@ -150,7 +129,6 @@ public class GuavaLookupCache extends LookupCache {
                     .expireAfterAccess(60)
                     .expireAfterAccessUnit(TimeUnit.SECONDS)
                     .expireAfterWrite(0)
-                    .refreshAfterWrite(0)
                     .build();
         }
     }
@@ -182,14 +160,6 @@ public class GuavaLookupCache extends LookupCache {
         @JsonProperty("expire_after_write_unit")
         public abstract TimeUnit expireAfterWriteUnit();
 
-        @Min(0)
-        @JsonProperty("refresh_after_write")
-        public abstract long refreshAfterWrite();
-
-        @Nullable
-        @JsonProperty("refresh_after_write_unit")
-        public abstract TimeUnit refreshAfterWriteUnit();
-
         public static Builder builder() {
             return new AutoValue_GuavaLookupCache_Config.Builder();
         }
@@ -213,12 +183,6 @@ public class GuavaLookupCache extends LookupCache {
 
             @JsonProperty("expire_after_write_unit")
             public abstract Builder expireAfterWriteUnit(@Nullable TimeUnit expireAfterWriteUnit);
-
-            @JsonProperty("refresh_after_write")
-            public abstract Builder refreshAfterWrite(long refreshAfterWrite);
-
-            @JsonProperty("refresh_after_write_unit")
-            public abstract Builder refreshAfterWriteUnit(@Nullable TimeUnit refreshAfterWriteUnit);
 
             public abstract Config build();
         }

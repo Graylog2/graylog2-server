@@ -17,6 +17,7 @@
 package org.graylog2.lookup;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.Streams;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
@@ -24,10 +25,13 @@ import org.graylog2.plugin.lookup.LookupResult;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.stream.Collectors;
+
+import static com.google.common.collect.Streams.stream;
 
 /**
  * A LookupTable references a {@link LookupCache} and a {@link LookupDataAdapter}, which both have their own lifecycle.
- *
+ * <p>
  * Multiple lookup tables can use the same caches and adapters.
  */
 @AutoValue
@@ -53,12 +57,14 @@ public abstract class LookupTable {
 
     @Nullable
     public String error() {
-        return dataAdapter().getError().map(Throwable::getMessage).orElse(null);
+        return Streams.concat(stream(dataAdapter().getError()), stream(cache().getError()))
+                .map(Throwable::getMessage)
+                .collect(Collectors.joining("\n"));
     }
 
     @Nullable
     public LookupResult lookup(@Nonnull Object key) {
-        return cache().get(key);
+        return cache().get(key, () -> dataAdapter().get(key));
     }
 
     @AutoValue.Builder

@@ -47,6 +47,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -57,11 +58,10 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+import static com.google.common.util.concurrent.Uninterruptibles.awaitUninterruptibly;
 import static java.lang.Math.toIntExact;
 import static org.graylog2.shared.utilities.ExceptionUtils.getRootCauseMessage;
 import static org.graylog2.utilities.ObjectUtils.objectId;
-import static org.slieb.throwables.ConsumerWithThrowable.asConsumerWithThrowable;
-import static org.slieb.throwables.ConsumerWithThrowable.castConsumerWithThrowable;
 
 /**
  * This service maintains the in-memory adapters, caches and lookup table instances.
@@ -166,12 +166,20 @@ public class LookupTableService extends AbstractIdleService {
             final ImmutableSet.Builder<LookupDataAdapter> existingAdapters = ImmutableSet.builder();
 
             // create new adapter and lookup table instances
-            dbAdapters.findByIds(updated.ids()).stream()
+            final Set<LookupDataAdapter> newAdapters = dbAdapters.findByIds(updated.ids()).stream()
                     .map(dto -> createAdapter(dto, existingAdapters))
                     .filter(Objects::nonNull)
-                    .forEach(asConsumerWithThrowable((LookupDataAdapter adapter) -> adapter.startAsync().awaitRunning())
-                            .withLogging(LOG)
-                            .thatThrowsNothing());
+                    .collect(Collectors.toSet());
+
+            final CountDownLatch runningLatch = new CountDownLatch(newAdapters.size());
+
+            newAdapters.forEach(adapter -> {
+                adapter.addListener(new LatchUpdaterListener(runningLatch), scheduler);
+                adapter.startAsync();
+            });
+            // wait until everything is either running or failed before starting the
+            awaitUninterruptibly(runningLatch);
+
             tablesToUpdate.forEach(this::createLookupTable);
 
             // stop old adapters
@@ -205,12 +213,20 @@ public class LookupTableService extends AbstractIdleService {
             final ImmutableSet.Builder<LookupCache> existingCaches = ImmutableSet.builder();
 
             // create new cache and lookup table instances
-            dbCaches.findByIds(updated.ids()).stream()
+            final Set<LookupCache> newCaches = dbCaches.findByIds(updated.ids()).stream()
                     .map(dto -> createCache(dto, existingCaches))
                     .filter(Objects::nonNull)
-                    .forEach(castConsumerWithThrowable((LookupCache cache) -> cache.startAsync().awaitRunning())
-                            .withLogging(LOG)
-                            .thatThrowsNothing());
+                    .collect(Collectors.toSet());
+
+            final CountDownLatch runningLatch = new CountDownLatch(newCaches.size());
+
+            newCaches.forEach(cache -> {
+                cache.addListener(new LatchUpdaterListener(runningLatch), scheduler);
+                cache.startAsync();
+            });
+            // wait until everything is either running or failed before starting the
+            awaitUninterruptibly(runningLatch);
+
             tablesToUpdate.forEach(this::createLookupTable);
 
             // stop old caches
@@ -266,7 +282,7 @@ public class LookupTableService extends AbstractIdleService {
         final LookupDataAdapter adapter = factory.create(dto.id(), dto.name(), dto.config());
         adapter.addListener(new LoggingServiceListener(
                         "Data Adapter",
-                        String.format("%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
+                        String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
                         LOG),
                 scheduler);
         adapter.addListener(new Listener() {
@@ -311,7 +327,7 @@ public class LookupTableService extends AbstractIdleService {
         final LookupCache cache = factory.create(dto.id(), dto.name(), dto.config());
         cache.addListener(new LoggingServiceListener(
                         "Cache",
-                        String.format("%s/%s [@%s]", dto.name(), dto.id(), objectId(cache)),
+                        String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(cache)),
                         LOG),
                 scheduler);
         cache.addListener(new Listener() {
@@ -357,10 +373,12 @@ public class LookupTableService extends AbstractIdleService {
                 .cache(cache)
                 .dataAdapter(adapter)
                 .build();
-        LOG.info("Starting lookup table {}/{} [@{}] using cache {}, data adapter {}",
+        final LookupCache newCache = table.cache();
+        final LookupDataAdapter newAdapter = table.dataAdapter();
+        LOG.info("Starting lookup table {}/{} [@{}] using cache {}/{} [@{}], data adapter {}/{} [@{}]",
                 table.name(), table.id(), objectId(table),
-                table.cache().name(),
-                table.dataAdapter().name());
+                newCache.name(), newCache.id(), objectId(newCache),
+                newAdapter.name(), newAdapter.id(), objectId(newAdapter));
         final LookupTable previous = liveTables.put(dto.name(), table);
         if (previous != null) {
             LOG.info("Replaced previous lookup table {} [@{}]", previous.name(), objectId(previous));
