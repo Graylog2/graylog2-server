@@ -1,15 +1,13 @@
-import React, { PropTypes } from 'react';
-import Reflux from 'reflux';
-import { Button, Row, Col } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
-import Routes from 'routing/Routes';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import React, {PropTypes} from "react";
+import Reflux from "reflux";
+import {Button, Col, Row} from "react-bootstrap";
+import {LinkContainer} from "react-router-bootstrap";
+import Routes from "routing/Routes";
+import {DocumentTitle, PageHeader, Spinner} from "components/common";
 
-import {
-  DataAdaptersOverview, DataAdapter, DataAdapterForm, DataAdapterCreate
-} from 'components/lookup-tables';
+import {DataAdapter, DataAdapterCreate, DataAdapterForm, DataAdaptersOverview} from "components/lookup-tables";
 
-import CombinedProvider from 'injection/CombinedProvider';
+import CombinedProvider from "injection/CombinedProvider";
 
 const { LookupTableDataAdaptersStore, LookupTableDataAdaptersActions } = CombinedProvider.get(
   'LookupTableDataAdapters');
@@ -45,6 +43,8 @@ const LUTDataAdaptersPage = React.createClass({
 
   _startErrorStatesTimer() {
     this._stopErrorStatesTimer();
+    console.log("Starting errorstates retrieval");
+
     this.errorStatesTimer = setInterval(() => {
       let names = null;
       if (this.state.dataAdapters) {
@@ -58,6 +58,7 @@ const LUTDataAdaptersPage = React.createClass({
 
   _stopErrorStatesTimer() {
     if (this.errorStatesTimer) {
+      console.log("Stopping errorstates retrieval");
       clearInterval(this.errorStatesTimer);
       this.errorStatesTimer = undefined;
     }
@@ -67,13 +68,12 @@ const LUTDataAdaptersPage = React.createClass({
     this._stopErrorStatesTimer();
     if (props.params && props.params.adapterName) {
       LookupTableDataAdaptersActions.get(props.params.adapterName);
+    } else if (this._isCreating(props)) {
+      LookupTableDataAdaptersActions.getTypes();
     } else {
       const p = this.state.pagination;
       LookupTableDataAdaptersActions.searchPaginated(p.page, p.per_page, p.query);
       this._startErrorStatesTimer();
-    }
-    if (this._isCreating(props)) {
-      LookupTableDataAdaptersActions.getTypes();
     }
   },
 

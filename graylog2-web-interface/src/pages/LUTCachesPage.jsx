@@ -1,13 +1,13 @@
-import React, { PropTypes } from 'react';
-import Reflux from 'reflux';
-import { Button, Row, Col } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
-import Routes from 'routing/Routes';
-import { DocumentTitle, PageHeader, Spinner } from 'components/common';
+import React, {PropTypes} from "react";
+import Reflux from "reflux";
+import {Button, Col, Row} from "react-bootstrap";
+import {LinkContainer} from "react-router-bootstrap";
+import Routes from "routing/Routes";
+import {DocumentTitle, PageHeader, Spinner} from "components/common";
 
-import { CachesOverview, Cache, CacheForm, CacheCreate } from 'components/lookup-tables';
+import {Cache, CacheCreate, CacheForm, CachesOverview} from "components/lookup-tables";
 
-import CombinedProvider from 'injection/CombinedProvider';
+import CombinedProvider from "injection/CombinedProvider";
 
 const { LookupTableCachesStore, LookupTableCachesActions } = CombinedProvider.get(
   'LookupTableCaches');
@@ -35,12 +35,11 @@ const LUTCachesPage = React.createClass({
   _loadData(props) {
     if (props.params && props.params.cacheName) {
       LookupTableCachesActions.get(props.params.cacheName);
+    } else if (this._isCreating(props)) {
+      LookupTableCachesActions.getTypes();
     } else {
       const p = this.state.pagination;
       LookupTableCachesActions.searchPaginated(p.page, p.per_page, p.query);
-    }
-    if (this._isCreating(props)) {
-      LookupTableCachesActions.getTypes();
     }
   },
 

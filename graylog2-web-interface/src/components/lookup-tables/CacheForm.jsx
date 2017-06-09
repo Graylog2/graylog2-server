@@ -1,13 +1,13 @@
-import React, { PropTypes } from 'react';
-import _ from 'lodash';
-import { Button, Row, Col } from 'react-bootstrap';
-import { Input } from 'components/bootstrap';
-import ObjectUtils from 'util/ObjectUtils';
-import FormsUtils from 'util/FormsUtils';
+import React, {PropTypes} from "react";
+import _ from "lodash";
+import {Button, Col, Row} from "react-bootstrap";
+import {Input} from "components/bootstrap";
+import ObjectUtils from "util/ObjectUtils";
+import FormsUtils from "util/FormsUtils";
 
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import {PluginStore} from "graylog-web-plugin/plugin";
 
-import CombinedProvider from 'injection/CombinedProvider';
+import CombinedProvider from "injection/CombinedProvider";
 
 const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
 
@@ -41,7 +41,7 @@ const CacheForm = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    if (_.isEqual(this.props, nextProps)) {
+    if (_.isEqual(this.props.cache, nextProps.cache)) {
       // props haven't change, don't update our state from them
       return;
     }
