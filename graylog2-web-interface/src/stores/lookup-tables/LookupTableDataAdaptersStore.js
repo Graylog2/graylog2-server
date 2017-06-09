@@ -77,7 +77,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
 
     promise.then((response) => {
       this.trigger({ dataAdapter: response });
-    });
+    }, this._errorHandler('Creating lookup table data adapter failed', `Could not create lookup table data adapter "${dataAdapter.name}"`));
 
     LookupTableDataAdaptersActions.create.promise(promise);
     return promise;
@@ -89,7 +89,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
 
     promise.then((response) => {
       this.trigger({ dataAdapter: response });
-    });
+    }, this._errorHandler('Updating lookup table data adapter failed', `Could not update lookup table data adapter "${dataAdapter.name}"`));
 
     LookupTableDataAdaptersActions.update.promise(promise);
     return promise;
@@ -101,7 +101,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
 
     promise.then((response) => {
       this.trigger({ types: response });
-    });
+    }, this._errorHandler('Fetching available types failed', 'Could not fetch the available lookup table data adapter types'));
 
     LookupTableDataAdaptersActions.getTypes.promise(promise);
     return promise;
@@ -111,18 +111,20 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
     const url = this._url(`adapters/${idOrName}`);
     const promise = fetch('DELETE', url);
 
+    promise.catch(this._errorHandler('Deleting lookup table data adapter failed', `Could not delete lookup table data adapter "${idOrName}"`));
+
     LookupTableDataAdaptersActions.delete.promise(promise);
     return promise;
   },
 
-  lookup(tableName, key) {
-    const promise = fetch('GET', this._url(`adapters/${tableName}/query?key=${key}`));
+  lookup(adapterName, key) {
+    const promise = fetch('GET', this._url(`adapters/${adapterName}/query?key=${key}`));
 
     promise.then((response) => {
       this.trigger({
         lookupResult: response,
       });
-    });
+    }, this._errorHandler('Lookup failed', `Could not lookup value for key "${key}" in lookup table data adapter "${adapterName}"`));
 
     LookupTableDataAdaptersActions.lookup.promise(promise);
 
@@ -137,7 +139,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
       this.trigger({
         validationErrors: response.errors,
       });
-    });
+    }, this._errorHandler('Lookup table data adapter validation failed', `Could not validate lookup table data adapter "${adapter.name}"`));
     LookupTableDataAdaptersActions.validate.promise(promise);
     return promise;
   },
