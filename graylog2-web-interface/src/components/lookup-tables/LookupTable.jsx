@@ -16,18 +16,12 @@ const LookupTable = React.createClass({
     table: React.PropTypes.object.isRequired,
     cache: React.PropTypes.object.isRequired,
     dataAdapter: React.PropTypes.object.isRequired,
-    lookupResult: React.PropTypes.object,
-  },
-
-  getDefaultProps() {
-    return {
-      lookupResult: null,
-    };
   },
 
   getInitialState() {
     return {
       lookupKey: null,
+      lookupResult: null,
     };
   },
 
@@ -37,7 +31,9 @@ const LookupTable = React.createClass({
 
   _lookupKey(e) {
     e.preventDefault();
-    LookupTablesActions.lookup(this.props.table.name, this.state.lookupKey);
+    LookupTablesActions.lookup(this.props.table.name, this.state.lookupKey).then((result) => {
+      this.setState({ lookupResult: result });
+    });
   },
 
   render() {
@@ -75,10 +71,10 @@ const LookupTable = React.createClass({
               </Input>
             </fieldset>
           </form>
-          { this.props.lookupResult && (
+          { this.state.lookupResult && (
             <div>
               <h4>Lookup result</h4>
-              <pre>{JSON.stringify(this.props.lookupResult, null, 2)}</pre>
+              <pre>{JSON.stringify(this.state.lookupResult, null, 2)}</pre>
             </div>
           )}
         </Col>

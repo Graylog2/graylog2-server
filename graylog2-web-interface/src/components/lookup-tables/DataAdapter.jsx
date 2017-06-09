@@ -12,18 +12,12 @@ const DataAdapter = React.createClass({
 
   propTypes: {
     dataAdapter: React.PropTypes.object.isRequired,
-    lookupResult: React.PropTypes.object,
-  },
-
-  getDefaultProps() {
-    return {
-      lookupResult: null,
-    };
   },
 
   getInitialState() {
     return {
       lookupKey: null,
+      lookupResult: null,
     };
   },
 
@@ -33,7 +27,9 @@ const DataAdapter = React.createClass({
 
   _lookupKey(e) {
     e.preventDefault();
-    LookupTableDataAdaptersActions.lookup(this.props.dataAdapter.name, this.state.lookupKey);
+    LookupTableDataAdaptersActions.lookup(this.props.dataAdapter.name, this.state.lookupKey).then((result) => {
+      this.setState({ lookupResult: result });
+    });
   },
 
   render() {
@@ -84,10 +80,10 @@ const DataAdapter = React.createClass({
               </Input>
             </fieldset>
           </form>
-          { this.props.lookupResult && (
+          { this.state.lookupResult && (
             <div>
               <h4>Lookup result</h4>
-              <pre>{JSON.stringify(this.props.lookupResult, null, 2)}</pre>
+              <pre>{JSON.stringify(this.state.lookupResult, null, 2)}</pre>
             </div>
           )}
         </Col>

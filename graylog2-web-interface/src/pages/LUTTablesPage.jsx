@@ -105,8 +105,7 @@ const LUTTablesPage = React.createClass({
       } else {
         content = (<LookupTable dataAdapter={this.state.dataAdapter}
                                 cache={this.state.cache}
-                                table={this.state.table}
-                                lookupResult={this.state.lookupResult} />);
+                                table={this.state.table} />);
       }
     } else if (this._isCreating(this.props)) {
       content = (<LookupTableCreate history={this.props.history} saved={this._saved} />);
