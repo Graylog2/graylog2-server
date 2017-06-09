@@ -17,13 +17,13 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.graylog2.configuration.converters.URIListConverter;
 import org.graylog2.configuration.validators.ListOfURIsWithHostAndSchemeValidator;
 import org.graylog2.configuration.validators.NonEmptyListValidator;
 
 import java.net.URI;
-import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 
@@ -32,13 +32,13 @@ public class ElasticsearchClientConfiguration {
     private List<URI> elasticsearchHosts = Collections.singletonList(URI.create("http://127.0.0.1:9200"));
 
     @Parameter(value = "elasticsearch_connect_timeout")
-    private Duration elasticsearchConnectTimeout = Duration.ofSeconds(10);
+    private Duration elasticsearchConnectTimeout = Duration.seconds(10);
 
     @Parameter(value = "elasticsearch_socket_timeout", validators = { PositiveIntegerValidator.class })
-    private Duration elasticsearchSocketTimeout = Duration.ofSeconds(60);
+    private Duration elasticsearchSocketTimeout = Duration.seconds(60);
 
     @Parameter(value = "elasticsearch_idle_timeout")
-    private Duration elasticsearchIdleTimeout = Duration.ofSeconds(-1L);
+    private Duration elasticsearchIdleTimeout = Duration.seconds(-1L);
 
     @Parameter(value = "elasticsearch_max_total_connections", validators = { PositiveIntegerValidator.class })
     private int elasticsearchMaxTotalConnections = 20;
@@ -53,5 +53,5 @@ public class ElasticsearchClientConfiguration {
     private String discoveryFilter = null;
 
     @Parameter(value = "elasticsearch_discovery_frequency")
-    private Duration discoveryFrequency = Duration.ofSeconds(30L);
+    private Duration discoveryFrequency = Duration.seconds(30L);
 }
