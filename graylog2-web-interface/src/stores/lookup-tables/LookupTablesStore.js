@@ -92,6 +92,8 @@ const LookupTablesStore = Reflux.createStore({
     const url = this._url('tables');
     const promise = fetch('POST', url, table);
 
+    promise.catch(this._errorHandler('Creating lookup table failed', `Could not create lookup table "${table.name}"`));
+
     LookupTablesActions.create.promise(promise);
     return promise;
   },
@@ -100,6 +102,8 @@ const LookupTablesStore = Reflux.createStore({
     const url = this._url('tables');
     const promise = fetch('PUT', url, table);
 
+    promise.catch(this._errorHandler('Updating lookup table failed', `Could not update lookup table "${table.name}"`));
+
     LookupTablesActions.update.promise(promise);
     return promise;
   },
@@ -107,6 +111,8 @@ const LookupTablesStore = Reflux.createStore({
   delete(idOrName) {
     const url = this._url(`tables/${idOrName}`);
     const promise = fetch('DELETE', url);
+
+    promise.catch(this._errorHandler('Deleting lookup table failed', `Could not delete lookup table "${idOrName}"`));
 
     LookupTablesActions.delete.promise(promise);
     return promise;
@@ -147,7 +153,7 @@ const LookupTablesStore = Reflux.createStore({
       this.trigger({
         lookupResult: response,
       });
-    });
+    }, this._errorHandler('Lookup failed', `Could not lookup value for key "${key}" in lookup table "${tableName}"`));
 
     LookupTablesActions.lookup.promise(promise);
     return promise;

@@ -13,6 +13,15 @@ const DataAdapterCreate = React.createClass({
   propTypes: {
     saved: PropTypes.func.isRequired,
     types: PropTypes.object.isRequired,
+    validate: PropTypes.func,
+    validationErrors: PropTypes.object,
+  },
+
+  getDefaultProps() {
+    return {
+      validate: null,
+      validationErrors: {},
+    };
   },
 
   getInitialState() {
@@ -70,7 +79,12 @@ const DataAdapterCreate = React.createClass({
         <Row className="content">
           <Col lg={12}>
             <h3>Configure Adapter</h3>
-            <DataAdapterForm dataAdapter={this.state.dataAdapter} type={this.state.type} create saved={this.props.saved} />
+            <DataAdapterForm dataAdapter={this.state.dataAdapter}
+                             type={this.state.type}
+                             create
+                             validate={this.props.validate}
+                             validationErrors={this.props.validationErrors}
+                             saved={this.props.saved} />
           </Col>
         </Row>
       )}

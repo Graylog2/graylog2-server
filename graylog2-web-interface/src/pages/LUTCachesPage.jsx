@@ -1,11 +1,11 @@
 import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
-import { CachesOverview, Cache, CacheForm, CacheCreate } from 'components/lookup-tables';
+import { Cache, CacheCreate, CacheForm, CachesOverview } from 'components/lookup-tables';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -35,12 +35,11 @@ const LUTCachesPage = React.createClass({
   _loadData(props) {
     if (props.params && props.params.cacheName) {
       LookupTableCachesActions.get(props.params.cacheName);
+    } else if (this._isCreating(props)) {
+      LookupTableCachesActions.getTypes();
     } else {
       const p = this.state.pagination;
       LookupTableCachesActions.searchPaginated(p.page, p.per_page, p.query);
-    }
-    if (this._isCreating(props)) {
-      LookupTableCachesActions.getTypes();
     }
   },
 
@@ -52,6 +51,10 @@ const LUTCachesPage = React.createClass({
 
   _isCreating(props) {
     return props.route.action === 'create';
+  },
+
+  _validateCache(adapter) {
+    LookupTableCachesActions.validate(adapter);
   },
 
   render() {
@@ -70,7 +73,9 @@ const LUTCachesPage = React.createClass({
               <CacheForm cache={this.state.cache}
                          type={this.state.cache.config.type}
                          create={false}
-                         saved={this._saved} />
+                         saved={this._saved}
+                         validate={this._validateCache}
+                         validationErrors={this.state.validationErrors} />
             </Col>
           </Row>
         );
@@ -82,7 +87,11 @@ const LUTCachesPage = React.createClass({
         content = <Spinner text="Loading data cache types" />;
       } else {
         content =
-          <CacheCreate history={this.props.history} types={this.state.types} saved={this._saved} />;
+          (<CacheCreate history={this.props.history}
+                       types={this.state.types}
+                       saved={this._saved}
+                       validate={this._validateCache}
+                       validationErrors={this.state.validationErrors} />);
       }
     } else if (!this.state.caches) {
       content = <Spinner text="Loading caches" />;

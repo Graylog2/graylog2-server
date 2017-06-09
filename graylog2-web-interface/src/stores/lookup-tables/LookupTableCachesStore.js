@@ -25,6 +25,7 @@ const LookupTableCachesStore = Reflux.createStore({
     return {
       caches: undefined,
       pagination: this.pagination,
+      validationErrors: {},
     };
   },
 
@@ -76,7 +77,7 @@ const LookupTableCachesStore = Reflux.createStore({
 
     promise.then((response) => {
       this.trigger({ cache: response });
-    });
+    }, this._errorHandler('Creating lookup table cache failed', `Could not create lookup table cache "${cache.name}"`));
 
     LookupTableCachesActions.create.promise(promise);
     return promise;
@@ -88,7 +89,7 @@ const LookupTableCachesStore = Reflux.createStore({
 
     promise.then((response) => {
       this.trigger({ cache: response });
-    });
+    }, this._errorHandler('Updating lookup table cache failed', `Could not update lookup table cache "${cache.name}"`));
 
     LookupTableCachesActions.update.promise(promise);
     return promise;
@@ -100,7 +101,7 @@ const LookupTableCachesStore = Reflux.createStore({
 
     promise.then((response) => {
       this.trigger({ types: response });
-    });
+    }, this._errorHandler('Fetching available types failed', 'Could not fetch the available lookup table cache types'));
 
     LookupTableCachesActions.getTypes.promise(promise);
     return promise;
@@ -110,7 +111,22 @@ const LookupTableCachesStore = Reflux.createStore({
     const url = this._url(`caches/${idOrName}`);
     const promise = fetch('DELETE', url);
 
+    promise.catch(this._errorHandler('Deleting lookup table cache failed', `Could not delete lookup table cache "${idOrName}"`));
+
     LookupTableCachesActions.delete.promise(promise);
+    return promise;
+  },
+
+  validate(cache) {
+    const url = this._url('caches/validate');
+    const promise = fetch('POST', url, cache);
+
+    promise.then((response) => {
+      this.trigger({
+        validationErrors: response.errors,
+      });
+    }, this._errorHandler('Lookup table cache validation failed', `Could not validate lookup table cache "${cache.name}"`));
+    LookupTableCachesActions.validate.promise(promise);
     return promise;
   },
 

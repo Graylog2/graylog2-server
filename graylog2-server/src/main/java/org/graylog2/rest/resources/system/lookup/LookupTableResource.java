@@ -16,14 +16,17 @@
  */
 package org.graylog2.rest.resources.system.lookup;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Maps;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonUnwrapped;
-
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.mongodb.DuplicateKeyException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
@@ -42,6 +45,7 @@ import org.graylog2.lookup.events.LookupTablesUpdated;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupResult;
+import org.graylog2.plugin.rest.ValidationResult;
 import org.graylog2.rest.models.PaginatedList;
 import org.graylog2.rest.models.system.lookup.CacheApi;
 import org.graylog2.rest.models.system.lookup.DataAdapterApi;
@@ -53,15 +57,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
 import org.slf4j.Logger;
-
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -78,10 +73,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.singleton;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -212,12 +211,16 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_CREATE)
     @ApiOperation(value = "Create a new lookup table")
     public LookupTableApi createTable(@ApiParam LookupTableApi lookupTable) {
-        LookupTableDto saved = lookupTableService.save(lookupTable.toDto());
-        LookupTableApi table = LookupTableApi.fromDto(saved);
+        try {
+            LookupTableDto saved = lookupTableService.save(lookupTable.toDto());
+            LookupTableApi table = LookupTableApi.fromDto(saved);
 
-        clusterBus.post(LookupTablesUpdated.create(saved));
+            clusterBus.post(LookupTablesUpdated.create(saved));
 
-        return table;
+            return table;
+        } catch (DuplicateKeyException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @PUT
@@ -384,9 +387,13 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_CREATE)
     @ApiOperation(value = "Create a new data adapter")
     public DataAdapterApi createAdapter(@Valid @ApiParam DataAdapterApi newAdapter) {
-        DataAdapterDto dto = newAdapter.toDto();
-        DataAdapterDto saved = adapterService.save(dto);
-        return DataAdapterApi.fromDto(saved);
+        try {
+            DataAdapterDto dto = newAdapter.toDto();
+            DataAdapterDto saved = adapterService.save(dto);
+            return DataAdapterApi.fromDto(saved);
+        } catch (DuplicateKeyException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @DELETE
@@ -419,6 +426,30 @@ public class LookupTableResource extends RestResource {
             clusterBus.post(LookupTablesUpdated.create(adapterUsages));
         }
         return DataAdapterApi.fromDto(saved);
+    }
+
+    @POST
+    @Path("adapters/validate")
+    @NoAuditEvent("Validation only")
+    @ApiOperation(value = "Validate the data adapter config")
+    public ValidationResult validateAdapter(@Valid @ApiParam DataAdapterApi toValidate) {
+        final ValidationResult validation = new ValidationResult();
+
+        final Optional<DataAdapterDto> dtoOptional = adapterService.get(toValidate.name());
+        if (dtoOptional.isPresent()) {
+            // an adapter exist with the given name, check that the IDs are the same, this might be an update
+            final DataAdapterDto adapterDto = dtoOptional.get();
+            //noinspection ConstantConditions
+            if (!adapterDto.id().equals(toValidate.id())) {
+                // an adapter exists with a different id, so the name is already in use, fail validation
+                validation.addError("name", "The data adapter name is already in use.");
+            }
+        }
+
+        final Optional<Multimap<String, String>> configValidations = toValidate.config().validate();
+        configValidations.ifPresent(validation::addAll);
+
+        return validation;
     }
 
     @JsonAutoDetect
@@ -485,7 +516,11 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_CREATE)
     @ApiOperation(value = "Create a new cache")
     public CacheApi createCache(@ApiParam CacheApi newCache) {
-        return CacheApi.fromDto(cacheService.save(newCache.toDto()));
+        try {
+            return CacheApi.fromDto(cacheService.save(newCache.toDto()));
+        } catch (DuplicateKeyException e) {
+            throw new BadRequestException(e.getMessage());
+        }
     }
 
     @DELETE
@@ -518,6 +553,30 @@ public class LookupTableResource extends RestResource {
             clusterBus.post(LookupTablesUpdated.create(cacheUsages));
         }
         return CacheApi.fromDto(saved);
+    }
+
+    @POST
+    @Path("caches/validate")
+    @NoAuditEvent("Validation only")
+    @ApiOperation(value = "Validate the cache config")
+    public ValidationResult validateCache(@Valid @ApiParam CacheApi toValidate) {
+        final ValidationResult validation = new ValidationResult();
+
+        final Optional<CacheDto> dtoOptional = cacheService.get(toValidate.name());
+        if (dtoOptional.isPresent()) {
+            // a cache exist with the given name, check that the IDs are the same, this might be an update
+            final CacheDto cacheDto = dtoOptional.get();
+            //noinspection ConstantConditions
+            if (!cacheDto.id().equals(toValidate.id())) {
+                // a ache exists with a different id, so the name is already in use, fail validation
+                validation.addError("name", "The cache name is already in use.");
+            }
+        }
+
+        final Optional<Multimap<String, String>> configValidations = toValidate.config().validate();
+        configValidations.ifPresent(validation::addAll);
+
+        return validation;
     }
 
     @JsonAutoDetect

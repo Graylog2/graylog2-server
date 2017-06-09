@@ -9,6 +9,10 @@ const GuavaCacheFieldSet = React.createClass({
     config: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
     handleFormEvent: PropTypes.func.isRequired,
+// eslint-disable-next-line react/no-unused-prop-types
+    validationState: PropTypes.func.isRequired,
+// eslint-disable-next-line react/no-unused-prop-types
+    validationMessage: PropTypes.func.isRequired,
   },
 
   _update(value, unit, enabled, name) {

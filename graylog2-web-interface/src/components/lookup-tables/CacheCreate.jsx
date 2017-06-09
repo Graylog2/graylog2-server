@@ -13,6 +13,15 @@ const CacheCreate = React.createClass({
   propTypes: {
     saved: PropTypes.func.isRequired,
     types: PropTypes.object.isRequired,
+    validate: PropTypes.func,
+    validationErrors: PropTypes.object,
+  },
+
+  getDefaultProps() {
+    return {
+      validate: null,
+      validationErrors: {},
+    };
   },
 
   getInitialState() {
@@ -70,7 +79,12 @@ const CacheCreate = React.createClass({
         <Row className="content">
           <Col lg={12}>
             <h3>Configure Cache</h3>
-            <CacheForm cache={this.state.cache} type={this.state.type} create saved={this.props.saved} />
+            <CacheForm cache={this.state.cache}
+                       type={this.state.type}
+                       create
+                       saved={this.props.saved}
+                       validationErrors={this.props.validationErrors}
+                       validate={this.props.validate} />
           </Col>
         </Row>
       )}

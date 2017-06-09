@@ -8,6 +8,7 @@ const LookupTableCachesActions = Reflux.createActions({
   delete: { asyncResult: true },
   update: { asyncResult: true },
   getTypes: { asyncResult: true },
+  validate: { asyncResult: true },
 });
 
 export default LookupTableCachesActions;

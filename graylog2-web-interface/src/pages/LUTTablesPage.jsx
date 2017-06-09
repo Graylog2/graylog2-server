@@ -1,12 +1,12 @@
 import React, { PropTypes } from 'react';
 import Reflux from 'reflux';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 
 import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
-import { LookupTablesOverview, LookupTable, LookupTableCreate, LookupTableForm } from 'components/lookup-tables';
+import { LookupTable, LookupTableCreate, LookupTableForm, LookupTablesOverview } from 'components/lookup-tables';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -64,13 +64,12 @@ const LUTTablesPage = React.createClass({
     this._stopErrorStatesTimer();
     if (props.params && props.params.tableName) {
       LookupTablesActions.get(props.params.tableName);
+    } else if (this._isCreating(props)) {
+      // nothing to do, the intermediate data container will take care of loading the caches and adapters
     } else {
       const p = this.state.pagination;
       LookupTablesActions.searchPaginated(p.page, p.per_page, p.query);
       this._startErrorStatesTimer();
-    }
-    if (this._isCreating(props)) {
-      // nothing to do, the intermediate data container will take care of loading the caches and adapters
     }
   },
 

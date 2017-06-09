@@ -17,7 +17,9 @@
 package org.graylog2.lookup.adapters;
 
 import com.google.auto.value.AutoValue;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
 
@@ -44,8 +46,10 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -270,6 +274,20 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
         public static Builder builder() {
             return new AutoValue_CSVFileDataAdapter_Config.Builder();
+        }
+
+        @Override
+        public Optional<Multimap<String, String>> validate() {
+            final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
+
+            final Path path = Paths.get(path());
+            if (!Files.exists(path)) {
+                errors.put("path", "The file does not exist.");
+            } else if (!Files.isReadable(path)) {
+                errors.put("path", "The file cannot be read.");
+            }
+
+            return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
         }
 
         @AutoValue.Builder
