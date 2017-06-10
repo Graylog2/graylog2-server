@@ -78,8 +78,9 @@ public class LookupTableService extends AbstractIdleService {
 
     private final Map<String, LookupCache.Factory> cacheFactories;
     private final Map<String, LookupDataAdapter.Factory> adapterFactories;
-    private ScheduledExecutorService scheduler;
-    private EventBus eventBus;
+    private final ScheduledExecutorService scheduler;
+    private final EventBus eventBus;
+    private final LookupDataAdapterRefreshService adapterRefreshService;
 
     private final ConcurrentMap<String, LookupTable> liveTables = new ConcurrentHashMap<>();
 
@@ -104,10 +105,14 @@ public class LookupTableService extends AbstractIdleService {
         this.adapterFactories = adapterFactories;
         this.scheduler = scheduler;
         this.eventBus = eventBus;
+        this.adapterRefreshService = new LookupDataAdapterRefreshService(scheduler, liveTables);
     }
 
     @Override
     protected void startUp() throws Exception {
+        // Start refresh service and wait until it's running so the adapters can register themselves
+        adapterRefreshService.startAsync().awaitRunning();
+
         // first load the adapters and caches and start them one by one, then create the lookup tables
         final CountDownLatch adaptersLatch = createAndStartAdapters();
         final CountDownLatch cachesLatch = createAndStartCaches();
@@ -150,6 +155,9 @@ public class LookupTableService extends AbstractIdleService {
             }, scheduler);
             adapter.stopAsync();
         });
+
+        // Stop data adapter refresh service
+        adapterRefreshService.stopAsync();
     }
 
     @Subscribe
@@ -300,6 +308,8 @@ public class LookupTableService extends AbstractIdleService {
                 LOG.warn("Unable to start data adapter {}: {}", dto.name(), getRootCauseMessage(failure));
             }
         }, scheduler);
+        // Each adapter needs to be added to the refresh scheduler
+        adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
         return adapter;
     }
 
