@@ -79,13 +79,13 @@ public abstract class LookupCache extends AbstractIdleService {
         this.id = id;
     }
 
-    public abstract LookupResult get(Object key, Callable<LookupResult> loader);
+    public abstract LookupResult get(LookupCacheKey key, Callable<LookupResult> loader);
 
-    public abstract LookupResult getIfPresent(Object key);
+    public abstract LookupResult getIfPresent(LookupCacheKey key);
 
     public abstract void purge();
 
-    public abstract void purge(Object key);
+    public abstract void purge(LookupCacheKey purgeKey);
 
     public LookupCacheConfiguration getConfig() {
         return config;

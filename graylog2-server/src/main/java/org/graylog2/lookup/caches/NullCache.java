@@ -26,6 +26,7 @@ import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
+import org.graylog2.plugin.lookup.LookupCacheKey;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,7 +59,7 @@ public class NullCache extends LookupCache {
     }
 
     @Override
-    public LookupResult get(Object key, Callable<LookupResult> loader) {
+    public LookupResult get(LookupCacheKey key, Callable<LookupResult> loader) {
         try {
             return loader.call();
         } catch (Exception e) {
@@ -68,7 +69,7 @@ public class NullCache extends LookupCache {
     }
 
     @Override
-    public LookupResult getIfPresent(Object key) {
+    public LookupResult getIfPresent(LookupCacheKey key) {
         return LookupResult.empty();
     }
 
@@ -78,7 +79,7 @@ public class NullCache extends LookupCache {
     }
 
     @Override
-    public void purge(Object key) {
+    public void purge(LookupCacheKey purgeKey) {
         // nothing to do
     }
 

@@ -28,6 +28,7 @@ import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
 import org.graylog2.plugin.lookup.LookupCacheConfiguration;
+import org.graylog2.plugin.lookup.LookupCacheKey;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,12 +39,13 @@ import javax.validation.constraints.Min;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class GuavaLookupCache extends LookupCache {
     private static final Logger LOG = LoggerFactory.getLogger(GuavaLookupCache.class);
 
     public static final String NAME = "guava_cache";
-    private final Cache<Object, LookupResult> cache;
+    private final Cache<LookupCacheKey, LookupResult> cache;
 
     @Inject
     public GuavaLookupCache(@Assisted("id") String id,
@@ -80,7 +82,7 @@ public class GuavaLookupCache extends LookupCache {
     }
 
     @Override
-    public LookupResult get(Object key, Callable<LookupResult> loader) {
+    public LookupResult get(LookupCacheKey key, Callable<LookupResult> loader) {
         try {
             return cache.get(key, loader);
         } catch (ExecutionException e) {
@@ -90,7 +92,7 @@ public class GuavaLookupCache extends LookupCache {
     }
 
     @Override
-    public LookupResult getIfPresent(Object key) {
+    public LookupResult getIfPresent(LookupCacheKey key) {
         final LookupResult cacheEntry = cache.getIfPresent(key);
         if (cacheEntry == null) {
             return LookupResult.empty();
@@ -104,8 +106,17 @@ public class GuavaLookupCache extends LookupCache {
     }
 
     @Override
-    public void purge(Object key) {
-        cache.invalidate(key);
+    public void purge(LookupCacheKey purgeKey) {
+        if (purgeKey.isPrefixOnly()) {
+            // If the key to purge only contains a prefix, invalidate all keys with that prefix
+            cache.invalidateAll(
+                    cache.asMap().keySet().stream()
+                            .filter(lookupCacheKey -> purgeKey.prefix().equals(lookupCacheKey.prefix()))
+                            .collect(Collectors.toSet())
+            );
+        } else {
+            cache.invalidate(purgeKey);
+        }
     }
 
     public interface Factory extends LookupCache.Factory {

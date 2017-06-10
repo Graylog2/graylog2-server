@@ -20,6 +20,7 @@ import com.google.auto.value.AutoValue;
 import com.google.common.collect.Streams;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.lookup.LookupCache;
+import org.graylog2.plugin.lookup.LookupCacheKey;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupResult;
 
@@ -64,7 +65,7 @@ public abstract class LookupTable {
 
     @Nullable
     public LookupResult lookup(@Nonnull Object key) {
-        return cache().get(key, () -> dataAdapter().get(key));
+        return cache().get(LookupCacheKey.create(dataAdapter().id(), key), () -> dataAdapter().get(key));
     }
 
     @AutoValue.Builder
