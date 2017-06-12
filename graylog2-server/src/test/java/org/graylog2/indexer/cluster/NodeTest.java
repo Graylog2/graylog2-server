@@ -102,7 +102,7 @@ public class NodeTest {
             .isPresent();
 
         assertThat(elasticsearchVersion.get())
-            .isEqualTo("5.4.0");
+            .isEqualTo(Version.forIntegers(5, 4, 0));
     }
 
     private static JsonObject buildVersionJsonObject(String foobar) {
