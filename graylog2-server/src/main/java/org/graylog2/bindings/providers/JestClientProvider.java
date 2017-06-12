@@ -57,6 +57,7 @@ public class JestClientProvider implements Provider<JestClient> {
                               @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled,
                               @Named("elasticsearch_discovery_filter") @Nullable String discoveryFilter,
                               @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
+                              @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
                               Gson gson) {
         this.factory = new JestClientFactory();
         this.credentialsProvider = new BasicCredentialsProvider();
@@ -97,6 +98,7 @@ public class JestClientProvider implements Provider<JestClient> {
                 .discoveryFilter(discoveryFilter)
                 .discoveryFrequency(discoveryFrequency.toSeconds(), TimeUnit.SECONDS)
                 .preemptiveAuthTargetHosts(preemptiveAuthHosts)
+                .requestCompressionEnabled(compressionEnabled)
                 .gson(gson);
 
         factory.setHttpClientConfig(httpClientConfigBuilder.build());

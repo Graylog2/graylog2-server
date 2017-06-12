@@ -54,4 +54,7 @@ public class ElasticsearchClientConfiguration {
 
     @Parameter(value = "elasticsearch_discovery_frequency")
     private Duration discoveryFrequency = Duration.seconds(30L);
+
+    @Parameter(value = "elasticsearch_compression_enabled")
+    private boolean compressionEnabled = false;
 }
