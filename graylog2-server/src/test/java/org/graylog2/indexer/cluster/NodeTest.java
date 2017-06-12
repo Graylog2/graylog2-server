@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.bindings.providers;
+package org.graylog2.indexer.cluster;
 
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
@@ -23,6 +23,7 @@ import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Ping;
 import org.graylog2.indexer.ElasticsearchException;
+import org.graylog2.indexer.cluster.Node;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +32,7 @@ import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -38,25 +40,25 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ElasticsearchVersionProviderTest {
+public class NodeTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
     private JestClient jestClient;
 
-    private ElasticsearchVersionProvider elasticsearchVersionProvider;
+    private Node node;
 
     @Before
     public void setUp() throws Exception {
-        elasticsearchVersionProvider = new ElasticsearchVersionProvider(jestClient);
+        node = new Node(jestClient);
     }
 
     @Test
     public void retrievingVersionFailsIfElasticsearchIsUnavailable() throws Exception {
         when(jestClient.execute(any(Ping.class))).thenThrow(IOException.class);
 
-        assertThatThrownBy(() -> elasticsearchVersionProvider.get())
+        assertThatThrownBy(() -> node.getVersion())
             .isInstanceOf(ElasticsearchException.class)
             .hasCauseInstanceOf(IOException.class);
     }
@@ -68,7 +70,7 @@ public class ElasticsearchVersionProviderTest {
         when(failedResult.getJsonObject()).thenReturn(new JsonObject());
         when(jestClient.execute(any(Ping.class))).thenReturn(failedResult);
 
-        assertThatThrownBy(() -> elasticsearchVersionProvider.get())
+        assertThatThrownBy(() -> node.getVersion())
             .isInstanceOf(ElasticsearchException.class)
             .hasMessageStartingWith("Unable to retrieve Elasticsearch version")
             .hasNoCause();
@@ -81,7 +83,7 @@ public class ElasticsearchVersionProviderTest {
         when(jestResult.getJsonObject()).thenReturn(buildVersionJsonObject("Foobar"));
         when(jestClient.execute(any(Ping.class))).thenReturn(jestResult);
 
-        assertThatThrownBy(() -> elasticsearchVersionProvider.get())
+        assertThatThrownBy(() -> node.getVersion())
             .isInstanceOf(ElasticsearchException.class)
             .hasMessageStartingWith("Unable to parse Elasticsearch version: Foobar")
             .hasCauseInstanceOf(ParseException.class);
@@ -94,9 +96,13 @@ public class ElasticsearchVersionProviderTest {
         when(jestResult.getJsonObject()).thenReturn(buildVersionJsonObject("5.4.0"));
         when(jestClient.execute(any(Ping.class))).thenReturn(jestResult);
 
-        final Version elasticsearchVersion = elasticsearchVersionProvider.get();
+        final Optional<Version> elasticsearchVersion = node.getVersion();
 
-        assertThat(elasticsearchVersion.toString()).isEqualTo("5.4.0");
+        assertThat(elasticsearchVersion)
+            .isPresent();
+
+        assertThat(elasticsearchVersion.get())
+            .isEqualTo("5.4.0");
     }
 
     private static JsonObject buildVersionJsonObject(String foobar) {
