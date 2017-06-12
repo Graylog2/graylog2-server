@@ -23,6 +23,7 @@ import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.base.Stopwatch;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableMap;
 import org.elasticsearch.ElasticsearchTimeoutException;
@@ -52,6 +53,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -113,15 +115,24 @@ public class Messages {
             return true;
         }
 
+        final UUID requestUuid = UUID.randomUUID();
+
+        final Stopwatch createRequest = Stopwatch.createStarted();
         final BulkRequestBuilder requestBuilder = c.prepareBulk().setConsistencyLevel(WriteConsistencyLevel.ONE);
         for (Map.Entry<IndexSet, Message> entry : messageList) {
             requestBuilder.add(buildIndexRequest(entry.getKey().getWriteIndexAlias(), entry.getValue().toElasticSearchObject(invalidTimestampMeter), entry.getValue().getId()));
         }
+        LOG.debug("{}: creating request took {} ms.", requestUuid.toString(), createRequest.stop().elapsed(TimeUnit.MILLISECONDS));
 
+        final Stopwatch runBulkRequestTimer = Stopwatch.createStarted();
         final BulkResponse response = runBulkRequest(requestBuilder.request());
+        LOG.debug("{}: Elasticsearch took {} ms, failures: {}",
+                requestUuid.toString(), response.getTookInMillis(), response.hasFailures());
+        final long runBulkRequestTook = runBulkRequestTimer.stop().elapsed(TimeUnit.MILLISECONDS);
+        LOG.debug("{}: runBulkRequest took {} ms.", requestUuid.toString(), runBulkRequestTook);
+        final long totalOverhead = runBulkRequestTook - response.getTookInMillis();
+        LOG.debug("{}: total overhead: {} ms.", requestUuid.toString(), totalOverhead);
 
-        LOG.debug("Index: Bulk indexed {} messages, took {} ms, failures: {}",
-                response.getItems().length, response.getTookInMillis(), response.hasFailures());
         if (response.hasFailures()) {
             propagateFailure(response.getItems(), messageList, response.buildFailureMessage());
         }
