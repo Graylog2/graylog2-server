@@ -16,6 +16,8 @@
  */
 package org.graylog2.plugin.lookup;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
@@ -40,11 +42,15 @@ import javax.annotation.Nullable;
  */
 @AutoValue
 public abstract class LookupCacheKey {
+    @JsonProperty("prefix")
     public abstract String prefix();
+
+    @JsonProperty("key")
     @Nullable
     public abstract Object key();
 
-    public static LookupCacheKey create(String prefix, @Nullable Object key) {
+    @JsonCreator
+    public static LookupCacheKey create(@JsonProperty("prefix") String prefix, @JsonProperty("key") @Nullable Object key) {
         return new AutoValue_LookupCacheKey(prefix, key);
     }
 
