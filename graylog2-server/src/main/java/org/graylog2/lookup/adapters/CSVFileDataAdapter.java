@@ -16,22 +16,20 @@
  */
 package org.graylog2.lookup.adapters;
 
+import au.com.bytecode.opencsv.CSVReader;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Multimap;
 import com.google.common.primitives.Ints;
 import com.google.inject.assistedinject.Assisted;
-
-import au.com.bytecode.opencsv.CSVReader;
-
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
@@ -41,6 +39,9 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -50,13 +51,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
-
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -71,11 +66,10 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     private FileInfo fileInfo;
 
     @Inject
-    public CSVFileDataAdapter(@Named("daemonScheduler") ScheduledExecutorService scheduler,
-                              @Assisted("id") String id,
+    public CSVFileDataAdapter(@Assisted("id") String id,
                               @Assisted("name") String name,
                               @Assisted LookupDataAdapterConfiguration config) {
-        super(id, name, config, scheduler);
+        super(id, name, config);
         this.config = (Config) config;
     }
 
@@ -100,12 +94,12 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     }
 
     @Override
-    protected Duration refreshInterval() {
+    public Duration refreshInterval() {
         return Duration.standardSeconds(Ints.saturatedCast(config.checkInterval()));
     }
 
     @Override
-    protected void doRefresh() throws Exception {
+    protected void doRefresh(LookupCachePurge cachePurge) throws Exception {
         try {
             clearError();
             final FileInfo.Change fileChanged = fileInfo.checkForChange();
@@ -116,7 +110,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
             LOG.debug("CSV file {} has changed, updating data", config.path());
             lookupRef.set(parseCSVFile());
-            getLookupTable().cache().purge();
+            cachePurge.purgeAll();
             fileInfo = fileChanged.fileInfo();
         } catch (IOException e) {
             LOG.error("Couldn't check CSV file {} for updates", config.path(), e);

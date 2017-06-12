@@ -17,22 +17,57 @@
 package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.graylog2.lookup.LookupTable;
+import com.google.common.util.concurrent.AbstractIdleService;
+import com.google.inject.assistedinject.Assisted;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static com.google.common.base.Preconditions.checkState;
-
-public abstract class LookupCache {
-
+public abstract class LookupCache extends AbstractIdleService {
+    private static final Logger LOG = LoggerFactory.getLogger(LookupCache.class);
     private String id;
 
-    private LookupTable lookupTable;
-
+    private final String name;
     private final LookupCacheConfiguration config;
 
-    protected LookupCache(LookupCacheConfiguration config) {
+    private AtomicReference<Throwable> error = new AtomicReference<>();
+
+    protected LookupCache(String id,
+                          String name,
+                          LookupCacheConfiguration config) {
+        this.id = id;
+        this.name = name;
         this.config = config;
+    }
+
+    @Override
+    protected void startUp() throws Exception {
+        doStart();
+    }
+
+    protected abstract void doStart() throws Exception;
+
+    @Override
+    protected void shutDown() throws Exception {
+        doStop();
+    }
+
+    protected abstract void doStop() throws Exception;
+
+    protected void clearError() {
+        error.set(null);
+    }
+
+    public Optional<Throwable> getError() {
+        return Optional.ofNullable(error.get());
+    }
+
+    protected void setError(Throwable throwable) {
+        error.set(throwable);
     }
 
     @Nullable
@@ -44,31 +79,24 @@ public abstract class LookupCache {
         this.id = id;
     }
 
-    public LookupTable getLookupTable() {
-        checkState(lookupTable != null, "lookup table cannot be null");
-        return lookupTable;
-    }
+    public abstract LookupResult get(LookupCacheKey key, Callable<LookupResult> loader);
 
-    public void setLookupTable(LookupTable lookupTable) {
-        this.lookupTable = lookupTable;
-    }
-
-    public abstract LookupResult get(Object key);
-
-    public abstract LookupResult getIfPresent(Object key);
-
-    public abstract void set(Object key, Object retrievedValue);
+    public abstract LookupResult getIfPresent(LookupCacheKey key);
 
     public abstract void purge();
 
-    public abstract void purge(Object key);
+    public abstract void purge(LookupCacheKey purgeKey);
 
     public LookupCacheConfiguration getConfig() {
         return config;
     }
 
+    public String name() {
+        return name;
+    }
+
     public interface Factory<T extends LookupCache> {
-        T create(LookupCacheConfiguration configuration);
+        T create(@Assisted("id") String id, @Assisted("name") String name, LookupCacheConfiguration configuration);
 
         Descriptor getDescriptor();
     }
