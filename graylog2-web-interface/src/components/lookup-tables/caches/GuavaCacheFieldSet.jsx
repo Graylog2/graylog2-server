@@ -1,8 +1,8 @@
-import React, {PropTypes} from "react";
-import ObjectUtils from "util/ObjectUtils";
+import React, { PropTypes } from 'react';
+import ObjectUtils from 'util/ObjectUtils';
 
-import {Input} from "components/bootstrap";
-import {TimeUnitInput} from "components/common";
+import { Input } from 'components/bootstrap';
+import { TimeUnitInput } from 'components/common';
 
 const GuavaCacheFieldSet = React.createClass({
   propTypes: {

@@ -1,5 +1,5 @@
-import React, {PropTypes} from "react";
-import {TimeUnit} from "components/common";
+import React, { PropTypes } from 'react';
+import { TimeUnit } from 'components/common';
 
 const GuavaCacheSummary = React.createClass({
   propTypes: {
