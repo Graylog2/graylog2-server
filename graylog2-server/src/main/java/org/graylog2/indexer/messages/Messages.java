@@ -23,6 +23,7 @@ import com.github.rholder.retry.RetryException;
 import com.github.rholder.retry.Retryer;
 import com.github.rholder.retry.RetryerBuilder;
 import com.github.rholder.retry.WaitStrategies;
+import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableMap;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -50,6 +51,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Timer;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -114,7 +117,9 @@ public class Messages {
             return true;
         }
 
+        final Stopwatch createRequest = Stopwatch.createStarted();
         final Bulk.Builder bulk = new Bulk.Builder();
+            //.setParameter("filter_path", "took,errors");
         for (Map.Entry<IndexSet, Message> entry : messageList) {
             final String id = entry.getValue().getId();
             bulk.addAction(new Index.Builder(entry.getValue().toElasticSearchObject(invalidTimestampMeter))
@@ -123,16 +128,44 @@ public class Messages {
                 .id(id)
                 .build());
         }
+        final Bulk request = bulk.build();
 
-        final BulkResult result = runBulkRequest(bulk.build(), messageList.size());
+        final UUID requestUuid = UUID.randomUUID();
 
-        LOG.debug("Index: Bulk indexed {} messages, took {} ms, failures: {}",
-                result.getItems().size(), result, result.getFailedItems().size());
+        LOG.debug("{}: creating request took {} ms.", requestUuid.toString(), createRequest.stop().elapsed(TimeUnit.MILLISECONDS));
+
+        final Stopwatch runBulk = Stopwatch.createStarted();
+        final BulkResult result = runBulkRequest(request, messageList.size());
+        runBulk.stop();
+
+        final Integer tookMs = extractRuntimeFromResult(result);
+        LOG.debug("{}: Elasticsearch took {} ms, failures: {}",
+            requestUuid.toString(),
+            tookMs,
+            result.getFailedItems().size());
+
         if (!result.getFailedItems().isEmpty()) {
             propagateFailure(result.getFailedItems(), messageList, result.getErrorMessage());
         }
 
+        LOG.debug("{}: runBulkRequest took {} ms.", requestUuid.toString(), runBulk.elapsed(TimeUnit.MILLISECONDS));
+
+        LOG.debug("{}: total overhead: {} ms.", requestUuid.toString(), runBulk.elapsed(TimeUnit.MILLISECONDS) - tookMs);
+
         return result.getFailedItems().isEmpty();
+    }
+
+    private Integer extractRuntimeFromResult(JestResult result) {
+        final String stringValue = String.valueOf(result.getValue("took"));
+        if (stringValue == null) {
+            return null;
+        }
+        try {
+            final Double doubleTook = Double.parseDouble(stringValue);
+            return doubleTook.intValue();
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private BulkResult runBulkRequest(final Bulk request, int count) {
