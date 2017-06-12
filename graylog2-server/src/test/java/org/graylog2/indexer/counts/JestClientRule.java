@@ -42,6 +42,7 @@ public class JestClientRule extends ExternalResource {
             false,
             null,
             Duration.seconds(30),
+            false,
             new Gson()
         );
     }
