@@ -26,9 +26,9 @@ import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
-import org.graylog2.lookup.MongoLutCacheService;
-import org.graylog2.lookup.MongoLutDataAdapterService;
-import org.graylog2.lookup.MongoLutService;
+import org.graylog2.lookup.db.DBCacheService;
+import org.graylog2.lookup.db.DBDataAdapterService;
+import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.shared.inputs.InputLauncher;
 import org.graylog2.shared.inputs.InputRegistry;
@@ -57,9 +57,9 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
     private final GrokPatternService grokPatternService;
-    private final MongoLutService mongoLutService;
-    private final MongoLutCacheService mongoLutCacheService;
-    private final MongoLutDataAdapterService mongoLutDataAdapterService;
+    private final DBLookupTableService dbLookupTableService;
+    private final DBCacheService dbCacheService;
+    private final DBDataAdapterService dbDataAdapterService;
     private final TimeRangeFactory timeRangeFactory;
     private final ClusterEventBus clusterBus;
     private final ObjectMapper objectMapper;
@@ -79,9 +79,9 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
                                   final MessageInputFactory messageInputFactory,
                                   final InputLauncher inputLauncher,
                                   final GrokPatternService grokPatternService,
-                                  final MongoLutService mongoLutService,
-                                  final MongoLutCacheService mongoLutCacheService,
-                                  final MongoLutDataAdapterService mongoLutDataAdapterService,
+                                  final DBLookupTableService dbLookupTableService,
+                                  final DBCacheService dbCacheService,
+                                  final DBDataAdapterService dbDataAdapterService,
                                   final TimeRangeFactory timeRangeFactory,
                                   final ClusterEventBus clusterBus,
                                   final ObjectMapper objectMapper) {
@@ -99,9 +99,9 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
         this.grokPatternService = grokPatternService;
-        this.mongoLutService = mongoLutService;
-        this.mongoLutCacheService = mongoLutCacheService;
-        this.mongoLutDataAdapterService = mongoLutDataAdapterService;
+        this.dbLookupTableService = dbLookupTableService;
+        this.dbCacheService = dbCacheService;
+        this.dbDataAdapterService = dbDataAdapterService;
         this.timeRangeFactory = timeRangeFactory;
         this.clusterBus = clusterBus;
         this.objectMapper = objectMapper;
@@ -113,7 +113,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
                 streamService, streamRuleService, indexSetRegistry, outputService, dashboardService,
                 dashboardWidgetCreator, serverStatus, messageInputFactory,
                 inputLauncher, grokPatternService,
-                mongoLutService, mongoLutCacheService, mongoLutDataAdapterService,
+                dbLookupTableService, dbCacheService, dbDataAdapterService,
                 timeRangeFactory, clusterBus, objectMapper);
     }
 }

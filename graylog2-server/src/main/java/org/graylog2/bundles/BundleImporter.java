@@ -35,9 +35,9 @@ import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
-import org.graylog2.lookup.MongoLutCacheService;
-import org.graylog2.lookup.MongoLutDataAdapterService;
-import org.graylog2.lookup.MongoLutService;
+import org.graylog2.lookup.db.DBCacheService;
+import org.graylog2.lookup.db.DBDataAdapterService;
+import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -101,9 +101,9 @@ public class BundleImporter {
     private final MessageInputFactory messageInputFactory;
     private final InputLauncher inputLauncher;
     private final GrokPatternService grokPatternService;
-    private final MongoLutService mongoLutService;
-    private final MongoLutCacheService mongoLutCacheService;
-    private final MongoLutDataAdapterService mongoLutDataAdapterService;
+    private final DBLookupTableService dbLookupTableService;
+    private final DBCacheService dbCacheService;
+    private final DBDataAdapterService dbDataAdapterService;
     private final TimeRangeFactory timeRangeFactory;
     private final ClusterEventBus clusterBus;
     private final ObjectMapper objectMapper;
@@ -134,9 +134,9 @@ public class BundleImporter {
                           final MessageInputFactory messageInputFactory,
                           final InputLauncher inputLauncher,
                           final GrokPatternService grokPatternService,
-                          final MongoLutService mongoLutService,
-                          final MongoLutCacheService mongoLutCacheService,
-                          final MongoLutDataAdapterService mongoLutDataAdapterService,
+                          final DBLookupTableService dbLookupTableService,
+                          final DBCacheService dbCacheService,
+                          final DBDataAdapterService dbDataAdapterService,
                           final TimeRangeFactory timeRangeFactory,
                           final ClusterEventBus clusterBus,
                           final ObjectMapper objectMapper) {
@@ -154,9 +154,9 @@ public class BundleImporter {
         this.messageInputFactory = messageInputFactory;
         this.inputLauncher = inputLauncher;
         this.grokPatternService = grokPatternService;
-        this.mongoLutService = mongoLutService;
-        this.mongoLutCacheService = mongoLutCacheService;
-        this.mongoLutDataAdapterService = mongoLutDataAdapterService;
+        this.dbLookupTableService = dbLookupTableService;
+        this.dbCacheService = dbCacheService;
+        this.dbDataAdapterService = dbDataAdapterService;
         this.timeRangeFactory = timeRangeFactory;
         this.clusterBus = clusterBus;
         this.objectMapper = objectMapper;
@@ -298,7 +298,7 @@ public class BundleImporter {
     private void deleteCreatedLookupTables() {
         for (String id : createdLookupTables.keySet()) {
             LOG.debug("Deleting lookup table {} from database", id);
-            mongoLutService.delete(id);
+            dbLookupTableService.delete(id);
         }
 
         clusterBus.post(LookupTablesDeleted.create(createdLookupTables.values()));
@@ -307,14 +307,14 @@ public class BundleImporter {
     private void deleteCreatedLookupCaches() {
         for (String id : createdLookupCaches.keySet()) {
             LOG.debug("Deleting lookup cache {} from database", id);
-            mongoLutCacheService.delete(id);
+            dbCacheService.delete(id);
         }
     }
 
     private void deleteCreatedLookupDataAdapters() {
         for (String id : createdLookupDataAdapters.keySet()) {
             LOG.debug("Deleting lookup data adapter {} from database", id);
-            mongoLutDataAdapterService.delete(id);
+            dbDataAdapterService.delete(id);
         }
     }
 
@@ -672,15 +672,15 @@ public class BundleImporter {
 
     private void createLookupTables(String bundleId, Set<LookupTableBundle> lookupTables) {
         for (LookupTableBundle bundle : lookupTables) {
-            final Optional<CacheDto> cacheDto = mongoLutCacheService.get(bundle.getCacheName());
-            final Optional<DataAdapterDto> adapterDto = mongoLutDataAdapterService.get(bundle.getDataAdapterName());
+            final Optional<CacheDto> cacheDto = dbCacheService.get(bundle.getCacheName());
+            final Optional<DataAdapterDto> adapterDto = dbDataAdapterService.get(bundle.getDataAdapterName());
 
             if (!cacheDto.isPresent() || !adapterDto.isPresent()) {
                 LOG.warn("Skipping content pack import of lookup table <{}> ({}) due to missing cache or data adapter", bundle.getName(), bundle.getTitle());
                 continue;
             }
 
-            final LookupTableDto dto = mongoLutService.save(LookupTableDto.builder()
+            final LookupTableDto dto = dbLookupTableService.save(LookupTableDto.builder()
                     .title(bundle.getTitle())
                     .description(bundle.getDescription())
                     .name(bundle.getName())
@@ -696,7 +696,7 @@ public class BundleImporter {
 
     private void createLookupCaches(String bundleId, Set<LookupCacheBundle> lookupCaches) {
         for (LookupCacheBundle bundle : lookupCaches) {
-            final CacheDto dto = mongoLutCacheService.save(CacheDto.builder()
+            final CacheDto dto = dbCacheService.save(CacheDto.builder()
                     .title(bundle.getTitle())
                     .description(bundle.getDescription())
                     .name(bundle.getName())
@@ -709,7 +709,7 @@ public class BundleImporter {
 
     private void createLookupDataAdapters(String bundleId, Set<LookupDataAdapterBundle> lookupDataAdapters) {
         for (LookupDataAdapterBundle bundle : lookupDataAdapters) {
-            final DataAdapterDto dto = mongoLutDataAdapterService.save(DataAdapterDto.builder()
+            final DataAdapterDto dto = dbDataAdapterService.save(DataAdapterDto.builder()
                     .title(bundle.getTitle())
                     .description(bundle.getDescription())
                     .name(bundle.getName())

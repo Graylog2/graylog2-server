@@ -22,9 +22,9 @@ import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.inputs.InputService;
-import org.graylog2.lookup.MongoLutCacheService;
-import org.graylog2.lookup.MongoLutDataAdapterService;
-import org.graylog2.lookup.MongoLutService;
+import org.graylog2.lookup.db.DBCacheService;
+import org.graylog2.lookup.db.DBDataAdapterService;
+import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamService;
 
@@ -38,9 +38,9 @@ public class BundleExporterProvider implements Provider<BundleExporter> {
     private final OutputService outputService;
     private final DashboardService dashboardService;
     private final DashboardWidgetCreator dashboardWidgetCreator;
-    private final MongoLutService mongoLutService;
-    private final MongoLutCacheService mongoLutCacheService;
-    private final MongoLutDataAdapterService mongoLutDataAdapterService;
+    private final DBLookupTableService dbLookupTableService;
+    private final DBCacheService dbCacheService;
+    private final DBDataAdapterService dbDataAdapterService;
     private final GrokPatternService grokPatternService;
     private final ObjectMapper objectMapper;
 
@@ -50,9 +50,9 @@ public class BundleExporterProvider implements Provider<BundleExporter> {
                                   final OutputService outputService,
                                   final DashboardService dashboardService,
                                   final DashboardWidgetCreator dashboardWidgetCreator,
-                                  final MongoLutService mongoLutService,
-                                  final MongoLutCacheService mongoLutCacheService,
-                                  final MongoLutDataAdapterService mongoLutDataAdapterService,
+                                  final DBLookupTableService dbLookupTableService,
+                                  final DBCacheService dbCacheService,
+                                  final DBDataAdapterService dbDataAdapterService,
                                   final GrokPatternService grokPatternService,
                                   final ObjectMapper objectMapper) {
         this.inputService = inputService;
@@ -60,9 +60,9 @@ public class BundleExporterProvider implements Provider<BundleExporter> {
         this.outputService = outputService;
         this.dashboardService = dashboardService;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
-        this.mongoLutService = mongoLutService;
-        this.mongoLutCacheService = mongoLutCacheService;
-        this.mongoLutDataAdapterService = mongoLutDataAdapterService;
+        this.dbLookupTableService = dbLookupTableService;
+        this.dbCacheService = dbCacheService;
+        this.dbDataAdapterService = dbDataAdapterService;
         this.grokPatternService = grokPatternService;
         this.objectMapper = objectMapper;
     }
@@ -70,7 +70,7 @@ public class BundleExporterProvider implements Provider<BundleExporter> {
     @Override
     public BundleExporter get() {
         return new BundleExporter(inputService, streamService, outputService, dashboardService, dashboardWidgetCreator,
-                mongoLutService, mongoLutCacheService, mongoLutDataAdapterService,
+                dbLookupTableService, dbCacheService, dbDataAdapterService,
                 grokPatternService, objectMapper);
     }
 }

@@ -27,9 +27,9 @@ import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.inputs.InputService;
-import org.graylog2.lookup.MongoLutCacheService;
-import org.graylog2.lookup.MongoLutDataAdapterService;
-import org.graylog2.lookup.MongoLutService;
+import org.graylog2.lookup.db.DBCacheService;
+import org.graylog2.lookup.db.DBDataAdapterService;
+import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.lookup.dto.CacheDto;
 import org.graylog2.lookup.dto.DataAdapterDto;
 import org.graylog2.lookup.dto.LookupTableDto;
@@ -55,9 +55,9 @@ public class BundleExporter {
     private final OutputService outputService;
     private final DashboardService dashboardService;
     private final DashboardWidgetCreator dashboardWidgetCreator;
-    private final MongoLutService mongoLutService;
-    private final MongoLutCacheService mongoLutCacheService;
-    private final MongoLutDataAdapterService mongoLutDataAdapterService;
+    private final DBLookupTableService dbLookupTableService;
+    private final DBCacheService dbCacheService;
+    private final DBDataAdapterService dbDataAdapterService;
     private final GrokPatternService grokPatternService;
     private final ObjectMapper objectMapper;
 
@@ -69,9 +69,9 @@ public class BundleExporter {
                           final OutputService outputService,
                           final DashboardService dashboardService,
                           final DashboardWidgetCreator dashboardWidgetCreator,
-                          final MongoLutService mongoLutService,
-                          final MongoLutCacheService mongoLutCacheService,
-                          final MongoLutDataAdapterService mongoLutDataAdapterService,
+                          final DBLookupTableService dbLookupTableService,
+                          final DBCacheService dbCacheService,
+                          final DBDataAdapterService dbDataAdapterService,
                           final GrokPatternService grokPatternService,
                           final ObjectMapper objectMapper) {
         this.inputService = inputService;
@@ -79,9 +79,9 @@ public class BundleExporter {
         this.outputService = outputService;
         this.dashboardService = dashboardService;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
-        this.mongoLutService = mongoLutService;
-        this.mongoLutCacheService = mongoLutCacheService;
-        this.mongoLutDataAdapterService = mongoLutDataAdapterService;
+        this.dbLookupTableService = dbLookupTableService;
+        this.dbCacheService = dbCacheService;
+        this.dbDataAdapterService = dbDataAdapterService;
         this.grokPatternService = grokPatternService;
         this.objectMapper = objectMapper;
     }
@@ -129,7 +129,7 @@ public class BundleExporter {
     }
 
     private LookupDataAdapterBundle exportLookupDataAdapter(String id) {
-        final Optional<DataAdapterDto> dtoOptional = mongoLutDataAdapterService.get(id);
+        final Optional<DataAdapterDto> dtoOptional = dbDataAdapterService.get(id);
 
         if (!dtoOptional.isPresent()) {
             return null;
@@ -162,7 +162,7 @@ public class BundleExporter {
 
     @Nullable
     private LookupCacheBundle exportLookupCache(String id) {
-        final Optional<CacheDto> dtoOptional = mongoLutCacheService.get(id);
+        final Optional<CacheDto> dtoOptional = dbCacheService.get(id);
 
         if (!dtoOptional.isPresent()) {
             return null;
@@ -195,15 +195,15 @@ public class BundleExporter {
 
     @Nullable
     private LookupTableBundle exportLookupTable(final String tableId) {
-        final Optional<LookupTableDto> dtoOptional = mongoLutService.get(tableId);
+        final Optional<LookupTableDto> dtoOptional = dbLookupTableService.get(tableId);
 
         if (!dtoOptional.isPresent()) {
             return null;
         }
 
         final LookupTableDto dto = dtoOptional.get();
-        final Optional<CacheDto> cacheDtoOptional = mongoLutCacheService.get(dto.cacheId());
-        final Optional<DataAdapterDto> adapterDtoOptional = mongoLutDataAdapterService.get(dto.dataAdapterId());
+        final Optional<CacheDto> cacheDtoOptional = dbCacheService.get(dto.cacheId());
+        final Optional<DataAdapterDto> adapterDtoOptional = dbDataAdapterService.get(dto.dataAdapterId());
 
         if (!cacheDtoOptional.isPresent() || !adapterDtoOptional.isPresent()) {
             LOG.warn("Skipping bundle export of incomplete lookup table <{}> ({})", dto.name(), dto.id());
