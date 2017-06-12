@@ -17,7 +17,8 @@
 package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
-import io.searchbox.client.JestClient;
+import org.graylog2.indexer.cluster.Node;
+import org.junit.Rule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -29,20 +30,29 @@ import org.mockito.junit.MockitoRule;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.mockito.Mockito.when;
 
 public class IndexMappingFactoryTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
     @Mock
-    private JestClient jestClient;
+    private Node node;
+
+    private IndexMappingFactory indexMappingFactory;
+
+    @Before
+    public void setUp() throws Exception {
+        this.indexMappingFactory = new IndexMappingFactory(node);
+    }
 
     @Test
     public void createIndexMappingFailsIfElasticsearchVersionIsTooLow() throws Exception {
-        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(Version.valueOf("1.7.3"));
+        when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("1.7.3")));
 
         assertThatThrownBy(indexMappingFactory::createIndexMapping)
                 .isInstanceOf(ElasticsearchException.class)
@@ -52,7 +62,7 @@ public class IndexMappingFactoryTest {
 
     @Test
     public void createIndexMappingFailsIfElasticsearch2VersionIsTooLow() throws Exception {
-        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(Version.valueOf("2.0.0"));
+        when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("2.0.0")));
 
         assertThatThrownBy(indexMappingFactory::createIndexMapping)
                 .isInstanceOf(ElasticsearchException.class)
@@ -62,7 +72,7 @@ public class IndexMappingFactoryTest {
 
     @Test
     public void createIndexMappingFailsIfElasticsearchVersionIsTooHigh() throws Exception {
-        final IndexMappingFactory indexMappingFactory = new IndexMappingFactory(Version.valueOf("6.0.0"));
+        when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("6.0.0")));
 
         assertThatThrownBy(indexMappingFactory::createIndexMapping)
                 .isInstanceOf(ElasticsearchException.class)
@@ -94,6 +104,9 @@ public class IndexMappingFactoryTest {
         private final String version;
         private final Class<? extends IndexMapping> expectedMapping;
 
+        @Mock
+        private Node node;
+
         private IndexMappingFactory indexMappingFactory;
 
 
@@ -104,7 +117,8 @@ public class IndexMappingFactoryTest {
 
         @Before
         public void setUp() throws Exception {
-            indexMappingFactory = new IndexMappingFactory(Version.valueOf(this.version));
+            when(node.getVersion()).thenReturn(Optional.of(Version.valueOf(this.version)));
+            indexMappingFactory = new IndexMappingFactory(node);
         }
 
         @Test
