@@ -101,9 +101,8 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     @Override
     protected void doRefresh(LookupCachePurge cachePurge) throws Exception {
         try {
-            clearError();
             final FileInfo.Change fileChanged = fileInfo.checkForChange();
-            if (!fileChanged.isChanged()) {
+            if (!fileChanged.isChanged() && !getError().isPresent()) {
                 // Nothing to do, file did not change
                 return;
             }
@@ -112,8 +111,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
             lookupRef.set(parseCSVFile());
             cachePurge.purgeAll();
             fileInfo = fileChanged.fileInfo();
+            clearError();
         } catch (IOException e) {
-            LOG.error("Couldn't check CSV file {} for updates", config.path(), e);
+            LOG.error("Couldn't check data adapter <{}> CSV file {} for updates: {} {}", name(), config.path(), e.getClass().getCanonicalName(), e.getMessage());
             setError(e);
         }
     }
