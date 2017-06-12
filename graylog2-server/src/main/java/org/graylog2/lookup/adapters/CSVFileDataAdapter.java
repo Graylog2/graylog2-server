@@ -79,18 +79,13 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         if (isNullOrEmpty(config.path())) {
             throw new IllegalStateException("File path needs to be set");
         }
-
-        try {
-            // Set file info before parsing the data for the first time
-            fileInfo = FileInfo.forPath(Paths.get(config.path()));
-            lookupRef.set(parseCSVFile());
-
-        } catch (Exception e) {
-            setError(e);
-        }
         if (config.checkInterval() < 1) {
             throw new IllegalStateException("Check interval setting cannot be smaller than 1");
         }
+
+        // Set file info before parsing the data for the first time
+        fileInfo = FileInfo.forPath(Paths.get(config.path()));
+        lookupRef.set(parseCSVFile());
     }
 
     @Override

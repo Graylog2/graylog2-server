@@ -27,6 +27,8 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.graylog2.utilities.ObjectUtils.objectId;
+
 public abstract class LookupCache extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(LookupCache.class);
     private String id;
@@ -46,14 +48,25 @@ public abstract class LookupCache extends AbstractIdleService {
 
     @Override
     protected void startUp() throws Exception {
-        doStart();
+        // Make sure startUp() never throws an error - we handle errors internally
+        try {
+            doStart();
+        } catch (Exception e) {
+            LOG.error("Couldn't start cache <{}/{}/@{}>", name(), id(), objectId(this), e);
+            setError(e);
+        }
     }
 
     protected abstract void doStart() throws Exception;
 
     @Override
     protected void shutDown() throws Exception {
-        doStop();
+        // Make sure shutDown() never throws an error - we handle errors internally
+        try {
+            doStop();
+        } catch (Exception e) {
+            LOG.error("Couldn't stop cache <{}/{}/@{}>", name(), id(), objectId(this), e);
+        }
     }
 
     protected abstract void doStop() throws Exception;
