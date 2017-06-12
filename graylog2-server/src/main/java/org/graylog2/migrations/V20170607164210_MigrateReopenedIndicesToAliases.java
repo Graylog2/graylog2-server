@@ -7,12 +7,11 @@ import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.State;
-import org.graylog2.bindings.annotations.ElasticsearchVersion;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.MongoIndexSet;
+import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.cluster.jest.JestUtils;
-import org.graylog2.indexer.gson.GsonUtils;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
 
@@ -24,7 +23,6 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
 import static org.graylog2.indexer.gson.GsonUtils.asString;
@@ -39,12 +37,12 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
     private final JestClient jestClient;
 
     @Inject
-    public V20170607164210_MigrateReopenedIndicesToAliases(@ElasticsearchVersion Version elasticsearchVersion,
+    public V20170607164210_MigrateReopenedIndicesToAliases(Node node,
                                                            IndexSetService indexSetService,
                                                            MongoIndexSet.Factory mongoIndexSetFactory,
                                                            Indices indices,
                                                            JestClient jestClient) {
-        this.elasticsearchVersion = elasticsearchVersion;
+        this.elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.indices = indices;
