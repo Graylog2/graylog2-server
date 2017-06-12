@@ -51,6 +51,7 @@ import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
+import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
@@ -118,7 +119,8 @@ public class IndicesTest extends AbstractESTest {
     public void setUp() throws Exception {
         super.setUp();
         eventBus = new EventBus("indices-test");
-        indexMappingFactory = new IndexMappingFactory(jestClient());
+        final Node node = new Node(jestClient());
+        indexMappingFactory = new IndexMappingFactory(node);
         indices = new Indices(jestClient(),
                 new Gson(),
                 indexMappingFactory,
