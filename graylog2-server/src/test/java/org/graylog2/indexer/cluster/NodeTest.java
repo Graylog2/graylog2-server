@@ -102,7 +102,7 @@ public class NodeTest {
 
         final Optional<Version> elasticsearchVersion = node.getVersion();
 
-        assertThat(elasticsearchVersion).contains("5.4.0");
+        assertThat(elasticsearchVersion).contains(Version.forIntegers(5, 4, 0));
     }
 
     private JsonNode buildVersionJsonObject(String foobar) {
