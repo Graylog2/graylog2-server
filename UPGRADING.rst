@@ -63,6 +63,12 @@ In most cases, the only configuration setting that needs to be set explicitly is
 
 .. caution:: Graylog does not react to externally triggered index changes (creating/closing/reopening/deleting an index) anymore. All of these actions need to be performed through the Graylog REST API in order to retain index consistency.
 
+
+Special note for upgrading from an existing Graylog setup with a new Elasticsearch cluster
+------------------------------------------------------------------------------------------
+
+If you are upgrading the Elasticsearch cluster of an existing Graylog setup without migrating the indices, your Graylog setup contains stale index ranges causing nonexisting index errors upon search/alerting. To remediate this, you need to manually trigger an index range recalculation for all index sets once. This is possible using the web interface using the System->Indices functionality or by using the REST API using the ``/system/indices/ranges/<index set id>/rebuild`` endpoint.
+
 Graylog REST API
 ================
 
