@@ -77,7 +77,7 @@ public class JestClientProvider implements Provider<JestClient> {
                         );
 
                         if (!Strings.isNullOrEmpty(username) || !Strings.isNullOrEmpty(password)) {
-                            preemptiveAuthHosts.add(HttpHost.create(hostUri.toString()));
+                            preemptiveAuthHosts.add(new HttpHost(hostUri.getHost(), hostUri.getPort(), hostUri.getScheme()));
                         }
                     }
                 }
