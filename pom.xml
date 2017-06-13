@@ -104,7 +104,7 @@
         <HdrHistogram.version>2.1.9</HdrHistogram.version>
         <hibernate-validator.version>5.4.1.Final</hibernate-validator.version>
         <hk2.version>2.5.0-b32</hk2.version> <!-- The HK2 version should match the version being used by Jersey -->
-        <jackson.version>2.8.8</jackson.version>
+        <jackson.version>2.8.9</jackson.version>
         <jadconfig.version>0.13.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javapoet.version>1.9.0</javapoet.version>
