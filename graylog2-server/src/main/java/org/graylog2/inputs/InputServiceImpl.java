@@ -201,6 +201,13 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     }
 
     @Override
+    public void updateExtractor(Input input, Extractor extractor) throws ValidationException {
+        removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractor.getId());
+        embed(input, InputImpl.EMBEDDED_EXTRACTORS, extractor);
+        publishChange(InputUpdated.create(input.getId()));
+    }
+
+    @Override
     public void addStaticField(Input input, final String key, final String value) throws ValidationException {
         final EmbeddedPersistable obj = new EmbeddedPersistable() {
             @Override

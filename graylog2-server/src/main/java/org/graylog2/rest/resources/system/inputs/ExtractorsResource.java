@@ -169,9 +169,8 @@ public class ExtractorsResource extends RestResource {
         final Extractor originalExtractor = inputService.getExtractor(mongoInput, extractorId);
         final Extractor extractor = buildExtractorFromRequest(cer, originalExtractor.getId());
 
-        inputService.removeExtractor(mongoInput, originalExtractor.getId());
         try {
-            inputService.addExtractor(mongoInput, extractor);
+            inputService.updateExtractor(mongoInput, extractor);
         } catch (ValidationException e) {
             LOG.error("Extractor persist validation failed.", e);
             throw new BadRequestException(e);
