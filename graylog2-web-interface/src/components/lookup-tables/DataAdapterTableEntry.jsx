@@ -7,6 +7,7 @@ import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 
 import { ErrorPopover } from 'components/lookup-tables';
+import { ContentPackMarker } from 'components/common';
 
 const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableDataAdapters');
 
@@ -37,6 +38,7 @@ const DataAdapterTableEntry = React.createClass({
           <td>
             {this.props.error && <ErrorPopover errorText={this.props.error} title="Lookup table problem" placement="right" />}
             <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(this.props.adapter.name)}><a>{this.props.adapter.title}</a></LinkContainer>
+            <ContentPackMarker contentPack={this.props.adapter.content_pack} marginLeft={5} />
           </td>
           <td>{this.props.adapter.description}</td>
           <td>{this.props.adapter.name}</td>

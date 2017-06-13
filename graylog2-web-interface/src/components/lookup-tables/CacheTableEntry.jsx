@@ -5,6 +5,7 @@ import { Button } from 'react-bootstrap';
 
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
+import { ContentPackMarker } from 'components/common';
 
 const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
 
@@ -26,6 +27,7 @@ const LUTTableEntry = React.createClass({
         <tr>
           <td>
             <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(this.props.cache.name)}><a>{this.props.cache.title}</a></LinkContainer>
+            <ContentPackMarker contentPack={this.props.cache.content_pack} marginLeft={5} />
           </td>
           <td>{this.props.cache.description}</td>
           <td>{this.props.cache.name}</td>

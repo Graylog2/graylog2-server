@@ -16,11 +16,15 @@
  */
 package org.graylog2.bindings.providers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.graylog2.bundles.BundleExporter;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.grok.GrokPatternService;
 import org.graylog2.inputs.InputService;
+import org.graylog2.lookup.db.DBCacheService;
+import org.graylog2.lookup.db.DBDataAdapterService;
+import org.graylog2.lookup.db.DBLookupTableService;
 import org.graylog2.streams.OutputService;
 import org.graylog2.streams.StreamService;
 
@@ -34,7 +38,11 @@ public class BundleExporterProvider implements Provider<BundleExporter> {
     private final OutputService outputService;
     private final DashboardService dashboardService;
     private final DashboardWidgetCreator dashboardWidgetCreator;
+    private final DBLookupTableService dbLookupTableService;
+    private final DBCacheService dbCacheService;
+    private final DBDataAdapterService dbDataAdapterService;
     private final GrokPatternService grokPatternService;
+    private final ObjectMapper objectMapper;
 
     @Inject
     public BundleExporterProvider(final InputService inputService,
@@ -42,18 +50,27 @@ public class BundleExporterProvider implements Provider<BundleExporter> {
                                   final OutputService outputService,
                                   final DashboardService dashboardService,
                                   final DashboardWidgetCreator dashboardWidgetCreator,
-                                  final GrokPatternService grokPatternService) {
+                                  final DBLookupTableService dbLookupTableService,
+                                  final DBCacheService dbCacheService,
+                                  final DBDataAdapterService dbDataAdapterService,
+                                  final GrokPatternService grokPatternService,
+                                  final ObjectMapper objectMapper) {
         this.inputService = inputService;
         this.streamService = streamService;
         this.outputService = outputService;
         this.dashboardService = dashboardService;
         this.dashboardWidgetCreator = dashboardWidgetCreator;
+        this.dbLookupTableService = dbLookupTableService;
+        this.dbCacheService = dbCacheService;
+        this.dbDataAdapterService = dbDataAdapterService;
         this.grokPatternService = grokPatternService;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public BundleExporter get() {
         return new BundleExporter(inputService, streamService, outputService, dashboardService, dashboardWidgetCreator,
-                grokPatternService);
+                dbLookupTableService, dbCacheService, dbDataAdapterService,
+                grokPatternService, objectMapper);
     }
 }

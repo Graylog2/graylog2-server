@@ -52,6 +52,10 @@ public abstract class LookupTableApi {
     @JsonProperty("data_adapter_id")
     public abstract String dataAdapterId();
 
+    @JsonProperty("content_pack")
+    @Nullable
+    public abstract String contentPack();
+
     public static Builder builder() {
         return new AutoValue_LookupTableApi.Builder();
     }
@@ -64,6 +68,7 @@ public abstract class LookupTableApi {
                 .name(name())
                 .cacheId(cacheId())
                 .dataAdapterId(dataAdapterId())
+                .contentPack(contentPack())
                 .build();
     }
 
@@ -75,6 +80,7 @@ public abstract class LookupTableApi {
                 .description(dto.description())
                 .cacheId(dto.cacheId())
                 .dataAdapterId(dto.dataAdapterId())
+                .contentPack(dto.contentPack())
                 .build();
     }
 
@@ -97,6 +103,9 @@ public abstract class LookupTableApi {
 
         @JsonProperty("data_adapter_id")
         public abstract Builder dataAdapterId(String id);
+
+        @JsonProperty("content_pack")
+        public abstract Builder contentPack(@Nullable String contentPack);
 
         public abstract LookupTableApi build();
     }
