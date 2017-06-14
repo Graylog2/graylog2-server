@@ -48,6 +48,13 @@ const CacheForm = React.createClass({
     this.setState(this._initialState(nextProps.cache));
   },
 
+  componentDidMount() {
+    if (!this.props.create) {
+      // Validate when mounted to immediately show errors for invalid objects
+      this._validate(this.props.cache);
+    }
+  },
+
   _initialState(c) {
     const cache = ObjectUtils.clone(c);
 

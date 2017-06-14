@@ -27,6 +27,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Preconditions.checkState;
+import static org.graylog2.utilities.ObjectUtils.objectId;
 
 public abstract class LookupDataAdapter extends AbstractIdleService {
     private static final Logger LOG = LoggerFactory.getLogger(LookupDataAdapter.class);
@@ -46,14 +47,25 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
 
     @Override
     protected void startUp() throws Exception {
-        doStart();
+        // Make sure startUp() never throws an error - we handle errors internally
+        try {
+            doStart();
+        } catch (Exception e) {
+            LOG.error("Couldn't start data adapter <{}/{}/@{}>", name(), id(), objectId(this), e);
+            setError(e);
+        }
     }
 
     protected abstract void doStart() throws Exception;
 
     @Override
     protected void shutDown() throws Exception {
-        doStop();
+        // Make sure shutDown() never throws an error - we handle errors internally
+        try {
+            doStop();
+        } catch (Exception e) {
+            LOG.error("Couldn't stop data adapter <{}/{}/@{}>", name(), id(), objectId(this), e);
+        }
     }
 
     protected abstract void doStop() throws Exception;
@@ -65,10 +77,11 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
     public abstract Duration refreshInterval();
 
     public void refresh(LookupCachePurge cachePurge) {
+        // Make sure refresh() never throws an error - we handle errors internally
         try {
             doRefresh(cachePurge);
         } catch (Exception e) {
-            LOG.error("Couldn't refresh data adapter", e);
+            LOG.error("Couldn't refresh data adapter <{}/{}/@{}>", name(), id(), objectId(this), e);
         }
     }
 
