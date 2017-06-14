@@ -17,7 +17,7 @@ const MaxmindAdapterDocumentation = React.createClass({
     },
     "postal": { "code": "94035" },
     "subdivisions": [ { "geoname_id": 5332921, "iso_code": "CA", "names": { "en": "California" } } ],
-    }`;
+}`;
 
     const countryFields = `{
     "continent": { "code": "NA", "geoname_id": 6255149, "names": { "en": "North America" } },
@@ -32,7 +32,7 @@ const MaxmindAdapterDocumentation = React.createClass({
       "isp": null,
       "organization": null,
     }
-    }`;
+}`;
 
     return (<div>
       <p>The GeoIP data adapter supports reading MaxMind's GeoIP2 databases.</p>
