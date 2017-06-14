@@ -84,7 +84,7 @@ const LookupTableDataAdaptersStore = Reflux.createStore({
   },
 
   update(dataAdapter) {
-    const url = this._url('adapters');
+    const url = this._url(`adapters/${dataAdapter.id}`);
     const promise = fetch('PUT', url, dataAdapter);
 
     promise.then((response) => {

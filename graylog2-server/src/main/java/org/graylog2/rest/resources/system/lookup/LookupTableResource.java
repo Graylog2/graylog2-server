@@ -284,10 +284,11 @@ public class LookupTableResource extends RestResource {
     }
 
     @PUT
-    @Path("tables")
+    @Path("tables/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_UPDATE)
     @ApiOperation(value = "Update the given lookup table")
-    public LookupTableApi updateTable(@Valid @ApiParam LookupTableApi toUpdate) {
+    public LookupTableApi updateTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                      @Valid @ApiParam LookupTableApi toUpdate) {
         LookupTableDto saved = dbTableService.save(toUpdate.toDto());
         clusterBus.post(LookupTablesUpdated.create(saved));
 
@@ -483,10 +484,11 @@ public class LookupTableResource extends RestResource {
     }
 
     @PUT
-    @Path("adapters")
+    @Path("adapters/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_UPDATE)
     @ApiOperation(value = "Update the given data adapter settings")
-    public DataAdapterApi updateAdapter(@Valid @ApiParam DataAdapterApi toUpdate) {
+    public DataAdapterApi updateAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                        @Valid @ApiParam DataAdapterApi toUpdate) {
         DataAdapterDto saved = dbDataAdapterService.save(toUpdate.toDto());
         // the linked lookup tables will be updated by the service
         clusterBus.post(DataAdaptersUpdated.create(saved.id()));
@@ -630,10 +632,11 @@ public class LookupTableResource extends RestResource {
     }
 
     @PUT
-    @Path("caches")
+    @Path("caches/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_UPDATE)
     @ApiOperation(value = "Update the given cache settings")
-    public CacheApi updateCache(@ApiParam CacheApi toUpdate) {
+    public CacheApi updateCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                @ApiParam CacheApi toUpdate) {
         CacheDto saved = dbCacheService.save(toUpdate.toDto());
         clusterBus.post(CachesUpdated.create(saved.id()));
         return CacheApi.fromDto(saved);

@@ -99,7 +99,7 @@ const LookupTablesStore = Reflux.createStore({
   },
 
   update(table) {
-    const url = this._url('tables');
+    const url = this._url(`tables/${table.id}`);
     const promise = fetch('PUT', url, table);
 
     promise.catch(this._errorHandler('Updating lookup table failed', `Could not update lookup table "${table.name}"`));
