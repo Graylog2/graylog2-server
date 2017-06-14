@@ -51,8 +51,10 @@ const DataAdapterForm = React.createClass({
   },
 
   componentDidMount() {
-    // Validate when mounted to immediately show errors for invalid objects
-    this._validate(this.props.dataAdapter);
+    if (!this.props.create) {
+      // Validate when mounted to immediately show errors for invalid objects
+      this._validate(this.props.dataAdapter);
+    }
   },
 
   _initialState(dataAdapter) {

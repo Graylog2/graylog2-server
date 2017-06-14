@@ -49,8 +49,10 @@ const CacheForm = React.createClass({
   },
 
   componentDidMount() {
-    // Validate when mounted to immediately show errors for invalid objects
-    this._validate(this.props.cache);
+    if (!this.props.create) {
+      // Validate when mounted to immediately show errors for invalid objects
+      this._validate(this.props.cache);
+    }
   },
 
   _initialState(c) {
