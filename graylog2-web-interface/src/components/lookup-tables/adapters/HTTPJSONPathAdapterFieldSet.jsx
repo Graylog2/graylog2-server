@@ -8,9 +8,7 @@ const HTTPJSONPathAdapterFieldSet = React.createClass({
     // eslint-disable-next-line react/no-unused-prop-types
     updateConfig: PropTypes.func.isRequired,
     handleFormEvent: PropTypes.func.isRequired,
-    // eslint-disable-next-line react/no-unused-prop-types
     validationState: PropTypes.func.isRequired,
-    // eslint-disable-next-line react/no-unused-prop-types
     validationMessage: PropTypes.func.isRequired,
   },
 
@@ -25,7 +23,8 @@ const HTTPJSONPathAdapterFieldSet = React.createClass({
              autoFocus
              required
              onChange={this.props.handleFormEvent}
-             help="The URL for the lookup. (this is a template - see documentation)"
+             help={this.props.validationMessage('url', 'The URL for the lookup. (this is a template - see documentation)')}
+             bsStyle={this.props.validationState('url')}
              value={config.url}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -35,7 +34,8 @@ const HTTPJSONPathAdapterFieldSet = React.createClass({
              label="Single value JSONPath"
              required
              onChange={this.props.handleFormEvent}
-             help="The JSONPath string to get the single value from the response."
+             help={this.props.validationMessage('single_value_jsonpath', 'The JSONPath string to get the single value from the response.')}
+             bsStyle={this.props.validationState('single_value_jsonpath')}
              value={config.single_value_jsonpath}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
@@ -44,7 +44,8 @@ const HTTPJSONPathAdapterFieldSet = React.createClass({
              name="multi_value_jsonpath"
              label="Multi value JSONPath"
              onChange={this.props.handleFormEvent}
-             help={<span>The JSONPath string to get the multi value from the response. Needs to return a list or map. <strong>(optional)</strong></span>}
+             help={this.props.validationMessage('multi_value_jsonpath', 'The JSONPath string to get the multi value from the response. Needs to return a list or map. (optional)')}
+             bsStyle={this.props.validationState('multi_value_jsonpath')}
              value={config.multi_value_jsonpath}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />

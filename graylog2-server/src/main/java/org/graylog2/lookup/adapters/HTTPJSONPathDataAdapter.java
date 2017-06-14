@@ -26,10 +26,13 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.floreysoft.jmte.Engine;
 import com.google.auto.value.AutoValue;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Multimap;
 import com.google.inject.assistedinject.Assisted;
 import com.jayway.jsonpath.DocumentContext;
 import com.jayway.jsonpath.InvalidJsonException;
+import com.jayway.jsonpath.InvalidPathException;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.PathNotFoundException;
 import okhttp3.Headers;
@@ -282,6 +285,33 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
 
         public static Builder builder() {
             return new AutoValue_HTTPJSONPathDataAdapter_Config.Builder();
+        }
+
+        @Override
+        public Optional<Multimap<String, String>> validate() {
+            final ArrayListMultimap<String, String> errors = ArrayListMultimap.create();
+
+            if (HttpUrl.parse(url()) == null) {
+                errors.put("url", "Invalid URL.");
+            }
+
+            try {
+                final JsonPath jsonPath = JsonPath.compile(singleValueJSONPath());
+                if (!jsonPath.isDefinite()) {
+                    errors.put("single_value_jsonpath", "JSONPath does not return a single value.");
+                }
+            } catch (InvalidPathException e) {
+                errors.put("single_value_jsonpath", "Invalid JSONPath.");
+            }
+            if (multiValueJSONPath().isPresent()) {
+                try {
+                    JsonPath.compile(multiValueJSONPath().get());
+                } catch (InvalidPathException e) {
+                    errors.put("multi_value_jsonpath", "Invalid JSONPath.");
+                }
+            }
+
+            return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
         }
 
         @AutoValue.Builder
