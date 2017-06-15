@@ -1,6 +1,8 @@
 import React from 'react';
 import Reflux from 'reflux';
 
+import TimeHelper from 'util/TimeHelper';
+
 import StoreProvider from 'injection/StoreProvider';
 const MetricsStore = StoreProvider.getStore('Metrics');
 
@@ -13,7 +15,7 @@ const MetricContainer = React.createClass({
   propTypes: {
     name: React.PropTypes.string.isRequired,
     zeroOnMissing: React.PropTypes.bool,
-    children: React.PropTypes.array.isRequired,
+    children: React.PropTypes.node.isRequired,
   },
   mixins: [Reflux.connect(MetricsStore)],
 
@@ -25,6 +27,17 @@ const MetricContainer = React.createClass({
 
   componentWillMount() {
     MetricsActions.addGlobal(this.props.name);
+  },
+
+  shouldComponentUpdate(_, nextState) {
+    // Do not render this component and it's children when no metric data has changed.
+    // This component and the CounterRate component expect to be rendered every second or less often. When using
+    // these components on a page that triggers a re-render more often - e.g. by having another setInterval - the
+    // calculation in CounterRate will break.
+    if (this.state.metricsUpdatedAt && nextState.metricsUpdatedAt) {
+      return nextState.metricsUpdatedAt > this.state.metricsUpdatedAt;
+    }
+    return true;
   },
 
   componentWillUnmount() {
