@@ -17,6 +17,7 @@
 package org.graylog2.lookup.adapters;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -68,8 +69,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
     @Inject
     public CSVFileDataAdapter(@Assisted("id") String id,
                               @Assisted("name") String name,
-                              @Assisted LookupDataAdapterConfiguration config) {
-        super(id, name, config);
+                              @Assisted LookupDataAdapterConfiguration config,
+                              MetricRegistry metricRegistry) {
+        super(id, name, config, metricRegistry);
         this.config = (Config) config;
     }
 

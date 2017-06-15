@@ -16,6 +16,7 @@
  */
 package org.graylog2.lookup.caches;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -44,8 +45,9 @@ public class NullCache extends LookupCache {
     @Inject
     public NullCache(@Assisted("id") String id,
                      @Assisted("name") String name,
-                     @Assisted LookupCacheConfiguration c) {
-        super(id, name, c);
+                     @Assisted LookupCacheConfiguration c,
+                     MetricRegistry metricRegistry) {
+        super(id, name, c, metricRegistry);
     }
 
     @Override

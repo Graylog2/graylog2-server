@@ -16,6 +16,10 @@
  */
 package org.graylog2.plugin.lookup;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.Meter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.assistedinject.Assisted;
@@ -36,14 +40,48 @@ public abstract class LookupCache extends AbstractIdleService {
     private final String name;
     private final LookupCacheConfiguration config;
 
+    private final Meter totalCount;
+    private final Meter hitCount;
+    private final Meter missCount;
+    private final Timer lookupTimer;
+    private final Gauge entryCount;
+
     private AtomicReference<Throwable> error = new AtomicReference<>();
 
     protected LookupCache(String id,
                           String name,
-                          LookupCacheConfiguration config) {
+                          LookupCacheConfiguration config,
+                          MetricRegistry metricRegistry) {
         this.id = id;
         this.name = name;
         this.config = config;
+
+        this.totalCount = metricRegistry.meter(MetricRegistry.name("org.graylog2.lookup.caches", id, "requests"));
+        this.hitCount = metricRegistry.meter(MetricRegistry.name("org.graylog2.lookup.caches", id, "hits"));
+        this.missCount = metricRegistry.meter(MetricRegistry.name("org.graylog2.lookup.caches", id, "misses"));
+        this.lookupTimer = metricRegistry.timer(MetricRegistry.name("org.graylog2.lookup.caches", id, "lookupTime"));
+        this.entryCount = metricRegistry.register(MetricRegistry.name("org.graylog2.lookup.caches", id, "entries"), () -> entryCount());
+    }
+
+    public void incrTotalCount() {
+        totalCount.mark();
+    }
+
+    public void incrHitCount() {
+        hitCount.mark();
+    }
+
+    public void incrMissCount() {
+        missCount.mark();
+    }
+
+    public Timer.Context lookupTimer() {
+        return lookupTimer.time();
+    }
+
+    public Gauge<Long> entryCount() {
+        // Returns -1 if the cache does not support counting entries
+        return () -> -1L;
     }
 
     @Override

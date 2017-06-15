@@ -86,7 +86,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
                                       Engine templateEngine,
                                       OkHttpClient httpClient,
                                       MetricRegistry metricRegistry) {
-        super(id, name, config);
+        super(id, name, config, metricRegistry);
         this.config = (Config) config;
         this.templateEngine = templateEngine;
         // TODO Add config options: caching, timeouts, custom headers, basic auth (See: https://github.com/square/okhttp/wiki/Recipes)

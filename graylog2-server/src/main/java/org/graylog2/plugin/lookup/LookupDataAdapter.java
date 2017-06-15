@@ -16,6 +16,8 @@
  */
 package org.graylog2.plugin.lookup;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.assistedinject.Assisted;
@@ -36,13 +38,18 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
     private final String name;
 
     private final LookupDataAdapterConfiguration config;
+    private final Timer requestTimer;
+    private final Timer refreshTimer;
 
     private AtomicReference<Throwable> dataSourceError = new AtomicReference<>();
 
-    protected LookupDataAdapter(String id, String name, LookupDataAdapterConfiguration config) {
+    protected LookupDataAdapter(String id, String name, LookupDataAdapterConfiguration config, MetricRegistry metricRegistry) {
         this.id = id;
         this.name = name;
         this.config = config;
+
+        this.requestTimer = metricRegistry.timer(MetricRegistry.name("org.graylog2.lookup.adapters", id, "requests"));
+        this.refreshTimer = metricRegistry.timer(MetricRegistry.name("org.graylog2.lookup.adapters", id, "refresh"));
     }
 
     @Override
@@ -78,7 +85,7 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
 
     public void refresh(LookupCachePurge cachePurge) {
         // Make sure refresh() never throws an error - we handle errors internally
-        try {
+        try (final Timer.Context ignored = refreshTimer.time()) {
             doRefresh(cachePurge);
         } catch (Exception e) {
             LOG.error("Couldn't refresh data adapter <{}/{}/@{}>", name(), id(), objectId(this), e);
@@ -112,7 +119,9 @@ public abstract class LookupDataAdapter extends AbstractIdleService {
             return LookupResult.empty();
         }
         checkState(isRunning(), "Data adapter needs to be started before it can be used");
-        return doGet(key);
+        try (final Timer.Context ignored = requestTimer.time()) {
+            return doGet(key);
+        }
     }
     protected abstract LookupResult doGet(Object key);
 
