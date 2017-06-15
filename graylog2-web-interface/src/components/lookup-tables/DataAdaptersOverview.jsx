@@ -114,7 +114,7 @@ const DataAdaptersOverview = React.createClass({
                   <th>Title</th>
                   <th>Description</th>
                   <th>Name</th>
-                  <th>Entries</th>
+                  <th>Throughput</th>
                   <th className={Styles.actions}>Actions</th>
                 </tr>
               </thead>

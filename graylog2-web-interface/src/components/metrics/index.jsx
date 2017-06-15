@@ -9,4 +9,5 @@ export { default as MetricDetails } from './MetricDetails';
 export { default as MetricsComponent } from './MetricsComponent';
 export { default as MetricsFilterInput } from './MetricsFilterInput';
 export { default as MetricsList } from './MetricsList';
+export { default as MetricsMapper } from './MetricsMapper';
 export { default as TimerDetails } from './TimerDetails';
