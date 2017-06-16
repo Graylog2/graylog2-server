@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
@@ -66,7 +67,7 @@ public abstract class LookupDefaultMultiValue implements LookupDefaultValue {
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
-            throw new IllegalArgumentException("Could not parse JSON "+ valueType.toString().toLowerCase() + " value <" + valueString + ">", e);
+            throw new IllegalArgumentException("Could not parse JSON "+ valueType.toString().toLowerCase(Locale.ENGLISH) + " value <" + valueString + ">", e);
         }
 
         return builder()
