@@ -375,6 +375,22 @@ public class LookupTableService extends AbstractIdleService {
                     dto.name(), dto.dataAdapterId());
             return null;
         }
+
+        final LookupDefaultSingleValue defaultSingleValue;
+        try {
+            defaultSingleValue = LookupDefaultSingleValue.create(dto.defaultSingleValue(), dto.defaultSingleValueType());
+        } catch (Exception e) {
+            LOG.error("Could not create default single value object for lookup table {}/{}: {}", dto.name(), dto.id(), e.getMessage());
+            return null;
+        }
+        final LookupDefaultMultiValue defaultMultiValue;
+        try {
+            defaultMultiValue = LookupDefaultMultiValue.create(dto.defaultMultiValue(), dto.defaultMultiValueType());
+        } catch (Exception e) {
+            LOG.error("Could not create default multi value object for lookup table {}/{}: {}", dto.name(), dto.id(), e.getMessage());
+            return null;
+        }
+
         final LookupTable table = LookupTable.builder()
                 .id(dto.id())
                 .name(dto.name())
@@ -382,6 +398,8 @@ public class LookupTableService extends AbstractIdleService {
                 .title(dto.title())
                 .cache(cache)
                 .dataAdapter(adapter)
+                .defaultSingleValue(defaultSingleValue)
+                .defaultMultiValue(defaultMultiValue)
                 .build();
         final LookupCache newCache = table.cache();
         final LookupDataAdapter newAdapter = table.dataAdapter();

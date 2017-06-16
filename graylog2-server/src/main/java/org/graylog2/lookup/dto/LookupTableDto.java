@@ -16,13 +16,12 @@
  */
 package org.graylog2.lookup.dto;
 
-import com.google.auto.value.AutoValue;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
+import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.lookup.LookupDefaultSingleValue;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
@@ -65,6 +64,18 @@ public abstract class LookupTableDto {
     @Nullable
     public abstract String contentPack();
 
+    @JsonProperty("default_single_value")
+    public abstract String defaultSingleValue();
+
+    @JsonProperty("default_single_value_type")
+    public abstract LookupDefaultSingleValue.Type defaultSingleValueType();
+
+    @JsonProperty("default_multi_value")
+    public abstract String defaultMultiValue();
+
+    @JsonProperty("default_multi_value_type")
+    public abstract LookupDefaultSingleValue.Type defaultMultiValueType();
+
     public static Builder builder() {
         return new AutoValue_LookupTableDto.Builder();
     }
@@ -95,6 +106,18 @@ public abstract class LookupTableDto {
 
         @JsonProperty("content_pack")
         public abstract Builder contentPack(@Nullable String contentPack);
+
+        @JsonProperty("default_single_value")
+        public abstract Builder defaultSingleValue(String defaultSingleValue);
+
+        @JsonProperty("default_single_value_type")
+        public abstract Builder defaultSingleValueType(LookupDefaultSingleValue.Type defaultSingleValueType);
+
+        @JsonProperty("default_multi_value")
+        public abstract Builder defaultMultiValue(String defaultMultiValue);
+
+        @JsonProperty("default_multi_value_type")
+        public abstract Builder defaultMultiValueType(LookupDefaultSingleValue.Type defaultMultiValueType);
 
         public abstract LookupTableDto build();
     }

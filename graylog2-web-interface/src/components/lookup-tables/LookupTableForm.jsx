@@ -5,8 +5,7 @@ import { Button } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
-
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import { JSONValueInput } from 'components/common';
 
 import { CachesContainer, CachePicker, DataAdaptersContainer, DataAdapterPicker } from 'components/lookup-tables';
 
@@ -31,6 +30,10 @@ const LookupTableForm = React.createClass({
         name: '',
         cache_id: undefined,
         data_adapter_id: undefined,
+        default_single_value: '',
+        default_single_value_type: '',
+        default_multi_value: '',
+        default_multi_value_type: '',
       },
     };
   },
@@ -58,7 +61,13 @@ const LookupTableForm = React.createClass({
         name: table.name,
         cache_id: table.cache_id,
         data_adapter_id: table.data_adapter_id,
+        default_single_value: table.default_single_value,
+        default_single_value_type: table.default_single_value_type,
+        default_multi_value: table.default_multi_value,
+        default_multi_value_type: table.default_multi_value_type,
       },
+      enable_default_single: table.default_single_value_type && table.default_single_value_type !== 'NULL',
+      enable_default_multi: table.default_multi_value_type && table.default_multi_value_type !== 'NULL',
     };
   },
 
@@ -103,6 +112,41 @@ const LookupTableForm = React.createClass({
     this.setState({ table: table });
   },
 
+  _onDefaultValueUpdate(name, value, valueType) {
+    const table = ObjectUtils.clone(this.state.table);
+
+    table[`default_${name}_value`] = value;
+    table[`default_${name}_value_type`] = valueType;
+
+    this.setState({ table: table });
+  },
+
+  _onCheckEnableSingleDefault(e) {
+    const value = FormsUtils.getValueFromInput(e.target);
+    this.setState({ enable_default_single: value });
+
+    if (value === false) {
+      this._onDefaultValueUpdate('single', '', 'NULL');
+    }
+  },
+
+  _onCheckEnableMultiDefault(e) {
+    const value = FormsUtils.getValueFromInput(e.target);
+    this.setState({ enable_default_multi: value });
+
+    if (value === false) {
+      this._onDefaultValueUpdate('multi', '', 'NULL');
+    }
+  },
+
+  _onDefaultSingleValueUpdate(value, valueType) {
+    this._onDefaultValueUpdate('single', value, valueType);
+  },
+
+  _onDefaultMultiValueUpdate(value, valueType) {
+    this._onDefaultValueUpdate('multi', value, valueType);
+  },
+
   render() {
     const table = this.state.table;
 
@@ -141,6 +185,44 @@ const LookupTableForm = React.createClass({
                  value={table.name}
                  labelClassName="col-sm-3"
                  wrapperClassName="col-sm-9" />
+
+          <Input type="checkbox"
+                 label="Enable single default value"
+                 checked={this.state.enable_default_single}
+                 onChange={this._onCheckEnableSingleDefault}
+                 help="Enable if the lookup table should provide a default for the single value."
+                 wrapperClassName="col-md-offset-3 col-md-9"
+                 />
+
+          {this.state.enable_default_single &&
+          <JSONValueInput label="Default single value"
+                          help="The single value that is being used as lookup result if the data adapter or cache does not find a value."
+                          update={this._onDefaultSingleValueUpdate}
+                          required
+                          value={table.default_single_value}
+                          valueType={table.default_single_value_type || 'NULL'}
+                          allowedTypes={['STRING', 'NUMBER', 'BOOLEAN', 'NULL']}
+                          labelClassName="col-sm-3"
+                          wrapperClassName="col-sm-9" />
+          }
+
+          <Input type="checkbox"
+                 label="Enable multi default value"
+                 checked={this.state.enable_default_multi}
+                 onChange={this._onCheckEnableMultiDefault}
+                 help="Enable if the lookup table should provide a default for the multi value."
+                 wrapperClassName="col-md-offset-3 col-md-9" />
+
+          {this.state.enable_default_multi &&
+          <JSONValueInput label="Default multi value"
+                          help="The multi value that is being used as lookup result if the data adapter or cache does not find a value."
+                          update={this._onDefaultMultiValueUpdate}
+                          value={table.default_multi_value}
+                          valueType={table.default_multi_value_type || 'NULL'}
+                          allowedTypes={['OBJECT', 'NULL']}
+                          labelClassName="col-sm-3"
+                          wrapperClassName="col-sm-9" />
+          }
         </fieldset>
 
         <DataAdaptersContainer>

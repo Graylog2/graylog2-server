@@ -52,6 +52,10 @@ public abstract class LookupTable {
 
     public abstract LookupDataAdapter dataAdapter();
 
+    public abstract LookupDefaultSingleValue defaultSingleValue();
+
+    public abstract LookupDefaultMultiValue defaultMultiValue();
+
     public static Builder builder() {
         return new AutoValue_LookupTable.Builder();
     }
@@ -65,7 +69,12 @@ public abstract class LookupTable {
 
     @Nullable
     public LookupResult lookup(@Nonnull Object key) {
-        return cache().get(LookupCacheKey.create(dataAdapter().id(), key), () -> dataAdapter().get(key));
+        final LookupResult result = cache().get(LookupCacheKey.create(dataAdapter().id(), key), () -> dataAdapter().get(key));
+
+        if (result.isEmpty()) {
+            return LookupResult.withDefaults(defaultSingleValue(), defaultMultiValue());
+        }
+        return result;
     }
 
     @AutoValue.Builder
@@ -81,6 +90,10 @@ public abstract class LookupTable {
         public abstract Builder cache(LookupCache cache);
 
         public abstract Builder dataAdapter(LookupDataAdapter dataAdapter);
+
+        public abstract Builder defaultSingleValue(LookupDefaultSingleValue defaultSingleValue);
+
+        public abstract Builder defaultMultiValue(LookupDefaultMultiValue defaultMultiValue);
 
         public abstract LookupTable build();
     }
