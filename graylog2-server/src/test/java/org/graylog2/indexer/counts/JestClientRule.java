@@ -16,9 +16,9 @@
  */
 package org.graylog2.indexer.counts;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableList;
-import com.google.gson.Gson;
 import io.searchbox.client.JestClient;
 import io.searchbox.indices.Refresh;
 import org.graylog2.bindings.providers.JestClientProvider;
@@ -43,7 +43,7 @@ public class JestClientRule extends ExternalResource {
             null,
             Duration.seconds(30),
             false,
-            new Gson()
+            new ObjectMapper()
         );
     }
 

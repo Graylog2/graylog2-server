@@ -16,8 +16,11 @@
  */
 package org.graylog2.indexer.cluster.jest;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.IntNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Ping;
@@ -44,6 +47,8 @@ public class JestUtilsTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
     @Mock
     private JestClient clientMock;
 
@@ -63,7 +68,7 @@ public class JestUtilsTest {
         final Ping request = new Ping.Builder().build();
         final JestResult resultMock = mock(JestResult.class);
         when(resultMock.isSucceeded()).thenReturn(false);
-        when(resultMock.getJsonObject()).thenReturn(new JsonObject());
+        when(resultMock.getJsonObject()).thenReturn(objectMapper.createObjectNode());
         when(clientMock.execute(request)).thenReturn(resultMock);
 
         expectedException.expect(ElasticsearchException.class);
@@ -79,14 +84,14 @@ public class JestUtilsTest {
         final JestResult resultMock = mock(JestResult.class);
         when(resultMock.isSucceeded()).thenReturn(false);
 
-        final JsonObject rootCauseStub = new JsonObject();
-        rootCauseStub.addProperty("reason", "foobar");
-        final JsonArray rootCausesStub = new JsonArray();
+        final ObjectNode rootCauseStub = objectMapper.createObjectNode();
+        rootCauseStub.set("reason", new TextNode("foobar"));
+        final ArrayNode rootCausesStub = objectMapper.createArrayNode();
         rootCausesStub.add(rootCauseStub);
-        final JsonObject errorStub = new JsonObject();
-        errorStub.add("root_cause", rootCausesStub);
-        final JsonObject responseStub = new JsonObject();
-        responseStub.add("error", errorStub);
+        final ObjectNode errorStub = objectMapper.createObjectNode();
+        errorStub.set("root_cause", rootCausesStub);
+        final ObjectNode responseStub = objectMapper.createObjectNode();
+        responseStub.set("error", errorStub);
 
         when(resultMock.getJsonObject()).thenReturn(responseStub);
         when(clientMock.execute(request)).thenReturn(resultMock);
@@ -123,8 +128,8 @@ public class JestUtilsTest {
         final JestResult resultMock = mock(JestResult.class);
         when(resultMock.isSucceeded()).thenReturn(false);
 
-        final JsonObject responseStub = new JsonObject();
-        responseStub.addProperty("Message", "Authorization header requires 'Credential' parameter.");
+        final ObjectNode responseStub = objectMapper.createObjectNode();
+        responseStub.set("Message", new TextNode("Authorization header requires 'Credential' parameter."));
 
         when(resultMock.getJsonObject()).thenReturn(responseStub);
 
@@ -150,18 +155,18 @@ public class JestUtilsTest {
         final JestResult resultMock = mock(JestResult.class);
         when(resultMock.isSucceeded()).thenReturn(false);
 
-        final JsonObject rootCauseStub = new JsonObject();
-        rootCauseStub.addProperty("type", "query_parsing_exception");
-        rootCauseStub.addProperty("reason", "foobar");
-        rootCauseStub.addProperty("line", 23);
-        rootCauseStub.addProperty("col", 42);
-        rootCauseStub.addProperty("index", "my_index");
-        final JsonArray rootCausesStub = new JsonArray();
+        final ObjectNode rootCauseStub = objectMapper.createObjectNode();
+        rootCauseStub.set("type", new TextNode("query_parsing_exception"));
+        rootCauseStub.set("reason", new TextNode("foobar"));
+        rootCauseStub.set("line", new IntNode(23));
+        rootCauseStub.set("col", new IntNode(42));
+        rootCauseStub.set("index", new TextNode("my_index"));
+        final ArrayNode rootCausesStub = objectMapper.createArrayNode();
         rootCausesStub.add(rootCauseStub);
-        final JsonObject errorStub = new JsonObject();
-        errorStub.add("root_cause", rootCausesStub);
-        final JsonObject responseStub = new JsonObject();
-        responseStub.add("error", errorStub);
+        final ObjectNode errorStub = objectMapper.createObjectNode();
+        errorStub.set("root_cause", rootCausesStub);
+        final ObjectNode responseStub = objectMapper.createObjectNode();
+        responseStub.set("error", errorStub);
 
         when(resultMock.getJsonObject()).thenReturn(responseStub);
         when(clientMock.execute(request)).thenReturn(resultMock);

@@ -16,14 +16,16 @@
  */
 package org.graylog2.indexer.cluster;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.Version;
-import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Ping;
 import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.indexer.cluster.Node;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,6 +45,8 @@ import static org.mockito.Mockito.when;
 public class NodeTest {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
     private JestClient jestClient;
@@ -67,7 +71,7 @@ public class NodeTest {
     public void retrievingVersionFailsIfElasticsearchResponseFailed() throws Exception {
         final JestResult failedResult = mock(JestResult.class);
         when(failedResult.isSucceeded()).thenReturn(false);
-        when(failedResult.getJsonObject()).thenReturn(new JsonObject());
+        when(failedResult.getJsonObject()).thenReturn(objectMapper.createObjectNode());
         when(jestClient.execute(any(Ping.class))).thenReturn(failedResult);
 
         assertThatThrownBy(() -> node.getVersion())
@@ -98,18 +102,14 @@ public class NodeTest {
 
         final Optional<Version> elasticsearchVersion = node.getVersion();
 
-        assertThat(elasticsearchVersion)
-            .isPresent();
-
-        assertThat(elasticsearchVersion.get())
-            .isEqualTo(Version.forIntegers(5, 4, 0));
+        assertThat(elasticsearchVersion).contains(Version.forIntegers(5, 4, 0));
     }
 
-    private static JsonObject buildVersionJsonObject(String foobar) {
-        final JsonObject versionObject = new JsonObject();
-        versionObject.addProperty("number", foobar);
-        final JsonObject jsonObject = new JsonObject();
-        jsonObject.add("version", versionObject);
+    private JsonNode buildVersionJsonObject(String foobar) {
+        final ObjectNode versionObject = objectMapper.createObjectNode();
+        versionObject.set("number", new TextNode(foobar));
+        final ObjectNode jsonObject = objectMapper.createObjectNode();
+        jsonObject.set("version", versionObject);
         return jsonObject;
     }
 }

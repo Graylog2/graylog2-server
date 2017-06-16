@@ -16,12 +16,11 @@
  */
 package org.graylog2.indexer.cluster;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.primitives.Ints;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
@@ -30,14 +29,12 @@ import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.jest.JestUtils;
-import org.graylog2.indexer.gson.GsonUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Optional;
@@ -47,8 +44,6 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-
-import static org.graylog2.indexer.gson.GsonUtils.asInteger;
 
 @Singleton
 public class Cluster {
@@ -70,7 +65,7 @@ public class Cluster {
         this.requestTimeout = requestTimeout;
     }
 
-    private JsonObject clusterHealth(Collection<? extends String> indices) {
+    private JsonNode clusterHealth(Collection<? extends String> indices) {
         final Health request = new Health.Builder()
                 .addIndex(indices)
                 .build();
@@ -83,7 +78,7 @@ public class Cluster {
      *
      * @return the cluster health response
      */
-    public Optional<JsonObject> health() {
+    public Optional<JsonNode> health() {
         return Optional.of(clusterHealth(Arrays.asList(indexSetRegistry.getIndexWildcards())));
     }
 
@@ -95,7 +90,7 @@ public class Cluster {
      *
      * @return the cluster health response
      */
-    public Optional<JsonObject> deflectorHealth() {
+    public Optional<JsonNode> deflectorHealth() {
         return Optional.of(clusterHealth(Arrays.asList(indexSetRegistry.getWriteIndexAliases())));
     }
 
@@ -103,27 +98,27 @@ public class Cluster {
      * Retrieve the response for the <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-nodes.html">cat nodes</a> request from Elasticsearch.
      *
      * @param fields The fields to show, see <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/cat-nodes.html">cat nodes API</a>.
-     * @return A {@link JsonArray} with the result of the cat nodes request.
+     * @return A {@link JsonNode} with the result of the cat nodes request.
      */
-    private JsonArray catNodes(String... fields) {
+    private JsonNode catNodes(String... fields) {
         final String fieldNames = String.join(",", fields);
         final Cat request = new Cat.NodesBuilder()
                 .setParameter("h", fieldNames)
                 .setParameter("full_id", true)
                 .build();
         final CatResult response = JestUtils.execute(jestClient, request, () -> "Unable to read Elasticsearch node information");
-        return GsonUtils.asJsonArray(response.getJsonObject().get("result"));
+        return response.getJsonObject().path("result");
     }
 
     public Set<NodeFileDescriptorStats> getFileDescriptorStats() {
-        final JsonArray nodes = catNodes("name", "host", "fileDescriptorMax");
+        final JsonNode nodes = catNodes("name", "host", "fileDescriptorMax");
         final ImmutableSet.Builder<NodeFileDescriptorStats> setBuilder = ImmutableSet.builder();
-        for (JsonElement jsonElement : nodes) {
-            if (jsonElement.isJsonObject()) {
-                final JsonObject jsonObject = jsonElement.getAsJsonObject();
-                final String name = GsonUtils.asString(jsonObject.get("name"));
-                final String host = GsonUtils.asString(jsonObject.get("host"));
-                final Long maxFileDescriptors = GsonUtils.asLong(jsonObject.get("fileDescriptorMax"));
+        for (JsonNode jsonElement : nodes) {
+            if (jsonElement.isObject()) {
+                final String name = jsonElement.path("name").asText();
+                final String host = jsonElement.path("host").asText(null);
+                final JsonNode fileDescriptorMax = jsonElement.path("fileDescriptorMax");
+                final Long maxFileDescriptors = fileDescriptorMax.isLong() ? fileDescriptorMax.asLong() : null;
                 setBuilder.add(NodeFileDescriptorStats.create(name, host, maxFileDescriptors));
             }
         }
@@ -132,23 +127,21 @@ public class Cluster {
     }
 
     public Optional<String> nodeIdToName(String nodeId) {
-        return getNodeInfo(nodeId).map(nodeInfo -> GsonUtils.asString(nodeInfo.get("name")));
+        return Optional.ofNullable(getNodeInfo(nodeId).path("name").asText(null));
     }
 
     public Optional<String> nodeIdToHostName(String nodeId) {
-        return getNodeInfo(nodeId).map(nodeInfo -> GsonUtils.asString(nodeInfo.get("host")));
+        return Optional.ofNullable(getNodeInfo(nodeId).path("host").asText(null));
     }
 
-    private Optional<JsonObject> getNodeInfo(String nodeId) {
+    private JsonNode getNodeInfo(String nodeId) {
         if (nodeId == null || nodeId.isEmpty()) {
-            return Optional.empty();
+            return MissingNode.getInstance();
         }
 
         final NodesInfo request = new NodesInfo.Builder().addNode(nodeId).build();
         final JestResult result = JestUtils.execute(jestClient, request, () -> "Couldn't read information of Elasticsearch node " + nodeId);
-        return Optional.ofNullable(result.getJsonObject())
-                .map(json -> GsonUtils.asJsonObject(json.get("nodes")))
-                .map(nodes -> GsonUtils.asJsonObject(nodes.get(nodeId)));
+        return result.getJsonObject().path("nodes").path(nodeId);
     }
 
     /**
@@ -163,9 +156,7 @@ public class Cluster {
                 .build();
 
         final JestResult result = JestUtils.execute(jestClient, request, () -> "Couldn't check connection status of Elasticsearch");
-        final int numberOfDataNodes = Optional.of(result.getJsonObject())
-            .map(json -> asInteger(json.get("number_of_data_nodes")))
-            .orElse(0);
+        final int numberOfDataNodes = result.getJsonObject().path("number_of_data_nodes").asInt();
         return numberOfDataNodes > 0;
     }
 
@@ -177,9 +168,7 @@ public class Cluster {
      */
     public boolean isHealthy() {
         return health()
-                .map(health -> GsonUtils.asString(health.get("status")))
-                .map(status -> !status.equals("red"))
-                .map(healthy -> healthy && indexSetRegistry.isUp())
+                .map(health -> !"red".equals(health.path("status").asText()) && indexSetRegistry.isUp())
                 .orElse(false);
     }
 
@@ -191,9 +180,7 @@ public class Cluster {
      */
     public boolean isDeflectorHealthy() {
         return deflectorHealth()
-                .map(health -> GsonUtils.asString(health.get("status")))
-                .map(status -> !status.equals("red"))
-                .map(healthy -> healthy && indexSetRegistry.isUp())
+                .map(health -> !"red".equals(health.path("status").asText()) && indexSetRegistry.isUp())
                 .orElse(false);
     }
 

@@ -16,8 +16,8 @@
  */
 package org.graylog2.bindings.providers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.gson.GsonBuilder;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.http.JestHttpClient;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class JestClientProviderTest {
                 null,
                 Duration.seconds(5L),
                 false,
-                new GsonBuilder().create()
+                new ObjectMapper()
         );
 
         final JestClient jestClient = provider.get();
@@ -61,7 +61,7 @@ public class JestClientProviderTest {
                 null,
                 Duration.seconds(5L),
                 false,
-                new GsonBuilder().create()
+                new ObjectMapper()
         );
 
         final JestClient jestClient = provider.get();
@@ -81,7 +81,7 @@ public class JestClientProviderTest {
                 null,
                 Duration.seconds(5L),
                 false,
-                new GsonBuilder().create()
+                new ObjectMapper()
         );
 
         final JestClient jestClient = provider.get();
