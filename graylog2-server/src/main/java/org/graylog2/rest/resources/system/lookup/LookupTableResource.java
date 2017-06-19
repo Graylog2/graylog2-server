@@ -96,6 +96,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singleton;
+import static java.util.Objects.requireNonNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @RequiresAuthentication
@@ -175,6 +176,25 @@ public class LookupTableResource extends RestResource {
         this.cacheSearchQueryParser = new SearchQueryParser(CacheDto.FIELD_TITLE, CACHE_SEARCH_FIELD_MAPPING);
     }
 
+    private void checkLookupTableId(String idOrName, LookupTableApi toUpdate) {
+        requireNonNull(idOrName, "idOrName parameter cannot be null");
+        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
+            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        }
+    }
+    private void checkLookupCacheId(String idOrName, CacheApi toUpdate) {
+        requireNonNull(idOrName, "idOrName parameter cannot be null");
+        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
+            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        }
+    }
+    private void checkLookupAdapterId(String idOrName, DataAdapterApi toUpdate) {
+        requireNonNull(idOrName, "idOrName parameter cannot be null");
+        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
+            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        }
+    }
+
     @GET
     @Path("tables/{name}/query")
     @ApiOperation(value = "Query a lookup table")
@@ -247,12 +267,13 @@ public class LookupTableResource extends RestResource {
     public LookupTablePage get(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                                @ApiParam(name = "resolve") @QueryParam("resolve") @DefaultValue("false") boolean resolveObjects) {
 
-        checkPermission(RestPermissions.LOOKUP_TABLES_READ, idOrName);
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
         if (!lookupTableDto.isPresent()) {
             throw new NotFoundException();
         }
         LookupTableDto tableDto = lookupTableDto.get();
+
+        checkPermission(RestPermissions.LOOKUP_TABLES_READ, tableDto.id());
 
         Set<CacheApi> caches = Collections.emptySet();
         Set<DataAdapterApi> adapters = Collections.emptySet();
@@ -295,7 +316,8 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Update the given lookup table")
     public LookupTableApi updateTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                                       @Valid @ApiParam LookupTableApi toUpdate) {
-        checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, idOrName);
+        checkLookupTableId(idOrName, toUpdate);
+        checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         LookupTableDto saved = dbTableService.save(toUpdate.toDto());
         clusterBus.post(LookupTablesUpdated.create(saved));
 
@@ -307,13 +329,12 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_DELETE)
     @ApiOperation(value = "Delete the lookup table")
     public LookupTableApi removeTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, idOrName);
-
         // TODO validate that table isn't in use, how?
         Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
         if (!lookupTableDto.isPresent()) {
             throw new NotFoundException();
         }
+        checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, lookupTableDto.get().id());
         dbTableService.delete(idOrName);
         clusterBus.post(LookupTablesDeleted.create(lookupTableDto.get()));
 
@@ -436,9 +457,9 @@ public class LookupTableResource extends RestResource {
     @Path("adapters/{idOrName}")
     @ApiOperation(value = "List the given data adapter")
     public DataAdapterApi getAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        checkPermission(RestPermissions.LOOKUP_TABLES_READ, idOrName);
         Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
         if (dataAdapterDto.isPresent()) {
+            checkPermission(RestPermissions.LOOKUP_TABLES_READ, dataAdapterDto.get().id());
             return DataAdapterApi.fromDto(dataAdapterDto.get());
         }
         throw new NotFoundException();
@@ -483,12 +504,12 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_DELETE)
     @ApiOperation(value = "Delete the given data adapter", notes = "The data adapter cannot be in use by any lookup table, otherwise the request will fail.")
     public DataAdapterApi deleteAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, idOrName);
         Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
         if (!dataAdapterDto.isPresent()) {
             throw new NotFoundException();
         }
         DataAdapterDto dto = dataAdapterDto.get();
+        checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, dto.id());
         boolean unused = dbTableService.findByDataAdapterIds(singleton(dto.id())).isEmpty();
         if (!unused) {
             throw new BadRequestException("The adapter is still in use, cannot delete.");
@@ -505,7 +526,8 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Update the given data adapter settings")
     public DataAdapterApi updateAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                                         @Valid @ApiParam DataAdapterApi toUpdate) {
-        checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, idOrName);
+        checkLookupAdapterId(idOrName, toUpdate);
+        checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         DataAdapterDto saved = dbDataAdapterService.save(toUpdate.toDto());
         // the linked lookup tables will be updated by the service
         clusterBus.post(DataAdaptersUpdated.create(saved.id()));
@@ -610,9 +632,9 @@ public class LookupTableResource extends RestResource {
     @Path("caches/{idOrName}")
     @ApiOperation(value = "List the given cache")
     public CacheApi getCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        checkPermission(RestPermissions.LOOKUP_TABLES_READ, idOrName);
         Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
         if (cacheDto.isPresent()) {
+            checkPermission(RestPermissions.LOOKUP_TABLES_READ, cacheDto.get().id());
             return CacheApi.fromDto(cacheDto.get());
         }
         throw new NotFoundException();
@@ -638,12 +660,12 @@ public class LookupTableResource extends RestResource {
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_DELETE)
     @ApiOperation(value = "Delete the given cache", notes = "The cache cannot be in use by any lookup table, otherwise the request will fail.")
     public CacheApi deleteCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
-        checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, idOrName);
         Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
         if (!cacheDto.isPresent()) {
             throw new NotFoundException();
         }
         CacheDto dto = cacheDto.get();
+        checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, dto.id());
         boolean unused = dbTableService.findByCacheIds(singleton(dto.id())).isEmpty();
         if (!unused) {
             throw new BadRequestException("The cache is still in use, cannot delete.");
@@ -660,7 +682,8 @@ public class LookupTableResource extends RestResource {
     @ApiOperation(value = "Update the given cache settings")
     public CacheApi updateCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
                                 @ApiParam CacheApi toUpdate) {
-        checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, idOrName);
+        checkLookupCacheId(idOrName, toUpdate);
+        checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         CacheDto saved = dbCacheService.save(toUpdate.toDto());
         clusterBus.post(CachesUpdated.create(saved.id()));
         return CacheApi.fromDto(saved);
