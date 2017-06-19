@@ -1,5 +1,6 @@
 package org.graylog.plugins.map.geoip;
 
+import com.codahale.metrics.MetricRegistry;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -53,8 +54,9 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
     @Inject
     protected MaxmindDataAdapter(@Assisted("id") String id,
                                  @Assisted("name") String name,
-                                 @Assisted LookupDataAdapterConfiguration config) {
-        super(id, name, config);
+                                 @Assisted LookupDataAdapterConfiguration config,
+                                 MetricRegistry metricRegistry) {
+        super(id, name, config, metricRegistry);
         this.config = (Config) config;
     }
 
