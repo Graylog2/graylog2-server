@@ -18,6 +18,7 @@ package org.graylog2.bundles;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.lookup.LookupDefaultSingleValue;
 
 @JsonAutoDetect
 public class LookupTableBundle {
@@ -35,6 +36,18 @@ public class LookupTableBundle {
 
     @JsonProperty("data_adapter_name")
     private String dataAdapterName;
+
+    @JsonProperty("default_single_value")
+    private String defaultSingleValue;
+
+    @JsonProperty("default_single_value_type")
+    private LookupDefaultSingleValue.Type defaultSingleValueType;
+
+    @JsonProperty("default_multi_value")
+    private String defaultMultiValue;
+
+    @JsonProperty("default_multi_value_type")
+    public LookupDefaultSingleValue.Type defaultMultiValueType;
 
     public String getTitle() {
         return title;
@@ -74,5 +87,37 @@ public class LookupTableBundle {
 
     public void setDataAdapterName(String dataAdapterName) {
         this.dataAdapterName = dataAdapterName;
+    }
+
+    public String getDefaultSingleValue() {
+        return defaultSingleValue;
+    }
+
+    public void setDefaultSingleValue(String defaultSingleValue) {
+        this.defaultSingleValue = defaultSingleValue;
+    }
+
+    public LookupDefaultSingleValue.Type getDefaultSingleValueType() {
+        return defaultSingleValueType;
+    }
+
+    public void setDefaultSingleValueType(LookupDefaultSingleValue.Type defaultSingleValueType) {
+        this.defaultSingleValueType = defaultSingleValueType;
+    }
+
+    public String getDefaultMultiValue() {
+        return defaultMultiValue;
+    }
+
+    public void setDefaultMultiValue(String defaultMultiValue) {
+        this.defaultMultiValue = defaultMultiValue;
+    }
+
+    public LookupDefaultSingleValue.Type getDefaultMultiValueType() {
+        return defaultMultiValueType;
+    }
+
+    public void setDefaultMultiValueType(LookupDefaultSingleValue.Type defaultMultiValueType) {
+        this.defaultMultiValueType = defaultMultiValueType;
     }
 }

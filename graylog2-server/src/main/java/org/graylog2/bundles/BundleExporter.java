@@ -216,6 +216,10 @@ public class BundleExporter {
         bundle.setName(dto.name());
         bundle.setCacheName(cacheDtoOptional.get().name());
         bundle.setDataAdapterName(adapterDtoOptional.get().name());
+        bundle.setDefaultSingleValue(dto.defaultSingleValue());
+        bundle.setDefaultSingleValueType(dto.defaultSingleValueType());
+        bundle.setDefaultMultiValue(dto.defaultMultiValue());
+        bundle.setDefaultMultiValueType(dto.defaultMultiValueType());
 
         return bundle;
     }

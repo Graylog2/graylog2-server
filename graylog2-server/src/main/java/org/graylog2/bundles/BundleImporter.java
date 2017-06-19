@@ -686,6 +686,10 @@ public class BundleImporter {
                     .name(bundle.getName())
                     .cacheId(cacheDto.get().id())
                     .dataAdapterId(adapterDto.get().id())
+                    .defaultSingleValue(bundle.getDefaultSingleValue())
+                    .defaultSingleValueType(bundle.getDefaultSingleValueType())
+                    .defaultMultiValue(bundle.getDefaultMultiValue())
+                    .defaultMultiValueType(bundle.getDefaultMultiValueType())
                     .contentPack(bundleId)
                     .build());
             createdLookupTables.put(dto.id(), dto);
