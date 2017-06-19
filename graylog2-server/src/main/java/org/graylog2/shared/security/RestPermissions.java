@@ -77,6 +77,10 @@ public class RestPermissions implements PluginPermissions {
     public static final String LDAP_EDIT = "ldap:edit";
     public static final String LDAPGROUPS_EDIT = "ldapgroups:edit";
     public static final String LDAPGROUPS_READ = "ldapgroups:read";
+    public static final String LOOKUP_TABLES_CREATE = "lookuptables:create";
+    public static final String LOOKUP_TABLES_DELETE = "lookuptables:delete";
+    public static final String LOOKUP_TABLES_EDIT = "lookuptables:edit";
+    public static final String LOOKUP_TABLES_READ = "lookuptables:read";
     public static final String LOGGERS_EDIT = "loggers:edit";
     public static final String LOGGERS_EDITSUBSYSTEM = "loggers:editsubsystem";
     public static final String LOGGERS_READ = "loggers:read";
@@ -178,6 +182,10 @@ public class RestPermissions implements PluginPermissions {
         .add(create(LDAP_EDIT, ""))
         .add(create(LDAPGROUPS_EDIT, ""))
         .add(create(LDAPGROUPS_READ, ""))
+        .add(create(LOOKUP_TABLES_CREATE, ""))
+        .add(create(LOOKUP_TABLES_DELETE, ""))
+        .add(create(LOOKUP_TABLES_EDIT, ""))
+        .add(create(LOOKUP_TABLES_READ, ""))
         .add(create(LOGGERS_EDIT, ""))
         .add(create(LOGGERS_EDITSUBSYSTEM, ""))
         .add(create(LOGGERS_READ, ""))

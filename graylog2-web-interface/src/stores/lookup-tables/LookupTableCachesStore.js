@@ -84,7 +84,7 @@ const LookupTableCachesStore = Reflux.createStore({
   },
 
   update(cache) {
-    const url = this._url('caches');
+    const url = this._url(`caches/${cache.id}`);
     const promise = fetch('PUT', url, cache);
 
     promise.then((response) => {

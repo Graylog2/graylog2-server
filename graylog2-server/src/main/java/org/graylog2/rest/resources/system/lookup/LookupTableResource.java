@@ -31,6 +31,7 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
@@ -63,6 +64,7 @@ import org.graylog2.search.SearchQuery;
 import org.graylog2.search.SearchQueryField;
 import org.graylog2.search.SearchQueryParser;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.mongojack.DBQuery;
 import org.mongojack.DBSort;
@@ -94,6 +96,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.singleton;
+import static java.util.Objects.requireNonNull;
 import static org.slf4j.LoggerFactory.getLogger;
 
 @RequiresAuthentication
@@ -173,9 +176,29 @@ public class LookupTableResource extends RestResource {
         this.cacheSearchQueryParser = new SearchQueryParser(CacheDto.FIELD_TITLE, CACHE_SEARCH_FIELD_MAPPING);
     }
 
+    private void checkLookupTableId(String idOrName, LookupTableApi toUpdate) {
+        requireNonNull(idOrName, "idOrName parameter cannot be null");
+        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
+            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        }
+    }
+    private void checkLookupCacheId(String idOrName, CacheApi toUpdate) {
+        requireNonNull(idOrName, "idOrName parameter cannot be null");
+        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
+            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        }
+    }
+    private void checkLookupAdapterId(String idOrName, DataAdapterApi toUpdate) {
+        requireNonNull(idOrName, "idOrName parameter cannot be null");
+        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
+            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        }
+    }
+
     @GET
     @Path("tables/{name}/query")
     @ApiOperation(value = "Query a lookup table")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public LookupResult performLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
                                       @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
         return lookupTableService.newBuilder().lookupTable(name).build().lookup(key);
@@ -184,6 +207,7 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("tables")
     @ApiOperation(value = "List configured lookup tables")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public LookupTablePage tables(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                   @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                   @ApiParam(name = "sort",
@@ -249,6 +273,8 @@ public class LookupTableResource extends RestResource {
         }
         LookupTableDto tableDto = lookupTableDto.get();
 
+        checkPermission(RestPermissions.LOOKUP_TABLES_READ, tableDto.id());
+
         Set<CacheApi> caches = Collections.emptySet();
         Set<DataAdapterApi> adapters = Collections.emptySet();
 
@@ -270,6 +296,7 @@ public class LookupTableResource extends RestResource {
     @Path("tables")
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_CREATE)
     @ApiOperation(value = "Create a new lookup table")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
     public LookupTableApi createTable(@ApiParam LookupTableApi lookupTable) {
         try {
             LookupTableDto saved = dbTableService.save(lookupTable.toDto());
@@ -284,10 +311,13 @@ public class LookupTableResource extends RestResource {
     }
 
     @PUT
-    @Path("tables")
+    @Path("tables/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_TABLE_UPDATE)
     @ApiOperation(value = "Update the given lookup table")
-    public LookupTableApi updateTable(@Valid @ApiParam LookupTableApi toUpdate) {
+    public LookupTableApi updateTable(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                      @Valid @ApiParam LookupTableApi toUpdate) {
+        checkLookupTableId(idOrName, toUpdate);
+        checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         LookupTableDto saved = dbTableService.save(toUpdate.toDto());
         clusterBus.post(LookupTablesUpdated.create(saved));
 
@@ -304,6 +334,7 @@ public class LookupTableResource extends RestResource {
         if (!lookupTableDto.isPresent()) {
             throw new NotFoundException();
         }
+        checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, lookupTableDto.get().id());
         dbTableService.delete(idOrName);
         clusterBus.post(LookupTablesDeleted.create(lookupTableDto.get()));
 
@@ -345,6 +376,7 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("adapters")
     @ApiOperation(value = "List available data adapters")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public DataAdapterPage adapters(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                                 @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                                 @ApiParam(name = "sort",
@@ -382,6 +414,7 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("types/adapters")
     @ApiOperation(value = "List available data adapter types")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public Map<String, LookupDataAdapter.Descriptor> availableAdapterTypes() {
 
         return dataAdapterTypes.values().stream()
@@ -394,6 +427,7 @@ public class LookupTableResource extends RestResource {
     @NoAuditEvent("Bulk read call")
     @Path("errorstates")
     @ApiOperation(value = "Retrieve the runtime error states of the given lookup tables, caches and adapters")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public ErrorStates errorStates(@ApiParam(name = "request") @Valid ErrorStatesRequest request) {
         final ErrorStates.Builder errorStates = ErrorStates.builder();
         if (request.tables() != null) {
@@ -425,6 +459,7 @@ public class LookupTableResource extends RestResource {
     public DataAdapterApi getAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<DataAdapterDto> dataAdapterDto = dbDataAdapterService.get(idOrName);
         if (dataAdapterDto.isPresent()) {
+            checkPermission(RestPermissions.LOOKUP_TABLES_READ, dataAdapterDto.get().id());
             return DataAdapterApi.fromDto(dataAdapterDto.get());
         }
         throw new NotFoundException();
@@ -436,6 +471,7 @@ public class LookupTableResource extends RestResource {
     @ApiResponses({
             @ApiResponse(code = 404, message = "If the adapter cannot be found (if it failed or doesn't exist at all)")
     })
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public LookupResult performAdapterLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
                                              @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
         final Collection<LookupDataAdapter> dataAdapters = lookupTableService.getDataAdapters(singleton(name));
@@ -450,6 +486,7 @@ public class LookupTableResource extends RestResource {
     @Path("adapters")
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_CREATE)
     @ApiOperation(value = "Create a new data adapter")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
     public DataAdapterApi createAdapter(@Valid @ApiParam DataAdapterApi newAdapter) {
         try {
             DataAdapterDto dto = newAdapter.toDto();
@@ -472,6 +509,7 @@ public class LookupTableResource extends RestResource {
             throw new NotFoundException();
         }
         DataAdapterDto dto = dataAdapterDto.get();
+        checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, dto.id());
         boolean unused = dbTableService.findByDataAdapterIds(singleton(dto.id())).isEmpty();
         if (!unused) {
             throw new BadRequestException("The adapter is still in use, cannot delete.");
@@ -483,10 +521,13 @@ public class LookupTableResource extends RestResource {
     }
 
     @PUT
-    @Path("adapters")
+    @Path("adapters/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_ADAPTER_UPDATE)
     @ApiOperation(value = "Update the given data adapter settings")
-    public DataAdapterApi updateAdapter(@Valid @ApiParam DataAdapterApi toUpdate) {
+    public DataAdapterApi updateAdapter(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                        @Valid @ApiParam DataAdapterApi toUpdate) {
+        checkLookupAdapterId(idOrName, toUpdate);
+        checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         DataAdapterDto saved = dbDataAdapterService.save(toUpdate.toDto());
         // the linked lookup tables will be updated by the service
         clusterBus.post(DataAdaptersUpdated.create(saved.id()));
@@ -498,6 +539,7 @@ public class LookupTableResource extends RestResource {
     @Path("adapters/validate")
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate the data adapter config")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public ValidationResult validateAdapter(@Valid @ApiParam DataAdapterApi toValidate) {
         final ValidationResult validation = new ValidationResult();
 
@@ -540,6 +582,7 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("caches")
     @ApiOperation(value = "List available caches")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public CachesPage caches(@ApiParam(name = "page") @QueryParam("page") @DefaultValue("1") int page,
                              @ApiParam(name = "per_page") @QueryParam("per_page") @DefaultValue("50") int perPage,
                              @ApiParam(name = "sort",
@@ -577,6 +620,7 @@ public class LookupTableResource extends RestResource {
     @GET
     @Path("types/caches")
     @ApiOperation(value = "List available caches types")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public Map<String, LookupCache.Descriptor> availableCacheTypes() {
         return cacheTypes.values().stream()
                 .map(LookupCache.Factory::getDescriptor)
@@ -590,6 +634,7 @@ public class LookupTableResource extends RestResource {
     public CacheApi getCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName) {
         Optional<CacheDto> cacheDto = dbCacheService.get(idOrName);
         if (cacheDto.isPresent()) {
+            checkPermission(RestPermissions.LOOKUP_TABLES_READ, cacheDto.get().id());
             return CacheApi.fromDto(cacheDto.get());
         }
         throw new NotFoundException();
@@ -599,6 +644,7 @@ public class LookupTableResource extends RestResource {
     @Path("caches")
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_CREATE)
     @ApiOperation(value = "Create a new cache")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_CREATE)
     public CacheApi createCache(@ApiParam CacheApi newCache) {
         try {
             final CacheDto saved = dbCacheService.save(newCache.toDto());
@@ -619,6 +665,7 @@ public class LookupTableResource extends RestResource {
             throw new NotFoundException();
         }
         CacheDto dto = cacheDto.get();
+        checkPermission(RestPermissions.LOOKUP_TABLES_DELETE, dto.id());
         boolean unused = dbTableService.findByCacheIds(singleton(dto.id())).isEmpty();
         if (!unused) {
             throw new BadRequestException("The cache is still in use, cannot delete.");
@@ -630,10 +677,13 @@ public class LookupTableResource extends RestResource {
     }
 
     @PUT
-    @Path("caches")
+    @Path("caches/{idOrName}")
     @AuditEvent(type = AuditEventTypes.LOOKUP_CACHE_UPDATE)
     @ApiOperation(value = "Update the given cache settings")
-    public CacheApi updateCache(@ApiParam CacheApi toUpdate) {
+    public CacheApi updateCache(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                                @ApiParam CacheApi toUpdate) {
+        checkLookupCacheId(idOrName, toUpdate);
+        checkPermission(RestPermissions.LOOKUP_TABLES_EDIT, toUpdate.id());
         CacheDto saved = dbCacheService.save(toUpdate.toDto());
         clusterBus.post(CachesUpdated.create(saved.id()));
         return CacheApi.fromDto(saved);
@@ -643,6 +693,7 @@ public class LookupTableResource extends RestResource {
     @Path("caches/validate")
     @NoAuditEvent("Validation only")
     @ApiOperation(value = "Validate the cache config")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public ValidationResult validateCache(@Valid @ApiParam CacheApi toValidate) {
         final ValidationResult validation = new ValidationResult();
 
