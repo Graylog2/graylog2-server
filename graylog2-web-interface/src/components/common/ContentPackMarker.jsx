@@ -2,13 +2,13 @@ import React from 'react';
 
 const ContentPackMarker = React.createClass({
   propTypes: {
-    contentPack: React.PropTypes.string.isRequired,
+    contentPack: React.PropTypes.string,
     marginLeft: React.PropTypes.number,
     marginRight: React.PropTypes.number,
   },
 
   getDefaultProps() {
-    return { marginLeft: 0, marginRight: 0 };
+    return { contentPack: undefined, marginLeft: 0, marginRight: 0 };
   },
 
   render() {

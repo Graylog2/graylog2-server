@@ -16,6 +16,9 @@
  */
 package org.graylog2.lookup.caches;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -23,6 +26,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheStats;
+import com.google.common.collect.ImmutableMap;
 import com.google.inject.Inject;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.autovalue.WithBeanGetter;
@@ -36,7 +41,9 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nullable;
 import javax.inject.Named;
 import javax.validation.constraints.Min;
+import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -51,8 +58,9 @@ public class GuavaLookupCache extends LookupCache {
     public GuavaLookupCache(@Assisted("id") String id,
                             @Assisted("name") String name,
                             @Assisted LookupCacheConfiguration c,
-                            @Named("processbuffer_processors") int processorCount) {
-        super(id, name, c);
+                            @Named("processbuffer_processors") int processorCount,
+                            MetricRegistry metricRegistry) {
+        super(id, name, c, metricRegistry);
         Config config = (Config) c;
         CacheBuilder<Object, Object> builder = CacheBuilder.newBuilder();
 
@@ -70,7 +78,16 @@ public class GuavaLookupCache extends LookupCache {
             builder.expireAfterWrite(config.expireAfterWrite(), config.expireAfterWriteUnit());
         }
 
-        cache = builder.build();
+        cache = new InstrumentedCache<>(builder.build(), this);
+    }
+
+    @Override
+    public Gauge<Long> entryCount() {
+        if (cache != null) {
+            return cache::size;
+        } else {
+            return () -> 0L;
+        }
     }
 
     @Override
@@ -83,7 +100,7 @@ public class GuavaLookupCache extends LookupCache {
 
     @Override
     public LookupResult get(LookupCacheKey key, Callable<LookupResult> loader) {
-        try {
+        try (final Timer.Context ignored = lookupTimer()) {
             return cache.get(key, loader);
         } catch (ExecutionException e) {
             LOG.warn("Loading value from data adapter failed for key {}, returning empty result", key, e);
@@ -196,6 +213,92 @@ public class GuavaLookupCache extends LookupCache {
             public abstract Builder expireAfterWriteUnit(@Nullable TimeUnit expireAfterWriteUnit);
 
             public abstract Config build();
+        }
+    }
+
+    private static class InstrumentedCache<K, V> implements Cache<K, V> {
+        private final Cache<K, V> delegate;
+        private final LookupCache cache;
+
+        public InstrumentedCache(Cache<K, V> delegate, LookupCache cache) {
+            this.delegate = delegate;
+            this.cache = cache;
+        }
+
+        @Nullable
+        @Override
+        public V getIfPresent(Object key) {
+            return delegate.getIfPresent(key);
+        }
+
+        @Override
+        public V get(K key, Callable<? extends V> loader) throws ExecutionException {
+            V value = delegate.getIfPresent(key);
+            if (value == null) {
+                try {
+                    value = loader.call();
+                    delegate.put(key, value);
+                    cache.incrMissCount();
+                } catch (Exception e) {
+                    throw new ExecutionException(e);
+                }
+            } else {
+                cache.incrHitCount();
+            }
+
+            cache.incrTotalCount();
+
+            return value;
+        }
+
+        @Override
+        public ImmutableMap<K, V> getAllPresent(Iterable<?> keys) {
+            return delegate.getAllPresent(keys);
+        }
+
+        @Override
+        public void put(K key, V value) {
+            delegate.put(key, value);
+        }
+
+        @Override
+        public void putAll(Map<? extends K, ? extends V> m) {
+            delegate.putAll(m);
+        }
+
+        @Override
+        public void invalidate(Object key) {
+            delegate.invalidate(key);
+        }
+
+        @Override
+        public void invalidateAll(Iterable<?> keys) {
+            delegate.invalidateAll(keys);
+        }
+
+        @Override
+        public void invalidateAll() {
+            delegate.invalidateAll();
+        }
+
+        @Override
+        public long size() {
+            return delegate.size();
+        }
+
+        @Override
+        public CacheStats stats() {
+            return delegate.stats();
+        }
+
+        @Override
+        public ConcurrentMap<K, V> asMap() {
+            return delegate.asMap();
+        }
+
+        @Override
+        public void cleanUp() {
+            delegate.cleanUp();
         }
     }
 }

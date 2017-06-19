@@ -113,6 +113,7 @@ const CachesOverview = React.createClass({
                   <th>Name</th>
                   <th>Entries</th>
                   <th>Hit rate</th>
+                  <th>Throughput</th>
                   <th className={Styles.actions}>Actions</th>
                 </tr>
               </thead>

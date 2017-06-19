@@ -6,6 +6,8 @@ import { Button } from 'react-bootstrap';
 import Routes from 'routing/Routes';
 import CombinedProvider from 'injection/CombinedProvider';
 import { ContentPackMarker } from 'components/common';
+import { MetricsMapper, MetricContainer, CounterRate } from 'components/metrics';
+import NumberUtils from 'util/NumberUtils';
 
 const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
 
@@ -21,7 +23,44 @@ const LUTTableEntry = React.createClass({
       LookupTableCachesActions.delete(this.props.cache.id).then(() => LookupTableCachesActions.reloadPage());
     }
   },
+
+  _onCountMetrics(metrics) {
+    let totalHits = 0;
+    let totalMisses = 0;
+
+    Object.keys(metrics).map(nodeId => metrics[nodeId].hits.metric.rate.total).forEach((v) => { totalHits += v; });
+    Object.keys(metrics).map(nodeId => metrics[nodeId].misses.metric.rate.total).forEach((v) => { totalMisses += v; });
+
+    const total = totalHits + totalMisses;
+
+    if (total < 1) {
+      return 'n/a';
+    }
+    const hitRate = (totalHits * 100.0) / total;
+    return `${NumberUtils.formatNumber(hitRate)}%`;
+  },
+
+  _onEntriesMetrics(metrics) {
+    let total = 0;
+
+    Object.keys(metrics).map(nodeId => metrics[nodeId].count.metric.value.value).forEach((v) => { total += v; });
+
+    if (total < 0) {
+      return 'n/a';
+    }
+
+    return NumberUtils.formatNumber(total);
+  },
+
   render() {
+    const countMap = {
+      requests: `org.graylog2.lookup.caches.${this.props.cache.id}.requests`,
+      hits: `org.graylog2.lookup.caches.${this.props.cache.id}.hits`,
+      misses: `org.graylog2.lookup.caches.${this.props.cache.id}.misses`,
+    };
+    const entriesMap = {
+      count: `org.graylog2.lookup.caches.${this.props.cache.id}.entries`,
+    };
     return (
       <tbody>
         <tr>
@@ -31,8 +70,17 @@ const LUTTableEntry = React.createClass({
           </td>
           <td>{this.props.cache.description}</td>
           <td>{this.props.cache.name}</td>
-          <td>TODO: <em>0</em></td>
-          <td>TODO: <em>0 %</em></td>
+          <td>
+            <MetricsMapper map={entriesMap} computeValue={this._onEntriesMetrics} />
+          </td>
+          <td>
+            <MetricsMapper map={countMap} computeValue={this._onCountMetrics} />
+          </td>
+          <td>
+            <MetricContainer name={`org.graylog2.lookup.caches.${this.props.cache.id}.requests`}>
+              <CounterRate suffix="lookups/s" />
+            </MetricContainer>
+          </td>
           <td>
             <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(this.props.cache.name)}>
               <Button bsSize="xsmall" bsStyle="info">Edit</Button>

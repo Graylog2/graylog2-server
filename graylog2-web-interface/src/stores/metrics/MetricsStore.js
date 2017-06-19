@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch, { Builder, fetchPeriodically } from 'logic/rest/FetchProvider';
+import TimeHelper from 'util/TimeHelper';
 
 import StoreProvider from 'injection/StoreProvider';
 const SessionStore = StoreProvider.getStore('Session');
@@ -92,7 +93,8 @@ const MetricsStore = Reflux.createStore({
 
       promise.then((response) => {
         this.metrics = this._buildMetricsFromResponse(response);
-        this.trigger({ metrics: this.metrics });
+        // The metricsUpdatedAt value is used by components to decide if they should be re-rendered
+        this.trigger({ metrics: this.metrics, metricsUpdatedAt: TimeHelper.nowInSeconds() });
         return this.metrics;
       });
       this.promises.list = promise;
