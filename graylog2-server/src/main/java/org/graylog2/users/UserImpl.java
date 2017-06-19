@@ -72,7 +72,6 @@ public class UserImpl extends PersistedImpl implements User {
 
     private static final Map<String, Object> DEFAULT_PREFERENCES = new ImmutableMap.Builder<String, Object>()
             .put("updateUnfocussed", false)
-            .put("disableExpensiveUpdates", false)
             .put("enableSmartSearch", true)
             .build();
 
