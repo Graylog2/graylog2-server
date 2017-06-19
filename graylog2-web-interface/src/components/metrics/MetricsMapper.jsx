@@ -1,6 +1,5 @@
 import React from 'react';
 import Reflux from 'reflux';
-//import { Row, Col } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { MetricsActions, MetricsStore } = CombinedProvider.get('Metrics');
