@@ -23,6 +23,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.LookupDefaultSingleValue;
 import org.graylog2.lookup.dto.LookupTableDto;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 
@@ -32,36 +33,43 @@ import javax.annotation.Nullable;
 @JsonDeserialize(builder = AutoValue_LookupTableApi.Builder.class)
 public abstract class LookupTableApi {
 
+    public static final String FIELD_DEFAULT_SINGLE_VALUE = "default_single_value";
+    public static final String FIELD_DEFAULT_MULTI_VALUE = "default_multi_value";
+
     @Nullable
     @JsonProperty("id")
     public abstract String id();
 
     @JsonProperty("title")
+    @NotEmpty
     public abstract String title();
 
     @JsonProperty("description")
     public abstract String description();
 
     @JsonProperty("name")
+    @NotEmpty
     public abstract String name();
 
     @JsonProperty("cache_id")
+    @NotEmpty
     public abstract String cacheId();
 
     @JsonProperty("data_adapter_id")
+    @NotEmpty
     public abstract String dataAdapterId();
 
     @JsonProperty("content_pack")
     @Nullable
     public abstract String contentPack();
 
-    @JsonProperty("default_single_value")
+    @JsonProperty(FIELD_DEFAULT_SINGLE_VALUE)
     public abstract String defaultSingleValue();
 
     @JsonProperty("default_single_value_type")
     public abstract LookupDefaultSingleValue.Type defaultSingleValueType();
 
-    @JsonProperty("default_multi_value")
+    @JsonProperty(FIELD_DEFAULT_MULTI_VALUE)
     public abstract String defaultMultiValue();
 
     @JsonProperty("default_multi_value_type")

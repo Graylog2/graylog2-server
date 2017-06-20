@@ -83,6 +83,10 @@ const LUTTablesPage = React.createClass({
     return props.route.action === 'create';
   },
 
+  _validateTable(table) {
+    LookupTablesActions.validate(table);
+  },
+
   render() {
     let content;
     const isShowing = this.props.route.action === 'show';
@@ -98,7 +102,9 @@ const LUTTablesPage = React.createClass({
               <h2>Lookup Table</h2>
               <LookupTableForm table={this.state.table}
                                create={false}
-                               saved={this._saved} />
+                               saved={this._saved}
+                               validate={this._validateTable}
+                               validationErrors={this.state.validationErrors} />
             </Col>
           </Row>
         );
@@ -108,7 +114,10 @@ const LUTTablesPage = React.createClass({
                                 table={this.state.table} />);
       }
     } else if (this._isCreating(this.props)) {
-      content = (<LookupTableCreate history={this.props.history} saved={this._saved} />);
+      content = (<LookupTableCreate history={this.props.history}
+                                    saved={this._saved}
+                                    validate={this._validateTable}
+                                    validationErrors={this.state.validationErrors} />);
     } else if (!this.state || !this.state.tables) {
       content = <Spinner text="Loading lookup tables" />;
     } else {

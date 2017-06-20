@@ -17,8 +17,9 @@ const JSONValueInput = React.createClass({
   propTypes: {
     update: PropTypes.func.isRequired,
     label: PropTypes.string,
-    help: PropTypes.string,
+    help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     required: PropTypes.bool,
+    validationState: PropTypes.string,
     value: PropTypes.string,
     valueType: PropTypes.oneOf(OPTIONS.map(option => option.value)),
     allowedTypes: (props, propName, componentName) => {
@@ -50,6 +51,7 @@ const JSONValueInput = React.createClass({
       label: '',
       help: '',
       required: false,
+      validationState: null,
       labelClassName: undefined,
       wrapperClassName: undefined,
     };
@@ -89,13 +91,14 @@ const JSONValueInput = React.createClass({
     });
 
     return (
-      <FormGroup>
+      <FormGroup validationState={this.props.validationState}>
         {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
             <FormControl type="text" onChange={this._onUpdate} value={this.props.value} required={this.props.required} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
+                            bsStyle={this.props.validationState === 'error' ? 'danger' : null}
                             title={OPTIONS.filter(o => o.value === this.props.valueType)[0].label}>
               {options}
             </DropdownButton>
