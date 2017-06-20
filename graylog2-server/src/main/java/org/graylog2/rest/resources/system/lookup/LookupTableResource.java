@@ -180,21 +180,24 @@ public class LookupTableResource extends RestResource {
 
     private void checkLookupTableId(String idOrName, LookupTableApi toUpdate) {
         requireNonNull(idOrName, "idOrName parameter cannot be null");
-        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
-            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        if (idOrName.equals(toUpdate.id()) || idOrName.equals(toUpdate.name())) {
+            return;
         }
+        throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
     }
     private void checkLookupCacheId(String idOrName, CacheApi toUpdate) {
         requireNonNull(idOrName, "idOrName parameter cannot be null");
-        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
-            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        if (idOrName.equals(toUpdate.id()) || idOrName.equals(toUpdate.name())) {
+            return;
         }
+        throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
     }
     private void checkLookupAdapterId(String idOrName, DataAdapterApi toUpdate) {
         requireNonNull(idOrName, "idOrName parameter cannot be null");
-        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
-            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        if (idOrName.equals(toUpdate.id()) || idOrName.equals(toUpdate.name())) {
+            return;
         }
+        throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
     }
 
     @GET
