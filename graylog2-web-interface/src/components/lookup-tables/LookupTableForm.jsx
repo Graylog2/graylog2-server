@@ -43,7 +43,7 @@ const LookupTableForm = React.createClass({
   },
 
   componentWillReceiveProps(nextProps) {
-    if (_.isEqual(this.props, nextProps)) {
+    if (_.isEqual(this.props.table, nextProps.table)) {
       // props haven't change, don't update our state from them
       return;
     }
