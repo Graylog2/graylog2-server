@@ -95,7 +95,7 @@ const JSONValueInput = React.createClass({
         {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
         <InputWrapper className={this.props.wrapperClassName}>
           <InputGroup>
-            <FormControl type="text" onChange={this._onUpdate} value={this.props.value} required={this.props.required} />
+            <FormControl type="text" onChange={this._onUpdate} value={this.state.value} required={this.props.required} />
             <DropdownButton componentClass={InputGroup.Button}
                             id="input-dropdown-addon"
                             bsStyle={this.props.validationState === 'error' ? 'danger' : null}
