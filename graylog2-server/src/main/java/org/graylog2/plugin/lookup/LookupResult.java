@@ -76,8 +76,7 @@ public abstract class LookupResult {
     }
 
     public static LookupResult withDefaults(final LookupDefaultSingleValue singleValue, final LookupDefaultMultiValue multiValue) {
-            LookupResult.Builder builder = LookupResult.withoutTTL()
-                    .multiValue(multiValue.value());
+            LookupResult.Builder builder = LookupResult.withoutTTL();
 
             switch (singleValue.valueType()) {
                 case STRING:
@@ -94,6 +93,15 @@ public abstract class LookupResult {
                 case NULL:
                     break;
             }
+
+            // If not default multi value is set, we use the single value with the single value key as we do
+            // in other methods as well.
+            if (multiValue.isSet()) {
+                builder = builder.multiValue(multiValue.value());
+            } else {
+                builder = builder.multiValue(Collections.singletonMap(SINGLE_VALUE_KEY, singleValue.value()));
+            }
+
             return builder.build();
     }
 
