@@ -20,6 +20,7 @@ import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -263,6 +264,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
     @JsonAutoDetect
     @JsonDeserialize(builder = AutoValue_HTTPJSONPathDataAdapter_Config.Builder.class)
     @JsonTypeName(NAME)
+    @JsonInclude(JsonInclude.Include.NON_EMPTY)
     public static abstract class Config implements LookupDataAdapterConfiguration {
         @Override
         @JsonProperty(TYPE_FIELD)
