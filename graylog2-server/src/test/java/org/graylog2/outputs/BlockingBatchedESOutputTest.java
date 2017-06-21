@@ -21,7 +21,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
 import org.graylog2.Configuration;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.cluster.Cluster;
 import org.graylog2.indexer.messages.Messages;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
@@ -37,12 +36,9 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 public class BlockingBatchedESOutputTest {
     @Rule
@@ -54,8 +50,6 @@ public class BlockingBatchedESOutputTest {
 
     @Mock
     private Messages messages;
-    @Mock
-    private Cluster cluster;
 
     @Before
     public void setUp() throws Exception {
@@ -71,10 +65,7 @@ public class BlockingBatchedESOutputTest {
 
     @Test
     public void write() throws Exception {
-        when(cluster.isConnected()).thenReturn(true);
-        when(cluster.isDeflectorHealthy()).thenReturn(true);
-
-        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
+        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal);
 
         final List<Map.Entry<IndexSet, Message>> messageList = buildMessages(config.getOutputBatchSize());
 
@@ -86,52 +77,8 @@ public class BlockingBatchedESOutputTest {
     }
 
     @Test
-    public void writeDoesNotFlushIfClusterIsNotConnected() throws Exception {
-        when(cluster.isConnected()).thenReturn(false);
-
-        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndDeflectorHealthy();
-
-        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
-
-        final List<Map.Entry<IndexSet, Message>> messageList = buildMessages(config.getOutputBatchSize());
-
-        for (Map.Entry<IndexSet, Message> entry : messageList) {
-            try {
-                output.writeMessageEntry(entry);
-            } catch(RuntimeException ignore) {
-            }
-        }
-
-        verify(messages, never()).bulkIndex(eq(messageList));
-    }
-
-    @Test
-    public void writeDoesNotFlushIfClusterIsUnhealthy() throws Exception {
-        when(cluster.isConnected()).thenReturn(true);
-        when(cluster.isDeflectorHealthy()).thenReturn(false);
-
-        doThrow(RuntimeException.class).when(cluster).waitForConnectedAndDeflectorHealthy();
-
-        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
-
-        final List<Map.Entry<IndexSet, Message>> messageList = buildMessages(config.getOutputBatchSize());
-
-        for (Map.Entry<IndexSet, Message> entry : messageList) {
-            try {
-                output.writeMessageEntry(entry);
-            } catch(RuntimeException ignore) {
-            }
-        }
-
-        verify(messages, never()).bulkIndex(eq(messageList));
-    }
-
-    @Test
     public void forceFlushIfTimedOut() throws Exception {
-        when(cluster.isConnected()).thenReturn(true);
-        when(cluster.isDeflectorHealthy()).thenReturn(true);
-
-        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, cluster, config, journal);
+        final BlockingBatchedESOutput output = new BlockingBatchedESOutput(metricRegistry, messages, config, journal);
 
         final List<Map.Entry<IndexSet, Message>> messageList = buildMessages(config.getOutputBatchSize() - 1);
 
