@@ -45,7 +45,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
     private static final Logger LOG = LoggerFactory.getLogger(V20170607164210_MigrateReopenedIndicesToAliases.class);
     private static final String REOPENED_INDEX_SETTING = "graylog2_reopened";
 
-    private final Version elasticsearchVersion;
+    private Node node;
     private final IndexSetService indexSetService;
     private final MongoIndexSet.Factory mongoIndexSetFactory;
     private final Indices indices;
@@ -57,7 +57,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
                                                            MongoIndexSet.Factory mongoIndexSetFactory,
                                                            Indices indices,
                                                            JestClient jestClient) {
-        this.elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
+        this.node = node;
         this.indexSetService = indexSetService;
         this.mongoIndexSetFactory = mongoIndexSetFactory;
         this.indices = indices;
@@ -81,6 +81,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
     }
 
     private Set<String> getReopenedIndices(final Collection<String> indices) {
+        final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
         final String indexList = String.join(",", indices);
         final State request = new State.Builder().withMetadata().indices(indexList).build();
 
@@ -107,7 +108,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
                 LOG.debug("Index metadata was: {}", value.toString());
                 continue;
             }
-            if (checkForReopened(indexSettings)) {
+            if (checkForReopened(indexSettings, elasticsearchVersion)) {
                 LOG.debug("Adding {} to list of indices to be migrated.", indexName);
                 reopenedIndices.add(indexName);
             }
@@ -116,7 +117,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
         return reopenedIndices.build();
     }
 
-    private boolean checkForReopened(@Nullable JsonNode indexSettings) {
+    private boolean checkForReopened(@Nullable JsonNode indexSettings, Version elasticsearchVersion) {
         final JsonNode settings;
         if (elasticsearchVersion.satisfies(">=2.1.0 & <5.0.0")) {
             settings = indexSettings;
