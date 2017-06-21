@@ -47,6 +47,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.core.MediaType;
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -119,7 +120,9 @@ public class IndexerOverviewResource extends RestResource {
         final DeflectorSummary deflectorSummary = deflectorResource.deflector(indexSetId);
         final List<IndexRangeSummary> indexRanges = indexRangesResource.list().ranges();
         final JsonNode indexStats = indices.getIndexStats(indexSet);
-        final Map<String, Boolean> areReopened = indices.areReopened(indexStats.fieldNames());
+        final List<String> indexNames = new ArrayList<>();
+        indexStats.fieldNames().forEachRemaining(indexNames::add);
+        final Map<String, Boolean> areReopened = indices.areReopened(indexNames);
         final Map<String, IndexSummary> indicesSummaries = buildIndexSummaries(deflectorSummary, indexRanges, indexStats, areReopened);
 
         indices.getClosedIndices(indexSet).forEach(indexName -> indicesSummaries.put(indexName, IndexSummary.create(
