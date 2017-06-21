@@ -89,7 +89,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
             final String indexName = entry.getKey();
             final JsonNode value = entry.getValue();
             if (value.isObject()) {
-                final JsonNode indexSettings = getIndexSettings(value, indexName);
+                final JsonNode indexSettings = getIndexSettings(value);
                 if (checkForReopened(indexSettings)) {
                     reopenedIndices.add(indexName);
                 }
@@ -110,7 +110,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
         }
 
         final JsonNode reopened = settings.path(REOPENED_INDEX_SETTING);
-        return reopened.isMissingNode() ? false : reopened.booleanValue();
+        return reopened.isMissingNode() ? false : reopened.asBoolean();
     }
 
     private Set<String> getReopenedIndices(final IndexSet indexSet) {
@@ -121,8 +121,8 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
         return clusterStateJson.path("metadata").path("indices");
     }
 
-    private JsonNode getIndexSettings(JsonNode indicesJson, String index) {
-        return indicesJson.path(index).path("settings").path("index");
+    private JsonNode getIndexSettings(JsonNode indicesJson) {
+        return indicesJson.path("settings").path("index");
     }
 }
 
