@@ -22,6 +22,9 @@ import com.google.common.eventbus.Subscribe;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.inputs.Input;
 import org.graylog2.inputs.InputService;
+import org.graylog2.inputs.extractors.events.ExtractorCreated;
+import org.graylog2.inputs.extractors.events.ExtractorDeleted;
+import org.graylog2.inputs.extractors.events.ExtractorUpdated;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.filters.MessageFilter;
 import org.graylog2.plugin.inputs.Extractor;
@@ -34,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Named;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -98,7 +102,29 @@ public class ExtractorFilter implements MessageFilter {
     @Subscribe
     @SuppressWarnings("unused")
     public void handleInputUpdate(final InputUpdated event) {
+        LOG.debug("Updating extractors cache for input <{}>", event.id());
         scheduler.submit(() -> loadExtractors(event.id()));
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleExtractorCreate(final ExtractorCreated event) {
+        LOG.debug("Load extractors for input <{}>", event.inputId());
+        scheduler.submit(() -> loadExtractors(event.inputId()));
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleExtractorDelete(final ExtractorDeleted event) {
+        LOG.debug("Removing extractors for input <{}> from extractors cache", event.inputId());
+        scheduler.submit(() -> loadExtractors(event.inputId()   ));
+    }
+
+    @Subscribe
+    @SuppressWarnings("unused")
+    public void handleExtractorUpdate(final ExtractorUpdated event) {
+        LOG.debug("Updating extractors cache for input <{}>", event.inputId());
+        scheduler.submit(() -> loadExtractors(event.inputId()));
     }
 
     private void loadAllExtractors() {
@@ -114,9 +140,8 @@ public class ExtractorFilter implements MessageFilter {
 
         try {
             final Input input = inputService.find(inputId);
-            final List<Extractor> sortedExtractors = inputService.getExtractors(input)
-                    .stream()
-                    .sorted((e1, e2) -> e1.getOrder().intValue() - e2.getOrder().intValue())
+            final List<Extractor> sortedExtractors = inputService.getExtractors(input).stream()
+                    .sorted(Comparator.comparingLong(Extractor::getOrder))
                     .collect(Collectors.toList());
 
             extractors.put(inputId, ImmutableList.copyOf(sortedExtractors));
