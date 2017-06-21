@@ -16,10 +16,10 @@
  */
 package org.graylog2.bindings.providers;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.joschi.jadconfig.util.Duration;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
-import com.google.gson.Gson;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
@@ -58,7 +58,7 @@ public class JestClientProvider implements Provider<JestClient> {
                               @Named("elasticsearch_discovery_filter") @Nullable String discoveryFilter,
                               @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
                               @Named("elasticsearch_compression_enabled") boolean compressionEnabled,
-                              Gson gson) {
+                              ObjectMapper objectMapper) {
         this.factory = new JestClientFactory();
         this.credentialsProvider = new BasicCredentialsProvider();
         final Set<HttpHost> preemptiveAuthHosts = new HashSet<>();
@@ -99,7 +99,7 @@ public class JestClientProvider implements Provider<JestClient> {
                 .discoveryFrequency(discoveryFrequency.toSeconds(), TimeUnit.SECONDS)
                 .preemptiveAuthTargetHosts(preemptiveAuthHosts)
                 .requestCompressionEnabled(compressionEnabled)
-                .gson(gson);
+                .objectMapper(objectMapper);
 
         factory.setHttpClientConfig(httpClientConfigBuilder.build());
     }

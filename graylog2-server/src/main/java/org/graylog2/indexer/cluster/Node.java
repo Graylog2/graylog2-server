@@ -22,7 +22,6 @@ import io.searchbox.client.JestResult;
 import io.searchbox.core.Ping;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.cluster.jest.JestUtils;
-import org.graylog2.indexer.gson.GsonUtils;
 
 import javax.inject.Inject;
 import java.util.Optional;
@@ -38,9 +37,7 @@ public class Node {
     public Optional<Version> getVersion() {
         final Ping request = new Ping.Builder().build();
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Unable to retrieve Elasticsearch version");
-        return Optional.ofNullable(jestResult.getJsonObject())
-            .map(json -> GsonUtils.asJsonObject(json.get("version")))
-            .map(json -> GsonUtils.asString(json.get("number")))
+        return Optional.ofNullable(jestResult.getJsonObject().path("version").path("number").asText(null))
             .map(this::parseVersion);
     }
 

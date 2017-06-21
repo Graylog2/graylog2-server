@@ -16,8 +16,6 @@
  */
 package org.graylog2.bindings;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.inject.AbstractModule;
 import io.searchbox.client.JestClient;
 import org.graylog2.bindings.providers.JestClientProvider;
@@ -26,7 +24,6 @@ import org.graylog2.indexer.IndexMappingFactory;
 public class ElasticsearchModule extends AbstractModule {
     @Override
     protected void configure() {
-        bind(Gson.class).toInstance(new GsonBuilder().create());
         bind(JestClient.class).toProvider(JestClientProvider.class).asEagerSingleton();
         bind(IndexMappingFactory.class).asEagerSingleton();
     }

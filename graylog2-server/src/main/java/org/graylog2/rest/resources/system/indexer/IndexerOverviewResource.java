@@ -17,8 +17,8 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -26,7 +26,6 @@ import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.Cluster;
-import org.graylog2.indexer.gson.GsonUtils;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.TooManyAliasesException;
 import org.graylog2.rest.models.system.deflector.responses.DeflectorSummary;
@@ -48,13 +47,10 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.ServiceUnavailableException;
 import javax.ws.rs.core.MediaType;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
-import static org.graylog2.indexer.gson.GsonUtils.asLong;
 
 @RequiresAuthentication
 @Api(value = "Indexer/Overview", description = "Indexing overview")
@@ -122,10 +118,9 @@ public class IndexerOverviewResource extends RestResource {
 
         final DeflectorSummary deflectorSummary = deflectorResource.deflector(indexSetId);
         final List<IndexRangeSummary> indexRanges = indexRangesResource.list().ranges();
-        final Map<String, JsonElement> indexStats = indices.getIndexStats(indexSet);
-        final Map<String, Boolean> areReopened = indices.areReopened(indexStats.keySet());
-        final Map<String, IndexSummary> indicesSummaries = indexStats.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, x -> buildIndexSummary(x, indexRanges, deflectorSummary,areReopened)));
+        final JsonNode indexStats = indices.getIndexStats(indexSet);
+        final Map<String, Boolean> areReopened = indices.areReopened(indexStats.fieldNames());
+        final Map<String, IndexSummary> indicesSummaries = buildIndexSummaries(deflectorSummary, indexRanges, indexStats, areReopened);
 
         indices.getClosedIndices(indexSet).forEach(indexName -> indicesSummaries.put(indexName, IndexSummary.create(
                 null,
@@ -137,22 +132,31 @@ public class IndexerOverviewResource extends RestResource {
 
         return IndexerOverview.create(deflectorSummary,
                 IndexerClusterOverview.create(indexerClusterResource.clusterHealth(), indexerClusterResource.clusterName().name()),
-                countResource.total(indexSetId),indicesSummaries);
+                countResource.total(indexSetId), indicesSummaries);
     }
 
-    private IndexSummary buildIndexSummary(Map.Entry<String, JsonElement> indexStats,
+    private Map<String, IndexSummary> buildIndexSummaries(DeflectorSummary deflectorSummary, List<IndexRangeSummary> indexRanges, JsonNode indexStats, Map<String, Boolean> areReopened) {
+        final Iterator<Map.Entry<String, JsonNode>> fields = indexStats.fields();
+        final ImmutableMap.Builder<String, IndexSummary> indexSummaries = ImmutableMap.builder();
+        while (fields.hasNext()) {
+            final Map.Entry<String, JsonNode> entry = fields.next();
+            indexSummaries.put(entry.getKey(), buildIndexSummary(entry, indexRanges, deflectorSummary, areReopened));
+
+        }
+        return indexSummaries.build();
+    }
+
+    private IndexSummary buildIndexSummary(Map.Entry<String, JsonNode> indexStats,
                                            List<IndexRangeSummary> indexRanges,
                                            DeflectorSummary deflectorSummary,
                                            Map<String, Boolean> areReopened) {
         final String index = indexStats.getKey();
-        final Optional<JsonObject> primaries = Optional.of(indexStats.getValue())
-                .map(GsonUtils::asJsonObject)
-                .map(json -> asJsonObject(json.get("primaries")));
-        final Optional<JsonObject> docs = primaries.map(json -> asJsonObject(json.get("docs")));
-        final long count = docs.map(json -> asLong(json.get("count"))).orElse(0L);
-        final long deleted = docs.map(json -> asLong(json.get("deleted"))).orElse(0L);
-        final Optional<JsonObject> store = primaries.map(json -> asJsonObject(json.get("store")));
-        final long sizeInBytes = store.map(json -> asLong(json.get("size_in_bytes"))).orElse(0L);
+        final JsonNode primaries = indexStats.getValue().path("primaries");
+        final JsonNode docs = primaries.path("docs");
+        final long count = docs.path("count").asLong();
+        final long deleted = docs.path("deleted").asLong();
+        final JsonNode store = primaries.path("store");
+        final long sizeInBytes = store.path("size_in_bytes").asLong();
 
         final Optional<IndexRangeSummary> range = indexRanges.stream()
                 .filter(indexRangeSummary -> indexRangeSummary.indexName().equals(index))

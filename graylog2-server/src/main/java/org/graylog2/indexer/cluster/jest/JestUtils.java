@@ -16,7 +16,8 @@
  */
 package org.graylog2.indexer.cluster.jest;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.ImmutableList;
 import io.searchbox.action.Action;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -26,21 +27,13 @@ import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexNotFoundException;
 import org.graylog2.indexer.QueryParsingException;
-import org.graylog2.indexer.gson.GsonUtils;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-import static org.graylog2.indexer.gson.GsonUtils.asInteger;
-import static org.graylog2.indexer.gson.GsonUtils.asJsonArray;
-import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
-import static org.graylog2.indexer.gson.GsonUtils.asString;
 
 public class JestUtils {
     private JestUtils() {
@@ -70,12 +63,12 @@ public class JestUtils {
         return execute(client, null, request, errorMessage);
     }
 
-    private static ElasticsearchException specificException(Supplier<String> errorMessage, JsonObject jsonObject) {
-        final List<JsonObject> rootCauses = extractRootCauses(jsonObject);
+    private static ElasticsearchException specificException(Supplier<String> errorMessage, JsonNode jsonObject) {
+        final List<JsonNode> rootCauses = extractRootCauses(jsonObject);
         final List<String> reasons = extractReasons(rootCauses);
 
-        for (JsonObject rootCause : rootCauses) {
-            final String type = asString(rootCause.get("type"));
+        for (JsonNode rootCause : rootCauses) {
+            final String type = rootCause.path("type").asText(null);
             if (type == null) {
                 continue;
             }
@@ -83,11 +76,11 @@ public class JestUtils {
                 case "query_parsing_exception":
                     return buildQueryParsingException(errorMessage, rootCause, reasons);
                 case "index_not_found_exception":
-                    final String indexName = asString(rootCause.get("resource.id"));
+                    final String indexName = rootCause.path("resource.id").asText();
                     return buildIndexNotFoundException(errorMessage, indexName);
                 case "illegal_argument_exception":
-                    final String reason = asString(rootCause.get("reason"));
-                    if (reason != null && reason.startsWith("Expected numeric type on field")) {
+                    final String reason = rootCause.path("reason").asText();
+                    if (reason.startsWith("Expected numeric type on field")) {
                         return buildFieldTypeException(errorMessage, reason);
                     }
                     break;
@@ -105,29 +98,24 @@ public class JestUtils {
         return new FieldTypeException(errorMessage.get(), reason);
     }
 
-    private static List<String> extractReasons(List<JsonObject> rootCauses) {
+    private static List<String> extractReasons(List<JsonNode> rootCauses) {
         return rootCauses.stream()
-                .map(rootCause -> asString(rootCause.get("reason")))
+                .map(rootCause -> rootCause.path("reason").asText(null))
                 .collect(Collectors.toList());
     }
 
-    private static List<JsonObject> extractRootCauses(JsonObject jsonObject) {
-        return Optional.of(jsonObject)
-                .map(json -> asJsonObject(json.get("error")))
-                .map(error -> asJsonArray(error.get("root_cause")))
-                .map(Iterable::spliterator)
-                .map(x -> StreamSupport.stream(x, false))
-                .orElse(Stream.empty())
-                .map(GsonUtils::asJsonObject)
-                .collect(Collectors.toList());
+    private static List<JsonNode> extractRootCauses(JsonNode jsonObject) {
+        return ImmutableList.copyOf(jsonObject.path("error").path("root_cause").iterator());
     }
 
     private static QueryParsingException buildQueryParsingException(Supplier<String> errorMessage,
-                                                                    JsonObject rootCause,
+                                                                    JsonNode rootCause,
                                                                     List<String> reasons) {
-        final Integer line = asInteger(rootCause.get("line"));
-        final Integer column = asInteger(rootCause.get("col"));
-        final String index = asString(rootCause.get("index"));
+        final JsonNode lineJson = rootCause.path("line");
+        final Integer line = lineJson.isInt() ? lineJson.asInt() : null;
+        final JsonNode columnJson = rootCause.path("col");
+        final Integer column = columnJson.isInt() ? columnJson.asInt() : null;
+        final String index = rootCause.path("index").asText(null);
 
         return new QueryParsingException(errorMessage.get(), line, column, index, reasons);
     }

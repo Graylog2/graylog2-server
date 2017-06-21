@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.results;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
@@ -25,24 +26,19 @@ import io.searchbox.core.ClearScroll;
 import io.searchbox.core.SearchResult;
 import io.searchbox.core.SearchScroll;
 import org.apache.shiro.crypto.hash.Md5Hash;
-import org.graylog2.indexer.ElasticsearchException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-
-import static org.graylog2.indexer.gson.GsonUtils.asJsonArray;
-import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
 
 public class ScrollResult extends IndexQueryResult {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
+    private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
+    };
 
     public interface Factory {
         ScrollResult create(SearchResult initialResult, String query, List<String> fields);
@@ -60,7 +56,7 @@ public class ScrollResult extends IndexQueryResult {
 
     @AssistedInject
     public ScrollResult(JestClient jestClient, ObjectMapper objectMapper, @Assisted SearchResult initialResult, @Assisted String query, @Assisted List<String> fields) {
-        super(query, null, initialResult.getJsonObject().get("took").getAsLong());
+        super(query, null, initialResult.getJsonObject().path("took").asLong());
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
         this.initialResult = initialResult;
@@ -80,22 +76,11 @@ public class ScrollResult extends IndexQueryResult {
         final List<ResultMessage> hits;
         if (initialResult == null) {
             search = getNextScrollResult();
-            hits = Optional.of(search.getJsonObject())
-                .map(json -> asJsonObject(json.get("hits")))
-                .map(json -> asJsonArray(json.get("hits")))
-                .map(Iterable::spliterator)
-                .map(spliterator -> StreamSupport.stream(spliterator, false))
-                .orElse(Stream.empty())
-                .map(hit -> {
-                    try {
-                        return objectMapper.readValue(hit.toString(), Map.class);
-                    } catch (IOException e) {
-                        throw new ElasticsearchException("Unable to deserialize search hits during scrolling: ", e);
-                    }
-                })
-                .filter(Objects::nonNull)
-                .map(hit -> ResultMessage.parseFromSource((String)hit.get("_id"), (String)hit.get("_index"), (Map<String, Object>)hit.get("_source")))
-                .collect(Collectors.toList());
+            hits = StreamSupport.stream(search.getJsonObject().path("hits").path("hits").spliterator(), false)
+                    .map(hit -> ResultMessage.parseFromSource(hit.path("_id").asText(),
+                            hit.path("_index").asText(),
+                            objectMapper.convertValue(hit.get("_source"), MAP_TYPE_REFERENCE)))
+                    .collect(Collectors.toList());
         } else {
             // make sure to return the initial hits, see https://github.com/Graylog2/graylog2-server/issues/2126
             search = initialResult;
@@ -117,7 +102,7 @@ public class ScrollResult extends IndexQueryResult {
     }
 
     private String getScrollIdFromResult(JestResult result) {
-        return result.getJsonObject().get("_scroll_id").getAsString();
+        return result.getJsonObject().path("_scroll_id").asText();
     }
 
     private JestResult getNextScrollResult() throws IOException {

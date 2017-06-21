@@ -16,25 +16,16 @@
  */
 package org.graylog2.indexer.indices.stats;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.auto.value.AutoValue;
 import com.google.common.collect.ImmutableList;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import org.graylog2.rest.models.system.indexer.responses.IndexStats;
 import org.graylog2.rest.models.system.indexer.responses.ShardRouting;
 
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Optional;
-
-import static com.google.common.base.MoreObjects.firstNonNull;
-import static org.graylog2.indexer.gson.GsonUtils.asBoolean;
-import static org.graylog2.indexer.gson.GsonUtils.asJsonArray;
-import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
-import static org.graylog2.indexer.gson.GsonUtils.asLong;
-import static org.graylog2.indexer.gson.GsonUtils.asString;
 
 @AutoValue
 public abstract class IndexStatistics {
@@ -53,62 +44,49 @@ public abstract class IndexStatistics {
         return new AutoValue_IndexStatistics(index, primaryShards, allShards, routing);
     }
 
-    public static IndexStatistics create(String index, JsonObject indexStats) {
-        final JsonObject primaries = Optional.of(indexStats)
-                .map(json -> asJsonObject(json.get("primaries")))
-                .orElse(new JsonObject());
-        final JsonObject total = Optional.of(indexStats)
-                .map(json -> asJsonObject(json.get("total")))
-                .orElse(new JsonObject());
-        final JsonObject shards = Optional.of(indexStats)
-                .map(json -> asJsonObject(json.get("shards")))
-                .orElse(new JsonObject());
+    public static IndexStatistics create(String index, JsonNode indexStats) {
+        final JsonNode primaries = indexStats.path("primaries");
+        final JsonNode total = indexStats.path("total");
+        final JsonNode shards = indexStats.path("shards");
 
 
         return create(index, buildIndexStats(primaries), buildIndexStats(total), buildShardRoutings(shards));
     }
 
-    private static IndexStats buildIndexStats(final JsonObject stats) {
-        final Optional<JsonObject> flush = Optional.of(stats).map(json -> asJsonObject(json.get("flush")));
-        final long flushTotal = flush.map(json -> asLong(json.get("total"))).orElse(0L);
-        final long flushTotalTimeSeconds = flush.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+    private static IndexStats buildIndexStats(final JsonNode stats) {
+        final JsonNode flush = stats.path("flush");
+        final long flushTotal = flush.path("total").asLong();
+        final long flushTotalTimeSeconds = flush.path("total_time_in_millis").asLong() / 1000L;
 
-        final Optional<JsonObject> get = Optional.of(stats).map(json -> asJsonObject(json.get("get")));
-        final long getTotal = get.map(json -> asLong(json.get("total"))).orElse(0L);
-        final long getTotalTimeSeconds = get.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+        final JsonNode get = stats.path("get");
+        final long getTotal = get.path("total").asLong();
+        final long getTotalTimeSeconds = get.path("total_time_in_millis").asLong() / 1000L;
 
-        final Optional<JsonObject> indexing = Optional.of(stats).map(json -> asJsonObject(json.get("indexing")));
-        final long indexingTotal = indexing.map(json -> asLong(json.get("total"))).orElse(0L);
-        final long indexingTotalTimeSeconds = indexing.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+        final JsonNode indexing = stats.path("indexing");
+        final long indexingTotal = indexing.path("total").asLong();
+        final long indexingTotalTimeSeconds = indexing.path("total_time_in_millis").asLong() / 1000L;
 
-        final Optional<JsonObject> merge = Optional.of(stats).map(json -> asJsonObject(json.get("merge")));
-        final long mergeTotal = merge.map(json -> asLong(json.get("total"))).orElse(0L);
-        final long mergeTotalTimeSeconds = merge.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+        final JsonNode merge = stats.path("merge");
+        final long mergeTotal = merge.path("total").asLong();
+        final long mergeTotalTimeSeconds = merge.path("total_time_in_millis").asLong() / 1000L;
 
-        final Optional<JsonObject> refresh = Optional.of(stats).map(json -> asJsonObject(json.get("refresh")));
-        final long refreshTotal = refresh.map(json -> asLong(json.get("total"))).orElse(0L);
-        final long refreshTotalTimeSeconds = refresh.map(json -> asLong(json.get("total_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
+        final JsonNode refresh = stats.path("refresh");
+        final long refreshTotal = refresh.path("total").asLong();
+        final long refreshTotalTimeSeconds = refresh.path("total_time_in_millis").asLong() / 1000L;
 
-        final Optional<JsonObject> search = Optional.of(stats).map(json -> asJsonObject(json.get("search")));
-        final long searchQueryTotal = search.map(json -> asLong(json.get("query_total"))).orElse(0L);
-        final long searchQueryTotalTimeSeconds = search.map(json -> asLong(json.get("query_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
-        final long searchFetchTotal = search.map(json -> asLong(json.get("fetch_total"))).orElse(0L);
-        final long searchFetchTotalTimeSeconds = search.map(json -> asLong(json.get("fetch_time_in_millis"))).map(ms -> ms / 1000L).orElse(0L);
-        final long searchOpenContexts = search.map(json -> asLong(json.get("open_contexts"))).orElse(0L);
+        final JsonNode search = stats.path("search");
+        final long searchQueryTotal = search.path("query_total").asLong();
+        final long searchQueryTotalTimeSeconds = search.path("query_time_in_millis").asLong() / 1000L;
+        final long searchFetchTotal = search.path("fetch_total").asLong();
+        final long searchFetchTotalTimeSeconds = search.path("fetch_time_in_millis").asLong() / 1000L;
+        final long searchOpenContexts = search.path("open_contexts").asLong();
 
-        final long storeSizeInBytes = Optional.of(stats)
-                .map(json -> asJsonObject(json.get("store")))
-                .map(json -> asLong(json.get("size_in_bytes")))
-                .orElse(0L);
+        final long storeSizeInBytes = stats.path("store").path("size_in_bytes").asLong();
+        final long segmentsCount = stats.path("segments").path("count").asLong();
 
-        final long segmentsCount = Optional.of(stats)
-                .map(json -> asJsonObject(json.get("segments")))
-                .map(json -> asLong(json.get("count")))
-                .orElse(0L);
-
-        final Optional<JsonObject> docs = Optional.of(stats).map(json -> asJsonObject(json.get("docs")));
-        final long docsCount = docs.map(json -> asLong(json.get("count"))).orElse(0L);
-        final long docsDeleted = docs.map(json -> asLong(json.get("deleted"))).orElse(0L);
+        final JsonNode docs = stats.path("docs");
+        final long docsCount = docs.path("count").asLong();
+        final long docsDeleted = docs.path("deleted").asLong();
 
         return IndexStats.create(
                 IndexStats.TimeAndTotalStats.create(flushTotal, flushTotalTimeSeconds),
@@ -125,29 +103,29 @@ public abstract class IndexStatistics {
         );
     }
 
-    private static List<ShardRouting> buildShardRoutings(JsonObject shardRoutings) {
+    private static List<ShardRouting> buildShardRoutings(JsonNode shardRoutings) {
         final ImmutableList.Builder<ShardRouting> shardRoutingsBuilder = ImmutableList.builder();
-        for (Map.Entry<String, JsonElement> entry : shardRoutings.entrySet()) {
+        final Iterator<Map.Entry<String, JsonNode>> it = shardRoutings.fields();
+        while (it.hasNext()) {
+            final Map.Entry<String, JsonNode> entry = it.next();
             final int shardId = Integer.parseInt(entry.getKey());
-            final JsonArray shards = firstNonNull(asJsonArray(entry.getValue()), new JsonArray());
+            final JsonNode shards = entry.getValue();
 
-            for (JsonElement jsonElement : shards) {
-                final Optional<JsonObject> routing = Optional.ofNullable(asJsonObject(jsonElement))
-                        .map(json -> asJsonObject(json.get("routing")));
-                final String state = routing.map(json -> asString(json.get("state")))
-                        .map(s -> s.toLowerCase(Locale.ENGLISH))
-                        .orElse("unknown");
+            for (JsonNode jsonElement : shards) {
+                final JsonNode routing = jsonElement.path("routing");
+                final String state = routing.path("state").asText("unknown").toLowerCase(Locale.ENGLISH);
+
                 // Taken from org.elasticsearch.cluster.routing.ShardRouting
                 final boolean active = "started".equals(state) || "relocating".equals(state);
 
-                final boolean primary = routing.map(json -> asBoolean(json.get("primary"))).orElse(false);
-                final String nodeId = routing.map(json -> asString(json.get("node"))).orElse("Unknown");
+                final boolean primary = routing.path("primary").asBoolean(false);
+                final String nodeId = routing.path("node").asText("Unknown");
 
                 // Node name and hostname should be filled when necessary (requiring an additional round trip to Elasticsearch)
                 final String nodeName = null;
                 final String nodeHostname = null;
 
-                final String relocatingNode = routing.map(json -> asString(json.get("relocating_node"))).orElse(null);
+                final String relocatingNode = routing.path("relocating_node").asText(null);
 
                 final ShardRouting shardRouting = ShardRouting.create(shardId, state, active, primary, nodeId, nodeName, nodeHostname, relocatingNode);
                 shardRoutingsBuilder.add(shardRouting);

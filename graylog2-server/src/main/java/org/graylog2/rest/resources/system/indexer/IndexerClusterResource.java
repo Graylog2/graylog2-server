@@ -17,7 +17,7 @@
 package org.graylog2.rest.resources.system.indexer;
 
 import com.codahale.metrics.annotation.Timed;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
@@ -51,9 +51,9 @@ public class IndexerClusterResource extends RestResource {
     @ApiOperation(value = "Get the cluster name")
     @Produces(MediaType.APPLICATION_JSON)
     public ClusterName clusterName() {
-        final String clusterName = cluster.health()
-                .map(health -> health.get("cluster_name").getAsString())
-                .orElse("<unknown>");
+        final JsonNode health = cluster.health()
+                .orElseThrow(() -> new InternalServerErrorException("Couldn't read Elasticsearch cluster health"));
+        final String clusterName = health.path("cluster_name").asText("<unknown>");
         return ClusterName.create(clusterName);
     }
 
@@ -64,14 +64,14 @@ public class IndexerClusterResource extends RestResource {
     @RequiresPermissions(RestPermissions.INDEXERCLUSTER_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public ClusterHealth clusterHealth() {
-        final JsonObject health = cluster.health()
+        final JsonNode health = cluster.health()
                 .orElseThrow(() -> new InternalServerErrorException("Couldn't read Elasticsearch cluster health"));
         final ClusterHealth.ShardStatus shards = ClusterHealth.ShardStatus.create(
-                health.get("active_shards").getAsInt(),
-                health.get("initializing_shards").getAsInt(),
-                health.get("relocating_shards").getAsInt(),
-                health.get("unassigned_shards").getAsInt());
+                health.path("active_shards").asInt(),
+                health.path("initializing_shards").asInt(),
+                health.path("relocating_shards").asInt(),
+                health.path("unassigned_shards").asInt());
 
-        return ClusterHealth.create(health.get("status").getAsString().toLowerCase(Locale.ENGLISH), shards);
+        return ClusterHealth.create(health.path("status").asText().toLowerCase(Locale.ENGLISH), shards);
     }
 }

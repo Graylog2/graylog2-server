@@ -16,8 +16,7 @@
  */
 package org.graylog2.indexer;
 
-import com.google.gson.JsonObject;
-import org.graylog2.indexer.gson.GsonUtils;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 
@@ -25,6 +24,7 @@ import javax.inject.Inject;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 public class IndexSetStatsCreator {
     private final Indices indices;
@@ -36,17 +36,14 @@ public class IndexSetStatsCreator {
 
     public IndexSetStats getForIndexSet(final IndexSet indexSet) {
         final Set<String> closedIndices = indices.getClosedIndices(indexSet);
-        final List<JsonObject> primaries = indices.getIndexStats(indexSet).values().stream()
-                .map(GsonUtils::asJsonObject)
-                .map(json -> GsonUtils.asJsonObject(json.get("primaries")))
+        final List<JsonNode> primaries = StreamSupport.stream(indices.getIndexStats(indexSet).spliterator(), false)
+                .map(json -> json.get("primaries"))
                 .collect(Collectors.toList());
         final long documents = primaries.stream()
-                .map(json -> GsonUtils.asJsonObject(json.get("docs")))
-                .map(json -> GsonUtils.asLong(json.get("count")))
+                .map(json -> json.path("docs").path("count").asLong())
                 .reduce(0L, Long::sum);
         final long size = primaries.stream()
-                .map(json -> GsonUtils.asJsonObject(json.get("store")))
-                .map(json -> GsonUtils.asLong(json.get("size_in_bytes")))
+                .map(json -> json.path("store").path("size_in_bytes").asLong())
                 .reduce(0L, Long::sum);
 
         return IndexSetStats.create(primaries.size() + closedIndices.size(), documents, size);

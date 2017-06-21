@@ -20,9 +20,8 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.core.Count;
@@ -52,7 +51,6 @@ import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.jest.JestUtils;
-import org.graylog2.indexer.gson.GsonUtils;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -78,7 +76,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
@@ -93,9 +90,6 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
-import static org.graylog2.indexer.gson.GsonUtils.asJsonArray;
-import static org.graylog2.indexer.gson.GsonUtils.asJsonObject;
-import static org.graylog2.indexer.gson.GsonUtils.asString;
 
 @Singleton
 public class Searches {
@@ -628,27 +622,13 @@ public class Searches {
         // if at least one of the index sets comes back with a result, the overall result will have the aggregation
         // but not considered failed entirely. however, if one shard has the error, we will refuse to respond
         // otherwise we would be showing empty graphs for non-numeric fields.
-        final JsonObject jsonObject = result.getJsonObject();
-        final Optional<JsonElement> shards = Optional.of(jsonObject.get("_shards"));
-        final double failedShards = shards
-            .map(JsonElement::getAsJsonObject)
-            .map(json -> json.get("failed"))
-            .map(JsonElement::getAsDouble)
-            .orElse(0.0);
+        final JsonNode shards = result.getJsonObject().path("_shards");
+        final double failedShards = shards.path("failed").asDouble();
 
         if (failedShards > 0) {
-            final List<String> errors = shards
-                .map(GsonUtils::asJsonObject)
-                .map(json -> asJsonArray(json.get("failures")))
-                .map(Iterable::spliterator)
-                .map(x -> StreamSupport.stream(x, false))
-                .orElse(java.util.stream.Stream.empty())
-                .map(GsonUtils::asJsonObject)
-                .map(failure -> Optional.ofNullable(asJsonObject(failure.get("reason")))
-                    .map(reason -> asString(reason.get("reason")))
-                    .orElse(null)
-                )
-                .filter(Objects::nonNull)
+            final List<String> errors = StreamSupport.stream(shards.path("failures").spliterator(), false)
+                .map(failure -> failure.path("reason").path("reason").asText())
+                .filter(String::isEmpty)
                 .collect(Collectors.toList());
 
             final List<String> nonNumericFieldErrors = errors.stream()

@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
-import com.google.gson.Gson;
 import com.jayway.jsonpath.JsonPath;
 import com.jayway.jsonpath.ReadContext;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
@@ -122,7 +121,7 @@ public class IndicesTest extends AbstractESTest {
         final Node node = new Node(jestClient());
         indexMappingFactory = new IndexMappingFactory(node);
         indices = new Indices(jestClient(),
-                new Gson(),
+                new ObjectMapper(),
                 indexMappingFactory,
                 new Messages(new MetricRegistry(), jestClient()),
                 mock(NodeId.class),
