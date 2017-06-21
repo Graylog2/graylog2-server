@@ -98,7 +98,7 @@ public abstract class LookupResult {
             // in other methods as well.
             if (multiValue.isSet()) {
                 builder = builder.multiValue(multiValue.value());
-            } else {
+            } else if (singleValue.isSet()) {
                 builder = builder.multiValue(Collections.singletonMap(SINGLE_VALUE_KEY, singleValue.value()));
             }
 
