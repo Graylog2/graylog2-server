@@ -29,6 +29,8 @@ import org.graylog2.indexer.cluster.Node;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.indexset.IndexSetService;
 import org.graylog2.indexer.indices.Indices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
@@ -40,6 +42,7 @@ import java.util.Map;
 import java.util.Set;
 
 public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
+    private static final Logger LOG = LoggerFactory.getLogger(V20170607164210_MigrateReopenedIndicesToAliases.class);
     private static final String REOPENED_INDEX_SETTING = "graylog2_reopened";
 
     private final Version elasticsearchVersion;
@@ -73,6 +76,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
             .stream()
             .map(mongoIndexSetFactory::create)
             .flatMap(indexSet -> getReopenedIndices(indexSet).stream())
+            .map(indexName -> { LOG.debug("Marking index {} to be reopened using alias.", indexName); return indexName; })
             .forEach(indices::markIndexReopened);
     }
 
@@ -81,18 +85,31 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
         final State request = new State.Builder().withMetadata().indices(indexList).build();
 
         final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster state for reopened indices " + indices);
-        final JsonNode indicesJson = getClusterStateIndicesMetadata(jestResult.getJsonObject());
+        final JsonNode clusterStateJson = jestResult.getJsonObject();
+        final JsonNode indicesJson = clusterStateJson.path("metadata").path("indices");
+
         final ImmutableSet.Builder<String> reopenedIndices = ImmutableSet.builder();
+
+        if (indicesJson.isMissingNode()) {
+            LOG.error("Retrieved cluster state is invalid (no metadata.indices key).");
+            LOG.debug("Received cluster state was: {}", clusterStateJson.toString());
+            return Collections.emptySet();
+        }
 
         for (Iterator<Map.Entry<String, JsonNode>> it = indicesJson.fields(); it.hasNext(); ) {
             final Map.Entry<String, JsonNode> entry = it.next();
             final String indexName = entry.getKey();
             final JsonNode value = entry.getValue();
-            if (value.isObject()) {
-                final JsonNode indexSettings = getIndexSettings(value);
-                if (checkForReopened(indexSettings)) {
-                    reopenedIndices.add(indexName);
-                }
+
+            final JsonNode indexSettings = value.path("settings").path("index");
+            if (indexSettings.isMissingNode()) {
+                LOG.error("Unable to retrieve index settings from metadata for index {} - skipping.", indexName);
+                LOG.debug("Index metadata was: {}", value.toString());
+                continue;
+            }
+            if (checkForReopened(indexSettings)) {
+                LOG.debug("Adding {} to list of indices to be migrated.", indexName);
+                reopenedIndices.add(indexName);
             }
         }
 
@@ -115,14 +132,6 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
 
     private Set<String> getReopenedIndices(final IndexSet indexSet) {
         return getReopenedIndices(Collections.singleton(indexSet.getIndexWildcard()));
-    }
-
-    private JsonNode getClusterStateIndicesMetadata(JsonNode clusterStateJson) {
-        return clusterStateJson.path("metadata").path("indices");
-    }
-
-    private JsonNode getIndexSettings(JsonNode indicesJson) {
-        return indicesJson.path("settings").path("index");
     }
 }
 
