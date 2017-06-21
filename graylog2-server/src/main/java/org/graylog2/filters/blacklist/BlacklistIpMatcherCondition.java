@@ -17,7 +17,7 @@
 package org.graylog2.filters.blacklist;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.graylog2.utilities.IpSubnet;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;

@@ -17,13 +17,10 @@
 package org.graylog2.utilities;
 
 import com.github.joschi.jadconfig.ParameterException;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.net.Inet4Address;
-import java.net.Inet6Address;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -40,8 +37,8 @@ public class IPSubnetConverterTest {
         final Set<IpSubnet> results = converter.convertFrom(defaultList);
         assertThat(results)
             .hasSize(2)
-            .contains(new IpSubnet(Inet4Address.getByName("127.0.0.1"), 32))
-            .contains(new IpSubnet(Inet6Address.getByName("0:0:0:0:0:0:0:1"), 128));
+            .contains(new IpSubnet("127.0.0.1/32"))
+            .contains(new IpSubnet("0:0:0:0:0:0:0:1/128"));
         assertThat(converter.convertTo(results)).isEqualTo(defaultList);
     }
 

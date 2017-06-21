@@ -29,7 +29,7 @@ import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.github.joschi.jadconfig.validators.URIAbsoluteValidator;
 import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.utilities.IPSubnetConverter;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
 
 import java.net.URI;

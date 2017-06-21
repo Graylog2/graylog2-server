@@ -20,7 +20,6 @@ import com.github.joschi.jadconfig.Converter;
 import com.github.joschi.jadconfig.ParameterException;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
 
 import java.net.UnknownHostException;
 import java.util.HashSet;
