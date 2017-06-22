@@ -18,8 +18,8 @@ package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.cluster.Node;
-import org.junit.Before;
 import org.junit.Rule;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;

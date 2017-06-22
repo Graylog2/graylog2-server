@@ -103,6 +103,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
@@ -111,7 +113,7 @@ import static org.graylog2.audit.AuditEventTypes.ES_INDEX_CREATE;
 @Singleton
 public class Indices {
     private static final Logger LOG = LoggerFactory.getLogger(Indices.class);
-    private static final String REOPENED_INDEX_SETTING = "graylog2_reopened";
+    private static final String REOPENED_ALIAS_SUFFIX = "_reopened";
 
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
@@ -200,6 +202,11 @@ public class Indices {
     }
 
     public void close(String indexName) {
+        if (isReopened(indexName)) {
+            JestUtils.execute(jestClient,
+                new ModifyAliases.Builder(new RemoveAliasMapping.Builder(indexName, indexName + REOPENED_ALIAS_SUFFIX).build()).build(),
+                () -> "Couldn't remove reopened alias for index " + indexName + " before closing.");
+        }
         JestUtils.execute(jestClient, new CloseIndex.Builder(indexName).build(), () -> "Couldn't close index " + indexName);
         eventBus.post(IndicesClosedEvent.create(indexName));
     }
@@ -455,19 +462,21 @@ public class Indices {
         JestUtils.execute(jestClient, new Flush.Builder().addIndex(index).force().build(), () -> "Couldn't flush index " + index);
     }
 
-    public Map<String, Object> reopenIndexSettings() {
-        return ImmutableMap.of("index", ImmutableMap.of(REOPENED_INDEX_SETTING, true));
-    }
-
     public void reopenIndex(String index) {
         // Mark this index as re-opened. It will never be touched by retention.
-        final Map<String, Object> settings = reopenIndexSettings();
-        final UpdateSettings request = new UpdateSettings.Builder(settings).addIndex(index).build();
-
-        JestUtils.execute(jestClient, request, () -> "Couldn't update settings of index " + index);
+        markIndexReopened(index);
 
         // Open index.
         openIndex(index);
+    }
+
+    public String markIndexReopened(String index) {
+        final String aliasName = index + REOPENED_ALIAS_SUFFIX;
+        final ModifyAliases request = new ModifyAliases.Builder(new AddAliasMapping.Builder(index, aliasName).build()).build();
+
+        JestUtils.execute(jestClient, request, () -> "Couldn't create reopened alias for index " + index);
+
+        return aliasName;
     }
 
     private void openIndex(String index) {
@@ -476,30 +485,13 @@ public class Indices {
     }
 
     public boolean isReopened(String indexName) {
-        final JestResult jestResult = JestUtils.execute(jestClient, new State.Builder().withMetadata().build(), () -> "Couldn't read cluster state for index " + indexName);
-        final JsonNode indexJson = getIndexSettings(jestResult.getJsonObject(), indexName);
+        final Optional<String> aliasTarget = aliasTarget(indexName + REOPENED_ALIAS_SUFFIX);
 
-        return checkForReopened(indexJson);
+        return aliasTarget.map(target -> target.equals(indexName)).orElse(false);
     }
 
-    public Map<String, Boolean> areReopened(Iterator<String> indices) {
-        final JestResult jestResult = JestUtils.execute(jestClient, new State.Builder().withMetadata().build(), () -> "Couldn't read cluster state for indices " + indices);
-
-        final JsonNode indicesJson = getClusterStateIndicesMetadata(jestResult.getJsonObject());
-        final ImmutableMap.Builder<String, Boolean> mapBuilder = ImmutableMap.builder();
-        while (indices.hasNext()) {
-            final String index = indices.next();
-            mapBuilder.put(index, checkForReopened(getIndexSettings(indicesJson, index)));
-        }
-        return mapBuilder.build();
-    }
-
-    private JsonNode getIndexSettings(JsonNode indicesJson, String index) {
-        return indicesJson.path(index).path("settings").path("index");
-    }
-
-    private boolean checkForReopened(JsonNode indexSettings) {
-        return indexSettings.path(REOPENED_INDEX_SETTING).asBoolean(false);
+    public Map<String, Boolean> areReopened(Collection<String> indices) {
+        return indices.stream().collect(Collectors.toMap(Function.identity(), this::isReopened));
     }
 
     public Set<String> getClosedIndices(final Collection<String> indices) {
@@ -544,24 +536,9 @@ public class Indices {
     }
 
     public Set<String> getReopenedIndices(final Collection<String> indices) {
-        final String indexList = String.join(",", indices);
-        final State request = new State.Builder().withMetadata().indices(indexList).build();
-
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster state for reopened indices " + indices);
-        final JsonNode indicesJson = getClusterStateIndicesMetadata(jestResult.getJsonObject());
-        final ImmutableSet.Builder<String> reopenedIndices = ImmutableSet.builder();
-
-        final Iterator<Map.Entry<String, JsonNode>> it = indicesJson.fields();
-        while (it.hasNext()) {
-            final Map.Entry<String, JsonNode> entry = it.next();
-            final String indexName = entry.getKey();
-            final JsonNode indexSettings = getIndexSettings(entry.getValue(), indexName);
-            if (checkForReopened(indexSettings)) {
-                reopenedIndices.add(indexName);
-            }
-        }
-
-        return reopenedIndices.build();
+        return indices.stream()
+            .filter(this::isReopened)
+            .collect(Collectors.toSet());
     }
 
     public Set<String> getReopenedIndices(final IndexSet indexSet) {

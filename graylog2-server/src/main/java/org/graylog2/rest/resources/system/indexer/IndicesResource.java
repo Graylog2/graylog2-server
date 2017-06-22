@@ -306,7 +306,7 @@ public class IndicesResource extends RestResource {
         final Set<String> indices = indicesStatistics.stream()
                 .map(IndexStatistics::index)
                 .collect(Collectors.toSet());
-        final Map<String, Boolean> areReopened = this.indices.areReopened(indices.iterator());
+        final Map<String, Boolean> areReopened = this.indices.areReopened(indices);
 
         for (IndexStatistics indexStatistics : indicesStatistics) {
             final IndexInfo indexInfo = IndexInfo.create(
@@ -341,7 +341,7 @@ public class IndicesResource extends RestResource {
 
     private Map<String, IndexInfo> toIndexInfos(Collection<IndexStatistics> indexStatistics) {
         final Set<String> indexNames = indexStatistics.stream().map(IndexStatistics::index).collect(Collectors.toSet());
-        final Map<String, Boolean> reopenedStatus = indices.areReopened(indexNames.iterator());
+        final Map<String, Boolean> reopenedStatus = indices.areReopened(indexNames);
 
         final ImmutableMap.Builder<String, IndexInfo> indexInfos = ImmutableMap.builder();
         for(IndexStatistics indexStats : indexStatistics) {

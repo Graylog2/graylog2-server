@@ -34,5 +34,6 @@ public class MigrationsModule extends AbstractModule {
         binder.addBinding().to(V20161215163900_MoveIndexSetDefaultConfig.class);
         binder.addBinding().to(V20161216123500_DefaultIndexSetMigration.class);
         binder.addBinding().to(V20170110150100_FixAlertConditionsMigration.class);
+        binder.addBinding().to(V20170607164210_MigrateReopenedIndicesToAliases.class);
     }
 }

@@ -16,6 +16,7 @@
  */
 package org.graylog2.bindings;
 
+import com.github.zafarkhaja.semver.Version;
 import com.google.inject.AbstractModule;
 import io.searchbox.client.JestClient;
 import org.graylog2.bindings.providers.JestClientProvider;
