@@ -1777,7 +1777,8 @@
       "node_modules/prop-types/lib/ReactPropTypesSecret.js": 933,
       "node_modules/prop-types/node_modules/fbjs/lib/warning.js": 934,
       "node_modules/prop-types/checkPropTypes.js": 935,
-      "node_modules/prop-types/factoryWithTypeCheckers.js": 936
+      "node_modules/prop-types/factoryWithTypeCheckers.js": 936,
+      "node_modules/moment/locale ../../../../../../^/.//.*$": 937
     },
     "usedIds": {
       "0": 0,
@@ -2717,6 +2718,7 @@
       "934": 934,
       "935": 935,
       "936": 936,
+      "937": 937,
       "1371": 1371,
       "1372": 1372,
       "1373": 1373,
