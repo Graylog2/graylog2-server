@@ -54,6 +54,15 @@ const LookupTable = React.createClass({
             <dt>Cache</dt>
             <dd><LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(this.props.cache.name)}><a>{this.props.cache.title}</a></LinkContainer></dd>
           </dl>
+          {
+            (this.props.table.default_single_value || this.props.table.default_multi_value) &&
+            <dl>
+              <dt>Default single value</dt>
+              <dd><code>{this.props.table.default_single_value}</code>{' '}({this.props.table.default_single_value_type.toLowerCase()})</dd>
+              <dt>Default multi value</dt>
+              <dd><code>{this.props.table.default_multi_value}</code>{' '}({this.props.table.default_multi_value_type.toLowerCase()})</dd>
+            </dl>
+          }
         </Col>
         <Col md={6}>
           <h3>Test lookup</h3>

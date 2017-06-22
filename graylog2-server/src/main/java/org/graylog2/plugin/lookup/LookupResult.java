@@ -18,6 +18,8 @@ package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.lookup.LookupDefaultMultiValue;
+import org.graylog2.lookup.LookupDefaultSingleValue;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
@@ -73,7 +75,37 @@ public abstract class LookupResult {
         return withoutTTL().single(singleValue).multiValue(multiValue).build();
     }
 
-    private static Builder withoutTTL() {
+    public static LookupResult withDefaults(final LookupDefaultSingleValue singleValue, final LookupDefaultMultiValue multiValue) {
+            LookupResult.Builder builder = LookupResult.withoutTTL();
+
+            switch (singleValue.valueType()) {
+                case STRING:
+                    builder = builder.single((CharSequence) singleValue.value());
+                    break;
+                case NUMBER:
+                    builder = builder.single((Number) singleValue.value());
+                    break;
+                case BOOLEAN:
+                    builder = builder.single((Boolean) singleValue.value());
+                    break;
+                case OBJECT:
+                    throw new IllegalArgumentException("Single value cannot be of type OBJECT");
+                case NULL:
+                    break;
+            }
+
+            // If not default multi value is set, we use the single value with the single value key as we do
+            // in other methods as well.
+            if (multiValue.isSet()) {
+                builder = builder.multiValue(multiValue.value());
+            } else if (singleValue.isSet()) {
+                builder = builder.multiValue(Collections.singletonMap(SINGLE_VALUE_KEY, singleValue.value()));
+            }
+
+            return builder.build();
+    }
+
+    public static Builder withoutTTL() {
         return builder().cacheTTL(Long.MAX_VALUE);
     }
 

@@ -36,6 +36,8 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.lookup.LookupDefaultMultiValue;
+import org.graylog2.lookup.LookupDefaultSingleValue;
 import org.graylog2.lookup.LookupTable;
 import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.db.DBCacheService;
@@ -178,21 +180,24 @@ public class LookupTableResource extends RestResource {
 
     private void checkLookupTableId(String idOrName, LookupTableApi toUpdate) {
         requireNonNull(idOrName, "idOrName parameter cannot be null");
-        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
-            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        if (idOrName.equals(toUpdate.id()) || idOrName.equals(toUpdate.name())) {
+            return;
         }
+        throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
     }
     private void checkLookupCacheId(String idOrName, CacheApi toUpdate) {
         requireNonNull(idOrName, "idOrName parameter cannot be null");
-        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
-            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        if (idOrName.equals(toUpdate.id()) || idOrName.equals(toUpdate.name())) {
+            return;
         }
+        throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
     }
     private void checkLookupAdapterId(String idOrName, DataAdapterApi toUpdate) {
         requireNonNull(idOrName, "idOrName parameter cannot be null");
-        if (!idOrName.equals(toUpdate.id()) || !idOrName.equals(toUpdate.name())) {
-            throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
+        if (idOrName.equals(toUpdate.id()) || idOrName.equals(toUpdate.name())) {
+            return;
         }
+        throw new BadRequestException("URL parameter <" + idOrName + "> does not match parameter in request body");
     }
 
     @GET
@@ -339,6 +344,39 @@ public class LookupTableResource extends RestResource {
         clusterBus.post(LookupTablesDeleted.create(lookupTableDto.get()));
 
         return LookupTableApi.fromDto(lookupTableDto.get());
+    }
+
+    @POST
+    @Path("tables/validate")
+    @NoAuditEvent("Validation only")
+    @ApiOperation(value = "Validate the lookup table config")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
+    public ValidationResult validateTable(@Valid @ApiParam LookupTableApi toValidate) {
+        final ValidationResult validation = new ValidationResult();
+
+        final Optional<LookupTableDto> dtoOptional = dbTableService.get(toValidate.name());
+        if (dtoOptional.isPresent()) {
+            // a table exist with the given name, check that the IDs are the same, this might be an update
+            final LookupTableDto tableDto = dtoOptional.get();
+            //noinspection ConstantConditions
+            if (!tableDto.id().equals(toValidate.id())) {
+                // a table exists with a different id, so the name is already in use, fail validation
+                validation.addError("name", "The lookup table name is already in use.");
+            }
+        }
+
+        try {
+            LookupDefaultSingleValue.create(toValidate.defaultSingleValue(), toValidate.defaultSingleValueType());
+        } catch (Exception e) {
+            validation.addError(LookupTableApi.FIELD_DEFAULT_SINGLE_VALUE, e.getMessage());
+        }
+        try {
+            LookupDefaultMultiValue.create(toValidate.defaultMultiValue(), toValidate.defaultMultiValueType());
+        } catch (Exception e) {
+            validation.addError(LookupTableApi.FIELD_DEFAULT_MULTI_VALUE, e.getMessage());
+        }
+
+        return validation;
     }
 
     @JsonAutoDetect

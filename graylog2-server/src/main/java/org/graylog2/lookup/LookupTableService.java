@@ -281,36 +281,41 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     private LookupDataAdapter createAdapter(DataAdapterDto dto, ImmutableSet.Builder<LookupDataAdapter> existingAdapters) {
-        final LookupDataAdapter.Factory factory = adapterFactories.get(dto.config().type());
-        if (factory == null) {
-            LOG.warn("Unable to load data adapter {} of type {}, missing a factory. Is a required plugin missing?", dto.name(), dto.config().type());
-            // TODO system notification
+        try {
+            final LookupDataAdapter.Factory factory = adapterFactories.get(dto.config().type());
+            if (factory == null) {
+                LOG.warn("Unable to load data adapter {} of type {}, missing a factory. Is a required plugin missing?", dto.name(), dto.config().type());
+                // TODO system notification
+                return null;
+            }
+            final LookupDataAdapter adapter = factory.create(dto.id(), dto.name(), dto.config());
+            adapter.addListener(new LoggingServiceListener(
+                            "Data Adapter",
+                            String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
+                            LOG),
+                    scheduler);
+            adapter.addListener(new Listener() {
+                @Override
+                public void running() {
+                    idToAdapter.put(dto.id(), adapter);
+                    final LookupDataAdapter existing = liveAdapters.put(dto.name(), adapter);
+                    if (existing != null && existingAdapters != null) {
+                        existingAdapters.add(existing);
+                    }
+                }
+
+                @Override
+                public void failed(State from, Throwable failure) {
+                    LOG.warn("Unable to start data adapter {}: {}", dto.name(), getRootCauseMessage(failure));
+                }
+            }, scheduler);
+            // Each adapter needs to be added to the refresh scheduler
+            adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
+            return adapter;
+        } catch (Exception e) {
+            LOG.error("Couldn't create adapter <{}/{}>", dto.name(), dto.id(), e);
             return null;
         }
-        final LookupDataAdapter adapter = factory.create(dto.id(), dto.name(), dto.config());
-        adapter.addListener(new LoggingServiceListener(
-                        "Data Adapter",
-                        String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(adapter)),
-                        LOG),
-                scheduler);
-        adapter.addListener(new Listener() {
-            @Override
-            public void running() {
-                idToAdapter.put(dto.id(), adapter);
-                final LookupDataAdapter existing = liveAdapters.put(dto.name(), adapter);
-                if (existing != null && existingAdapters != null) {
-                    existingAdapters.add(existing);
-                }
-            }
-
-            @Override
-            public void failed(State from, Throwable failure) {
-                LOG.warn("Unable to start data adapter {}: {}", dto.name(), getRootCauseMessage(failure));
-            }
-        }, scheduler);
-        // Each adapter needs to be added to the refresh scheduler
-        adapter.addListener(adapterRefreshService.newServiceListener(adapter), scheduler);
-        return adapter;
     }
 
     private CountDownLatch createAndStartCaches() {
@@ -328,38 +333,53 @@ public class LookupTableService extends AbstractIdleService {
     }
 
     private LookupCache createCache(CacheDto dto, @Nullable ImmutableSet.Builder<LookupCache> existingCaches) {
-        final LookupCache.Factory factory = cacheFactories.get(dto.config().type());
-        if (factory == null) {
-            LOG.warn("Unable to load cache {} of type {}, missing a factory. Is a required plugin missing?", dto.name(), dto.config().type());
-            // TODO system notification
+        try {
+            final LookupCache.Factory factory = cacheFactories.get(dto.config().type());
+            if (factory == null) {
+                LOG.warn("Unable to load cache {} of type {}, missing a factory. Is a required plugin missing?", dto.name(), dto.config().type());
+                // TODO system notification
+                return null;
+            }
+            final LookupCache cache = factory.create(dto.id(), dto.name(), dto.config());
+            cache.addListener(new LoggingServiceListener(
+                            "Cache",
+                            String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(cache)),
+                            LOG),
+                    scheduler);
+            cache.addListener(new Listener() {
+                @Override
+                public void running() {
+                    idToCache.put(dto.id(), cache);
+                    final LookupCache existing = liveCaches.put(dto.name(), cache);
+                    if (existing != null && existingCaches != null) {
+                        existingCaches.add(existing);
+                    }
+                }
+
+                @Override
+                public void failed(State from, Throwable failure) {
+                    LOG.warn("Unable to start cache {}: {}", dto.name(), getRootCauseMessage(failure));
+                }
+            }, scheduler);
+            return cache;
+        } catch (Exception e) {
+            LOG.error("Couldn't create cache <{}/{}>", dto.name(), dto.id(), e);
             return null;
         }
-        final LookupCache cache = factory.create(dto.id(), dto.name(), dto.config());
-        cache.addListener(new LoggingServiceListener(
-                        "Cache",
-                        String.format(Locale.ENGLISH, "%s/%s [@%s]", dto.name(), dto.id(), objectId(cache)),
-                        LOG),
-                scheduler);
-        cache.addListener(new Listener() {
-            @Override
-            public void running() {
-                idToCache.put(dto.id(), cache);
-                final LookupCache existing = liveCaches.put(dto.name(), cache);
-                if (existing != null && existingCaches != null) {
-                    existingCaches.add(existing);
-                }
-            }
-
-            @Override
-            public void failed(State from, Throwable failure) {
-                LOG.warn("Unable to start cache {}: {}", dto.name(), getRootCauseMessage(failure));
-            }
-        }, scheduler);
-        return cache;
     }
 
     private void createLookupTables() {
-        dbTables.forEach(this::createLookupTable);
+        try {
+            dbTables.forEach(dto -> {
+                try {
+                    createLookupTable(dto);
+                } catch (Exception e) {
+                    LOG.error("Couldn't create lookup table <{}/{}>: {}", dto.name(), dto.id(), e.getMessage());
+                }
+            });
+        } catch (Exception e) {
+            LOG.error("Couldn't create lookup tables", e);
+        }
     }
 
     private LookupTable createLookupTable(LookupTableDto dto) {
@@ -375,6 +395,22 @@ public class LookupTableService extends AbstractIdleService {
                     dto.name(), dto.dataAdapterId());
             return null;
         }
+
+        final LookupDefaultSingleValue defaultSingleValue;
+        try {
+            defaultSingleValue = LookupDefaultSingleValue.create(dto.defaultSingleValue(), dto.defaultSingleValueType());
+        } catch (Exception e) {
+            LOG.error("Could not create default single value object for lookup table {}/{}: {}", dto.name(), dto.id(), e.getMessage());
+            return null;
+        }
+        final LookupDefaultMultiValue defaultMultiValue;
+        try {
+            defaultMultiValue = LookupDefaultMultiValue.create(dto.defaultMultiValue(), dto.defaultMultiValueType());
+        } catch (Exception e) {
+            LOG.error("Could not create default multi value object for lookup table {}/{}: {}", dto.name(), dto.id(), e.getMessage());
+            return null;
+        }
+
         final LookupTable table = LookupTable.builder()
                 .id(dto.id())
                 .name(dto.name())
@@ -382,6 +418,8 @@ public class LookupTableService extends AbstractIdleService {
                 .title(dto.title())
                 .cache(cache)
                 .dataAdapter(adapter)
+                .defaultSingleValue(defaultSingleValue)
+                .defaultMultiValue(defaultMultiValue)
                 .build();
         final LookupCache newCache = table.cache();
         final LookupDataAdapter newAdapter = table.dataAdapter();
@@ -414,8 +452,13 @@ public class LookupTableService extends AbstractIdleService {
         if (liveTables.containsKey(name)) {
             return true;
         } else {
-            // Do a more expensive DB lookup as fallback (live tables might not be populated yet)
-            return dbTables.get(name).isPresent();
+            try {
+                // Do a more expensive DB lookup as fallback (live tables might not be populated yet)
+                return dbTables.get(name).isPresent();
+            } catch (Exception e) {
+                LOG.error("Couldn't load lookup table <{}> from database", name, e);
+                return false;
+            }
         }
     }
 

@@ -9,6 +9,7 @@ const LookupTablesActions = Reflux.createActions({
   update: { asyncResult: true },
   getErrors: { asyncResult: true },
   lookup: { asyncResult: true },
+  validate: { asyncResult: true },
 });
 
 export default LookupTablesActions;

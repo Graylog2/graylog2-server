@@ -1,0 +1,113 @@
+import React, { PropTypes } from 'react';
+import {
+  InputGroup, FormGroup, ControlLabel, FormControl, HelpBlock, DropdownButton, MenuItem,
+} from 'react-bootstrap';
+import { InputWrapper } from 'components/bootstrap';
+
+const OPTIONS = [
+  { value: 'STRING', label: 'string' },
+  { value: 'NUMBER', label: 'number' },
+  { value: 'OBJECT', label: 'object' },
+  { value: 'ARRAY', label: 'array' },
+  { value: 'BOOLEAN', label: 'boolean' },
+  { value: 'NULL', label: 'null' },
+];
+
+const JSONValueInput = React.createClass({
+  propTypes: {
+    update: PropTypes.func.isRequired,
+    label: PropTypes.string,
+    help: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    required: PropTypes.bool,
+    validationState: PropTypes.string,
+    value: PropTypes.string,
+    valueType: PropTypes.oneOf(OPTIONS.map(option => option.value)),
+    allowedTypes: (props, propName, componentName) => {
+      // Check that allowedTypes is an array of type values
+      const values = OPTIONS.map(option => option.value);
+      const errors = [];
+      if (!(props[propName] instanceof Array)) {
+        return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected an array but got ${props[propName]}`);
+      }
+      props[propName].forEach((p) => {
+        if (values.indexOf(p) < 0) {
+          errors.push(p);
+        }
+      });
+      if (errors.length > 0) {
+        return new Error(`Invalid prop ${propName} supplied to ${componentName}. Expected array of ${values} but got invalid ${errors}`);
+      }
+      return null;
+    },
+    labelClassName: PropTypes.string,
+    wrapperClassName: PropTypes.string,
+  },
+
+  getDefaultProps() {
+    return {
+      value: '',
+      valueType: 'STRING',
+      allowedTypes: OPTIONS.map(option => option.value),
+      label: '',
+      help: '',
+      required: false,
+      validationState: null,
+      labelClassName: undefined,
+      wrapperClassName: undefined,
+    };
+  },
+
+  getInitialState() {
+    return this._computeInitialState(this.props);
+  },
+
+  componentWillReceiveProps(nextProps) {
+    this.setState(this._computeInitialState(nextProps));
+  },
+
+  _computeInitialState(props) {
+    return {
+      value: props.value,
+      valueType: props.valueType,
+    };
+  },
+
+  _propagateState() {
+    this.props.update(this.state.value, this.state.valueType);
+  },
+
+  _onUpdate(e) {
+    const value = e.target.value;
+    this.setState({ value: value }, this._propagateState);
+  },
+
+  _onValueTypeSelect(valueType) {
+    this.setState({ valueType: valueType }, this._propagateState);
+  },
+
+  render() {
+    const options = OPTIONS.filter(o => this.props.allowedTypes.indexOf(o.value) > -1).map((o) => {
+      return <MenuItem key={o.value} onSelect={() => this._onValueTypeSelect(o.value)}>{o.label}</MenuItem>;
+    });
+
+    return (
+      <FormGroup validationState={this.props.validationState}>
+        {this.props.label && <ControlLabel className={this.props.labelClassName}>{this.props.label}</ControlLabel>}
+        <InputWrapper className={this.props.wrapperClassName}>
+          <InputGroup>
+            <FormControl type="text" onChange={this._onUpdate} value={this.state.value} required={this.props.required} />
+            <DropdownButton componentClass={InputGroup.Button}
+                            id="input-dropdown-addon"
+                            bsStyle={this.props.validationState === 'error' ? 'danger' : null}
+                            title={OPTIONS.filter(o => o.value === this.props.valueType)[0].label}>
+              {options}
+            </DropdownButton>
+          </InputGroup>
+          {this.props.help && <HelpBlock>{this.props.help}</HelpBlock>}
+        </InputWrapper>
+      </FormGroup>
+    );
+  },
+});
+
+export default JSONValueInput;

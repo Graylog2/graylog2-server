@@ -16,14 +16,14 @@
  */
 package org.graylog2.rest.models.system.lookup;
 
-import com.google.auto.value.AutoValue;
-
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
+import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
+import org.graylog2.lookup.LookupDefaultSingleValue;
 import org.graylog2.lookup.dto.LookupTableDto;
+import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 
@@ -33,28 +33,47 @@ import javax.annotation.Nullable;
 @JsonDeserialize(builder = AutoValue_LookupTableApi.Builder.class)
 public abstract class LookupTableApi {
 
+    public static final String FIELD_DEFAULT_SINGLE_VALUE = "default_single_value";
+    public static final String FIELD_DEFAULT_MULTI_VALUE = "default_multi_value";
+
     @Nullable
     @JsonProperty("id")
     public abstract String id();
 
     @JsonProperty("title")
+    @NotEmpty
     public abstract String title();
 
     @JsonProperty("description")
     public abstract String description();
 
     @JsonProperty("name")
+    @NotEmpty
     public abstract String name();
 
     @JsonProperty("cache_id")
+    @NotEmpty
     public abstract String cacheId();
 
     @JsonProperty("data_adapter_id")
+    @NotEmpty
     public abstract String dataAdapterId();
 
     @JsonProperty("content_pack")
     @Nullable
     public abstract String contentPack();
+
+    @JsonProperty(FIELD_DEFAULT_SINGLE_VALUE)
+    public abstract String defaultSingleValue();
+
+    @JsonProperty("default_single_value_type")
+    public abstract LookupDefaultSingleValue.Type defaultSingleValueType();
+
+    @JsonProperty(FIELD_DEFAULT_MULTI_VALUE)
+    public abstract String defaultMultiValue();
+
+    @JsonProperty("default_multi_value_type")
+    public abstract LookupDefaultSingleValue.Type defaultMultiValueType();
 
     public static Builder builder() {
         return new AutoValue_LookupTableApi.Builder();
@@ -69,6 +88,10 @@ public abstract class LookupTableApi {
                 .cacheId(cacheId())
                 .dataAdapterId(dataAdapterId())
                 .contentPack(contentPack())
+                .defaultSingleValue(defaultSingleValue())
+                .defaultSingleValueType(defaultSingleValueType())
+                .defaultMultiValue(defaultMultiValue())
+                .defaultMultiValueType(defaultMultiValueType())
                 .build();
     }
 
@@ -81,6 +104,10 @@ public abstract class LookupTableApi {
                 .cacheId(dto.cacheId())
                 .dataAdapterId(dto.dataAdapterId())
                 .contentPack(dto.contentPack())
+                .defaultSingleValue(dto.defaultSingleValue())
+                .defaultSingleValueType(dto.defaultSingleValueType())
+                .defaultMultiValue(dto.defaultMultiValue())
+                .defaultMultiValueType(dto.defaultMultiValueType())
                 .build();
     }
 
@@ -103,6 +130,18 @@ public abstract class LookupTableApi {
 
         @JsonProperty("data_adapter_id")
         public abstract Builder dataAdapterId(String id);
+
+        @JsonProperty("default_single_value")
+        public abstract Builder defaultSingleValue(String defaultSingleValue);
+
+        @JsonProperty("default_single_value_type")
+        public abstract Builder defaultSingleValueType(LookupDefaultSingleValue.Type defaultSingleValueType);
+
+        @JsonProperty("default_multi_value")
+        public abstract Builder defaultMultiValue(String defaultMultiValue);
+
+        @JsonProperty("default_multi_value_type")
+        public abstract Builder defaultMultiValueType(LookupDefaultSingleValue.Type defaultMultiValueType);
 
         @JsonProperty("content_pack")
         public abstract Builder contentPack(@Nullable String contentPack);

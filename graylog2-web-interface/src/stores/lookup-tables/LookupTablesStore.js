@@ -159,8 +159,30 @@ const LookupTablesStore = Reflux.createStore({
     return promise;
   },
 
+  validate(table) {
+    const url = this._url('tables/validate');
+    const promise = fetch('POST', url, table);
+
+    promise.then((response) => {
+      this.trigger({
+        validationErrors: response.errors,
+      });
+    }, this._errorHandler('Lookup table validation failed', `Could not validate lookup table "${table.name}"`));
+    LookupTablesActions.validate.promise(promise);
+    return promise;
+  },
+
   _errorHandler(message, title, cb) {
     return (error) => {
+      try {
+        // Do not show the user notification if the error is a hibernate error message. We cannot display those
+        // properly yet...
+        if (error.additional.body[0].message_template) {
+          return;
+        }
+      } catch (e) {
+        // ignored
+      }
       let errorMessage;
       try {
         errorMessage = error.additional.body.message;
