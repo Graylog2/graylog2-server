@@ -102,7 +102,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
             final String indexName = entry.getKey();
             final JsonNode value = entry.getValue();
 
-            final JsonNode indexSettings = value.path("settings").path("index");
+            final JsonNode indexSettings = value.path("settings");
             if (indexSettings.isMissingNode()) {
                 LOG.error("Unable to retrieve index settings from metadata for index {} - skipping.", indexName);
                 LOG.debug("Index metadata was: {}", value.toString());
@@ -127,7 +127,7 @@ public class V20170607164210_MigrateReopenedIndicesToAliases extends Migration {
             throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
         }
 
-        final JsonNode reopened = settings.path(REOPENED_INDEX_SETTING);
+        final JsonNode reopened = settings.path("index").path(REOPENED_INDEX_SETTING);
         return reopened.isMissingNode() ? false : reopened.asBoolean();
     }
 
