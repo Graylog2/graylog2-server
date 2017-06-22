@@ -59,6 +59,11 @@ public class OptimizeIndexJob extends SystemJob {
 
     @Override
     public void execute() {
+        if (indices.isClosed(index)) {
+            LOG.debug("Not running job for closed index <{}>", index);
+            return;
+        }
+
         String msg = "Optimizing index <" + index + ">.";
         activityWriter.write(new Activity(msg, OptimizeIndexJob.class));
         LOG.info(msg);
