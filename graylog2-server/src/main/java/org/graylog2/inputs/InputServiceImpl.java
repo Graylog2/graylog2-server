@@ -34,6 +34,9 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.inputs.extractors.events.ExtractorCreated;
+import org.graylog2.inputs.extractors.events.ExtractorDeleted;
+import org.graylog2.inputs.extractors.events.ExtractorUpdated;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.database.EmbeddedPersistable;
 import org.graylog2.plugin.database.Persisted;
@@ -197,7 +200,14 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public void addExtractor(Input input, Extractor extractor) throws ValidationException {
         embed(input, InputImpl.EMBEDDED_EXTRACTORS, extractor);
-        publishChange(InputUpdated.create(input.getId()));
+        publishChange(ExtractorCreated.create(input.getId(), extractor.getId()));
+    }
+
+    @Override
+    public void updateExtractor(Input input, Extractor extractor) throws ValidationException {
+        removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractor.getId());
+        embed(input, InputImpl.EMBEDDED_EXTRACTORS, extractor);
+        publishChange(ExtractorUpdated.create(input.getId(), extractor.getId()));
     }
 
     @Override
@@ -324,7 +334,7 @@ public class InputServiceImpl extends PersistedServiceImpl implements InputServi
     @Override
     public void removeExtractor(Input input, String extractorId) {
         removeEmbedded(input, InputImpl.EMBEDDED_EXTRACTORS, extractorId);
-        publishChange(InputUpdated.create(input.getId()));
+        publishChange(ExtractorDeleted.create(input.getId(), extractorId));
     }
 
     @Override
