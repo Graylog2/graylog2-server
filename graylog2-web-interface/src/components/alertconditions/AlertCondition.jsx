@@ -4,15 +4,17 @@ import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
 const { AlertConditionsActions, AlertConditionsStore } = CombinedProvider.get('AlertConditions');
+const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 import { AlertConditionSummary, UnknownAlertCondition } from 'components/alertconditions';
+import PermissionsMixin from 'util/PermissionsMixin';
 
 const AlertCondition = React.createClass({
   propTypes: {
     alertCondition: React.PropTypes.object.isRequired,
     stream: React.PropTypes.object,
   },
-  mixins: [Reflux.connect(AlertConditionsStore)],
+  mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 
   _onDelete() {
     if (window.confirm('Really delete alert condition?')) {
@@ -30,12 +32,16 @@ const AlertCondition = React.createClass({
       return <UnknownAlertCondition alertCondition={condition} onDelete={this._onDelete} stream={stream} />;
     }
 
-    const actions = [
-      <DropdownButton key="more-actions-button" title="Actions" pullRight
-                      id={`more-actions-dropdown-${condition.id}`}>
-        <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
-      </DropdownButton>,
-    ];
+    const permissions = this.state.currentUser.permissions;
+    let actions = [];
+    if (this.isPermitted(permissions, `streams:edit:${stream.id}`)) {
+      actions = [
+        <DropdownButton key="more-actions-button" title="Actions" pullRight
+                        id={`more-actions-dropdown-${condition.id}`}>
+          <MenuItem onSelect={this._onDelete}>Delete</MenuItem>
+        </DropdownButton>,
+      ];
+    }
 
     return (
       <AlertConditionSummary alertCondition={condition} typeDefinition={typeDefinition} stream={stream}
