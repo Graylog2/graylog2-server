@@ -27,6 +27,7 @@ import io.searchbox.cluster.Health;
 import io.searchbox.cluster.NodesInfo;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.slf4j.Logger;
@@ -65,12 +66,21 @@ public class Cluster {
         this.requestTimeout = requestTimeout;
     }
 
-    private JsonNode clusterHealth(Collection<? extends String> indices) {
+    private Optional<JsonNode> clusterHealth(Collection<? extends String> indices) {
         final Health request = new Health.Builder()
                 .addIndex(indices)
                 .build();
-        final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster health for indices " + indices);
-        return jestResult.getJsonObject();
+        try {
+            final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster health for indices " + indices);
+            return Optional.of(jestResult.getJsonObject());
+        } catch(ElasticsearchException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"), e);
+            } else {
+                LOG.error("{} ({})", e.getMessage(), Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse("n/a"));
+            }
+            return Optional.empty();
+        }
     }
 
     /**
@@ -79,7 +89,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public Optional<JsonNode> health() {
-        return Optional.of(clusterHealth(Arrays.asList(indexSetRegistry.getIndexWildcards())));
+        return clusterHealth(Arrays.asList(indexSetRegistry.getIndexWildcards()));
     }
 
     /**
@@ -91,7 +101,7 @@ public class Cluster {
      * @return the cluster health response
      */
     public Optional<JsonNode> deflectorHealth() {
-        return Optional.of(clusterHealth(Arrays.asList(indexSetRegistry.getWriteIndexAliases())));
+        return clusterHealth(Arrays.asList(indexSetRegistry.getWriteIndexAliases()));
     }
 
     /**
@@ -155,9 +165,16 @@ public class Cluster {
                 .timeout(Ints.saturatedCast(requestTimeout.toSeconds()))
                 .build();
 
-        final JestResult result = JestUtils.execute(jestClient, request, () -> "Couldn't check connection status of Elasticsearch");
-        final int numberOfDataNodes = result.getJsonObject().path("number_of_data_nodes").asInt();
-        return numberOfDataNodes > 0;
+        try {
+            final JestResult result = JestUtils.execute(jestClient, request, () -> "Couldn't check connection status of Elasticsearch");
+            final int numberOfDataNodes = result.getJsonObject().path("number_of_data_nodes").asInt();
+            return numberOfDataNodes > 0;
+        } catch (ElasticsearchException e) {
+            if (LOG.isDebugEnabled()) {
+                LOG.error(e.getMessage(), e);
+            }
+            return false;
+        }
     }
 
     /**
