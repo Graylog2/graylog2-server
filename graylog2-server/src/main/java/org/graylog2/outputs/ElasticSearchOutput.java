@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -111,12 +112,12 @@ public class ElasticSearchOutput implements MessageOutput {
         }
         failures.mark(failedMessageIds.size());
 
-        for (final Map.Entry<IndexSet, Message> entry : messageList) {
-            final Message message = entry.getValue();
-            if (!failedMessageIds.contains(message.getId())) {
-                journal.markJournalOffsetCommitted(message.getJournalOffset());
-            }
-        }
+        final Optional<Long> offset = messageList.stream()
+            .map(Map.Entry::getValue)
+            .map(Message::getJournalOffset)
+            .max(Long::compare);
+
+        offset.ifPresent(journal::markJournalOffsetCommitted);
     }
 
     @Override
