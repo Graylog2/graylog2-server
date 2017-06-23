@@ -72,6 +72,22 @@ public class Messages {
                 public <V> void onRetry(Attempt<V> attempt) {
                     if (attempt.hasException()) {
                         LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
+                    } else {
+                        if (!(attempt.getResult() instanceof BulkResult)) {
+                            return;
+                        }
+                        final BulkResult result = (BulkResult) attempt.getResult();
+                        if (result.isSucceeded()) {
+                            return;
+                        }
+                        final List<BulkResult.BulkResultItem> failedItems = result.getFailedItems();
+                        if (!failedItems.isEmpty()) {
+                            // Looking at the first failed item should be enough to get an idea about the issue
+                            final BulkResult.BulkResultItem item = failedItems.get(0);
+                            LOG.error("Bulk indexing {} messages into {}/{} failed: {} - retrying (attempt #{})", failedItems.size(), item.index, item.type, item.error, attempt.getAttemptNumber());
+                        }  else {
+                            LOG.error("Bulk indexing failed: {} - retrying (attempt #{})", result.getErrorMessage(), attempt.getAttemptNumber());
+                        }
                     }
                 }
             })
