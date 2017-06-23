@@ -179,7 +179,7 @@ public class StreamAlertConditionResource extends RestResource {
                        @PathParam("streamId") String streamid,
                        @ApiParam(name = "conditionId", value = "The alert condition id to be deleted", required = true)
                        @PathParam("conditionId") String conditionId) throws NotFoundException {
-        checkPermission(RestPermissions.STREAMS_READ, streamid);
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
 
         final Stream stream = streamService.load(streamid);
         streamService.removeAlertCondition(stream, conditionId);
