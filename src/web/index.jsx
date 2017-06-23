@@ -10,7 +10,7 @@ import MaxmindAdapterFieldSet from 'components/adapter/MaxmindAdapterFieldSet';
 import MaxmindAdapterSummary from 'components/adapter/MaxmindAdapterSummary';
 import MaxmindAdapterDocumentation from 'components/adapter/MaxmindAdapterDocumentation';
 
-PluginStore.register(new PluginManifest(packageJson, {
+const manifest = new PluginManifest(packageJson, {
   widgets: [
     {
       type: 'org.graylog.plugins.map.widget.strategy.MapWidgetStrategy',
@@ -42,5 +42,12 @@ PluginStore.register(new PluginManifest(packageJson, {
       summaryComponent: MaxmindAdapterSummary,
       documentationComponent: MaxmindAdapterDocumentation,
     },
-  ]
-}));
+  ],
+});
+
+PluginStore.register(manifest);
+
+if (module.hot) {
+  module.hot.accept();
+  module.hot.dispose(() => PluginStore.unregister(manifest));
+}
