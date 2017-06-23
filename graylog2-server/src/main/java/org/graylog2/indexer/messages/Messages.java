@@ -47,12 +47,10 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -60,7 +58,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static com.google.common.base.Preconditions.checkNotNull;
 
 @Singleton
 public class Messages {
@@ -74,7 +71,7 @@ public class Messages {
                 @Override
                 public <V> void onRetry(Attempt<V> attempt) {
                     if (attempt.hasException()) {
-                        LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #[]).", attempt.getExceptionCause(), attempt.getAttemptNumber());
+                        LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
                     }
                 }
             })
