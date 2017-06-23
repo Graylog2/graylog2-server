@@ -19,8 +19,6 @@ package org.graylog2.outputs;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.google.common.base.Joiner;
-import com.google.common.collect.Ordering;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.indexer.IndexSet;
@@ -36,8 +34,10 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
@@ -45,12 +45,14 @@ import static com.codahale.metrics.MetricRegistry.name;
 
 public class ElasticSearchOutput implements MessageOutput {
     private static final String WRITES_METRICNAME = name(ElasticSearchOutput.class, "writes");
+    private static final String FAILURES_METRICNAME = name(ElasticSearchOutput.class, "failures");
     private static final String PROCESS_TIME_METRICNAME = name(ElasticSearchOutput.class, "processTime");
 
     private static final String NAME = "ElasticSearch Output";
     private static final Logger LOG = LoggerFactory.getLogger(ElasticSearchOutput.class);
 
     private final Meter writes;
+    private final Meter failures;
     private final Timer processTime;
     private final Messages messages;
     private final Journal journal;
@@ -73,6 +75,7 @@ public class ElasticSearchOutput implements MessageOutput {
         this.journal = journal;
         // Only constructing metrics here. write() get's another Core reference. (because this technically is a plugin)
         this.writes = metricRegistry.meter(WRITES_METRICNAME);
+        this.failures = metricRegistry.meter(FAILURES_METRICNAME);
         this.processTime = metricRegistry.timer(PROCESS_TIME_METRICNAME);
 
         // Should be set in initialize once this becomes a real plugin.
@@ -94,19 +97,27 @@ public class ElasticSearchOutput implements MessageOutput {
 
     public void writeMessageEntries(List<Map.Entry<IndexSet, Message>> messageList) throws Exception {
         if (LOG.isTraceEnabled()) {
-            final List<String> sortedIds = Ordering.natural().sortedCopy(messageList.stream()
-                    .map(entry -> entry.getValue().getId())
-                    .collect(Collectors.toList()));
-            LOG.trace("Writing message ids to [{}]: <{}>", NAME, Joiner.on(", ").join(sortedIds));
+            final String sortedIds = messageList.stream()
+                    .map(Map.Entry::getValue)
+                    .map(Message::getId)
+                    .sorted(Comparator.naturalOrder())
+                    .collect(Collectors.joining(", "));
+            LOG.trace("Writing message ids to [{}]: <{}>", NAME, sortedIds);
         }
 
         writes.mark(messageList.size());
+        final List<String> failedMessageIds;
         try (final Timer.Context ignored = processTime.time()) {
-            messages.bulkIndex(messageList);
+            failedMessageIds = messages.bulkIndex(messageList);
         }
-        for (final Map.Entry<IndexSet, Message> entry : messageList) {
-            journal.markJournalOffsetCommitted(entry.getValue().getJournalOffset());
-        }
+        failures.mark(failedMessageIds.size());
+
+        final Optional<Long> offset = messageList.stream()
+            .map(Map.Entry::getValue)
+            .map(Message::getJournalOffset)
+            .max(Long::compare);
+
+        offset.ifPresent(journal::markJournalOffsetCommitted);
     }
 
     @Override

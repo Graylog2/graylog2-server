@@ -47,7 +47,7 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -109,9 +109,9 @@ public class Messages {
         return terms;
     }
 
-    public boolean bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList) {
+    public List<String> bulkIndex(final List<Map.Entry<IndexSet, Message>> messageList) {
         if (messageList.isEmpty()) {
-            return true;
+            return Collections.emptyList();
         }
 
         final Bulk.Builder bulk = new Bulk.Builder();
@@ -125,14 +125,18 @@ public class Messages {
         }
 
         final BulkResult result = runBulkRequest(bulk.build(), messageList.size());
+        final List<BulkResult.BulkResultItem> failedItems = result.getFailedItems();
 
-        LOG.debug("Index: Bulk indexed {} messages, took {} ms, failures: {}",
-                result.getItems().size(), result, result.getFailedItems().size());
-        if (!result.getFailedItems().isEmpty()) {
-            propagateFailure(result.getFailedItems(), messageList, result.getErrorMessage());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Index: Bulk indexed {} messages, took {} ms, failures: {}",
+                    result.getItems().size(), result, failedItems.size());
         }
 
-        return result.getFailedItems().isEmpty();
+        if (!failedItems.isEmpty()) {
+            return propagateFailure(failedItems, messageList, result.getErrorMessage());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
     private BulkResult runBulkRequest(final Bulk request, int count) {
@@ -149,12 +153,13 @@ public class Messages {
         }
     }
 
-    private void propagateFailure(List<BulkResult.BulkResultItem> items, List<Map.Entry<IndexSet, Message>> messageList, String errorMessage) {
-        final List<IndexFailure> indexFailures = new LinkedList<>();
+    private List<String> propagateFailure(List<BulkResult.BulkResultItem> items, List<Map.Entry<IndexSet, Message>> messageList, String errorMessage) {
         final Map<String, Message> messageMap = messageList.stream()
             .map(Map.Entry::getValue)
             .distinct()
             .collect(Collectors.toMap(Message::getId, Function.identity()));
+        final List<String> failedMessageIds = new ArrayList<>(items.size());
+        final List<IndexFailure> indexFailures = new ArrayList<>(items.size());
         for (BulkResult.BulkResultItem item : items) {
             LOG.trace("Failed to index message: {}", item.error);
 
@@ -169,6 +174,8 @@ public class Messages {
                     .build();
 
             indexFailures.add(new IndexFailureImpl(doc));
+
+            failedMessageIds.add(item.id);
         }
 
         LOG.error("Failed to index [{}] messages. Please check the index error log in your web interface for the reason. Error: {}",
@@ -180,6 +187,8 @@ public class Messages {
         } catch (InterruptedException e) {
             LOG.warn("Couldn't save index failures.", e);
         }
+
+        return failedMessageIds;
     }
 
     public Index prepareIndexRequest(String index, Map<String, Object> source, String id) {
