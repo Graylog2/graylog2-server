@@ -8,6 +8,7 @@ import io.searchbox.core.BulkResult;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.plugin.Message;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -112,7 +113,7 @@ public class MockedMessagesTest {
 
         final Message mockedMessage = mock(Message.class);
         when(mockedMessage.getId()).thenReturn(messageId);
-        when(mockedMessage.getTimestamp()).thenReturn(DateTime.now());
+        when(mockedMessage.getTimestamp()).thenReturn(DateTime.now(DateTimeZone.UTC));
 
         final List<Map.Entry<IndexSet, Message>> messageList = ImmutableList.of(
             new AbstractMap.SimpleEntry(mock(IndexSet.class), mockedMessage)
