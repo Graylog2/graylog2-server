@@ -65,13 +65,14 @@ public class Messages {
     private static final Duration MAX_WAIT_TIME = Duration.seconds(30L);
     private static final Retryer<BulkResult> BULK_REQUEST_RETRYER = RetryerBuilder.<BulkResult>newBuilder()
             .retryIfException(t -> t instanceof IOException)
-            .retryIfResult((result) -> result == null || !result.isSucceeded())
             .withWaitStrategy(WaitStrategies.exponentialWait(MAX_WAIT_TIME.getQuantity(), MAX_WAIT_TIME.getUnit()))
             .withRetryListener(new RetryListener() {
                 @Override
                 public <V> void onRetry(Attempt<V> attempt) {
                     if (attempt.hasException()) {
                         LOG.error("Caught exception during bulk indexing: {}, retrying (attempt #{}).", attempt.getExceptionCause(), attempt.getAttemptNumber());
+                    } else if (attempt.getAttemptNumber() > 1) {
+                        LOG.info("Bulk indexing finally successful (attempt #{}).", attempt.getAttemptNumber());
                     }
                 }
             })
