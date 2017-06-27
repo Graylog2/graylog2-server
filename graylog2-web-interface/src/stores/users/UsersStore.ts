@@ -84,13 +84,6 @@ export const UsersStore = {
     return promise;
   },
 
-  updateRoles(username: string, roles: string[]): void {
-    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(username)).url);
-    const promise = fetch('PUT', url, {roles: roles});
-
-    return promise;
-  },
-
   changePassword(username: string, request: ChangePasswordRequest): void {
     const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.changePassword(encodeURIComponent(username)).url);
     const promise = fetch('PUT', url, request);

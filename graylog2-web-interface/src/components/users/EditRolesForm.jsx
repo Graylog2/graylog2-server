@@ -4,6 +4,7 @@ import Routes from 'routing/Routes';
 
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
+import ObjectUtils from 'util/ObjectUtils';
 
 import StoreProvider from 'injection/StoreProvider';
 const RolesStore = StoreProvider.getStore('Roles');
@@ -33,7 +34,9 @@ const EditRolesForm = React.createClass({
     evt.preventDefault();
     if (confirm(`Really update roles for "${this.props.user.username}"?`)) {
       const roles = this.refs.roles.getValue().filter(value => value !== '');
-      UsersStore.updateRoles(this.props.user.username, roles).then(() => {
+      const user = ObjectUtils.clone(this.props.user);
+      user.roles = roles;
+      UsersStore.update(this.props.user.username, user).then(() => {
         UserNotification.success('Roles updated successfully.', 'Success!');
         this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }, () => {
