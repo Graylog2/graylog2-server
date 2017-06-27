@@ -30,7 +30,6 @@ const UserForm = React.createClass({
     return {
       streams: undefined,
       dashboards: undefined,
-      roles: undefined,
       user: this._getUserStateFromProps(this.props),
     };
   },
@@ -62,6 +61,7 @@ const UserForm = React.createClass({
       permissions: props.user.permissions,
       read_only: props.user.read_only,
       external: props.user.external,
+      roles: props.user.roles,
     };
   },
 
