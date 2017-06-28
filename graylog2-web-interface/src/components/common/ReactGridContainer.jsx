@@ -8,6 +8,7 @@ import style from './ReactGridContainer.css';
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
 const COLUMN_WIDTH = 350;
+const ROW_HEIGHT = 200;
 
 const COLUMNS = {
   xxl: 6,
@@ -33,11 +34,13 @@ const ReactGridContainer = React.createClass({
     children: React.PropTypes.node.isRequired,
     onPositionsChange: React.PropTypes.func.isRequired,
     locked: React.PropTypes.bool,
+    rowHeight: React.PropTypes.number,
   },
 
   getDefaultProps() {
     return {
       locked: false,
+      rowHeight: ROW_HEIGHT,
     };
   },
 
@@ -57,8 +60,8 @@ const ReactGridContainer = React.createClass({
   },
 
   render() {
-    const layout = Object.keys(this.props.positions).map((id) => {
-      const position = this.props.positions[id];
+    const { children, locked, positions, rowHeight } = this.props;
+    const layout = Object.keys(positions).map((id) => {
       return {
         i: id,
         x: Math.max(position.col - 1, 0),
@@ -71,16 +74,16 @@ const ReactGridContainer = React.createClass({
     // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
     // https://github.com/STRML/react-grid-layout/issues/371
     return (
-      <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${this.props.locked ? 'locked' : 'unlocked'}`}
+      <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${locked ? 'locked' : 'unlocked'}`}
                                     layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
                                     breakpoints={BREAKPOINTS}
                                     cols={COLUMNS}
-                                    rowHeight={200}
+                                    rowHeight={rowHeight}
                                     margin={[10, 10]}
                                     onDragStop={this._onLayoutChange}
                                     onResizeStop={this._onLayoutChange}
-                                    draggableHandle={this.props.locked ? '.no-handle' : ''}>
-        {this.props.children}
+                                    draggableHandle={locked ? '.no-handle' : ''}>
+        {children}
       </WidthAdjustedReactGridLayout>
     );
   },
