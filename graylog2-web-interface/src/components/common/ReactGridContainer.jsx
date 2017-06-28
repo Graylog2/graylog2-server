@@ -35,8 +35,8 @@ const ReactGridContainer = React.createClass({
     children: PropTypes.node.isRequired,
     onPositionsChange: PropTypes.func.isRequired,
     locked: PropTypes.bool,
-    isResizable: React.PropTypes.bool,
-    rowHeight: React.PropTypes.number,
+    isResizable: PropTypes.bool,
+    rowHeight: PropTypes.number,
   },
 
   getDefaultProps() {
@@ -63,7 +63,7 @@ const ReactGridContainer = React.createClass({
   },
 
   render() {
-    const { children, locked, isResizable, positions, rowHeight } = this.props;
+    const { children, locked, positions, rowHeight } = this.props;
     const layout = Object.keys(positions).map((id) => {
       const { col, row, height, width } = positions[id];
       return {
