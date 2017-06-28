@@ -23,7 +23,7 @@ import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.glassfish.grizzly.http.server.Request;
 import org.graylog2.rest.RestTools;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.graylog2.utilities.IpSubnet;
 
 import javax.annotation.Priority;
 import javax.inject.Inject;

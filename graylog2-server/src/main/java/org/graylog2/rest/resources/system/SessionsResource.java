@@ -45,7 +45,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.ShiroAuthenticationFilter;
 import org.graylog2.shared.security.ShiroSecurityContext;
 import org.graylog2.shared.users.UserService;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;

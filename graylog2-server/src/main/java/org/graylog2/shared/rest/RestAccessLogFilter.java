@@ -18,7 +18,7 @@ package org.graylog2.shared.rest;
 
 import org.glassfish.grizzly.http.server.Response;
 import org.graylog2.rest.RestTools;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.graylog2.utilities.IpSubnet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

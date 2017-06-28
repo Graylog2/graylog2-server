@@ -21,7 +21,7 @@ import org.glassfish.grizzly.http.server.Request;
 import org.glassfish.jersey.server.model.Resource;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.security.ShiroSecurityContext;
-import org.jboss.netty.handler.ipfilter.IpSubnet;
+import org.graylog2.utilities.IpSubnet;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
