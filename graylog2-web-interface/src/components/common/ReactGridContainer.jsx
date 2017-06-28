@@ -64,12 +64,13 @@ const ReactGridContainer = React.createClass({
   render() {
     const { children, locked, isResizable, positions, rowHeight } = this.props;
     const layout = Object.keys(positions).map((id) => {
+      const { col, row, height, width } = positions[id];
       return {
         i: id,
-        x: Math.max(position.col - 1, 0),
-        y: (position.row <= 0 ? Infinity : position.row - 1),
-        h: position.height,
-        w: position.width,
+        x: col ? Math.max(col - 1, 0) : 0,
+        y: (row === undefined || row <= 0 ? Infinity : row - 1),
+        h: height || 1,
+        w: width || 1,
       };
     });
 
