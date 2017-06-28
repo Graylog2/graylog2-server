@@ -34,12 +34,14 @@ const ReactGridContainer = React.createClass({
     children: React.PropTypes.node.isRequired,
     onPositionsChange: React.PropTypes.func.isRequired,
     locked: React.PropTypes.bool,
+    isResizable: React.PropTypes.bool,
     rowHeight: React.PropTypes.number,
   },
 
   getDefaultProps() {
     return {
       locked: false,
+      isResizable: true,
       rowHeight: ROW_HEIGHT,
     };
   },
@@ -60,7 +62,7 @@ const ReactGridContainer = React.createClass({
   },
 
   render() {
-    const { children, locked, positions, rowHeight } = this.props;
+    const { children, locked, isResizable, positions, rowHeight } = this.props;
     const layout = Object.keys(positions).map((id) => {
       return {
         i: id,
@@ -74,7 +76,7 @@ const ReactGridContainer = React.createClass({
     // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
     // https://github.com/STRML/react-grid-layout/issues/371
     return (
-      <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${locked ? 'locked' : 'unlocked'}`}
+      <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${locked || !isResizable ? 'locked' : 'unlocked'}`}
                                     layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
                                     breakpoints={BREAKPOINTS}
                                     cols={COLUMNS}
