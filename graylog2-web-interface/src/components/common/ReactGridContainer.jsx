@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import style from './ReactGridContainer.css';
+
+const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
 const COLUMN_WIDTH = 350;
 
@@ -43,7 +44,7 @@ const ReactGridContainer = React.createClass({
 
   _onLayoutChange(newLayout) {
     const newPositions = [];
-    newLayout.forEach(widget => {
+    newLayout.forEach((widget) => {
       newPositions.push({
         id: widget.i,
         col: widget.x + 1,
@@ -57,7 +58,7 @@ const ReactGridContainer = React.createClass({
   },
 
   render() {
-    const layout = Object.keys(this.props.positions).map(id => {
+    const layout = Object.keys(this.props.positions).map((id) => {
       const position = this.props.positions[id];
       return {
         i: id,
