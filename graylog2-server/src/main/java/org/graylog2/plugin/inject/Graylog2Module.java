@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.inject;
 
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.google.common.util.concurrent.Service;
 import com.google.inject.AbstractModule;
 import com.google.inject.Key;
@@ -409,6 +410,14 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<String, Object> jacksonSubTypesBinder() {
         return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), TypeLiteral.get(Object.class), JacksonSubTypes.class);
+    }
+
+    protected Multibinder<JsonSerializer> customSerializerBinder() {
+        return Multibinder.newSetBinder(binder(), JsonSerializer.class);
+    }
+
+    protected void addSerializer(Class<? extends JsonSerializer> serializer) {
+        customSerializerBinder().addBinding().to(serializer);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}
