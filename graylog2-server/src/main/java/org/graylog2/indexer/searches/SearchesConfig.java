@@ -19,10 +19,13 @@ package org.graylog2.indexer.searches;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 @AutoValue
@@ -54,6 +57,9 @@ public abstract class SearchesConfig {
     @Nullable
     public abstract Sorting sorting();
 
+    @JsonProperty
+    public abstract Collection<AbstractAggregationBuilder> aggregations();
+
     @JsonCreator
     public SearchesConfig create(@JsonProperty("query") String query,
                                  @JsonProperty("filter") @Nullable String filter,
@@ -61,7 +67,8 @@ public abstract class SearchesConfig {
                                  @JsonProperty("range") TimeRange timeRange,
                                  @JsonProperty("limit") int limit,
                                  @JsonProperty("offset") int offset,
-                                 @JsonProperty("sorting") @Nullable Sorting sorting) {
+                                 @JsonProperty("sorting") @Nullable Sorting sorting,
+                                 @JsonProperty("aggregations") Collection<AbstractAggregationBuilder> aggregations) {
         return builder()
                 .query(query)
                 .filter(filter)
@@ -70,11 +77,13 @@ public abstract class SearchesConfig {
                 .limit(limit)
                 .offset(offset)
                 .sorting(sorting)
+                .aggregations(aggregations)
                 .build();
     }
 
     public static Builder builder() {
-        return new AutoValue_SearchesConfig.Builder();
+        return new AutoValue_SearchesConfig.Builder()
+            .aggregations(Collections.emptyList());
     }
 
     @AutoValue.Builder
@@ -94,6 +103,8 @@ public abstract class SearchesConfig {
         public abstract Builder offset(int offset);
 
         public abstract Builder sorting(Sorting sorting);
+
+        public abstract Builder aggregations(Collection<AbstractAggregationBuilder> aggregations);
 
         abstract SearchesConfig autoBuild();
 

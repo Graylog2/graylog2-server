@@ -38,6 +38,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
+import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
@@ -74,6 +75,8 @@ import org.joda.time.Period;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -242,6 +245,10 @@ public class Searches {
     }
 
     public SearchResult search(String query, String filter, TimeRange range, int limit, int offset, Sorting sorting) {
+        return search(query, filter, range, limit, offset, sorting, Collections.emptyList());
+    }
+
+    public SearchResult search(String query, String filter, TimeRange range, int limit, int offset, Sorting sorting, Collection<AbstractAggregationBuilder> aggregations) {
         final SearchesConfig searchesConfig = SearchesConfig.builder()
                 .query(query)
                 .filter(filter)
@@ -249,6 +256,7 @@ public class Searches {
                 .limit(limit)
                 .offset(offset)
                 .sorting(sorting)
+                .aggregations(aggregations)
                 .build();
 
         return search(searchesConfig);
@@ -259,6 +267,8 @@ public class Searches {
         final Set<String> indices = indexRanges.stream().map(IndexRange::indexName).collect(Collectors.toSet());
 
         final SearchSourceBuilder requestBuilder = searchRequest(config);
+
+        config.aggregations().forEach(requestBuilder::aggregation);
 
         final Search.Builder searchBuilder = new Search.Builder(requestBuilder.toString())
             .addType(IndexMapping.TYPE_MESSAGE)
@@ -274,7 +284,7 @@ public class Searches {
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, config.range());
 
-        return new SearchResult(hits, searchResult.getTotal().longValue(), indexRanges, config.query(), requestBuilder.toString(), tookMs);
+        return new SearchResult(hits, searchResult.getTotal().longValue(), indexRanges, config.query(), requestBuilder.toString(), tookMs, searchResult.getAggregations());
     }
 
     private long tookMsFromSearchResult(io.searchbox.core.SearchResult searchResult) {
