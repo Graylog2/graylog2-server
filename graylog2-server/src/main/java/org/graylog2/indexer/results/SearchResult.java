@@ -16,8 +16,10 @@
  */
 package org.graylog2.indexer.results;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.Sets;
+import io.searchbox.core.search.aggregation.MetricAggregation;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.plugin.Message;
 
@@ -31,13 +33,10 @@ public class SearchResult extends IndexQueryResult {
 	private final List<ResultMessage> results;
 	private final Set<String> fields;
     private final Set<IndexRange> usedIndices;
+    private final MetricAggregation aggregations;
 
 	public SearchResult(List<ResultMessage> hits, long totalResults, Set<IndexRange> usedIndices, String originalQuery, String builtQuery, long tookMs) {
-	    super(originalQuery, builtQuery, tookMs);
-	    this.results = hits;
-        this.fields = extractFields(hits);
-        this.totalResults = totalResults;
-        this.usedIndices = usedIndices;
+	    this(hits, totalResults, usedIndices, originalQuery, builtQuery, tookMs, null);
     }
 
     private SearchResult(String query, String originalQuery) {
@@ -46,6 +45,16 @@ public class SearchResult extends IndexQueryResult {
         this.fields = Collections.emptySet();
         this.usedIndices = Collections.emptySet();
         this.totalResults = 0;
+        this.aggregations = null;
+    }
+
+    public SearchResult(List<ResultMessage> hits, long totalResults, Set<IndexRange> indexRanges, String originalQuery, String builtQuery, long tookMs, MetricAggregation aggregations) {
+	    super(originalQuery, builtQuery, tookMs);
+        this.results = hits;
+        this.fields = extractFields(hits);
+        this.totalResults = totalResults;
+        this.usedIndices = indexRanges;
+        this.aggregations = aggregations;
     }
 
     public long getTotalResults() {
@@ -60,7 +69,12 @@ public class SearchResult extends IndexQueryResult {
 		return fields;
 	}
 
-	@VisibleForTesting
+	@JsonIgnore
+    public MetricAggregation getAggregations() {
+        return aggregations;
+    }
+
+    @VisibleForTesting
     Set<String> extractFields(List<ResultMessage> hits) {
         Set<String> filteredFields = Sets.newHashSet();
 
