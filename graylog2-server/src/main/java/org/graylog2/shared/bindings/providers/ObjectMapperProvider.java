@@ -18,6 +18,7 @@ package org.graylog2.shared.bindings.providers;
 
 import com.codahale.metrics.json.MetricsModule;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategy;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -28,7 +29,6 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.plugin.inject.JacksonSubTypes;
@@ -37,27 +37,35 @@ import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.joda.time.Period;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class ObjectMapperProvider implements Provider<ObjectMapper> {
     protected final ObjectMapper objectMapper;
 
     public ObjectMapperProvider() {
-        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptyMap());
+        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptyMap(), Collections.emptySet());
     }
 
     @Inject
     public ObjectMapperProvider(@GraylogClassLoader final ClassLoader classLoader,
-                                @JacksonSubTypes Map<String, Object> subtypes) {
+                                @JacksonSubTypes Map<String, Object> subtypes,
+                                Set<JsonSerializer> customSerializers) {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
+        final SimpleModule graylogModule = new SimpleModule("Graylog")
+            .addKeyDeserializer(Period.class, new JodaTimePeriodKeyDeserializer())
+            .addSerializer(new RangeJsonSerializer())
+            .addSerializer(new SizeSerializer())
+            .addSerializer(new ObjectIdSerializer());
+
+        customSerializers.forEach(graylogModule::addSerializer);
 
         this.objectMapper = mapper
                 .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
@@ -69,11 +77,7 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                 .registerModule(new Jdk8Module())
                 .registerModule(new JavaTimeModule())
                 .registerModule(new MetricsModule(TimeUnit.SECONDS, TimeUnit.SECONDS, false))
-                .registerModule(new SimpleModule("Graylog")
-                        .addKeyDeserializer(Period.class, new JodaTimePeriodKeyDeserializer())
-                        .addSerializer(new RangeJsonSerializer())
-                        .addSerializer(new SizeSerializer())
-                        .addSerializer(new ObjectIdSerializer()));
+                .registerModule(graylogModule);
 
         subtypes.forEach((name, klass) -> objectMapper.registerSubtypes(new NamedType((Class)klass, name)));
     }
