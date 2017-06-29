@@ -479,6 +479,27 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void clonedMessageWithInvalidTimestamp() {
+        final Message message = new Message("test", "test", Tools.nowUTC());
+        message.addField("timestamp", "foobar");
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final EvaluationContext context = contextForRuleEval(rule, message);
+
+        final Message origMessage = context.currentMessage();
+        final Message clonedMessage = Iterables.get(context.createdMessages(), 0);
+
+        assertThat(origMessage).isNotEqualTo(clonedMessage);
+        assertThat(origMessage.getField("timestamp")).isNotInstanceOf(DateTime.class);
+
+        assertThat(clonedMessage).isNotNull();
+        assertThat(clonedMessage.getMessage()).isEqualTo(origMessage.getMessage());
+        assertThat(clonedMessage.getSource()).isEqualTo(origMessage.getSource());
+        assertThat(clonedMessage.getStreams()).isEqualTo(origMessage.getStreams());
+        assertThat(clonedMessage.getTimestamp()).isNotNull();
+        assertThat(clonedMessage.getField("gl2_original_timestamp")).isEqualTo(origMessage.getField("timestamp"));
+    }
+
+    @Test
     public void grok() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         final Message message = evaluateRule(rule);
