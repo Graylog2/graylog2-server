@@ -147,7 +147,7 @@ public class ConfigurationStateUpdater {
         }
         ImmutableSetMultimap<String, Pipeline> streamPipelineConnections = ImmutableSetMultimap.copyOf(connections);
 
-        final PipelineInterpreter.State newState = stateFactory.newState(currentPipelines, streamPipelineConnections, commonClassLoader);
+        final PipelineInterpreter.State newState = stateFactory.newState(currentPipelines, streamPipelineConnections);
         latestState.set(newState);
         return newState;
     }
