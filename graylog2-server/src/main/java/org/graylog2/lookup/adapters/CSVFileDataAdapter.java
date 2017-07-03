@@ -150,7 +150,11 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     if (keyColumn < 0 || valueColumn < 0) {
                         throw new IllegalStateException("Couldn't detect column number for key or value - check CSV file format");
                     }
-                    newLookupBuilder.put(next[keyColumn], next[valueColumn]);
+                    if (config.isCaseInsensitiveLookup()) {
+                        newLookupBuilder.put(next[keyColumn].toLowerCase(), next[valueColumn]);
+                    } else {
+                        newLookupBuilder.put(next[keyColumn], next[valueColumn]);
+                    }
                 }
             }
         } catch (Exception e) {
@@ -169,7 +173,8 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     @Override
     public LookupResult doGet(Object key) {
-        final String value = lookupRef.get().get(String.valueOf(key));
+        final String stringKey = config.isCaseInsensitiveLookup() ? String.valueOf(key).toLowerCase() : String.valueOf(key);
+        final String value = lookupRef.get().get(stringKey);
 
         if (value == null) {
             return LookupResult.empty();
@@ -208,6 +213,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                     .keyColumn("key")
                     .valueColumn("value")
                     .checkInterval(60)
+                    .caseInsensitiveLookup(false)
                     .build();
         }
     }
@@ -263,6 +269,13 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
         @Min(1)
         public abstract long checkInterval();
 
+        @JsonProperty("case_insensitive_lookup")
+        public abstract Optional<Boolean> caseInsensitiveLookup();
+
+        public boolean isCaseInsensitiveLookup() {
+            return caseInsensitiveLookup().isPresent() && caseInsensitiveLookup().get();
+        }
+
         public static Builder builder() {
             return new AutoValue_CSVFileDataAdapter_Config.Builder();
         }
@@ -303,6 +316,9 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
             @JsonProperty("check_interval")
             public abstract Builder checkInterval(long checkInterval);
+
+            @JsonProperty("case_insensitive_lookup")
+            public abstract Builder caseInsensitiveLookup(Boolean caseInsensitiveLookup);
 
             public abstract Config build();
         }

@@ -20,6 +20,8 @@ const CSVFileAdapterSummary = React.createClass({
       <dd>{config.value_column}</dd>
       <dt>Check interval</dt>
       <dd>{config.check_interval} seconds</dd>
+      <dt>Case-insensitive lookup</dt>
+      <dd>{config.case_insensitive_lookup ? 'yes' : 'no'}</dd>
     </dl>);
   },
 });

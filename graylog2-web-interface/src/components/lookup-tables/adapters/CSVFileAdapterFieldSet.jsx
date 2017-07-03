@@ -78,6 +78,14 @@ const CSVFileAdapterFieldSet = React.createClass({
              value={config.value_column}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
+      <Input type="checkbox"
+             id="case_insensitive_lookup"
+             name="case_insensitive_lookup"
+             label="Allow case-insensitive lookups"
+             checked={config.case_insensitive_lookup}
+             onChange={this.props.handleFormEvent}
+             help="Enable if the key lookup should be case-insensitive."
+             wrapperClassName="col-md-offset-3 col-md-9" />
     </fieldset>);
   },
 });
