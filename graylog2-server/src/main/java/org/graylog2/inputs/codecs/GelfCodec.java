@@ -124,6 +124,8 @@ public class GelfCodec extends AbstractCodec {
             throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)", e);
         }
 
+        validateGELFMessage(node);
+
         // Timestamp.
         final double messageTimestamp = doubleValue(node, Message.FIELD_TIMESTAMP);
         final DateTime timestamp;
@@ -216,6 +218,41 @@ public class GelfCodec extends AbstractCodec {
         }
 
         return message;
+    }
+
+    private void validateGELFMessage(JsonNode jsonNode) {
+        final JsonNode versionNode = jsonNode.path("version");
+        if (versionNode.isMissingNode()) {
+            throw new IllegalArgumentException("GELF message is missing mandatory \"version\" field.");
+        }
+        final String version = versionNode.asText();
+        if (!"1.1".equals(version)) {
+            throw new IllegalArgumentException("GELF message has invalid \"version\": " + version);
+        }
+        final JsonNode hostNode = jsonNode.path("host");
+        if (hostNode.isMissingNode()) {
+            throw new IllegalArgumentException("GELF message is missing mandatory \"host\" field.");
+        }
+        if (!hostNode.isTextual()) {
+            throw new IllegalArgumentException("GELF message has invalid \"host\": " + hostNode.asText());
+        }
+        if (StringUtils.isBlank(hostNode.asText())) {
+            throw new IllegalArgumentException("GELF message has empty mandatory \"host\" field.");
+        }
+        final JsonNode shortMessageNode = jsonNode.path("short_message");
+        if (shortMessageNode.isMissingNode()) {
+            throw new IllegalArgumentException("GELF message is missing mandatory \"short_message\" field.");
+        }
+        if (!shortMessageNode.isTextual()) {
+            throw new IllegalArgumentException("GELF message has invalid \"short_message\": " + shortMessageNode.asText());
+        }
+        if (StringUtils.isBlank(shortMessageNode.asText())) {
+            throw new IllegalArgumentException("GELF message has empty mandatory \"short_message\" field.");
+        }
+        final JsonNode timestampNode = jsonNode.path("timestamp");
+        if (timestampNode.isValueNode() && !timestampNode.isNumber()) {
+            throw new IllegalArgumentException("GELF message has invalid \"timestamp\": " + timestampNode.asText());
+        }
     }
 
     @Nullable

@@ -148,4 +148,167 @@ public class GelfCodecTest {
     public void getAggregatorReturnsGelfChunkAggregator() throws Exception {
         assertThat(codec.getAggregator()).isSameAs(aggregator);
     }
+
+    @Test
+    public void decodeFailsWithoutVersion() throws Exception {
+        final String json = "{"
+                + "\"host\": \"example.org\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message is missing mandatory \"version\" field.");
+
+        codec.decode(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsWithWrongVersion() throws Exception {
+        final String json = "{"
+                + "\"version\": \"Foobar\","
+                + "\"host\": \"example.org\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message has invalid \"version\": Foobar");
+
+        codec.decode(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsWithoutHost() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message is missing mandatory \"host\" field.");
+
+        codec.decode(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsWithWrongTypeForHost() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": 42,"
+                + "\"short_message\": \"A short message that helps you identify what is going on\""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message has invalid \"host\": 42");
+
+        codec.decode(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsWithEmptyHost() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": \"\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message has empty mandatory \"host\" field.");
+
+        codec.decode(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsWithBlankHost() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": \"      \","
+                + "\"short_message\": \"A short message that helps you identify what is going on\""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message has empty mandatory \"host\" field.");
+
+        codec.decode(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsWithoutShortMessage() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": \"example.org\""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message is missing mandatory \"short_message\" field.");
+
+        codec.decode(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsWithWrongTypeForShortMessage() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": \"example.org\","
+                + "\"short_message\": 42"
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message has invalid \"short_message\": 42");
+
+        codec.decode(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsWithEmptyShortMessage() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": \"example.org\","
+                + "\"short_message\": \"\""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message has empty mandatory \"short_message\" field.");
+
+        codec.decode(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsWithBlankShortMessage() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": \"example.org\","
+                + "\"short_message\": \"     \""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message has empty mandatory \"short_message\" field.");
+
+        codec.decode(rawMessage);
+    }
+
+    @Test
+    public void decodeFailsWithWrongTypeForTimestamp() throws Exception {
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"host\": \"example.org\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\","
+                + "\"timestamp\": \"Foobar\""
+                + "}";
+
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("GELF message has invalid \"timestamp\": Foobar");
+
+        codec.decode(rawMessage);
+    }
 }
