@@ -221,14 +221,6 @@ public class GelfCodec extends AbstractCodec {
     }
 
     private void validateGELFMessage(JsonNode jsonNode) {
-        final JsonNode versionNode = jsonNode.path("version");
-        if (versionNode.isMissingNode()) {
-            throw new IllegalArgumentException("GELF message is missing mandatory \"version\" field.");
-        }
-        final String version = versionNode.asText();
-        if (!"1.1".equals(version)) {
-            throw new IllegalArgumentException("GELF message has invalid \"version\": " + version);
-        }
         final JsonNode hostNode = jsonNode.path("host");
         if (hostNode.isMissingNode()) {
             throw new IllegalArgumentException("GELF message is missing mandatory \"host\" field.");

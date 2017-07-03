@@ -150,35 +150,6 @@ public class GelfCodecTest {
     }
 
     @Test
-    public void decodeFailsWithoutVersion() throws Exception {
-        final String json = "{"
-                + "\"host\": \"example.org\","
-                + "\"short_message\": \"A short message that helps you identify what is going on\""
-                + "}";
-
-        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("GELF message is missing mandatory \"version\" field.");
-
-        codec.decode(rawMessage);
-    }
-
-    @Test
-    public void decodeFailsWithWrongVersion() throws Exception {
-        final String json = "{"
-                + "\"version\": \"Foobar\","
-                + "\"host\": \"example.org\","
-                + "\"short_message\": \"A short message that helps you identify what is going on\""
-                + "}";
-
-        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
-        expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("GELF message has invalid \"version\": Foobar");
-
-        codec.decode(rawMessage);
-    }
-
-    @Test
     public void decodeFailsWithoutHost() throws Exception {
         final String json = "{"
                 + "\"version\": \"1.1\","
