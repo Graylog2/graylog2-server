@@ -160,7 +160,6 @@ const LookupTablesStore = Reflux.createStore({
   },
 
   purgeKey(table, key) {
-    console.log('PURGE', table.name, key);
     const promise = fetch('POST', this._url(`tables/${table.id}/purge?key=${key}`));
 
     promise.then(() => {
@@ -172,7 +171,6 @@ const LookupTablesStore = Reflux.createStore({
   },
 
   purgeAll(table) {
-    console.log('PURGE', table.name);
     const promise = fetch('POST', this._url(`tables/${table.id}/purge`));
 
     promise.then(() => {
