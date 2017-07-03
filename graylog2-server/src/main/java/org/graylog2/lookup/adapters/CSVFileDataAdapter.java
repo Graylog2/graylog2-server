@@ -50,6 +50,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -151,7 +152,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                         throw new IllegalStateException("Couldn't detect column number for key or value - check CSV file format");
                     }
                     if (config.isCaseInsensitiveLookup()) {
-                        newLookupBuilder.put(next[keyColumn].toLowerCase(), next[valueColumn]);
+                        newLookupBuilder.put(next[keyColumn].toLowerCase(Locale.ENGLISH), next[valueColumn]);
                     } else {
                         newLookupBuilder.put(next[keyColumn], next[valueColumn]);
                     }
@@ -173,7 +174,7 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
 
     @Override
     public LookupResult doGet(Object key) {
-        final String stringKey = config.isCaseInsensitiveLookup() ? String.valueOf(key).toLowerCase() : String.valueOf(key);
+        final String stringKey = config.isCaseInsensitiveLookup() ? String.valueOf(key).toLowerCase(Locale.ENGLISH) : String.valueOf(key);
         final String value = lookupRef.get().get(stringKey);
 
         if (value == null) {
