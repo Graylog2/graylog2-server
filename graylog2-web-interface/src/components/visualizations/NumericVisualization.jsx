@@ -17,7 +17,15 @@ const NumericVisualization = React.createClass({
       React.PropTypes.object,
       React.PropTypes.number,
     ]).isRequired,
+    onRenderComplete: React.PropTypes.func,
   },
+
+  getDefaultProps() {
+    return {
+      onRenderComplete: () => {},
+    };
+  },
+
   getInitialState() {
     return {
       currentNumber: undefined,
@@ -25,20 +33,24 @@ const NumericVisualization = React.createClass({
     };
   },
   componentDidMount() {
-    const state = this._normalizeStateFromProps(this.props.data);
-    this.setState(state);
+    this._updateData(this.props.data, this.props.onRenderComplete);
   },
   componentWillReceiveProps(nextProps) {
     if (deepEqual(this.props, nextProps)) {
       return;
     }
-
-    const state = this._normalizeStateFromProps(nextProps.data);
-    this.setState(state);
+    this._updateData(nextProps.data, this.props.onRenderComplete);
   },
+
   DEFAULT_VALUE_FONT_SIZE: '70px',
   NUMBER_OF_INDICATORS: 3,
   PERCENTAGE_PER_INDICATOR: 30,
+
+  _updateData(data, renderCallback) {
+    const state = this._normalizeStateFromProps(data);
+    this.setState(state, renderCallback);
+  },
+
   _normalizeStateFromProps(props) {
     let state = {};
     if (typeof props === 'object') {

@@ -3,3 +3,4 @@ export { default as HistogramVisualization } from './HistogramVisualization';
 export { default as NumericVisualization } from './NumericVisualization';
 export { default as QuickValuesVisualization } from './QuickValuesVisualization';
 export { default as StackedGraphVisualization } from './StackedGraphVisualization';
+export { default as RenderCompletionObserver } from './RenderCompletionObserver';
