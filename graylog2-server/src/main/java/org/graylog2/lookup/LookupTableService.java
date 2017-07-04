@@ -50,6 +50,7 @@ import java.util.Collections;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -432,6 +433,15 @@ public class LookupTableService extends AbstractIdleService {
             LOG.info("Replaced previous lookup table {} [@{}]", previous.name(), objectId(previous));
         }
         return table;
+    }
+
+    public Optional<CachePurge> newCachePurge(String tableName) {
+        final LookupTable table = getTable(tableName);
+        if (table != null) {
+            return Optional.of(new CachePurge(liveTables, table.dataAdapter()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     public LookupTableService.Builder newBuilder() {

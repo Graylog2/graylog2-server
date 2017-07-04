@@ -18,8 +18,6 @@ package org.graylog2.lookup;
 
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.common.util.concurrent.Service;
-import org.graylog2.plugin.lookup.LookupCache;
-import org.graylog2.plugin.lookup.LookupCacheKey;
 import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.joda.time.Duration;
@@ -32,7 +30,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Stream;
 
 import static org.graylog2.utilities.ObjectUtils.objectId;
 
@@ -180,39 +177,6 @@ public class LookupDataAdapterRefreshService extends AbstractIdleService {
         @Override
         public void stopping(State from) {
             refreshService.remove(adapter);
-        }
-    }
-
-    /**
-     * This will be passed to {@link LookupDataAdapter#refresh(LookupCachePurge)} to allow data adapters to purge
-     * the cache after updating their state/data. It takes care of using the correct {@link LookupCacheKey} prefix
-     * to delete only those cache keys which belong to the data adapter.
-     */
-    private static class CachePurge implements LookupCachePurge {
-        private final ConcurrentMap<String, LookupTable> tables;
-        private final LookupDataAdapter adapter;
-
-        CachePurge(ConcurrentMap<String, LookupTable> tables, LookupDataAdapter adapter) {
-            this.tables = tables;
-            this.adapter = adapter;
-        }
-
-        @Override
-        public void purgeAll() {
-            // Collect related caches on every call to improve the chance that we get all of them
-            caches().forEach(cache -> cache.purge(LookupCacheKey.prefix(adapter.name())));
-        }
-
-        @Override
-        public void purgeKey(Object key) {
-            // Collect related caches on every call to improve the chance that we get all of them
-            caches().forEach(cache -> cache.purge(LookupCacheKey.create(adapter.name(), key)));
-        }
-
-        private Stream<LookupCache> caches() {
-            return tables.values().stream()
-                    .filter(table -> table.dataAdapter().id().equals(adapter.id()))
-                    .map(LookupTable::cache);
         }
     }
 }

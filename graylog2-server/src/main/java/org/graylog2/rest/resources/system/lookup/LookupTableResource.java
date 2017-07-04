@@ -36,6 +36,7 @@ import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.events.ClusterEventBus;
+import org.graylog2.lookup.CachePurge;
 import org.graylog2.lookup.LookupDefaultMultiValue;
 import org.graylog2.lookup.LookupDefaultSingleValue;
 import org.graylog2.lookup.LookupTable;
@@ -97,6 +98,7 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.singleton;
 import static java.util.Objects.requireNonNull;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -207,6 +209,30 @@ public class LookupTableResource extends RestResource {
     public LookupResult performLookup(@ApiParam(name = "name") @PathParam("name") @NotEmpty String name,
                                       @ApiParam(name = "key") @QueryParam("key") @NotEmpty String key) {
         return lookupTableService.newBuilder().lookupTable(name).build().lookup(key);
+    }
+
+    @POST
+    @Path("tables/{idOrName}/purge")
+    @ApiOperation(value = "Purge lookup table cache")
+    @NoAuditEvent("Cache purge only")
+    @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
+    public void performPurge(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
+                             @ApiParam(name = "key") @QueryParam("key") String key) {
+        final Optional<LookupTableDto> lookupTableDto = dbTableService.get(idOrName);
+        if (!lookupTableDto.isPresent()) {
+            throw new NotFoundException("Lookup table <" + idOrName + "> not found");
+        }
+
+        final Optional<CachePurge> cachePurge = lookupTableService.newCachePurge(lookupTableDto.get().name());
+        if (cachePurge.isPresent()) {
+            if (isNullOrEmpty(key)) {
+                cachePurge.get().purgeAll();
+            } else {
+                cachePurge.get().purgeKey(key);
+            }
+        } else {
+            throw new NotFoundException("Lookup table <" + idOrName + "> not found");
+        }
     }
 
     @GET

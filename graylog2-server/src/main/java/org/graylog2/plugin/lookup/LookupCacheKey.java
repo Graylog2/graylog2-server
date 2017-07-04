@@ -50,12 +50,17 @@ public abstract class LookupCacheKey {
     public abstract Object key();
 
     @JsonCreator
-    public static LookupCacheKey create(@JsonProperty("prefix") String prefix, @JsonProperty("key") @Nullable Object key) {
+    @SuppressWarnings("unused")
+    public static LookupCacheKey createFromJSON(@JsonProperty("prefix") String prefix, @JsonProperty("key") @Nullable Object key) {
         return new AutoValue_LookupCacheKey(prefix, key);
     }
 
-    public static LookupCacheKey prefix(String prefix) {
-        return create(prefix, null);
+    public static LookupCacheKey create(LookupDataAdapter adapter, @Nullable Object key) {
+        return new AutoValue_LookupCacheKey(adapter.id(), key);
+    }
+
+    public static LookupCacheKey prefix(LookupDataAdapter adapter) {
+        return create(adapter, null);
     }
 
     /**

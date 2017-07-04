@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Row, Col } from 'react-bootstrap';
+import { Button, ButtonToolbar, Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
@@ -23,11 +23,28 @@ const LookupTable = React.createClass({
     return {
       lookupKey: null,
       lookupResult: null,
+      purgeKey: null,
     };
   },
 
   _onChange(event) {
     this.setState({ lookupKey: FormsUtils.getValueFromInput(event.target) });
+  },
+
+  _onChangePurgeKey(event) {
+    this.setState({ purgeKey: FormsUtils.getValueFromInput(event.target) });
+  },
+
+  _onPurgeKey(e) {
+    e.preventDefault();
+    if (this.state.purgeKey && this.state.purgeKey.length > 0) {
+      LookupTablesActions.purgeKey(this.props.table, this.state.purgeKey);
+    }
+  },
+
+  _onPurgeAll(e) {
+    e.preventDefault();
+    LookupTablesActions.purgeAll(this.props.table);
   },
 
   _lookupKey(e) {
@@ -63,6 +80,26 @@ const LookupTable = React.createClass({
               <dd><code>{this.props.table.default_multi_value}</code>{' '}({this.props.table.default_multi_value_type.toLowerCase()})</dd>
             </dl>
           }
+          <h3>Purge Cache</h3>
+          <p>You can purge the complete cache for this lookup table or only the cache entry for a single key.</p>
+          <form onSubmit={this._onPurgeKey}>
+            <fieldset>
+              <Input type="text"
+                     id="purge-key"
+                     name="purge-key"
+                     label="Key"
+                     onChange={this._onChangePurgeKey}
+                     help="Key to purge from cache"
+                     required
+                     value={this.state.purgeKey} />
+              <Input>
+                <ButtonToolbar>
+                  <Button type="submit" bsStyle="success">Purge key</Button>
+                  <Button type="button" bsStyle="info" onClick={this._onPurgeAll}>Purge all</Button>
+                </ButtonToolbar>
+              </Input>
+            </fieldset>
+          </form>
         </Col>
         <Col md={6}>
           <h3>Test lookup</h3>
