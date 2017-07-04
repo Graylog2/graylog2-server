@@ -213,7 +213,7 @@ public class LookupTableResource extends RestResource {
 
     @POST
     @Path("tables/{idOrName}/purge")
-    @ApiOperation(value = "Query a lookup table")
+    @ApiOperation(value = "Purge lookup table cache")
     @NoAuditEvent("Cache purge only")
     @RequiresPermissions(RestPermissions.LOOKUP_TABLES_READ)
     public void performPurge(@ApiParam(name = "idOrName") @PathParam("idOrName") @NotEmpty String idOrName,
