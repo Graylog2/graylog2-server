@@ -45,29 +45,29 @@ public abstract class PipelineSource {
     @ObjectId
     public abstract String id();
 
-    @JsonProperty
+    @JsonProperty("title")
     @Nullable
     public abstract String title();
 
-    @JsonProperty
+    @JsonProperty("description")
     @Nullable
     public abstract String description();
 
-    @JsonProperty
+    @JsonProperty("source")
     public abstract String source();
 
-    @JsonProperty
+    @JsonProperty("created_at")
     @Nullable
     public abstract DateTime createdAt();
 
-    @JsonProperty
+    @JsonProperty("modified_at")
     @Nullable
     public abstract DateTime modifiedAt();
 
-    @JsonProperty
+    @JsonProperty("stages")
     public abstract List<StageSource> stages();
 
-    @JsonProperty
+    @JsonProperty("errors")
     @Nullable
     public abstract Set<ParseError> errors();
 
@@ -82,6 +82,7 @@ public abstract class PipelineSource {
                                         @JsonProperty("title") String title,
                                         @JsonProperty("description") @Nullable String description,
                                         @JsonProperty("source") String source,
+                                        @Nullable @JsonProperty("stages") List<StageSource> stages,
                                         @Nullable @JsonProperty("created_at") DateTime createdAt,
                                         @Nullable @JsonProperty("modified_at") DateTime modifiedAt) {
         return builder()
@@ -91,7 +92,7 @@ public abstract class PipelineSource {
                 .source(source)
                 .createdAt(createdAt)
                 .modifiedAt(modifiedAt)
-                .stages(Collections.emptyList())
+                .stages(stages == null ? Collections.emptyList() : stages)
                 .build();
     }
 
