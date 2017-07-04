@@ -71,7 +71,9 @@ const GraphVisualization = React.createClass({
     }).isRequired,
     height: PropTypes.number,
     width: PropTypes.number,
+    onRenderComplete: React.PropTypes.func,
   },
+
   statics: {
     getReadableFieldChartStatisticalFunction(statisticalFunction) {
       switch (statisticalFunction) {
@@ -84,6 +86,13 @@ const GraphVisualization = React.createClass({
       }
     },
   },
+
+  getDefaultProps() {
+    return {
+      onRenderComplete: () => {},
+    };
+  },
+
   getInitialState() {
     this.triggerRender = true;
     this.graphData = crossfilter();
@@ -262,6 +271,8 @@ const GraphVisualization = React.createClass({
       .yAxisLabel(this.props.config.field)
       .renderTitle(false)
       .colors(D3Utils.glColourPalette());
+
+    this.graph.on('postRender', this.props.onRenderComplete);
 
     $(graphDomNode).tooltip({
       selector: '[rel="tooltip"]',

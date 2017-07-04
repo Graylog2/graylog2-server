@@ -26,7 +26,15 @@ const HistogramVisualization = React.createClass({
     computationTimeRange: PropTypes.object,
     height: PropTypes.number,
     width: PropTypes.number,
+    onRenderComplete: React.PropTypes.func,
   },
+
+  getDefaultProps() {
+    return {
+      onRenderComplete: () => {},
+    };
+  },
+
   getInitialState() {
     this.triggerRender = true;
     this.histogramData = crossfilter();
@@ -112,6 +120,8 @@ const HistogramVisualization = React.createClass({
           .attr('rel', 'tooltip')
           .attr('data-original-title', formatTitle);
       });
+
+    this.histogram.on('postRender', this.props.onRenderComplete);
 
     $(histogramDomNode).tooltip({
       selector: '[rel="tooltip"]',

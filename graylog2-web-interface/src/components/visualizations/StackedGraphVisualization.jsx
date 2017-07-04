@@ -23,7 +23,15 @@ const StackedGraphVisualization = React.createClass({
     width: PropTypes.number,
     config: PropTypes.object.isRequired,
     computationTimeRange: PropTypes.object,
+    onRenderComplete: React.PropTypes.func,
   },
+
+  getDefaultProps() {
+    return {
+      onRenderComplete: () => {},
+    };
+  },
+
   getInitialState() {
     this.series = Immutable.List();
     this.seriesNames = Immutable.Map();
@@ -201,6 +209,7 @@ const StackedGraphVisualization = React.createClass({
 
     this.graph = c3.generate({
       bindto: graphDomNode,
+      onrendered: this.props.onRenderComplete,
       size: {
         height: props.height,
         width: props.width,

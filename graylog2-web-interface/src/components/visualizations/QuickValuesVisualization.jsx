@@ -42,6 +42,7 @@ const QuickValuesVisualization = React.createClass({
     horizontal: PropTypes.bool,
     displayAnalysisInformation: PropTypes.bool,
     displayAddToSearchButton: PropTypes.bool,
+    onRenderComplete: PropTypes.func,
   },
   getDefaultProps() {
     return {
@@ -51,8 +52,10 @@ const QuickValuesVisualization = React.createClass({
       horizontal: false,
       displayAnalysisInformation: false,
       displayAddToSearchButton: false,
+      onRenderComplete: () => {},
     };
   },
+
   getInitialState() {
     this.filters = [];
     this.triggerRender = true;
@@ -95,6 +98,22 @@ const QuickValuesVisualization = React.createClass({
   _table: undefined,
   DEFAULT_PIE_CHART_SIZE: 200,
   MARGIN_TOP: 15,
+  _pieChartRendered: false,
+  _dataTableRendered: false,
+
+  _handleRender(viz) {
+    return () => {
+      if (this._dataTableRendered && this._pieChartRendered) {
+        return;
+      }
+      this._dataTableRendered = this._dataTableRendered || viz === 'dataTable';
+      this._pieChartRendered = this._pieChartRendered || viz === 'pieChart';
+
+      if (this._dataTableRendered && this._pieChartRendered) {
+        this.props.onRenderComplete();
+      }
+    };
+  },
 
   _getConfig(key, newConfig) {
     const config = newConfig || {};
@@ -214,6 +233,8 @@ const QuickValuesVisualization = React.createClass({
         });
       });
 
+    this.dataTable.on('postRender', this._handleRender('dataTable'));
+
     this.dataTable.render();
   },
   _renderPieChart(props) {
@@ -240,6 +261,7 @@ const QuickValuesVisualization = React.createClass({
       .ordering(d => d.value)
       .colors(D3Utils.glColourPalette());
 
+    this.pieChart.on('postRender', this._handleRender('pieChart'));
     this._resizeVisualization(props.width, props.height, this._getConfig('show_data_table', props.config));
 
     D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
