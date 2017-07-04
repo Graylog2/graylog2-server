@@ -35,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
+import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,6 +55,7 @@ import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
 import static org.graylog2.plugin.Tools.buildElasticSearchTimeFormat;
 import static org.joda.time.DateTimeZone.UTC;
 
+@NotThreadSafe
 public class Message implements Messages {
     private static final Logger LOG = LoggerFactory.getLogger(Message.class);
 
