@@ -355,4 +355,10 @@ public class GelfCodecTest {
                 .withNoCause()
                 .withMessageMatching("GELF message <[0-9a-f-]+> \\(received from <198\\.51\\.100\\.42:24783>\\) is missing mandatory \"short_message\" or \"message\" field.");
     }
+
+    @Test
+    public void decodeSucceedsWithMinimalMessages() throws Exception {
+        assertThat(codec.decode(new RawMessage("{\"short_message\":\"0\"}".getBytes(StandardCharsets.UTF_8)))).isNotNull();
+        assertThat(codec.decode(new RawMessage("{\"message\":\"0\"}".getBytes(StandardCharsets.UTF_8)))).isNotNull();
+    }
 }
