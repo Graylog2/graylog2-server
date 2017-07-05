@@ -228,13 +228,13 @@ public class GelfCodec extends AbstractCodec {
         final JsonNode hostNode = jsonNode.path("host");
         if (hostNode.isMissingNode()) {
             log.warn(prefix + "is missing mandatory \"host\" field.");
-            return;
-        }
-        if (!hostNode.isTextual()) {
-            throw new IllegalArgumentException(prefix + "has invalid \"host\": " + hostNode.asText());
-        }
-        if (StringUtils.isBlank(hostNode.asText())) {
-            throw new IllegalArgumentException(prefix + "has empty mandatory \"host\" field.");
+        } else {
+            if (!hostNode.isTextual()) {
+                throw new IllegalArgumentException(prefix + "has invalid \"host\": " + hostNode.asText());
+            }
+            if (StringUtils.isBlank(hostNode.asText())) {
+                throw new IllegalArgumentException(prefix + "has empty mandatory \"host\" field.");
+            }
         }
 
         final JsonNode shortMessageNode = jsonNode.path("short_message");
