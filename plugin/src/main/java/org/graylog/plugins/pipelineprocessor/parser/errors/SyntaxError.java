@@ -20,6 +20,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 
+import javax.annotation.Nullable;
+
 public class SyntaxError extends ParseError {
 
     private final Object offendingSymbol;
@@ -28,7 +30,7 @@ public class SyntaxError extends ParseError {
     private final String msg;
     private final RecognitionException e;
 
-    public SyntaxError(Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
+    public SyntaxError(@Nullable Object offendingSymbol, int line, int charPositionInLine, String msg, @Nullable RecognitionException e) {
         super("syntax_error", new ParserRuleContext());
 
         this.offendingSymbol = offendingSymbol;

@@ -17,6 +17,8 @@
 package org.graylog.plugins.pipelineprocessor.ast.expressions;
 
 import org.antlr.v4.runtime.Token;
+import org.graylog.plugins.pipelineprocessor.parser.ParseException;
+import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 
 import java.util.Collections;
 
@@ -26,7 +28,19 @@ public abstract class UnaryExpression extends BaseExpression {
 
     public UnaryExpression(Token start, Expression right) {
         super(start);
-        this.right = right;
+        this.right = requireNonNull(right, start);
+    }
+
+    private static Expression requireNonNull(Expression expression, Token token) {
+        if (expression != null) {
+            return expression;
+        } else {
+            final int line = token.getLine();
+            final int positionInLine = token.getCharPositionInLine();
+            final String msg = "Invalid expression (line: " + line + ", column: " + positionInLine + ")";
+            final SyntaxError syntaxError = new SyntaxError(token.getText(), line, positionInLine, msg, null);
+            throw new ParseException(Collections.singleton(syntaxError));
+        }
     }
 
     @Override

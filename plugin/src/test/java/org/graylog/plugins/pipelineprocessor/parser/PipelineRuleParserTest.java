@@ -20,7 +20,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
-
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Pipeline;
@@ -56,6 +55,7 @@ import org.graylog.plugins.pipelineprocessor.parser.errors.InvalidOperation;
 import org.graylog.plugins.pipelineprocessor.parser.errors.NonIndexableType;
 import org.graylog.plugins.pipelineprocessor.parser.errors.OptionalParametersMustBeNamed;
 import org.graylog.plugins.pipelineprocessor.parser.errors.ParseError;
+import org.graylog.plugins.pipelineprocessor.parser.errors.SyntaxError;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredFunction;
 import org.graylog.plugins.pipelineprocessor.parser.errors.UndeclaredVariable;
 import org.graylog2.plugin.InstantMillisProvider;
@@ -410,6 +410,17 @@ public class PipelineRuleParserTest extends BaseParserTest {
         } catch (ParseException e) {
             assertEquals(1, e.getErrors().size());
             assertEquals(InvalidOperation.class, Iterables.getOnlyElement(e.getErrors()).getClass());
+        }
+    }
+
+    @Test
+    public void issue185() {
+        try {
+            parseRuleWithOptionalCodegen();
+            fail("Should have thrown parse exception");
+        } catch (ParseException e) {
+            assertEquals(1, e.getErrors().size());
+            assertEquals(SyntaxError.class, Iterables.getOnlyElement(e.getErrors()).getClass());
         }
     }
 
