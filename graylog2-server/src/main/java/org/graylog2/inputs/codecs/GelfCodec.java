@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs.codecs;
 
+import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +25,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.graylog2.inputs.codecs.gelf.GELFMessage;
 import org.graylog2.inputs.transports.TcpTransport;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -124,6 +126,8 @@ public class GelfCodec extends AbstractCodec {
             throw new IllegalStateException("JSON is null/could not be parsed (invalid JSON)", e);
         }
 
+        validateGELFMessage(node, rawMessage.getId(), rawMessage.getRemoteAddress());
+
         // Timestamp.
         final double messageTimestamp = doubleValue(node, Message.FIELD_TIMESTAMP);
         final DateTime timestamp;
@@ -216,6 +220,47 @@ public class GelfCodec extends AbstractCodec {
         }
 
         return message;
+    }
+
+    private void validateGELFMessage(JsonNode jsonNode, UUID id, ResolvableInetSocketAddress remoteAddress) {
+        final String prefix = "GELF message <" + id + "> " + (remoteAddress == null ? "" : "(received from <" + remoteAddress + ">) ");
+
+        final JsonNode hostNode = jsonNode.path("host");
+        if (hostNode.isMissingNode()) {
+            log.warn(prefix + "is missing mandatory \"host\" field.");
+        } else {
+            if (!hostNode.isTextual()) {
+                throw new IllegalArgumentException(prefix + "has invalid \"host\": " + hostNode.asText());
+            }
+            if (StringUtils.isBlank(hostNode.asText())) {
+                throw new IllegalArgumentException(prefix + "has empty mandatory \"host\" field.");
+            }
+        }
+
+        final JsonNode shortMessageNode = jsonNode.path("short_message");
+        final JsonNode messageNode = jsonNode.path("message");
+        if (!shortMessageNode.isMissingNode()) {
+            if (!shortMessageNode.isTextual()) {
+                throw new IllegalArgumentException(prefix + "has invalid \"short_message\": " + shortMessageNode.asText());
+            }
+            if (StringUtils.isBlank(shortMessageNode.asText())) {
+                throw new IllegalArgumentException(prefix + "has empty mandatory \"short_message\" field.");
+            }
+        } else if (!messageNode.isMissingNode()) {
+            if (!messageNode.isTextual()) {
+                throw new IllegalArgumentException(prefix + "has invalid \"message\": " + messageNode.asText());
+            }
+            if (StringUtils.isBlank(messageNode.asText())) {
+                throw new IllegalArgumentException(prefix + "has empty mandatory \"message\" field.");
+            }
+        } else {
+            throw new IllegalArgumentException(prefix + "is missing mandatory \"short_message\" or \"message\" field.");
+        }
+
+        final JsonNode timestampNode = jsonNode.path("timestamp");
+        if (timestampNode.isValueNode() && !timestampNode.isNumber()) {
+            throw new IllegalArgumentException(prefix + "has invalid \"timestamp\": " + timestampNode.asText());
+        }
     }
 
     @Nullable
