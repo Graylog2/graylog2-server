@@ -305,7 +305,7 @@ public abstract class NettyTransport implements Transport {
                 final ChannelBuffer completeMessage = result.getMessage();
                 if (completeMessage != null) {
                     log.debug("Message aggregation completion, forwarding {}", completeMessage);
-                    fireMessageReceived(ctx, completeMessage);
+                    fireMessageReceived(ctx, completeMessage, e.getRemoteAddress());
                 } else if (result.isValid()) {
                     log.debug("More chunks necessary to complete this message");
                 } else {
@@ -314,7 +314,7 @@ public abstract class NettyTransport implements Transport {
                 }
             } else {
                 log.debug("Could not handle netty message {}, sending further upstream.", e);
-                fireMessageReceived(ctx, message);
+                fireMessageReceived(ctx, message, e.getRemoteAddress());
             }
         }
     }
