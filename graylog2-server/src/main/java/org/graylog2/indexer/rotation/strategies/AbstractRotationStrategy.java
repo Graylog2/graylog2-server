@@ -53,7 +53,8 @@ public abstract class AbstractRotationStrategy implements RotationStrategy {
 
     @Override
     public void rotate(IndexSet indexSet) {
-        final String indexSetTitle = indexSet.getConfig().title();
+        requireNonNull(indexSet, "indexSet must not be null");
+        final String indexSetTitle = requireNonNull(indexSet.getConfig(), "Index set configuration must not be null").title();
         final String strategyName = this.getClass().getCanonicalName();
         final String indexName;
         try {
