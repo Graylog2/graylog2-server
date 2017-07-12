@@ -121,7 +121,7 @@ const HistogramVisualization = React.createClass({
   },
 
   renderHistogram() {
-    const histogramDomNode = ReactDOM.findDOMNode(this);
+    const histogramDomNode = this._graph;
     const xAxisLabel = this.props.config.xAxis || 'Time';
     const yAxisLabel = this.props.config.yAxis || 'Messages';
 
@@ -161,7 +161,7 @@ const HistogramVisualization = React.createClass({
   },
   render() {
     return (
-      <div id={`visualization-${this.props.id}`} className="histogram" />
+      <div ref={(c) => { this._graph = c; }} id={`visualization-${this.props.id}`} className="histogram" />
     );
   },
 });

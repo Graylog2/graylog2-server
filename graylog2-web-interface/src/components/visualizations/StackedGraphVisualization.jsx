@@ -192,7 +192,7 @@ const StackedGraphVisualization = React.createClass({
     });
   },
   renderGraph(props) {
-    const graphDomNode = ReactDOM.findDOMNode(this);
+    const graphDomNode = this._graph;
     const colourPalette = D3Utils.glColourPalette();
 
     let i = 0;
@@ -278,7 +278,7 @@ const StackedGraphVisualization = React.createClass({
   render() {
     const classNames = this.props.config.doNotShowCircles ? 'donotshowcircles' : '';
     return (
-      <div  id={`visualization-${this.props.id}`}
+      <div ref={(c) => { this._graph = c; }} id={`visualization-${this.props.id}`}
            className={`graph ${this.props.config.renderer}${classNames}`} />
     );
   },
