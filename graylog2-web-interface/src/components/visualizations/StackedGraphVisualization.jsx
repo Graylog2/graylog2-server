@@ -23,11 +23,13 @@ const StackedGraphVisualization = React.createClass({
     width: PropTypes.number,
     config: PropTypes.object.isRequired,
     computationTimeRange: PropTypes.object,
-    onRenderComplete: React.PropTypes.func,
+    interactive: PropTypes.bool,
+    onRenderComplete: PropTypes.func,
   },
 
   getDefaultProps() {
     return {
+      interactive: true,
       onRenderComplete: () => {},
     };
   },
@@ -114,6 +116,7 @@ const StackedGraphVisualization = React.createClass({
     return graphType;
   },
   _applyGraphConfiguration(graphType) {
+    /* eslint-disable no-case-declarations */
     switch (graphType) {
       case 'bar':
         // Automatically resize bar width
@@ -131,6 +134,7 @@ const StackedGraphVisualization = React.createClass({
       default:
         console.warn(`Invalid graph type ${graphType}`);
     }
+    /* eslint-enable no-case-declarations */
   },
   _formatTooltipTitle(x) {
     return new DateTime(x).toString(DateTime.Formats.COMPLETE);
@@ -207,7 +211,7 @@ const StackedGraphVisualization = React.createClass({
       return Math.abs(value) > 1e+30 || value === 0 ? value.toPrecision(1) : d3.format('.2s')(value);
     };
 
-    this.graph = c3.generate({
+    const config = {
       bindto: graphDomNode,
       onrendered: this.props.onRenderComplete,
       size: {
@@ -262,7 +266,14 @@ const StackedGraphVisualization = React.createClass({
           value: this._formatTooltipValue,
         },
       },
-    });
+    };
+
+    if (!this.props.interactive) {
+      config.interaction = { enabled: false };
+      config.transition = { duration: null };
+    }
+
+    this.graph = c3.generate(config);
   },
   render() {
     const classNames = this.props.config.doNotShowCircles ? 'donotshowcircles' : '';

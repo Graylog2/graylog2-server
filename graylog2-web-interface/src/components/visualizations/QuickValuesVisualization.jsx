@@ -42,6 +42,7 @@ const QuickValuesVisualization = React.createClass({
     horizontal: PropTypes.bool,
     displayAnalysisInformation: PropTypes.bool,
     displayAddToSearchButton: PropTypes.bool,
+    interactive: PropTypes.bool,
     onRenderComplete: PropTypes.func,
   },
   getDefaultProps() {
@@ -52,6 +53,7 @@ const QuickValuesVisualization = React.createClass({
       horizontal: false,
       displayAnalysisInformation: false,
       displayAddToSearchButton: false,
+      interactive: true,
       onRenderComplete: () => {},
     };
   },
@@ -74,6 +76,8 @@ const QuickValuesVisualization = React.createClass({
     };
   },
   componentDidMount() {
+    this.disableTransitions = dc.disableTransitions;
+    dc.disableTransitions = !this.props.interactive;
     this._resizeVisualization(this.props.width, this.props.height, this._getConfig('show_data_table'));
     this._formatProps(this.props);
     this._renderDataTable(this.props);
@@ -92,6 +96,10 @@ const QuickValuesVisualization = React.createClass({
 
     this._resizeVisualization(nextProps.width, nextProps.height, this._getConfig('show_data_table', nextProps.config));
     this._formatProps(nextProps);
+  },
+
+  componentWillUnmount() {
+    dc.disableTransitions = this.disableTransitions;
   },
 
   _graph: undefined,
@@ -223,15 +231,17 @@ const QuickValuesVisualization = React.createClass({
       .sortBy(d => d.count)
       .order(this._getSortOrder(sortOrder))
       .size(dataTableLimit)
-      .columns(this._getDataTableColumns())
-      .on('renderlet', (table) => {
+      .columns(this._getDataTableColumns());
+
+    if (this.props.interactive) {
+      this.dataTable.on('renderlet', (table) => {
         table.selectAll('.dc-table-group').classed('info', true);
         table.selectAll('td.dc-table-column button').on('click', () => {
-          // noinspection Eslint
           const term = $(d3.event.target).closest('button').data('term');
           SearchStore.addSearchTerm(props.id, term);
         });
       });
+    }
 
     this.dataTable.on('postRender', this._handleRender('dataTable'));
 
@@ -264,15 +274,17 @@ const QuickValuesVisualization = React.createClass({
     this.pieChart.on('postRender', this._handleRender('pieChart'));
     this._resizeVisualization(props.width, props.height, this._getConfig('show_data_table', props.config));
 
-    D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
+    if (this.props.interactive) {
+      D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
 
-    $(graphDomNode).tooltip({
-      selector: '[rel="tooltip"]',
-      container: 'body',
-      placement: 'auto',
-      delay: { show: 300, hide: 100 },
-      html: true,
-    });
+      $(graphDomNode).tooltip({
+        selector: '[rel="tooltip"]',
+        container: 'body',
+        placement: 'auto',
+        delay: { show: 300, hide: 100 },
+        html: true,
+      });
+    }
 
     this.pieChart.render();
   },
