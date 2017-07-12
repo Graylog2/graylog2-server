@@ -166,7 +166,7 @@ const QuickValuesVisualization = React.createClass({
     }
   },
   _renderDataTable() {
-    const tableDomNode = this.refs.table;
+    const tableDomNode = this._table;
 
     this.dataTable = dc.dataTable(tableDomNode, this.dcGroupName);
     this.dataTable
@@ -196,7 +196,7 @@ const QuickValuesVisualization = React.createClass({
     this.dataTable.render();
   },
   _renderPieChart() {
-    const graphDomNode = this.refs.graph;
+    const graphDomNode = this._graph;
 
     this.pieChart = dc.pieChart(graphDomNode, this.dcGroupName);
     this.pieChart
@@ -346,7 +346,7 @@ const QuickValuesVisualization = React.createClass({
         <Panel>
           <ListGroup fill>
             <ListGroupItem>
-              <div ref="graph" className="quickvalues-graph" />
+              <div ref={(c) => { this._graph = c; }} className="quickvalues-graph" />
             </ListGroupItem>
             <ListGroupItem>
               {this._getAnalysisInformation()}
@@ -355,7 +355,7 @@ const QuickValuesVisualization = React.createClass({
         </Panel>
       );
     } else {
-      pieChart = <div ref="graph" className="quickvalues-graph" />;
+      pieChart = <div ref={(c) => { this._graph = c; }} className="quickvalues-graph" />;
     }
 
     return (
@@ -368,7 +368,7 @@ const QuickValuesVisualization = React.createClass({
             </div>
             <div className={dataTableClassName}>
               <div className="quickvalues-table">
-                <table ref="table" className="table table-condensed table-hover">
+                <table ref={(c) => { this._table = c; }} className="table table-condensed table-hover">
                   <thead>
                     <tr>
                       <th style={{ width: '60%' }}>Value</th>

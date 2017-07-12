@@ -1,5 +1,4 @@
 import React, { PropTypes } from 'react';
-import ReactDOM from 'react-dom';
 import numeral from 'numeral';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
@@ -178,7 +177,7 @@ const GraphVisualization = React.createClass({
     }
   },
   renderGraph() {
-    const graphDomNode = ReactDOM.findDOMNode(this);
+    const graphDomNode = this._graph;
     const interactive = this.props.interactive;
 
     this.graph = GraphFactory.create(this.props.config, graphDomNode, interactive, this._formatTooltipTitle);
@@ -222,7 +221,8 @@ const GraphVisualization = React.createClass({
   },
   render() {
     return (
-      <div id={`visualization-${this.props.id}`} className={`graph ${this.props.config.renderer}`} />
+      <div ref={(c) => { this._graph = c; }} id={`visualization-${this.props.id}`}
+           className={`graph ${this.props.config.renderer}`} />
     );
   },
 });
