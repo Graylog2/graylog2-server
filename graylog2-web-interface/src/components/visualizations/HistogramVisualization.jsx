@@ -25,12 +25,15 @@ const HistogramVisualization = React.createClass({
     computationTimeRange: PropTypes.object,
     height: PropTypes.number,
     width: PropTypes.number,
-    onRenderComplete: React.PropTypes.func,
+    interactive: PropTypes.bool,
+    onRenderComplete: PropTypes.func,
   },
 
   getDefaultProps() {
     return {
-      onRenderComplete: () => {},
+      interactive: true,
+      onRenderComplete: () => {
+      },
     };
   },
 
@@ -45,6 +48,8 @@ const HistogramVisualization = React.createClass({
     };
   },
   componentDidMount() {
+    this.disableTransitions = dc.disableTransitions;
+    dc.disableTransitions = !this.props.interactive;
     this.renderHistogram();
     this._updateData(this.props.data);
   },
@@ -58,6 +63,11 @@ const HistogramVisualization = React.createClass({
     }
     this._updateData(nextProps.data);
   },
+
+  componentWillUnmount() {
+    dc.disableTransitions = this.disableTransitions;
+  },
+
   _updateData(data) {
     this.setState({ dataPoints: data }, this.drawData);
   },
@@ -85,6 +95,30 @@ const HistogramVisualization = React.createClass({
       this.histogram.redraw();
     }
   },
+
+  _renderTooltip(histogram, histogramDomNode) {
+    histogram.on('renderlet', () => {
+      const formatTitle = (d) => {
+        const valueText = `${numeral(d.y).format('0,0')} messages`;
+        const keyText = `<span class="date">${new DateTime(d.x).toString(DateTime.Formats.COMPLETE)}</span>`;
+
+        return `<div class="datapoint-info">${valueText}<br>${keyText}</div>`;
+      };
+
+      d3.select(histogramDomNode).selectAll('.chart-body rect.bar')
+        .attr('rel', 'tooltip')
+        .attr('data-original-title', formatTitle);
+    });
+
+    $(histogramDomNode).tooltip({
+      selector: '[rel="tooltip"]',
+      container: 'body',
+      placement: 'auto',
+      delay: { show: 300, hide: 100 },
+      html: true,
+    });
+  },
+
   renderHistogram() {
     const histogramDomNode = ReactDOM.findDOMNode(this);
 
@@ -104,29 +138,13 @@ const HistogramVisualization = React.createClass({
       .xAxisLabel('Time')
       .yAxisLabel('Messages')
       .renderTitle(false)
-      .colors(D3Utils.glColourPalette())
-      .on('renderlet', () => {
-        const formatTitle = (d) => {
-          const valueText = `${numeral(d.y).format('0,0')} messages`;
-          const keyText = `<span class="date">${new DateTime(d.x).toString(DateTime.Formats.COMPLETE)}</span>`;
+      .colors(D3Utils.glColourPalette());
 
-          return `<div class="datapoint-info">${valueText}<br>${keyText}</div>`;
-        };
-
-        d3.select(histogramDomNode).selectAll('.chart-body rect.bar')
-          .attr('rel', 'tooltip')
-          .attr('data-original-title', formatTitle);
-      });
+    if (this.props.interactive) {
+      this._renderTooltip(this.histogram, histogramDomNode);
+    }
 
     this.histogram.on('postRender', this.props.onRenderComplete);
-
-    $(histogramDomNode).tooltip({
-      selector: '[rel="tooltip"]',
-      container: 'body',
-      placement: 'auto',
-      delay: { show: 300, hide: 100 },
-      html: true,
-    });
 
     this.histogram.xAxis()
       .ticks(graphHelper.customTickInterval())

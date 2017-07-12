@@ -19,30 +19,35 @@ global.jQuery = $;
 require('bootstrap/js/tooltip');
 
 const GraphFactory = {
-  create(config, domNode, tooltipTitleFormatter) {
+  create(config, domNode, renderTooltip, tooltipTitleFormatter) {
     let graph;
+    let tooltipSelector;
     switch (config.renderer) {
       case 'line':
         graph = dc.lineChart(domNode);
-        D3Utils.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
+        tooltipSelector = '.chart-body circle.dot';
         break;
       case 'area':
         graph = dc.lineChart(domNode);
         graph.renderArea(true);
-        D3Utils.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
+        tooltipSelector = '.chart-body circle.dot';
         break;
       case 'bar':
         graph = dc.barChart(domNode);
         graph.centerBar(true);
-        D3Utils.tooltipRenderlet(graph, '.chart-body rect.bar', tooltipTitleFormatter);
+        tooltipSelector = '.chart-body rect.bar';
         break;
       case 'scatterplot':
         graph = dc.lineChart(domNode);
         graph.renderDataPoints({ radius: 2, fillOpacity: 1, strokeOpacity: 1 });
-        D3Utils.tooltipRenderlet(graph, '.chart-body circle.dot', tooltipTitleFormatter);
+        tooltipSelector = '.chart-body circle.dot';
         break;
       default:
         throw new Error(`Unsupported renderer '${config.renderer}'`);
+    }
+
+    if (renderTooltip && tooltipSelector) {
+      D3Utils.tooltipRenderlet(graph, tooltipSelector, tooltipTitleFormatter);
     }
 
     if (config.renderer === 'line' || config.renderer === 'area') {
@@ -66,7 +71,8 @@ const GraphVisualization = React.createClass({
     computationTimeRange: PropTypes.object,
     height: PropTypes.number,
     width: PropTypes.number,
-    onRenderComplete: React.PropTypes.func,
+    interactive: PropTypes.bool,
+    onRenderComplete: PropTypes.func,
   },
 
   statics: {
@@ -84,6 +90,7 @@ const GraphVisualization = React.createClass({
 
   getDefaultProps() {
     return {
+      interactive: true,
       onRenderComplete: () => {},
     };
   },
@@ -99,6 +106,8 @@ const GraphVisualization = React.createClass({
     };
   },
   componentDidMount() {
+    this.disableTransitions = dc.disableTransitions;
+    dc.disableTransitions = !this.props.interactive;
     this.renderGraph();
     this._updateData(this.props.data, this.props.config);
   },
@@ -112,6 +121,11 @@ const GraphVisualization = React.createClass({
     }
     this._updateData(nextProps.data, nextProps.config);
   },
+
+  componentWillUnmount() {
+    dc.disableTransitions = this.disableTransitions;
+  },
+
   _updateData(data, config) {
     const isSearchAll = (config.timerange.type === 'relative' && config.timerange.range === 0);
     const dataPoints = HistogramFormatter.format(data, this.props.computationTimeRange,
@@ -165,8 +179,9 @@ const GraphVisualization = React.createClass({
   },
   renderGraph() {
     const graphDomNode = ReactDOM.findDOMNode(this);
+    const interactive = this.props.interactive;
 
-    this.graph = GraphFactory.create(this.props.config, graphDomNode, this._formatTooltipTitle);
+    this.graph = GraphFactory.create(this.props.config, graphDomNode, interactive, this._formatTooltipTitle);
     this.graph
       .width(this.props.width)
       .height(this.props.height)
@@ -185,13 +200,15 @@ const GraphVisualization = React.createClass({
 
     this.graph.on('postRender', this.props.onRenderComplete);
 
-    $(graphDomNode).tooltip({
-      selector: '[rel="tooltip"]',
-      container: 'body',
-      placement: 'auto',
-      delay: { show: 300, hide: 100 },
-      html: true,
-    });
+    if (interactive) {
+      $(graphDomNode).tooltip({
+        selector: '[rel="tooltip"]',
+        container: 'body',
+        placement: 'auto',
+        delay: { show: 300, hide: 100 },
+        html: true,
+      });
+    }
 
     this.graph.xAxis()
       .ticks(graphHelper.customTickInterval())

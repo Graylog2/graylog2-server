@@ -26,6 +26,7 @@ const QuickValuesVisualization = React.createClass({
     horizontal: PropTypes.bool,
     displayAnalysisInformation: PropTypes.bool,
     displayAddToSearchButton: PropTypes.bool,
+    interactive: PropTypes.bool,
     onRenderComplete: PropTypes.func,
     sortOrder: PropTypes.string,
     dataTableTitle: PropTypes.string,
@@ -33,6 +34,7 @@ const QuickValuesVisualization = React.createClass({
   },
   getDefaultProps() {
     return {
+      interactive: true,
       onRenderComplete: () => {},
       dataTableTitle: 'Top values',
       limit: 50,
@@ -56,6 +58,8 @@ const QuickValuesVisualization = React.createClass({
     };
   },
   componentDidMount() {
+    this.disableTransitions = dc.disableTransitions;
+    dc.disableTransitions = !this.props.interactive;
     this._resizeVisualization(this.props.width, this.props.height, this.props.config.show_data_table);
     this._formatProps(this.props);
     this._renderDataTable();
@@ -69,6 +73,11 @@ const QuickValuesVisualization = React.createClass({
     this._resizeVisualization(nextProps.width, nextProps.height, nextProps.config.show_data_table);
     this._formatProps(nextProps);
   },
+
+  componentWillUnmount() {
+    dc.disableTransitions = this.disableTransitions;
+  },
+
   NUMBER_OF_TOP_VALUES: 5,
   DEFAULT_PIE_CHART_SIZE: 200,
   MARGIN_TOP: 15,
@@ -170,15 +179,17 @@ const QuickValuesVisualization = React.createClass({
       .sortBy(d => d.count)
       .order(this._getSortOrder())
       .size(this.props.limit)
-      .columns(this._getDataTableColumns())
-      .on('renderlet', (table) => {
+      .columns(this._getDataTableColumns());
+
+    if (this.props.interactive) {
+      this.dataTable.on('renderlet', (table) => {
         table.selectAll('.dc-table-group').classed('info', true);
         table.selectAll('td.dc-table-column button').on('click', () => {
-          // noinspection Eslint
           const term = $(d3.event.target).closest('button').data('term');
           SearchStore.addSearchTerm(this.props.id, term);
         });
       });
+    }
 
     this.dataTable.on('postRender', this._handleRender('dataTable'));
 
@@ -212,16 +223,17 @@ const QuickValuesVisualization = React.createClass({
 
     this._resizeVisualization(this.props.width, this.props.height, this.props.config.show_data_table);
 
-    D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
+    if (this.props.interactive) {
+      D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
 
-    // noinspection Eslint
-    $(graphDomNode).tooltip({
-      selector: '[rel="tooltip"]',
-      container: 'body',
-      placement: 'auto',
-      delay: { show: 300, hide: 100 },
-      html: true,
-    });
+      $(graphDomNode).tooltip({
+        selector: '[rel="tooltip"]',
+        container: 'body',
+        placement: 'auto',
+        delay: { show: 300, hide: 100 },
+        html: true,
+      });
+    }
 
     this.pieChart.render();
   },
