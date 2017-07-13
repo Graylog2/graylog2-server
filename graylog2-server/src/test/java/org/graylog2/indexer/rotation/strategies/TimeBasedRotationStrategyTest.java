@@ -76,6 +76,7 @@ public class TimeBasedRotationStrategyTest {
     @Before
     public void setUp() {
         when(indexSetConfig.id()).thenReturn("index-set-id");
+        when(indexSetConfig.title()).thenReturn("index-set-title");
         rotationStrategy = new TimeBasedRotationStrategy(indices, nodeId, auditEventSender);
     }
 
