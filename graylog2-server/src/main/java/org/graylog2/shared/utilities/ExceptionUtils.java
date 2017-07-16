@@ -41,15 +41,16 @@ public class ExceptionUtils {
 
         // UnknownHostException has only the hostname as error message, we need to add some
         // information before showing the error message to the user.
+        final String message = t.getMessage();
         if (t.getClass() == UnknownHostException.class) {
             causeMessage.append("Unknown host '");
-            causeMessage.append(t.getMessage());
+            causeMessage.append(message);
             causeMessage.append("'");
         } else {
-            causeMessage.append(t.getMessage());
+            causeMessage.append(message);
         }
 
-        if (!t.getMessage().endsWith(".")) {
+        if (message != null && !message.endsWith(".")) {
             causeMessage.append(".");
         }
 
