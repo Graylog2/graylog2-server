@@ -44,10 +44,7 @@ const Cache = React.createClass({
             {React.createElement(summary, { cache: cache })}
           </div>
         </Col>
-        <Col md={6}>
-          <h3>TODO: Cached data</h3>
-          <p>Use this to inspect the lookup table cache.</p>
-        </Col>
+        <Col md={6} />
       </Row>
     );
   },
