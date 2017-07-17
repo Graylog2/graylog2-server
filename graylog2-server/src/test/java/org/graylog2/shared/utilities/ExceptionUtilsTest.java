@@ -19,18 +19,10 @@ package org.graylog2.shared.utilities;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 
 public class ExceptionUtilsTest {
     @Test
-    public void formatMessageCause() throws Exception {
-
-        final NullPointerException npe = new NullPointerException();
-
-        try {
-            assertThat(ExceptionUtils.formatMessageCause(npe)).isNotBlank();
-        } catch (Exception e) {
-            fail(e.getMessage());
-        }
+    public void formatMessageCause() {
+        assertThat(ExceptionUtils.formatMessageCause(new Exception())).isNotBlank();
     }
 }
