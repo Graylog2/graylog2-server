@@ -571,7 +571,7 @@ public class Indices {
                 .path("primaries")
                 .path("store")
                 .path("size_in_bytes");
-        return Optional.of(sizeInBytes).filter(JsonNode::isLong).map(JsonNode::asLong);
+        return Optional.of(sizeInBytes).filter(JsonNode::isNumber).map(JsonNode::asLong);
     }
 
     public Set<IndexStatistics> getIndicesStats(final IndexSet indexSet) {
