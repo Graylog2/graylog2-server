@@ -46,6 +46,9 @@ public class ElasticsearchClientConfiguration {
     @Parameter(value = "elasticsearch_max_total_connections_per_route", validators = { PositiveIntegerValidator.class })
     private int elasticsearchMaxTotalConnectionsPerRoute = 2;
 
+    @Parameter(value = "elasticsearch_max_retries", validators = { PositiveIntegerValidator.class })
+    private int elasticsearchMaxRetries = 2;
+
     @Parameter(value = "elasticsearch_discovery_enabled")
     private boolean discoveryEnabled = false;
 
