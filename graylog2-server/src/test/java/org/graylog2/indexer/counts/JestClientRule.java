@@ -39,6 +39,7 @@ public class JestClientRule extends ExternalResource {
             Duration.seconds(60),
             20,
             2,
+            2,
             false,
             null,
             Duration.seconds(30),
