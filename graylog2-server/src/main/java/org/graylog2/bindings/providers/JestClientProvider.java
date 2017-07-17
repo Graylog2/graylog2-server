@@ -23,6 +23,7 @@ import com.google.common.base.Strings;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestClientFactory;
 import io.searchbox.client.config.HttpClientConfig;
+import io.searchbox.client.http.HttpRetryHandler;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -54,6 +55,7 @@ public class JestClientProvider implements Provider<JestClient> {
                               @Named("elasticsearch_idle_timeout") Duration elasticsearchIdleTimeout,
                               @Named("elasticsearch_max_total_connections") int elasticsearchMaxTotalConnections,
                               @Named("elasticsearch_max_total_connections_per_route") int elasticsearchMaxTotalConnectionsPerRoute,
+                              @Named("elasticsearch_max_retries") int elasticsearchMaxRetries,
                               @Named("elasticsearch_discovery_enabled") boolean discoveryEnabled,
                               @Named("elasticsearch_discovery_filter") @Nullable String discoveryFilter,
                               @Named("elasticsearch_discovery_frequency") Duration discoveryFrequency,
@@ -99,6 +101,7 @@ public class JestClientProvider implements Provider<JestClient> {
                 .discoveryFrequency(discoveryFrequency.toSeconds(), TimeUnit.SECONDS)
                 .preemptiveAuthTargetHosts(preemptiveAuthHosts)
                 .requestCompressionEnabled(compressionEnabled)
+                .retryHandler(new HttpRetryHandler(elasticsearchMaxRetries))
                 .objectMapper(objectMapper);
 
         factory.setHttpClientConfig(httpClientConfigBuilder.build());
