@@ -22,7 +22,8 @@ const NumericVisualization = React.createClass({
 
   getDefaultProps() {
     return {
-      onRenderComplete: () => {},
+      onRenderComplete: () => {
+      },
     };
   },
 
@@ -42,7 +43,7 @@ const NumericVisualization = React.createClass({
     this._updateData(nextProps.data, this.props.onRenderComplete);
   },
 
-  DEFAULT_VALUE_FONT_SIZE: '70px',
+  DEFAULT_VALUE_FONT_SIZE: '60px',
   NUMBER_OF_INDICATORS: 3,
   PERCENTAGE_PER_INDICATOR: 30,
 
@@ -89,17 +90,17 @@ const NumericVisualization = React.createClass({
     }
 
     let fontSize;
-    const numberOfDigits = this._formatData().replace(/[,.]/g, '').length;
+    const formattedLength = this._formatData().length;
 
-    if (numberOfDigits < 7) {
+    if (formattedLength < 7) {
       fontSize = this.DEFAULT_VALUE_FONT_SIZE;
     } else {
-      switch (numberOfDigits) {
+      switch (formattedLength) {
         case 7:
-          fontSize = '60px';
+          fontSize = '50px';
           break;
         case 8:
-          fontSize = '50px';
+          fontSize = '45px';
           break;
         case 9:
         case 10:
@@ -159,42 +160,29 @@ const NumericVisualization = React.createClass({
 
     if (this.props.config.trend) {
       trendIndicators = (
-        <div className={style.trendIndicators}>
-          <div>
-            <div className={this._getHigherIndicatorClass(0)}>
-              <span><i className="fa fa-angle-up" /></span>
-            </div>
-            <div className={this._getHigherIndicatorClass(1)}>
-              <span><i className="fa fa-angle-up" /></span>
-            </div>
-            <div className={this._getHigherIndicatorClass(2)}>
-              <span><i className="fa fa-angle-up" /></span>
-            </div>
-          </div>
-          <div>
-            <div className={this._getLowerIndicatorClass(0)}>
-              <span><i className="fa fa-angle-down" /></span>
-            </div>
-            <div className={this._getLowerIndicatorClass(1)}>
-              <span><i className="fa fa-angle-down" /></span>
-            </div>
-            <div className={this._getLowerIndicatorClass(2)}>
-              <span><i className="fa fa-angle-down" /></span>
-            </div>
-          </div>
-        </div>
+        <g transform="translate(270,45)">
+          <g transform="translate(0,-17)">
+            <path d="M0 5 L5 0 L10 5" className={this._getHigherIndicatorClass(0)} />
+            <path d="M0 10 L5 5 L10 10" className={this._getHigherIndicatorClass(1)} />
+            <path d="M0 15 L5 10 L10 15" className={this._getHigherIndicatorClass(2)} />
+          </g>
+          <g transform="translate(0, 2) rotate(180,5,7.5)">
+            <path d="M0 5 L5 0 L10 5" className={this._getLowerIndicatorClass(2)} />
+            <path d="M0 10 L5 5 L10 10" className={this._getLowerIndicatorClass(1)} />
+            <path d="M0 15 L5 10 L10 15" className={this._getLowerIndicatorClass(0)} />
+          </g>
+        </g>
       );
     }
 
     return (
-      <div className={style.number}>
-        <div className={style.aside} />
-        <div className={style.value} style={{ fontSize: this._calculateFontSize() }}>
-          {this._formatData()}
-        </div>
-        <div className={style.aside}>
+      <div className={style.container}>
+        <svg viewBox="0 0 300 100" className={style.number}>
+          <text x="150" y="45" className={style.value} style={{ fontSize: this._calculateFontSize() }}>
+            {this._formatData()}
+          </text>
           {trendIndicators}
-        </div>
+        </svg>
       </div>
     );
   },

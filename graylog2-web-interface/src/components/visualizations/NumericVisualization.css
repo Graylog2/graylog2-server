@@ -1,40 +1,29 @@
+:local(.container) {
+    height: 100%;
+    text-align: center;
+    padding-bottom: 30px;
+}
+
 :local(.number) {
-    display: flex;
-    justify-content: center;
+    height: 100%;
     width: 100%;
 }
 
-:local(.aside) {
-    flex: 1;
-    align-self: flex-start;
-}
-
 :local(.value) {
-    flex: 2;
+    dominant-baseline: central;
     line-height: 100px; /* Ensure changing the value font-size doesn't change the element's height */
-    text-align: center;
-}
-
-:local(.trendIndicators) {
-    font-size: 24px;
-    margin-top: 12px; /* font-size / 2 */
-    margin-left: 10px;
-}
-
-:local(.trendIndicators) > *:first-child {
-    margin-bottom: 5px;
+    text-anchor: middle;
 }
 
 :local(.trendIcon) {
-    color: #E3E5E5;
-    height: 25px;
-    margin-bottom: -18px;
+    stroke: #E3E5E5;
+    fill: none;
 }
 
 :local(.trendGood) {
-    color: #8DC63F;
+    stroke: #8DC63F;
 }
 
 :local(.trendBad) {
-    color: #BE1E2D;
+    stroke: #BE1E2D;
 }
