@@ -18,6 +18,7 @@ package org.graylog2.indexer.counts;
 
 import com.google.common.collect.ImmutableMap;
 import org.elasticsearch.action.index.IndexResponse;
+import org.elasticsearch.rest.RestStatus;
 import org.graylog2.AbstractESTest;
 import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexNotFoundException;
@@ -137,11 +138,10 @@ public class CountsTest extends AbstractESTest {
         for (int i = 0; i < 10; i++) {
             final IndexResponse indexResponse = client().prepareIndex()
                     .setIndex(INDEX_NAME_1)
-                    .setRefresh(true)
                     .setType("test")
                     .setSource("foo", "bar", "counter", i)
                     .execute().get();
-            assumeTrue(indexResponse.isCreated());
+            assumeTrue(indexResponse.status() == RestStatus.CREATED);
         }
 
         // Simulate no indices for the second index set.
@@ -163,20 +163,18 @@ public class CountsTest extends AbstractESTest {
         for (int i = 0; i < count1; i++) {
             final IndexResponse indexResponse = client().prepareIndex()
                     .setIndex(INDEX_NAME_1)
-                    .setRefresh(true)
                     .setType("test")
                     .setSource("foo", "bar", "counter", i)
                     .execute().get();
-            assumeTrue(indexResponse.isCreated());
+            assumeTrue(indexResponse.status() == RestStatus.CREATED);
         }
         for (int i = 0; i < count2; i++) {
             final IndexResponse indexResponse = client().prepareIndex()
                     .setIndex(INDEX_NAME_2)
-                    .setRefresh(true)
                     .setType("test")
                     .setSource("foo", "bar", "counter", i)
                     .execute().get();
-            assumeTrue(indexResponse.isCreated());
+            assumeTrue(indexResponse.status() == RestStatus.CREATED);
         }
 
         assertThat(counts.total()).isEqualTo(count1 + count2);

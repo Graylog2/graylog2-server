@@ -65,8 +65,8 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortParseElement;
 import org.graylog2.audit.AuditActor;
 import org.graylog2.audit.AuditEventSender;
 import org.graylog2.indexer.ElasticsearchException;
@@ -141,7 +141,7 @@ public class Indices {
         final String query = SearchSourceBuilder.searchSource()
                 .query(QueryBuilders.matchAllQuery())
                 .size(350)
-                .sort(SortBuilders.fieldSort(SortParseElement.DOC_FIELD_NAME))
+                .sort(SortBuilders.fieldSort(FieldSortBuilder.DOC_FIELD_NAME))
                 .toString();
 
         final Search request = new Search.Builder(query)
@@ -666,8 +666,7 @@ public class Indices {
      * @see org.elasticsearch.search.aggregations.metrics.stats.Stats
      */
     public IndexRangeStats indexRangeStatsOfIndex(String index) {
-        final FilterAggregationBuilder builder = AggregationBuilders.filter("agg")
-                .filter(QueryBuilders.existsQuery(Message.FIELD_TIMESTAMP))
+        final FilterAggregationBuilder builder = AggregationBuilders.filter("agg", QueryBuilders.existsQuery(Message.FIELD_TIMESTAMP))
                 .subAggregation(AggregationBuilders.min("ts_min").field(Message.FIELD_TIMESTAMP))
                 .subAggregation(AggregationBuilders.max("ts_max").field(Message.FIELD_TIMESTAMP))
                 .subAggregation(AggregationBuilders.terms("streams").field(Message.FIELD_STREAMS));

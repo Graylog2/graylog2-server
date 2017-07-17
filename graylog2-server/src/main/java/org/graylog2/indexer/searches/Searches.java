@@ -41,7 +41,7 @@ import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.Configuration;
@@ -296,12 +296,16 @@ public class Searches {
         }
     }
 
+    public void debug(Object arg) {
+        System.out.println(arg);
+    }
+
     public TermsResult terms(String field, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
         final Terms.Order termsOrder = sorting == Sorting.Direction.DESC ? Terms.Order.count(false) : Terms.Order.count(true);
 
         final SearchSourceBuilder searchSourceBuilder = filter == null ? standardSearchRequest(query, range) : filteredSearchRequest(query, filter, range);
 
-        final FilterAggregationBuilder filterBuilder = AggregationBuilders.filter(AGG_FILTER)
+        final FilterAggregationBuilder filterBuilder = AggregationBuilders.filter(AGG_FILTER, standardAggregationFilters(range, filter))
             .subAggregation(
                 AggregationBuilders.terms(AGG_TERMS)
                     .field(field)
@@ -311,8 +315,7 @@ public class Searches {
             .subAggregation(
                 AggregationBuilders.missing("missing")
                     .field(field)
-            )
-            .filter(standardAggregationFilters(range, filter));
+            );
 
         searchSourceBuilder.aggregation(filterBuilder);
 
@@ -410,15 +413,14 @@ public class Searches {
                 termsOrder = Terms.Order.count(true);
         }
 
-        final FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
+        final FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER, standardAggregationFilters(range, filter))
             .subAggregation(
                 AggregationBuilders.terms(AGG_TERMS_STATS)
                     .field(keyField)
                     .subAggregation(AggregationBuilders.stats(AGG_STATS).field(valueField))
                     .order(termsOrder)
                     .size(size)
-            )
-            .filter(standardAggregationFilters(range, filter));
+            );
 
         searchSourceBuilder.aggregation(builder);
 
@@ -474,8 +476,8 @@ public class Searches {
             searchSourceBuilder = filteredSearchRequest(query, filter, range);
         }
 
-        final FilterAggregationBuilder filterBuilder = AggregationBuilders.filter(AGG_FILTER)
-                .filter(standardAggregationFilters(range, filter));
+        final FilterAggregationBuilder filterBuilder = AggregationBuilders.filter(AGG_FILTER, standardAggregationFilters(range, filter));
+
         if (includeCount) {
             filterBuilder.subAggregation(AggregationBuilders.count(AGG_VALUE_COUNT).field(field));
         }
@@ -534,13 +536,12 @@ public class Searches {
     }
 
     public HistogramResult histogram(String query, DateHistogramInterval interval, String filter, TimeRange range) {
-        final FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER)
+        final FilterAggregationBuilder builder = AggregationBuilders.filter(AGG_FILTER, standardAggregationFilters(range, filter))
             .subAggregation(
                 AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                     .field(Message.FIELD_TIMESTAMP)
-                    .interval(interval.toESInterval())
-            )
-            .filter(standardAggregationFilters(range, filter));
+                    .dateHistogramInterval(interval.toESInterval())
+            );
 
         final QueryStringQueryBuilder qs = queryStringQuery(query)
             .allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
@@ -583,18 +584,17 @@ public class Searches {
                                           String filter,
                                           TimeRange range,
                                           boolean includeCardinality) {
-        final DateHistogramBuilder dateHistogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
+        final DateHistogramAggregationBuilder dateHistogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                 .field(Message.FIELD_TIMESTAMP)
                 .subAggregation(AggregationBuilders.stats(AGG_STATS).field(field))
-                .interval(interval.toESInterval());
+                .dateHistogramInterval(interval.toESInterval());
 
         if (includeCardinality) {
             dateHistogramBuilder.subAggregation(AggregationBuilders.cardinality(AGG_CARDINALITY).field(field));
         }
 
-        final FilterAggregationBuilder filterBuilder = AggregationBuilders.filter(AGG_FILTER)
-                .subAggregation(dateHistogramBuilder)
-                .filter(standardAggregationFilters(range, filter));
+        final FilterAggregationBuilder filterBuilder = AggregationBuilders.filter(AGG_FILTER, standardAggregationFilters(range, filter))
+                .subAggregation(dateHistogramBuilder);
 
         final QueryStringQueryBuilder qs = queryStringQuery(query)
             .allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
@@ -669,7 +669,7 @@ public class Searches {
             // load the _source and extract it from it. This functionality has been replaced by the source filtering
             // parameter."
             // TODO: Look at the source filtering parameter once we switched to ES 1.x.
-            request.fields(config.fields());
+            request.storedFields(config.fields());
         }
 
         return request;
