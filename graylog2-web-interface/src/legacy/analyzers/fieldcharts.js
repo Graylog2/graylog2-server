@@ -443,7 +443,7 @@ export const FieldChart = {
       }
 
       // Add query to query list of chart.
-      const queryDescription = `<div class="field-graph-query-color" style="background-color: "${lineColor};"></div> `
+      const queryDescription = `<div class="field-graph-query-color" style="background-color: ${lineColor};"></div> `
         + `<span class="type-description">[${StringUtils.escapeHTML(series.valuetype)}] ${series.field}, </span> `
         + `Query: <span class="field-graph-query">${StringUtils.escapeHTML(query)}</span>`;
 
