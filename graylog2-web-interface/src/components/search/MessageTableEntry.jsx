@@ -1,10 +1,44 @@
 import React from 'react';
-import MessageDetail from './MessageDetail';
 import Immutable from 'immutable';
+
+import MessageDetail from './MessageDetail';
 import { Timestamp } from 'components/common';
 import StringUtils from 'util/StringUtils';
 
 const MessageTableEntry = React.createClass({
+  propTypes: {
+    allStreams: React.PropTypes.instanceOf(Immutable.List).isRequired,
+    allStreamsLoaded: React.PropTypes.bool.isRequired,
+    disableSurroundingSearch: React.PropTypes.bool,
+    expandAllRenderAsync: React.PropTypes.bool.isRequired,
+    expanded: React.PropTypes.bool.isRequired,
+    highlight: React.PropTypes.bool,
+    highlightMessage: React.PropTypes.string,
+    inputs: React.PropTypes.instanceOf(Immutable.Map).isRequired,
+    message: React.PropTypes.shape({
+      fields: React.PropTypes.object.isRequired,
+      highlight_ranges: React.PropTypes.object,
+      id: React.PropTypes.string.isRequired,
+      index: React.PropTypes.string.isRequired,
+    }).isRequired,
+    nodes: React.PropTypes.instanceOf(Immutable.Map).isRequired,
+    searchConfig: React.PropTypes.object,
+    selectedFields: React.PropTypes.instanceOf(Immutable.OrderedSet),
+    showMessageRow: React.PropTypes.bool,
+    streams: React.PropTypes.instanceOf(Immutable.Map).isRequired,
+    toggleDetail: React.PropTypes.func.isRequired,
+  },
+  getDefaultProps() {
+    return {
+      disableSurroundingSearch: false,
+      highlight: false,
+      highlightMessage: undefined,
+      searchConfig: undefined,
+      selectedFields: Immutable.OrderedSet(),
+      showMessageRow: false,
+    };
+  },
+
   shouldComponentUpdate(newProps) {
     if (this.props.highlight !== newProps.highlight) {
       return true;
@@ -95,10 +129,16 @@ const MessageTableEntry = React.createClass({
         {this.props.expanded &&
         <tr className="message-detail-row" style={{ display: 'table-row' }}>
           <td colSpan={colSpanFixup}>
-            <MessageDetail message={this.props.message} inputs={this.props.inputs} streams={this.props.streams}
-                         allStreams={this.props.allStreams} allStreamsLoaded={this.props.allStreamsLoaded}
-                         nodes={this.props.nodes} possiblyHighlight={this.possiblyHighlight}
-                         expandAllRenderAsync={this.props.expandAllRenderAsync} searchConfig={this.props.searchConfig} />
+            <MessageDetail message={this.props.message}
+                           inputs={this.props.inputs}
+                           streams={this.props.streams}
+                           allStreams={this.props.allStreams}
+                           allStreamsLoaded={this.props.allStreamsLoaded}
+                           nodes={this.props.nodes}
+                           possiblyHighlight={this.possiblyHighlight}
+                           disableSurroundingSearch={this.props.disableSurroundingSearch}
+                           expandAllRenderAsync={this.props.expandAllRenderAsync}
+                           searchConfig={this.props.searchConfig}/>
           </td>
         </tr>
         }
