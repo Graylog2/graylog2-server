@@ -14,6 +14,7 @@ import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 
 const ResultTable = React.createClass({
   propTypes: {
+    disableSurroundingSearch: React.PropTypes.bool,
     highlight: PropTypes.bool.isRequired,
     inputs: PropTypes.object.isRequired,
     messages: PropTypes.array.isRequired,
@@ -25,6 +26,11 @@ const ResultTable = React.createClass({
     sortOrder: PropTypes.string.isRequired,
     streams: PropTypes.object.isRequired,
     searchConfig: PropTypes.object.isRequired,
+  },
+  getDefaultProps() {
+    return {
+      disableSurroundingSearch: false,
+    };
   },
   getInitialState() {
     return {
@@ -162,6 +168,7 @@ const ResultTable = React.createClass({
                 {this.props.messages.map((message) => {
                   return (
                     <MessageTableEntry key={`${message.index}-${message.id}`}
+                                       disableSurroundingSearch={this.props.disableSurroundingSearch}
                                        message={message}
                                        showMessageRow={this.props.selectedFields.contains('message')}
                                        selectedFields={selectedColumns}
