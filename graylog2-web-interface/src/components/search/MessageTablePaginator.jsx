@@ -19,12 +19,16 @@ const MessageTablePaginator = React.createClass({
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
-    ]),
+    ]).isRequired,
+    onPageChange: PropTypes.func.isRequired,
+    pageSize: PropTypes.number,
     position: PropTypes.string,
   },
+
   getInitialState() {
     return {
       paginationWidth: 0,
+      pageSize: UniversalSearchStore.DEFAULT_LIMIT,
     };
   },
 
@@ -58,7 +62,7 @@ const MessageTablePaginator = React.createClass({
     }
   },
   _numberOfPages() {
-    return Math.ceil(this.props.resultCount / UniversalSearchStore.DEFAULT_LIMIT);
+    return Math.ceil(this.props.resultCount / this.props.pageSize);
   },
   _minPage() {
     const currentTenMin = Math.floor(this.props.currentPage / 10) * 10;
@@ -82,7 +86,7 @@ const MessageTablePaginator = React.createClass({
       newPage = Number(page);
     }
 
-    SearchStore.page = newPage;
+    this.props.onPageChange(newPage);
   },
   render() {
     const pages = [];
