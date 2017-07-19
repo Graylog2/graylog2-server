@@ -18,7 +18,9 @@ const ResultTable = React.createClass({
     inputs: React.PropTypes.object.isRequired,
     messages: React.PropTypes.array.isRequired,
     nodes: React.PropTypes.object.isRequired,
+    onPageChange: React.PropTypes.func,
     page: React.PropTypes.number.isRequired,
+    pageSize: React.PropTypes.number,
     resultCount: React.PropTypes.number.isRequired,
     selectedFields: React.PropTypes.object.isRequired,
     sortField: React.PropTypes.string.isRequired,
@@ -29,6 +31,7 @@ const ResultTable = React.createClass({
   getDefaultProps() {
     return {
       disableSurroundingSearch: false,
+      onPageChange: (page) => { SearchStore.page = page; },
     };
   },
   getInitialState() {
@@ -144,7 +147,10 @@ const ResultTable = React.createClass({
                   disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress" /></Button>
         </ButtonGroup>
 
-        <MessageTablePaginator position="top" currentPage={Number(this.props.page)}
+        <MessageTablePaginator currentPage={Number(this.props.page)}
+                               onPageChange={this.props.onPageChange}
+                               pageSize={this.props.pageSize}
+                               position="top"
                                resultCount={this.props.resultCount} />
 
         <div className="search-results-table">
@@ -189,7 +195,10 @@ const ResultTable = React.createClass({
           </div>
         </div>
 
-        <MessageTablePaginator position="bottom" currentPage={Number(this.props.page)}
+        <MessageTablePaginator currentPage={Number(this.props.page)}
+                               onPageChange={this.props.onPageChange}
+                               pageSize={this.props.pageSize}
+                               position="bottom"
                                resultCount={this.props.resultCount}>
           <ButtonGroup bsSize="small" className="pull-right" style={{ position: 'absolute', marginTop: 20, right: 10 }}>
             <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand" /></Button>
