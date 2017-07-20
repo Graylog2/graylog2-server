@@ -127,6 +127,29 @@ const Navigation = React.createClass({
         return null;
       });
 
+    const pluginDropdownNavigations = PluginStore.exports('dropdownNavigation')
+      .sort((route1, route2) => naturalSort(route1.title.toLowerCase(), route2.title.toLowerCase()))
+      .map((dropdownMenu, idx) => {
+        if (this._shouldAddPluginRoute(dropdownMenu)) {
+          const routes = dropdownMenu.routes.map((route) => {
+            if (this._shouldAddPluginRoute(route)) {
+              return (
+                <LinkContainer key={route.path} to={URLUtils.appPrefixed(route.path)}>
+                  <MenuItem>{route.description}</MenuItem>
+                </LinkContainer>
+              );
+            }
+            return null;
+          });
+          return (
+            <NavDropdown title={dropdownMenu.title} id={`plugin-menu-dropdown-${idx}`}>
+              {routes}
+            </NavDropdown>
+          );
+        }
+        return null;
+      });
+
     const pluginSystemNavigations = PluginStore.exports('systemnavigation')
       .sort((route1, route2) => naturalSort(route1.description.toLowerCase(), route2.description.toLowerCase()))
       .map((pluginRoute) => {
@@ -173,6 +196,8 @@ const Navigation = React.createClass({
             </IfPermitted>
 
             {pluginNavigations}
+
+            {pluginDropdownNavigations}
 
             {/*
              * We cannot use IfPermitted in the dropdown unless we modify it to clone children elements and pass
