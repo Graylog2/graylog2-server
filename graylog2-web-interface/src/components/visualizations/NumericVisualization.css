@@ -8,22 +8,3 @@
     height: 100%;
     width: 100%;
 }
-
-:local(.value) {
-    dominant-baseline: central;
-    line-height: 100px; /* Ensure changing the value font-size doesn't change the element's height */
-    text-anchor: middle;
-}
-
-:local(.trendIcon) {
-    stroke: #E3E5E5;
-    fill: none;
-}
-
-:local(.trendGood) {
-    stroke: #8DC63F;
-}
-
-:local(.trendBad) {
-    stroke: #BE1E2D;
-}

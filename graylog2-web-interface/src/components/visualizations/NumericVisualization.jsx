@@ -10,6 +10,10 @@ const TrendIndicatorType = {
   LOWER: 'lower',
 };
 
+const TREND_ICON_COLOR = '#E3E5E5';
+const TREND_ICON_GOOD_COLOR = '#8DC63F';
+const TREND_ICON_BAD_COLOR = '#BE1E2D';
+
 const NumericVisualization = React.createClass({
   propTypes: {
     config: React.PropTypes.object.isRequired,
@@ -17,6 +21,8 @@ const NumericVisualization = React.createClass({
       React.PropTypes.object,
       React.PropTypes.number,
     ]).isRequired,
+    height: React.PropTypes.number,
+    width: React.PropTypes.number,
     onRenderComplete: React.PropTypes.func,
   },
 
@@ -134,42 +140,51 @@ const NumericVisualization = React.createClass({
     }
     return Math.abs(this.state.percentage) >= this.PERCENTAGE_PER_INDICATOR * index;
   },
-  _getIndicatorClass(index, trendIndicatorType) {
-    const className = style.trendIcon;
-
+  _getStrokeColor(index, trendIndicatorType) {
     const indicatorIsActive = this._isIndicatorActive(index, trendIndicatorType);
     if (!indicatorIsActive) {
-      return className;
+      return TREND_ICON_COLOR;
     }
 
-    const lowerClass = this.props.config.lower_is_better ? style.trendGood : style.trendBad;
-    const higherClass = this.props.config.lower_is_better ? style.trendBad : style.trendGood;
+    const lowerStroke = this.props.config.lower_is_better ? TREND_ICON_GOOD_COLOR : TREND_ICON_BAD_COLOR;
+    const higherStroke = this.props.config.lower_is_better ? TREND_ICON_BAD_COLOR : TREND_ICON_GOOD_COLOR;
 
-    const activeClass = trendIndicatorType === TrendIndicatorType.HIGHER ? higherClass : lowerClass;
+    const activeStroke = trendIndicatorType === TrendIndicatorType.HIGHER ? higherStroke : lowerStroke;
 
-    return `${className} ${activeClass}`;
+    return activeStroke;
   },
-  _getHigherIndicatorClass(index) {
-    return this._getIndicatorClass(index, TrendIndicatorType.HIGHER);
+  _getHigherStrokeColor(index) {
+    return this._getStrokeColor(index, TrendIndicatorType.HIGHER);
   },
-  _getLowerIndicatorClass(index) {
-    return this._getIndicatorClass(index, TrendIndicatorType.LOWER);
+  _getLowerStrokeColor(index) {
+    return this._getStrokeColor(index, TrendIndicatorType.LOWER);
+  },
+  // We need to set some attributes in the DOM elements that React v0.14 does not support.
+  // This is a hack to workaround it as suggested in https://github.com/facebook/react/pull/5210
+  _setAttribute(attribute, value) {
+    return (node) => {
+      if (node) {
+        node.setAttribute(attribute, value);
+      }
+    };
   },
   render() {
+    const { config, width, height } = this.props;
+
     let trendIndicators;
 
-    if (this.props.config.trend) {
+    if (config.trend) {
       trendIndicators = (
         <g transform="translate(270,45)">
           <g transform="translate(0,-17)">
-            <path d="M0 5 L5 0 L10 5" className={this._getHigherIndicatorClass(0)} />
-            <path d="M0 10 L5 5 L10 10" className={this._getHigherIndicatorClass(1)} />
-            <path d="M0 15 L5 10 L10 15" className={this._getHigherIndicatorClass(2)} />
+            <path d="M0 5 L5 0 L10 5" fill="none" stroke={this._getHigherStrokeColor(0)} />
+            <path d="M0 10 L5 5 L10 10" fill="none" stroke={this._getHigherStrokeColor(1)} />
+            <path d="M0 15 L5 10 L10 15" fill="none" stroke={this._getHigherStrokeColor(2)} />
           </g>
           <g transform="translate(0, 2) rotate(180,5,7.5)">
-            <path d="M0 5 L5 0 L10 5" className={this._getLowerIndicatorClass(2)} />
-            <path d="M0 10 L5 5 L10 10" className={this._getLowerIndicatorClass(1)} />
-            <path d="M0 15 L5 10 L10 15" className={this._getLowerIndicatorClass(0)} />
+            <path d="M0 5 L5 0 L10 5" fill="none" stroke={this._getLowerStrokeColor(2)} />
+            <path d="M0 10 L5 5 L10 10" fill="none" stroke={this._getLowerStrokeColor(1)} />
+            <path d="M0 15 L5 10 L10 15" fill="none" stroke={this._getLowerStrokeColor(0)} />
           </g>
         </g>
       );
@@ -177,9 +192,16 @@ const NumericVisualization = React.createClass({
 
     return (
       <div className={style.container}>
-        <svg viewBox="0 0 300 100" className={style.number}>
-          <text x="150" y="45" className={style.value} style={{ fontSize: this._calculateFontSize() }}>
-            {this._formatData()}
+        <svg viewBox="0 0 300 100" className={style.number} width={width} height={height}>
+          <defs>
+            <path id="text-baseline" d="M0 45 H300" />
+          </defs>
+          <text textAnchor="middle" style={{ fontSize: this._calculateFontSize(), lineHeight: '100px' }}>
+            <textPath xlinkHref="#text-baseline" ref={this._setAttribute('startOffset', '50%')}>
+              <tspan ref={this._setAttribute('baseline-shift', '-40%')}>
+                {this._formatData()}
+              </tspan>
+            </textPath>
           </text>
           {trendIndicators}
         </svg>
