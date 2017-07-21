@@ -142,7 +142,7 @@ const Navigation = React.createClass({
             return null;
           });
           return (
-            <NavDropdown title={dropdownMenu.title} id={`plugin-menu-dropdown-${idx}`}>
+            <NavDropdown key={dropdownMenu.title} title={dropdownMenu.title} id={`plugin-menu-dropdown-${idx}`}>
               {routes}
             </NavDropdown>
           );
