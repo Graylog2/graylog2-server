@@ -26,6 +26,15 @@ const QuickValuesVisualization = React.createClass({
     horizontal: PropTypes.bool,
     displayAnalysisInformation: PropTypes.bool,
     displayAddToSearchButton: PropTypes.bool,
+    sortOrder: PropTypes.string,
+    dataTableTitle: PropTypes.string,
+    limit: PropTypes.number,
+  },
+  getDefaultProps() {
+    return {
+      dataTableTitle: 'Top values',
+      limit: 50,
+    };
   },
   getInitialState() {
     this.filters = [];
@@ -121,6 +130,13 @@ const QuickValuesVisualization = React.createClass({
 
     return columns;
   },
+  _getSortOrder() {
+    switch (this.props.sortOrder) {
+      case 'desc': return d3.descending;
+      case 'asc': return d3.ascending;
+      default: return d3.descending;
+    }
+  },
   _renderDataTable() {
     const tableDomNode = this.refs.table;
 
@@ -130,12 +146,12 @@ const QuickValuesVisualization = React.createClass({
       .group((d) => {
         const topValues = this.group.top(this.NUMBER_OF_TOP_VALUES);
         const dInTopValues = topValues.some(value => d.term.localeCompare(value.key) === 0);
-        return dInTopValues ? 'Top values' : 'Others';
+        return dInTopValues ? this.props.dataTableTitle : 'Others';
       })
-      .size(50)
-      .columns(this._getDataTableColumns())
       .sortBy(d => d.count)
-      .order(d3.descending)
+      .order(this._getSortOrder())
+      .size(this.props.limit)
+      .columns(this._getDataTableColumns())
       .on('renderlet', (table) => {
         table.selectAll('.dc-table-group').classed('info', true);
         table.selectAll('td.dc-table-column button').on('click', () => {
