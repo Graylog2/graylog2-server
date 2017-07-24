@@ -47,8 +47,9 @@ const QuickValuesVisualization = React.createClass({
     this.shouldUpdateData = true;
     this.dcGroupName = `quickvalue-${this.props.id}`;
     this.quickValuesData = crossfilter();
-    this.dimension = this.quickValuesData.dimension(d => d.term);
-    this.group = this.dimension.group().reduceSum(d => d.count);
+    this.dimensionByTerm = this.quickValuesData.dimension(d => d.term);
+    this.dimensionByCount = this.quickValuesData.dimension(d => d.count);
+    this.group = this.dimensionByTerm.group().reduceSum(d => d.count);
 
     return {
       total: undefined,
@@ -78,7 +79,6 @@ const QuickValuesVisualization = React.createClass({
     dc.disableTransitions = this.disableTransitions;
   },
 
-  NUMBER_OF_TOP_VALUES: 5,
   DEFAULT_PIE_CHART_SIZE: 200,
   MARGIN_TOP: 15,
   _pieChartRendered: false,
@@ -146,9 +146,7 @@ const QuickValuesVisualization = React.createClass({
 
         return `${colourBadge} ${d.term}`;
       },
-      (d) => {
-        return NumberUtils.formatPercentage(d.percentage);
-      },
+      d => NumberUtils.formatPercentage(d.percentage),
       d => NumberUtils.formatNumber(d.count),
     ];
 
@@ -167,10 +165,11 @@ const QuickValuesVisualization = React.createClass({
   },
   _renderDataTable() {
     const tableDomNode = this._table;
+    const limit = this.props.limit;
 
     this.dataTable = dc.dataTable(tableDomNode, this.dcGroupName);
     this.dataTable
-      .dimension(this.dimension)
+      .dimension(this.dimensionByCount)
       .group((d) => {
         const topValues = this.group.top(this.NUMBER_OF_TOP_VALUES);
         const dInTopValues = topValues.some(value => d.term.localeCompare(value.key) === 0);
@@ -200,7 +199,7 @@ const QuickValuesVisualization = React.createClass({
 
     this.pieChart = dc.pieChart(graphDomNode, this.dcGroupName);
     this.pieChart
-      .dimension(this.dimension)
+      .dimension(this.dimensionByTerm)
       .group(this.group)
       .othersGrouper((topRows) => {
         const chart = this.pieChart;
@@ -215,7 +214,7 @@ const QuickValuesVisualization = React.createClass({
       })
       .renderLabel(false)
       .renderTitle(false)
-      .slicesCap(this.NUMBER_OF_TOP_VALUES)
+      .slicesCap(this.props.limit)
       .ordering(d => d.value)
       .colors(D3Utils.glColourPalette());
 
