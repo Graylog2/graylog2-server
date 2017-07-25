@@ -60,7 +60,7 @@ public class NetFlowUdpInput extends MessageInput {
     public static class Descriptor extends MessageInput.Descriptor {
         @Inject
         public Descriptor() {
-            super(NAME, false, "");
+            super(NAME, false, "https://github.com/Graylog2/graylog-plugin-netflow");
         }
     }
 

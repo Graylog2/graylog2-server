@@ -9,7 +9,10 @@ This plugin provides a NetFlow UDP input to act as a Flow collector that receive
 
 ## Supported NetFlow Versions
 
-The plugin only supports NetFlow V5 at the moment.
+The version of the plugin now supports NetFlow V9.  It can support IPv6 addresses without 
+conversion and handles all of the fields from the fixed V5 format.  In addition this plugin supports
+events from a CISCO ASA 5500, including firewall and routing events.  Beware, there is significant
+duplication of typical syslog reporting in the v9 reporting. 
 
 ## Installation
 

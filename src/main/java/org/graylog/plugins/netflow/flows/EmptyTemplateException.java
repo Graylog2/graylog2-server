@@ -14,15 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+/*
+* Created by Benjamin H. Klimkowski, bhklimk@gmail.com
+*/
+
 package org.graylog.plugins.netflow.flows;
 
-import org.graylog2.plugin.Message;
-
-import javax.annotation.Nullable;
-
-public interface NetFlow {
-    String toMessageString();
-
-    @Nullable
-    Message toMessage();
+public class EmptyTemplateException extends FlowException {
 }

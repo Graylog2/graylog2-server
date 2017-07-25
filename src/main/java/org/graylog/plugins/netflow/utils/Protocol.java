@@ -6,7 +6,7 @@
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *         http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -16,12 +16,14 @@
  */
 package org.graylog.plugins.netflow.utils;
 
+import com.google.common.collect.ImmutableMap;
+
 /**
  * Can be used to lookup protocol numbers. Generated from a /etc/protocols file on Ubuntu 14.04 LTS.
  */
 public enum Protocol {
     IP("ip", 0, "IP"),
-    HOPOPT("hopopt", 0, "HOPOPT"),
+    // HOPOPT("hopopt", 0, "HOPOPT"),
     ICMP("icmp", 1, "ICMP"),
     IGMP("igmp", 2, "IGMP"),
     GGP("ggp", 3, "GGP"),
@@ -80,6 +82,16 @@ public enum Protocol {
     private final int number;
     private final String alias;
 
+    private static final ImmutableMap<Integer, Protocol> ID_MAP;
+
+    static {
+        final ImmutableMap.Builder<Integer, Protocol> idMapBuilder = ImmutableMap.builder();
+        for (final Protocol protocol : values()) {
+            idMapBuilder.put(protocol.getNumber(), protocol);
+        }
+        ID_MAP = idMapBuilder.build();
+    }
+
     Protocol(final String name, final int number, final String alias) {
         this.name = name;
         this.number = number;
@@ -99,12 +111,6 @@ public enum Protocol {
     }
 
     public static Protocol getByNumber(final int number) {
-        for (final Protocol protocol : values()) {
-            if (protocol.getNumber() == number) {
-                return protocol;
-            }
-        }
-
-        return null;
+        return ID_MAP.get(number);
     }
 }
