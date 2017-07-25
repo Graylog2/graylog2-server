@@ -120,6 +120,10 @@ public class ServerBindings extends Graylog2Module {
         bindSearchResponseDecorators();
         install(new GrokModule());
         install(new LookupModule());
+
+        // Initialize the JsonSerializer binding here to make sure the bindings work.
+        // Without this, the server does not start if there is no custom serializer.
+        customSerializerBinder();
     }
 
     private void bindProviders() {
