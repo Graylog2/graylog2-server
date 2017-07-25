@@ -145,13 +145,13 @@ const QuickValuesVisualization = React.createClass({
     this.dataTable
       .dimension(this.dimensionByCount)
       .group((d) => {
-        const topValues = this.group.top(this.NUMBER_OF_TOP_VALUES);
+        const topValues = this.group.top(limit);
         const dInTopValues = topValues.some(value => d.term.localeCompare(value.key) === 0);
         return dInTopValues ? this.props.dataTableTitle : 'Others';
       })
       .sortBy(d => d.count)
       .order(this._getSortOrder())
-      .size(this.props.limit)
+      .size(limit)
       .columns(this._getDataTableColumns())
       .on('renderlet', (table) => {
         table.selectAll('.dc-table-group').classed('info', true);
