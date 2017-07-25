@@ -99,15 +99,20 @@ public class GelfCodec extends AbstractCodec {
         return -1;
     }
 
-    private static double doubleValue(final JsonNode json, final String fieldName) {
-        if (json != null) {
-            final JsonNode value = json.get(fieldName);
-
-            if (value != null) {
-                return value.asDouble(-1.0);
+    private static double timestampValue(final JsonNode json) {
+        final JsonNode value = json.path(Message.FIELD_TIMESTAMP);
+        if (value.isNumber()) {
+            return value.asDouble(-1.0);
+        } else if (value.isTextual()) {
+            try {
+                return Double.parseDouble(value.asText());
+            } catch (NumberFormatException e) {
+                log.debug("Unable to parse timestamp", e);
+                return -1.0;
             }
+        } else {
+            return -1.0;
         }
-        return -1.0;
     }
 
     @Nullable
@@ -129,7 +134,7 @@ public class GelfCodec extends AbstractCodec {
         validateGELFMessage(node, rawMessage.getId(), rawMessage.getRemoteAddress());
 
         // Timestamp.
-        final double messageTimestamp = doubleValue(node, Message.FIELD_TIMESTAMP);
+        final double messageTimestamp = timestampValue(node);
         final DateTime timestamp;
         if (messageTimestamp <= 0) {
             timestamp = rawMessage.getTimestamp();
@@ -259,7 +264,7 @@ public class GelfCodec extends AbstractCodec {
 
         final JsonNode timestampNode = jsonNode.path("timestamp");
         if (timestampNode.isValueNode() && !timestampNode.isNumber()) {
-            throw new IllegalArgumentException(prefix + "has invalid \"timestamp\": " + timestampNode.asText());
+            log.warn(prefix + "has invalid \"timestamp\": {}  (type: {})", timestampNode.asText(), timestampNode.getNodeType().name());
         }
     }
 
