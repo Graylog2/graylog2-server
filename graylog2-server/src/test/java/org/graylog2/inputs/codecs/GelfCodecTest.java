@@ -21,6 +21,7 @@ import org.graylog2.inputs.TestHelper;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
+import org.joda.time.DateTime;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -31,6 +32,7 @@ import org.mockito.junit.MockitoRule;
 
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.time.DateTimeException;
 import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -327,7 +329,7 @@ public class GelfCodecTest {
     }
 
     @Test
-    public void decodeFailsWithWrongTypeForTimestamp() throws Exception {
+    public void decodeSucceedsWithWrongTypeForTimestamp() throws Exception {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -337,9 +339,7 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has invalid \"timestamp\": Foobar");
+        assertThat(rawMessage).isNotNull();
     }
 
     @Test
@@ -360,5 +360,37 @@ public class GelfCodecTest {
     public void decodeSucceedsWithMinimalMessages() throws Exception {
         assertThat(codec.decode(new RawMessage("{\"short_message\":\"0\"}".getBytes(StandardCharsets.UTF_8)))).isNotNull();
         assertThat(codec.decode(new RawMessage("{\"message\":\"0\"}".getBytes(StandardCharsets.UTF_8)))).isNotNull();
+    }
+
+    @Test
+    public void decodeSucceedsWithValidTimestampIssue4027() throws Exception {
+        // https://github.com/Graylog2/graylog2-server/issues/4027
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\","
+                + "\"host\": \"example.org\","
+                + "\"timestamp\": 1500646980.661"
+                + "}";
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+
+        final Message message = codec.decode(rawMessage);
+        assertThat(message).isNotNull();
+        assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2017-07-21T14:23:00.661Z"));
+    }
+
+    @Test
+    public void decodeSucceedsWithValidTimestampAsStringIssue4027() throws Exception {
+        // https://github.com/Graylog2/graylog2-server/issues/4027
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\","
+                + "\"host\": \"example.org\","
+                + "\"timestamp\": \"1500646980.661\""
+                + "}";
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+
+        final Message message = codec.decode(rawMessage);
+        assertThat(message).isNotNull();
+        assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2017-07-21T14:23:00.661Z"));
     }
 }
