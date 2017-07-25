@@ -67,7 +67,10 @@ const GraphVisualization = React.createClass({
     id: PropTypes.string.isRequired,
     data: PropTypes.object.isRequired,
     config: PropTypes.object.isRequired,
-    computationTimeRange: PropTypes.object,
+    computationTimeRange: PropTypes.shape({
+      from: PropTypes.string.isRequired,
+      to: PropTypes.string.isRequired,
+    }).isRequired,
     height: PropTypes.number,
     width: PropTypes.number,
     interactive: PropTypes.bool,
@@ -108,7 +111,10 @@ const GraphVisualization = React.createClass({
     this.disableTransitions = dc.disableTransitions;
     dc.disableTransitions = !this.props.interactive;
     this.renderGraph();
-    this._updateData(this.props.data, this.props.config);
+    this._updateData(this.props.data, this.props.config, this.props.computationTimeRange);
+  },
+  componentDidUpdate() {
+    this.drawData();
   },
   componentWillReceiveProps(nextProps) {
     if (deepEqual(this.props, nextProps)) {
@@ -118,19 +124,19 @@ const GraphVisualization = React.createClass({
     if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
       this._resizeVisualization(nextProps.width, nextProps.height);
     }
-    this._updateData(nextProps.data, nextProps.config);
+    this._updateData(nextProps.data, nextProps.config, nextProps.computationTimeRange);
   },
 
   componentWillUnmount() {
     dc.disableTransitions = this.disableTransitions;
   },
 
-  _updateData(data, config) {
+  _updateData(data, config, computationTimeRange) {
     const isSearchAll = (config.timerange.type === 'relative' && config.timerange.range === 0);
-    const dataPoints = HistogramFormatter.format(data, this.props.computationTimeRange,
+    const dataPoints = HistogramFormatter.format(data, computationTimeRange,
       config.interval, this.props.width, isSearchAll, config.valuetype);
 
-    this.setState({ dataPoints: this._normalizeData(dataPoints) }, this.drawData);
+    this.setState({ dataPoints: this._normalizeData(dataPoints) });
   },
   _normalizeData(data) {
     if (data === null || data === undefined || !Array.isArray(data)) {
