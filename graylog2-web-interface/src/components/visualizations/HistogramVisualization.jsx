@@ -120,6 +120,8 @@ const HistogramVisualization = React.createClass({
 
   renderHistogram() {
     const histogramDomNode = this._graph;
+    const xAxisLabel = this.props.config.xAxis || 'Time';
+    const yAxisLabel = this.props.config.yAxis || 'Messages';
 
     this.histogram = dc.barChart(histogramDomNode);
     this.histogram
@@ -134,8 +136,8 @@ const HistogramVisualization = React.createClass({
       .centerBar(true)
       .renderHorizontalGridLines(true)
       .brushOn(false)
-      .xAxisLabel('Time')
-      .yAxisLabel('Messages')
+      .xAxisLabel(xAxisLabel)
+      .yAxisLabel(yAxisLabel)
       .renderTitle(false)
       .colors(D3Utils.glColourPalette());
 
