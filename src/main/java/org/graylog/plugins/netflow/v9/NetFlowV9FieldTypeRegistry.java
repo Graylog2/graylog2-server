@@ -15,7 +15,7 @@ public class NetFlowV9FieldTypeRegistry {
     private final Map<Integer, NetFlowV9FieldType> fieldTypes;
 
     public NetFlowV9FieldTypeRegistry() {
-        final URL url = Resources.getResource("netflow9.csv");
+        final URL url = Resources.getResource(this.getClass(), "/netflow9.csv");
         final List<String> lines;
         try {
             lines = Resources.readLines(url, StandardCharsets.UTF_8);
