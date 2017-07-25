@@ -329,7 +329,7 @@ public class GelfCodecTest {
     }
 
     @Test
-    public void decodeFailsWithWrongTypeForTimestamp() throws Exception {
+    public void decodeSucceedsWithWrongTypeForTimestamp() throws Exception {
         final String json = "{"
                 + "\"version\": \"1.1\","
                 + "\"host\": \"example.org\","
@@ -339,9 +339,7 @@ public class GelfCodecTest {
 
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
-        assertThatIllegalArgumentException().isThrownBy(() -> codec.decode(rawMessage))
-                .withNoCause()
-                .withMessageMatching("GELF message <[0-9a-f-]+> has invalid \"timestamp\": Foobar");
+        assertThat(rawMessage).isNotNull();
     }
 
     @Test
@@ -372,6 +370,22 @@ public class GelfCodecTest {
                 + "\"short_message\": \"A short message that helps you identify what is going on\","
                 + "\"host\": \"example.org\","
                 + "\"timestamp\": 1500646980.661"
+                + "}";
+        final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
+
+        final Message message = codec.decode(rawMessage);
+        assertThat(message).isNotNull();
+        assertThat(message.getTimestamp()).isEqualTo(DateTime.parse("2017-07-21T14:23:00.661Z"));
+    }
+
+    @Test
+    public void decodeSucceedsWithValidTimestampAsStringIssue4027() throws Exception {
+        // https://github.com/Graylog2/graylog2-server/issues/4027
+        final String json = "{"
+                + "\"version\": \"1.1\","
+                + "\"short_message\": \"A short message that helps you identify what is going on\","
+                + "\"host\": \"example.org\","
+                + "\"timestamp\": \"1500646980.661\""
                 + "}";
         final RawMessage rawMessage = new RawMessage(json.getBytes(StandardCharsets.UTF_8));
 
