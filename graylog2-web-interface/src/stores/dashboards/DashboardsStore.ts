@@ -1,7 +1,3 @@
-/// <reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-/// <reference path='../../routing/ApiRoutes.d.ts' />
-/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
-
 import Immutable = require('immutable');
 const UserNotification = require('util/UserNotification');
 import ApiRoutes = require('routing/ApiRoutes');

@@ -1,9 +1,7 @@
 {
   "compilerOptions" : {
     "target": "es5",
-    "sourceMap" : true
-  },
-  "files": [
-    "declarations/toastr/toastr.d.ts"
-  ]
+    "sourceMap" : true,
+    "lib": ["es5", "es6", "dom"]
+  }
 }

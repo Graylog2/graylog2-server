@@ -1,5 +1,3 @@
-/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
-
 const Reflux = require('reflux');
 
 const UserNotification = require('util/UserNotification');

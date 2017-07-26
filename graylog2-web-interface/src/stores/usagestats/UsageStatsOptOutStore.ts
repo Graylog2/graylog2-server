@@ -1,5 +1,3 @@
-/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
-
 import ApiRoutes = require('routing/ApiRoutes');
 const URLUtils = require('util/URLUtils');
 const fetch = require('logic/rest/FetchProvider').default;

@@ -14,7 +14,7 @@ const processSourcesData = (sources: Object): Array<Source> => {
     let total = 0;
     let sourcesArray = [];
     $.each(sources, (name, count) => {
-        total += count;
+        total += Number(count);
         sourcesArray.push({name: StringUtils.escapeHTML(name), message_count: count})
     });
     sourcesArray.forEach((d) => {
