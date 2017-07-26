@@ -161,11 +161,13 @@ const StackedGraphVisualization = React.createClass({
     const graphType = this._getGraphType();
     this._applyGraphConfiguration(graphType);
 
-    // Generate custom tick values for the time axis
-    this.graph.internal.config.axis_x_tick_values = graphHelper.customTickInterval()(
-      this.dataPoints.first().get('timestamp') - 1000,
-      this.dataPoints.last().get('timestamp') + 1000,
-    );
+    if (!this.dataPoints.isEmpty()) {
+      // Generate custom tick values for the time axis
+      this.graph.internal.config.axis_x_tick_values = graphHelper.customTickInterval()(
+        this.dataPoints.first().get('timestamp') - 1000,
+        this.dataPoints.last().get('timestamp') + 1000,
+      );
+    }
 
     this.graph.load({
       json: this.dataPoints.toJS(),
