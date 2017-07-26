@@ -11,6 +11,8 @@ import HistogramFormatter from 'logic/graphs/HistogramFormatter';
 
 import graphHelper from 'legacy/graphHelper';
 
+import style from './StackedGraphVisualization.css';
+
 const StackedGraphVisualization = React.createClass({
   propTypes: {
     id: PropTypes.string.isRequired,
@@ -267,9 +269,11 @@ const StackedGraphVisualization = React.createClass({
     this.graph = c3.generate(config);
   },
   render() {
+    const classNames = this.props.config.doNotShowCircles ? 'donotshowcircles' : '';
     return (
-      <div ref={(c) => { this._graph = c; }} id={`visualization-${this.props.id}`}
-           className={`graph ${this.props.config.renderer}`} />
+      <div ref={(c) => { this._graph = c; }}
+           id={`visualization-${this.props.id}`}
+           className={`graph ${this.props.config.renderer} ${classNames}`} />
     );
   },
 });
