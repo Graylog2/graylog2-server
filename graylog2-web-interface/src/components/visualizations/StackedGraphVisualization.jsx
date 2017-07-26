@@ -42,7 +42,7 @@ const StackedGraphVisualization = React.createClass({
   },
   componentDidMount() {
     this.renderGraph();
-    this.dataPoints = this._formatData(this.props.data);
+    this.dataPoints = this._formatData(this.props);
     this.drawData();
   },
   componentWillReceiveProps(nextProps) {
@@ -54,7 +54,7 @@ const StackedGraphVisualization = React.createClass({
       this._resizeVisualization(nextProps.width, nextProps.height);
     }
     this._updateSeriesNames();
-    this.dataPoints = this._formatData(nextProps.data);
+    this.dataPoints = this._formatData(nextProps);
     this.drawData();
   },
   _normalizeData(data) {
@@ -63,14 +63,15 @@ const StackedGraphVisualization = React.createClass({
     }
     return data;
   },
-  _formatData(data) {
+  _formatData(props) {
+    const data = props.data;
     const normalizedData = this._normalizeData(data);
-    const isSearchAll = (this.props.config.timerange.type === 'relative' && this.props.config.timerange.range === 0);
+    const isSearchAll = (props.config.timerange.type === 'relative' && props.config.timerange.range === 0);
     const formattedSeries = [];
 
     normalizedData.forEach((aSeries, idx) => {
-      formattedSeries.push(HistogramFormatter.format(aSeries, this.props.computationTimeRange,
-        this.props.config.interval, this.props.width, isSearchAll, this.props.config.series[idx].statistical_function));
+      formattedSeries.push(HistogramFormatter.format(aSeries, props.computationTimeRange,
+        props.config.interval, props.width, isSearchAll, props.config.series[idx].statistical_function));
     }, this);
 
     return this._mergeSeries(formattedSeries);
