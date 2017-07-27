@@ -160,6 +160,9 @@ const GraphVisualization = React.createClass({
     } else {
       this.graph.redraw();
     }
+    if (this.props.config.threshold) {
+      this.renderThreshold();
+    }
   },
   // Draws a horizontal threshold line in the graph
   renderThreshold() {
@@ -188,14 +191,19 @@ const GraphVisualization = React.createClass({
         .interpolate('linear');
 
       const chartBody = chart.select('g.chart-body');
-      const path = chartBody.selectAll('path.threshold').data([thresholdData]);
-      path.enter()
-        .append('path')
-        .attr('id', 'threshold-line')
+      const paths = chartBody.selectAll('path.threshold').data([thresholdData]);
+      paths // Modify the existing path
         .attr('class', 'threshold')
         .attr('stroke', thresholdColor)
         .attr('stroke-width', 1)
         .attr('d', line);
+      paths.enter() // This will only do something if there isn't a path yet
+        .append('path')
+        .attr('class', 'threshold')
+        .attr('stroke', thresholdColor)
+        .attr('stroke-width', 1)
+        .attr('d', line);
+      paths.exit().remove(); // Remove any outdated paths
 
       // Collect all x-axis values
       const xValues = chart.data().reduce((list, value) => {
@@ -259,10 +267,6 @@ const GraphVisualization = React.createClass({
       delay: { show: 300, hide: 100 },
       html: true,
     });
-
-    if (this.props.config.threshold) {
-      this.renderThreshold();
-    }
 
     this.graph.xAxis()
       .ticks(graphHelper.customTickInterval())
