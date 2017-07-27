@@ -45,7 +45,7 @@ public class FieldStatsResult extends IndexQueryResult {
                             long tookMs) {
         super(query, source, tookMs);
         this.count = getValueCount(valueCountAggregation, extendedStatsAggregation);
-        this.cardinality = cardinalityAggregation == null ? Long.MIN_VALUE : cardinalityAggregation.getCardinality();
+        this.cardinality = cardinalityAggregation == null || cardinalityAggregation.getCardinality() == null ? Long.MIN_VALUE : cardinalityAggregation.getCardinality();
 
         if (extendedStatsAggregation != null) {
             sum = Optional.ofNullable(extendedStatsAggregation.getSum()).orElse(Double.NaN);
@@ -83,9 +83,9 @@ public class FieldStatsResult extends IndexQueryResult {
     }
 
     private long getValueCount(ValueCountAggregation valueCountAggregation, ExtendedStatsAggregation extendedStatsAggregation) {
-        if (valueCountAggregation != null) {
+        if (valueCountAggregation != null && valueCountAggregation.getValueCount() != null) {
             return valueCountAggregation.getValueCount();
-        } else if (extendedStatsAggregation != null) {
+        } else if (extendedStatsAggregation != null && extendedStatsAggregation.getCount() != null) {
             return extendedStatsAggregation.getCount();
         }
         return Long.MIN_VALUE;
