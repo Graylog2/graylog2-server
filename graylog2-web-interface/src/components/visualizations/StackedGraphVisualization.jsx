@@ -33,7 +33,7 @@ const StackedGraphVisualization = React.createClass({
     return {};
   },
   componentDidMount() {
-    this.renderGraph();
+    this.renderGraph(this.props);
     this.dataPoints = this._formatData(this.props);
     this.drawData();
   },
@@ -42,11 +42,12 @@ const StackedGraphVisualization = React.createClass({
       return;
     }
 
+    this._updateSeriesNames(nextProps);
+    this.dataPoints = this._formatData(nextProps);
     if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
       this._resizeVisualization(nextProps.width, nextProps.height);
+      this.renderGraph(nextProps);
     }
-    this._updateSeriesNames();
-    this.dataPoints = this._formatData(nextProps);
     this.drawData();
   },
   _normalizeData(data) {
@@ -142,10 +143,10 @@ const StackedGraphVisualization = React.createClass({
       height: height,
     });
   },
-  _updateSeriesNames() {
+  _updateSeriesNames(props) {
     let i = 0;
     let newSeriesNames = Immutable.Map();
-    this.props.config.series.forEach((seriesConfig) => {
+    props.config.series.forEach((seriesConfig) => {
       i++;
       const seriesName = `series${i}`;
       const seriesTitle = seriesConfig.title ? seriesConfig.title : `${seriesConfig.statistical_function} ${seriesConfig.field}, "${seriesConfig.query}"`;
@@ -178,18 +179,19 @@ const StackedGraphVisualization = React.createClass({
       type: graphType,
     });
   },
-  renderGraph() {
+  renderGraph(props) {
     const graphDomNode = ReactDOM.findDOMNode(this);
     const colourPalette = D3Utils.glColourPalette();
 
     let i = 0;
     let colours = Immutable.Map();
 
-    this.props.config.series.forEach((seriesConfig) => {
+    props.config.series.forEach((seriesConfig) => {
       i++;
       const seriesName = `series${i}`;
+      const seriesTitle = seriesConfig.title ? seriesConfig.title : `${seriesConfig.statistical_function} ${seriesConfig.field}, "${seriesConfig.query}"`;
       this.series = this.series.push(seriesName);
-      this.seriesNames = this.seriesNames.set(seriesName, `${seriesConfig.statistical_function} ${seriesConfig.field}, "${seriesConfig.query}"`);
+      this.seriesNames = this.seriesNames.set(seriesName, seriesTitle);
       colours = colours.set(seriesName, colourPalette(seriesName));
     });
 
@@ -200,8 +202,8 @@ const StackedGraphVisualization = React.createClass({
     this.graph = c3.generate({
       bindto: graphDomNode,
       size: {
-        height: this.props.height,
-        width: this.props.width,
+        height: props.height,
+        width: props.width,
       },
       data: {
         columns: [],
