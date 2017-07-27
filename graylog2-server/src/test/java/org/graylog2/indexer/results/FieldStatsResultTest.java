@@ -1,10 +1,9 @@
 package org.graylog2.indexer.results;
 
-import edu.emory.mathcs.backport.java.util.Collections;
-import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
-import io.searchbox.core.search.aggregation.ValueCountAggregation;
 import org.junit.Test;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
