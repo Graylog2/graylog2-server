@@ -174,7 +174,7 @@ const GraphVisualization = React.createClass({
     const thresholdDotRadius = 4;
 
     this.graph.on('renderlet.threshold', (chart) => {
-      const thresholdData = [
+      const lineData = [
         {
           x: chart.x().range()[0],
           y: chart.y()(threshold),
@@ -191,11 +191,9 @@ const GraphVisualization = React.createClass({
         .interpolate('linear');
 
       const chartBody = chart.select('g.chart-body');
-      const paths = chartBody.selectAll('path.threshold').data([thresholdData]);
+      const paths = chartBody.selectAll('path.threshold').data([lineData]);
       paths // Modify the existing path
-        .attr('class', 'threshold')
         .attr('stroke', thresholdColor)
-        .attr('stroke-width', 1)
         .attr('d', line);
       paths.enter() // This will only do something if there isn't a path yet
         .append('path')
@@ -236,6 +234,9 @@ const GraphVisualization = React.createClass({
       dots
         .attr('cx', d => dc.utils.safeNumber(chart.x()(d)))
         .attr('cy', () => dc.utils.safeNumber(chart.y()(threshold)))
+        .attr('data-original-title', () => {
+          return `<div class="datapoint-info">${thresholdTooltip}</div>`;
+        })
         .attr('fill', thresholdColor);
       dots.exit().remove();
     });
