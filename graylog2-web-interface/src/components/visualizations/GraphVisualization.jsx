@@ -182,6 +182,77 @@ const GraphVisualization = React.createClass({
       this.graph.redraw();
     }
   },
+  // Draws a horizontal threshold line in the graph
+  renderThreshold() {
+    const threshold = this.props.config.threshold;
+    const thresholdColor = this.props.config.threshold_color || '#f00';
+    const thresholdTooltip = this.props.config.threshold_tooltip || `threshold: ${threshold}`;
+    const thresholdDotHidden = 1e-6;
+    const thresholdDotVisible = 0.8;
+    const thresholdDotRadius = 4;
+
+    this.graph.on('renderlet.threshold', (chart) => {
+      const thresholdData = [
+        {
+          x: chart.x().range()[0],
+          y: chart.y()(threshold),
+        },
+        {
+          x: chart.x().range()[1],
+          y: chart.y()(threshold),
+        },
+      ];
+
+      const line = d3.svg.line()
+        .x(d => d.x)
+        .y(d => d.y)
+        .interpolate('linear');
+
+      const chartBody = chart.select('g.chart-body');
+      const path = chartBody.selectAll('path.threshold').data([thresholdData]);
+      path.enter()
+        .append('path')
+        .attr('id', 'threshold-line')
+        .attr('class', 'threshold')
+        .attr('stroke', thresholdColor)
+        .attr('stroke-width', 1)
+        .attr('d', line);
+
+      // Collect all x-axis values
+      const xValues = chart.data().reduce((list, value) => {
+        value.values.forEach(v => list.push(v.x));
+        return list;
+      }, []);
+
+      // Put circles on the threshold line to make it easier to show the tooltip
+      const dots = chartBody.selectAll('circle.threshold').data(xValues);
+      dots.enter()
+        .append('circle')
+        .attr('class', 'threshold')
+        .attr('r', thresholdDotRadius)
+        .attr('rel', 'tooltip') // To make the tooltip helper pick it up
+        .attr('data-original-title', () => {
+          return `<div class="datapoint-info">${thresholdTooltip}</div>`;
+        })
+        .style('stroke-opacity', thresholdDotHidden)
+        .style('fill-opacity', thresholdDotHidden)
+        .on('mousemove', function show() {
+          d3.select(this)
+            .style('stroke-opacity', thresholdDotVisible)
+            .style('fill-opacity', thresholdDotVisible);
+        })
+        .on('mouseout', function hide() {
+          d3.select(this)
+            .style('stroke-opacity', thresholdDotHidden)
+            .style('fill-opacity', thresholdDotHidden);
+        });
+      dots
+        .attr('cx', d => dc.utils.safeNumber(chart.x()(d)))
+        .attr('cy', () => dc.utils.safeNumber(chart.y()(threshold)))
+        .attr('fill', thresholdColor);
+      dots.exit().remove();
+    });
+  },
   renderGraph() {
     const graphDomNode = this._graph;
     const interactive = this.props.interactive;
@@ -213,6 +284,10 @@ const GraphVisualization = React.createClass({
         delay: { show: 300, hide: 100 },
         html: true,
       });
+    }
+
+    if (this.props.config.threshold) {
+      this.renderThreshold();
     }
 
     this.graph.xAxis()
