@@ -21,7 +21,6 @@ import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
 
 import java.util.List;
-import java.util.Optional;
 
 public class FieldStatsResult extends IndexQueryResult {
     private List<ResultMessage> searchHits;
@@ -48,13 +47,13 @@ public class FieldStatsResult extends IndexQueryResult {
         this.cardinality = cardinalityAggregation == null || cardinalityAggregation.getCardinality() == null ? Long.MIN_VALUE : cardinalityAggregation.getCardinality();
 
         if (extendedStatsAggregation != null) {
-            sum = Optional.ofNullable(extendedStatsAggregation.getSum()).orElse(Double.NaN);
-            sumOfSquares = Optional.ofNullable(extendedStatsAggregation.getSumOfSquares()).orElse(Double.NaN);
-            mean = Optional.ofNullable(extendedStatsAggregation.getAvg()).orElse(Double.NaN);
-            min = Optional.ofNullable(extendedStatsAggregation.getMin()).orElse(Double.NaN);
-            max = Optional.ofNullable(extendedStatsAggregation.getMax()).orElse(Double.NaN);
-            variance = Optional.ofNullable(extendedStatsAggregation.getVariance()).orElse(Double.NaN);
-            stdDeviation = Optional.ofNullable(extendedStatsAggregation.getStdDeviation()).orElse(Double.NaN);
+            sum = extendedStatsAggregation.getSum() != null ? extendedStatsAggregation.getSum() : Double.NaN;
+            sumOfSquares = extendedStatsAggregation.getSumOfSquares() != null ? extendedStatsAggregation.getSumOfSquares() : Double.NaN;
+            mean = extendedStatsAggregation.getAvg() != null ? extendedStatsAggregation.getAvg() : Double.NaN;
+            min = extendedStatsAggregation.getMin() != null ? extendedStatsAggregation.getMin() : Double.NaN;
+            max = extendedStatsAggregation.getMax() != null ? extendedStatsAggregation.getMax() : Double.NaN;
+            variance = extendedStatsAggregation.getVariance() != null ? extendedStatsAggregation.getVariance() : Double.NaN;
+            stdDeviation = extendedStatsAggregation.getStdDeviation() != null ? extendedStatsAggregation.getStdDeviation() : Double.NaN;
         } else {
             sum = Double.NaN;
             sumOfSquares = Double.NaN;
