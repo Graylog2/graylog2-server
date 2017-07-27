@@ -21,6 +21,7 @@ import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
 
 import java.util.List;
+import java.util.Optional;
 
 public class FieldStatsResult extends IndexQueryResult {
     private List<ResultMessage> searchHits;
@@ -47,13 +48,13 @@ public class FieldStatsResult extends IndexQueryResult {
         this.cardinality = cardinalityAggregation == null ? Long.MIN_VALUE : cardinalityAggregation.getCardinality();
 
         if (extendedStatsAggregation != null) {
-            sum = extendedStatsAggregation.getSum();
-            sumOfSquares = extendedStatsAggregation.getSumOfSquares();
-            mean = extendedStatsAggregation.getAvg();
-            min = extendedStatsAggregation.getMin();
-            max = extendedStatsAggregation.getMax();
-            variance = extendedStatsAggregation.getVariance();
-            stdDeviation = extendedStatsAggregation.getStdDeviation();
+            sum = Optional.ofNullable(extendedStatsAggregation.getSum()).orElse(Double.NaN);
+            sumOfSquares = Optional.ofNullable(extendedStatsAggregation.getSumOfSquares()).orElse(Double.NaN);
+            mean = Optional.ofNullable(extendedStatsAggregation.getAvg()).orElse(Double.NaN);
+            min = Optional.ofNullable(extendedStatsAggregation.getMin()).orElse(Double.NaN);
+            max = Optional.ofNullable(extendedStatsAggregation.getMax()).orElse(Double.NaN);
+            variance = Optional.ofNullable(extendedStatsAggregation.getVariance()).orElse(Double.NaN);
+            stdDeviation = Optional.ofNullable(extendedStatsAggregation.getStdDeviation()).orElse(Double.NaN);
         } else {
             sum = Double.NaN;
             sumOfSquares = Double.NaN;
