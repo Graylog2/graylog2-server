@@ -200,6 +200,7 @@ const GraphVisualization = React.createClass({
         .attr('class', 'threshold')
         .attr('stroke', thresholdColor)
         .attr('stroke-width', 1)
+        .attr('stroke-dasharray', ('2', '2'))
         .attr('d', line);
       paths.exit().remove(); // Remove any outdated paths
 
