@@ -6,10 +6,11 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Promise from 'bluebird';
 import Reflux from 'reflux';
+import RefluxPromise from 'reflux-promise';
 import { AppContainer } from 'react-hot-loader';
 
 Promise.config({ cancellation: true });
-Reflux.setPromiseFactory(handlers => new Promise(handlers));
+Reflux.use(RefluxPromise(Promise));
 
 function renderAppContainer(appContainer) {
   // eslint-disable-next-line global-require
