@@ -6,15 +6,16 @@ import StoreProvider from 'injection/StoreProvider';
 const SystemStore = StoreProvider.getStore('System');
 
 const Footer = React.createClass({
-  mixins: [Reflux.connect(SystemStore)],
+  mixins: [Reflux.connect(SystemStore, 'systemStoreState')],
   componentDidMount() {
     SystemStore.jvm().then(jvmInfo => this.setState({ jvm: jvmInfo }));
   },
-  _isLoading() {
-    return !(this.state.system && this.state.jvm);
+  _isLoading(system) {
+    return !(system && this.state.jvm);
   },
   render() {
-    if (this._isLoading()) {
+    const { system } = this.state.systemStoreState;
+    if (this._isLoading(system)) {
       return (
         <div id="footer">
           Graylog {Version.getFullVersion()}
@@ -24,7 +25,7 @@ const Footer = React.createClass({
 
     return (
       <div id="footer">
-        Graylog {this.state.system.version} on {this.state.system.hostname} ({this.state.jvm.info})
+        Graylog {system.version} on {system.hostname} ({this.state.jvm.info})
       </div>
     );
   },

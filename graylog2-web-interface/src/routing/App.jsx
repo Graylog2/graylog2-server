@@ -21,7 +21,7 @@ const App = React.createClass({
     location: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser')],
   render() {
     if (!this.state.currentUser) {
       return <Spinner />;

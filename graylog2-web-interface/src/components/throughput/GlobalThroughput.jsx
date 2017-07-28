@@ -8,15 +8,16 @@ const GlobalThroughputStore = StoreProvider.getStore('GlobalThroughput');
 import { Spinner } from 'components/common';
 
 const GlobalThroughput = React.createClass({
-  mixins: [Reflux.connect(GlobalThroughputStore)],
+  mixins: [Reflux.connect(GlobalThroughputStore, 'throughput')],
   render() {
-    if (!this.state.throughput) {
+    const throughput = this.state.throughput;
+    if (!throughput) {
       return <Spinner />;
     }
     return (
       <span>
-        In <strong className="total-throughput">{numeral(this.state.throughput.input).format('0,0')}</strong>{' '}
-        / Out <strong className="total-throughput">{numeral(this.state.throughput.output).format('0,0')}</strong> msg/s
+        In <strong className="total-throughput">{numeral(throughput.input).format('0,0')}</strong>{' '}
+        / Out <strong className="total-throughput">{numeral(throughput.output).format('0,0')}</strong> msg/s
       </span>
     );
   },

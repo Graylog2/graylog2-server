@@ -17,7 +17,7 @@ const StartPage = React.createClass({
   propTypes: {
     history: React.PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
   getInitialState() {
     return {
       gettingStarted: undefined,

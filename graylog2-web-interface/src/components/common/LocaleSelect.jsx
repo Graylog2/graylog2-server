@@ -7,7 +7,7 @@ import StoreProvider from "injection/StoreProvider";
 const SystemStore = StoreProvider.getStore('System');
 
 const LocaleSelect = React.createClass({
-  mixins: [Reflux.connect(SystemStore)],
+  mixins: [Reflux.connect(SystemStore, 'systemStoreState')],
   propTypes: {
     onChange: React.PropTypes.func,
   },
@@ -39,15 +39,16 @@ const LocaleSelect = React.createClass({
       return <span key={option.value} title="{option.value} [{option.value}]">{option.label} [{option.value}]</span>;
   },
   render() {
-    if (!this.state.locales) {
+    const { locales } = this.state.systemStoreState;
+    if (!locales) {
       return <Spinner />;
     }
 
-    const locales = this._formatLocales(this.state.locales);
+    const formattedLocales = this._formatLocales(locales);
     return (
       <Select ref="locale" {...this.props}
               placeholder="Pick a locale"
-              options={locales}
+              options={formattedLocales}
               optionRenderer={this._renderOption} />
     );
   },

@@ -28,7 +28,7 @@ const Navigation = React.createClass({
     permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
   },
 
-  mixins: [PermissionsMixin, Reflux.connect(NotificationsStore)],
+  mixins: [PermissionsMixin, Reflux.connect(NotificationsStore, 'notificationsStoreState')],
 
   componentDidMount() {
     this.interval = setInterval(NotificationsStore.list, this.POLL_INTERVAL);
@@ -100,14 +100,15 @@ const Navigation = React.createClass({
       </LinkContainer>);
 
     let notificationBadge;
+    const { total } = this.state.notificationsStoreState;
 
-    if (this.state.total > 0) {
+    if (total > 0) {
       notificationBadge = (
         <Nav navbar>
           <NavItem className="notification-badge-link">
             <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
               <span className="badge" style={{ backgroundColor: '#ff3b00' }}
-                    id="notification-badge">{this.state.total}</span>
+                    id="notification-badge">{total}</span>
             </LinkContainer>
           </NavItem>
         </Nav>

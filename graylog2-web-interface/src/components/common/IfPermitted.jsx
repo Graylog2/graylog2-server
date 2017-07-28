@@ -15,21 +15,22 @@ const IfPermitted = React.createClass({
     ]).isRequired,
     anyPermissions: PropTypes.bool,
   },
-  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
   getDefaultProps() {
     return {
       anyPermissions: false,
     };
   },
-  _checkPermissions() {
+  _checkPermissions(currentUser) {
     if (this.props.anyPermissions) {
-      return this.isAnyPermitted(this.state.currentUser.permissions, this.props.permissions);
+      return this.isAnyPermitted(currentUser.permissions, this.props.permissions);
     }
 
-    return this.isPermitted(this.state.currentUser.permissions, this.props.permissions);
+    return this.isPermitted(currentUser.permissions, this.props.permissions);
   },
   render() {
-    if (this.state.currentUser && this._checkPermissions()) {
+    const currentUser = this.state.currentUser;
+    if (currentUser && this._checkPermissions(currentUser)) {
       return React.Children.count(this.props.children) > 1 ? <span>{this.props.children}</span> : this.props.children;
     }
 

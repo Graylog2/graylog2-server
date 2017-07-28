@@ -12,7 +12,7 @@ const LinkToNode = React.createClass({
   propTypes: {
     nodeId: React.PropTypes.string.isRequired,
   },
-  mixins: [Reflux.connect(NodesStore)],
+  mixins: [Reflux.connect(NodesStore, 'nodes')],
   render() {
     if (!this.state.nodes) {
       return <Spinner />;
