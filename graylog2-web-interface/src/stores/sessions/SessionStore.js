@@ -58,7 +58,11 @@ const SessionStore = Reflux.createStore({
             username: username || response.username,
           });
         }
-        this._removeSession();
+        if (sessionId && username) {
+          this._removeSession();
+        }
+
+        return response;
       })
       .finally(() => {
         this.validatingSession = false;
