@@ -19,10 +19,12 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -30,6 +32,7 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 
 public class NetFlowCodecTest {
     @Rule
@@ -48,6 +51,70 @@ public class NetFlowCodecTest {
         final Configuration configuration = new Configuration(configMap);
 
         codec = new NetFlowCodec(configuration, Executors.newSingleThreadScheduledExecutor(), objectMapper);
+    }
+
+    @Test
+    public void constructorFailsIfNetFlow9DefinitionsPathDoesNotExist() throws Exception {
+        final File cacheFile = temporaryFolder.newFile();
+        final File definitionsFile = temporaryFolder.newFile();
+        assertThat(definitionsFile.delete()).isTrue();
+
+        final ImmutableMap<String, Object> configMap = ImmutableMap.of(
+                NetFlowCodec.CK_CACHE_SIZE, 100,
+                NetFlowCodec.CK_CACHE_SAVE_INTERVAL, 300,
+                NetFlowCodec.CK_CACHE_PATH, cacheFile.getAbsolutePath(),
+                NetFlowCodec.CK_NETFLOW9_DEFINITION_PATH, definitionsFile.getAbsolutePath());
+        final Configuration configuration = new Configuration(configMap);
+
+        assertThatExceptionOfType(FileNotFoundException.class)
+                .isThrownBy(() -> new NetFlowCodec(configuration, Executors.newSingleThreadScheduledExecutor(), objectMapper))
+                .withMessageEndingWith("(No such file or directory)");
+    }
+
+    @Test
+    public void constructorSucceedsIfNetFlow9DefinitionsPathIsEmpty() throws Exception {
+        final File cacheFile = temporaryFolder.newFile();
+
+        final ImmutableMap<String, Object> configMap = ImmutableMap.of(
+                NetFlowCodec.CK_CACHE_SIZE, 100,
+                NetFlowCodec.CK_CACHE_SAVE_INTERVAL, 300,
+                NetFlowCodec.CK_CACHE_PATH, cacheFile.getAbsolutePath(),
+                NetFlowCodec.CK_NETFLOW9_DEFINITION_PATH, "");
+        final Configuration configuration = new Configuration(configMap);
+
+        assertThat(new NetFlowCodec(configuration, Executors.newSingleThreadScheduledExecutor(), objectMapper)).isNotNull();
+    }
+
+    @Test
+    public void constructorSucceedsIfNetFlow9DefinitionsPathIsBlank() throws Exception {
+        final File cacheFile = temporaryFolder.newFile();
+
+        final ImmutableMap<String, Object> configMap = ImmutableMap.of(
+                NetFlowCodec.CK_CACHE_SIZE, 100,
+                NetFlowCodec.CK_CACHE_SAVE_INTERVAL, 300,
+                NetFlowCodec.CK_CACHE_PATH, cacheFile.getAbsolutePath(),
+                NetFlowCodec.CK_NETFLOW9_DEFINITION_PATH, "   ");
+        final Configuration configuration = new Configuration(configMap);
+
+        assertThat(new NetFlowCodec(configuration, Executors.newSingleThreadScheduledExecutor(), objectMapper)).isNotNull();
+    }
+
+    @Test
+    public void constructorFailsIfNetFlow9DefinitionsPathIsInvalidYaml() throws Exception {
+        final File cacheFile = temporaryFolder.newFile();
+        final File definitionsFile = temporaryFolder.newFile();
+        Files.write(definitionsFile.toPath(), "foo: %bar".getBytes(StandardCharsets.UTF_8));
+
+        final ImmutableMap<String, Object> configMap = ImmutableMap.of(
+                NetFlowCodec.CK_CACHE_SIZE, 100,
+                NetFlowCodec.CK_CACHE_SAVE_INTERVAL, 300,
+                NetFlowCodec.CK_CACHE_PATH, cacheFile.getAbsolutePath(),
+                NetFlowCodec.CK_NETFLOW9_DEFINITION_PATH, definitionsFile.getAbsolutePath());
+        final Configuration configuration = new Configuration(configMap);
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> new NetFlowCodec(configuration, Executors.newSingleThreadScheduledExecutor(), objectMapper))
+                .withMessageMatching("Unable to parse NetFlow 9 definitions");
     }
 
     @Test

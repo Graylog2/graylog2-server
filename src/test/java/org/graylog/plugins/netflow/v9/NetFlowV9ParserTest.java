@@ -49,7 +49,7 @@ public class NetFlowV9ParserTest {
                 30 * 60,
                 Executors.newSingleThreadScheduledExecutor(),
                 objectMapper);
-        NetFlowV9FieldTypeRegistry typeRegistry = new NetFlowV9FieldTypeRegistry();
+        NetFlowV9FieldTypeRegistry typeRegistry = NetFlowV9FieldTypeRegistry.create();
 
         // check header
         NetFlowV9Packet p1 = NetFlowV9Parser.parsePacket(Unpooled.wrappedBuffer(b1), cache, typeRegistry);

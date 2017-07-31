@@ -28,11 +28,12 @@ public class NetFlowParserTest {
     public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-    private final NetFlowV9FieldTypeRegistry typeRegistry = new NetFlowV9FieldTypeRegistry();
+    private NetFlowV9FieldTypeRegistry typeRegistry;
     private NetFlowV9TemplateCache templateCache;
 
     @Before
     public void setUp() throws Exception {
+        typeRegistry = NetFlowV9FieldTypeRegistry.create();
         templateCache = new NetFlowV9TemplateCache(
                 1000L,
                 temporaryFolder.newFile().toPath(),

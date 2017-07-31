@@ -44,6 +44,9 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Named;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collection;
@@ -59,26 +62,36 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
     static final String CK_CACHE_PATH = "cache_path";
     @VisibleForTesting
     static final String CK_CACHE_SAVE_INTERVAL = "cache_save_interval";
+    @VisibleForTesting
+    static final String CK_NETFLOW9_DEFINITION_PATH = "netflow9_definitions_Path";
 
     private static final int DEFAULT_CACHE_SIZE = 1000;
     private static final String DEFAULT_CACHE_PATH = SystemUtils.getJavaIoTmpDir().toPath().resolve("netflow-templates.json").toString();
     private static final int DEFAULT_CACHE_SAVE_INTERVAL = 15 * 60;
 
     private final NetFlowV9TemplateCache templateCache;
-    private final NetFlowV9FieldTypeRegistry typeRegistry = new NetFlowV9FieldTypeRegistry();
+    private final NetFlowV9FieldTypeRegistry typeRegistry;
 
     @Inject
     protected NetFlowCodec(@Assisted Configuration configuration,
                            @Named("daemonScheduler") ScheduledExecutorService scheduler,
-                           ObjectMapper objectMapper) {
+                           ObjectMapper objectMapper) throws IOException {
         super(configuration);
 
         final int cacheSize = configuration.getInt(CK_CACHE_SIZE, DEFAULT_CACHE_SIZE);
         final int cacheSaveInterval = configuration.getInt(CK_CACHE_SAVE_INTERVAL, DEFAULT_CACHE_SAVE_INTERVAL);
         final String configCachePath = configuration.getString(CK_CACHE_PATH, DEFAULT_CACHE_PATH);
         final Path cachePath = Paths.get(configCachePath);
+        this.templateCache = new NetFlowV9TemplateCache(cacheSize, cachePath, cacheSaveInterval, scheduler, objectMapper);
 
-        templateCache = new NetFlowV9TemplateCache(cacheSize, cachePath, cacheSaveInterval, scheduler, objectMapper);
+        final String netFlow9DefinitionsPath = configuration.getString(CK_NETFLOW9_DEFINITION_PATH);
+        if (netFlow9DefinitionsPath == null || netFlow9DefinitionsPath.trim().isEmpty()) {
+            this.typeRegistry = NetFlowV9FieldTypeRegistry.create();
+        } else {
+            try (InputStream inputStream = new FileInputStream(netFlow9DefinitionsPath)) {
+                this.typeRegistry = NetFlowV9FieldTypeRegistry.create(inputStream);
+            }
+        }
     }
 
     @Nullable
@@ -120,9 +133,10 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest configuration = super.getRequestedConfiguration();
 
-            configuration.addField(new NumberField(CK_CACHE_SIZE, "Maximum cache size", DEFAULT_CACHE_SIZE, "Maximum number of elements in the NetFlow9 template cache", ConfigurationField.Optional.OPTIONAL));
-            configuration.addField(new TextField(CK_CACHE_PATH, "Cache file path", DEFAULT_CACHE_PATH, "Path to the file persisting the the NetFlow9 template cache", ConfigurationField.Optional.OPTIONAL));
+            configuration.addField(new NumberField(CK_CACHE_SIZE, "Maximum cache size", DEFAULT_CACHE_SIZE, "Maximum number of elements in the NetFlow 9 template cache", ConfigurationField.Optional.OPTIONAL));
+            configuration.addField(new TextField(CK_CACHE_PATH, "Cache file path", DEFAULT_CACHE_PATH, "Path to the file persisting the the NetFlow 9 template cache", ConfigurationField.Optional.OPTIONAL));
             configuration.addField(new NumberField(CK_CACHE_SAVE_INTERVAL, "Cache save interval (seconds)", DEFAULT_CACHE_SAVE_INTERVAL, "Interval in seconds for persisting the cache contents", ConfigurationField.Optional.OPTIONAL));
+            configuration.addField(new TextField(CK_NETFLOW9_DEFINITION_PATH, "Netflow 9 field definitions", "", "Path to the YAML file containing Netflow 9 field definitions", ConfigurationField.Optional.OPTIONAL));
 
             return configuration;
         }

@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import io.netty.buffer.ByteBuf;
 
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
@@ -52,10 +53,18 @@ public abstract class NetFlowV9FieldDef {
                 return Optional.of(bb.readUnsignedShort());
             case INT16:
                 return Optional.of(bb.readShort());
+            case UINT24:
+                return Optional.of(bb.readUnsignedMedium());
+            case INT24:
+                return Optional.of(bb.readMedium());
             case UINT32:
                 return Optional.of(bb.readUnsignedInt());
             case INT32:
                 return Optional.of(bb.readInt());
+            case UINT64:
+                byte[] uint64Bytes = new byte[8];
+                bb.readBytes(uint64Bytes);
+                return Optional.of(new BigInteger(uint64Bytes));
             case INT64:
                 return Optional.of(bb.readLong());
             case VARINT:

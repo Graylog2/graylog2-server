@@ -63,14 +63,14 @@ public class NetFlowV9TemplateCacheTest {
         final NetFlowV9TemplateCache templateCache = new NetFlowV9TemplateCache(100L, cachePath, saveInterval, executorService, objectMapper);
         assertThat(Files.size(cachePath)).isEqualTo(0L);
 
-        final NetFlowV9Template template1 = NetFlowV9Template.create(0, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.INT64, "foobar"), 8)));
-        final byte[] expectedJson1 = ("{\"0\":{\"template_id\":0,\"field_count\":1,\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"INT64\",\"name\":\"foobar\"},\"length\":8}]}}").getBytes(StandardCharsets.UTF_8);
+        final NetFlowV9Template template1 = NetFlowV9Template.create(0, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.UINT64, "foobar"), 8)));
+        final byte[] expectedJson1 = ("{\"0\":{\"template_id\":0,\"field_count\":1,\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"UINT64\",\"name\":\"foobar\"},\"length\":8}]}}").getBytes(StandardCharsets.UTF_8);
         final NetFlowV9Template template2 = NetFlowV9Template.create(1, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.IPV4, "covfefe"), 4)));
         final byte[] expectedJson2 = ("{" +
                 "\"0\":{" +
                 "\"template_id\":0," +
                 "\"field_count\":1," +
-                "\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"INT64\",\"name\":\"foobar\"},\"length\":8}]" +
+                "\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"UINT64\",\"name\":\"foobar\"},\"length\":8}]" +
                 "}," +
                 "\"1\":{" +
                 "\"template_id\":1," +
@@ -94,7 +94,7 @@ public class NetFlowV9TemplateCacheTest {
     public void runSavesCacheToExistingFile() throws Exception {
         final NetFlowV9TemplateCache templateCache = new NetFlowV9TemplateCache(100L, cachePath, 300, executorService, objectMapper);
 
-        final NetFlowV9Template template1 = NetFlowV9Template.create(0, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.INT64, "foobar"), 8)));
+        final NetFlowV9Template template1 = NetFlowV9Template.create(0, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.UINT64, "foobar"), 8)));
         final NetFlowV9Template template2 = NetFlowV9Template.create(1, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.IPV4, "covfefe"), 4)));
         templateCache.put(template1);
         templateCache.put(template2);
@@ -111,7 +111,7 @@ public class NetFlowV9TemplateCacheTest {
                 "\"0\":{" +
                 "\"template_id\":0," +
                 "\"field_count\":1," +
-                "\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"INT64\",\"name\":\"foobar\"},\"length\":8}]" +
+                "\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"UINT64\",\"name\":\"foobar\"},\"length\":8}]" +
                 "}," +
                 "\"1\":{" +
                 "\"template_id\":1," +
@@ -128,7 +128,7 @@ public class NetFlowV9TemplateCacheTest {
 
         final NetFlowV9TemplateCache templateCache = new NetFlowV9TemplateCache(100L, cachePath, 300, executorService, objectMapper);
 
-        final NetFlowV9Template template1 = NetFlowV9Template.create(0, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.INT64, "foobar"), 8)));
+        final NetFlowV9Template template1 = NetFlowV9Template.create(0, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.UINT64, "foobar"), 8)));
         final NetFlowV9Template template2 = NetFlowV9Template.create(1, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.IPV4, "covfefe"), 4)));
         templateCache.put(template1);
         templateCache.put(template2);
@@ -144,7 +144,7 @@ public class NetFlowV9TemplateCacheTest {
                 "\"0\":{" +
                 "\"template_id\":0," +
                 "\"field_count\":1," +
-                "\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"INT64\",\"name\":\"foobar\"},\"length\":8}]" +
+                "\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"UINT64\",\"name\":\"foobar\"},\"length\":8}]" +
                 "}," +
                 "\"1\":{" +
                 "\"template_id\":1," +
@@ -160,7 +160,7 @@ public class NetFlowV9TemplateCacheTest {
                 "\"0\":{" +
                 "\"template_id\":0," +
                 "\"field_count\":1," +
-                "\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"INT64\",\"name\":\"foobar\"},\"length\":8}]" +
+                "\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"UINT64\",\"name\":\"foobar\"},\"length\":8}]" +
                 "}," +
                 "\"1\":{" +
                 "\"template_id\":1," +
@@ -172,7 +172,7 @@ public class NetFlowV9TemplateCacheTest {
 
         final NetFlowV9TemplateCache templateCache = new NetFlowV9TemplateCache(100L, cachePath, 300, executorService, objectMapper);
 
-        final NetFlowV9Template template1 = NetFlowV9Template.create(0, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.INT64, "foobar"), 8)));
+        final NetFlowV9Template template1 = NetFlowV9Template.create(0, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.UINT64, "foobar"), 8)));
         final NetFlowV9Template template2 = NetFlowV9Template.create(1, 1, ImmutableList.of(NetFlowV9FieldDef.create(NetFlowV9FieldType.create(0, NetFlowV9FieldType.ValueType.IPV4, "covfefe"), 4)));
 
         assertThat(templateCache.get(0)).isEqualTo(template1);
