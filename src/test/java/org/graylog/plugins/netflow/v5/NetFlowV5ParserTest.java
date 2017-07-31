@@ -17,12 +17,19 @@ package org.graylog.plugins.netflow.v5;
 
 import com.google.common.io.Resources;
 import com.google.common.net.InetAddresses;
+import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.pkts.Pcap;
+import io.pkts.packet.UDPPacket;
+import io.pkts.protocol.Protocol;
 import org.junit.Test;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -118,5 +125,45 @@ public class NetFlowV5ParserTest {
         assertEquals(202473L, r.first());
         assertEquals(0, r.dstMask());
         assertEquals(110L, r.packetCount());
+    }
+
+    @Test
+    public void pcap_softflowd_NetFlowV5() throws Exception {
+        final List<NetFlowV5Record> allRecords = new ArrayList<>();
+        try (InputStream inputStream = Resources.getResource("netflow-data/netflow5.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(inputStream);
+            pcap.loop(packet -> {
+                        if (packet.hasProtocol(Protocol.UDP)) {
+                            final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                            final ByteBuf byteBuf = Unpooled.wrappedBuffer(udp.getPayload().getArray());
+                            final NetFlowV5Packet netFlowV5Packet = NetFlowV5Parser.parsePacket(byteBuf);
+                            assertThat(netFlowV5Packet).isNotNull();
+                            allRecords.addAll(netFlowV5Packet.records());
+                        }
+                        return true;
+                    }
+            );
+        }
+        assertThat(allRecords).hasSize(4);
+    }
+
+    @Test
+    public void pcap_pmacctd_NetFlowV5() throws Exception {
+        final List<NetFlowV5Record> allRecords = new ArrayList<>();
+        try (InputStream inputStream = Resources.getResource("netflow-data/pmacctd-netflow5.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(inputStream);
+            pcap.loop(packet -> {
+                        if (packet.hasProtocol(Protocol.UDP)) {
+                            final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                            final ByteBuf byteBuf = Unpooled.wrappedBuffer(udp.getPayload().getArray());
+                            final NetFlowV5Packet netFlowV5Packet = NetFlowV5Parser.parsePacket(byteBuf);
+                            assertThat(netFlowV5Packet).isNotNull();
+                            allRecords.addAll(netFlowV5Packet.records());
+                        }
+                        return true;
+                    }
+            );
+        }
+        assertThat(allRecords).hasSize(42);
     }
 }

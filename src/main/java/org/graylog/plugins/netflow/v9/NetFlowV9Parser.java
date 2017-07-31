@@ -34,14 +34,15 @@ public class NetFlowV9Parser {
         final int dataLength = bb.readableBytes();
         final NetFlowV9Header header = parseHeader(bb);
 
-        List<NetFlowV9Template> templates = Collections.emptyList();
+        final ImmutableList.Builder<NetFlowV9Template> allTemplates = ImmutableList.builder();
         NetFlowV9OptionTemplate optTemplate = null;
         List<NetFlowV9BaseRecord> records = Collections.emptyList();
         while (bb.isReadable()) {
             bb.markReaderIndex();
             int flowSetId = bb.readUnsignedShort();
             if (flowSetId == 0) {
-                templates = parseTemplates(bb, typeRegistry);
+                final List<NetFlowV9Template> templates = parseTemplates(bb, typeRegistry);
+                allTemplates.addAll(templates);
                 for (NetFlowV9Template t : templates) {
                     cache.put(t);
                 }
@@ -56,7 +57,7 @@ public class NetFlowV9Parser {
 
         return NetFlowV9Packet.create(
                 header,
-                templates,
+                allTemplates.build(),
                 optTemplate,
                 records,
                 dataLength);
@@ -116,10 +117,13 @@ public class NetFlowV9Parser {
             for (int i = 0; i < fieldCount; i++) {
                 int fieldType = bb.readUnsignedShort();
                 int fieldLength = bb.readUnsignedShort();
-                final NetFlowV9FieldType type = typeRegistry.get(fieldType);
-                if (type == null) {
-                    // Skip unknown/invalid field type
-                    continue;
+                final NetFlowV9FieldType registeredType = typeRegistry.get(fieldType);
+                final NetFlowV9FieldType type;
+                if (registeredType == null) {
+                    // Unknown/invalid field type
+                    type = NetFlowV9FieldType.create(fieldType, NetFlowV9FieldType.ValueType.byLength(fieldLength), "nf_field_" + fieldType);
+                } else {
+                    type = registeredType;
                 }
                 final NetFlowV9FieldDef fieldDef = NetFlowV9FieldDef.create(type, fieldLength);
                 fieldDefs.add(fieldDef);

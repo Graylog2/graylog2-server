@@ -53,5 +53,18 @@ public abstract class NetFlowV9FieldType {
         public int getDefaultLength() {
             return defaultLength;
         }
+
+        public static ValueType byLength(int length) {
+            switch (length) {
+                case 1: return UINT8;
+                case 2: return UINT16;
+                case 3: return UINT24;
+                case 4: return UINT32;
+                case 6: return MAC;
+                case 8: return UINT64;
+                case 16: return IPV6;
+                default: return VARINT;
+            }
+        }
     }
 }

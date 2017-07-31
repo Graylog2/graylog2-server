@@ -197,8 +197,8 @@ public class NetFlowCodecTest {
                 .containsEntry("nf_src_address", "192.168.124.1")
                 .containsEntry("nf_dst_address", "239.255.255.250")
                 .containsEntry("nf_proto_name", "UDP")
-                .containsEntry("nf_src_as", 0)
-                .containsEntry("nf_dst_as", 0)
+                .containsEntry("nf_src_as", 0L)
+                .containsEntry("nf_dst_as", 0L)
                 .containsEntry("nf_snmp_input", 0)
                 .containsEntry("nf_snmp_output", 0);
 
@@ -215,14 +215,14 @@ public class NetFlowCodecTest {
                 .containsEntry("nf_src_address", "192.168.124.20")
                 .containsEntry("nf_dst_address", "121.161.231.32")
                 .containsEntry("nf_proto_name", "UDP")
-                .containsEntry("nf_src_as", 0)
-                .containsEntry("nf_dst_as", 0)
+                .containsEntry("nf_src_as", 0L)
+                .containsEntry("nf_dst_as", 0L)
                 .containsEntry("nf_snmp_input", 0)
                 .containsEntry("nf_snmp_output", 0);
     }
 
     @Test
-    public void pcapNetFlowV5() throws Exception {
+    public void pcap_softflowd_NetFlowV5() throws Exception {
         final List<Message> allMessages = new ArrayList<>();
         try (InputStream inputStream = Resources.getResource("netflow-data/netflow5.pcap").openStream()) {
             final Pcap pcap = Pcap.openStream(inputStream);
@@ -244,7 +244,29 @@ public class NetFlowCodecTest {
     }
 
     @Test
-    public void pcapNetFlowV9() throws Exception {
+    public void pcap_pmacctd_NetFlowV5() throws Exception {
+        final List<Message> allMessages = new ArrayList<>();
+        try (InputStream inputStream = Resources.getResource("netflow-data/pmacctd-netflow5.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(inputStream);
+            pcap.loop(packet -> {
+                        if (packet.hasProtocol(Protocol.UDP)) {
+                            final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                            final InetSocketAddress source = new InetSocketAddress(udp.getSourceIP(), udp.getSourcePort());
+                            final Collection<Message> messages = codec.decodeMessages(new RawMessage(udp.getPayload().getArray(), source));
+                            assertThat(messages)
+                                    .isNotNull()
+                                    .isNotEmpty();
+                            allMessages.addAll(messages);
+                        }
+                        return true;
+                    }
+            );
+            assertThat(allMessages).hasSize(42);
+        }
+    }
+
+    @Test
+    public void pcap_softflowd_NetFlowV9() throws Exception {
         final List<Message> allMessages = new ArrayList<>();
         try (InputStream inputStream = Resources.getResource("netflow-data/netflow9.pcap").openStream()) {
             final Pcap pcap = Pcap.openStream(inputStream);
@@ -263,5 +285,27 @@ public class NetFlowCodecTest {
             );
         }
         assertThat(allMessages).hasSize(19);
+    }
+
+    @Test
+    public void pcap_pmacctd_NetFlowV9() throws Exception {
+        final List<Message> allMessages = new ArrayList<>();
+        try (InputStream inputStream = Resources.getResource("netflow-data/pmacctd-netflow9.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(inputStream);
+            pcap.loop(packet -> {
+                        if (packet.hasProtocol(Protocol.UDP)) {
+                            final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                            final InetSocketAddress source = new InetSocketAddress(udp.getSourceIP(), udp.getSourcePort());
+                            final Collection<Message> messages = codec.decodeMessages(new RawMessage(udp.getPayload().getArray(), source));
+                            assertThat(messages)
+                                    .isNotNull()
+                                    .isNotEmpty();
+                            allMessages.addAll(messages);
+                        }
+                        return true;
+                    }
+            );
+        }
+        assertThat(allMessages).hasSize(6);
     }
 }

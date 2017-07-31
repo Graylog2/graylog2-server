@@ -55,9 +55,9 @@ public class NetFlowFormatter {
         final long octetCount = (long) fields.get("in_bytes");
         final String srcAddr = (String) fields.get("ipv4_src_addr");
         final String dstAddr = (String) fields.get("ipv4_dst_addr");
-        final int srcPort = (int) fields.get("l4_src_port");
-        final int dstPort = (int) fields.get("l4_dst_port");
-        final short protocol = (short) fields.get("protocol");
+        final Integer srcPort = (Integer) fields.get("l4_src_port");
+        final Integer dstPort = (Integer) fields.get("l4_dst_port");
+        final Short protocol = (Short) fields.get("protocol");
 
         return String.format("NetFlowV9 [%s]:%d <> [%s]:%d proto:%d pkts:%d bytes:%d",
                 srcAddr, srcPort,
@@ -125,11 +125,11 @@ public class NetFlowFormatter {
 
         final String srcAddr = (String) fields.get("ipv4_src_addr");
         final String dstAddr = (String) fields.get("ipv4_dst_addr");
-        final int srcPort = (int) fields.get("l4_src_port");
-        final int dstPort = (int) fields.get("l4_dst_port");
+        final Object srcPort = fields.get("l4_src_port");
+        final Object dstPort = fields.get("l4_dst_port");
         final String ipv4NextHop = (String) fields.get("ipv4_next_hop");
-        final long first = (long) fields.get("first_switched");
-        final long last = (long) fields.get("last_switched");
+        final Long first = (Long) fields.get("first_switched");
+        final Long last = (Long) fields.get("last_switched");
 
         message.addField(MF_FLOW_PACKET_ID, header.sequence());
         message.addField(MF_TOS, fields.get("ip_tos"));
@@ -148,18 +148,22 @@ public class NetFlowFormatter {
         message.addField(MF_DST_MASK, fields.get("dst_mask"));
         message.addField(MF_SRC_AS, fields.get("src_as"));
         message.addField(MF_DST_AS, fields.get("dst_as"));
-        message.addField(MF_PROTO, fields.get("protocol"));
-        final Protocol protocolInfo = Protocol.getByNumber((short) fields.get("protocol"));
-        if (protocolInfo != null) {
-            message.addField(MF_PROTO_NAME, protocolInfo.getAlias());
+        final Object protocol = fields.get("protocol");
+        if (protocol != null) {
+            message.addField(MF_PROTO, protocol);
+            short protocolNumber = ((Number) protocol).shortValue();
+            final Protocol protocolInfo = Protocol.getByNumber(protocolNumber);
+            if (protocolInfo != null) {
+                message.addField(MF_PROTO_NAME, protocolInfo.getAlias());
+            }
         }
         message.addField(MF_TCP_FLAGS, fields.get("tcp_flags"));
 
-        if (first > 0) {
+        if (first != null && first > 0) {
             long start = timestamp - (header.sysUptime() - first);
             message.addField(MF_START, new DateTime(start, DateTimeZone.UTC));
         }
-        if (last > 0) {
+        if (last != null && last > 0) {
             long stop = timestamp - (header.sysUptime() - last);
             message.addField(MF_STOP, new DateTime(stop, DateTimeZone.UTC));
         }

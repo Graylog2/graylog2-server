@@ -46,29 +46,21 @@ public abstract class NetFlowV9FieldDef {
         int len = length() != 0 ? length() : type().valueType().getDefaultLength();
         switch (type().valueType()) {
             case UINT8:
-                return Optional.of(bb.readUnsignedByte());
+            case UINT16:
+            case UINT24:
+            case UINT32:
+            case UINT64:
+                return parseUnsignedNumber(bb, len);
             case INT8:
                 return Optional.of(bb.readByte());
-            case UINT16:
-                return Optional.of(bb.readUnsignedShort());
             case INT16:
                 return Optional.of(bb.readShort());
-            case UINT24:
-                return Optional.of(bb.readUnsignedMedium());
             case INT24:
                 return Optional.of(bb.readMedium());
-            case UINT32:
-                return Optional.of(bb.readUnsignedInt());
             case INT32:
                 return Optional.of(bb.readInt());
-            case UINT64:
-                byte[] uint64Bytes = new byte[8];
-                bb.readBytes(uint64Bytes);
-                return Optional.of(new BigInteger(uint64Bytes));
             case INT64:
                 return Optional.of(bb.readLong());
-            case VARINT:
-                return Optional.of(parseLong(bb, len));
             case IPV4:
                 byte[] b = new byte[4];
                 bb.readBytes(b);
@@ -98,12 +90,23 @@ public abstract class NetFlowV9FieldDef {
         }
     }
 
-    private long parseLong(ByteBuf bb, int length) {
-        long l = 0;
-        for (int i = 0; i < length; i++) {
-            l <<= 8;
-            l |= bb.readUnsignedByte();
+    private Optional<Object> parseUnsignedNumber(ByteBuf bb, int length) {
+        switch (length) {
+            case 1:
+                return Optional.of(bb.readUnsignedByte());
+            case 2:
+                return Optional.of(bb.readUnsignedShort());
+            case 3:
+                return Optional.of(bb.readUnsignedMedium());
+            case 4:
+                return Optional.of(bb.readUnsignedInt());
+            case 8:
+                return Optional.of(bb.readLong());
+            default:
+                byte[] uint64Bytes = new byte[length];
+                bb.readBytes(uint64Bytes);
+                return Optional.of(new BigInteger(uint64Bytes));
         }
-        return l;
+
     }
 }
