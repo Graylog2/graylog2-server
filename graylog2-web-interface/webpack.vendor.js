@@ -67,7 +67,16 @@ if (TARGET === 'build') {
         'process.env.NODE_ENV': JSON.stringify('production'),
       }),
       new Clean([path.resolve(BUILD_PATH)]),
-      new webpack.optimize.UglifyJsPlugin(),
+      new webpack.optimize.UglifyJsPlugin({
+        minimize: true,
+        sourceMap: true,
+        compress: {
+          warnings: false,
+        },
+        mangle: {
+          except: ['$super', '$', 'exports', 'require'],
+        },
+      }),
       new webpack.LoaderOptionsPlugin({
         minimize: true,
       }),
