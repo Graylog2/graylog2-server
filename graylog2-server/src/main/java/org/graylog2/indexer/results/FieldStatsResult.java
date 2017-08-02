@@ -44,16 +44,16 @@ public class FieldStatsResult extends IndexQueryResult {
                             long tookMs) {
         super(query, source, tookMs);
         this.count = getValueCount(valueCountAggregation, extendedStatsAggregation);
-        this.cardinality = cardinalityAggregation == null ? Long.MIN_VALUE : cardinalityAggregation.getCardinality();
+        this.cardinality = cardinalityAggregation == null || cardinalityAggregation.getCardinality() == null ? Long.MIN_VALUE : cardinalityAggregation.getCardinality();
 
         if (extendedStatsAggregation != null) {
-            sum = extendedStatsAggregation.getSum();
-            sumOfSquares = extendedStatsAggregation.getSumOfSquares();
-            mean = extendedStatsAggregation.getAvg();
-            min = extendedStatsAggregation.getMin();
-            max = extendedStatsAggregation.getMax();
-            variance = extendedStatsAggregation.getVariance();
-            stdDeviation = extendedStatsAggregation.getStdDeviation();
+            sum = extendedStatsAggregation.getSum() != null ? extendedStatsAggregation.getSum() : Double.NaN;
+            sumOfSquares = extendedStatsAggregation.getSumOfSquares() != null ? extendedStatsAggregation.getSumOfSquares() : Double.NaN;
+            mean = extendedStatsAggregation.getAvg() != null ? extendedStatsAggregation.getAvg() : Double.NaN;
+            min = extendedStatsAggregation.getMin() != null ? extendedStatsAggregation.getMin() : Double.NaN;
+            max = extendedStatsAggregation.getMax() != null ? extendedStatsAggregation.getMax() : Double.NaN;
+            variance = extendedStatsAggregation.getVariance() != null ? extendedStatsAggregation.getVariance() : Double.NaN;
+            stdDeviation = extendedStatsAggregation.getStdDeviation() != null ? extendedStatsAggregation.getStdDeviation() : Double.NaN;
         } else {
             sum = Double.NaN;
             sumOfSquares = Double.NaN;
@@ -82,9 +82,9 @@ public class FieldStatsResult extends IndexQueryResult {
     }
 
     private long getValueCount(ValueCountAggregation valueCountAggregation, ExtendedStatsAggregation extendedStatsAggregation) {
-        if (valueCountAggregation != null) {
+        if (valueCountAggregation != null && valueCountAggregation.getValueCount() != null) {
             return valueCountAggregation.getValueCount();
-        } else if (extendedStatsAggregation != null) {
+        } else if (extendedStatsAggregation != null && extendedStatsAggregation.getCount() != null) {
             return extendedStatsAggregation.getCount();
         }
         return Long.MIN_VALUE;
