@@ -473,10 +473,9 @@ public class Searches {
         final long tookMs = tookMsFromSearchResult(searchResponse);
         recordEsMetrics(tookMs, range);
 
-        final FilterAggregation filterAggregation = searchResponse.getAggregations().getFilterAggregation(AGG_FILTER);
-        final ExtendedStatsAggregation extendedStatsAggregation = filterAggregation.getExtendedStatsAggregation(AGG_EXTENDED_STATS);
-        final ValueCountAggregation valueCountAggregation = filterAggregation.getValueCountAggregation(AGG_VALUE_COUNT);
-        final CardinalityAggregation cardinalityAggregation = filterAggregation.getCardinalityAggregation(AGG_CARDINALITY);
+        final ExtendedStatsAggregation extendedStatsAggregation = searchResponse.getAggregations().getExtendedStatsAggregation(AGG_EXTENDED_STATS);
+        final ValueCountAggregation valueCountAggregation = searchResponse.getAggregations().getValueCountAggregation(AGG_VALUE_COUNT);
+        final CardinalityAggregation cardinalityAggregation = searchResponse.getAggregations().getCardinalityAggregation(AGG_CARDINALITY);
 
         return new FieldStatsResult(
                 valueCountAggregation,
@@ -551,9 +550,6 @@ public class Searches {
         if (includeCardinality) {
             dateHistogramBuilder.subAggregation(AggregationBuilders.cardinality(AGG_CARDINALITY).field(field));
         }
-
-        final QueryStringQueryBuilder qs = queryStringQuery(query)
-            .allowLeadingWildcard(configuration.isAllowLeadingWildcardSearches());
 
         final SearchSourceBuilder searchSourceBuilder = filteredSearchRequest(query, filter, range)
             .aggregation(dateHistogramBuilder);
