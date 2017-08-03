@@ -248,7 +248,7 @@ public class GelfCodec extends AbstractCodec {
             if (!shortMessageNode.isTextual()) {
                 throw new IllegalArgumentException(prefix + "has invalid \"short_message\": " + shortMessageNode.asText());
             }
-            if (StringUtils.isBlank(shortMessageNode.asText())) {
+            if (StringUtils.isBlank(shortMessageNode.asText()) && StringUtils.isBlank(messageNode.asText())) {
                 throw new IllegalArgumentException(prefix + "has empty mandatory \"short_message\" field.");
             }
         } else if (!messageNode.isMissingNode()) {
