@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Modal, Well } from 'react-bootstrap';
 import { DocumentTitle } from 'components/common';
@@ -8,7 +9,7 @@ import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.
 
 const ServerUnavailablePage = React.createClass({
   propTypes: {
-    server: React.PropTypes.object,
+    server: PropTypes.object,
   },
 
   getInitialState() {

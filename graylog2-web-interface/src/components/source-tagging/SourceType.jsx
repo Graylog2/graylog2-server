@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const SourceType = React.createClass({
   propTypes: {
-    name: React.PropTypes.string.isRequired,
-    description: React.PropTypes.string.isRequired,
-    onSelect: React.PropTypes.func.isRequired,
+    name: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    onSelect: PropTypes.func.isRequired,
   },
   _onChange(event) {
     this.props.onSelect(event.target.id, event.target.value);

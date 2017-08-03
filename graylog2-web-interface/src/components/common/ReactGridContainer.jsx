@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
@@ -28,10 +29,10 @@ const BREAKPOINTS = {
 
 const ReactGridContainer = React.createClass({
   propTypes: {
-    positions: React.PropTypes.object.isRequired,
-    children: React.PropTypes.node.isRequired,
-    onPositionsChange: React.PropTypes.func.isRequired,
-    locked: React.PropTypes.bool,
+    positions: PropTypes.object.isRequired,
+    children: PropTypes.node.isRequired,
+    onPositionsChange: PropTypes.func.isRequired,
+    locked: PropTypes.bool,
   },
 
   getDefaultProps() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment';
 
@@ -5,7 +6,7 @@ import { LinkToNode } from 'components/common';
 
 const SystemMessage = React.createClass({
   propTypes: {
-    message: React.PropTypes.object.isRequired,
+    message: PropTypes.object.isRequired,
   },
   render() {
     const message = this.props.message;

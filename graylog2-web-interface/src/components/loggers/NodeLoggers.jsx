@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -13,8 +14,8 @@ const MetricsStore = StoreProvider.getStore('Metrics');
 
 const NodeLoggers = React.createClass({
   propTypes: {
-    nodeId: React.PropTypes.string.isRequired,
-    subsystems: React.PropTypes.object.isRequired,
+    nodeId: PropTypes.string.isRequired,
+    subsystems: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(MetricsStore)],
   getInitialState() {

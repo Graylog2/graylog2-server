@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
@@ -13,9 +14,9 @@ import MetricsExtractor from 'logic/metrics/MetricsExtractor';
 
 const MetricContainer = React.createClass({
   propTypes: {
-    name: React.PropTypes.string.isRequired,
-    zeroOnMissing: React.PropTypes.bool,
-    children: React.PropTypes.node.isRequired,
+    name: PropTypes.string.isRequired,
+    zeroOnMissing: PropTypes.bool,
+    children: PropTypes.node.isRequired,
   },
   mixins: [Reflux.connect(MetricsStore)],
 

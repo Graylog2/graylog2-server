@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 import ISODurationUtils from 'util/ISODurationUtils';
@@ -9,12 +10,12 @@ import ObjectUtils from 'util/ObjectUtils';
  */
 const TimeRangeOptionsForm = React.createClass({
   propTypes: {
-    options: React.PropTypes.array,
-    title: React.PropTypes.string.isRequired,
-    help: React.PropTypes.any.isRequired,
-    addButtonTitle: React.PropTypes.string,
-    update: React.PropTypes.func.isRequired,
-    validator: React.PropTypes.func,
+    options: PropTypes.array,
+    title: PropTypes.string.isRequired,
+    help: PropTypes.any.isRequired,
+    addButtonTitle: PropTypes.string,
+    update: PropTypes.func.isRequired,
+    validator: PropTypes.func,
   },
 
   getDefaultProps() {

@@ -1,14 +1,15 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const WidgetFooter = React.createClass({
   propTypes: {
-    locked: React.PropTypes.bool.isRequired,
-    onDelete: React.PropTypes.func.isRequired,
-    onEditConfig: React.PropTypes.func.isRequired,
-    onShowConfig: React.PropTypes.func.isRequired,
-    replayHref: React.PropTypes.string.isRequired,
-    replayToolTip: React.PropTypes.string,
+    locked: PropTypes.bool.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    onEditConfig: PropTypes.func.isRequired,
+    onShowConfig: PropTypes.func.isRequired,
+    replayHref: PropTypes.string.isRequired,
+    replayToolTip: PropTypes.string,
   },
   _showConfig(e) {
     e.preventDefault();

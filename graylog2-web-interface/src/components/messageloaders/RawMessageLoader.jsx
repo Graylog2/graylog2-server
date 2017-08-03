@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -19,8 +20,8 @@ const InputsStore = StoreProvider.getStore('Inputs');
 
 const RawMessageLoader = React.createClass({
   propTypes: {
-    onMessageLoaded: React.PropTypes.func.isRequired,
-    inputIdSelector: React.PropTypes.bool,
+    onMessageLoaded: PropTypes.func.isRequired,
+    inputIdSelector: PropTypes.bool,
   },
 
   mixins: [Reflux.connect(CodecTypesStore), Reflux.connect(InputsStore)],

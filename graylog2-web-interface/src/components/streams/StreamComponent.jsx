@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, Alert } from 'react-bootstrap';
 
@@ -14,9 +15,9 @@ import CreateStreamButton from './CreateStreamButton';
 
 const StreamComponent = React.createClass({
   propTypes: {
-    currentUser: React.PropTypes.object.isRequired,
-    onStreamSave: React.PropTypes.func.isRequired,
-    indexSets: React.PropTypes.array.isRequired,
+    currentUser: PropTypes.object.isRequired,
+    onStreamSave: PropTypes.func.isRequired,
+    indexSets: PropTypes.array.isRequired,
   },
   getInitialState() {
     return {};

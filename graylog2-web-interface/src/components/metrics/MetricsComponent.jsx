@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
@@ -9,9 +10,9 @@ import { MetricsFilterInput, MetricsList } from 'components/metrics';
 
 const MetricsComponent = React.createClass({
   propTypes: {
-    names: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-    namespace: React.PropTypes.string.isRequired,
-    nodeId: React.PropTypes.string.isRequired,
+    names: PropTypes.arrayOf(PropTypes.object).isRequired,
+    namespace: PropTypes.string.isRequired,
+    nodeId: PropTypes.string.isRequired,
   },
   mixins: [LinkedStateMixin],
   getInitialState() {

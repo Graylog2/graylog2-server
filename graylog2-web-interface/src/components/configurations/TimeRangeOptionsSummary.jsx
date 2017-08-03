@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const TimeRangeOptionsSummary = React.createClass({
   propTypes: {
-    options: React.PropTypes.object.isRequired,
+    options: PropTypes.object.isRequired,
   },
 
   render() {

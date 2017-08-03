@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const GracePeriodSummary = React.createClass({
   propTypes: {
-    alertCondition: React.PropTypes.object.isRequired,
+    alertCondition: PropTypes.object.isRequired,
   },
   _formatTime(time) {
     if (time === 1) {

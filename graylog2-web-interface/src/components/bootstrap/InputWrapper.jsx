@@ -1,12 +1,13 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const InputWrapper = React.createClass({
   propTypes: {
-    className: React.PropTypes.string,
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.arrayOf(React.PropTypes.oneOfType([React.PropTypes.element, React.PropTypes.string])),
-      React.PropTypes.element,
-      React.PropTypes.string,
+    className: PropTypes.string,
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.element, PropTypes.string])),
+      PropTypes.element,
+      PropTypes.string,
     ]).isRequired,
   },
 

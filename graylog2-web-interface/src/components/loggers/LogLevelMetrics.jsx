@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Col } from 'react-bootstrap';
@@ -14,8 +15,8 @@ import { Spinner } from 'components/common';
 
 const LogLevelMetrics = React.createClass({
   propTypes: {
-    nodeId: React.PropTypes.string.isRequired,
-    loglevel: React.PropTypes.string.isRequired,
+    nodeId: PropTypes.string.isRequired,
+    loglevel: PropTypes.string.isRequired,
   },
   mixins: [Reflux.connect(MetricsStore)],
   componentDidMount() {

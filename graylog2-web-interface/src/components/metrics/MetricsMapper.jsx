@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
@@ -6,8 +7,8 @@ const { MetricsActions, MetricsStore } = CombinedProvider.get('Metrics');
 
 const MetricsMapper = React.createClass({
   propTypes: {
-    map: React.PropTypes.object.isRequired,
-    computeValue: React.PropTypes.func.isRequired,
+    map: PropTypes.object.isRequired,
+    computeValue: PropTypes.func.isRequired,
   },
   mixins: [Reflux.connect(MetricsStore)],
 

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import { Button } from 'react-bootstrap';
@@ -6,9 +7,9 @@ import { DataTable } from 'components/common';
 
 const RoleList = React.createClass({
   propTypes: {
-    roles: React.PropTypes.instanceOf(Immutable.Set).isRequired,
-    showEditRole: React.PropTypes.func.isRequired,
-    deleteRole: React.PropTypes.func.isRequired,
+    roles: PropTypes.instanceOf(Immutable.Set).isRequired,
+    showEditRole: PropTypes.func.isRequired,
+    deleteRole: PropTypes.func.isRequired,
   },
 
   _headerCellFormatter(header) {

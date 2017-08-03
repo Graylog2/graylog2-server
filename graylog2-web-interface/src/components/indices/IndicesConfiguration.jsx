@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Row, Col } from 'react-bootstrap';
@@ -11,7 +12,7 @@ const style = require('!style/useable!css!components/configurations/Configuratio
 
 const IndicesConfiguration = React.createClass({
   propTypes: {
-    indexSet: React.PropTypes.object.isRequired,
+    indexSet: PropTypes.object.isRequired,
   },
 
   componentDidMount() {

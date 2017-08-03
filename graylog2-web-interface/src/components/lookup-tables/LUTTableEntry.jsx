@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button } from 'react-bootstrap';
@@ -14,10 +15,10 @@ const { LookupTablesActions } = CombinedProvider.get('LookupTables');
 const LUTTableEntry = React.createClass({
 
   propTypes: {
-    table: React.PropTypes.object.isRequired,
-    cache: React.PropTypes.object.isRequired,
-    dataAdapter: React.PropTypes.object.isRequired,
-    errors: React.PropTypes.object,
+    table: PropTypes.object.isRequired,
+    cache: PropTypes.object.isRequired,
+    dataAdapter: PropTypes.object.isRequired,
+    errors: PropTypes.object,
   },
 
   getDefaultProps() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Label } from 'react-bootstrap';
 
@@ -8,11 +9,11 @@ import { IndexSizeSummary } from 'components/indices';
 
 const IndexSummary = React.createClass({
   propTypes: {
-    children: React.PropTypes.node.isRequired,
-    index: React.PropTypes.object.isRequired,
-    indexRange: React.PropTypes.object,
-    isDeflector: React.PropTypes.bool.isRequired,
-    name: React.PropTypes.string.isRequired,
+    children: PropTypes.node.isRequired,
+    index: PropTypes.object.isRequired,
+    indexRange: PropTypes.object,
+    isDeflector: PropTypes.bool.isRequired,
+    name: PropTypes.string.isRequired,
   },
   getInitialState() {
     return { showDetails: this.props.isDeflector };

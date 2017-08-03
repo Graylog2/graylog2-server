@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
@@ -20,8 +21,8 @@ import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
 const DecoratorSidebar = React.createClass({
   propTypes: {
-    stream: React.PropTypes.string,
-    maximumHeight: React.PropTypes.number,
+    stream: PropTypes.string,
+    maximumHeight: PropTypes.number,
   },
   mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
   getInitialState() {

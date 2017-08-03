@@ -1,11 +1,12 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 import moment from 'moment';
 
 const ShardMeter = React.createClass({
   propTypes: {
-    title: React.PropTypes.string.isRequired,
-    shardMeter: React.PropTypes.object.isRequired,
+    title: PropTypes.string.isRequired,
+    shardMeter: PropTypes.object.isRequired,
   },
   _formatMeter(meter) {
     const value = <span>{numeral(meter.total).format('0,0')} ops</span>;

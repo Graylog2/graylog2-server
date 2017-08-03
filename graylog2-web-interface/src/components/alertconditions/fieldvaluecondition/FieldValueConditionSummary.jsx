@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import GracePeriodSummary from 'components/alertconditions/GracePeriodSummary';
@@ -7,7 +8,7 @@ import { Pluralize } from 'components/common';
 
 const FieldValueConditionSummary = React.createClass({
   propTypes: {
-    alertCondition: React.PropTypes.object.isRequired,
+    alertCondition: PropTypes.object.isRequired,
   },
   render() {
     const alertCondition = this.props.alertCondition;

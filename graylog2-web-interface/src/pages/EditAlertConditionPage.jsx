@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -17,7 +18,7 @@ const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('A
 
 const EditAlertConditionPage = React.createClass({
   propTypes: {
-    params: React.PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(AlertConditionsStore)],

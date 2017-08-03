@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
@@ -7,7 +8,7 @@ import loadingIndicatorStyle from './LoadingIndicator.css';
 
 const LoadingIndicator = React.createClass({
   propTypes: {
-    text: React.PropTypes.string,
+    text: PropTypes.string,
   },
 
   getDefaultProps() {

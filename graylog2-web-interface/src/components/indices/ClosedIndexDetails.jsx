@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Button } from 'react-bootstrap';
 
@@ -8,8 +9,8 @@ import { IndexRangeSummary } from 'components/indices';
 
 const ClosedIndexDetails = React.createClass({
   propTypes: {
-    indexName: React.PropTypes.string.isRequired,
-    indexRange: React.PropTypes.object,
+    indexName: PropTypes.string.isRequired,
+    indexRange: PropTypes.object,
   },
   _onReopen() {
     IndicesActions.reopen(this.props.indexName);

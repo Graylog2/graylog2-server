@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 
@@ -8,7 +9,7 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const UserPreferencesModal = React.createClass({
   propTypes: {
-    userName: React.PropTypes.string.isRequired,
+    userName: PropTypes.string.isRequired,
   },
   getInitialState() {
     return { preferences: [] };

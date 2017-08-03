@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
 const DecoratedMessageFieldMarker = React.createClass({
   propTypes: {
-    className: React.PropTypes.string,
+    className: PropTypes.string,
   },
   render() {
     const classNames = [DecoratorStyles.decoratorMarker];

@@ -1,12 +1,13 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 
 const DataFilter = React.createClass({
   propTypes: {
-    data: React.PropTypes.any,
-    filterKeys: React.PropTypes.arrayOf(React.PropTypes.string),
-    label: React.PropTypes.string,
-    onFilterUpdate: React.PropTypes.func,
+    data: PropTypes.any,
+    filterKeys: PropTypes.arrayOf(PropTypes.string),
+    label: PropTypes.string,
+    onFilterUpdate: PropTypes.func,
   },
   getInitialState() {
     return {

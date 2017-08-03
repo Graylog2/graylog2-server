@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import moment from 'moment';
@@ -12,8 +13,8 @@ import { AlarmCallbackHistory } from 'components/alarmcallbacks';
 
 const AlarmCallbackHistoryOverview = React.createClass({
   propTypes: {
-    alertId: React.PropTypes.string.isRequired,
-    streamId: React.PropTypes.string.isRequired,
+    alertId: PropTypes.string.isRequired,
+    streamId: PropTypes.string.isRequired,
   },
 
   mixins: [Reflux.connect(AlarmCallbackHistoryStore), Reflux.connect(AlertNotificationsStore)],

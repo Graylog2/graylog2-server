@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Button, Col, DropdownButton, MenuItem } from 'react-bootstrap';
@@ -15,10 +16,10 @@ import { ConfigurationForm, ConfigurationWell } from 'components/configurationfo
 
 const AlertNotification = React.createClass({
   propTypes: {
-    alertNotification: React.PropTypes.object.isRequired,
-    stream: React.PropTypes.object,
-    onNotificationUpdate: React.PropTypes.func,
-    onNotificationDelete: React.PropTypes.func,
+    alertNotification: PropTypes.object.isRequired,
+    stream: PropTypes.object,
+    onNotificationUpdate: PropTypes.func,
+    onNotificationDelete: PropTypes.func,
   },
   mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 

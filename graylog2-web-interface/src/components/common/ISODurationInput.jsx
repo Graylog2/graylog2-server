@@ -1,17 +1,18 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 import ISODurationUtils from 'util/ISODurationUtils';
 
 const ISODurationInput = React.createClass({
   propTypes: {
-    duration: React.PropTypes.string.isRequired,
-    update: React.PropTypes.func.isRequired,
-    label: React.PropTypes.string,
-    help: React.PropTypes.string,
-    validator: React.PropTypes.func,
-    errorText: React.PropTypes.string,
-    autoFocus: React.PropTypes.bool,
-    required: React.PropTypes.bool,
+    duration: PropTypes.string.isRequired,
+    update: PropTypes.func.isRequired,
+    label: PropTypes.string,
+    help: PropTypes.string,
+    validator: PropTypes.func,
+    errorText: PropTypes.string,
+    autoFocus: PropTypes.bool,
+    required: PropTypes.bool,
   },
 
   getDefaultProps() {

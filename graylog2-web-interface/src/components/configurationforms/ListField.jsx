@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { MultiSelect } from 'components/common';
@@ -5,14 +6,14 @@ import { FieldHelpers } from 'components/configurationforms';
 
 const ListField = React.createClass({
   propTypes: {
-    autoFocus: React.PropTypes.bool.isRequired,
-    field: React.PropTypes.object.isRequired,
-    onChange: React.PropTypes.func.isRequired,
-    title: React.PropTypes.string.isRequired,
-    typeName: React.PropTypes.string.isRequired,
-    value: React.PropTypes.any,
-    addPlaceholder: React.PropTypes.bool,
-    disabled: React.PropTypes.bool,
+    autoFocus: PropTypes.bool.isRequired,
+    field: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
+    typeName: PropTypes.string.isRequired,
+    value: PropTypes.any,
+    addPlaceholder: PropTypes.bool,
+    disabled: PropTypes.bool,
   },
 
   getDefaultProps() {

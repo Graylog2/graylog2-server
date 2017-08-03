@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { ButtonGroup, Col } from 'react-bootstrap';
 import String from 'string';
@@ -6,9 +7,9 @@ import { LogLevelDropdown } from 'components/loggers';
 
 const LoggingSubsystem = React.createClass({
   propTypes: {
-    name: React.PropTypes.string.isRequired,
-    nodeId: React.PropTypes.string.isRequired,
-    subsystem: React.PropTypes.object.isRequired,
+    name: PropTypes.string.isRequired,
+    nodeId: PropTypes.string.isRequired,
+    subsystem: PropTypes.object.isRequired,
   },
 
   render() {

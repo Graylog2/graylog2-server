@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, Label } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -11,10 +12,10 @@ import styles from './Alert.css';
 
 const Alert = React.createClass({
   propTypes: {
-    alert: React.PropTypes.object.isRequired,
-    alertConditions: React.PropTypes.array.isRequired,
-    streams: React.PropTypes.array.isRequired,
-    conditionTypes: React.PropTypes.object.isRequired,
+    alert: PropTypes.object.isRequired,
+    alertConditions: PropTypes.array.isRequired,
+    streams: PropTypes.array.isRequired,
+    conditionTypes: PropTypes.object.isRequired,
   },
 
   getInitialState() {

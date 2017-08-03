@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const MessageCountRotationStrategySummary = React.createClass({
   propTypes: {
-    config: React.PropTypes.object.isRequired,
+    config: PropTypes.object.isRequired,
   },
 
   render() {

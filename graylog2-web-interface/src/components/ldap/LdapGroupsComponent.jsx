@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import { Row, Col, Panel, Button } from 'react-bootstrap';
@@ -15,8 +16,8 @@ const LdapGroupsStore = StoreProvider.getStore('LdapGroups');
 
 const LdapGroupsComponent = React.createClass({
   propTypes: {
-    onCancel: React.PropTypes.func.isRequired,
-    onShowConfig: React.PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onShowConfig: PropTypes.func.isRequired,
   },
 
   getInitialState() {

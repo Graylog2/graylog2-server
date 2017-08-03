@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
@@ -19,8 +20,8 @@ import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
 const Decorator = React.createClass({
   propTypes: {
-    decorator: React.PropTypes.object.isRequired,
-    typeDefinition: React.PropTypes.object.isRequired,
+    decorator: PropTypes.object.isRequired,
+    typeDefinition: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
   componentDidMount() {

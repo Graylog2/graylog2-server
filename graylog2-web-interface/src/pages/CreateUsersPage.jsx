@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Routes from 'routing/Routes';
@@ -14,7 +15,7 @@ import NewUserForm from 'components/users/NewUserForm';
 const CreateUsersPage = React.createClass({
 
   propTypes: {
-    history: React.PropTypes.object,
+    history: PropTypes.object,
   },
 
   getInitialState() {

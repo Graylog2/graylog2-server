@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -13,8 +14,8 @@ import history from 'util/History';
 
 const UserMenu = React.createClass({
   propTypes: {
-    loginName: React.PropTypes.string.isRequired,
-    fullName: React.PropTypes.string.isRequired,
+    loginName: PropTypes.string.isRequired,
+    fullName: PropTypes.string.isRequired,
   },
   onLogoutClicked() {
     SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {

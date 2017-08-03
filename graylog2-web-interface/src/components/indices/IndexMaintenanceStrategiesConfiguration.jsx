@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 
@@ -5,13 +6,13 @@ import { Select } from 'components/common';
 
 const IndexMaintenanceStrategiesConfiguration = React.createClass({
   propTypes: {
-    title: React.PropTypes.string.isRequired,
-    description: React.PropTypes.string.isRequired,
-    selectPlaceholder: React.PropTypes.string.isRequired,
-    pluginExports: React.PropTypes.array.isRequired,
-    strategies: React.PropTypes.array.isRequired,
-    activeConfig: React.PropTypes.object.isRequired,
-    updateState: React.PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
+    description: PropTypes.string.isRequired,
+    selectPlaceholder: PropTypes.string.isRequired,
+    pluginExports: PropTypes.array.isRequired,
+    strategies: PropTypes.array.isRequired,
+    activeConfig: PropTypes.object.isRequired,
+    updateState: PropTypes.func.isRequired,
   },
 
   getInitialState() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -14,7 +15,7 @@ const { LookupTableCachesActions } = CombinedProvider.get('LookupTableCaches');
 const LUTTableEntry = React.createClass({
 
   propTypes: {
-    cache: React.PropTypes.object.isRequired,
+    cache: PropTypes.object.isRequired,
   },
 
   _onDelete() {

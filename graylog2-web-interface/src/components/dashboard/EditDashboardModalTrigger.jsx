@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { EditDashboardModal } from 'components/dashboard';
 
 const EditDashboardModalTrigger = React.createClass({
   propTypes: {
-    action: React.PropTypes.string.isRequired,
+    action: PropTypes.string.isRequired,
   },
   getDefaultProps() {
     return {

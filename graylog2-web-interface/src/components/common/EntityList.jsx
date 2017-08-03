@@ -1,14 +1,15 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
 const EntityList = React.createClass({
   propTypes: {
-    bsNoItemsStyle: React.PropTypes.oneOf(['info', 'success', 'warning']),
-    noItemsText: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.element,
+    bsNoItemsStyle: PropTypes.oneOf(['info', 'success', 'warning']),
+    noItemsText: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.element,
     ]),
-    items: React.PropTypes.array.isRequired,
+    items: PropTypes.array.isRequired,
   },
   getDefaultProps() {
     return {

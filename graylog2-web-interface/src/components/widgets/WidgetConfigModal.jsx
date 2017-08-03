@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { Button, Modal } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';

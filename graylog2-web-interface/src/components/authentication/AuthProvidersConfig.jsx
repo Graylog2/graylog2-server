@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, Button, Alert, Table } from 'react-bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -8,10 +9,10 @@ import naturalSort from 'javascript-natural-sort';
 
 const AuthProvidersConfig = React.createClass({
   propTypes: {
-    config: React.PropTypes.object.isRequired,
-    descriptors: React.PropTypes.object.isRequired,
-    updateConfig: React.PropTypes.func.isRequired,
-    history: React.PropTypes.object.isRequired,
+    config: PropTypes.object.isRequired,
+    descriptors: PropTypes.object.isRequired,
+    updateConfig: PropTypes.func.isRequired,
+    history: PropTypes.object.isRequired,
   },
 
   getDefaultProps() {

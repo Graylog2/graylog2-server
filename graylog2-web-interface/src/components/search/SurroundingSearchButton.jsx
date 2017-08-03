@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
@@ -9,10 +10,10 @@ import moment from 'moment';
 
 const SurroundingSearchButton = React.createClass({
   propTypes: {
-    id: React.PropTypes.string.isRequired,
-    timestamp: React.PropTypes.number.isRequired,
-    searchConfig: React.PropTypes.object.isRequired,
-    messageFields: React.PropTypes.object.isRequired,
+    id: PropTypes.string.isRequired,
+    timestamp: PropTypes.number.isRequired,
+    searchConfig: PropTypes.object.isRequired,
+    messageFields: PropTypes.object.isRequired,
   },
 
   _buildTimeRangeOptions(searchConfig) {

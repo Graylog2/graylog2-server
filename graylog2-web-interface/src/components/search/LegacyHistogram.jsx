@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 
@@ -13,10 +14,10 @@ import resultHistogram from 'legacy/result-histogram';
 // Hue-manatee. We tried to be sorry, but aren't.
 const LegacyHistogram = React.createClass({
   propTypes: {
-    formattedHistogram: React.PropTypes.array.isRequired,
-    histogram: React.PropTypes.object.isRequired,
-    stream: React.PropTypes.object,
-    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
+    formattedHistogram: PropTypes.array.isRequired,
+    histogram: PropTypes.object.isRequired,
+    stream: PropTypes.object,
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
   getInitialState() {
     return {};

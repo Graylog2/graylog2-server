@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
@@ -11,7 +12,7 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const BulkLoadPatternModal = React.createClass({
   propTypes: {
-    onSuccess: React.PropTypes.func.isRequired,
+    onSuccess: PropTypes.func.isRequired,
   },
   getInitialState() {
     return {

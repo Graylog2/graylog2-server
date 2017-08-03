@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 import Immutable from 'immutable';
@@ -6,10 +7,10 @@ import StringUtils from 'util/StringUtils';
 
 const MessageShow = React.createClass({
   propTypes: {
-    message: React.PropTypes.object,
-    inputs: React.PropTypes.object,
-    streams: React.PropTypes.object,
-    nodes: React.PropTypes.object,
+    message: PropTypes.object,
+    inputs: PropTypes.object,
+    streams: PropTypes.object,
+    nodes: PropTypes.object,
   },
 
   getInitialState() {

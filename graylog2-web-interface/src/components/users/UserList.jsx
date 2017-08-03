@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, OverlayTrigger, Popover, Tooltip } from 'react-bootstrap';
@@ -15,8 +16,8 @@ import UserListStyle from '!style!css!./UserList.css';
 
 const UserList = React.createClass({
   propTypes: {
-    currentUsername: React.PropTypes.string.isRequired,
-    currentUser: React.PropTypes.object.isRequired,
+    currentUsername: PropTypes.string.isRequired,
+    currentUser: PropTypes.object.isRequired,
   },
 
   mixins: [PermissionsMixin],

@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { ButtonGroup, Button, Row, Col, DropdownButton, MenuItem, Label } from 'react-bootstrap';
 import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';

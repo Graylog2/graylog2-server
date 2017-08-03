@@ -1,11 +1,12 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const DocumentTitle = React.createClass({
   propTypes: {
-    title: React.PropTypes.string.isRequired,
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.arrayOf(React.PropTypes.element),
-      React.PropTypes.element,
+    title: PropTypes.string.isRequired,
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.element),
+      PropTypes.element,
     ]).isRequired,
   },
 

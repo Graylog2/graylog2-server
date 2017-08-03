@@ -1,12 +1,13 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { MetricDetails } from 'components/metrics';
 
 const Metric = React.createClass({
   propTypes: {
-    metric: React.PropTypes.object.isRequired,
-    namespace: React.PropTypes.string,
-    nodeId: React.PropTypes.string.isRequired,
+    metric: PropTypes.object.isRequired,
+    namespace: PropTypes.string,
+    nodeId: PropTypes.string.isRequired,
   },
   getInitialState() {
     return {

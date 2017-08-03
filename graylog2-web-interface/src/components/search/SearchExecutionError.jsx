@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from "react";
 import {Col, Panel, Row} from "react-bootstrap";
 
@@ -5,7 +6,7 @@ import {ContactUs} from "components/support";
 
 const SearchExecutionError = React.createClass({
   propTypes: {
-    error: React.PropTypes.object.isRequired,
+    error: PropTypes.object.isRequired,
   },
 
   _getFormattedErrorDetails(details) {

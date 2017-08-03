@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -21,7 +22,7 @@ import Routes from 'routing/Routes';
 
 const IndexSetPage = React.createClass({
   propTypes: {
-    params: React.PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
   },
 
   mixins: [

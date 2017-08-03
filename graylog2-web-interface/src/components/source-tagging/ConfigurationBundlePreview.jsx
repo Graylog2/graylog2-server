@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { markdown } from 'markdown';
@@ -9,9 +10,9 @@ const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBun
 
 const ConfigurationBundlePreview = React.createClass({
   propTypes: {
-    sourceTypeId: React.PropTypes.string,
-    sourceTypeDescription: React.PropTypes.string,
-    onDelete: React.PropTypes.func.isRequired,
+    sourceTypeId: PropTypes.string,
+    sourceTypeDescription: PropTypes.string,
+    onDelete: PropTypes.func.isRequired,
   },
 
   _confirmDeletion() {

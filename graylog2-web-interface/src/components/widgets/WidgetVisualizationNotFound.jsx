@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
 const WidgetVisualizationNotFound = React.createClass({
   propTypes: {
-    widgetClassName: React.PropTypes.string.isRequired,
+    widgetClassName: PropTypes.string.isRequired,
   },
   render() {
     return (

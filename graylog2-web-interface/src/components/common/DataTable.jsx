@@ -1,24 +1,25 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import DataTableElement from './DataTableElement';
 import { TypeAheadDataFilter } from 'components/common';
 
 const DataTable = React.createClass({
   propTypes: {
-    children: React.PropTypes.node,
-    className: React.PropTypes.string,
-    rowClassName: React.PropTypes.string,
-    displayKey: React.PropTypes.string,
-    dataRowFormatter: React.PropTypes.func.isRequired,
-    filterBy: React.PropTypes.string,
-    filterLabel: React.PropTypes.string.isRequired,
-    filterKeys: React.PropTypes.array.isRequired,
-    filterSuggestions: React.PropTypes.array,
-    headerCellFormatter: React.PropTypes.func.isRequired,
-    headers: React.PropTypes.array.isRequired,
-    id: React.PropTypes.string,
-    noDataText: React.PropTypes.oneOfType([React.PropTypes.string, React.PropTypes.node]),
-    rows: React.PropTypes.array.isRequired,
-    sortByKey: React.PropTypes.string,
+    children: PropTypes.node,
+    className: PropTypes.string,
+    rowClassName: PropTypes.string,
+    displayKey: PropTypes.string,
+    dataRowFormatter: PropTypes.func.isRequired,
+    filterBy: PropTypes.string,
+    filterLabel: PropTypes.string.isRequired,
+    filterKeys: PropTypes.array.isRequired,
+    filterSuggestions: PropTypes.array,
+    headerCellFormatter: PropTypes.func.isRequired,
+    headers: PropTypes.array.isRequired,
+    id: PropTypes.string,
+    noDataText: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
+    rows: PropTypes.array.isRequired,
+    sortByKey: PropTypes.string,
   },
   getDefaultProps() {
     return {

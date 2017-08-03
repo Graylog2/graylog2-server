@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import { Row, Col } from 'react-bootstrap';
@@ -16,7 +17,7 @@ import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 
 const DashboardListPage = React.createClass({
   propTypes: {
-    permissions: React.PropTypes.arrayOf(React.PropTypes.string),
+    permissions: PropTypes.arrayOf(PropTypes.string),
   },
   mixins: [PermissionsMixin],
   getInitialState() {

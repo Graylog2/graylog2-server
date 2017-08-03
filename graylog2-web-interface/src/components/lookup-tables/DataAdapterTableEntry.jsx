@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -15,8 +16,8 @@ const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableData
 const DataAdapterTableEntry = React.createClass({
 
   propTypes: {
-    adapter: React.PropTypes.object.isRequired,
-    error: React.PropTypes.string,
+    adapter: PropTypes.object.isRequired,
+    error: PropTypes.string,
   },
 
   getDefaultProps() {

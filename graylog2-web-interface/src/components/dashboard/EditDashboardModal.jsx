@@ -1,5 +1,7 @@
 import $ from 'jquery';
 
+import PropTypes from 'prop-types';
+
 import React from 'react';
 import { Input } from 'components/bootstrap';
 
@@ -10,11 +12,11 @@ const DashboardsStore = StoreProvider.getStore('Dashboards');
 
 const EditDashboardModal = React.createClass({
   propTypes: {
-    action: React.PropTypes.oneOf(['create', 'edit']),
-    description: React.PropTypes.string,
-    id: React.PropTypes.string,
-    onSaved: React.PropTypes.func,
-    title: React.PropTypes.string,
+    action: PropTypes.oneOf(['create', 'edit']),
+    description: PropTypes.string,
+    id: PropTypes.string,
+    onSaved: PropTypes.func,
+    title: PropTypes.string,
   },
   getInitialState() {
     return {

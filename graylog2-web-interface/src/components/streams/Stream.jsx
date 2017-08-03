@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import StreamThroughput from './StreamThroughput';
 import StreamControls from './StreamControls';
 import StreamStateBadge from './StreamStateBadge';
@@ -25,7 +26,7 @@ const Stream = React.createClass({
       permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
       streamRuleTypes: PropTypes.array.isRequired,
       user: PropTypes.object.isRequired,
-      indexSets: React.PropTypes.array.isRequired,
+      indexSets: PropTypes.array.isRequired,
     };
   },
   mixins: [PermissionsMixin],

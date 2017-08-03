@@ -1,15 +1,16 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { MessageFieldDescription } from 'components/search';
 
 const MessageField = React.createClass({
   propTypes: {
-    customFieldActions: React.PropTypes.node,
-    disableFieldActions: React.PropTypes.bool,
-    fieldName: React.PropTypes.string.isRequired,
-    message: React.PropTypes.object.isRequired,
-    possiblyHighlight: React.PropTypes.func.isRequired,
-    value: React.PropTypes.any.isRequired,
+    customFieldActions: PropTypes.node,
+    disableFieldActions: PropTypes.bool,
+    fieldName: PropTypes.string.isRequired,
+    message: PropTypes.object.isRequired,
+    possiblyHighlight: PropTypes.func.isRequired,
+    value: PropTypes.any.isRequired,
   },
   SPECIAL_FIELDS: ['full_message', 'level'],
   _isAdded(key) {

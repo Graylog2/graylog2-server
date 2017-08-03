@@ -1,8 +1,9 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const Spinner = React.createClass({
   propTypes: {
-    text: React.PropTypes.string,
+    text: PropTypes.string,
   },
   getDefaultProps() {
     return { text: 'Loading...' };

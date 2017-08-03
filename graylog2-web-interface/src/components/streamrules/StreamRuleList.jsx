@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import StreamRule from 'components/streamrules/StreamRule';
@@ -5,12 +6,12 @@ import { Spinner } from 'components/common';
 
 const StreamRuleList = React.createClass({
   propTypes: {
-    matchData: React.PropTypes.object,
-    onSubmit: React.PropTypes.func,
-    onDelete: React.PropTypes.func,
-    permissions: React.PropTypes.array.isRequired,
-    stream: React.PropTypes.object.isRequired,
-    streamRuleTypes: React.PropTypes.array.isRequired,
+    matchData: PropTypes.object,
+    onSubmit: PropTypes.func,
+    onDelete: PropTypes.func,
+    permissions: PropTypes.array.isRequired,
+    stream: PropTypes.object.isRequired,
+    streamRuleTypes: PropTypes.array.isRequired,
   },
 
   _formatStreamRules(streamRules) {

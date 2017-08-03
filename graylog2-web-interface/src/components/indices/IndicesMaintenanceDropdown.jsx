@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 
@@ -10,8 +11,8 @@ const DeflectorStore = StoreProvider.getStore('Deflector'); // eslint-disable-li
 
 const IndicesMaintenanceDropdown = React.createClass({
   propTypes: {
-    indexSetId: React.PropTypes.string.isRequired,
-    indexSet: React.PropTypes.object,
+    indexSetId: PropTypes.string.isRequired,
+    indexSet: PropTypes.object,
   },
 
   _onRecalculateIndexRange() {

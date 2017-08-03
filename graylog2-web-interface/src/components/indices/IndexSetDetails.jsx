@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
@@ -7,7 +8,7 @@ const style = require('!style/useable!css!./IndexSetDetails.css');
 
 const IndexSetDetails = React.createClass({
   propTypes: {
-    indexSet: React.PropTypes.object.isRequired,
+    indexSet: PropTypes.object.isRequired,
   },
 
   componentDidMount() {

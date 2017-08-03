@@ -1,14 +1,15 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { ChangedMessageField, MessageField } from 'components/search';
 
 const MessageFields = React.createClass({
   propTypes: {
-    customFieldActions: React.PropTypes.node,
-    disableFieldActions: React.PropTypes.bool,
-    message: React.PropTypes.object.isRequired,
-    possiblyHighlight: React.PropTypes.func.isRequired,
-    showDecoration: React.PropTypes.bool,
+    customFieldActions: PropTypes.node,
+    disableFieldActions: PropTypes.bool,
+    message: PropTypes.object.isRequired,
+    possiblyHighlight: PropTypes.func.isRequired,
+    showDecoration: PropTypes.bool,
   },
 
   getDefaultProps() {

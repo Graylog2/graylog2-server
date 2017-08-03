@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Immutable from 'immutable';
@@ -25,11 +26,11 @@ import moment from 'moment';
 
 const SearchBar = React.createClass({
   propTypes: {
-    userPreferences: React.PropTypes.object,
-    savedSearches: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-    config: React.PropTypes.object,
-    displayRefreshControls: React.PropTypes.bool,
-    onExecuteSearch: React.PropTypes.func,
+    userPreferences: PropTypes.object,
+    savedSearches: PropTypes.arrayOf(PropTypes.object).isRequired,
+    config: PropTypes.object,
+    displayRefreshControls: PropTypes.bool,
+    onExecuteSearch: PropTypes.func,
   },
 
   getDefaultProps() {

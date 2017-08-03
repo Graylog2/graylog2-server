@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ListGroupItem } from 'react-bootstrap';
@@ -81,15 +82,15 @@ function collectTarget(connect, monitor) {
 
 const SortableListItem = React.createClass({
   propTypes: {
-    connectDragSource: React.PropTypes.func.isRequired,
-    connectDropTarget: React.PropTypes.func.isRequired,
-    content: React.PropTypes.any.isRequired,
-    disableDragging: React.PropTypes.bool,
-    index: React.PropTypes.number.isRequired,
-    isDragging: React.PropTypes.bool.isRequired,
-    isOver: React.PropTypes.bool.isRequired,
-    id: React.PropTypes.any.isRequired,
-    moveItem: React.PropTypes.func.isRequired,
+    connectDragSource: PropTypes.func.isRequired,
+    connectDropTarget: PropTypes.func.isRequired,
+    content: PropTypes.any.isRequired,
+    disableDragging: PropTypes.bool,
+    index: PropTypes.number.isRequired,
+    isDragging: PropTypes.bool.isRequired,
+    isOver: PropTypes.bool.isRequired,
+    id: PropTypes.any.isRequired,
+    moveItem: PropTypes.func.isRequired,
   },
   getDefaultProps() {
     return {

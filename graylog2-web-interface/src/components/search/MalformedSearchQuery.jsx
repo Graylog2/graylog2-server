@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, Panel, Row } from 'react-bootstrap';
 
@@ -6,7 +7,7 @@ import DocsHelper from 'util/DocsHelper';
 
 const MalformedSearchQuery = React.createClass({
   propTypes: {
-    error: React.PropTypes.object.isRequired,
+    error: PropTypes.object.isRequired,
   },
 
   _isGenericError(error) {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from "react";
 import Reflux from "reflux";
 
@@ -9,7 +10,7 @@ const SystemStore = StoreProvider.getStore('System');
 const LocaleSelect = React.createClass({
   mixins: [Reflux.connect(SystemStore)],
   propTypes: {
-    onChange: React.PropTypes.func,
+    onChange: PropTypes.func,
   },
   getValue() {
     return this.refs.locale.getValue();

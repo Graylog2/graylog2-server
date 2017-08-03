@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Row, Col, Button } from 'react-bootstrap';
 

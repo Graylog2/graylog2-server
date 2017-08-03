@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Label, OverlayTrigger, Popover } from 'react-bootstrap';
@@ -12,7 +13,7 @@ import InputStateComparator from 'logic/inputs/InputStateComparator';
 
 const InputStateBadge = React.createClass({
   propTypes: {
-    input: React.PropTypes.object.isRequired,
+    input: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(InputStatesStore), Reflux.connect(NodesStore)],
   comparator: new InputStateComparator(),

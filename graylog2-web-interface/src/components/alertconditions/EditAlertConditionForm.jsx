@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
@@ -12,8 +13,8 @@ const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 
 const EditAlertConditionForm = React.createClass({
   propTypes: {
-    alertCondition: React.PropTypes.object.isRequired,
-    stream: React.PropTypes.object.isRequired,
+    alertCondition: PropTypes.object.isRequired,
+    stream: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],

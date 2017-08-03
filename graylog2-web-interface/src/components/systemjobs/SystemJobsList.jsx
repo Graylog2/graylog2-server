@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
@@ -5,7 +6,7 @@ import { SystemJob } from 'components/systemjobs';
 
 const SystemJobsList = React.createClass({
   propTypes: {
-    jobs: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
+    jobs: PropTypes.arrayOf(PropTypes.object).isRequired,
   },
   _formatSystemJob(job) {
     return (

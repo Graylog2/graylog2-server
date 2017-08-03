@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import { Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
@@ -7,14 +8,14 @@ import { TypeAheadDataFilter } from 'components/common';
 
 const TableList = React.createClass({
   propTypes: {
-    idKey: React.PropTypes.string,
-    titleKey: React.PropTypes.string,
-    descriptionKey: React.PropTypes.string,
-    filterKeys: React.PropTypes.arrayOf(React.PropTypes.string),
-    filterLabel: React.PropTypes.string,
-    items: React.PropTypes.instanceOf(Immutable.List),
-    headerActionsFactory: React.PropTypes.func,
-    itemActionsFactory: React.PropTypes.func,
+    idKey: PropTypes.string,
+    titleKey: PropTypes.string,
+    descriptionKey: PropTypes.string,
+    filterKeys: PropTypes.arrayOf(PropTypes.string),
+    filterLabel: PropTypes.string,
+    items: PropTypes.instanceOf(Immutable.List),
+    headerActionsFactory: PropTypes.func,
+    itemActionsFactory: PropTypes.func,
   },
   getDefaultProps() {
     return {

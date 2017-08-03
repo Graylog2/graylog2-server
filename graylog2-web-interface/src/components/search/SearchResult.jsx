@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import { Col, Row } from 'react-bootstrap';
@@ -13,19 +14,19 @@ import {} from 'components/field-analyzers'; // Make sure to load all field anal
 
 const SearchResult = React.createClass({
   propTypes: {
-    query: React.PropTypes.string,
-    builtQuery: React.PropTypes.string,
-    result: React.PropTypes.object.isRequired,
-    histogram: React.PropTypes.object.isRequired,
-    formattedHistogram: React.PropTypes.array,
-    searchInStream: React.PropTypes.object,
-    streams: React.PropTypes.instanceOf(Immutable.Map),
-    inputs: React.PropTypes.instanceOf(Immutable.Map),
-    nodes: React.PropTypes.instanceOf(Immutable.Map),
-    permissions: React.PropTypes.array.isRequired,
-    searchConfig: React.PropTypes.object.isRequired,
-    loadingSearch: React.PropTypes.bool,
-    forceFetch: React.PropTypes.bool,
+    query: PropTypes.string,
+    builtQuery: PropTypes.string,
+    result: PropTypes.object.isRequired,
+    histogram: PropTypes.object.isRequired,
+    formattedHistogram: PropTypes.array,
+    searchInStream: PropTypes.object,
+    streams: PropTypes.instanceOf(Immutable.Map),
+    inputs: PropTypes.instanceOf(Immutable.Map),
+    nodes: PropTypes.instanceOf(Immutable.Map),
+    permissions: PropTypes.array.isRequired,
+    searchConfig: PropTypes.object.isRequired,
+    loadingSearch: PropTypes.bool,
+    forceFetch: PropTypes.bool,
   },
 
   getDefaultProps() {

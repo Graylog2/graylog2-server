@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const HumanReadableStreamRule = React.createClass({
   propTypes: {
-    streamRule: React.PropTypes.object.isRequired,
-    streamRuleTypes: React.PropTypes.array.isRequired,
+    streamRule: PropTypes.object.isRequired,
+    streamRuleTypes: PropTypes.array.isRequired,
   },
   EMPTY_TAG: '<empty>',
   FIELD_PRESENCE_RULE_TYPE: 5,

@@ -1,14 +1,15 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
 
 const EditPatternModal = React.createClass({
   propTypes: {
-    id: React.PropTypes.string,
-    name: React.PropTypes.string,
-    pattern: React.PropTypes.string,
-    create: React.PropTypes.bool,
-    savePattern: React.PropTypes.func.isRequired,
-    validPatternName: React.PropTypes.func.isRequired,
+    id: PropTypes.string,
+    name: PropTypes.string,
+    pattern: PropTypes.string,
+    create: PropTypes.bool,
+    savePattern: PropTypes.func.isRequired,
+    validPatternName: PropTypes.func.isRequired,
   },
   getInitialState() {
     return {

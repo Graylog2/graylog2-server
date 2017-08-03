@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const ConfigurationWell = React.createClass({
   propTypes: {
-    id: React.PropTypes.string,
-    configuration: React.PropTypes.any,
-    typeDefinition: React.PropTypes.object,
+    id: PropTypes.string,
+    configuration: PropTypes.any,
+    typeDefinition: PropTypes.object,
   },
   PASSWORD_PLACEHOLDER: '********',
   _formatRegularField(value, key) {

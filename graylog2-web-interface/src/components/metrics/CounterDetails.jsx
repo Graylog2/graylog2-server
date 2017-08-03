@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 
 const CounterDetails = React.createClass({
   propTypes: {
-    metric: React.PropTypes.object.isRequired,
+    metric: PropTypes.object.isRequired,
   },
   render() {
     const metric = this.props.metric.metric;

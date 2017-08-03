@@ -1,15 +1,16 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Pagination } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 
 const PaginatedList = React.createClass({
   propTypes: {
-    children: React.PropTypes.node.isRequired,
-    onChange: React.PropTypes.func.isRequired,
-    pageSize: React.PropTypes.number,
-    pageSizes: React.PropTypes.arrayOf(React.PropTypes.number),
-    totalItems: React.PropTypes.number.isRequired,
-    showPageSizeSelect: React.PropTypes.bool,
+    children: PropTypes.node.isRequired,
+    onChange: PropTypes.func.isRequired,
+    pageSize: PropTypes.number,
+    pageSizes: PropTypes.arrayOf(PropTypes.number),
+    totalItems: PropTypes.number.isRequired,
+    showPageSizeSelect: PropTypes.bool,
   },
   getDefaultProps() {
     const defaultPageSizes = [10, 50, 100];

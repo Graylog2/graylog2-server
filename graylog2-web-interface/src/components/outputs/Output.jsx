@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Button, Col, Row } from 'react-bootstrap';
 
@@ -7,12 +8,12 @@ import { IfPermitted, Spinner } from 'components/common';
 
 const Output = React.createClass({
   propTypes: {
-    streamId: React.PropTypes.string,
-    output: React.PropTypes.object.isRequired,
-    types: React.PropTypes.object.isRequired,
-    getTypeDefinition: React.PropTypes.func.isRequired,
-    removeOutputFromStream: React.PropTypes.func.isRequired,
-    removeOutputGlobally: React.PropTypes.func.isRequired,
+    streamId: PropTypes.string,
+    output: PropTypes.object.isRequired,
+    types: PropTypes.object.isRequired,
+    getTypeDefinition: PropTypes.func.isRequired,
+    removeOutputFromStream: PropTypes.func.isRequired,
+    removeOutputGlobally: PropTypes.func.isRequired,
   },
   getInitialState() {
     return {};

@@ -1,5 +1,6 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
 import { Button, Grid, Row, Col } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 import Qs from 'qs';
 
 import { Spinner } from 'components/common';

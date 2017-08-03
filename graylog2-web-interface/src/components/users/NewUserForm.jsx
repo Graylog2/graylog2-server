@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Row, Col, Button } from 'react-bootstrap';
 
@@ -13,9 +14,9 @@ import ValidationsUtils from 'util/ValidationsUtils';
 
 const NewUserForm = React.createClass({
   propTypes: {
-    roles: React.PropTypes.array.isRequired,
-    onSubmit: React.PropTypes.func.isRequired,
-    onCancel: React.PropTypes.func.isRequired,
+    roles: PropTypes.array.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
   },
 
   getInitialState() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Checkbox, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup, Radio } from 'react-bootstrap';
 
@@ -18,31 +19,31 @@ const generateId = () => {
  */
 const Input = React.createClass({
   propTypes: {
-    id: React.PropTypes.string,
-    type: React.PropTypes.string,
-    label: React.PropTypes.oneOfType([
-      React.PropTypes.element,
-      React.PropTypes.string,
+    id: PropTypes.string,
+    type: PropTypes.string,
+    label: PropTypes.oneOfType([
+      PropTypes.element,
+      PropTypes.string,
     ]),
-    labelClassName: React.PropTypes.string,
-    bsStyle: React.PropTypes.oneOf(['success', 'warning', 'error']),
-    value: React.PropTypes.oneOfType([
-      React.PropTypes.string,
-      React.PropTypes.number,
+    labelClassName: PropTypes.string,
+    bsStyle: PropTypes.oneOf(['success', 'warning', 'error']),
+    value: PropTypes.oneOfType([
+      PropTypes.string,
+      PropTypes.number,
     ]),
-    placeholder: React.PropTypes.string,
-    help: React.PropTypes.oneOfType([
-      React.PropTypes.element,
-      React.PropTypes.string,
+    placeholder: PropTypes.string,
+    help: PropTypes.oneOfType([
+      PropTypes.element,
+      PropTypes.string,
     ]),
-    wrapperClassName: React.PropTypes.string,
-    addonAfter: React.PropTypes.oneOfType([
-      React.PropTypes.element,
-      React.PropTypes.string,
+    wrapperClassName: PropTypes.string,
+    addonAfter: PropTypes.oneOfType([
+      PropTypes.element,
+      PropTypes.string,
     ]),
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.array,
-      React.PropTypes.element,
+    children: PropTypes.oneOfType([
+      PropTypes.array,
+      PropTypes.element,
     ]),
   },
 

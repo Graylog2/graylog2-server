@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
 
 import ActionsProvider from 'injection/ActionsProvider';
