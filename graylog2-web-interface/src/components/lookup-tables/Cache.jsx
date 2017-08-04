@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -8,7 +9,7 @@ import Styles from './ConfigSummary.css';
 const Cache = React.createClass({
 
   propTypes: {
-    cache: React.PropTypes.object.isRequired,
+    cache: PropTypes.object.isRequired,
   },
 
   render() {

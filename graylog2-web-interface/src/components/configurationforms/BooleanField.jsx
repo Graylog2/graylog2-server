@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import FieldHelpers from './FieldHelpers';
 
@@ -5,12 +6,12 @@ import FormsUtils from 'util/FormsUtils';
 
 const BooleanField = React.createClass({
   propTypes: {
-    autoFocus: React.PropTypes.bool,
-    field: React.PropTypes.object.isRequired,
-    onChange: React.PropTypes.func.isRequired,
-    title: React.PropTypes.string.isRequired,
-    typeName: React.PropTypes.string.isRequired,
-    value: React.PropTypes.any,
+    autoFocus: PropTypes.bool,
+    field: PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
+    typeName: PropTypes.string.isRequired,
+    value: PropTypes.any,
   },
   render() {
     const field = this.props.field;

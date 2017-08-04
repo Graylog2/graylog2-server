@@ -1,5 +1,6 @@
+import PropTypes from 'prop-types';
 import React from 'react';
-import { PropTypes, Component } from 'react';
+import { Component } from 'react';
 import { Input } from 'components/bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';

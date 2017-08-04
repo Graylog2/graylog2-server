@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Col, Row } from 'react-bootstrap';
 
@@ -13,11 +14,11 @@ import { IndexRangeSummary, ShardMeter, ShardRoutingOverview } from 'components/
 
 const IndexDetails = React.createClass({
   propTypes: {
-    index: React.PropTypes.object.isRequired,
-    indexName: React.PropTypes.string.isRequired,
-    indexRange: React.PropTypes.object.isRequired,
-    indexSetId: React.PropTypes.string.isRequired,
-    isDeflector: React.PropTypes.bool.isRequired,
+    index: PropTypes.object.isRequired,
+    indexName: PropTypes.string.isRequired,
+    indexRange: PropTypes.object.isRequired,
+    indexSetId: PropTypes.string.isRequired,
+    isDeflector: PropTypes.bool.isRequired,
   },
   componentDidMount() {
     IndicesActions.subscribe(this.props.indexName);

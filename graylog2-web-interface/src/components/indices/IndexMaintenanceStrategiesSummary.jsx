@@ -1,11 +1,12 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 import Spinner from 'components/common/Spinner';
 
 const IndexMaintenanceStrategiesSummary = React.createClass({
   propTypes: {
-    config: React.PropTypes.object.isRequired,
-    pluginExports: React.PropTypes.array.isRequired,
+    config: PropTypes.object.isRequired,
+    pluginExports: PropTypes.array.isRequired,
   },
 
   render() {

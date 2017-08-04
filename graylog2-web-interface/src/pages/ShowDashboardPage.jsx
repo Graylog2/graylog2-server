@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
@@ -25,8 +26,8 @@ import style from './ShowDashboardPage.css';
 
 const ShowDashboardPage = React.createClass({
   propTypes: {
-    history: React.PropTypes.object.isRequired,
-    params: React.PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
 

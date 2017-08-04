@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
@@ -11,7 +12,7 @@ import { Spinner } from 'components/common';
 
 const StreamThroughput = React.createClass({
   propTypes: {
-    streamId: React.PropTypes.string.isRequired,
+    streamId: PropTypes.string.isRequired,
   },
   mixins: [Reflux.connect(MetricsStore)],
   componentWillMount() {

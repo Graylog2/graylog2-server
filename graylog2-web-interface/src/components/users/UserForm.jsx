@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Button, Row, Col, Alert, Panel } from 'react-bootstrap';
@@ -22,8 +23,8 @@ import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/co
 
 const UserForm = React.createClass({
   propTypes: {
-    user: React.PropTypes.object.isRequired,
-    history: React.PropTypes.object,
+    user: PropTypes.object.isRequired,
+    history: PropTypes.object,
   },
   mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
   getInitialState() {

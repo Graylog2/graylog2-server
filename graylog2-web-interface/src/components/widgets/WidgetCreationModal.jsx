@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -10,10 +11,10 @@ import StringUtils from 'util/StringUtils';
 
 const WidgetCreationModal = React.createClass({
   propTypes: {
-    fields: React.PropTypes.array,
-    onConfigurationSaved: React.PropTypes.func.isRequired,
-    onModalHidden: React.PropTypes.func,
-    widgetType: React.PropTypes.string.isRequired,
+    fields: PropTypes.array,
+    onConfigurationSaved: PropTypes.func.isRequired,
+    onModalHidden: PropTypes.func,
+    widgetType: PropTypes.string.isRequired,
   },
 
   getInitialState() {

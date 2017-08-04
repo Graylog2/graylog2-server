@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import { Alert, Button, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
@@ -8,11 +9,11 @@ import PermissionsMixin from 'util/PermissionsMixin';
 
 const EditRole = React.createClass({
   propTypes: {
-    initialRole: React.PropTypes.object,
-    onSave: React.PropTypes.func.isRequired,
-    cancelEdit: React.PropTypes.func.isRequired,
-    streams: React.PropTypes.object,
-    dashboards: React.PropTypes.object,
+    initialRole: PropTypes.object,
+    onSave: PropTypes.func.isRequired,
+    cancelEdit: PropTypes.func.isRequired,
+    streams: PropTypes.object,
+    dashboards: PropTypes.object,
   },
 
   mixins: [PermissionsMixin],

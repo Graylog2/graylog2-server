@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
@@ -12,8 +13,8 @@ import UserPreferencesButton from 'components/users/UserPreferencesButton';
 
 const EditUsersPage = React.createClass({
   propTypes: {
-    params: React.PropTypes.object.isRequired,
-    history: React.PropTypes.object,
+    params: PropTypes.object.isRequired,
+    history: PropTypes.object,
   },
   getInitialState() {
     return {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
@@ -11,8 +12,8 @@ import PermissionsMixin from 'util/PermissionsMixin';
 
 const AlertCondition = React.createClass({
   propTypes: {
-    alertCondition: React.PropTypes.object.isRequired,
-    stream: React.PropTypes.object,
+    alertCondition: PropTypes.object.isRequired,
+    stream: PropTypes.object,
   },
   mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
 

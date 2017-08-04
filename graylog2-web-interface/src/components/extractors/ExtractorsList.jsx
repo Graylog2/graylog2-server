@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';

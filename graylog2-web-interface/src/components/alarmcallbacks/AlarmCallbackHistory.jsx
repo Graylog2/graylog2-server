@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Col, Label } from 'react-bootstrap';
 
@@ -7,8 +8,8 @@ import DateTime from 'logic/datetimes/DateTime';
 
 const AlarmCallbackHistory = React.createClass({
   propTypes: {
-    types: React.PropTypes.object.isRequired,
-    alarmCallbackHistory: React.PropTypes.object.isRequired,
+    types: PropTypes.object.isRequired,
+    alarmCallbackHistory: PropTypes.object.isRequired,
   },
 
   render() {

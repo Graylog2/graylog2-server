@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import moment from 'moment';
@@ -12,10 +13,10 @@ import style from './AlertTimeline.css';
 
 const AlertTimeline = React.createClass({
   propTypes: {
-    alert: React.PropTypes.object.isRequired,
-    stream: React.PropTypes.object.isRequired,
-    condition: React.PropTypes.object,
-    conditionType: React.PropTypes.object,
+    alert: PropTypes.object.isRequired,
+    stream: PropTypes.object.isRequired,
+    condition: PropTypes.object,
+    conditionType: PropTypes.object,
   },
 
   mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(AlarmCallbackHistoryStore)],

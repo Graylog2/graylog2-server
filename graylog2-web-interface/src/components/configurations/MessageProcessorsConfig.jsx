@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Alert, Table } from 'react-bootstrap';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -7,8 +8,8 @@ import naturalSort from 'javascript-natural-sort';
 
 const MessageProcessorsConfig = React.createClass({
   propTypes: {
-    config: React.PropTypes.object.isRequired,
-    updateConfig: React.PropTypes.func.isRequired,
+    config: PropTypes.object.isRequired,
+    updateConfig: PropTypes.func.isRequired,
   },
 
   getDefaultProps() {

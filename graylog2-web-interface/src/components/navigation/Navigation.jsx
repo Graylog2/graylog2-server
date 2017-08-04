@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
@@ -22,10 +23,10 @@ import { IfPermitted } from 'components/common';
 
 const Navigation = React.createClass({
   propTypes: {
-    requestPath: React.PropTypes.string.isRequired,
-    loginName: React.PropTypes.string.isRequired,
-    fullName: React.PropTypes.string.isRequired,
-    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
+    requestPath: PropTypes.string.isRequired,
+    loginName: PropTypes.string.isRequired,
+    fullName: PropTypes.string.isRequired,
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
   },
 
   mixins: [PermissionsMixin, Reflux.connect(NotificationsStore)],

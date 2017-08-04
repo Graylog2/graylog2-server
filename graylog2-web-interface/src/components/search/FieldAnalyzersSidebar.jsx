@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Input } from 'components/bootstrap';
@@ -6,19 +7,19 @@ import { DecoratedSidebarMessageField, SidebarMessageField } from 'components/se
 
 const FieldAnalyzersSidebar = React.createClass({
   propTypes: {
-    fields: React.PropTypes.array,
-    fieldAnalyzers: React.PropTypes.array,
-    onFieldAnalyzer: React.PropTypes.func,
-    onFieldToggled: React.PropTypes.func,
-    maximumHeight: React.PropTypes.number,
-    predefinedFieldSelection: React.PropTypes.func,
-    result: React.PropTypes.object,
-    selectedFields: React.PropTypes.object,
-    shouldHighlight: React.PropTypes.bool,
-    showAllFields: React.PropTypes.bool,
-    showHighlightToggle: React.PropTypes.bool,
-    togglePageFields: React.PropTypes.func,
-    toggleShouldHighlight: React.PropTypes.func,
+    fields: PropTypes.array,
+    fieldAnalyzers: PropTypes.array,
+    onFieldAnalyzer: PropTypes.func,
+    onFieldToggled: PropTypes.func,
+    maximumHeight: PropTypes.number,
+    predefinedFieldSelection: PropTypes.func,
+    result: PropTypes.object,
+    selectedFields: PropTypes.object,
+    shouldHighlight: PropTypes.bool,
+    showAllFields: PropTypes.bool,
+    showHighlightToggle: PropTypes.bool,
+    togglePageFields: PropTypes.func,
+    toggleShouldHighlight: PropTypes.func,
   },
 
   getInitialState() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -18,7 +19,7 @@ import Routes from 'routing/Routes';
 
 const IndexSetCreationPage = React.createClass({
   propTypes: {
-    history: React.PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connect(IndexSetsStore), Reflux.connect(IndicesConfigurationStore)],

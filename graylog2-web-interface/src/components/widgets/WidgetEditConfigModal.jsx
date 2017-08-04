@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
@@ -12,9 +13,9 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 
 const WidgetEditConfigModal = React.createClass({
   propTypes: {
-    onModalHidden: React.PropTypes.func,
-    onUpdate: React.PropTypes.func.isRequired,
-    widget: React.PropTypes.object.isRequired,
+    onModalHidden: PropTypes.func,
+    onUpdate: PropTypes.func.isRequired,
+    widget: PropTypes.object.isRequired,
   },
 
   getInitialState() {

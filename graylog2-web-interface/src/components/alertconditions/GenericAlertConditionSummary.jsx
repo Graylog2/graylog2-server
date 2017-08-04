@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { ConfigurationWell } from 'components/configurationforms';
@@ -6,7 +7,7 @@ import BacklogSummary from 'components/alertconditions/BacklogSummary';
 
 const GenericAlertConditionSummary = React.createClass({
   propTypes: {
-    alertCondition: React.PropTypes.object.isRequired,
+    alertCondition: PropTypes.object.isRequired,
   },
 
   render() {

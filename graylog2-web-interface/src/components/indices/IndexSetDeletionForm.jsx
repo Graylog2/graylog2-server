@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
@@ -10,8 +11,8 @@ const { StreamsStore } = CombinedProvider.get('Streams');
 
 const IndexSetDeletionForm = React.createClass({
   propTypes: {
-    indexSet: React.PropTypes.object.isRequired,
-    onDelete: React.PropTypes.func.isRequired,
+    indexSet: PropTypes.object.isRequired,
+    onDelete: PropTypes.func.isRequired,
   },
 
   getInitialState() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import jQuery from 'jquery';
 
@@ -6,11 +7,11 @@ import { ConfigurationForm } from 'components/configurationforms';
 
 const InputForm = React.createClass({
   propTypes: {
-    globalValue: React.PropTypes.bool,
-    nodeValue: React.PropTypes.string,
-    titleValue: React.PropTypes.string,
-    submitAction: React.PropTypes.func.isRequired,
-    values: React.PropTypes.object,
+    globalValue: PropTypes.bool,
+    nodeValue: PropTypes.string,
+    titleValue: PropTypes.string,
+    submitAction: PropTypes.func.isRequired,
+    values: PropTypes.object,
   },
   getInitialState() {
     return {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import numeral from 'numeral';
@@ -13,7 +14,7 @@ import { LinkToNode, Spinner } from 'components/common';
 
 const InputThroughput = React.createClass({
   propTypes: {
-    input: React.PropTypes.object.isRequired,
+    input: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(MetricsStore)],
   getInitialState() {

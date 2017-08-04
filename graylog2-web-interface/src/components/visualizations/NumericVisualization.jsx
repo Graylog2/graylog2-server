@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import deepEqual from 'deep-equal';
 
@@ -10,10 +11,10 @@ const TrendIndicatorType = {
 
 const NumericVisualization = React.createClass({
   propTypes: {
-    config: React.PropTypes.object.isRequired,
-    data: React.PropTypes.oneOfType([
-      React.PropTypes.object,
-      React.PropTypes.number,
+    config: PropTypes.object.isRequired,
+    data: PropTypes.oneOfType([
+      PropTypes.object,
+      PropTypes.number,
     ]).isRequired,
   },
   getInitialState() {

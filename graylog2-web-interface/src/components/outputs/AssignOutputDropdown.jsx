@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button } from 'react-bootstrap';
 
 const AssignOutputDropdown = React.createClass({
   propTypes: {
-    outputs: React.PropTypes.array.isRequired,
-    onSubmit: React.PropTypes.func.isRequired,
+    outputs: PropTypes.array.isRequired,
+    onSubmit: PropTypes.func.isRequired,
   },
   getInitialState() {
     return {

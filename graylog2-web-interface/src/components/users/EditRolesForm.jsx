@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Col, Button, Row } from 'react-bootstrap';
 import Routes from 'routing/Routes';
@@ -17,8 +18,8 @@ import EditRolesFormStyle from '!style!css!./EditRolesForm.css';
 
 const EditRolesForm = React.createClass({
   propTypes: {
-    user: React.PropTypes.object.isRequired,
-    history: React.PropTypes.object,
+    user: PropTypes.object.isRequired,
+    history: PropTypes.object,
   },
   getInitialState() {
     return {

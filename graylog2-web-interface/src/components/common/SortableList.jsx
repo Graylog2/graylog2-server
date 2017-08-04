@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { ListGroup } from 'react-bootstrap';
 import { DragDropContext } from 'react-dnd';
 import HTML5Backend from 'react-dnd-html5-backend';
@@ -7,7 +8,7 @@ import SortableListItem from './SortableListItem';
 
 const SortableList = React.createClass({
   propTypes: {
-    disableDragging: React.PropTypes.bool,
+    disableDragging: PropTypes.bool,
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
     onMoveItem: PropTypes.func,
   },

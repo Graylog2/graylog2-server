@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Link } from 'react-router';
@@ -10,7 +11,7 @@ import { Spinner } from 'components/common';
 
 const LinkToNode = React.createClass({
   propTypes: {
-    nodeId: React.PropTypes.string.isRequired,
+    nodeId: PropTypes.string.isRequired,
   },
   mixins: [Reflux.connect(NodesStore)],
   render() {

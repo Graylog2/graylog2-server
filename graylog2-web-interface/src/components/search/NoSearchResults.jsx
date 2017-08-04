@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 
@@ -12,10 +13,10 @@ const SearchStore = StoreProvider.getStore('Search');
 
 const NoSearchResults = React.createClass({
   propTypes: {
-    builtQuery: React.PropTypes.string,
-    histogram: React.PropTypes.object.isRequired,
-    permissions: React.PropTypes.array.isRequired,
-    searchInStream: React.PropTypes.object,
+    builtQuery: PropTypes.string,
+    histogram: PropTypes.object.isRequired,
+    permissions: PropTypes.array.isRequired,
+    searchInStream: PropTypes.object,
   },
 
   componentDidMount() {

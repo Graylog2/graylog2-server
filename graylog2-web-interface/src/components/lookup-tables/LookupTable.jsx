@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, ButtonToolbar, Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
@@ -14,9 +15,9 @@ const { LookupTablesActions } = CombinedProvider.get('LookupTables');
 const LookupTable = React.createClass({
 
   propTypes: {
-    table: React.PropTypes.object.isRequired,
-    cache: React.PropTypes.object.isRequired,
-    dataAdapter: React.PropTypes.object.isRequired,
+    table: PropTypes.object.isRequired,
+    cache: PropTypes.object.isRequired,
+    dataAdapter: PropTypes.object.isRequired,
   },
 
   getInitialState() {

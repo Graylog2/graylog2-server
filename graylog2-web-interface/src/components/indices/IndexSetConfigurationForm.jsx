@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
 import { Button, Col, Row } from 'react-bootstrap';
@@ -12,12 +13,12 @@ import {} from 'components/indices/retention'; // Load rotation plugin UI plugin
 
 const IndexSetConfigurationForm = React.createClass({
   propTypes: {
-    indexSet: React.PropTypes.object.isRequired,
-    rotationStrategies: React.PropTypes.array.isRequired,
-    retentionStrategies: React.PropTypes.array.isRequired,
-    create: React.PropTypes.bool,
-    onUpdate: React.PropTypes.func.isRequired,
-    cancelLink: React.PropTypes.string.isRequired,
+    indexSet: PropTypes.object.isRequired,
+    rotationStrategies: PropTypes.array.isRequired,
+    retentionStrategies: PropTypes.array.isRequired,
+    create: PropTypes.bool,
+    onUpdate: PropTypes.func.isRequired,
+    cancelLink: PropTypes.string.isRequired,
   },
 
   getInitialState() {

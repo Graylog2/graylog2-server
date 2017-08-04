@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import GracePeriodSummary from 'components/alertconditions/GracePeriodSummary';
@@ -6,7 +7,7 @@ import RepeatNotificationsSummary from 'components/alertconditions/RepeatNotific
 
 const FieldContentConditionSummary = React.createClass({
   propTypes: {
-    alertCondition: React.PropTypes.object.isRequired,
+    alertCondition: PropTypes.object.isRequired,
   },
   _formatMatcher(field, value) {
     return <span>{`\<${field}: "${value}"\>`}</span>;

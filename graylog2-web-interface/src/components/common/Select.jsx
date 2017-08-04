@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactSelect from 'react-select';
 
 const propTypes = ReactSelect.propTypes;
-propTypes.onValueChange = React.PropTypes.func;
-propTypes.size = React.PropTypes.oneOf(['normal', 'small']);
+propTypes.onValueChange = PropTypes.func;
+propTypes.size = PropTypes.oneOf(['normal', 'small']);
 
 const Select = React.createClass({
   propTypes: propTypes,

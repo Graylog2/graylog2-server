@@ -1,4 +1,5 @@
 import $ from 'jquery';
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -13,15 +14,15 @@ import {
 
 const ConfigurationForm = React.createClass({
   propTypes: {
-    cancelAction: React.PropTypes.func,
-    children: React.PropTypes.node,
-    helpBlock: React.PropTypes.node,
-    includeTitleField: React.PropTypes.bool,
-    submitAction: React.PropTypes.func.isRequired,
-    title: React.PropTypes.node,
-    titleValue: React.PropTypes.string,
-    typeName: React.PropTypes.string,
-    values: React.PropTypes.object,
+    cancelAction: PropTypes.func,
+    children: PropTypes.node,
+    helpBlock: PropTypes.node,
+    includeTitleField: PropTypes.bool,
+    submitAction: PropTypes.func.isRequired,
+    title: PropTypes.node,
+    titleValue: PropTypes.string,
+    typeName: PropTypes.string,
+    values: PropTypes.object,
   },
 
   getDefaultProps() {

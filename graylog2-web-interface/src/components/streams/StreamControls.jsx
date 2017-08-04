@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
@@ -10,14 +11,14 @@ const StartpageStore = StoreProvider.getStore('Startpage');
 
 const StreamControls = React.createClass({
   propTypes: {
-    stream: React.PropTypes.object.isRequired,
-    user: React.PropTypes.object.isRequired,
-    indexSets: React.PropTypes.array.isRequired,
-    onDelete: React.PropTypes.func.isRequired,
-    onClone: React.PropTypes.func.isRequired,
-    onQuickAdd: React.PropTypes.func.isRequired,
-    onUpdate: React.PropTypes.func.isRequired,
-    isDefaultStream: React.PropTypes.bool,
+    stream: PropTypes.object.isRequired,
+    user: PropTypes.object.isRequired,
+    indexSets: PropTypes.array.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    onClone: PropTypes.func.isRequired,
+    onQuickAdd: PropTypes.func.isRequired,
+    onUpdate: PropTypes.func.isRequired,
+    isDefaultStream: PropTypes.bool,
   },
   mixins: [PermissionsMixin],
   getInitialState() {

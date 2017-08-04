@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { ShardRouting } from 'components/indices';
@@ -5,8 +6,8 @@ import naturalSort from 'javascript-natural-sort';
 
 const ShardRoutingOverview = React.createClass({
   propTypes: {
-    routing: React.PropTypes.array.isRequired,
-    indexName: React.PropTypes.string.isRequired,
+    routing: PropTypes.array.isRequired,
+    indexName: PropTypes.string.isRequired,
   },
   render() {
     const { indexName, routing } = this.props;

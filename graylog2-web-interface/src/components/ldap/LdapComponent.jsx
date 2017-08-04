@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Button, Panel } from 'react-bootstrap';
@@ -131,8 +132,8 @@ const LdapComponent = React.createClass({
   mixins: [Reflux.listenTo(LdapStore, '_onLdapSettingsChange', '_onLdapSettingsChange')],
 
   propTypes: {
-    onCancel: React.PropTypes.func.isRequired,
-    onShowGroups: React.PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
+    onShowGroups: PropTypes.func.isRequired,
   },
 
   getInitialState() {

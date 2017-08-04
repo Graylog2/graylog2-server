@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Alert, Nav, NavItem, Row, Col } from 'react-bootstrap';
@@ -21,10 +22,10 @@ import AuthenticationComponentStyle from '!style!css!./AuthenticationComponent.c
 const AuthenticationComponent = React.createClass({
 
   propTypes: {
-    location: React.PropTypes.object.isRequired,
-    params: React.PropTypes.object.isRequired,
-    history: React.PropTypes.object.isRequired,
-    children: React.PropTypes.element,
+    location: PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
+    children: PropTypes.element,
   },
 
   mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore), PermissionsMixin],

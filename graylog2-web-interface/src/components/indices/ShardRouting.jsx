@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import classNames from 'classnames';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 const ShardRouting = React.createClass({
   propTypes: {
-    route: React.PropTypes.object.isRequired,
+    route: PropTypes.object.isRequired,
   },
   render() {
     const route = this.props.route;

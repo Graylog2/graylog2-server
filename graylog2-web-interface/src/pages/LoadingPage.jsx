@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 
@@ -8,7 +9,7 @@ import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
 const LoadingPage = React.createClass({
   propTypes: {
-    text: React.PropTypes.string,
+    text: PropTypes.string,
   },
 
   getDefaultProps() {

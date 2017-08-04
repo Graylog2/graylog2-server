@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
@@ -12,7 +13,7 @@ const { LookupTableDataAdaptersActions } = CombinedProvider.get('LookupTableData
 const DataAdapter = React.createClass({
 
   propTypes: {
-    dataAdapter: React.PropTypes.object.isRequired,
+    dataAdapter: PropTypes.object.isRequired,
   },
 
   getInitialState() {

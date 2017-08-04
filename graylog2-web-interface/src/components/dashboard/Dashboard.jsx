@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
@@ -15,8 +16,8 @@ import Routes from 'routing/Routes';
 
 const Dashboard = React.createClass({
   propTypes: {
-    dashboard: React.PropTypes.object,
-    permissions: React.PropTypes.arrayOf(React.PropTypes.string),
+    dashboard: PropTypes.object,
+    permissions: PropTypes.arrayOf(PropTypes.string),
   },
   mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
   _setStartpage() {

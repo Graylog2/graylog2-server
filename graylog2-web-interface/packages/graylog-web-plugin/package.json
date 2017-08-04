@@ -33,6 +33,7 @@
     "jquery": "2.1.x",
     "moment": "2.14.1",
     "moment-timezone": "0.5.7",
+    "prop-types": "^15.5.10",
     "react": "^15.6.1",
     "react-addons-linked-state-mixin": "^15.6.0",
     "react-addons-pure-render-mixin": "^15.6.0",

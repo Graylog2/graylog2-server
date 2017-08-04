@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
@@ -6,10 +7,10 @@ import TimeoutUnitSelect from 'components/users/TimeoutUnitSelect';
 
 const TimeoutInput = React.createClass({
   propTypes: {
-    controlSize: React.PropTypes.number,
-    labelSize: React.PropTypes.number,
-    value: React.PropTypes.number,
-    onChange: React.PropTypes.func,
+    controlSize: PropTypes.number,
+    labelSize: PropTypes.number,
+    value: PropTypes.number,
+    onChange: PropTypes.func,
   },
 
   getDefaultProps() {

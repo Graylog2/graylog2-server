@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -13,8 +14,8 @@ import UserNotification from 'util/UserNotification';
 
 const AlertMessages = React.createClass({
   propTypes: {
-    alert: React.PropTypes.object.isRequired,
-    stream: React.PropTypes.object.isRequired,
+    alert: PropTypes.object.isRequired,
+    stream: PropTypes.object.isRequired,
   },
 
   getInitialState() {

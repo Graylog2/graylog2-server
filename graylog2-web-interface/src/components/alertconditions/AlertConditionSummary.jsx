@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -11,11 +12,11 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 const AlertConditionSummary = React.createClass({
   propTypes: {
-    alertCondition: React.PropTypes.object.isRequired,
-    typeDefinition: React.PropTypes.object.isRequired,
-    stream: React.PropTypes.object,
-    actions: React.PropTypes.array.isRequired,
-    linkToDetails: React.PropTypes.bool,
+    alertCondition: PropTypes.object.isRequired,
+    typeDefinition: PropTypes.object.isRequired,
+    stream: PropTypes.object,
+    actions: PropTypes.array.isRequired,
+    linkToDetails: PropTypes.bool,
   },
 
   render() {

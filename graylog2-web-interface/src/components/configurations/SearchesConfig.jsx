@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Row, Col } from 'react-bootstrap';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
@@ -12,8 +13,8 @@ import TimeRangeOptionsSummary from './TimeRangeOptionsSummary';
 
 const SearchesConfig = React.createClass({
   propTypes: {
-    config: React.PropTypes.object.isRequired,
-    updateConfig: React.PropTypes.func.isRequired,
+    config: PropTypes.object.isRequired,
+    updateConfig: PropTypes.func.isRequired,
   },
 
   getInitialState() {

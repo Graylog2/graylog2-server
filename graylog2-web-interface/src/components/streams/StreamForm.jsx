@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
@@ -9,10 +10,10 @@ const { IndexSetsActions } = CombinedProvider.get('IndexSets');
 
 const StreamForm = React.createClass({
   propTypes: {
-    onSubmit: React.PropTypes.func.isRequired,
-    stream: React.PropTypes.object.isRequired,
-    title: React.PropTypes.string.isRequired,
-    indexSets: React.PropTypes.array.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    stream: PropTypes.object.isRequired,
+    title: PropTypes.string.isRequired,
+    indexSets: PropTypes.array.isRequired,
   },
 
   mixins: [LinkedStateMixin],

@@ -1,25 +1,26 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 
 const SearchForm = React.createClass({
   propTypes: {
-    onSearch: React.PropTypes.func.isRequired,
-    onReset: React.PropTypes.func,
-    label: React.PropTypes.string,
-    placeholder: React.PropTypes.string,
-    wrapperClass: React.PropTypes.string,
-    queryWidth: React.PropTypes.any,
-    topMargin: React.PropTypes.number,
-    buttonLeftMargin: React.PropTypes.number,
-    searchBsStyle: React.PropTypes.string,
-    searchButtonLabel: React.PropTypes.string,
-    resetButtonLabel: React.PropTypes.string,
-    loadingLabel: React.PropTypes.string,
-    useLoadingState: React.PropTypes.bool,
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.arrayOf(React.PropTypes.element),
-      React.PropTypes.element,
+    onSearch: PropTypes.func.isRequired,
+    onReset: PropTypes.func,
+    label: PropTypes.string,
+    placeholder: PropTypes.string,
+    wrapperClass: PropTypes.string,
+    queryWidth: PropTypes.any,
+    topMargin: PropTypes.number,
+    buttonLeftMargin: PropTypes.number,
+    searchBsStyle: PropTypes.string,
+    searchButtonLabel: PropTypes.string,
+    resetButtonLabel: PropTypes.string,
+    loadingLabel: PropTypes.string,
+    useLoadingState: PropTypes.bool,
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.element),
+      PropTypes.element,
     ]),
   },
 

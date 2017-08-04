@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { ControlLabel, FormControl, FormGroup } from 'react-bootstrap';
@@ -9,10 +10,10 @@ const { AlertConditionsStore } = CombinedProvider.get('AlertConditions');
 
 const AlertConditionForm = React.createClass({
   propTypes: {
-    alertCondition: React.PropTypes.object,
-    onCancel: React.PropTypes.func,
-    onSubmit: React.PropTypes.func.isRequired,
-    type: React.PropTypes.string.isRequired,
+    alertCondition: PropTypes.object,
+    onCancel: PropTypes.func,
+    onSubmit: PropTypes.func.isRequired,
+    type: PropTypes.string.isRequired,
   },
   mixins: [Reflux.connect(AlertConditionsStore)],
 

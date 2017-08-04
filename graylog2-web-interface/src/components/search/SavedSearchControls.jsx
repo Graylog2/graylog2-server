@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
@@ -12,8 +13,8 @@ const SavedSearchesActions = ActionsProvider.getActions('SavedSearches');
 
 const SavedSearchControls = React.createClass({
   propTypes: {
-    currentSavedSearch: React.PropTypes.string, // saved search ID
-    pullRight: React.PropTypes.bool,
+    currentSavedSearch: PropTypes.string, // saved search ID
+    pullRight: PropTypes.bool,
   },
   mixins: [Reflux.listenTo(SavedSearchesStore, '_updateTitle')],
   getInitialState() {

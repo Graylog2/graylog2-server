@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button } from 'react-bootstrap';
 import Immutable from 'immutable';
@@ -6,15 +7,15 @@ import { TypeAheadInput } from 'components/common';
 
 const TypeAheadDataFilter = React.createClass({
   propTypes: {
-    data: React.PropTypes.array,
-    displayKey: React.PropTypes.string,
-    filterBy: React.PropTypes.string,
-    filterData: React.PropTypes.func,
-    filterSuggestionAccessor: React.PropTypes.string,
-    filterSuggestions: React.PropTypes.array,
-    label: React.PropTypes.string,
-    onDataFiltered: React.PropTypes.func,
-    searchInKeys: React.PropTypes.array,
+    data: PropTypes.array,
+    displayKey: PropTypes.string,
+    filterBy: PropTypes.string,
+    filterData: PropTypes.func,
+    filterSuggestionAccessor: PropTypes.string,
+    filterSuggestions: PropTypes.array,
+    label: PropTypes.string,
+    onDataFiltered: PropTypes.func,
+    searchInKeys: PropTypes.array,
   },
   getInitialState() {
     return {

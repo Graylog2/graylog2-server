@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import Reflux from 'reflux';
 import Navigation from 'components/navigation/Navigation';
 import Spinner from 'components/common/Spinner';

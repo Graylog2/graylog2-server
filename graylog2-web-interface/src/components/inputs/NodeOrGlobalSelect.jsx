@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Input } from 'components/bootstrap';
@@ -9,9 +10,9 @@ import { Spinner } from 'components/common';
 
 const NodeOrGlobalSelect = React.createClass({
   propTypes: {
-    global: React.PropTypes.bool,
-    onChange: React.PropTypes.func.isRequired,
-    node: React.PropTypes.string,
+    global: PropTypes.bool,
+    onChange: PropTypes.func.isRequired,
+    node: PropTypes.string,
   },
   mixins: [Reflux.connect(NodesStore)],
   getInitialState() {

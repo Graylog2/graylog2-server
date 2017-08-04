@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import dc from 'dc';
 import numeral from 'numeral';
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 import SourceTitle from './SourceTitle';
 import D3Utils from 'util/D3Utils';

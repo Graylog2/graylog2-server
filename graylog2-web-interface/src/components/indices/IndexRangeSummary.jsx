@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Timestamp } from 'components/common';
 
 const IndexRangeSummary = React.createClass({
   propTypes: {
-    indexRange: React.PropTypes.object,
+    indexRange: PropTypes.object,
   },
   render() {
     const { indexRange } = this.props;

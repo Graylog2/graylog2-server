@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 
@@ -5,8 +6,8 @@ import { EntityListItem } from 'components/common';
 
 const UnknownAlertNotification = React.createClass({
   propTypes: {
-    alertNotification: React.PropTypes.object.isRequired,
-    onDelete: React.PropTypes.func.isRequired,
+    alertNotification: PropTypes.object.isRequired,
+    onDelete: PropTypes.func.isRequired,
   },
 
   render() {

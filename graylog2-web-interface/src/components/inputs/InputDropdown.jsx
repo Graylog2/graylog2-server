@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import { Button } from 'react-bootstrap';
 

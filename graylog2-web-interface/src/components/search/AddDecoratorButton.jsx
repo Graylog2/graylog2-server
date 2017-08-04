@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import jQuery from 'jquery';
@@ -17,9 +18,9 @@ import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
 const AddDecoratorButton = React.createClass({
   propTypes: {
-    nextOrder: React.PropTypes.number.isRequired,
-    stream: React.PropTypes.string,
-    disabled: React.PropTypes.bool,
+    nextOrder: PropTypes.number.isRequired,
+    stream: PropTypes.string,
+    disabled: PropTypes.bool,
   },
   mixins: [Reflux.connect(DecoratorsStore), PureRenderMixin],
   getDefaultProps() {

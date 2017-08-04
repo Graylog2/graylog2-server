@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { Button } from 'react-bootstrap';
 import Reflux from 'reflux';
@@ -15,11 +16,11 @@ const RefreshStore = StoreProvider.getStore('Refresh');
 const FieldQuickValues = React.createClass({
   propTypes: {
     permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
-    query: React.PropTypes.string.isRequired,
-    rangeType: React.PropTypes.string.isRequired,
-    rangeParams: React.PropTypes.object.isRequired,
+    query: PropTypes.string.isRequired,
+    rangeType: PropTypes.string.isRequired,
+    rangeParams: PropTypes.object.isRequired,
     stream: PropTypes.object,
-    forceFetch: React.PropTypes.bool,
+    forceFetch: PropTypes.bool,
   },
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
   getInitialState() {

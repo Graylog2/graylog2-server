@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
@@ -6,7 +7,7 @@ import DocsHelper from 'util/DocsHelper';
 
 const IndexerClusterHealthSummary = React.createClass({
   propTypes: {
-    health: React.PropTypes.object.isRequired,
+    health: PropTypes.object.isRequired,
   },
   _alertClassForHealth(health) {
     switch (health.status) {

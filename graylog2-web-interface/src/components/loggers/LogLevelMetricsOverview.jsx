@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
@@ -8,7 +9,7 @@ import { LogLevelMetrics } from 'components/loggers';
 
 const LogLevelMetricsOverview = React.createClass({
   propTypes: {
-    nodeId: React.PropTypes.string.isRequired,
+    nodeId: PropTypes.string.isRequired,
   },
   mixins: [Reflux.connect(LoggersStore)],
   render() {

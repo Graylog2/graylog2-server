@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Panel } from 'react-bootstrap';
@@ -6,11 +7,11 @@ import { Input } from 'components/bootstrap';
 
 const SidebarMessageField = React.createClass({
   propTypes: {
-    field: React.PropTypes.object,
-    fieldAnalyzers: React.PropTypes.array,
-    onFieldAnalyzer: React.PropTypes.func,
-    onToggled: React.PropTypes.func,
-    selected: React.PropTypes.bool,
+    field: PropTypes.object,
+    fieldAnalyzers: PropTypes.array,
+    onFieldAnalyzer: PropTypes.func,
+    onToggled: PropTypes.func,
+    selected: PropTypes.bool,
   },
   getInitialState() {
     return {

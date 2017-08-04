@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Col, Row } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
@@ -7,13 +8,13 @@ import Output from 'components/outputs/Output';
 
 const OutputList = React.createClass({
   propTypes: {
-    streamId: React.PropTypes.string,
-    outputs: React.PropTypes.array,
-    onRemove: React.PropTypes.func.isRequired,
-    onTerminate: React.PropTypes.func.isRequired,
-    onUpdate: React.PropTypes.func.isRequired,
-    getTypeDefinition: React.PropTypes.func.isRequired,
-    types: React.PropTypes.object.isRequired,
+    streamId: PropTypes.string,
+    outputs: PropTypes.array,
+    onRemove: PropTypes.func.isRequired,
+    onTerminate: PropTypes.func.isRequired,
+    onUpdate: PropTypes.func.isRequired,
+    getTypeDefinition: PropTypes.func.isRequired,
+    types: PropTypes.object.isRequired,
   },
   _sortByTitle(output1, output2) {
     return naturalSort(output1.title.toLowerCase(), output2.title.toLowerCase());

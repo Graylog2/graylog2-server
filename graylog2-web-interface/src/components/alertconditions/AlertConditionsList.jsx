@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { AlertCondition } from 'components/alertconditions';
@@ -5,8 +6,8 @@ import { EntityList, PaginatedList } from 'components/common';
 
 const AlertConditionsList = React.createClass({
   propTypes: {
-    alertConditions: React.PropTypes.array.isRequired,
-    streams: React.PropTypes.array.isRequired,
+    alertConditions: PropTypes.array.isRequired,
+    streams: PropTypes.array.isRequired,
   },
 
   getInitialState() {

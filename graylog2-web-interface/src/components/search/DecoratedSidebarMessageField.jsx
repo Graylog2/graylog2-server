@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 
@@ -7,9 +8,9 @@ import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
 const DecoratedSidebarMessageField = React.createClass({
   propTypes: {
-    field: React.PropTypes.object,
-    onToggled: React.PropTypes.func,
-    selected: React.PropTypes.bool,
+    field: PropTypes.object,
+    onToggled: PropTypes.func,
+    selected: PropTypes.bool,
   },
   render() {
     const label = (<span>

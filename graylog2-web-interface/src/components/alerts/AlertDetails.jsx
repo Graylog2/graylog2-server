@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, Row } from 'react-bootstrap';
 
@@ -10,10 +11,10 @@ const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications')
 
 const AlertDetails = React.createClass({
   propTypes: {
-    alert: React.PropTypes.object.isRequired,
-    condition: React.PropTypes.object,
-    conditionType: React.PropTypes.object,
-    stream: React.PropTypes.object.isRequired,
+    alert: PropTypes.object.isRequired,
+    condition: PropTypes.object,
+    conditionType: PropTypes.object,
+    stream: PropTypes.object.isRequired,
   },
 
   componentDidMount() {

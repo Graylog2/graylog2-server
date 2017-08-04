@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
@@ -7,10 +8,10 @@ import { TableList } from 'components/common';
 
 const PermissionSelector = React.createClass({
   propTypes: {
-    onChange: React.PropTypes.func,
-    streams: React.PropTypes.object,
-    dashboards: React.PropTypes.object,
-    permissions: React.PropTypes.object,
+    onChange: PropTypes.func,
+    streams: PropTypes.object,
+    dashboards: PropTypes.object,
+    permissions: PropTypes.object,
   },
 
   render() {

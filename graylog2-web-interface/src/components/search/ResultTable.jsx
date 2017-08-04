@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, ButtonGroup } from 'react-bootstrap';
 import Immutable from 'immutable';
@@ -13,17 +14,17 @@ import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 
 const ResultTable = React.createClass({
   propTypes: {
-    highlight: React.PropTypes.bool.isRequired,
-    inputs: React.PropTypes.object.isRequired,
-    messages: React.PropTypes.array.isRequired,
-    nodes: React.PropTypes.object.isRequired,
-    page: React.PropTypes.number.isRequired,
-    resultCount: React.PropTypes.number.isRequired,
-    selectedFields: React.PropTypes.object.isRequired,
-    sortField: React.PropTypes.string.isRequired,
-    sortOrder: React.PropTypes.string.isRequired,
-    streams: React.PropTypes.object.isRequired,
-    searchConfig: React.PropTypes.object.isRequired,
+    highlight: PropTypes.bool.isRequired,
+    inputs: PropTypes.object.isRequired,
+    messages: PropTypes.array.isRequired,
+    nodes: PropTypes.object.isRequired,
+    page: PropTypes.number.isRequired,
+    resultCount: PropTypes.number.isRequired,
+    selectedFields: PropTypes.object.isRequired,
+    sortField: PropTypes.string.isRequired,
+    sortOrder: PropTypes.string.isRequired,
+    streams: PropTypes.object.isRequired,
+    searchConfig: PropTypes.object.isRequired,
   },
   getInitialState() {
     return {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Col } from 'react-bootstrap';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
@@ -13,10 +14,10 @@ import HumanReadableStreamRule from 'components/streamrules//HumanReadableStream
 
 const StreamRuleForm = React.createClass({
   propTypes: {
-    onSubmit: React.PropTypes.func.isRequired,
-    streamRule: React.PropTypes.object,
-    streamRuleTypes: React.PropTypes.array.isRequired,
-    title: React.PropTypes.string.isRequired,
+    onSubmit: PropTypes.func.isRequired,
+    streamRule: PropTypes.object,
+    streamRuleTypes: PropTypes.array.isRequired,
+    title: PropTypes.string.isRequired,
   },
   mixins: [LinkedStateMixin],
   getDefaultProps() {

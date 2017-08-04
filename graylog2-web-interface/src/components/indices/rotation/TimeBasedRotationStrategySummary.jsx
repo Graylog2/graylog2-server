@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import moment from 'moment';
@@ -5,7 +6,7 @@ import {} from 'moment-duration-format';
 
 const TimeBasedRotationStrategySummary = React.createClass({
   propTypes: {
-    config: React.PropTypes.object.isRequired,
+    config: PropTypes.object.isRequired,
   },
 
   _humanizedPeriod() {

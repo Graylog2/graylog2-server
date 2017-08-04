@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { AlertNotification } from 'components/alertnotifications';
@@ -5,10 +6,10 @@ import { EntityList, PaginatedList } from 'components/common';
 
 const AlertNotificationsList = React.createClass({
   propTypes: {
-    alertNotifications: React.PropTypes.array.isRequired,
-    streams: React.PropTypes.array.isRequired,
-    onNotificationUpdate: React.PropTypes.func,
-    onNotificationDelete: React.PropTypes.func,
+    alertNotifications: PropTypes.array.isRequired,
+    streams: PropTypes.array.isRequired,
+    onNotificationUpdate: PropTypes.func,
+    onNotificationDelete: PropTypes.func,
   },
 
   getInitialState() {

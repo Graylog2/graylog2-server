@@ -1,18 +1,19 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { OverlayTrigger } from 'react-bootstrap';
 
 const OverlayElement = React.createClass({
   propTypes: {
-    overlay: React.PropTypes.element,
-    placement: React.PropTypes.oneOf(['top', 'bottom', 'right', 'left']),
-    trigger: React.PropTypes.oneOfType([
-      React.PropTypes.oneOf(['click', 'hover', 'focus']),
-      React.PropTypes.arrayOf(React.PropTypes.oneOf(['click', 'hover', 'focus'])),
+    overlay: PropTypes.element,
+    placement: PropTypes.oneOf(['top', 'bottom', 'right', 'left']),
+    trigger: PropTypes.oneOfType([
+      PropTypes.oneOf(['click', 'hover', 'focus']),
+      PropTypes.arrayOf(PropTypes.oneOf(['click', 'hover', 'focus'])),
     ]),
-    useOverlay: React.PropTypes.bool, // True if overlay should be applied, false otherwise
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.arrayOf(React.PropTypes.element),
-      React.PropTypes.element,
+    useOverlay: PropTypes.bool, // True if overlay should be applied, false otherwise
+    children: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.element),
+      PropTypes.element,
     ]).isRequired,
   },
 

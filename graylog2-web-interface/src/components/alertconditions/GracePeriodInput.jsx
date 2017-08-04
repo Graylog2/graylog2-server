@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import { Pluralize } from 'components/common';
 
 const GracePeriodInput = React.createClass({
   propTypes: {
-    parameters: React.PropTypes.object.isRequired,
+    parameters: PropTypes.object.isRequired,
   },
   getInitialState() {
     return {

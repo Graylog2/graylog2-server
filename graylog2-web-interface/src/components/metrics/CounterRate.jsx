@@ -1,15 +1,16 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import numeral from 'numeral';
 import TimeHelper from 'util/TimeHelper';
 
 const CounterRate = React.createClass({
   propTypes: {
-    metric: React.PropTypes.object,
-    showTotal: React.PropTypes.bool,
-    prefix: React.PropTypes.string,
-    suffix: React.PropTypes.string,
-    hideOnZero: React.PropTypes.bool,
-    hideOnMissing: React.PropTypes.bool,
+    metric: PropTypes.object,
+    showTotal: PropTypes.bool,
+    prefix: PropTypes.string,
+    suffix: PropTypes.string,
+    hideOnZero: PropTypes.bool,
+    hideOnMissing: PropTypes.bool,
   },
   getDefaultProps() {
     return {

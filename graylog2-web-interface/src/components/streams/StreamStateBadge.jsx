@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Label } from 'react-bootstrap';
 
 const StreamStateBadge = React.createClass({
   propTypes: {
-    stream: React.PropTypes.object.isRequired,
+    stream: PropTypes.object.isRequired,
   },
   render() {
     if (this.props.stream.is_default) {

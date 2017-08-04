@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
@@ -14,10 +15,10 @@ import AuthenticationComponent from 'components/authentication/AuthenticationCom
 const AuthenticationPage = React.createClass({
 
   propTypes: {
-    children: React.PropTypes.object,
-    location: React.PropTypes.object.isRequired,
-    params: React.PropTypes.object.isRequired,
-    history: React.PropTypes.object.isRequired,
+    children: PropTypes.object,
+    location: PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   },
 
   mixins: [PermissionsMixin],

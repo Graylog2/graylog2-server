@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 
@@ -10,8 +11,8 @@ const { AlertNotificationsActions } = CombinedProvider.get('AlertNotifications')
 
 const ConditionAlertNotifications = React.createClass({
   propTypes: {
-    alertCondition: React.PropTypes.object.isRequired,
-    stream: React.PropTypes.object.isRequired,
+    alertCondition: PropTypes.object.isRequired,
+    stream: PropTypes.object.isRequired,
   },
 
   getInitialState() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'react-bootstrap';
@@ -27,23 +28,23 @@ import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 const SearchSidebar = React.createClass({
   propTypes: {
-    builtQuery: React.PropTypes.any,
-    currentSavedSearch: React.PropTypes.string,
-    fields: React.PropTypes.array,
-    fieldAnalyzers: React.PropTypes.array,
-    onFieldAnalyzer: React.PropTypes.func,
-    onFieldToggled: React.PropTypes.func,
-    permissions: React.PropTypes.array,
-    predefinedFieldSelection: React.PropTypes.func,
-    result: React.PropTypes.object,
-    searchInStream: React.PropTypes.object,
-    selectedFields: React.PropTypes.object,
-    shouldHighlight: React.PropTypes.bool,
-    showAllFields: React.PropTypes.bool,
-    showHighlightToggle: React.PropTypes.bool,
-    togglePageFields: React.PropTypes.func,
-    toggleShouldHighlight: React.PropTypes.func,
-    loadingSearch: React.PropTypes.bool,
+    builtQuery: PropTypes.any,
+    currentSavedSearch: PropTypes.string,
+    fields: PropTypes.array,
+    fieldAnalyzers: PropTypes.array,
+    onFieldAnalyzer: PropTypes.func,
+    onFieldToggled: PropTypes.func,
+    permissions: PropTypes.array,
+    predefinedFieldSelection: PropTypes.func,
+    result: PropTypes.object,
+    searchInStream: PropTypes.object,
+    selectedFields: PropTypes.object,
+    shouldHighlight: PropTypes.bool,
+    showAllFields: PropTypes.bool,
+    showHighlightToggle: PropTypes.bool,
+    togglePageFields: PropTypes.func,
+    toggleShouldHighlight: PropTypes.func,
+    loadingSearch: PropTypes.bool,
   },
 
   getInitialState() {

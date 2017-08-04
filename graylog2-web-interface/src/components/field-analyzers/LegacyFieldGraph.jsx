@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import PureRenderMixin from 'react-addons-pure-render-mixin';

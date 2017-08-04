@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const ContentPackMarker = React.createClass({
   propTypes: {
-    contentPack: React.PropTypes.string,
-    marginLeft: React.PropTypes.number,
-    marginRight: React.PropTypes.number,
+    contentPack: PropTypes.string,
+    marginLeft: PropTypes.number,
+    marginRight: PropTypes.number,
   },
 
   getDefaultProps() {
