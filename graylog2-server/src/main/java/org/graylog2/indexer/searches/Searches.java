@@ -21,6 +21,7 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableSortedSet;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -50,6 +51,7 @@ import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -86,8 +88,8 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 import static com.codahale.metrics.MetricRegistry.name;
-import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 import static org.elasticsearch.index.query.QueryBuilders.queryStringQuery;
 
@@ -102,6 +104,9 @@ public class Searches {
     public static final String AGG_CARDINALITY = "gl2_field_cardinality";
     public static final String AGG_VALUE_COUNT = "gl2_value_count";
     private static final Pattern filterStreamIdPattern = Pattern.compile("^(.+[^\\p{Alnum}])?streams:([\\p{XDigit}]+)");
+
+    @VisibleForTesting
+    static final int MAX_INDICES_PER_QUERY = 100;
 
     public enum TermsStatsOrder {
         TERM,
@@ -161,6 +166,7 @@ public class Searches {
 
     private final Configuration configuration;
     private final IndexRangeService indexRangeService;
+    private final IndexSetRegistry indexSetRegistry;
     private final Timer esRequestTimer;
     private final Histogram esTimeRangeHistogram;
     private final Counter esTotalSearchesCounter;
@@ -172,21 +178,23 @@ public class Searches {
     @Inject
     public Searches(Configuration configuration,
                     IndexRangeService indexRangeService,
+                    IndexSetRegistry indexSetRegistry,
                     MetricRegistry metricRegistry,
                     StreamService streamService,
                     Indices indices,
                     JestClient jestClient,
                     ScrollResult.Factory scrollResultFactory) {
-        this.configuration = checkNotNull(configuration);
-        this.indexRangeService = checkNotNull(indexRangeService);
+        this.configuration = requireNonNull(configuration, "configuration");
+        this.indexRangeService = requireNonNull(indexRangeService, "indexRangeService");
+        this.indexSetRegistry = requireNonNull(indexSetRegistry, "indexSetRegistry");
 
         this.esRequestTimer = metricRegistry.timer(name(Searches.class, "elasticsearch", "requests"));
         this.esTimeRangeHistogram = metricRegistry.histogram(name(Searches.class, "elasticsearch", "ranges"));
         this.esTotalSearchesCounter = metricRegistry.counter(name(Searches.class, "elasticsearch", "total-searches"));
-        this.streamService = streamService;
-        this.indices = indices;
-        this.jestClient = jestClient;
-        this.scrollResultFactory = scrollResultFactory;
+        this.streamService = requireNonNull(streamService, "streamService");
+        this.indices = requireNonNull(indices, "indices");
+        this.jestClient = requireNonNull(jestClient, "jestClient");
+        this.scrollResultFactory = requireNonNull(scrollResultFactory, "scrollResultFactory");
     }
 
     public CountResult count(String query, TimeRange range) {
@@ -805,16 +813,27 @@ public class Searches {
         return Optional.empty();
     }
 
-    public Set<String> determineAffectedIndices(TimeRange range,
-                                                @Nullable String filter) {
+    @VisibleForTesting
+    Set<String> determineAffectedIndices(TimeRange range, @Nullable String filter) {
         final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(range, filter);
-        return indexRanges.stream()
-                .map(IndexRange::indexName)
-                .collect(Collectors.toSet());
+        if(indexRanges.size() > MAX_INDICES_PER_QUERY) {
+            return indexRanges.stream()
+                    .map(IndexRange::indexName)
+                    .map(indexSetRegistry::getForIndex)
+                    .flatMap(o -> o.map(java.util.stream.Stream::of).orElseGet(java.util.stream.Stream::empty))
+                    .map(IndexSet::getWriteIndexAlias)
+                    .collect(Collectors.toSet());
+
+        } else {
+            return indexRanges.stream()
+                    .map(IndexRange::indexName)
+                    .collect(Collectors.toSet());
+        }
+
     }
 
-    public Set<IndexRange> determineAffectedIndicesWithRanges(TimeRange range,
-                                                              @Nullable String filter) {
+    @VisibleForTesting
+    Set<IndexRange> determineAffectedIndicesWithRanges(TimeRange range, @Nullable String filter) {
         final Optional<String> streamId = extractStreamId(filter);
         IndexSet indexSet = null;
         // if we are searching in a stream, we are further restricting the indices using the currently
