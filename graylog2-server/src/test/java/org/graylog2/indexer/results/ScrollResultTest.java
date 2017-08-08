@@ -99,7 +99,7 @@ public class ScrollResultTest extends AbstractESTest {
         final SearchResult searchResult = JestUtils.execute(jestClient(), request, () -> "Exception");
 
         assertThat(jestClient()).isNotNull();
-        final ScrollResult scrollResult = new ScrollResult(jestClient(), objectMapper, searchResult, "*", Collections.singletonList("message"));
+        final ScrollResult scrollResult = new ScrollResult(jestClient(), objectMapper, searchResult, "*", "1m", Collections.singletonList("message"));
         scrollResult.nextChunk().getMessages().forEach(
                 message -> assertThat(message.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version")
         );
