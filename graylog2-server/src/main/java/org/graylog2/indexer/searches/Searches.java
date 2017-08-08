@@ -234,7 +234,7 @@ public class Searches {
         final long tookMs = tookMsFromSearchResult(initialResult);
         recordEsMetrics(tookMs, range);
 
-        return scrollResultFactory.create(initialResult, query, "1m", fields);
+        return scrollResultFactory.create(initialResult, query, fields);
     }
 
     public SearchResult search(String query, TimeRange range, int limit, int offset, Sorting sorting) {

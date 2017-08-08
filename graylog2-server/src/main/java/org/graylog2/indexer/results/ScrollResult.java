@@ -39,8 +39,10 @@ public class ScrollResult extends IndexQueryResult {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
     private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
     };
+    private static final String DEFAULT_SCROLL = "1m";
 
     public interface Factory {
+        ScrollResult create(SearchResult initialResult, @Assisted("query") String query, List<String> fields);
         ScrollResult create(SearchResult initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, List<String> fields);
     }
 
@@ -54,6 +56,11 @@ public class ScrollResult extends IndexQueryResult {
 
     private String scrollId;
     private int chunkId = 0;
+
+    @AssistedInject
+    public ScrollResult(JestClient jestClient, ObjectMapper objectMapper, @Assisted SearchResult initialResult, @Assisted("query") String query, @Assisted List<String> fields) {
+        this(jestClient, objectMapper, initialResult, query, DEFAULT_SCROLL, fields);
+    }
 
     @AssistedInject
     public ScrollResult(JestClient jestClient, ObjectMapper objectMapper, @Assisted SearchResult initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, @Assisted List<String> fields) {
