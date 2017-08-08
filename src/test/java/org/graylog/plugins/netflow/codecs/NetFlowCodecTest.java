@@ -308,4 +308,28 @@ public class NetFlowCodecTest {
         }
         assertThat(allMessages).hasSize(6);
     }
+
+    @Test
+    public void pcap_nprobe_NetFlowV5() throws Exception {
+        final List<Message> allMessages = new ArrayList<>();
+        try (InputStream inputStream = Resources.getResource("netflow-data/nprobe-netflow5.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(inputStream);
+            pcap.loop(packet -> {
+                        if (packet.hasProtocol(Protocol.UDP)) {
+                            final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                            final InetSocketAddress source = new InetSocketAddress(udp.getSourceIP(), udp.getSourcePort());
+                            final Collection<Message> messages = codec.decodeMessages(new RawMessage(udp.getPayload().getArray(), source));
+                            assertThat(messages)
+                                    .isNotNull()
+                                    .isNotEmpty();
+                            allMessages.addAll(messages);
+                        }
+                        return true;
+                    }
+            );
+        }
+        assertThat(allMessages)
+                .hasSize(120)
+                .allSatisfy(message -> assertThat(message.getField("nf_version")).isEqualTo(5));
+    }
 }
