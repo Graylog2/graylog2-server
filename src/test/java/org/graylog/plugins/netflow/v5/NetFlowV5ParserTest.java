@@ -166,4 +166,24 @@ public class NetFlowV5ParserTest {
         }
         assertThat(allRecords).hasSize(42);
     }
+
+    @Test
+    public void pcap_nprobe_NetFlowV5() throws Exception {
+        final List<NetFlowV5Record> allRecords = new ArrayList<>();
+        try (InputStream inputStream = Resources.getResource("netflow-data/nprobe-netflow5.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(inputStream);
+            pcap.loop(packet -> {
+                        if (packet.hasProtocol(Protocol.UDP)) {
+                            final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                            final ByteBuf byteBuf = Unpooled.wrappedBuffer(udp.getPayload().getArray());
+                            final NetFlowV5Packet netFlowV5Packet = NetFlowV5Parser.parsePacket(byteBuf);
+                            assertThat(netFlowV5Packet).isNotNull();
+                            allRecords.addAll(netFlowV5Packet.records());
+                        }
+                        return true;
+                    }
+            );
+        }
+        assertThat(allRecords).hasSize(120);
+    }
 }
