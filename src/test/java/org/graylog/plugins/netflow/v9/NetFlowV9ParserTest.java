@@ -238,6 +238,140 @@ public class NetFlowV9ParserTest {
                 );
     }
 
+    @Test
+    public void pcap_nprobe_NetFlowV9_2() throws Exception {
+        final List<NetFlowV9BaseRecord> allRecords = new ArrayList<>();
+        final List<NetFlowV9Template> allTemplates = new ArrayList<>();
+        try (InputStream inputStream = Resources.getResource("netflow-data/nprobe-netflow9-2.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(inputStream);
+            pcap.loop(packet -> {
+                        if (packet.hasProtocol(Protocol.UDP)) {
+                            final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                            final ByteBuf byteBuf = Unpooled.wrappedBuffer(udp.getPayload().getArray());
+                            final NetFlowV9Packet netFlowV9Packet = NetFlowV9Parser.parsePacket(byteBuf, cache, typeRegistry);
+                            assertThat(netFlowV9Packet).isNotNull();
+                            allTemplates.addAll(netFlowV9Packet.templates());
+                            allRecords.addAll(netFlowV9Packet.records());
+                        }
+                        return true;
+                    }
+            );
+        }
+        assertThat(allTemplates).contains(
+                NetFlowV9Template.create(257, 18,
+                        ImmutableList.<NetFlowV9FieldDef>builder().add(
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(1, NetFlowV9FieldType.ValueType.UINT32, "in_bytes"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(2, NetFlowV9FieldType.ValueType.UINT32, "in_pkts"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(4, NetFlowV9FieldType.ValueType.UINT8, "protocol"), 1),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(5, NetFlowV9FieldType.ValueType.UINT8, "src_tos"), 1),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(6, NetFlowV9FieldType.ValueType.UINT8, "tcp_flags"), 1),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(7, NetFlowV9FieldType.ValueType.UINT16, "l4_src_port"), 2),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(8, NetFlowV9FieldType.ValueType.IPV4, "ipv4_src_addr"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(9, NetFlowV9FieldType.ValueType.UINT8, "src_mask"), 1),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(10, NetFlowV9FieldType.ValueType.UINT16, "input_snmp"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(11, NetFlowV9FieldType.ValueType.UINT16, "l4_dst_port"), 2),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(12, NetFlowV9FieldType.ValueType.IPV4, "ipv4_dst_addr"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(13, NetFlowV9FieldType.ValueType.UINT8, "dst_mask"), 1),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(14, NetFlowV9FieldType.ValueType.UINT16, "output_snmp"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(15, NetFlowV9FieldType.ValueType.IPV4, "ipv4_next_hop"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(16, NetFlowV9FieldType.ValueType.UINT16, "src_as"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(17, NetFlowV9FieldType.ValueType.UINT16, "dst_as"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(21, NetFlowV9FieldType.ValueType.UINT32, "last_switched"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(22, NetFlowV9FieldType.ValueType.UINT32, "first_switched"), 4)
+                        ).build()
+                )
+        );
+        assertThat(allRecords)
+                .hasSize(7)
+                .contains(
+                        NetFlowV9Record.create(
+                                ImmutableMap.<String, Object>builder()
+                                        .put("in_bytes", 375L)
+                                        .put("in_pkts", 7L)
+                                        .put("ipv4_src_addr", "172.17.0.2")
+                                        .put("ipv4_dst_addr", "93.184.216.34")
+                                        .put("ipv4_next_hop", "0.0.0.0")
+                                        .put("l4_src_port", 43296)
+                                        .put("l4_dst_port", 80)
+                                        .put("protocol", (short) 6)
+                                        .put("src_tos", (short) 0)
+                                        .put("tcp_flags", (short) 27)
+                                        .put("src_mask", (short) 0)
+                                        .put("dst_mask", (short) 0)
+                                        .put("input_snmp", 0L)
+                                        .put("output_snmp", 0L)
+                                        .put("src_as", 0L)
+                                        .put("dst_as", 15133L)
+                                        .put("first_switched", 3L)
+                                        .put("last_switched", 413L)
+                                        .build())
+                        ,
+                        NetFlowV9Record.create(
+                                ImmutableMap.<String, Object>builder()
+                                        .put("in_bytes", 1829L)
+                                        .put("in_pkts", 6L)
+                                        .put("ipv4_src_addr", "93.184.216.34")
+                                        .put("ipv4_dst_addr", "172.17.0.2")
+                                        .put("ipv4_next_hop", "0.0.0.0")
+                                        .put("l4_src_port", 80)
+                                        .put("l4_dst_port", 43296)
+                                        .put("protocol", (short) 6)
+                                        .put("src_tos", (short) 0)
+                                        .put("tcp_flags", (short) 27)
+                                        .put("src_mask", (short) 0)
+                                        .put("dst_mask", (short) 0)
+                                        .put("input_snmp", 0L)
+                                        .put("output_snmp", 0L)
+                                        .put("src_as", 15133L)
+                                        .put("dst_as", 0L)
+                                        .put("first_switched", 138L)
+                                        .put("last_switched", 413L)
+                                        .build()),
+                        NetFlowV9Record.create(
+                                ImmutableMap.<String, Object>builder()
+                                        .put("in_bytes", 68L)
+                                        .put("in_pkts", 1L)
+                                        .put("ipv4_src_addr", "172.17.0.2")
+                                        .put("ipv4_dst_addr", "8.8.4.4")
+                                        .put("ipv4_next_hop", "0.0.0.0")
+                                        .put("l4_src_port", 60546)
+                                        .put("l4_dst_port", 53)
+                                        .put("protocol", (short) 17)
+                                        .put("src_tos", (short) 0)
+                                        .put("tcp_flags", (short) 0)
+                                        .put("src_mask", (short) 0)
+                                        .put("dst_mask", (short) 0)
+                                        .put("input_snmp", 0L)
+                                        .put("output_snmp", 0L)
+                                        .put("src_as", 0L)
+                                        .put("dst_as", 15169L)
+                                        .put("first_switched", 284L)
+                                        .put("last_switched", 284L)
+                                        .build()),
+                        NetFlowV9Record.create(
+                                ImmutableMap.<String, Object>builder()
+                                        .put("in_bytes", 84L)
+                                        .put("in_pkts", 1L)
+                                        .put("ipv4_src_addr", "8.8.4.4")
+                                        .put("ipv4_dst_addr", "172.17.0.2")
+                                        .put("ipv4_next_hop", "0.0.0.0")
+                                        .put("l4_src_port", 53)
+                                        .put("l4_dst_port", 60546)
+                                        .put("protocol", (short) 17)
+                                        .put("src_tos", (short) 0)
+                                        .put("tcp_flags", (short) 0)
+                                        .put("src_mask", (short) 0)
+                                        .put("dst_mask", (short) 0)
+                                        .put("input_snmp", 0L)
+                                        .put("output_snmp", 0L)
+                                        .put("src_as", 15169L)
+                                        .put("dst_as", 0L)
+                                        .put("first_switched", 321L)
+                                        .put("last_switched", 321L)
+                                        .build())
+                );
+    }
+
     private String name(NetFlowV9FieldDef def) {
         return def.type().name().toLowerCase();
     }

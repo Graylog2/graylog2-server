@@ -340,4 +340,47 @@ public class NetFlowCodecTest {
                 .hasSize(120)
                 .allSatisfy(message -> assertThat(message.getField("nf_version")).isEqualTo(5));
     }
+
+    @Test
+    public void pcap_nprobe_NetFlowV9_mixed() throws Exception {
+        final List<Message> allMessages = new ArrayList<>();
+        try (InputStream inputStream = Resources.getResource("netflow-data/nprobe-netflow9.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(inputStream);
+            pcap.loop(packet -> {
+                        if (packet.hasProtocol(Protocol.UDP)) {
+                            final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                            final InetSocketAddress source = new InetSocketAddress(udp.getSourceIP(), udp.getSourcePort());
+                            final Collection<Message> messages = codec.decodeMessages(new RawMessage(udp.getPayload().getArray(), source));
+                            assertThat(messages).isNotNull();
+                            allMessages.addAll(messages);
+                        }
+                        return true;
+                    }
+            );
+        }
+        assertThat(allMessages)
+                .hasSize(152);
+    }
+
+    @Test
+    public void pcap_nprobe_NetFlowV9_2() throws Exception {
+        final List<Message> allMessages = new ArrayList<>();
+        try (InputStream inputStream = Resources.getResource("netflow-data/nprobe-netflow9-2.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(inputStream);
+            pcap.loop(packet -> {
+                        if (packet.hasProtocol(Protocol.UDP)) {
+                            final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                            final InetSocketAddress source = new InetSocketAddress(udp.getSourceIP(), udp.getSourcePort());
+                            final Collection<Message> messages = codec.decodeMessages(new RawMessage(udp.getPayload().getArray(), source));
+                            assertThat(messages).isNotNull();
+                            allMessages.addAll(messages);
+                        }
+                        return true;
+                    }
+            );
+        }
+        assertThat(allMessages)
+                .hasSize(6)
+               .allSatisfy(message -> assertThat(message.getField("nf_version")).isEqualTo(9));
+    }
 }
