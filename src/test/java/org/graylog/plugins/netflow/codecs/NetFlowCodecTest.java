@@ -318,9 +318,9 @@ public class NetFlowCodecTest {
     }
 
     @Test
-    public void pcap_nprobe_NetFlowV5() throws Exception {
+    public void pcap_netgraph_NetFlowV5() throws Exception {
         final List<Message> allMessages = new ArrayList<>();
-        try (InputStream inputStream = Resources.getResource("netflow-data/nprobe-netflow5.pcap").openStream()) {
+        try (InputStream inputStream = Resources.getResource("netflow-data/netgraph-netflow5.pcap").openStream()) {
             final Pcap pcap = Pcap.openStream(inputStream);
             pcap.loop(packet -> {
                         if (packet.hasProtocol(Protocol.UDP)) {
