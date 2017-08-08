@@ -372,6 +372,52 @@ public class NetFlowV9ParserTest {
                 );
     }
 
+    @Test
+    public void pcap_nprobe_NetFlowV9_3() throws Exception {
+        final List<NetFlowV9BaseRecord> allRecords = new ArrayList<>();
+        final List<NetFlowV9Template> allTemplates = new ArrayList<>();
+        try (InputStream inputStream = Resources.getResource("netflow-data/nprobe-netflow9-3.pcap").openStream()) {
+            final Pcap pcap = Pcap.openStream(inputStream);
+            pcap.loop(packet -> {
+                        if (packet.hasProtocol(Protocol.UDP)) {
+                            final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
+                            final ByteBuf byteBuf = Unpooled.wrappedBuffer(udp.getPayload().getArray());
+                            final NetFlowV9Packet netFlowV9Packet = NetFlowV9Parser.parsePacket(byteBuf, cache, typeRegistry);
+                            assertThat(netFlowV9Packet).isNotNull();
+                            allTemplates.addAll(netFlowV9Packet.templates());
+                            allRecords.addAll(netFlowV9Packet.records());
+                        }
+                        return true;
+                    }
+            );
+        }
+        assertThat(allTemplates).contains(
+                NetFlowV9Template.create(257, 18,
+                        ImmutableList.<NetFlowV9FieldDef>builder().add(
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(1, NetFlowV9FieldType.ValueType.UINT32, "in_bytes"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(2, NetFlowV9FieldType.ValueType.UINT32, "in_pkts"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(4, NetFlowV9FieldType.ValueType.UINT8, "protocol"), 1),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(5, NetFlowV9FieldType.ValueType.UINT8, "src_tos"), 1),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(6, NetFlowV9FieldType.ValueType.UINT8, "tcp_flags"), 1),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(7, NetFlowV9FieldType.ValueType.UINT16, "l4_src_port"), 2),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(8, NetFlowV9FieldType.ValueType.IPV4, "ipv4_src_addr"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(9, NetFlowV9FieldType.ValueType.UINT8, "src_mask"), 1),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(10, NetFlowV9FieldType.ValueType.UINT16, "input_snmp"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(11, NetFlowV9FieldType.ValueType.UINT16, "l4_dst_port"), 2),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(12, NetFlowV9FieldType.ValueType.IPV4, "ipv4_dst_addr"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(13, NetFlowV9FieldType.ValueType.UINT8, "dst_mask"), 1),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(14, NetFlowV9FieldType.ValueType.UINT16, "output_snmp"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(15, NetFlowV9FieldType.ValueType.IPV4, "ipv4_next_hop"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(16, NetFlowV9FieldType.ValueType.UINT16, "src_as"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(17, NetFlowV9FieldType.ValueType.UINT16, "dst_as"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(21, NetFlowV9FieldType.ValueType.UINT32, "last_switched"), 4),
+                                NetFlowV9FieldDef.create(NetFlowV9FieldType.create(22, NetFlowV9FieldType.ValueType.UINT32, "first_switched"), 4)
+                        ).build()
+                )
+        );
+        assertThat(allRecords).hasSize(898);
+    }
+
     private String name(NetFlowV9FieldDef def) {
         return def.type().name().toLowerCase();
     }
