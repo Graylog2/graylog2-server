@@ -239,7 +239,9 @@ public class NetFlowCodecTest {
                         return true;
                     }
             );
-            assertThat(allMessages).hasSize(4);
+            assertThat(allMessages)
+                    .hasSize(4)
+                    .allSatisfy(message -> assertThat(message.getField("nf_version")).isEqualTo(5));
         }
     }
 
@@ -261,7 +263,9 @@ public class NetFlowCodecTest {
                         return true;
                     }
             );
-            assertThat(allMessages).hasSize(42);
+            assertThat(allMessages)
+                    .hasSize(42)
+                    .allSatisfy(message -> assertThat(message.getField("nf_version")).isEqualTo(5));;
         }
     }
 
@@ -284,7 +288,9 @@ public class NetFlowCodecTest {
                     }
             );
         }
-        assertThat(allMessages).hasSize(19);
+        assertThat(allMessages)
+                .hasSize(19)
+                .allSatisfy(message -> assertThat(message.getField("nf_version")).isEqualTo(9));;
     }
 
     @Test
@@ -306,7 +312,9 @@ public class NetFlowCodecTest {
                     }
             );
         }
-        assertThat(allMessages).hasSize(6);
+        assertThat(allMessages)
+                .hasSize(6)
+                .allSatisfy(message -> assertThat(message.getField("nf_version")).isEqualTo(9));;
     }
 
     @Test
