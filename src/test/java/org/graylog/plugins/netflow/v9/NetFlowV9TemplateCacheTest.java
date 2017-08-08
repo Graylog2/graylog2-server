@@ -178,4 +178,31 @@ public class NetFlowV9TemplateCacheTest {
         assertThat(templateCache.get(0)).isEqualTo(template1);
         assertThat(templateCache.get(1)).isEqualTo(template2);
     }
+
+    @Test
+    public void isEmptyReturnsFalseForNonEmptyCache() throws Exception {
+        final byte[] json = ("{" +
+                "\"0\":{" +
+                "\"template_id\":0," +
+                "\"field_count\":1," +
+                "\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"UINT64\",\"name\":\"foobar\"},\"length\":8}]" +
+                "}," +
+                "\"1\":{" +
+                "\"template_id\":1," +
+                "\"field_count\":1," +
+                "\"definitions\":[{\"type\":{\"id\":0,\"value_type\":\"IPV4\",\"name\":\"covfefe\"},\"length\":4}]}}")
+                .getBytes(StandardCharsets.UTF_8);
+        assertThat(Files.write(cachePath, json)).isEqualTo(cachePath);
+        assertThat(Files.size(cachePath)).isEqualTo(json.length);
+
+        final NetFlowV9TemplateCache templateCache = new NetFlowV9TemplateCache(100L, cachePath, 300, executorService, objectMapper);
+
+        assertThat(templateCache.isEmpty()).isFalse();
+    }
+
+    @Test
+    public void isEmptyReturnsTrueForNonEmptyCache() throws Exception {
+        final NetFlowV9TemplateCache templateCache = new NetFlowV9TemplateCache(100L, cachePath, 300, executorService, objectMapper);
+        assertThat(templateCache.isEmpty()).isTrue();
+    }
 }

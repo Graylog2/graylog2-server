@@ -87,6 +87,10 @@ public class NetFlowV9TemplateCache implements Runnable {
         return cache.getIfPresent(id);
     }
 
+    public boolean isEmpty() {
+        return cache.size() == 0L;
+    }
+
     @Override
     public void run() {
         if (cache.size() != 0) {

@@ -18,6 +18,7 @@ package org.graylog.plugins.netflow.v9;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import io.netty.buffer.ByteBuf;
+import org.graylog.plugins.netflow.flows.EmptyTemplateException;
 import org.graylog.plugins.netflow.flows.InvalidFlowVersionException;
 
 import java.util.ArrayList;
@@ -28,13 +29,13 @@ import java.util.concurrent.atomic.AtomicReference;
 
 
 public class NetFlowV9Parser {
-    private static AtomicReference<NetFlowV9OptionTemplate> optionTemplateReference = new AtomicReference<>();
+    private static final AtomicReference<NetFlowV9OptionTemplate> optionTemplateReference = new AtomicReference<>();
 
     public static NetFlowV9Packet parsePacket(ByteBuf bb, NetFlowV9TemplateCache cache, NetFlowV9FieldTypeRegistry typeRegistry) {
         final int dataLength = bb.readableBytes();
         final NetFlowV9Header header = parseHeader(bb);
 
-        final ImmutableList.Builder<NetFlowV9Template> allTemplates = ImmutableList.builder();
+        final List<NetFlowV9Template> allTemplates = new ArrayList<>();
         NetFlowV9OptionTemplate optTemplate = null;
         List<NetFlowV9BaseRecord> records = Collections.emptyList();
         while (bb.isReadable()) {
@@ -51,13 +52,16 @@ public class NetFlowV9Parser {
                 optionTemplateReference.set(optTemplate);
             } else {
                 bb.resetReaderIndex();
+                if (cache.isEmpty()) {
+                    throw new EmptyTemplateException("Unable to parse NetFlow 9 records without template. Discarding packet.");
+                }
                 records = parseRecords(bb, cache);
             }
         }
 
         return NetFlowV9Packet.create(
                 header,
-                allTemplates.build(),
+                allTemplates,
                 optTemplate,
                 records,
                 dataLength);

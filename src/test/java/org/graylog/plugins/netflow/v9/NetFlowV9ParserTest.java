@@ -24,6 +24,7 @@ import io.netty.buffer.Unpooled;
 import io.pkts.Pcap;
 import io.pkts.packet.UDPPacket;
 import io.pkts.protocol.Protocol;
+import org.graylog.plugins.netflow.flows.EmptyTemplateException;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.junit.Before;
 import org.junit.Rule;
@@ -38,6 +39,7 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -122,6 +124,13 @@ public class NetFlowV9ParserTest {
 
         NetFlowV9Packet p3 = NetFlowV9Parser.parsePacket(Unpooled.wrappedBuffer(b3), cache, typeRegistry);
         assertEquals(1, p3.records().size());
+    }
+
+    @Test
+    public void testParseIncomplete() throws Exception {
+        final byte[] b = Resources.toByteArray(Resources.getResource("netflow-data/netflow-v9-3_incomplete.dat"));
+        assertThatExceptionOfType(EmptyTemplateException.class)
+                .isThrownBy(() -> NetFlowV9Parser.parsePacket(Unpooled.wrappedBuffer(b), cache, typeRegistry));
     }
 
     @Test
@@ -428,10 +437,14 @@ public class NetFlowV9ParserTest {
                         if (packet.hasProtocol(Protocol.UDP)) {
                             final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
                             final ByteBuf byteBuf = Unpooled.wrappedBuffer(udp.getPayload().getArray());
-                            final NetFlowV9Packet netFlowV9Packet = NetFlowV9Parser.parsePacket(byteBuf, cache, typeRegistry);
-                            assertThat(netFlowV9Packet).isNotNull();
-                            allTemplates.addAll(netFlowV9Packet.templates());
-                            allRecords.addAll(netFlowV9Packet.records());
+                            try {
+                                final NetFlowV9Packet netFlowV9Packet = NetFlowV9Parser.parsePacket(byteBuf, cache, typeRegistry);
+                                assertThat(netFlowV9Packet).isNotNull();
+                                allTemplates.addAll(netFlowV9Packet.templates());
+                                allRecords.addAll(netFlowV9Packet.records());
+                            } catch (EmptyTemplateException e) {
+                                // ignore
+                            }
                         }
                         return true;
                     }
@@ -461,7 +474,7 @@ public class NetFlowV9ParserTest {
                         ).build()
                 )
         );
-        assertThat(allRecords).hasSize(898);
+        assertThat(allRecords).hasSize(2);
     }
 
     private String name(NetFlowV9FieldDef def) {

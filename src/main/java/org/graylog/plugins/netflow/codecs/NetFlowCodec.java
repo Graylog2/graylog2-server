@@ -106,7 +106,7 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
         try {
             return NetFlowParser.parse(rawMessage, templateCache, typeRegistry);
         } catch (FlowException e) {
-            LOG.error("Error parsing NetFlow packet", e);
+            LOG.error("Error parsing NetFlow packet <{}> received from <{}>", rawMessage.getId(), rawMessage.getRemoteAddress(), e);
             return null;
         }
     }
