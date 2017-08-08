@@ -607,7 +607,7 @@ public class SearchesTest extends AbstractESTest {
 
         final TimeRange absoluteRange = AbsoluteRange.create(now, now.plusDays(numberOfIndices + 1));
 
-        assertThat(searches.determineAffectedIndices(absoluteRange, null)).containsExactly(indexSet.getWriteIndexAlias());
+        assertThat(searches.determineAffectedIndices(absoluteRange, null)).containsExactly(indexSet.getIndexWildcard());
     }
 
     @Test

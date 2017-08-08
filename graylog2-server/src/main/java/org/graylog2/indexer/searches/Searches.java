@@ -821,7 +821,7 @@ public class Searches {
                     .map(IndexRange::indexName)
                     .map(indexSetRegistry::getForIndex)
                     .flatMap(o -> o.map(java.util.stream.Stream::of).orElseGet(java.util.stream.Stream::empty))
-                    .map(IndexSet::getWriteIndexAlias)
+                    .map(IndexSet::getIndexWildcard)
                     .collect(Collectors.toSet());
 
         } else {
