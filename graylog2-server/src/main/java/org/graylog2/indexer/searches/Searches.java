@@ -660,6 +660,11 @@ public class Searches {
             // parameter."
             // TODO: Look at the source filtering parameter once we switched to ES 1.x.
             request.fields(config.fields());
+
+            // Re-enable source fetching, because
+            // "By default operations return the contents of the _source field unless you have used the fields parameter
+            // or if the _source field is disabled."
+            request.fetchSource(true);
         }
 
         return request;
