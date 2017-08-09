@@ -264,20 +264,20 @@ public class Searches {
 
     public SearchResult search(SearchesConfig config) {
         final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(config.range(), config.filter());
-        final Set<String> indices = indexRanges.stream().map(IndexRange::indexName).collect(Collectors.toSet());
 
         final SearchSourceBuilder requestBuilder = searchRequest(config);
+        if (indexRanges.isEmpty()) {
+            return SearchResult.empty(config.query(), requestBuilder.toString());
+        }
 
+        final Set<String> indices = extractIndexNamesFromIndexRanges(indexRanges);
         final Search.Builder searchBuilder = new Search.Builder(requestBuilder.toString())
             .addType(IndexMapping.TYPE_MESSAGE)
             .addIndex(indices);
 
-        if (indices.isEmpty()) {
-            return SearchResult.empty(config.query(), requestBuilder.toString());
-        }
         final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform search query."));
         final List<ResultMessage> hits = searchResult.getHits(Map.class, false).stream()
-            .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>)hit.source))
+            .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>) hit.source))
             .collect(Collectors.toList());
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, config.range());
@@ -815,7 +815,10 @@ public class Searches {
 
     @VisibleForTesting
     Set<String> determineAffectedIndices(TimeRange range, @Nullable String filter) {
-        final Set<IndexRange> indexRanges = determineAffectedIndicesWithRanges(range, filter);
+        return extractIndexNamesFromIndexRanges(determineAffectedIndicesWithRanges(range, filter));
+    }
+
+    private Set<String> extractIndexNamesFromIndexRanges(Set<IndexRange> indexRanges) {
         if(indexRanges.size() > MAX_INDICES_PER_QUERY) {
             return indexRanges.stream()
                     .map(IndexRange::indexName)
@@ -823,13 +826,11 @@ public class Searches {
                     .flatMap(o -> o.map(java.util.stream.Stream::of).orElseGet(java.util.stream.Stream::empty))
                     .map(IndexSet::getIndexWildcard)
                     .collect(Collectors.toSet());
-
         } else {
             return indexRanges.stream()
                     .map(IndexRange::indexName)
                     .collect(Collectors.toSet());
         }
-
     }
 
     @VisibleForTesting
