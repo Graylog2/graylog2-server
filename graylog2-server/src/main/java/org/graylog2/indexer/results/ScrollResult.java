@@ -39,14 +39,17 @@ public class ScrollResult extends IndexQueryResult {
     private static final Logger LOG = LoggerFactory.getLogger(ScrollResult.class);
     private static final TypeReference<Map<String, Object>> MAP_TYPE_REFERENCE = new TypeReference<Map<String, Object>>() {
     };
+    private static final String DEFAULT_SCROLL = "1m";
 
     public interface Factory {
-        ScrollResult create(SearchResult initialResult, String query, List<String> fields);
+        ScrollResult create(SearchResult initialResult, @Assisted("query") String query, List<String> fields);
+        ScrollResult create(SearchResult initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, List<String> fields);
     }
 
     private final JestClient jestClient;
     private final ObjectMapper objectMapper;
     private SearchResult initialResult;
+    private final String scroll;
     private final List<String> fields;
     private final String queryHash; // used in log output only
     private final long totalHits;
@@ -55,11 +58,17 @@ public class ScrollResult extends IndexQueryResult {
     private int chunkId = 0;
 
     @AssistedInject
-    public ScrollResult(JestClient jestClient, ObjectMapper objectMapper, @Assisted SearchResult initialResult, @Assisted String query, @Assisted List<String> fields) {
+    public ScrollResult(JestClient jestClient, ObjectMapper objectMapper, @Assisted SearchResult initialResult, @Assisted("query") String query, @Assisted List<String> fields) {
+        this(jestClient, objectMapper, initialResult, query, DEFAULT_SCROLL, fields);
+    }
+
+    @AssistedInject
+    public ScrollResult(JestClient jestClient, ObjectMapper objectMapper, @Assisted SearchResult initialResult, @Assisted("query") String query, @Assisted("scroll") String scroll, @Assisted List<String> fields) {
         super(query, null, initialResult.getJsonObject().path("took").asLong());
         this.jestClient = jestClient;
         this.objectMapper = objectMapper;
         this.initialResult = initialResult;
+        this.scroll = scroll;
         this.fields = fields;
         totalHits = initialResult.getTotal();
         scrollId = getScrollIdFromResult(initialResult);
@@ -106,7 +115,7 @@ public class ScrollResult extends IndexQueryResult {
     }
 
     private JestResult getNextScrollResult() throws IOException {
-        final SearchScroll.Builder searchBuilder = new SearchScroll.Builder(scrollId, "1m");
+        final SearchScroll.Builder searchBuilder = new SearchScroll.Builder(scrollId, scroll);
         return jestClient.execute(searchBuilder.build());
     }
 
