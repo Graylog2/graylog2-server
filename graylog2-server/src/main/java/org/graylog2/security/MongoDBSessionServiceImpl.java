@@ -19,26 +19,36 @@ package org.graylog2.security;
 import com.google.common.collect.Lists;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import com.mongodb.client.model.Indexes;
+import org.bson.Document;
 import org.bson.types.ObjectId;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.PersistedServiceImpl;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collection;
 import java.util.List;
 
+@Singleton
 public class MongoDBSessionServiceImpl extends PersistedServiceImpl implements MongoDBSessionService {
     @Inject
     public MongoDBSessionServiceImpl(MongoConnection mongoConnection) {
         super(mongoConnection);
+
+        final MongoDatabase database = mongoConnection.getMongoDatabase();
+        final MongoCollection<Document> sessions = database.getCollection(MongoDbSession.COLLECTION_NAME);
+        sessions.createIndex(Indexes.ascending(MongoDbSession.FIELD_SESSION_ID));
     }
 
     @Override
     @Nullable
     public MongoDbSession load(String sessionId) {
         DBObject query = new BasicDBObject();
-        query.put("session_id", sessionId);
+        query.put(MongoDbSession.FIELD_SESSION_ID, sessionId);
 
         DBObject result = findOne(MongoDbSession.class, query);
         if (result == null) {
