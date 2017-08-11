@@ -34,6 +34,7 @@ import io.searchbox.core.search.aggregation.MissingAggregation;
 import io.searchbox.core.search.aggregation.TermsAggregation;
 import io.searchbox.core.search.aggregation.ValueCountAggregation;
 import io.searchbox.params.Parameters;
+import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -613,13 +614,13 @@ public class Searches {
             request = filteredSearchRequest(config.query(), config.filter(), config.limit(), config.offset(), config.range(), config.sorting());
         }
 
-        if (config.fields() != null) {
-            // http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/search-request-fields.html#search-request-fields
-            // "For backwards compatibility, if the fields parameter specifies fields which are not stored , it will
-            // load the _source and extract it from it. This functionality has been replaced by the source filtering
-            // parameter."
-            // TODO: Look at the source filtering parameter once we switched to ES 1.x.
-            request.fields(config.fields());
+        final List<String> fields = config.fields();
+        if (fields != null) {
+            // Use source filtering instead of SearchSourceBuilder#fields() here because Jest cannot handle responses
+            // without a "_source" field yet. See:
+            // https://github.com/searchbox-io/Jest/issues/157
+            // https://github.com/searchbox-io/Jest/issues/339
+            request.fetchSource(fields.toArray(new String[fields.size()]), Strings.EMPTY_ARRAY);
         }
 
         return request;

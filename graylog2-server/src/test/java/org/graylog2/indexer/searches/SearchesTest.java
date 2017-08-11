@@ -748,4 +748,22 @@ public class SearchesTest extends AbstractESTest {
         assertThat(searchResult.getTotalResults()).isEqualTo(10L);
         assertThat(searchResult.getFields()).doesNotContain("es_metadata_id", "es_metadata_version");
     }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void searchReturnsResultWithSelectiveFields() throws Exception {
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final SearchesConfig searchesConfig = SearchesConfig.builder()
+                .query("*")
+                .range(range)
+                .limit(1)
+                .offset(0)
+                .fields(Collections.singletonList("source"))
+                .build();
+        final SearchResult searchResult = searches.search(searchesConfig);
+
+        assertThat(searchResult).isNotNull();
+        assertThat(searchResult.getResults()).hasSize(1);
+        assertThat(searchResult.getTotalResults()).isEqualTo(10L);
+    }
 }
