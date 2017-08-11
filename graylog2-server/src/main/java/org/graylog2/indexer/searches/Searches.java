@@ -460,12 +460,8 @@ public class Searches {
                                        TimeRange range,
                                        boolean includeCardinality,
                                        boolean includeStats,
-                                       boolean includeCount)
-        {
-        SearchSourceBuilder searchSourceBuilder;
-
-        final Set<String> affectedIndices = indicesContainingField(determineAffectedIndices(range, filter), field);
-
+                                       boolean includeCount) {
+        final SearchSourceBuilder searchSourceBuilder;
         if (filter == null) {
             searchSourceBuilder = standardSearchRequest(query, range);
         } else {
@@ -486,13 +482,20 @@ public class Searches {
 
         searchSourceBuilder.aggregation(filterBuilder);
 
-        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
-            .addType(IndexMapping.TYPE_MESSAGE)
-            .addIndex(affectedIndices);
-
+        final Set<String> affectedIndices = indicesContainingField(determineAffectedIndices(range, filter), field);
         if (affectedIndices.isEmpty()) {
             return FieldStatsResult.empty(query, searchSourceBuilder.toString());
         }
+
+        final Set<String> indices;
+        if (affectedIndices.size() > MAX_INDICES_PER_QUERY) {
+            indices = reduceIndexNamesToIndexWildcards(affectedIndices);
+        } else {
+            indices = affectedIndices;
+        }
+        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
+            .addType(IndexMapping.TYPE_MESSAGE)
+            .addIndex(indices);
 
         final io.searchbox.core.SearchResult searchResponse = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to retrieve fields stats."));
         final List<ResultMessage> hits = searchResponse.getHits(Map.class, false).stream()
@@ -819,18 +822,22 @@ public class Searches {
     }
 
     private Set<String> extractIndexNamesFromIndexRanges(Set<IndexRange> indexRanges) {
-        if(indexRanges.size() > MAX_INDICES_PER_QUERY) {
-            return indexRanges.stream()
-                    .map(IndexRange::indexName)
-                    .map(indexSetRegistry::getForIndex)
-                    .flatMap(o -> o.map(java.util.stream.Stream::of).orElseGet(java.util.stream.Stream::empty))
-                    .map(IndexSet::getIndexWildcard)
-                    .collect(Collectors.toSet());
+        final Set<String> indexNames = indexRanges.stream()
+                .map(IndexRange::indexName)
+                .collect(Collectors.toSet());
+        if (indexNames.size() > MAX_INDICES_PER_QUERY) {
+            return reduceIndexNamesToIndexWildcards(indexNames);
         } else {
-            return indexRanges.stream()
-                    .map(IndexRange::indexName)
-                    .collect(Collectors.toSet());
+            return indexNames;
         }
+    }
+
+    private Set<String> reduceIndexNamesToIndexWildcards(Set<String> indexNames) {
+        return indexNames.stream()
+                .map(indexSetRegistry::getForIndex)
+                .flatMap(o -> o.map(java.util.stream.Stream::of).orElseGet(java.util.stream.Stream::empty))
+                .map(IndexSet::getIndexWildcard)
+                .collect(Collectors.toSet());
     }
 
     @VisibleForTesting
