@@ -35,9 +35,11 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
-@CollectionName("sessions")
+@CollectionName(MongoDbSession.COLLECTION_NAME)
 public class MongoDbSession extends PersistedImpl {
     private static final Logger LOG = LoggerFactory.getLogger(MongoDbSession.class);
+    static final String COLLECTION_NAME = "sessions";
+    static final String FIELD_SESSION_ID = "session_id";
 
     protected MongoDbSession(Map<String, Object> fields) {
         super(fields);
@@ -144,6 +146,6 @@ public class MongoDbSession extends PersistedImpl {
     }
 
     public String getSessionId() {
-        return String.valueOf(fields.get("session_id"));
+        return String.valueOf(fields.get(FIELD_SESSION_ID));
     }
 }
