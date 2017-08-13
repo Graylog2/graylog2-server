@@ -28,7 +28,6 @@ import org.graylog2.rest.models.system.outputs.responses.OutputSummary;
 
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 

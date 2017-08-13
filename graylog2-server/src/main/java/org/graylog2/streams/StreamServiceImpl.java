@@ -141,7 +141,6 @@ public class StreamServiceImpl extends PersistedServiceImpl implements StreamSer
         streamData.put(StreamImpl.FIELD_SURROUNDING_FILTERS, cr.surroundingFilters());
         streamData.put(StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId());
 
-
         return create(streamData);
     }
 

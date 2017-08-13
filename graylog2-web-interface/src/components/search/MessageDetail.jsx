@@ -134,10 +134,7 @@ const MessageDetail = React.createClass({
     const messageUrl = this.props.message.index ? Routes.message_show(this.props.message.index, this.props.message.id) : '#';
 
     let surroundingSearchButton;
-    console.log("Stream objecct");
-    console.log(this.props.streams);
 
-    let surrounding_filters = this.props.searchInStream ? this.STREAM_SEARCH_COUNT_WIDGET_TYPE : this.SEARCH_COUNT_WIDGET_TYPE
     if (!this.props.disableSurroundingSearch) {
       surroundingSearchButton = (
         <SurroundingSearchButton id={this.props.message.id}

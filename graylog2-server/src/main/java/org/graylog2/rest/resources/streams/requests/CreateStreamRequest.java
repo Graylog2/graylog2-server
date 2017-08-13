@@ -27,7 +27,6 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
