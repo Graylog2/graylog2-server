@@ -16,9 +16,11 @@
  */
 package org.graylog2.streams;
 
+import com.google.common.collect.ImmutableMap;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
+import org.bson.types.ObjectId;
 import org.graylog2.alarmcallbacks.AlarmCallbackConfigurationService;
 import org.graylog2.alerts.AlertService;
 import org.graylog2.database.MongoConnectionRule;
@@ -38,6 +40,7 @@ import java.util.List;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertEquals;
 
 public class StreamServiceImplTest {
     @ClassRule
@@ -98,5 +101,30 @@ public class StreamServiceImplTest {
         assertThat(alertableStreams)
             .isNotEmpty()
             .hasSize(2);
+    }
+
+    @Test
+    public void getSurroundingFiltersOnStream() {
+        final StreamMock stream = getStreamMock("test");
+
+        assertEquals(stream.getSurroundingFilters(), stream.DEFAULT_SURROUNDING_FILTERS);
+    }
+
+    @Test
+    public void setSurroundingFiltersOnStream() {
+        final StreamMock stream = getStreamMock("test");
+        final String newSurroundingFilter = "test, source, name";
+
+        stream.setSurroundingFilters(newSurroundingFilter);
+
+        assertEquals(stream.getSurroundingFilters(), newSurroundingFilter);
+    }
+
+    private StreamMock getStreamMock(String title) {
+        return getStreamMock(title, Stream.MatchingType.AND);
+    }
+
+    private StreamMock getStreamMock(String title, Stream.MatchingType matchingType) {
+        return new StreamMock(ImmutableMap.of("_id", new ObjectId(), "title", title, "matching_type", matchingType));
     }
 }

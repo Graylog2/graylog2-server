@@ -75,8 +75,8 @@ const StreamControls = React.createClass({
             </MenuItem>
           </IfPermitted>
         </DropdownButton>
-        <StreamForm ref="streamForm" title="Editing Stream" onSubmit={this.props.onUpdate} stream={stream} indexSets={this.props.indexSets} />
-        <StreamForm ref="cloneForm" title="Cloning Stream" onSubmit={this._onCloneSubmit} indexSets={this.props.indexSets} />
+        <StreamForm ref="streamForm" title="Editing Stream" action="Edit" onSubmit={this.props.onUpdate} stream={stream} indexSets={this.props.indexSets} />
+        <StreamForm ref="cloneForm" title="Cloning Stream" action="Clone" onSubmit={this._onCloneSubmit} stream={stream} indexSets={this.props.indexSets} />
       </span>
     );
   },

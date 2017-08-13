@@ -27,6 +27,7 @@ import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Set;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
@@ -34,6 +35,7 @@ import static com.google.common.base.MoreObjects.firstNonNull;
 @AutoValue
 @WithBeanGetter
 public abstract class CreateStreamRequest {
+
     @JsonProperty
     public abstract String title();
 
@@ -55,6 +57,9 @@ public abstract class CreateStreamRequest {
     @JsonProperty("remove_matches_from_default_stream")
     public abstract boolean removeMatchesFromDefaultStream();
 
+    @JsonProperty("surrounding_filters")
+    public abstract String surroundingFilters();
+
     @JsonProperty("index_set_id")
     public abstract String indexSetId();
 
@@ -65,6 +70,7 @@ public abstract class CreateStreamRequest {
                                              @JsonProperty("content_pack") @Nullable String contentPack,
                                              @JsonProperty("matching_type") @Nullable String matchingType,
                                              @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream,
+                                             @JsonProperty("surrounding_filters") String surroundingFilters,
                                              @JsonProperty("index_set_id") String indexSetId) {
         return new AutoValue_CreateStreamRequest(
                 title,
@@ -73,6 +79,7 @@ public abstract class CreateStreamRequest {
                 contentPack,
                 Stream.MatchingType.valueOfOrDefault(matchingType),
                 firstNonNull(removeMatchesFromDefaultStream, false),
+                surroundingFilters,
                 indexSetId
         );
     }

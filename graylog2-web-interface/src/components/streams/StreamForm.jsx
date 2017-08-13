@@ -13,6 +13,7 @@ const StreamForm = React.createClass({
     onSubmit: PropTypes.func.isRequired,
     stream: PropTypes.object.isRequired,
     title: PropTypes.string.isRequired,
+    action: PropTypes.string,
     indexSets: PropTypes.array.isRequired,
   },
 
@@ -24,12 +25,17 @@ const StreamForm = React.createClass({
         title: '',
         description: '',
         remove_matches_from_default_stream: false,
+        surrounding_filters: 'file, source, gl2_source_input, source_file',
       },
     };
   },
 
   getInitialState() {
     return this._getValuesFromProps(this.props);
+  },
+
+  handleChange: function(field, value) {
+    this.setState({[field]: value});
   },
 
   _resetValues() {
@@ -49,6 +55,7 @@ const StreamForm = React.createClass({
       title: props.stream.title,
       description: props.stream.description,
       remove_matches_from_default_stream: props.stream.remove_matches_from_default_stream,
+      surrounding_filters: props.stream.surrounding_filters,
       index_set_id: defaultIndexSetId,
     };
   },
@@ -59,6 +66,7 @@ const StreamForm = React.createClass({
         title: this.state.title,
         description: this.state.description,
         remove_matches_from_default_stream: this.state.remove_matches_from_default_stream,
+        surrounding_filters: this.state.surrounding_filters,
         index_set_id: this.state.index_set_id,
       });
     this.refs.modal.close();
@@ -103,7 +111,7 @@ const StreamForm = React.createClass({
       <BootstrapModalForm ref="modal"
                           title={this.props.title}
                           onSubmitForm={this._onSubmit}
-                          submitButtonText="Save">
+                          submitButtonText={this.props.action ? this.props.action : "Save"}>
         <Input id="Title" type="text" required label="Title" name="Title"
                placeholder="A descriptive name of the new stream"
                valueLink={this.linkState('title')} autoFocus />
@@ -111,6 +119,9 @@ const StreamForm = React.createClass({
                placeholder="What kind of messages are routed into this stream?"
                valueLink={this.linkState('description')} />
         {indexSetSelect}
+        <Input id="SurroundingFilters" type="text" label="Surrounding Fields" name="Show Surrounding Fields"
+               placeholder="The fields to correlate with for Show Surrounding Messages." value={this.state.surrounding_filters} onChange={e=>this.handleChange('surrounding_filters', e.target.value)}
+               help={<span>If blank, defaults to 'file, source, gl2_source_input, source_file'</span>} />
         <Input id="RemoveFromDefaultStream" type="checkbox" label="Remove matches from 'All messages' stream" name="Remove from All messages"
                help={<span>Remove messages that match this stream from the 'All messages' stream which is assigned to every message by default.</span>}
                checkedLink={this.linkState('remove_matches_from_default_stream')} />

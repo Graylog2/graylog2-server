@@ -79,6 +79,10 @@ public interface Stream extends Persisted {
 
     void setRemoveMatchesFromDefaultStream(boolean removeMatchesFromDefaultStream);
 
+    String getSurroundingFilters();
+
+    String setSurroundingFilters(String fieldSurroundingFilters);
+
     IndexSet getIndexSet();
 
     String getIndexSetId();

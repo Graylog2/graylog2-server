@@ -24,6 +24,7 @@ const ResultTable = React.createClass({
     sortField: PropTypes.string.isRequired,
     sortOrder: PropTypes.string.isRequired,
     streams: PropTypes.object.isRequired,
+    searchInStream: PropTypes.object,
     searchConfig: PropTypes.object.isRequired,
   },
   getInitialState() {
@@ -171,6 +172,7 @@ const ResultTable = React.createClass({
                                        streams={this.props.streams}
                                        allStreams={this.state.allStreams}
                                        allStreamsLoaded={this.state.allStreamsLoaded}
+                                       searchInStream={this.props.searchInStream}
                                        nodes={this.props.nodes}
                                        highlight={this.props.highlight}
                                        highlightMessage={SearchStore.highlightMessage}

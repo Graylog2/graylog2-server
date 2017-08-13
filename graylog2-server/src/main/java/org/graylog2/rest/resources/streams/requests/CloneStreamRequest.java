@@ -35,6 +35,9 @@ public abstract class CloneStreamRequest {
     @JsonProperty("remove_matches_from_default_stream")
     public abstract boolean removeMatchesFromDefaultStream();
 
+    @JsonProperty("surrounding_filters")
+    public abstract String surroundingFilters();
+
     @JsonProperty("index_set_id")
     public abstract String indexSetId();
 
@@ -42,7 +45,8 @@ public abstract class CloneStreamRequest {
     public static CloneStreamRequest create(@JsonProperty("title") String title,
                                             @JsonProperty("description") String description,
                                             @JsonProperty("remove_matches_from_default_stream") boolean removeMatchesFromDefaultStream,
+                                            @JsonProperty("surrounding_filters") String surroundingFilters,
                                             @JsonProperty("index_set_id") String indexSetId) {
-        return new AutoValue_CloneStreamRequest(title, description, removeMatchesFromDefaultStream, indexSetId);
+        return new AutoValue_CloneStreamRequest(title, description, removeMatchesFromDefaultStream, surroundingFilters, indexSetId);
     }
 }
