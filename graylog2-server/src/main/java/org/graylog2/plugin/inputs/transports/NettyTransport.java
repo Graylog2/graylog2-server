@@ -29,6 +29,7 @@ import org.graylog2.plugin.configuration.ConfigurationRequest;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
+import org.graylog2.plugin.inputs.codecs.RemoteAddressCodecAggregator;
 import org.graylog2.plugin.inputs.util.PacketInformationDumper;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.graylog2.plugin.journal.RawMessage;
@@ -283,11 +284,18 @@ public abstract class NettyTransport implements Transport {
 
     private class MessageAggregationHandler extends SimpleChannelHandler {
         private final CodecAggregator aggregator;
+        private final RemoteAddressCodecAggregator remoteAddressCodecAggregator;
         private final Timer aggregationTimer;
         private final Meter invalidChunksMeter;
 
         public MessageAggregationHandler(CodecAggregator aggregator) {
             this.aggregator = aggregator;
+            // workaround to stay compatible until 3.0
+            if (aggregator instanceof RemoteAddressCodecAggregator) {
+                remoteAddressCodecAggregator = (RemoteAddressCodecAggregator) aggregator;
+            } else {
+                remoteAddressCodecAggregator = null;
+            }
             aggregationTimer = localRegistry.timer("aggregationTime");
             invalidChunksMeter = localRegistry.meter("invalidMessages");
         }
@@ -295,17 +303,23 @@ public abstract class NettyTransport implements Transport {
         @Override
         public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
             final Object message = e.getMessage();
+            final SocketAddress remoteAddress = e.getRemoteAddress();
 
             if (message instanceof ChannelBuffer) {
                 final ChannelBuffer buf = (ChannelBuffer) message;
                 final CodecAggregator.Result result;
                 try (Timer.Context ignored = aggregationTimer.time()) {
-                    result = aggregator.addChunk(buf);
+                    if (remoteAddressCodecAggregator == null) {
+                        // for compatibility during 2.x, to be remove in 3.0
+                        result = aggregator.addChunk(buf);
+                    } else {
+                        result = remoteAddressCodecAggregator.addChunk(buf, remoteAddress);
+                    }
                 }
                 final ChannelBuffer completeMessage = result.getMessage();
                 if (completeMessage != null) {
                     log.debug("Message aggregation completion, forwarding {}", completeMessage);
-                    fireMessageReceived(ctx, completeMessage, e.getRemoteAddress());
+                    fireMessageReceived(ctx, completeMessage, remoteAddress);
                 } else if (result.isValid()) {
                     log.debug("More chunks necessary to complete this message");
                 } else {
@@ -314,7 +328,7 @@ public abstract class NettyTransport implements Transport {
                 }
             } else {
                 log.debug("Could not handle netty message {}, sending further upstream.", e);
-                fireMessageReceived(ctx, message, e.getRemoteAddress());
+                fireMessageReceived(ctx, message, remoteAddress);
             }
         }
     }

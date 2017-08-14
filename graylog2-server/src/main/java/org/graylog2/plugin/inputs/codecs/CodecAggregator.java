@@ -21,10 +21,19 @@ import org.jboss.netty.buffer.ChannelBuffer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.net.SocketAddress;
 
 public interface CodecAggregator {
 
+    /**
+     * Deprecated in favor of {@link RemoteAddressCodecAggregator#addChunk(ChannelBuffer, SocketAddress)} which will replace
+     * this method in 3.0.
+     *
+     * @param buf the buffer containing a message part
+     * @return the result of the aggregation
+     */
     @Nonnull
+    @Deprecated
     Result addChunk(ChannelBuffer buf);
 
     final class Result {
@@ -43,6 +52,18 @@ public interface CodecAggregator {
 
         public boolean isValid() {
             return valid;
+        }
+
+        public static Result discard() {
+            return new Result(null, false);
+        }
+
+        public static Result incomplete() {
+            return new Result(null, true);
+        }
+
+        public static Result complete(ChannelBuffer buf) {
+            return new Result(buf, true);
         }
 
         @Override
