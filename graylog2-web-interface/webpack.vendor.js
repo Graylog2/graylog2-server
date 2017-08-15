@@ -63,6 +63,9 @@ const webpackConfig = {
 if (TARGET === 'build') {
   module.exports = merge(webpackConfig, {
     plugins: [
+      new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify('production'),
+      }),
       new Clean([path.resolve(BUILD_PATH)]),
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
@@ -75,7 +78,7 @@ if (TARGET === 'build') {
         },
       }),
       new webpack.LoaderOptionsPlugin({
-        minimize: true
+        minimize: true,
       }),
     ],
     output: {
