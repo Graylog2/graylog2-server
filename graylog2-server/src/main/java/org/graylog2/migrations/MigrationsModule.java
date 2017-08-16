@@ -16,24 +16,22 @@
  */
 package org.graylog2.migrations;
 
-import com.google.inject.AbstractModule;
-import com.google.inject.multibindings.Multibinder;
+import org.graylog2.plugin.PluginModule;
 
-public class MigrationsModule extends AbstractModule {
+public class MigrationsModule extends PluginModule {
     @Override
     protected void configure() {
-        final Multibinder<Migration> binder = Multibinder.newSetBinder(binder(), Migration.class);
-        binder.addBinding().to(V20151210140600_ElasticsearchConfigMigration.class);
-        binder.addBinding().to(V20161116172100_DefaultIndexSetMigration.class);
-        binder.addBinding().to(V20161116172200_CreateDefaultStreamMigration.class);
-        binder.addBinding().to(V20161122174500_AssignIndexSetsToStreamsMigration.class);
-        binder.addBinding().to(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.class);
-        binder.addBinding().to(V20161125142400_EmailAlarmCallbackMigration.class);
-        binder.addBinding().to(V20161125161400_AlertReceiversMigration.class);
-        binder.addBinding().to(V20161130141500_DefaultStreamRecalcIndexRanges.class);
-        binder.addBinding().to(V20161215163900_MoveIndexSetDefaultConfig.class);
-        binder.addBinding().to(V20161216123500_DefaultIndexSetMigration.class);
-        binder.addBinding().to(V20170110150100_FixAlertConditionsMigration.class);
-        binder.addBinding().to(V20170607164210_MigrateReopenedIndicesToAliases.class);
+        addMigration(V20151210140600_ElasticsearchConfigMigration.class);
+        addMigration(V20161116172100_DefaultIndexSetMigration.class);
+        addMigration(V20161116172200_CreateDefaultStreamMigration.class);
+        addMigration(V20161122174500_AssignIndexSetsToStreamsMigration.class);
+        addMigration(V20161124104700_AddRetentionRotationAndDefaultFlagToIndexSetMigration.class);
+        addMigration(V20161125142400_EmailAlarmCallbackMigration.class);
+        addMigration(V20161125161400_AlertReceiversMigration.class);
+        addMigration(V20161130141500_DefaultStreamRecalcIndexRanges.class);
+        addMigration(V20161215163900_MoveIndexSetDefaultConfig.class);
+        addMigration(V20161216123500_DefaultIndexSetMigration.class);
+        addMigration(V20170110150100_FixAlertConditionsMigration.class);
+        addMigration(V20170607164210_MigrateReopenedIndicesToAliases.class);
     }
 }
