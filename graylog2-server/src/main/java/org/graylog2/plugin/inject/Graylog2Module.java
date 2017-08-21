@@ -31,6 +31,7 @@ import org.graylog2.audit.AuditEventSender;
 import org.graylog2.audit.AuditEventType;
 import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.formatter.AuditEventFormatter;
+import org.graylog2.migrations.Migration;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.decorators.SearchResponseDecorator;
@@ -409,6 +410,10 @@ public abstract class Graylog2Module extends AbstractModule {
 
     protected MapBinder<String, Object> jacksonSubTypesBinder() {
         return MapBinder.newMapBinder(binder(), TypeLiteral.get(String.class), TypeLiteral.get(Object.class), JacksonSubTypes.class);
+    }
+
+    protected Multibinder<Migration> migrationsBinder() {
+        return Multibinder.newSetBinder(binder(), Migration.class);
     }
 
     private static class DynamicFeatureType extends TypeLiteral<Class<? extends DynamicFeature>> {}
