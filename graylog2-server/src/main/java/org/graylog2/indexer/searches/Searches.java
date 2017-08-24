@@ -283,7 +283,7 @@ public class Searches {
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, config.range());
 
-        return new SearchResult(hits, searchResult.getTotal().longValue(), indexRanges, config.query(), requestBuilder.toString(), tookMs);
+        return new SearchResult(hits, searchResult.getTotal(), indexRanges, config.query(), requestBuilder.toString(), tookMs);
     }
 
     private long tookMsFromSearchResult(io.searchbox.core.SearchResult searchResult) {
