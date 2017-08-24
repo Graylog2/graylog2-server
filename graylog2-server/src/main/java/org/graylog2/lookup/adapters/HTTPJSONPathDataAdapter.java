@@ -124,7 +124,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
                 .add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
 
         if (config.headers() != null) {
-            config.headers().forEach(headersBuilder::add);
+            config.headers().forEach(headersBuilder::set);
         }
         this.headers = headersBuilder.build();
     }
