@@ -278,7 +278,7 @@ public class Searches {
 
         final io.searchbox.core.SearchResult searchResult = checkForFailedShards(JestUtils.execute(jestClient, searchBuilder.build(), () -> "Unable to perform search query."));
         final List<ResultMessage> hits = searchResult.getHits(Map.class, false).stream()
-            .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>) hit.source))
+            .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>) hit.source, hit.highlight))
             .collect(Collectors.toList());
         final long tookMs = tookMsFromSearchResult(searchResult);
         recordEsMetrics(tookMs, config.range());

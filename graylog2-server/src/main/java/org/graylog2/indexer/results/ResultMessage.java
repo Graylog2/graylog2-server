@@ -24,6 +24,8 @@ import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.graylog2.plugin.Tools.ES_DATE_FORMAT_FORMATTER;
@@ -39,12 +41,18 @@ public class ResultMessage {
 
     protected ResultMessage() { /* use factory method */}
 
-    public static ResultMessage parseFromSource(String id, String index, Map<String, Object> message) {
-        final ResultMessage m = new ResultMessage();
-        m.setMessage(id, message);
-        m.setIndex(index);
+    private ResultMessage(String id, String index, Map<String, Object> message, Multimap<String, Range<Integer>> highlightRanges) {
+        this.index = index;
+        this.highlightRanges = highlightRanges;
+        setMessage(id, message);
+    }
 
-        return m;
+    public static ResultMessage parseFromSource(String id, String index, Map<String, Object> message) {
+        return parseFromSource(id, index, message, Collections.emptyMap());
+    }
+
+    public static ResultMessage parseFromSource(String id, String index, Map<String, Object> message, Map<String, List<String>> highlight) {
+        return new ResultMessage(id, index, message, HighlightParser.extractHighlightRanges(highlight));
     }
 
     public static ResultMessage createFromMessage(Message message) {
