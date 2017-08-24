@@ -136,7 +136,7 @@ const HTTPJSONPathAdapterFieldSet = React.createClass({
           <pre>
             {httpHeaders}
           </pre>
-          <HelpBlock>The custom HTTP headers to use for the HTTP request.</HelpBlock>
+          <HelpBlock>The custom HTTP headers to use for the HTTP request. Multiple values must be comma-separated.</HelpBlock>
           {addHeaderForm}
         </InputWrapper>
       </FormGroup>
