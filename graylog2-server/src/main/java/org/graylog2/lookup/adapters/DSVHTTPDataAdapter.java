@@ -81,6 +81,7 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         this.dsvParser = new DSVParser(
                 this.config.ignorechar(),
                 this.config.separator(),
+                this.config.lineSeparator(),
                 this.config.quotechar(),
                 this.config.isCheckPresenceOnly(),
                 this.config.isCaseInsensitiveLookup(),
@@ -174,6 +175,7 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
                     .type(NAME)
                     .url("https://example.org/table.csv")
                     .separator(",")
+                    .lineSeparator("\n")
                     .quotechar("\"")
                     .ignorechar("#")
                     .keyColumn(1)
@@ -206,6 +208,11 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         @Size(min = 1, max = 1)
         @NotEmpty
         public abstract String separator();
+
+        @JsonProperty("line_separator")
+        @Size(min = 1, max = 1)
+        @NotEmpty
+        public abstract String lineSeparator();
 
         // Using String here instead of char to allow deserialization of a longer (invalid) string to get proper
         // validation error messages
@@ -270,6 +277,9 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
 
             @JsonProperty("separator")
             public abstract DSVHTTPDataAdapter.Config.Builder separator(String separator);
+
+            @JsonProperty("line_separator")
+            public abstract DSVHTTPDataAdapter.Config.Builder lineSeparator(String separator);
 
             @JsonProperty("quotechar")
             public abstract DSVHTTPDataAdapter.Config.Builder quotechar(String quotechar);

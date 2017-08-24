@@ -31,7 +31,25 @@ public class DSVParserTest {
                 "foo:23\n" +
                 "bar:42\n" +
                 "baz:17";
-        final DSVParser dsvParser = new DSVParser("#", ":", "", false, false, 0, Optional.of(1));
+        final DSVParser dsvParser = new DSVParser("#", "\n", ":", "", false, false, 0, Optional.of(1));
+
+        final Map<String, String> result = dsvParser.parse(input);
+
+        assertThat(result)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(3)
+                .containsExactly(
+                        new AbstractMap.SimpleEntry<>("foo", "23"),
+                        new AbstractMap.SimpleEntry<>("bar", "42"),
+                        new AbstractMap.SimpleEntry<>("baz", "17")
+                );
+    }
+
+    @Test
+    public void parseSimpleFileWithDifferentLineSeparator() throws Exception {
+        final String input = "# Sample file for testing;foo:23;bar:42;baz:17";
+        final DSVParser dsvParser = new DSVParser("#", ";", ":", "", false, false, 0, Optional.of(1));
 
         final Map<String, String> result = dsvParser.parse(input);
 
@@ -52,7 +70,7 @@ public class DSVParserTest {
                 "foo:23\n" +
                 "bar:42\n" +
                 "baz:17";
-        final DSVParser dsvParser = new DSVParser("#", ":", "", false, false, 1, Optional.of(0));
+        final DSVParser dsvParser = new DSVParser("#", "\n", ":", "", false, false, 1, Optional.of(0));
 
         final Map<String, String> result = dsvParser.parse(input);
 
@@ -73,7 +91,7 @@ public class DSVParserTest {
                 "\"foo\":\"23\"\n" +
                 "\"bar\":\"42\"\n" +
                 "\"baz\":\"17\"";
-        final DSVParser dsvParser = new DSVParser("#", ":", "\"", false, false, 0, Optional.of(1));
+        final DSVParser dsvParser = new DSVParser("#", "\n", ":", "\"", false, false, 0, Optional.of(1));
 
         final Map<String, String> result = dsvParser.parse(input);
 
@@ -94,7 +112,7 @@ public class DSVParserTest {
                 "foo\n" +
                 "bar\n" +
                 "baz";
-        final DSVParser dsvParser = new DSVParser("#", ":", "", true, false, 0, Optional.empty());
+        final DSVParser dsvParser = new DSVParser("#", "\n", ":", "", true, false, 0, Optional.empty());
 
         final Map<String, String> result = dsvParser.parse(input);
 
@@ -115,7 +133,7 @@ public class DSVParserTest {
                 "1;foo\n" +
                 "2;bar\n" +
                 "3;baz";
-        final DSVParser dsvParser = new DSVParser("#", ";", "", true, false, 1, Optional.empty());
+        final DSVParser dsvParser = new DSVParser("#", "\n", ";", "", true, false, 1, Optional.empty());
 
         final Map<String, String> result = dsvParser.parse(input);
 
@@ -136,7 +154,7 @@ public class DSVParserTest {
                 "1;foo\n" +
                 "2;bar\n" +
                 "3;baz";
-        final DSVParser dsvParser = new DSVParser("#", ";", "", true, false, 2, Optional.empty());
+        final DSVParser dsvParser = new DSVParser("#", "\n", ";", "", true, false, 2, Optional.empty());
 
         final Map<String, String> result = dsvParser.parse(input);
 

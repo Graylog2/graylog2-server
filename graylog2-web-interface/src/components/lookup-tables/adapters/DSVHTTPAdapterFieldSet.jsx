@@ -32,8 +32,18 @@ const DSVHTTPAdapterFieldSet = ({ handleFormEvent, validationState, validationMe
            label="Separator"
            required
            onChange={handleFormEvent}
-           help="The delimiter to use for separating entries."
+           help="The delimiter to use for separating columns of entries."
            value={config.separator}
+           labelClassName="col-sm-3"
+           wrapperClassName="col-sm-9" />
+    <Input type="text"
+           id="line_separator"
+           name="line_separator"
+           label="Line Separator"
+           required
+           onChange={handleFormEvent}
+           help="The delimiter to use for separating lines."
+           value={config.line_separator}
            labelClassName="col-sm-3"
            wrapperClassName="col-sm-9" />
     <Input type="text"

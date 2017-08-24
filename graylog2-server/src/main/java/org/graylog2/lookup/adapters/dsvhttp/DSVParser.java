@@ -25,6 +25,7 @@ import java.util.Optional;
 
 public class DSVParser {
     private final String ignorechar;
+    private final String lineSeparator;
     private final String separator;
     private final String quoteChar;
     private final Boolean keyOnly;
@@ -33,6 +34,7 @@ public class DSVParser {
     private final Optional<Integer> valueColumn;
 
     public DSVParser(String ignorechar,
+                     String lineSeparator,
                      String separator,
                      String quoteChar,
                      Boolean keyOnly,
@@ -41,6 +43,7 @@ public class DSVParser {
                      Optional<Integer> valueColumn) {
 
         this.ignorechar = ignorechar;
+        this.lineSeparator = lineSeparator;
         this.separator = separator;
         this.quoteChar = quoteChar;
         this.keyOnly = keyOnly;
@@ -52,7 +55,7 @@ public class DSVParser {
     public Map<String, String> parse(String body) {
         final ImmutableMap.Builder<String, String> newLookupBuilder = ImmutableMap.builder();
 
-        final String[] lines = body.split("\n");
+        final String[] lines = body.split(lineSeparator);
 
         for (String line : lines) {
             if (line.startsWith(this.ignorechar)) {

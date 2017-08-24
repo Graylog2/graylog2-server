@@ -8,6 +8,8 @@ const DSVHTTPAdapterSummary = ({ dataAdapter }) => {
     <dd>{config.url}</dd>
     <dt>Separator</dt>
     <dd><code>{config.separator}</code></dd>
+    <dt>Line Separator</dt>
+    <dd><code>{config.line_separator}</code></dd>
     <dt>Quote character</dt>
     <dd><code>{config.quotechar}</code></dd>
     <dt>Ignore lines starting with</dt>
