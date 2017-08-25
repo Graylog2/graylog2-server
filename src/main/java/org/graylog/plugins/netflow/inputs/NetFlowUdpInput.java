@@ -1,6 +1,6 @@
 /**
  * Copyright (C) 2012, 2013, 2014 wasted.io Ltd <really@wasted.io>
- * Copyright (C) 2015 Graylog, Inc. (hello@graylog.org)
+ * Copyright (C) 2015, 2017 Graylog, Inc. (hello@graylog.org)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ package org.graylog.plugins.netflow.inputs;
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import org.graylog.plugins.netflow.codecs.NetFlowCodec;
-import org.graylog2.inputs.transports.UdpTransport;
+import org.graylog.plugins.netflow.transport.NetFlowUdpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -35,7 +35,7 @@ public class NetFlowUdpInput extends MessageInput {
     @Inject
     public NetFlowUdpInput(MetricRegistry metricRegistry,
                            @Assisted Configuration configuration,
-                           UdpTransport.Factory transportFactory,
+                           NetFlowUdpTransport.Factory transportFactory,
                            NetFlowCodec.Factory codecFactory,
                            LocalMetricRegistry localMetricRegistry,
                            Config config,
@@ -67,7 +67,7 @@ public class NetFlowUdpInput extends MessageInput {
     @ConfigClass
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(UdpTransport.Factory transport, NetFlowCodec.Factory codec) {
+        public Config(NetFlowUdpTransport.Factory transport, NetFlowCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }

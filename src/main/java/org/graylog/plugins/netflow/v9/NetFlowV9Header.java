@@ -16,6 +16,8 @@
 package org.graylog.plugins.netflow.v9;
 
 import com.google.auto.value.AutoValue;
+import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 
 @AutoValue
 public abstract class NetFlowV9Header {
@@ -41,5 +43,16 @@ public abstract class NetFlowV9Header {
 
     public static NetFlowV9Header create(int version, int count, long sysUptime, long unixSecs, long sequence, long sourceId) {
         return new AutoValue_NetFlowV9Header(version, count, sysUptime, unixSecs, sequence, sourceId);
+    }
+
+    public ChannelBuffer encode() {
+        final ChannelBuffer buffer = ChannelBuffers.dynamicBuffer(20);
+        buffer.writeShort(version());
+        buffer.writeShort(count());
+        buffer.writeInt(Math.toIntExact(sysUptime()));
+        buffer.writeInt(Math.toIntExact(unixSecs()));
+        buffer.writeInt(Math.toIntExact(sequence()));
+        buffer.writeInt(Math.toIntExact(sourceId()));
+        return buffer;
     }
 }

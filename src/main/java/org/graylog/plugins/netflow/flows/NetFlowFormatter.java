@@ -121,7 +121,7 @@ public class NetFlowFormatter {
         final Map<String, Object> fields = record.fields();
 
         message.addField(MF_VERSION, 9);
-        message.addFields(fields);
+        fields.forEach((key, value) -> message.addField("nf_" + key, value));
 
         final String srcAddr = (String) fields.get("ipv4_src_addr");
         final String dstAddr = (String) fields.get("ipv4_dst_addr");

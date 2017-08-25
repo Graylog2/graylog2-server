@@ -30,7 +30,7 @@ public class NetFlowV5Parser {
     public static NetFlowV5Packet parsePacket(ByteBuf bb) {
         final int readableBytes = bb.readableBytes();
 
-        final NetFlowV5Header header = parseHeader(bb.slice(0, HEADER_LENGTH));
+        final NetFlowV5Header header = parseHeader(bb.slice(bb.readerIndex(), HEADER_LENGTH));
         final int packetLength = HEADER_LENGTH + header.count() * RECORD_LENGTH;
         if (header.count() <= 0 || readableBytes < packetLength) {
             throw new CorruptFlowPacketException("Insufficient data (expected: " + packetLength + " bytes, actual: " + readableBytes + " bytes)");
@@ -39,7 +39,7 @@ public class NetFlowV5Parser {
         final ImmutableList.Builder<NetFlowV5Record> records = ImmutableList.builder();
         int offset = HEADER_LENGTH;
         for (int i = 0; i < header.count(); i++) {
-            records.add(parseRecord(bb.slice(offset, RECORD_LENGTH)));
+            records.add(parseRecord(bb.slice(offset + bb.readerIndex(), RECORD_LENGTH)));
             offset += RECORD_LENGTH;
         }
 

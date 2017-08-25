@@ -21,6 +21,7 @@ package org.graylog.plugins.netflow;
 
 import org.graylog.plugins.netflow.codecs.NetFlowCodec;
 import org.graylog.plugins.netflow.inputs.NetFlowUdpInput;
+import org.graylog.plugins.netflow.transport.NetFlowUdpTransport;
 import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
 
@@ -37,5 +38,6 @@ public class NetFlowPluginModule extends PluginModule {
     protected void configure() {
         addMessageInput(NetFlowUdpInput.class);
         addCodec("netflow", NetFlowCodec.class);
+        addTransport("netflow-udp", NetFlowUdpTransport.class);
     }
 }
