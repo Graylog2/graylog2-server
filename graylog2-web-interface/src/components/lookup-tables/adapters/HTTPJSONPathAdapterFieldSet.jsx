@@ -1,7 +1,11 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { Button, ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
 
-import { Input } from 'components/bootstrap';
+import { Input, InputWrapper } from 'components/bootstrap';
+import FormsUtils from 'util/FormsUtils';
+
+import EditableOnClickField from './EditableOnClickField';
 
 const HTTPJSONPathAdapterFieldSet = React.createClass({
   propTypes: {
@@ -12,9 +16,75 @@ const HTTPJSONPathAdapterFieldSet = React.createClass({
     validationState: PropTypes.func.isRequired,
     validationMessage: PropTypes.func.isRequired,
   },
-
+  getInitialState() {
+    return {};
+  },
+  _formatHeaders(headers) {
+    if (headers) {
+      return Object.keys(headers).map(key => (
+        <p key={key} style={{ 'margin-bottom': 0 }}>
+          <a onClick={() => this._onDeleteHeader(key)} style={{ marginRight: 5 }}>
+            <i className="fa fa-trash-o" />
+          </a>
+          <EditableOnClickField value={key} onChange={newKey => this._updateHeaderKey(key, newKey)}>
+            {key}
+          </EditableOnClickField>:
+          <EditableOnClickField value={headers[key]} onChange={newValue => this._updateHeaderValue(key, newValue)}>
+            {headers[key]}
+          </EditableOnClickField>
+        </p>
+      ));
+    }
+    return <span><i>Empty</i></span>;
+  },
+  _headerUpdated(headers) {
+    const event = { target: { name: 'headers', value: headers } };
+    this.props.handleFormEvent(event);
+  },
+  _onDeleteHeader(key) {
+    if (window.confirm('Do you really want to delete this header?')) {
+      const headers = this.props.config.headers || {};
+      delete headers[key];
+      this._headerUpdated(headers);
+    }
+  },
+  _updateHeaderKey(oldKey, newKey) {
+    const newHeaders = this.props.config.headers || {};
+    newHeaders[newKey] = newHeaders[oldKey];
+    delete newHeaders[oldKey];
+    this._headerUpdated(newHeaders);
+  },
+  _updateHeaderValue(key, newValue) {
+    const newHeaders = this.props.config.headers || {};
+    newHeaders[key] = newValue;
+    this._headerUpdated(newHeaders);
+  },
   render() {
     const config = this.props.config;
+    const onChangeHeaderKey = event => this.setState({ header_key: FormsUtils.getValueFromInput(event.target) });
+    const onChangeHeaderValue = event => this.setState({ header_value: FormsUtils.getValueFromInput(event.target) });
+    const onHeaderAdded = () => {
+      if (!this.state.header_key || !this.state.header_value) {
+        return;
+      }
+      const headers = config.headers || {};
+      headers[this.state.header_key] = this.state.header_value;
+      this._headerUpdated(headers);
+      this.setState({ header_key: undefined, header_value: undefined });
+    };
+    const addHeaderForm = (
+      <span>
+        <Input type="text" id="key" name="key" label="Header"
+               onChange={onChangeHeaderKey} value={this.state.header_key}
+               labelClassName="col-sm-3" wrapperClassName="col-sm-5" />
+        <Input type="text" id="value" name="value" label="Value"
+               onChange={onChangeHeaderValue} value={this.state.header_value}
+               labelClassName="col-sm-3" wrapperClassName="col-sm-5" />
+        <Button className="pull-right" onClick={onHeaderAdded}>Add</Button>
+      </span>
+    );
+
+    const httpHeaders = this._formatHeaders(config.headers);
 
     return (<fieldset>
       <Input type="text"
@@ -60,6 +130,17 @@ const HTTPJSONPathAdapterFieldSet = React.createClass({
              value={config.user_agent}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
+      <FormGroup>
+        <ControlLabel className="col-sm-3">HTTP Headers</ControlLabel>
+        <InputWrapper className="col-sm-9">
+          <pre>
+            {httpHeaders}
+          </pre>
+          <HelpBlock>The custom HTTP headers to use for the HTTP request. Multiple values must be comma-separated.</HelpBlock>
+          {addHeaderForm}
+        </InputWrapper>
+      </FormGroup>
+
     </fieldset>);
   },
 });

@@ -59,6 +59,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -118,10 +119,14 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
             this.multiJsonPath = JsonPath.compile(config.multiValueJSONPath().get());
         }
 
-        this.headers = new Headers.Builder()
+        final Headers.Builder headersBuilder = new Headers.Builder()
                 .add(HttpHeaders.USER_AGENT, config.userAgent())
-                .add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON)
-                .build();
+                .add(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON);
+
+        if (config.headers() != null) {
+            config.headers().forEach(headersBuilder::set);
+        }
+        this.headers = headersBuilder.build();
     }
 
     @Override
@@ -255,6 +260,7 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
                     .url("")
                     .singleValueJSONPath("$.value")
                     .userAgent("Graylog Lookup - https://www.graylog.org/")
+                    .headers(Collections.emptyMap())
                     .build();
         }
     }
@@ -284,6 +290,10 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
         @JsonProperty("user_agent")
         @NotEmpty
         public abstract String userAgent();
+
+        @JsonProperty("headers")
+        @Nullable
+        public abstract Map<String, String> headers();
 
         public static Builder builder() {
             return new AutoValue_HTTPJSONPathDataAdapter_Config.Builder();
@@ -332,6 +342,9 @@ public class HTTPJSONPathDataAdapter extends LookupDataAdapter {
 
             @JsonProperty("user_agent")
             public abstract Builder userAgent(String userAgent);
+
+            @JsonProperty("headers")
+            public abstract Builder headers(Map<String, String> headers);
 
             public abstract Config build();
         }
