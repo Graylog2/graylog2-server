@@ -1,7 +1,7 @@
 const UserNotification = require("util/UserNotification");
 const URLUtils = require('util/URLUtils');
 
-const fetch = require('logic/rest/FetchProvider').default;
+const fetchDefault = require('logic/rest/FetchProvider').default;
 const fetchPlainText = require('logic/rest/FetchProvider').fetchPlainText;
 
 interface GrokPattern {
@@ -19,7 +19,7 @@ const GrokPatternsStore = {
         "Could not load Grok patterns");
     };
     // get the current list of patterns and sort it by name
-    fetch('GET', this.URL).then(
+    fetchDefault('GET', this.URL).then(
       (resp: any) => {
         const patterns = resp.patterns;
         patterns.sort((pattern1: GrokPattern, pattern2: GrokPattern) => {
@@ -52,7 +52,7 @@ const GrokPatternsStore = {
       url += '/' + pattern.id;
       method = 'PUT';
     }
-    fetch(method, url, requestPattern)
+    fetchDefault(method, url, requestPattern)
       .then(
         response => {
           callback();
@@ -70,7 +70,7 @@ const GrokPatternsStore = {
       UserNotification.error("Deleting Grok pattern \"" + pattern.name + "\" failed with status: " + error.message,
         "Could not delete Grok pattern");
     };
-    fetch('DELETE', this.URL + "/" + pattern.id)
+    fetchDefault('DELETE', this.URL + "/" + pattern.id)
       .then(
         response => {
           callback();

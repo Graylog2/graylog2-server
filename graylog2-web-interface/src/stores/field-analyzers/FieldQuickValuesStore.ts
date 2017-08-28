@@ -1,5 +1,3 @@
-/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
-
 const fetch = require('logic/rest/FetchProvider').default;
 
 const StoreProvider = require('injection/StoreProvider');

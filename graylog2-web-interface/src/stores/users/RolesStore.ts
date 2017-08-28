@@ -1,5 +1,3 @@
-/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
-
 const UserNotification = require('util/UserNotification');
 const URLUtils = require('util/URLUtils');
 

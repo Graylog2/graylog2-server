@@ -1,6 +1,3 @@
-/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
-/// <reference path="../../../declarations/typeahead/typeahead.d.ts" />
-
 'use strict';
 
 const StoreProvider = require('injection/StoreProvider');

@@ -1,7 +1,3 @@
-/// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
-/// <reference path='../../../node_modules/immutable/dist/immutable.d.ts'/>
-/// <reference path="../../../declarations/node/node.d.ts" />
-
 const fetch = require('logic/rest/FetchProvider').default;
 import Immutable = require('immutable');
 import ApiRoutes = require('routing/ApiRoutes');
