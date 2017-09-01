@@ -152,7 +152,7 @@
         <jukito.version>1.5</jukito.version>
         <junit.version>4.12</junit.version>
         <mockito.version>2.8.9</mockito.version>
-        <nosqlunit.version>0.10.0</nosqlunit.version>
+        <nosqlunit.version>1.0.0-rc.5</nosqlunit.version>
         <restassured.version>2.9.0</restassured.version>
         <system-rules.version>1.16.1</system-rules.version>
 

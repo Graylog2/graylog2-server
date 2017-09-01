@@ -357,6 +357,10 @@
             <artifactId>nosqlunit-mongodb</artifactId>
         </dependency>
         <dependency>
+            <groupId>com.github.fakemongo</groupId>
+            <artifactId>fongo</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.jukito</groupId>
             <artifactId>jukito</artifactId>
         </dependency>
