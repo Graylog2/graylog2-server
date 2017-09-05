@@ -69,6 +69,7 @@
         <it.es.instanceCount>1</it.es.instanceCount>
         <it.es.clusterName>test</it.es.clusterName>
         <it.es.await>false</it.es.await>
+        <it.es.skip>false</it.es.skip>
     </properties>
 
     <dependencies>
@@ -639,6 +640,7 @@
                 <groupId>com.github.alexcojocaru</groupId>
                 <artifactId>elasticsearch-maven-plugin</artifactId>
                 <configuration>
+                    <skip>${it.es.skip}</skip>
                     <version>${it.es.version}</version>
                     <clusterName>${it.es.clusterName}</clusterName>
                     <httpPort>${it.es.httpPort}</httpPort>
