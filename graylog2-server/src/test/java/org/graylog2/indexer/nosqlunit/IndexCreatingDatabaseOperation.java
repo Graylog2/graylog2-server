@@ -28,6 +28,7 @@ import io.searchbox.core.Ping;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
 import io.searchbox.indices.IndicesExists;
+import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.PutTemplate;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMapping2;
@@ -76,34 +77,38 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<JestCli
         }
 
         final String templateName = "graylog-test-internal";
-
         final Map<String, Object> template = indexMapping.messageTemplate("*", "standard");
-        final PutTemplate putTemplate = new PutTemplate.Builder(templateName, template).build();
-        execute(putTemplate, s -> "Couldn't create index template: " + s);
+        try {
+            final PutTemplate putTemplate = new PutTemplate.Builder(templateName, template).build();
+            execute(putTemplate, s -> "Couldn't create index template: " + s);
 
-        for (String index : indexes) {
-            final IndicesExists indicesExists = new IndicesExists.Builder(index).build();
-            final JestResult indicesExistsResponse;
-            try {
-                indicesExistsResponse = client.execute(indicesExists);
-            } catch (IOException e) {
-                throw new UncheckedIOException(e);
+            for (String index : indexes) {
+                final IndicesExists indicesExists = new IndicesExists.Builder(index).build();
+                final JestResult indicesExistsResponse;
+                try {
+                    indicesExistsResponse = client.execute(indicesExists);
+                } catch (IOException e) {
+                    throw new UncheckedIOException(e);
+                }
+
+                if (indicesExistsResponse.isSucceeded()) {
+                    final DeleteIndex deleteIndex = new DeleteIndex.Builder(index).build();
+                    execute(deleteIndex, s -> "Couldn't delete index: " + s);
+                }
+
+                final Map<String, Map<String, Object>> indexSettings = ImmutableMap.of("settings", ImmutableMap.of(
+                        "number_of_shards", indexSet.getConfig().shards(),
+                        "number_of_replicas", indexSet.getConfig().replicas()
+                ));
+                final CreateIndex createIndex = new CreateIndex.Builder(index).settings(indexSettings).build();
+                execute(createIndex, s -> "Couldn't create index " + s);
             }
 
-            if (indicesExistsResponse.isSucceeded()) {
-                final DeleteIndex deleteIndex = new DeleteIndex.Builder(index).build();
-                execute(deleteIndex, s -> "Couldn't delete index: " + s);
-            }
-
-            final Map<String, Map<String, Object>> indexSettings = ImmutableMap.of("settings", ImmutableMap.of(
-                    "number_of_shards", indexSet.getConfig().shards(),
-                    "number_of_replicas", indexSet.getConfig().replicas()
-            ));
-            final CreateIndex createIndex = new CreateIndex.Builder(index).settings(indexSettings).build();
-            execute(createIndex, s -> "Couldn't create index " + s);
+            databaseOperation.insert(dataScript);
+        } finally {
+            final DeleteTemplate deleteTemplate = new DeleteTemplate.Builder(templateName).build();
+            execute(deleteTemplate, s -> "Couldn't delete index template: " + s);
         }
-
-        databaseOperation.insert(dataScript);
     }
 
     @Override
