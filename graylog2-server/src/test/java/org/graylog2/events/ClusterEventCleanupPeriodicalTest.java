@@ -70,6 +70,7 @@ public class ClusterEventCleanupPeriodicalTest {
     @After
     public void tearDown() {
         DateTimeUtils.setCurrentMillisSystem();
+        mongoConnection.getMongoDatabase().drop();
     }
 
     @Test
