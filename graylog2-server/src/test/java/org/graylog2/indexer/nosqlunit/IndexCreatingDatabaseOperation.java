@@ -16,29 +16,38 @@
  */
 package org.graylog2.indexer.nosqlunit;
 
+import com.github.zafarkhaja.semver.Version;
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.core.DatabaseOperation;
-import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.admin.indices.template.put.PutIndexTemplateResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.IndicesAdminClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.unit.TimeValue;
+import io.searchbox.action.Action;
+import io.searchbox.client.JestClient;
+import io.searchbox.client.JestResult;
+import io.searchbox.cluster.Health;
+import io.searchbox.core.Ping;
+import io.searchbox.indices.CreateIndex;
+import io.searchbox.indices.DeleteIndex;
+import io.searchbox.indices.IndicesExists;
+import io.searchbox.indices.template.PutTemplate;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexMapping2;
+import org.graylog2.indexer.IndexMapping5;
 import org.graylog2.indexer.IndexSet;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UncheckedIOException;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
-public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client> {
-    private final DatabaseOperation<Client> databaseOperation;
+public class IndexCreatingDatabaseOperation implements DatabaseOperation<JestClient> {
+    private final DatabaseOperation<JestClient> databaseOperation;
     private final IndexSet indexSet;
-    private final Client client;
+    private final JestClient client;
     private final Set<String> indexes;
 
-    public IndexCreatingDatabaseOperation(DatabaseOperation<Client> databaseOperation, IndexSet indexSet, Set<String> indexes) {
+    public IndexCreatingDatabaseOperation(DatabaseOperation<JestClient> databaseOperation, IndexSet indexSet, Set<String> indexes) {
         this.databaseOperation = databaseOperation;
         this.indexSet = indexSet;
         this.client = databaseOperation.connectionManager();
@@ -48,38 +57,50 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
     @Override
     public void insert(InputStream dataScript) {
         waitForGreenStatus();
-        final IndicesAdminClient indicesAdminClient = client.admin().indices();
+
+        final Ping ping = new Ping.Builder().build();
+        final JestResult pingResult = execute(ping, s -> "Failed to get Elasticsearch version: " + s);
+        final String elasticsearchVersionString = pingResult.getJsonObject().path("version").path("number").asText();
+        final Version elasticsearchVersion = Version.valueOf(elasticsearchVersionString);
+
+        final IndexMapping indexMapping;
+        switch (elasticsearchVersion.getMajorVersion()) {
+            case 2:
+                indexMapping = new IndexMapping2();
+                break;
+            case 5:
+                indexMapping = new IndexMapping5();
+                break;
+            default:
+                throw new IllegalStateException("Only Elasticsearch 2.x and 5.x are supported");
+        }
+
+        final String templateName = "graylog-test-internal";
+
+        final Map<String, Object> template = indexMapping.messageTemplate("*", "standard");
+        final PutTemplate putTemplate = new PutTemplate.Builder(templateName, template).build();
+        execute(putTemplate, s -> "Couldn't create index template: " + s);
+
         for (String index : indexes) {
-            final IndicesExistsResponse indicesExistsResponse = indicesAdminClient.prepareExists(index)
-                    .execute()
-                    .actionGet();
-
-            if (indicesExistsResponse.isExists()) {
-                client.admin().indices().prepareDelete(index).execute().actionGet();
+            final IndicesExists indicesExists = new IndicesExists.Builder(index).build();
+            final JestResult indicesExistsResponse;
+            try {
+                indicesExistsResponse = client.execute(indicesExists);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
 
-            // TODO: Use IndexMappingFactory if another version than Elasticsearch 2.x is being used (depends on NoSQLUnit).
-            final IndexMapping indexMapping = new IndexMapping2();
-
-            final String templateName = "graylog-test-internal";
-            final PutIndexTemplateResponse putIndexTemplateResponse = indicesAdminClient.preparePutTemplate(templateName)
-                    .setSource(indexMapping.messageTemplate("*", "standard"))
-                    .get();
-
-            if(!putIndexTemplateResponse.isAcknowledged()) {
-                throw new IllegalStateException("Couldn't create index template " + templateName);
+            if (indicesExistsResponse.isSucceeded()) {
+                final DeleteIndex deleteIndex = new DeleteIndex.Builder(index).build();
+                execute(deleteIndex, s -> "Couldn't delete index: " + s);
             }
 
-            final CreateIndexResponse createIndexResponse = indicesAdminClient.prepareCreate(index)
-                    .setSettings(Settings.builder()
-                            .put("number_of_shards", indexSet.getConfig().shards())
-                            .put("number_of_replicas", indexSet.getConfig().replicas())
-                            .build())
-                    .get();
-
-            if (!createIndexResponse.isAcknowledged()) {
-                throw new IllegalStateException("Couldn't create index " + index);
-            }
+            final Map<String, Map<String, Object>> indexSettings = ImmutableMap.of("settings", ImmutableMap.of(
+                    "number_of_shards", indexSet.getConfig().shards(),
+                    "number_of_replicas", indexSet.getConfig().replicas()
+            ));
+            final CreateIndex createIndex = new CreateIndex.Builder(index).settings(indexSettings).build();
+            execute(createIndex, s -> "Couldn't create index " + s);
         }
 
         databaseOperation.insert(dataScript);
@@ -92,10 +113,22 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
     }
 
     private void waitForGreenStatus() {
-        client.admin().cluster().prepareHealth()
-                .setTimeout(TimeValue.timeValueSeconds(15L))
-                .setWaitForGreenStatus()
-                .get();
+        final Health request = new Health.Builder().timeout(15).waitForStatus(Health.Status.YELLOW).build();
+        execute(request, s -> "Couldn't check cluster health of Elasticsearch: " + s);
+    }
+
+    private <T extends JestResult> T execute(Action<T> request, Function<String, String> errorMessage) {
+        try {
+            final T result = client.execute(request);
+
+            if (!result.isSucceeded()) {
+                throw new IllegalStateException(errorMessage.apply(result.getErrorMessage()));
+            }
+
+            return result;
+        } catch (IOException e) {
+            throw new UncheckedIOException(errorMessage.apply(e.getMessage()), e);
+        }
     }
 
     @Override
@@ -104,7 +137,7 @@ public class IndexCreatingDatabaseOperation implements DatabaseOperation<Client>
     }
 
     @Override
-    public Client connectionManager() {
+    public JestClient connectionManager() {
         return databaseOperation.connectionManager();
     }
 }

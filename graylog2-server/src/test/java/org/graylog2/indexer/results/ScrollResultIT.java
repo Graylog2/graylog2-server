@@ -23,7 +23,7 @@ import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.params.Parameters;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.graylog2.AbstractESTest;
+import org.graylog2.ElasticsearchBase;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
@@ -35,7 +35,6 @@ import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConfig;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
@@ -48,7 +47,7 @@ import java.util.Collections;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
 
-public class ScrollResultTest extends AbstractESTest {
+public class ScrollResultIT extends ElasticsearchBase {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -56,11 +55,8 @@ public class ScrollResultTest extends AbstractESTest {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    private final IndexSetConfig indexSetConfig;
-    private final IndexSet indexSet;
-
-    public ScrollResultTest() {
-        this.indexSetConfig = IndexSetConfig.builder()
+    public ScrollResultIT() {
+        final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
                 .id("index-set-1")
                 .title("Index set 1")
                 .description("For testing")
@@ -77,13 +73,8 @@ public class ScrollResultTest extends AbstractESTest {
                 .indexOptimizationMaxNumSegments(1)
                 .indexOptimizationDisabled(false)
                 .build();
-        this.indexSet = new TestIndexSet(indexSetConfig);
+        final IndexSet indexSet = new TestIndexSet(indexSetConfig);
         this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
-    }
-
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
     }
 
     @Test
@@ -96,10 +87,10 @@ public class ScrollResultTest extends AbstractESTest {
                 .setParameter(Parameters.SCROLL, "1m")
                 .setParameter(Parameters.SIZE, 5)
                 .build();
-        final SearchResult searchResult = JestUtils.execute(jestClient(), request, () -> "Exception");
+        final SearchResult searchResult = JestUtils.execute(client(), request, () -> "Exception");
 
-        assertThat(jestClient()).isNotNull();
-        final ScrollResult scrollResult = new ScrollResult(jestClient(), objectMapper, searchResult, "*", Collections.singletonList("message"));
+        assertThat(client()).isNotNull();
+        final ScrollResult scrollResult = new ScrollResult(client(), objectMapper, searchResult, "*", Collections.singletonList("message"));
         scrollResult.nextChunk().getMessages().forEach(
                 message -> assertThat(message.getMessage().getFields()).doesNotContainKeys("es_metadata_id", "es_metadata_version")
         );
