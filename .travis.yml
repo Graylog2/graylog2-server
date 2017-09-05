@@ -18,7 +18,7 @@ notifications:
 before_script:
   - sudo sysctl -w vm.max_map_count=262144
 script:
-  - mvn -B verify
+  - mvn -B verify -Dit.ElasticsearchVersion=${GRAYLOG_ELASTICSEARCH_VERSION}
 after_success:
   - curl -X GET https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.der -o lets-encrypt-x3-cross-signed.der && sudo keytool -trustcacerts -keystore $JAVA_HOME/jre/lib/security/cacerts -storepass changeit -noprompt -importcert -alias lets-encrypt-x3-cross-signed -file lets-encrypt-x3-cross-signed.der
   - mvn -B -Dmaven.test.skip=true -Dskip.web.build=true -pl graylog2-server versioneye:securityAndLicenseCheck
@@ -48,3 +48,6 @@ env:
   - secure: MYZwUwFkHwWfJ79JKyDK8VrYVcsax4t+7atMLLVNI4CDxTWZzR4qFGUfauf+7fDEmnGYbMHDRSnzzhVtSR0ZSuvWoSkZ+v62ASmSfglzI2GcMD/VBREq+9TlLasSIa+wR60VvgYwxJnawwJlV6sbjmetT6MWug7/icdi5KgfDlQ=
   - secure: r0enVlGBPjqaGfNrD1b6YxgRaSp/v39ZMKQFs/C0RtRKliZ5LVo7kS4lL0tLQoqMAXJel0NgsVH6j1P6428uLQDxqKmCsNZiX0VS9K3Z0iq5NG4x/5QidxyXjHefSGmpquLmZbM094xhtvdou3NEfkJTKbxHu3ML9i9ScMn5+vA=
   - secure: "OiqpeUFVXO/sWdSA4WZIrK5UvVUN4lG5YWm41e1P+6lvOAHpWeyX6fIs9Ndz12Vio/Wlt03ixzCAO/67UW4XGv/e3tClmvOSKt811Ml8wu3ALMxdV2218OkFXGzQ8AOnIRK1AAln3JdvBMHj8wFoUmGBaHJ7odqOxu3WC4m0Xr0="
+  matrix:
+  - GRAYLOG_ELASTICSEARCH_VERSION=2
+  - GRAYLOG_ELASTICSEARCH_VERSION=5

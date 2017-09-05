@@ -20,11 +20,13 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
 import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
 import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchRule;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
 import io.searchbox.cluster.Health;
+import io.searchbox.core.Ping;
 import io.searchbox.indices.CloseIndex;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.DeleteIndex;
@@ -63,11 +65,16 @@ public abstract class ElasticsearchBase {
     @Inject
     private JestClient jestClient;
 
-    protected static String getServer() {
-        return getServer(PROPERTIES_RESOURCE_NAME);
+    private final Properties properties;
+    private final Version elasticsearchVersion;
+
+    public ElasticsearchBase() {
+        this.properties = loadProperties(PROPERTIES_RESOURCE_NAME);
+        this.elasticsearchVersion = Version.valueOf(properties.getProperty("version"));
+        this.elasticsearchRule = elasticsearchRule().build();
     }
 
-    protected static String getServer(String resourceName) {
+    private Properties loadProperties(String resourceName) {
         final Properties properties = new Properties();
         final URL resource = Resources.getResource(resourceName);
         try (InputStream stream = resource.openStream()) {
@@ -75,13 +82,15 @@ public abstract class ElasticsearchBase {
         } catch (IOException e) {
             throw new UncheckedIOException("Error while reading test properties", e);
         }
-
-        final String httpPort = properties.getProperty("httpPort", "9200");
-        return "http://localhost:" + httpPort;
+        return properties;
     }
 
-    public ElasticsearchBase() {
-        this.elasticsearchRule = elasticsearchRule().build();
+    protected String getHttpPort() {
+        return properties.getProperty("httpPort", "9200");
+    }
+
+    protected String getServer() {
+        return "http://localhost:" + getHttpPort();
     }
 
     protected ElasticsearchConfiguration.Builder elasticsearchConfiguration() {
@@ -242,6 +251,18 @@ public abstract class ElasticsearchBase {
                 .isEqualTo(status.getKey());
 
         return Health.Status.valueOf(actualStatus.toUpperCase(Locale.ROOT));
+    }
+
+    public Version remoteElasticsearchVersion() throws IOException {
+        final Ping ping = new Ping.Builder().build();
+        final JestResult pingResponse = client().execute(ping);
+        assertSucceeded(pingResponse);
+
+        return Version.valueOf(pingResponse.getJsonObject().path("version").path("number").asText());
+    }
+
+    public Version getElasticsearchVersion() throws IOException {
+        return elasticsearchVersion;
     }
 
 }
