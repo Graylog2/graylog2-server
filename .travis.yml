@@ -15,6 +15,8 @@ notifications:
         g6Gpj2n1Bl6hIwWlywEkw8wRjpN2XuFsxFr9KQu/p7mRLYPdF3V5qQPVLBRd
         KvkjCIM7gZy2DTRNUooQPXdJB3npbnlbQn4jNWqA7/fp434Sw5sdfSUMawGr
         XvemLvn0KxQxCO9GfN3wfmYxEWJwXO36Q29BnRWWgMQOXpFFD8A=
+before_script:
+  - sudo sysctl -w vm.max_map_count=262144
 after_success:
   - curl -X GET https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.der -o lets-encrypt-x3-cross-signed.der && sudo keytool -trustcacerts -keystore $JAVA_HOME/jre/lib/security/cacerts -storepass changeit -noprompt -importcert -alias lets-encrypt-x3-cross-signed -file lets-encrypt-x3-cross-signed.der
   - mvn -B -Dmaven.test.skip=true -Dskip.web.build=true -pl graylog2-server versioneye:securityAndLicenseCheck
