@@ -4,7 +4,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog_0",
+            "indexName": "get_all_message_fields_0",
             "indexType": "message",
             "indexId": "0"
           }
@@ -23,7 +23,7 @@
       "document": [
         {
           "index": {
-            "indexName": "otherindexset_0",
+            "indexName": "get_all_message_fields_1",
             "indexType": "message",
             "indexId": "1"
           }
@@ -42,7 +42,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog_0",
+            "indexName": "get_all_message_fields_0",
             "indexType": "message",
             "indexId": "2"
           }
@@ -61,7 +61,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog_0",
+            "indexName": "get_all_message_fields_0",
             "indexType": "message",
             "indexId": "3"
           }
@@ -80,7 +80,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog_0",
+            "indexName": "get_all_message_fields_0",
             "indexType": "message",
             "indexId": "4"
           }
@@ -99,7 +99,7 @@
       "document": [
         {
           "index": {
-            "indexName": "graylog_0",
+            "indexName": "get_all_message_fields_0",
             "indexType": "message",
             "indexId": "5"
           }
@@ -117,7 +117,7 @@
       "document": [
         {
           "index": {
-            "indexName": "otherindexset_0",
+            "indexName": "get_all_message_fields_1",
             "indexType": "message",
             "indexId": "6"
           }
