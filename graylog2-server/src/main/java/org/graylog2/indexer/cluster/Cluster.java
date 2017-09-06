@@ -69,6 +69,7 @@ public class Cluster {
     private Optional<JsonNode> clusterHealth(Collection<? extends String> indices) {
         final Health request = new Health.Builder()
                 .addIndex(indices)
+                .timeout(Ints.saturatedCast(requestTimeout.toSeconds()))
                 .build();
         try {
             final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster health for indices " + indices);
