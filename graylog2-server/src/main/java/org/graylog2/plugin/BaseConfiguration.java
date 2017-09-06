@@ -75,9 +75,6 @@ public abstract class BaseConfiguration {
     @Parameter(value = "rest_enable_gzip")
     private boolean restEnableGzip = true;
 
-    @Parameter(value = "rest_max_initial_line_length", required = true, validator = PositiveIntegerValidator.class)
-    private int restMaxInitialLineLength = 4096;
-
     @Parameter(value = "rest_max_header_size", required = true, validator = PositiveIntegerValidator.class)
     private int restMaxHeaderSize = 8192;
 
@@ -146,9 +143,6 @@ public abstract class BaseConfiguration {
 
     @Parameter(value = "web_enable_gzip")
     private boolean webEnableGzip = true;
-
-    @Parameter(value = "web_max_initial_line_length", required = true, validator = PositiveIntegerValidator.class)
-    private int webMaxInitialLineLength = 4096;
 
     @Parameter(value = "web_max_header_size", required = true, validator = PositiveIntegerValidator.class)
     private int webMaxHeaderSize = 8192;
@@ -286,10 +280,6 @@ public abstract class BaseConfiguration {
         return restEnableGzip;
     }
 
-    public int getRestMaxInitialLineLength() {
-        return restMaxInitialLineLength;
-    }
-
     public int getRestMaxHeaderSize() {
         return restMaxHeaderSize;
     }
@@ -402,10 +392,6 @@ public abstract class BaseConfiguration {
 
     public boolean isWebEnableGzip() {
         return webEnableGzip;
-    }
-
-    public int getWebMaxInitialLineLength() {
-        return webMaxInitialLineLength;
     }
 
     public int getWebMaxHeaderSize() {

@@ -38,7 +38,6 @@ import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
 import org.graylog2.plugin.rest.PluginRestResource;
-import org.graylog2.rest.GraylogErrorPageGenerator;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.shared.rest.CORSFilter;
 import org.graylog2.shared.rest.NodeIdResponseFilter;
@@ -169,7 +168,6 @@ public class JerseyService extends AbstractIdleService {
                 sslEngineConfigurator,
                 configuration.getWebThreadPoolSize(),
                 configuration.getWebSelectorRunnersCount(),
-                configuration.getWebMaxInitialLineLength(),
                 configuration.getWebMaxHeaderSize(),
                 configuration.isWebEnableGzip(),
                 configuration.isWebEnableCors(),
@@ -226,7 +224,6 @@ public class JerseyService extends AbstractIdleService {
                 sslEngineConfigurator,
                 configuration.getRestThreadPoolSize(),
                 configuration.getRestSelectorRunnersCount(),
-                configuration.getRestMaxInitialLineLength(),
                 configuration.getRestMaxHeaderSize(),
                 configuration.isRestEnableGzip(),
                 configuration.isRestEnableCors(),
@@ -326,7 +323,6 @@ public class JerseyService extends AbstractIdleService {
                              SSLEngineConfigurator sslEngineConfigurator,
                              int threadPoolSize,
                              int selectorRunnersCount,
-                             int maxInitialLineLength,
                              int maxHeaderSize,
                              boolean enableGzip,
                              boolean enableCors,
@@ -347,8 +343,7 @@ public class JerseyService extends AbstractIdleService {
                 false);
 
         final NetworkListener listener = httpServer.getListener("grizzly");
-        listener.setMaxHttpHeaderSize(maxInitialLineLength);
-        listener.setMaxRequestHeaders(maxHeaderSize);
+        listener.setMaxHttpHeaderSize(maxHeaderSize);
 
         final ExecutorService workerThreadPoolExecutor = instrumentedExecutor(
                 namePrefix + "-worker-executor",
