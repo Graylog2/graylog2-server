@@ -122,15 +122,16 @@ public class Cluster {
     }
 
     public Set<NodeFileDescriptorStats> getFileDescriptorStats() {
-        final JsonNode nodes = catNodes("name", "host", "fileDescriptorMax");
+        final JsonNode nodes = catNodes("name", "host", "ip", "fileDescriptorMax");
         final ImmutableSet.Builder<NodeFileDescriptorStats> setBuilder = ImmutableSet.builder();
         for (JsonNode jsonElement : nodes) {
             if (jsonElement.isObject()) {
                 final String name = jsonElement.path("name").asText();
                 final String host = jsonElement.path("host").asText(null);
+                final String ip = jsonElement.path("ip").asText();
                 final JsonNode fileDescriptorMax = jsonElement.path("fileDescriptorMax");
                 final Long maxFileDescriptors = fileDescriptorMax.isLong() ? fileDescriptorMax.asLong() : null;
-                setBuilder.add(NodeFileDescriptorStats.create(name, host, maxFileDescriptors));
+                setBuilder.add(NodeFileDescriptorStats.create(name, ip, host, maxFileDescriptors));
             }
         }
 

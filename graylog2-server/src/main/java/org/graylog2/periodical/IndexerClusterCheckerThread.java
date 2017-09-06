@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.Set;
 
+import static com.google.common.base.MoreObjects.firstNonNull;
+
 public class IndexerClusterCheckerThread extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(IndexerClusterCheckerThread.class);
     private static final int MINIMUM_OPEN_FILES_LIMIT = 64000;
@@ -56,20 +58,23 @@ public class IndexerClusterCheckerThread extends Periodical {
         final Set<NodeFileDescriptorStats> fileDescriptorStats = cluster.getFileDescriptorStats();
         for (NodeFileDescriptorStats nodeFileDescriptorStats : fileDescriptorStats) {
             final String name = nodeFileDescriptorStats.name();
+            final String ip = nodeFileDescriptorStats.ip();
             final String host = nodeFileDescriptorStats.host();
             final long maxFileDescriptors = nodeFileDescriptorStats.fileDescriptorMax().orElse(-1L);
 
             if (maxFileDescriptors != -1L && maxFileDescriptors < MINIMUM_OPEN_FILES_LIMIT) {
                 // Write notification.
+                final String ipOrHostName = firstNonNull(host, ip);
                 final Notification notification = notificationService.buildNow()
                         .addType(Notification.Type.ES_OPEN_FILES)
                         .addSeverity(Notification.Severity.URGENT)
-                        .addDetail("hostname", host)
+                        .addDetail("hostname", ipOrHostName)
                         .addDetail("max_file_descriptors", maxFileDescriptors);
 
                 if (notificationService.publishIfFirst(notification)) {
-                    LOG.warn("Indexer node <{}> open file limit is too low: [{}]. Set it to at least {}.",
+                    LOG.warn("Indexer node <{}> ({}) open file limit is too low: [{}]. Set it to at least {}.",
                             name,
+                            ipOrHostName,
                             maxFileDescriptors,
                             MINIMUM_OPEN_FILES_LIMIT);
                 }

@@ -25,12 +25,14 @@ import java.util.Optional;
 public abstract class NodeFileDescriptorStats {
     public abstract String name();
 
+    public abstract String ip();
+
     @Nullable
     public abstract String host();
 
     public abstract Optional<Long> fileDescriptorMax();
 
-    public static NodeFileDescriptorStats create(String name, @Nullable String host, Long fileDescriptorMax) {
-        return new AutoValue_NodeFileDescriptorStats(name, host, Optional.ofNullable(fileDescriptorMax));
+    public static NodeFileDescriptorStats create(String name, String ip, @Nullable String host, Long fileDescriptorMax) {
+        return new AutoValue_NodeFileDescriptorStats(name, ip, host, Optional.ofNullable(fileDescriptorMax));
     }
 }
