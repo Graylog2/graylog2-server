@@ -170,6 +170,22 @@ public class IndexSetsResource extends RestResource {
                 .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
     }
 
+    @GET
+    @Path("{id}/stats")
+    @Timed
+    @ApiOperation(value = "Get index set statistics")
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized"),
+            @ApiResponse(code = 404, message = "Index set not found"),
+    })
+    public IndexSetStats indexSetStatistics(@ApiParam(name = "id", required = true)
+                                            @PathParam("id") String id) {
+        checkPermission(RestPermissions.INDEXSETS_READ, id);
+        return indexSetRegistry.get(id)
+                .map(indexSetStatsCreator::getForIndexSet)
+                .orElseThrow(() -> new NotFoundException("Couldn't load index set with ID <" + id + ">"));
+    }
+
     @POST
     @Timed
     @ApiOperation(value = "Create index set")
