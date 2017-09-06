@@ -115,6 +115,7 @@ public class Cluster {
         final Cat request = new Cat.NodesBuilder()
                 .setParameter("h", fieldNames)
                 .setParameter("full_id", true)
+                .setParameter("format", "json")
                 .build();
         final CatResult response = JestUtils.execute(jestClient, request, () -> "Unable to read Elasticsearch node information");
         return response.getJsonObject().path("result");
