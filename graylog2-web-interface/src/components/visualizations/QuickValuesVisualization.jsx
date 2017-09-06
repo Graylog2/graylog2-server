@@ -182,7 +182,7 @@ const QuickValuesVisualization = React.createClass({
 
         if (typeof this.pieChart !== 'undefined' && this.dataTable.group()(d) !== 'Others') {
           const colour = this.pieChart.colors()(d.term);
-          colourBadge = `<span class="datatable-badge" style="background-color: ${colour}"></span>`;
+          colourBadge = `<span class="datatable-badge" style="background-color: ${colour} !important;"></span>`;
         }
 
         return `${colourBadge} ${d.term}`;
