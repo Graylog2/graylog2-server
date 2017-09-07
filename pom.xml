@@ -147,7 +147,7 @@
         <assertj-core.version>3.8.0</assertj-core.version>
         <assertj-joda-time.version>2.0.0</assertj-joda-time.version>
         <awaitility.version>1.7.0</awaitility.version>
-        <equalsverifier.version>2.2.2</equalsverifier.version>
+        <equalsverifier.version>2.3.3</equalsverifier.version>
         <fongo.version>2.1.0</fongo.version>
         <jukito.version>1.5</jukito.version>
         <junit.version>4.12</junit.version>
