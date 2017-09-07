@@ -78,7 +78,7 @@ public class StreamRouterEngine {
         this.streams = streams;
         this.streamFaultManager = streamFaultManager;
         this.streamMetrics = streamMetrics;
-        this.timeLimiter = new SimpleTimeLimiter(executorService);
+        this.timeLimiter = SimpleTimeLimiter.create(executorService);
         this.streamProcessingTimeout = streamFaultManager.getStreamProcessingTimeout();
         this.fingerprint = new StreamListFingerprint(streams).getFingerprint();
         this.defaultStreamProvider = defaultStreamProvider;
@@ -306,7 +306,7 @@ public class StreamRouterEngine {
                     public Stream call() throws Exception {
                         return match(message);
                     }
-                }, timeout, unit, true);
+                }, timeout, unit);
             } catch (UncheckedTimeoutException e) {
                 streamFaultManager.registerFailure(stream);
             } catch (Exception e) {
