@@ -84,7 +84,7 @@ public class LdapConnector {
 
         // this will perform an anonymous bind if there were no system credentials
         final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat("ldap-connector-%d").build();
-        final SimpleTimeLimiter timeLimiter = new SimpleTimeLimiter(Executors.newSingleThreadExecutor(threadFactory));
+        final SimpleTimeLimiter timeLimiter = SimpleTimeLimiter.create(Executors.newSingleThreadExecutor(threadFactory));
         @SuppressWarnings("unchecked")
         final Callable<Boolean> timeLimitedConnection = timeLimiter.newProxy(
                 new Callable<Boolean>() {
