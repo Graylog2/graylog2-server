@@ -89,7 +89,7 @@
         <auto-value.version>1.5.1</auto-value.version>
         <auto-value-extension-util.version>0.3.0</auto-value-extension-util.version>
         <commons-codec.version>1.10</commons-codec.version>
-        <commons-email.version>1.4</commons-email.version>
+        <commons-email.version>1.5</commons-email.version>
         <commons-io.version>2.5</commons-io.version>
         <disruptor.version>3.3.6</disruptor.version>
         <drools.version>6.5.0.Final</drools.version>
