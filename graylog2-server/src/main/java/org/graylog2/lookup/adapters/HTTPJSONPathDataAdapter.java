@@ -46,13 +46,13 @@ import org.graylog2.plugin.lookup.LookupCachePurge;
 import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import java.io.IOException;

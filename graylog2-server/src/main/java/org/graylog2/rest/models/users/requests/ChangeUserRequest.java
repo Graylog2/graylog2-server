@@ -22,10 +22,10 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.hibernate.validator.constraints.Email;
 
 import javax.annotation.Nullable;
 import javax.validation.Valid;
+import javax.validation.constraints.Email;
 import javax.validation.constraints.Min;
 import java.util.List;
 

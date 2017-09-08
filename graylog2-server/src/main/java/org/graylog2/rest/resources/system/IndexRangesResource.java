@@ -41,12 +41,12 @@ import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.system.jobs.SystemJob;
 import org.graylog2.system.jobs.SystemJobConcurrencyException;
 import org.graylog2.system.jobs.SystemJobManager;
-import org.hibernate.validator.constraints.NotBlank;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.GET;

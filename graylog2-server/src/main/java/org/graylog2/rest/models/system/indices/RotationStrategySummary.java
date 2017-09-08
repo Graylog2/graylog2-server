@@ -22,9 +22,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 @JsonAutoDetect

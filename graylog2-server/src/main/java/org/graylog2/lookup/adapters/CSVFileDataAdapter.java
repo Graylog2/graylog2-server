@@ -35,13 +35,13 @@ import org.graylog2.plugin.lookup.LookupDataAdapter;
 import org.graylog2.plugin.lookup.LookupDataAdapterConfiguration;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.plugin.utilities.FileInfo;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.io.InputStream;

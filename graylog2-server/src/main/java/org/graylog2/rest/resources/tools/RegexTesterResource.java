@@ -23,9 +23,9 @@ import org.graylog2.audit.jersey.NoAuditEvent;
 import org.graylog2.rest.models.tools.requests.RegexTestRequest;
 import org.graylog2.rest.models.tools.responses.RegexTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;

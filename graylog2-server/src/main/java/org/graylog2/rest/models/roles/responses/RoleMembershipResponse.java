@@ -22,8 +22,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.rest.models.users.responses.UserSummary;
-import org.hibernate.validator.constraints.NotBlank;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 

@@ -32,10 +32,10 @@ import org.graylog2.rest.models.system.loggers.responses.LoggersSummary;
 import org.graylog2.rest.models.system.loggers.responses.SubsystemSummary;
 import org.graylog2.rest.resources.system.logs.RemoteLoggersResource;
 import org.graylog2.shared.rest.resources.ProxiedResource;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.GET;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;

@@ -30,12 +30,12 @@ import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.rest.models.system.indices.RetentionStrategies;
 import org.graylog2.rest.models.system.indices.RetentionStrategyDescription;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;

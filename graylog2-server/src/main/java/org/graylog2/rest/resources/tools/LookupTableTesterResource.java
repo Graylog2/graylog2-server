@@ -24,10 +24,10 @@ import org.graylog2.plugin.lookup.LookupResult;
 import org.graylog2.rest.models.tools.requests.LookupTableTestRequest;
 import org.graylog2.rest.resources.tools.responses.LookupTableTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;

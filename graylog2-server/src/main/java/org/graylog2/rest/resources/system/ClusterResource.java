@@ -34,9 +34,9 @@ import org.graylog2.plugin.system.NodeId;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummary;
 import org.graylog2.rest.models.system.cluster.responses.NodeSummaryList;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
