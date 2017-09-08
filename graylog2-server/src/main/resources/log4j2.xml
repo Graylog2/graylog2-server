@@ -20,6 +20,7 @@
         <Logger name="org.graylog2.periodical.VersionCheckThread" level="off"/>
         <!-- Suppress crazy byte array dump of Drools -->
         <Logger name="org.drools.compiler.kie.builder.impl.KieRepositoryImpl" level="warn"/>
+        <Logger name="org.kie.api.internal" level="warn"/>
         <!-- Silence chatty natty -->
         <Logger name="com.joestelmach.natty.Parser" level="warn"/>
         <!-- Silence Kafka log chatter -->
