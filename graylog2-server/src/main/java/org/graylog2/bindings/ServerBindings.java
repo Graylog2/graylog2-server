@@ -170,7 +170,7 @@ public class ServerBindings extends Graylog2Module {
         bind(ClusterStatsModule.class).asEagerSingleton();
         bind(ClusterConfigService.class).to(ClusterConfigServiceImpl.class).asEagerSingleton();
         bind(GrokPatternRegistry.class).in(Scopes.SINGLETON);
-        bind(Engine.class).toInstance(Engine.createCompilingEngine());
+        bind(Engine.class).toInstance(Engine.createEngine());
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
 
         bind(String[].class).annotatedWith(named("RestControllerPackages")).toInstance(new String[]{
