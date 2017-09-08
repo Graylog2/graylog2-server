@@ -24,10 +24,10 @@ import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.plugin.indexer.retention.RetentionStrategyConfig;
 import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
-import org.hibernate.validator.constraints.NotBlank;
 
 import javax.annotation.Nullable;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import java.time.ZonedDateTime;

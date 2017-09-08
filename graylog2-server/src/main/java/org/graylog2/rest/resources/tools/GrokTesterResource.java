@@ -28,10 +28,10 @@ import org.graylog2.grok.GrokPatternService;
 import org.graylog2.rest.models.tools.requests.GrokTestRequest;
 import org.graylog2.rest.resources.tools.responses.GrokTesterResponse;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;
 import javax.validation.Valid;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;

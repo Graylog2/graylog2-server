@@ -40,11 +40,11 @@ import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.security.RestPermissions;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;

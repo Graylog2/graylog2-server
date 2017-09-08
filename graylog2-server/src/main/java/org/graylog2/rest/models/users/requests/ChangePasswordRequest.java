@@ -21,9 +21,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 
 @JsonAutoDetect
 @AutoValue

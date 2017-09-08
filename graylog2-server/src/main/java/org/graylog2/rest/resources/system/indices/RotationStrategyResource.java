@@ -30,10 +30,10 @@ import org.graylog2.plugin.indexer.rotation.RotationStrategyConfig;
 import org.graylog2.rest.models.system.indices.RotationStrategies;
 import org.graylog2.rest.models.system.indices.RotationStrategyDescription;
 import org.graylog2.shared.rest.resources.RestResource;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.GET;
 import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;

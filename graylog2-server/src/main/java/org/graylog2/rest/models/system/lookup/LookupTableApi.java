@@ -23,9 +23,9 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.lookup.LookupDefaultSingleValue;
 import org.graylog2.lookup.dto.LookupTableDto;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 
 @AutoValue
 @JsonAutoDetect

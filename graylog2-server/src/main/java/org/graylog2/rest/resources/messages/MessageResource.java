@@ -42,12 +42,12 @@ import org.graylog2.rest.models.messages.requests.MessageParseRequest;
 import org.graylog2.rest.models.messages.responses.MessageTokens;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import javax.inject.Inject;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.ForbiddenException;

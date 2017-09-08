@@ -30,13 +30,13 @@ import org.graylog2.rest.RemoteInterfaceProvider;
 import org.graylog2.rest.models.system.SystemJobSummary;
 import org.graylog2.rest.resources.system.jobs.RemoteSystemJobResource;
 import org.graylog2.shared.rest.resources.ProxiedResource;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import retrofit2.Response;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;

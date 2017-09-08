@@ -22,11 +22,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.database.CollectionName;
-import org.hibernate.validator.constraints.NotBlank;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotBlank;
 import java.util.Map;
 import java.util.Optional;
 

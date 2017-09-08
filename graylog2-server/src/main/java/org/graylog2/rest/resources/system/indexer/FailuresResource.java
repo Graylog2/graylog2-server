@@ -30,13 +30,13 @@ import org.graylog2.indexer.IndexFailureService;
 import org.graylog2.rest.models.system.indexer.responses.FailureCount;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.validation.constraints.Min;
+import javax.validation.constraints.NotEmpty;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

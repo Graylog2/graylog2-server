@@ -18,15 +18,14 @@ package org.graylog2.plugin.utilities;
 
 import com.google.auto.value.AutoValue;
 
+import javax.annotation.Nullable;
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.FileTime;
 import java.util.Objects;
-
-import javax.annotation.Nullable;
-import javax.validation.constraints.NotNull;
 
 /**
  * A {@code FileInfo} presents a concise way of checking for file modification based on its file system attributes.

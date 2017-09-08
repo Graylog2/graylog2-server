@@ -23,9 +23,9 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.rest.resources.streams.rules.requests.CreateStreamRuleRequest;
-import org.hibernate.validator.constraints.NotEmpty;
 
 import javax.annotation.Nullable;
+import javax.validation.constraints.NotEmpty;
 import java.util.List;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
