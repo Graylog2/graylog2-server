@@ -16,6 +16,7 @@
  */
 package org.graylog.plugins.pipelineprocessor.db.mongodb;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Sets;
 import com.mongodb.BasicDBObject;
 import com.mongodb.MongoException;
@@ -74,8 +75,8 @@ public class MongoDbRuleService implements RuleService {
     @Override
     public Collection<RuleDao> loadAll() {
         try {
-            final DBCursor<RuleDao> ruleDaos = dbCollection.find();
-            return Sets.newHashSet(ruleDaos.iterator());
+            final DBCursor<RuleDao> ruleDaos = dbCollection.find().sort(DBSort.asc("title"));
+            return ruleDaos.toArray();
         } catch (MongoException e) {
             log.error("Unable to load processing rules", e);
             return Collections.emptySet();
