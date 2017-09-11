@@ -14,9 +14,11 @@ import NumberUtils from 'util/NumberUtils';
 
 import StoreProvider from 'injection/StoreProvider';
 
+import style from './QuickValuesVisualization.css';
+
 global.jQuery = $;
-// eslint-disable-next-line import/newline-after-import
 require('bootstrap/js/tooltip');
+
 const SearchStore = StoreProvider.getStore('Search');
 
 const QuickValuesVisualization = React.createClass({
@@ -418,7 +420,7 @@ const QuickValuesVisualization = React.createClass({
            style={limitHeight ? { height: height } : {}}>
         <div className="container-fluid">
           <div className="row" style={{ marginBottom: 0 }}>
-            <div className={pieChartClassName} style={pieChartStyle}>
+            <div className={`${pieChartClassName} ${style.pieChart}`} style={pieChartStyle}>
               {pieChart}
             </div>
             <div className={dataTableClassName}>
