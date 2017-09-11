@@ -20,7 +20,6 @@ import com.google.inject.Binder;
 import com.google.inject.Scopes;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
-
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
@@ -41,6 +40,16 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
 import org.graylog.plugins.pipelineprocessor.functions.debug.Debug;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Decode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Encode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Decode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Encode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32HumanDecode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32HumanEncode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64Decode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64Encode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64UrlDecode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64UrlEncode;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32C;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
@@ -157,6 +166,16 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(SHA1.NAME, SHA1.class);
         addMessageProcessorFunction(SHA256.NAME, SHA256.class);
         addMessageProcessorFunction(SHA512.NAME, SHA512.class);
+
+        // encoding
+        addMessageProcessorFunction(Base16Encode.NAME, Base16Encode.class);
+        addMessageProcessorFunction(Base16Decode.NAME, Base16Decode.class);
+        addMessageProcessorFunction(Base32Encode.NAME, Base32Encode.class);
+        addMessageProcessorFunction(Base32Decode.NAME, Base32Decode.class);
+        addMessageProcessorFunction(Base32HumanEncode.NAME, Base32HumanEncode.class);
+        addMessageProcessorFunction(Base32HumanDecode.NAME, Base32HumanDecode.class);
+        addMessageProcessorFunction(Base64UrlEncode.NAME, Base64UrlEncode.class);
+        addMessageProcessorFunction(Base64UrlDecode.NAME, Base64UrlDecode.class);
 
         // ip handling
         addMessageProcessorFunction(CidrMatch.NAME, CidrMatch.class);

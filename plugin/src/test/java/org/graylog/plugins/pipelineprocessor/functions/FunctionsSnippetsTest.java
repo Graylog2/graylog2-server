@@ -16,15 +16,13 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.eventbus.EventBus;
 import com.google.common.net.InetAddresses;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.graylog.plugins.pipelineprocessor.BaseParserTest;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
@@ -47,6 +45,16 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.periods.PeriodParse
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Seconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Weeks;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Years;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Decode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base16Encode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Decode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Encode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32HumanDecode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32HumanEncode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64Decode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64Encode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64UrlDecode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64UrlEncode;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32C;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.MD5;
@@ -221,6 +229,17 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SHA256.NAME, new SHA256());
         functions.put(SHA512.NAME, new SHA512());
 
+        functions.put(Base16Encode.NAME, new Base16Encode());
+        functions.put(Base16Decode.NAME, new Base16Decode());
+        functions.put(Base32Encode.NAME, new Base32Encode());
+        functions.put(Base32Decode.NAME, new Base32Decode());
+        functions.put(Base32HumanEncode.NAME, new Base32HumanEncode());
+        functions.put(Base32HumanDecode.NAME, new Base32HumanDecode());
+        functions.put(Base64Encode.NAME, new Base64Encode());
+        functions.put(Base64Decode.NAME, new Base64Decode());
+        functions.put(Base64UrlEncode.NAME, new Base64UrlEncode());
+        functions.put(Base64UrlDecode.NAME, new Base64UrlDecode());
+
         functions.put(IpAddressConversion.NAME, new IpAddressConversion());
         functions.put(CidrMatch.NAME, new CidrMatch());
 
@@ -348,6 +367,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
 
     @Test
     public void digests() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
+    }
+
+    @Test
+    public void encodings() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
 
