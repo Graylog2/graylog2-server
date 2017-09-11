@@ -17,6 +17,7 @@ const TREND_ICON_BAD_COLOR = '#BE1E2D';
 
 const NumericVisualization = React.createClass({
   propTypes: {
+    id: PropTypes.string.isRequired,
     config: PropTypes.object.isRequired,
     data: PropTypes.oneOfType([
       PropTypes.object,
@@ -170,7 +171,7 @@ const NumericVisualization = React.createClass({
     };
   },
   render() {
-    const { config, width, height } = this.props;
+    const { id, config, width, height } = this.props;
 
     let trendIndicators;
 
@@ -192,7 +193,7 @@ const NumericVisualization = React.createClass({
     }
 
     return (
-      <div className={style.container}>
+      <div id={`visualization-${id}`} className={style.container}>
         <svg viewBox="0 0 300 100" className={style.number} width={width} height={height}>
           <defs>
             <path id="text-baseline" d="M0 45 H300" />
