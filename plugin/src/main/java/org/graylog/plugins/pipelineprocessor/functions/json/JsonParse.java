@@ -18,6 +18,7 @@ package org.graylog.plugins.pipelineprocessor.functions.json;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -51,9 +52,9 @@ public class JsonParse extends AbstractFunction<JsonNode> {
         try {
             return objectMapper.readTree(value);
         } catch (IOException e) {
-            log.warn("Unable to parse json", e);
+            log.warn("Unable to parse JSON", e);
         }
-        return null;
+        return MissingNode.getInstance();
     }
 
     @Override

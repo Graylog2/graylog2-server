@@ -7,4 +7,13 @@ then
               author_last: "$['store']['book'][-1:]['author']"
             });
   set_fields(new_fields);
+
+  // Don't fail on empty input
+  let invalid_json = parse_json("#FOOBAR#");
+  let invalid_json_fields = select_jsonpath(invalid_json, { some_field: "$.message" });
+  set_fields(invalid_json_fields);
+
+  // Don't fail on missing field
+  let missing_fields = select_jsonpath(x, { some_field: "$.i_dont_exist" });
+  set_fields(missing_fields);
 end

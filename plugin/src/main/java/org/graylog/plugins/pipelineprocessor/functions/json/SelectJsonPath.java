@@ -32,6 +32,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
 import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -70,7 +71,7 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
         final JsonNode json = jsonParam.required(args, context);
         final Map<String, JsonPath> paths = pathsParam.required(args, context);
         if (json == null || paths == null) {
-            return null;
+            return Collections.emptyMap();
         }
         return paths
                 .entrySet().stream()
