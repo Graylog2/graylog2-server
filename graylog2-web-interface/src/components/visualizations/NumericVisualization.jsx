@@ -194,7 +194,7 @@ const NumericVisualization = React.createClass({
 
     return (
       <div id={`visualization-${id}`} className={style.container}>
-        <svg viewBox="0 0 300 100" className={style.number} width={width} height={height}>
+        <svg viewBox="0 0 300 100" className={style.number} width="100%" height="100%" style={{ height: height, width: width }}>
           <defs>
             <path id="text-baseline" d="M0 45 H300" />
           </defs>
