@@ -32,6 +32,7 @@ import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategyConf
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
+import org.graylog2.rest.resources.system.indexer.responses.IndexSetStats;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetSummary;
 import org.graylog2.shared.bindings.GuiceInjectorHolder;
 import org.graylog2.system.jobs.SystemJobManager;
@@ -242,6 +243,46 @@ public class IndexSetsResourceTest {
             indexSetsResource.get("id");
         } finally {
             verifyZeroInteractions(indexSetService);
+        }
+    }
+
+    @Test
+    public void indexSetStatistics() {
+        final IndexSet indexSet = mock(IndexSet.class);
+        final IndexSetStats indexSetStats = IndexSetStats.create(5L, 23L, 42L);
+
+        when(indexSetRegistry.get("id")).thenReturn(Optional.of(indexSet));
+        when(indexSetStatsCreator.getForIndexSet(indexSet)).thenReturn(indexSetStats);
+
+        assertThat(indexSetsResource.indexSetStatistics("id")).isEqualTo(indexSetStats);
+    }
+
+    @Test
+    public void indexSetStatistics0() {
+        when(indexSetRegistry.get("id")).thenReturn(Optional.empty());
+
+        expectedException.expect(NotFoundException.class);
+        expectedException.expectMessage("Couldn't load index set with ID <id>");
+
+        try {
+            indexSetsResource.indexSetStatistics("id");
+        } finally {
+            verify(indexSetRegistry, times(1)).get("id");
+            verifyNoMoreInteractions(indexSetRegistry);
+        }
+    }
+
+    @Test
+    public void indexSetStatisticsDenied() {
+        notPermitted();
+
+        expectedException.expect(ForbiddenException.class);
+        expectedException.expectMessage("Not authorized to access resource id <id>");
+
+        try {
+            indexSetsResource.indexSetStatistics("id");
+        } finally {
+            verifyZeroInteractions(indexSetRegistry);
         }
     }
 
