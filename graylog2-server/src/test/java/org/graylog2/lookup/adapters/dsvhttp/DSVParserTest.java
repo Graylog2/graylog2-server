@@ -107,6 +107,31 @@ public class DSVParserTest {
     }
 
     @Test
+    public void parseQuotedStringsWithSeparatorInKey() throws Exception {
+        final String input = "# Sample file for testing\n" +
+                "\"foo\":\"23\"\n" +
+                "\"bar\":\"42\"\n" +
+                "\"baz\":\"17\"\n" +
+                "\"qux\":\"42:23\"\n" +
+                "\"qu:ux\":\"42\"";
+        final DSVParser dsvParser = new DSVParser("#", "\n", ":", "\"", false, false, 0, Optional.of(1));
+
+        final Map<String, String> result = dsvParser.parse(input);
+
+        assertThat(result)
+                .isNotNull()
+                .isNotEmpty()
+                .hasSize(5)
+                .containsExactly(
+                        new AbstractMap.SimpleEntry<>("foo", "23"),
+                        new AbstractMap.SimpleEntry<>("bar", "42"),
+                        new AbstractMap.SimpleEntry<>("baz", "17"),
+                        new AbstractMap.SimpleEntry<>("qux", "42:23"),
+                        new AbstractMap.SimpleEntry<>("qu:ux", "42")
+                );
+    }
+
+    @Test
     public void parseKeyOnlyFile() throws Exception {
         final String input = "# Sample file for testing\n" +
                 "foo\n" +

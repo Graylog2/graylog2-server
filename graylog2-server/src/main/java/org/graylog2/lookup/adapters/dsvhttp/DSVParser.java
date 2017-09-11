@@ -32,6 +32,8 @@ public class DSVParser {
     private final Boolean caseInsensitive;
     private final Integer keyColumn;
     private final Optional<Integer> valueColumn;
+    
+    private final String splitPattern;
 
     public DSVParser(String ignorechar,
                      String lineSeparator,
@@ -50,6 +52,12 @@ public class DSVParser {
         this.caseInsensitive = caseInsensitive;
         this.keyColumn = keyColumn;
         this.valueColumn = valueColumn;
+
+        if (Strings.isNullOrEmpty(quoteChar)) {
+            this.splitPattern = separator;
+        } else {
+            this.splitPattern = separator + "(?=(?:[^\\" + quoteChar + "]*\\" + quoteChar + "[^\\" + quoteChar + "]*\\" + quoteChar + ")*[^\\" + quoteChar + "]*$)";
+        }
     }
 
     public Map<String, String> parse(String body) {
@@ -61,7 +69,7 @@ public class DSVParser {
             if (line.startsWith(this.ignorechar)) {
                 continue;
             }
-            final String[] values = line.split(this.separator);
+            final String[] values = line.split(this.splitPattern);
             if (values.length <= Math.max(keyColumn, keyOnly ? 0 : valueColumn.orElse(0))) {
                 continue;
             }
