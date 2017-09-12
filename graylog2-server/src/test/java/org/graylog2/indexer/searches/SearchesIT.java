@@ -20,6 +20,7 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
@@ -34,7 +35,6 @@ import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeComparator;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -127,8 +127,24 @@ public class SearchesIT extends ElasticsearchBase {
                 }
             }).build();
 
-    private final IndexSetConfig indexSetConfig;
-    private final IndexSet indexSet;
+    private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
+            .id("index-set-1")
+            .title("Index set 1")
+            .description("For testing")
+            .indexPrefix("graylog")
+            .creationDate(ZonedDateTime.now())
+            .shards(1)
+            .replicas(0)
+            .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+            .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+            .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
+            .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+            .indexAnalyzer("standard")
+            .indexTemplateName("template-1")
+            .indexOptimizationMaxNumSegments(1)
+            .indexOptimizationDisabled(false)
+            .build();
+    private static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
 
     @Mock
     private IndexRangeService indexRangeService;
@@ -145,26 +161,12 @@ public class SearchesIT extends ElasticsearchBase {
     private MetricRegistry metricRegistry;
     private Searches searches;
 
-    public SearchesIT() {
-        this.indexSetConfig = IndexSetConfig.builder()
-                .id("index-set-1")
-                .title("Index set 1")
-                .description("For testing")
-                .indexPrefix("graylog")
-                .creationDate(ZonedDateTime.now())
-                .shards(1)
-                .replicas(0)
-                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
-                .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
-                .indexAnalyzer("standard")
-                .indexTemplateName("template-1")
-                .indexOptimizationMaxNumSegments(1)
-                .indexOptimizationDisabled(false)
-                .build();
-        this.indexSet = new TestIndexSet(indexSetConfig);
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
+    @Override
+    protected ElasticsearchConfiguration.Builder elasticsearchConfiguration() {
+        final Map<String, Map<String, Object>> messageTemplates = Collections.singletonMap("graylog-test-internal", indexMapping().messageTemplate("*", "standard"));
+        return super.elasticsearchConfiguration()
+                .indexTemplates(messageTemplates)
+                .deleteAllIndices(true);
     }
 
     @Before

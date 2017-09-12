@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.BooleanNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -42,7 +43,6 @@ import org.graylog2.indexer.indices.events.IndicesClosedEvent;
 import org.graylog2.indexer.indices.events.IndicesDeletedEvent;
 import org.graylog2.indexer.indices.events.IndicesReopenedEvent;
 import org.graylog2.indexer.messages.Messages;
-import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -75,7 +75,7 @@ public class IndicesIT extends ElasticsearchBase {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
-    private final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
+    private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
             .id("index-set-1")
             .title("Index set 1")
             .description("For testing")
@@ -92,14 +92,19 @@ public class IndicesIT extends ElasticsearchBase {
             .indexOptimizationMaxNumSegments(1)
             .indexOptimizationDisabled(false)
             .build();
-    private final IndexSet indexSet = new TestIndexSet(indexSetConfig);
+    private static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
 
     private EventBus eventBus;
     private Indices indices;
     private IndexMappingFactory indexMappingFactory;
 
-    public IndicesIT() {
-        elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
+    @Override
+    protected ElasticsearchConfiguration.Builder elasticsearchConfiguration() {
+        final Map<String, Map<String, Object>> messageTemplates = Collections.singletonMap("graylog-test-internal", indexMapping().messageTemplate("*", "standard"));
+        return super.elasticsearchConfiguration()
+                .indexTemplates(messageTemplates)
+                .createIndices(false)
+                .deleteAllIndices(true);
     }
 
     @Before
@@ -108,7 +113,7 @@ public class IndicesIT extends ElasticsearchBase {
         final Node node = new Node(client());
         indexMappingFactory = new IndexMappingFactory(node);
         indices = new Indices(client(),
-                new ObjectMapper(),
+                new ObjectMapperProvider().get(),
                 indexMappingFactory,
                 new Messages(new MetricRegistry(), client()),
                 mock(NodeId.class),
@@ -117,7 +122,6 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testDelete() throws Exception {
         final String index = createRandomIndex("indices_it_");
         indices.delete(index);
@@ -148,18 +152,19 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testAliasExists() throws Exception {
+        final String index = createRandomIndex("indices_it_");
         final String alias = "graylog_alias_exists";
         assertThat(indices.aliasExists(alias)).isFalse();
 
         try {
-            addAliasMapping(INDEX_NAME, alias);
+            addAliasMapping(index, alias);
 
             assertThat(indices.aliasExists(alias)).isTrue();
             assertThat(indices.exists(alias)).isFalse();
         } finally {
-            removeAliasMapping(INDEX_NAME, alias);
+            removeAliasMapping(index, alias);
+            deleteIndex(index);
         }
     }
 
@@ -185,24 +190,24 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testExistsIfIndexDoesNotExist() throws Exception {
         final String indexNotAlias = "graylog_index_does_not_exist";
         assertThat(indices.exists(indexNotAlias)).isFalse();
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void testAliasTarget() throws Exception {
+        final String index = createRandomIndex("indices_it_");
         final String alias = "graylog_alias_target";
         assertThat(indices.aliasTarget(alias)).isEmpty();
 
         try {
-            addAliasMapping(INDEX_NAME, alias);
+            addAliasMapping(index, alias);
 
-            assertThat(indices.aliasTarget(alias)).contains(INDEX_NAME);
+            assertThat(indices.aliasTarget(alias)).contains(index);
         } finally {
-            removeAliasMapping(INDEX_NAME, alias);
+            removeAliasMapping(index, alias);
+            deleteIndex(index);
         }
     }
 
@@ -311,22 +316,19 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
-    public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() {
-        final String indexName = "index_creation_date_test";
+    public void indexCreationDateReturnsIndexCreationDateOfExistingIndexAsDateTime() throws IOException {
         final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final String indexName = createRandomIndex("indices_it_");
         try {
-            indices.create(indexName, indexSet);
             indices.indexCreationDate(indexName).ifPresent(
                     indexCreationDate -> org.assertj.jodatime.api.Assertions.assertThat(indexCreationDate).isAfterOrEqualTo(now)
             );
         } finally {
-            indices.delete(indexName);
+            deleteIndex(indexName);
         }
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void indexCreationDateReturnsEmptyOptionalForNonExistingIndex() {
         assertThat(indices.indexCreationDate("index_missing")).isEmpty();
     }

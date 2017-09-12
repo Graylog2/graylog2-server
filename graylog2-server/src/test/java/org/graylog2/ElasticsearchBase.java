@@ -38,6 +38,9 @@ import io.searchbox.indices.mapping.GetMapping;
 import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.GetTemplate;
 import io.searchbox.indices.template.PutTemplate;
+import org.graylog2.indexer.IndexMapping;
+import org.graylog2.indexer.IndexMapping2;
+import org.graylog2.indexer.IndexMapping5;
 import org.junit.Rule;
 
 import javax.inject.Inject;
@@ -57,6 +60,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public abstract class ElasticsearchBase {
     private static final String PROPERTIES_RESOURCE_NAME = "elasticsearch.properties";
+    private static final String DEFAULT_PORT = "9200";
+
     public static final Duration ES_TIMEOUT = Duration.seconds(5L);
 
     @Rule
@@ -86,7 +91,7 @@ public abstract class ElasticsearchBase {
     }
 
     protected String getHttpPort() {
-        return properties.getProperty("httpPort", "9200");
+        return properties.getProperty("httpPort", DEFAULT_PORT);
     }
 
     protected String getServer() {
@@ -111,6 +116,17 @@ public abstract class ElasticsearchBase {
         assertThat(jestResult.isSucceeded())
                 .overridingErrorMessage(errorMessage)
                 .isTrue();
+    }
+
+    protected IndexMapping indexMapping() {
+        switch (elasticsearchVersion.getMajorVersion()) {
+            case 2:
+                return new IndexMapping2();
+            case 5:
+                return new IndexMapping5();
+            default:
+                throw new IllegalStateException("Only Elasticsearch 2.x and 5.x are supported");
+        }
     }
 
     public void createIndex(String index) throws IOException {

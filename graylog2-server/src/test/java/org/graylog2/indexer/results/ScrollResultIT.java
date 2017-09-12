@@ -17,6 +17,8 @@
 package org.graylog2.indexer.results;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
+import com.google.common.collect.ImmutableMap;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import io.searchbox.core.Search;
@@ -29,7 +31,6 @@ import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.indexset.IndexSetConfig;
-import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategy;
 import org.graylog2.indexer.retention.strategies.DeletionRetentionStrategyConfig;
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
@@ -43,6 +44,7 @@ import org.mockito.junit.MockitoRule;
 import java.io.IOException;
 import java.time.ZonedDateTime;
 import java.util.Collections;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.elasticsearch.index.query.QueryBuilders.matchAllQuery;
@@ -55,7 +57,9 @@ public class ScrollResultIT extends ElasticsearchBase {
 
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
 
-    public ScrollResultIT() {
+    @Override
+    protected ElasticsearchConfiguration.Builder elasticsearchConfiguration() {
+        final Map<String, Map<String, Object>> messageTemplates = Collections.singletonMap("graylog-test-internal", indexMapping().messageTemplate("*", "standard"));
         final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
                 .id("index-set-1")
                 .title("Index set 1")
@@ -74,7 +78,15 @@ public class ScrollResultIT extends ElasticsearchBase {
                 .indexOptimizationDisabled(false)
                 .build();
         final IndexSet indexSet = new TestIndexSet(indexSetConfig);
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
+        final Map<String, Object> indexSettings = ImmutableMap.of("settings", ImmutableMap.of(
+                "number_of_shards", indexSet.getConfig().shards(),
+                "number_of_replicas", indexSet.getConfig().replicas()
+        ));
+        return super.elasticsearchConfiguration()
+                .indexTemplates(messageTemplates)
+                .createIndices(false)
+                .indexSettings(indexSettings)
+                .deleteAllIndices(true);
     }
 
     @Test
