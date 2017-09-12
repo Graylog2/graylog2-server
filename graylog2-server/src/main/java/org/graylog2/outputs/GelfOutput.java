@@ -242,7 +242,6 @@ public class GelfOutput implements MessageOutput {
 
         final GelfMessageLevel messageLevel = extractLevel(message.getField(Message.FIELD_LEVEL));
         final String fullMessage = (String) message.getField(Message.FIELD_FULL_MESSAGE);
-        final String facility = (String) message.getField("facility");
         final String forwarder = GelfOutput.class.getCanonicalName();
 
         final GelfMessageBuilder builder = new GelfMessageBuilder(message.getMessage(), message.getSource())
@@ -256,10 +255,6 @@ public class GelfOutput implements MessageOutput {
 
         if (fullMessage != null) {
             builder.fullMessage(fullMessage);
-        }
-
-        if (facility != null) {
-            builder.additionalField("_facility", facility);
         }
 
         return builder.build();
