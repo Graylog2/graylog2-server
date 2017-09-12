@@ -63,8 +63,8 @@
         <!-- to work around filtering bug, which makes maven.build.timestamp inaccessible -->
         <build.timestamp>${maven.build.timestamp}</build.timestamp>
 
-        <it.es.httpPort>9200</it.es.httpPort>
-        <it.es.transportPort>9300</it.es.transportPort>
+        <it.es.httpPort>19200</it.es.httpPort>
+        <it.es.transportPort>19300</it.es.transportPort>
         <it.es.version>5.5.2</it.es.version>
         <it.es.instanceCount>1</it.es.instanceCount>
         <it.es.clusterName>test</it.es.clusterName>
