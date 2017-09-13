@@ -21,12 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.eventbus.EventBus;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
-import org.elasticsearch.action.admin.indices.get.GetIndexResponse;
-import org.graylog2.AbstractESTest;
+import org.graylog2.ElasticsearchBase;
 import org.graylog2.audit.NullAuditEventSender;
 import org.graylog2.indexer.IndexMappingFactory;
 import org.graylog2.indexer.cluster.Node;
@@ -39,13 +34,14 @@ import org.junit.Test;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
+public class IndicesGetAllMessageFieldsIT extends ElasticsearchBase {
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
 
@@ -53,39 +49,44 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
-        final Node node = new Node(jestClient());
-        indices = new Indices(jestClient(),
+        final Node node = new Node(client());
+        indices = new Indices(client(),
                 new ObjectMapper(),
                 new IndexMappingFactory(node),
-                new Messages(new MetricRegistry(), jestClient()),
+                new Messages(new MetricRegistry(), client()),
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus());
     }
 
+    @After
+    public void tearDown() throws IOException {
+        deleteIndex("get_all_message_fields_0", "get_all_message_fields_1");
+    }
+
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void GetAllMessageFieldsForNonexistingIndexShouldReturnEmptySet() throws Exception {
-        final String[] indexNames = new String[] { "graylog_0" };
+        final String[] indexNames = new String[] { "does_not_exist_" + System.nanoTime() };
         final Set<String> result = indices.getAllMessageFields(indexNames);
 
         assertThat(result).isNotNull().isEmpty();
     }
 
     @Test
-    @UsingDataSet(locations = "IndicesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void GetAllMessageFieldsForEmptyIndexShouldReturnEmptySet() throws Exception {
-        final String[] indexNames = new String[] { "graylog_0" };
-        final Set<String> result = indices.getAllMessageFields(indexNames);
-
-        assertThat(result).isNotNull().isEmpty();
+        final String indexName = createRandomIndex("get_all_message_fields_");
+        try {
+            final Set<String> result = indices.getAllMessageFields(new String[]{indexName});
+            assertThat(result).isNotNull().isEmpty();
+        } finally {
+            deleteIndex(indexName);
+        }
     }
 
     @Test
-    @UsingDataSet(locations = "IndicesGetAllMessageFieldsTest-MultipleIndices.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "IndicesGetAllMessageFieldsIT-MultipleIndices.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void GetAllMessageFieldsForSingleIndexShouldReturnCompleteList() throws Exception {
-        final String[] indexNames = new String[] { "graylog_0" };
+        final String[] indexNames = new String[] { "get_all_message_fields_0" };
         final Set<String> result = indices.getAllMessageFields(indexNames);
 
         assertThat(result)
@@ -93,7 +94,7 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
             .hasSize(5)
             .containsOnly("fieldonlypresenthere", "message", "n", "source", "timestamp");
 
-        final String[] otherIndexName = new String[] { "otherindexset_0" };
+        final String[] otherIndexName = new String[] { "get_all_message_fields_1" };
 
         final Set<String> otherResult = indices.getAllMessageFields(otherIndexName);
 
@@ -104,9 +105,9 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
     }
 
     @Test
-    @UsingDataSet(locations = "IndicesGetAllMessageFieldsTest-MultipleIndices.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "IndicesGetAllMessageFieldsIT-MultipleIndices.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void GetAllMessageFieldsForMultipleIndicesShouldReturnCompleteList() throws Exception {
-        final String[] indexNames = new String[] { "graylog_0", "otherindexset_0" };
+        final String[] indexNames = new String[] { "get_all_message_fields_0", "get_all_message_fields_1" };
         final Set<String> result = indices.getAllMessageFields(indexNames);
 
         assertThat(result)
@@ -118,29 +119,32 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
     @Test
     @UsingDataSet(loadStrategy = LoadStrategyEnum.DELETE_ALL)
     public void GetAllMessageFieldsForIndicesForNonexistingIndexShouldReturnEmptySet() throws Exception {
-        final String[] indexNames = new String[] { "graylog_0" };
-        final IndicesExistsResponse response = client().admin().indices().exists(new IndicesExistsRequest("graylog_0")).get();
-        assertThat(response.isExists()).isFalse();
-        final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(indexNames);
+        final String indexName = "does_not_exist_" + System.nanoTime();
+        assertThat(indicesExists(indexName)).isFalse();
+
+        final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(new String[] { indexName });
 
         assertThat(result).isNotNull().isEmpty();
     }
 
     @Test
-    @UsingDataSet(locations = "IndicesTest-EmptyIndex.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void GetAllMessageFieldsForIndicesForEmptyIndexShouldReturnEmptySet() throws Exception {
-        final String[] indexNames = new String[] { "graylog_0" };
-        final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(indexNames);
+        final String indexName = createRandomIndex("indices_it_");
+        try {
+            final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(new String[]{indexName});
 
-        assertThat(result)
-            .isNotNull()
-            .isEmpty();
+            assertThat(result)
+                    .isNotNull()
+                    .isEmpty();
+        } finally {
+            deleteIndex(indexName);
+        }
     }
 
     @Test
-    @UsingDataSet(locations = "IndicesGetAllMessageFieldsTest-MultipleIndices.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "IndicesGetAllMessageFieldsIT-MultipleIndices.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void GetAllMessageFieldsForIndicesForSingleIndexShouldReturnCompleteList() throws Exception {
-        final String indexName = "graylog_0";
+        final String indexName = "get_all_message_fields_0";
         final String[] indexNames = new String[] { indexName };
         final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(indexNames);
 
@@ -154,7 +158,7 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
             .hasSize(5)
             .containsOnly("fieldonlypresenthere", "message", "n", "source", "timestamp");
 
-        final String otherIndexName = "otherindexset_0";
+        final String otherIndexName = "get_all_message_fields_1";
         final String[] otherIndexNames = new String[] { otherIndexName };
 
         final Map<String, Set<String>> otherResult = indices.getAllMessageFieldsForIndices(otherIndexNames);
@@ -171,32 +175,24 @@ public class IndicesGetAllMessageFieldsTest extends AbstractESTest {
     }
 
     @Test
-    @UsingDataSet(locations = "IndicesGetAllMessageFieldsTest-MultipleIndices.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(locations = "IndicesGetAllMessageFieldsIT-MultipleIndices.json", loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void GetAllMessageFieldsForIndicesForMultipleIndicesShouldReturnCompleteList() throws Exception {
-        final String[] indexNames = new String[] { "graylog_0", "otherindexset_0" };
+        final String[] indexNames = new String[] { "get_all_message_fields_0", "get_all_message_fields_1" };
         final Map<String, Set<String>> result = indices.getAllMessageFieldsForIndices(indexNames);
 
         assertThat(result)
             .isNotNull()
             .hasSize(2)
-            .containsOnlyKeys("graylog_0", "otherindexset_0");
+            .containsOnlyKeys("get_all_message_fields_0", "get_all_message_fields_1");
 
-        assertThat(result.get("graylog_0"))
+        assertThat(result.get("get_all_message_fields_0"))
             .isNotNull()
             .hasSize(5)
             .containsOnly("message", "n", "source", "timestamp", "fieldonlypresenthere");
 
-        assertThat(result.get("otherindexset_0"))
+        assertThat(result.get("get_all_message_fields_1"))
             .isNotNull()
             .hasSize(5)
             .containsOnly("message", "n", "source", "timestamp", "someotherfield");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        final GetIndexResponse response = client().admin().indices().getIndex(new GetIndexRequest()).get();
-        for (String index : response.indices()) {
-            client().admin().indices().delete(new DeleteIndexRequest(index)).get();
-        }
     }
 }

@@ -94,6 +94,7 @@ public class ClusterConfigServiceImplTest {
     @After
     public void tearDown() {
         DateTimeUtils.setCurrentMillisSystem();
+        mongoConnection.getMongoDatabase().drop();
     }
 
     @Test

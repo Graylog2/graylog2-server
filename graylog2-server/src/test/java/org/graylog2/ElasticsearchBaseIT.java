@@ -20,16 +20,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-public class AbstractESTestTest extends AbstractESTest {
-    @Override
+public class ElasticsearchBaseIT extends ElasticsearchBase {
     @Before
     public void setUp() throws Exception {
-        super.setUp();
-        assertThat(jestClient()).isNotNull();
+        assertThat(client()).isNotNull();
     }
 
     @Test
     public void testIfJestClientIsNotNull() throws Exception {
-        assertThat(jestClient()).isNotNull();
+        assertThat(client()).isNotNull();
     }
 }

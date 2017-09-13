@@ -20,13 +20,14 @@ import com.codahale.metrics.Histogram;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.joschi.nosqlunit.elasticsearch.http.ElasticsearchConfiguration;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.graylog2.AbstractESTest;
 import org.graylog2.Configuration;
+import org.graylog2.ElasticsearchBase;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexSet;
@@ -34,7 +35,6 @@ import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
-import org.graylog2.indexer.nosqlunit.IndexCreatingLoadStrategyFactory;
 import org.graylog2.indexer.ranges.IndexRange;
 import org.graylog2.indexer.ranges.IndexRangeComparator;
 import org.graylog2.indexer.ranges.IndexRangeService;
@@ -84,7 +84,7 @@ import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class SearchesTest extends AbstractESTest {
+public class SearchesIT extends ElasticsearchBase {
     private static final String REQUEST_TIMER_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.requests";
     private static final String RANGES_HISTOGRAM_NAME = "org.graylog2.indexer.searches.Searches.elasticsearch.ranges";
 
@@ -127,8 +127,24 @@ public class SearchesTest extends AbstractESTest {
                 }
             }).build();
 
-    private final IndexSetConfig indexSetConfig;
-    private final IndexSet indexSet;
+    private static final IndexSetConfig indexSetConfig = IndexSetConfig.builder()
+            .id("index-set-1")
+            .title("Index set 1")
+            .description("For testing")
+            .indexPrefix("graylog")
+            .creationDate(ZonedDateTime.now())
+            .shards(1)
+            .replicas(0)
+            .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
+            .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
+            .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
+            .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
+            .indexAnalyzer("standard")
+            .indexTemplateName("template-1")
+            .indexOptimizationMaxNumSegments(1)
+            .indexOptimizationDisabled(false)
+            .build();
+    private static final IndexSet indexSet = new TestIndexSet(indexSetConfig);
 
     @Mock
     private IndexRangeService indexRangeService;
@@ -145,31 +161,16 @@ public class SearchesTest extends AbstractESTest {
     private MetricRegistry metricRegistry;
     private Searches searches;
 
-    public SearchesTest() {
-        this.indexSetConfig = IndexSetConfig.builder()
-                .id("index-set-1")
-                .title("Index set 1")
-                .description("For testing")
-                .indexPrefix("graylog")
-                .creationDate(ZonedDateTime.now())
-                .shards(1)
-                .replicas(0)
-                .rotationStrategyClass(MessageCountRotationStrategy.class.getCanonicalName())
-                .rotationStrategy(MessageCountRotationStrategyConfig.createDefault())
-                .retentionStrategyClass(DeletionRetentionStrategy.class.getCanonicalName())
-                .retentionStrategy(DeletionRetentionStrategyConfig.createDefault())
-                .indexAnalyzer("standard")
-                .indexTemplateName("template-1")
-                .indexOptimizationMaxNumSegments(1)
-                .indexOptimizationDisabled(false)
-                .build();
-        this.indexSet = new TestIndexSet(indexSetConfig);
-        this.elasticsearchRule.setLoadStrategyFactory(new IndexCreatingLoadStrategyFactory(indexSet, Collections.singleton(INDEX_NAME)));
+    @Override
+    protected ElasticsearchConfiguration.Builder elasticsearchConfiguration() {
+        final Map<String, Map<String, Object>> messageTemplates = Collections.singletonMap("graylog-test-internal", indexMapping().messageTemplate("*", "standard"));
+        return super.elasticsearchConfiguration()
+                .indexTemplates(messageTemplates)
+                .deleteAllIndices(true);
     }
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
         when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(INDEX_RANGES);
         when(indices.getAllMessageFieldsForIndices(any(String[].class))).thenReturn(ImmutableMap.of(INDEX_NAME, Collections.singleton("n")));
         metricRegistry = new MetricRegistry();
@@ -180,15 +181,15 @@ public class SearchesTest extends AbstractESTest {
             metricRegistry,
             streamService,
             indices,
-            jestClient(),
+            client(),
             new ScrollResult.Factory() {
                 @Override
                 public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, List<String> fields) {
-                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, fields);
+                    return new ScrollResult(client(), new ObjectMapper(), initialResult, query, fields);
                 }
                 @Override
                 public ScrollResult create(io.searchbox.core.SearchResult initialResult, String query, String scroll, List<String> fields) {
-                    return new ScrollResult(jestClient(), new ObjectMapper(), initialResult, query, scroll, fields);
+                    return new ScrollResult(client(), new ObjectMapper(), initialResult, query, scroll, fields);
                 }
             }
         );
@@ -347,9 +348,9 @@ public class SearchesTest extends AbstractESTest {
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT, locations = "SearchesIT-terms_stats.json")
     public void testTermsStats() throws Exception {
-        TermsStatsResult r = searches.termsStats("message", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
+        TermsStatsResult r = searches.termsStats("f", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
                 AbsoluteRange.create(
                         new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                         new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC))
@@ -358,13 +359,13 @@ public class SearchesTest extends AbstractESTest {
         assertThat(r.getResults()).hasSize(2);
         assertThat(r.getResults().get(0))
                 .hasSize(7)
-                .containsEntry("key_field", "ho");
+                .containsEntry("key_field", "Ho");
     }
 
     @Test
-    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT, locations = "SearchesIT-terms_stats.json")
     public void termsStatsRecordsMetrics() throws Exception {
-        TermsStatsResult r = searches.termsStats("message", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
+        TermsStatsResult r = searches.termsStats("f", "n", Searches.TermsStatsOrder.COUNT, 25, "*",
                 AbsoluteRange.create(
                         new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC),
                         new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC))

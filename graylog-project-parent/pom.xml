@@ -543,6 +543,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>com.github.joschi.nosqlunit</groupId>
+                <artifactId>nosqlunit-elasticsearch-http</artifactId>
+                <version>1.0.0-4+jackson</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.jukito</groupId>
                 <artifactId>jukito</artifactId>
                 <version>${jukito.version}</version>
@@ -628,6 +634,7 @@
                     <argLine>-Djava.library.path=${project.basedir}/../lib/sigar-${sigar.version}</argLine>
                     <excludes>
                         <exclude>**/*IntegrationTest.java</exclude>
+                        <exclude>**/*IT.java</exclude>
                     </excludes>
                     <includes>
                         <include>**/*Spec.class</include>

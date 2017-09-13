@@ -21,6 +21,7 @@ import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.database.MongoConnectionRule;
 import org.joda.time.DateTime;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.ClassRule;
 import org.junit.Rule;
@@ -46,6 +47,11 @@ public class AccessTokenServiceImplTest {
     @Before
     public void setupService () {
         this.accessTokenService = new AccessTokenServiceImpl(mongoRule.getMongoConnection());
+    }
+
+    @After
+    public void tearDown() {
+        mongoRule.getMongoConnection().getMongoDatabase().drop();
     }
 
     @Test

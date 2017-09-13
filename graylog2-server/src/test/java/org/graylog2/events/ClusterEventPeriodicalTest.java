@@ -103,6 +103,7 @@ public class ClusterEventPeriodicalTest {
     @After
     public void tearDown() {
         DateTimeUtils.setCurrentMillisSystem();
+        mongoConnection.getMongoDatabase().drop();
     }
 
     @Test
