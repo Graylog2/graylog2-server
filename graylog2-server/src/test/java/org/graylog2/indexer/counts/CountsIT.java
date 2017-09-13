@@ -212,4 +212,29 @@ public class CountsIT extends ElasticsearchBase {
             fail("Expected IndexNotFoundException to be thrown");
         }
     }
+
+    @Test
+    public void totalSucceedsWithListOfIndicesLargerThan4Kilobytes() throws Exception {
+        final int numberOfIndices = 100;
+        final String[] indexNames = new String[numberOfIndices];
+        final String indexPrefix = "very_long_list_of_indices_0123456789_counts_it_";
+        final IndexSet indexSet = mock(IndexSet.class);
+
+        try {
+            for (int i = 0; i < numberOfIndices; i++) {
+                final String indexName = indexPrefix + i;
+                createIndex(indexName);
+                indexNames[i] = indexName;
+            }
+
+            when(indexSet.getManagedIndices()).thenReturn(indexNames);
+
+            final String indicesString = String.join(",", indexNames);
+            assertThat(indicesString.length()).isGreaterThanOrEqualTo(4096);
+
+            assertThat(counts.total(indexSet)).isEqualTo(0L);
+        } finally {
+            deleteIndex(indexNames);
+        }
+    }
 }

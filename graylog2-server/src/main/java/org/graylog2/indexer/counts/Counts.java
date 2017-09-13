@@ -16,14 +16,19 @@
  */
 package org.graylog2.indexer.counts;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.searchbox.client.JestClient;
-import io.searchbox.core.Count;
-import io.searchbox.core.CountResult;
+import io.searchbox.core.MultiSearch;
+import io.searchbox.core.MultiSearchResult;
+import io.searchbox.core.Search;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog2.indexer.ElasticsearchException;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.jest.JestUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,6 +37,8 @@ import java.util.List;
 
 @Singleton
 public class Counts {
+    private static final Logger LOG = LoggerFactory.getLogger(Counts.class);
+
     private final JestClient jestClient;
     private final IndexSetRegistry indexSetRegistry;
 
@@ -59,12 +66,23 @@ public class Counts {
         final List<String> indices = Arrays.asList(indexNames);
         final String query = new SearchSourceBuilder()
                 .query(QueryBuilders.matchAllQuery())
+                .size(0)
                 .toString();
-        final Count request = new Count.Builder()
-                .query(query)
+        final Search request = new Search.Builder(query)
                 .addIndex(indices)
                 .build();
-        final CountResult result = JestUtils.execute(jestClient, request, () -> "Fetching message count failed for indices " + indices);
-        return result.getCount().longValue();
+        final MultiSearch multiSearch = new MultiSearch.Builder(request).build();
+        final MultiSearchResult searchResult = JestUtils.execute(jestClient, multiSearch, () -> "Fetching message count failed for indices " + indices);
+        final JsonNode responses = searchResult.getJsonObject().path("responses");
+        if (!responses.isArray()) {
+            LOG.debug("\"responses\" array not found: {}", responses.toString());
+            throw new ElasticsearchException("Expected list of results not found");
+        }
+
+        if (responses.size() != 1) {
+            throw new ElasticsearchException("Expected list of results to contain exactly 1 item, actual size: " + responses.size());
+        }
+
+        return responses.path(0).path("hits").path("total").asLong(-1L);
     }
 }
