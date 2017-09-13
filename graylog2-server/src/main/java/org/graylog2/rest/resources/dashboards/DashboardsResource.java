@@ -37,6 +37,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.dashboards.requests.CreateDashboardRequest;
 import org.graylog2.rest.models.dashboards.requests.UpdateDashboardRequest;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
@@ -61,6 +62,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -101,6 +103,18 @@ public class DashboardsResource extends RestResource {
         final Map<String, String> result = ImmutableMap.of("dashboard_id", id);
         final URI dashboardUri = getUriBuilderToSelf().path(DashboardsResource.class, "get")
                 .build(id);
+
+        if (!isPermitted(RestPermissions.DASHBOARDS_READ, id)) {
+            final User user = getCurrentUser();
+            user.ensurePermission(RestPermissions.DASHBOARDS_READ + ":" + id);
+            userService.save(user);
+        }
+
+        if (!isPermitted(RestPermissions.DASHBOARDS_EDIT, id)) {
+            final User user = getCurrentUser();
+            user.ensurePermission(RestPermissions.DASHBOARDS_EDIT + ":" + id);
+            userService.save(user);
+        }
 
         return Response.created(dashboardUri).entity(result).build();
     }
@@ -145,7 +159,7 @@ public class DashboardsResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.DASHBOARD_DELETE)
     public void delete(@ApiParam(name = "dashboardId", required = true)
-                       @PathParam("dashboardId") String dashboardId) throws NotFoundException {
+                       @PathParam("dashboardId") String dashboardId) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         final Dashboard dashboard = dashboardService.load(dashboardId);
@@ -155,6 +169,13 @@ public class DashboardsResource extends RestResource {
         final String msg = "Deleted dashboard <" + dashboard.getId() + ">. Reason: REST request.";
         LOG.info(msg);
         activityWriter.write(new Activity(msg, DashboardsResource.class));
+
+        final User user = getCurrentUser();
+        final List<String> permissions = new ArrayList<>(user.getPermissions());
+        permissions.remove(RestPermissions.DASHBOARDS_READ + ":" + dashboardId);
+        permissions.remove(RestPermissions.DASHBOARDS_EDIT + ":" + dashboardId);
+        user.setPermissions(permissions);
+        userService.save(user);
 
         this.serverEventBus.post(DashboardDeletedEvent.create(dashboard.getId()));
     }
