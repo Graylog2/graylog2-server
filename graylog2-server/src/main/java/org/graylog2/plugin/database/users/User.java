@@ -54,6 +54,8 @@ public interface User extends Persisted {
 
     void setSessionTimeoutMs(long timeoutValue);
 
+    void ensurePermission(String permission);
+
     void setPermissions(List<String> permissions);
 
     void setPreferences(Map<String, Object> preferences);

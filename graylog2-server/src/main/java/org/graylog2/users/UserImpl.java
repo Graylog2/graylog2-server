@@ -226,6 +226,13 @@ public class UserImpl extends PersistedImpl implements User {
     }
 
     @Override
+    public void ensurePermission(String permission) {
+        final Set<String> permissions = new HashSet<>(getPermissions());
+        permissions.add(permission);
+        setPermissions(new ArrayList<>(permissions));
+    }
+
+    @Override
     public String getHashedPassword() {
         return firstNonNull(fields.get(PASSWORD), "").toString();
     }
