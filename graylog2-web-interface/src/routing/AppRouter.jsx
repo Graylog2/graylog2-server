@@ -141,6 +141,7 @@ const AppRouter = React.createClass({
             <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
             <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
             {pluginRoutes}
+            <Route path={Routes.NOTFOUND} component={NotFoundPage} />
             <Route path="*" component={NotFoundPage} />
           </Route>
         </Route>
