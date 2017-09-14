@@ -33,7 +33,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
@@ -44,7 +43,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -53,8 +51,6 @@ public class CountsIT extends ElasticsearchBase {
     private static final String INDEX_NAME_2 = "index_set_2_counts_test_0";
     @Rule
     public MockitoRule mockitoRule = MockitoJUnit.rule();
-    @Rule
-    public final ExpectedException expectedException = ExpectedException.none();
 
     @Mock
     private IndexSetRegistry indexSetRegistry;
@@ -200,7 +196,7 @@ public class CountsIT extends ElasticsearchBase {
         when(indexSet.getManagedIndices()).thenReturn(new String[]{"does_not_exist"});
 
         try {
-            assertThat(counts.total(indexSet)).isEqualTo(-1L);
+            counts.total(indexSet);
         } catch (IndexNotFoundException e) {
             final String expectedErrorDetail = "Index not found for query: does_not_exist. Try recalculating your index ranges.";
             assertThat(e)
@@ -208,8 +204,6 @@ public class CountsIT extends ElasticsearchBase {
                 .hasMessageEndingWith(expectedErrorDetail)
                 .hasNoSuppressedExceptions();
             assertThat(e.getErrorDetails()).containsExactly(expectedErrorDetail);
-        } catch (Exception e) {
-            fail("Expected IndexNotFoundException to be thrown");
         }
     }
 
