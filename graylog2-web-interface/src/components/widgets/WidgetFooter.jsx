@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Timestamp } from 'components/common';
 
 const WidgetFooter = React.createClass({
   propTypes: {
@@ -9,6 +10,9 @@ const WidgetFooter = React.createClass({
     onEditConfig: PropTypes.func.isRequired,
     onShowConfig: PropTypes.func.isRequired,
     replayHref: PropTypes.string.isRequired,
+    error: PropTypes.any,
+    errorMessage: PropTypes.string,
+    calculatedAt: PropTypes.string,
     replayToolTip: PropTypes.string,
   },
   _showConfig(e) {
@@ -24,6 +28,24 @@ const WidgetFooter = React.createClass({
     this.props.onDelete();
   },
   render() {
+    let loadErrorElement;
+
+    if (this.props.error) {
+      loadErrorElement = (
+        <span className="load-error" title={this.props.errorMessage}>
+          <i className="fa fa-exclamation-triangle" />
+        </span>
+      );
+    }
+
+    let calculatedAtTime;
+
+    if (this.props.calculatedAt) {
+      calculatedAtTime = <span title={this.props.calculatedAt}><Timestamp dateTime={this.props.calculatedAt} relative /></span>;
+    } else {
+      calculatedAtTime = 'Loading...';
+    }
+
     // if we have a tooltip, we disable the button link and instead show a tooltip on hover
     const title = this.props.replayToolTip ? null : 'Replay search';
     const href = this.props.replayToolTip ? null : this.props.replayHref;
@@ -69,7 +91,13 @@ const WidgetFooter = React.createClass({
 
     return (
       <div>
-        {this.props.locked ? lockedActions : unlockedActions}
+        <div className="widget-update-info">
+        {loadErrorElement}
+        {calculatedAtTime}
+        </div>
+        <div>
+          {this.props.locked ? lockedActions : unlockedActions}
+        </div>
       </div>
     );
   },

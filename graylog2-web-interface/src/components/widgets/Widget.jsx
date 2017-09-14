@@ -223,10 +223,7 @@ const Widget = React.createClass({
     return (
       <div ref="widget" className="widget" data-widget-id={this.props.widget.id}>
         <WidgetHeader ref="widgetHeader"
-                      title={this.props.widget.description}
-                      calculatedAt={this.state.calculatedAt}
-                      error={this.state.error}
-                      errorMessage={this.state.errorMessage} />
+                      title={this.props.widget.description} />
 
         {this._getVisualization()}
 
@@ -236,7 +233,10 @@ const Widget = React.createClass({
                       onEditConfig={this._showEditConfig}
                       onDelete={this.deleteWidget}
                       replayHref={this.replayUrl()}
-                      replayToolTip={disabledTooltip} />
+                      replayToolTip={disabledTooltip}
+                      calculatedAt={this.state.calculatedAt}
+                      error={this.state.error}
+                      errorMessage={this.state.errorMessage} />
         {this.props.locked ? showConfigModal : editConfigModal}
       </div>
     );
