@@ -161,7 +161,7 @@ const StackedGraphVisualization = React.createClass({
     props.config.series.forEach((seriesConfig) => {
       i++;
       const seriesName = `series${i}`;
-      const seriesTitle = seriesConfig.title ? seriesConfig.title : `${seriesConfig.statistical_function} ${seriesConfig.field}, "${seriesConfig.query}"`;
+      const seriesTitle = seriesConfig.title ? seriesConfig.title : `${seriesConfig.statistical_function} ${seriesConfig.field}, "${seriesConfig.query || '*'}"`;
       newSeriesNames = newSeriesNames.set(seriesName, seriesTitle);
     }, this);
 
@@ -201,7 +201,7 @@ const StackedGraphVisualization = React.createClass({
     props.config.series.forEach((seriesConfig) => {
       i++;
       const seriesName = `series${i}`;
-      const seriesTitle = seriesConfig.title ? seriesConfig.title : `${seriesConfig.statistical_function} ${seriesConfig.field}, "${seriesConfig.query}"`;
+      const seriesTitle = seriesConfig.title ? seriesConfig.title : `${seriesConfig.statistical_function} ${seriesConfig.field}, "${seriesConfig.query || '*'}"`;
       this.series = this.series.push(seriesName);
       this.seriesNames = this.seriesNames.set(seriesName, seriesTitle);
       colours = colours.set(seriesName, colourPalette(seriesName));
