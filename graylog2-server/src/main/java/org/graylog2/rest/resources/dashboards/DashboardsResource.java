@@ -172,10 +172,6 @@ public class DashboardsResource extends RestResource {
 
         final User user = getCurrentUser();
         final List<String> permissions = new ArrayList<>(user.getPermissions());
-        permissions.remove(RestPermissions.DASHBOARDS_READ + ":" + dashboardId);
-        permissions.remove(RestPermissions.DASHBOARDS_EDIT + ":" + dashboardId);
-        user.setPermissions(permissions);
-        userService.save(user);
 
         this.serverEventBus.post(DashboardDeletedEvent.create(dashboard.getId()));
     }

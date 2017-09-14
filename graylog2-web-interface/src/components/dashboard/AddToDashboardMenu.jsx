@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Reflux from 'reflux';
 import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
 
+import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
+
 const SearchStore = StoreProvider.getStore('Search');
-const DashboardsStore = StoreProvider.getStore('Dashboards');
+const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
 const WidgetsStore = StoreProvider.getStore('Widgets');
 
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -28,11 +31,10 @@ const AddToDashboardMenu = React.createClass({
     ]),
   },
 
-  mixins: [PermissionsMixin],
+  mixins: [Reflux.connect(DashboardsStore), PermissionsMixin],
 
   getInitialState() {
     return {
-      dashboards: undefined,
       selectedDashboard: '',
     };
   },
@@ -46,28 +48,6 @@ const AddToDashboardMenu = React.createClass({
     };
   },
 
-  componentDidMount() {
-    this._initializeDashboards();
-  },
-  _initializeDashboards() {
-    DashboardsStore.addOnWritableDashboardsChangedCallback((dashboards) => {
-      if (this.isMounted()) {
-        this._updateDashboards(dashboards);
-      }
-    });
-
-    const dashboards = DashboardsStore.writableDashboards;
-    // Trigger a dashboard update if the store haven't got any dashboards
-    if (dashboards.size === 0) {
-      DashboardsStore.updateWritableDashboards();
-      return;
-    }
-
-    this._updateDashboards(dashboards);
-  },
-  _updateDashboards(newDashboards) {
-    this.setState({ dashboards: newDashboards });
-  },
   _selectDashboard(dashboardId) {
     this.setState({ selectedDashboard: dashboardId });
     this.refs.widgetModal.open();
@@ -147,9 +127,9 @@ const AddToDashboardMenu = React.createClass({
 
     this.state.dashboards
       .sortBy(dashboard => dashboard.title)
-      .forEach((dashboard, id) => {
+      .forEach((dashboard) => {
         dashboards = dashboards.push(
-          <MenuItem eventKey={id} key={dashboard.id}>
+          <MenuItem eventKey={dashboard.id} key={dashboard.id}>
             {dashboard.title}
           </MenuItem>,
         );

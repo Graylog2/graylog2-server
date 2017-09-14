@@ -1,18 +1,22 @@
 import React from 'react';
+import Reflux from 'reflux';
 import Immutable from 'immutable';
 import { Button, Col, Row } from 'react-bootstrap';
-
-import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
-const DashboardsStore = StoreProvider.getStore('Dashboards');
-const RolesStore = StoreProvider.getStore('Roles');
 
 import UserNotification from 'util/UserNotification';
 import RoleList from 'components/users/RoleList';
 import EditRole from 'components/users/EditRole';
 import PageHeader from 'components/common/PageHeader';
 
+import StoreProvider from 'injection/StoreProvider';
+
+const StreamsStore = StoreProvider.getStore('Streams');
+const DashboardsStore = StoreProvider.getStore('Dashboards');
+const RolesStore = StoreProvider.getStore('Roles');
+
+
 const RolesComponent = React.createClass({
+  mixins: [Reflux.connect(DashboardsStore)],
   getInitialState() {
     return {
       roles: Immutable.Set(),
@@ -25,7 +29,6 @@ const RolesComponent = React.createClass({
   componentDidMount() {
     this.loadRoles();
     StreamsStore.load(streams => this.setState({ streams: Immutable.List(streams) }));
-    DashboardsStore.listDashboards().then(dashboards => this.setState({ dashboards: dashboards }));
   },
 
   loadRoles() {

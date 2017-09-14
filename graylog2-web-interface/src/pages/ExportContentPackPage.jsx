@@ -4,8 +4,11 @@ import { Row, Col, Button } from 'react-bootstrap';
 
 import FileSaver from 'logic/files/FileSaver';
 import UserNotification from 'util/UserNotification';
+import { DocumentTitle, PageHeader } from 'components/common';
 
+import ActionsProvider from 'injection/ActionsProvider';
 import StoreProvider from 'injection/StoreProvider';
+
 const DashboardsStore = StoreProvider.getStore('Dashboards');
 const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 const InputsStore = StoreProvider.getStore('Inputs');
@@ -17,21 +20,15 @@ const LookupTableDataAdaptersStore = StoreProvider.getStore('LookupTableDataAdap
 // eslint-disable-next-line no-unused-vars
 const ConfigurationBundlesStore = StoreProvider.getStore('ConfigurationBundles');
 
-import ActionsProvider from 'injection/ActionsProvider';
 const InputsActions = ActionsProvider.getActions('Inputs');
 const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
-import { DocumentTitle, PageHeader } from 'components/common';
-
 const ExportContentPackPage = React.createClass({
-  mixins: [Reflux.connect(InputsStore)],
+  mixins: [Reflux.connect(InputsStore), Reflux.connect(DashboardsStore)],
   getInitialState() {
     return {};
   },
   componentDidMount() {
-    DashboardsStore.listDashboards().then((dashboards) => {
-      this.setState({ dashboards });
-    });
     GrokPatternsStore.loadPatterns((grokPatterns) => {
       this.setState({ grok_patterns: grokPatterns });
     });
