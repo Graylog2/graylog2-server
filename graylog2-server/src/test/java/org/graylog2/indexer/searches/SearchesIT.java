@@ -31,7 +31,6 @@ import org.graylog2.ElasticsearchBase;
 import org.graylog2.buffers.processors.fakestreams.FakeStream;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexSet;
-import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.TestIndexSet;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indices.Indices;
@@ -72,13 +71,11 @@ import java.time.ZonedDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.SortedSet;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.joda.time.DateTimeZone.UTC;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.startsWith;
 import static org.mockito.Mockito.mock;
@@ -150,9 +147,6 @@ public class SearchesIT extends ElasticsearchBase {
     private IndexRangeService indexRangeService;
 
     @Mock
-    private IndexSetRegistry indexSetRegistry;
-
-    @Mock
     private StreamService streamService;
 
     @Mock
@@ -177,7 +171,6 @@ public class SearchesIT extends ElasticsearchBase {
         searches = new Searches(
             new Configuration(),
             indexRangeService,
-            indexSetRegistry,
             metricRegistry,
             streamService,
             indices,
@@ -599,25 +592,6 @@ public class SearchesIT extends ElasticsearchBase {
                 .containsExactly(indexRangeLatest, indexRange0, indexRange1);
         assertThat(searches.determineAffectedIndicesWithRanges(relativeRange, null))
                 .containsExactly(indexRangeLatest, indexRange0, indexRange1);
-    }
-
-    @Test
-    public void determineAffectedIndicesOnlyReturnsAliasesIfTooManyIndicesAreFound() throws Exception {
-        final int numberOfIndices = Searches.MAX_INDICES_PER_QUERY + 1;
-        final DateTime now = DateTime.now(DateTimeZone.UTC);
-        final ImmutableSortedSet.Builder<IndexRange> indices = ImmutableSortedSet.orderedBy(IndexRange.COMPARATOR);
-
-        for (int i = 0; i < numberOfIndices; i++) {
-            final MongoIndexRange indexRange = MongoIndexRange.create("graylog_" + i, now.plusDays(i), now.plusDays(i + 1), now, 0);
-            indices.add(indexRange);
-        }
-
-        when(indexRangeService.find(any(DateTime.class), any(DateTime.class))).thenReturn(indices.build());
-        when(indexSetRegistry.getForIndex(anyString())).thenReturn(Optional.of(indexSet));
-
-        final TimeRange absoluteRange = AbsoluteRange.create(now, now.plusDays(numberOfIndices + 1));
-
-        assertThat(searches.determineAffectedIndices(absoluteRange, null)).containsExactly(indexSet.getIndexWildcard());
     }
 
     @Test
