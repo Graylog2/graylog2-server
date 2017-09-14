@@ -1,4 +1,5 @@
 /// <reference path="../../../declarations/bluebird/bluebird.d.ts" />
+/// <reference path='../../routing/ApiRoutes.d.ts' />
 
 const Reflux = require('reflux');
 
