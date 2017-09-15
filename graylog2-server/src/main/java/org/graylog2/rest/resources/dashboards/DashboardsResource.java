@@ -170,9 +170,6 @@ public class DashboardsResource extends RestResource {
         LOG.info(msg);
         activityWriter.write(new Activity(msg, DashboardsResource.class));
 
-        final User user = getCurrentUser();
-        final List<String> permissions = new ArrayList<>(user.getPermissions());
-
         this.serverEventBus.post(DashboardDeletedEvent.create(dashboard.getId()));
     }
 
