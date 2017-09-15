@@ -6,21 +6,22 @@ import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
 import deepEqual from 'deep-equal';
-
 import $ from 'jquery';
-global.jQuery = $;
-require('bootstrap/js/tooltip');
 
 import D3Utils from 'util/D3Utils';
 import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';
 
 import StoreProvider from 'injection/StoreProvider';
+
+global.jQuery = $;
+// eslint-disable-next-line import/newline-after-import
+require('bootstrap/js/tooltip');
 const SearchStore = StoreProvider.getStore('Search');
 
 const QuickValuesVisualization = React.createClass({
   propTypes: {
-    id: PropTypes.string,
+    id: PropTypes.string.isRequired,
     config: PropTypes.object,
     width: PropTypes.any,
     height: PropTypes.any,
@@ -34,6 +35,12 @@ const QuickValuesVisualization = React.createClass({
   },
   getDefaultProps() {
     return {
+      config: { show_pie_chart: true, show_data_table: true },
+      width: undefined,
+      height: undefined,
+      horizontal: false,
+      displayAnalysisInformation: false,
+      displayAddToSearchButton: false,
       dataTableLimit: 50,
       dataTableTitle: 'Top values',
       limit: 5,
@@ -70,6 +77,9 @@ const QuickValuesVisualization = React.createClass({
     this._resizeVisualization(nextProps.width, nextProps.height, nextProps.config.show_data_table);
     this._formatProps(nextProps);
   },
+
+  _graph: undefined,
+  _table: undefined,
   DEFAULT_PIE_CHART_SIZE: 200,
   MARGIN_TOP: 15,
 
@@ -139,7 +149,7 @@ const QuickValuesVisualization = React.createClass({
     }
   },
   _renderDataTable() {
-    const tableDomNode = this.refs.table;
+    const tableDomNode = this._table;
     const { dataTableLimit, limit } = this.props;
 
     this.dataTable = dc.dataTable(tableDomNode, this.dcGroupName);
@@ -166,7 +176,7 @@ const QuickValuesVisualization = React.createClass({
     this.dataTable.render();
   },
   _renderPieChart() {
-    const graphDomNode = this.refs.graph;
+    const graphDomNode = this._graph;
 
     this.pieChart = dc.pieChart(graphDomNode, this.dcGroupName);
     this.pieChart
@@ -193,7 +203,6 @@ const QuickValuesVisualization = React.createClass({
 
     D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
 
-    // noinspection Eslint
     $(graphDomNode).tooltip({
       selector: '[rel="tooltip"]',
       container: 'body',
@@ -213,7 +222,7 @@ const QuickValuesVisualization = React.createClass({
     this.pieChart
       .width(newSize)
       .height(newSize)
-      .radius(newSize / 2 - 10);
+      .radius((newSize / 2) - 10);
 
     this.triggerRender = true;
   },
@@ -313,7 +322,7 @@ const QuickValuesVisualization = React.createClass({
         <Panel>
           <ListGroup fill>
             <ListGroupItem>
-              <div ref="graph" className="quickvalues-graph" />
+              <div ref={(c) => { this._graph = c; }} className="quickvalues-graph" />
             </ListGroupItem>
             <ListGroupItem>
               {this._getAnalysisInformation()}
@@ -322,7 +331,7 @@ const QuickValuesVisualization = React.createClass({
         </Panel>
       );
     } else {
-      pieChart = <div ref="graph" className="quickvalues-graph" />;
+      pieChart = <div ref={(c) => { this._graph = c; }} className="quickvalues-graph" />;
     }
 
     return (
@@ -335,7 +344,7 @@ const QuickValuesVisualization = React.createClass({
             </div>
             <div className={dataTableClassName}>
               <div className="quickvalues-table">
-                <table ref="table" className="table table-condensed table-hover">
+                <table ref={(c) => { this._table = c; }} className="table table-condensed table-hover">
                   <thead>
                     <tr>
                       <th style={{ width: '60%' }}>Value</th>
