@@ -24,6 +24,6 @@ deploy:
     - "**/target/**/*.rpm"
   skip_cleanup: true
   on:
-    repo: Graylog2/graylog-plugin-cef
+    repo: graylog-labs/graylog-plugin-cef
     tags: true
     jdk: oraclejdk8
