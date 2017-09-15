@@ -4,7 +4,7 @@
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-input-cef</artifactId>
-    <version>1.2.1</version>
+    <version>1.2.2-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
@@ -22,7 +22,7 @@
         <connection>scm:git:git@github.com:graylog-labs/graylog-plugin-cef.git</connection>
         <developerConnection>scm:git:git@github.com:graylog-labs/graylog-plugin-cef.git</developerConnection>
         <url>https://github.com/graylog-labs/graylog-plugin-cef</url>
-      <tag>1.2.1</tag>
+      <tag>HEAD</tag>
   </scm>
 
     <properties>
