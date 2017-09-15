@@ -9,9 +9,10 @@ import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Spinner from 'components/common/Spinner';
 import UIUtils from 'util/UIUtils';
 
-import StoreProvider from 'injection/StoreProvider';
-const FieldQuickValuesStore = StoreProvider.getStore('FieldQuickValues');
-const RefreshStore = StoreProvider.getStore('Refresh');
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { FieldQuickValuesStore, FieldQuickValuesActions } = CombinedProvider.get('FieldQuickValues');
+const { RefreshStore } = CombinedProvider.get('Refresh');
 
 const FieldQuickValues = React.createClass({
   propTypes: {
@@ -22,7 +23,7 @@ const FieldQuickValues = React.createClass({
     stream: PropTypes.object,
     forceFetch: PropTypes.bool,
   },
-  mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],
+  mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'), Reflux.connect(FieldQuickValuesStore)],
   getInitialState() {
     return {
       field: undefined,
@@ -71,9 +72,7 @@ const FieldQuickValues = React.createClass({
   },
   _loadQuickValuesData() {
     if (this.state.field !== undefined) {
-      this.setState({ loadPending: true });
-      const promise = FieldQuickValuesStore.getQuickValues(this.state.field);
-      promise.then(data => this.setState({ data: data, loadPending: false }));
+      FieldQuickValuesActions.get(this.state.field);
     }
   },
   _resetStatus() {
