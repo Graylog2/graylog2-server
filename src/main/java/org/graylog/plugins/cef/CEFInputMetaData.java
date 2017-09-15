@@ -33,7 +33,7 @@ public class CEFInputMetaData implements PluginMetaData {
 
     @Override
     public Version getVersion() {
-        return new Version(1, 0, 0);
+        return Version.fromPluginProperties(this.getClass(), PLUGIN_PROPERTIES, "version", Version.from(0, 0, 0, "unknown"));
     }
 
     @Override
@@ -43,7 +43,7 @@ public class CEFInputMetaData implements PluginMetaData {
 
     @Override
     public Version getRequiredVersion() {
-        return new Version(2, 0, 0);
+        return Version.fromPluginProperties(this.getClass(), PLUGIN_PROPERTIES, "graylog.version", Version.CURRENT_CLASSPATH);
     }
 
     @Override
