@@ -1,6 +1,6 @@
 package org.graylog.plugins.cef.parser;
 
-import autovalue.shaded.com.google.common.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

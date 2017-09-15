@@ -1,9 +1,9 @@
 package org.graylog.plugins.cef.parser;
 
-import autovalue.shaded.com.google.common.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableMap;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class CEFFieldsParserTest {
 
