@@ -147,6 +147,7 @@ const Widget = React.createClass({
       height: this.state.height,
       width: this.state.width,
       computationTimeRange: this.state.computationTimeRange,
+      locked: !this.props.locked, // widget should be locked when dashboard is unlocked and widgets can be moved
     });
   },
   _getTimeRange() {
