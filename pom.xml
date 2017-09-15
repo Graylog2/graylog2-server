@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <prerequisites>
-        <maven>3.1</maven>
-    </prerequisites>
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-input-cef</artifactId>
@@ -11,12 +8,12 @@
     <packaging>jar</packaging>
 
     <name>${project.artifactId}</name>
-    <description>Graylog ${project.artifactId} plugin.</description>
+    <description>Graylog CEF plugin.</description>
     <url>https://www.graylog.org</url>
 
     <developers>
         <developer>
-            <name>Lennart Koopmann</name>
+            <name>Graylog, Inc.</name>
             <email>hello@graylog.com</email>
         </developer>
     </developers>
@@ -82,7 +79,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.0.2</version>
                 <configuration>
                     <archive>
                         <manifestEntries>
@@ -95,9 +92,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.4.1</version>
+                <version>3.0.0</version>
                 <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
                     <minimizeJar>false</minimizeJar>
+                    <transformers>
+                        <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+                    </transformers>
                 </configuration>
                 <executions>
                     <execution>
@@ -105,11 +106,6 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
-                            </transformers>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -117,7 +113,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.2</version>
+                <version>2.5.3</version>
                 <configuration>
                     <autoVersionSubmodules>true</autoVersionSubmodules>
                     <mavenExecutorId>forked-path</mavenExecutorId>
@@ -130,7 +126,7 @@
             <plugin>
                 <artifactId>jdeb</artifactId>
                 <groupId>org.vafer</groupId>
-                <version>1.4</version>
+                <version>1.5</version>
                 <configuration>
                     <deb>${project.build.directory}/${project.artifactId}-${project.version}.deb</deb>
                     <dataSet>
@@ -152,7 +148,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>rpm-maven-plugin</artifactId>
-                <version>2.1.4</version>
+                <version>2.1.5</version>
                 <configuration>
                     <group>Application/Internet</group>
                     <prefixes>
@@ -183,19 +179,4 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>web-interface-build</id>
-            <activation>
-                <property>
-                    <name>!skip.web.build</name>
-                </property>
-            </activation>
-            <build>
-                <plugins>
-
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
 </project>
