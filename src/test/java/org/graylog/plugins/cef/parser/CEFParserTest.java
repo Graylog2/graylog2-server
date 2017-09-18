@@ -2,7 +2,8 @@ package org.graylog.plugins.cef.parser;
 
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class CEFParserTest {
 
@@ -132,5 +133,33 @@ public class CEFParserTest {
         assertEquals("Detected a threat.\nNo action needed.", m.message());
         assertEquals("10.0.0.1", m.fields().get("src"));
         assertEquals("foo\rbar", m.fields().get("custom"));
+    }
+
+    @Test
+    public void testNumericSeverity() throws Exception {
+        CEFParser parser = new CEFParser();
+        for (int i = 0; i < 10; i++) {
+            assertEquals(i, parser.parse("CEF:0|vendor|product|1.0|id|name|" + i + "|msg=Foobar").build().severity());
+        }
+    }
+
+    @Test
+    public void testTextualSeverity() throws Exception {
+        CEFParser parser = new CEFParser();
+        assertEquals(0, parser.parse("CEF:0|vendor|product|1.0|id|name|low|msg=Foobar").build().severity());
+        assertEquals(0, parser.parse("CEF:0|vendor|product|1.0|id|name|LOW|msg=Foobar").build().severity());
+        assertEquals(4, parser.parse("CEF:0|vendor|product|1.0|id|name|medium|msg=Foobar").build().severity());
+        assertEquals(4, parser.parse("CEF:0|vendor|product|1.0|id|name|MEDIUM|msg=Foobar").build().severity());
+        assertEquals(7, parser.parse("CEF:0|vendor|product|1.0|id|name|high|msg=Foobar").build().severity());
+        assertEquals(7, parser.parse("CEF:0|vendor|product|1.0|id|name|HIGH|msg=Foobar").build().severity());
+        assertEquals(9, parser.parse("CEF:0|vendor|product|1.0|id|name|very-high|msg=Foobar").build().severity());
+        assertEquals(9, parser.parse("CEF:0|vendor|product|1.0|id|name|VERY-HIGH|msg=Foobar").build().severity());
+        assertEquals(9, parser.parse("CEF:0|vendor|product|1.0|id|name|Very-High|msg=Foobar").build().severity());
+        assertEquals(9, parser.parse("CEF:0|vendor|product|1.0|id|name|very high|msg=Foobar").build().severity());
+        assertEquals(9, parser.parse("CEF:0|vendor|product|1.0|id|name|VERY HIGH|msg=Foobar").build().severity());
+        assertEquals(9, parser.parse("CEF:0|vendor|product|1.0|id|name|Very High|msg=Foobar").build().severity());
+        assertEquals(0, parser.parse("CEF:0|vendor|product|1.0|id|name|unknown|msg=Foobar").build().severity());
+        assertEquals(0, parser.parse("CEF:0|vendor|product|1.0|id|name|UNKNOWN|msg=Foobar").build().severity());
+        assertEquals(0, parser.parse("CEF:0|vendor|product|1.0|id|name|FOOBAR|msg=Foobar").build().severity());
     }
 }
