@@ -14,11 +14,6 @@ public class SyslogCEFParser {
 
     private static final Logger LOG = LoggerFactory.getLogger(SyslogCEFParser.class);
 
-    /*
-     * TODO:
-     *   - benchmark regex
-     */
-
     private static final Pattern SYSLOG_PATTERN = Pattern.compile("^<\\d+>(?<timestamp>[a-zA-Z]{3}\\s+\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2})\\s*(?<hostname>\\S*)\\s*(?<cef>CEF:.+)$");
     private static final DateTimeFormatter TIMESTAMP_PATTERN = DateTimeFormat.forPattern("MMM dd HH:mm:ss");
 

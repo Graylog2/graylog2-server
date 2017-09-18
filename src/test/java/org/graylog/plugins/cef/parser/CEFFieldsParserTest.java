@@ -1,6 +1,7 @@
 package org.graylog.plugins.cef.parser;
 
 import com.google.common.collect.ImmutableMap;
+import org.joda.time.DateTime;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -53,14 +54,14 @@ public class CEFFieldsParserTest {
     public void testParseCustomTimestamp() throws Exception {
         CEFFieldsParser p = new CEFFieldsParser();
         ImmutableMap<String, Object> r = p.parse("dvc=ip-172-30-2-212 deviceCustomDate1=2016-08-19T21:51:08+00:00 deviceCustomDate1Label=TestTest cs2=ip-172-30-2-212->/var/log/auth.log cs2Label=Location msg=Aug 14 14:26:53 ip-172-30-2-212 sshd[16217]: message repeated 2 times");
-        assertEquals("2016-08-19T21:51:08+00:00", r.get("TestTest"));
+        assertEquals(DateTime.parse("2016-08-19T21:51:08+00:00"), r.get("TestTest"));
     }
 
     @Test
     public void testParseCustomTimestampFlex() throws Exception {
         CEFFieldsParser p = new CEFFieldsParser();
         ImmutableMap<String, Object> r = p.parse("dvc=ip-172-30-2-212 flexDate1=2016-08-19T21:51:08+00:00 flexDate1Label=TestTest cs2=ip-172-30-2-212->/var/log/auth.log cs2Label=Location msg=Aug 14 14:26:53 ip-172-30-2-212 sshd[16217]: message repeated 2 times");
-        assertEquals("2016-08-19T21:51:08+00:00", r.get("TestTest"));
+        assertEquals(DateTime.parse("2016-08-19T21:51:08+00:00"), r.get("TestTest"));
     }
 
     @Test
@@ -84,7 +85,7 @@ public class CEFFieldsParserTest {
         ImmutableMap<String, Object> r = p.parse("dvc=ip-172-30-2-212 cnt=3 destinationTranslatedPort=22 deviceDirection=1 dpid=9001 dpt=3342 dvcpid=900 fsize=12 in=543 oldFileSize=1000 sourceTranslatedPort=443 spid=5516 spt=22 type=0 cs2=ip-172-30-2-212->/var/log/auth.log cs2Label=Location msg=Aug 14 14:26:53 ip-172-30-2-212 sshd[16217]: message repeated 2 times");
         assertEquals(3, r.get("cnt"));
         assertEquals(22, r.get("destinationTranslatedPort"));
-        assertEquals(1, r.get("deviceDirection"));
+        assertEquals(CEFMapping.Direction.OUTBOUND, r.get("deviceDirection"));
         assertEquals(9001, r.get("dpid"));
         assertEquals(3342, r.get("dpt"));
         assertEquals(900, r.get("dvcpid"));
@@ -94,7 +95,7 @@ public class CEFFieldsParserTest {
         assertEquals(443, r.get("sourceTranslatedPort"));
         assertEquals(5516, r.get("spid"));
         assertEquals(22, r.get("spt"));
-        assertEquals(0, r.get("type"));
+        assertEquals(CEFMapping.Type.BASE_EVENT, r.get("type"));
     }
 
     @Test

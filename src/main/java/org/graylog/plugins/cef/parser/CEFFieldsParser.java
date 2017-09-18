@@ -23,7 +23,7 @@ public class CEFFieldsParser {
 
         // Parse out all fields into a map.
         ImmutableMap.Builder<String, String> fieldsBuilder = new ImmutableMap.Builder<>();
-        while(m.find()) {
+        while (m.find()) {
             if (m.groupCount() == 2) {
                 final String value = m.group("value")
                         .replace("\\r", "\r")
@@ -41,7 +41,7 @@ public class CEFFieldsParser {
         ImmutableMap<String, String> fields;
         try {
             fields = fieldsBuilder.build();
-        } catch(IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             LOG.warn("Skipping malformed CEF message. Multiple keys with same name?");
             return null;
         }
@@ -49,101 +49,32 @@ public class CEFFieldsParser {
         // Build a final set of fields.
         ImmutableMap.Builder<String, Object> resultBuilder = new ImmutableMap.Builder<>();
         for (Map.Entry<String, String> field : fields.entrySet()) {
-            try {
-                // Specifically handle everything that needs mapping or is not of type String.
-                switch (field.getKey()) {
-                    // Custom IPv6 fields. (we keep it as String)
-                    case "c6a1":
-                    case "c6a2":
-                    case "c6a3":
-                    case "c6a4":
-                        resultBuilder.put(fields.get(getLabelFromValue(field.getKey())), field.getValue());
-                        break;
+            final String key = field.getKey();
 
-                    // Custom floating points.
-                    case "cfp1":
-                    case "cfp2":
-                    case "cfp3":
-                    case "cfp4":
-                        resultBuilder.put(fields.get(getLabelFromValue(field.getKey())), Float.valueOf(field.getValue()));
-                        break;
+            // Skip "labels"
+            if (key.endsWith("Label")) {
+                continue;
+            }
 
-                    // Custom longs. (only going to 3 for some reason /shrug)
-                    case "cn1":
-                    case "cn2":
-                    case "cn3":
-                    case "flexNumber1":
-                    case "flexNumber2":
-                        resultBuilder.put(fields.get(getLabelFromValue(field.getKey())), Long.valueOf(field.getValue()));
-                        break;
-
-                    // Custom strings.
-                    case "cs1":
-                    case "cs2":
-                    case "cs3":
-                    case "cs4":
-                    case "cs5":
-                    case "cs6":
-                    case "flexString1":
-                    case "flexString2":
-                        resultBuilder.put(fields.get(getLabelFromValue(field.getKey())), field.getValue());
-                        break;
-
-                    // Custom timestamps. (we keep it as String) - This is where CEF suddenly breaks the naming scheme.
-                    case "deviceCustomDate1":
-                    case "deviceCustomDate2":
-                    case "flexDate1":
-                        resultBuilder.put(fields.get(getLabelFromValue(field.getKey())), field.getValue());
-                        break;
-
-                    // Direct integer conversions.
-                    case "cnt":
-                    case "destinationTranslatedPort":
-                    case "deviceDirection":
-                    case "dpid":
-                    case "dpt":
-                    case "dvcpid":
-                    case "fsize":
-                    case "in":
-                    case "oldFileSize":
-                    case "sourceTranslatedPort":
-                    case "spid":
-                    case "spt":
-                    case "type":
-                        resultBuilder.put(field.getKey(), Integer.valueOf(field.getValue()));
-                        break;
-
-                    // Direct double conversions.
-                    case "dlat":
-                    case "dlong":
-                    case "slat":
-                    case "slong":
-                        resultBuilder.put(field.getKey(), Double.valueOf(field.getValue()));
-                        break;
-
-                    // Direct long conversions.
-                    case "eventId":
-                        resultBuilder.put(field.getKey(), Long.valueOf(field.getValue()));
-                        break;
-
-                    // All standard strings.
-                    default:
-                        // Add all standard strings but never the custom fields/extension field labels.
-                        if(!field.getKey().endsWith("Label")) {
-                            resultBuilder.put(field.getKey(), field.getValue());
-                        }
-                        break;
+            final String label = getLabel(key, fields);
+            final CEFMapping fieldMapping = CEFMapping.forKeyName(key);
+            if (fieldMapping != null) {
+                try {
+                    resultBuilder.put(label, fieldMapping.convert(field.getValue()));
+                } catch (Exception e) {
+                    LOG.warn("Could not transform CEF field [{}] according to standard. Skipping.", key, e);
                 }
-            } catch (Exception e) {
-                LOG.warn("Could not transform CEF field [{}] according to standard. Skipping.", field.getKey(), e);
+            } else {
+                resultBuilder.put(label, field.getValue());
             }
         }
 
         return resultBuilder.build();
     }
 
-    private String getLabelFromValue(String valueName) {
-        return valueName + "Label";
+    private String getLabel(String valueName, Map<String, String> fields) {
+        final String labelName = valueName + "Label";
+        return fields.getOrDefault(labelName, valueName);
     }
 
 }
