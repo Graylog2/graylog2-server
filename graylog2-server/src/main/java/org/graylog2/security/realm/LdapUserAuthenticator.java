@@ -183,7 +183,7 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
 
         // do not try to look a token up in LDAP if there is no principal or password
         if (isNullOrEmpty(principal)) {
-            LOG.debug("Principal wsa empty. Not trying to sync user with LDAP.");
+            LOG.debug("Principal was empty. Not trying to sync user with LDAP.");
             return null;
         }
         try (final LdapNetworkConnection connection = openLdapConnection(ldapSettings)) {
