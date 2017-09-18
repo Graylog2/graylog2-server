@@ -172,28 +172,29 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         return ldapSettings != null && ldapSettings.isEnabled();
     }
 
-    public void syncLdapUser(String principal) {
+    @Nullable
+    public User syncLdapUser(String principal) {
 
         final LdapSettings ldapSettings = ldapSettingsService.load();
         if (ldapSettings == null || !ldapSettings.isEnabled()) {
             LOG.trace("LDAP is disabled, skipping");
-            return;
+            return null;
         }
 
         // do not try to look a token up in LDAP if there is no principal or password
         if (isNullOrEmpty(principal)) {
             LOG.debug("Principal wsa empty. Not trying to sync user with LDAP.");
-            return;
+            return null;
         }
         try (final LdapNetworkConnection connection = openLdapConnection(ldapSettings)) {
             if (null == connection) {
                 LOG.error("Couldn't connect to LDAP directory");
-                return;
+                return null;
             }
             final LdapEntry userEntry = searchLdapUser(connection, principal, ldapSettings);
             if (userEntry == null) {
                 LOG.debug("User {} not found in LDAP", principal);
-                return;
+                return null;
             }
 
             // user found, sync the user entry with mongodb
@@ -201,8 +202,10 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             if (user == null) {
                 // in case there was an error reading, creating or modifying the user in mongodb, we do not authenticate the user.
                 LOG.error("Unable to sync LDAP user {} (DN {})", userEntry.getBindPrincipal(), userEntry.getDn());
-                return;
+                return null;
             }
+
+            return user;
         } catch (LdapException e) {
             LOG.error("LDAP error", e);
         } catch (CursorException e) {
@@ -210,6 +213,8 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         } catch (Exception e) {
             LOG.error("Error during LDAP user account sync. Cannot sync user {}", principal, e);
         }
+
+        return null;
     }
 
     @Nullable
