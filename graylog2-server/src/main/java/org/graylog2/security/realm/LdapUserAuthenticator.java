@@ -87,21 +87,12 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         // safe, we only handle this type
         final UsernamePasswordToken token = (UsernamePasswordToken) authtoken;
 
-        final LdapSettings ldapSettings = ldapSettingsService.load();
-        if (ldapSettings == null || !ldapSettings.isEnabled()) {
+        if (isEnabled() == false) {
             LOG.trace("LDAP is disabled, skipping");
             return null;
         }
-        final LdapConnectionConfig config = new LdapConnectionConfig();
-        config.setLdapHost(ldapSettings.getUri().getHost());
-        config.setLdapPort(ldapSettings.getUri().getPort());
-        config.setUseSsl(ldapSettings.getUri().getScheme().startsWith("ldaps"));
-        config.setUseTls(ldapSettings.isUseStartTls());
-        if (ldapSettings.isTrustAllCertificates()) {
-            config.setTrustManagers(new TrustAllX509TrustManager());
-        }
-        config.setName(ldapSettings.getSystemUserName());
-        config.setCredentials(ldapSettings.getSystemPassword());
+
+        final LdapSettings ldapSettings = ldapSettingsService.load();
 
         final String principal = (String) token.getPrincipal();
         final char[] tokenPassword = firstNonNull(token.getPassword(), new char[0]);
@@ -111,20 +102,12 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
             LOG.debug("Principal or password were empty. Not trying to look up a token in LDAP.");
             return null;
         }
-        try (final LdapNetworkConnection connection = ldapConnector.connect(config)) {
+        try (final LdapNetworkConnection connection = openLdapConnection(ldapSettings)) {
             if (null == connection) {
                 LOG.error("Couldn't connect to LDAP directory");
                 return null;
             }
-            final LdapEntry userEntry = ldapConnector.search(connection,
-                                                             ldapSettings.getSearchBase(),
-                                                             ldapSettings.getSearchPattern(),
-                                                             ldapSettings.getDisplayNameAttribute(),
-                                                             principal,
-                                                             ldapSettings.isActiveDirectory(),
-                                                             ldapSettings.getGroupSearchBase(),
-                                                             ldapSettings.getGroupIdAttribute(),
-                                                             ldapSettings.getGroupSearchPattern());
+            final LdapEntry userEntry = searchLdapUser(connection, principal, ldapSettings);
             if (userEntry == null) {
                 LOG.debug("User {} not found in LDAP", principal);
                 return null;
@@ -159,9 +142,81 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         return null;
     }
 
+    protected LdapNetworkConnection openLdapConnection(LdapSettings ldapSettings) throws LdapException {
+        final LdapConnectionConfig config = new LdapConnectionConfig();
+        config.setLdapHost(ldapSettings.getUri().getHost());
+        config.setLdapPort(ldapSettings.getUri().getPort());
+        config.setUseSsl(ldapSettings.getUri().getScheme().startsWith("ldaps"));
+        config.setUseTls(ldapSettings.isUseStartTls());
+        if (ldapSettings.isTrustAllCertificates()) {
+            config.setTrustManagers(new TrustAllX509TrustManager());
+        }
+        config.setName(ldapSettings.getSystemUserName());
+        config.setCredentials(ldapSettings.getSystemPassword());
+        return ldapConnector.connect(config);
+    }
+
+    protected LdapEntry searchLdapUser(LdapNetworkConnection connection, String principal, LdapSettings ldapSettings) throws LdapException, CursorException {
+        return ldapConnector.search(connection,
+                ldapSettings.getSearchBase(),
+                ldapSettings.getSearchPattern(),
+                ldapSettings.getDisplayNameAttribute(),
+                principal,
+                ldapSettings.isActiveDirectory(),
+                ldapSettings.getGroupSearchBase(),
+                ldapSettings.getGroupIdAttribute(),
+                ldapSettings.getGroupSearchPattern());
+    }
+
     public boolean isEnabled() {
         final LdapSettings ldapSettings = ldapSettingsService.load();
         return ldapSettings != null && ldapSettings.isEnabled();
+    }
+
+    @Nullable
+    public User syncLdapUser(String principal) {
+
+        if (isEnabled() == false) {
+            LOG.trace("LDAP is disabled, skipping");
+            return null;
+        }
+
+        final LdapSettings ldapSettings = ldapSettingsService.load();
+
+        // do not try to look a token up in LDAP if there is no principal or password
+        if (isNullOrEmpty(principal)) {
+            LOG.debug("Principal was empty. Not trying to sync user with LDAP.");
+            return null;
+        }
+        try (final LdapNetworkConnection connection = openLdapConnection(ldapSettings)) {
+            if (null == connection) {
+                LOG.error("Couldn't connect to LDAP directory");
+                return null;
+            }
+            final LdapEntry userEntry = searchLdapUser(connection, principal, ldapSettings);
+            if (userEntry == null) {
+                LOG.debug("User {} not found in LDAP", principal);
+                return null;
+            }
+
+            // user found, sync the user entry with mongodb
+            final User user = syncFromLdapEntry(userEntry, ldapSettings, principal);
+            if (user == null) {
+                // in case there was an error reading, creating or modifying the user in mongodb, we do not authenticate the user.
+                LOG.error("Unable to sync LDAP user {} (DN {})", userEntry.getBindPrincipal(), userEntry.getDn());
+                return null;
+            }
+
+            return user;
+        } catch (LdapException e) {
+            LOG.error("LDAP error", e);
+        } catch (CursorException e) {
+            LOG.error("Unable to read LDAP entry", e);
+        } catch (Exception e) {
+            LOG.error("Error during LDAP user account sync. Cannot sync user {}", principal, e);
+        }
+
+        return null;
     }
 
     @Nullable
