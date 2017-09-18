@@ -33,8 +33,8 @@ public class SyslogCEFParserTest {
         assertEquals("v2.8.3", m.deviceVersion());
         assertEquals("2502", m.deviceEventClassId());
         assertEquals("User missed the password more than one time", m.name());
-        assertEquals(10, m.severity());
-        assertEquals("VERY HIGH", m.humanReadableSeverity());
+        assertEquals(10, m.severity().numeric());
+        assertEquals("Very-High", m.severity().text());
 
         assertEquals("Aug 14 14:26:53 ip-172-30-2-212 sshd[16217]: PAM 2 more authentication failures; logname= uid=0 euid=0 tty=ssh ruser= rhost=116.31.116.17  user=root", m.message());
 
@@ -67,8 +67,8 @@ public class SyslogCEFParserTest {
         assertEquals("v2.8.3", m.deviceVersion());
         assertEquals("2502", m.deviceEventClassId());
         assertEquals("User missed the password more than one time", m.name());
-        assertEquals(10, m.severity());
-        assertEquals("VERY HIGH", m.humanReadableSeverity());
+        assertEquals(10, m.severity().numeric());
+        assertEquals("Very-High", m.severity().text());
 
         assertNull(m.message());
 
@@ -110,8 +110,8 @@ public class SyslogCEFParserTest {
         assertEquals("1.0", m.deviceVersion());
         assertEquals("100", m.deviceEventClassId());
         assertEquals("worm successfully stopped", m.name());
-        assertEquals(10, m.severity());
-        assertEquals("VERY HIGH", m.humanReadableSeverity());
+        assertEquals(10, m.severity().numeric());
+        assertEquals("Very-High", m.severity().text());
         assertEquals("10.0.0.1", m.fields().get("src"));
         assertEquals("2.1.2.2", m.fields().get("dst"));
         assertEquals(1232, m.fields().get("spt"));

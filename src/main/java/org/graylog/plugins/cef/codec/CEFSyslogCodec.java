@@ -65,8 +65,8 @@ public class CEFSyslogCodec extends BaseCEFCodec {
             result.addField("device_version", cef.deviceVersion());
             result.addField("event_class_id", cef.deviceEventClassId());
             result.addField("name", cef.name());
-            result.addField("severity", cef.humanReadableSeverity());
-            result.addField("severity_number", cef.severity());
+            result.addField("severity", cef.severity().text());
+            result.addField("severity_number", cef.severity().numeric());
 
             // Add msg field if the CEF message has one.
             result.addField("msg", cef.message());

@@ -1,51 +1,43 @@
 package org.graylog.plugins.cef.parser;
 
+import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Locale;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static java.util.Objects.requireNonNull;
 
 public class CEFParser {
     private static final Logger LOG = LoggerFactory.getLogger(CEFParser.class);
 
     private static final Pattern PATTERN = Pattern.compile("^\\s*CEF:(?<version>\\d+?)(?<!\\\\)\\|(?<deviceVendor>.+?)(?<!\\\\)\\|(?<deviceProduct>.+?)(?<!\\\\)\\|(?<deviceVersion>.+?)(?<!\\\\)\\|(?<deviceEventClassId>.+?)(?<!\\\\)\\|(?<name>.+?)(?<!\\\\)\\|(?<severity>.+?)(?<!\\\\)\\|(?<fields>.+?)(?:$|msg=(?<message>.+))", Pattern.DOTALL);
-    private static final int DEFAULT_SEVERITY = 0;
-
-    private final CEFFieldsParser parser;
-
-    public CEFParser() {
-        this(new CEFFieldsParser());
-    }
-
-    public CEFParser(CEFFieldsParser parser) {
-        this.parser = requireNonNull(parser, "parser");
-    }
+    private static final Pattern EXTENSIONS_PATTERN = Pattern.compile("(?<key>\\w+)=(?<value>.*?(?=\\s*\\w+=|\\s*$))");
 
     public CEFMessage.Builder parse(String x) throws ParserException {
-        Matcher m = PATTERN.matcher(x);
+        final Matcher m = PATTERN.matcher(x);
 
         if (m.find()) {
             // Build the message with all CEF headers.
-            CEFMessage.Builder builder = CEFMessage.builder();
+            final CEFMessage.Builder builder = CEFMessage.builder();
             builder.version(Integer.valueOf(m.group("version")));
-            builder.deviceVendor(m.group("deviceVendor").replace("\\\\", "\\").replace("\\|", "|"));
-            builder.deviceProduct(m.group("deviceProduct").replace("\\\\", "\\").replace("\\|", "|"));
-            builder.deviceVersion(m.group("deviceVersion").replace("\\\\", "\\").replace("\\|", "|"));
-            builder.deviceEventClassId(m.group("deviceEventClassId").replace("\\\\", "\\").replace("\\|", "|"));
-            builder.name(m.group("name").replace("\\\\", "\\").replace("\\|", "|"));
-            builder.severity(parseSeverity(m.group("severity")));
+            builder.deviceVendor(sanitizeHeaderField(m.group("deviceVendor")));
+            builder.deviceProduct(sanitizeHeaderField(m.group("deviceProduct")));
+            builder.deviceVersion(sanitizeHeaderField(m.group("deviceVersion")));
+            builder.deviceEventClassId(sanitizeHeaderField(m.group("deviceEventClassId")));
+            builder.name(sanitizeHeaderField(m.group("name")));
+            builder.severity(CEFMessage.Severity.parse(m.group("severity")));
 
             // Parse and add all CEF fields.
-            String fieldsString = m.group("fields");
+            final String fieldsString = m.group("fields");
             if (fieldsString == null || fieldsString.isEmpty()) {
                 throw new ParserException("No CEF payload found. Skipping this message.");
             } else {
-                builder.fields(parser.parse(fieldsString));
+                builder.fields(parseExtensions(fieldsString));
             }
 
             /*
@@ -57,12 +49,7 @@ public class CEFParser {
              */
             final String message = m.group("message");
             if (!isNullOrEmpty(message)) {
-                builder.message(message
-                        .replace("\\n", "\n")
-                        .replace("\\r", "\\r")
-                        .replace("\\=", "=")
-                        .replace("\\\\", "\\")
-                );
+                builder.message(sanitizeFieldValue(message));
             }
 
             return builder;
@@ -71,27 +58,61 @@ public class CEFParser {
         throw new ParserException("CEF pattern did not match. Skipping this message.");
     }
 
-    private int parseSeverity(String severity) {
-        final String s = severity.trim().toUpperCase(Locale.ROOT);
-        switch (s) {
-            case "LOW":
-                return 0;
-            case "MEDIUM":
-                return 4;
-            case "HIGH":
-                return 7;
-            case "VERY HIGH":
-            case "VERY-HIGH":
-                return 9;
-            case "UNKNOWN":
-                return DEFAULT_SEVERITY;
-            default:
-                try {
-                    return Integer.parseInt(s);
-                } catch (NumberFormatException e) {
-                    LOG.debug("Couldn't parse CEF severity", e);
-                }
-                return DEFAULT_SEVERITY;
+    @VisibleForTesting
+    Map<String, Object> parseExtensions(String x) {
+        final Matcher m = EXTENSIONS_PATTERN.matcher(x);
+
+        // Parse out all fields into a map.
+        final Map<String, String> allFields = new HashMap<>();
+        while (m.find()) {
+            if (m.groupCount() == 2) {
+                allFields.put(m.group("key"), sanitizeFieldValue(m.group("value")));
+            } else {
+                LOG.debug("Skipping field with unexpected group count: " + m.toString());
+            }
         }
+
+        // Build a final set of fields.
+        final ImmutableMap.Builder<String, Object> resultBuilder = new ImmutableMap.Builder<>();
+        for (Map.Entry<String, String> field : allFields.entrySet()) {
+            final String key = field.getKey();
+
+            // Skip "labels"
+            if (key.endsWith("Label")) {
+                continue;
+            }
+
+            final String label = getLabel(key, allFields);
+            final CEFMapping fieldMapping = CEFMapping.forKeyName(key);
+            if (fieldMapping != null) {
+                try {
+                    resultBuilder.put(label, fieldMapping.convert(field.getValue()));
+                } catch (Exception e) {
+                    LOG.warn("Could not transform CEF field [{}] according to standard. Skipping.", key, e);
+                }
+            } else {
+                resultBuilder.put(label, field.getValue());
+            }
+        }
+
+        return resultBuilder.build();
+    }
+
+    private String sanitizeHeaderField(String headerField) {
+        return headerField
+                .replace("\\\\", "\\")
+                .replace("\\|", "|");
+    }
+
+    private String sanitizeFieldValue(String value) {
+        return sanitizeHeaderField(value)
+                .replace("\\r", "\r")
+                .replace("\\n", "\n")
+                .replace("\\=", "=");
+    }
+
+    private String getLabel(String valueName, Map<String, String> fields) {
+        final String labelName = valueName + "Label";
+        return fields.getOrDefault(labelName, valueName);
     }
 }

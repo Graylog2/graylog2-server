@@ -41,7 +41,7 @@ public abstract class BaseCEFCodec implements Codec {
     }
 
     protected String buildMessageSummary(CEFMessage cef) {
-        return cef.deviceProduct() + ": [" + cef.deviceEventClassId() + ", " + cef.humanReadableSeverity() + "] " + cef.name();
+        return cef.deviceProduct() + ": [" + cef.deviceEventClassId() + ", " + cef.severity().text() + "] " + cef.name();
     }
 
     protected String decideSource(CEFMessage cef, RawMessage raw) {
