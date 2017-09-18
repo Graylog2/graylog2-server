@@ -4,7 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.cef.parser.CEFMessage;
-import org.graylog.plugins.cef.parser.CEFParser;
+import org.graylog.plugins.cef.parser.SyslogCEFParser;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -22,16 +22,16 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class CEFCodec extends BaseCEFCodec {
-    public static final String NAME = "CEF";
+public class CEFSyslogCodec extends BaseCEFCodec {
+    public static final String NAME = "CEF Syslog";
 
-    private static final Logger LOG = LoggerFactory.getLogger(CEFCodec.class);
+    private static final Logger LOG = LoggerFactory.getLogger(CEFSyslogCodec.class);
     private static final String CK_TIMEZONE = "timezone";
 
-    private final CEFParser parser;
+    private final SyslogCEFParser parser;
 
     @AssistedInject
-    public CEFCodec(@Assisted Configuration configuration) {
+    public CEFSyslogCodec(@Assisted Configuration configuration) {
         super(configuration);
 
         DateTimeZone timezone;
@@ -42,7 +42,7 @@ public class CEFCodec extends BaseCEFCodec {
             timezone = DateTimeZone.getDefault();
         }
 
-        this.parser = new CEFParser();
+        this.parser = new SyslogCEFParser(timezone);
     }
 
     @Nullable
@@ -51,7 +51,7 @@ public class CEFCodec extends BaseCEFCodec {
         try {
             // CEF standard says all messages are UTF-8 so I trust that.
             String s = new String(rawMessage.getPayload(), Charsets.UTF_8);
-            CEFMessage cef = parser.parse(s).build();
+            CEFMessage cef = parser.parse(s);
 
             // Build standard message.
             Message result = new Message(buildMessageSummary(cef), decideSource(cef, rawMessage), cef.timestamp());
@@ -95,9 +95,9 @@ public class CEFCodec extends BaseCEFCodec {
     }
 
     @FactoryClass
-    public interface Factory extends Codec.Factory<CEFCodec> {
+    public interface Factory extends Codec.Factory<CEFSyslogCodec> {
         @Override
-        CEFCodec create(Configuration configuration);
+        CEFSyslogCodec create(Configuration configuration);
 
         @Override
         Config getConfig();

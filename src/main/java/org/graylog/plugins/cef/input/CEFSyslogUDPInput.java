@@ -1,11 +1,11 @@
 package org.graylog.plugins.cef.input;
 
-
 import com.codahale.metrics.MetricRegistry;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.cef.codec.CEFCodec;
-import org.graylog2.inputs.transports.TcpTransport;
+import org.graylog.plugins.cef.codec.CEFSyslogCodec;
+import org.graylog2.inputs.transports.UdpTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -15,22 +15,22 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
 import javax.inject.Inject;
 
-public class CEFTCPInput extends MessageInput {
-    private static final String NAME = "CEF TCP Input";
+public class CEFSyslogUDPInput extends MessageInput {
+    private static final String NAME = "CEF Syslog UDP Input";
 
     @AssistedInject
-    public CEFTCPInput(@Assisted Configuration configuration,
-                       MetricRegistry metricRegistry,
-                       final TcpTransport.Factory tcpTransportFactory,
-                       final LocalMetricRegistry localRegistry,
-                       CEFCodec.Factory codec,
-                       Config config,
-                       Descriptor descriptor,
-                       ServerStatus serverStatus) {
+    public CEFSyslogUDPInput(@Assisted Configuration configuration,
+                             MetricRegistry metricRegistry,
+                             final UdpTransport.Factory udpTransportFactory,
+                             final LocalMetricRegistry localRegistry,
+                             CEFSyslogCodec.Factory codec,
+                             Config config,
+                             Descriptor descriptor,
+                             ServerStatus serverStatus) {
         super(
                 metricRegistry,
                 configuration,
-                tcpTransportFactory.create(configuration),
+                udpTransportFactory.create(configuration),
                 localRegistry,
                 codec.create(configuration),
                 config,
@@ -40,9 +40,9 @@ public class CEFTCPInput extends MessageInput {
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<CEFTCPInput> {
+    public interface Factory extends MessageInput.Factory<CEFSyslogUDPInput> {
         @Override
-        CEFTCPInput create(Configuration configuration);
+        CEFSyslogUDPInput create(Configuration configuration);
 
         @Override
         Config getConfig();
@@ -61,7 +61,7 @@ public class CEFTCPInput extends MessageInput {
     @ConfigClass
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(TcpTransport.Factory transport, CEFCodec.Factory codec) {
+        public Config(UdpTransport.Factory transport, CEFCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }

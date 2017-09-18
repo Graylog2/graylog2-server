@@ -8,14 +8,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Objects.requireNonNull;
 
 public class CEFParser {
     private static final Logger LOG = LoggerFactory.getLogger(CEFParser.class);
 
     private static final Pattern PATTERN = Pattern.compile("^\\s*CEF:(?<version>\\d+?)(?<!\\\\)\\|(?<deviceVendor>.+?)(?<!\\\\)\\|(?<deviceProduct>.+?)(?<!\\\\)\\|(?<deviceVersion>.+?)(?<!\\\\)\\|(?<deviceEventClassId>.+?)(?<!\\\\)\\|(?<name>.+?)(?<!\\\\)\\|(?<severity>.+?)(?<!\\\\)\\|(?<fields>.+?)(?:$|msg=(?<message>.+))", Pattern.DOTALL);
-
-    private static final CEFFieldsParser FIELDS_PARSER = new CEFFieldsParser();
     private static final int DEFAULT_SEVERITY = 0;
+
+    private final CEFFieldsParser parser;
+
+    public CEFParser() {
+        this(new CEFFieldsParser());
+    }
+
+    public CEFParser(CEFFieldsParser parser) {
+        this.parser = requireNonNull(parser, "parser");
+    }
 
     public CEFMessage.Builder parse(String x) throws ParserException {
         Matcher m = PATTERN.matcher(x);
@@ -36,7 +45,7 @@ public class CEFParser {
             if (fieldsString == null || fieldsString.isEmpty()) {
                 throw new ParserException("No CEF payload found. Skipping this message.");
             } else {
-                builder.fields(FIELDS_PARSER.parse(fieldsString));
+                builder.fields(parser.parse(fieldsString));
             }
 
             /*
@@ -85,5 +94,4 @@ public class CEFParser {
                 return DEFAULT_SEVERITY;
         }
     }
-
 }
