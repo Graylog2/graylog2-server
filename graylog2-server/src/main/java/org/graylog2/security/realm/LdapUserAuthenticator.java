@@ -87,11 +87,12 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
         // safe, we only handle this type
         final UsernamePasswordToken token = (UsernamePasswordToken) authtoken;
 
-        final LdapSettings ldapSettings = ldapSettingsService.load();
-        if (ldapSettings == null || !ldapSettings.isEnabled()) {
+        if (isEnabled() == false) {
             LOG.trace("LDAP is disabled, skipping");
             return null;
         }
+
+        final LdapSettings ldapSettings = ldapSettingsService.load();
 
         final String principal = (String) token.getPrincipal();
         final char[] tokenPassword = firstNonNull(token.getPassword(), new char[0]);
@@ -175,11 +176,12 @@ public class LdapUserAuthenticator extends AuthenticatingRealm {
     @Nullable
     public User syncLdapUser(String principal) {
 
-        final LdapSettings ldapSettings = ldapSettingsService.load();
-        if (ldapSettings == null || !ldapSettings.isEnabled()) {
+        if (isEnabled() == false) {
             LOG.trace("LDAP is disabled, skipping");
             return null;
         }
+
+        final LdapSettings ldapSettings = ldapSettingsService.load();
 
         // do not try to look a token up in LDAP if there is no principal or password
         if (isNullOrEmpty(principal)) {
