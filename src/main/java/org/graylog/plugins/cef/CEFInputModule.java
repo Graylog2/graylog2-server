@@ -5,6 +5,8 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.cef.codec.CEFCodec;
 import org.graylog.plugins.cef.codec.CEFSyslogCodec;
+import org.graylog.plugins.cef.input.CEFAmqpInput;
+import org.graylog.plugins.cef.input.CEFKafkaInput;
 import org.graylog.plugins.cef.input.CEFSyslogTCPInput;
 import org.graylog.plugins.cef.input.CEFSyslogUDPInput;
 import org.graylog.plugins.cef.input.CEFTCPInput;
@@ -24,6 +26,9 @@ public class CEFInputModule extends PluginModule {
         addMessageInput(CEFTCPInput.class);
         addMessageInput(CEFSyslogUDPInput.class);
         addMessageInput(CEFSyslogTCPInput.class);
+
+        addMessageInput(CEFAmqpInput.class);
+        addMessageInput(CEFKafkaInput.class);
 
         // Register pipeline function.
         addMessageProcessorFunction(CEFParserFunction.NAME, CEFParserFunction.class);
