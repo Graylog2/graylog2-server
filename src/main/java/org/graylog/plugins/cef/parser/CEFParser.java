@@ -3,28 +3,30 @@ package org.graylog.plugins.cef.parser;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+
 public class CEFParser {
 
-    private static final Pattern PATTERN = Pattern.compile("^\\s?CEF:(\\d+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)\\|(.+?)(?:$|(msg=.+))", Pattern.DOTALL);
+    private static final Pattern PATTERN = Pattern.compile("^\\s*CEF:(?<version>\\d+?)(?<!\\\\)\\|(?<deviceVendor>.+?)(?<!\\\\)\\|(?<deviceProduct>.+?)(?<!\\\\)\\|(?<deviceVersion>.+?)(?<!\\\\)\\|(?<deviceEventClassId>.+?)(?<!\\\\)\\|(?<name>.+?)(?<!\\\\)\\|(?<severity>.+?)(?<!\\\\)\\|(?<fields>.+?)(?:$|msg=(?<message>.+))", Pattern.DOTALL);
 
     private static final CEFFieldsParser FIELDS_PARSER = new CEFFieldsParser();
 
     public CEFMessage.Builder parse(String x) throws ParserException {
         Matcher m = PATTERN.matcher(x);
 
-        if(m.find()) {
+        if (m.find()) {
             // Build the message with all CEF headers.
             CEFMessage.Builder builder = CEFMessage.builder();
-            builder.version(Integer.valueOf(m.group(1)));
-            builder.deviceVendor(m.group(2));
-            builder.deviceProduct(m.group(3));
-            builder.deviceVersion(m.group(4));
-            builder.deviceEventClassId(m.group(5));
-            builder.name(m.group(6));
-            builder.severity(Integer.valueOf(m.group(7)));
+            builder.version(Integer.valueOf(m.group("version")));
+            builder.deviceVendor(m.group("deviceVendor").replace("\\\\", "\\").replace("\\|", "|"));
+            builder.deviceProduct(m.group("deviceProduct").replace("\\\\", "\\").replace("\\|", "|"));
+            builder.deviceVersion(m.group("deviceVersion").replace("\\\\", "\\").replace("\\|", "|"));
+            builder.deviceEventClassId(m.group("deviceEventClassId").replace("\\\\", "\\").replace("\\|", "|"));
+            builder.name(m.group("name").replace("\\\\", "\\").replace("\\|", "|"));
+            builder.severity(Integer.valueOf(m.group("severity")));
 
             // Parse and add all CEF fields.
-            String fieldsString = m.group(8);
+            String fieldsString = m.group("fields");
             if (fieldsString == null || fieldsString.isEmpty()) {
                 throw new ParserException("No CEF payload found. Skipping this message.");
             } else {
@@ -38,11 +40,14 @@ public class CEFParser {
              *
              * Optional. Not all message have this and we'e ok with that fact. /shrug
              */
-            if (m.group(9) != null && !m.group(9).isEmpty()) {
-                // This message has a msg field.
-                builder.message(m.group(9).substring(4)); // cut off 'msg=' part instead of going crazy with regex capture group.
-            } else {
-                builder.message(null);
+            final String message = m.group("message");
+            if (!isNullOrEmpty(message)) {
+                builder.message(message
+                        .replace("\\n", "\n")
+                        .replace("\\r", "\\r")
+                        .replace("\\=", "=")
+                        .replace("\\\\", "\\")
+                );
             }
 
             return builder;

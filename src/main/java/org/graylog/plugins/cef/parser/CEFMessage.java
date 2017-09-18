@@ -18,6 +18,8 @@ public abstract class CEFMessage {
     public abstract String deviceVersion();
     public abstract String deviceEventClassId();
     public abstract String name();
+    @Nullable
+    public abstract String hostname();
     public abstract int severity();
 
     @Nullable
@@ -60,6 +62,7 @@ public abstract class CEFMessage {
         public abstract Builder deviceVersion(String version);
         public abstract Builder deviceEventClassId(String eventClassId);
         public abstract Builder name(String name);
+        public abstract Builder hostname(String name);
         public abstract Builder severity(int severity);
 
         public abstract Builder fields(Map<String, Object> fields);

@@ -19,7 +19,7 @@ public class SyslogCEFParser {
      *   - benchmark regex
      */
 
-    private static final Pattern SYSLOG_PATTERN = Pattern.compile("^<\\d+>([a-zA-Z]{3}\\s+\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2})(.+)$");
+    private static final Pattern SYSLOG_PATTERN = Pattern.compile("^<\\d+>(?<timestamp>[a-zA-Z]{3}\\s+\\d{1,2} \\d{1,2}:\\d{1,2}:\\d{1,2})\\s*(?<hostname>\\S*)\\s*(?<cef>CEF:.+)$");
     private static final DateTimeFormatter TIMESTAMP_PATTERN = DateTimeFormat.forPattern("MMM dd HH:mm:ss");
 
     private final DateTimeZone timezone;
@@ -35,16 +35,16 @@ public class SyslogCEFParser {
 
         if(m.find()) {
             try {
-                DateTime timestamp = DateTime.parse(m.group(1).replaceAll("\\s+", " "), TIMESTAMP_PATTERN)
+                DateTime timestamp = DateTime.parse(m.group("timestamp").replaceAll("\\s+", " "), TIMESTAMP_PATTERN)
                         .withYear(DateTime.now(timezone).getYear())
                         .withZoneRetainFields(timezone);
 
                 // Build the message with all CEF headers.
-                CEFMessage.Builder builder = parser.parse(m.group(2));
-                builder.timestamp(timestamp);
-                return builder.build();
+                return parser.parse(m.group("cef"))
+                        .hostname(m.group("hostname"))
+                        .timestamp(timestamp).build();
             } catch(Exception e) {
-                LOG.debug("CEF was [{}].", m.group(2));
+                LOG.debug("CEF was [{}].", m.group("cef"));
                 throw new ParserException("Could not parse CEF message in envelope.", e);
             }
         } else {

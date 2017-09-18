@@ -16,7 +16,7 @@ public class CEFFieldsParser {
      * According to the CEF specification this SHOULD work. I have a feeling it will not
      * cover all implementations but then I also only have one set of example messages.
      */
-    private static final Pattern KEYVALUE_PATTERN = Pattern.compile("(\\w+)=(.*?(?=\\s*\\w+=|\\s*$))");
+    private static final Pattern KEYVALUE_PATTERN = Pattern.compile("(?<key>\\w+)=(?<value>.*?(?=\\s*\\w+=|\\s*$))");
 
     public ImmutableMap<String, Object> parse(String x) {
         Matcher m = KEYVALUE_PATTERN.matcher(x);
@@ -25,7 +25,13 @@ public class CEFFieldsParser {
         ImmutableMap.Builder<String, String> fieldsBuilder = new ImmutableMap.Builder<>();
         while(m.find()) {
             if (m.groupCount() == 2) {
-                fieldsBuilder.put(m.group(1), m.group(2));
+                final String value = m.group("value")
+                        .replace("\\r", "\r")
+                        .replace("\\n", "\n")
+                        .replace("\\=", "=")
+                        .replace("\\|", "|")
+                        .replace("\\\\", "\\");
+                fieldsBuilder.put(m.group("key"), value);
             } else {
                 LOG.debug("Unexpected group count for fields pattern in CEF message. Skipping.");
                 return null;

@@ -121,4 +121,27 @@ public class CEFFieldsParserTest {
         ImmutableMap<String, Object> r = p.parse("dvc=ip-172-30-2-212 eventId=9001 cs2=ip-172-30-2-212 -> /var/log/auth.log cs2Label=Location msg=Aug 14 14:26:53 ip-172-30-2-212 sshd[16217]: message repeated 2 times");
         assertEquals("ip-172-30-2-212 -> /var/log/auth.log", r.get("Location"));
     }
+
+    @Test
+    public void testParseEscapedMultiLine() throws Exception {
+        CEFFieldsParser p = new CEFFieldsParser();
+        ImmutableMap<String, Object> r = p.parse("custom1=new\\rline custom2=new\\nline custom3=new\\r\\nline msg=Foobar");
+        assertEquals("new\rline", r.get("custom1"));
+        assertEquals("new\nline", r.get("custom2"));
+        assertEquals("new\r\nline", r.get("custom3"));
+    }
+
+    @Test
+    public void testParseEscapedEqualSign() throws Exception {
+        CEFFieldsParser p = new CEFFieldsParser();
+        ImmutableMap<String, Object> r = p.parse("custom=equal\\=sign msg=Foobar");
+        assertEquals("equal=sign", r.get("custom"));
+    }
+
+    @Test
+    public void testParseEscapedBackslash() throws Exception {
+        CEFFieldsParser p = new CEFFieldsParser();
+        ImmutableMap<String, Object> r = p.parse("custom=back\\\\slash msg=Foobar");
+        assertEquals("back\\slash", r.get("custom"));
+    }
 }
