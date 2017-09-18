@@ -172,4 +172,17 @@ public class GelfOutputTest {
 
         assertEquals(GelfMessageLevel.ALERT, gelfMessage.getLevel());
     }
+
+    @Test
+    public void testToGELFMessageWithNonStringFacility() throws Exception {
+        final GelfTransport transport = mock(GelfTransport.class);
+        final GelfOutput gelfOutput = new GelfOutput(transport);
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
+        final Message message = new Message("Test", "Source", now);
+        message.addField("facility", 42L);
+
+        final GelfMessage gelfMessage = gelfOutput.toGELFMessage(message);
+
+        assertEquals(42L, gelfMessage.getAdditionalFields().get("facility"));
+    }
 }
