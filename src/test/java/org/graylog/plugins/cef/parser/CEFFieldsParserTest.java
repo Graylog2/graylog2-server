@@ -115,4 +115,10 @@ public class CEFFieldsParserTest {
         assertEquals(9001L, r.get("eventId"));
     }
 
+    @Test
+    public void testParseSpacedValues() throws Exception {
+        CEFFieldsParser p = new CEFFieldsParser();
+        ImmutableMap<String, Object> r = p.parse("dvc=ip-172-30-2-212 eventId=9001 cs2=ip-172-30-2-212 -> /var/log/auth.log cs2Label=Location msg=Aug 14 14:26:53 ip-172-30-2-212 sshd[16217]: message repeated 2 times");
+        assertEquals("ip-172-30-2-212 -> /var/log/auth.log", r.get("Location"));
+    }
 }

@@ -16,7 +16,7 @@ public class CEFFieldsParser {
      * According to the CEF specification this SHOULD work. I have a feeling it will not
      * cover all implementations but then I also only have one set of example messages.
      */
-    private static final Pattern KEYVALUE_PATTERN = Pattern.compile("(\\S+)=(\\S+)");
+    private static final Pattern KEYVALUE_PATTERN = Pattern.compile("(\\w+)=(.*?(?=\\s*\\w+=|\\s*$))");
 
     public ImmutableMap<String, Object> parse(String x) {
         Matcher m = KEYVALUE_PATTERN.matcher(x);
