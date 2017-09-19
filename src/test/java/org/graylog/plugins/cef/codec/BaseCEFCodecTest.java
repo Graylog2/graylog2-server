@@ -68,6 +68,24 @@ public class BaseCEFCodecTest {
     }
 
     @Test
+    public void decideSourceWithoutDeviceAddressReturnsCEFHostname() throws Exception {
+        final CEFMessage cefMessage = CEFMessage.builder()
+                .version(0)
+                .deviceVendor("vendor")
+                .deviceProduct("product")
+                .deviceVersion("1.0.0")
+                .deviceEventClassId("event-class-id")
+                .name("name")
+                .severity(CEFMessage.Severity.parse("High"))
+                .hostname("128.66.23.42")
+                .fields(Collections.emptyMap())
+                .build();
+        final RawMessage rawMessage = new RawMessage(new byte[0], new InetSocketAddress("example.com", 12345));
+
+        assertEquals("128.66.23.42", codec.decideSource(cefMessage, rawMessage));
+    }
+
+    @Test
     public void decideSourceWithFullDeviceAddressReturnsExtensionValue() throws Exception {
         final CEFMessage cefMessage = CEFMessage.builder()
                 .version(0)

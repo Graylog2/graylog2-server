@@ -55,12 +55,18 @@ public abstract class BaseCEFCodec implements Codec {
     }
 
     protected String decideSource(CEFMessage cef, RawMessage raw) {
+        // Try getting the host name from the CEF extension "deviceAddress"/"dvc"
         final Map<String, Object> fields = cef.fields();
         if (fields != null && !fields.isEmpty()) {
             final String deviceAddress = (String) fields.getOrDefault(CEFMapping.dvc.getFullName(), fields.get(CEFMapping.dvc.getKeyName()));
             if (!isNullOrEmpty(deviceAddress)) {
                 return deviceAddress;
             }
+        }
+
+        // Try getting the hostname from the CEF message metadata (e. g. syslog)
+        if (!isNullOrEmpty(cef.hostname())) {
+            return cef.hostname();
         }
 
         // Use raw message source information if we were not able to parse a source from the CEF extensions.
