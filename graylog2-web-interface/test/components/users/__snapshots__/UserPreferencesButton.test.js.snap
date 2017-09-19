@@ -1,0 +1,93 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`UserPreferencesButton should load user data when user clicks edit button 1`] = `
+<UserPreferencesButton
+  userName="Full"
+>
+  <span>
+    <Button
+      active={false}
+      block={false}
+      bsClass="btn"
+      bsStyle="success"
+      disabled={false}
+      onClick={[Function]}
+    >
+      <button
+        className="btn btn-success"
+        disabled={false}
+        onClick={[Function]}
+        type="button"
+      >
+        User preferences
+      </button>
+    </Button>
+    <UserPreferencesModal
+      userName="Full"
+    >
+      <BootstrapModalForm
+        cancelButtonText="Cancel"
+        formProps={Object {}}
+        onSubmitForm={[Function]}
+        submitButtonDisabled={false}
+        submitButtonText="Save"
+        title="Preferences for user Full"
+      >
+        <BootstrapModalWrapper
+          onHide={[Function]}
+        >
+          <Modal
+            animation={true}
+            autoFocus={true}
+            backdrop={true}
+            bsClass="modal"
+            dialogComponentClass={[Function]}
+            enforceFocus={true}
+            keyboard={true}
+            manager={
+              ModalManager {
+                "containers": Array [],
+                "data": Array [],
+                "handleContainerOverflow": true,
+                "hideSiblingNodes": true,
+                "modals": Array [],
+              }
+            }
+            onHide={[Function]}
+            renderBackdrop={[Function]}
+            restoreFocus={true}
+            show={false}
+          >
+            <Modal
+              autoFocus={true}
+              backdrop={true}
+              backdropClassName="modal-backdrop"
+              backdropTransitionTimeout={150}
+              containerClassName="modal-open"
+              dialogTransitionTimeout={300}
+              enforceFocus={true}
+              keyboard={true}
+              manager={
+                ModalManager {
+                  "containers": Array [],
+                  "data": Array [],
+                  "handleContainerOverflow": true,
+                  "hideSiblingNodes": true,
+                  "modals": Array [],
+                }
+              }
+              onEntering={[Function]}
+              onExited={[Function]}
+              onHide={[Function]}
+              renderBackdrop={[Function]}
+              restoreFocus={true}
+              show={false}
+              transition={[Function]}
+            />
+          </Modal>
+        </BootstrapModalWrapper>
+      </BootstrapModalForm>
+    </UserPreferencesModal>
+  </span>
+</UserPreferencesButton>
+`;

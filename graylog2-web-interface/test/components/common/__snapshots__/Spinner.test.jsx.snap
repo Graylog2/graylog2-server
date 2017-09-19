@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<Spinner /> should render with a different text string 1`] = `
+<span>
+  <i
+    className="fa fa-spin fa-spinner"
+  />
+   
+  Hello world!
+</span>
+`;
+
+exports[`<Spinner /> should render without props 1`] = `
+<span>
+  <i
+    className="fa fa-spin fa-spinner"
+  />
+   
+  Loading...
+</span>
+`;
