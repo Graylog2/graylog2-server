@@ -67,21 +67,19 @@ public class CEFParserFunction extends AbstractFunction<CEFParserResult> {
           * to clean up field names if desired.
          */
         fields.put("cef_version", message.version());
-        fields.put("cef_device_vendor", message.deviceVendor());
-        fields.put("cef_device_product", message.deviceProduct());
-        fields.put("cef_device_version", message.deviceVersion());
-        fields.put("cef_device_event_class_id", message.deviceEventClassId());
-        fields.put("cef_name", message.name());
-        fields.put("cef_severity", message.severity().text());
-        fields.put("cef_severity_numeric", message.severity().numeric());
+        fields.put("device_vendor", message.deviceVendor());
+        fields.put("device_product", message.deviceProduct());
+        fields.put("device_version", message.deviceVersion());
+        fields.put("device_event_class_id", message.deviceEventClassId());
+        fields.put("name", message.name());
+        fields.put("severity", message.severity().text());
+        fields.put("severity_numeric", message.severity().numeric());
         if (message.message() != null) {
-            fields.put("cef_message", message.message());
+            fields.put("message", message.message());
         }
 
         // Add all custom CEF fields.
-        for (Map.Entry<String, Object> f : message.fields().entrySet()) {
-            fields.put("cef_" + f.getKey(), f.getValue());
-        }
+        fields.putAll(message.fields());
 
         return new CEFParserResult(fields);
     }

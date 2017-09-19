@@ -76,14 +76,14 @@ public class CEFParserFunctionTest {
         final CEFParserResult result = function.evaluate(functionArgs, evaluationContext);
         assertNotNull(result);
         assertEquals(0, result.get("cef_version"));
-        assertEquals("vendor", result.get("cef_device_vendor"));
-        assertEquals("product", result.get("cef_device_product"));
-        assertEquals("1.0", result.get("cef_device_version"));
-        assertEquals("id", result.get("cef_device_event_class_id"));
-        assertEquals("Low", result.get("cef_severity"));
-        assertEquals(0, result.get("cef_severity_numeric"));
-        assertEquals("example.com", result.get("cef_dvc"));
-        assertEquals("Foobar", result.get("cef_message"));
+        assertEquals("vendor", result.get("device_vendor"));
+        assertEquals("product", result.get("device_product"));
+        assertEquals("1.0", result.get("device_version"));
+        assertEquals("id", result.get("device_event_class_id"));
+        assertEquals("Low", result.get("severity"));
+        assertEquals(0, result.get("severity_numeric"));
+        assertEquals("example.com", result.get("dvc"));
+        assertEquals("Foobar", result.get("message"));
     }
 
     @Test
@@ -98,14 +98,14 @@ public class CEFParserFunctionTest {
         final CEFParserResult result = function.evaluate(functionArgs, evaluationContext);
         assertNotNull(result);
         assertEquals(0, result.get("cef_version"));
-        assertEquals("vendor", result.get("cef_device_vendor"));
-        assertEquals("product", result.get("cef_device_product"));
-        assertEquals("1.0", result.get("cef_device_version"));
-        assertEquals("id", result.get("cef_device_event_class_id"));
-        assertEquals("Low", result.get("cef_severity"));
-        assertEquals(0, result.get("cef_severity_numeric"));
-        assertEquals("example.com", result.get("cef_dvc"));
-        assertEquals("Foobar", result.get("cef_message"));
+        assertEquals("vendor", result.get("device_vendor"));
+        assertEquals("product", result.get("device_product"));
+        assertEquals("1.0", result.get("device_version"));
+        assertEquals("id", result.get("device_event_class_id"));
+        assertEquals("Low", result.get("severity"));
+        assertEquals(0, result.get("severity_numeric"));
+        assertEquals("example.com", result.get("dvc"));
+        assertEquals("Foobar", result.get("message"));
     }
 
     @Test
@@ -122,14 +122,14 @@ public class CEFParserFunctionTest {
         final CEFParserResult result = function.evaluate(functionArgs, evaluationContext);
         assertNotNull(result);
         assertEquals(0, result.get("cef_version"));
-        assertEquals("vendor", result.get("cef_device_vendor"));
-        assertEquals("product", result.get("cef_device_product"));
-        assertEquals("1.0", result.get("cef_device_version"));
-        assertEquals("id", result.get("cef_device_event_class_id"));
-        assertEquals("Low", result.get("cef_severity"));
-        assertEquals(0, result.get("cef_severity_numeric"));
-        assertEquals("example.com", result.get("cef_deviceAddress"));
-        assertEquals("Foobar", result.get("cef_message"));
+        assertEquals("vendor", result.get("device_vendor"));
+        assertEquals("product", result.get("device_product"));
+        assertEquals("1.0", result.get("device_version"));
+        assertEquals("id", result.get("device_event_class_id"));
+        assertEquals("Low", result.get("severity"));
+        assertEquals(0, result.get("severity_numeric"));
+        assertEquals("example.com", result.get("deviceAddress"));
+        assertEquals("Foobar", result.get("message"));
     }
 
     @Test
@@ -145,13 +145,13 @@ public class CEFParserFunctionTest {
         final CEFParserResult result = function.evaluate(functionArgs, evaluationContext);
         assertNotNull(result);
         assertEquals(0, result.get("cef_version"));
-        assertEquals("vendor", result.get("cef_device_vendor"));
-        assertEquals("product", result.get("cef_device_product"));
-        assertEquals("1.0", result.get("cef_device_version"));
-        assertEquals("id", result.get("cef_device_event_class_id"));
-        assertEquals("Low", result.get("cef_severity"));
-        assertEquals(0, result.get("cef_severity_numeric"));
-        assertEquals("example.com", result.get("cef_dvc"));
-        assertFalse(result.containsKey("cef_message"));
+        assertEquals("vendor", result.get("device_vendor"));
+        assertEquals("product", result.get("device_product"));
+        assertEquals("1.0", result.get("device_version"));
+        assertEquals("id", result.get("device_event_class_id"));
+        assertEquals("Low", result.get("severity"));
+        assertEquals(0, result.get("severity_numeric"));
+        assertEquals("example.com", result.get("dvc"));
+        assertFalse(result.containsKey("message"));
     }
 }
