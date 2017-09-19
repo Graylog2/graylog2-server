@@ -8,6 +8,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class CEFParserTest {
     private CEFParser parser;
@@ -187,6 +188,40 @@ public class CEFParserTest {
         assertEquals(22, m.fields().get("spt"));
         assertEquals(90.01F, m.fields().get("SomeFloat"));
         assertEquals("ip-172-30-2-212->/var/log/auth.log", m.fields().get("Location"));
+    }
+
+    @Test
+    public void testParseWithoutExtensions() throws Exception {
+        CEFMessage m = parser.parse("CEF:0|Trend Micro Inc.|OSSEC HIDS|v2.8.3|2502|User missed the password more than one time|10|").build();
+
+        assertEquals(0, m.version());
+        assertEquals("Trend Micro Inc.", m.deviceVendor());
+        assertEquals("OSSEC HIDS", m.deviceProduct());
+        assertEquals("v2.8.3", m.deviceVersion());
+        assertEquals("2502", m.deviceEventClassId());
+        assertEquals("User missed the password more than one time", m.name());
+        assertEquals(10, m.severity().numeric());
+        assertEquals("Very-High", m.severity().text());
+
+        assertNull(m.message());
+        assertTrue(m.fields().isEmpty());
+    }
+
+    @Test
+    public void testParseWithOnlyMsg() throws Exception {
+        CEFMessage m = parser.parse("CEF:0|Trend Micro Inc.|OSSEC HIDS|v2.8.3|2502|User missed the password more than one time|10|msg=Foobar").build();
+
+        assertEquals(0, m.version());
+        assertEquals("Trend Micro Inc.", m.deviceVendor());
+        assertEquals("OSSEC HIDS", m.deviceProduct());
+        assertEquals("v2.8.3", m.deviceVersion());
+        assertEquals("2502", m.deviceEventClassId());
+        assertEquals("User missed the password more than one time", m.name());
+        assertEquals(10, m.severity().numeric());
+        assertEquals("Very-High", m.severity().text());
+
+        assertEquals("Foobar", m.message());
+        assertTrue(m.fields().isEmpty());
     }
 
     @Test

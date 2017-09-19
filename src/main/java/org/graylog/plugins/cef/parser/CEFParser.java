@@ -15,7 +15,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 public class CEFParser {
     private static final Logger LOG = LoggerFactory.getLogger(CEFParser.class);
 
-    private static final Pattern PATTERN = Pattern.compile("^\\s*CEF:(?<version>\\d+?)(?<!\\\\)\\|(?<deviceVendor>.+?)(?<!\\\\)\\|(?<deviceProduct>.+?)(?<!\\\\)\\|(?<deviceVersion>.+?)(?<!\\\\)\\|(?<deviceEventClassId>.+?)(?<!\\\\)\\|(?<name>.+?)(?<!\\\\)\\|(?<severity>.+?)(?<!\\\\)\\|(?<fields>.+?)(?:$|msg=(?<message>.+))", Pattern.DOTALL);
+    private static final Pattern PATTERN = Pattern.compile("^\\s*CEF:(?<version>\\d+?)(?<!\\\\)\\|(?<deviceVendor>.+?)(?<!\\\\)\\|(?<deviceProduct>.+?)(?<!\\\\)\\|(?<deviceVersion>.+?)(?<!\\\\)\\|(?<deviceEventClassId>.+?)(?<!\\\\)\\|(?<name>.+?)(?<!\\\\)\\|(?<severity>.+?)(?<!\\\\)\\|(?<fields>.*?)(?:$|msg=(?<message>.+$))", Pattern.DOTALL);
     private static final Pattern EXTENSIONS_PATTERN = Pattern.compile("(?<key>\\w+)=(?<value>.*?(?=\\s*\\w+=|\\s*$))");
     private static final String LABEL_SUFFIX = "Label";
 
@@ -41,9 +41,9 @@ public class CEFParser {
 
             // Parse and add all CEF fields.
             final String fieldsString = m.group("fields");
-            if (fieldsString == null || fieldsString.isEmpty()) {
+            if (fieldsString == null) {
                 throw new ParserException("No CEF payload found. Skipping this message.");
-            } else {
+            } else if (!fieldsString.isEmpty()) {
                 builder.fields(parseExtensions(fieldsString));
             }
 

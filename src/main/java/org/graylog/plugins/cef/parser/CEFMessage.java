@@ -7,6 +7,7 @@ import com.google.common.collect.Range;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
 import java.util.Map;
 
 @AutoValue
@@ -81,7 +82,8 @@ public abstract class CEFMessage {
     public abstract Map<String, Object> fields();
 
     public static Builder builder() {
-        return new AutoValue_CEFMessage.Builder();
+        return new AutoValue_CEFMessage.Builder()
+                .fields(Collections.emptyMap());
     }
 
     @AutoValue.Builder
