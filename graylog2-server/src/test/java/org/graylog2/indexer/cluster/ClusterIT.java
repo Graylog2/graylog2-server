@@ -55,7 +55,8 @@ public class ClusterIT extends ElasticsearchBase {
     public void setUp() throws Exception {
         createIndex(INDEX_NAME, 1, 0);
         addAliasMapping(INDEX_NAME, ALIAS_NAME);
-
+        waitForGreenStatus(INDEX_NAME, ALIAS_NAME);
+        
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactoryBuilder().setNameFormat("cluster-it-%d").build()
         );
@@ -76,11 +77,17 @@ public class ClusterIT extends ElasticsearchBase {
 
     @Test
     public void health() throws Exception {
-        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{INDEX_NAME});
-        final Optional<JsonNode> health = cluster.health();
-        assertThat(health)
-                .isPresent()
-                .hasValueSatisfying(json -> assertThat(json.path("status").asText()).isEqualTo("green"));
+        final String index = createRandomIndex("cluster_it_");
+        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{index});
+
+        try {
+            final Optional<JsonNode> health = cluster.health();
+            assertThat(health)
+                    .isPresent()
+                    .hasValueSatisfying(json -> assertThat(json.path("status").asText()).isEqualTo("green"));
+        } finally {
+            deleteIndex(index);
+        }
     }
 
     @Test
@@ -169,9 +176,15 @@ public class ClusterIT extends ElasticsearchBase {
 
     @Test
     public void isHealthy() throws Exception {
-        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{INDEX_NAME});
+        final String index = createRandomIndex("cluster_it_");
+        when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{index});
         when(indexSetRegistry.isUp()).thenReturn(true);
-        assertThat(cluster.isHealthy()).isTrue();
+
+        try {
+            assertThat(cluster.isHealthy()).isTrue();
+        } finally {
+            deleteIndex(index);
+        }
     }
 
     @Test
@@ -183,9 +196,15 @@ public class ClusterIT extends ElasticsearchBase {
 
     @Test
     public void isHealthy_returns_false_with_missing_write_aliases() throws Exception {
+        final String index = createRandomIndex("cluster_it_");
         when(indexSetRegistry.getIndexWildcards()).thenReturn(new String[]{INDEX_NAME});
         when(indexSetRegistry.isUp()).thenReturn(false);
-        assertThat(cluster.isHealthy()).isFalse();
+
+        try {
+            assertThat(cluster.isHealthy()).isFalse();
+        } finally {
+            deleteIndex(index);
+        }
     }
 
     @Test
