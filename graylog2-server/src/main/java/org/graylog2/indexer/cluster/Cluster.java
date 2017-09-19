@@ -69,6 +69,7 @@ public class Cluster {
     private Optional<JsonNode> clusterHealth(Collection<? extends String> indices) {
         final Health request = new Health.Builder()
                 .addIndex(indices)
+                .timeout(Ints.saturatedCast(requestTimeout.toSeconds()))
                 .build();
         try {
             final JestResult jestResult = JestUtils.execute(jestClient, request, () -> "Couldn't read cluster health for indices " + indices);
@@ -115,21 +116,23 @@ public class Cluster {
         final Cat request = new Cat.NodesBuilder()
                 .setParameter("h", fieldNames)
                 .setParameter("full_id", true)
+                .setParameter("format", "json")
                 .build();
         final CatResult response = JestUtils.execute(jestClient, request, () -> "Unable to read Elasticsearch node information");
         return response.getJsonObject().path("result");
     }
 
     public Set<NodeFileDescriptorStats> getFileDescriptorStats() {
-        final JsonNode nodes = catNodes("name", "host", "fileDescriptorMax");
+        final JsonNode nodes = catNodes("name", "host", "ip", "fileDescriptorMax");
         final ImmutableSet.Builder<NodeFileDescriptorStats> setBuilder = ImmutableSet.builder();
         for (JsonNode jsonElement : nodes) {
             if (jsonElement.isObject()) {
                 final String name = jsonElement.path("name").asText();
                 final String host = jsonElement.path("host").asText(null);
+                final String ip = jsonElement.path("ip").asText();
                 final JsonNode fileDescriptorMax = jsonElement.path("fileDescriptorMax");
                 final Long maxFileDescriptors = fileDescriptorMax.isLong() ? fileDescriptorMax.asLong() : null;
-                setBuilder.add(NodeFileDescriptorStats.create(name, host, maxFileDescriptors));
+                setBuilder.add(NodeFileDescriptorStats.create(name, ip, host, maxFileDescriptors));
             }
         }
 
