@@ -26,7 +26,7 @@ public abstract class StreamFilter implements Filter {
     public abstract String streamTitle();
 
     public static Builder builder() {
-        return new AutoValue_StreamFilter.Builder();
+        return new AutoValue_StreamFilter.Builder().type(NAME);
     }
 
     @AutoValue.Builder

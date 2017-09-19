@@ -26,6 +26,7 @@ public abstract class MessageList implements SearchType {
 
     public static Builder builder() {
         return new AutoValue_MessageList.Builder()
+                .type(NAME)
                 .limit(150)
                 .offset(0);
     }
