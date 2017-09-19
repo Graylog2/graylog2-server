@@ -14,7 +14,16 @@ public class CEFParserTest {
     
     @Before
     public void setUp() {
-        parser = new CEFParser();
+        parser = new CEFParser(false);
+    }
+
+    @Test
+    public void testParseExtensionsUseCustomLabelsWithFullNames() throws Exception {
+        final CEFParser parser = new CEFParser(true);
+        Map<String, Object> r = parser.parseExtensions("dvc=ip-172-30-2-212 c6a1=fe80::5626:96ff:fed0:943 c6a1Label=TestTest foobar=quux");
+        assertEquals("ip-172-30-2-212", r.get("deviceAddress"));
+        assertEquals("fe80::5626:96ff:fed0:943", r.get("TestTest"));
+        assertEquals("quux", r.get("foobar"));
     }
 
     @Test

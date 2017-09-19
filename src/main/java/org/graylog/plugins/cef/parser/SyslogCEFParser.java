@@ -21,8 +21,8 @@ public class SyslogCEFParser {
     private final DateTimeZone timezone;
     private final CEFParser parser;
 
-    public SyslogCEFParser(DateTimeZone timezone) {
-        this(timezone, new CEFParser());
+    public SyslogCEFParser(DateTimeZone timezone, boolean useFullNames) {
+        this(timezone, new CEFParser(useFullNames));
     }
 
     public SyslogCEFParser(DateTimeZone timezone, CEFParser parser) {

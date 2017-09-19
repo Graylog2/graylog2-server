@@ -33,7 +33,8 @@ public class CEFParserFunction extends AbstractFunction<CEFParserResult> {
     @Inject
     public CEFParserFunction(final MetricRegistry metricRegistry) {
         this.parseTime = metricRegistry.timer(name(this.getClass(), "parseTime"));
-        this.parser = new CEFParser();
+        // TODO
+        this.parser = new CEFParser(false);
     }
 
     @Override

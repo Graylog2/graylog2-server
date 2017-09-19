@@ -2,10 +2,12 @@ package org.graylog.plugins.cef.codec;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import org.graylog.plugins.cef.parser.CEFMapping;
 import org.graylog.plugins.cef.parser.CEFMessage;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.BooleanField;
 import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
@@ -19,16 +21,22 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
+import java.util.Map;
+
+import static com.google.common.base.Strings.isNullOrEmpty;
 
 public abstract class BaseCEFCodec implements Codec {
     private static final Logger LOG = LoggerFactory.getLogger(BaseCEFCodec.class);
 
-    private static final String CK_TIMEZONE = "timezone";
+    static final String CK_TIMEZONE = "timezone";
+    static final String CK_USE_FULL_NAMES = "use_full_names";
 
     protected final Configuration configuration;
+    final DateTimeZone timezone;
+    final boolean useFullNames;
 
     @AssistedInject
-    public BaseCEFCodec(@Assisted Configuration configuration) {
+    BaseCEFCodec(@Assisted Configuration configuration) {
         this.configuration = configuration;
 
         DateTimeZone timezone;
@@ -38,6 +46,8 @@ public abstract class BaseCEFCodec implements Codec {
             LOG.warn("Could not configure CEF input timezone. Falling back to local default. Please check the error message:", e);
             timezone = DateTimeZone.getDefault();
         }
+        this.timezone = timezone;
+        this.useFullNames = configuration.getBoolean(CK_USE_FULL_NAMES);
     }
 
     protected String buildMessageSummary(CEFMessage cef) {
@@ -45,10 +55,11 @@ public abstract class BaseCEFCodec implements Codec {
     }
 
     protected String decideSource(CEFMessage cef, RawMessage raw) {
-        if (cef.fields() != null && cef.fields().containsKey("dvc")) {
-            String dvc = (String) cef.fields().get("dvc");
-            if (!dvc.isEmpty()) {
-                return dvc;
+        final Map<String, Object> fields = cef.fields();
+        if (fields != null && !fields.isEmpty()) {
+            final String deviceAddress = (String) fields.getOrDefault(CEFMapping.dvc.getFullName(), fields.get(CEFMapping.dvc.getKeyName()));
+            if (!isNullOrEmpty(deviceAddress)) {
+                return deviceAddress;
             }
         }
 
@@ -70,6 +81,12 @@ public abstract class BaseCEFCodec implements Codec {
         return null;
     }
 
+    @Nonnull
+    @Override
+    public Configuration getConfiguration() {
+        return configuration;
+    }
+
     @ConfigClass
     public static class Config implements Codec.Config {
         @Override
@@ -82,6 +99,12 @@ public abstract class BaseCEFCodec implements Codec {
                     DateTimeZone.getDefault().getID(),
                     "Timezone of the timestamps in the CEF messages we'l receive. Set this to the local timezone if in doubt. (CEF messages do not include timezone information) Format example: +01:00 or America/Chicago",
                     ConfigurationField.Optional.NOT_OPTIONAL
+            ));
+            cr.addField(new BooleanField(
+                    CK_USE_FULL_NAMES,
+                    "Use full field names",
+                    false,
+                    "Use full field names in CEF messages (as defined in the CEF specification)"
             ));
 
             return cr;

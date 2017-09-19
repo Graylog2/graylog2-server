@@ -17,6 +17,13 @@ public class CEFParser {
 
     private static final Pattern PATTERN = Pattern.compile("^\\s*CEF:(?<version>\\d+?)(?<!\\\\)\\|(?<deviceVendor>.+?)(?<!\\\\)\\|(?<deviceProduct>.+?)(?<!\\\\)\\|(?<deviceVersion>.+?)(?<!\\\\)\\|(?<deviceEventClassId>.+?)(?<!\\\\)\\|(?<name>.+?)(?<!\\\\)\\|(?<severity>.+?)(?<!\\\\)\\|(?<fields>.+?)(?:$|msg=(?<message>.+))", Pattern.DOTALL);
     private static final Pattern EXTENSIONS_PATTERN = Pattern.compile("(?<key>\\w+)=(?<value>.*?(?=\\s*\\w+=|\\s*$))");
+    private static final String LABEL_SUFFIX = "Label";
+
+    private final boolean useFullNames;
+
+    public CEFParser(boolean useFullNames) {
+        this.useFullNames = useFullNames;
+    }
 
     public CEFMessage.Builder parse(String x) throws ParserException {
         final Matcher m = PATTERN.matcher(x);
@@ -78,20 +85,19 @@ public class CEFParser {
             final String key = field.getKey();
 
             // Skip "labels"
-            if (key.endsWith("Label")) {
+            if (key.endsWith(LABEL_SUFFIX)) {
                 continue;
             }
 
-            final String label = getLabel(key, allFields);
             final CEFMapping fieldMapping = CEFMapping.forKeyName(key);
             if (fieldMapping != null) {
                 try {
-                    resultBuilder.put(label, fieldMapping.convert(field.getValue()));
+                    resultBuilder.put(getLabel(fieldMapping, allFields), fieldMapping.convert(field.getValue()));
                 } catch (Exception e) {
                     LOG.warn("Could not transform CEF field [{}] according to standard. Skipping.", key, e);
                 }
             } else {
-                resultBuilder.put(label, field.getValue());
+                resultBuilder.put(getLabel(key, allFields), field.getValue());
             }
         }
 
@@ -111,8 +117,13 @@ public class CEFParser {
                 .replace("\\=", "=");
     }
 
+    private String getLabel(CEFMapping mapping, Map<String, String> fields) {
+        final String labelName = mapping.getKeyName() + LABEL_SUFFIX;
+        return fields.getOrDefault(labelName, useFullNames ? mapping.getFullName() : mapping.getKeyName());
+    }
+
     private String getLabel(String valueName, Map<String, String> fields) {
-        final String labelName = valueName + "Label";
+        final String labelName = valueName + LABEL_SUFFIX;
         return fields.getOrDefault(labelName, valueName);
     }
 }
