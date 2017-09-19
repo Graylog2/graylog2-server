@@ -8,7 +8,7 @@ This plugin is strictly following the CEF standard and will probably not work wi
 
 ![](https://github.com/Graylog2/graylog-plugin-cef/blob/master/screenshot.png)
 
-**Required Graylog version:** 2.2.x and later
+**Required Graylog version:** 2.4.x and later
 
 ## Installation
 
