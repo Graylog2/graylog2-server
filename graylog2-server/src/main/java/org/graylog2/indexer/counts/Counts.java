@@ -17,8 +17,9 @@
 package org.graylog2.indexer.counts;
 
 import io.searchbox.client.JestClient;
-import io.searchbox.core.Count;
-import io.searchbox.core.CountResult;
+import io.searchbox.core.MultiSearch;
+import io.searchbox.core.MultiSearchResult;
+import io.searchbox.core.Search;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.indexer.IndexSet;
@@ -59,12 +60,23 @@ public class Counts {
         final List<String> indices = Arrays.asList(indexNames);
         final String query = new SearchSourceBuilder()
                 .query(QueryBuilders.matchAllQuery())
+                .size(0)
                 .toString();
-        final Count request = new Count.Builder()
-                .query(query)
+        final Search request = new Search.Builder(query)
                 .addIndex(indices)
                 .build();
-        final CountResult result = JestUtils.execute(jestClient, request, () -> "Fetching message count failed for indices " + indices);
-        return result.getCount().longValue();
+        final MultiSearch multiSearch = new MultiSearch.Builder(request).build();
+        final MultiSearchResult searchResult = JestUtils.execute(jestClient, multiSearch, () -> "Fetching message count failed for indices " + indices);
+        final List<MultiSearchResult.MultiSearchResponse> responses = searchResult.getResponses();
+
+        long total = 0L;
+        for (MultiSearchResult.MultiSearchResponse response : responses) {
+            if (response.isError) {
+                throw JestUtils.specificException(() -> "Fetching message count failed for indices " + indices, response.error);
+            }
+            total += response.searchResult.getTotal();
+        }
+
+        return total;
     }
 }

@@ -129,9 +129,11 @@ public class JestUtilsTest {
         when(resultMock.isSucceeded()).thenReturn(false);
 
         final ObjectNode responseStub = objectMapper.createObjectNode();
+        final ObjectNode errorStub = objectMapper.createObjectNode();
         responseStub.set("Message", new TextNode("Authorization header requires 'Credential' parameter."));
+        errorStub.set("error", responseStub);
 
-        when(resultMock.getJsonObject()).thenReturn(responseStub);
+        when(resultMock.getJsonObject()).thenReturn(errorStub);
 
         when(clientMock.execute(request)).thenReturn(resultMock);
 

@@ -55,7 +55,7 @@ public class JestUtils {
         if (result.isSucceeded()) {
             return result;
         } else {
-            throw specificException(errorMessage, result.getJsonObject());
+            throw specificException(errorMessage, result.getJsonObject().path("error"));
         }
     }
 
@@ -63,8 +63,8 @@ public class JestUtils {
         return execute(client, null, request, errorMessage);
     }
 
-    private static ElasticsearchException specificException(Supplier<String> errorMessage, JsonNode jsonObject) {
-        final List<JsonNode> rootCauses = extractRootCauses(jsonObject);
+    public static ElasticsearchException specificException(Supplier<String> errorMessage, JsonNode errorNode) {
+        final List<JsonNode> rootCauses = extractRootCauses(errorNode);
         final List<String> reasons = extractReasons(rootCauses);
 
         for (JsonNode rootCause : rootCauses) {
@@ -88,7 +88,7 @@ public class JestUtils {
         }
 
         if (reasons.isEmpty()) {
-            return new ElasticsearchException(errorMessage.get(), Collections.singletonList(jsonObject.toString()));
+            return new ElasticsearchException(errorMessage.get(), Collections.singletonList(errorNode.toString()));
         }
 
         return new ElasticsearchException(errorMessage.get(), reasons);
@@ -105,7 +105,7 @@ public class JestUtils {
     }
 
     private static List<JsonNode> extractRootCauses(JsonNode jsonObject) {
-        return ImmutableList.copyOf(jsonObject.path("error").path("root_cause").iterator());
+        return ImmutableList.copyOf(jsonObject.path("root_cause").iterator());
     }
 
     private static QueryParsingException buildQueryParsingException(Supplier<String> errorMessage,
