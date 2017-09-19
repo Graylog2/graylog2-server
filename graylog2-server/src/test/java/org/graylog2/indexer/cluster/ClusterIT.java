@@ -18,17 +18,10 @@ package org.graylog2.indexer.cluster;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.joschi.jadconfig.util.Duration;
-import com.google.common.collect.ImmutableMap;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import io.searchbox.client.JestResult;
 import io.searchbox.core.Cat;
 import io.searchbox.core.CatResult;
-import io.searchbox.indices.CreateIndex;
-import io.searchbox.indices.DeleteIndex;
-import io.searchbox.indices.aliases.AddAliasMapping;
-import io.searchbox.indices.aliases.ModifyAliases;
-import io.searchbox.indices.aliases.RemoveAliasMapping;
-import org.graylog2.AbstractESTest;
+import org.graylog2.ElasticsearchBase;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.junit.After;
 import org.junit.Before;
@@ -38,7 +31,6 @@ import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnit;
 import org.mockito.junit.MockitoRule;
 
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -47,7 +39,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
-public class ClusterTest extends AbstractESTest {
+public class ClusterIT extends ElasticsearchBase {
     private static final String INDEX_NAME = "cluster_it_" + System.nanoTime();
     private static final String ALIAS_NAME = "cluster_it_alias_" + System.nanoTime();
 
@@ -61,36 +53,19 @@ public class ClusterTest extends AbstractESTest {
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
-
-        final Map<String, Map<String, Object>> settings = ImmutableMap.of("settings", ImmutableMap.of(
-                "number_of_shards", 1,
-                "number_of_replicas", 0));
-        final CreateIndex createIndex = new CreateIndex.Builder(INDEX_NAME).settings(settings).refresh(true).build();
-        final JestResult createIndexResponse = jestClient().execute(createIndex);
-        assertThat(createIndexResponse.isSucceeded()).isTrue();
-
-        final AddAliasMapping addAliasMapping = new AddAliasMapping.Builder(INDEX_NAME, ALIAS_NAME).build();
-        final ModifyAliases modifyAliases = new ModifyAliases.Builder(addAliasMapping).refresh(true).build();
-        final JestResult modifyAliasesResponse = jestClient().execute(modifyAliases);
-        assertThat(modifyAliasesResponse.isSucceeded()).isTrue();
+        createIndex(INDEX_NAME, 1, 0);
+        addAliasMapping(INDEX_NAME, ALIAS_NAME);
 
         final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor(
                 new ThreadFactoryBuilder().setNameFormat("cluster-it-%d").build()
         );
-        cluster = new Cluster(jestClient(), indexSetRegistry, scheduler, Duration.seconds(1L));
+        cluster = new Cluster(client(), indexSetRegistry, scheduler, Duration.seconds(1L));
     }
 
     @After
     public void tearDown() throws Exception {
-        final RemoveAliasMapping removeAliasMapping = new RemoveAliasMapping.Builder(INDEX_NAME, ALIAS_NAME).build();
-        final ModifyAliases modifyAliases = new ModifyAliases.Builder(removeAliasMapping).refresh(true).build();
-        final JestResult modifyAliasesResponse = jestClient().execute(modifyAliases);
-        assertThat(modifyAliasesResponse.isSucceeded()).isTrue();
-
-        final DeleteIndex deleteIndex = new DeleteIndex.Builder(INDEX_NAME).refresh(true).build();
-        final JestResult deleteIndexResponse = jestClient().execute(deleteIndex);
-        assertThat(deleteIndexResponse.isSucceeded()).isTrue();
+        removeAliasMapping(INDEX_NAME, ALIAS_NAME);
+        deleteIndex(INDEX_NAME);
     }
 
     @Test
@@ -138,7 +113,7 @@ public class ClusterTest extends AbstractESTest {
                 .setParameter("format", "json")
                 .setParameter("full_id", "true")
                 .build();
-        final CatResult catResult = jestClient().execute(nodesInfo);
+        final CatResult catResult = client().execute(nodesInfo);
         final JsonNode result = catResult.getJsonObject().path("result");
         assertThat(result).isNotEmpty();
 
@@ -161,17 +136,19 @@ public class ClusterTest extends AbstractESTest {
     @Test
     public void nodeIdToHostName() throws Exception {
         final Cat nodesInfo = new Cat.NodesBuilder()
-                .setParameter("h", "id,host")
+                .setParameter("h", "id,host,ip")
                 .setParameter("format", "json")
                 .setParameter("full_id", "true")
                 .build();
-        final CatResult catResult = jestClient().execute(nodesInfo);
+        final CatResult catResult = client().execute(nodesInfo);
         final JsonNode result = catResult.getJsonObject().path("result");
         assertThat(result).isNotEmpty();
 
         final JsonNode node = result.path(0);
         final String nodeId = node.get("id").asText();
-        final String expectedHostName = node.get("host").asText();
+        // "host" only exists in Elasticsearch 2.x
+        final String ip = node.path("ip").asText();
+        final String expectedHostName = node.path("host").asText(ip);
 
         final Optional<String> hostName = cluster.nodeIdToHostName(nodeId);
         assertThat(hostName)
