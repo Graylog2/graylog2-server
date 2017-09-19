@@ -23,7 +23,7 @@ public class CEFInputMetaData implements PluginMetaData {
 
     @Override
     public String getAuthor() {
-        return "Lennart Koopmann <lennart@graylog.com>";
+        return "Graylog, Inc. <hello@graylog.com>";
     }
 
     @Override
