@@ -1,18 +1,18 @@
 # Graylog CEF message input
 
-[![Build Status](https://travis-ci.org/graylog-labs/graylog-plugin-cef.svg?branch=master)](https://travis-ci.org/graylog-labs/graylog-plugin-cef)
+[![Build Status](https://travis-ci.org/Graylog2/graylog-plugin-cef.svg?branch=master)](https://travis-ci.org/Graylog2/graylog-plugin-cef)
 
 Graylog input plugin to receive CEF logs via UDP or TCP. Install the plugin and launch a new CEF input from `System -> Inputs` in your Graylog Web Interface.
 
 This plugin is strictly following the CEF standard and will probably not work with non-compliant messages. Please open an issue in this repository in case of any problems.
 
-![](https://github.com/graylog-labs/graylog-plugin-cef/blob/master/screenshot.png)
+![](https://github.com/Graylog2/graylog-plugin-cef/blob/master/screenshot.png)
 
 **Required Graylog version:** 2.2.x and later
 
 ## Installation
 
-[Download the plugin](https://github.com/graylog-labs/graylog-plugin-cef/releases)
+[Download the plugin](https://github.com/Graylog2/graylog-plugin-cef/releases)
 and place the `.jar` file in your Graylog plugin directory. The plugin directory
 is the `plugins/` folder relative from your `graylog-server` directory by default
 and can be configured in your `graylog.conf` file.
