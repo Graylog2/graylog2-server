@@ -1,37 +1,19 @@
 import React from 'react';
 
+import { CombinedProviderMock, StoreMock } from 'helpers/mocking';
+
 describe('UserPreferencesButton', function () {
   beforeEach(() => {
     jest.resetModules();
   });
 
   it('should load user data when user clicks edit button', function () {
-    const mockLoadUserPreferences = jest.fn();
-
-    jest.doMock('injection/CombinedProvider', () => {
-      return {
-        get: (name) => {
-          if (name === 'Preferences') {
-            return {
-              PreferencesStore: {
-                get: () => jest.fn(() => ({})),
-                listen: jest.fn(),
-                loadUserPreferences: mockLoadUserPreferences,
-              },
-              PreferencesActions: {},
-            };
-          }
-          const result = {};
-          result[`${name}Store`] = {
-            get: () => jest.fn(() => ({})),
-            listen: jest.fn(),
-          };
-          result[`${name}Actions`] = {};
-          return result;
-        },
-      };
+    const PreferencesStore = StoreMock('get', 'listen', 'loadUserPreferences');
+    const combinedProviderMock = new CombinedProviderMock({
+      Preferences: { PreferencesStore },
     });
 
+    jest.doMock('injection/CombinedProvider', () => combinedProviderMock);
 
     const UserPreferencesButton = require('components/users/UserPreferencesButton');
     const userName = 'Full';
@@ -42,6 +24,6 @@ describe('UserPreferencesButton', function () {
 
     instance.find('button').simulate('click');
 
-    expect(mockLoadUserPreferences).toBeCalled();
+    expect(PreferencesStore.loadUserPreferences).toBeCalled();
   });
 });

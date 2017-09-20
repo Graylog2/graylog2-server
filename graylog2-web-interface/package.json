@@ -15,15 +15,19 @@
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
     "prepare-dev": "./tools/prepare-dev",
     "lint": "eslint --ext js,jsx src",
-    "test": "jest test"
+    "test": "jest"
   },
   "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}"
+    ],
     "setupFiles": [
       "jest-localstorage-mock"
     ],
     "setupTestFrameworkScriptFile": "./node_modules/jest-enzyme/lib/index.js",
     "moduleDirectories": [
       "src",
+      "test",
       "node_modules"
     ],
     "moduleFileExtensions": [
@@ -34,6 +38,7 @@
     "moduleNameMapper": {
       "\\.(css|less)$": "identity-obj-proxy"
     },
+    "testRegex": "test/.+\\.test\\.(js|jsx)$",
     "transform": {
       "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest",
       "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
