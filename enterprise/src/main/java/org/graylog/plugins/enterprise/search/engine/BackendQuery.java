@@ -1,4 +1,4 @@
-package org.graylog.plugins.enterprise.search;
+package org.graylog.plugins.enterprise.search.engine;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;

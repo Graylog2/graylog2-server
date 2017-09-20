@@ -2,6 +2,7 @@ package org.graylog.plugins.enterprise.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.enterprise.search.engine.BackendQuery;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 
 import javax.annotation.Nullable;
