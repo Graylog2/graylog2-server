@@ -4,7 +4,7 @@ export default class CombinedProviderMock {
     listen: jest.fn(),
   };
   static defaultActions = {};
-  constructor(rules, defaultStore = CombinedProviderMock.defaultStore, defaultActions = CombinedProviderMock.defaultActions) {
+  constructor(rules = {}, defaultStore = CombinedProviderMock.defaultStore, defaultActions = CombinedProviderMock.defaultActions) {
     this.rules = rules;
     this.store = defaultStore;
     this.actions = defaultActions;
@@ -15,7 +15,7 @@ export default class CombinedProviderMock {
     if (!result[`${name}Store`]) {
       result[`${name}Store`] = this.store;
     }
-    if (result[`${name}Actions`]) {
+    if (!result[`${name}Actions`]) {
       result[`${name}Actions`] = this.actions;
     }
 
