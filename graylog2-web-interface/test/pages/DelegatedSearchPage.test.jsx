@@ -1,19 +1,7 @@
 jest.mock('c3', () => ({ default: jest.fn() }))
   .mock('components/search/LegacyHistogram', () => ({ default: jest.fn() }))
   .mock('components/search/QueryInput', () => ({ default: jest.fn() }))
-  .mock('injection/CombinedProvider', () => {
-    return {
-      get: (name) => {
-        const result = {};
-        result[`${name}Store`] = {
-          get: () => { return {}; },
-          listen: jest.fn(),
-        };
-        result[`${name}Actions`] = {};
-        return result;
-      },
-    };
-  });
+  .mock('injection/CombinedProvider', () => new (require('helpers/mocking').CombinedProviderMock)());
 
 import React from 'react';
 import ShallowRenderer from 'react-test-renderer/shallow';
