@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Spinner } from 'components/common';
@@ -12,16 +13,16 @@ const RefreshStore = StoreProvider.getStore('Refresh');
 
 const FieldAnalyzerMapComponent = React.createClass({
   propTypes: {
-    from: React.PropTypes.any.isRequired,
-    to: React.PropTypes.any.isRequired,
-    resolution: React.PropTypes.any.isRequired,
-    stream: React.PropTypes.object,
-    permissions: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
-    query: React.PropTypes.string.isRequired,
-    page: React.PropTypes.number.isRequired,
-    rangeType: React.PropTypes.string.isRequired,
-    rangeParams: React.PropTypes.object.isRequired,
-    forceFetch: React.PropTypes.bool,
+    from: PropTypes.any.isRequired,
+    to: PropTypes.any.isRequired,
+    resolution: PropTypes.any.isRequired,
+    stream: PropTypes.object,
+    permissions: PropTypes.arrayOf(PropTypes.string).isRequired,
+    query: PropTypes.string.isRequired,
+    page: PropTypes.number.isRequired,
+    rangeType: PropTypes.string.isRequired,
+    rangeParams: PropTypes.object.isRequired,
+    forceFetch: PropTypes.bool,
   },
 
   mixins: [Reflux.connect(MapsStore), Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer')],

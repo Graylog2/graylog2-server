@@ -1,9 +1,10 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { TimeUnit } from 'components/common';
 
 const MaxmindAdapterSummary = React.createClass({
   propTypes: {
-    dataAdapter: React.PropTypes.object.isRequired,
+    dataAdapter: PropTypes.object.isRequired,
   },
 
   render() {
