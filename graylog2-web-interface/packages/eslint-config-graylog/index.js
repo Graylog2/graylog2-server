@@ -14,7 +14,7 @@ module.exports = {
     'import/extensions': 0,
     'import/no-extraneous-dependencies': 0,
     'import/no-unresolved': 0,
-    indent: [2, 2, { SwitchCase: 1, ignoredNodes: ['JSXElement *'] }],
+    indent: [2, 2, { SwitchCase: 1, ignoredNodes: ['JSXAttribute *'] }],
     'max-len': 0,
     'new-cap': 0,
     'no-else-return': 1,
