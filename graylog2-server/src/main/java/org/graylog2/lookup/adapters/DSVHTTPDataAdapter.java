@@ -80,8 +80,8 @@ public class DSVHTTPDataAdapter extends LookupDataAdapter {
         this.httpFileRetriever = httpFileRetriever;
         this.dsvParser = new DSVParser(
                 this.config.ignorechar(),
-                this.config.separator(),
                 this.config.lineSeparator(),
+                this.config.separator(),
                 this.config.quotechar(),
                 this.config.isCheckPresenceOnly(),
                 this.config.isCaseInsensitiveLookup(),
