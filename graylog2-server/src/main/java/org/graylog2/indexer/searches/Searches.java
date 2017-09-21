@@ -579,7 +579,7 @@ public class Searches {
         if (failedShards > 0) {
             final List<String> errors = StreamSupport.stream(shards.path("failures").spliterator(), false)
                 .map(failure -> failure.path("reason").path("reason").asText())
-                .filter(String::isEmpty)
+                .filter(s -> !s.isEmpty())
                 .collect(Collectors.toList());
 
             final List<String> nonNumericFieldErrors = errors.stream()
