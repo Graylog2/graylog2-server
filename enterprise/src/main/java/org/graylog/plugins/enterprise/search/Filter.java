@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import java.util.Collections;
+import java.util.Set;
+
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
@@ -17,6 +20,9 @@ public interface Filter {
     @JsonProperty(TYPE_FIELD)
     String type();
 
+    @JsonProperty("filters")
+    Set<Filter> filters();
+
     @JsonAutoDetect
     class Fallback implements Filter {
         @JsonProperty
@@ -25,6 +31,11 @@ public interface Filter {
         @Override
         public String type() {
             return type;
+        }
+
+        @Override
+        public Set<Filter> filters() {
+            return Collections.emptySet();
         }
 
         @JsonAnySetter

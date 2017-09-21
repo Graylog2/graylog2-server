@@ -7,6 +7,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.plugins.enterprise.search.Filter;
 
 import javax.annotation.Nullable;
+import java.util.Set;
 
 @AutoValue
 @JsonTypeName(StreamFilter.NAME)
@@ -16,6 +17,10 @@ public abstract class StreamFilter implements Filter {
 
     @Override
     public abstract String type();
+
+    @Override
+    @Nullable
+    public abstract Set<Filter> filters();
 
     @Nullable
     @JsonProperty("id")
@@ -29,9 +34,15 @@ public abstract class StreamFilter implements Filter {
         return new AutoValue_StreamFilter.Builder().type(NAME);
     }
 
+    public static StreamFilter ofId(String id) {
+        return builder().streamId(id).build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder type(String type);
+
+        public abstract Builder filters(@Nullable Set<Filter> filters);
 
         @JsonProperty("id")
         public abstract Builder streamId(@Nullable String streamId);

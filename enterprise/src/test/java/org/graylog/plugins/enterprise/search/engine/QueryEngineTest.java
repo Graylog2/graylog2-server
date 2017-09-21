@@ -8,6 +8,7 @@ import org.graylog.plugins.enterprise.search.QueryResult;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryGenerator;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryString;
+import org.graylog.plugins.enterprise.search.filter.OrFilter;
 import org.graylog.plugins.enterprise.search.filter.StreamFilter;
 import org.graylog.plugins.enterprise.search.searchtypes.MessageList;
 import org.graylog.plugins.enterprise.search.searchtypes.Sort;
@@ -19,7 +20,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -41,7 +41,10 @@ public class QueryEngineTest {
         final Query query = Query.builder()
                 .query(ElasticsearchQueryString.builder().queryString("_exists_:message").build())
                 .timerange(RelativeRange.builder().type(RelativeRange.RELATIVE).range(600).build())
-                .filters(Collections.singletonList(StreamFilter.builder().streamId(Stream.DEFAULT_STREAM_ID).build()))
+                .filter(OrFilter.or(
+                        StreamFilter.ofId(Stream.DEFAULT_STREAM_ID),
+                        StreamFilter.ofId("000000000000000000000002"))
+                )
                 .searchTypes(ImmutableList.of(
                         MessageList.builder()
                                 .offset(0)

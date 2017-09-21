@@ -22,7 +22,7 @@ public abstract class Query {
 
     @Nullable
     @JsonProperty
-    public abstract List<Filter> filters();
+    public abstract Filter filter();
 
     @Nullable
     public abstract BackendQuery query();
@@ -49,7 +49,7 @@ public abstract class Query {
 
         public abstract Builder timerange(TimeRange timerange);
 
-        public abstract Builder filters(List<Filter> filters);
+        public abstract Builder filter(Filter filter);
 
         public abstract Builder query(BackendQuery query);
 
