@@ -117,6 +117,12 @@ const AddToDashboardMenu = React.createClass({
     if (searchParams.has('streamId')) {
       searchParams = searchParams.set('stream_id', searchParams.get('streamId')).delete('streamId');
     }
+
+    if (widgetConfig.has('series')) {
+      // If widget has several series, each of them will contain a query, delete it from global widget configuration.
+      searchParams = searchParams.delete('query');
+    }
+
     widgetConfig = searchParams.merge(widgetConfig).merge(configuration);
 
     const promise = WidgetsStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
