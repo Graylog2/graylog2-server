@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { Button, ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';

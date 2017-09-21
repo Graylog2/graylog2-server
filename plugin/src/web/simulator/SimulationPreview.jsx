@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
@@ -5,8 +6,8 @@ import MessageShow from 'components/search/MessageShow';
 
 const SimulationPreview = React.createClass({
   propTypes: {
-    simulationResults: React.PropTypes.object.isRequired,
-    streams: React.PropTypes.object.isRequired,
+    simulationResults: PropTypes.object.isRequired,
+    streams: PropTypes.object.isRequired,
   },
 
   render() {

@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
@@ -8,10 +9,10 @@ import { MetricContainer, CounterRate } from 'components/metrics';
 
 const PipelineDetails = React.createClass({
   propTypes: {
-    pipeline: React.PropTypes.object,
-    create: React.PropTypes.bool,
-    onChange: React.PropTypes.func.isRequired,
-    onCancel: React.PropTypes.func,
+    pipeline: PropTypes.object,
+    create: PropTypes.bool,
+    onChange: PropTypes.func.isRequired,
+    onCancel: PropTypes.func,
   },
 
   render() {

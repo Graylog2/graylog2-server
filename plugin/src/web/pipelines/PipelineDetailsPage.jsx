@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col, Button } from 'react-bootstrap';
@@ -33,8 +34,8 @@ function filterConnections(state) {
 
 const PipelineDetailsPage = React.createClass({
   propTypes: {
-    params: React.PropTypes.object.isRequired,
-    history: React.PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connectFilter(PipelinesStore, 'pipeline', filterPipeline), Reflux.connectFilter(PipelineConnectionsStore, 'connections', filterConnections)],

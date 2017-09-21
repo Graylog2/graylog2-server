@@ -1,4 +1,5 @@
-import React, { PropTypes } from 'react';
+import PropTypes from 'prop-types';
+import React from 'react';
 import { DataTable, Timestamp } from 'components/common';
 
 import { Button } from 'react-bootstrap';

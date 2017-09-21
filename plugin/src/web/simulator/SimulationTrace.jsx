@@ -1,10 +1,11 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 import NumberUtils from 'util/NumberUtils';
 
 const SimulationTrace = React.createClass({
   propTypes: {
-    simulationResults: React.PropTypes.object.isRequired,
+    simulationResults: PropTypes.object.isRequired,
   },
 
   componentDidMount() {

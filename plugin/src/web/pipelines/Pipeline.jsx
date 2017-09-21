@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Row, Col, Alert } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -13,12 +14,12 @@ import Routes from 'routing/Routes';
 
 const Pipeline = React.createClass({
   propTypes: {
-    pipeline: React.PropTypes.object.isRequired,
-    connections: React.PropTypes.array.isRequired,
-    streams: React.PropTypes.array.isRequired,
-    onConnectionsChange: React.PropTypes.func.isRequired,
-    onStagesChange: React.PropTypes.func.isRequired,
-    onPipelineChange: React.PropTypes.func.isRequired,
+    pipeline: PropTypes.object.isRequired,
+    connections: PropTypes.array.isRequired,
+    streams: PropTypes.array.isRequired,
+    onConnectionsChange: PropTypes.func.isRequired,
+    onStagesChange: PropTypes.func.isRequired,
+    onPipelineChange: PropTypes.func.isRequired,
   },
 
   componentDidMount() {

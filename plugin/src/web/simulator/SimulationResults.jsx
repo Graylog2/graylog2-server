@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert, Col, DropdownButton, MenuItem, Row } from 'react-bootstrap';
 
@@ -12,11 +13,11 @@ import NumberUtils from 'util/NumberUtils';
 
 const SimulationResults = React.createClass({
   propTypes: {
-    stream: React.PropTypes.object.isRequired,
-    originalMessage: React.PropTypes.object,
-    simulationResults: React.PropTypes.object,
-    isLoading: React.PropTypes.bool,
-    error: React.PropTypes.object,
+    stream: PropTypes.object.isRequired,
+    originalMessage: PropTypes.object,
+    simulationResults: PropTypes.object,
+    isLoading: PropTypes.bool,
+    error: PropTypes.object,
   },
 
   getInitialState() {

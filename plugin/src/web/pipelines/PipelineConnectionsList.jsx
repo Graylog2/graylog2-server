@@ -1,13 +1,14 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import naturalSort from 'javascript-natural-sort';
 
 const PipelineConnectionsList = React.createClass({
   propTypes: {
-    pipeline: React.PropTypes.object.isRequired,
-    connections: React.PropTypes.array.isRequired,
-    streams: React.PropTypes.array.isRequired,
-    streamsFormatter: React.PropTypes.func.isRequired,
-    noConnectionsMessage: React.PropTypes.any,
+    pipeline: PropTypes.object.isRequired,
+    connections: PropTypes.array.isRequired,
+    streams: PropTypes.array.isRequired,
+    streamsFormatter: PropTypes.func.isRequired,
+    noConnectionsMessage: PropTypes.any,
   },
 
   getDefaultProps() {

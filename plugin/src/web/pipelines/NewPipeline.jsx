@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 
@@ -7,8 +8,8 @@ import Routes from 'routing/Routes';
 
 const NewPipeline = React.createClass({
   propTypes: {
-    onChange: React.PropTypes.func.isRequired,
-    history: React.PropTypes.object.isRequired,
+    onChange: PropTypes.func.isRequired,
+    history: PropTypes.object.isRequired,
   },
 
   _onChange(newPipeline) {

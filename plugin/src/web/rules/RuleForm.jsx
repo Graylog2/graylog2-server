@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
@@ -15,12 +16,12 @@ import RuleFormStyle from './RuleForm.css';
 
 const RuleForm = React.createClass({
   propTypes: {
-    rule: React.PropTypes.object,
-    usedInPipelines: React.PropTypes.array,
-    create: React.PropTypes.bool,
-    onSave: React.PropTypes.func.isRequired,
-    validateRule: React.PropTypes.func.isRequired,
-    history: React.PropTypes.object.isRequired,
+    rule: PropTypes.object,
+    usedInPipelines: PropTypes.array,
+    create: PropTypes.bool,
+    onSave: PropTypes.func.isRequired,
+    validateRule: PropTypes.func.isRequired,
+    history: PropTypes.object.isRequired,
   },
 
   getDefaultProps() {

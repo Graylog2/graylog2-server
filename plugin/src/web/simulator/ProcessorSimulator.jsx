@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
@@ -17,7 +18,7 @@ const DEFAULT_STREAM_ID = '000000000000000000000001';
 
 const ProcessorSimulator = React.createClass({
   propTypes: {
-    streams: React.PropTypes.array.isRequired,
+    streams: PropTypes.array.isRequired,
   },
 
   getInitialState() {

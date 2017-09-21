@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
@@ -16,8 +17,8 @@ function filterRules(state) {
 
 const RuleDetailsPage = React.createClass({
   propTypes: {
-    params: React.PropTypes.object.isRequired,
-    history: React.PropTypes.object.isRequired,
+    params: PropTypes.object.isRequired,
+    history: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connectFilter(RulesStore, 'rule', filterRules), Reflux.connect(PipelinesStore)],
