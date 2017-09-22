@@ -6,7 +6,6 @@ import { Page } from 'components/common';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
 import StoreProvider from 'injection/StoreProvider';
-const SearchStore = StoreProvider.getStore('Search');
 const UniversalSearchStore = StoreProvider.getStore('UniversalSearch');
 
 import $ from 'jquery';
