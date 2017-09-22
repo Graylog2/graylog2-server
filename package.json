@@ -15,8 +15,8 @@
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "GPL-3.0",
   "dependencies": {
-    "leaflet": "~0.7.7",
-    "react-leaflet": "~0.10.0"
+    "leaflet": "^1.2.0",
+    "react-leaflet": "^1.6.0"
   },
   "devDependencies": {
     "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin"
