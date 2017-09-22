@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableSet;
 import org.graylog.autovalue.WithBeanGetter;
 import org.joda.time.Period;
 
+import javax.annotation.Nullable;
 import java.util.Map;
 import java.util.Set;
 
@@ -62,6 +63,10 @@ public abstract class SearchesClusterConfig {
             .add("file")
             .add("source_file")
             .build();
+    private static final Set<String> DEFAULT_ANALYSIS_DISABLED_FIELDS = ImmutableSet.<String>builder()
+            .add("message")
+            .add("full_message")
+            .build();
 
     @JsonProperty("query_time_range_limit")
     public abstract Period queryTimeRangeLimit();
@@ -75,16 +80,21 @@ public abstract class SearchesClusterConfig {
     @JsonProperty("surrounding_filter_fields")
     public abstract Set<String> surroundingFilterFields();
 
+    @JsonProperty("analysis_disabled_fields")
+    public abstract Set<String> analysisDisabledFields();
+
     @JsonCreator
     public static SearchesClusterConfig create(@JsonProperty("query_time_range_limit") Period queryTimeRangeLimit,
                                                @JsonProperty("relative_timerange_options") Map<Period, String> relativeTimerangeOptions,
                                                @JsonProperty("surrounding_timerange_options") Map<Period, String> surroundingTimerangeOptions,
-                                               @JsonProperty("surrounding_filter_fields") Set<String> surroundingFilterFields) {
+                                               @JsonProperty("surrounding_filter_fields") Set<String> surroundingFilterFields,
+                                               @JsonProperty("analysis_disabled_fields") @Nullable Set<String> analysisDisabledFields) {
         return builder()
                 .queryTimeRangeLimit(queryTimeRangeLimit)
                 .relativeTimerangeOptions(relativeTimerangeOptions)
                 .surroundingTimerangeOptions(surroundingTimerangeOptions)
                 .surroundingFilterFields(surroundingFilterFields)
+                .analysisDisabledFields(analysisDisabledFields == null ? DEFAULT_ANALYSIS_DISABLED_FIELDS : analysisDisabledFields)
                 .build();
     }
 
@@ -94,6 +104,7 @@ public abstract class SearchesClusterConfig {
                 .relativeTimerangeOptions(DEFAULT_RELATIVE_TIMERANGE_OPTIONS)
                 .surroundingTimerangeOptions(DEFAULT_SURROUNDING_TIMERANGE_OPTIONS)
                 .surroundingFilterFields(DEFAULT_SURROUNDING_FILTER_FIELDS)
+                .analysisDisabledFields(DEFAULT_ANALYSIS_DISABLED_FIELDS)
                 .build();
     }
 
@@ -109,6 +120,7 @@ public abstract class SearchesClusterConfig {
         public abstract Builder relativeTimerangeOptions(Map<Period, String> relativeTimerangeOptions);
         public abstract Builder surroundingTimerangeOptions(Map<Period, String> surroundingTimerangeOptions);
         public abstract Builder surroundingFilterFields(Set<String> surroundingFilterFields);
+        public abstract Builder analysisDisabledFields(Set<String> analysisDisabledFields);
 
         public abstract SearchesClusterConfig build();
     }
