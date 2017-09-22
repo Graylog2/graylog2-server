@@ -14,7 +14,7 @@ module.exports = {
     'import/extensions': 0,
     'import/no-extraneous-dependencies': 0,
     'import/no-unresolved': 0,
-    indent: [2, 2, { SwitchCase: 1 }],
+    indent: [2, 2, { SwitchCase: 1, ignoredNodes: ['JSXAttribute *'] }],
     'max-len': 0,
     'new-cap': 0,
     'no-else-return': 1,
@@ -28,5 +28,5 @@ module.exports = {
     'react/jsx-space-before-closing': 0,
     'react/prefer-es6-class': 0,
     'react/prefer-stateless-function': 1,
-  }
+  },
 };
