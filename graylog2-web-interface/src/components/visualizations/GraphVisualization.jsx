@@ -6,6 +6,7 @@ import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
 import deepEqual from 'deep-equal';
+import _ from 'lodash';
 
 import DateTime from 'logic/datetimes/DateTime';
 import HistogramFormatter from 'logic/graphs/HistogramFormatter';
@@ -218,7 +219,7 @@ const GraphVisualization = React.createClass({
         .attr('r', thresholdDotRadius)
         .attr('rel', 'tooltip') // To make the tooltip helper pick it up
         .attr('data-original-title', () => {
-          return `<div class="datapoint-info">${thresholdTooltip}</div>`;
+          return `<div class="datapoint-info">${_.escape(thresholdTooltip)}</div>`;
         })
         .style('stroke-opacity', thresholdDotHidden)
         .style('fill-opacity', thresholdDotHidden)
