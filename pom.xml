@@ -9,13 +9,13 @@
     <parent>
         <groupId>org.graylog.plugins</groupId>
         <artifactId>graylog-plugin-web-parent</artifactId>
-        <version>2.4.0-SNAPSHOT</version>
+        <version>2.4.0-alpha.1</version>
         <relativePath>../graylog2-server/graylog-plugin-parent/graylog-plugin-web-parent</relativePath>
     </parent>
 
     <groupId>org.graylog.plugins</groupId>
     <artifactId>graylog-plugin-pipeline-processor-parent</artifactId>
-    <version>2.4.0-SNAPSHOT</version>
+    <version>2.4.0-alpha.1</version>
     <packaging>pom</packaging>
 
     <name>Graylog Pipeline Plugin Parent</name>
