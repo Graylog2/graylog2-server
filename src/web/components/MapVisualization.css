@@ -1,6 +1,6 @@
 :local(.overlay) {
     position: absolute;
-    z-index: 1000;
+    z-index: 999; /* So it displays below bootstrap dropdowns */
 }
 
 :local(.mapLocked) .leaflet-control-container {

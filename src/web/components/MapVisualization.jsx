@@ -25,7 +25,7 @@ const MapVisualization = React.createClass({
       attribution: '&copy; <a href="http://osm.org/copyright" target="_blank">OpenStreetMap</a> contributors',
       interactive: true,
       onRenderComplete: () => {},
-      locked: PropTypes.bool,
+      locked: false,
     };
   },
 
