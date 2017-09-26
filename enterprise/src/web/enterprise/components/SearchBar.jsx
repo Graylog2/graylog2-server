@@ -18,6 +18,7 @@ const SearchBar = React.createClass({
   mixins: [Reflux.connect(SearchStore, 'search')],
   _performSearch(event) {
     event.preventDefault();
+
   },
   // TODO: Transfer this to AbsoluteTimeRangeSelector
   _rangeParamsChanged(key, value) {
@@ -68,10 +69,10 @@ const SearchBar = React.createClass({
   render() {
     const { rangeParams, rangeType, query } = this.state.search;
     return (
-      <div className="row no-bm">
-        <div className="col-md-12" id="universalsearch-container">
-          <div className="row no-bm">
-            <div ref="universalSearch" className="col-md-12" id="universalsearch">
+      <Row className="no-bm">
+        <Col md={12} id="universalsearch-container">
+          <Row className="no-bm">
+            <Col md={12} ref="universalSearch" id="universalsearch">
               <form ref="searchForm"
                 className="universalsearch-form"
                 method="GET"
@@ -141,10 +142,10 @@ const SearchBar = React.createClass({
                   </div>
                 </div>
               </form>
-            </div>
-          </div>
-        </div>
-      </div>
+            </Col>
+          </Row>
+        </Col>
+      </Row>
     );
   },
 });
