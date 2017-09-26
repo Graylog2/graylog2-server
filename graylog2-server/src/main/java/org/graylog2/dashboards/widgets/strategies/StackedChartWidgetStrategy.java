@@ -90,28 +90,44 @@ public class StackedChartWidgetStrategy extends ChartWidgetStrategy {
         long tookMs = 0;
 
         for (Series series : chartSeries) {
+            HistogramResult histogramResult;
+            final boolean shouldCalculateCardinality = "cardinality".equalsIgnoreCase(series.statisticalFunction);
             try {
-                final HistogramResult histogramResult = searches.fieldHistogram(
+                histogramResult = searches.fieldHistogram(
                         series.query,
                         series.field,
                         Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase(Locale.ENGLISH)),
                         filter,
                         this.timeRange,
-                        "cardinality".equalsIgnoreCase(series.statisticalFunction));
-
-                if (from == null) {
-                    from = histogramResult.getHistogramBoundaries().getFrom();
-                }
-
-                to = histogramResult.getHistogramBoundaries().getTo();
-
-                results.add(histogramResult.getResults());
-                tookMs += histogramResult.tookMs();
+                        !shouldCalculateCardinality,
+                        shouldCalculateCardinality);
             } catch (FieldTypeException e) {
-                String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + widgetId + ">. Not a numeric field? The field was [" + series.field + "]";
-                LOG.error(msg, e);
-                throw new RuntimeException(msg, e);
+                try {
+                    // Try again without calculating stats
+                    histogramResult = searches.fieldHistogram(
+                            series.query,
+                            series.field,
+                            Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase(Locale.ENGLISH)),
+                            filter,
+                            this.timeRange,
+                            false,
+                            shouldCalculateCardinality);
+                } catch (FieldTypeException e1) {
+                    String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + widgetId + ">. The field was [" + series.field + "]";
+                    LOG.error(msg, e1);
+                    throw new RuntimeException(msg, e1);
+                }
             }
+
+            if (from == null) {
+                from = histogramResult.getHistogramBoundaries().getFrom();
+            }
+
+            to = histogramResult.getHistogramBoundaries().getTo();
+
+            results.add(histogramResult.getResults());
+            tookMs += histogramResult.tookMs();
+
         }
 
         final AbsoluteRange computationTimeRange = AbsoluteRange.create(from, to);

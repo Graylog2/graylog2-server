@@ -78,6 +78,7 @@ public class FieldChartWidgetStrategy extends ChartWidgetStrategy {
             filter = "streams:" + streamId;
         }
 
+        final boolean shouldCalculateCardinality = "cardinality".equalsIgnoreCase(statisticalFunction);
         try {
             final HistogramResult histogramResult = searches.fieldHistogram(
                     query,
@@ -85,13 +86,28 @@ public class FieldChartWidgetStrategy extends ChartWidgetStrategy {
                     Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase(Locale.ENGLISH)),
                     filter,
                     this.timeRange,
-                    "cardinality".equalsIgnoreCase(statisticalFunction));
+                    !shouldCalculateCardinality,
+                    shouldCalculateCardinality);
 
             return new ComputationResult(histogramResult.getResults(), histogramResult.tookMs(), histogramResult.getHistogramBoundaries());
         } catch (FieldTypeException e) {
-            String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + this.widgetId + ">. Not a numeric field? The field was [" + field + "]";
-            LOG.error(msg, e);
-            throw new RuntimeException(msg, e);
+            try {
+                // Try again not calculating statistics
+                final HistogramResult histogramResult = searches.fieldHistogram(
+                        query,
+                        field,
+                        Searches.DateHistogramInterval.valueOf(interval.toString().toUpperCase(Locale.ENGLISH)),
+                        filter,
+                        this.timeRange,
+                        false,
+                        shouldCalculateCardinality);
+
+                return new ComputationResult(histogramResult.getResults(), histogramResult.tookMs(), histogramResult.getHistogramBoundaries());
+            } catch (FieldTypeException e1) {
+                String msg = "Could not calculate [" + this.getClass().getCanonicalName() + "] widget <" + this.widgetId + ">. The field was [" + field + "]";
+                LOG.error(msg, e1);
+                throw new RuntimeException(msg, e1);
+            }
         }
     }
 
