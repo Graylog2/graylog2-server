@@ -15,7 +15,7 @@ public abstract class Sort {
     public abstract SortOrder order();
 
     @JsonCreator
-    public static Sort create(String field, SortOrder order) {
+    public static Sort create(@JsonProperty("field") String field, @JsonProperty("order") SortOrder order) {
         return new AutoValue_Sort(field, order);
     }
 

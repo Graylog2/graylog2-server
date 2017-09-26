@@ -1,29 +1,34 @@
 package org.graylog.plugins.enterprise.search.engine;
 
 import org.graylog.plugins.enterprise.search.Query;
+import org.graylog.plugins.enterprise.search.QueryJob;
 import org.graylog.plugins.enterprise.search.QueryResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+@Singleton
 public class QueryEngine {
     private static final Logger LOG = LoggerFactory.getLogger(QueryEngine.class);
 
     private final Map<String, QueryBackend> queryBackends;
 
+    @Inject
     public QueryEngine(Map<String, QueryBackend> queryBackends) {
         this.queryBackends = queryBackends;
     }
 
-    public CompletableFuture<QueryResult> execute(Query query) {
-        return CompletableFuture.supplyAsync(() -> doExecute(query));
+    public CompletableFuture<QueryResult> execute(QueryJob job) {
+        return CompletableFuture.supplyAsync(() -> doExecute(job));
     }
 
-    private QueryResult doExecute(Query query) {
+    private QueryResult doExecute(QueryJob queryJob) {
         // TODO validate query
-
+        final Query query = queryJob.getQuery();
         final BackendQuery backendQuery = query.query();
         if (backendQuery == null) {
             throw new NullPointerException("query cannot be empty");
@@ -34,8 +39,8 @@ public class QueryEngine {
         }
         final Object generatedQuery = queryBackend.generate(query);
         LOG.warn("Generated query: {}", generatedQuery.toString());
-        final QueryResult queryResult = queryBackend.run(query, generatedQuery);
+        final QueryResult queryResult = queryBackend.run(queryJob, generatedQuery);
 
-        return new QueryResult(query);
+        return queryResult;
     }
 }

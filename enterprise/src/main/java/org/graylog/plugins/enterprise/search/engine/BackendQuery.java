@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = BackendQuery.TYPE_FIELD,
         visible = true,
         defaultImpl = BackendQuery.Fallback.class)
+@JsonAutoDetect
 public interface BackendQuery {
     String TYPE_FIELD = "type";
 

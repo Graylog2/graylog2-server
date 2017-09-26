@@ -14,6 +14,7 @@ import java.util.Set;
         property = Filter.TYPE_FIELD,
         visible = true,
         defaultImpl = Filter.Fallback.class)
+@JsonAutoDetect
 public interface Filter {
     String TYPE_FIELD = "type";
 

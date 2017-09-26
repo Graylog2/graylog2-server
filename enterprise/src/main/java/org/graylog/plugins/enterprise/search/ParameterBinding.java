@@ -1,6 +1,7 @@
 package org.graylog.plugins.enterprise.search;
 
 import com.fasterxml.jackson.annotation.JsonAnySetter;
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
@@ -10,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
         property = ParameterBinding.TYPE_FIELD,
         visible = true,
         defaultImpl = ParameterBinding.Fallback.class)
+@JsonAutoDetect
 public interface ParameterBinding {
     String TYPE_FIELD = "type";
 

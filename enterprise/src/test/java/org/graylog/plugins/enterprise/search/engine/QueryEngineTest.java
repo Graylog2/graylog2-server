@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.enterprise.search.Query;
+import org.graylog.plugins.enterprise.search.QueryJob;
 import org.graylog.plugins.enterprise.search.QueryResult;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryGenerator;
@@ -20,6 +21,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -31,7 +33,7 @@ public class QueryEngineTest {
     @BeforeClass
     public static void setup() {
         queryGenerators = ImmutableMap.<String, QueryBackend>builder()
-                .put(ElasticsearchQueryString.TYPE, new ElasticsearchBackend(new ElasticsearchQueryGenerator()))
+                .put(ElasticsearchQueryString.NAME, new ElasticsearchBackend(new ElasticsearchQueryGenerator()))
                 .build();
     }
 
@@ -59,7 +61,9 @@ public class QueryEngineTest {
 
         LOG.warn("Query {}", query);
 
-        final CompletableFuture<QueryResult> queryJob = new QueryEngine(queryGenerators).execute(query);
+        final QueryJob job = new QueryJob(UUID.randomUUID().toString(), query);
+
+        final CompletableFuture<QueryResult> queryJob = new QueryEngine(queryGenerators).execute(job);
 
         queryJob.thenAccept(o -> LOG.warn("result {}", o)).get();
     }

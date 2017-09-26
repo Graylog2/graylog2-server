@@ -16,10 +16,12 @@ public abstract class StreamFilter implements Filter {
     public static final String NAME = "stream";
 
     @Override
+    @JsonProperty
     public abstract String type();
 
     @Override
     @Nullable
+    @JsonProperty
     public abstract Set<Filter> filters();
 
     @Nullable
@@ -40,8 +42,10 @@ public abstract class StreamFilter implements Filter {
 
     @AutoValue.Builder
     public abstract static class Builder {
+        @JsonProperty
         public abstract Builder type(String type);
 
+        @JsonProperty
         public abstract Builder filters(@Nullable Set<Filter> filters);
 
         @JsonProperty("id")
