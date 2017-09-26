@@ -199,6 +199,7 @@ const SearchResult = React.createClass({
                          searchInStream={this.props.searchInStream}
                          permissions={this.props.permissions}
                          loadingSearch={this.props.loadingSearch}
+                         searchConfig={this.props.searchConfig}
           />
         </Col>
         <Col md={9} sm={12} id="main-content-sidebar">

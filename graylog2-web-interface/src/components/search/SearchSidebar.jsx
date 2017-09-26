@@ -45,6 +45,7 @@ const SearchSidebar = React.createClass({
     togglePageFields: PropTypes.func,
     toggleShouldHighlight: PropTypes.func,
     loadingSearch: PropTypes.bool,
+    searchConfig: PropTypes.object.isRequired,
   },
 
   getInitialState() {
@@ -255,6 +256,7 @@ const SearchSidebar = React.createClass({
                                      maximumHeight={this.state.availableHeight}
                                      predefinedFieldSelection={this.props.predefinedFieldSelection}
                                      result={this.props.result}
+                                     searchConfig={this.props.searchConfig}
                                      selectedFields={this.props.selectedFields}
                                      shouldHighlight={this.props.shouldHighlight}
                                      showAllFields={this.props.showAllFields}
