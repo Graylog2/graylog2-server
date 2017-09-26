@@ -42,7 +42,7 @@ public class PipelineProcessorMetaData implements PluginMetaData {
 
     @Override
     public String getAuthor() {
-        return "Graylog, Inc";
+        return "Graylog, Inc.";
     }
 
     @Override
