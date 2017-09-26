@@ -16,11 +16,6 @@ public class CEFTimestampParser {
             ISODateTimeFormat.basicDateTime(),
             ISODateTimeFormat.basicDateTimeNoMillis(),
 
-            DateTimeFormat.fullDateTime(),
-            DateTimeFormat.mediumDateTime(),
-            DateTimeFormat.shortDateTime(),
-            DateTimeFormat.longDateTime(),
-
             DateTimeFormat.forPattern("MMM dd HH:mm:ss.SSS ZZZ"),
             DateTimeFormat.forPattern("MMM dd HH:mm:sss.SSS"),
             DateTimeFormat.forPattern("MMM dd HH:mm:ss ZZZ"),
@@ -29,6 +24,11 @@ public class CEFTimestampParser {
             DateTimeFormat.forPattern("MMM dd yyyy HH:mm:ss.SSS"),
             DateTimeFormat.forPattern("MMM dd yyyy HH:mm:ss ZZZ"),
             DateTimeFormat.forPattern("MMM dd yyyy HH:mm:ss"),
+
+            DateTimeFormat.fullDateTime(),
+            DateTimeFormat.mediumDateTime(),
+            DateTimeFormat.shortDateTime(),
+            DateTimeFormat.longDateTime()
     };
 
     @Nullable

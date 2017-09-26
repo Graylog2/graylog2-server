@@ -2,10 +2,11 @@ package org.graylog.plugins.cef.pipelines.rules;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.github.jcustenborder.cef.CEFParser;
+import com.github.jcustenborder.cef.CEFParserFactory;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.inject.Inject;
-import org.graylog.plugins.cef.parser.CEFMessage;
-import org.graylog.plugins.cef.parser.CEFParser;
+import org.graylog.plugins.cef.parser.MappedMessage;
 import org.graylog.plugins.pipelineprocessor.EvaluationContext;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
@@ -43,7 +44,7 @@ public class CEFParserFunction extends AbstractFunction<CEFParserResult> {
         final String cef = valueParam.required(args, context);
         final boolean useFullNames = useFullNamesParam.optional(args, context).orElse(false);
 
-        final CEFParser parser = new CEFParser(useFullNames);
+        final CEFParser parser = CEFParserFactory.create();
         if (cef == null || cef.isEmpty()) {
             LOG.debug("NULL or empty parameter passed to CEF parser function. Not evaluating.");
             return null;
@@ -51,11 +52,11 @@ public class CEFParserFunction extends AbstractFunction<CEFParserResult> {
 
         LOG.debug("Running CEF parser for [{}].", cef);
 
-        final CEFMessage message;
+        final MappedMessage message;
         try (Timer.Context timer = parseTime.time()) {
-            message = parser.parse(cef.trim()).build();
+            message = new MappedMessage(parser.parse(cef.trim()), useFullNames);
         } catch (Exception e) {
-            LOG.error("Could not run CEF parser for [{}].", cef, e);
+            LOG.error("Error while parsing CEF message: {}", cef, e);
             return null;
         }
 
@@ -66,20 +67,16 @@ public class CEFParserFunction extends AbstractFunction<CEFParserResult> {
           * overwritten ourselves later in the processing. The user is encouraged to run another pipeline function
           * to clean up field names if desired.
          */
-        fields.put("cef_version", message.version());
+        fields.put("cef_version", message.cefVersion());
         fields.put("device_vendor", message.deviceVendor());
         fields.put("device_product", message.deviceProduct());
         fields.put("device_version", message.deviceVersion());
         fields.put("device_event_class_id", message.deviceEventClassId());
         fields.put("name", message.name());
-        fields.put("severity", message.severity().text());
-        fields.put("severity_numeric", message.severity().numeric());
-        if (message.message() != null) {
-            fields.put("message", message.message());
-        }
+        fields.put("severity", message.severity());
 
         // Add all custom CEF fields.
-        fields.putAll(message.fields());
+        fields.putAll(message.mappedExtensions());
 
         return new CEFParserResult(fields);
     }

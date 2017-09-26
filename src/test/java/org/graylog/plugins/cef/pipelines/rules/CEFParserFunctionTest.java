@@ -80,14 +80,13 @@ public class CEFParserFunctionTest {
         assertEquals("product", result.get("device_product"));
         assertEquals("1.0", result.get("device_version"));
         assertEquals("id", result.get("device_event_class_id"));
-        assertEquals("Low", result.get("severity"));
-        assertEquals(0, result.get("severity_numeric"));
+        assertEquals("low", result.get("severity"));
         assertEquals("example.com", result.get("dvc"));
-        assertEquals("Foobar", result.get("message"));
+        assertEquals("Foobar", result.get("msg"));
     }
 
     @Test
-    public void evaluate_returns_result_for_valid_CEF_string_with_short_names_if_parameter_is_missing() throws Exception {
+    public void evaluate_returns_result_for_valid_CEF_string_with_short_names_if_useFullNames_parameter_is_missing() throws Exception {
         final Map<String, Expression> arguments = Collections.singletonMap(
                 CEFParserFunction.VALUE, new StringExpression(new CommonToken(0), "CEF:0|vendor|product|1.0|id|name|low|dvc=example.com msg=Foobar")
         );
@@ -102,10 +101,9 @@ public class CEFParserFunctionTest {
         assertEquals("product", result.get("device_product"));
         assertEquals("1.0", result.get("device_version"));
         assertEquals("id", result.get("device_event_class_id"));
-        assertEquals("Low", result.get("severity"));
-        assertEquals(0, result.get("severity_numeric"));
+        assertEquals("low", result.get("severity"));
         assertEquals("example.com", result.get("dvc"));
-        assertEquals("Foobar", result.get("message"));
+        assertEquals("Foobar", result.get("msg"));
     }
 
     @Test
@@ -126,8 +124,7 @@ public class CEFParserFunctionTest {
         assertEquals("product", result.get("device_product"));
         assertEquals("1.0", result.get("device_version"));
         assertEquals("id", result.get("device_event_class_id"));
-        assertEquals("Low", result.get("severity"));
-        assertEquals(0, result.get("severity_numeric"));
+        assertEquals("low", result.get("severity"));
         assertEquals("example.com", result.get("deviceAddress"));
         assertEquals("Foobar", result.get("message"));
     }
@@ -149,8 +146,7 @@ public class CEFParserFunctionTest {
         assertEquals("product", result.get("device_product"));
         assertEquals("1.0", result.get("device_version"));
         assertEquals("id", result.get("device_event_class_id"));
-        assertEquals("Low", result.get("severity"));
-        assertEquals(0, result.get("severity_numeric"));
+        assertEquals("low", result.get("severity"));
         assertEquals("example.com", result.get("dvc"));
         assertFalse(result.containsKey("message"));
     }

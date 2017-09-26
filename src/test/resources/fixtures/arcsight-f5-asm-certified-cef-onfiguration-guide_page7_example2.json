@@ -1,0 +1,37 @@
+{
+  "testString": "Sep 3 16:06:16 172.30.0.20 ASM:CEF:0|F5|ASM|11.0.0|200000098|XSS script tag (Parameter)|5|dvchost=3600.lab.asm.f5net.com dvc=172.30.0.20 cs1=maui_app_default cs1Label=policy_name cs2=maui_app cs2Label=web_application_name deviceCustomDate1=Sep 03 2010 15:56:49 deviceCustomDate1Label=policy_apply_date externalId=2922246059721752663 act=alerted cn1=200 cn1Label=response_code src=192.168.74.216 spt=52793 dst=172.30.0.30 dpt=80 requestMethod=GET app=HTTP request=/xss/xss.php?param\\=<script cs5=N/A cs5Label=x_forwarded_for_header_value rt=Sep 03 2010 16:06:15 deviceExternalId=0 cs4=Cross Site Scripting (XSS) cs4Label=attack_type cs6=N/A cs6Label=geo_location cs3Label=full_request cs3=GET /xss/xss.php?param\\=<script HTTP/1.1\\r\\nAccept: */*\\r\\nAccept-Language: en-US\\r\\nUser-Agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; InfoPath.2; MS-RTC LM 8)\\r\\nAccept-Encoding: gzip, deflate\\r\\nHost: 172.30.0.30\\r\\nConnection: Keep-Alive\\r\\nCookie: Super_Secret_Session_Cookie\\=123456789;TS49b723\\=5dc5319219c48503ae788c666bc08a1fbf81f2c754f2bc3b4c817eec",
+  "description": "Attack Signature is triggered - https://www.f5.com/images/solution-center/arcsight-f5-asm-certified-cef-onfiguration-guide.pdf#page=7",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "172.30.0.20",
+  "cefVersion": 0,
+  "deviceVendor": "F5",
+  "deviceProduct": "ASM",
+  "deviceVersion": "11.0.0",
+  "deviceEventClassId": "200000098",
+  "name": "XSS script tag (Parameter)",
+  "severity": "5",
+  "extensions": {
+    "dvchost": "3600.lab.asm.f5net.com",
+    "dvc": "172.30.0.20",
+    "policy_name": "maui_app_default",
+    "web_application_name": "maui_app",
+    "policy_apply_date": "2010-09-03T15:56:49Z",
+    "externalId": "2922246059721752663",
+    "act": "alerted",
+    "response_code": 200,
+    "src": "192.168.74.216",
+    "spt": 52793,
+    "dst": "172.30.0.30",
+    "dpt": 80,
+    "requestMethod": "GET",
+    "app": "HTTP",
+    "request": "/xss/xss.php?param=<script",
+    "x_forwarded_for_header_value": "N/A",
+    "rt": "2010-09-03T16:06:15Z",
+    "deviceExternalId": "0",
+    "attack_type": "Cross Site Scripting (XSS)",
+    "geo_location": "N/A",
+    "full_request": "GET /xss/xss.php?param=<script HTTP/1.1\r\nAccept: */*\r\nAccept-Language: en-US\r\nUser-Agent: Mozilla/4.0 (compatible; MSIE 8.0; Windows NT 6.1; WOW64; Trident/4.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; InfoPath.2; MS-RTC LM 8)\r\nAccept-Encoding: gzip, deflate\r\nHost: 172.30.0.30\r\nConnection: Keep-Alive\r\nCookie: Super_Secret_Session_Cookie=123456789;TS49b723=5dc5319219c48503ae788c666bc08a1fbf81f2c754f2bc3b4c817eec"
+  }
+}
+

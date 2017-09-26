@@ -4,11 +4,8 @@ import com.google.inject.Binder;
 import com.google.inject.TypeLiteral;
 import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.cef.codec.CEFCodec;
-import org.graylog.plugins.cef.codec.CEFSyslogCodec;
 import org.graylog.plugins.cef.input.CEFAmqpInput;
 import org.graylog.plugins.cef.input.CEFKafkaInput;
-import org.graylog.plugins.cef.input.CEFSyslogTCPInput;
-import org.graylog.plugins.cef.input.CEFSyslogUDPInput;
 import org.graylog.plugins.cef.input.CEFTCPInput;
 import org.graylog.plugins.cef.input.CEFUDPInput;
 import org.graylog.plugins.cef.pipelines.rules.CEFParserFunction;
@@ -20,12 +17,9 @@ public class CEFInputModule extends PluginModule {
     protected void configure() {
         // Register message input.
         addCodec(CEFCodec.NAME, CEFCodec.class);
-        addCodec(CEFSyslogCodec.NAME, CEFSyslogCodec.class);
 
         addMessageInput(CEFUDPInput.class);
         addMessageInput(CEFTCPInput.class);
-        addMessageInput(CEFSyslogUDPInput.class);
-        addMessageInput(CEFSyslogTCPInput.class);
 
         addMessageInput(CEFAmqpInput.class);
         addMessageInput(CEFKafkaInput.class);

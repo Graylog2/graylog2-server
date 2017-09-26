@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableMap;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.function.Function;
 
@@ -28,13 +29,13 @@ public enum CEFMapping {
     cfp3Label("cfp3Label", "deviceCustomFloatingPoint3Label", CEFMapping::convertString),
     cfp4("cfp4", "deviceCustomFloatingPoint4", CEFMapping::convertFloat),
     cfp4Label("cfp4Label", "deviceCustomFloatingPoint4Label", CEFMapping::convertString),
-    cn1("cn1", "deviceCustomNumber1", CEFMapping::convertLong),
+    cn1("cn1", "deviceCustomNumber1", CEFMapping::convertBigInteger),
     cn1Label("cn1Label", "deviceCustomNumber1Label", CEFMapping::convertString),
-    cn2("cn2", "deviceCustomNumber2", CEFMapping::convertLong),
+    cn2("cn2", "deviceCustomNumber2", CEFMapping::convertBigInteger),
     cn2Label("cn2Label", "deviceCustomNumber2Label", CEFMapping::convertString),
-    cn3("cn3", "deviceCustomNumber3", CEFMapping::convertLong),
+    cn3("cn3", "deviceCustomNumber3", CEFMapping::convertBigInteger),
     cn3Label("cn3Label", "deviceCustomNumber3Label", CEFMapping::convertString),
-    cn4("cn4", "deviceCustomNumber4", CEFMapping::convertLong),
+    cn4("cn4", "deviceCustomNumber4", CEFMapping::convertBigInteger),
     cn4Label("cn4Label", "deviceCustomNumber4Label", CEFMapping::convertString),
     cnt("cnt", "baseEventCount", CEFMapping::convertInteger),
     cs1("cs1", "deviceCustomString1", CEFMapping::convertString),
@@ -193,41 +194,6 @@ public enum CEFMapping {
     sourceZoneExternalID("sourceZoneExternalID", "sourceZoneExternalID", CEFMapping::convertString),
     sourceZoneURI("sourceZoneURI", "sourceZoneURI", CEFMapping::convertString);
 
-    public enum Type {
-        BASE_EVENT, AGGREGATED, CORRELATION, ACTION;
-
-        @Nullable
-        public static Type fromText(String text) {
-            switch (text) {
-                case "0":
-                    return Type.BASE_EVENT;
-                case "1":
-                    return Type.AGGREGATED;
-                case "2":
-                    return Type.CORRELATION;
-                case "3":
-                    return Type.ACTION;
-                default:
-                    return null;
-            }
-        }
-    }
-
-    public enum Direction {
-        INBOUND, OUTBOUND;
-
-        public static Direction fromText(String text) {
-            switch (text) {
-                case "0":
-                    return Direction.INBOUND;
-                case "1":
-                    return Direction.OUTBOUND;
-                default:
-                    return null;
-            }
-        }
-    }
-
     // Lookup tables for faster access
     private static final Map<String, CEFMapping> KEY_NAMES;
     private static final Map<String, CEFMapping> FULL_NAMES;
@@ -259,13 +225,17 @@ public enum CEFMapping {
         return Long.parseLong(s);
     }
 
+    private static BigInteger convertBigInteger(String s) {
+        return new BigInteger(s);
+    }
+
     private static Integer convertInteger(String s) {
         return Integer.parseInt(s);
     }
 
-    @Nullable
-    private static DateTime convertTimestamp(String s) {
-        return CEFTimestampParser.parse(s);
+    private static Object convertTimestamp(String s) {
+        final DateTime dateTime = CEFTimestampParser.parse(s);
+        return dateTime == null ? s : dateTime;
     }
 
     private static String convertIPv4Address(String s) {
@@ -284,14 +254,13 @@ public enum CEFMapping {
         return s;
     }
 
-    @Nullable
-    private static Type convertType(String s) {
-        return Type.fromText(s);
+    private static Integer convertType(String s) {
+        return convertInteger(s);
     }
 
     @Nullable
-    private static Direction convertDirection(String s) {
-        return Direction.fromText(s);
+    private static Integer convertDirection(String s) {
+        return convertInteger(s);
     }
 
     @Nullable
