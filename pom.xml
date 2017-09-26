@@ -92,7 +92,7 @@
         <commons-email.version>1.5</commons-email.version>
         <commons-io.version>2.5</commons-io.version>
         <disruptor.version>3.3.6</disruptor.version>
-        <drools.version>7.3.0.Final</drools.version>
+        <drools.version>6.5.0.Final</drools.version>
         <elasticsearch.version>2.4.4</elasticsearch.version>
         <jest.version>2.4.9+jackson</jest.version>
         <gelfclient.version>1.4.1</gelfclient.version>
