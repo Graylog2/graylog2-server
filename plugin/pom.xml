@@ -61,7 +61,7 @@
             <dependency>
                 <groupId>com.google.auto.value</groupId>
                 <artifactId>auto-value</artifactId>
-                <version>1.4-rc1</version>
+                <version>${auto-value.version}</version>
             </dependency>
             <dependency>
                 <groupId>junit</groupId>
