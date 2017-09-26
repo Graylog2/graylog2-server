@@ -10,6 +10,8 @@ import DocsHelper from 'util/DocsHelper';
 import SearchButton from 'enterprise/components/searchbar/SearchButton';
 import SearchStore from 'enterprise/stores/SearchStore';
 import SearchActions from 'enterprise/actions/SearchActions';
+import QueriesStore from 'enterprise/stores/QueriesStore';
+import QueriesActions from 'enterprise/actions/QueriesActions';
 import RelativeTimeRangeSelector from 'enterprise/components/searchbar/RelativeTimeRangeSelector';
 import AbsoluteTimeRangeSelector from 'enterprise/components/searchbar/AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from 'enterprise/components/searchbar/KeywordTimeRangeSelector';
@@ -18,7 +20,8 @@ const SearchBar = React.createClass({
   mixins: [Reflux.connect(SearchStore, 'search')],
   _performSearch(event) {
     event.preventDefault();
-
+    QueriesActions.create(this.state.search)
+      .then(id => console.log('Added query ' + id));
   },
   // TODO: Transfer this to AbsoluteTimeRangeSelector
   _rangeParamsChanged(key, value) {
@@ -83,8 +86,8 @@ const SearchBar = React.createClass({
                 <input type="hidden" ref={(ref) => { this.highlightMessage = ref; }} name="highlightMessage" value="" />
 
                 <div className="timerange-selector-container">
-                  <div className="row no-bm">
-                    <div className="col-md-6">
+                  <Row className="no-bm">
+                    <Col md={6}>
                       <ButtonToolbar className="timerange-chooser pull-left">
                         <DropdownButton bsStyle="info"
                           title={<i className="fa fa-clock-o" />}
@@ -106,8 +109,8 @@ const SearchBar = React.createClass({
                       </ButtonToolbar>
 
                       {this._getRangeTypeSelector(rangeType, rangeParams)}
-                    </div>
-                    <div className="col-md-6">
+                    </Col>
+                    <Col md={6}>
                       <div className="saved-searches-selector-container pull-right"
                         style={{ display: 'inline-flex', marginRight: 5 }}>
                         {this.props.displayRefreshControls &&
@@ -119,8 +122,8 @@ const SearchBar = React.createClass({
                           {this._getSavedSearchesSelector()}
                         </div>
                       </div>
-                    </div>
-                  </div>
+                    </Col>
+                  </Row>
                 </div>
 
                 <div id="search-container">
@@ -137,7 +140,7 @@ const SearchBar = React.createClass({
                       ref="query"
                       name="q"
                       value={query}
-                      onChange={SearchActions.query}
+                      onChange={event => SearchActions.query(event.target.VALUE)}
                       placeholder="Type your search query here and press enter. (&quot;not found&quot; AND http) OR http_response_code:[400 TO 404]" />
                   </div>
                 </div>

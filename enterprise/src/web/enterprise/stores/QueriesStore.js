@@ -10,7 +10,7 @@ export default Reflux.createStore({
     const id = uuidv4();
     this.queries[id] = query;
     this._trigger();
-    return id;
+    QueriesActions.create.promise(Promise.resolve(id));
   },
   update(id, query) {
     this.queries[id] = query;
