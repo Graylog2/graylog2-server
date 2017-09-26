@@ -5,7 +5,6 @@ import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog.plugins.cef.codec.CEFCodec;
 import org.graylog2.inputs.transports.AmqpTransport;
-import org.graylog2.inputs.transports.KafkaTransport;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.configuration.Configuration;
@@ -41,9 +40,9 @@ public class CEFAmqpInput extends MessageInput {
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<CEFTCPInput> {
+    public interface Factory extends MessageInput.Factory<CEFAmqpInput> {
         @Override
-        CEFTCPInput create(Configuration configuration);
+        CEFAmqpInput create(Configuration configuration);
 
         @Override
         Config getConfig();
@@ -62,7 +61,7 @@ public class CEFAmqpInput extends MessageInput {
     @ConfigClass
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(KafkaTransport.Factory transport, CEFCodec.Factory codec) {
+        public Config(AmqpTransport.Factory transport, CEFCodec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }

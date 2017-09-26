@@ -40,9 +40,9 @@ public class CEFKafkaInput extends MessageInput {
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<CEFTCPInput> {
+    public interface Factory extends MessageInput.Factory<CEFKafkaInput> {
         @Override
-        CEFTCPInput create(Configuration configuration);
+        CEFKafkaInput create(Configuration configuration);
 
         @Override
         Config getConfig();
