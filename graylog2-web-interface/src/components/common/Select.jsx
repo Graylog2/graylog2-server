@@ -46,7 +46,7 @@ const Select = React.createClass({
       this.props.onValueChange(value);
     }
   },
-  reactSelectStyles: require('!style/useable!css!react-select/dist/default.css'),
+  reactSelectStyles: require('!style/useable!css!react-select/dist/react-select.css'),
   reactSelectSmStyles: require('!style/useable!css!./Select.css'),
   render() {
     // eslint-disable-next-line no-unused-vars
