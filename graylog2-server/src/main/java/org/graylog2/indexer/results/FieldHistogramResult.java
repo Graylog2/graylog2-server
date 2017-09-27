@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
 import io.searchbox.core.search.aggregation.HistogramAggregation;
 import io.searchbox.core.search.aggregation.StatsAggregation;
+import io.searchbox.core.search.aggregation.ValueCountAggregation;
 import org.graylog2.indexer.searches.Searches;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -70,13 +71,22 @@ public class FieldHistogramResult extends HistogramResult {
             resultMap.put("total_count", b.getCount());
 
             final StatsAggregation stats = b.getStatsAggregation(Searches.AGG_STATS);
-            resultMap.put("count", stats.getCount());
-            resultMap.put("min", stats.getMin() == null ? 0D : stats.getMin());
-            resultMap.put("max", stats.getMax() == null ? 0D : stats.getMax());
-            resultMap.put("total", stats.getSum() == null ? 0D : stats.getSum());
-            resultMap.put("mean", stats.getAvg() == null ? 0D : stats.getAvg());
+            if (stats != null) {
+                resultMap.put("count", stats.getCount() == null ? 0L : stats.getCount());
+                resultMap.put("min", stats.getMin() == null ? 0D : stats.getMin());
+                resultMap.put("max", stats.getMax() == null ? 0D : stats.getMax());
+                resultMap.put("total", stats.getSum() == null ? 0D : stats.getSum());
+                resultMap.put("mean", stats.getAvg() == null ? 0D : stats.getAvg());
+            } else {
+                // Get count from count aggregation if stats aggregation was not requested
+                final ValueCountAggregation count = b.getValueCountAggregation(Searches.AGG_VALUE_COUNT);
+                resultMap.put("count", count == null ? 0L : count.getValueCount());
+                resultMap.put("min", Double.NaN);
+                resultMap.put("max", Double.NaN);
+                resultMap.put("total", Double.NaN);
+                resultMap.put("mean", Double.NaN);
+            }
 
-            // cardinality is only calculated if it was explicitly requested, so this might be null
             final CardinalityAggregation cardinality = b.getCardinalityAggregation(Searches.AGG_CARDINALITY);
             resultMap.put("cardinality", cardinality == null ? 0 : cardinality.getCardinality());
 

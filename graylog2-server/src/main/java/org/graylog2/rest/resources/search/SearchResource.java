@@ -134,16 +134,29 @@ public abstract class SearchResource extends RestResource {
                                                                           boolean includeCardinality) {
         try {
             return searches.fieldHistogram(
-                query,
-                field,
-                Searches.DateHistogramInterval.valueOf(interval),
-                filter,
-                timeRange,
-                includeCardinality);
+                    query,
+                    field,
+                    Searches.DateHistogramInterval.valueOf(interval),
+                    filter,
+                    timeRange,
+                    true,
+                    includeCardinality);
         } catch (FieldTypeException e) {
-            final String msg = "Field histogram query failed. Make sure that field [" + field + "] is a numeric type.";
-            LOG.error(msg);
-            throw new BadRequestException(msg, e);
+            try {
+                LOG.debug("Field histogram query failed. Make sure that field [{}] is a numeric type. Retrying without numerical statistics.", field);
+                return searches.fieldHistogram(
+                        query,
+                        field,
+                        Searches.DateHistogramInterval.valueOf(interval),
+                        filter,
+                        timeRange,
+                        false,
+                        true);
+            } catch (FieldTypeException e1) {
+                final String msg = "Field histogram for field [" + field + "] failed while calculating its cardinality.";
+                LOG.error(msg, ExceptionUtils.getRootCauseMessage(e1));
+                throw new BadRequestException(msg, e1);
+            }
         }
     }
 

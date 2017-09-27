@@ -78,7 +78,7 @@ export const FieldChart = {
     }
 
     if (opts.valuetype === undefined) {
-      opts.valuetype = 'mean';
+      opts.valuetype = 'count';
     }
 
     if (opts.query === undefined) {

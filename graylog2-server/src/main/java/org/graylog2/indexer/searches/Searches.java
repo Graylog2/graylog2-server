@@ -534,11 +534,26 @@ public class Searches {
                                           String filter,
                                           TimeRange range,
                                           boolean includeCardinality) {
+        return fieldHistogram(query, field, interval, filter, range, true, includeCardinality);
+    }
+
+    public HistogramResult fieldHistogram(String query,
+                                          String field,
+                                          DateHistogramInterval interval,
+                                          String filter,
+                                          TimeRange range,
+                                          boolean includeStats,
+                                          boolean includeCardinality) {
         final DateHistogramBuilder dateHistogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
                 .field(Message.FIELD_TIMESTAMP)
-                .subAggregation(AggregationBuilders.stats(AGG_STATS).field(field))
                 .interval(interval.toESInterval());
 
+        if (includeStats) {
+            dateHistogramBuilder.subAggregation(AggregationBuilders.stats(AGG_STATS).field(field));
+        } else {
+            // Stats aggregation already include count. Only calculate it explicitly when stats are disabled
+            dateHistogramBuilder.subAggregation(AggregationBuilders.count(AGG_VALUE_COUNT).field(field));
+        }
         if (includeCardinality) {
             dateHistogramBuilder.subAggregation(AggregationBuilders.cardinality(AGG_CARDINALITY).field(field));
         }
