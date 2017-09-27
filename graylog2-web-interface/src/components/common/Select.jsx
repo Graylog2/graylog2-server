@@ -4,7 +4,8 @@ import ReactSelect from 'react-select';
 import lodash from 'lodash';
 
 // Pass all props react-select accepts, excepting `onChange`
-const acceptedReactSelectProps = lodash.without(lodash.keys(ReactSelect.propTypes), 'onChange');
+const filteredProps = ['onChange', 'value'];
+const acceptedReactSelectProps = lodash.without(lodash.keys(ReactSelect.propTypes), ...filteredProps);
 
 const Select = React.createClass({
   propTypes: {
