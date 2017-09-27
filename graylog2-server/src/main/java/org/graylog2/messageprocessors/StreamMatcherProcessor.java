@@ -14,10 +14,11 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.filters;
+package org.graylog2.messageprocessors;
 
 import org.graylog2.plugin.Message;
-import org.graylog2.plugin.filters.MessageFilter;
+import org.graylog2.plugin.Messages;
+import org.graylog2.plugin.messageprocessors.MessageProcessor;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.streams.StreamRouter;
 import org.slf4j.Logger;
@@ -26,36 +27,37 @@ import org.slf4j.LoggerFactory;
 import javax.inject.Inject;
 import java.util.List;
 
-public class StreamMatcherFilter implements MessageFilter {
+public class StreamMatcherProcessor implements MessageProcessor {
+    private static final Logger LOG = LoggerFactory.getLogger(StreamMatcherProcessor.class);
 
-    private static final Logger LOG = LoggerFactory.getLogger(StreamMatcherFilter.class);
+    public static class Descriptor implements MessageProcessor.Descriptor {
+        @Override
+        public String name() {
+            return "Stream Matcher Processor";
+        }
+
+        @Override
+        public String className() {
+            return StreamMatcherProcessor.class.getCanonicalName();
+        }
+    }
 
     private final StreamRouter streamRouter;
 
     @Inject
-    public StreamMatcherFilter(StreamRouter streamRouter) {
+    public StreamMatcherProcessor(StreamRouter streamRouter) {
         this.streamRouter = streamRouter;
     }
 
     @Override
-    public boolean filter(Message msg) {
-        List<Stream> streams = streamRouter.route(msg);
-        msg.addStreams(streams);
+    public Messages process(Messages messages) {
+        for (Message message : messages) {
+            final List<Stream> streams = streamRouter.route(message);
+            message.addStreams(streams);
 
-        LOG.debug("Routed message <{}> to {} streams.", msg.getId(), streams.size());
+            LOG.debug("Routed message <{}> to {} streams.", message.getId(), streams.size());
+        }
 
-        return false;
+        return messages;
     }
-
-    @Override
-    public String getName() {
-        return "StreamMatcher";
-    }
-
-    @Override
-    public int getPriority() {
-        // of the built-in filters this gets run last
-        return 40;
-    }
-
 }
