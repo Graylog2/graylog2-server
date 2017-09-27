@@ -140,7 +140,8 @@ public class CSVFileDataAdapter extends LookupDataAdapter {
                         if (!isNullOrEmpty(column)) {
                             if (config.keyColumn().equals(column)) {
                                 keyColumn = col;
-                            } else if (config.valueColumn().equals(column)) {
+                            }
+                            if (config.valueColumn().equals(column)) {
                                 valueColumn = col;
                             }
                         }
