@@ -27,7 +27,7 @@
 
     <groupId>org.graylog</groupId>
     <artifactId>graylog-parent</artifactId>
-    <version>2.4.0-alpha.3-SNAPSHOT</version>
+    <version>2.4.0-alpha.3</version>
     <packaging>pom</packaging>
 
     <name>Graylog Parent POM</name>
