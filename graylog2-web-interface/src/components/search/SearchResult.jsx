@@ -220,6 +220,7 @@ const SearchResult = React.createClass({
                        resultCount={this.props.result.total_results}
                        inputs={this.props.inputs}
                        streams={this.props.streams}
+                       searchInStream={this.props.searchInStream}
                        nodes={this.props.nodes}
                        highlight={this.state.shouldHighlight}
                        searchConfig={this.props.searchConfig} />

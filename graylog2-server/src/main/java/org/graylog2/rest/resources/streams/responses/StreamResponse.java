@@ -80,6 +80,9 @@ public abstract class StreamResponse {
     @JsonProperty("remove_matches_from_default_stream")
     public abstract boolean removeMatchesFromDefaultStream();
 
+    @JsonProperty("surrounding_filters")
+    public abstract String surroundingFilters();
+
     @JsonProperty("index_set_id")
     public abstract String indexSetId();
 
@@ -98,6 +101,7 @@ public abstract class StreamResponse {
                                         @JsonProperty("content_pack") @Nullable String contentPack,
                                         @JsonProperty("is_default") @Nullable Boolean isDefault,
                                         @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream,
+                                        @JsonProperty("surrounding_filters") String surroundingFilters,
                                         @JsonProperty("index_set_id") String indexSetId) {
         return new AutoValue_StreamResponse(
                 id,
@@ -114,6 +118,7 @@ public abstract class StreamResponse {
                 contentPack,
                 firstNonNull(isDefault, false),
                 firstNonNull(removeMatchesFromDefaultStream, false),
+                surroundingFilters,
                 indexSetId);
     }
 }

@@ -52,7 +52,10 @@ public class StreamMock implements Stream {
     private MatchingType matchingType;
     private boolean defaultStream;
     private boolean removeMatchesFromDefaultStream;
+    private String surroundingFilters;
     private IndexSet indexSet;
+
+    public static final String DEFAULT_SURROUNDING_FILTERS = "source, gl2_source_input, file, source_file";
 
     public StreamMock(Map<String, Object> stream) {
         this(stream, Collections.emptyList());
@@ -70,6 +73,7 @@ public class StreamMock implements Stream {
         this.matchingType = (MatchingType) stream.getOrDefault(StreamImpl.FIELD_MATCHING_TYPE, MatchingType.AND);
         this.defaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_DEFAULT_STREAM, false);
         this.removeMatchesFromDefaultStream = (boolean) stream.getOrDefault(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, false);
+        this.surroundingFilters = (String) stream.getOrDefault(StreamImpl.FIELD_SURROUNDING_FILTERS, "");
         this.indexSet = new TestIndexSet(IndexSetConfig.create(
                 "index-set-id",
                 "title",
@@ -212,6 +216,17 @@ public class StreamMock implements Stream {
     @Override
     public void setRemoveMatchesFromDefaultStream(boolean removeMatchesFromDefaultStream) {
         this.removeMatchesFromDefaultStream = removeMatchesFromDefaultStream;
+    }
+
+    @Override
+    public String getSurroundingFilters() {
+        return (this.surroundingFilters.isEmpty()) ? this.DEFAULT_SURROUNDING_FILTERS : this.surroundingFilters;
+    }
+
+    @Override
+    public String setSurroundingFilters(String surroundingFilters) {
+        this.surroundingFilters = surroundingFilters;
+        return this.surroundingFilters;
     }
 
     @Override

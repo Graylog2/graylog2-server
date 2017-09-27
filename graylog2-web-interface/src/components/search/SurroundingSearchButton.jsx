@@ -13,6 +13,7 @@ const SurroundingSearchButton = React.createClass({
     id: PropTypes.string.isRequired,
     timestamp: PropTypes.number.isRequired,
     searchConfig: PropTypes.object.isRequired,
+    surroundingFilters: PropTypes.string.isRequired,
     messageFields: PropTypes.object.isRequired,
   },
 
@@ -29,8 +30,12 @@ const SurroundingSearchButton = React.createClass({
   _buildFilterFields() {
     const fields = {};
 
-    if (this.props.searchConfig) {
-      this.props.searchConfig.surrounding_filter_fields.forEach((field) => {
+    if (this.props.surroundingFilters) {
+      let filters = this.props.surroundingFilters.split(",")
+        .map(f => f.trim())
+        .filter(f => f.length > 0);
+
+      filters.forEach((field) => {
         fields[field] = this.props.messageFields[field];
       });
     }

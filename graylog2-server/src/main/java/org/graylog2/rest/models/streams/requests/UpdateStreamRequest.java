@@ -47,6 +47,10 @@ public abstract class UpdateStreamRequest {
     @Nullable
     public abstract Boolean removeMatchesFromDefaultStream();
 
+    @JsonProperty("surrounding_filters")
+    @Nullable
+    public abstract String surroundingFilters();
+
     @JsonProperty("index_set_id")
     @Nullable
     public abstract String indexSetId();
@@ -57,7 +61,8 @@ public abstract class UpdateStreamRequest {
                                              @JsonProperty("matching_type") @Nullable String matchingType,
                                              @JsonProperty("rules") @Nullable List rules,
                                              @JsonProperty("remove_matches_from_default_stream") @Nullable Boolean removeMatchesFromDefaultStream,
+                                             @JsonProperty("surrounding_filters") @Nullable String surroundingFilters,
                                              @JsonProperty("index_set_id") @Nullable String indexSetId) {
-        return new AutoValue_UpdateStreamRequest(title, description, matchingType, removeMatchesFromDefaultStream, indexSetId);
+        return new AutoValue_UpdateStreamRequest(title, description, matchingType, removeMatchesFromDefaultStream, surroundingFilters, indexSetId);
     }
 }

@@ -60,11 +60,14 @@ public class StreamImpl extends PersistedImpl implements Stream {
     public static final String FIELD_DEFAULT_STREAM = "is_default_stream";
     public static final String FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM = "remove_matches_from_default_stream";
     public static final String FIELD_INDEX_SET_ID = "index_set_id";
+    public static final String FIELD_SURROUNDING_FILTERS = "surrounding_filters";
     public static final String EMBEDDED_ALERT_CONDITIONS = "alert_conditions";
 
     private final List<StreamRule> streamRules;
     private final Set<Output> outputs;
     private final IndexSet indexSet;
+
+    public static final String DEFAULT_SURROUNDING_FILTERS = "source, gl2_source_input, file, source_file";
 
     public StreamImpl(Map<String, Object> fields) {
         super(fields);
@@ -185,6 +188,7 @@ public class StreamImpl extends PersistedImpl implements Stream {
         result.put(FIELD_MATCHING_TYPE, getMatchingType());
         result.put(FIELD_DEFAULT_STREAM, isDefaultStream());
         result.put(FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, getRemoveMatchesFromDefaultStream());
+        result.put(FIELD_SURROUNDING_FILTERS, getSurroundingFilters());
         result.put(FIELD_INDEX_SET_ID, getIndexSetId());
         return result;
     }
@@ -263,6 +267,18 @@ public class StreamImpl extends PersistedImpl implements Stream {
             throw new IllegalStateException("index set must not be null! (stream id=" + getId() + " title=\"" + getTitle() + "\")");
         }
         return indexSet;
+    }
+
+    @Override
+    public String getSurroundingFilters() { return (String) fields.getOrDefault(FIELD_SURROUNDING_FILTERS, DEFAULT_SURROUNDING_FILTERS); }
+
+    @Override
+    public String setSurroundingFilters(String fieldSurroundingFilters) {
+        if (fieldSurroundingFilters.isEmpty()) {
+            fieldSurroundingFilters = DEFAULT_SURROUNDING_FILTERS;
+        }
+
+        return (String) fields.put(FIELD_SURROUNDING_FILTERS, fieldSurroundingFilters);
     }
 
     @Override

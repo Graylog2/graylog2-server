@@ -148,6 +148,8 @@ public class StreamResource extends RestResource {
         final Stream stream = streamService.create(cr, getCurrentUser().getName());
         stream.setDisabled(true);
 
+        stream.setSurroundingFilters(stream.getSurroundingFilters());
+
         if (!stream.getIndexSet().getConfig().isWritable()) {
             throw new BadRequestException("Assigned index set must be writable!");
         }
@@ -246,6 +248,8 @@ public class StreamResource extends RestResource {
         if (!Strings.isNullOrEmpty(cr.description())) {
             stream.setDescription(cr.description());
         }
+
+        stream.setSurroundingFilters(cr.surroundingFilters());
 
         if (cr.matchingType() != null) {
             try {
@@ -407,6 +411,7 @@ public class StreamResource extends RestResource {
         streamData.put(StreamImpl.FIELD_CREATED_AT, Tools.nowUTC());
         streamData.put(StreamImpl.FIELD_MATCHING_TYPE, sourceStream.getMatchingType().toString());
         streamData.put(StreamImpl.FIELD_REMOVE_MATCHES_FROM_DEFAULT_STREAM, cr.removeMatchesFromDefaultStream());
+        streamData.put(StreamImpl.FIELD_SURROUNDING_FILTERS, cr.surroundingFilters());
         streamData.put(StreamImpl.FIELD_INDEX_SET_ID, cr.indexSetId());
 
         final Stream stream = streamService.create(streamData);
@@ -493,6 +498,7 @@ public class StreamResource extends RestResource {
             stream.getContentPack(),
             stream.isDefaultStream(),
             stream.getRemoveMatchesFromDefaultStream(),
+            stream.getSurroundingFilters(),
             stream.getIndexSetId()
         );
     }
