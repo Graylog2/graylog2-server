@@ -5,7 +5,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.enterprise.search.SearchType;
-import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 
 import javax.annotation.Nullable;
 import java.util.List;
@@ -75,7 +75,7 @@ public abstract class MessageList implements SearchType {
         public abstract String id();
 
         @JsonProperty
-        public abstract List<ResultMessage> messages();
+        public abstract List<ResultMessageSummary> messages();
 
         @JsonProperty
         public abstract long totalResults();
@@ -92,7 +92,7 @@ public abstract class MessageList implements SearchType {
         public abstract static class Builder {
             public abstract Builder id(String id);
 
-            public abstract Builder messages(List<ResultMessage> messages);
+            public abstract Builder messages(List<ResultMessageSummary> messages);
 
             public abstract Builder totalResults(long totalResults);
 
