@@ -33,7 +33,7 @@ public class QueryEngineTest {
     @BeforeClass
     public static void setup() {
         queryGenerators = ImmutableMap.<String, QueryBackend>builder()
-                .put(ElasticsearchQueryString.NAME, new ElasticsearchBackend(new ElasticsearchQueryGenerator()))
+                .put(ElasticsearchQueryString.NAME, new ElasticsearchBackend(new ElasticsearchQueryGenerator(), null))
                 .build();
     }
 

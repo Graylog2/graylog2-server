@@ -27,7 +27,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
-import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -107,10 +106,6 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         final CompletableFuture<QueryResult> future = queryJob.getResultFuture();
 
-        return QueryResult.builder()
-                .query(queryJob.getQuery())
-                .queryJob(queryJob)
-                .results(Collections.emptyMap())
-                .build();
+        return future.join();
     }
 }
