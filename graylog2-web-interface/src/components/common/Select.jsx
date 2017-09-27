@@ -8,7 +8,9 @@ const acceptedReactSelectProps = lodash.without(lodash.keys(ReactSelect.propType
 
 const Select = React.createClass({
   propTypes: {
-    onValueChange: PropTypes.func,
+    onChange: PropTypes.func,
+    onValueChange: PropTypes.func, // deprecated
+    onReactSelectChange: PropTypes.func,
     size: PropTypes.oneOf(['normal', 'small']),
     value: PropTypes.string,
   },
@@ -48,19 +50,22 @@ const Select = React.createClass({
     const value = selectedOption.value;
     this.setState({ value: value });
 
-    if (this.props.onValueChange) {
+    if (this.props.onChange) {
+      this.props.onChange(value);
+    } else if (this.props.onValueChange) {
+      console.warn('Select prop `onValueChange` is deprecated. Please use `onChange` instead.');
       this.props.onValueChange(value);
     }
   },
   reactSelectStyles: require('!style/useable!css!react-select/dist/react-select.css'),
   reactSelectSmStyles: require('!style/useable!css!./Select.css'),
   render() {
-    const { size } = this.props;
+    const { size, onReactSelectChange } = this.props;
     const reactSelectProps = lodash.pick(this.props, acceptedReactSelectProps);
 
     return (
       <div className={size === 'small' ? 'select-sm' : ''}>
-        <ReactSelect ref="select" onChange={this._onChange} {...reactSelectProps} value={this.state.value} />
+        <ReactSelect ref="select" onChange={onReactSelectChange || this._onChange} {...reactSelectProps} value={this.state.value} />
       </div>
     );
   },
