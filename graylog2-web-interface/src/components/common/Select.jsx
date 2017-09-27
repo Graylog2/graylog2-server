@@ -39,7 +39,8 @@ const Select = React.createClass({
     // As someone said: "This can't do any more harm that we already do"
     this.refs.select.clearValue(new CustomEvent('fake'));
   },
-  _onChange(value) {
+  _onChange(selectedOption) {
+    const value = selectedOption.value;
     this.setState({ value: value });
 
     if (this.props.onValueChange) {
