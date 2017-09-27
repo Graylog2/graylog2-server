@@ -48,7 +48,7 @@ const Select = React.createClass({
     this._select.clearValue(new CustomEvent('fake'));
   },
   _onChange(selectedOption) {
-    const value = selectedOption.value;
+    const value = selectedOption ? selectedOption.value : '';
     this.setState({ value: value });
 
     if (this.props.onChange) {
