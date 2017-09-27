@@ -1,13 +1,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactSelect from 'react-select';
+import lodash from 'lodash';
 
-const propTypes = ReactSelect.propTypes;
-propTypes.onValueChange = PropTypes.func;
-propTypes.size = PropTypes.oneOf(['normal', 'small']);
+// Pass all props react-select accepts, excepting `onChange`
+const acceptedReactSelectProps = lodash.without(lodash.keys(ReactSelect.propTypes), 'onChange');
 
 const Select = React.createClass({
-  propTypes: propTypes,
+  propTypes: {
+    onValueChange: PropTypes.func,
+    size: PropTypes.oneOf(['normal', 'small']),
+    value: PropTypes.string,
+  },
+
   getDefaultProps() {
     return {
       size: 'normal',
@@ -50,8 +55,8 @@ const Select = React.createClass({
   reactSelectStyles: require('!style/useable!css!react-select/dist/react-select.css'),
   reactSelectSmStyles: require('!style/useable!css!./Select.css'),
   render() {
-    // eslint-disable-next-line no-unused-vars
-    const { onValueChange, size, ...reactSelectProps } = this.props;
+    const { size } = this.props;
+    const reactSelectProps = lodash.pick(this.props, acceptedReactSelectProps);
 
     return (
       <div className={size === 'small' ? 'select-sm' : ''}>
