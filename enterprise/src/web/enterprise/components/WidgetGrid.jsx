@@ -24,7 +24,7 @@ export default class WidgetGrid extends React.Component {
     widgets: PropTypes.object.isRequired,
   };
 
-  defaultProps = {
+  static defaultProps = {
     locked: true,
     positions: {},
     onPositionsChange: () => {},
