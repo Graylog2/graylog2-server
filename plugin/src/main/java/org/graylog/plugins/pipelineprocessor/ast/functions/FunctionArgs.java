@@ -54,7 +54,7 @@ public class FunctionArgs {
     @Nonnull
     public Map<String, Expression> getConstantArgs() {
         return args.entrySet().stream()
-                .filter(e -> e.getValue().isConstant())
+                .filter(e -> e != null && e.getValue() != null && e.getValue().isConstant())
                 .filter(e -> !(e.getValue() instanceof VarRefExpression)) // do not eagerly touch variables
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
