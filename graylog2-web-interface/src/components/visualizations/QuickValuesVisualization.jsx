@@ -30,11 +30,13 @@ const QuickValuesVisualization = React.createClass({
     sortOrder: PropTypes.string,
     dataTableTitle: PropTypes.string,
     limit: PropTypes.number,
+    dataTableLimit: PropTypes.number,
   },
   getDefaultProps() {
     return {
+      dataTableLimit: 50,
       dataTableTitle: 'Top values',
-      limit: 50,
+      limit: 5,
     };
   },
   getInitialState() {
@@ -138,7 +140,7 @@ const QuickValuesVisualization = React.createClass({
   },
   _renderDataTable() {
     const tableDomNode = this.refs.table;
-    const limit = this.props.limit;
+    const { dataTableLimit, limit } = this.props;
 
     this.dataTable = dc.dataTable(tableDomNode, this.dcGroupName);
     this.dataTable
@@ -150,7 +152,7 @@ const QuickValuesVisualization = React.createClass({
       })
       .sortBy(d => d.count)
       .order(this._getSortOrder())
-      .size(limit)
+      .size(dataTableLimit)
       .columns(this._getDataTableColumns())
       .on('renderlet', (table) => {
         table.selectAll('.dc-table-group').classed('info', true);
