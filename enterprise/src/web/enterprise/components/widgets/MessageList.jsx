@@ -1,15 +1,25 @@
-import React, { PropTypes } from 'react';
+import React from 'react';
+import PropTypes from 'prop-types';
+import Reflux from 'reflux';
 import Immutable from 'immutable';
 import moment from 'moment';
 
 import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 import ActionsProvider from 'injection/ActionsProvider';
 
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { ConfigurationActions } = CombinedProvider.get('Configuration');
+const { ConfigurationsStore } = CombinedProvider.get('Configurations');
+
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
 const MessageList = React.createClass({
+  mixins: [Reflux.connect(ConfigurationsStore, 'configurations')],
   propTypes: {
-    data: PropTypes.array.isRequired,
+    data: PropTypes.shape({
+      messages: PropTypes.arrayOf(PropTypes.object).isRequired,
+    }).isRequired,
     config: PropTypes.shape({
       fields: PropTypes.arrayOf(PropTypes.string).isRequired,
       pageSize: PropTypes.number,
@@ -19,7 +29,13 @@ const MessageList = React.createClass({
     return {
       currentPage: 1,
       expandedMessages: Immutable.Set(),
+      configurations: {
+        searchesClusterConfig: {},
+      },
     };
+  },
+  componentDidMount() {
+    ConfigurationActions.listSearchesClusterConfig();
   },
   _columnStyle(fieldName) {
     const selectedFields = Immutable.OrderedSet(this.props.config.fields);
@@ -44,15 +60,15 @@ const MessageList = React.createClass({
 
   render() {
     const pageSize = this.props.config.pageSize || 7;
-    this.props.data.sort((m1, m2) => moment(m2.message.timestamp).unix() - moment(m1.message.timestamp).unix());
-    const messages = this.props.data;
+    const messages = this.props.data.messages || [];
+    messages.sort((m1, m2) => moment(m2.message.timestamp).unix() - moment(m1.message.timestamp).unix());
     const messageSlice = messages
       .slice((this.state.currentPage - 1) * pageSize, this.state.currentPage * pageSize)
       .map((m) => {
         return {
-          fields: m.message.fields,
-          formatted_fields: m.message.formatted_fields || m.message.fields,
-          id: m.message.id,
+          fields: m.message,
+          formatted_fields: m.message,
+          id: m.message._id,
           index: m.index,
         };
       });
@@ -99,7 +115,7 @@ const MessageList = React.createClass({
                       nodes={new Immutable.Map()}
                       highlight={false}
                       expandAllRenderAsync={false}
-                      searchConfig={{}} />
+                      searchConfig={this.state.configurations.searchesClusterConfig} />
                   );
                 })}
               </table>
