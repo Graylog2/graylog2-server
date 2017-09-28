@@ -17,16 +17,20 @@ const Select = React.createClass({
     size: PropTypes.oneOf(['normal', 'small']),
     value: PropTypes.string,
     multi: PropTypes.bool,
+    displayKey: PropTypes.string,
     valueKey: PropTypes.string,
     delimiter: PropTypes.string,
+    allowCreate: PropTypes.bool,
   },
 
   getDefaultProps() {
     return {
       multi: false,
       size: 'normal',
+      displayKey: 'label',
       valueKey: 'value',
       delimiter: ',',
+      allowCreate: false,
     };
   },
   getInitialState() {
@@ -82,16 +86,38 @@ const Select = React.createClass({
   _select: undefined,
   reactSelectStyles: require('!style/useable!css!react-select/dist/react-select.css'),
   reactSelectSmStyles: require('!style/useable!css!./Select.css'),
+
+  // Using ReactSelect.Creatable now needs to get values as objects or they are not display
+  // This method takes care of formatting a string value into options react-select supports.
+  _formatInputValue(value) {
+    const { options, displayKey, valueKey, delimiter } = this.props;
+
+    return value.split(delimiter).map((v) => {
+      const predicate = {};
+      predicate[valueKey] = v;
+      const option = lodash.find(options, predicate);
+
+      predicate[displayKey] = v;
+      return option || predicate;
+    });
+  },
   render() {
-    const { size, onReactSelectChange } = this.props;
+    const { allowCreate, size, onReactSelectChange, multi } = this.props;
+    const value = this.state.value;
     const reactSelectProps = lodash.pick(this.props, acceptedReactSelectProps);
+    const SelectComponent = allowCreate ? ReactSelect.Creatable : ReactSelect;
+
+    let formattedValue = value;
+    if (value && multi && allowCreate) {
+      formattedValue = this._formatInputValue(value);
+    }
 
     return (
       <div className={size === 'small' ? 'select-sm' : ''}>
-        <ReactSelect ref={(c) => { this._select = c; }}
-                     onChange={onReactSelectChange || this._onChange}
-                     {...reactSelectProps}
-                     value={this.state.value} />
+        <SelectComponent ref={(c) => { this._select = c; }}
+                         onChange={onReactSelectChange || this._onChange}
+                         {...reactSelectProps}
+                         value={formattedValue} />
       </div>
     );
   },
