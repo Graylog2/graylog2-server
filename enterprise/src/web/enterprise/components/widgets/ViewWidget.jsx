@@ -40,14 +40,6 @@ export default React.createClass({
         <WidgetHeader title={this.props.title} calculatedAt={calculatedAt} />
 
         {this.props.children}
-
-        <WidgetFooter locked
-          onDelete={() => {}}
-          onShowConfig={() => {}}
-          onEditConfig={() => {}}
-          onDeleteConfig={() => {}}
-          replayHref="#"
-          replayToolTip="No replay possible." />
       </div>
     );
   },
