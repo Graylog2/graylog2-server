@@ -45,7 +45,7 @@ const DataAdapterPicker = React.createClass({
                   clearable={false}
                   options={sortedAdapters}
                   matchProp="value"
-                  onValueChange={this.props.onSelect}
+                  onChange={this.props.onSelect}
                   value={this.props.selectedId} />
         </Input>
       </fieldset>

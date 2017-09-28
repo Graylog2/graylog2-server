@@ -175,7 +175,7 @@ const RawMessageLoader = React.createClass({
         <Input id="input" name="input" label={<span>Message input <small>(optional)</small></span>}
                help="Select the message input ID that should be assigned to the parsed message.">
           <Select id="input" placeholder="Select input" options={this._formatInputSelectOptions()}
-                  matchProp="label" onValueChange={this._onInputSelect} value={this.state.inputId} />
+                  matchProp="label" onChange={this._onInputSelect} value={this.state.inputId} />
         </Input>
       );
     }
@@ -198,7 +198,7 @@ const RawMessageLoader = React.createClass({
               <Input id="codec" name="codec" label="Message codec"
                      help="Select the codec that should be used to decode the message." required>
                 <Select id="codec" placeholder="Select codec" options={this._formatSelectOptions()}
-                        matchProp="label" onValueChange={this._onCodecSelect} value={this.state.codec} />
+                        matchProp="label" onChange={this._onCodecSelect} value={this.state.codec} />
               </Input>
               {codecConfigurationOptions}
             </fieldset>

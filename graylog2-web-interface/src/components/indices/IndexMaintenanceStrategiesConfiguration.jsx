@@ -115,7 +115,7 @@ const IndexMaintenanceStrategiesConfiguration = React.createClass({
                   options={this._availableSelectOptions()}
                   matchProp="value"
                   value={this._activeSelection()}
-                  onValueChange={this._onSelect} />
+                  onChange={this._onSelect} />
         </Input>
         {this._getConfigurationComponent(this._activeSelection())}
       </span>

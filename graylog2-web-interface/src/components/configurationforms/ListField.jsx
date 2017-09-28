@@ -65,7 +65,7 @@ const ListField = React.createClass({
                      options={formattedOptions}
                      value={this.state.value}
                      placeholder={`${allowCreate ? 'Add' : 'Select'} ${field.human_name}`}
-                     onValueChange={this._handleChange}
+                     onChange={this._handleChange}
                      disabled={this.props.disabled}
                      allowCreate={allowCreate} />
 

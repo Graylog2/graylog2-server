@@ -73,7 +73,7 @@ const CreateInputControl = React.createClass({
           <form className="form-inline" onSubmit={this._openModal}>
             <div className="form-group" style={{ width: 300 }}>
               <Select placeholder="Select input" options={this._formatSelectOptions()} matchProp="label"
-                      onValueChange={this._onInputSelect} value={this.state.selectedInput} />
+                      onChange={this._onInputSelect} value={this.state.selectedInput} />
             </div>
             &nbsp;
             <Button bsStyle="success" type="submit" disabled={!this.state.selectedInput}>Launch new input</Button>
