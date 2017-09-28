@@ -20,8 +20,19 @@ const SearchBar = React.createClass({
   mixins: [Reflux.connect(SearchStore, 'search')],
   _performSearch(event) {
     event.preventDefault();
-    QueriesActions.create(this.state.search)
-      .then(id => console.log('Added query ' + id));
+    const { search } = this.state;
+    const query = {
+      timerange: Object.assign({
+        type: search.rangeType,
+      }, search.rangeParams.toObject()),
+      query: {
+        elasticsearch: search.query || '*',
+      },
+      search_types: [
+
+      ],
+    };
+    QueriesActions.update('root', query);
   },
   // TODO: Transfer this to AbsoluteTimeRangeSelector
   _rangeParamsChanged(key, value) {
@@ -75,7 +86,7 @@ const SearchBar = React.createClass({
       <Row className="no-bm">
         <Col md={12} id="universalsearch-container">
           <Row className="no-bm">
-            <Col md={12} ref="universalSearch" id="universalsearch">
+            <Col md={12} ref="universalSearch" id="universalsearch" style={{ marginTop: '0px' }}>
               <form ref="searchForm"
                 className="universalsearch-form"
                 method="GET"
@@ -140,7 +151,7 @@ const SearchBar = React.createClass({
                       ref="query"
                       name="q"
                       value={query}
-                      onChange={event => SearchActions.query(event.target.VALUE)}
+                      onChange={event => SearchActions.query(event.target.value)}
                       placeholder="Type your search query here and press enter. (&quot;not found&quot; AND http) OR http_response_code:[400 TO 404]" />
                   </div>
                 </div>
