@@ -11,7 +11,7 @@ const ListField = React.createClass({
     onChange: PropTypes.func.isRequired,
     title: PropTypes.string.isRequired,
     typeName: PropTypes.string.isRequired,
-    value: PropTypes.any,
+    value: PropTypes.oneOfType([PropTypes.array, PropTypes.string]),
     addPlaceholder: PropTypes.bool,
     disabled: PropTypes.bool,
   },
@@ -48,6 +48,7 @@ const ListField = React.createClass({
   render() {
     const field = this.state.field;
     const typeName = this.state.typeName;
+    const value = this.state.value;
     const isRequired = !field.is_optional;
     const allowCreate = field.attributes.includes('allow_create');
     const options = (field.additional_info && field.additional_info.values ? field.additional_info.values : {});
@@ -65,7 +66,7 @@ const ListField = React.createClass({
                      required={isRequired}
                      autoFocus={this.props.autoFocus}
                      options={formattedOptions}
-                     value={this.state.value}
+                     value={value ? (Array.isArray(value) ? value.join(',') : value) : undefined}
                      placeholder={`${allowCreate ? 'Add' : 'Select'} ${field.human_name}`}
                      onChange={this._handleChange}
                      disabled={this.props.disabled}
