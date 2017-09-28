@@ -35,7 +35,7 @@ export default class WidgetGrid extends React.Component {
   };
 
   _onWidgetSizeChange(widgetId, dimensions) {
-    const widgetDimensions = this.state.widgetDimensions;
+    const widgetDimensions = (this.state && this.state.widgetDimensions) || {};
     widgetDimensions[widgetId] = dimensions;
     this.setState({ widgetDimensions: widgetDimensions });
   }
@@ -58,20 +58,22 @@ export default class WidgetGrid extends React.Component {
 
       positions[widgetId] = positions[widgetId] || WidgetGrid._defaultDimensions(widget.type);
 
-      const { height, width } = this.state.widgetDimensions[widgetId] || {};
+      const { height, width } = (this.state && this.state.widgetDimensions[widgetId]) || {};
 
-      returnedWidgets.widgets.push(
-        <div key={widgetId} className={style.widgetContainer}>
-          <ViewWidget title={widget.title} widgetId={widgetId} onSizeChange={this._onWidgetSizeChange}>
-            <VisComponent id={widgetId}
-              config={config}
-              data={widgetData}
-              height={height}
-              width={width}
-              computationTimeRange={computationTimeRange} />
-          </ViewWidget>
-        </div>,
-      );
+      if (widgetData) {
+        returnedWidgets.widgets.push(
+          <div key={widgetId} className={style.widgetContainer}>
+            <ViewWidget title={widget.title} widgetId={widgetId} onSizeChange={this._onWidgetSizeChange.bind(this)}>
+              <VisComponent id={widgetId}
+                            config={config}
+                            data={widgetData}
+                            height={height}
+                            width={width}
+                            computationTimeRange={computationTimeRange}/>
+            </ViewWidget>
+          </div>,
+        );
+      }
     });
 
     returnedWidgets.positions = positions;
