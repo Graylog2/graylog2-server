@@ -3,6 +3,8 @@ import React from 'react';
 import ReactSelect from 'react-select';
 import lodash from 'lodash';
 
+import AppConfig from 'util/AppConfig';
+
 // Pass all props react-select accepts, excepting `onChange`
 const filteredProps = ['onChange', 'value'];
 const acceptedReactSelectProps = lodash.without(lodash.keys(ReactSelect.propTypes), ...filteredProps);
@@ -14,11 +16,17 @@ const Select = React.createClass({
     onReactSelectChange: PropTypes.func,
     size: PropTypes.oneOf(['normal', 'small']),
     value: PropTypes.string,
+    multi: PropTypes.bool,
+    valueKey: PropTypes.string,
+    delimiter: PropTypes.string,
   },
 
   getDefaultProps() {
     return {
+      multi: false,
       size: 'normal',
+      valueKey: 'value',
+      delimiter: ',',
     };
   },
   getInitialState() {
@@ -47,14 +55,27 @@ const Select = React.createClass({
     // As someone said: "This can't do any more harm that we already do"
     this._select.clearValue(new CustomEvent('fake'));
   },
+  // This helps us emulate the behaviour of react-select < 1.0:
+  //  - On simple selects it returns the value
+  //  - On multi selects it returns all selected values split by a delimiter (',' by default)
+  _extractOptionValue(option) {
+    const { multi, valueKey, delimiter } = this.props;
+
+    if (option) {
+      return multi ? option.map(i => i[valueKey]).join(delimiter) : option[valueKey];
+    }
+    return '';
+  },
   _onChange(selectedOption) {
-    const value = selectedOption ? selectedOption.value : '';
+    const value = this._extractOptionValue(selectedOption);
     this.setState({ value: value });
 
     if (this.props.onChange) {
       this.props.onChange(value);
     } else if (this.props.onValueChange) {
-      console.warn('Select prop `onValueChange` is deprecated. Please use `onChange` instead.');
+      if (AppConfig.gl2DevMode()) {
+        console.error('Select prop `onValueChange` is deprecated. Please use `onChange` instead.');
+      }
       this.props.onValueChange(value);
     }
   },
