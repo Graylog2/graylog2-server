@@ -146,7 +146,7 @@ const Navigation = React.createClass({
           </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
-        <Navbar.Collapse eventKey={0}>
+        <Navbar.Collapse>
           <Nav navbar>
             <IfPermitted permissions={['searches:absolute', 'searches:relative', 'searches:keyword']}>
               <LinkContainer to={Routes.SEARCH}>
