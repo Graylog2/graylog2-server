@@ -1,13 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
-const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 import style from './ReactGridContainer.css';
 
+const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
+
 const COLUMN_WIDTH = 350;
+const ROW_HEIGHT = 200;
 
 const COLUMNS = {
   xxl: 6,
@@ -33,17 +35,21 @@ const ReactGridContainer = React.createClass({
     children: PropTypes.node.isRequired,
     onPositionsChange: PropTypes.func.isRequired,
     locked: PropTypes.bool,
+    isResizable: React.PropTypes.bool,
+    rowHeight: React.PropTypes.number,
   },
 
   getDefaultProps() {
     return {
       locked: false,
+      isResizable: true,
+      rowHeight: ROW_HEIGHT,
     };
   },
 
   _onLayoutChange(newLayout) {
     const newPositions = [];
-    newLayout.forEach(widget => {
+    newLayout.forEach((widget) => {
       newPositions.push({
         id: widget.i,
         col: widget.x + 1,
@@ -57,30 +63,31 @@ const ReactGridContainer = React.createClass({
   },
 
   render() {
-    const layout = Object.keys(this.props.positions).map(id => {
-      const position = this.props.positions[id];
+    const { children, locked, isResizable, positions, rowHeight } = this.props;
+    const layout = Object.keys(positions).map((id) => {
+      const { col, row, height, width } = positions[id];
       return {
         i: id,
-        x: Math.max(position.col - 1, 0),
-        y: (position.row <= 0 ? Infinity : position.row - 1),
-        h: position.height,
-        w: position.width,
+        x: col ? Math.max(col - 1, 0) : 0,
+        y: (row === undefined || row <= 0 ? Infinity : row - 1),
+        h: height || 1,
+        w: width || 1,
       };
     });
 
     // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
     // https://github.com/STRML/react-grid-layout/issues/371
     return (
-      <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${this.props.locked ? 'locked' : 'unlocked'}`}
+      <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${locked || !isResizable ? 'locked' : 'unlocked'}`}
                                     layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
                                     breakpoints={BREAKPOINTS}
                                     cols={COLUMNS}
-                                    rowHeight={200}
+                                    rowHeight={rowHeight}
                                     margin={[10, 10]}
                                     onDragStop={this._onLayoutChange}
                                     onResizeStop={this._onLayoutChange}
-                                    draggableHandle={this.props.locked ? '.no-handle' : ''}>
-        {this.props.children}
+                                    draggableHandle={locked ? '.no-handle' : ''}>
+        {children}
       </WidthAdjustedReactGridLayout>
     );
   },
