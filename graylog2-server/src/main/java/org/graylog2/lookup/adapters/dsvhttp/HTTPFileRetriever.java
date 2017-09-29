@@ -69,6 +69,9 @@ public class HTTPFileRetriever {
             }
         } else {
             if (response.code() != 304) {
+                if (response.body() != null) {
+                    response.close();
+                }
                 throw new IOException("Request failed: " + response.message());
             }
         }
