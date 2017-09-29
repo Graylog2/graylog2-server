@@ -169,7 +169,7 @@ public class Messages {
         final List<String> failedMessageIds = new ArrayList<>(items.size());
         final List<IndexFailure> indexFailures = new ArrayList<>(items.size());
         for (BulkResult.BulkResultItem item : items) {
-            LOG.trace("Failed to index message: {}", item.error);
+            LOG.warn("Failed to index message: index=<{}> id=<{}> error=<{}>", item.index, item.id, item.error);
 
             // Write failure to index_failures.
             final Message messageEntry = messageMap.get(item.id);
