@@ -21,6 +21,7 @@ import UserMenu from 'components/navigation/UserMenu';
 import HelpMenu from 'components/navigation/HelpMenu';
 import { IfPermitted } from 'components/common';
 import NavigationBrand from './NavigationBrand';
+import InactiveNavItem from './InactiveNavItem';
 
 const Navigation = React.createClass({
   propTypes: {
@@ -238,15 +239,9 @@ const Navigation = React.createClass({
           {notificationBadge}
 
           <Nav navbar pullRight>
-            {/* Needed to replace NavItem with `li` and `a` elements to avoid LinkContainer setting NavItem as active */}
-            {/* More information here: https://github.com/react-bootstrap/react-router-bootstrap/issues/134 */}
-            <li role="presentation" className="">
-              <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
-                <a>
-                  <GlobalThroughput />
-                </a>
-              </LinkContainer>
-            </li>
+            <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
+              <InactiveNavItem><GlobalThroughput /></InactiveNavItem>
+            </LinkContainer>
             <HelpMenu active={this._isActive(Routes.GETTING_STARTED)} />
             <UserMenu fullName={this.props.fullName} loginName={this.props.loginName} />
             {AppConfig.gl2DevMode() ?
