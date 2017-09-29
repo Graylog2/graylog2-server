@@ -713,7 +713,9 @@ public class BundleImporter {
             createdLookupTables.put(dto.id(), dto);
         }
 
-        clusterBus.post(LookupTablesUpdated.create(createdLookupTables.values()));
+        if (!createdLookupDataAdapters.isEmpty()) {
+            clusterBus.post(LookupTablesUpdated.create(createdLookupTables.values()));
+        }
     }
 
     private void createLookupCaches(String bundleId, Set<LookupCacheBundle> lookupCaches) throws InterruptedException {
@@ -728,15 +730,15 @@ public class BundleImporter {
             createdLookupCaches.put(dto.id(), dto);
         }
 
+        if (!createdLookupCaches.isEmpty()) {
+            clusterBus.post(CachesUpdated.create(createdLookupCaches.keySet()));
+        }
+
         final Collection<LookupCache> caches = lookupTableService.getCaches(createdLookupCaches.keySet());
         final CountDownLatch latch = new CountDownLatch(caches.size());
         caches.forEach(c -> c.addListener(new LatchUpdaterListener(latch), scheduler));
 
         latch.await(30, TimeUnit.SECONDS);
-
-        if (!createdLookupCaches.isEmpty()) {
-            clusterBus.post(CachesUpdated.create(createdLookupCaches.keySet()));
-        }
     }
 
     private void createLookupDataAdapters(String bundleId, Set<LookupDataAdapterBundle> lookupDataAdapters) throws InterruptedException {
@@ -751,14 +753,14 @@ public class BundleImporter {
             createdLookupDataAdapters.put(dto.id(), dto);
         }
 
+        if (!createdLookupDataAdapters.isEmpty()) {
+            clusterBus.post(DataAdaptersUpdated.create(createdLookupDataAdapters.keySet()));
+        }
+
         final Collection<LookupDataAdapter> dataAdapters = lookupTableService.getDataAdapters(createdLookupDataAdapters.keySet());
         final CountDownLatch latch = new CountDownLatch(dataAdapters.size());
         dataAdapters.forEach(da -> da.addListener(new LatchUpdaterListener(latch), scheduler));
 
         latch.await(30, TimeUnit.SECONDS);
-
-        if (!createdLookupDataAdapters.isEmpty()) {
-            clusterBus.post(DataAdaptersUpdated.create(createdLookupDataAdapters.keySet()));
-        }
     }
 }
