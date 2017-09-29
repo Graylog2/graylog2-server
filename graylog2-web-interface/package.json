@@ -13,9 +13,35 @@
     "start": "webpack-dev-server --config webpack.bundled.js --history-api-fallback --hot --inline",
     "start-nohmr": "webpack-dev-server --watch --history-api-fallback --config webpack.bundled.js",
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
-    "test": "webpack --config webpack.vendor.js && karma start karma.ci.conf.js",
     "prepare-dev": "./tools/prepare-dev",
-    "lint": "eslint --ext js,jsx src"
+    "lint": "eslint --ext js,jsx src",
+    "test": "jest"
+  },
+  "jest": {
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}"
+    ],
+    "setupFiles": [
+      "jest-localstorage-mock"
+    ],
+    "setupTestFrameworkScriptFile": "./node_modules/jest-enzyme/lib/index.js",
+    "moduleDirectories": [
+      "src",
+      "test",
+      "node_modules"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "ts"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less)$": "identity-obj-proxy"
+    },
+    "transform": {
+      "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest",
+      "^.+\\.tsx?$": "<rootDir>/node_modules/ts-jest/preprocessor.js"
+    }
   },
   "dependencies": {
     "bluebird": "^3.4.0",
@@ -65,6 +91,7 @@
     "@types/typeahead": "^0.11.29",
     "assets-webpack-plugin": "^3.5.1",
     "babel-core": "^6.22.1",
+    "babel-jest": "^21.0.2",
     "babel-loader": "^7.0.0",
     "babel-plugin-add-module-exports": "^0.2.1",
     "babel-polyfill": "^6.22.0",
@@ -73,29 +100,27 @@
     "babel-preset-stage-0": "^6.22.0",
     "clean-webpack-plugin": "^0.1.3",
     "css-loader": "^0.28.4",
-    "enzyme": "^2.0.0",
+    "enzyme": "^2.9.0",
     "eslint": "^4.3.0",
     "eslint-loader": "^1.6.3",
     "estraverse-fb": "^1.3.1",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.11.0",
     "glob": "^7.0.0",
-    "jasmine-core": "*",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^21.1.0",
+    "jest-enzyme": "^3.8.3",
+    "jest-localstorage-mock": "^2.0.0",
     "json-loader": "^0.5.3",
-    "karma": "^1.1.2",
-    "karma-chrome-launcher": "*",
-    "karma-html2js-preprocessor": "*",
-    "karma-jasmine": "*",
-    "karma-phantomjs-launcher": "*",
-    "karma-webpack": "*",
     "less": "^2.5.3",
     "less-loader": "^4.0.5",
-    "mocha": "^2.3.4",
     "phantomjs-prebuilt": ">=1.9",
     "react-hot-loader": "^3.0.0-beta.6",
     "react-proxy-loader": "^0.3.4",
+    "react-test-renderer": "^15.6.1",
     "script-loader": "^0.7.0",
     "style-loader": "^0.18.2",
+    "ts-jest": "^21.0.1",
     "ts-loader": "^2.3.1",
     "typescript": "^2.4.2",
     "url-loader": "^0.5.6",
