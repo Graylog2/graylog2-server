@@ -192,24 +192,24 @@ const Navigation = React.createClass({
                 <MenuItem>Nodes</MenuItem>
               </LinkContainer>
               {this.isPermitted(this.props.permissions, ['inputs:read']) &&
-                <LinkContainer to={Routes.SYSTEM.INPUTS}>
-                  <MenuItem>Inputs</MenuItem>
-                </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.INPUTS}>
+                <MenuItem>Inputs</MenuItem>
+              </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['outputs:read']) &&
-                <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
-                  <MenuItem>Outputs</MenuItem>
-                </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
+                <MenuItem>Outputs</MenuItem>
+              </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['indices:read']) &&
-                <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                  <MenuItem>Indices</MenuItem>
-                </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                <MenuItem>Indices</MenuItem>
+              </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['loggers:read']) &&
-                <LinkContainer to={Routes.SYSTEM.LOGGING}>
-                  <MenuItem>Logging</MenuItem>
-                </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.LOGGING}>
+                <MenuItem>Logging</MenuItem>
+              </LinkContainer>
               }
               {this.isAnyPermitted(this.props.permissions, ['users:list, roles:read']) &&
               <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.OVERVIEW}>
@@ -222,14 +222,14 @@ const Navigation = React.createClass({
               </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['inputs:edit']) &&
-               <LinkContainer to={Routes.SYSTEM.GROKPATTERNS}>
-                 <MenuItem>Grok Patterns</MenuItem>
-               </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.GROKPATTERNS}>
+                <MenuItem>Grok Patterns</MenuItem>
+              </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['inputs:edit']) &&
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
                 <MenuItem>Lookup Tables</MenuItem>
-                </LinkContainer>
+              </LinkContainer>
               }
               {pluginSystemNavigations}
             </NavDropdown>
