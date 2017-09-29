@@ -20,6 +20,7 @@ import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from 'components/navigation/UserMenu';
 import HelpMenu from 'components/navigation/HelpMenu';
 import { IfPermitted } from 'components/common';
+import NavigationBrand from './NavigationBrand';
 
 const Navigation = React.createClass({
   propTypes: {
@@ -94,12 +95,6 @@ const Navigation = React.createClass({
   },
 
   render() {
-    const logoUrl = require('images/toplogo.png');
-    const brand = (
-      <LinkContainer to={Routes.STARTPAGE}>
-        <a><img src={logoUrl} /></a>
-      </LinkContainer>);
-
     let notificationBadge;
 
     if (this.state.total > 0) {
@@ -144,7 +139,11 @@ const Navigation = React.createClass({
     return (
       <Navbar inverse fluid fixedTop>
         <Navbar.Header>
-          <Navbar.Brand>{brand}</Navbar.Brand>
+          <Navbar.Brand>
+            <LinkContainer to={Routes.STARTPAGE}>
+              <NavigationBrand />
+            </LinkContainer>
+          </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
         <Navbar.Collapse eventKey={0}>
