@@ -26,6 +26,7 @@ import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.inputs.InputService;
 import org.graylog2.inputs.converters.ConverterFactory;
 import org.graylog2.inputs.extractors.ExtractorFactory;
+import org.graylog2.lookup.LookupTableService;
 import org.graylog2.lookup.db.DBCacheService;
 import org.graylog2.lookup.db.DBDataAdapterService;
 import org.graylog2.lookup.db.DBLookupTableService;
@@ -39,7 +40,9 @@ import org.graylog2.streams.StreamService;
 import org.graylog2.timeranges.TimeRangeFactory;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Provider;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class BundleImporterProvider implements Provider<BundleImporter> {
 
@@ -60,9 +63,11 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
     private final DBLookupTableService dbLookupTableService;
     private final DBCacheService dbCacheService;
     private final DBDataAdapterService dbDataAdapterService;
+    private final LookupTableService lookupTableService;
     private final TimeRangeFactory timeRangeFactory;
     private final ClusterEventBus clusterBus;
     private final ObjectMapper objectMapper;
+    private final ScheduledExecutorService scheduler;
 
     @Inject
     public BundleImporterProvider(final InputService inputService,
@@ -82,9 +87,11 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
                                   final DBLookupTableService dbLookupTableService,
                                   final DBCacheService dbCacheService,
                                   final DBDataAdapterService dbDataAdapterService,
+                                  final LookupTableService lookupTableService,
                                   final TimeRangeFactory timeRangeFactory,
                                   final ClusterEventBus clusterBus,
-                                  final ObjectMapper objectMapper) {
+                                  final ObjectMapper objectMapper,
+                                  @Named("daemonScheduler") ScheduledExecutorService scheduler) {
         this.inputService = inputService;
         this.inputRegistry = inputRegistry;
         this.extractorFactory = extractorFactory;
@@ -102,9 +109,11 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
         this.dbLookupTableService = dbLookupTableService;
         this.dbCacheService = dbCacheService;
         this.dbDataAdapterService = dbDataAdapterService;
+        this.lookupTableService = lookupTableService;
         this.timeRangeFactory = timeRangeFactory;
         this.clusterBus = clusterBus;
         this.objectMapper = objectMapper;
+        this.scheduler = scheduler;
     }
 
     @Override
@@ -113,7 +122,7 @@ public class BundleImporterProvider implements Provider<BundleImporter> {
                 streamService, streamRuleService, indexSetRegistry, outputService, dashboardService,
                 dashboardWidgetCreator, serverStatus, messageInputFactory,
                 inputLauncher, grokPatternService,
-                dbLookupTableService, dbCacheService, dbDataAdapterService,
-                timeRangeFactory, clusterBus, objectMapper);
+                dbLookupTableService, dbCacheService, dbDataAdapterService, lookupTableService,
+                timeRangeFactory, clusterBus, objectMapper, scheduler);
     }
 }
