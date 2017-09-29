@@ -12,7 +12,7 @@ import UserNotification from 'util/UserNotification';
 const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
 const DashboardsActions = ActionsProvider.getActions('Dashboards');
 
-const DashboardsStore = Reflux.createStore({
+export default Reflux.createStore({
   listenables: [DashboardsActions],
   dashboards: undefined,
   writableDashboards: undefined,
@@ -40,13 +40,12 @@ const DashboardsStore = Reflux.createStore({
 
   create(title, description) {
     const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.create().url);
-    const promise = fetch('POST', url, {title: title, description: description})
+    const promise = fetch('POST', url, { title: title, description: description })
       .then((response) => {
-        UserNotification.success("Dashboard successfully created");
+        UserNotification.success('Dashboard successfully created');
         return response.dashboard_id;
       }, (error) => {
-        UserNotification.error("Creating dashboard \"" + title + "\" failed with status: " + error,
-          "Could not create dashboard");
+        UserNotification.error(`Creating dashboard "${title}" failed with status: ${error}`, 'Could not create dashboard');
       });
 
     DashboardsActions.create.promise(promise);
@@ -61,13 +60,12 @@ const DashboardsStore = Reflux.createStore({
 
   delete(dashboard) {
     const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.delete(dashboard.id).url);
-    const promise = fetch('DELETE', url)
+    const promise = fetch('DELETE', url);
 
     promise.then(() => {
-      UserNotification.success("Dashboard successfully deleted");
+      UserNotification.success('Dashboard successfully deleted');
     }, (error) => {
-      UserNotification.error("Deleting dashboard \"" + dashboard.title + "\" failed with status: " + error,
-        "Could not delete dashboard");
+      UserNotification.error(`Deleting dashboard "${dashboard.title}" failed with status: ${error}`, 'Could not delete dashboard');
     });
 
     DashboardsActions.delete.promise(promise);
@@ -85,8 +83,7 @@ const DashboardsStore = Reflux.createStore({
 
     promise.catch((error) => {
       if (error.additional && error.additional.status !== 404) {
-        UserNotification.error("Loading your dashboard failed with status: " + error.message,
-          "Could not load your dashboard");
+        UserNotification.error(`Loading your dashboard failed with status: ${error.message}`, 'Could not load your dashboard');
       }
     });
 
@@ -111,8 +108,7 @@ const DashboardsStore = Reflux.createStore({
         return state;
       }, (error) => {
         if (!error.additional || error.additional.status !== 404) {
-          UserNotification.error("Loading dashboard list failed with status: " + error,
-            "Could not load dashboards");
+          UserNotification.error(`Loading dashboard list failed with status: ${error}`, 'Could not load dashboards');
         }
       });
     DashboardsActions.list.promise(promise);
@@ -120,18 +116,17 @@ const DashboardsStore = Reflux.createStore({
   },
 
   getWritableDashboardList(dashboards, permissions) {
-    return dashboards.toArray().filter((dashboard) => PermissionsMixin.isPermitted(permissions, 'dashboards:edit:' + dashboard.id));
+    return dashboards.toArray().filter(dashboard => PermissionsMixin.isPermitted(permissions, `dashboards:edit:${dashboard.id}`));
   },
 
   update(dashboard) {
     const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.update(dashboard.id).url);
-    const promise = fetch('PUT', url, {title: dashboard.title, description: dashboard.description});
+    const promise = fetch('PUT', url, { title: dashboard.title, description: dashboard.description });
 
     promise.then(() => {
-      UserNotification.success("Dashboard successfully updated");
+      UserNotification.success('Dashboard successfully updated');
     }, (error) => {
-      UserNotification.error("Saving dashboard \"" + dashboard.title + "\" failed with status: " + error,
-        "Could not save dashboard");
+      UserNotification.error(`Saving dashboard "${dashboard.title}" failed with status: ${error}`, 'Could not save dashboard');
     });
 
     DashboardsActions.update.promise(promise);
@@ -146,8 +141,8 @@ const DashboardsStore = Reflux.createStore({
   updatePositions(dashboard, positions) {
     const url = URLUtils.qualifyUrl(ApiRoutes.DashboardsApiController.updatePositions(dashboard.id).url);
     const promise = fetch('PUT', url, { positions: positions }).catch((error) => {
-      UserNotification.error("Updating widget positions for dashboard \"" + dashboard.title + "\" failed with status: " + error.message,
-        "Could not update dashboard");
+      UserNotification.error(`Updating widget positions for dashboard "${dashboard.title}" failed with status: ${error.message}`,
+        'Could not update dashboard');
 
       return error;
     });
@@ -155,7 +150,5 @@ const DashboardsStore = Reflux.createStore({
     DashboardsActions.updatePositions.promise(promise);
 
     return promise;
-  }
+  },
 });
-
-export default DashboardsStore;
