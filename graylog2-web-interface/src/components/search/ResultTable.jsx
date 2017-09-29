@@ -14,17 +14,26 @@ import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 
 const ResultTable = React.createClass({
   propTypes: {
+    disableSurroundingSearch: React.PropTypes.bool,
     highlight: PropTypes.bool.isRequired,
     inputs: PropTypes.object.isRequired,
     messages: PropTypes.array.isRequired,
     nodes: PropTypes.object.isRequired,
+    onPageChange: React.PropTypes.func,
     page: PropTypes.number.isRequired,
+    pageSize: React.PropTypes.number,
     resultCount: PropTypes.number.isRequired,
     selectedFields: PropTypes.object.isRequired,
     sortField: PropTypes.string.isRequired,
     sortOrder: PropTypes.string.isRequired,
     streams: PropTypes.object.isRequired,
     searchConfig: PropTypes.object.isRequired,
+  },
+  getDefaultProps() {
+    return {
+      disableSurroundingSearch: false,
+      onPageChange: (page) => { SearchStore.page = page; },
+    };
   },
   getInitialState() {
     return {
@@ -139,7 +148,10 @@ const ResultTable = React.createClass({
                   disabled={this.state.expandedMessages.size === 0}><i className="fa fa-compress" /></Button>
         </ButtonGroup>
 
-        <MessageTablePaginator position="top" currentPage={Number(this.props.page)}
+        <MessageTablePaginator currentPage={Number(this.props.page)}
+                               onPageChange={this.props.onPageChange}
+                               pageSize={this.props.pageSize}
+                               position="top"
                                resultCount={this.props.resultCount} />
 
         <div className="search-results-table">
@@ -162,6 +174,7 @@ const ResultTable = React.createClass({
                 {this.props.messages.map((message) => {
                   return (
                     <MessageTableEntry key={`${message.index}-${message.id}`}
+                                       disableSurroundingSearch={this.props.disableSurroundingSearch}
                                        message={message}
                                        showMessageRow={this.props.selectedFields.contains('message')}
                                        selectedFields={selectedColumns}
@@ -183,7 +196,10 @@ const ResultTable = React.createClass({
           </div>
         </div>
 
-        <MessageTablePaginator position="bottom" currentPage={Number(this.props.page)}
+        <MessageTablePaginator currentPage={Number(this.props.page)}
+                               onPageChange={this.props.onPageChange}
+                               pageSize={this.props.pageSize}
+                               position="bottom"
                                resultCount={this.props.resultCount}>
           <ButtonGroup bsSize="small" className="pull-right" style={{ position: 'absolute', marginTop: 20, right: 10 }}>
             <Button title="Expand all messages" onClick={this.expandAll}><i className="fa fa-expand" /></Button>
