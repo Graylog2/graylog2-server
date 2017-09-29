@@ -1,0 +1,25 @@
+:local(.badgeSuccess) {
+    background-color: #8DC63F !important;
+}
+
+:local(.badgeInfo) {
+    background-color: #16ACE3 !important;
+
+}
+
+:local(.badgeWarning) {
+    background-color: #F7941E !important;
+}
+
+:local(.badgeDanger) {
+    background-color: #FF3B00 !important;
+
+}
+
+:local(.badgePrimary) {
+    background-color: #9E1F63 !important;
+}
+
+:local(.badgeDefault) {
+    background-color: #AAAAAA !important;
+}

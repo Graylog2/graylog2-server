@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Badge, Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
@@ -22,6 +22,8 @@ import HelpMenu from 'components/navigation/HelpMenu';
 import { IfPermitted } from 'components/common';
 import NavigationBrand from './NavigationBrand';
 import InactiveNavItem from './InactiveNavItem';
+
+import badgeStyles from 'components/bootstrap/Badge.css';
 
 const Navigation = React.createClass({
   propTypes: {
@@ -101,12 +103,11 @@ const Navigation = React.createClass({
     if (this.state.total > 0) {
       notificationBadge = (
         <Nav navbar>
-          <NavItem className="notification-badge-link">
-            <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
-              <span className="badge" style={{ backgroundColor: '#ff3b00' }}
-                    id="notification-badge">{this.state.total}</span>
-            </LinkContainer>
-          </NavItem>
+          <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
+            <InactiveNavItem className="notification-badge-link">
+              <Badge className={badgeStyles.badgeDanger} id="notification-badge">{this.state.total}</Badge>
+            </InactiveNavItem>
+          </LinkContainer>
         </Nav>
       );
     }
@@ -246,7 +247,7 @@ const Navigation = React.createClass({
             <UserMenu fullName={this.props.fullName} loginName={this.props.loginName} />
             {AppConfig.gl2DevMode() ?
               <NavItem className="notification-badge-link">
-                <span className="badge" style={{ backgroundColor: '#ff3b00' }}>DEV</span>
+                <Badge className={badgeStyles.badgeDanger}>DEV</Badge>
               </NavItem>
               : null}
           </Nav>
