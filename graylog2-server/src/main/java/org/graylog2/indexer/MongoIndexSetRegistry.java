@@ -154,12 +154,7 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     private boolean isManagedIndex(Collection<? extends IndexSet> indexSets, String index) {
-        for (IndexSet indexSet : indexSets) {
-            if (indexSet.isManagedIndex(index)) {
-                return true;
-            }
-        }
-        return false;
+        return indexSets.stream().anyMatch(indexSet -> indexSet.isManagedIndex(index));
     }
 
     @Override
@@ -197,24 +192,12 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
 
     @Override
     public boolean isCurrentWriteIndexAlias(String indexName) {
-        for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            if (indexSet.isWriteIndexAlias(indexName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return findAllMongoIndexSets().stream().anyMatch(indexSet -> indexSet.isWriteIndexAlias(indexName));
     }
 
     @Override
     public boolean isCurrentWriteIndex(String indexName) throws TooManyAliasesException {
-        for (MongoIndexSet indexSet : findAllMongoIndexSets()) {
-            if (indexSet.getActiveWriteIndex() != null && indexSet.getActiveWriteIndex().equals(indexName)) {
-                return true;
-            }
-        }
-
-        return false;
+        return findAllMongoIndexSets().stream().anyMatch(indexSet -> indexSet.getActiveWriteIndex() != null && indexSet.getActiveWriteIndex().equals(indexName));
     }
 
     @Override

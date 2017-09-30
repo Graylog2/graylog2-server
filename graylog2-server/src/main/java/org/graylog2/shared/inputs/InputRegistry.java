@@ -57,13 +57,7 @@ public class InputRegistry extends HashSet<IOState<MessageInput>> {
     }
 
     public boolean hasTypeRunning(Class klazz) {
-        for (IOState<MessageInput> inputState : this) {
-            if (inputState.getStoppable().getClass().equals(klazz)) {
-                return true;
-            }
-        }
-
-        return false;
+        return this.stream().anyMatch(inputState -> inputState.getStoppable().getClass().equals(klazz));
     }
 
     public int runningCount() {
