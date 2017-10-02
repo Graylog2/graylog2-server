@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
-import { Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
+import { Badge, Navbar, Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import naturalSort from 'javascript-natural-sort';
 
@@ -20,6 +20,10 @@ import GlobalThroughput from 'components/throughput/GlobalThroughput';
 import UserMenu from 'components/navigation/UserMenu';
 import HelpMenu from 'components/navigation/HelpMenu';
 import { IfPermitted } from 'components/common';
+import NavigationBrand from './NavigationBrand';
+import InactiveNavItem from './InactiveNavItem';
+
+import badgeStyles from 'components/bootstrap/Badge.css';
 
 const Navigation = React.createClass({
   propTypes: {
@@ -94,23 +98,16 @@ const Navigation = React.createClass({
   },
 
   render() {
-    const logoUrl = require('images/toplogo.png');
-    const brand = (
-      <LinkContainer to={Routes.STARTPAGE}>
-        <a><img src={logoUrl} /></a>
-      </LinkContainer>);
-
     let notificationBadge;
 
     if (this.state.total > 0) {
       notificationBadge = (
         <Nav navbar>
-          <NavItem className="notification-badge-link">
-            <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
-              <span className="badge" style={{ backgroundColor: '#ff3b00' }}
-                    id="notification-badge">{this.state.total}</span>
-            </LinkContainer>
-          </NavItem>
+          <LinkContainer to={Routes.SYSTEM.OVERVIEW}>
+            <InactiveNavItem className="notification-badge-link">
+              <Badge className={badgeStyles.badgeDanger} id="notification-badge">{this.state.total}</Badge>
+            </InactiveNavItem>
+          </LinkContainer>
         </Nav>
       );
     }
@@ -144,10 +141,14 @@ const Navigation = React.createClass({
     return (
       <Navbar inverse fluid fixedTop>
         <Navbar.Header>
-          <Navbar.Brand>{brand}</Navbar.Brand>
+          <Navbar.Brand>
+            <LinkContainer to={Routes.STARTPAGE}>
+              <NavigationBrand />
+            </LinkContainer>
+          </Navbar.Brand>
           <Navbar.Toggle />
         </Navbar.Header>
-        <Navbar.Collapse eventKey={0}>
+        <Navbar.Collapse>
           <Nav navbar>
             <IfPermitted permissions={['searches:absolute', 'searches:relative', 'searches:keyword']}>
               <LinkContainer to={Routes.SEARCH}>
@@ -193,24 +194,24 @@ const Navigation = React.createClass({
                 <MenuItem>Nodes</MenuItem>
               </LinkContainer>
               {this.isPermitted(this.props.permissions, ['inputs:read']) &&
-                <LinkContainer to={Routes.SYSTEM.INPUTS}>
-                  <MenuItem>Inputs</MenuItem>
-                </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.INPUTS}>
+                <MenuItem>Inputs</MenuItem>
+              </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['outputs:read']) &&
-                <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
-                  <MenuItem>Outputs</MenuItem>
-                </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.OUTPUTS}>
+                <MenuItem>Outputs</MenuItem>
+              </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['indices:read']) &&
-                <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
-                  <MenuItem>Indices</MenuItem>
-                </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.INDICES.LIST}>
+                <MenuItem>Indices</MenuItem>
+              </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['loggers:read']) &&
-                <LinkContainer to={Routes.SYSTEM.LOGGING}>
-                  <MenuItem>Logging</MenuItem>
-                </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.LOGGING}>
+                <MenuItem>Logging</MenuItem>
+              </LinkContainer>
               }
               {this.isAnyPermitted(this.props.permissions, ['users:list, roles:read']) &&
               <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.OVERVIEW}>
@@ -223,14 +224,14 @@ const Navigation = React.createClass({
               </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['inputs:edit']) &&
-               <LinkContainer to={Routes.SYSTEM.GROKPATTERNS}>
-                 <MenuItem>Grok Patterns</MenuItem>
-               </LinkContainer>
+              <LinkContainer to={Routes.SYSTEM.GROKPATTERNS}>
+                <MenuItem>Grok Patterns</MenuItem>
+              </LinkContainer>
               }
               {this.isPermitted(this.props.permissions, ['inputs:edit']) &&
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
+              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
                 <MenuItem>Lookup Tables</MenuItem>
-                </LinkContainer>
+              </LinkContainer>
               }
               {pluginSystemNavigations}
             </NavDropdown>
@@ -239,20 +240,14 @@ const Navigation = React.createClass({
           {notificationBadge}
 
           <Nav navbar pullRight>
-            {/* Needed to replace NavItem with `li` and `a` elements to avoid LinkContainer setting NavItem as active */}
-            {/* More information here: https://github.com/react-bootstrap/react-router-bootstrap/issues/134 */}
-            <li role="presentation" className="">
-              <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
-                <a>
-                  <GlobalThroughput />
-                </a>
-              </LinkContainer>
-            </li>
+            <LinkContainer to={Routes.SYSTEM.NODES.LIST}>
+              <InactiveNavItem><GlobalThroughput /></InactiveNavItem>
+            </LinkContainer>
             <HelpMenu active={this._isActive(Routes.GETTING_STARTED)} />
             <UserMenu fullName={this.props.fullName} loginName={this.props.loginName} />
             {AppConfig.gl2DevMode() ?
               <NavItem className="notification-badge-link">
-                <span className="badge" style={{ backgroundColor: '#ff3b00' }}>DEV</span>
+                <Badge className={badgeStyles.badgeDanger}>DEV</Badge>
               </NavItem>
               : null}
           </Nav>
