@@ -70,7 +70,7 @@ const CacheCreate = React.createClass({
                       clearable={false}
                       options={sortedCaches}
                       matchProp="value"
-                      onValueChange={this._onTypeSelect}
+                      onChange={this._onTypeSelect}
                       value={null} />
             </Input>
           </form>

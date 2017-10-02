@@ -373,7 +373,7 @@ const SearchBar = React.createClass({
 
     return (
       <Select placeholder="Saved searches" options={formattedSavedSearches} value={this.state.savedSearch}
-              onValueChange={this._onSavedSearchSelect} size="small" />
+              onChange={this._onSavedSearchSelect} size="small" />
     );
   },
 

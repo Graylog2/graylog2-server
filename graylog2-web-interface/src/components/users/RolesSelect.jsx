@@ -27,7 +27,7 @@ const RolesSelect = React.createClass({
         ref="select"
         options={rolesOptions}
         value={rolesValue}
-        onValueChange={this.props.onValueChange}
+        onChange={this.props.onValueChange}
         placeholder="Choose roles..."
       />
     );

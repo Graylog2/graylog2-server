@@ -99,7 +99,7 @@ const LookupTableConverterConfiguration = React.createClass({
                         clearable={false}
                         options={lookupTables}
                         matchProp="value"
-                        onValueChange={this._onSelect('lookup_table_name')}
+                        onChange={this._onSelect('lookup_table_name')}
                         value={this.props.configuration.lookup_table_name} />
               </Input>
             </div>
