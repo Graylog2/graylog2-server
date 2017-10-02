@@ -126,10 +126,11 @@ const GeoIpResolverConfig = React.createClass({
             <Input label="Select the MaxMind database type"
                    help="Select the MaxMind database type you want to use to extract geo-location information.">
               <Select placeholder="Select MaxMind database type"
+                      required
                       options={this._availableDatabaseTypes()}
                       matchProp="value"
                       value={this.state.config.db_type}
-                      onValueChange={this._onDbTypeSelect}/>
+                      onChange={this._onDbTypeSelect} />
             </Input>
             <Input type="text"
                    label="Path to the MaxMind database"

@@ -61,7 +61,7 @@ const MaxmindAdapterFieldSet = React.createClass({
                 clearable={false}
                 options={databaseTypes}
                 matchProp="value"
-                onValueChange={this._onDbTypeSelect}
+                onChange={this._onDbTypeSelect}
                 value={config.database_type} />
       </Input>
       <TimeUnitInput label="Refresh file"
