@@ -4,4 +4,5 @@ export default Reflux.createActions([
   'rangeParams',
   'rangeType',
   'query',
+  'toggleField',
 ]);

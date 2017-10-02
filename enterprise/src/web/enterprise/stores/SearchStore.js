@@ -9,20 +9,39 @@ export default Reflux.createStore({
     query: '',
     rangeType: 'relative',
     rangeParams: Immutable.Map({ relative: '300' }),
+    fields: Immutable.Set.of('source', 'message'),
   },
   getInitialState() {
     return this.state;
   },
   query(query) {
     this.state.query = query;
-    this.trigger(this.state);
+    this._trigger();
   },
   rangeParams(key, value) {
     this.state.rangeParams = this.state.rangeParams.set(key, value);
-    this.trigger(this.state);
+    this._trigger();
   },
   rangeType(rangeType) {
     this.state.rangeType = rangeType;
+    this._trigger();
+  },
+  toggleField(field) {
+    if (this.state.fields.contains(field)) {
+      this.removeField(field);
+    } else {
+      this.addField(field);
+    }
+  },
+  addField(field) {
+    this.state.fields = this.state.fields.add(field);
+    this._trigger();
+  },
+  removeField(field) {
+    this.state.fields = this.state.fields.delete(field);
+    this._trigger();
+  },
+  _trigger() {
     this.trigger(this.state);
   },
 });
