@@ -104,7 +104,10 @@ const ProcessorSimulator = React.createClass({
                 <FormGroup id="streamSelectorSimulation">
                   <ControlLabel>Stream</ControlLabel>
                   <Select options={this._getFormattedStreams(this.props.streams)}
-                          onValueChange={this._onStreamSelect} value={this.state.stream.id} clearable={false} />
+                          onChange={this._onStreamSelect}
+                          value={this.state.stream.id}
+                          required
+                          clearable={false} />
                   <HelpBlock>{streamHelp}</HelpBlock>
                 </FormGroup>
               </Col>
