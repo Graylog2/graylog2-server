@@ -19,7 +19,6 @@ export default Reflux.createStore({
   permissions: [],
 
   init() {
-    this.permissions = CurrentUserStore.get().permissions;
     this.listenTo(CurrentUserStore, this.currentUserUpdated);
     DashboardsActions.list();
   },
