@@ -45,7 +45,7 @@ const CachePicker = React.createClass({
                   clearable={false}
                   options={sortedCaches}
                   matchProp="value"
-                  onValueChange={this.props.onSelect}
+                  onChange={this.props.onSelect}
                   value={this.props.selectedId} />
         </Input>
       </fieldset>

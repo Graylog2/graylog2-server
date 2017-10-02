@@ -91,7 +91,7 @@ const StreamForm = React.createClass({
         <div className="form-group">
           <label>Index Set</label>
           <Select placeholder="Select index set" options={this._formatSelectOptions()} matchProp="label"
-                  onValueChange={this._onIndexSetSelect} value={this.state.index_set_id} />
+                  onChange={this._onIndexSetSelect} value={this.state.index_set_id} />
           <p className="help-block">Messages that match this stream will be written to the configured index set.</p>
         </div>
       );

@@ -70,7 +70,7 @@ const DataAdapterCreate = React.createClass({
                       clearable={false}
                       options={sortedAdapters}
                       matchProp="value"
-                      onValueChange={this._onTypeSelect}
+                      onChange={this._onTypeSelect}
                       value={null} />
             </Input>
           </form>
