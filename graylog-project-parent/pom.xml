@@ -20,7 +20,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <modules>
-        <module>../auto-value-javabean</module>
         <module>../graylog2-server</module>
         <module>../integration-tests</module>
     </modules>
@@ -425,14 +424,9 @@
                 <scope>provided</scope>
             </dependency>
             <dependency>
-                <groupId>com.gabrielittner.auto.value</groupId>
-                <artifactId>auto-value-extension-util</artifactId>
-                <version>${auto-value-extension-util.version}</version>
-            </dependency>
-            <dependency>
                 <groupId>org.graylog.autovalue</groupId>
                 <artifactId>auto-value-javabean</artifactId>
-                <version>${project.version}</version>
+                <version>${auto-value-javabean.version}</version>
                 <scope>provided</scope>
             </dependency>
             <dependency>
@@ -480,11 +474,6 @@
                 <groupId>javax.validation</groupId>
                 <artifactId>validation-api</artifactId>
                 <version>${validation-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.squareup</groupId>
-                <artifactId>javapoet</artifactId>
-                <version>${javapoet.version}</version>
             </dependency>
 
             <!-- Test dependencies -->
