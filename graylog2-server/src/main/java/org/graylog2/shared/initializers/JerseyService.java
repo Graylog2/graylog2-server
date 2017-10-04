@@ -176,7 +176,7 @@ public class JerseyService extends AbstractIdleService {
                 null
         );
 
-        apiHttpServer = setUp("rest",
+        apiHttpServer = setUp(
                 listenUri,
                 sslEngineConfigurator,
                 configuration.getHttpThreadPoolSize(),
@@ -272,8 +272,7 @@ public class JerseyService extends AbstractIdleService {
         return rc;
     }
 
-    private HttpServer setUp(String namePrefix,
-                             URI listenUri,
+    private HttpServer setUp(URI listenUri,
                              SSLEngineConfigurator sslEngineConfigurator,
                              int threadPoolSize,
                              int selectorRunnersCount,
@@ -300,8 +299,8 @@ public class JerseyService extends AbstractIdleService {
         listener.setMaxHttpHeaderSize(maxHeaderSize);
 
         final ExecutorService workerThreadPoolExecutor = instrumentedExecutor(
-                namePrefix + "-worker-executor",
-                namePrefix + "-worker-%d",
+                "http-worker-executor",
+                "http-worker-%d",
                 threadPoolSize);
         listener.getTransport().setWorkerThreadPool(workerThreadPoolExecutor);
 
