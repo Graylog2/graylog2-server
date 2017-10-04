@@ -738,9 +738,11 @@ public class BundleImporter {
         caches.forEach(c -> c.addListener(new LatchUpdaterListener(latch), scheduler));
 
         try {
-            latch.await(30, TimeUnit.SECONDS);
+            if (!latch.await(30, TimeUnit.SECONDS)) {
+                LOG.warn("Starting imported Lookup Table Caches did not finish within 30 seconds. A server restart might be required for imported Lookup Tables to function.");
+            }
         } catch (InterruptedException e) {
-            LOG.warn("Starting imported Lookup Table Caches did not finish within 30 seconds. A server restart might be required for imported Lookup Tables to function.");
+            LOG.warn("Starting imported Lookup Table Caches did not finish properly. A server restart might be required for imported Lookup Tables to function: ", e);
         }
     }
 
@@ -765,9 +767,11 @@ public class BundleImporter {
         dataAdapters.forEach(da -> da.addListener(new LatchUpdaterListener(latch), scheduler));
 
         try {
-            latch.await(30, TimeUnit.SECONDS);
+            if (!latch.await(30, TimeUnit.SECONDS)) {
+                LOG.warn("Starting imported Lookup Table Data Adapters did not finish within 30 seconds. A server restart might be required for imported Lookup Tables to function.");
+            }
         } catch (InterruptedException e) {
-            LOG.warn("Starting imported Lookup Table Data Adapters did not finish within 30 seconds. A server restart might be required for imported Lookup Tables to function.");
+            LOG.warn("Starting imported Lookup Table Data Adapters did not finish properly. A server restart might be required for imported Lookup Tables to function: ", e);
         }
     }
 }
