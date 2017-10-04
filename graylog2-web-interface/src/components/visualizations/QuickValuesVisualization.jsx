@@ -66,11 +66,17 @@ const QuickValuesVisualization = React.createClass({
   componentDidMount() {
     this._resizeVisualization(this.props.width, this.props.height, this.props.config.show_data_table);
     this._formatProps(this.props);
-    this._renderDataTable();
-    this._renderPieChart();
+    this._renderDataTable(this.props);
+    this._renderPieChart(this.props);
   },
   componentWillReceiveProps(nextProps) {
     if (deepEqual(this.props, nextProps)) {
+      return;
+    }
+
+    if (this.props.limit !== nextProps.limit || this.props.dataTableLimit !== nextProps.dataTableLimit) {
+      this._renderDataTable(nextProps);
+      this._renderPieChart(nextProps);
       return;
     }
 
@@ -148,9 +154,9 @@ const QuickValuesVisualization = React.createClass({
       default: return d3.descending;
     }
   },
-  _renderDataTable() {
+  _renderDataTable(props) {
     const tableDomNode = this._table;
-    const { dataTableLimit, limit } = this.props;
+    const { dataTableLimit, limit } = props;
 
     this.dataTable = dc.dataTable(tableDomNode, this.dcGroupName);
     this.dataTable
@@ -158,7 +164,7 @@ const QuickValuesVisualization = React.createClass({
       .group((d) => {
         const topValues = this.group.top(limit);
         const dInTopValues = topValues.some(value => d.term.localeCompare(value.key) === 0);
-        return dInTopValues ? this.props.dataTableTitle : 'Others';
+        return dInTopValues ? props.dataTableTitle : 'Others';
       })
       .sortBy(d => d.count)
       .order(this._getSortOrder())
@@ -169,13 +175,13 @@ const QuickValuesVisualization = React.createClass({
         table.selectAll('td.dc-table-column button').on('click', () => {
           // noinspection Eslint
           const term = $(d3.event.target).closest('button').data('term');
-          SearchStore.addSearchTerm(this.props.id, term);
+          SearchStore.addSearchTerm(props.id, term);
         });
       });
 
     this.dataTable.render();
   },
-  _renderPieChart() {
+  _renderPieChart(props) {
     const graphDomNode = this._graph;
 
     this.pieChart = dc.pieChart(graphDomNode, this.dcGroupName);
@@ -195,11 +201,11 @@ const QuickValuesVisualization = React.createClass({
       })
       .renderLabel(false)
       .renderTitle(false)
-      .slicesCap(this.props.limit)
+      .slicesCap(props.limit)
       .ordering(d => d.value)
       .colors(D3Utils.glColourPalette());
 
-    this._resizeVisualization(this.props.width, this.props.height, this.props.config.show_data_table);
+    this._resizeVisualization(props.width, props.height, props.config.show_data_table);
 
     D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
 

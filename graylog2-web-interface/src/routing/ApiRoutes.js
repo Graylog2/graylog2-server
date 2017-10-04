@@ -286,10 +286,12 @@ const ApiRoutes = {
       queryString.field = field;
       return { url: this._buildUrl(url, queryString) };
     },
-    fieldTerms(type, query, field, timerange, streamId) {
+    fieldTerms(type, query, field, order, size, timerange, streamId) {
       const url = `/search/universal/${type}/terms`;
       const queryString = this._buildBaseQueryString(query, timerange, streamId);
       queryString.field = field;
+      queryString.order = `${field}:${order}`; // REST API expects <field>:<order> format for the "order" param
+      queryString.size = size;
       return { url: this._buildUrl(url, queryString) };
     },
   },

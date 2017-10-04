@@ -1,13 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button } from 'react-bootstrap';
+import { DropdownButton, MenuItem } from 'react-bootstrap';
 import Reflux from 'reflux';
+import StringUtils from 'util/StringUtils';
 
 import QuickValuesVisualization from 'components/visualizations/QuickValuesVisualization';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Spinner from 'components/common/Spinner';
 import UIUtils from 'util/UIUtils';
+import QuickValuesOptionsForm from './QuickValuesOptionsForm';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
@@ -28,6 +30,12 @@ const FieldQuickValues = React.createClass({
     return {
       field: undefined,
       data: [],
+      showVizOptions: false,
+      options: {
+        order: 'desc',
+        limit: 5,
+        tableSize: 50,
+      },
     };
   },
 
@@ -72,23 +80,43 @@ const FieldQuickValues = React.createClass({
   },
   _loadQuickValuesData() {
     if (this.state.field !== undefined) {
-      FieldQuickValuesActions.get(this.state.field);
+      FieldQuickValuesActions.get(this.state.field, this.state.options.order, this.state.options.tableSize);
     }
   },
   _resetStatus() {
     this.setState(this.getInitialState());
   },
+
+  _onVizOptionsChange(newOptions) {
+    this.setState({ options: newOptions, showVizOptions: false }, () => this._loadQuickValuesData());
+  },
+
+  _showVizOptions() {
+    this.setState({ showVizOptions: true });
+  },
+
   render() {
     let content;
 
     let inner;
-    if (this.state.data.length === 0) {
+    if (this.state.showVizOptions) {
+      inner = (
+        <QuickValuesOptionsForm limit={this.state.options.limit}
+                                tableSize={this.state.options.tableSize}
+                                order={this.state.options.order}
+                                onSave={this._onVizOptionsChange} />
+      );
+    } else if (this.state.data.length === 0) {
       inner = <Spinner />;
     } else {
+      const dataTableTitle = `${this.state.options.order === 'desc' ? 'Top' : 'Bottom'} ${this.state.options.limit} values`;
       inner = (
         <QuickValuesVisualization id={this.state.field}
                                   config={{ show_pie_chart: true, show_data_table: true }}
                                   data={this.state.data}
+                                  limit={this.state.options.limit}
+                                  dataTableLimit={this.state.options.tableSize}
+                                  dataTableTitle={dataTableTitle}
                                   horizontal
                                   displayAddToSearchButton
                                   displayAnalysisInformation />
@@ -105,7 +133,14 @@ const FieldQuickValues = React.createClass({
                                 bsStyle="default"
                                 pullRight
                                 permissions={this.props.permissions}>
-              <Button bsSize="small" onClick={() => this._resetStatus()}>Dismiss</Button>
+              <DropdownButton bsSize="small"
+                              className="graph-settings"
+                              title="Customize"
+                              id="customize-field-graph-dropdown">
+                <MenuItem onSelect={this._showVizOptions}>Configuration</MenuItem>
+                <MenuItem divider />
+                <MenuItem onSelect={() => this._resetStatus()}>Dismiss</MenuItem>
+              </DropdownButton>
             </AddToDashboardMenu>
           </div>
           <h1>Quick Values for {this.state.field} {this.state.loadPending && <i

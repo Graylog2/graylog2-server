@@ -13,7 +13,7 @@ const { FieldQuickValuesActions } = CombinedProvider.get('FieldQuickValues');
 const FieldQuickValuesStore = Reflux.createStore({
   listenables: [FieldQuickValuesActions],
 
-  get(field) {
+  get(field, order, tableSize) {
     this.trigger({ loading: true });
     const originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
     const streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : null;
@@ -39,6 +39,8 @@ const FieldQuickValuesStore = Reflux.createStore({
       rangeType,
       originalSearchURLParams.get('q') || '*',
       field,
+      order,
+      tableSize,
       timerange,
       streamId,
     ).url;

@@ -14,6 +14,11 @@ const FormUtils = {
         return input.value;
     }
   },
+
+  // Emulates a minimal input event that can be used with FormUtils#getValueFromInput()
+  inputEvent(name, value) {
+    return { target: { name: name, value: value } };
+  },
 };
 
 export default FormUtils;
