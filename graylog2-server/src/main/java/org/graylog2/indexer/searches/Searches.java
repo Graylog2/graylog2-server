@@ -40,6 +40,8 @@ import org.elasticsearch.common.Strings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.Script;
+import org.elasticsearch.script.ScriptService;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
@@ -76,6 +78,7 @@ import org.joda.time.Period;
 import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -274,15 +277,37 @@ public class Searches {
         return new SearchResult(hits, searchResult.getTotal(), indexRanges, config.query(), requestBuilder.toString(), tookMsFromSearchResult(searchResult));
     }
 
-    public TermsResult terms(String field, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
+    public TermsResult terms(String field, List<String> stackedFields, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
         final Terms.Order termsOrder = sorting == Sorting.Direction.DESC ? Terms.Order.count(false) : Terms.Order.count(true);
 
-        final SearchSourceBuilder searchSourceBuilder = filteredSearchRequest(query, filter, range)
-                .aggregation(AggregationBuilders.terms(AGG_TERMS)
-                        .field(field)
-                        .size(size > 0 ? size : 50)
-                        .order(termsOrder))
-                .aggregation(AggregationBuilders.missing("missing")
+        final SearchSourceBuilder searchSourceBuilder = filteredSearchRequest(query, filter, range);
+
+        if (stackedFields.isEmpty()) {
+            searchSourceBuilder.aggregation(AggregationBuilders.terms(AGG_TERMS)
+                            .field(field)
+                            .size(size > 0 ? size : 50)
+                            .order(termsOrder));
+        } else {
+            // If the methods gets stacked fields, we have to use scripting to concatenate the fields.
+            // There is currently no other way to do this. (as of ES 5.6)
+            final StringBuilder scriptStringBuilder = new StringBuilder();
+
+            // Add the main field
+            scriptStringBuilder.append("doc['").append(field).append("'].value");
+
+            // Add all other fields
+            stackedFields.forEach(f -> {
+                scriptStringBuilder.append(" + ' - ' + ");
+                scriptStringBuilder.append("doc['").append(f).append("'].value");
+            });
+
+            searchSourceBuilder.aggregation(AggregationBuilders.terms(AGG_TERMS)
+                    .script(new Script(scriptStringBuilder.toString(), ScriptService.ScriptType.INLINE, "painless", null))
+                    .size(size > 0 ? size : 50)
+                    .order(termsOrder));
+        }
+
+        searchSourceBuilder.aggregation(AggregationBuilders.missing("missing")
                         .field(field));
 
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
@@ -309,6 +334,10 @@ public class Searches {
                 searchSourceBuilder.toString(),
                 tookMsFromSearchResult(searchResult)
         );
+    }
+
+    public TermsResult terms(String field, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
+        return terms(field, Collections.emptyList(), size, query, filter, range, sorting);
     }
 
     public TermsResult terms(String field, int size, String query, String filter, TimeRange range) {

@@ -179,13 +179,17 @@ public class AbsoluteSearchResource extends SearchResource {
             @QueryParam("field") @NotEmpty String field,
             @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
             @QueryParam("query") @NotEmpty String query,
+            @ApiParam(name = "stacked_fields", value = "Fields to stack", required = false) @QueryParam("stacked_fields") String stackedFieldsParam,
             @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
             @ApiParam(name = "from", value = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
             @ApiParam(name = "to", value = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to,
-            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter) {
+            @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
+            @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_ABSOLUTE);
 
-        return buildTermsResult(searches.terms(field, size, query, filter, buildAbsoluteTimeRange(from, to)));
+        final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
+        final Sorting sortOrder = buildSorting(order);
+        return buildTermsResult(searches.terms(field, stackedFields, size, query, filter, buildAbsoluteTimeRange(from, to), sortOrder.getDirection()));
     }
 
     @GET
