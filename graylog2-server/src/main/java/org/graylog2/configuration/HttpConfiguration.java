@@ -84,7 +84,7 @@ public class HttpConfiguration {
     public HostAndPort getHttpBindAddress() {
         return httpBindAddress
                 .requireBracketsForIPv6()
-                .withDefaultPort(9000);
+                .withDefaultPort(GRAYLOG_DEFAULT_PORT);
     }
 
     public String getUriScheme() {
