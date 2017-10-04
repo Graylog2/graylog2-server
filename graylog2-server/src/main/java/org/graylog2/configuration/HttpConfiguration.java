@@ -110,8 +110,7 @@ public class HttpConfiguration {
         return getDefaultHttpUri("/");
     }
 
-    @VisibleForTesting
-    URI getDefaultHttpUri(String path) {
+    private URI getDefaultHttpUri(String path) {
         final HostAndPort bindAddress = getHttpBindAddress();
 
         final URI publishUri;
