@@ -3,7 +3,6 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import Reflux from 'reflux';
-import StringUtils from 'util/StringUtils';
 
 import QuickValuesVisualization from 'components/visualizations/QuickValuesVisualization';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
@@ -24,8 +23,16 @@ const FieldQuickValues = React.createClass({
     rangeParams: PropTypes.object.isRequired,
     stream: PropTypes.object,
     forceFetch: PropTypes.bool,
+    fields: PropTypes.arrayOf(PropTypes.object),
   },
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'), Reflux.connect(FieldQuickValuesStore)],
+
+  getDefaultProps() {
+    return {
+      fields: [],
+    };
+  },
+
   getInitialState() {
     return {
       field: undefined,
@@ -35,6 +42,7 @@ const FieldQuickValues = React.createClass({
         order: 'desc',
         limit: 5,
         tableSize: 50,
+        stackedFields: '',
       },
     };
   },
@@ -80,7 +88,7 @@ const FieldQuickValues = React.createClass({
   },
   _loadQuickValuesData() {
     if (this.state.field !== undefined) {
-      FieldQuickValuesActions.get(this.state.field, this.state.options.order, this.state.options.tableSize);
+      FieldQuickValuesActions.get(this.state.field, this.state.options);
     }
   },
   _resetStatus() {
@@ -109,6 +117,8 @@ const FieldQuickValues = React.createClass({
           <QuickValuesOptionsForm limit={this.state.options.limit}
                                   tableSize={this.state.options.tableSize}
                                   order={this.state.options.order}
+                                  stackedFields={this.state.options.stackedFields}
+                                  stackedFieldsOptions={this.props.fields}
                                   onSave={this._onVizOptionsChange}
                                   onCancel={this._onVizOptionsCancel} />
         </div>
@@ -157,7 +167,7 @@ const FieldQuickValues = React.createClass({
               </DropdownButton>
             </AddToDashboardMenu>
           </div>
-          <h1>Quick Values for {this.state.field} {this.state.loadPending && <i
+          <h1>Quick Values for <em>{this.state.field}</em> {this.state.loadPending && <i
             className="fa fa-spin fa-spinner" />}</h1>
 
           {inner}

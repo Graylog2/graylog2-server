@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { Button, Col, Row } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
+import { MultiSelect } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
 
 const QuickValuesOptionsForm = React.createClass({
@@ -10,6 +11,9 @@ const QuickValuesOptionsForm = React.createClass({
     limit: PropTypes.number.isRequired,
     tableSize: PropTypes.number.isRequired,
     order: PropTypes.string.isRequired,
+    field: PropTypes.string.isRequired,
+    stackedFields: PropTypes.string,
+    stackedFieldsOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
     onSave: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
   },
@@ -19,13 +23,23 @@ const QuickValuesOptionsForm = React.createClass({
       limit: this.props.limit,
       tableSize: this.props.tableSize,
       order: this.props.order,
+      stackedFields: this.props.stackedFields,
     };
   },
 
-  _onChange(event) {
+  _changeConfig(key, value) {
+    console.log('ON CHANGE', key, value);
     const state = _.cloneDeep(this.state);
-    state[event.target.name] = FormsUtils.getValueFromInput(event.target);
+    state[key] = value;
     this.setState(state);
+  },
+
+  _onChange(event) {
+    this._changeConfig(event.target.name, FormsUtils.getValueFromInput(event.target));
+  },
+
+  _onStackedFieldChange(values) {
+    this._changeConfig('stackedFields', values);
   },
 
   _onCancel(event) {
@@ -39,6 +53,13 @@ const QuickValuesOptionsForm = React.createClass({
   },
 
   render() {
+    const fieldOptions = this.props.stackedFieldsOptions
+      .filter(field => !field.name.startsWith('gl2_')) // Do not include Graylog internal fields
+      .filter(field => field.name !== this.props.field) // Do not include the main QuickValues field
+      .map((field) => {
+        return { value: field.name, label: field.name };
+      });
+
     return (
       <Row>
         <Col md={6}>
@@ -72,6 +93,12 @@ const QuickValuesOptionsForm = React.createClass({
                        checked={this.state.order === 'asc'}
                        value="asc"
                        onChange={this._onChange} />
+              </Input>
+
+              <Input label="Stacked fields">
+                <MultiSelect options={fieldOptions}
+                             value={this.state.stackedFields}
+                             onChange={this._onStackedFieldChange} />
               </Input>
 
               <Button type="submit" bsStyle="success" bsSize="small">Update</Button>

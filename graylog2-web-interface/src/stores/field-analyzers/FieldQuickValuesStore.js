@@ -13,7 +13,9 @@ const { FieldQuickValuesActions } = CombinedProvider.get('FieldQuickValues');
 const FieldQuickValuesStore = Reflux.createStore({
   listenables: [FieldQuickValuesActions],
 
-  get(field, order, tableSize) {
+  get(field, options = {}) {
+    const { order, tableSize, stackedFields } = options;
+
     this.trigger({ loading: true });
     const originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
     const streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : null;
@@ -41,6 +43,7 @@ const FieldQuickValuesStore = Reflux.createStore({
       field,
       order,
       tableSize,
+      stackedFields,
       timerange,
       streamId,
     ).url;
@@ -50,13 +53,25 @@ const FieldQuickValuesStore = Reflux.createStore({
       (response) => {
         this.trigger({ data: response, loading: false });
       },
-      (error) => {
-        UserNotification.error(`Loading quick values failed with status: ${error}`,
-          'Could not load quick values');
-      },
+      this._errorHandler('Loading quick values failed with message', 'Could not load quick values'),
     );
 
     FieldQuickValuesActions.get.promise(promise);
+  },
+
+  _errorHandler(message, title, cb) {
+    return (error) => {
+      let errorMessage;
+      try {
+        errorMessage = error.additional.body.message;
+      } catch (e) {
+        errorMessage = error.message;
+      }
+      UserNotification.error(`${message}: ${errorMessage}`, title);
+      if (cb) {
+        cb(error);
+      }
+    };
   },
 });
 
