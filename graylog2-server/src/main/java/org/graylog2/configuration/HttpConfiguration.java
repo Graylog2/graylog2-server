@@ -88,11 +88,7 @@ public class HttpConfiguration {
     }
 
     public String getUriScheme() {
-        return getUriScheme(isHttpEnableTls());
-    }
-
-    public String getUriScheme(boolean enableTls) {
-        return enableTls ? "https" : "http";
+        return isHttpEnableTls() ? "https" : "http";
     }
 
     public URI getHttpPublishUri() {
