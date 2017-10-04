@@ -12,6 +12,7 @@ export default Reflux.createStore({
     fields: Immutable.Set.of('source', 'message'),
   },
   getInitialState() {
+    this.state.fullQuery = this._generateFullQuery(this.state);
     return this.state;
   },
   query(query) {
@@ -42,6 +43,21 @@ export default Reflux.createStore({
     this._trigger();
   },
   _trigger() {
+    this.state.fullQuery = this._generateFullQuery(this.state);
     this.trigger(this.state);
+  },
+
+  _generateFullQuery(search) {
+    return {
+      timerange: Object.assign({
+        type: search.rangeType,
+      }, search.rangeParams.toObject()),
+      query: {
+        elasticsearch: search.query || '*',
+      },
+      search_types: [
+
+      ],
+    };
   },
 });

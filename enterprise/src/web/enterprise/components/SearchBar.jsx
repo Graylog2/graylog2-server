@@ -10,8 +10,6 @@ import DocsHelper from 'util/DocsHelper';
 import SearchButton from 'enterprise/components/searchbar/SearchButton';
 import SearchStore from 'enterprise/stores/SearchStore';
 import SearchActions from 'enterprise/actions/SearchActions';
-import QueriesStore from 'enterprise/stores/QueriesStore';
-import QueriesActions from 'enterprise/actions/QueriesActions';
 import RelativeTimeRangeSelector from 'enterprise/components/searchbar/RelativeTimeRangeSelector';
 import AbsoluteTimeRangeSelector from 'enterprise/components/searchbar/AbsoluteTimeRangeSelector';
 import KeywordTimeRangeSelector from 'enterprise/components/searchbar/KeywordTimeRangeSelector';
@@ -21,18 +19,7 @@ const SearchBar = React.createClass({
   _performSearch(event) {
     event.preventDefault();
     const { search } = this.state;
-    const query = {
-      timerange: Object.assign({
-        type: search.rangeType,
-      }, search.rangeParams.toObject()),
-      query: {
-        elasticsearch: search.query || '*',
-      },
-      search_types: [
-
-      ],
-    };
-    QueriesActions.update('root', query);
+    this.props.onExecute(search.fullQuery);
   },
   // TODO: Transfer this to AbsoluteTimeRangeSelector
   _rangeParamsChanged(key, value) {
