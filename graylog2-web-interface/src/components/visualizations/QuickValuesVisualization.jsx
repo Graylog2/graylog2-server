@@ -154,6 +154,13 @@ const QuickValuesVisualization = React.createClass({
       default: return d3.descending;
     }
   },
+  _groupOrderFunc(d) {
+    if (this.props.sortOrder === 'asc') {
+      return d * -1;
+    } else {
+      return d;
+    }
+  },
   _renderDataTable(props) {
     const tableDomNode = this._table;
     const { dataTableLimit, limit } = props;
@@ -162,7 +169,7 @@ const QuickValuesVisualization = React.createClass({
     this.dataTable
       .dimension(this.dimensionByCount)
       .group((d) => {
-        const topValues = this.group.top(limit);
+        const topValues = this.group.order(this._groupOrderFunc).top(limit);
         const dInTopValues = topValues.some(value => d.term.localeCompare(value.key) === 0);
         return dInTopValues ? props.dataTableTitle : 'Others';
       })

@@ -117,6 +117,7 @@ const FieldQuickValues = React.createClass({
                                   limit={this.state.options.limit}
                                   dataTableLimit={this.state.options.tableSize}
                                   dataTableTitle={dataTableTitle}
+                                  sortOrder={this.state.options.order}
                                   horizontal
                                   displayAddToSearchButton
                                   displayAnalysisInformation />
