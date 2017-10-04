@@ -1,15 +1,15 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
-import moment from 'moment';
 
 import { Spinner, Timestamp } from 'components/common';
 
 import CombinedProvider from 'injection/CombinedProvider';
-const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
-const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
+import { sortByDate } from 'util/SortUtils';
 
 import style from './AlertTimeline.css';
+const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
+const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 
 const AlertTimeline = React.createClass({
   propTypes: {
@@ -36,12 +36,7 @@ const AlertTimeline = React.createClass({
     }
 
     this.state.histories
-      .sort((h1, h2) => {
-        const h1Time = moment(h1.created_at);
-        const h2Time = moment(h2.created_at);
-
-        return (h1Time.isBefore(h2Time) ? -1 : h2Time.isBefore(h1Time) ? 1 : 0);
-      })
+      .sort((h1, h2) => sortByDate(h1.created_at, h2.created_at))
       .forEach((history) => {
         const configuration = history.alarmcallbackconfiguration;
         const type = this.state.availableNotifications[configuration.type];
