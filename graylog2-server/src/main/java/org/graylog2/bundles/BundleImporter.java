@@ -17,7 +17,6 @@
 package org.graylog2.bundles;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
@@ -198,7 +197,7 @@ public class BundleImporter {
             if (!rollback()) {
                 LOG.error("Rollback unsuccessful.");
             }
-            Throwables.propagate(e);
+            throw new RuntimeException(e);
         }
     }
 
@@ -718,7 +717,7 @@ public class BundleImporter {
         }
     }
 
-    private void createLookupCaches(String bundleId, Set<LookupCacheBundle> lookupCaches) throws InterruptedException {
+    private void createLookupCaches(String bundleId, Set<LookupCacheBundle> lookupCaches) {
         for (LookupCacheBundle bundle : lookupCaches) {
             final CacheDto dto = dbCacheService.save(CacheDto.builder()
                     .title(bundle.getTitle())
@@ -738,10 +737,14 @@ public class BundleImporter {
         final CountDownLatch latch = new CountDownLatch(caches.size());
         caches.forEach(c -> c.addListener(new LatchUpdaterListener(latch), scheduler));
 
-        latch.await(30, TimeUnit.SECONDS);
+        try {
+            latch.await(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            LOG.warn("Starting imported Lookup Table Caches did not finish within 30 seconds. A server restart might be required for imported Lookup Tables to function.");
+        }
     }
 
-    private void createLookupDataAdapters(String bundleId, Set<LookupDataAdapterBundle> lookupDataAdapters) throws InterruptedException {
+    private void createLookupDataAdapters(String bundleId, Set<LookupDataAdapterBundle> lookupDataAdapters) {
         for (LookupDataAdapterBundle bundle : lookupDataAdapters) {
             final DataAdapterDto dto = dbDataAdapterService.save(DataAdapterDto.builder()
                     .title(bundle.getTitle())
@@ -761,6 +764,10 @@ public class BundleImporter {
         final CountDownLatch latch = new CountDownLatch(dataAdapters.size());
         dataAdapters.forEach(da -> da.addListener(new LatchUpdaterListener(latch), scheduler));
 
-        latch.await(30, TimeUnit.SECONDS);
+        try {
+            latch.await(30, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            LOG.warn("Starting imported Lookup Table Data Adapters did not finish within 30 seconds. A server restart might be required for imported Lookup Tables to function.");
+        }
     }
 }
