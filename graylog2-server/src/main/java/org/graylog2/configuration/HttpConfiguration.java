@@ -17,6 +17,7 @@
 package org.graylog2.configuration;
 
 import com.github.joschi.jadconfig.Parameter;
+import com.github.joschi.jadconfig.ParameterException;
 import com.github.joschi.jadconfig.ValidationException;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
@@ -28,6 +29,8 @@ import org.graylog2.plugin.Tools;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
+import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -38,7 +41,6 @@ import java.nio.file.Path;
 public class HttpConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(HttpConfiguration.class);
 
-    private static final String WILDCARD_IP_ADDRESS = "0.0.0.0";
     private static final int GRAYLOG_DEFAULT_PORT = 9000;
 
     public static final String OVERRIDE_HEADER = "X-Graylog-Server-URL";
@@ -91,17 +93,30 @@ public class HttpConfiguration {
         return isHttpEnableTls() ? "https" : "http";
     }
 
+    @Nullable
+    private InetAddress toInetAddress(String host) {
+        try {
+            return InetAddress.getByName(host);
+        } catch (UnknownHostException e) {
+            LOG.debug("Couldn't resolve \"{}\"", host, e);
+            return null;
+        }
+    }
+
     public URI getHttpPublishUri() {
         if (httpPublishUri == null) {
             final URI defaultHttpUri = getDefaultHttpUri();
             LOG.debug("No \"http_publish_uri\" set. Using default <{}>.", defaultHttpUri);
             return defaultHttpUri;
-        } else if (WILDCARD_IP_ADDRESS.equals(httpPublishUri.getHost())) {
-            final URI defaultHttpUri = getDefaultHttpUri(httpPublishUri.getPath());
-            LOG.warn("\"{}\" is not a valid setting for \"http_publish_uri\". Using default <{}>.", httpPublishUri, defaultHttpUri);
-            return defaultHttpUri;
         } else {
-            return Tools.normalizeURI(httpPublishUri, httpPublishUri.getScheme(), GRAYLOG_DEFAULT_PORT, httpPublishUri.getPath());
+            final InetAddress inetAddress = toInetAddress(httpPublishUri.getHost());
+            if (Tools.isWildcardInetAddress(inetAddress)) {
+                final URI defaultHttpUri = getDefaultHttpUri(httpPublishUri.getPath());
+                LOG.warn("\"{}\" is not a valid setting for \"http_publish_uri\". Using default <{}>.", httpPublishUri, defaultHttpUri);
+                return defaultHttpUri;
+            } else {
+                return Tools.normalizeURI(httpPublishUri, httpPublishUri.getScheme(), GRAYLOG_DEFAULT_PORT, httpPublishUri.getPath());
+            }
         }
     }
 
@@ -114,17 +129,18 @@ public class HttpConfiguration {
         final HostAndPort bindAddress = getHttpBindAddress();
 
         final URI publishUri;
-        if (WILDCARD_IP_ADDRESS.equals(bindAddress.getHost())) {
+        final InetAddress inetAddress = toInetAddress(bindAddress.getHost());
+        if (inetAddress != null && Tools.isWildcardInetAddress(inetAddress)) {
             final InetAddress guessedAddress;
             try {
-                guessedAddress = Tools.guessPrimaryNetworkAddress();
+                guessedAddress = Tools.guessPrimaryNetworkAddress(inetAddress instanceof Inet4Address);
 
                 if (guessedAddress.isLoopbackAddress()) {
                     LOG.debug("Using loopback address {}", guessedAddress);
                 }
             } catch (Exception e) {
                 LOG.error("Could not guess primary network address for \"http_publish_uri\". Please configure it in your Graylog configuration.", e);
-                throw new RuntimeException("No http_publish_uri.", e);
+                throw new ParameterException("No http_publish_uri.", e);
             }
 
             try {
@@ -204,7 +220,7 @@ public class HttpConfiguration {
     public void validateHttpBindAddress() throws ValidationException {
         try {
             final String host = getHttpBindAddress().getHost();
-            if(!InetAddresses.isInetAddress(host)) {
+            if (!InetAddresses.isInetAddress(host)) {
                 final InetAddress inetAddress = InetAddress.getByName(host);
             }
         } catch (IllegalArgumentException | UnknownHostException e) {
@@ -215,7 +231,7 @@ public class HttpConfiguration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validateHttpPublishUriPathEndsWithSlash() throws ValidationException {
-        if(!getHttpPublishUri().getPath().endsWith("/")) {
+        if (!getHttpPublishUri().getPath().endsWith("/")) {
             throw new ValidationException("\"http_publish_uri\" must end with a slash (\"/\")");
         }
     }
@@ -223,7 +239,7 @@ public class HttpConfiguration {
     @ValidatorMethod
     @SuppressWarnings("unused")
     public void validateHttpExternalUriPathEndsWithSlash() throws ValidationException {
-        if(!getHttpExternalUri().getPath().endsWith("/")) {
+        if (!getHttpExternalUri().getPath().endsWith("/")) {
             throw new ValidationException("\"http_external_uri\" must end with a slash (\"/\")");
         }
     }

@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.management.ManagementFactory;
 import java.net.Inet4Address;
+import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
@@ -43,6 +44,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -61,6 +63,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
  * Utility class for various tool/helper functions.
  */
 public final class Tools {
+    private static final byte[] EMPTY_BYTE_ARRAY_4 = {0,0,0,0};
+    private static final byte[] EMPTY_BYTE_ARRAY_16 = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 
     public static final String ES_DATE_FORMAT = "yyyy-MM-dd HH:mm:ss.SSS";
     public static final String ES_DATE_FORMAT_NO_MS = "yyyy-MM-dd HH:mm:ss";
@@ -451,7 +455,7 @@ public final class Tools {
      * or the loopback address as fallback.
      * @throws SocketException if the list of network interfaces couldn't be retrieved
      */
-    public static InetAddress guessPrimaryNetworkAddress() throws SocketException {
+    public static InetAddress guessPrimaryNetworkAddress(boolean preferIPv4) throws SocketException {
         final Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
 
         if (interfaces != null) {
@@ -459,7 +463,10 @@ public final class Tools {
                 if (!interf.isLoopback() && interf.isUp()) {
                     // Interface is not loopback and up. Try to get the first address.
                     for (InetAddress addr : Collections.list(interf.getInetAddresses())) {
-                        if (addr instanceof Inet4Address) {
+                        if (preferIPv4 && addr instanceof Inet4Address) {
+                            return addr;
+                        }
+                        if (!preferIPv4 && addr instanceof Inet6Address) {
                             return addr;
                         }
                     }
@@ -468,6 +475,10 @@ public final class Tools {
         }
 
         return InetAddress.getLoopbackAddress();
+    }
+
+    public static boolean isWildcardInetAddress(@Nullable InetAddress inetAddress) {
+        return inetAddress != null && (Arrays.equals(EMPTY_BYTE_ARRAY_4, inetAddress.getAddress()) || Arrays.equals(EMPTY_BYTE_ARRAY_16, inetAddress.getAddress()));
     }
 
     @Nullable

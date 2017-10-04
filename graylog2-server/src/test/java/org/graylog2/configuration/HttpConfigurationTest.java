@@ -153,6 +153,15 @@ public class HttpConfigurationTest {
     }
 
     @Test
+    public void testHttpBindAddressIPv6Wildcard() throws RepositoryException, ValidationException {
+        jadConfig.setRepository(new InMemoryRepository(ImmutableMap.of("http_bind_address", "[::]:9000"))).addConfigurationBean(configuration).process();
+
+        assertThat(configuration.getDefaultHttpUri())
+                .isNotNull()
+                .isNotEqualTo(URI.create("http://[::]:9000"));
+    }
+
+    @Test
     public void testHttpPublishUriWildcard() throws RepositoryException, ValidationException {
         final Map<String, String> properties = ImmutableMap.of(
                 "http_bind_address", "0.0.0.0:9000",
@@ -161,6 +170,17 @@ public class HttpConfigurationTest {
         jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
 
         assertThat(configuration.getHttpPublishUri()).isNotEqualTo(URI.create("http://0.0.0.0:9000/"));
+    }
+
+    @Test
+    public void testHttpPublishUriIPv6Wildcard() throws RepositoryException, ValidationException {
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_bind_address", "[::]:9000",
+                "http_publish_uri", "http://[::]:9000/");
+
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+
+        assertThat(configuration.getHttpPublishUri()).isNotEqualTo(URI.create("http://[::]:9000/"));
     }
 
     @Test
@@ -174,6 +194,19 @@ public class HttpConfigurationTest {
         assertThat(configuration.getHttpPublishUri())
                 .hasPath("/api/")
                 .isNotEqualTo(URI.create("http://0.0.0.0:9000/api/"));
+    }
+
+    @Test
+    public void testHttpPublishUriIPv6WildcardKeepsPath() throws RepositoryException, ValidationException {
+        final Map<String, String> properties = ImmutableMap.of(
+                "http_bind_address", "[::]:9000",
+                "http_publish_uri", "http://[::]:9000/api/");
+
+        jadConfig.setRepository(new InMemoryRepository(properties)).addConfigurationBean(configuration).process();
+
+        assertThat(configuration.getHttpPublishUri())
+                .hasPath("/api/")
+                .isNotEqualTo(URI.create("http://[::]:9000/api/"));
     }
 
     @Test
