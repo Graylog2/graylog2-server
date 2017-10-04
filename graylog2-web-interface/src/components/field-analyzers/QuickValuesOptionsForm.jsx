@@ -11,6 +11,7 @@ const QuickValuesOptionsForm = React.createClass({
     tableSize: PropTypes.number.isRequired,
     order: PropTypes.string.isRequired,
     onSave: PropTypes.func.isRequired,
+    onCancel: PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -27,11 +28,9 @@ const QuickValuesOptionsForm = React.createClass({
     this.setState(state);
   },
 
-  _onOrderChange(value) {
-    return (e) => {
-      e.preventDefault();
-      this._onChange(FormsUtils.inputEvent('order', value));
-    };
+  _onCancel(event) {
+    event.preventDefault();
+    this.props.onCancel();
   },
 
   _onSave(e) {
@@ -42,9 +41,9 @@ const QuickValuesOptionsForm = React.createClass({
   render() {
     return (
       <Row>
-        <form className="form form-horizontal" onSubmit={this._onSave}>
-          <fieldset>
-            <Col md={10}>
+        <Col md={6}>
+          <form className="form" onSubmit={this._onSave}>
+            <fieldset style={{ paddingLeft: 15 }}>
               <Input type="number"
                      id="limit"
                      name="limit"
@@ -52,37 +51,35 @@ const QuickValuesOptionsForm = React.createClass({
                      autoFocus
                      required
                      onChange={this._onChange}
-                     value={this.state.limit}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
+                     value={this.state.limit} />
               <Input type="number"
                      id="tableSize"
                      name="tableSize"
                      label="Total table size"
                      required
                      onChange={this._onChange}
-                     value={this.state.tableSize}
-                     labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" />
-              <Input type="radio"
-                     name="order"
-                     label="Top values"
-                     checked={this.state.order === 'desc'}
-                     onChange={this._onOrderChange('desc')}
-                     wrapperClassName="col-md-offset-3 col-md-9" />
-              <Input type="radio"
-                     name="order"
-                     label="Bottom values"
-                     checked={this.state.order === 'asc'}
-                     onChange={this._onOrderChange('asc')}
-                     wrapperClassName="col-md-offset-3 col-md-9" />
-
-              <Input wrapperClassName="col-sm-offset-3 col-sm-9">
-                <Button type="submit" bsStyle="success" bsSize="small">Update</Button>
+                     value={this.state.tableSize} />
+              <Input label="Sort options">
+                <Input type="radio"
+                       name="order"
+                       label="Top values"
+                       checked={this.state.order === 'desc'}
+                       value="desc"
+                       onChange={this._onChange} />
+                <Input type="radio"
+                       name="order"
+                       label="Bottom values"
+                       checked={this.state.order === 'asc'}
+                       value="asc"
+                       onChange={this._onChange} />
               </Input>
-            </Col>
-          </fieldset>
-        </form>
+
+              <Button type="submit" bsStyle="success" bsSize="small">Update</Button>
+              {' '}
+              <Button bsSize="small" onClick={this._onCancel}>Cancel</Button>
+            </fieldset>
+          </form>
+        </Col>
       </Row>
     );
   },

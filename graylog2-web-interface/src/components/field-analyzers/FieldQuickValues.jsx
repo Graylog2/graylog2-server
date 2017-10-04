@@ -91,6 +91,10 @@ const FieldQuickValues = React.createClass({
     this.setState({ options: newOptions, showVizOptions: false }, () => this._loadQuickValuesData());
   },
 
+  _onVizOptionsCancel() {
+    this.setState({ showVizOptions: false });
+  },
+
   _showVizOptions() {
     this.setState({ showVizOptions: true });
   },
@@ -101,26 +105,35 @@ const FieldQuickValues = React.createClass({
     let inner;
     if (this.state.showVizOptions) {
       inner = (
-        <QuickValuesOptionsForm limit={this.state.options.limit}
-                                tableSize={this.state.options.tableSize}
-                                order={this.state.options.order}
-                                onSave={this._onVizOptionsChange} />
+        <div style={{ marginTop: 10 }}>
+          <QuickValuesOptionsForm limit={this.state.options.limit}
+                                  tableSize={this.state.options.tableSize}
+                                  order={this.state.options.order}
+                                  onSave={this._onVizOptionsChange}
+                                  onCancel={this._onVizOptionsCancel} />
+        </div>
       );
     } else if (this.state.data.length === 0) {
-      inner = <Spinner />;
+      inner = (
+        <div style={{ maxHeight: 400, marginTop: 10 }}>
+          <Spinner />;
+        </div>
+      );
     } else {
       const dataTableTitle = `${this.state.options.order === 'desc' ? 'Top' : 'Bottom'} ${this.state.options.limit} values`;
       inner = (
-        <QuickValuesVisualization id={this.state.field}
-                                  config={{ show_pie_chart: true, show_data_table: true }}
-                                  data={this.state.data}
-                                  limit={this.state.options.limit}
-                                  dataTableLimit={this.state.options.tableSize}
-                                  dataTableTitle={dataTableTitle}
-                                  sortOrder={this.state.options.order}
-                                  horizontal
-                                  displayAddToSearchButton
-                                  displayAnalysisInformation />
+        <div style={{ maxHeight: 400, overflowY: 'auto', marginTop: 10 }}>
+          <QuickValuesVisualization id={this.state.field}
+                                    config={{ show_pie_chart: true, show_data_table: true }}
+                                    data={this.state.data}
+                                    limit={this.state.options.limit}
+                                    dataTableLimit={this.state.options.tableSize}
+                                    dataTableTitle={dataTableTitle}
+                                    sortOrder={this.state.options.order}
+                                    horizontal
+                                    displayAddToSearchButton
+                                    displayAnalysisInformation />
+        </div>
       );
     }
 
@@ -147,7 +160,7 @@ const FieldQuickValues = React.createClass({
           <h1>Quick Values for {this.state.field} {this.state.loadPending && <i
             className="fa fa-spin fa-spinner" />}</h1>
 
-          <div style={{ maxHeight: 400, overflow: 'auto', marginTop: 10 }}>{inner}</div>
+          {inner}
         </div>
       );
     }
