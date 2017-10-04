@@ -28,7 +28,6 @@ const QuickValuesOptionsForm = React.createClass({
   },
 
   _changeConfig(key, value) {
-    console.log('ON CHANGE', key, value);
     const state = _.cloneDeep(this.state);
     state[key] = value;
     this.setState(state);
