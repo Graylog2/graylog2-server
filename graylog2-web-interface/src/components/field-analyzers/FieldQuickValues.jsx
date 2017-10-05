@@ -107,6 +107,17 @@ const FieldQuickValues = React.createClass({
     this.setState({ showVizOptions: true });
   },
 
+  _buildDashboardConfig() {
+    // Map internal state fields to widget config fields. (snake case vs. camel case)
+    return {
+      field: this.state.field,
+      limit: this.state.options.limit,
+      sort_order: this.state.options.order,
+      data_table_limit: this.state.options.tableSize,
+      stacked_fields: this.state.options.stackedFields,
+    };
+  },
+
   render() {
     let content;
 
@@ -155,7 +166,7 @@ const FieldQuickValues = React.createClass({
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
                                 widgetType={this.WIDGET_TYPE}
-                                configuration={{ field: this.state.field }}
+                                configuration={this._buildDashboardConfig()}
                                 bsStyle="default"
                                 pullRight
                                 permissions={this.props.permissions}>
