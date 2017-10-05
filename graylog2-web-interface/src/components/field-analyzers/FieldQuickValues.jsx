@@ -130,16 +130,18 @@ const FieldQuickValues = React.createClass({
         </div>
       );
     } else {
-      const dataTableTitle = `${this.state.options.order === 'desc' ? 'Top' : 'Bottom'} ${this.state.options.limit} values`;
+      const config = {
+        show_pie_chart: true,
+        show_data_table: true,
+        data_table_limit: this.state.options.tableSize,
+        sort_order: this.state.options.order,
+        limit: this.state.options.limit,
+      };
       inner = (
         <div style={{ maxHeight: 400, overflowY: 'auto', marginTop: 10 }}>
           <QuickValuesVisualization id={this.state.field}
-                                    config={{ show_pie_chart: true, show_data_table: true }}
+                                    config={config}
                                     data={this.state.data}
-                                    limit={this.state.options.limit}
-                                    dataTableLimit={this.state.options.tableSize}
-                                    dataTableTitle={dataTableTitle}
-                                    sortOrder={this.state.options.order}
                                     horizontal
                                     displayAddToSearchButton
                                     displayAnalysisInformation />
