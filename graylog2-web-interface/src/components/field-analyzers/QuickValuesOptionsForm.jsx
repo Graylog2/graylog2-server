@@ -1,10 +1,12 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, Row } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { MultiSelect } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
+
+import style from './QuickValuesOptionsForm.css';
 
 const QuickValuesOptionsForm = React.createClass({
   propTypes: {
@@ -41,8 +43,7 @@ const QuickValuesOptionsForm = React.createClass({
     this._changeConfig('stackedFields', values);
   },
 
-  _onCancel(event) {
-    event.preventDefault();
+  _onCancel() {
     this.props.onCancel();
   },
 
@@ -63,7 +64,7 @@ const QuickValuesOptionsForm = React.createClass({
       <Row>
         <Col md={6}>
           <form className="form" onSubmit={this._onSave}>
-            <fieldset style={{ paddingLeft: 15 }}>
+            <fieldset className={style.optionsFieldSet}>
               <Input type="number"
                      id="limit"
                      name="limit"
@@ -79,7 +80,8 @@ const QuickValuesOptionsForm = React.createClass({
                      required
                      onChange={this._onChange}
                      value={this.state.tableSize} />
-              <Input label="Sort options">
+              <FormGroup>
+                <ControlLabel>Sort options</ControlLabel>
                 <Input type="radio"
                        name="order"
                        label="Top values"
@@ -92,17 +94,19 @@ const QuickValuesOptionsForm = React.createClass({
                        checked={this.state.order === 'asc'}
                        value="asc"
                        onChange={this._onChange} />
-              </Input>
+              </FormGroup>
 
-              <Input label="Stacked fields">
+              <FormGroup>
+                <ControlLabel>Stacked fields</ControlLabel>
                 <MultiSelect options={fieldOptions}
                              value={this.state.stackedFields}
                              onChange={this._onStackedFieldChange} />
-              </Input>
+              </FormGroup>
 
-              <Button type="submit" bsStyle="success" bsSize="small">Update</Button>
-              {' '}
-              <Button bsSize="small" onClick={this._onCancel}>Cancel</Button>
+              <ButtonToolbar>
+                <Button type="submit" bsStyle="success" bsSize="small">Update</Button>
+                <Button bsSize="small" onClick={this._onCancel}>Cancel</Button>
+              </ButtonToolbar>
             </fieldset>
           </form>
         </Col>

@@ -10,6 +10,8 @@ import Spinner from 'components/common/Spinner';
 import UIUtils from 'util/UIUtils';
 import QuickValuesOptionsForm from './QuickValuesOptionsForm';
 
+import style from './FieldQuickValues.css';
+
 import CombinedProvider from 'injection/CombinedProvider';
 
 const { FieldQuickValuesStore, FieldQuickValuesActions } = CombinedProvider.get('FieldQuickValues');
@@ -124,19 +126,20 @@ const FieldQuickValues = React.createClass({
     let inner;
     if (this.state.showVizOptions) {
       inner = (
-        <div style={{ marginTop: 10 }}>
+        <div className={style.optionsFormWrapper}>
           <QuickValuesOptionsForm limit={this.state.options.limit}
                                   tableSize={this.state.options.tableSize}
                                   order={this.state.options.order}
                                   stackedFields={this.state.options.stackedFields}
                                   stackedFieldsOptions={this.props.fields}
+                                  field={this.state.field}
                                   onSave={this._onVizOptionsChange}
                                   onCancel={this._onVizOptionsCancel} />
         </div>
       );
     } else if (this.state.data.length === 0) {
       inner = (
-        <div style={{ maxHeight: 400, marginTop: 10 }}>
+        <div className={style.spinnerWrapper}>
           <Spinner />;
         </div>
       );
@@ -149,7 +152,7 @@ const FieldQuickValues = React.createClass({
         limit: this.state.options.limit,
       };
       inner = (
-        <div style={{ maxHeight: 400, overflowY: 'auto', marginTop: 10 }}>
+        <div className={style.visualizationWrapper}>
           <QuickValuesVisualization id={this.state.field}
                                     config={config}
                                     data={this.state.data}

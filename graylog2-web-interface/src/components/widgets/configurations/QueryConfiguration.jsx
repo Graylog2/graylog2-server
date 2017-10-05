@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { ControlLabel, FormGroup } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { MultiSelect } from 'components/common';
 
@@ -36,7 +37,8 @@ const QueryConfiguration = React.createClass({
                required
                onChange={this.props.onChange}
                value={this.props.config.data_table_limit} />
-        <Input label="Sort options">
+        <FormGroup>
+          <ControlLabel>Sort options</ControlLabel>
           <Input type="radio"
                  name="sort_order"
                  label="Top values"
@@ -49,11 +51,12 @@ const QueryConfiguration = React.createClass({
                  checked={this.props.config.sort_order === 'asc'}
                  value="asc"
                  onChange={this.props.onChange} />
-        </Input>
+        </FormGroup>
 
-        <Input label="Stacked fields">
+        <FormGroup>
+          <ControlLabel>Stacked fields</ControlLabel>
           <MultiSelect allowCreate value={this.props.config.stacked_fields} onChange={this._onStackedFieldChange} />
-        </Input>
+        </FormGroup>
       </div>
     );
   },
