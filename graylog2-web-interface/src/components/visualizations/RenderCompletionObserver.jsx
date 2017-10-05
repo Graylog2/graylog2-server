@@ -21,11 +21,11 @@ const RenderCompletionObserver = React.createClass({
 
   render() {
     return (
-      <span>
+      <div>
         {React.Children.map(this.props.children, (child) => {
           return React.cloneElement(child, { onRenderComplete: this._handleRenderComplete });
         })}
-      </span>
+      </div>
     );
   },
 });
