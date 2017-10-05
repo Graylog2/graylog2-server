@@ -24,6 +24,7 @@ export default Reflux.createStore({
     this._trigger();
   },
   rangeType(rangeType) {
+    this.state.rangeParams = new Immutable.Map();
     this.state.rangeType = rangeType;
     this._trigger();
   },
