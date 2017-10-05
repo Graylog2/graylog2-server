@@ -30,7 +30,7 @@ export default class KeywordTimeRangeSelector extends React.Component {
   }
 
   _keywordSearchChanged(value) {
-    this.props.onChange(value);
+    this.props.onChange('keyword', value);
 
     if (value === '') {
       this._resetKeywordPreview();
