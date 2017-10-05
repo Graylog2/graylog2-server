@@ -80,16 +80,20 @@ export default class WidgetGrid extends React.Component {
 
     return returnedWidgets;
   }
+
   render() {
     const { widgets, positions } = this._renderWidgets(this.props.widgets);
+    const grid = widgets && widgets.length > 0 ? (
+      <ReactGridContainer locked={this.props.locked}
+                          positions={positions}
+                          onPositionsChange={this.props.onPositionsChange}>
+        {widgets}
+      </ReactGridContainer>
+    ) : null;
     return (
       <Row>
         <div className="dashboard">
-          <ReactGridContainer locked={this.props.locked}
-            positions={positions}
-            onPositionsChange={this.props.onPositionsChange}>
-            {widgets}
-          </ReactGridContainer>
+          {grid}
         </div>
       </Row>
     );
