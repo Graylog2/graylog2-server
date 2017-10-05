@@ -8,7 +8,7 @@ export default Reflux.createStore({
   state: {
     query: '',
     rangeType: 'relative',
-    rangeParams: Immutable.Map({ relative: '300' }),
+    rangeParams: Immutable.Map({ range: '300' }),
     fields: Immutable.Set.of('source', 'message'),
   },
   getInitialState() {
@@ -54,10 +54,22 @@ export default Reflux.createStore({
         type: search.rangeType,
       }, search.rangeParams.toObject()),
       query: {
-        elasticsearch: search.query || '*',
+        type: 'elasticsearch',
+        query_string: search.query || '*',
       },
       search_types: [
-
+        {
+          id: 'messages',
+          type: 'messages',
+          limit: 150,
+          offset: 0,
+          sort: [{ field: 'timestamp', order: 'DESC' }, { field: 'source', order: 'ASC' }],
+        },
+        {
+          id: 'histogram',
+          type: 'date_histogram',
+          interval: 'MINUTE',
+        },
       ],
     };
   },
