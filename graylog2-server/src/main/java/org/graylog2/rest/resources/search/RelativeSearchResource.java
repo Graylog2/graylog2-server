@@ -177,14 +177,16 @@ public class RelativeSearchResource extends SearchResource {
             @QueryParam("field") @NotEmpty String field,
             @ApiParam(name = "query", value = "Query (Lucene syntax)", required = true)
             @QueryParam("query") @NotEmpty String query,
+            @ApiParam(name = "stacked_fields", value = "Fields to stack", required = false) @QueryParam("stacked_fields") String stackedFieldsParam,
             @ApiParam(name = "size", value = "Maximum number of terms to return", required = false) @QueryParam("size") int size,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
+        final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
         final Sorting sortOrder = buildSorting(order);
-        return buildTermsResult(searches.terms(field, size, query, filter, buildRelativeTimeRange(range), sortOrder.getDirection()));
+        return buildTermsResult(searches.terms(field, stackedFields, size, query, filter, buildRelativeTimeRange(range), sortOrder.getDirection()));
     }
 
     @GET
