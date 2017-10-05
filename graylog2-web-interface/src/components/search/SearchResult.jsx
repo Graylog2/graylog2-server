@@ -144,6 +144,7 @@ const SearchResult = React.createClass({
           from: this.props.histogram.histogram_boundaries.from,
           to: this.props.histogram.histogram_boundaries.to,
           forceFetch: this.props.forceFetch,
+          fields: this.props.result.all_fields,
         });
       });
   },

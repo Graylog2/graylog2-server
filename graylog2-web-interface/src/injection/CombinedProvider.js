@@ -14,6 +14,7 @@ class CombinedProvider {
       Decorators: () => require('actions/decorators/DecoratorsActions'),
       Deflector: () => require('actions/indices/DeflectorActions'),
       Extractors: () => require('actions/extractors/ExtractorsActions'),
+      FieldQuickValues: () => require('actions/field-analyzers/FieldQuickValuesActions'),
       GettingStarted: () => require('actions/gettingstarted/GettingStartedActions'),
       HistogramData: () => require('actions/sources/HistogramDataActions'),
       IndexerCluster: () => require('actions/indexers/IndexerClusterActions'),

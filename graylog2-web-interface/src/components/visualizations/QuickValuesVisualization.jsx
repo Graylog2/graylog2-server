@@ -6,37 +6,50 @@ import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
 import deepEqual from 'deep-equal';
-
 import $ from 'jquery';
-global.jQuery = $;
-require('bootstrap/js/tooltip');
 
 import D3Utils from 'util/D3Utils';
 import StringUtils from 'util/StringUtils';
 import NumberUtils from 'util/NumberUtils';
 
 import StoreProvider from 'injection/StoreProvider';
+
+global.jQuery = $;
+// eslint-disable-next-line import/newline-after-import
+require('bootstrap/js/tooltip');
 const SearchStore = StoreProvider.getStore('Search');
 
 const QuickValuesVisualization = React.createClass({
+  DEFAULT_CONFIG: {
+    show_pie_chart: true,
+    show_data_table: true,
+    data_table_limit: 50,
+    limit: 5,
+    sort_order: 'desc',
+  },
   propTypes: {
-    id: PropTypes.string,
-    config: PropTypes.object,
+    id: PropTypes.string.isRequired,
+    config: PropTypes.shape({
+      show_pie_chart: PropTypes.bool,
+      show_data_table: PropTypes.bool,
+      data_table_limit: PropTypes.number,
+      limit: PropTypes.number,
+      sort_order: PropTypes.oneOf(['asc', 'desc']),
+    }),
     width: PropTypes.any,
     height: PropTypes.any,
     horizontal: PropTypes.bool,
     displayAnalysisInformation: PropTypes.bool,
     displayAddToSearchButton: PropTypes.bool,
-    sortOrder: PropTypes.string,
-    dataTableTitle: PropTypes.string,
-    limit: PropTypes.number,
-    dataTableLimit: PropTypes.number,
   },
   getDefaultProps() {
     return {
-      dataTableLimit: 50,
-      dataTableTitle: 'Top values',
-      limit: 5,
+      config: this.DEFAULT_CONFIG,
+      width: undefined,
+      height: undefined,
+      horizontal: false,
+      displayAnalysisInformation: false,
+      displayAddToSearchButton: false,
     };
   },
   getInitialState() {
@@ -57,21 +70,46 @@ const QuickValuesVisualization = React.createClass({
     };
   },
   componentDidMount() {
-    this._resizeVisualization(this.props.width, this.props.height, this.props.config.show_data_table);
+    this._resizeVisualization(this.props.width, this.props.height, this._getConfig('show_data_table'));
     this._formatProps(this.props);
-    this._renderDataTable();
-    this._renderPieChart();
+    this._renderDataTable(this.props);
+    this._renderPieChart(this.props);
   },
   componentWillReceiveProps(nextProps) {
     if (deepEqual(this.props, nextProps)) {
       return;
     }
 
-    this._resizeVisualization(nextProps.width, nextProps.height, nextProps.config.show_data_table);
+    if (!deepEqual(this.props.config, nextProps.config)) {
+      this._renderDataTable(nextProps);
+      this._renderPieChart(nextProps);
+      return;
+    }
+
+    this._resizeVisualization(nextProps.width, nextProps.height, this._getConfig('show_data_table', nextProps.config));
     this._formatProps(nextProps);
   },
+
+  _graph: undefined,
+  _table: undefined,
   DEFAULT_PIE_CHART_SIZE: 200,
   MARGIN_TOP: 15,
+
+  _getConfig(key, newConfig) {
+    const config = newConfig || {};
+    const propsConfig = this.props.config || {};
+    const defaultConfig = this.DEFAULT_CONFIG;
+
+    if (Object.prototype.hasOwnProperty.call(config, key)) {
+      return config[key];
+    } else if (Object.prototype.hasOwnProperty.call(propsConfig, key)) {
+      return propsConfig[key];
+    } else if (Object.prototype.hasOwnProperty.call(defaultConfig, key)) {
+      return defaultConfig[key];
+    } else {
+      throw new Error(`Couldn't find config key "${key}" in any data source`);
+    }
+  },
 
   _formatProps(newProps) {
     if (newProps.data) {
@@ -131,27 +169,39 @@ const QuickValuesVisualization = React.createClass({
 
     return columns;
   },
-  _getSortOrder() {
-    switch (this.props.sortOrder) {
+  _getSortOrder(sortOrder) {
+    switch (sortOrder) {
       case 'desc': return d3.descending;
       case 'asc': return d3.ascending;
       default: return d3.descending;
     }
   },
-  _renderDataTable() {
-    const tableDomNode = this.refs.table;
-    const { dataTableLimit, limit } = this.props;
+  _groupOrderFunc(sortOrder) {
+    return (d) => {
+      if (sortOrder === 'asc') {
+        return d * -1;
+      } else {
+        return d;
+      }
+    };
+  },
+  _renderDataTable(props) {
+    const tableDomNode = this._table;
+    const limit = this._getConfig('limit', props.config);
+    const dataTableLimit = this._getConfig('data_table_limit', props.config);
+    const sortOrder = this._getConfig('sort_order', props.config);
 
     this.dataTable = dc.dataTable(tableDomNode, this.dcGroupName);
     this.dataTable
       .dimension(this.dimensionByCount)
       .group((d) => {
-        const topValues = this.group.top(limit);
+        const topValues = this.group.order(this._groupOrderFunc(sortOrder)).top(limit);
         const dInTopValues = topValues.some(value => d.term.localeCompare(value.key) === 0);
-        return dInTopValues ? this.props.dataTableTitle : 'Others';
+        const dataTableTitle = `${sortOrder === 'desc' ? 'Top' : 'Bottom'} ${limit} values`;
+        return dInTopValues ? dataTableTitle : 'Others';
       })
       .sortBy(d => d.count)
-      .order(this._getSortOrder())
+      .order(this._getSortOrder(sortOrder))
       .size(dataTableLimit)
       .columns(this._getDataTableColumns())
       .on('renderlet', (table) => {
@@ -159,14 +209,14 @@ const QuickValuesVisualization = React.createClass({
         table.selectAll('td.dc-table-column button').on('click', () => {
           // noinspection Eslint
           const term = $(d3.event.target).closest('button').data('term');
-          SearchStore.addSearchTerm(this.props.id, term);
+          SearchStore.addSearchTerm(props.id, term);
         });
       });
 
     this.dataTable.render();
   },
-  _renderPieChart() {
-    const graphDomNode = this.refs.graph;
+  _renderPieChart(props) {
+    const graphDomNode = this._graph;
 
     this.pieChart = dc.pieChart(graphDomNode, this.dcGroupName);
     this.pieChart
@@ -185,15 +235,14 @@ const QuickValuesVisualization = React.createClass({
       })
       .renderLabel(false)
       .renderTitle(false)
-      .slicesCap(this.props.limit)
+      .slicesCap(this._getConfig('limit', props.config))
       .ordering(d => d.value)
       .colors(D3Utils.glColourPalette());
 
-    this._resizeVisualization(this.props.width, this.props.height, this.props.config.show_data_table);
+    this._resizeVisualization(props.width, props.height, this._getConfig('show_data_table', props.config));
 
     D3Utils.tooltipRenderlet(this.pieChart, 'g.pie-slice', this._formatGraphTooltip);
 
-    // noinspection Eslint
     $(graphDomNode).tooltip({
       selector: '[rel="tooltip"]',
       container: 'body',
@@ -213,14 +262,14 @@ const QuickValuesVisualization = React.createClass({
     this.pieChart
       .width(newSize)
       .height(newSize)
-      .radius(newSize / 2 - 10);
+      .radius((newSize / 2) - 10);
 
     this.triggerRender = true;
   },
   _resizeVisualization(width, height, showDataTable) {
     let computedSize;
 
-    if (this.props.config.show_pie_chart) {
+    if (this._getConfig('show_pie_chart')) {
       if (showDataTable) {
         computedSize = this.DEFAULT_PIE_CHART_SIZE;
       } else {
@@ -254,7 +303,7 @@ const QuickValuesVisualization = React.createClass({
       this.dataTable.redraw();
     }
 
-    if (this.props.config.show_pie_chart) {
+    if (this._getConfig('show_pie_chart')) {
       if (this.triggerRender) {
         this.pieChart.render();
         this.triggerRender = false;
@@ -284,7 +333,7 @@ const QuickValuesVisualization = React.createClass({
     let pieChartClassName;
     const pieChartStyle = {};
 
-    if (this.props.config.show_pie_chart) {
+    if (this._getConfig('show_pie_chart')) {
       if (this.props.horizontal) {
         pieChartClassName = 'col-md-4';
         pieChartStyle.textAlign = 'center';
@@ -301,7 +350,7 @@ const QuickValuesVisualization = React.createClass({
      * Ensure we always render the data table when quickvalues config was created before introducing pie charts,
      * or when neither the data table or the pie chart are selected for rendering.
      */
-    if (this.props.config.show_data_table || !this.props.config.show_pie_chart) {
+    if (this._getConfig('show_data_table') || !this._getConfig('show_pie_chart')) {
       dataTableClassName = this.props.horizontal ? 'col-md-8' : 'col-md-12';
     } else {
       dataTableClassName = 'hidden';
@@ -313,7 +362,7 @@ const QuickValuesVisualization = React.createClass({
         <Panel>
           <ListGroup fill>
             <ListGroupItem>
-              <div ref="graph" className="quickvalues-graph" />
+              <div ref={(c) => { this._graph = c; }} className="quickvalues-graph" />
             </ListGroupItem>
             <ListGroupItem>
               {this._getAnalysisInformation()}
@@ -322,12 +371,11 @@ const QuickValuesVisualization = React.createClass({
         </Panel>
       );
     } else {
-      pieChart = <div ref="graph" className="quickvalues-graph" />;
+      pieChart = <div ref={(c) => { this._graph = c; }} className="quickvalues-graph" />;
     }
 
     return (
-      <div id={`visualization-${this.props.id}`} className="quickvalues-visualization"
-           style={{ height: this.props.height }}>
+      <div id={`visualization-${this.props.id}`} className="quickvalues-visualization" style={{ height: this.props.height }}>
         <div className="container-fluid">
           <div className="row" style={{ marginBottom: 0 }}>
             <div className={pieChartClassName} style={pieChartStyle}>
@@ -335,7 +383,7 @@ const QuickValuesVisualization = React.createClass({
             </div>
             <div className={dataTableClassName}>
               <div className="quickvalues-table">
-                <table ref="table" className="table table-condensed table-hover">
+                <table ref={(c) => { this._table = c; }} className="table table-condensed table-hover">
                   <thead>
                     <tr>
                       <th style={{ width: '60%' }}>Value</th>
