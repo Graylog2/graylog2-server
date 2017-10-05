@@ -20,18 +20,14 @@ export default Reflux.createStore({
     const id = ObjectID();
     this.queries[id] =  { query: Object.assign(query, { id }) };
     const promise = fetch('POST', createSearchUrl, this.queries[id].query)
-      .then((response) => {
-        return fetch('POST', createSearchJobUrl(response.id))
-          .then((executionResponse) => {
-            return fetch('GET', jobStatusUrl(executionResponse.job_id))
-              .then((result) => {
-                result.results.messages.fields = ['source', 'message'];
-                result.results.messages.used_indices = [];
-                result.results.messages.built_query = '"*"';
-                this.queries[id] = result;
-                this._trigger();
-              });
-          });
+      .then(response => fetch('POST', createSearchJobUrl(response.id)))
+      .then(executionResponse => fetch('GET', jobStatusUrl(executionResponse.job_id)))
+      .then((result) => {
+        result.results.messages.fields = ['source', 'message'];
+        result.results.messages.used_indices = [];
+        result.results.messages.built_query = '"*"';
+        this.queries[id] = result;
+        this._trigger();
       });
     QueriesActions.create.promise(promise);
   },
