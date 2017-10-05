@@ -71,11 +71,10 @@ const SearchBar = React.createClass({
     const { rangeParams, rangeType, query } = this.state.search;
     return (
       <Row className="no-bm">
-        <Col md={12} id="universalsearch-container">
+        <Col md={12} id="universalsearch-container" style={{ paddingLeft: '15px', paddingRight: '15px', paddingBottom: '10px' }}>
           <Row className="no-bm">
-            <Col md={12} ref="universalSearch" id="universalsearch" style={{ marginTop: '0px' }}>
-              <form ref="searchForm"
-                className="universalsearch-form"
+            <Col md={12} id="universalsearch" style={{ marginTop: '0px' }}>
+              <form className="universalsearch-form"
                 method="GET"
                 onSubmit={this._performSearch}>
                 <input type="hidden" name="rangetype" value={rangeType} />
