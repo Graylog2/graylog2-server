@@ -1,6 +1,5 @@
 import React from 'react';
 import Reflux from 'reflux';
-import Immutable from 'immutable';
 import md5 from 'md5';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
