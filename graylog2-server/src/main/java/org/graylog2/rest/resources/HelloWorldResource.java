@@ -19,7 +19,7 @@ package org.graylog2.rest.resources;
 import com.codahale.metrics.annotation.Timed;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.graylog2.Configuration;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.Version;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.cluster.ClusterId;
@@ -42,15 +42,12 @@ import static java.util.Objects.requireNonNull;
 public class HelloWorldResource extends RestResource {
     private final NodeId nodeId;
     private final ClusterConfigService clusterConfigService;
-    private final Configuration configuration;
 
     @Inject
     public HelloWorldResource(NodeId nodeId,
-                              ClusterConfigService clusterConfigService,
-                              Configuration configuration) {
+                              ClusterConfigService clusterConfigService) {
         this.nodeId = requireNonNull(nodeId);
         this.clusterConfigService = requireNonNull(clusterConfigService);
-        this.configuration = configuration;
     }
 
     @GET
@@ -72,16 +69,8 @@ public class HelloWorldResource extends RestResource {
     @ApiOperation(value = "Redirecting to web console if it runs on same port.")
     @Produces({MediaType.TEXT_HTML, MediaType.APPLICATION_XHTML_XML})
     public Response redirectToWebConsole() {
-        if (configuration.isRestAndWebOnSamePort()) {
-            final URI target = URI.create(configuration.getWebPrefix());
-            return Response
-                .temporaryRedirect(target)
-                .build();
-        }
-
         return Response
-            .ok(helloWorld())
-            .type(MediaType.APPLICATION_JSON)
+            .temporaryRedirect(URI.create(HttpConfiguration.PATH_WEB))
             .build();
     }
 }

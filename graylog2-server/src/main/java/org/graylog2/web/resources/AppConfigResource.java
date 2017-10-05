@@ -20,6 +20,7 @@ import com.floreysoft.jmte.Engine;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.io.Resources;
 import org.graylog2.Configuration;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.rest.MoreMediaTypes;
 import org.graylog2.rest.RestTools;
 
@@ -30,6 +31,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
@@ -39,11 +41,15 @@ import static java.util.Objects.requireNonNull;
 @Path("/config.js")
 public class AppConfigResource {
     private final Configuration configuration;
+    private final HttpConfiguration httpConfiguration;
     private final Engine templateEngine;
 
     @Inject
-    public AppConfigResource(Configuration configuration, Engine templateEngine) {
+    public AppConfigResource(Configuration configuration,
+                             HttpConfiguration httpConfiguration,
+                             Engine templateEngine) {
         this.configuration = requireNonNull(configuration, "configuration");
+        this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
         this.templateEngine = requireNonNull(templateEngine, "templateEngine");
     }
 
@@ -58,10 +64,11 @@ public class AppConfigResource {
             throw new RuntimeException("Unable to read AppConfig template while generating web interface configuration: ", e);
         }
 
+        final URI baseUri = RestTools.buildExternalUri(headers.getRequestHeaders(), httpConfiguration.getHttpExternalUri());
         final Map<String, Object> model = ImmutableMap.of(
             "rootTimeZone", configuration.getRootTimeZone(),
-            "serverUri", RestTools.buildEndpointUri(headers, configuration.getWebEndpointUri()),
-            "appPathPrefix", configuration.getWebPrefix());
+            "serverUri", baseUri.resolve(HttpConfiguration.PATH_API),
+            "appPathPrefix", baseUri.getPath());
         return templateEngine.transform(template, model);
     }
 }

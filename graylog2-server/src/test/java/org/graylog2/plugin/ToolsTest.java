@@ -18,12 +18,14 @@ package org.graylog2.plugin;
 
 import com.google.common.collect.Lists;
 import com.google.common.io.Resources;
+import com.google.common.net.InetAddresses;
 import org.graylog2.inputs.TestHelper;
 import org.joda.time.DateTime;
 import org.junit.Test;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -322,5 +324,16 @@ public class ToolsTest {
     @Test
     public void normalizeURIReturnsNullIfURIIsNull() {
         assertNull(Tools.normalizeURI(null, "http", 1234, "/baz"));
+    }
+
+    @Test
+    public void isWildcardAddress() {
+        assertTrue(Tools.isWildcardInetAddress(InetAddresses.forString("0.0.0.0")));
+        assertTrue(Tools.isWildcardInetAddress(InetAddresses.forString("::")));
+        assertFalse(Tools.isWildcardInetAddress(null));
+        assertFalse(Tools.isWildcardInetAddress(InetAddresses.forString("127.0.0.1")));
+        assertFalse(Tools.isWildcardInetAddress(InetAddresses.forString("::1")));
+        assertFalse(Tools.isWildcardInetAddress(InetAddresses.forString("198.51.100.23")));
+        assertFalse(Tools.isWildcardInetAddress(InetAddresses.forString("2001:DB8::42")));
     }
 }

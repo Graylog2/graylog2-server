@@ -22,7 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.plugins.PluginRestResourceClasses;
@@ -39,10 +39,12 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 
 @Api(value = "Documentation", description = "Documentation of this API in JSON format.")
@@ -50,15 +52,15 @@ import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
 public class DocumentationResource extends RestResource {
 
     private final Generator generator;
-    private final BaseConfiguration configuration;
+    private final HttpConfiguration httpConfiguration;
 
     @Inject
-    public DocumentationResource(BaseConfiguration configuration,
+    public DocumentationResource(HttpConfiguration httpConfiguration,
                                  @Named("RestControllerPackages") String[] restControllerPackages,
                                  ObjectMapper objectMapper,
                                  PluginRestResourceClasses pluginRestResourceClasses) {
 
-        this.configuration = configuration;
+        this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
 
         final ImmutableSet.Builder<String> packageNames = ImmutableSet.<String>builder()
                 .add(restControllerPackages);
@@ -93,8 +95,8 @@ public class DocumentationResource extends RestResource {
     public Response route(@ApiParam(name = "route", value = "Route to fetch. For example /system", required = true)
                           @PathParam("route") String route,
                           @Context HttpHeaders httpHeaders) {
-        final String basePath = RestTools.buildEndpointUri(httpHeaders, configuration.getWebEndpointUri());
-        return buildSuccessfulCORSResponse(generator.generateForRoute(route, basePath));
+        final URI baseUri = RestTools.buildExternalUri(httpHeaders.getRequestHeaders(), httpConfiguration.getHttpExternalUri()).resolve(HttpConfiguration.PATH_API);
+        return buildSuccessfulCORSResponse(generator.generateForRoute(route, baseUri.toString()));
     }
 
     private Response buildSuccessfulCORSResponse(Map<String, Object> result) {

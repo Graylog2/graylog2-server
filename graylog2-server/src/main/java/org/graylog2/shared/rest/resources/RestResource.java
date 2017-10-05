@@ -22,6 +22,7 @@ import com.fasterxml.jackson.jaxrs.cfg.EndpointConfigBase;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterInjector;
 import com.fasterxml.jackson.jaxrs.cfg.ObjectWriterModifier;
 import org.apache.shiro.subject.Subject;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.plugin.BaseConfiguration;
@@ -54,7 +55,7 @@ public abstract class RestResource {
     protected UserService userService;
 
     @Inject
-    private BaseConfiguration configuration;
+    private HttpConfiguration configuration;
 
     @Context
     SecurityContext securityContext;
@@ -148,9 +149,9 @@ public abstract class RestResource {
     }
 
     protected UriBuilder getUriBuilderToSelf() {
-        final URI restTransportUri = configuration.getRestTransportUri();
-        if (restTransportUri != null) {
-            return UriBuilder.fromUri(restTransportUri);
+        final URI httpPublishUri = configuration.getHttpPublishUri();
+        if (httpPublishUri != null) {
+            return UriBuilder.fromUri(httpPublishUri);
         } else {
             return uriInfo.getBaseUriBuilder();
         }

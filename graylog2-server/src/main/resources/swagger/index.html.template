@@ -2,31 +2,24 @@
 <html>
 <head>
   <title>Graylog REST API browser</title>
-  <link href='${apiPrefix}api-browser/css/fonts.css' rel='stylesheet' type='text/css'/>
-  <link href='${apiPrefix}api-browser/css/highlight.default.css' media='screen' rel='stylesheet' type='text/css'/>
-  <link href='${apiPrefix}api-browser/css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
-  <script src='${apiPrefix}api-browser/lib/shred.bundle.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/lib/jquery-1.8.0.min.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/lib/jquery.slideto.min.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/lib/jquery.wiggle.min.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/lib/jquery.ba-bbq.min.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/lib/handlebars-1.0.0.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/lib/underscore-min.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/lib/backbone-min.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/lib/swagger.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/swagger-ui.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/lib/highlight.7.3.pack.js' type='text/javascript'></script>
-  <script src='${apiPrefix}api-browser/lib/sha256.js'></script>
+  <base href="${baseUri}api-browser/">
+  <link href='css/fonts.css' rel='stylesheet' type='text/css'/>
+  <link href='css/highlight.default.css' media='screen' rel='stylesheet' type='text/css'/>
+  <link href='css/screen.css' media='screen' rel='stylesheet' type='text/css'/>
+  <script src='lib/shred.bundle.js' type='text/javascript'></script>
+  <script src='lib/jquery-1.8.0.min.js' type='text/javascript'></script>
+  <script src='lib/jquery.slideto.min.js' type='text/javascript'></script>
+  <script src='lib/jquery.wiggle.min.js' type='text/javascript'></script>
+  <script src='lib/jquery.ba-bbq.min.js' type='text/javascript'></script>
+  <script src='lib/handlebars-1.0.0.js' type='text/javascript'></script>
+  <script src='lib/underscore-min.js' type='text/javascript'></script>
+  <script src='lib/backbone-min.js' type='text/javascript'></script>
+  <script src='lib/swagger.js' type='text/javascript'></script>
+  <script src='swagger-ui.js' type='text/javascript'></script>
+  <script src='lib/highlight.7.3.pack.js' type='text/javascript'></script>
+  <script src='lib/sha256.js'></script>
   <script type="text/javascript">
-    var port = window.location.port;
-    if (port == '') {
-      if (window.location.protocol == 'http') {
-        port = 80;
-      } else if (window.location.protocol == 'https') {
-        port = 443;
-      }
-    }
-    var apiTarget = window.location.protocol + "//" + window.location.hostname + ":" + port + "${apiPrefix}";
+    var apiTarget = "${baseUri}";
     $(function () {
       window.swaggerUi = new SwaggerUi({
       url: apiTarget + "api-docs",
@@ -72,7 +65,7 @@
 <body>
 <div id='header'>
   <div class="swagger-ui-wrap">
-    <img src="${apiPrefix}api-browser/images/toplogo.png">
+    <img src="images/toplogo.png">
     <span class="subtitle">REST API browser</span>
     <form id="api_selector">
       <div class="input">

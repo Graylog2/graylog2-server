@@ -16,7 +16,7 @@
  */
 package org.graylog2.rest.filter;
 
-import org.graylog2.Configuration;
+import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.web.IndexHtmlGenerator;
 
 import javax.annotation.Priority;
@@ -33,12 +33,10 @@ import java.util.List;
 
 @Priority(Priorities.ENTITY_CODER)
 public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
-    private final String webAppPrefix;
     private final IndexHtmlGenerator indexHtmlGenerator;
 
     @Inject
-    public WebAppNotFoundResponseFilter(Configuration configuration, IndexHtmlGenerator indexHtmlGenerator) {
-        this.webAppPrefix = configuration.getWebListenUri().getPath();
+    public WebAppNotFoundResponseFilter(IndexHtmlGenerator indexHtmlGenerator) {
         this.indexHtmlGenerator = indexHtmlGenerator;
     }
 
@@ -54,8 +52,8 @@ public class WebAppNotFoundResponseFilter implements ContainerResponseFilter {
         if (isGetRequest
                 && responseStatus == Response.Status.NOT_FOUND
                 && acceptsHtml
-                && requestPath.startsWith(webAppPrefix)) {
-            final String entity = indexHtmlGenerator.get();
+                && !requestPath.startsWith("/" + HttpConfiguration.PATH_API)) {
+            final String entity = indexHtmlGenerator.get(requestContext.getHeaders());
             responseContext.setStatusInfo(Response.Status.OK);
             responseContext.setEntity(entity, new Annotation[0], MediaType.TEXT_HTML_TYPE);
 

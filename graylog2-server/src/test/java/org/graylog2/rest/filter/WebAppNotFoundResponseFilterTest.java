@@ -16,7 +16,6 @@
  */
 package org.graylog2.rest.filter;
 
-import org.graylog2.Configuration;
 import org.graylog2.web.IndexHtmlGenerator;
 import org.junit.Before;
 import org.junit.Rule;
@@ -37,6 +36,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -49,18 +49,6 @@ public class WebAppNotFoundResponseFilterTest {
 
     @Rule
     public final MockitoRule mockitoRule = MockitoJUnit.rule();
-
-    private final Configuration configuration = new Configuration() {
-        @Override
-        public URI getRestListenUri() {
-            return URI.create("http://example.com/api/");
-        }
-
-        @Override
-        public URI getWebListenUri() {
-            return URI.create("http://example.com/web/");
-        }
-    };
 
     @Mock
     private ContainerRequestContext requestContext;
@@ -75,9 +63,9 @@ public class WebAppNotFoundResponseFilterTest {
     @Before
     public void setUp() throws Exception {
         responseHeaders = new MultivaluedHashMap<>();
-        when(indexHtmlGenerator.get()).thenReturn("index.html");
+        when(indexHtmlGenerator.get(any())).thenReturn("index.html");
         when(responseContext.getHeaders()).thenReturn(responseHeaders);
-        filter = new WebAppNotFoundResponseFilter(configuration, indexHtmlGenerator);
+        filter = new WebAppNotFoundResponseFilter(indexHtmlGenerator);
     }
 
     @Test
