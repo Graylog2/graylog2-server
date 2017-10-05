@@ -154,6 +154,29 @@ public class IndexSetsResource extends RestResource {
     }
 
     @GET
+    @Path("stats")
+    @Timed
+    @ApiOperation(value = "Get stats of all index sets")
+    @ApiResponses(value = {
+            @ApiResponse(code = 403, message = "Unauthorized"),
+    })
+    public IndexSetStats globalStats() {
+        checkPermission(RestPermissions.INDEXSETS_READ);
+
+        long indices = 0;
+        long documents = 0;
+        long size = 0;
+        for (IndexSetStats stats : indexSetRegistry.getAll().stream()
+                .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet)).values()) {
+            indices += stats.indices();
+            documents += stats.documents();
+            size += stats.size();
+        }
+
+        return IndexSetStats.create(indices, documents, size);
+    }
+
+    @GET
     @Path("{id}")
     @Timed
     @ApiOperation(value = "Get index set")
