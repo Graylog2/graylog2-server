@@ -12,8 +12,9 @@ import org.graylog.plugins.enterprise.search.SearchType;
 public interface SearchTypeHandler<S extends SearchType, Q, R> {
 
     default void generateQueryPart(SearchType searchType, Q queryBuilder) {
-        // unfortunately if we don't typecast here the compiler complains about "capture of ? extends SearchType" and "SearchType" not being compatible.
-        // it is probably right, but I can't figure out why now, so I'm taking the short route.
+        // We need to typecast manually here, because '? extends SearchType' and 'SearchType' are never compatible
+        // and thus the compiler won't accept the types at their call sites
+        // This allows us to get proper types in the implementing classes instead of having to cast there.
         doGenerateQueryPart((S) searchType, queryBuilder);
     }
 
