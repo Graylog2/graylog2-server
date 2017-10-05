@@ -53,25 +53,13 @@ const FieldQuickValuesStore = Reflux.createStore({
       (response) => {
         this.trigger({ data: response, loading: false });
       },
-      this._errorHandler('Loading quick values failed with message', 'Could not load quick values'),
+      (error) => {
+        UserNotification.error(`Loading quick values failed with status: ${error}`,
+          'Could not load quick values');
+      },
     );
 
     FieldQuickValuesActions.get.promise(promise);
-  },
-
-  _errorHandler(message, title, cb) {
-    return (error) => {
-      let errorMessage;
-      try {
-        errorMessage = error.additional.body.message;
-      } catch (e) {
-        errorMessage = error.message;
-      }
-      UserNotification.error(`${message}: ${errorMessage}`, title);
-      if (cb) {
-        cb(error);
-      }
-    };
   },
 });
 
