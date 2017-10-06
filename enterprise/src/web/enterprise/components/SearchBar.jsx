@@ -10,7 +10,7 @@ import DocsHelper from 'util/DocsHelper';
 import SearchButton from 'enterprise/components/searchbar/SearchButton';
 import SearchStore from 'enterprise/stores/SearchStore';
 import SearchActions from 'enterprise/actions/SearchActions';
-import TimeRangeInput from 'enterprise/components/searchbar/TimeRangeSelector';
+import TimeRangeInput from 'enterprise/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'enterprise/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'enterprise/components/searchbar/QueryInput';
 
