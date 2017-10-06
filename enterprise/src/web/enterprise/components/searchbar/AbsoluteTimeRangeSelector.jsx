@@ -38,6 +38,29 @@ const _isValidDateString = (dateString) => {
   }
 };
 
+// TODO: Transfer this to AbsoluteTimeRangeSelector
+const _rangeParamsChanged = (key) => {
+  return () => {
+    let refInput;
+
+    switch (key) {
+      case 'from':
+      case 'to':
+        const ref = `${key}Formatted`;
+        refInput = this.refs[ref];
+        if (!this._isValidDateString(refInput.getValue())) {
+          refInput.getInputDOMNode().setCustomValidity('Invalid date time provided');
+        } else {
+          refInput.getInputDOMNode().setCustomValidity('');
+        }
+        break;
+      default:
+        refInput = this.refs[key];
+    }
+    SearchActions.rangeParams(key, refInput.getValue);
+  };
+};
+
 const _isValidDateField = (field, rangeParams) => {
   return _isValidDateString(_formattedDateStringInUserTZ(field, rangeParams));
 };
