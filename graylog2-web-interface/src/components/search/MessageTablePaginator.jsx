@@ -19,16 +19,21 @@ const MessageTablePaginator = React.createClass({
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
-    ]).isRequired,
+    ]),
     onPageChange: PropTypes.func.isRequired,
     pageSize: PropTypes.number,
     position: PropTypes.string,
   },
 
+  getDefaultProps() {
+    return {
+      pageSize: UniversalSearchStore.DEFAULT_LIMIT,
+    };
+  },
+
   getInitialState() {
     return {
       paginationWidth: 0,
-      pageSize: UniversalSearchStore.DEFAULT_LIMIT,
     };
   },
 
