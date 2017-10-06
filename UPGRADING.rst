@@ -22,10 +22,10 @@ The path of the Graylog REST API is now hard-coded to ``/api``, so if you're sti
 For a more detailed description of the new HTTP settings, please consult the annotated `Graylog configuration file <https://github.com/Graylog2/graylog2-server/blob/d9bb656275eeac7027e3fe12d9ee1b6a0905dcd1/misc/graylog.conf#L79-L81>`__.
 
 
-Overview of deprecated Graylog REST API settings:
+Overview of removed Graylog REST API settings:
 
 +----------------------------------+----------------------------------+--------------------------------+
-| Deprecated Setting               | New Setting                      | Default                        |
+| Removed Setting                  | New Setting                      | Default                        |
 +==================================+==================================+================================+
 | ``rest_listen_uri``              | ``http_bind_address``            | ``127.0.0.1:9000``             |
 +----------------------------------+----------------------------------+--------------------------------+
@@ -53,10 +53,10 @@ Overview of deprecated Graylog REST API settings:
 +----------------------------------+----------------------------------+--------------------------------+
 
 
-Overview of deprecated Graylog web interface settings:
+Overview of removed Graylog web interface settings:
 
 +---------------------------------+----------------------------------+--------------------+
-| Deprecated Setting              | New Setting                      | Default            |
+| Removed Setting                 | New Setting                      | Default            |
 +=================================+==================================+====================+
 | ``web_enable``                  | None                             |                    |
 +---------------------------------+----------------------------------+--------------------+
