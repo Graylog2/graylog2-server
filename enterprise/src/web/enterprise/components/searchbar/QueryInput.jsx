@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
+import Input from 'components/bootstrap/Input';
+
 export default function QueryInput({ value, onChange }) {
   return (
     <div className="query">

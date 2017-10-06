@@ -33,7 +33,8 @@ const SearchBar = React.createClass({
     const { rangeParams, rangeType, query } = this.state.search;
     return (
       <Row className="no-bm">
-        <Col md={12} id="universalsearch-container"
+        <Col md={12}
+             id="universalsearch-container"
              style={{ paddingLeft: '15px', paddingRight: '15px', paddingBottom: '10px' }}>
           <Row className="no-bm">
             <Col md={12} id="universalsearch" style={{ marginTop: '0px' }}>
@@ -43,18 +44,18 @@ const SearchBar = React.createClass({
                 <div className="timerange-selector-container">
                   <Row className="no-bm">
                     <Col md={6}>
-                      <TimeRangeTypeSelector onSelect={SearchActions.rangeType} value={rangeType}/>
+                      <TimeRangeTypeSelector onSelect={SearchActions.rangeType} value={rangeType} />
                       <TimeRangeInput onChange={SearchActions.rangeParams}
                                       rangeType={rangeType}
                                       rangeParams={rangeParams}
-                                      config={this.props.config}/>
+                                      config={this.props.config} />
                     </Col>
                     <Col md={6}>
                       <div className="saved-searches-selector-container pull-right"
                            style={{ display: 'inline-flex', marginRight: 5 }}>
                         {this.props.displayRefreshControls &&
                         <div style={{ marginRight: 5 }}>
-                          <RefreshControls/>
+                          <RefreshControls />
                         </div>
                         }
                         <div style={{ width: 270 }}>
@@ -69,12 +70,12 @@ const SearchBar = React.createClass({
                   <div className="pull-right search-help">
                     <DocumentationLink page={DocsHelper.PAGES.SEARCH_QUERY_LANGUAGE}
                                        title="Search query syntax documentation"
-                                       text={<i className="fa fa-lightbulb-o"/>}/>
+                                       text={<i className="fa fa-lightbulb-o" />} />
                   </div>
 
-                  <SearchButton/>
+                  <SearchButton />
 
-                  <QueryInput value={query} onChange={SearchActions.query}/>
+                  <QueryInput value={query} onChange={SearchActions.query} />
                 </div>
               </form>
             </Col>
