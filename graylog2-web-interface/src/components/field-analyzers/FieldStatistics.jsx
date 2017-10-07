@@ -164,12 +164,11 @@ const FieldStatistics = React.createClass({
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
                                 widgetType={this.WIDGET_TYPE}
-                                bsStyle="default"
                                 fields={this.state.fieldStatistics.keySeq().toJS()}
                                 pullRight
                                 permissions={this.props.permissions}>
 
-              <Button bsSize="small" onClick={() => this._resetStatus()}>Dismiss</Button>
+              <Button bsSize="small" className="field-analyzer-close" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Field Statistics</h1>

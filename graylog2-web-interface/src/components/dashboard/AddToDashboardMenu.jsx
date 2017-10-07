@@ -39,7 +39,7 @@ const AddToDashboardMenu = React.createClass({
 
   getDefaultProps() {
     return {
-      bsStyle: 'info',
+      bsStyle: 'default',
       configuration: {},
       hidden: false,
       pullRight: false,
@@ -200,8 +200,11 @@ const AddToDashboardMenu = React.createClass({
     return (
       <div style={{ display: 'inline-block' }}>
         <ButtonGroup>
-          {this.props.children}
           {dropdownMenu}
+
+          <div style={{ display: 'inline' }}>
+            {this.props.children}
+          </div>
         </ButtonGroup>
         <WidgetCreationModal ref="widgetModal"
                              widgetType={this.props.widgetType}

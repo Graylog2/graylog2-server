@@ -118,18 +118,13 @@ const LegacyFieldGraph = React.createClass({
                               dashboards={this.props.dashboards}
                               widgetType={this._getWidgetType()}
                               configuration={this._getWidgetConfiguration()}
-                              bsStyle="default"
                               pullRight
                               permissions={this.props.permissions}>
             <DropdownButton bsSize="small" className="graph-settings" title="Customize"
                             id="customize-field-graph-dropdown">
               {submenus}
-              <MenuItem divider />
-              <MenuItem onSelect={this.props.onDelete}>Dismiss</MenuItem>
             </DropdownButton>
-          </AddToDashboardMenu>
 
-          <div style={{ display: 'inline', marginLeft: 20 }}>
             <Button href="#"
                     bsSize="small"
                     className="reposition-handle"
@@ -137,7 +132,9 @@ const LegacyFieldGraph = React.createClass({
                     title="Drag and drop to merge the graph into another">
               <i className="fa fa-reorder" />
             </Button>
-          </div>
+
+            <Button bsSize="small" className="field-analyzer-close" onClick={this.props.onDelete}><i className="fa fa-close" /></Button>
+          </AddToDashboardMenu>
         </div>
         <h1>{this._getGraphTitle()}</h1>
 
