@@ -35,6 +35,7 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
+import org.graylog2.rest.models.search.responses.TermsHistogramResult;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.models.search.responses.TimeRange;
@@ -55,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -223,6 +225,24 @@ public abstract class SearchResource extends RestResource {
             histogram.tookMs(),
             histogram.getBuiltQuery(),
             TimeRange.create(histogramBoundaries.getFrom(), histogramBoundaries.getTo()));
+    }
+
+    protected TermsHistogramResult buildTermsHistogramResult(org.graylog2.indexer.results.TermsHistogramResult termsHistogram) {
+        final AbsoluteRange histogramBoundaries = termsHistogram.getHistogramBoundaries();
+
+        final Map<Long, TermsResult> result = termsHistogram.getResults().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                    final org.graylog2.indexer.results.TermsResult tr = entry.getValue();
+                    return TermsResult.create(tr.tookMs(), tr.getTerms(), tr.getMissing(), tr.getOther(), tr.getTotal(), tr.getBuiltQuery());
+                }));
+
+        return TermsHistogramResult.create(
+                termsHistogram.tookMs(),
+                termsHistogram.getInterval().toString().toLowerCase(Locale.ENGLISH),
+                termsHistogram.getSize(),
+                result,
+                termsHistogram.getBuiltQuery(),
+                TimeRange.create(histogramBoundaries.getFrom(), histogramBoundaries.getTo()));
     }
 
     protected Sorting buildSorting(String sort) {

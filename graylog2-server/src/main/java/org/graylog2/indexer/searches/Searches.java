@@ -29,6 +29,7 @@ import io.searchbox.core.MultiSearch;
 import io.searchbox.core.MultiSearchResult;
 import io.searchbox.core.Search;
 import io.searchbox.core.search.aggregation.CardinalityAggregation;
+import io.searchbox.core.search.aggregation.DateHistogramAggregation;
 import io.searchbox.core.search.aggregation.ExtendedStatsAggregation;
 import io.searchbox.core.search.aggregation.FilterAggregation;
 import io.searchbox.core.search.aggregation.HistogramAggregation;
@@ -46,6 +47,7 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
@@ -66,6 +68,7 @@ import org.graylog2.indexer.results.HistogramResult;
 import org.graylog2.indexer.results.ResultMessage;
 import org.graylog2.indexer.results.ScrollResult;
 import org.graylog2.indexer.results.SearchResult;
+import org.graylog2.indexer.results.TermsHistogramResult;
 import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.results.TermsStatsResult;
 import org.graylog2.indexer.searches.timeranges.TimeRanges;
@@ -277,36 +280,39 @@ public class Searches {
         return new SearchResult(hits, searchResult.getTotal(), indexRanges, config.query(), requestBuilder.toString(), tookMsFromSearchResult(searchResult));
     }
 
+    public TermsBuilder createTermsBuilder(String field, List<String> stackedFields, int size, Terms.Order termsOrder) {
+        if (stackedFields.isEmpty()) {
+            return AggregationBuilders.terms(AGG_TERMS)
+                    .field(field)
+                    .size(size > 0 ? size : 50)
+                    .order(termsOrder);
+        }
+
+        // If the methods gets stacked fields, we have to use scripting to concatenate the fields.
+        // There is currently no other way to do this. (as of ES 5.6)
+        final StringBuilder scriptStringBuilder = new StringBuilder();
+
+        // Add the main field
+        scriptStringBuilder.append("doc['").append(field).append("'].value");
+
+        // Add all other fields
+        stackedFields.forEach(f -> {
+            scriptStringBuilder.append(" + ' - ' + ");
+            scriptStringBuilder.append("doc['").append(f).append("'].value");
+        });
+
+        return AggregationBuilders.terms(AGG_TERMS)
+                .script(new Script(scriptStringBuilder.toString(), ScriptService.ScriptType.INLINE, "painless", null))
+                .size(size > 0 ? size : 50)
+                .order(termsOrder);
+    }
+
     public TermsResult terms(String field, List<String> stackedFields, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
         final Terms.Order termsOrder = sorting == Sorting.Direction.DESC ? Terms.Order.count(false) : Terms.Order.count(true);
 
         final SearchSourceBuilder searchSourceBuilder = filteredSearchRequest(query, filter, range);
 
-        if (stackedFields.isEmpty()) {
-            searchSourceBuilder.aggregation(AggregationBuilders.terms(AGG_TERMS)
-                            .field(field)
-                            .size(size > 0 ? size : 50)
-                            .order(termsOrder));
-        } else {
-            // If the methods gets stacked fields, we have to use scripting to concatenate the fields.
-            // There is currently no other way to do this. (as of ES 5.6)
-            final StringBuilder scriptStringBuilder = new StringBuilder();
-
-            // Add the main field
-            scriptStringBuilder.append("doc['").append(field).append("'].value");
-
-            // Add all other fields
-            stackedFields.forEach(f -> {
-                scriptStringBuilder.append(" + ' - ' + ");
-                scriptStringBuilder.append("doc['").append(f).append("'].value");
-            });
-
-            searchSourceBuilder.aggregation(AggregationBuilders.terms(AGG_TERMS)
-                    .script(new Script(scriptStringBuilder.toString(), ScriptService.ScriptType.INLINE, "painless", null))
-                    .size(size > 0 ? size : 50)
-                    .order(termsOrder));
-        }
-
+        searchSourceBuilder.aggregation(createTermsBuilder(field, stackedFields, size, termsOrder));
         searchSourceBuilder.aggregation(AggregationBuilders.missing("missing")
                         .field(field));
 
@@ -346,6 +352,49 @@ public class Searches {
 
     public TermsResult terms(String field, int size, String query, TimeRange range) {
         return terms(field, size, query, null, range, Sorting.Direction.DESC);
+    }
+
+    public TermsHistogramResult termsHistogram(String field,
+                                               List<String> stackedFields,
+                                               int size,
+                                               String query,
+                                               String filter,
+                                               TimeRange range,
+                                               DateHistogramInterval interval,
+                                               Sorting.Direction sorting) {
+        final Terms.Order termsOrder = sorting == Sorting.Direction.DESC ? Terms.Order.count(false) : Terms.Order.count(true);
+
+        final DateHistogramBuilder histogramBuilder = AggregationBuilders.dateHistogram(AGG_HISTOGRAM)
+                .field(Message.FIELD_TIMESTAMP)
+                .interval(interval.toESInterval())
+                .subAggregation(createTermsBuilder(field, stackedFields, size, termsOrder))
+                .subAggregation(AggregationBuilders.missing("missing").field(field));
+
+        final SearchSourceBuilder searchSourceBuilder = filteredSearchRequest(query, filter, range)
+                .aggregation(histogramBuilder);
+
+        final Set<String> affectedIndices = determineAffectedIndices(range, filter);
+        if (affectedIndices.isEmpty()) {
+            return TermsHistogramResult.empty(query, searchSourceBuilder.toString(), size, interval);
+        }
+        final Search.Builder searchBuilder = new Search.Builder(searchSourceBuilder.toString())
+                .ignoreUnavailable(true)
+                .allowNoIndices(true)
+                .addType(IndexMapping.TYPE_MESSAGE)
+                .addIndex(affectedIndices);
+        final io.searchbox.core.SearchResult searchResult = wrapInMultiSearch(searchBuilder.build(), () -> "Unable to perform terms query");
+
+        recordEsMetrics(searchResult, range);
+
+        final DateHistogramAggregation dateHistogramAggregation = searchResult.getAggregations().getDateHistogramAggregation(AGG_HISTOGRAM);
+
+        return new TermsHistogramResult(
+                dateHistogramAggregation,
+                query,
+                searchSourceBuilder.toString(),
+                size,
+                tookMsFromSearchResult(searchResult),
+                interval);
     }
 
     public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, String filter, TimeRange range) {
