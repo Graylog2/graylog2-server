@@ -20,6 +20,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.indexer.indices.stats.IndexStatistics;
+import org.graylog2.rest.models.system.indexer.responses.IndexStats;
+
+import java.util.Collection;
 
 @JsonAutoDetect
 @AutoValue
@@ -42,5 +46,19 @@ public abstract class IndexSetStats {
                                        @JsonProperty(FIELD_DOCUMENTS) long documents,
                                        @JsonProperty(FIELD_SIZE) long size) {
         return new AutoValue_IndexSetStats(indices, documents, size);
+    }
+
+    public static IndexSetStats fromIndexStatistics(Collection<IndexStatistics> indexStatistics, Collection<String> closedIndices) {
+        final long totalIndicesCount = indexStatistics.size() + closedIndices.size();
+        final long totalDocumentsCount = indexStatistics.stream()
+                .map(IndexStatistics::allShards)
+                .map(IndexStats::documents)
+                .mapToLong(IndexStats.DocsStats::count)
+                .sum();
+        final long totalSizeInBytes = indexStatistics.stream()
+                .map(IndexStatistics::allShards)
+                .mapToLong(IndexStats::storeSizeBytes)
+                .sum();
+        return create(totalIndicesCount, totalDocumentsCount, totalSizeInBytes);
     }
 }

@@ -128,6 +128,26 @@ const IndexSetsStore = Reflux.createStore({
     IndexSetsActions.setDefault.promise(promise);
   },
 
+  stats() {
+    const url = URLUtils.qualifyUrl(ApiRoutes.IndexSetsApiController.stats().url);
+    const promise = fetch('GET', url);
+    promise
+      .then(
+        response => this.trigger({
+          globalIndexSetStats: {
+            indices: response.indices,
+            documents: response.documents,
+            size: response.size,
+          }
+        }),
+        (error) => {
+          UserNotification.error(`Fetching global index stats failed: ${error.message}`,
+            'Could not retrieve global index stats.');
+        });
+
+    IndexSetsActions.stats.promise(promise);
+  },
+
   _errorMessage(error) {
     try {
       return error.additional.body.message;
