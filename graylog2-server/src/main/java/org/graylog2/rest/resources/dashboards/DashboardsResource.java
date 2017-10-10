@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.dashboards;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
@@ -62,7 +63,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -104,15 +104,14 @@ public class DashboardsResource extends RestResource {
         final URI dashboardUri = getUriBuilderToSelf().path(DashboardsResource.class, "get")
                 .build(id);
 
-        if (!isPermitted(RestPermissions.DASHBOARDS_READ, id)) {
-            final User user = getCurrentUser();
-            user.ensurePermission(RestPermissions.DASHBOARDS_READ + ":" + id);
-            userService.save(user);
-        }
-
-        if (!isPermitted(RestPermissions.DASHBOARDS_EDIT, id)) {
-            final User user = getCurrentUser();
-            user.ensurePermission(RestPermissions.DASHBOARDS_EDIT + ":" + id);
+        final User user = getCurrentUser();
+        if (!user.isLocalAdmin()) {
+            final List<String> permissions = ImmutableList.<String>builder()
+                    .addAll(user.getPermissions())
+                    .add(RestPermissions.DASHBOARDS_READ + ":" + id)
+                    .add(RestPermissions.DASHBOARDS_EDIT + ":" + id)
+                    .build();
+            user.setPermissions(permissions);
             userService.save(user);
         }
 

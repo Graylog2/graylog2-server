@@ -38,11 +38,16 @@ import org.mockito.junit.MockitoRule;
 import javax.ws.rs.core.UriBuilder;
 import java.security.Principal;
 import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class DashboardsResourceTest {
     @Rule
@@ -121,7 +126,6 @@ public class DashboardsResourceTest {
 
     @Test
     public void creatingADashboardAddsRequiredPermissionsForNonAdmin() throws Exception {
-        when(subject.isPermitted(anyString())).thenReturn(false);
         final Dashboard dashboard = mock(Dashboard.class);
         when(dashboardService.create(eq("foo"), eq("bar"), anyString(), ArgumentMatchers.any())).thenReturn(dashboard);
 
@@ -130,22 +134,22 @@ public class DashboardsResourceTest {
 
         this.dashboardsResource.create(CreateDashboardRequest.create("foo", "bar"));
 
-        verify(userService, times(2)).save(user);
-        final ArgumentCaptor<String> ensurePermissionsArguments = ArgumentCaptor.forClass(String.class);
+        final ArgumentCaptor<User> userArgument = ArgumentCaptor.forClass(User.class);
+        verify(userService, times(1)).save(userArgument.capture());
+        @SuppressWarnings("unchecked")
+        final ArgumentCaptor<List<String>> permissionsArgument = ArgumentCaptor.forClass(List.class);
+        verify(user, times(1)).setPermissions(permissionsArgument.capture());
 
-        verify(user, times(2)).ensurePermission(ensurePermissionsArguments.capture());
-
-        assertThat(ensurePermissionsArguments.getAllValues())
-                .isNotNull()
-                .isNotEmpty()
-                .containsExactly(
-                        "dashboards:read:" + dashboardId,
-                        "dashboards:edit:" + dashboardId
-                );
+        final User updatedUser = userArgument.getValue();
+        assertThat(updatedUser).isNotNull();
+        final List<String> updatedPermissions = permissionsArgument.getValue();
+        assertThat(updatedPermissions)
+                .containsExactly("dashboards:read:" + dashboardId, "dashboards:edit:" + dashboardId);
     }
+
     @Test
     public void creatingADashboardDoesNotAddPermissionsForAdmin() throws Exception {
-        when(subject.isPermitted(anyString())).thenReturn(true);
+        when(user.isLocalAdmin()).thenReturn(true);
         final Dashboard dashboard = mock(Dashboard.class);
         when(dashboardService.create(eq("foo"), eq("bar"), anyString(), ArgumentMatchers.any())).thenReturn(dashboard);
 
@@ -155,7 +159,5 @@ public class DashboardsResourceTest {
         this.dashboardsResource.create(CreateDashboardRequest.create("foo", "bar"));
 
         verify(userService, never()).save(user);
-
-        verify(user, never()).ensurePermission(anyString());
     }
 }
