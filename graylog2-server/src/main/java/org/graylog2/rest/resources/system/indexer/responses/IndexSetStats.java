@@ -48,8 +48,8 @@ public abstract class IndexSetStats {
         return new AutoValue_IndexSetStats(indices, documents, size);
     }
 
-    public static IndexSetStats fromIndexStatistics(Collection<IndexStatistics> indexStatistics) {
-        final long totalIndicesCount = indexStatistics.size();
+    public static IndexSetStats fromIndexStatistics(Collection<IndexStatistics> indexStatistics, Collection<String> closedIndices) {
+        final long totalIndicesCount = indexStatistics.size() + closedIndices.size();
         final long totalDocumentsCount = indexStatistics.stream()
                 .map(IndexStatistics::allShards)
                 .map(IndexStats::documents)

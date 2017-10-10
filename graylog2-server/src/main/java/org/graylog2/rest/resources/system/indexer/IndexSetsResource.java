@@ -174,7 +174,8 @@ public class IndexSetsResource extends RestResource {
                 .map(IndexSet::getIndexWildcard)
                 .collect(Collectors.toSet());
         final Set<IndexStatistics> indicesStats = indices.getIndicesStats(indexWildcards);
-        return IndexSetStats.fromIndexStatistics(indicesStats);
+        final Set<String> closedIndices = indices.getClosedIndices(indexWildcards);
+        return IndexSetStats.fromIndexStatistics(indicesStats, closedIndices);
     }
 
     @GET

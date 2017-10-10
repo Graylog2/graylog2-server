@@ -578,12 +578,13 @@ public class IndexSetsResourceTest {
                 ),
                 Collections.emptyList()
         );
+        when(indices.getClosedIndices(anyCollection())).thenReturn(Collections.singleton("closed_index_0"));
         when(indices.getIndicesStats(anyCollection())).thenReturn(Collections.singleton(indexStatistics));
 
         final IndexSetStats indexSetStats = indexSetsResource.globalStats();
 
         assertThat(indexSetStats).isNotNull();
-        assertThat(indexSetStats.indices()).isEqualTo(1L);
+        assertThat(indexSetStats.indices()).isEqualTo(2L);
         assertThat(indexSetStats.documents()).isEqualTo(42L);
         assertThat(indexSetStats.size()).isEqualTo(23L);
     }
