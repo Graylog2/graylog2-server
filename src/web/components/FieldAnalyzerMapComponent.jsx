@@ -123,10 +123,10 @@ const FieldAnalyzerMapComponent = React.createClass({
             <AddToDashboardMenu title="Add to dashboard"
                                 widgetType={this.WIDGET_TYPE}
                                 configuration={{field: this.state.field}}
-                                bsStyle="default"
                                 pullRight
                                 permissions={this.props.permissions}>
-              <Button bsSize="small" onClick={() => this._resetStatus()}>Dismiss</Button>
+
+              <Button bsSize="small" className="field-analyzer-close" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Map for field: {this.state.field}</h1>
