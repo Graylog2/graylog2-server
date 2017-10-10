@@ -7,9 +7,11 @@ import { LinkContainer } from 'react-router-bootstrap';
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from 'util/PermissionsMixin';
 
+import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const DashboardsStore = StoreProvider.getStore('Dashboards');
+const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
 const StartpageStore = StoreProvider.getStore('Startpage');
 
 import Routes from 'routing/Routes';
@@ -25,7 +27,7 @@ const Dashboard = React.createClass({
   },
   _onDashboardDelete() {
     if (window.confirm(`Do you really want to delete the dashboard ${this.props.dashboard.title}?`)) {
-      DashboardsStore.remove(this.props.dashboard);
+      DashboardsActions.delete(this.props.dashboard);
     }
   },
   _getDashboardActions() {

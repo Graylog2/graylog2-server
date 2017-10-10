@@ -7,8 +7,8 @@ import { Input } from 'components/bootstrap';
 
 import BootstrapModalForm from '../bootstrap/BootstrapModalForm';
 
-import StoreProvider from 'injection/StoreProvider';
-const DashboardsStore = StoreProvider.getStore('Dashboards');
+import CombinedProvider from 'injection/CombinedProvider';
+const { DashboardsActions } = CombinedProvider.get('Dashboards');
 
 const EditDashboardModal = React.createClass({
   propTypes: {
@@ -53,7 +53,7 @@ const EditDashboardModal = React.createClass({
     let promise;
 
     if (this._isCreateModal()) {
-      promise = DashboardsStore.createDashboard(this.state.title, this.state.description);
+      promise = DashboardsActions.create(this.state.title, this.state.description);
       promise.then((id) => {
         this.close();
 
@@ -64,7 +64,7 @@ const EditDashboardModal = React.createClass({
         this.setState(this.getInitialState());
       });
     } else {
-      promise = DashboardsStore.saveDashboard(this.state);
+      promise = DashboardsActions.update(this.state);
       promise.then(() => {
         this.close();
 

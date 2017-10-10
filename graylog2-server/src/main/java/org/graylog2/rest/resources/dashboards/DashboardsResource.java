@@ -17,6 +17,7 @@
 package org.graylog2.rest.resources.dashboards;
 
 import com.codahale.metrics.annotation.Timed;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.eventbus.EventBus;
@@ -37,6 +38,7 @@ import org.graylog2.database.NotFoundException;
 import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.rest.models.dashboards.requests.CreateDashboardRequest;
 import org.graylog2.rest.models.dashboards.requests.UpdateDashboardRequest;
 import org.graylog2.rest.models.dashboards.requests.WidgetPositionsRequest;
@@ -102,6 +104,17 @@ public class DashboardsResource extends RestResource {
         final URI dashboardUri = getUriBuilderToSelf().path(DashboardsResource.class, "get")
                 .build(id);
 
+        final User user = getCurrentUser();
+        if (!user.isLocalAdmin()) {
+            final List<String> permissions = ImmutableList.<String>builder()
+                    .addAll(user.getPermissions())
+                    .add(RestPermissions.DASHBOARDS_READ + ":" + id)
+                    .add(RestPermissions.DASHBOARDS_EDIT + ":" + id)
+                    .build();
+            user.setPermissions(permissions);
+            userService.save(user);
+        }
+
         return Response.created(dashboardUri).entity(result).build();
     }
 
@@ -145,7 +158,7 @@ public class DashboardsResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.DASHBOARD_DELETE)
     public void delete(@ApiParam(name = "dashboardId", required = true)
-                       @PathParam("dashboardId") String dashboardId) throws NotFoundException {
+                       @PathParam("dashboardId") String dashboardId) throws NotFoundException, ValidationException {
         checkPermission(RestPermissions.DASHBOARDS_EDIT, dashboardId);
 
         final Dashboard dashboard = dashboardService.load(dashboardId);

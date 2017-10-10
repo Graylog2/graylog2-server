@@ -11,9 +11,11 @@ import ValidationsUtils from 'util/ValidationsUtils';
 import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
 
+import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
+
 const StreamsStore = StoreProvider.getStore('Streams');
-const DashboardsStore = StoreProvider.getStore('Dashboards');
+const { DashboardsStore } = CombinedProvider.get('Dashboards');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const UsersStore = StoreProvider.getStore('Users');
 
@@ -26,11 +28,10 @@ const UserForm = React.createClass({
     user: PropTypes.object.isRequired,
     history: PropTypes.object,
   },
-  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
+  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore), Reflux.connect(DashboardsStore)],
   getInitialState() {
     return {
       streams: undefined,
-      dashboards: undefined,
       user: this._getUserStateFromProps(this.props),
     };
   },
@@ -39,9 +40,6 @@ const UserForm = React.createClass({
       this.setState({
         streams: streams.sort((s1, s2) => s1.title.localeCompare(s2.title)),
       });
-    });
-    DashboardsStore.listDashboards().then((dashboards) => {
-      this.setState({ dashboards: dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title)) });
     });
   },
 
@@ -188,6 +186,7 @@ const UserForm = React.createClass({
 
     const user = this.state.user;
     const permissions = this.state.currentUser.permissions;
+    const dashboards = this.state.dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title));
 
     let requiresOldPassword = true;
     if (this.isPermitted(permissions, 'users:passwordchange:*')) {
@@ -198,8 +197,8 @@ const UserForm = React.createClass({
     const streamReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'streams:read', this.state.streams);
     const streamEditOptions = this.formatSelectedOptions(this.state.user.permissions, 'streams:edit', this.state.streams);
 
-    const dashboardReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:read', this.state.dashboards);
-    const dashboardEditOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:edit', this.state.dashboards);
+    const dashboardReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:read', dashboards);
+    const dashboardEditOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:edit', dashboards);
 
     return (
       <div>
@@ -257,13 +256,13 @@ const UserForm = React.createClass({
                       <label className="col-sm-3 control-label" htmlFor="dashboardpermissions">Dashboard Permissions</label>
                       <Col sm={9}>
                         <MultiSelect ref="dashboardReadOptions" placeholder="Choose dashboards read permissions..."
-                                     options={this.formatMultiselectOptions(this.state.dashboards)}
+                                     options={this.formatMultiselectOptions(dashboards)}
                                      value={dashboardReadOptions}
                                      onChange={this._onPermissionsChange('dashboards', 'read')} />
                         <span className="help-block">Choose dashboards the user can <strong>view</strong>
                           . Removing read access will remove edit access, too.</span>
                         <MultiSelect ref="dashboardEditOptions" placeholder="Choose dashboards edit permissions..."
-                                     options={this.formatMultiselectOptions(this.state.dashboards)}
+                                     options={this.formatMultiselectOptions(dashboards)}
                                      value={dashboardEditOptions}
                                      onChange={this._onPermissionsChange('dashboards', 'edit')} />
                         <span className="help-block">Choose dashboards the user can <strong>edit</strong>

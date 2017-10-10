@@ -1,31 +1,34 @@
 import React from 'react';
+import Reflux from 'reflux';
 import Immutable from 'immutable';
 import { Button, Col, Row } from 'react-bootstrap';
-
-import StoreProvider from 'injection/StoreProvider';
-const StreamsStore = StoreProvider.getStore('Streams');
-const DashboardsStore = StoreProvider.getStore('Dashboards');
-const RolesStore = StoreProvider.getStore('Roles');
 
 import UserNotification from 'util/UserNotification';
 import RoleList from 'components/users/RoleList';
 import EditRole from 'components/users/EditRole';
 import PageHeader from 'components/common/PageHeader';
 
-const RolesComponent = React.createClass({
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { StreamsStore } = CombinedProvider.get('Streams');
+const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
+const { RolesStore } = CombinedProvider.get('Roles');
+
+
+export default React.createClass({
+  mixins: [Reflux.connect(DashboardsStore, 'dashboards')],
   getInitialState() {
     return {
       roles: Immutable.Set(),
       rolesLoaded: false,
       editRole: null,
       streams: Immutable.List(),
-      dashboards: Immutable.List(),
     };
   },
   componentDidMount() {
     this.loadRoles();
     StreamsStore.load(streams => this.setState({ streams: Immutable.List(streams) }));
-    DashboardsStore.listDashboards().then(dashboards => this.setState({ dashboards: dashboards }));
+    DashboardsActions.list();
   },
 
   loadRoles() {
@@ -42,6 +45,7 @@ const RolesComponent = React.createClass({
     this.setState({ showEditRole: true, editRole: role });
   },
   _deleteRole(role) {
+    // eslint-disable-next-line no-alert
     if (window.confirm(`Do you really want to delete role ${role.name}?`)) {
       RolesStore.getMembers(role.name).then((membership) => {
         if (membership.users.length !== 0) {
@@ -69,8 +73,11 @@ const RolesComponent = React.createClass({
       content = <span>Loading roles...</span>;
     } else if (this.state.showEditRole) {
       content =
-        (<EditRole initialRole={this.state.editRole} streams={this.state.streams} dashboards={this.state.dashboards}
-                  onSave={this._saveRole} cancelEdit={this._clearEditRole} />);
+        (<EditRole initialRole={this.state.editRole}
+                   streams={this.state.streams}
+                   dashboards={this.state.dashboards.dashboards}
+                   onSave={this._saveRole}
+                   cancelEdit={this._clearEditRole} />);
     } else {
       content = (<RoleList roles={this.state.roles}
                            showEditRole={this._showEditRole}
@@ -100,5 +107,3 @@ const RolesComponent = React.createClass({
     );
   },
 });
-
-export default RolesComponent;
