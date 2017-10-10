@@ -25,6 +25,7 @@ const IndexSetsComponent = React.createClass({
     this.currentPageNo = pageNo;
     this.currentPageSize = limit;
     IndexSetsActions.listPaginated((pageNo - 1) * limit, limit, true);
+    IndexSetsActions.stats();
   },
 
   // Stores the current page and page size to be able to reload the current page
@@ -100,11 +101,7 @@ const IndexSetsComponent = React.createClass({
     let statsString;
     const stats = this.state.indexSetStats[indexSet.id];
     if (stats) {
-      const indices = `${NumberUtils.formatNumber(stats.indices)} ${StringUtils.pluralize(stats.indices, 'index', 'indices')}`;
-      const documents = `${NumberUtils.formatNumber(stats.documents)} ${StringUtils.pluralize(stats.documents, 'document', 'documents')}`;
-      const size = NumberUtils.formatBytes(stats.size);
-
-      statsString = `${indices}, ${documents}, ${size}`;
+      statsString = this._formatStatsString(stats)
     }
 
     return (
@@ -115,6 +112,14 @@ const IndexSetsComponent = React.createClass({
                       actions={actions}
                       contentRow={content} />
     );
+  },
+
+  _formatStatsString(stats) {
+    const indices = `${NumberUtils.formatNumber(stats.indices)} ${StringUtils.pluralize(stats.indices, 'index', 'indices')}`;
+    const documents = `${NumberUtils.formatNumber(stats.documents)} ${StringUtils.pluralize(stats.documents, 'document', 'documents')}`;
+    const size = NumberUtils.formatBytes(stats.size);
+
+    return `${indices}, ${documents}, ${size}`;
   },
 
   _isLoading() {
@@ -128,6 +133,10 @@ const IndexSetsComponent = React.createClass({
 
     return (
       <div>
+        <h4><strong>Total:</strong> {this._formatStatsString(this.state.globalIndexSetStats)}</h4>
+
+        <hr style={{ marginBottom: "0" }} />
+
         <PaginatedList pageSize={this.PAGE_SIZE} totalItems={this.state.indexSetsCount} onChange={this._onChangePaginatedList}
                        showPageSizeSelect={false}>
           <EntityList bsNoItemsStyle="info"
