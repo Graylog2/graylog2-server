@@ -4,7 +4,7 @@ const PermissionsMixin = {
   },
 
   _permissionPredicate(permissionSet, p) {
-      if ((permissionSet.indexOf(p) > -1) === true || (permissionSet.indexOf('*') > -1)) {
+      if ((permissionSet.indexOf(p) > -1) || (permissionSet.indexOf('*') > -1)) {
       return true;
     }
 
