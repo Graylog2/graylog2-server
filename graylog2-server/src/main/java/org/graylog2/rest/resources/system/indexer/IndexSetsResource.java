@@ -34,7 +34,9 @@ import org.graylog2.indexer.IndexSetValidator;
 import org.graylog2.indexer.indexset.DefaultIndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetConfig;
 import org.graylog2.indexer.indexset.IndexSetService;
+import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.indices.jobs.IndexSetCleanupJob;
+import org.graylog2.indexer.indices.stats.IndexStatistics;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.rest.resources.system.indexer.requests.IndexSetUpdateRequest;
 import org.graylog2.rest.resources.system.indexer.responses.IndexSetResponse;
@@ -65,11 +67,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.StringJoiner;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
@@ -81,6 +85,7 @@ import static java.util.Objects.requireNonNull;
 public class IndexSetsResource extends RestResource {
     private static final Logger LOG = LoggerFactory.getLogger(IndexSetsResource.class);
 
+    private final Indices indices;
     private final IndexSetService indexSetService;
     private final IndexSetRegistry indexSetRegistry;
     private final IndexSetValidator indexSetValidator;
@@ -90,13 +95,15 @@ public class IndexSetsResource extends RestResource {
     private final SystemJobManager systemJobManager;
 
     @Inject
-    public IndexSetsResource(final IndexSetService indexSetService,
+    public IndexSetsResource(final Indices indices,
+                             final IndexSetService indexSetService,
                              final IndexSetRegistry indexSetRegistry,
                              final IndexSetValidator indexSetValidator,
                              final IndexSetCleanupJob.Factory indexSetCleanupJobFactory,
                              final IndexSetStatsCreator indexSetStatsCreator,
                              final ClusterConfigService clusterConfigService,
                              final SystemJobManager systemJobManager) {
+        this.indices = requireNonNull(indices);
         this.indexSetService = requireNonNull(indexSetService);
         this.indexSetRegistry = indexSetRegistry;
         this.indexSetValidator = indexSetValidator;
@@ -163,17 +170,11 @@ public class IndexSetsResource extends RestResource {
     public IndexSetStats globalStats() {
         checkPermission(RestPermissions.INDEXSETS_READ);
 
-        long indices = 0;
-        long documents = 0;
-        long size = 0;
-        for (IndexSetStats stats : indexSetRegistry.getAll().stream()
-                .collect(Collectors.toMap(indexSet -> indexSet.getConfig().id(), indexSetStatsCreator::getForIndexSet)).values()) {
-            indices += stats.indices();
-            documents += stats.documents();
-            size += stats.size();
-        }
-
-        return IndexSetStats.create(indices, documents, size);
+        final Set<String> indexWildcards = indexSetRegistry.getAll().stream()
+                .map(IndexSet::getIndexWildcard)
+                .collect(Collectors.toSet());
+        final Set<IndexStatistics> indicesStats = indices.getIndicesStats(indexWildcards);
+        return IndexSetStats.fromIndexStatistics(indicesStats);
     }
 
     @GET
