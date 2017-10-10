@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { DropdownButton, MenuItem, Button } from 'react-bootstrap';
 import Reflux from 'reflux';
 
 import QuickValuesVisualization from 'components/visualizations/QuickValuesVisualization';
@@ -170,17 +170,11 @@ const FieldQuickValues = React.createClass({
             <AddToDashboardMenu title="Add to dashboard"
                                 widgetType={this.WIDGET_TYPE}
                                 configuration={this._buildDashboardConfig()}
-                                bsStyle="default"
                                 pullRight
                                 permissions={this.props.permissions}>
-              <DropdownButton bsSize="small"
-                              className="graph-settings"
-                              title="Customize"
-                              id="customize-field-graph-dropdown">
-                <MenuItem onSelect={this._showVizOptions}>Configuration</MenuItem>
-                <MenuItem divider />
-                <MenuItem onSelect={() => this._resetStatus()}>Dismiss</MenuItem>
-              </DropdownButton>
+
+                <Button bsSize="small" onClick={this._showVizOptions}>Customize</Button>
+                <Button bsSize="small" className="field-analyzer-close" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Quick Values for <em>{this.state.field}</em> {this.state.loadPending && <i
