@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Reflux from 'reflux';
 import Immutable from 'immutable';
 import { Row, Col } from 'react-bootstrap';
 
-import StoreProvider from 'injection/StoreProvider';
-const DashboardsStore = StoreProvider.getStore('Dashboards');
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
 
 import DocsHelper from 'util/DocsHelper';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -19,29 +21,18 @@ const DashboardListPage = React.createClass({
   propTypes: {
     permissions: PropTypes.arrayOf(PropTypes.string),
   },
-  mixins: [PermissionsMixin],
+  mixins: [Reflux.connect(DashboardsStore, 'dashboards'), PermissionsMixin],
   getInitialState() {
     return {
       dashboardsLoaded: false,
-      dashboards: DashboardsStore.dashboards,
-      filteredDashboards: Immutable.List(),
     };
   },
   componentDidMount() {
-    DashboardsStore.addOnDashboardsChangedCallback(this._onDashboardsChange);
-    DashboardsStore.updateDashboards();
-  },
-  _onDashboardsChange(dashboards) {
-    if (!this.isMounted()) {
-      return;
-    }
-    if (dashboards) {
-      this.setState({ dashboards: dashboards, filteredDashboards: dashboards, dashboardsLoaded: true });
-    } else {
-      this.setState({ dashboardsLoaded: false });
-    }
+    DashboardsActions.list();
   },
   render() {
+    const { dashboards } = this.state.dashboards;
+    const filteredDashboards = dashboards;
     const createDashboardButton = this.isPermitted(this.props.permissions, ['dashboards:create']) ?
       <EditDashboardModalTrigger action="create" buttonClass="btn-success btn-lg" /> : null;
 
@@ -62,28 +53,20 @@ const DashboardListPage = React.createClass({
       </PageHeader>
     );
 
-    if (!this.state.dashboardsLoaded) {
-      return (
-        <div>
-          {pageHeader}
-
-          <Row className="content">
-            <div style={{ marginLeft: 10 }}><Spinner /></div>
-          </Row>
-        </div>
-      );
-    }
-
     let dashboardList;
 
-    if (this.state.dashboards && this.state.dashboards.count() > 0 && this.state.filteredDashboards.isEmpty()) {
-      dashboardList = <div>No dashboards matched your filter criteria.</div>;
+    if (!dashboards) {
+      dashboardList = <Spinner />;
     } else {
-      dashboardList = (
-        <DashboardList dashboards={this.state.filteredDashboards}
-                       onDashboardAdd={this._onDashboardAdd}
-                       permissions={this.props.permissions} />
-      );
+      if (dashboards && dashboards.count() > 0 && filteredDashboards.isEmpty()) {
+        dashboardList = <div>No dashboards matched your filter criteria.</div>;
+      } else {
+        dashboardList = (
+          <DashboardList dashboards={filteredDashboards}
+                         onDashboardAdd={this._onDashboardAdd}
+                         permissions={this.props.permissions}/>
+        );
+      }
     }
 
     return (

@@ -5,10 +5,12 @@ import { Row, Col, Button, Alert } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import deepEqual from 'deep-equal';
 
+import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
+
 const StreamsStore = StoreProvider.getStore('Streams');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const DashboardsStore = StoreProvider.getStore('Dashboards');
+const { DashboardsActions, DashboardsStore } = CombinedProvider.get('Dashboards');
 const FocusStore = StoreProvider.getStore('Focus');
 const WidgetsStore = StoreProvider.getStore('Widgets');
 
@@ -177,7 +179,7 @@ const ShowDashboardPage = React.createClass({
     this.setState({ locked: !this.state.locked });
   },
   _onPositionsChange(newPositions) {
-    DashboardsStore.updatePositions(this.state.dashboard, newPositions);
+    DashboardsActions.updatePositions(this.state.dashboard, newPositions);
   },
   _toggleFullscreen() {
     const element = document.documentElement;

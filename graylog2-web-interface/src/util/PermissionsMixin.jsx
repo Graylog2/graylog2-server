@@ -4,11 +4,20 @@ const PermissionsMixin = {
   },
 
   _permissionPredicate(permissionSet, p) {
-    if (p.split(':').length === 3) {
-      // eslint-disable-next-line prefer-template
-      return (permissionSet.indexOf(p) > -1) || (permissionSet.indexOf(p.split(':').slice(0, 2).join(':') + ':*') > -1);
+      if ((permissionSet.indexOf(p) > -1) || (permissionSet.indexOf('*') > -1)) {
+      return true;
     }
-    return (permissionSet.indexOf(p) > -1) || (permissionSet.indexOf(`${p}:*`) > -1);
+
+    let permissionParts = p.split(':');
+    if (permissionParts.length >= 2) {
+      let first = permissionParts[0];
+      let second = permissionParts[0] + ':' + permissionParts[1];
+      return (permissionSet.indexOf(first) > -1)
+        || (permissionSet.indexOf(first + ':*') > -1)
+        || (permissionSet.indexOf(second) > -1)
+        || (permissionSet.indexOf(second + ':*') > -1);
+    }
+    return (permissionSet.indexOf(`${p}:*`) > -1);
   },
 
   isPermitted(permissionSet, permissions) {
