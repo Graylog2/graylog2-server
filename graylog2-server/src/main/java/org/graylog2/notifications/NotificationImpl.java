@@ -32,7 +32,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @CollectionName("notifications")
-public class NotificationImpl extends PersistedImpl implements Notification {
+public class    NotificationImpl extends PersistedImpl implements Notification {
     static final String FIELD_TYPE = "type";
     static final String FIELD_SEVERITY = "severity";
     static final String FIELD_TIMESTAMP = "timestamp";

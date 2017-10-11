@@ -40,6 +40,7 @@ import org.graylog2.periodical.ThrottleStateUpdaterThread;
 import org.graylog2.periodical.UserPermissionMigrationPeriodical;
 import org.graylog2.periodical.VersionCheckThread;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.shared.journal.KafkaJournalDiskCheckPeriodical;
 
 public class PeriodicalBindings extends AbstractModule {
     @Override
@@ -66,5 +67,6 @@ public class PeriodicalBindings extends AbstractModule {
         periodicalBinder.addBinding().to(ConfigurationManagementPeriodical.class);
         periodicalBinder.addBinding().to(LdapGroupMappingMigration.class);
         periodicalBinder.addBinding().to(IndexFailuresPeriodical.class);
+        periodicalBinder.addBinding().to(KafkaJournalDiskCheckPeriodical.class);
     }
 }
