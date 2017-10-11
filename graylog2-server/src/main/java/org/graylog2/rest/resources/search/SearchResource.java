@@ -45,6 +45,7 @@ import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.utilities.ExceptionUtils;
 import org.joda.time.DateTime;
+import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -255,6 +256,34 @@ public abstract class SearchResource extends RestResource {
         } catch (Exception e) {
             LOG.error("Falling back to default sorting.", e);
             return Sorting.DEFAULT;
+        }
+    }
+
+    protected Searches.DateHistogramInterval buildInterval(final String intervalParam, org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange) {
+        if (!isNullOrEmpty(intervalParam)) {
+            final String interval = intervalParam.toUpperCase(Locale.ENGLISH);
+            validateInterval(interval);
+
+            return Searches.DateHistogramInterval.valueOf(interval);
+        }
+
+        final Duration duration = Duration.millis(timeRange.getTo().getMillis() - timeRange.getFrom().getMillis());
+
+        // This is the same as SearchPage#_determineHistogramResolution() in the UI code
+        if (duration.getStandardHours() < 12) {
+            return Searches.DateHistogramInterval.MINUTE;
+        } else if (duration.getStandardDays() < 3) {
+            return Searches.DateHistogramInterval.HOUR;
+        } else if (duration.getStandardDays() < 30) {
+            return Searches.DateHistogramInterval.DAY;
+        } else if (duration.getStandardDays() < (30 * 2)) {
+            return Searches.DateHistogramInterval.WEEK;
+        } else if (duration.getStandardDays() < (30 * 18)) {
+            return Searches.DateHistogramInterval.MONTH;
+        } else if (duration.getStandardDays() < (365 * 3)) {
+            return Searches.DateHistogramInterval.QUARTER;
+        } else {
+            return Searches.DateHistogramInterval.YEAR;
         }
     }
 

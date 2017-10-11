@@ -212,14 +212,16 @@ public class AbsoluteSearchResource extends SearchResource {
             @ApiParam(name = "from", value = "Timerange start. See search method description for date format", required = true) @QueryParam("from") String from,
             @ApiParam(name = "to", value = "Timerange end. See search method description for date format", required = true) @QueryParam("to") String to,
             @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true)
-            @QueryParam("interval") @NotEmpty String interval,
+            @QueryParam("interval") String interval,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
         final Sorting sortOrder = buildSorting(order);
-        return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, buildAbsoluteTimeRange(from, to), Searches.DateHistogramInterval.valueOf(interval), sortOrder.getDirection()));
+        final TimeRange timeRange = buildAbsoluteTimeRange(from, to);
+
+        return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, timeRange, buildInterval(interval, timeRange), sortOrder.getDirection()));
     }
 
     @GET

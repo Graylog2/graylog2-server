@@ -236,14 +236,16 @@ public class KeywordSearchResource extends SearchResource {
             @ApiParam(name = "size", value = "Maximum number of terms to return", required = true) @QueryParam("size") @Min(1) int size,
             @ApiParam(name = "keyword", value = "Range keyword", required = true) @QueryParam("keyword") String keyword,
             @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true)
-            @QueryParam("interval") @NotEmpty String interval,
+            @QueryParam("interval") String interval,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
         final Sorting sortOrder = buildSorting(order);
-        return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, buildKeywordTimeRange(keyword), Searches.DateHistogramInterval.valueOf(interval), sortOrder.getDirection()));
+        final TimeRange timeRange = buildKeywordTimeRange(keyword);
+
+        return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, timeRange, buildInterval(interval, timeRange), sortOrder.getDirection()));
     }
 
     @GET

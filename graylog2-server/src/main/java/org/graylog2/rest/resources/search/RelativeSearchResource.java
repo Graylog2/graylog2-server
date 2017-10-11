@@ -207,15 +207,17 @@ public class RelativeSearchResource extends SearchResource {
             @ApiParam(name = "stacked_fields", value = "Fields to stack", required = false) @QueryParam("stacked_fields") String stackedFieldsParam,
             @ApiParam(name = "size", value = "Maximum number of terms to return", required = true) @QueryParam("size") @Min(1) int size,
             @ApiParam(name = "range", value = "Relative timeframe to search in. See search method description.", required = true) @QueryParam("range") int range,
-            @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = true)
-            @QueryParam("interval") @NotEmpty String interval,
+            @ApiParam(name = "interval", value = "Histogram interval / bucket size. (year, quarter, month, week, day, hour or minute)", required = false)
+            @QueryParam("interval") String interval,
             @ApiParam(name = "filter", value = "Filter", required = false) @QueryParam("filter") String filter,
             @ApiParam(name = "order", value = "Sorting (field:asc / field:desc)", required = false) @QueryParam("order") String order) {
         checkSearchPermission(filter, RestPermissions.SEARCHES_RELATIVE);
 
         final List<String> stackedFields = splitStackedFields(stackedFieldsParam);
         final Sorting sortOrder = buildSorting(order);
-        return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, buildRelativeTimeRange(range), Searches.DateHistogramInterval.valueOf(interval), sortOrder.getDirection()));
+        final TimeRange timeRange = buildRelativeTimeRange(range);
+
+        return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, timeRange, buildInterval(interval, timeRange), sortOrder.getDirection()));
     }
 
     @GET
