@@ -59,7 +59,7 @@ public abstract class Query {
     public abstract Builder toBuilder();
 
     /**
-     * For a new query, we need to assign an ID to each search type, to be able to reference its result during execution.
+     * Search queries require
      *
      * @return a Query instance with IDs assigned to each of its search types.
      */

@@ -29,6 +29,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
@@ -89,8 +90,11 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @ApiOperation(value = "Execute the referenced search query asynchronously",
             notes = "Starts a new search, irrespective whether or not another is already running")
     @Path("{id}/execute")
-    public Response executeQuery(@Context UriInfo uriInfo, @ApiParam(name = "id") @PathParam("id") String id) {
+    public Response executeQuery(@Context UriInfo uriInfo,
+                                 @ApiParam(name = "id") @PathParam("id") String id,
+                                 Map<String, Object> executionState) {
         final Query query = getQuery(id);
+
         final QueryJob queryJob = queryJobService.create(query);
 
         final CompletableFuture<QueryResult> futureResult = queryEngine.execute(queryJob);

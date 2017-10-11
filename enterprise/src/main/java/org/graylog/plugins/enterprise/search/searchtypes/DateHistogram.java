@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.enterprise.search.ExecutionState;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog2.indexer.searches.Searches;
 
@@ -24,6 +25,7 @@ public abstract class DateHistogram implements SearchType {
     @JsonProperty
     public abstract String id();
 
+    @ExecutionState
     @JsonProperty
     public abstract Searches.DateHistogramInterval interval();
 

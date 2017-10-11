@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
+import org.graylog.plugins.enterprise.search.ExecutionState;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 
@@ -24,9 +25,11 @@ public abstract class MessageList implements SearchType {
     @JsonProperty
     public abstract String id();
 
+    @ExecutionState
     @JsonProperty
     public abstract int limit();
 
+    @ExecutionState
     @JsonProperty
     public abstract int offset();
 
