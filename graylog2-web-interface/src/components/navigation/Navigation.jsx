@@ -213,7 +213,7 @@ const Navigation = React.createClass({
                 <MenuItem>Logging</MenuItem>
               </LinkContainer>
               }
-              {this.isAnyPermitted(this.props.permissions, ['users:list, roles:read']) &&
+              {this.isAnyPermitted(this.props.permissions, ['users:list', 'roles:read']) &&
               <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.OVERVIEW}>
                 <MenuItem>Authentication</MenuItem>
               </LinkContainer>
