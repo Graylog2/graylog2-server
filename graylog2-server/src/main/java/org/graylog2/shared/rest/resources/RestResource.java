@@ -98,7 +98,8 @@ public abstract class RestResource {
 
     protected void checkPermission(String permission) {
         if (!isPermitted(permission)) {
-            throw new ForbiddenException("Not authorized. User is missing permission <" + permission + ">");
+            final String userName = getSubject().getPrincipal().toString();
+            throw new ForbiddenException("Not authorized. User <" + userName + "> is missing permission <" + permission + ">");
         }
     }
 
@@ -108,7 +109,8 @@ public abstract class RestResource {
 
     protected void checkPermission(String permission, String instanceId) {
         if (!isPermitted(permission, instanceId)) {
-            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">. User is missing permission <" + permission + ":" + instanceId + ">");
+            final String userName = getSubject().getPrincipal().toString();
+            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">. User <" + userName + "> is missing permission <" + permission + ":" + instanceId + ">");
         }
     }
 
@@ -131,7 +133,8 @@ public abstract class RestResource {
 
     protected void checkAnyPermission(String permissions[], String instanceId) {
         if (!isAnyPermitted(permissions, instanceId)) {
-            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">. User is missing permissions " + Arrays.toString(permissions) + " on instance <" + instanceId + ">");
+            final String userName = getSubject().getPrincipal().toString();
+            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">. User <" + userName + "> is missing permissions " + Arrays.toString(permissions) + " on instance <" + instanceId + ">");
         }
     }
 
