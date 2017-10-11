@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { DropdownButton, MenuItem, Button } from 'react-bootstrap';
 import Reflux from 'reflux';
 
-import QuickValuesVisualization from 'components/visualizations/QuickValuesVisualization';
+import { QuickValuesVisualization, StackedChartVisualization } from 'components/visualizations';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Spinner from 'components/common/Spinner';
 import UIUtils from 'util/UIUtils';
@@ -40,11 +40,13 @@ const FieldQuickValues = React.createClass({
       field: undefined,
       data: [],
       showVizOptions: false,
+      showHistogram: false,
       options: {
         order: 'desc',
         limit: 5,
         tableSize: 50,
         stackedFields: '',
+        interval: undefined,
       },
     };
   },
@@ -90,7 +92,11 @@ const FieldQuickValues = React.createClass({
   },
   _loadQuickValuesData() {
     if (this.state.field !== undefined) {
-      FieldQuickValuesActions.get(this.state.field, this.state.options);
+      if (this.state.showHistogram) {
+        FieldQuickValuesActions.getHistogram(this.state.field, this.state.options);
+      } else {
+        FieldQuickValuesActions.get(this.state.field, this.state.options);
+      }
     }
   },
   _resetStatus() {
@@ -107,6 +113,11 @@ const FieldQuickValues = React.createClass({
 
   _showVizOptions() {
     this.setState({ showVizOptions: true });
+  },
+
+  _showHistogram() {
+    // Reset the data when toggling histogram
+    this.setState({ data: [], showHistogram: true }, this._loadQuickValuesData);
   },
 
   _buildDashboardConfig() {
@@ -143,6 +154,19 @@ const FieldQuickValues = React.createClass({
           <Spinner />;
         </div>
       );
+    } else if (this.state.showHistogram) {
+      const config = {
+        sort_order: this.state.options.order,
+        limit: this.state.options.limit,
+        interval: this.state.options.interval,
+      };
+      inner = (
+        <div className={style.visualizationWrapper}>
+          <StackedChartVisualization id={this.state.field}
+                                     config={config}
+                                     data={this.state.data} />
+        </div>
+      );
     } else {
       const config = {
         show_pie_chart: true,
@@ -172,9 +196,14 @@ const FieldQuickValues = React.createClass({
                                 configuration={this._buildDashboardConfig()}
                                 pullRight
                                 permissions={this.props.permissions}>
-
-                <Button bsSize="small" onClick={this._showVizOptions}>Customize</Button>
-                <Button bsSize="small" className="field-analyzer-close" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
+              <DropdownButton bsSize="small"
+                              className="graph-settings"
+                              title="Customize"
+                              id="customize-field-graph-dropdown">
+                <MenuItem onSelect={this._showVizOptions}>Configuration</MenuItem>
+                <MenuItem onSelect={this._showHistogram}>Show as histogram</MenuItem>
+              </DropdownButton>
+              <Button bsSize="small" className="field-analyzer-close" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Quick Values for <em>{this.state.field}</em> {this.state.loadPending && <i
