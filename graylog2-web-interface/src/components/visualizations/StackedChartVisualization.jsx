@@ -238,7 +238,7 @@ const StackedChartVisualization = React.createClass({
   render() {
     return (
       <div>
-        <div ref={(c) => { this._chartRef = c; }} className="stacked-chart-viz" id={`visualization-${this.props.id}`} />
+        <div ref={(c) => { this._chartRef = c; }} className="stacked-chart-viz" id={`visualization-${this.props.id}`} style={{ width: '100%' }} />
       </div>
     );
   },
