@@ -25,7 +25,6 @@ import org.apache.shiro.subject.Subject;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.IndexSetRegistry;
-import org.graylog2.plugin.BaseConfiguration;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.ShiroPrincipal;
 import org.graylog2.shared.users.UserService;
@@ -99,7 +98,7 @@ public abstract class RestResource {
 
     protected void checkPermission(String permission) {
         if (!isPermitted(permission)) {
-            throw new ForbiddenException("Not authorized");
+            throw new ForbiddenException("Not authorized. User is missing permission <" + permission + ">");
         }
     }
 
@@ -109,7 +108,7 @@ public abstract class RestResource {
 
     protected void checkPermission(String permission, String instanceId) {
         if (!isPermitted(permission, instanceId)) {
-            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">");
+            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">. User is missing permission <" + permission + ":" + instanceId + ">");
         }
     }
 
@@ -132,7 +131,7 @@ public abstract class RestResource {
 
     protected void checkAnyPermission(String permissions[], String instanceId) {
         if (!isAnyPermitted(permissions, instanceId)) {
-            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">");
+            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">. User is missing permissions " + Arrays.toString(permissions) + " on instance <" + instanceId + ">");
         }
     }
 
