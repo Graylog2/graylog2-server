@@ -1,6 +1,4 @@
-:local(.actions) {
-    max-width: 150px;
-}
+
 
 :local(.searchHelpButton) {
     cursor: help;
@@ -11,4 +9,30 @@
 :local(.popoverWide) {
     max-width: 500px;
     min-width: 350px;
+}
+
+/* styles for table columns */
+:local(.rowTitle) {
+    width: 15%;
+}
+:local(.rowDescription) {
+    max-width: 50%;
+    width: 35%
+}
+:local(.rowName) {
+    width: 15%;
+}
+:local(.rowCache) {
+    width: 15%;
+}
+:local(.rowAdapter) {
+    width: 15%;
+}
+:local(.rowActions) {
+    min-width: 100px;
+}
+
+:local(overviewTable) {
+    width: 100%;
+    table-layout: fixed;
 }

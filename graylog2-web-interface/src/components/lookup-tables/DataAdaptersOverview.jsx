@@ -109,14 +109,14 @@ const DataAdaptersOverview = React.createClass({
                 <Button bsStyle="link" className={Styles.searchHelpButton}><i className="fa fa-fw fa-question-circle" /></Button>
               </OverlayTrigger>
             </SearchForm>
-            <Table condensed hover>
+            <Table condensed hover className={Styles.overviewTable}>
               <thead>
                 <tr>
-                  <th>Title</th>
-                  <th>Description</th>
-                  <th>Name</th>
+                  <th className={Styles.rowTitle}>Title</th>
+                  <th className={Styles.rowDescription}>Description</th>
+                  <th className={Styles.rowName}>Name</th>
                   <th>Throughput</th>
-                  <th className={Styles.actions}>Actions</th>
+                  <th className={Styles.rowActions}>Actions</th>
                 </tr>
               </thead>
               {dataAdapters}
