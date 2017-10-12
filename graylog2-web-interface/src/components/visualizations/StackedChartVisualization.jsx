@@ -187,6 +187,8 @@ const StackedChartVisualization = React.createClass({
       .margins(this.CHART_MARGINS)
       .brushOn(false)
       .colors(D3Utils.glColourPalette())
+      .transitionDelay(0)
+      .transitionDuration(0)
       .dimension(dimension)
       .title(function getTitle(d) {
         const idx = this.layer;
