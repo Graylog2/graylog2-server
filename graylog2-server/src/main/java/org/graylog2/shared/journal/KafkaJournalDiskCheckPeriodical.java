@@ -22,14 +22,18 @@ import org.graylog2.cluster.Node;
 import org.graylog2.notifications.Notification;
 import org.graylog2.notifications.NotificationService;
 import org.graylog2.plugin.BaseConfiguration;
+import org.graylog2.plugin.IOState;
 import org.graylog2.plugin.KafkaJournalConfiguration;
 import org.graylog2.plugin.ServerStatus;
+import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.periodical.Periodical;
+import org.graylog2.shared.inputs.InputRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.Set;
 
 public class KafkaJournalDiskCheckPeriodical extends Periodical {
     private static final Logger LOG = LoggerFactory.getLogger(KafkaJournalDiskCheckPeriodical.class);
@@ -37,9 +41,11 @@ public class KafkaJournalDiskCheckPeriodical extends Periodical {
     private final ServerStatus serverStatus;
     private final Node node;
     private final NotificationService notificationService;
+    private final InputRegistry inputRegistry;
     private final int freeSpacePercentLimit;
     private final File journalDir;
     private final boolean checkEnabled;
+    private final boolean stopInputs;
     private final boolean journalEnabled;
     private final int periodSeconds;
 
@@ -48,12 +54,15 @@ public class KafkaJournalDiskCheckPeriodical extends Periodical {
                                            KafkaJournalConfiguration kafkaJournalConfiguration,
                                            ServerStatus serverStatus,
                                            Node node,
-                                           NotificationService notificationService) {
+                                           NotificationService notificationService,
+                                           InputRegistry inputRegistry) {
         this.serverStatus = serverStatus;
         this.node = node;
         this.notificationService = notificationService;
+        this.inputRegistry = inputRegistry;
 
         this.checkEnabled = kafkaJournalConfiguration.isMessageJournalCheckEnabled();
+        this.stopInputs = kafkaJournalConfiguration.isMessageJournalCheckStopInputs();
         this.journalEnabled = configuration.isMessageJournalEnabled();
         this.journalDir = kafkaJournalConfiguration.getMessageJournalDir();
         this.freeSpacePercentLimit = kafkaJournalConfiguration.getMessageJournalCheckDiskFreePercent();
@@ -69,6 +78,18 @@ public class KafkaJournalDiskCheckPeriodical extends Periodical {
         if (freeSpacePercent < freeSpacePercentLimit) {
             LOG.warn("Only {} ({}%) left on disk hosting \"{}\". Setting server status to DEAD.",
                     Size.bytes(freeSpace), freeSpacePercent, journalDir.getAbsolutePath());
+
+            if (stopInputs) {
+                LOG.error("Stopping all inputs due to insufficient space left on \"{}\"", journalDir.getAbsolutePath());
+                final Set<IOState<MessageInput>> runningInputs = inputRegistry.getRunningInputs();
+                for (IOState<MessageInput> ioState : runningInputs) {
+                    final MessageInput messageInput = ioState.getStoppable();
+                    if (!messageInput.isGlobal()) {
+                        inputRegistry.stop(messageInput);
+                        LOG.debug("Stopped input {}", messageInput);
+                    }
+                }
+            }
 
             final Notification notification = notificationService.buildNow()
                     .addType(Notification.Type.JOURNAL_INSUFFICIENT_DISK_SPACE)

@@ -42,6 +42,7 @@ public class KafkaJournalConfiguration {
                                      @JsonProperty("flush_interval") long messageJournalFlushInterval,
                                      @JsonProperty("flush_age") Duration messageJournalFlushAge,
                                      @JsonProperty("check_enabled") boolean messageJournalCheckEnabled,
+                                     @JsonProperty("check_stop_inputs") boolean messageJournalCheckStopInputs,
                                      @JsonProperty("check_interval") Duration messageJournalCheckInterval,
                                      @JsonProperty("check_disk_free_percent") int messageJournalCheckDiskFreePercent) {
         this.messageJournalDir = Objects.requireNonNull(messageJournalDir);
@@ -52,6 +53,7 @@ public class KafkaJournalConfiguration {
         this.messageJournalFlushInterval = messageJournalFlushInterval;
         this.messageJournalFlushAge = messageJournalFlushAge;
         this.messageJournalCheckEnabled = messageJournalCheckEnabled;
+        this.messageJournalCheckStopInputs = messageJournalCheckStopInputs;
         this.messageJournalCheckInterval = messageJournalCheckInterval;
         this.messageJournalCheckDiskFreePercent = messageJournalCheckDiskFreePercent;
     }
@@ -90,6 +92,10 @@ public class KafkaJournalConfiguration {
     @Parameter(PREFIX + "check_enabled")
     @JsonProperty("check_enabled")
     private boolean messageJournalCheckEnabled = true;
+
+    @Parameter(PREFIX + "check_stop_inputs")
+    @JsonProperty("check_stop_inputs")
+    private boolean messageJournalCheckStopInputs = true;
 
     @Parameter(PREFIX + "check_interval")
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
@@ -130,6 +136,10 @@ public class KafkaJournalConfiguration {
 
     public boolean isMessageJournalCheckEnabled() {
         return messageJournalCheckEnabled;
+    }
+
+    public boolean isMessageJournalCheckStopInputs() {
+        return messageJournalCheckStopInputs;
     }
 
     public Duration getMessageJournalCheckInterval() {
