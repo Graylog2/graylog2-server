@@ -17,6 +17,7 @@
 package org.graylog2.bindings;
 
 import org.graylog2.dashboards.widgets.strategies.FieldChartWidgetStrategy;
+import org.graylog2.dashboards.widgets.strategies.QuickvaluesHistogramWidgetStrategy;
 import org.graylog2.dashboards.widgets.strategies.QuickvaluesWidgetStrategy;
 import org.graylog2.dashboards.widgets.strategies.SearchResultChartWidgetStrategy;
 import org.graylog2.dashboards.widgets.strategies.SearchResultCountWidgetStrategy;
@@ -30,6 +31,7 @@ public class WidgetStrategyBindings extends Graylog2Module {
     protected void configure() {
         installWidgetStrategyWithAlias(widgetStrategyBinder(), "FIELD_CHART", FieldChartWidgetStrategy.class, FieldChartWidgetStrategy.Factory.class);
         installWidgetStrategyWithAlias(widgetStrategyBinder(), "QUICKVALUES", QuickvaluesWidgetStrategy.class, QuickvaluesWidgetStrategy.Factory.class);
+        installWidgetStrategyWithAlias(widgetStrategyBinder(), "QUICKVALUES_HISTOGRAM", QuickvaluesHistogramWidgetStrategy.class, QuickvaluesHistogramWidgetStrategy.Factory.class);
         installWidgetStrategyWithAlias(widgetStrategyBinder(), "SEARCH_RESULT_CHART", SearchResultChartWidgetStrategy.class, SearchResultChartWidgetStrategy.Factory.class);
         installWidgetStrategyWithAlias(widgetStrategyBinder(), "SEARCH_RESULT_COUNT", SearchResultCountWidgetStrategy.class, SearchResultCountWidgetStrategy.Factory.class);
         installWidgetStrategyWithAlias(widgetStrategyBinder(), "STACKED_CHART", StackedChartWidgetStrategy.class, StackedChartWidgetStrategy.Factory.class);
