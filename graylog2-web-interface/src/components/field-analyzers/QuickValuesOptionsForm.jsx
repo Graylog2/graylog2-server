@@ -3,8 +3,9 @@ import PropTypes from 'prop-types';
 import _ from 'lodash';
 import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, Row } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
-import { MultiSelect } from 'components/common';
+import { MultiSelect, Select } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
+import SearchUtils from 'util/SearchUtils';
 
 import style from './QuickValuesOptionsForm.css';
 
@@ -16,6 +17,8 @@ const QuickValuesOptionsForm = React.createClass({
     field: PropTypes.string.isRequired,
     stackedFields: PropTypes.string,
     stackedFieldsOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
+    interval: PropTypes.string,
+    isHistogram: PropTypes.bool.isRequired,
     onSave: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
   },
@@ -26,6 +29,7 @@ const QuickValuesOptionsForm = React.createClass({
       tableSize: this.props.tableSize,
       order: this.props.order,
       stackedFields: this.props.stackedFields,
+      interval: this.props.interval,
     };
   },
 
@@ -41,6 +45,10 @@ const QuickValuesOptionsForm = React.createClass({
 
   _onStackedFieldChange(values) {
     this._changeConfig('stackedFields', values);
+  },
+
+  _onIntervalChange(value) {
+    this._changeConfig('interval', value);
   },
 
   _onCancel() {
@@ -59,6 +67,21 @@ const QuickValuesOptionsForm = React.createClass({
       .map((field) => {
         return { value: field.name, label: field.name };
       });
+
+    let intervalForm = null;
+    if (this.props.isHistogram) {
+      const intervalOptions = SearchUtils.histogramIntervals().map((interval) => {
+        return { value: interval, label: interval };
+      });
+      intervalForm = (
+        <FormGroup>
+          <ControlLabel>Interval</ControlLabel>
+          <Select options={intervalOptions}
+                  value={this.state.interval}
+                  onChange={this._onIntervalChange} />
+        </FormGroup>
+      );
+    }
 
     return (
       <Row>
@@ -102,6 +125,8 @@ const QuickValuesOptionsForm = React.createClass({
                              value={this.state.stackedFields}
                              onChange={this._onStackedFieldChange} />
               </FormGroup>
+
+              {intervalForm}
 
               <ButtonToolbar>
                 <Button type="submit" bsStyle="success" bsSize="small">Update</Button>

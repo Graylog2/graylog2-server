@@ -75,6 +75,7 @@ const FieldQuickValues = React.createClass({
   },
 
   WIDGET_TYPE: 'QUICKVALUES',
+  WIDGET_TYPE_HISTOGRAM: 'QUICKVALUES_HISTOGRAM',
 
   _setupTimer(refresh) {
     this._stopTimer();
@@ -125,15 +126,25 @@ const FieldQuickValues = React.createClass({
     this.setState({ data: [], showHistogram: false}, this._loadQuickValuesData);
   },
 
-  _buildDashboardConfig() {
+  _buildDashboardConfig(isHistogram) {
     // Map internal state fields to widget config fields. (snake case vs. camel case)
-    return {
+    const baseConfig = {
       field: this.state.field,
       limit: this.state.options.limit,
       sort_order: this.state.options.order,
-      data_table_limit: this.state.options.tableSize,
       stacked_fields: this.state.options.stackedFields,
     };
+
+    if (isHistogram) {
+      return Object.assign(baseConfig, {
+        interval: this.state.options.interval,
+        show_chart_legend: false,
+      });
+    }
+
+    return Object.assign(baseConfig, {
+      data_table_limit: this.state.options.tableSize,
+    });
   },
 
   render() {
@@ -149,6 +160,8 @@ const FieldQuickValues = React.createClass({
                                   stackedFields={this.state.options.stackedFields}
                                   stackedFieldsOptions={this.props.fields}
                                   field={this.state.field}
+                                  interval={this.state.options.interval}
+                                  isHistogram={this.state.showHistogram}
                                   onSave={this._onVizOptionsChange}
                                   onCancel={this._onVizOptionsCancel} />
         </div>
@@ -194,17 +207,20 @@ const FieldQuickValues = React.createClass({
 
     if (this.state.field !== undefined) {
       let toggleVizType;
+      let widgetType;
       if (this.state.showHistogram) {
         toggleVizType = <MenuItem onSelect={this._showOverview}>Show overview</MenuItem>;
+        widgetType = this.WIDGET_TYPE_HISTOGRAM;
       } else {
         toggleVizType = <MenuItem onSelect={this._showHistogram}>Show as histogram</MenuItem>;
+        widgetType = this.WIDGET_TYPE;
       }
       content = (
         <div className="content-col">
           <div className="pull-right">
             <AddToDashboardMenu title="Add to dashboard"
-                                widgetType={this.WIDGET_TYPE}
-                                configuration={this._buildDashboardConfig()}
+                                widgetType={widgetType}
+                                configuration={this._buildDashboardConfig(this.state.showHistogram)}
                                 pullRight
                                 permissions={this.props.permissions}>
               <DropdownButton bsSize="small"

@@ -4,6 +4,8 @@ export { default as FieldChartWidgetConfiguration } from './FieldChartWidgetConf
 export { default as QueryConfiguration } from './QueryConfiguration';
 export { default as QuickValuesWidgetCreateConfiguration } from './QuickValuesWidgetCreateConfiguration';
 export { default as QuickValuesWidgetEditConfiguration } from './QuickValuesWidgetEditConfiguration';
+export { default as QuickValuesHistogramWidgetCreateConfiguration } from './QuickValuesHistogramWidgetCreateConfiguration';
+export { default as QuickValuesHistogramWidgetEditConfiguration } from './QuickValuesHistogramWidgetEditConfiguration';
 export { default as StackedChartWidgetConfiguration } from './StackedChartWidgetConfiguration';
 export { default as StatisticalCountWidgetCreateConfiguration } from './StatisticalCountWidgetCreateConfiguration';
 export { default as StatisticalCountWidgetEditConfiguration } from './StatisticalCountWidgetEditConfiguration';

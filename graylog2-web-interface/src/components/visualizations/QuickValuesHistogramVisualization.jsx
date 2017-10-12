@@ -17,16 +17,18 @@ const QuickValuesHistogramVisualization = React.createClass({
   DEFAULT_CONFIG: {
     limit: 5,
     sort_order: 'desc',
+    show_chart_legend: true,
   },
   DEFAULT_HEIGHT: 220,
 
-  CHART_MARGINS: { left: 40, top: 20, right: 20, bottom: 50 },
+  CHART_MARGINS: { left: 50, right: 15, top: 10, bottom: 45 },
 
   propTypes: {
     id: PropTypes.string.isRequired,
     config: PropTypes.shape({
       limit: PropTypes.number,
       sort_order: PropTypes.oneOf(['asc', 'desc']),
+      show_chart_legend: PropTypes.bool,
     }),
     data: PropTypes.object,
     width: PropTypes.number,
@@ -145,12 +147,11 @@ const QuickValuesHistogramVisualization = React.createClass({
     return { all: () => { return this.state.data; } };
   },
 
-  _buildChartLegend(height, sortOrder) {
+  _addChartLegend(height, sortOrder) {
     const legendPrefix = sortOrder === 'asc' ? 'Bottom' : 'Top';
-
-    return dc.legend()
+    const legend = dc.legend()
       .horizontal(true)
-      .x(this.CHART_MARGINS.left)
+      .x(this._getChartMargins().left)
       .y(height - 20)
       .itemHeight(12)
       .autoItemWidth(true)
@@ -158,6 +159,8 @@ const QuickValuesHistogramVisualization = React.createClass({
       .legendText((d, i) => {
         return `${legendPrefix} ${i + 1}`;
       });
+
+    this._chart.legend(legend);
   },
 
   _addChartStacks(limit) {
@@ -166,6 +169,10 @@ const QuickValuesHistogramVisualization = React.createClass({
     for (let i = 1; i < limit; i += 1) {
       this._chart.stack(this._group(), 0, this._selectGroupData(i));
     }
+  },
+
+  _getChartMargins() {
+    return this.CHART_MARGINS;
   },
 
   _renderChart() {
@@ -181,8 +188,9 @@ const QuickValuesHistogramVisualization = React.createClass({
       .x(d3.time.scale.utc().domain([timerange.from, timerange.to]))
       .round(d3.time[interval].utc.round)
       .xUnits(d3.time[interval].utc.range)
+      .xAxisLabel('Time')
       .renderHorizontalGridLines(true)
-      .margins(this.CHART_MARGINS)
+      .margins(this._getChartMargins())
       .brushOn(false)
       .colors(D3Utils.glColourPalette())
       .transitionDelay(0)
@@ -195,9 +203,9 @@ const QuickValuesHistogramVisualization = React.createClass({
         }
         return 'no title';
       })
-      .legend(this._buildChartLegend(height, sortOrder))
       .renderLabel(false);
 
+    this._addChartLegend(height, sortOrder);
     this._addChartStacks(limit);
 
     this._chart.render();
@@ -212,25 +220,26 @@ const QuickValuesHistogramVisualization = React.createClass({
 
     // Add all the data stacks to the chart
     this._addChartStacks(limit);
+    this._addChartLegend(height, sortOrder);
 
     // Update chart properties to new data
     this._chart
       .x(d3.time.scale.utc().domain([timerange.from, timerange.to]))
       .round(d3.time[interval].utc.round)
       .xUnits(d3.time[interval].utc.range)
+      .margins(this._getChartMargins())
       .width(width)
-      .height(height)
-      .legend(this._buildChartLegend(height, sortOrder));
+      .height(height);
 
     // Redraw and rescale to ensure a correct graph
     this._chart.rescale().redraw();
   },
 
   _resizeChart(width, height, sortOrder) {
-    this._chart
-      .width(width)
+    this._addChartLegend(height, sortOrder);
+    this._chart.width(width)
       .height(height)
-      .legend(this._buildChartLegend(height, sortOrder))
+      .margins(this._getChartMargins())
       .rescale()
       .redraw();
   },
