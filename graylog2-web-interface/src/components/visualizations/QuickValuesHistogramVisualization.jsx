@@ -7,6 +7,7 @@ import d3 from 'd3';
 import _ from 'lodash';
 import deepEqual from 'deep-equal';
 import naturalSort from 'javascript-natural-sort';
+import graphHelper from 'legacy/graphHelper';
 
 import D3Utils from 'util/D3Utils';
 
@@ -20,13 +21,14 @@ const QuickValuesHistogramVisualization = React.createClass({
   },
   DEFAULT_HEIGHT: 220,
 
-  CHART_MARGINS: { left: 50, right: 15, top: 10, bottom: 45 },
+  CHART_MARGINS: { left: 50, right: 15, top: 10, bottom: 35 },
 
   propTypes: {
     id: PropTypes.string.isRequired,
     config: PropTypes.shape({
       limit: PropTypes.number,
       sort_order: PropTypes.oneOf(['asc', 'desc']),
+      field: PropTypes.string.isRequired,
     }),
     data: PropTypes.object,
     width: PropTypes.number,
@@ -183,18 +185,20 @@ const QuickValuesHistogramVisualization = React.createClass({
     this._chart
       .width(width)
       .height(height)
-      .elasticY(true)
+      .margins(this._getChartMargins())
+      .dimension(dimension)
       .x(d3.time.scale.utc().domain([timerange.from, timerange.to]))
+      .elasticX(false)
+      .elasticY(true)
       .round(d3.time[interval].utc.round)
       .xUnits(d3.time[interval].utc.range)
-      .xAxisLabel('Time')
       .renderHorizontalGridLines(true)
-      .margins(this._getChartMargins())
       .brushOn(false)
+      .xAxisLabel('Time')
+      .yAxisLabel(this.props.config.field)
       .colors(D3Utils.glColourPalette())
       .transitionDelay(0)
       .transitionDuration(0)
-      .dimension(dimension)
       .title(function getTitle(d) {
         const idx = this.layer;
         if (d.terms[idx]) {
@@ -206,6 +210,15 @@ const QuickValuesHistogramVisualization = React.createClass({
 
     this._addChartLegend(height, sortOrder);
     this._addChartStacks(limit);
+
+    this._chart.xAxis()
+      .ticks(graphHelper.customTickInterval())
+      .tickFormat(graphHelper.customDateTimeFormat());
+    this._chart.yAxis()
+      .ticks(3)
+      .tickFormat((value) => {
+        return Math.abs(value) > 1e+30 ? value.toPrecision(1) : d3.format('.2s')(value);
+      });
 
     this._chart.render();
   },

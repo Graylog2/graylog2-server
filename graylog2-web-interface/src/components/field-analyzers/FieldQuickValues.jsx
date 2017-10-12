@@ -176,6 +176,7 @@ const FieldQuickValues = React.createClass({
         sort_order: this.state.options.order,
         limit: this.state.options.limit,
         interval: this.state.options.interval,
+        field: this.state.field,
       };
       inner = (
         <div className={style.visualizationWrapper}>
