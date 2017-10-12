@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 
-import { QueryConfiguration } from 'components/widgets/configurations';
+import { QueryConfiguration, QuickValuesConfiguration } from 'components/widgets/configurations';
 
 const QuickValuesWidgetEditConfiguration = React.createClass({
   propTypes: {
@@ -13,6 +13,7 @@ const QuickValuesWidgetEditConfiguration = React.createClass({
     return (
       <fieldset>
         <QueryConfiguration {...this.props} />
+        <QuickValuesConfiguration {...this.props} />
         <Input key="showPieChart"
                type="checkbox"
                id="quickvalues-show-pie-chart"

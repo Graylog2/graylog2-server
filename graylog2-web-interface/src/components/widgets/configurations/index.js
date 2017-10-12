@@ -2,6 +2,7 @@ export { default as CountWidgetCreateConfiguration } from './CountWidgetCreateCo
 export { default as CountWidgetEditConfiguration } from './CountWidgetEditConfiguration';
 export { default as FieldChartWidgetConfiguration } from './FieldChartWidgetConfiguration';
 export { default as QueryConfiguration } from './QueryConfiguration';
+export { default as QuickValuesConfiguration } from './QuickValuesConfiguration';
 export { default as QuickValuesWidgetCreateConfiguration } from './QuickValuesWidgetCreateConfiguration';
 export { default as QuickValuesWidgetEditConfiguration } from './QuickValuesWidgetEditConfiguration';
 export { default as QuickValuesHistogramWidgetCreateConfiguration } from './QuickValuesHistogramWidgetCreateConfiguration';

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Input } from 'components/bootstrap';
 
-import { QueryConfiguration } from 'components/widgets/configurations';
+import { QueryConfiguration, QuickValuesConfiguration } from 'components/widgets/configurations';
 
 const QuickValuesHistogramWidgetEditConfiguration = React.createClass({
   propTypes: {
@@ -16,6 +16,7 @@ const QuickValuesHistogramWidgetEditConfiguration = React.createClass({
     return (
       <fieldset>
         <QueryConfiguration {...this.props} />
+        <QuickValuesConfiguration {...this.props} />
         <Input type="select"
                name="interval"
                label="Interval"
