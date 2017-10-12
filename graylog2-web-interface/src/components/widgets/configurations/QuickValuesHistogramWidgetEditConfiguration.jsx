@@ -16,7 +16,7 @@ const QuickValuesHistogramWidgetEditConfiguration = React.createClass({
     return (
       <fieldset>
         <QueryConfiguration {...this.props} />
-        <QuickValuesConfiguration {...this.props} />
+        <QuickValuesConfiguration isHistogram {...this.props} />
         <Input type="select"
                name="interval"
                label="Interval"

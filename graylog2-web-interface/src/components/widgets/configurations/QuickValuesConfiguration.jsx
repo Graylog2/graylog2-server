@@ -8,11 +8,28 @@ const QuickValuesConfiguration = React.createClass({
   propTypes: {
     config: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
+    isHistogram: PropTypes.bool,
+  },
+  getDefaultProps() {
+    return { isHistogram: false };
   },
   _onStackedFieldChange(values) {
     this.props.onChange('stacked_fields', values);
   },
   render() {
+    let dataTableLimitForm;
+    if (!this.props.isHistogram) {
+      dataTableLimitForm = (
+        <Input type="number"
+               id="data_table_limit"
+               name="data_table_limit"
+               label="Total table size"
+               required
+               onChange={this.props.onChange}
+               value={this.props.config.data_table_limit} />
+      );
+    }
+
     return (
       <div>
         <Input type="number"
@@ -22,13 +39,7 @@ const QuickValuesConfiguration = React.createClass({
                required
                onChange={this.props.onChange}
                value={this.props.config.limit} />
-        <Input type="number"
-               id="data_table_limit"
-               name="data_table_limit"
-               label="Total table size"
-               required
-               onChange={this.props.onChange}
-               value={this.props.config.data_table_limit} />
+        {dataTableLimitForm}
         <FormGroup>
           <ControlLabel>Sort options</ControlLabel>
           <Input type="radio"
