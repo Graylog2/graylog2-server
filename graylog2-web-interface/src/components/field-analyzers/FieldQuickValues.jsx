@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import { DropdownButton, MenuItem, Button } from 'react-bootstrap';
 import Reflux from 'reflux';
 
-import { QuickValuesVisualization, StackedChartVisualization } from 'components/visualizations';
+import { QuickValuesVisualization, QuickValuesHistogramVisualization } from 'components/visualizations';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
 import Spinner from 'components/common/Spinner';
 import UIUtils from 'util/UIUtils';
@@ -167,9 +167,9 @@ const FieldQuickValues = React.createClass({
       };
       inner = (
         <div className={style.visualizationWrapper}>
-          <StackedChartVisualization id={this.state.field}
-                                     config={config}
-                                     data={this.state.data} />
+          <QuickValuesHistogramVisualization id={this.state.field}
+                                             config={config}
+                                             data={this.state.data} />
         </div>
       );
     } else {

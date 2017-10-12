@@ -11,11 +11,9 @@ import naturalSort from 'javascript-natural-sort';
 import D3Utils from 'util/D3Utils';
 
 /*
- * A stacked bar chart visualization based on dc.js.
- *
- * This is tailored for the quick-values-over-time widget for now.
+ * A stacked bar chart visualization to draw QuickValues over time based on dc.js.
  */
-const StackedChartVisualization = React.createClass({
+const QuickValuesHistogramVisualization = React.createClass({
   DEFAULT_CONFIG: {
     limit: 5,
     sort_order: 'desc',
@@ -246,4 +244,4 @@ const StackedChartVisualization = React.createClass({
   },
 });
 
-export default StackedChartVisualization;
+export default QuickValuesHistogramVisualization;
