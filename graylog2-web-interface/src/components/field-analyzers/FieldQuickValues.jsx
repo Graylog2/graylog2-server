@@ -120,6 +120,11 @@ const FieldQuickValues = React.createClass({
     this.setState({ data: [], showHistogram: true }, this._loadQuickValuesData);
   },
 
+  _showOverview() {
+    // Reset the data when toggling histogram
+    this.setState({ data: [], showHistogram: false}, this._loadQuickValuesData);
+  },
+
   _buildDashboardConfig() {
     // Map internal state fields to widget config fields. (snake case vs. camel case)
     return {
@@ -188,6 +193,12 @@ const FieldQuickValues = React.createClass({
     }
 
     if (this.state.field !== undefined) {
+      let toggleVizType;
+      if (this.state.showHistogram) {
+        toggleVizType = <MenuItem onSelect={this._showOverview}>Show overview</MenuItem>;
+      } else {
+        toggleVizType = <MenuItem onSelect={this._showHistogram}>Show as histogram</MenuItem>;
+      }
       content = (
         <div className="content-col">
           <div className="pull-right">
@@ -201,7 +212,7 @@ const FieldQuickValues = React.createClass({
                               title="Customize"
                               id="customize-field-graph-dropdown">
                 <MenuItem onSelect={this._showVizOptions}>Configuration</MenuItem>
-                <MenuItem onSelect={this._showHistogram}>Show as histogram</MenuItem>
+                {toggleVizType}
               </DropdownButton>
               <Button bsSize="small" className="field-analyzer-close" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
