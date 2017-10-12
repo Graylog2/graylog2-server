@@ -138,7 +138,6 @@ const FieldQuickValues = React.createClass({
     if (isHistogram) {
       return Object.assign(baseConfig, {
         interval: this.state.options.interval,
-        show_chart_legend: false,
       });
     }
 

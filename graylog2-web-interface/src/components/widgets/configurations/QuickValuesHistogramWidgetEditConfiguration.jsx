@@ -31,15 +31,6 @@ const QuickValuesHistogramWidgetEditConfiguration = React.createClass({
             );
           })}
         </Input>
-
-        <Input key="show_chart_legend"
-               type="checkbox"
-               id="show_chart_legend"
-               name="show_chart_legend"
-               label="Show chart legend"
-               checked={this.props.config.show_chart_legend}
-               onChange={this.props.onChange}
-               help="Show the legend below the chart." />
       </fieldset>
     );
   },

@@ -17,7 +17,6 @@ const QuickValuesHistogramVisualization = React.createClass({
   DEFAULT_CONFIG: {
     limit: 5,
     sort_order: 'desc',
-    show_chart_legend: true,
   },
   DEFAULT_HEIGHT: 220,
 
@@ -28,7 +27,6 @@ const QuickValuesHistogramVisualization = React.createClass({
     config: PropTypes.shape({
       limit: PropTypes.number,
       sort_order: PropTypes.oneOf(['asc', 'desc']),
-      show_chart_legend: PropTypes.bool,
     }),
     data: PropTypes.object,
     width: PropTypes.number,
