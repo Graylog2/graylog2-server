@@ -154,6 +154,7 @@ const QuickValuesHistogramVisualization = React.createClass({
       .itemHeight(12)
       .autoItemWidth(true)
       .gap(5)
+      .maxItems(5) // We cannot show more without overwriting the "Time" x axis label
       .legendText((d, i) => {
         return `${legendPrefix} ${i + 1}`;
       });
