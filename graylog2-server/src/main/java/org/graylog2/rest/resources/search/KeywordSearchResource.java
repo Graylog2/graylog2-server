@@ -41,6 +41,7 @@ import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.security.RestPermissions;
+import org.graylog2.utilities.SearchUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +59,8 @@ import javax.ws.rs.core.Response;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+
+import static org.graylog2.utilities.SearchUtils.buildTermsHistogramResult;
 
 @RequiresAuthentication
 @Api(value = "Search/Keyword", description = "Message search")
@@ -245,7 +248,7 @@ public class KeywordSearchResource extends SearchResource {
         final Sorting sortOrder = buildSorting(order);
         final TimeRange timeRange = buildKeywordTimeRange(keyword);
 
-        return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, timeRange, buildInterval(interval, timeRange), sortOrder.getDirection()));
+        return buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, size, query, filter, timeRange, SearchUtils.buildInterval(interval, timeRange), sortOrder.getDirection()));
     }
 
     @GET

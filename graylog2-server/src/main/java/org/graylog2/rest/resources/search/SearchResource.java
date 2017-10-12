@@ -35,7 +35,6 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.rest.models.messages.responses.ResultMessageSummary;
 import org.graylog2.rest.models.search.responses.FieldStatsResult;
 import org.graylog2.rest.models.search.responses.HistogramResult;
-import org.graylog2.rest.models.search.responses.TermsHistogramResult;
 import org.graylog2.rest.models.search.responses.TermsResult;
 import org.graylog2.rest.models.search.responses.TermsStatsResult;
 import org.graylog2.rest.models.search.responses.TimeRange;
@@ -44,8 +43,8 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.graylog2.utilities.SearchUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,7 +56,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -80,11 +78,9 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected void validateInterval(String interval) {
-        try {
-            Searches.DateHistogramInterval.valueOf(interval);
-        } catch (IllegalArgumentException e) {
-            LOG.warn("Invalid interval type. Returning HTTP 400.");
-            throw new BadRequestException("Invalid interval type", e);
+        if (!SearchUtils.validateInterval(interval)) {
+            LOG.warn("Invalid interval type <{}>. Returning HTTP 400.", interval);
+            throw new BadRequestException("Invalid interval type: " + interval + "\"");
         }
     }
 
@@ -228,24 +224,6 @@ public abstract class SearchResource extends RestResource {
             TimeRange.create(histogramBoundaries.getFrom(), histogramBoundaries.getTo()));
     }
 
-    protected TermsHistogramResult buildTermsHistogramResult(org.graylog2.indexer.results.TermsHistogramResult termsHistogram) {
-        final AbsoluteRange histogramBoundaries = termsHistogram.getHistogramBoundaries();
-
-        final Map<Long, TermsResult> result = termsHistogram.getResults().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-                    final org.graylog2.indexer.results.TermsResult tr = entry.getValue();
-                    return TermsResult.create(tr.tookMs(), tr.getTerms(), tr.getMissing(), tr.getOther(), tr.getTotal(), tr.getBuiltQuery());
-                }));
-
-        return TermsHistogramResult.create(
-                termsHistogram.tookMs(),
-                termsHistogram.getInterval().toString().toLowerCase(Locale.ENGLISH),
-                termsHistogram.getSize(),
-                result,
-                termsHistogram.getBuiltQuery(),
-                TimeRange.create(histogramBoundaries.getFrom(), histogramBoundaries.getTo()));
-    }
-
     protected Sorting buildSorting(String sort) {
         if (isNullOrEmpty(sort)) {
             return Sorting.DEFAULT;
@@ -256,34 +234,6 @@ public abstract class SearchResource extends RestResource {
         } catch (Exception e) {
             LOG.error("Falling back to default sorting.", e);
             return Sorting.DEFAULT;
-        }
-    }
-
-    protected Searches.DateHistogramInterval buildInterval(final String intervalParam, org.graylog2.plugin.indexer.searches.timeranges.TimeRange timeRange) {
-        if (!isNullOrEmpty(intervalParam)) {
-            final String interval = intervalParam.toUpperCase(Locale.ENGLISH);
-            validateInterval(interval);
-
-            return Searches.DateHistogramInterval.valueOf(interval);
-        }
-
-        final Duration duration = Duration.millis(timeRange.getTo().getMillis() - timeRange.getFrom().getMillis());
-
-        // This is the same as SearchPage#_determineHistogramResolution() in the UI code
-        if (duration.getStandardHours() < 12) {
-            return Searches.DateHistogramInterval.MINUTE;
-        } else if (duration.getStandardDays() < 3) {
-            return Searches.DateHistogramInterval.HOUR;
-        } else if (duration.getStandardDays() < 30) {
-            return Searches.DateHistogramInterval.DAY;
-        } else if (duration.getStandardDays() < (30 * 2)) {
-            return Searches.DateHistogramInterval.WEEK;
-        } else if (duration.getStandardDays() < (30 * 18)) {
-            return Searches.DateHistogramInterval.MONTH;
-        } else if (duration.getStandardDays() < (365 * 3)) {
-            return Searches.DateHistogramInterval.QUARTER;
-        } else {
-            return Searches.DateHistogramInterval.YEAR;
         }
     }
 
