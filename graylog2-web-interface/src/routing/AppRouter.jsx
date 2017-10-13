@@ -11,7 +11,7 @@ import URLUtils from 'util/URLUtils';
 import Routes from 'routing/Routes';
 
 import StartPage from 'pages/StartPage';
-import SearchPage from 'pages/SearchPage';
+import DelegatedSearchPage from 'pages/DelegatedSearchPage';
 import ShowMessagePage from 'pages/ShowMessagePage';
 import StreamsPage from 'pages/StreamsPage';
 import AlertsPage from 'pages/AlertsPage';
@@ -71,7 +71,7 @@ const AppRouter = React.createClass({
         <Route path={Routes.STARTPAGE} component={App}>
           <IndexRoute component={StartPage} />
           <Route component={AppWithSearchBar}>
-            <Route path={Routes.SEARCH} component={SearchPage} />
+            <Route path={Routes.SEARCH} component={DelegatedSearchPage} />
             <Route path={Routes.message_show(':index', ':messageId')} component={ShowMessagePage} />
             <Route path={Routes.SOURCES} component={SourcesPage} />
             <Route path={Routes.stream_search(':streamId')} component={StreamSearchPage} />
