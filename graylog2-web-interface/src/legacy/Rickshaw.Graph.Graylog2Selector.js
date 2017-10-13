@@ -110,14 +110,7 @@ const Graylog2Selector = Rickshaw.Class.create({
 
       SearchStore.changeTimeRange('absolute', { from: fromDate.toString(), to: toDate.toString() });
 
-      $('.timerange-selector-container').effect('bounce', {
-        complete() {
-                    // Submit search directly if alt key is pressed.
-          if (e.altKey) {
-            submitSearch();
-          }
-        },
-      });
+      $('.timerange-selector-container').effect('bounce');
 
       clearSelection();
     }, false);
