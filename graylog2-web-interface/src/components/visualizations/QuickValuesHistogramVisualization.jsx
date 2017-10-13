@@ -5,6 +5,7 @@ import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
 import _ from 'lodash';
+import Immutable from 'immutable';
 import deepEqual from 'deep-equal';
 import naturalSort from 'javascript-natural-sort';
 import graphHelper from 'legacy/graphHelper';
@@ -21,7 +22,8 @@ const QuickValuesHistogramVisualization = React.createClass({
   },
   DEFAULT_HEIGHT: 220,
 
-  CHART_MARGINS: { left: 50, right: 15, top: 10, bottom: 35 },
+  // dc.js is modifying the margins passed into the graph so make sure this is immutable
+  CHART_MARGINS: Immutable.fromJS({ left: 50, right: 15, top: 10, bottom: 35 }),
 
   propTypes: {
     id: PropTypes.string.isRequired,
@@ -155,7 +157,7 @@ const QuickValuesHistogramVisualization = React.createClass({
     const legendPrefix = sortOrder === 'asc' ? 'Bottom' : 'Top';
     const legend = dc.legend()
       .horizontal(true)
-      .x(this._getChartMargins().left)
+      .x(this.CHART_MARGINS.get('left'))
       .y(height - 20)
       .itemHeight(12)
       .autoItemWidth(true)
@@ -176,10 +178,6 @@ const QuickValuesHistogramVisualization = React.createClass({
     }
   },
 
-  _getChartMargins() {
-    return this.CHART_MARGINS;
-  },
-
   _renderChart() {
     const { interval, timerange, limit, sortOrder, width, height } = this.state;
     const dimension = this._crossfilter.dimension(d => d3.time[interval](d.key));
@@ -189,7 +187,7 @@ const QuickValuesHistogramVisualization = React.createClass({
     this._chart
       .width(width)
       .height(height)
-      .margins(this._getChartMargins())
+      .margins(this.CHART_MARGINS.toJS())
       .dimension(dimension)
       .x(d3.time.scale.utc().domain([timerange.from, timerange.to]))
       .elasticX(false)
