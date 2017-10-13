@@ -73,6 +73,10 @@ const QuickValuesHistogramVisualization = React.createClass({
       return;
     }
 
+    if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
+      this._resizeChart(nextProps.width, nextProps.height, this.state.sortOrder);
+    }
+
     if (nextProps.data) {
       this._updateData(nextProps);
     }
@@ -238,10 +242,7 @@ const QuickValuesHistogramVisualization = React.createClass({
     this._chart
       .x(d3.time.scale.utc().domain([timerange.from, timerange.to]))
       .round(d3.time[interval].utc.round)
-      .xUnits(d3.time[interval].utc.range)
-      .margins(this._getChartMargins())
-      .width(width)
-      .height(height);
+      .xUnits(d3.time[interval].utc.range);
 
     // Redraw and rescale to ensure a correct graph
     this._chart.rescale().redraw();
@@ -249,9 +250,9 @@ const QuickValuesHistogramVisualization = React.createClass({
 
   _resizeChart(width, height, sortOrder) {
     this._addChartLegend(height, sortOrder);
-    this._chart.width(width)
+    this._chart
+      .width(width)
       .height(height)
-      .margins(this._getChartMargins())
       .rescale()
       .redraw();
   },
