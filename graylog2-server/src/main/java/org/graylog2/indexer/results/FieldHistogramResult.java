@@ -107,7 +107,7 @@ public class FieldHistogramResult extends HistogramResult {
         while (currentTime.getMillis() < maxTimestamp) {
             final Map<String, Number> entry = results.get(currentTime.getMillis());
 
-            // advance timestamp by the interval's seconds value
+            // advance timestamp by the interval
             currentTime.add(interval.getPeriod());
 
             if (entry == null) {

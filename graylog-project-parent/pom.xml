@@ -118,12 +118,6 @@
             </dependency>
 
             <dependency>
-                <groupId>net.java.dev.jna</groupId>
-                <artifactId>jna</artifactId>
-                <version>${jna.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>org.kie</groupId>
                 <artifactId>kie-api</artifactId>
                 <version>${drools.version}</version>
@@ -541,7 +535,7 @@
             <dependency>
                 <groupId>com.github.joschi.nosqlunit</groupId>
                 <artifactId>nosqlunit-elasticsearch-http</artifactId>
-                <version>1.0.0-4+jackson</version>
+                <version>${nosqlunit-elasticsearch-http.version}</version>
                 <scope>test</scope>
             </dependency>
             <dependency>

@@ -65,7 +65,7 @@
 
         <it.es.httpPort>19200</it.es.httpPort>
         <it.es.transportPort>19300</it.es.transportPort>
-        <it.es.version>5.5.2</it.es.version>
+        <it.es.version>5.6.4</it.es.version>
         <it.es.instanceCount>1</it.es.instanceCount>
         <it.es.clusterName>test</it.es.clusterName>
         <it.es.await>false</it.es.await>
@@ -272,11 +272,6 @@
         <dependency>
             <groupId>org.graylog.jest</groupId>
             <artifactId>jest</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>net.java.dev.jna</groupId>
-            <artifactId>jna</artifactId>
         </dependency>
 
         <dependency>
@@ -859,7 +854,7 @@
                 </property>
             </activation>
             <properties>
-                <it.es.version>5.5.2</it.es.version>
+                <it.es.version>5.6.4</it.es.version>
             </properties>
             <build>
                 <plugins>
