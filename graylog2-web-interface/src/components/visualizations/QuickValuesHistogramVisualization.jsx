@@ -157,7 +157,7 @@ const QuickValuesHistogramVisualization = React.createClass({
     const legendPrefix = sortOrder === 'asc' ? 'Bottom' : 'Top';
     const legend = dc.legend()
       .horizontal(true)
-      .x(this.CHART_MARGINS.get('left'))
+      .x(this.CHART_MARGINS.get('left') + 12)
       .y(height - 20)
       .itemHeight(12)
       .autoItemWidth(true)
