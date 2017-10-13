@@ -68,6 +68,7 @@ const QuickValuesOptionsForm = React.createClass({
         return { value: field.name, label: field.name };
       });
 
+    let tableSizeForm = null;
     let intervalForm = null;
     if (this.props.isHistogram) {
       const intervalOptions = SearchUtils.histogramIntervals().map((interval) => {
@@ -80,6 +81,16 @@ const QuickValuesOptionsForm = React.createClass({
                   value={this.state.interval}
                   onChange={this._onIntervalChange} />
         </FormGroup>
+      );
+    } else {
+      tableSizeForm = (
+        <Input type="number"
+               id="tableSize"
+               name="tableSize"
+               label="Total table size"
+               required
+               onChange={this._onChange}
+               value={this.state.tableSize} />
       );
     }
 
@@ -96,13 +107,9 @@ const QuickValuesOptionsForm = React.createClass({
                      required
                      onChange={this._onChange}
                      value={this.state.limit} />
-              <Input type="number"
-                     id="tableSize"
-                     name="tableSize"
-                     label="Total table size"
-                     required
-                     onChange={this._onChange}
-                     value={this.state.tableSize} />
+
+              {tableSizeForm}
+
               <FormGroup>
                 <ControlLabel>Sort options</ControlLabel>
                 <Input type="radio"

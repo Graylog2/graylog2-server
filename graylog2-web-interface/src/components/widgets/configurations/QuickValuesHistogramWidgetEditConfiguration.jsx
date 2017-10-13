@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Input } from 'components/bootstrap';
+import { FormGroup, ControlLabel } from 'react-bootstrap';
+import { Select } from 'components/common';
+import SearchUtils from 'util/SearchUtils';
 
 import { QueryConfiguration, QuickValuesConfiguration } from 'components/widgets/configurations';
 
@@ -10,27 +12,25 @@ const QuickValuesHistogramWidgetEditConfiguration = React.createClass({
     onChange: PropTypes.func.isRequired,
   },
 
-  INTERVALS: ['year', 'quarter', 'month', 'week', 'day', 'hour', 'minute'],
+  _onIntervalChange(value) {
+    this.props.onChange('interval', value);
+  },
 
   render() {
+    const intervalOptions = SearchUtils.histogramIntervals().map((i) => {
+      return { value: i, label: i };
+    });
+
     return (
       <fieldset>
         <QueryConfiguration {...this.props} />
         <QuickValuesConfiguration isHistogram {...this.props} />
-        <Input type="select"
-               name="interval"
-               label="Interval"
-               defaultValue={this.props.config.interval}
-               onChange={this.props.onChange}
-               help="The interval for the buckets in the histogram.">
-          {this.INTERVALS.map((interval) => {
-            return (
-              <option key={interval} value={interval}>
-                {interval}
-              </option>
-            );
-          })}
-        </Input>
+        <FormGroup>
+          <ControlLabel>Interval</ControlLabel>
+          <Select options={intervalOptions}
+                  value={this.props.config.interval}
+                  onChange={this._onIntervalChange} />
+        </FormGroup>
       </fieldset>
     );
   },
