@@ -67,7 +67,7 @@ const QuickValuesHistogramVisualization = React.createClass({
   componentDidMount() {
     this._renderChart();
     // Resize the chart after rendering it to get the actual width and height of the container
-    this._resizeChart(this._chartRef.clientWidth, this._chartRef.clientHeight, this.state.sortOrder);
+    this._resizeChart(this._chartRef.clientWidth, this._chartRef.clientHeight);
   },
 
   componentWillReceiveProps(nextProps) {
@@ -76,7 +76,7 @@ const QuickValuesHistogramVisualization = React.createClass({
     }
 
     if (nextProps.height !== this.props.height || nextProps.width !== this.props.width) {
-      this._resizeChart(nextProps.width, nextProps.height, this.state.sortOrder);
+      this._resizeChart(nextProps.width, nextProps.height);
     }
 
     if (nextProps.data) {
@@ -153,8 +153,8 @@ const QuickValuesHistogramVisualization = React.createClass({
     return { all: () => { return this.state.data; } };
   },
 
-  _addChartLegend(height, sortOrder) {
-    const legendPrefix = sortOrder === 'asc' ? 'Bottom' : 'Top';
+  _addChartLegend(height) {
+    const legendPrefix = this.state.sortOrder === 'asc' ? 'Bottom' : 'Top';
     const legend = dc.legend()
       .horizontal(true)
       .x(this.CHART_MARGINS.get('left') + 12)
@@ -179,7 +179,7 @@ const QuickValuesHistogramVisualization = React.createClass({
   },
 
   _renderChart() {
-    const { interval, timerange, limit, sortOrder, width, height } = this.state;
+    const { interval, timerange, limit, width, height } = this.state;
     const dimension = this._crossfilter.dimension(d => d3.time[interval](d.key));
 
     this._chart = dc.barChart(this._chartRef);
@@ -210,7 +210,7 @@ const QuickValuesHistogramVisualization = React.createClass({
       })
       .renderLabel(false);
 
-    this._addChartLegend(height, sortOrder);
+    this._addChartLegend(height);
     this._addChartStacks(limit);
 
     this._chart.xAxis()
@@ -226,7 +226,7 @@ const QuickValuesHistogramVisualization = React.createClass({
   },
 
   _redrawChart() {
-    const { data, timerange, interval, limit, sortOrder, width, height } = this.state;
+    const { data, timerange, interval, limit } = this.state;
 
     // Replace data in crossfilter
     this._crossfilter.remove();
@@ -234,7 +234,6 @@ const QuickValuesHistogramVisualization = React.createClass({
 
     // Add all the data stacks to the chart
     this._addChartStacks(limit);
-    this._addChartLegend(height, sortOrder);
 
     // Update chart properties to new data
     this._chart
@@ -246,8 +245,8 @@ const QuickValuesHistogramVisualization = React.createClass({
     this._chart.rescale().redraw();
   },
 
-  _resizeChart(width, height, sortOrder) {
-    this._addChartLegend(height, sortOrder);
+  _resizeChart(width, height) {
+    this._addChartLegend(height);
     this._chart
       .width(width)
       .height(height)
@@ -258,7 +257,7 @@ const QuickValuesHistogramVisualization = React.createClass({
   render() {
     return (
       <div>
-        <div ref={(c) => { this._chartRef = c; }} className="stacked-chart-viz" id={`visualization-${this.props.id}`} style={{ width: '100%' }} />
+        <div ref={(c) => { this._chartRef = c; }} id={`visualization-${this.props.id}`} style={{ width: '100%' }} />
       </div>
     );
   },
