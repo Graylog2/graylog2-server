@@ -18,8 +18,8 @@ package org.graylog2.indexer;
 
 import com.github.zafarkhaja.semver.Version;
 import org.graylog2.indexer.cluster.Node;
-import org.junit.Rule;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -50,7 +50,7 @@ public class IndexMappingFactoryTest {
     }
 
     @Test
-    public void createIndexMappingFailsIfElasticsearchVersionIsTooLow() throws Exception {
+    public void createIndexMappingFailsIfElasticsearch1VersionIsTooLow() throws Exception {
         when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("1.7.3")));
 
         assertThatThrownBy(indexMappingFactory::createIndexMapping)
@@ -70,7 +70,7 @@ public class IndexMappingFactoryTest {
     }
 
     @Test
-    public void createIndexMappingFailsIfElasticsearchVersionIsTooHigh() throws Exception {
+    public void createIndexMappingFailsIfElasticsearch6VersionIsTooHigh() throws Exception {
         when(node.getVersion()).thenReturn(Optional.of(Version.valueOf("6.0.0")));
 
         assertThatThrownBy(indexMappingFactory::createIndexMapping)
@@ -84,11 +84,6 @@ public class IndexMappingFactoryTest {
         @Parameterized.Parameters
         public static Collection<Object[]> data() {
             return Arrays.asList(new Object[][]{
-                    {"2.1.0", IndexMapping2.class},
-                    {"2.2.0", IndexMapping2.class},
-                    {"2.3.0", IndexMapping2.class},
-                    {"2.4.0", IndexMapping2.class},
-                    {"2.4.5", IndexMapping2.class},
                     {"5.0.0", IndexMapping5.class},
                     {"5.1.0", IndexMapping5.class},
                     {"5.2.0", IndexMapping5.class},

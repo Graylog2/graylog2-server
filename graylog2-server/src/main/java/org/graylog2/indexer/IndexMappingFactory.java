@@ -33,9 +33,7 @@ public class IndexMappingFactory {
 
     public IndexMapping createIndexMapping() {
         final Version elasticsearchVersion = node.getVersion().orElseThrow(() -> new ElasticsearchException("Unable to retrieve Elasticsearch version."));
-        if (elasticsearchVersion.satisfies(">=2.1.0 & <5.0.0")) {
-            return new IndexMapping2();
-        } else if (elasticsearchVersion.satisfies("^5.0.0")) {
+        if (elasticsearchVersion.satisfies("^5.0.0")) {
             return new IndexMapping5();
         } else {
             throw new ElasticsearchException("Unsupported Elasticsearch version: " + elasticsearchVersion);
