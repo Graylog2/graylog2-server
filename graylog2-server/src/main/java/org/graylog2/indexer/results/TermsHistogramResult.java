@@ -43,7 +43,7 @@ public class TermsHistogramResult extends IndexQueryResult {
         if (result != null) {
             for (DateHistogramAggregation.DateHistogram histogram : result.getBuckets()) {
                 final DateTime keyAsDate = new DateTime(histogram.getKey());
-                final TermsAggregation termsAggregation = histogram.getTermsAggregation(Searches.AGG_TERMS);
+                final TermsAggregation termsAggregation = histogram.getFilterAggregation(Searches.AGG_FILTER).getTermsAggregation(Searches.AGG_TERMS);
                 final MissingAggregation missingAgregation = histogram.getMissingAggregation("missing");
                 final TermsResult termsResult = new TermsResult(termsAggregation, missingAgregation.getMissing(), histogram.getCount(), "", "", tookMs);
 

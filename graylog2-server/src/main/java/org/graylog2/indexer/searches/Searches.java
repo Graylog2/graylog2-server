@@ -43,11 +43,11 @@ import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
 import org.elasticsearch.script.ScriptService;
+import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
@@ -280,31 +280,43 @@ public class Searches {
         return new SearchResult(hits, searchResult.getTotal(), indexRanges, config.query(), requestBuilder.toString(), tookMsFromSearchResult(searchResult));
     }
 
-    public TermsBuilder createTermsBuilder(String field, List<String> stackedFields, int size, Terms.Order termsOrder) {
+    public AbstractAggregationBuilder createTermsBuilder(String field, List<String> stackedFields, int size, Terms.Order termsOrder) {
         if (stackedFields.isEmpty()) {
-            return AggregationBuilders.terms(AGG_TERMS)
-                    .field(field)
-                    .size(size > 0 ? size : 50)
-                    .order(termsOrder);
+            // Wrap terms aggregation in a no-op filter to make sure the result structure is correct when not having
+            // stacked fields.
+            return AggregationBuilders.filter(AGG_FILTER)
+                    .filter(QueryBuilders.matchAllQuery())
+                    .subAggregation(AggregationBuilders.terms(AGG_TERMS)
+                            .field(field)
+                            .size(size > 0 ? size : 50)
+                            .order(termsOrder));
         }
 
         // If the methods gets stacked fields, we have to use scripting to concatenate the fields.
         // There is currently no other way to do this. (as of ES 5.6)
         final StringBuilder scriptStringBuilder = new StringBuilder();
 
+        // Build a filter for the terms aggregation to make sure we only get terms for messages where all fields
+        // exist.
+        final BoolQueryBuilder filterQuery = QueryBuilders.boolQuery();
+
         // Add the main field
         scriptStringBuilder.append("doc['").append(field).append("'].value");
+        filterQuery.must(QueryBuilders.existsQuery(field));
 
         // Add all other fields
         stackedFields.forEach(f -> {
             scriptStringBuilder.append(" + ' - ' + ");
             scriptStringBuilder.append("doc['").append(f).append("'].value");
+            filterQuery.must(QueryBuilders.existsQuery(f));
         });
 
-        return AggregationBuilders.terms(AGG_TERMS)
-                .script(new Script(scriptStringBuilder.toString(), ScriptService.ScriptType.INLINE, "painless", null))
-                .size(size > 0 ? size : 50)
-                .order(termsOrder);
+        return AggregationBuilders.filter(AGG_FILTER)
+                .filter(filterQuery)
+                .subAggregation(AggregationBuilders.terms(AGG_TERMS)
+                        .script(new Script(scriptStringBuilder.toString(), ScriptService.ScriptType.INLINE, "painless", null))
+                        .size(size > 0 ? size : 50)
+                        .order(termsOrder));
     }
 
     public TermsResult terms(String field, List<String> stackedFields, int size, String query, String filter, TimeRange range, Sorting.Direction sorting) {
@@ -329,7 +341,7 @@ public class Searches {
 
         recordEsMetrics(searchResult, range);
 
-        final TermsAggregation termsAggregation = searchResult.getAggregations().getTermsAggregation(AGG_TERMS);
+        final TermsAggregation termsAggregation = searchResult.getAggregations().getFilterAggregation(AGG_FILTER).getTermsAggregation(AGG_TERMS);
         final MissingAggregation missing = searchResult.getAggregations().getMissingAggregation("missing");
 
         return new TermsResult(
