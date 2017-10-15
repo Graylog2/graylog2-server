@@ -30,7 +30,7 @@ public class LookupValue extends AbstractFunction<Object> {
                 .description("The key to lookup in the table")
                 .build();
         defaultParam = object("default")
-                .description("The default that should be used if there is no lookup result")
+                .description("The default single value that should be used if there is no lookup result")
                 .optional()
                 .build();
     }
@@ -57,7 +57,7 @@ public class LookupValue extends AbstractFunction<Object> {
         //noinspection unchecked
         return FunctionDescriptor.builder()
                 .name(NAME)
-                .description("Looks a value up in the named lookup table.")
+                .description("Looks up a single value in the named lookup table.")
                 .params(lookupTableParam, keyParam, defaultParam)
                 .returnType(Object.class)
                 .build();

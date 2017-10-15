@@ -35,7 +35,7 @@ public class Lookup extends AbstractFunction<Map<Object, Object>> {
                 .description("The key to lookup in the table")
                 .build();
         defaultParam = object("default")
-                .description("The default that should be used if there is no lookup result")
+                .description("The default multi value that should be used if there is no lookup result")
                 .optional()
                 .build();
     }
@@ -62,7 +62,7 @@ public class Lookup extends AbstractFunction<Map<Object, Object>> {
         //noinspection unchecked
         return FunctionDescriptor.<Map<Object, Object>>builder()
                 .name(NAME)
-                .description("Looks a value up in the named lookup table.")
+                .description("Looks up a multi value in the named lookup table.")
                 .params(lookupTableParam, keyParam, defaultParam)
                 .returnType((Class<? extends Map<Object, Object>>) new TypeLiteral<Map<Object, Object>>() {}.getRawType())
                 .build();
