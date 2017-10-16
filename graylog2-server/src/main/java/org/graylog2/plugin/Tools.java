@@ -16,10 +16,14 @@
  */
 package org.graylog2.plugin;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSortedSet;
 import com.google.common.io.BaseEncoding;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Doubles;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -71,6 +75,7 @@ public final class Tools {
 
     public static final DateTimeFormatter ES_DATE_FORMAT_FORMATTER = DateTimeFormat.forPattern(Tools.ES_DATE_FORMAT).withZoneUTC();
     public static final DateTimeFormatter ISO_DATE_FORMAT_FORMATTER = ISODateTimeFormat.dateTime().withZoneUTC();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     private Tools() {
     }
@@ -632,6 +637,20 @@ public final class Tools {
         @Override
         public void uncaughtException(Thread t, Throwable e) {
             log.error("Thread {} failed by not catching exception: {}.", t.getName(), e);
+        }
+    }
+
+    public static Optional<AbsoluteRange> extractHistogramBoundaries(final String query) {
+        try {
+            final JsonParser jp = OBJECT_MAPPER.getFactory().createParser(query);
+            final JsonNode rootNode = OBJECT_MAPPER.readTree(jp);
+            final JsonNode timestampNode = rootNode.findValue("range").findValue("timestamp");
+            final String from = elasticSearchTimeFormatToISO8601(timestampNode.findValue("from").asText());
+            final String to = elasticSearchTimeFormatToISO8601(timestampNode.findValue("to").asText());
+
+            return Optional.of(AbsoluteRange.create(from, to));
+        } catch (Exception ignored) {
+            return Optional.empty();
         }
     }
 }
