@@ -14,10 +14,10 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package org.graylog2.indexer.rotation;
 
 import org.graylog2.indexer.rotation.strategies.MessageCountRotationStrategy;
+import org.graylog2.indexer.rotation.strategies.NoopRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.SizeBasedRotationStrategy;
 import org.graylog2.indexer.rotation.strategies.TimeBasedRotationStrategy;
 import org.graylog2.plugin.PluginModule;
@@ -28,6 +28,6 @@ public class RotationStrategyBindings extends PluginModule {
         addRotationStrategy(MessageCountRotationStrategy.class);
         addRotationStrategy(SizeBasedRotationStrategy.class);
         addRotationStrategy(TimeBasedRotationStrategy.class);
+        addRotationStrategy(NoopRotationStrategy.class);
     }
-
 }
