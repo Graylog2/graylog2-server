@@ -12,7 +12,7 @@ nbproject/*
 coverage
 build.xml
 nbactions.xml
-
+test
 data/*
 
 .DS_Store
