@@ -131,7 +131,7 @@ const QuickValuesHistogramVisualization = React.createClass({
       const terms = _.reduce(bucket.terms, (termResult, count, term) => {
         termResult.push({ term: term, count: count });
         return termResult;
-      }, []).sort((a, b) => naturalSort(a.term, b.term));
+      }, []).sort((a, b) => naturalSort(b.count, a.count));
 
       result.push({
         key: new Date(timestamp * 1000),
