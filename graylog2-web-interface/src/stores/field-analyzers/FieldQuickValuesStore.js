@@ -61,6 +61,56 @@ const FieldQuickValuesStore = Reflux.createStore({
 
     FieldQuickValuesActions.get.promise(promise);
   },
+
+  getHistogram(field, options = {}) {
+    const { order, limit, stackedFields, interval } = options;
+
+    this.trigger({ loading: true });
+    const originalSearchURLParams = SearchStore.getOriginalSearchURLParams();
+    const streamId = SearchStore.searchInStream ? SearchStore.searchInStream.id : null;
+
+    const rangeType = originalSearchURLParams.get('rangetype');
+    const timerange = {};
+    switch (rangeType) {
+      case 'relative':
+        timerange.range = originalSearchURLParams.get('relative');
+        break;
+      case 'absolute':
+        timerange.from = originalSearchURLParams.get('from');
+        timerange.to = originalSearchURLParams.get('to');
+        break;
+      case 'keyword':
+        timerange.keyword = originalSearchURLParams.get('keyword');
+        break;
+      default:
+      // Do nothing
+    }
+
+    const url = ApiRoutes.UniversalSearchApiController.fieldTermsHistogram(
+      rangeType,
+      originalSearchURLParams.get('q') || '*',
+      field,
+      order,
+      limit,
+      stackedFields,
+      timerange,
+      interval,
+      streamId,
+    ).url;
+
+    const promise = fetch('GET', URLUtils.qualifyUrl(url));
+    promise.then(
+      (response) => {
+        this.trigger({ data: response, loading: false });
+      },
+      (error) => {
+        UserNotification.error(`Loading quick values histogram failed with status: ${error}`,
+          'Could not load quick values histogram');
+      },
+    );
+
+    FieldQuickValuesActions.getHistogram.promise(promise);
+  },
 });
 
 export default FieldQuickValuesStore;

@@ -16,36 +16,41 @@
  */
 package org.graylog2.dashboards.widgets.strategies;
 
-import com.google.common.collect.Maps;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
-import org.graylog2.indexer.results.TermsResult;
 import org.graylog2.indexer.searches.Searches;
 import org.graylog2.indexer.searches.Sorting;
 import org.graylog2.plugin.dashboards.widgets.ComputationResult;
 import org.graylog2.plugin.dashboards.widgets.WidgetStrategy;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
+import org.graylog2.rest.models.search.responses.TermsHistogramResult;
+import org.graylog2.utilities.SearchUtils;
 
 import java.util.Map;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.graylog2.utilities.SearchUtils.buildTermsHistogramResult;
 
-public class QuickvaluesWidgetStrategy extends QuickvaluesBaseWidgetStrategy {
-
-    public interface Factory extends WidgetStrategy.Factory<QuickvaluesWidgetStrategy> {
+public class QuickvaluesHistogramWidgetStrategy extends QuickvaluesBaseWidgetStrategy {
+    public interface Factory extends WidgetStrategy.Factory<QuickvaluesHistogramWidgetStrategy> {
         @Override
-        QuickvaluesWidgetStrategy create(Map<String, Object> config, TimeRange timeRange, String widgetId);
+        QuickvaluesHistogramWidgetStrategy create(Map<String, Object> config, TimeRange timeRange, String widgetId);
     }
 
-    private final int dataTableLimit;
+    private final int limit;
+    private final Searches.DateHistogramInterval interval;
 
     @AssistedInject
-    public QuickvaluesWidgetStrategy(Searches searches, @Assisted Map<String, Object> config, @Assisted TimeRange timeRange, @Assisted String widgetId) throws InvalidWidgetConfigurationException {
+    public QuickvaluesHistogramWidgetStrategy(Searches searches,
+                                              @Assisted Map<String, Object> config,
+                                              @Assisted TimeRange timeRange,
+                                              @Assisted String widgetId) throws InvalidWidgetConfigurationException {
         super(searches, timeRange, config, widgetId);
 
-        this.dataTableLimit = (int) firstNonNull(config.get("data_table_limit"), 50);
+        this.limit = (int) firstNonNull(config.get("limit"), 5);
+        this.interval = SearchUtils.buildInterval((String) config.get("interval"), timeRange);
     }
 
     @Override
@@ -56,14 +61,8 @@ public class QuickvaluesWidgetStrategy extends QuickvaluesBaseWidgetStrategy {
         }
 
         final Sorting.Direction sortDirection = getSortingDirection(sortOrder);
-        final TermsResult terms = searches.terms(field, stackedFields, dataTableLimit, query, filter, this.timeRange, sortDirection);
+        final TermsHistogramResult termsHistogram = buildTermsHistogramResult(searches.termsHistogram(field, stackedFields, limit, query, filter, timeRange, interval, sortDirection));
 
-        Map<String, Object> result = Maps.newHashMap();
-        result.put("terms", terms.getTerms());
-        result.put("total", terms.getTotal());
-        result.put("other", terms.getOther());
-        result.put("missing", terms.getMissing());
-
-        return new ComputationResult(result, terms.tookMs());
+        return new ComputationResult(termsHistogram, termsHistogram.time());
     }
 }

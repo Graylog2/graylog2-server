@@ -43,6 +43,7 @@ import org.graylog2.rest.resources.search.responses.SearchResponse;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.utilities.ExceptionUtils;
+import org.graylog2.utilities.SearchUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.slf4j.Logger;
@@ -77,11 +78,9 @@ public abstract class SearchResource extends RestResource {
     }
 
     protected void validateInterval(String interval) {
-        try {
-            Searches.DateHistogramInterval.valueOf(interval);
-        } catch (IllegalArgumentException e) {
-            LOG.warn("Invalid interval type. Returning HTTP 400.");
-            throw new BadRequestException("Invalid interval type", e);
+        if (!SearchUtils.validateInterval(interval)) {
+            LOG.warn("Invalid interval type <{}>. Returning HTTP 400.", interval);
+            throw new BadRequestException("Invalid interval type: " + interval + "\"");
         }
     }
 
