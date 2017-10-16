@@ -38,4 +38,3 @@ dependency-reduced-pom.xml
 /graylog2-server/src/main/resources/web-interface/assets/**/*
 
 **/hs_err_pid*.log
-graylog2-web-interface/webpack/vendor-module-ids.json
