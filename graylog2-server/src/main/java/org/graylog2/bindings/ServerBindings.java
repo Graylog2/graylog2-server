@@ -32,7 +32,6 @@ import org.graylog2.bindings.providers.ClusterEventBusProvider;
 import org.graylog2.bindings.providers.DefaultSecurityManagerProvider;
 import org.graylog2.bindings.providers.DefaultStreamProvider;
 import org.graylog2.bindings.providers.MongoConnectionProvider;
-import org.graylog2.bindings.providers.RulesEngineProvider;
 import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.bundles.BundleService;
@@ -58,7 +57,6 @@ import org.graylog2.inputs.InputEventListener;
 import org.graylog2.inputs.InputStateListener;
 import org.graylog2.inputs.PersistedInputsImpl;
 import org.graylog2.lookup.LookupModule;
-import org.graylog2.plugin.RulesEngine;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.streams.DefaultStream;
@@ -159,7 +157,6 @@ public class ServerBindings extends Graylog2Module {
         }
 
         bind(SystemJobManager.class).toProvider(SystemJobManagerProvider.class);
-        bind(RulesEngine.class).toProvider(RulesEngineProvider.class);
         bind(LdapConnector.class).in(Scopes.SINGLETON);
         bind(LdapUserAuthenticator.class).in(Scopes.SINGLETON);
         bind(DefaultSecurityManager.class).toProvider(DefaultSecurityManagerProvider.class).asEagerSingleton();
