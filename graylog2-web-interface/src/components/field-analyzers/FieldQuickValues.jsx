@@ -196,6 +196,7 @@ const FieldQuickValues = React.createClass({
       inner = (
         <div className={style.visualizationWrapper}>
           <QuickValuesVisualization id={this.state.field}
+                                    field={this.state.field}
                                     config={config}
                                     data={this.state.data}
                                     horizontal
