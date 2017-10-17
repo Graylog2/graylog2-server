@@ -24,9 +24,6 @@ import org.graylog2.plugin.Version;
 import java.net.URI;
 import java.util.Set;
 
-/**
- * Implement the PluginMetaData interface here.
- */
 public class PipelineProcessorMetaData implements PluginMetaData {
     private static final String PLUGIN_PROPERTIES = "org.graylog.plugins.graylog-plugin-pipeline-processor/graylog-plugin.properties";
 
@@ -47,7 +44,7 @@ public class PipelineProcessorMetaData implements PluginMetaData {
 
     @Override
     public URI getURL() {
-        return URI.create("https://www.graylog.org/");
+        return URI.create("http://docs.graylog.org/en/latest/pages/pipelines.html");
     }
 
     @Override
