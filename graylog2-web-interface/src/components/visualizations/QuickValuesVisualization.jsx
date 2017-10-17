@@ -29,6 +29,7 @@ const QuickValuesVisualization = React.createClass({
   },
   propTypes: {
     id: PropTypes.string.isRequired,
+    field: PropTypes.string.isRequired,
     config: PropTypes.shape({
       show_pie_chart: PropTypes.bool,
       show_data_table: PropTypes.bool,
@@ -316,11 +317,11 @@ const QuickValuesVisualization = React.createClass({
     return this.state.total - this.state.missing;
   },
   _getAnalysisInformation() {
-    const analysisInformation = [`Found <em>${NumberUtils.formatNumber(this._getTotalMessagesWithField())}</em> messages with this field`];
+    const analysisInformation = [`Found <em>${NumberUtils.formatNumber(this._getTotalMessagesWithField())}</em> messages with field <em>${this.props.field}</em>`];
 
     if (this.state.missing !== 0) {
       let missingMessage = this.state.others === 0 ? ' and' : '';
-      missingMessage += ` <em>${NumberUtils.formatNumber(this.state.missing)}</em> messages without it`;
+      missingMessage += ` <em>${NumberUtils.formatNumber(this.state.missing)}</em> messages without field <em>${this.props.field}</em>`;
       analysisInformation.push(missingMessage);
     }
     if (this.state.others !== 0) {
