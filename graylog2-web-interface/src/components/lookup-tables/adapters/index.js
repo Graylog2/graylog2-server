@@ -3,7 +3,7 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import CSVFileAdapterFieldSet from './CSVFileAdapterFieldSet';
 import CSVFileAdapterSummary from './CSVFileAdapterSummary';
 import CSVFileAdapterDocumentation from './CSVFileAdapterDocumentation';
-import DSVHTTPAdapterFieldSet from './CSVFileAdapterFieldSet';
+import DSVHTTPAdapterFieldSet from './DSVHTTPAdapterFieldSet';
 import DSVHTTPAdapterSummary from './DSVHTTPAdapterSummary';
 import DSVHTTPAdapterDocumentation from './DSVHTTPAdapterDocumentation';
 import HTTPJSONPathAdapterFieldSet from './HTTPJSONPathAdapterFieldSet';
