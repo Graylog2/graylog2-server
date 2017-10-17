@@ -56,6 +56,7 @@ import org.graylog2.indexer.FieldTypeException;
 import org.graylog2.indexer.IndexHelper;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
+import org.graylog2.indexer.IndexSetRegistry;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.indices.Indices;
 import org.graylog2.indexer.ranges.IndexRange;
@@ -174,6 +175,7 @@ public class Searches {
     private final Counter esTotalSearchesCounter;
     private final StreamService streamService;
     private final Indices indices;
+    private final IndexSetRegistry indexSetRegistry;
     private final JestClient jestClient;
     private final ScrollResult.Factory scrollResultFactory;
 
@@ -183,6 +185,7 @@ public class Searches {
                     MetricRegistry metricRegistry,
                     StreamService streamService,
                     Indices indices,
+                    IndexSetRegistry indexSetRegistry,
                     JestClient jestClient,
                     ScrollResult.Factory scrollResultFactory) {
         this.configuration = requireNonNull(configuration, "configuration");
@@ -193,6 +196,7 @@ public class Searches {
         this.esTotalSearchesCounter = metricRegistry.counter(name(Searches.class, "elasticsearch", "total-searches"));
         this.streamService = requireNonNull(streamService, "streamService");
         this.indices = requireNonNull(indices, "indices");
+        this.indexSetRegistry = requireNonNull(indexSetRegistry, "indexSetRegistry");
         this.jestClient = requireNonNull(jestClient, "jestClient");
         this.scrollResultFactory = requireNonNull(scrollResultFactory, "scrollResultFactory");
     }
@@ -218,6 +222,9 @@ public class Searches {
 
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
+        final Set<String> indexWildcards = indexSetRegistry.getForIndices(affectedIndices).stream()
+                .map(IndexSet::getIndexWildcard)
+                .collect(Collectors.toSet());
 
         final String searchQuery;
         final Sorting sorting = new Sorting("_doc", Sorting.Direction.ASC);
@@ -230,9 +237,9 @@ public class Searches {
         final Search.Builder initialSearchBuilder = new Search.Builder(searchQuery)
             .addType(IndexMapping.TYPE_MESSAGE)
             .setParameter(Parameters.SCROLL, "1m")
-            .addIndex(affectedIndices);
+            .addIndex(indexWildcards);
         fields.forEach(initialSearchBuilder::addSourceIncludePattern);
-        final io.searchbox.core.SearchResult initialResult = wrapInMultiSearch(initialSearchBuilder.build(), () -> "Unable to perform scroll search");
+        final io.searchbox.core.SearchResult initialResult = checkForFailedShards(JestUtils.execute(jestClient, initialSearchBuilder.build(), () -> "Unable to perform scroll search"));
 
         recordEsMetrics(initialResult, range);
 

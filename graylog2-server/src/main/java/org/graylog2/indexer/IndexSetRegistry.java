@@ -48,6 +48,14 @@ public interface IndexSetRegistry extends Iterable<IndexSet> {
     Optional<IndexSet> getForIndex(String index);
 
     /**
+     * Returns the {@link IndexSet}s for the given indices.
+     *
+     * @param indices Collection with the name of the indicies
+     * @return Set of index sets which manages the given indices
+     */
+    Set<IndexSet> getForIndices(Collection<String> indices);
+
+    /**
      * Returns the {@link IndexSet} that is marked as default.
      *
      * Throws an {@link IllegalStateException} if the default index set does not exist.
