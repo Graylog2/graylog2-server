@@ -44,7 +44,7 @@ public class MapWidgetMetaData implements PluginMetaData {
 
     @Override
     public URI getURL() {
-        return URI.create("https://www.graylog.org/");
+        return URI.create("http://docs.graylog.org/en/latest/pages/geolocation.html");
     }
 
     @Override
