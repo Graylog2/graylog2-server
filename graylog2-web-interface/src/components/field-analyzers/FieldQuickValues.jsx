@@ -48,6 +48,7 @@ const FieldQuickValues = React.createClass({
         stackedFields: '',
         interval: undefined,
       },
+      loadingData: false,
     };
   },
 
@@ -93,10 +94,15 @@ const FieldQuickValues = React.createClass({
   },
   _loadQuickValuesData() {
     if (this.state.field !== undefined) {
+      this.setState({ loadingData: true });
       if (this.state.showHistogram) {
-        FieldQuickValuesActions.getHistogram(this.state.field, this.state.options);
+        FieldQuickValuesActions.getHistogram(this.state.field, this.state.options).then(() => {
+          this.setState({ loadingData: false });
+        });
       } else {
-        FieldQuickValuesActions.get(this.state.field, this.state.options);
+        FieldQuickValuesActions.get(this.state.field, this.state.options).then(() => {
+          this.setState({ loadingData: false });
+        });
       }
     }
   },
@@ -165,10 +171,10 @@ const FieldQuickValues = React.createClass({
                                   onCancel={this._onVizOptionsCancel} />
         </div>
       );
-    } else if (this.state.data.length === 0) {
+    } else if (this.state.loadingData || this.state.data.length === 0) {
       inner = (
         <div className={style.spinnerWrapper}>
-          <Spinner />;
+          <Spinner />
         </div>
       );
     } else if (this.state.showHistogram) {
