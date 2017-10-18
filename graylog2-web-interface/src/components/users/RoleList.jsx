@@ -1,11 +1,18 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import Reflux from 'reflux';
 import Immutable from 'immutable';
 import { Button } from 'react-bootstrap';
+
+import StoreProvider from 'injection/StoreProvider';
+
+import PermissionsMixin from 'util/PermissionsMixin';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import { DataTable } from 'components/common';
 
 const RoleList = React.createClass({
+  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
   propTypes: {
     roles: PropTypes.instanceOf(Immutable.Set).isRequired,
     showEditRole: PropTypes.func.isRequired,
@@ -16,21 +23,27 @@ const RoleList = React.createClass({
     const className = (header === 'Actions' ? 'actions' : '');
     return <th className={className}>{header}</th>;
   },
+  _editButton(role) {
+    if (this.isPermitted(this.state.currentUser.permissions, ['roles:edit:' + role.name]) === false || role.read_only) {
+        return null;
+    }
+    return (<Button key="edit" bsSize="xsmall" bsStyle="info" onClick={() => this.props.showEditRole(role)} title="Edit role">Edit</Button>);
+  },
+  _deleteButton(role) {
+    if (this.isPermitted(this.state.currentUser.permissions, ['roles:delete:' + role.name]) === false || role.read_only) {
+        return null;
+    }
+    return (<Button key="delete" bsSize="xsmall" bsStyle="primary" onClick={() => this.props.deleteRole(role)} title="Delete role">Delete</Button>);
+  },
   _roleInfoFormatter(role) {
-    const actions = [
-      <Button key="delete" bsSize="xsmall" bsStyle="primary" onClick={() => this.props.deleteRole(role)}
-              title="Delete role">Delete</Button>,
-      <span key="space">&nbsp;</span>,
-      <Button key="edit" bsSize="xsmall" bsStyle="info" onClick={() => this.props.showEditRole(role)}
-              title="Edit role">Edit</Button>,
-    ];
-
     return (
       <tr key={role.name}>
         <td>{role.name}</td>
         <td className="limited">{role.description}</td>
         <td>
-          {role.read_only ? null : actions}
+          {this._editButton(role)}
+          <span key="space">&nbsp;</span>
+          {this._deleteButton(role)}
         </td>
       </tr>
     );
