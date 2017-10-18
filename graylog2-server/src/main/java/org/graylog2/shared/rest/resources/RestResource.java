@@ -98,8 +98,8 @@ public abstract class RestResource {
 
     protected void checkPermission(String permission) {
         if (!isPermitted(permission)) {
-            final String userName = getSubject().getPrincipal().toString();
-            throw new ForbiddenException("Not authorized. User <" + userName + "> is missing permission <" + permission + ">");
+            LOG.info("Not authorized. User <{}> is missing permission <{}>", getSubject().getPrincipal(), permission);
+            throw new ForbiddenException("Not authorized");
         }
     }
 
@@ -109,8 +109,9 @@ public abstract class RestResource {
 
     protected void checkPermission(String permission, String instanceId) {
         if (!isPermitted(permission, instanceId)) {
-            final String userName = getSubject().getPrincipal().toString();
-            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">. User <" + userName + "> is missing permission <" + permission + ":" + instanceId + ">");
+            LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permission <{}:{}>",
+                    instanceId, getSubject().getPrincipal(), permission, instanceId);
+            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">");
         }
     }
 
@@ -133,8 +134,9 @@ public abstract class RestResource {
 
     protected void checkAnyPermission(String permissions[], String instanceId) {
         if (!isAnyPermitted(permissions, instanceId)) {
-            final String userName = getSubject().getPrincipal().toString();
-            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">. User <" + userName + "> is missing permissions " + Arrays.toString(permissions) + " on instance <" + instanceId + ">");
+            LOG.info("Not authorized to access resource id <{}>. User <{}> is missing permissions {} on instance <{}>",
+                    instanceId, getSubject().getPrincipal(), Arrays.toString(permissions), instanceId);
+            throw new ForbiddenException("Not authorized to access resource id <" + instanceId + ">");
         }
     }
 
