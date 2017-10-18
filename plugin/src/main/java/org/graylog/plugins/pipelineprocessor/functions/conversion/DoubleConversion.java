@@ -46,11 +46,15 @@ public class DoubleConversion extends AbstractFunction<Double> {
     public Double evaluate(FunctionArgs args, EvaluationContext context) {
         final Object evaluated = valueParam.required(args, context);
         final Double defaultValue = defaultParam.optional(args, context).orElse(0d);
+
         if (evaluated == null) {
             return defaultValue;
+        } else if (evaluated instanceof Number) {
+            return ((Number) evaluated).doubleValue();
+        } else {
+            final String s = String.valueOf(evaluated);
+            return firstNonNull(Doubles.tryParse(s), defaultValue);
         }
-        return firstNonNull(Doubles.tryParse(evaluated.toString()),
-                            defaultValue);
     }
 
     @Override

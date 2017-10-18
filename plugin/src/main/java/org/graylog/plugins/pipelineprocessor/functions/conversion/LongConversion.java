@@ -48,7 +48,14 @@ public class LongConversion extends AbstractFunction<Long> {
         final Object evaluated = valueParam.required(args, context);
         final Long defaultValue = defaultParam.optional(args, context).orElse(0L);
 
-        return firstNonNull(tryParse(String.valueOf(evaluated)), defaultValue);
+        if (evaluated == null) {
+            return defaultValue;
+        } else if (evaluated instanceof Number) {
+            return ((Number) evaluated).longValue();
+        } else {
+            final String s = String.valueOf(evaluated);
+            return firstNonNull(tryParse(s), defaultValue);
+        }
     }
 
     @Override
