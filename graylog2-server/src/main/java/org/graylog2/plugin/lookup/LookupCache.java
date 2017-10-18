@@ -23,6 +23,7 @@ import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.util.concurrent.AbstractIdleService;
 import com.google.inject.assistedinject.Assisted;
+import org.graylog2.shared.metrics.MetricUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,6 @@ public abstract class LookupCache extends AbstractIdleService {
     private final Meter hitCount;
     private final Meter missCount;
     private final Timer lookupTimer;
-    private final Gauge entryCount;
 
     private AtomicReference<Throwable> error = new AtomicReference<>();
 
@@ -60,7 +60,7 @@ public abstract class LookupCache extends AbstractIdleService {
         this.hitCount = metricRegistry.meter(MetricRegistry.name("org.graylog2.lookup.caches", id, "hits"));
         this.missCount = metricRegistry.meter(MetricRegistry.name("org.graylog2.lookup.caches", id, "misses"));
         this.lookupTimer = metricRegistry.timer(MetricRegistry.name("org.graylog2.lookup.caches", id, "lookupTime"));
-        this.entryCount = metricRegistry.register(MetricRegistry.name("org.graylog2.lookup.caches", id, "entries"), () -> entryCount());
+        MetricUtils.safelyRegister(metricRegistry, MetricRegistry.name("org.graylog2.lookup.caches", id, "entries"), entryCount());
     }
 
     public void incrTotalCount() {
