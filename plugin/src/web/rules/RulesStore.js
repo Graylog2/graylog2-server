@@ -5,6 +5,7 @@ import RulesActions from './RulesActions';
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
+import naturalSort from 'javascript-natural-sort';
 
 const urlPrefix = '/plugins/org.graylog.plugins.pipelineprocessor';
 
@@ -33,7 +34,7 @@ const RulesStore = Reflux.createStore({
 
   _updateFunctionDescriptors(functions) {
     if (functions) {
-      this.functionDescriptors = functions;
+      this.functionDescriptors = functions.sort((fn1, fn2) => naturalSort(fn1.name, fn2.name));
     }
     this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
   },
