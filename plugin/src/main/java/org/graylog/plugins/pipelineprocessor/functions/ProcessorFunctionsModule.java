@@ -46,8 +46,6 @@ import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Decode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Encode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32HumanDecode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32HumanEncode;
-import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64Decode;
-import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64Encode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64UrlEncode;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32;
@@ -69,6 +67,7 @@ import org.graylog.plugins.pipelineprocessor.functions.messages.CreateMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.DropMessage;
 import org.graylog.plugins.pipelineprocessor.functions.messages.HasField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveField;
+import org.graylog.plugins.pipelineprocessor.functions.messages.RemoveFromStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RenameField;
 import org.graylog.plugins.pipelineprocessor.functions.messages.RouteToStream;
 import org.graylog.plugins.pipelineprocessor.functions.messages.SetField;
@@ -113,6 +112,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(DropMessage.NAME, DropMessage.class);
         addMessageProcessorFunction(CreateMessage.NAME, CreateMessage.class);
         addMessageProcessorFunction(CloneMessage.NAME, CloneMessage.class);
+        addMessageProcessorFunction(RemoveFromStream.NAME, RemoveFromStream.class);
         addMessageProcessorFunction(RouteToStream.NAME, RouteToStream.class);
         // helper service for route_to_stream
         serviceBinder().addBinding().to(StreamCacheService.class).in(Scopes.SINGLETON);

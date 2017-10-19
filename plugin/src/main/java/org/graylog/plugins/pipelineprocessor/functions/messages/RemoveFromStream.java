@@ -29,53 +29,49 @@ import org.graylog2.plugin.streams.Stream;
 import javax.inject.Provider;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 
 import static com.google.common.collect.ImmutableList.of;
-import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.bool;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.string;
 import static org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor.type;
 
-public class RouteToStream extends AbstractFunction<Void> {
+public class RemoveFromStream extends AbstractFunction<Void> {
 
-    public static final String NAME = "route_to_stream";
+    public static final String NAME = "remove_from_stream";
     private static final String ID_ARG = "id";
     private static final String NAME_ARG = "name";
-    private static final String REMOVE_FROM_DEFAULT = "remove_from_default";
     private final StreamCacheService streamCacheService;
     private final Provider<Stream> defaultStreamProvider;
     private final ParameterDescriptor<Message, Message> messageParam;
     private final ParameterDescriptor<String, String> nameParam;
     private final ParameterDescriptor<String, String> idParam;
-    private final ParameterDescriptor<Boolean, Boolean> removeFromDefault;
 
     @Inject
-    public RouteToStream(StreamCacheService streamCacheService, @DefaultStream Provider<Stream> defaultStreamProvider) {
+    public RemoveFromStream(StreamCacheService streamCacheService, @DefaultStream Provider<Stream> defaultStreamProvider) {
         this.streamCacheService = streamCacheService;
         this.defaultStreamProvider = defaultStreamProvider;
 
         messageParam = type("message", Message.class).optional().description("The message to use, defaults to '$message'").build();
-        nameParam = string(NAME_ARG).optional().description("The name of the stream to route the message to, must match exactly").build();
+        nameParam = string(NAME_ARG).optional().description("The name of the stream to remove the message from, must match exactly").build();
         idParam = string(ID_ARG).optional().description("The ID of the stream").build();
-        removeFromDefault = bool(REMOVE_FROM_DEFAULT).optional().description("After routing the message, remove it from the default stream").build();
     }
 
     @Override
     public Void evaluate(FunctionArgs args, EvaluationContext context) {
-        String id = idParam.optional(args, context).orElse("");
+        Optional<String> id = idParam.optional(args, context);
 
-        final Collection<Stream> streams;
-        if ("".equals(id)) {
-            final String name = nameParam.optional(args, context).orElse("");
-            if ("".equals(name)) {
-                return null;
-            }
-            streams = streamCacheService.getByName(name);
-            if (streams.isEmpty()) {
+        Collection<Stream> streams;
+        if (!id.isPresent()) {
+            final Optional<Collection<Stream>> foundStreams = nameParam.optional(args, context).map(streamCacheService::getByName);
+
+            if (!foundStreams.isPresent()) {
                 // TODO signal error somehow
                 return null;
+            } else {
+                streams = foundStreams.get();
             }
         } else {
-            final Stream stream = streamCacheService.getById(id);
+            final Stream stream = streamCacheService.getById(id.get());
             if (stream == null) {
                 return null;
             }
@@ -84,11 +80,12 @@ public class RouteToStream extends AbstractFunction<Void> {
         final Message message = messageParam.optional(args, context).orElse(context.currentMessage());
         streams.forEach(stream -> {
             if (!stream.isPaused()) {
-                message.addStream(stream);
+                message.removeStream(stream);
             }
         });
-        if (removeFromDefault.optional(args, context).orElse(Boolean.FALSE)) {
-            message.removeStream(defaultStreamProvider.get());
+        // always leave a message at least on the default stream if we removed the last stream it was on
+        if (message.getStreams().isEmpty()) {
+            message.addStream(defaultStreamProvider.get());
         }
         return null;
     }
@@ -101,9 +98,8 @@ public class RouteToStream extends AbstractFunction<Void> {
                 .params(of(
                         nameParam,
                         idParam,
-                        messageParam,
-                        removeFromDefault))
-                .description("Routes a message to a stream")
+                        messageParam))
+                .description("Removes a message from a stream. Removing the last stream will put the message back onto the default stream. To complete drop a message use the drop_message function.")
                 .build();
     }
 }

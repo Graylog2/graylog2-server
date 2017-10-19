@@ -18,7 +18,6 @@ package org.graylog.plugins.pipelineprocessor;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
-
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
@@ -31,10 +30,13 @@ import org.graylog.plugins.pipelineprocessor.codegen.compiler.JavaCompiler;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.rules.TestName;
 
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -43,14 +45,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.annotation.Nullable;
+import java.util.function.Consumer;
 
 import static com.google.common.collect.ImmutableList.of;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class BaseParserTest {
     protected static final AtomicBoolean actionsTriggered = new AtomicBoolean(false);
     protected static FunctionRegistry functionRegistry;
+    protected static Stream defaultStream;
 
     @org.junit.Rule
     public TestName name = new TestName();
@@ -75,6 +79,14 @@ public class BaseParserTest {
             }
         });
         return functions;
+    }
+
+    @BeforeClass
+    public static void init() {
+        defaultStream = mock(Stream.class, "Default stream");
+        when(defaultStream.isPaused()).thenReturn(false);
+        when(defaultStream.getTitle()).thenReturn("default stream");
+        when(defaultStream.getId()).thenReturn(Stream.DEFAULT_STREAM_ID);
     }
 
     @Before
@@ -125,7 +137,14 @@ public class BaseParserTest {
 
     @Nullable
     protected Message evaluateRule(Rule rule) {
+        return evaluateRule(rule, (msg) -> {});
+    }
+
+    @Nullable
+    protected Message evaluateRule(Rule rule, Consumer<Message> messageModifier) {
         final Message message = new Message("hello test", "source", DateTime.now());
+        message.addStream(defaultStream);
+        messageModifier.accept(message);
         return evaluateRule(rule, message);
     }
 
