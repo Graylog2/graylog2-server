@@ -224,6 +224,9 @@ public class Searches {
 
     public ScrollResult scroll(String query, TimeRange range, int limit, int offset, List<String> fields, String filter) {
         final Set<String> affectedIndices = determineAffectedIndices(range, filter);
+        final Set<String> indexWildcards = indexSetRegistry.getForIndices(affectedIndices).stream()
+                .map(IndexSet::getIndexWildcard)
+                .collect(Collectors.toSet());
 
         final String searchQuery;
         final Sorting sorting = new Sorting("_doc", Sorting.Direction.ASC);
@@ -236,10 +239,11 @@ public class Searches {
         final Search.Builder initialSearchBuilder = new Search.Builder(searchQuery)
             .addType(IndexMapping.TYPE_MESSAGE)
             .setParameter(Parameters.SCROLL, "1m")
-            .addIndex(affectedIndices);
+            .addIndex(indexWildcards);
         fields.forEach(initialSearchBuilder::addSourceIncludePattern);
 
         final io.searchbox.core.SearchResult initialResult = checkForFailedShards(JestUtils.execute(jestClient, initialSearchBuilder.build(), () -> "Unable to perform scrolling search."));
+
         final long tookMs = tookMsFromSearchResult(initialResult);
         recordEsMetrics(tookMs, range);
 
