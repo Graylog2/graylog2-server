@@ -94,7 +94,7 @@
         <disruptor.version>3.3.6</disruptor.version>
         <drools.version>6.5.0.Final</drools.version>
         <elasticsearch.version>2.4.4</elasticsearch.version>
-        <jest.version>2.4.9+jackson</jest.version>
+        <jest.version>2.4.10+jackson</jest.version>
         <gelfclient.version>1.4.1</gelfclient.version>
         <grok.version>0.1.7-graylog</grok.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>

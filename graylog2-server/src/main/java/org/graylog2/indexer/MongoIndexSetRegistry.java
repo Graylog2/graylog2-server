@@ -126,6 +126,21 @@ public class MongoIndexSetRegistry implements IndexSetRegistry {
     }
 
     @Override
+    public Set<IndexSet> getForIndices(Collection<String> indices) {
+        final Set<? extends IndexSet> indexSets = findAllMongoIndexSets();
+        final ImmutableSet.Builder<IndexSet> resultBuilder = ImmutableSet.builder();
+        for (IndexSet indexSet : indexSets) {
+            for (String index : indices) {
+                if (indexSet.isManagedIndex(index)) {
+                    resultBuilder.add(indexSet);
+                }
+            }
+        }
+
+        return resultBuilder.build();
+    }
+
+    @Override
     public IndexSet getDefault() {
         return mongoIndexSetFactory.create(indexSetService.getDefault());
     }
