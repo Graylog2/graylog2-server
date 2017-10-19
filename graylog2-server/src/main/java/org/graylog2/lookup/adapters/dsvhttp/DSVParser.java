@@ -23,35 +23,42 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * The main difference to using a CSVReader is that this explicitly handles comment lines and does not support
+ * a column name line.
+ */
 public class DSVParser {
     private final String ignorechar;
     private final String lineSeparator;
-    private final String separator;
     private final String quoteChar;
-    private final Boolean keyOnly;
-    private final Boolean caseInsensitive;
-    private final Integer keyColumn;
-    private final Optional<Integer> valueColumn;
-    
+    private final boolean keyOnly;
+    private final boolean caseInsensitive;
+    private final int keyColumn;
+    private final int valueColumn;
+
     private final String splitPattern;
 
     public DSVParser(String ignorechar,
                      String lineSeparator,
                      String separator,
                      String quoteChar,
-                     Boolean keyOnly,
-                     Boolean caseInsensitive,
-                     Integer keyColumn,
-                     Optional<Integer> valueColumn) {
+                     boolean keyOnly,
+                     boolean caseInsensitive,
+                     int keyColumn,
+                     @SuppressWarnings("OptionalUsedAsFieldOrParameterType") Optional<Integer> valueColumn) {
 
         this.ignorechar = ignorechar;
         this.lineSeparator = lineSeparator;
-        this.separator = separator;
         this.quoteChar = quoteChar;
         this.keyOnly = keyOnly;
         this.caseInsensitive = caseInsensitive;
         this.keyColumn = keyColumn;
-        this.valueColumn = valueColumn;
+        this.valueColumn = valueColumn.orElse(0);
+
+        if (!keyOnly) {
+            //noinspection ResultOfMethodCallIgnored
+            valueColumn.orElseThrow(() -> new IllegalStateException("No value column and not key only parsing specified!"));
+        }
 
         if (Strings.isNullOrEmpty(quoteChar)) {
             this.splitPattern = separator;
@@ -70,11 +77,11 @@ public class DSVParser {
                 continue;
             }
             final String[] values = line.split(this.splitPattern);
-            if (values.length <= Math.max(keyColumn, keyOnly ? 0 : valueColumn.orElse(0))) {
+            if (values.length <= Math.max(keyColumn, keyOnly ? 0 : valueColumn)) {
                 continue;
             }
             final String key = this.caseInsensitive ? values[keyColumn].toLowerCase(Locale.ENGLISH) : values[keyColumn];
-            final String value = this.keyOnly ? "" : values[valueColumn.orElseThrow(() -> new IllegalStateException("No value column and not key only parsing specified!"))].trim();
+            final String value = this.keyOnly ? "" : values[valueColumn].trim();
             final String finalKey = Strings.isNullOrEmpty(quoteChar) ? key.trim() : key.trim().replaceAll("^" + quoteChar + "|" + quoteChar + "$", "");
             final String finalValue = Strings.isNullOrEmpty(quoteChar) ? value.trim() : value.trim().replaceAll("^" + quoteChar + "|" + quoteChar + "$", "");
             newLookupBuilder.put(finalKey, finalValue);
