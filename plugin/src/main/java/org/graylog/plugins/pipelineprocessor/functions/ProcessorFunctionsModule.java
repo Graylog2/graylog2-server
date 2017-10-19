@@ -174,6 +174,8 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(Base32Decode.NAME, Base32Decode.class);
         addMessageProcessorFunction(Base32HumanEncode.NAME, Base32HumanEncode.class);
         addMessageProcessorFunction(Base32HumanDecode.NAME, Base32HumanDecode.class);
+        addMessageProcessorFunction(Base64Encode.NAME, Base64Encode.class);
+        addMessageProcessorFunction(Base64Decode.NAME, Base64Decode.class);
         addMessageProcessorFunction(Base64UrlEncode.NAME, Base64UrlEncode.class);
         addMessageProcessorFunction(Base64UrlDecode.NAME, Base64UrlDecode.class);
 
