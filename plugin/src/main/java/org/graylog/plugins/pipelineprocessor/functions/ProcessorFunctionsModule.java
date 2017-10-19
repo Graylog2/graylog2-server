@@ -46,6 +46,8 @@ import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Decode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32Encode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32HumanDecode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base32HumanEncode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64Decode;
+import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64Encode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64UrlDecode;
 import org.graylog.plugins.pipelineprocessor.functions.encoding.Base64UrlEncode;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.CRC32;
