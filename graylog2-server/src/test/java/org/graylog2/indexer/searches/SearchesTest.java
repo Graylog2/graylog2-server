@@ -783,4 +783,22 @@ public class SearchesTest extends AbstractESTest {
         assertThat(searchResult.getResults()).hasSize(1);
         assertThat(searchResult.getTotalResults()).isEqualTo(10L);
     }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void scrollReturnsResultWithSelectiveFields() throws Exception {
+        when(indexSetRegistry.getForIndices(Collections.singleton("graylog_0"))).thenReturn(Collections.singleton(indexSet));
+        final AbsoluteRange range = AbsoluteRange.create(new DateTime(2015, 1, 1, 0, 0, DateTimeZone.UTC).withZone(UTC), new DateTime(2015, 1, 2, 0, 0, DateTimeZone.UTC).withZone(UTC));
+        final ScrollResult scrollResult = searches.scroll("*", range, 5, 0, Collections.singletonList("source"), null);
+
+        assertThat(scrollResult).isNotNull();
+        assertThat(scrollResult.getQueryHash()).isNotEmpty();
+        assertThat(scrollResult.totalHits()).isEqualTo(10L);
+
+        final ScrollResult.ScrollChunk firstChunk = scrollResult.nextChunk();
+        assertThat(firstChunk).isNotNull();
+        assertThat(firstChunk.getMessages()).hasSize(5);
+        assertThat(firstChunk.isFirstChunk()).isTrue();
+        assertThat(firstChunk.getFields()).containsExactly("source");
+    }
 }
