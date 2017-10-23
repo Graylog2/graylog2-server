@@ -76,7 +76,7 @@ public class SearchUtils {
         final Map<Long, TermsResult> result = termsHistogram.getResults().entrySet().stream()
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                     final org.graylog2.indexer.results.TermsResult tr = entry.getValue();
-                    return TermsResult.create(tr.tookMs(), tr.getTerms(), tr.getMissing(), tr.getOther(), tr.getTotal(), tr.getBuiltQuery());
+                    return TermsResult.create(tr.tookMs(), tr.getTerms(), tr.termsMapping(), tr.getMissing(), tr.getOther(), tr.getTotal(), tr.getBuiltQuery());
                 }));
 
         return TermsHistogramResult.create(

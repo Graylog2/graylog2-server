@@ -68,6 +68,7 @@ const QuickValuesVisualization = React.createClass({
       others: undefined,
       missing: undefined,
       terms: Immutable.List(),
+      termsMapping: {},
     };
   },
   componentDidMount() {
@@ -136,6 +137,7 @@ const QuickValuesVisualization = React.createClass({
         others: quickValues.other,
         missing: quickValues.missing,
         terms: formattedTerms,
+        termsMapping: quickValues.terms_mapping,
       }, this.drawData);
     }
   },
@@ -210,7 +212,7 @@ const QuickValuesVisualization = React.createClass({
         table.selectAll('td.dc-table-column button').on('click', () => {
           // noinspection Eslint
           const term = $(d3.event.target).closest('button').data('term');
-          SearchStore.addSearchTerm(props.id, term);
+          SearchStore.addSearchTermWithMapping(this.state.termsMapping, props.id, term);
         });
       });
 
