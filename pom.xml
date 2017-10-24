@@ -88,7 +88,7 @@
         <apache-directory-version>1.0.0</apache-directory-version>
         <auto-value.version>1.5.1</auto-value.version>
         <auto-value-javabean.version>1.0.0</auto-value-javabean.version>
-        <commons-codec.version>1.10</commons-codec.version>
+        <commons-codec.version>1.11</commons-codec.version>
         <commons-email.version>1.5</commons-email.version>
         <commons-io.version>2.6</commons-io.version>
         <disruptor.version>3.3.6</disruptor.version>
