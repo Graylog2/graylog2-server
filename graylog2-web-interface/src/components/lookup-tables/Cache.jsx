@@ -1,6 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Row, Col } from 'react-bootstrap';
+import { Button, Row, Col } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
+import Routes from 'routing/Routes';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import { ContentPackMarker } from 'components/common';
 
@@ -44,6 +46,9 @@ const Cache = React.createClass({
           <div className={Styles.config}>
             {React.createElement(summary, { cache: cache })}
           </div>
+          <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.edit(cache.name)}>
+            <Button bsStyle="success">Edit</Button>
+          </LinkContainer>
         </Col>
         <Col md={6} />
       </Row>
