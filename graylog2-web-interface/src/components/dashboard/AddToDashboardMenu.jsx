@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
-import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
+import { ButtonGroup, ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -15,6 +15,8 @@ import PermissionsMixin from 'util/PermissionsMixin';
 import { WidgetCreationModal } from 'components/widgets';
 import { EditDashboardModal } from 'components/dashboard';
 
+import style from './AddToDashboardMenu.css';
+
 const AddToDashboardMenu = React.createClass({
   propTypes: {
     widgetType: PropTypes.string.isRequired,
@@ -25,6 +27,10 @@ const AddToDashboardMenu = React.createClass({
     fields: PropTypes.array,
     hidden: PropTypes.bool,
     pullRight: PropTypes.bool,
+    appendMenus: PropTypes.oneOfType([
+      PropTypes.arrayOf(PropTypes.element),
+      PropTypes.element,
+    ]),
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
@@ -170,22 +176,25 @@ const AddToDashboardMenu = React.createClass({
     );
   },
   render() {
-    let dropdownMenu;
+    let addToDashboardMenu;
     if (this.state.dashboards === undefined) {
-      dropdownMenu = this._renderLoadingDashboardsMenu();
+      addToDashboardMenu = this._renderLoadingDashboardsMenu();
     } else {
-      dropdownMenu = (!this.props.hidden && (this.state.dashboards.size > 0 ? this._renderDashboardMenu() : this._renderNoDashboardsMenu()));
+      addToDashboardMenu = (!this.props.hidden && (this.state.dashboards.size > 0 ? this._renderDashboardMenu() : this._renderNoDashboardsMenu()));
     }
+
+    const { appendMenus, children } = this.props;
 
     return (
       <div style={{ display: 'inline-block' }}>
-        <ButtonGroup>
-          {dropdownMenu}
+        <ButtonToolbar className={style.toolbar}>
+          <ButtonGroup>
+            {addToDashboardMenu}
+            {appendMenus}
+          </ButtonGroup>
 
-          <div style={{ display: 'inline' }}>
-            {this.props.children}
-          </div>
-        </ButtonGroup>
+          {children}
+        </ButtonToolbar>
         <WidgetCreationModal ref="widgetModal"
                              widgetType={this.props.widgetType}
                              onConfigurationSaved={this._saveWidget}

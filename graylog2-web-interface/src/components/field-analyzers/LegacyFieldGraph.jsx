@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
+import { Button, ButtonGroup, DropdownButton } from 'react-bootstrap';
 import PureRenderMixin from 'react-addons-pure-render-mixin';
 
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
@@ -105,6 +105,12 @@ const LegacyFieldGraph = React.createClass({
       );
     }
 
+    const menus = (
+      <DropdownButton bsSize="small" className="graph-settings" title="Customize" id="customize-field-graph-dropdown" pullRight>
+        {submenus}
+      </DropdownButton>
+    );
+
     return (
       <div ref="fieldGraphContainer"
            style={{ display: this.props.hidden ? 'none' : 'block' }}
@@ -119,12 +125,9 @@ const LegacyFieldGraph = React.createClass({
                               widgetType={this._getWidgetType()}
                               configuration={this._getWidgetConfiguration()}
                               pullRight
-                              permissions={this.props.permissions}>
-            <DropdownButton bsSize="small" className="graph-settings" title="Customize"
-                            id="customize-field-graph-dropdown">
-              {submenus}
-            </DropdownButton>
-
+                              permissions={this.props.permissions}
+                              appendMenus={menus}>
+            {/* It needs to be an anchor to properly work as a draggable handle */}
             <Button href="#"
                     bsSize="small"
                     className="reposition-handle"
@@ -133,7 +136,7 @@ const LegacyFieldGraph = React.createClass({
               <i className="fa fa-reorder" />
             </Button>
 
-            <Button bsSize="small" className="field-analyzer-close" onClick={this.props.onDelete}><i className="fa fa-close" /></Button>
+            <Button bsSize="small" onClick={this.props.onDelete}><i className="fa fa-close" /></Button>
           </AddToDashboardMenu>
         </div>
         <h1>{this._getGraphTitle()}</h1>
