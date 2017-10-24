@@ -126,7 +126,7 @@ const FieldAnalyzerMapComponent = React.createClass({
                                 pullRight
                                 permissions={this.props.permissions}>
 
-              <Button bsSize="small" className="field-analyzer-close" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
+              <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Map for field: {this.state.field}</h1>
