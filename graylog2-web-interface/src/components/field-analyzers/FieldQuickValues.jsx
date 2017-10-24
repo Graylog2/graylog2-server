@@ -226,7 +226,8 @@ const FieldQuickValues = React.createClass({
         <DropdownButton bsSize="small"
                         className="graph-settings"
                         title="Customize"
-                        id="customize-field-graph-dropdown">
+                        id="customize-field-graph-dropdown"
+                        pullRight>
           <MenuItem onSelect={this._showVizOptions}>Configuration</MenuItem>
           {toggleVizType}
         </DropdownButton>

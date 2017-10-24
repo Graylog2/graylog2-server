@@ -106,7 +106,7 @@ const LegacyFieldGraph = React.createClass({
     }
 
     const menus = (
-      <DropdownButton bsSize="small" className="graph-settings" title="Customize" id="customize-field-graph-dropdown">
+      <DropdownButton bsSize="small" className="graph-settings" title="Customize" id="customize-field-graph-dropdown" pullRight>
         {submenus}
       </DropdownButton>
     );
