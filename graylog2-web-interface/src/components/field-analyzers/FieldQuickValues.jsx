@@ -222,6 +222,17 @@ const FieldQuickValues = React.createClass({
         toggleVizType = <MenuItem onSelect={this._showHistogram}>Show as histogram</MenuItem>;
         widgetType = this.WIDGET_TYPE;
       }
+      const menus = (
+        <DropdownButton bsSize="small"
+                        className="graph-settings"
+                        title="Customize"
+                        id="customize-field-graph-dropdown"
+                        pullRight>
+          <MenuItem onSelect={this._showVizOptions}>Configuration</MenuItem>
+          {toggleVizType}
+        </DropdownButton>
+      );
+
       content = (
         <div className="content-col">
           <div className="pull-right">
@@ -229,15 +240,9 @@ const FieldQuickValues = React.createClass({
                                 widgetType={widgetType}
                                 configuration={this._buildDashboardConfig(this.state.showHistogram)}
                                 pullRight
-                                permissions={this.props.permissions}>
-              <DropdownButton bsSize="small"
-                              className="graph-settings"
-                              title="Customize"
-                              id="customize-field-graph-dropdown">
-                <MenuItem onSelect={this._showVizOptions}>Configuration</MenuItem>
-                {toggleVizType}
-              </DropdownButton>
-              <Button bsSize="small" className="field-analyzer-close" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
+                                permissions={this.props.permissions}
+                                appendMenus={menus}>
+              <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Quick Values for <em>{this.state.field}</em> {this.state.loadPending && <i

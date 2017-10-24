@@ -167,8 +167,7 @@ const FieldStatistics = React.createClass({
                                 fields={this.state.fieldStatistics.keySeq().toJS()}
                                 pullRight
                                 permissions={this.props.permissions}>
-
-              <Button bsSize="small" className="field-analyzer-close" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
+              <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
           <h1>Field Statistics</h1>
