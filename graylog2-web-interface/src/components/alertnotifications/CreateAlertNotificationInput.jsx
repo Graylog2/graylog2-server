@@ -97,8 +97,20 @@ const CreateAlertNotificationInput = React.createClass({
     const formattedStreams = this.state.streams
       .map(stream => this._formatOption(stream.title, stream.id))
       .sort((s1, s2) => naturalSort(s1.label.toLowerCase(), s2.label.toLowerCase()));
+
+    const notificationTypeHelp = (
+      <span>
+        Select the notification type that will be used. You can find more types in the{' '}
+        <a href="https://marketplace.graylog.org/" target="_blank" rel="noopener noreferrer">Graylog Marketplace</a>.
+      </span>
+    );
+
     return (
       <div>
+        <Button bsStyle="info" href="https://marketplace.graylog.org/" target="_blank" className="pull-right">
+          <i className="fa fa-external-link" />&nbsp; Find more notifications
+        </Button>
+
         <h2>Notification</h2>
         <p className="description">
           Define the notification that will be triggered from the alert conditions in a stream.
@@ -112,9 +124,12 @@ const CreateAlertNotificationInput = React.createClass({
                 <Select placeholder="Select a stream" options={formattedStreams} onChange={this._onStreamChange} />
               </Input>
 
-              <Input type="select" value={this.state.type} onChange={this._onChange}
+              <Input type="select"
+                     value={this.state.type}
+                     onChange={this._onChange}
                      disabled={!this.state.selectedStream}
-                     label="Notification type" help="Select the notification type that will be used.">
+                     label="Notification type"
+                     help={notificationTypeHelp}>
                 <option value={this.PLACEHOLDER} disabled>Select a notification type</option>
                 {availableTypes}
               </Input>

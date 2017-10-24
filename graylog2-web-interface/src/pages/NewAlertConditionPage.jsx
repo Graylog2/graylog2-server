@@ -1,10 +1,10 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Button, Col, Row } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import { DocumentTitle, PageHeader } from 'components/common';
+import { AlertsHeaderToolbar } from 'components/alerts';
 import { CreateAlertConditionInput } from 'components/alertconditions';
 
 import Routes from 'routing/Routes';
@@ -31,13 +31,7 @@ const NewAlertConditionPage = React.createClass({
             </span>
 
             <span>
-              <LinkContainer to={Routes.ALERTS.CONDITIONS}>
-                <Button bsStyle="info">Manage conditions</Button>
-              </LinkContainer>
-              &nbsp;
-              <LinkContainer to={Routes.ALERTS.NOTIFICATIONS}>
-                <Button bsStyle="info">Manage notifications</Button>
-              </LinkContainer>
+              <AlertsHeaderToolbar active={Routes.ALERTS.CONDITIONS} />
             </span>
           </PageHeader>
 
