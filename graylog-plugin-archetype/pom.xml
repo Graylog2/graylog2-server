@@ -46,7 +46,7 @@
             <extension>
                 <groupId>org.apache.maven.archetype</groupId>
                 <artifactId>archetype-packaging</artifactId>
-                <version>2.2</version>
+                <version>3.0.1</version>
             </extension>
         </extensions>
 
@@ -101,13 +101,12 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-archetype-plugin</artifactId>
-                    <version>2.4</version>
+                    <version>3.0.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <!-- Using 2.6 instead of 2.7 because of this: https://issues.apache.org/jira/browse/MRESOURCES-190 -->
-                    <version>2.6</version>
+                    <version>3.0.2</version>
                 </plugin>
             </plugins>
         </pluginManagement>

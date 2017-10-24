@@ -648,7 +648,9 @@
                         <bundledSignature>jdk-unsafe</bundledSignature>
                         <bundledSignature>jdk-deprecated</bundledSignature>
                         <bundledSignature>jdk-reflection</bundledSignature>
-                        <bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature>
+                        <!-- Required until https://github.com/policeman-tools/forbidden-apis/pull/133 has been merged -->
+                        <bundledSignature>commons-io-unsafe-2.5</bundledSignature>
+                        <!--bundledSignature>commons-io-unsafe-${commons-io.version}</bundledSignature-->
                     </bundledSignatures>
                     <signaturesFiles>
                         <signaturesFile>${project.basedir}/../config/forbidden-apis/signatures.txt</signaturesFile>
@@ -730,12 +732,12 @@
                                 <plugin>
                                     <groupId>com.h3xstream.findsecbugs</groupId>
                                     <artifactId>findsecbugs-plugin</artifactId>
-                                    <version>1.5.0</version>
+                                    <version>1.7.1</version>
                                 </plugin>
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
                                     <artifactId>fb-contrib</artifactId>
-                                    <version>6.8.3</version>
+                                    <version>7.0.5</version>
                                 </plugin>
                             </plugins>
                         </configuration>
