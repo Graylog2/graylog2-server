@@ -556,11 +556,6 @@
                     <artifactId>buildnumber-maven-plugin</artifactId>
                     <version>1.4</version>
                 </plugin>
-                <plugin>
-                    <groupId>com.versioneye</groupId>
-                    <artifactId>versioneye-maven-plugin</artifactId>
-                    <version>3.11.1</version>
-                </plugin>
             </plugins>
         </pluginManagement>
         <plugins>
@@ -655,15 +650,6 @@
             <plugin>
                 <groupId>com.mycila</groupId>
                 <artifactId>license-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>com.versioneye</groupId>
-                <artifactId>versioneye-maven-plugin</artifactId>
-                <configuration>
-                    <organisation>Graylog</organisation>
-                    <team>Owners</team>
-                    <projectId>570f6fbbd1a090000fe62b58</projectId>
-                </configuration>
             </plugin>
         </plugins>
     </build>
