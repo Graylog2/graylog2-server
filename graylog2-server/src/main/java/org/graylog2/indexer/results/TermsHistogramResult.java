@@ -26,6 +26,8 @@ import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class TermsHistogramResult extends IndexQueryResult {
@@ -34,7 +36,7 @@ public class TermsHistogramResult extends IndexQueryResult {
     private final Map<Long, TermsResult> result;
     private AbsoluteRange boundaries;
 
-    public TermsHistogramResult(@Nullable DateHistogramAggregation result, String originalQuery, String builtQuery, long size, long tookMs, Searches.DateHistogramInterval interval) {
+    public TermsHistogramResult(@Nullable DateHistogramAggregation result, String originalQuery, String builtQuery, long size, long tookMs, Searches.DateHistogramInterval interval, List<String> fields) {
         super(originalQuery, builtQuery, tookMs);
         this.size = size;
         this.interval = interval;
@@ -45,7 +47,7 @@ public class TermsHistogramResult extends IndexQueryResult {
                 final DateTime keyAsDate = new DateTime(histogram.getKey());
                 final TermsAggregation termsAggregation = histogram.getFilterAggregation(Searches.AGG_FILTER).getTermsAggregation(Searches.AGG_TERMS);
                 final MissingAggregation missingAgregation = histogram.getMissingAggregation("missing");
-                final TermsResult termsResult = new TermsResult(termsAggregation, missingAgregation.getMissing(), histogram.getCount(), "", "", tookMs);
+                final TermsResult termsResult = new TermsResult(termsAggregation, missingAgregation.getMissing(), histogram.getCount(), "", "", tookMs, fields);
 
                 this.result.put(keyAsDate.getMillis() / 1000L, termsResult);
             }
@@ -78,6 +80,6 @@ public class TermsHistogramResult extends IndexQueryResult {
     }
 
     public static TermsHistogramResult empty(String originalQuery, String builtQuery, long size, Searches.DateHistogramInterval interval) {
-        return new TermsHistogramResult(null, originalQuery, builtQuery, size, 0L, interval);
+        return new TermsHistogramResult(null, originalQuery, builtQuery, size, 0L, interval, Collections.emptyList());
     }
 }
