@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
-import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, Row } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, ControlLabel, FormGroup, HelpBlock, Row } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { MultiSelect, Select } from 'components/common';
 import FormsUtils from 'util/FormsUtils';
@@ -131,6 +131,7 @@ const QuickValuesOptionsForm = React.createClass({
                 <MultiSelect options={fieldOptions}
                              value={this.state.stackedFields}
                              onChange={this._onStackedFieldChange} />
+                <HelpBlock>The stacked fields option <strong>requires Elasticsearch version &gt;= 5</strong> to work correctly</HelpBlock>
               </FormGroup>
 
               {intervalForm}
