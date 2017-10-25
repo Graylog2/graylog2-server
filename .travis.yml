@@ -20,8 +20,6 @@ before_script:
 script:
   - mvn -B verify -Dit.ElasticsearchVersion=${GRAYLOG_ELASTICSEARCH_VERSION}
 after_success:
-  - curl -X GET https://letsencrypt.org/certs/lets-encrypt-x3-cross-signed.der -o lets-encrypt-x3-cross-signed.der && sudo keytool -trustcacerts -keystore $JAVA_HOME/jre/lib/security/cacerts -storepass changeit -noprompt -importcert -alias lets-encrypt-x3-cross-signed -file lets-encrypt-x3-cross-signed.der
-  - mvn -B -Dmaven.test.skip=true -Dskip.web.build=true -pl graylog2-server versioneye:securityAndLicenseCheck
   - mvn -B -Dmaven.test.skip=true -Dskip.web.build=true assembly:single
   - mvn -B -Dmaven.test.skip=true -Dskip.web.build=true --settings config/settings.xml deploy
 deploy:
