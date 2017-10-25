@@ -237,6 +237,16 @@ class SearchStore {
         this.addQueryTerm(term, effectiveOperator);
     }
 
+    addSearchTermWithMapping(mapping, field, value, operator) {
+        if (!mapping[value]) {
+          return this.addSearchTerm(field, value, operator);
+        }
+
+        mapping[value].forEach((m) => {
+          this.addSearchTerm(m.field, m.value, operator);
+        });
+    }
+
     changeTimeRange(newRangeType: string, newRangeParams: Object) {
         this.rangeType = newRangeType;
         this.rangeParams = Immutable.fromJS(newRangeParams);

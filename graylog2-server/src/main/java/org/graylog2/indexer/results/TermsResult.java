@@ -16,28 +16,37 @@
  */
 package org.graylog2.indexer.results;
 
-import io.searchbox.core.search.aggregation.Bucket;
+import com.google.common.base.Splitter;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 import io.searchbox.core.search.aggregation.TermsAggregation;
+import org.graylog2.indexer.searches.Searches;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class TermsResult extends IndexQueryResult {
 
     private final long total;
     private final long missing;
     private final long other;
-    private final Map<String, Long> terms;
+    private final Map<String, Long> terms = new HashMap<>();
+    private final Map<String, List<Map<String, String>>> termsMapping = new HashMap<>();
 
     public TermsResult(TermsAggregation terms, long missingCount, long totalCount, String originalQuery, String builtQuery, long tookMs) {
+        this(terms, missingCount, totalCount, originalQuery, builtQuery, tookMs, Collections.emptyList());
+    }
+
+    public TermsResult(TermsAggregation terms, long missingCount, long totalCount, String originalQuery, String builtQuery, long tookMs, List<String> fields) {
         super(originalQuery, builtQuery, tookMs);
 
         this.total = totalCount;
         this.missing = missingCount;
         this.other = terms.getSumOtherDocCount();
-        this.terms = terms.getBuckets().stream()
-            .collect(Collectors.toMap(TermsAggregation.Entry::getKey, Bucket::getCount));
+
+        processTermsBuckets(terms, fields, this.terms, this.termsMapping);
     }
 
     private TermsResult(String originalQuery, String builtQuery) {
@@ -46,7 +55,29 @@ public class TermsResult extends IndexQueryResult {
         this.total = 0;
         this.missing = 0;
         this.other = 0;
-        this.terms = Collections.emptyMap();
+    }
+
+    private static void processTermsBuckets(TermsAggregation buckets,
+                                            List<String> fields,
+                                            Map<String, Long> terms,
+                                            Map<String, List<Map<String, String>>> termsMapping) {
+        for (final TermsAggregation.Entry entry : buckets.getBuckets()) {
+            // Use the "special" character to split up the terms value so we can create a field->value mapping.
+            final List<String> valueList = Splitter.on(Searches.STACKED_TERMS_AGG_SEPARATOR).splitToList(entry.getKey());
+
+            // We need a human readable value here because the word separator we are using might not be readable
+            final String value = entry.getKey().replace(Searches.STACKED_TERMS_AGG_SEPARATOR, " - ");
+
+            // For every field in the field list, get the value from the split up terms value list. After this, we
+            // have a mapping of field->value for each bucket.
+            final ImmutableList.Builder<Map<String, String>> mapping = ImmutableList.builder();
+            for (int i = 0; i < fields.size(); i++) {
+                mapping.add(ImmutableMap.of("field", fields.get(i), "value", valueList.get(i)));
+            }
+
+            terms.put(value, entry.getCount());
+            termsMapping.put(value, mapping.build());
+        }
     }
 
     public static TermsResult empty(String originalQuery, String builtQuery) {
@@ -69,4 +100,7 @@ public class TermsResult extends IndexQueryResult {
         return terms;
     }
 
+    public Map<String, List<Map<String, String>>> termsMapping() {
+        return termsMapping;
+    }
 }

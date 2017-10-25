@@ -22,6 +22,7 @@ import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSortedSet;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -112,6 +113,10 @@ public class Searches {
     public static final String AGG_CARDINALITY = "gl2_field_cardinality";
     public static final String AGG_VALUE_COUNT = "gl2_value_count";
     private static final Pattern filterStreamIdPattern = Pattern.compile("^(.+[^\\p{Alnum}])?streams:([\\p{XDigit}]+)");
+
+    // This is the "WORD SEPARATOR MIDDLE DOT" unicode character. It's used to join and split the term values in a
+    // stacked terms query.
+    public static final String STACKED_TERMS_AGG_SEPARATOR = "\u2E31";
 
     public enum TermsStatsOrder {
         TERM,
@@ -313,7 +318,10 @@ public class Searches {
 
         // Add all other fields
         stackedFields.forEach(f -> {
-            scriptStringBuilder.append(" + ' - ' + ");
+            // There is no way to use some kind of structured value for the stacked fields in the painless script
+            // so we have to use a "special" character (that is hopefully not showing up in any value) to join the
+            // stacked field values. That allows us to split the result again later to create a field->value mapping.
+            scriptStringBuilder.append(" + \"").append(STACKED_TERMS_AGG_SEPARATOR).append("\" + ");
             scriptStringBuilder.append("doc['").append(f).append("'].value");
             filterQuery.must(QueryBuilders.existsQuery(f));
         });
@@ -357,7 +365,9 @@ public class Searches {
                 searchResult.getTotal(),
                 query,
                 searchSourceBuilder.toString(),
-                tookMsFromSearchResult(searchResult)
+                tookMsFromSearchResult(searchResult),
+                // Concat field and stacked fields into one fields list
+                ImmutableList.<String>builder().add(field).addAll(stackedFields).build()
         );
     }
 
@@ -413,7 +423,9 @@ public class Searches {
                 searchSourceBuilder.toString(),
                 size,
                 tookMsFromSearchResult(searchResult),
-                interval);
+                interval,
+                // Concat field and stacked fields into one fields list
+                ImmutableList.<String>builder().add(field).addAll(stackedFields).build());
     }
 
     public TermsStatsResult termsStats(String keyField, String valueField, TermsStatsOrder order, int size, String query, String filter, TimeRange range) {
