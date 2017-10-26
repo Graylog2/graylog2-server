@@ -1,14 +1,15 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import moment from 'moment';
 
 import { WidgetFooter, WidgetHeader } from 'components/widgets';
 
 export default React.createClass({
   propTypes: {
-    title: React.PropTypes.string.isRequired,
-    widgetId: React.PropTypes.string.isRequired,
-    children: React.PropTypes.node.isRequired,
-    onSizeChange: React.PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
+    widgetId: PropTypes.string.isRequired,
+    children: PropTypes.node.isRequired,
+    onSizeChange: PropTypes.func.isRequired,
   },
   getInitialState() {
     return {
@@ -37,7 +38,7 @@ export default React.createClass({
 
     return (
       <div className="widget" ref={(elem) => { this._widgetNode = elem; }} style={{ overflow: 'auto' }} data-widget-id={this.props.widgetId}>
-        <WidgetHeader title={this.props.title} calculatedAt={calculatedAt} />
+        <WidgetHeader title={`${this.props.title}`} calculatedAt={calculatedAt} />
 
         {this.props.children}
       </div>

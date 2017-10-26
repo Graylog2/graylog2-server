@@ -10,26 +10,27 @@ import StoreProvider from 'injection/StoreProvider';
 const ToolsStore = StoreProvider.getStore('Tools');
 
 export default class KeywordTimeRangeSelector extends React.Component {
-  state = {
-    keywordPreview: Immutable.Map(),
-  };
-
   static propTypes = {
     value: PropTypes.object.isRequired,
     onChange: PropTypes.func.isRequired,
   };
 
-  _onKeywordPreviewLoaded(data) {
+  state = {
+    keywordPreview: Immutable.Map(),
+  };
+
+  _onKeywordPreviewLoaded = (data) => {
     const from = DateTime.fromUTCDateTime(data.from).toString();
     const to = DateTime.fromUTCDateTime(data.to).toString();
     this.setState({ keywordPreview: Immutable.Map({ from: from, to: to }) });
-  }
+  };
 
-  _resetKeywordPreview() {
+  _resetKeywordPreview = () => {
     this.setState({ keywordPreview: Immutable.Map() });
-  }
+  };
 
-  _keywordSearchChanged(value) {
+  _keywordSearchChanged = (event) => {
+    const value = event.target.value;
     this.props.onChange('keyword', value);
 
     if (value === '') {
@@ -39,7 +40,7 @@ export default class KeywordTimeRangeSelector extends React.Component {
         .then(data => this._onKeywordPreviewLoaded(data))
         .catch(() => this._resetKeywordPreview());
     }
-  }
+  };
 
   render() {
     const { value } = this.props;
@@ -51,10 +52,10 @@ export default class KeywordTimeRangeSelector extends React.Component {
             <Input type="text"
                    name="keyword"
                    value={value.get('keyword')}
-                   onChange={event => this._keywordSearchChanged(event.target.value)}
+                   onChange={this._keywordSearchChanged}
                    placeholder="Last week"
                    className="input-sm"
-                   required/>
+                   required />
           </Col>
           <Col md={7} style={{ paddingRight: 0 }}>
             {keywordPreview.size > 0 &&

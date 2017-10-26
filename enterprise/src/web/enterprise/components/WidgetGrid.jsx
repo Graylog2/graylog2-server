@@ -34,13 +34,13 @@ export default class WidgetGrid extends React.Component {
     widgetDimensions: {},
   };
 
-  _onWidgetSizeChange(widgetId, dimensions) {
+  _onWidgetSizeChange = (widgetId, dimensions) => {
     const widgetDimensions = (this.state && this.state.widgetDimensions) || {};
     widgetDimensions[widgetId] = dimensions;
     this.setState({ widgetDimensions: widgetDimensions });
-  }
+  };
 
-  _renderWidgets(widgetConfig) {
+  _renderWidgets = (widgetConfig) => {
     const returnedWidgets = { positions: {}, widgets: [] };
 
     if (!widgetConfig || _.isEmpty(widgetConfig)) {
@@ -79,9 +79,9 @@ export default class WidgetGrid extends React.Component {
     returnedWidgets.positions = positions;
 
     return returnedWidgets;
-  }
+  };
 
-  render() {
+  render = () => {
     const { widgets, positions } = this._renderWidgets(this.props.widgets);
     const grid = widgets && widgets.length > 0 ? (
       <ReactGridContainer locked={this.props.locked}
