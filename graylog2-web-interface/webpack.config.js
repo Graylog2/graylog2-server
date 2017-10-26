@@ -144,6 +144,26 @@ if (TARGET === 'start-nohmr') {
   });
 }
 
+if (TARGET === 'watch') {
+  const CopyWebpackPlugin = require('copy-webpack-plugin');
+
+  console.error('Running in development (watch) mode');
+  module.exports = merge(webpackConfig, {
+    devtool: 'eval',
+    output: {
+      path: BUILD_PATH,
+      filename: '[name].js',
+      publicPath: '/',
+    },
+    plugins: [
+      new webpack.DefinePlugin({DEVELOPMENT: true}),
+      // We need config.js in the "build/" folder. No idea how webpack-dev-server
+      // handles that, I found nothing in the config. (bernd)
+      new CopyWebpackPlugin([{ from: 'config.js' }]),
+    ],
+  });
+}
+
 if (TARGET === 'build') {
   console.error('Running in production mode');
   process.env.NODE_ENV = 'production';
