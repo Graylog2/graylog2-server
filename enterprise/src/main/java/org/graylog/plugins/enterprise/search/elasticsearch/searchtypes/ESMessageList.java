@@ -3,6 +3,7 @@ package org.graylog.plugins.enterprise.search.elasticsearch.searchtypes;
 import io.searchbox.core.SearchResult;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.graylog.plugins.enterprise.search.QueryJob;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.searchtypes.MessageList;
 import org.graylog.plugins.enterprise.search.searchtypes.Sort;
@@ -31,7 +32,7 @@ public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     }
 
     @Override
-    public SearchType.Result doExtractResult(MessageList searchType, SearchResult result) {
+    public SearchType.Result doExtractResult(QueryJob job, MessageList searchType, SearchResult result) {
         //noinspection unchecked
         final List<ResultMessageSummary> messages = result.getHits(Map.class, false).stream()
                 .map(hit -> ResultMessage.parseFromSource(hit.id, hit.index, (Map<String, Object>) hit.source, hit.highlight))

@@ -4,6 +4,7 @@ import ObjectID from 'bson-objectid';
 import QueriesActions from 'enterprise/actions/QueriesActions';
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
+import ObjectUtils from 'util/ObjectUtils';
 
 const createSearchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search');
 const createSearchJobUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/search/${id}/execute`);
@@ -23,10 +24,11 @@ export default Reflux.createStore({
       .then(response => fetch('POST', createSearchJobUrl(response.id)))
       .then(executionResponse => fetch('GET', jobStatusUrl(executionResponse.job_id)))
       .then((result) => {
-        result.results.messages.fields = ['source', 'message'];
-        result.results.messages.used_indices = [];
-        result.results.messages.built_query = '"*"';
-        this.queries[id] = result;
+        const searchResult = ObjectUtils.clone(result);
+        searchResult.results.messages.fields = ['source', 'message'];
+        searchResult.results.messages.used_indices = [];
+        searchResult.results.messages.built_query = '"*"';
+        this.queries[id] = searchResult;
         this._trigger();
       });
     QueriesActions.create.promise(promise);

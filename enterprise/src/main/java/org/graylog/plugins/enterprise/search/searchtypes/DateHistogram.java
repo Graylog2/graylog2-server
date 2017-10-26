@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog2.indexer.searches.Searches;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
 
 import javax.annotation.Nullable;
 import java.util.Locale;
@@ -75,6 +76,9 @@ public abstract class DateHistogram implements SearchType {
         @JsonProperty
         public abstract Map<Long, Long> results();
 
+        @JsonProperty
+        public abstract AbsoluteRange timerange();
+
         public static DateHistogram.Result.Builder builder() {
             return new AutoValue_DateHistogram_Result.Builder();
         }
@@ -88,6 +92,8 @@ public abstract class DateHistogram implements SearchType {
             public abstract DateHistogram.Result.Builder id(String id);
 
             public abstract Builder results(Map<Long, Long> results);
+
+            public abstract Builder timerange(AbsoluteRange timerange);
 
             public abstract DateHistogram.Result build();
         }

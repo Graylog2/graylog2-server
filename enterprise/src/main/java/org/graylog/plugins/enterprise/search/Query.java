@@ -43,7 +43,6 @@ public abstract class Query {
     @JsonProperty
     public abstract String id();
 
-    @Nullable
     @JsonProperty
     public abstract TimeRange timerange();
 

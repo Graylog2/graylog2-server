@@ -6,9 +6,12 @@ import io.searchbox.core.search.aggregation.DateHistogramAggregation;
 import one.util.streamex.StreamEx;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.graylog.plugins.enterprise.search.QueryJob;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.searchtypes.DateHistogram;
 import org.graylog2.plugin.Message;
+import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
+import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.joda.time.DateTime;
 
 import java.util.Map;
@@ -24,15 +27,17 @@ public class ESDateHistogram implements ESSearchTypeHandler<DateHistogram> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public SearchType.Result doExtractResult(DateHistogram searchType, SearchResult result) {
+    public SearchType.Result doExtractResult(QueryJob job, DateHistogram searchType, SearchResult result) {
         final DateHistogramAggregation dateHistogramAggregation = result.getAggregations().getDateHistogramAggregation(searchType.id());
         final Map<Long, Long> buckets = StreamEx.of(dateHistogramAggregation.getBuckets())
                 .mapToEntry(bucket -> new DateTime(bucket.getKey()).getMillis() / 1000L,
                         Bucket::getCount)
                 .toMap();
 
+        final TimeRange timerange = job.getQuery().timerange();
         return DateHistogram.Result.result(searchType.id())
                 .results(buckets)
+                .timerange(AbsoluteRange.create(timerange.getFrom(), timerange.getTo()))
                 .build();
 
     }

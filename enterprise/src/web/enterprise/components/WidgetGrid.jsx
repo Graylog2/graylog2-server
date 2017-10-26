@@ -63,13 +63,13 @@ export default class WidgetGrid extends React.Component {
       if (widgetData) {
         returnedWidgets.widgets.push(
           <div key={widgetId} className={style.widgetContainer}>
-            <ViewWidget title={widget.title} widgetId={widgetId} onSizeChange={this._onWidgetSizeChange.bind(this)}>
+            <ViewWidget title={widget.title} widgetId={widgetId} onSizeChange={this._onWidgetSizeChange}>
               <VisComponent id={widgetId}
                             config={config}
                             data={widgetData}
                             height={height}
                             width={width}
-                            computationTimeRange={computationTimeRange}/>
+                            computationTimeRange={computationTimeRange} />
             </ViewWidget>
           </div>,
         );
