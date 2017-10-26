@@ -1,5 +1,6 @@
 package org.graylog.plugins.enterprise.search.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -46,12 +47,14 @@ public class SearchResource extends RestResource implements PluginRestResource {
     private final QueryEngine queryEngine;
     private final QueryDbService queryDbService;
     private final QueryJobService queryJobService;
+    private final ObjectMapper objectMapper;
 
     @Inject
-    public SearchResource(QueryEngine queryEngine, QueryDbService queryDbService, QueryJobService queryJobService) {
+    public SearchResource(QueryEngine queryEngine, QueryDbService queryDbService, QueryJobService queryJobService, ObjectMapper objectMapper) {
         this.queryEngine = queryEngine;
         this.queryDbService = queryDbService;
         this.queryJobService = queryJobService;
+        this.objectMapper = objectMapper;
     }
 
     @POST
@@ -92,8 +95,9 @@ public class SearchResource extends RestResource implements PluginRestResource {
     @Path("{id}/execute")
     public Response executeQuery(@Context UriInfo uriInfo,
                                  @ApiParam(name = "id") @PathParam("id") String id,
-                                 Map<String, Object> executionState) {
-        final Query query = getQuery(id);
+                                 @ApiParam Map<String, Object> executionState) {
+        Query query = getQuery(id);
+        query = query.applyExecutionState(objectMapper, executionState);
 
         final QueryJob queryJob = queryJobService.create(query);
 
@@ -104,6 +108,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
                 .entity(ImmutableMap.of("job_id", queryJob.getId()))
                 .build();
     }
+
 
     @GET
     @ApiOperation(value = "Retrieve the status of an executed query")

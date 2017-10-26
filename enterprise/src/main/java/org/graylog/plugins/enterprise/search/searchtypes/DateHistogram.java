@@ -2,13 +2,14 @@ package org.graylog.plugins.enterprise.search.searchtypes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import org.graylog.plugins.enterprise.search.ExecutionState;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog2.indexer.searches.Searches;
 
 import javax.annotation.Nullable;
+import java.util.Locale;
 import java.util.Map;
 
 @AutoValue
@@ -25,13 +26,23 @@ public abstract class DateHistogram implements SearchType {
     @JsonProperty
     public abstract String id();
 
-    @ExecutionState
     @JsonProperty
     public abstract Searches.DateHistogramInterval interval();
 
     @Override
     public SearchType withId(String id) {
         return toBuilder().id(id).build();
+    }
+
+    @Override
+    public SearchType applyExecutionContext(ObjectMapper objectMapper, Map<String, Object> state) {
+        if (state.containsKey("interval")) {
+            final String interval = (String) state.get("interval");
+            final Builder builder = toBuilder()
+                    .interval(Searches.DateHistogramInterval.valueOf(interval.toUpperCase(Locale.ENGLISH)));
+            return builder.build();
+        }
+        return this;
     }
 
     abstract Builder toBuilder();

@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.annotation.Nullable;
+import java.util.Map;
 
 /**
  * A search type represents parts of a query that generates a {@see Result result}.
@@ -32,6 +34,8 @@ public interface SearchType {
 
     SearchType withId(String id);
 
+    SearchType applyExecutionContext(ObjectMapper objectMapper, Map<String, Object> state);
+
     @JsonAutoDetect
     class Fallback implements SearchType {
 
@@ -54,6 +58,11 @@ public interface SearchType {
         @Override
         public SearchType withId(String id) {
             this.id = id;
+            return this;
+        }
+
+        @Override
+        public SearchType applyExecutionContext(ObjectMapper objectMapper, Map<String, Object> state) {
             return this;
         }
 
