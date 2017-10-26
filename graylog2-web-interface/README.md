@@ -26,6 +26,18 @@ In this case just set the correct (installed!) Python binary before running `npm
 npm config set python python2.7
 ```
 
+### Alternative Development Setup
+
+Due to problems with webpack-dev-server there is another way to run the development setup.
+
+* Install [devd](https://github.com/cortesi/devd)
+* Install [node.js](http://nodejs.org/) and npm.
+* Run `npm install`
+* Run `npm run watch` and **keep it running** to start webpack in watch mode so it rebuilds on source changes
+* Run `npm run devd` and **keep it running** once the `build/` directory exists
+* Open http://localhost:8080
+
+
 #### Update Javascript dependencies
 
 a. Update a single dependency
