@@ -49,7 +49,7 @@ const CreateAlertNotificationInput = React.createClass({
 
     AlarmCallbacksActions.save(this.state.selectedStream.id, data).then(
       () => {
-        history.pushState(null, Routes.ALERTS.NOTIFICATIONS);
+        history.push(Routes.ALERTS.NOTIFICATIONS);
       },
       () => this.refs.configurationForm.open(),
     );

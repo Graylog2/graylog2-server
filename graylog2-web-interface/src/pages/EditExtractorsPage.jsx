@@ -54,7 +54,7 @@ const EditExtractorsPage = React.createClass({
       url = Routes.local_input_extractors(this.props.params.nodeId, this.props.params.inputId);
     }
 
-    history.pushState(null, url);
+    history.push(url);
   },
   render() {
     // TODO:

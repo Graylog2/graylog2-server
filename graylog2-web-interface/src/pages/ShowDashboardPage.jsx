@@ -81,7 +81,7 @@ const ShowDashboardPage = React.createClass({
       }, (response) => {
         if (response.additional && response.additional.status === 404) {
           UserNotification.error(`Unable to find a dashboard with the id <${dashboardId}>. Maybe it was deleted in the meantime.`);
-          history.pushState(null, Routes.DASHBOARDS);
+          history.push(Routes.DASHBOARDS);
         }
       });
   },

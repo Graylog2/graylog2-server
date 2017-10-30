@@ -34,7 +34,7 @@ const StartPage = React.createClass({
     this.setState({ gettingStarted: state.status });
   },
   _redirect(page) {
-    history.pushState(null, page);
+    history.push(page);
   },
   _redirectToStartpage() {
     // Show getting started page if user is an admin and getting started wasn't dismissed

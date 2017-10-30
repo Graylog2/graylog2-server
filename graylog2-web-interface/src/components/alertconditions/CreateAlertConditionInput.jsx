@@ -46,7 +46,7 @@ const CreateAlertConditionInput = React.createClass({
     }
 
     AlertConditionsActions.save(this.state.selectedStream.id, data).then((conditionId) => {
-      history.pushState(null, Routes.show_alert_condition(this.state.selectedStream.id, conditionId));
+      history.push(Routes.show_alert_condition(this.state.selectedStream.id, conditionId));
     });
   },
   _openForm() {

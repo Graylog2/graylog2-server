@@ -22,7 +22,7 @@ const GettingStartedPage = React.createClass({
     return !this.state.system;
   },
   _onDismiss() {
-    history.pushState(null, Routes.STARTPAGE);
+    history.push(Routes.STARTPAGE);
   },
   render() {
     if (this._isLoading()) {

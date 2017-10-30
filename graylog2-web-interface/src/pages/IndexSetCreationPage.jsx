@@ -55,7 +55,7 @@ const IndexSetCreationPage = React.createClass({
     const copy = indexSet;
     copy.creation_date = DateTime.now().toISOString();
     IndexSetsActions.create(copy).then(() => {
-      history.pushState(null, Routes.SYSTEM.INDICES.LIST);
+      history.push(Routes.SYSTEM.INDICES.LIST);
     });
   },
 

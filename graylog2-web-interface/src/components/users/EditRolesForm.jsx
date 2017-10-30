@@ -39,14 +39,14 @@ const EditRolesForm = React.createClass({
       user.roles = roles;
       UsersStore.update(this.props.user.username, user).then(() => {
         UserNotification.success('Roles updated successfully.', 'Success!');
-        history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+        history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }, () => {
         UserNotification.error('Updating roles failed.', 'Error!');
       });
     }
   },
   _onCancel() {
-    history.pushState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+    history.push(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
   },
   _onValueChange(newRoles) {
     const roles = newRoles.split(',');

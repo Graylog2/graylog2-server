@@ -19,7 +19,7 @@ const UserMenu = React.createClass({
   },
   onLogoutClicked() {
     SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {
-      history.pushState(null, Routes.STARTPAGE);
+      history.push(Routes.STARTPAGE);
     });
   },
   render() {

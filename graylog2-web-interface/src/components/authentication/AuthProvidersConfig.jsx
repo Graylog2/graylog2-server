@@ -55,7 +55,7 @@ const AuthProvidersConfig = React.createClass({
   },
 
   _onCancel() {
-    history.pushState(null, Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
+    history.push(Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
   },
 
   _updateSorting(newSorting) {
