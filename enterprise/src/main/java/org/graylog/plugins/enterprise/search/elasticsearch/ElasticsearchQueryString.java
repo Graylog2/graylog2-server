@@ -14,7 +14,6 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
     public static final String NAME = "elasticsearch";
 
     @Override
-    @JsonProperty
     public abstract String type();
 
     @JsonProperty

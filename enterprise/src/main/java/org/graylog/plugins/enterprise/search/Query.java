@@ -62,6 +62,10 @@ public abstract class Query {
     @JsonProperty
     public abstract Map<String, ParameterBinding> parameters();
 
+    @Nullable
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    public abstract QueryInfo info();
+
     public abstract Builder toBuilder();
 
     public static Builder builder() {
@@ -124,6 +128,10 @@ public abstract class Query {
         return this;
     }
 
+    public Query withInfo(QueryInfo queryInfo) {
+        return toBuilder().info(queryInfo).build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @Id
@@ -144,6 +152,9 @@ public abstract class Query {
 
         @JsonProperty
         public abstract Builder parameters(Map<String, ParameterBinding> parameters);
+
+        @JsonIgnore
+        public abstract Builder info(@Nullable QueryInfo info);
 
         abstract Query autoBuild();
 

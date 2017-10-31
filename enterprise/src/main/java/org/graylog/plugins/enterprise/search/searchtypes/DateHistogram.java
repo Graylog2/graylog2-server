@@ -20,7 +20,6 @@ public abstract class DateHistogram implements SearchType {
     public static final String NAME = "date_histogram";
 
     @Override
-    @JsonProperty
     public abstract String type();
 
     @Nullable
