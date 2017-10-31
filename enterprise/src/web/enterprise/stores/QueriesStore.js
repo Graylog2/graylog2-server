@@ -1,5 +1,4 @@
 import Reflux from 'reflux';
-import ObjectID from 'bson-objectid';
 
 import QueriesActions from 'enterprise/actions/QueriesActions';
 import fetch from 'logic/rest/FetchProvider';
@@ -18,17 +17,18 @@ export default Reflux.createStore({
   },
   create(query) {
     this.queries = {};
-    const id = ObjectID();
-    this.queries[id] =  { query: Object.assign(query, { id }) };
-    const promise = fetch('POST', createSearchUrl, this.queries[id].query)
-      .then(response => fetch('POST', createSearchJobUrl(response.id)))
+    const promise = fetch('POST', createSearchUrl, query)
+      .then((response) => {
+        this.queries[response.id] = response;
+        return fetch('POST', createSearchJobUrl(response.id));
+      })
       .then(executionResponse => fetch('GET', jobStatusUrl(executionResponse.job_id)))
       .then((result) => {
         const searchResult = ObjectUtils.clone(result);
         searchResult.results.messages.fields = ['source', 'message'];
         searchResult.results.messages.used_indices = [];
         searchResult.results.messages.built_query = '"*"';
-        this.queries[id] = searchResult;
+        this.queries[searchResult.query.id] = searchResult;
         this._trigger();
       });
     QueriesActions.create.promise(promise);

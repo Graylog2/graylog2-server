@@ -101,8 +101,7 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         final QueryJob queryJob = queryJobService.create(query);
 
-        final CompletableFuture<QueryResult> futureResult = queryEngine.execute(queryJob);
-        queryJob.setResultFuture(futureResult);
+        queryEngine.execute(queryJob);
 
         return Response.created(URI.create(BASE_PATH + "/status/" + queryJob.getId()))
                 .entity(ImmutableMap.of("job_id", queryJob.getId()))

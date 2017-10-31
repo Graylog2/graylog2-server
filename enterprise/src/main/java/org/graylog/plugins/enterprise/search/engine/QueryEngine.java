@@ -23,7 +23,9 @@ public class QueryEngine {
     }
 
     public CompletableFuture<QueryResult> execute(QueryJob job) {
-        return CompletableFuture.supplyAsync(() -> doExecute(job));
+        final CompletableFuture<QueryResult> resultFuture = CompletableFuture.supplyAsync(() -> doExecute(job));
+        job.setResultFuture(resultFuture);
+        return resultFuture;
     }
 
     private QueryResult doExecute(QueryJob queryJob) {

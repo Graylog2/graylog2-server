@@ -7,7 +7,7 @@ export default function Histogram(props) {
   return (<HistogramVisualization {...props}
                                  computationTimeRange={props.data.timerange}
                                  config={Object.assign(props.config, {
-                                   interval: props.data.interval,
+                                   interval: props.data.interval || 'minute',
                                  })}
                                  data={props.data.results} />);
 };

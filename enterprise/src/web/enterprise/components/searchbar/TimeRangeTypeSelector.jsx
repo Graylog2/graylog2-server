@@ -3,7 +3,7 @@ import { ButtonToolbar, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import PropTypes from 'enterprise/components/CustomPropTypes';
 
-export default function TimeRangeTypeSelector({ onSelect, value}) {
+export default function TimeRangeTypeSelector({ onSelect, value }) {
   return (
     <ButtonToolbar className="timerange-chooser pull-left">
       <DropdownButton bsStyle="info"
@@ -25,7 +25,7 @@ export default function TimeRangeTypeSelector({ onSelect, value}) {
       </DropdownButton>
     </ButtonToolbar>
   );
-};
+}
 
 TimeRangeTypeSelector.propTypes = {
   onSelect: PropTypes.func.isRequired,

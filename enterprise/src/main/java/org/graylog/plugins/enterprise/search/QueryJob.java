@@ -15,7 +15,7 @@ public class QueryJob {
     @JsonIgnore
     private final Query query;
 
-    @JsonProperty
+    @JsonIgnore
     private CompletableFuture<QueryResult> resultFuture;
 
     public QueryJob(String id, Query query) {
@@ -38,5 +38,25 @@ public class QueryJob {
 
     public void setResultFuture(CompletableFuture<QueryResult> resultFuture) {
         this.resultFuture = resultFuture;
+    }
+
+    @JsonProperty("done")
+    public boolean isDone() {
+        return resultFuture.isDone();
+    }
+
+    @JsonProperty("cancelled")
+    public boolean isCancelled() {
+        return resultFuture.isCancelled();
+    }
+
+    @JsonProperty("failed")
+    public boolean isCompletedExceptionally() {
+        return resultFuture.isCompletedExceptionally();
+    }
+
+    @JsonProperty("dependent_jobs")
+    public int getNumberOfDependents() {
+        return resultFuture.getNumberOfDependents();
     }
 }

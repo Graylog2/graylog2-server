@@ -61,7 +61,6 @@ const MessageList = React.createClass({
   render() {
     const pageSize = this.props.config.pageSize || 7;
     const messages = this.props.data.messages || [];
-    messages.sort((m1, m2) => (moment(m2.message.timestamp).unix() - moment(m1.message.timestamp).unix()) || m1.message.message.localeCompare(m2.message.message));
     const messageSlice = messages
       .slice((this.state.currentPage - 1) * pageSize, this.state.currentPage * pageSize)
       .map((m) => {
