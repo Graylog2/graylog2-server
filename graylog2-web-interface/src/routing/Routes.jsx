@@ -196,12 +196,12 @@ const qualifyUrls = (routes, appPrefix) => {
   Object.keys(routes).forEach((routeName) => {
     switch (typeof routes[routeName]) {
       case 'string':
-        qualifiedRoutes[routeName] = new URI(appPrefix + '/' + routes[routeName]).normalizePath().path();
+        qualifiedRoutes[routeName] = new URI(`${appPrefix}/${routes[routeName]}`).normalizePath().resource();
         break;
       case 'function':
         qualifiedRoutes[routeName] = (...params) => {
           const result = routes[routeName](...params);
-          return new URI(appPrefix + '/' + result).normalizePath().path();
+          return new URI(`${appPrefix}/${result}`).normalizePath().resource();
         };
         break;
       case 'object':
