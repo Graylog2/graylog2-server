@@ -1,15 +1,16 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
-import moment from 'moment';
 import { Row, Col } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
-const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
-const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
+import { sortByDate } from 'util/SortUtils';
 
 import { EntityList, Spinner } from 'components/common';
 import { AlarmCallbackHistory } from 'components/alarmcallbacks';
+
+const { AlarmCallbackHistoryStore } = CombinedProvider.get('AlarmCallbackHistory');
+const { AlertNotificationsStore } = CombinedProvider.get('AlertNotifications');
 
 const AlarmCallbackHistoryOverview = React.createClass({
   propTypes: {
@@ -33,12 +34,7 @@ const AlarmCallbackHistoryOverview = React.createClass({
     }
 
     const histories = this.state.histories
-      .sort((h1, h2) => {
-        const h1Time = moment(h1.created_at);
-        const h2Time = moment(h2.created_at);
-
-        return (h1Time.isBefore(h2Time) ? -1 : h2Time.isBefore(h1Time) ? 1 : 0);
-      })
+      .sort((h1, h2) => sortByDate(h1.created_at, h2.created_at))
       .map(this._formatHistory);
     return (
       <Row>

@@ -35,8 +35,10 @@ const ReactGridContainer = React.createClass({
     children: PropTypes.node.isRequired,
     onPositionsChange: PropTypes.func.isRequired,
     locked: PropTypes.bool,
-    isResizable: React.PropTypes.bool,
-    rowHeight: React.PropTypes.number,
+    isResizable: PropTypes.bool,
+    rowHeight: PropTypes.number,
+    columns: PropTypes.object,
+    animate: PropTypes.bool,
   },
 
   getDefaultProps() {
@@ -44,6 +46,8 @@ const ReactGridContainer = React.createClass({
       locked: false,
       isResizable: true,
       rowHeight: ROW_HEIGHT,
+      columns: COLUMNS,
+      animate: true,
     };
   },
 
@@ -63,7 +67,7 @@ const ReactGridContainer = React.createClass({
   },
 
   render() {
-    const { children, locked, isResizable, positions, rowHeight } = this.props;
+    const { children, locked, isResizable, positions, rowHeight, columns, animate } = this.props;
     const layout = Object.keys(positions).map((id) => {
       const { col, row, height, width } = positions[id];
       return {
@@ -81,11 +85,12 @@ const ReactGridContainer = React.createClass({
       <WidthAdjustedReactGridLayout className={`${style.reactGridLayout} ${locked || !isResizable ? 'locked' : 'unlocked'}`}
                                     layouts={{ xxl: layout, xl: layout, lg: layout, md: layout, sm: layout, xs: layout }}
                                     breakpoints={BREAKPOINTS}
-                                    cols={COLUMNS}
+                                    cols={columns}
                                     rowHeight={rowHeight}
                                     margin={[10, 10]}
                                     onDragStop={this._onLayoutChange}
                                     onResizeStop={this._onLayoutChange}
+                                    useCSSTransforms={animate}
                                     draggableHandle={locked ? '.no-handle' : ''}>
         {children}
       </WidthAdjustedReactGridLayout>
