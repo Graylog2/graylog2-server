@@ -62,7 +62,7 @@ const FieldQuickValuesStore = Reflux.createStore({
     FieldQuickValuesActions.get.promise(promise);
   },
 
-  getHistogram(field, options = {}) {
+  getHistogram(field, fieldQueryObjects, options = {}) {
     const { order, limit, stackedFields, interval } = options;
 
     this.trigger({ loading: true });
@@ -86,9 +86,12 @@ const FieldQuickValuesStore = Reflux.createStore({
       // Do nothing
     }
 
+    // Build a new query that scopes the result to the requested field terms
+    const query = SearchStore.appendFieldQueryObjectToQueryString(originalSearchURLParams.get('q') || '*', fieldQueryObjects, SearchStore.AND_OPERATOR);
+
     const url = ApiRoutes.UniversalSearchApiController.fieldTermsHistogram(
       rangeType,
-      originalSearchURLParams.get('q') || '*',
+      query,
       field,
       order,
       limit,

@@ -23,7 +23,7 @@ const QuickValuesHistogramVisualization = React.createClass({
   DEFAULT_HEIGHT: 220,
 
   // dc.js is modifying the margins passed into the graph so make sure this is immutable
-  CHART_MARGINS: Immutable.fromJS({ left: 50, right: 15, top: 10, bottom: 35 }),
+  CHART_MARGINS: Immutable.fromJS({ left: 50, right: 15, top: 10, bottom: 45 }),
 
   propTypes: {
     id: PropTypes.string.isRequired,
@@ -55,6 +55,7 @@ const QuickValuesHistogramVisualization = React.createClass({
 
     return {
       data: this._formatData(this.props.data),
+      sortedTerms: this._formatTerms(this.props.data.terms),
       timerange: this._getQueriedTimerange(this.props.data),
       interval: this._getInterval(this.props.data),
       limit: this.props.config.limit,
@@ -87,6 +88,7 @@ const QuickValuesHistogramVisualization = React.createClass({
   _updateData({ data, config, width, height }) {
     this.setState({
       data: this._formatData(data),
+      sortedTerms: this._formatTerms(data.terms),
       timerange: this._getQueriedTimerange(data),
       interval: this._getInterval(data),
       limit: config.limit,
@@ -131,7 +133,7 @@ const QuickValuesHistogramVisualization = React.createClass({
       const terms = _.reduce(bucket.terms, (termResult, count, term) => {
         termResult.push({ term: term, count: count });
         return termResult;
-      }, []).sort((a, b) => naturalSort(b.count, a.count));
+      }, []);
 
       result.push({
         key: new Date(timestamp * 1000),
@@ -142,9 +144,13 @@ const QuickValuesHistogramVisualization = React.createClass({
     }, []);
   },
 
-  _selectGroupData(idx) {
+  _formatTerms(terms) {
+    return _.sortBy(terms);
+  },
+
+  _selectGroupData(term) {
     return (d) => {
-      return d.terms[idx] ? d.terms[idx].count : 0;
+      return (_.find(d.terms, t => t.term === term) || { count: 0 }).count;
     };
   },
 
@@ -153,28 +159,34 @@ const QuickValuesHistogramVisualization = React.createClass({
     return { all: () => { return this.state.data; } };
   },
 
-  _addChartLegend(height) {
-    const legendPrefix = this.state.sortOrder === 'asc' ? 'Bottom' : 'Top';
+  _addChartLegend(width, height) {
+    // Do not try to render the legend if we don't have a width or height yet. Avoids NaN error.
+    if (!width || !height) {
+      return;
+    }
+    const padding = 12;
     const legend = dc.legend()
       .horizontal(true)
-      .x(this.CHART_MARGINS.get('left') + 12)
-      .y(height - 20)
+      .x(this.CHART_MARGINS.get('left') + padding)
+      .y(height - 15)
       .itemHeight(12)
       .autoItemWidth(true)
       .gap(5)
-      .maxItems(5) // We cannot show more without overwriting the "Time" x axis label
-      .legendText((d, i) => {
-        return `${legendPrefix} ${i + 1}`;
-      });
+      .legendWidth(width - padding)
+      .legendText(d => d.name);
 
     this._chart.legend(legend);
   },
 
-  _addChartStacks(limit) {
-    this._chart.group(this._group(), 0, this._selectGroupData(0));
+  _addChartStacks() {
+    const terms = this.state.sortedTerms;
 
-    for (let i = 1; i < limit; i += 1) {
-      this._chart.stack(this._group(), 0, this._selectGroupData(i));
+    // For the first term we have to use "group()"
+    this._chart.group(this._group(), terms[0], this._selectGroupData(terms[0]));
+
+    // For the other terms we have to use "stack()"
+    for (let i = 1; i < terms.length; i += 1) {
+      this._chart.stack(this._group(), terms[i], this._selectGroupData(terms[i]));
     }
   },
 
@@ -202,15 +214,15 @@ const QuickValuesHistogramVisualization = React.createClass({
       .transitionDelay(0)
       .transitionDuration(0)
       .title(function getTitle(d) {
-        const idx = this.layer;
-        if (d.terms[idx]) {
-          return `${d.key.toISOString()}\n${d.terms[idx].term}: ${d.terms[idx].count}`;
+        const entry = _.find(d.terms, t => t.term === this.layer);
+        if (entry) {
+          return `${d.key.toISOString()}\n${entry.term}: ${entry.count}`;
         }
         return 'no title';
       })
       .renderLabel(false);
 
-    this._addChartLegend(height);
+    this._addChartLegend(width, height);
     this._addChartStacks(limit);
 
     this._chart.xAxis()
@@ -246,7 +258,7 @@ const QuickValuesHistogramVisualization = React.createClass({
   },
 
   _resizeChart(width, height) {
-    this._addChartLegend(height);
+    this._addChartLegend(width, height);
     this._chart
       .width(width)
       .height(height)
