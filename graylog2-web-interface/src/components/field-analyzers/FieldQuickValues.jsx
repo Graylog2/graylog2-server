@@ -90,7 +90,7 @@ const FieldQuickValues = React.createClass({
     }
   },
   addField(field) {
-    this.setState({ field: field }, () => this._loadQuickValuesData(false));
+    this.setState({ field: field, showHistogram: false, showVizOptions: false }, () => this._loadQuickValuesData(false));
   },
   _loadQuickValuesData() {
     if (this.state.field !== undefined) {
