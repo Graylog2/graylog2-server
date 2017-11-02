@@ -1,11 +1,12 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 
 const RenderCompletionObserver = React.createClass({
   propTypes: {
-    onRenderComplete: React.PropTypes.func.isRequired,
-    children: React.PropTypes.oneOfType([
-      React.PropTypes.element,
-      React.PropTypes.arrayOf(React.PropTypes.element),
+    onRenderComplete: PropTypes.func.isRequired,
+    children: PropTypes.oneOfType([
+      PropTypes.element,
+      PropTypes.arrayOf(PropTypes.element),
     ]).isRequired,
   },
 
