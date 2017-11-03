@@ -12,6 +12,8 @@ import 'brace/theme/chrome';
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
 
+import history from 'util/History';
+
 import RuleFormStyle from './RuleForm.css';
 
 const RuleForm = React.createClass({
@@ -21,7 +23,6 @@ const RuleForm = React.createClass({
     create: PropTypes.bool,
     onSave: PropTypes.func.isRequired,
     validateRule: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
   },
 
   getDefaultProps() {
@@ -107,11 +108,11 @@ const RuleForm = React.createClass({
   },
 
   _goBack() {
-    this.props.history.goBack();
+    history.goBack();
   },
 
   _saved() {
-    this.props.history.pushState(null, Routes.pluginRoute('SYSTEM_PIPELINES_RULES'));
+    history.push(Routes.pluginRoute('SYSTEM_PIPELINES_RULES'));
   },
 
   _save() {

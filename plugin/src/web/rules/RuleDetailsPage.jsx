@@ -18,7 +18,6 @@ function filterRules(state) {
 const RuleDetailsPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connectFilter(RulesStore, 'rule', filterRules), Reflux.connect(PipelinesStore)],
@@ -62,7 +61,7 @@ const RuleDetailsPage = React.createClass({
     return (
       <DocumentTitle title={pageTitle}>
         <Rule rule={this.state.rule} usedInPipelines={pipelinesUsingRule} create={this.props.params.ruleId === 'new'}
-              onSave={this._save} validateRule={this._validateRule} history={this.props.history} />
+              onSave={this._save} validateRule={this._validateRule} />
       </DocumentTitle>
     );
   },

@@ -20,7 +20,6 @@ const Rule = React.createClass({
     create: PropTypes.bool,
     onSave: PropTypes.func.isRequired,
     validateRule: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
   },
 
   render() {
@@ -63,7 +62,7 @@ const Rule = React.createClass({
         <Row className="content">
           <Col md={6}>
             <RuleForm rule={this.props.rule} usedInPipelines={this.props.usedInPipelines} create={this.props.create}
-                      onSave={this.props.onSave} validateRule={this.props.validateRule} history={this.props.history} />
+                      onSave={this.props.onSave} validateRule={this.props.validateRule} />
           </Col>
           <Col md={6}>
             <RuleHelper />

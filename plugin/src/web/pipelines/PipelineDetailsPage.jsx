@@ -35,7 +35,6 @@ function filterConnections(state) {
 const PipelineDetailsPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
   },
 
   mixins: [Reflux.connectFilter(PipelinesStore, 'pipeline', filterPipeline), Reflux.connectFilter(PipelineConnectionsStore, 'connections', filterConnections)],
@@ -109,7 +108,7 @@ const PipelineDetailsPage = React.createClass({
 
     let content;
     if (this._isNewPipeline(this.props.params.pipelineId)) {
-      content = <NewPipeline onChange={this._savePipeline} history={this.props.history} />;
+      content = <NewPipeline onChange={this._savePipeline} />;
     } else {
       content = (
         <Pipeline pipeline={this.state.pipeline} connections={this.state.connections} streams={this.state.streams}
