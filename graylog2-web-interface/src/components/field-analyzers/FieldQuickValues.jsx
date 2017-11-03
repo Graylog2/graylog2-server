@@ -3,6 +3,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { DropdownButton, MenuItem, Button } from 'react-bootstrap';
 import Reflux from 'reflux';
+import crossfilter from 'crossfilter';
 
 import { QuickValuesVisualization, QuickValuesHistogramVisualization } from 'components/visualizations';
 import AddToDashboardMenu from 'components/dashboard/AddToDashboardMenu';
@@ -90,13 +91,73 @@ const FieldQuickValues = React.createClass({
     }
   },
   addField(field) {
-    this.setState({ field: field }, () => this._loadQuickValuesData(false));
+    this.setState({ field: field, showHistogram: false, showVizOptions: false }, () => this._loadQuickValuesData(false));
+  },
+  // Builds a field query object list: [{ field: "cluster_id", value: "a" }, { field: "source", value: "b" }, ...]
+  _buildFieldQueryObjects() {
+    // We build a list of field query objects from the terms and terms_mapping data.
+    //
+    // {
+    //    field: "fieldName",
+    //    stacked_fields: ["fieldName2"],
+    //    terms: {
+    //      "foo - bar": 1,
+    //      "foo - baz": 2
+    //    },
+    //    terms_mapping: {
+    //      "foo - bar": [
+    //        { field: "fieldName", value: "foo" },
+    //        { field: "fieldName2", value: "bar" },
+    //      ],
+    //      "foo - baz": [
+    //        { field: "fieldName", value: "foo" },
+    //        { field: "fieldName2", value: "baz" },
+    //      ]
+    //    }
+    // }
+    //
+    // Will be transformed into:
+    //
+    //   [
+    //     [
+    //       { field: 'fieldName', value: 'foo' }
+    //       { field: 'fieldName2', value: 'bar' }
+    //     ],
+    //     [
+    //       { field: 'fieldName', value: 'foo' }
+    //       { field: 'fieldName2', value: 'baz' }
+    //     ],
+    //   ]
+    //
+    // We only transform the top/bottom N (limit) entries.
+
+    // Build a structure that is suitable for crossfilter
+    const data = Object.keys(this.state.data.terms)
+      .reduce((list, field) => {
+        list.push({ field: field, count: this.state.data.terms[field] });
+        return list;
+      }, []);
+
+    // Using crossfilter here to get the top or bottom N values
+    const cf = crossfilter(data).dimension(d => d.count);
+    let values;
+    if (this.state.options.order === 'desc') {
+      values = cf.top(this.state.options.limit);
+    } else {
+      values = cf.bottom(this.state.options.limit);
+    }
+
+    // Transform into field query objects as described above
+    return values.reduce((list, f) => {
+      list.push(this.state.data.terms_mapping[f.field]);
+      return list;
+    }, []);
   },
   _loadQuickValuesData() {
     if (this.state.field !== undefined) {
       this.setState({ loadingData: true });
       if (this.state.showHistogram) {
-        FieldQuickValuesActions.getHistogram(this.state.field, this.state.options).then(() => {
+        FieldQuickValuesActions.getHistogram(this.state.field, this.state.fieldQueryObjects, this.state.options).then(() => {
           this.setState({ loadingData: false });
         });
       } else {
@@ -123,8 +184,8 @@ const FieldQuickValues = React.createClass({
   },
 
   _showHistogram() {
-    // Reset the data when toggling histogram
-    this.setState({ data: [], showHistogram: true }, this._loadQuickValuesData);
+    // Reset the data when toggling histogram and build field query objects from existing data
+    this.setState({ data: [], fieldQueryObjects: this._buildFieldQueryObjects(), showHistogram: true }, this._loadQuickValuesData);
   },
 
   _showOverview() {

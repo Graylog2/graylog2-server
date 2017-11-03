@@ -84,6 +84,7 @@ public class SearchUtils {
                 termsHistogram.getInterval().toString().toLowerCase(Locale.ENGLISH),
                 termsHistogram.getSize(),
                 result,
+                termsHistogram.getTerms(),
                 termsHistogram.getBuiltQuery(),
                 org.graylog2.rest.models.search.responses.TimeRange.create(histogramBoundaries.getFrom(), histogramBoundaries.getTo()));
     }
