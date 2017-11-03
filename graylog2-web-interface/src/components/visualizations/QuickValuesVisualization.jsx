@@ -186,12 +186,19 @@ const QuickValuesVisualization = React.createClass({
       (d) => {
         let colourBadge = '';
 
+        let formattedTerm = d.term;
+        if (this.props.data.terms_mapping && this.props.data.terms_mapping[d.term]) {
+          // Separate the terms with a character that is unusual in terms and use a different text color to make the
+          // different terms in the stacked value more visible.
+          formattedTerm = this.props.data.terms_mapping[d.term].map(t => t.value).join(' <strong style="color: #e3e3e3;">&mdash;</strong> ');
+        }
+
         if (typeof this.pieChart !== 'undefined' && this.dataTable.group()(d) !== 'Others') {
           const colour = this.pieChart.colors()(d.term);
           colourBadge = `<span class="datatable-badge" style="background-color: ${colour} !important;"></span>`;
         }
 
-        return `${colourBadge} ${d.term}`;
+        return `${colourBadge} ${formattedTerm}`;
       },
       d => NumberUtils.formatPercentage(d.percentage),
       d => NumberUtils.formatNumber(d.count),
