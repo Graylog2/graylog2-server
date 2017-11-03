@@ -226,15 +226,60 @@ class SearchStore {
         return originalSearch.set('rangeParams', rangeParams);
     }
 
+    appendToQueryString(query: string, field: string, value: any, operator: any) {
+      let effectiveValue = value;
+      if (field === 'timestamp') {
+        const dateTime = new DateTime(value).toTimeZone('UTC');
+        effectiveValue = dateTime.toString(DateTime.Formats.TIMESTAMP);
+      }
+      const term = `${field}:${SearchStore.escape(effectiveValue)}`;
+      const effectiveOperator = operator || SearchStore.AND_OPERATOR;
+      const newQuery = this.addQueryTerm(query, term, effectiveOperator);
+
+      return newQuery;
+    }
+
+    appendFieldQueryObjectToQueryString(query: string, fieldQueryObjects: Array<Array<{field: string, value: string}>>, operator: any) {
+      // We transform field query objects like
+      //   [
+      //     [
+      //       { field: 'a', value: 'foo' }
+      //       { field: 'b', value: 'bar' }
+      //     ],
+      //     [
+      //       { field: 'c', value: 'baz' }
+      //       { field: 'd', value: 'hey' }
+      //     ],
+      //   ]
+      //
+      // into a query string that looks like this:
+      //
+      //   "(a:foo AND b:bar) OR (c:baz AND d:hey)"
+      //
+      const newQuery = fieldQueryObjects.map((subquery) => {
+        const q = subquery.reduce((sq, o) => {
+          return this.appendToQueryString(sq, o.field, o.value, SearchStore.AND_OPERATOR);
+        }, '');
+
+        return `(${q})`;
+      }).join(` ${SearchStore.OR_OPERATOR} `);
+
+      if (query && query !== '' && query !== '*') {
+        return `${query} ${operator || SearchStore.AND_OPERATOR} (${newQuery})`;
+      } else {
+        return newQuery;
+      }
+    }
+
     addSearchTerm(field, value, operator) {
-        let effectiveValue = value;
-        if (field === 'timestamp') {
-            const dateTime = new DateTime(value).toTimeZone('UTC');
-            effectiveValue = dateTime.toString(DateTime.Formats.TIMESTAMP);
+        const newQuery = this.appendToQueryString(this.query, field, value, operator);
+
+        if (this.query !== newQuery) {
+          this.query = newQuery;
+          if (this.onAddQueryTerm !== undefined) {
+            this.onAddQueryTerm();
+          }
         }
-        const term = `${field}:${SearchStore.escape(effectiveValue)}`;
-        const effectiveOperator = operator || SearchStore.AND_OPERATOR;
-        this.addQueryTerm(term, effectiveOperator);
     }
 
     addSearchTermWithMapping(mapping, field, value, operator) {
@@ -287,24 +332,21 @@ class SearchStore {
         return escapedTerm;
     }
 
-    queryContainsTerm(termInQuestion: string): boolean {
-        return this.query.indexOf(termInQuestion) != -1;
+    queryContainsTerm(query: string, termInQuestion: string): boolean {
+        return query.indexOf(termInQuestion) != -1;
     }
 
-    addQueryTerm(term: string, operator: string): string {
-        if (this.queryContainsTerm(term)) {
-            return;
+    addQueryTerm(query: string, term: string, operator: string): string {
+        if (this.queryContainsTerm(query, term)) {
+            return query;
         }
-        var newQuery = "";
-        if (typeof operator !== 'undefined' && this.query !== "" && this.query !== "*") {
-            newQuery = this.query + " " + operator + " ";
+        let newQuery = "";
+        if (typeof operator !== 'undefined' && query !== "" && query !== "*") {
+            newQuery = query + " " + operator + " ";
         }
         newQuery += term;
-        this.query = newQuery;
 
-        if (this.onAddQueryTerm !== undefined) {
-            this.onAddQueryTerm();
-        }
+        return newQuery;
     }
 
     getParams(): Object {

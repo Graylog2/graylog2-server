@@ -27,13 +27,16 @@ import org.joda.time.DateTime;
 
 import javax.annotation.Nullable;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class TermsHistogramResult extends IndexQueryResult {
     private final long size;
     private final Searches.DateHistogramInterval interval;
     private final Map<Long, TermsResult> result;
+    private final HashSet<String> terms;
     private AbsoluteRange boundaries;
 
     public TermsHistogramResult(@Nullable DateHistogramAggregation result, String originalQuery, String builtQuery, long size, long tookMs, Searches.DateHistogramInterval interval, List<String> fields) {
@@ -41,6 +44,7 @@ public class TermsHistogramResult extends IndexQueryResult {
         this.size = size;
         this.interval = interval;
         this.result = Maps.newTreeMap();
+        this.terms = new HashSet<>();
 
         if (result != null) {
             for (DateHistogramAggregation.DateHistogram histogram : result.getBuckets()) {
@@ -49,6 +53,7 @@ public class TermsHistogramResult extends IndexQueryResult {
                 final MissingAggregation missingAgregation = histogram.getMissingAggregation("missing");
                 final TermsResult termsResult = new TermsResult(termsAggregation, missingAgregation.getMissing(), histogram.getCount(), "", "", tookMs, fields);
 
+                this.terms.addAll(termsResult.getTerms().keySet());
                 this.result.put(keyAsDate.getMillis() / 1000L, termsResult);
             }
         }
@@ -64,6 +69,10 @@ public class TermsHistogramResult extends IndexQueryResult {
 
     public Map<Long, TermsResult> getResults() {
         return this.result;
+    }
+
+    public Set<String> getTerms() {
+        return this.terms;
     }
 
     /*

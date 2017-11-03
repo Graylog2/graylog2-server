@@ -22,6 +22,7 @@ import com.google.auto.value.AutoValue;
 import org.graylog.autovalue.WithBeanGetter;
 
 import java.util.Map;
+import java.util.Set;
 
 @JsonAutoDetect
 @AutoValue
@@ -39,13 +40,16 @@ public abstract class TermsHistogramResult {
     @JsonProperty("buckets")
     public abstract Map<Long, TermsResult> buckets();
 
+    @JsonProperty("terms")
+    public abstract Set<String> terms();
+
     @JsonProperty("built_query")
     public abstract String builtQuery();
 
     @JsonProperty("queried_timerange")
     public abstract TimeRange queriedTimerange();
 
-    public static TermsHistogramResult create(long time, String interval, long size, Map<Long, TermsResult> buckets, String builtQuery, TimeRange queriedTimerange) {
-        return new AutoValue_TermsHistogramResult(time, interval, size, buckets, builtQuery, queriedTimerange);
+    public static TermsHistogramResult create(long time, String interval, long size, Map<Long, TermsResult> buckets, Set<String> terms, String builtQuery, TimeRange queriedTimerange) {
+        return new AutoValue_TermsHistogramResult(time, interval, size, buckets, terms, builtQuery, queriedTimerange);
     }
 }
