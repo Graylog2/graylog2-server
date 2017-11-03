@@ -1,7 +1,7 @@
-import { createHistory } from 'history';
+import { browserHistory } from 'react-router';
 
 if (!window.graylogHistory) {
-  window.graylogHistory = createHistory();
+  window.graylogHistory = browserHistory;
 }
 
 export default window.graylogHistory;

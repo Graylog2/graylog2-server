@@ -7,6 +7,7 @@ import GettingStarted from 'components/gettingstarted/GettingStarted';
 import UsageStatsOptOut from 'components/usagestats/UsageStatsOptOut';
 
 import Routes from 'routing/Routes';
+import history from 'util/History';
 
 import StoreProvider from 'injection/StoreProvider';
 const SystemStore = StoreProvider.getStore('System');
@@ -15,14 +16,13 @@ const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
 const GettingStartedPage = React.createClass({
   propTypes: {
     location: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(SystemStore)],
   _isLoading() {
     return !this.state.system;
   },
   _onDismiss() {
-    this.props.history.pushState(null, Routes.STARTPAGE);
+    history.push(Routes.STARTPAGE);
   },
   render() {
     if (this._isLoading()) {

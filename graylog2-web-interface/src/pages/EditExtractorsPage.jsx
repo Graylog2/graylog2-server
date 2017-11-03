@@ -7,6 +7,7 @@ import DocumentationLink from 'components/support/DocumentationLink';
 import EditExtractor from 'components/extractors/EditExtractor';
 
 import DocsHelper from 'util/DocsHelper';
+import history from 'util/History';
 import Routes from 'routing/Routes';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -21,7 +22,6 @@ const UniversalSearchstore = StoreProvider.getStore('UniversalSearch');
 const EditExtractorsPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(ExtractorsStore), Reflux.connect(InputsStore)],
   getInitialState() {
@@ -54,7 +54,7 @@ const EditExtractorsPage = React.createClass({
       url = Routes.local_input_extractors(this.props.params.nodeId, this.props.params.inputId);
     }
 
-    this.props.history.pushState(null, url);
+    history.push(url);
   },
   render() {
     // TODO:

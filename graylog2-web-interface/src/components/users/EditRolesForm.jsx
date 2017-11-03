@@ -6,6 +6,7 @@ import Routes from 'routing/Routes';
 import { Input } from 'components/bootstrap';
 import UserNotification from 'util/UserNotification';
 import ObjectUtils from 'util/ObjectUtils';
+import history from 'util/History';
 
 import StoreProvider from 'injection/StoreProvider';
 const RolesStore = StoreProvider.getStore('Roles');
@@ -19,7 +20,6 @@ import EditRolesFormStyle from '!style!css!./EditRolesForm.css';
 const EditRolesForm = React.createClass({
   propTypes: {
     user: PropTypes.object.isRequired,
-    history: PropTypes.object,
   },
   getInitialState() {
     return {
@@ -39,14 +39,14 @@ const EditRolesForm = React.createClass({
       user.roles = roles;
       UsersStore.update(this.props.user.username, user).then(() => {
         UserNotification.success('Roles updated successfully.', 'Success!');
-        this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+        history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }, () => {
         UserNotification.error('Updating roles failed.', 'Error!');
       });
     }
   },
   _onCancel() {
-    this.props.history.pushState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+    history.push(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
   },
   _onValueChange(newRoles) {
     const roles = newRoles.split(',');

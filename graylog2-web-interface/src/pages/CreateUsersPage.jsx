@@ -1,9 +1,9 @@
-import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
 import Routes from 'routing/Routes';
 
 import UserNotification from 'util/UserNotification';
+import history from 'util/History';
 
 import StoreProvider from 'injection/StoreProvider';
 const RolesStore = StoreProvider.getStore('Roles');
@@ -13,11 +13,6 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 import NewUserForm from 'components/users/NewUserForm';
 
 const CreateUsersPage = React.createClass({
-
-  propTypes: {
-    history: PropTypes.object,
-  },
-
   getInitialState() {
     return {
       roles: undefined,
@@ -36,14 +31,14 @@ const CreateUsersPage = React.createClass({
     delete request['session-timeout-never'];
     UsersStore.create(request).then(() => {
       UserNotification.success(`User ${request.username} was created successfully.`, 'Success!');
-      this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+      history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
     }, () => {
       UserNotification.error('Failed to create user!', 'Error!');
     });
   },
 
   _onCancel() {
-    this.props.history.pushState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+    history.push(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
   },
 
   render() {

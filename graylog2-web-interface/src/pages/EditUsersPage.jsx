@@ -14,7 +14,6 @@ import UserPreferencesButton from 'components/users/UserPreferencesButton';
 const EditUsersPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
-    history: PropTypes.object,
   },
   getInitialState() {
     return {
@@ -71,7 +70,7 @@ const EditUsersPage = React.createClass({
             </div>
           </PageHeader>
 
-          <UserForm user={this.state.user} history={this.props.history} />
+          <UserForm user={this.state.user} />
         </span>
       </DocumentTitle>
     );

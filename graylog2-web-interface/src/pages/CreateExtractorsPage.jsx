@@ -8,6 +8,7 @@ import EditExtractor from 'components/extractors/EditExtractor';
 
 import DocsHelper from 'util/DocsHelper';
 import StringUtils from 'util/StringUtils';
+import history from 'util/History';
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -24,7 +25,6 @@ const CreateExtractorsPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
   },
   mixins: [Reflux.connect(InputsStore)],
   getInitialState() {
@@ -56,7 +56,7 @@ const CreateExtractorsPage = React.createClass({
       url = Routes.local_input_extractors(this.props.params.nodeId, this.props.params.inputId);
     }
 
-    this.props.history.pushState(null, url);
+    history.push(url);
   },
   render() {
     if (this._isLoading()) {

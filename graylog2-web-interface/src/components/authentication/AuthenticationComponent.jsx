@@ -24,7 +24,6 @@ const AuthenticationComponent = React.createClass({
   propTypes: {
     location: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
-    history: PropTypes.object.isRequired,
     children: PropTypes.element,
   },
 
@@ -49,7 +48,6 @@ const AuthenticationComponent = React.createClass({
     if (auth) {
       return React.createElement(auth.component, {
         key: `auth-configuration-${name}`,
-        history: this.props.history,
       });
     }
     return (<Alert bsStyle="danger">Plugin component missing for authenticator <code>{name}</code>, this is an error.</Alert>);
@@ -66,8 +64,7 @@ const AuthenticationComponent = React.createClass({
     if (this.props.params.name === undefined) {
       return (<AuthProvidersConfig config={this.state.authenticators}
                                    descriptors={this.authenticatorConfigurations}
-                                   updateConfig={this._onUpdateProviders}
-                                   history={this.props.history} />);
+                                   updateConfig={this._onUpdateProviders} />);
     }
     return this._pluginPane();
   },

@@ -5,6 +5,7 @@ import BootstrapModalForm from 'components/bootstrap/BootstrapModalForm';
 import { DocumentTitle, PageHeader, IfPermitted, SortableList } from 'components/common';
 import Routes from 'routing/Routes';
 import ObjectUtils from 'util/ObjectUtils';
+import history from 'util/History';
 import naturalSort from 'javascript-natural-sort';
 
 const AuthProvidersConfig = React.createClass({
@@ -12,7 +13,6 @@ const AuthProvidersConfig = React.createClass({
     config: PropTypes.object.isRequired,
     descriptors: PropTypes.object.isRequired,
     updateConfig: PropTypes.func.isRequired,
-    history: PropTypes.object.isRequired,
   },
 
   getDefaultProps() {
@@ -55,7 +55,7 @@ const AuthProvidersConfig = React.createClass({
   },
 
   _onCancel() {
-    this.props.history.pushState(null, Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
+    history.push(Routes.SYSTEM.AUTHENTICATION.OVERVIEW);
   },
 
   _updateSorting(newSorting) {

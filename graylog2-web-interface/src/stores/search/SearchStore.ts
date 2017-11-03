@@ -423,7 +423,7 @@ class SearchStore {
     }
 
     executeSearch(url) {
-        history.pushState(null, url);
+        history.push(url);
     }
 
     searchSurroundingMessages(messageId: string, fromTime: string, toTime: string, filter: any) {

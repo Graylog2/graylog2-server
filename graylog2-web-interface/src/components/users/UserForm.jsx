@@ -10,6 +10,7 @@ import UserNotification from 'util/UserNotification';
 import ValidationsUtils from 'util/ValidationsUtils';
 import FormsUtils from 'util/FormsUtils';
 import ObjectUtils from 'util/ObjectUtils';
+import history from 'util/History';
 
 import CombinedProvider from 'injection/CombinedProvider';
 import StoreProvider from 'injection/StoreProvider';
@@ -26,7 +27,6 @@ import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/co
 const UserForm = React.createClass({
   propTypes: {
     user: PropTypes.object.isRequired,
-    history: PropTypes.object,
   },
   mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore), Reflux.connect(DashboardsStore)],
   getInitialState() {
@@ -96,7 +96,7 @@ const UserForm = React.createClass({
     UsersStore.changePassword(this.props.user.username, request).then(() => {
       UserNotification.success('Password updated successfully.', 'Success');
       if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
-        this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+        history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }
     }, () => {
       UserNotification.error('Could not update password. Please verify that your current password is correct.', 'Updating password failed');
@@ -109,7 +109,7 @@ const UserForm = React.createClass({
     UsersStore.update(this.props.user.username, this.state.user).then(() => {
       UserNotification.success('User updated successfully.', 'Success');
       if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
-        this.props.history.replaceState(null, Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
+        history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }
       if (this.props.user.username === this.state.currentUser.username) {
         CurrentUserStore.reload();
@@ -176,7 +176,7 @@ const UserForm = React.createClass({
   },
 
   _onCancel() {
-    this.props.history.goBack();
+    history.goBack();
   },
 
   render() {
@@ -342,7 +342,7 @@ const UserForm = React.createClass({
           </Col>
         </Row>
         <IfPermitted permissions="users:rolesedit">
-          <EditRolesForm user={this.props.user} history={this.props.history} />
+          <EditRolesForm user={this.props.user} />
         </IfPermitted>
       </div>
     );

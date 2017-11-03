@@ -71,7 +71,7 @@ export class Builder {
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
         if (SessionStore.isLoggedIn() && error.status === 403) {
-          history.replaceState(null, Routes.NOTFOUND);
+          history.replace(Routes.NOTFOUND);
         }
 
         if (error.originalError && !error.originalError.status) {
@@ -107,7 +107,7 @@ export class Builder {
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
         if (SessionStore.isLoggedIn() && error.status === 403) {
-          history.replaceState(null, Routes.STARTPAGE);
+          history.replace(Routes.STARTPAGE);
         }
 
         if (error.originalError && !error.originalError.status) {
