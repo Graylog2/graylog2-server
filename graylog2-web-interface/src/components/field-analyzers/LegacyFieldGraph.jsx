@@ -31,7 +31,7 @@ const LegacyFieldGraph = React.createClass({
   },
   componentDidUpdate(prevProps) {
     if (this.props.from !== prevProps.from || this.props.to !== prevProps.to) {
-      FieldGraphsStore.updateFieldGraphData(this.props.graphId);
+      FieldGraphsStore.updateFieldGraphData(this.props.graphId, this.fieldGraphContainer);
     }
   },
 
