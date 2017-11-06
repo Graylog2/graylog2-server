@@ -30,6 +30,14 @@ const FieldQuickValues = React.createClass({
   },
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'), Reflux.connect(FieldQuickValuesStore)],
 
+  DEFAULT_OPTIONS: {
+    order: 'desc',
+    limit: 5,
+    tableSize: 50,
+    stackedFields: '',
+    interval: undefined,
+  },
+
   getDefaultProps() {
     return {
       fields: [],
@@ -42,13 +50,7 @@ const FieldQuickValues = React.createClass({
       data: [],
       showVizOptions: false,
       showHistogram: false,
-      options: {
-        order: 'desc',
-        limit: 5,
-        tableSize: 50,
-        stackedFields: '',
-        interval: undefined,
-      },
+      options: this.DEFAULT_OPTIONS,
       loadingData: false,
     };
   },
@@ -91,7 +93,12 @@ const FieldQuickValues = React.createClass({
     }
   },
   addField(field) {
-    this.setState({ field: field, showHistogram: false, showVizOptions: false }, () => this._loadQuickValuesData(false));
+    this.setState({
+      field: field,
+      showHistogram: false,
+      showVizOptions: false,
+      options: this.DEFAULT_OPTIONS,
+    }, () => this._loadQuickValuesData(false));
   },
   // Builds a field query object list: [{ field: "cluster_id", value: "a" }, { field: "source", value: "b" }, ...]
   _buildFieldQueryObjects() {
