@@ -193,7 +193,7 @@ class FieldGraphsStore {
       }
     }
 
-    updateFieldGraphData(graphId: string) {
+    updateFieldGraphData(graphId: string, graphContainer: Element) {
         const seriesName = graphId;
         const graphOptions = this.fieldGraphs.get(graphId);
         let effectiveGraphId;
@@ -211,7 +211,7 @@ class FieldGraphsStore {
             effectiveGraphId = graphId;
         }
 
-        FieldChart.updateFieldChartData(effectiveGraphId, graphOptions, seriesName);
+        FieldChart.updateFieldChartData(effectiveGraphId, graphOptions, seriesName, $(graphContainer));
     }
 
     stackGraphs(targetGraphId: string, sourceGraphId: string) {

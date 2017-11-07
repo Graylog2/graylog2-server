@@ -280,13 +280,23 @@ export const FieldChart = {
     sendUpdatedGraphEvent(options);
   },
 
-  _insertSpinner($graphContainer) {
+  _insertSpinner($graphContainer, shouldHideChart) {
+    if (shouldHideChart) {
+      this._getGraphElement($graphContainer).hide();
+      this._getGraphYAxis($graphContainer).hide();
+    }
+
     const spinnerElement = jQuery(`<div class="spinner" style="height: ${this.GRAPH_HEIGHT}px; line-height: ${this.GRAPH_HEIGHT}px;"><i class="fa fa-spin fa-refresh fa-3x spinner"></i></div>`);
     $graphContainer.append(spinnerElement);
   },
 
-  _deleteSpinner($graphContainer) {
+  _deleteSpinner($graphContainer, shouldShowChart) {
     jQuery('.spinner', $graphContainer).remove();
+
+    if (shouldShowChart) {
+      this._getGraphElement($graphContainer).show();
+      this._getGraphYAxis($graphContainer).show();
+    }
   },
 
   _fetchData(opts, timeRangeParams) {
@@ -316,12 +326,19 @@ export const FieldChart = {
       });
   },
 
+  _getGraphElement($graphContainer) {
+    return jQuery('.field-graph', $graphContainer);
+  },
+
+  _getGraphYAxis($graphContainer) {
+    return jQuery('.field-graph-y-axis', $graphContainer);
+  },
+
   renderFieldChart(opts, graphContainer, options) {
     const renderingOptions = options || {};
-    const field = opts.field;
     const $graphContainer = jQuery(graphContainer);
-    const $graphElement = jQuery('.field-graph', $graphContainer);
-    const $graphYAxis = jQuery('.field-graph-y-axis', $graphContainer);
+    const $graphElement = this._getGraphElement($graphContainer);
+    const $graphYAxis = this._getGraphYAxis($graphContainer);
 
     if (renderingOptions.newGraph) {
       this._insertSpinner($graphContainer);
@@ -353,27 +370,32 @@ export const FieldChart = {
       });
   },
 
-  updateFieldChartData(graphId, options, seriesName) {
+  updateFieldChartData(graphId, options, seriesName, $graphContainer) {
     options = this._getDefaultOptions(options);
     const timeRangeParams = this._getTimeRangeParams(options);
 
+    this._insertSpinner($graphContainer, true);
     const promise = this._fetchData(options, timeRangeParams);
-    promise.then(
-      (data) => {
-        const fieldGraph = this.fieldGraphs[graphId];
-        if (fieldGraph) {
-          const series = fieldGraph.series.filter(aSeries => aSeries.name === seriesName)[0];
-          if (series) {
-            series.valuetype = GraphVisualization.getReadableFieldChartStatisticalFunction(options.valuetype);
-            series.data = data.values;
-            fieldGraph.update();
+    promise
+      .then(
+        (data) => {
+          const fieldGraph = this.fieldGraphs[graphId];
+          if (fieldGraph) {
+            const series = fieldGraph.series.filter(aSeries => aSeries.name === seriesName)[0];
+            if (series) {
+              series.valuetype = GraphVisualization.getReadableFieldChartStatisticalFunction(options.valuetype);
+              series.data = data.values;
+              fieldGraph.update();
+            }
           }
-        }
-      },
-      (error) => {
-        UserNotification.error(`Updating field graph data failed: ${error}`, 'Could not update field graph data');
-      },
-    );
+        },
+        (error) => {
+          UserNotification.error(`Updating field graph data failed: ${error}`, 'Could not update field graph data');
+        },
+      )
+      .finally(() => {
+        this._deleteSpinner($graphContainer, true);
+      });
   },
 
   _updateStatisticalFunctionText($graphContainer, graphOptions) {
@@ -412,18 +434,18 @@ export const FieldChart = {
     graph.render();
   },
 
-  changeResolution(graphContainer, resolution) {
-    const graphOptions = this._chartOptionsFromContainer(graphContainer);
+  changeResolution($graphContainer, resolution) {
+    const graphOptions = this._chartOptionsFromContainer($graphContainer);
     graphOptions.interval = resolution;
-    this._changeGraphConfig(graphContainer, 'interval', resolution);
-    this.updateFieldChartData(graphOptions.chartid, graphOptions, graphOptions.chartid);
+    this._changeGraphConfig($graphContainer, 'interval', resolution);
+    this.updateFieldChartData(graphOptions.chartid, graphOptions, graphOptions.chartid, $graphContainer);
   },
 
   changeStatisticalFunction($graphContainer, statisticalFunction) {
     const graphOptions = this._chartOptionsFromContainer($graphContainer);
     graphOptions.valuetype = statisticalFunction;
     this._changeGraphConfig($graphContainer, 'valuetype', statisticalFunction);
-    this.updateFieldChartData(graphOptions.chartid, graphOptions, graphOptions.chartid);
+    this.updateFieldChartData(graphOptions.chartid, graphOptions, graphOptions.chartid, $graphContainer);
     this._updateStatisticalFunctionText($graphContainer, graphOptions);
   },
 
