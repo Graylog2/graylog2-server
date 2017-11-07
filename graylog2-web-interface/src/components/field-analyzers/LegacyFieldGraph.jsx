@@ -27,12 +27,11 @@ const LegacyFieldGraph = React.createClass({
   },
   mixins: [PureRenderMixin],
   componentDidMount() {
-    const graphContainer = ReactDOM.findDOMNode(this.refs.fieldGraphContainer);
-    FieldGraphsStore.renderFieldGraph(this.props.graphOptions, graphContainer);
+    FieldGraphsStore.renderFieldGraph(this.props.graphOptions, this.fieldGraphContainer);
   },
   componentDidUpdate(prevProps) {
     if (this.props.from !== prevProps.from || this.props.to !== prevProps.to) {
-      FieldGraphsStore.updateFieldGraphData(this.props.graphId);
+      FieldGraphsStore.updateFieldGraphData(this.props.graphId, this.fieldGraphContainer);
     }
   },
 
@@ -112,7 +111,7 @@ const LegacyFieldGraph = React.createClass({
     );
 
     return (
-      <div ref="fieldGraphContainer"
+      <div ref={(c) => { this.fieldGraphContainer = c; }}
            style={{ display: this.props.hidden ? 'none' : 'block' }}
            className="content-col field-graph-container"
            data-chart-id={this.props.graphId}
