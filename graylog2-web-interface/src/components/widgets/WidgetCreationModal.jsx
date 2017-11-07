@@ -15,6 +15,13 @@ const WidgetCreationModal = React.createClass({
     onConfigurationSaved: PropTypes.func.isRequired,
     onModalHidden: PropTypes.func,
     widgetType: PropTypes.string.isRequired,
+    loading: PropTypes.bool,
+  },
+
+  getDefaultProps() {
+    return {
+      loading: false,
+    };
   },
 
   getInitialState() {
@@ -114,13 +121,15 @@ const WidgetCreationModal = React.createClass({
   },
 
   render() {
+    const loading = this.props.loading;
     return (
       <BootstrapModalForm ref="createModal"
                           title="Create Dashboard Widget"
                           onModalOpen={this._getInitialConfiguration}
                           onModalClose={this.props.onModalHidden}
                           onSubmitForm={this.save}
-                          submitButtonText="Create">
+                          submitButtonText={loading ? 'Creating...' : 'Create'}
+                          submitButtonDisabled={loading}>
         <fieldset>
           <Input type="text"
                  label="Title"

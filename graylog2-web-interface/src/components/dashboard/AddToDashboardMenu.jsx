@@ -42,6 +42,7 @@ const AddToDashboardMenu = React.createClass({
   getInitialState() {
     return {
       selectedDashboard: '',
+      loading: false,
     };
   },
 
@@ -111,8 +112,11 @@ const AddToDashboardMenu = React.createClass({
 
     widgetConfig = searchParams.merge(widgetConfig).merge(configuration);
 
+    this.setState({ loading: true });
     const promise = WidgetsStore.addWidget(this.state.selectedDashboard, this.props.widgetType, title, widgetConfig.toJS());
-    promise.done(() => this.refs.widgetModal.saved());
+    promise
+      .then(() => this.refs.widgetModal.saved())
+      .finally(() => this.setState({ loading: false }));
   },
   _createNewDashboard() {
     this.refs.createDashboardModal.open();
@@ -184,6 +188,7 @@ const AddToDashboardMenu = React.createClass({
     }
 
     const { appendMenus, children } = this.props;
+    const loading = this.state.loading;
 
     return (
       <div style={{ display: 'inline-block' }}>
@@ -198,7 +203,8 @@ const AddToDashboardMenu = React.createClass({
         <WidgetCreationModal ref="widgetModal"
                              widgetType={this.props.widgetType}
                              onConfigurationSaved={this._saveWidget}
-                             fields={this.props.fields} />
+                             fields={this.props.fields}
+                             loading={loading} />
       </div>
     );
   },
