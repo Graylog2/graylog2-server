@@ -17,6 +17,8 @@
 package org.graylog2.system.stats.elasticsearch;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
 import com.google.common.collect.Lists;
 import com.google.inject.Singleton;
 import io.searchbox.client.JestClient;
@@ -47,6 +49,17 @@ public class ElasticsearchProbe {
         final JestResult clusterStatsResponse = JestUtils.execute(jestClient, new Stats.Builder().build(), () -> "Couldn't read Elasticsearch cluster stats");
         final JsonNode clusterStatsResponseJson = clusterStatsResponse.getJsonObject();
         final String clusterName = clusterStatsResponseJson.path("cluster_name").asText();
+
+        String clusterVersion = null;
+        if (clusterStatsResponseJson.path("nodes").path("versions").isArray()) {
+            final ArrayNode versions = (ArrayNode) clusterStatsResponseJson.path("nodes").path("versions");
+            // We just use the first version in the "versions" array. This is not correct if there are different
+            // versions running in the cluster, but that is not recommended anyway.
+            final JsonNode versionNode = versions.path(0);
+            if (versionNode.getNodeType() != JsonNodeType.MISSING) {
+                clusterVersion = versionNode.asText();
+            }
+        }
 
         final JsonNode countStats = clusterStatsResponseJson.path("nodes").path("count");
 
@@ -96,6 +109,7 @@ public class ElasticsearchProbe {
 
         return ElasticsearchStats.create(
                 clusterName,
+                clusterVersion,
                 healthStatus,
                 clusterHealth,
                 nodesStats,
