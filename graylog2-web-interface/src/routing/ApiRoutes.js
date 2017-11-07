@@ -41,6 +41,7 @@ const ApiRoutes = {
   ClusterApiResource: {
     list: () => { return { url: '/system/cluster/nodes' }; },
     node: () => { return { url: '/system/cluster/node' }; },
+    elasticsearchStats: () => { return { url: '/system/cluster/stats/elasticsearch' }; },
   },
   DashboardsApiController: {
     create: () => { return { url: '/dashboards' }; },

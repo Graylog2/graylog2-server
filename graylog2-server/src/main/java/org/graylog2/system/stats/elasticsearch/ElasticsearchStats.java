@@ -19,7 +19,6 @@ package org.graylog2.system.stats.elasticsearch;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.graylog.autovalue.WithBeanGetter;
 
 @JsonAutoDetect
@@ -34,6 +33,9 @@ public abstract class ElasticsearchStats {
     public abstract String clusterName();
 
     @JsonProperty
+    public abstract String clusterVersion();
+
+    @JsonProperty
     public abstract HealthStatus status();
 
     @JsonProperty
@@ -46,10 +48,11 @@ public abstract class ElasticsearchStats {
     public abstract IndicesStats indicesStats();
 
     public static ElasticsearchStats create(String clusterName,
+                                            String clusterVersion,
                                             HealthStatus status,
                                             ClusterHealth clusterHealth,
                                             NodesStats nodesStats,
                                             IndicesStats indicesStats) {
-        return new AutoValue_ElasticsearchStats(clusterName, status, clusterHealth, nodesStats, indicesStats);
+        return new AutoValue_ElasticsearchStats(clusterName, clusterVersion, status, clusterHealth, nodesStats, indicesStats);
     }
 }

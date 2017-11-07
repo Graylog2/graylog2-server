@@ -17,6 +17,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { FieldQuickValuesStore, FieldQuickValuesActions } = CombinedProvider.get('FieldQuickValues');
 const { RefreshStore } = CombinedProvider.get('Refresh');
+const { SystemStore } = CombinedProvider.get('System');
 
 const FieldQuickValues = React.createClass({
   propTypes: {
@@ -30,6 +31,14 @@ const FieldQuickValues = React.createClass({
   },
   mixins: [Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'), Reflux.connect(FieldQuickValuesStore)],
 
+  DEFAULT_OPTIONS: {
+    order: 'desc',
+    limit: 5,
+    tableSize: 50,
+    stackedFields: '',
+    interval: undefined,
+  },
+
   getDefaultProps() {
     return {
       fields: [],
@@ -42,14 +51,9 @@ const FieldQuickValues = React.createClass({
       data: [],
       showVizOptions: false,
       showHistogram: false,
-      options: {
-        order: 'desc',
-        limit: 5,
-        tableSize: 50,
-        stackedFields: '',
-        interval: undefined,
-      },
+      options: this.DEFAULT_OPTIONS,
       loadingData: false,
+      disableStackedFields: false,
     };
   },
 
@@ -91,7 +95,12 @@ const FieldQuickValues = React.createClass({
     }
   },
   addField(field) {
-    this.setState({ field: field, showHistogram: false, showVizOptions: false }, () => this._loadQuickValuesData(false));
+    this.setState({
+      field: field,
+      showHistogram: false,
+      showVizOptions: false,
+      options: this.DEFAULT_OPTIONS,
+    }, () => this._loadQuickValuesData(false));
   },
   // Builds a field query object list: [{ field: "cluster_id", value: "a" }, { field: "source", value: "b" }, ...]
   _buildFieldQueryObjects() {
@@ -157,11 +166,11 @@ const FieldQuickValues = React.createClass({
     if (this.state.field !== undefined) {
       this.setState({ loadingData: true });
       if (this.state.showHistogram) {
-        FieldQuickValuesActions.getHistogram(this.state.field, this.state.fieldQueryObjects, this.state.options).then(() => {
+        FieldQuickValuesActions.getHistogram(this.state.field, this.state.fieldQueryObjects, this.state.options).finally(() => {
           this.setState({ loadingData: false });
         });
       } else {
-        FieldQuickValuesActions.get(this.state.field, this.state.options).then(() => {
+        FieldQuickValuesActions.get(this.state.field, this.state.options).finally(() => {
           this.setState({ loadingData: false });
         });
       }
@@ -180,6 +189,13 @@ const FieldQuickValues = React.createClass({
   },
 
   _showVizOptions() {
+    SystemStore.elasticsearchVersion().then((version) => {
+      // The stacking feature of the QuickValues widget needs at least ES 5 because earlier versions do not have
+      // the painless scripting engine.
+      if (version.major < 5) {
+        this.setState({ disableStackedFields: true });
+      }
+    });
     this.setState({ showVizOptions: true });
   },
 
@@ -225,6 +241,7 @@ const FieldQuickValues = React.createClass({
                                   order={this.state.options.order}
                                   stackedFields={this.state.options.stackedFields}
                                   stackedFieldsOptions={this.props.fields}
+                                  disableStackedFields={this.state.disableStackedFields}
                                   field={this.state.field}
                                   interval={this.state.options.interval}
                                   isHistogram={this.state.showHistogram}
