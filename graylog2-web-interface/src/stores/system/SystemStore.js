@@ -3,6 +3,7 @@ import Reflux from 'reflux';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
+import Promise from 'bluebird';
 
 const SystemStore = Reflux.createStore({
   system: undefined,
@@ -34,6 +35,19 @@ const SystemStore = Reflux.createStore({
     const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.locales().url);
 
     return fetch('GET', url);
+  },
+  elasticsearchVersion() {
+    const url = URLUtils.qualifyUrl(ApiRoutes.ClusterApiResource.elasticsearchStats().url);
+
+    const promise = new Promise((resolve, reject) => {
+      fetch('GET', url).then((response) => {
+        const splitVersion = response.cluster_version.split('.');
+
+        resolve({ major: splitVersion[0], minor: splitVersion[1], patch: splitVersion[2] });
+      }).catch(reject);
+    });
+
+    return promise;
   },
 });
 

@@ -17,6 +17,7 @@ import CombinedProvider from 'injection/CombinedProvider';
 
 const { FieldQuickValuesStore, FieldQuickValuesActions } = CombinedProvider.get('FieldQuickValues');
 const { RefreshStore } = CombinedProvider.get('Refresh');
+const { SystemStore } = CombinedProvider.get('System');
 
 const FieldQuickValues = React.createClass({
   propTypes: {
@@ -52,6 +53,7 @@ const FieldQuickValues = React.createClass({
       showHistogram: false,
       options: this.DEFAULT_OPTIONS,
       loadingData: false,
+      disableStackedFields: false,
     };
   },
 
@@ -187,6 +189,13 @@ const FieldQuickValues = React.createClass({
   },
 
   _showVizOptions() {
+    SystemStore.elasticsearchVersion().then((version) => {
+      // The stacking feature of the QuickValues widget needs at least ES 5 because earlier versions do not have
+      // the painless scripting engine.
+      if (version.major < 5) {
+        this.setState({ disableStackedFields: true });
+      }
+    });
     this.setState({ showVizOptions: true });
   },
 
@@ -232,6 +241,7 @@ const FieldQuickValues = React.createClass({
                                   order={this.state.options.order}
                                   stackedFields={this.state.options.stackedFields}
                                   stackedFieldsOptions={this.props.fields}
+                                  disableStackedFields={this.state.disableStackedFields}
                                   field={this.state.field}
                                   interval={this.state.options.interval}
                                   isHistogram={this.state.showHistogram}

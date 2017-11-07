@@ -17,10 +17,17 @@ const QuickValuesOptionsForm = React.createClass({
     field: PropTypes.string.isRequired,
     stackedFields: PropTypes.string,
     stackedFieldsOptions: PropTypes.arrayOf(PropTypes.object).isRequired,
+    disableStackedFields: PropTypes.bool,
     interval: PropTypes.string,
     isHistogram: PropTypes.bool.isRequired,
     onSave: PropTypes.func.isRequired,
     onCancel: PropTypes.func.isRequired,
+  },
+
+  getDefaultProps() {
+    return {
+      disableStackedFields: false,
+    };
   },
 
   getInitialState() {
@@ -94,6 +101,11 @@ const QuickValuesOptionsForm = React.createClass({
       );
     }
 
+    let stackedFieldsPlaceholder = 'Select fields for stacking...';
+    if (this.props.disableStackedFields) {
+      stackedFieldsPlaceholder = 'Feature requires Elasticsearch version >= 5';
+    }
+
     return (
       <Row>
         <Col md={6}>
@@ -130,8 +142,9 @@ const QuickValuesOptionsForm = React.createClass({
                 <ControlLabel>Stacked fields</ControlLabel>
                 <MultiSelect options={fieldOptions}
                              value={this.state.stackedFields}
+                             disabled={this.props.disableStackedFields}
+                             placeholder={stackedFieldsPlaceholder}
                              onChange={this._onStackedFieldChange} />
-                <HelpBlock>The stacked fields option <strong>requires Elasticsearch version &gt;= 5</strong> to work correctly</HelpBlock>
               </FormGroup>
 
               {intervalForm}
