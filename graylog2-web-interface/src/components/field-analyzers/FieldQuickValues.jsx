@@ -164,11 +164,11 @@ const FieldQuickValues = React.createClass({
     if (this.state.field !== undefined) {
       this.setState({ loadingData: true });
       if (this.state.showHistogram) {
-        FieldQuickValuesActions.getHistogram(this.state.field, this.state.fieldQueryObjects, this.state.options).then(() => {
+        FieldQuickValuesActions.getHistogram(this.state.field, this.state.fieldQueryObjects, this.state.options).finally(() => {
           this.setState({ loadingData: false });
         });
       } else {
-        FieldQuickValuesActions.get(this.state.field, this.state.options).then(() => {
+        FieldQuickValuesActions.get(this.state.field, this.state.options).finally(() => {
           this.setState({ loadingData: false });
         });
       }
