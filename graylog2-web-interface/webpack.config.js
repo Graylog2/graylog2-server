@@ -117,7 +117,10 @@ if (TARGET === 'start') {
     },
     plugins: [
       new webpack.NamedModulesPlugin(),
-      new webpack.DefinePlugin({DEVELOPMENT: true}),
+      new webpack.DefinePlugin({
+        DEVELOPMENT: true,
+        REPLACE_MODULES: true,
+      }),
     ],
   });
 }
@@ -152,7 +155,10 @@ if (TARGET === 'watch') {
       publicPath: '/',
     },
     plugins: [
-      new webpack.DefinePlugin({DEVELOPMENT: true}),
+      new webpack.DefinePlugin({
+        DEVELOPMENT: true,
+        REPLACE_MODULES: false, // We don't intend to use HMR but for reloading the browser window
+      }),
       // We need config.js in the "build/" folder. No idea how webpack-dev-server
       // handles that, I found nothing in the config. (bernd)
       new CopyWebpackPlugin([{ from: 'config.js' }]),
