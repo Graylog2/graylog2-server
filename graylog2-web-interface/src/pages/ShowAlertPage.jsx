@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, Label, Tooltip } from 'react-bootstrap';
+import { Button, ButtonToolbar, Label, Tooltip } from 'react-bootstrap';
 
 import { DocumentTitle, OverlayElement, PageHeader, Spinner, Timestamp } from 'components/common';
 import { AlertDetails } from 'components/alerts';
@@ -127,16 +127,17 @@ const ShowAlertPage = React.createClass({
             </span>
 
             <span>
-              <OverlayElement overlay={conditionDetailsTooltip} placement="top" useOverlay={!condition.id}
-                              trigger={['hover', 'focus']}>
-                <LinkContainer to={Routes.show_alert_condition(stream.id, condition.id)} disabled={!condition.id}>
-                  <Button bsStyle="info">Condition details</Button>
+              <ButtonToolbar>
+                <LinkContainer to={Routes.ALERTS.LIST}>
+                  <Button bsStyle="info" className="active">Alerts</Button>
                 </LinkContainer>
-              </OverlayElement>
-              &nbsp;
-              <LinkContainer to={Routes.ALERTS.LIST}>
-                <Button bsStyle="info">Alerts overview</Button>
-              </LinkContainer>
+                <OverlayElement overlay={conditionDetailsTooltip} placement="top" useOverlay={!condition.id}
+                                trigger={['hover', 'focus']}>
+                  <LinkContainer to={Routes.show_alert_condition(stream.id, condition.id)} disabled={!condition.id}>
+                    <Button bsStyle="info">Condition details</Button>
+                  </LinkContainer>
+                </OverlayElement>
+              </ButtonToolbar>
             </span>
           </PageHeader>
 

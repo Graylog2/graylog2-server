@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
-import { Button, Col, Row } from 'react-bootstrap';
+import { Button, ButtonToolbar, Col, Row } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -138,27 +138,17 @@ const LUTDataAdaptersPage = React.createClass({
             <span>Data adapters provide the actual values for lookup tables</span>
             {null}
             <span>
-              {isShowing && (
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.edit(this.props.params.adapterName)}
-                               onlyActiveOnIndex>
-                  <Button bsStyle="success">Edit</Button>
+              <ButtonToolbar>
+                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
+                  <Button bsStyle="info">Lookup Tables</Button>
                 </LinkContainer>
-              )}
-              &nbsp;
-              {(isShowing || isEditing) && (
-                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}
-                               onlyActiveOnIndex>
-                  <Button bsStyle="info">Data Adapters</Button>
+                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW}>
+                  <Button bsStyle="info">Caches</Button>
                 </LinkContainer>
-              )}
-              &nbsp;
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW} onlyActiveOnIndex>
-                <Button bsStyle="info">Lookup Tables</Button>
-              </LinkContainer>
-              &nbsp;
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.OVERVIEW} onlyActiveOnIndex>
-                <Button bsStyle="info">Caches</Button>
-              </LinkContainer>
+                <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.OVERVIEW}>
+                  <Button bsStyle="info" className="active">Data Adapters</Button>
+                </LinkContainer>
+              </ButtonToolbar>
             </span>
           </PageHeader>
 
