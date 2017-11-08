@@ -23,9 +23,9 @@ const NumericVisualization = React.createClass({
       PropTypes.object,
       PropTypes.number,
     ]).isRequired,
-    height: React.PropTypes.number,
-    width: React.PropTypes.number,
-    onRenderComplete: React.PropTypes.func,
+    height: PropTypes.number,
+    width: PropTypes.number,
+    onRenderComplete: PropTypes.func,
   },
 
   getDefaultProps() {

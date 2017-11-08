@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
@@ -7,26 +8,26 @@ import StringUtils from 'util/StringUtils';
 
 const MessageTableEntry = React.createClass({
   propTypes: {
-    allStreams: React.PropTypes.instanceOf(Immutable.List).isRequired,
-    allStreamsLoaded: React.PropTypes.bool.isRequired,
-    disableSurroundingSearch: React.PropTypes.bool,
-    expandAllRenderAsync: React.PropTypes.bool.isRequired,
-    expanded: React.PropTypes.bool.isRequired,
-    highlight: React.PropTypes.bool,
-    highlightMessage: React.PropTypes.string,
-    inputs: React.PropTypes.instanceOf(Immutable.Map).isRequired,
-    message: React.PropTypes.shape({
-      fields: React.PropTypes.object.isRequired,
-      highlight_ranges: React.PropTypes.object,
-      id: React.PropTypes.string.isRequired,
-      index: React.PropTypes.string.isRequired,
+    allStreams: PropTypes.instanceOf(Immutable.List).isRequired,
+    allStreamsLoaded: PropTypes.bool.isRequired,
+    disableSurroundingSearch: PropTypes.bool,
+    expandAllRenderAsync: PropTypes.bool.isRequired,
+    expanded: PropTypes.bool.isRequired,
+    highlight: PropTypes.bool,
+    highlightMessage: PropTypes.string,
+    inputs: PropTypes.instanceOf(Immutable.Map).isRequired,
+    message: PropTypes.shape({
+      fields: PropTypes.object.isRequired,
+      highlight_ranges: PropTypes.object,
+      id: PropTypes.string.isRequired,
+      index: PropTypes.string.isRequired,
     }).isRequired,
-    nodes: React.PropTypes.instanceOf(Immutable.Map).isRequired,
-    searchConfig: React.PropTypes.object,
-    selectedFields: React.PropTypes.instanceOf(Immutable.OrderedSet),
-    showMessageRow: React.PropTypes.bool,
-    streams: React.PropTypes.instanceOf(Immutable.Map).isRequired,
-    toggleDetail: React.PropTypes.func.isRequired,
+    nodes: PropTypes.instanceOf(Immutable.Map).isRequired,
+    searchConfig: PropTypes.object,
+    selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
+    showMessageRow: PropTypes.bool,
+    streams: PropTypes.instanceOf(Immutable.Map).isRequired,
+    toggleDetail: PropTypes.func.isRequired,
   },
   getDefaultProps() {
     return {

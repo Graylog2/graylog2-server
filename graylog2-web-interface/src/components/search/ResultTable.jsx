@@ -14,14 +14,14 @@ import { MessageTableEntry, MessageTablePaginator } from 'components/search';
 
 const ResultTable = React.createClass({
   propTypes: {
-    disableSurroundingSearch: React.PropTypes.bool,
+    disableSurroundingSearch: PropTypes.bool,
     highlight: PropTypes.bool.isRequired,
     inputs: PropTypes.object.isRequired,
     messages: PropTypes.array.isRequired,
     nodes: PropTypes.object.isRequired,
-    onPageChange: React.PropTypes.func,
+    onPageChange: PropTypes.func,
     page: PropTypes.number.isRequired,
-    pageSize: React.PropTypes.number,
+    pageSize: PropTypes.number,
     resultCount: PropTypes.number.isRequired,
     selectedFields: PropTypes.object.isRequired,
     sortField: PropTypes.string.isRequired,
