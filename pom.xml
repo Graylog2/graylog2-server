@@ -93,7 +93,7 @@
         <dependency>
             <groupId>org.graylog.autovalue</groupId>
             <artifactId>auto-value-javabean</artifactId>
-            <version>${graylog.version}</version>
+            <version>${auto-value-javabean.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
