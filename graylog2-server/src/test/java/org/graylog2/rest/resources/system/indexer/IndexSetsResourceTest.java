@@ -730,6 +730,7 @@ public class IndexSetsResourceTest {
         protected Subject getSubject() {
             final Subject mockSubject = mock(Subject.class);
             when(mockSubject.isPermitted(anyString())).thenReturn(permitted.get());
+            when(mockSubject.getPrincipal()).thenReturn("test-user");
             return mockSubject;
         }
     }
