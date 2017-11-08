@@ -11,7 +11,7 @@
   "readme": "../README.md",
   "scripts": {
     "start": "webpack-dev-server --config webpack.bundled.js --history-api-fallback --hot --inline",
-    "start-nohmr": "webpack-dev-server --watch --history-api-fallback --config webpack.bundled.js",
+    "start-nohmr": "node devServer.js",
     "watch": "webpack --watch --config webpack.bundled.js",
     "devd": "devd --livewatch --port=8080 --address=127.0.0.1 --notfound=index.html build/",
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
@@ -99,12 +99,15 @@
     "babel-preset-react": "^6.22.0",
     "babel-preset-stage-0": "^6.22.0",
     "clean-webpack-plugin": "^0.1.3",
+    "compression": "^1.7.1",
+    "connect-history-api-fallback": "^1.4.0",
     "copy-webpack-plugin": "^4.2.0",
     "css-loader": "^0.28.4",
     "enzyme": "^2.9.0",
     "eslint": "^4.3.0",
     "eslint-loader": "^1.6.3",
     "estraverse-fb": "^1.3.1",
+    "express": "^4.16.2",
     "extract-text-webpack-plugin": "^3.0.0",
     "file-loader": "^0.11.0",
     "glob": "^7.0.0",
@@ -126,7 +129,9 @@
     "typescript": "^2.4.2",
     "url-loader": "^0.5.6",
     "webpack": "^3.4.1",
+    "webpack-dev-middleware": "^1.12.0",
     "webpack-dev-server": "^2.6.1",
+    "webpack-hot-middleware": "^2.20.0",
     "webpack-merge": "^4.1.0"
   }
 }

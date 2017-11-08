@@ -1,3 +1,5 @@
+/* global REPLACE_MODULES */
+
 // We need to set the app prefix before doing anything else, so it applies to styles too.
 // eslint-disable-next-line no-unused-vars
 import webpackEntry from 'webpack-entry';
@@ -15,9 +17,7 @@ function renderAppContainer(appContainer) {
   // eslint-disable-next-line global-require
   const AppFacade = require('routing/AppFacade');
   ReactDOM.render(
-    <AppContainer>
-      <AppFacade />
-    </AppContainer>,
+    REPLACE_MODULES ? <AppContainer><AppFacade /></AppContainer> : <AppFacade />,
     appContainer,
   );
 }
@@ -28,7 +28,8 @@ window.onload = () => {
 
   renderAppContainer(appContainer);
 
-  if (module.hot) {
+  if (module.hot && REPLACE_MODULES) {
+    console.log('HMR enabled');
     module.hot.accept('routing/AppFacade', () => {
       renderAppContainer(appContainer);
     });

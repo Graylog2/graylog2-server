@@ -3,6 +3,7 @@ const webpack = require('webpack');
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const merge = require('webpack-merge');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 const ROOT_PATH = path.resolve(__dirname);
 const APP_PATH = path.resolve(ROOT_PATH, 'src');
@@ -125,28 +126,23 @@ if (TARGET === 'start-nohmr') {
   console.error('Running in development (no HMR) mode');
   module.exports = merge(webpackConfig, {
     devtool: 'eval',
-    devServer: {
-      historyApiFallback: true,
-      hot: false,
-      inline: true,
-      watchOptions: {
-        ignored: /node_modules/,
-      },
-    },
     output: {
       path: BUILD_PATH,
       filename: '[name].js',
       publicPath: '/',
     },
     plugins: [
-      new webpack.DefinePlugin({DEVELOPMENT: true}),
+      new webpack.DefinePlugin({
+        DEVELOPMENT: true,
+        REPLACE_MODULES: false, // We don't intend to use HMR but for reloading the browser window
+      }),
+      new CopyWebpackPlugin([{ from: 'config.js' }]),
+      new webpack.HotModuleReplacementPlugin(),
     ],
   });
 }
 
 if (TARGET === 'watch') {
-  const CopyWebpackPlugin = require('copy-webpack-plugin');
-
   console.error('Running in development (watch) mode');
   module.exports = merge(webpackConfig, {
     devtool: 'eval',
