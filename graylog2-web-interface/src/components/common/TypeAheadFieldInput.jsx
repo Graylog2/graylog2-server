@@ -15,6 +15,7 @@ import fetch from 'logic/rest/FetchProvider';
 
 const TypeAheadFieldInput = React.createClass({
   propTypes: {
+    id: PropTypes.string.isRequired,
     valueLink: PropTypes.object,
     autoFocus: PropTypes.bool,
     onChange: PropTypes.func,
@@ -77,10 +78,12 @@ const TypeAheadFieldInput = React.createClass({
 
   render() {
     return (
-      <Input ref="fieldInput" label={this.props.label}
+      <Input id={this.props.id}
+             ref="fieldInput"
+             label={this.props.label}
              wrapperClassName="typeahead-wrapper"
              defaultValue={this.props.valueLink ? this.props.valueLink.value : null}
-        {...this._getFilteredProps()} />
+             {...this._getFilteredProps()} />
     );
   },
 });

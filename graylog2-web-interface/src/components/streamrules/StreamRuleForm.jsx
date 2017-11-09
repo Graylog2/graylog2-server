@@ -59,7 +59,7 @@ const StreamRuleForm = React.createClass({
   render() {
     const streamRuleTypes = this.props.streamRuleTypes.map(this._formatStreamRuleType);
     const fieldBox = (String(this.state.type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
-      <TypeAheadFieldInput ref="fieldInput" type="text" required label="Field" valueLink={this.linkState('field')} autoFocus /> : '');
+      <TypeAheadFieldInput id="field-input" ref="fieldInput" type="text" required label="Field" valueLink={this.linkState('field')} autoFocus /> : '');
     const valueBox = (String(this.state.type) !== String(this.FIELD_PRESENCE_RULE_TYPE) && String(this.state.type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
       <Input id="Value" type="text" required label="Value" name="Value" valueLink={this.linkState('value')} /> : '');
     return (
