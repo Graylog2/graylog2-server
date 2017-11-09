@@ -227,7 +227,8 @@ const SearchesConfig = React.createClass({
                    checked={this._isEnabled()}
                    onChange={this._onChecked} />
             {this._isEnabled() &&
-            <ISODurationInput duration={config.query_time_range_limit}
+            <ISODurationInput id="query-timerange-limit-field"
+                              duration={config.query_time_range_limit}
                               update={this._onUpdate('query_time_range_limit')}
                               label="Query time range limit (ISO8601 Duration)"
                               help={'The maximum time range for searches. (i.e. "P30D" for 30 days, "PT24H" for 24 hours)'}

@@ -5,6 +5,7 @@ import ISODurationUtils from 'util/ISODurationUtils';
 
 const ISODurationInput = React.createClass({
   propTypes: {
+    id: PropTypes.string.isRequired,
     duration: PropTypes.string.isRequired,
     update: PropTypes.func.isRequired,
     label: PropTypes.string,
@@ -49,7 +50,8 @@ const ISODurationInput = React.createClass({
 
   render() {
     return (
-      <Input type="text"
+      <Input id={this.props.id}
+             type="text"
              ref="isoDuration"
              label={this.props.label}
              onChange={this._onUpdate}
