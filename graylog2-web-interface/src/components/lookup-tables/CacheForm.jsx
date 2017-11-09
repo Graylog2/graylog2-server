@@ -235,9 +235,11 @@ const CacheForm = React.createClass({
             </fieldset>
             {configFieldSet}
             <fieldset>
-              <Input wrapperClassName="col-sm-offset-3 col-sm-9">
-                <Button type="submit" bsStyle="success">{this.props.create ? 'Create Cache' : 'Update Cache'}</Button>
-              </Input>
+              <Row>
+                <Col mdOffset={3} md={9}>
+                  <Button type="submit" bsStyle="success">{this.props.create ? 'Create Cache' : 'Update Cache'}</Button>
+                </Col>
+              </Row>
             </fieldset>
           </form>
         </Col>

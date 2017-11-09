@@ -284,11 +284,13 @@ const EditExtractor = React.createClass({
                                              onChange={this._onConverterChange} />
                   </div>
 
-                  <Input wrapperClassName="col-md-offset-2 col-md-10">
-                    <Button type="submit" bsStyle="success">
-                      {this.props.action === 'create' ? 'Create extractor' : 'Update extractor'}
-                    </Button>
-                  </Input>
+                  <Row>
+                    <Col mdOffset={2} md={10}>
+                      <Button type="submit" bsStyle="success">
+                        {this.props.action === 'create' ? 'Create extractor' : 'Update extractor'}
+                      </Button>
+                    </Col>
+                  </Row>
                 </form>
               </Col>
             </Row>

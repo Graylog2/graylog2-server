@@ -85,11 +85,7 @@ const DataAdapter = React.createClass({
                      onChange={this._onChange}
                      help="Key to look up a value for."
                      value={this.state.lookupKey} />
-            </fieldset>
-            <fieldset>
-              <Input>
-                <Button type="submit" bsStyle="success">Look up</Button>
-              </Input>
+              <Button type="submit" bsStyle="success">Look up</Button>
             </fieldset>
           </form>
           { this.state.lookupResult && (

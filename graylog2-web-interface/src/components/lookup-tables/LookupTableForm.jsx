@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import _ from 'lodash';
-import { Button } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 import FormsUtils from 'util/FormsUtils';
@@ -295,9 +295,11 @@ const LookupTableForm = React.createClass({
         </CachesContainer>
 
         <fieldset>
-          <Input wrapperClassName="col-sm-offset-3 col-sm-9">
-            <Button type="submit" bsStyle="success">{this.props.create ? 'Create Lookup Table' : 'Update Lookup Table'}</Button>
-          </Input>
+          <Row>
+            <Col mdOffset={3} md={9}>
+              <Button type="submit" bsStyle="success">{this.props.create ? 'Create Lookup Table' : 'Update Lookup Table'}</Button>
+            </Col>
+          </Row>
         </fieldset>
       </form>
     );

@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button } from 'react-bootstrap';
+import { Button, Col, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
 import StoreProvider from 'injection/StoreProvider';
@@ -142,11 +142,13 @@ const JSONExtractorConfiguration = React.createClass({
                onChange={this._onChange('key_whitespace_replacement')}
                help="What character to use when replacing whitespaces in message keys. Please ensure the replacement character is valid in Lucene, e.g. '-' or '_'." />
 
-        <Input wrapperClassName="col-md-offset-2 col-md-10">
-          <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
-            {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try'}
-          </Button>
-        </Input>
+        <Row>
+          <Col mdOffset={2} md={10}>
+            <Button bsStyle="info" onClick={this._onTryClick} disabled={this._isTryButtonDisabled()}>
+              {this.state.trying ? <i className="fa fa-spin fa-spinner" /> : 'Try'}
+            </Button>
+          </Col>
+        </Row>
       </div>
     );
   },
