@@ -89,13 +89,17 @@ const CreateAlertConditionInput = React.createClass({
         <Row>
           <Col md={6}>
             <form>
-              <Input label="Alert on stream" help="Select the stream that the condition will use to trigger alerts.">
+              <Input id="stream-selector" label="Alert on stream" help="Select the stream that the condition will use to trigger alerts.">
                 <Select placeholder="Select a stream" options={formattedStreams} onChange={this._onStreamChange} />
               </Input>
 
-              <Input type="select" value={this.state.type} onChange={this._onChange}
+              <Input id="condition-type-selector"
+                     type="select"
+                     value={this.state.type}
+                     onChange={this._onChange}
                      disabled={!this.state.selectedStream}
-                     label="Condition type" help="Select the condition type that will be used.">
+                     label="Condition type"
+                     help="Select the condition type that will be used.">
                 <option value={this.PLACEHOLDER} disabled>Select a condition type</option>
                 {availableTypes}
               </Input>

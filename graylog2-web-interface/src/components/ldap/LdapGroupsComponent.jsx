@@ -89,8 +89,14 @@ const LdapGroupsComponent = React.createClass({
     const content = this.state.groups.sort(naturalSort).map((group) => {
       return (
         <li key={group}>
-          <Input label={group} data-group={group} type="select" value={this.state.mapping.get(group, '')}
-                 onChange={this._updateMapping} labelClassName="col-sm-2" wrapperClassName="col-sm-5">
+          <Input id={`${group}-select`}
+                 label={group}
+                 data-group={group}
+                 type="select"
+                 value={this.state.mapping.get(group, '')}
+                 onChange={this._updateMapping}
+                 labelClassName="col-sm-2"
+                 wrapperClassName="col-sm-5">
             <option value="">None</option>
             {options}
           </Input>

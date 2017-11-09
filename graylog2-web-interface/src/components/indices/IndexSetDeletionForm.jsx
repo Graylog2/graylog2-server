@@ -102,7 +102,8 @@ const IndexSetDeletionForm = React.createClass({
     return (
       <Row>
         <Col md={12}>
-          <Input type="checkbox"
+          <Input id="remove-data-checkbox"
+                 type="checkbox"
                  label="Remove all data for this index set?"
                  help={<span>All indices related to this index set will be deleted from Elasticsearch.</span>}
                  checked={this.state.deleteIndices}

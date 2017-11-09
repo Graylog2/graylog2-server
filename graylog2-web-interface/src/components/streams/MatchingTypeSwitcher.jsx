@@ -36,11 +36,13 @@ class MatchingTypeSwitcher extends React.Component {
     return (
       <div className="streamrule-connector-type-form">
         <div>
-          <Input type="radio"
+          <Input id="streamrule-and-connector"
+                 type="radio"
                  label="A message must match all of the following rules"
                  checked={this.props.stream.matching_type === 'AND'}
                  onChange={this.handleTypeChangeToAnd} />
-          <Input type="radio"
+          <Input id="streamrule-or-connector"
+                 type="radio"
                  label="A message must match at least one of the following rules"
                  checked={this.props.stream.matching_type === 'OR'}
                  onChange={this.handleTypeChangeToOr} />

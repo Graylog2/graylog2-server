@@ -38,7 +38,7 @@ const EditDashboardModal = React.createClass({
                           submitButtonText="Save">
         <fieldset>
           <Input id={`${this.props.id}-title`} type="text" label="Title:" onChange={this._onTitleChange} value={this.state.title} autoFocus required />
-          <Input type="text" label="Description:" name="Description" onChange={this._onDescriptionChange} value={this.state.description} required />
+          <Input id={`${this.props.id}-description`} type="text" label="Description:" name="Description" onChange={this._onDescriptionChange} value={this.state.description} required />
         </fieldset>
       </BootstrapModalForm>
     );

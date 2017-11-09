@@ -47,8 +47,14 @@ const NodeOrGlobalSelect = React.createClass({
       });
 
     const nodeSelect = !this.state.global ? (
-      <Input type="select" label="Node" placeholder="placeholder" value={this.state.node}
-             help="On which node should this input start" onChange={this._onChangeNode} required>
+      <Input id="node-select"
+             type="select"
+             label="Node"
+             placeholder="placeholder"
+             value={this.state.node}
+             help="On which node should this input start"
+             onChange={this._onChangeNode}
+             required>
         <option key="placeholder" value="">Select Node</option>
         {options}
       </Input>
@@ -56,8 +62,12 @@ const NodeOrGlobalSelect = React.createClass({
 
     return (
       <span>
-        <Input type="checkbox" label="Global" help="Should this input start on all nodes"
-               checked={this.state.global} onChange={this._onChangeGlobal} />
+        <Input id="global-checkbox"
+               type="checkbox"
+               label="Global"
+               help="Should this input start on all nodes"
+               checked={this.state.global}
+               onChange={this._onChangeGlobal} />
         {nodeSelect}
       </span>
     );

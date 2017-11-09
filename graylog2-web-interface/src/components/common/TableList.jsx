@@ -46,7 +46,11 @@ const TableList = React.createClass({
     const header = (
       <div>
         {bulkHeaderActions}
-        <Input type="checkbox" label="Select all" checked={this.state.allSelected} onChange={this._toggleSelectAll}
+        <Input id="select-all-checkbox"
+               type="checkbox"
+               label="Select all"
+               checked={this.state.allSelected}
+               onChange={this._toggleSelectAll}
                groupClassName="form-group-inline" />
       </div>
     );
@@ -63,7 +67,8 @@ const TableList = React.createClass({
           {this.props.itemActionsFactory(item)}
         </div>
 
-        <Input type="checkbox"
+        <Input id={`${this.props.idKey}-checkbox`}
+               type="checkbox"
                label={item[this.props.titleKey]}
                checked={this.state.selected.includes(item[this.props.idKey])}
                onChange={this._onItemSelect(item[this.props.idKey])}

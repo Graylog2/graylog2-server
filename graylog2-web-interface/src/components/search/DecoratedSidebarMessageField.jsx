@@ -20,7 +20,8 @@ const DecoratedSidebarMessageField = React.createClass({
       <li>
         <div className="pull-left" />
         <div className="field-selector">
-          <Input type="checkbox"
+          <Input id="decorator-field-checkbox"
+                 type="checkbox"
                  label={label}
                  groupClassName={DecoratorStyles.decoratorFieldWrapper}
                  checked={this.props.selected}

@@ -88,7 +88,8 @@ const SidebarMessageField = React.createClass({
           <a href="#" onClick={this._toggleFieldAnalyzers}><i className={toggleClassName} /></a>
         </div>
         <div className="field-selector">
-          <Input type="checkbox"
+          <Input id="field-selector-checkbox"
+                 type="checkbox"
                  label={this.props.field.name}
                  checked={this.props.selected}
                  onChange={() => this.props.onToggled(this.props.field.name)} />

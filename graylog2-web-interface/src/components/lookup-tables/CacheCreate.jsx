@@ -60,7 +60,8 @@ const CacheCreate = React.createClass({
       <Row className="content">
         <Col lg={8}>
           <form className="form form-horizontal" onSubmit={() => {}}>
-            <Input label="Cache Type"
+            <Input id="cache-type-select"
+                   label="Cache Type"
                    required
                    autoFocus
                    help="The type of cache to configure."

@@ -96,6 +96,7 @@ const SavedSearchControls = React.createClass({
                             onSubmitForm={this._save}
                             submitButtonText="Save">
           <Input type="text"
+                 id="saved-search-title"
                  label="Title"
                  ref="title"
                  required

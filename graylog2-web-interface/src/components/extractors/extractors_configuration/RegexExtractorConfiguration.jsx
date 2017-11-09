@@ -66,7 +66,8 @@ const RegexExtractorConfiguration = React.createClass({
 
     return (
       <div>
-        <Input label="Regular expression"
+        <Input id="regex-value-input"
+               label="Regular expression"
                labelClassName="col-md-2"
                wrapperClassName="col-md-10"
                help={helpMessage}>

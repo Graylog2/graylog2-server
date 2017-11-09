@@ -125,12 +125,14 @@ const QuickValuesOptionsForm = React.createClass({
               <FormGroup>
                 <ControlLabel>Sort options</ControlLabel>
                 <Input type="radio"
+                       id="top-values-desc-option"
                        name="order"
                        label="Top values"
                        checked={this.state.order === 'desc'}
                        value="desc"
                        onChange={this._onChange} />
                 <Input type="radio"
+                       id="top-values-asc-option"
                        name="order"
                        label="Bottom values"
                        checked={this.state.order === 'asc'}

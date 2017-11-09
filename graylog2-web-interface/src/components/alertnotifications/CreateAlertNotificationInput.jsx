@@ -119,12 +119,14 @@ const CreateAlertNotificationInput = React.createClass({
         <Row>
           <Col md={6}>
             <form>
-              <Input label="Notify on stream"
+              <Input id="stream-selector"
+                     label="Notify on stream"
                      help="Select the stream that should use this notification when its alert conditions are triggered.">
                 <Select placeholder="Select a stream" options={formattedStreams} onChange={this._onStreamChange} />
               </Input>
 
-              <Input type="select"
+              <Input id="notification-type-selector"
+                     type="select"
                      value={this.state.type}
                      onChange={this._onChange}
                      disabled={!this.state.selectedStream}

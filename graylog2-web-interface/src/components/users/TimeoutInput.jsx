@@ -79,9 +79,11 @@ const TimeoutInput = React.createClass({
                label="Sessions do not time out" help="When checked sessions never time out due to inactivity."
                onChange={this._onClick} checked={this.state.sessionTimeoutNever} />
 
-        <Input label="Timeout"
+        <Input id="timeout-controls"
+               label="Timeout"
                help="Session automatically end after this amount of time, unless they are actively used."
-               labelClassName={`col-sm-${this.props.labelSize}`} wrapperClassName={`col-sm-${this.props.controlSize}`}>
+               labelClassName={`col-sm-${this.props.labelSize}`}
+               wrapperClassName={`col-sm-${this.props.controlSize}`}>
           <Row>
             <Col sm={2}>
               <input ref="timeout" type="number" id="timeout"

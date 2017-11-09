@@ -60,7 +60,8 @@ const DataAdapterCreate = React.createClass({
       <Row className="content">
         <Col lg={8}>
           <form className="form form-horizontal" onSubmit={() => {}}>
-            <Input label="Data Adapter Type"
+            <Input id="data-adapter-type-select"
+                   label="Data Adapter Type"
                    required
                    autoFocus
                    help="The type of data adapter to configure."

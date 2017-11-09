@@ -265,7 +265,9 @@ const LdapComponent = React.createClass({
       <Row>
         <Col lg={8}>
           <form id="ldap-settings-form" className="form-horizontal" onSubmit={this._saveSettings}>
-            <Input type="checkbox" label="Enable LDAP"
+            <Input id="enable-ldap-checkbox"
+                   type="checkbox"
+                   label="Enable LDAP"
                    help="User accounts will be taken from LDAP/Active Directory, the administrator account will still be available."
                    wrapperClassName="col-sm-offset-3 col-sm-9"
                    name="enabled"
