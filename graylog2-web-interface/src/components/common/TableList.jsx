@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
+import lodash from 'lodash';
 import { Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
@@ -105,7 +106,8 @@ const TableList = React.createClass({
       filter = (
         <Row>
           <Col md={5}>
-            <TypeAheadDataFilter label={this.props.filterLabel}
+            <TypeAheadDataFilter id={`${lodash.kebabCase(this.props.filterLabel)}-data-filter`}
+                                 label={this.props.filterLabel}
                                  data={this.props.items}
                                  displayKey="value"
                                  filterSuggestions={[]}
