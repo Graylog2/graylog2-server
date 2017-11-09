@@ -173,6 +173,7 @@ if (TARGET === 'build') {
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
+        REPLACE_MODULES: false, // Do not use HMR in production
       }),
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
