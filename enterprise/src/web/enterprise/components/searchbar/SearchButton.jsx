@@ -1,8 +1,19 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { Button } from 'react-bootstrap';
 
-export default () => (
-  <Button type="submit" bsStyle="success" className="pull-left">
-    <i className="fa fa-search" />
+const SearchButton = ({ running }) => (
+  <Button type="submit" bsStyle={running ? 'warning' : 'success'} className="pull-left">
+    <i className={running ? 'fa fa-spinner fa-pulse fa-fw' : 'fa fa-search'} />
   </Button>
 );
+
+SearchButton.defaultProps = {
+  running: false,
+};
+
+SearchButton.propTypes = {
+  running: PropTypes.boolean,
+};
+
+export default SearchButton;

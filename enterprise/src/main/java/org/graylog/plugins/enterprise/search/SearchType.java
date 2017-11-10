@@ -6,7 +6,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import javax.annotation.Nullable;
 import java.util.Map;
 
 /**
@@ -27,7 +26,6 @@ public interface SearchType {
 
     String type();
 
-    @Nullable
     @JsonProperty("id")
     String id();
 

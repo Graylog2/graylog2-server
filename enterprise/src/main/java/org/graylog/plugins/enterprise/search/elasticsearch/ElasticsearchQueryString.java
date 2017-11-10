@@ -23,6 +23,11 @@ public abstract class ElasticsearchQueryString implements BackendQuery {
         return new AutoValue_ElasticsearchQueryString.Builder().type(NAME);
     }
 
+    @Override
+    public String toString() {
+        return type() + ": " + queryString();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         @JsonProperty

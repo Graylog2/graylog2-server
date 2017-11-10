@@ -1,6 +1,7 @@
 package org.graylog.plugins.enterprise.search.engine;
 
-import org.graylog.plugins.enterprise.search.QueryJob;
+import org.graylog.plugins.enterprise.search.Query;
+import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
 
 /**
@@ -21,10 +22,10 @@ public interface SearchTypeHandler<S extends SearchType, Q, R> {
 
     void doGenerateQueryPart(S searchType, Q queryBuilder);
 
-    default SearchType.Result extractResult(QueryJob job, SearchType searchType, R queryResult) {
+    default SearchType.Result extractResult(SearchJob job, Query query,SearchType searchType, R queryResult) {
         // see above for the reason for typecasting
-        return doExtractResult(job, (S) searchType, queryResult);
+        return doExtractResult(job, query, (S) searchType, queryResult);
     }
 
-    SearchType.Result doExtractResult(QueryJob job, S searchType, R queryResult);
+    SearchType.Result doExtractResult(SearchJob job, Query query, S searchType, R queryResult);
 }

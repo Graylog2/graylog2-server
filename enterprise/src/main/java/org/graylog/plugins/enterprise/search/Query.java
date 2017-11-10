@@ -1,6 +1,5 @@
 package org.graylog.plugins.enterprise.search;
 
-import com.eaio.uuid.UUID;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -13,16 +12,15 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.enterprise.search.engine.BackendQuery;
+import org.graylog.plugins.enterprise.search.engine.EmptyTimeRange;
 import org.graylog2.plugin.indexer.searches.timeranges.TimeRange;
 import org.mongojack.Id;
-import org.mongojack.ObjectId;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @AutoValue
 @JsonAutoDetect
@@ -32,14 +30,12 @@ public abstract class Query {
     private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
     /**
-     * Implicitely created by {@link Builder#build} to make looking up search types easier and quicker. Simply a unique index by ID.
+     * Implicitly created by {@link Builder#build} to make looking up search types easier and quicker. Simply a unique index by ID.
      */
     @JsonIgnore
     private ImmutableMap<String, SearchType> searchTypesIndex;
 
     @Id
-    @ObjectId
-    @Nullable
     @JsonProperty
     public abstract String id();
 
@@ -107,29 +103,20 @@ public abstract class Query {
         return this;
     }
 
-    /**
-     * Search queries require
-     *
-     * @return a Query instance with IDs assigned to each of its search types.
-     */
-    public Query withSearchTypeIds() {
-        final List<SearchType> searchTypes = searchTypes();
-        if (searchTypes != null) {
-            return this.toBuilder().searchTypes(searchTypes.stream()
-                    .map(searchType -> {
-                        if (searchType.id() == null) {
-                            return searchType.withId(new UUID().toString());
-                        } else {
-                            return searchType;
-                        }
-                    })
-                    .collect(Collectors.toList())).build();
-        }
-        return this;
-    }
-
     public Query withInfo(QueryInfo queryInfo) {
         return toBuilder().info(queryInfo).build();
+    }
+
+    public static Query emptyRoot() {
+        return Query.builder()
+                .id("")
+                .timerange(EmptyTimeRange.emptyTimeRange())
+                .query(null)
+                .filter(null)
+                .searchTypes(null)
+                .parameters(null)
+                .info(null)
+                .build();
     }
 
     @AutoValue.Builder

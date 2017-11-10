@@ -5,6 +5,9 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import java.util.Collections;
+import java.util.Set;
+
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
@@ -18,6 +21,8 @@ public interface ParameterBinding {
     @JsonProperty(TYPE_FIELD)
     String type();
 
+    Set<String> getReferences();
+
     class Fallback implements ParameterBinding {
         @JsonProperty
         private String type;
@@ -25,6 +30,11 @@ public interface ParameterBinding {
         @Override
         public String type() {
             return type;
+        }
+
+        @Override
+        public Set<String> getReferences() {
+            return Collections.emptySet();
         }
 
         @JsonAnySetter

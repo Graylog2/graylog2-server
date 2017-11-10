@@ -3,31 +3,51 @@ import Immutable from 'immutable';
 
 import SearchActions from 'enterprise/actions/SearchActions';
 
-export default Reflux.createStore({
-  listenables: [SearchActions],
-  state: {
+const _defaultQuery = () => {
+  return {
     query: '',
     rangeType: 'relative',
     rangeParams: Immutable.Map({ range: '300' }),
     fields: Immutable.Set.of('source', 'message'),
-  },
+  };
+};
+
+/**
+ * Contains the state for the search/view page components.
+ * The server side of the query creation and execution is handled by the QueriesStore.
+ */
+export default Reflux.createStore({
+  listenables: [SearchActions],
+
+  state: {},
+
   getInitialState() {
-    this.state.fullQuery = this._generateFullQuery(this.state);
-    return this.state;
+    return {
+      selectedQuery: 0,
+      queries: Immutable.List().push(_defaultQuery()),
+      currentJobId: null,
+    };
   },
+
   query(query) {
     this.state.query = query;
     this._trigger();
   },
+
   rangeParams(key, value) {
-    this.state.rangeParams = this.state.rangeParams.set(key, value);
+    const current = this.state.queries[this.state.selectedQuery];
+    current.rangeParams = current.set(key, value);
     this._trigger();
   },
+
   rangeType(rangeType) {
-    this.state.rangeParams = new Immutable.Map();
-    this.state.rangeType = rangeType;
+    const current = this.state.queries[this.state.selectedQuery];
+
+    current.rangeParams = new Immutable.Map();
+    current.rangeType = rangeType;
     this._trigger();
   },
+
   toggleField(field) {
     if (this.state.fields.contains(field)) {
       this.removeField(field);
@@ -35,16 +55,30 @@ export default Reflux.createStore({
       this.addField(field);
     }
   },
+
   addField(field) {
     this.state.fields = this.state.fields.add(field);
     this._trigger();
   },
+
   removeField(field) {
     this.state.fields = this.state.fields.delete(field);
     this._trigger();
   },
+
+  createRootQuery() {
+    this.state.queries = this.state.queries.push(_defaultQuery());
+    this._trigger();
+    SearchActions.createRootQuery.promise(Promise.resolve(this.state.queries.size() - 1));
+  },
+
+  trackQueryJob(jobId) {
+    this.state.currentJobId = jobId;
+    this._trigger();
+  },
+
   _trigger() {
-    this.state.fullQuery = this._generateFullQuery(this.state);
+    this.state.fullQuery = this._generateFullQuery(this.state.queries[0]);
     this.trigger(this.state);
   },
 

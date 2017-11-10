@@ -5,8 +5,8 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.enterprise.search.Query;
-import org.graylog.plugins.enterprise.search.QueryJob;
-import org.graylog.plugins.enterprise.search.QueryResult;
+import org.graylog.plugins.enterprise.search.Search;
+import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchBackend;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryGenerator;
@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
 public class QueryEngineTest {
@@ -55,6 +54,7 @@ public class QueryEngineTest {
     public void test() throws ExecutionException, InterruptedException {
 
         final Query query = Query.builder()
+                .id(randomId())
                 .query(ElasticsearchQueryString.builder().queryString("_exists_:message").build())
                 .timerange(RelativeRange.builder().type(RelativeRange.RELATIVE).range(600).build())
                 .filter(OrFilter.or(
@@ -63,6 +63,7 @@ public class QueryEngineTest {
                 )
                 .searchTypes(ImmutableList.of(
                         MessageList.builder()
+                                .id(randomId())
                                 .offset(0)
                                 .limit(10)
                                 .sort(ImmutableList.of(
@@ -73,13 +74,19 @@ public class QueryEngineTest {
                 )
                 .build();
 
+        final Search search = Search.builder().id(randomId()).queries(ImmutableList.of(query)).build();
+
         LOG.warn("Query {}", query);
 
-        final QueryJob job = new QueryJob(UUID.randomUUID().toString(), query);
+        final SearchJob job = new SearchJob(randomId(), search);
 
-        final CompletableFuture<QueryResult> queryJob = new QueryEngine(queryGenerators).execute(job);
+        final SearchJob searchJob = new QueryEngine(queryGenerators).execute(job);
 
-        queryJob.thenAccept(o -> LOG.warn("result {}", o)).get();
+        searchJob.getResultFuture().thenAccept(o -> LOG.warn("result {}", o)).get();
+    }
+
+    private static String randomId() {
+        return UUID.randomUUID().toString();
     }
 
 }

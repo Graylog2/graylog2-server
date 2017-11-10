@@ -3,8 +3,8 @@ package org.graylog.plugins.enterprise.search.db;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.bson.types.ObjectId;
-import org.graylog.plugins.enterprise.search.Query;
-import org.graylog.plugins.enterprise.search.QueryJob;
+import org.graylog.plugins.enterprise.search.Search;
+import org.graylog.plugins.enterprise.search.SearchJob;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -13,12 +13,12 @@ import java.util.concurrent.TimeUnit;
 
 // TODO dummy that only holds everything in memory for now
 @Singleton
-public class InMemoryQueryJobService implements QueryJobService {
+public class InMemorySearchJobService implements SearchJobService {
 
-    private final Cache<String, QueryJob> cache;
+    private final Cache<String, SearchJob> cache;
 
     @Inject
-    public InMemoryQueryJobService() {
+    public InMemorySearchJobService() {
         cache = CacheBuilder.newBuilder()
                 .expireAfterAccess(5, TimeUnit.MINUTES)
                 .maximumSize(1000)
@@ -27,21 +27,21 @@ public class InMemoryQueryJobService implements QueryJobService {
     }
 
     @Override
-    public QueryJob create(Query query) {
+    public SearchJob create(Search query) {
         final String id = new ObjectId().toHexString();
-        final QueryJob queryJob = new QueryJob(id, query);
-        cache.put(id, queryJob);
-        return queryJob;
+        final SearchJob searchJob = new SearchJob(id, query);
+        cache.put(id, searchJob);
+        return searchJob;
     }
 
     @Override
-    public Optional<QueryJob> load(String id) {
+    public Optional<SearchJob> load(String id) {
         return Optional.ofNullable(cache.getIfPresent(id));
     }
 
     @Override
     public boolean delete(String id) {
-        final Optional<QueryJob> load = load(id);
+        final Optional<SearchJob> load = load(id);
         if (load.isPresent()) {
             cache.invalidate(id);
             return true;

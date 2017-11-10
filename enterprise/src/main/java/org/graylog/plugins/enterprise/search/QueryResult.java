@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
+import java.util.Collections;
 import java.util.Map;
 
 @AutoValue
@@ -16,20 +17,19 @@ public abstract class QueryResult {
     public abstract Query query();
 
     @JsonProperty
-    public abstract QueryJob queryJob();
-
-    @JsonProperty
     public abstract Map<String, SearchType.Result> results();
 
     public static Builder builder() {
         return new AutoValue_QueryResult.Builder();
     }
 
+    public static QueryResult emptyResult() {
+        return builder().results(Collections.emptyMap()).query(Query.emptyRoot()).build();
+    }
+
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder query(Query query);
-
-        public abstract Builder queryJob(QueryJob queryJob);
 
         public abstract Builder results(Map<String, SearchType.Result> results);
 

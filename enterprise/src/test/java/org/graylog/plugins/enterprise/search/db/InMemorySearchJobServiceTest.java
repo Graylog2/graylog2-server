@@ -26,7 +26,7 @@ import org.junit.Test;
 
 import java.util.concurrent.TimeUnit;
 
-public class InMemoryQueryJobServiceTest {
+public class InMemorySearchJobServiceTest {
 
     private ObjectMapper objectMapper;
 

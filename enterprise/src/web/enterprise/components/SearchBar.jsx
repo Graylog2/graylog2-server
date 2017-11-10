@@ -1,10 +1,9 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Col, Row } from 'react-bootstrap';
+import { Col, Nav, NavItem, Row, Tab } from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import DocumentationLink from 'components/support/DocumentationLink';
-import RefreshControls from 'components/search/RefreshControls';
 import DocsHelper from 'util/DocsHelper';
 
 import SearchButton from 'enterprise/components/searchbar/SearchButton';
@@ -13,6 +12,7 @@ import SearchActions from 'enterprise/actions/SearchActions';
 import TimeRangeInput from 'enterprise/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'enterprise/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'enterprise/components/searchbar/QueryInput';
+import SearchResult from 'enterprise/components/SearchResult';
 
 const SearchBar = React.createClass({
   mixins: [Reflux.connect(SearchStore, 'search')],
@@ -20,6 +20,7 @@ const SearchBar = React.createClass({
     return {
       savedSearch: '',
       keywordPreview: Immutable.Map(),
+      selectedQuery: '1',
     };
   },
   _performSearch(event) {
@@ -29,15 +30,41 @@ const SearchBar = React.createClass({
   },
   _getSavedSearchesSelector() {
   },
+
+  _selectQuery(queryKey) {
+    if (queryKey === '__add') {
+      console.log('Creating new query');
+      // create a new root query, initially sharing the same timerange
+      const rootQuery = SearchActions.createRootQuery();
+      rootQuery.then((newIndex) => {
+        this.setState({ selectedQuery: newIndex });
+      });
+    } else {
+      this.setState({ selectedQuery: queryKey });
+    }
+  },
+
   render() {
     const { rangeParams, rangeType, query } = this.state.search;
+    const querySelector = (
+      <Tab.Container id="query-selector" defaultActiveKey="0" activeKey={this.state.selectedQuery} onSelect={this._selectQuery}>
+        <Nav bsStyle="pills">
+          <NavItem eventKey="0">
+            Query 1
+          </NavItem>
+          <NavItem eventKey="__add">
+            <i className="fa fa-plus" alt="Add a query" />
+          </NavItem>
+        </Nav>
+      </Tab.Container>
+    );
     return (
       <Row className="no-bm">
         <Col md={12}
              id="universalsearch-container"
              style={{ paddingLeft: '15px', paddingRight: '15px', paddingBottom: '10px' }}>
           <Row className="no-bm">
-            <Col md={12} id="universalsearch" style={{ marginTop: '0px' }}>
+            <Col md={8} id="universalsearch" style={{ marginTop: '0px' }}>
               <form className="universalsearch-form"
                     method="GET"
                     onSubmit={this._performSearch}>
@@ -53,14 +80,7 @@ const SearchBar = React.createClass({
                     <Col md={6}>
                       <div className="saved-searches-selector-container pull-right"
                            style={{ display: 'inline-flex', marginRight: 5 }}>
-                        {this.props.displayRefreshControls &&
-                        <div style={{ marginRight: 5 }}>
-                          <RefreshControls />
-                        </div>
-                        }
-                        <div style={{ width: 270 }}>
-                          {this._getSavedSearchesSelector()}
-                        </div>
+                        {querySelector}
                       </div>
                     </Col>
                   </Row>
@@ -73,11 +93,16 @@ const SearchBar = React.createClass({
                                        text={<i className="fa fa-lightbulb-o" />} />
                   </div>
 
-                  <SearchButton />
+                  <SearchButton running />
 
                   <QueryInput value={query} onChange={SearchActions.query} />
                 </div>
               </form>
+            </Col>
+            <Col md={4}>
+              <Row className="no-bm">
+                <SearchResult />
+              </Row>
             </Col>
           </Row>
         </Col>
