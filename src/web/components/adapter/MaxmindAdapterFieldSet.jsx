@@ -51,7 +51,8 @@ const MaxmindAdapterFieldSet = React.createClass({
              value={config.path}
              labelClassName="col-sm-3"
              wrapperClassName="col-sm-9" />
-      <Input label="Database type"
+      <Input id="database-type-select"
+             label="Database type"
              required
              autoFocus
              help={'Select the type of the database file'}

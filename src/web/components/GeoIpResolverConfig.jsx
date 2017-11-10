@@ -117,13 +117,15 @@ const GeoIpResolverConfig = React.createClass({
                             onModalClose={this._resetConfig}
                             submitButtonText="Save">
           <fieldset>
-            <Input type="checkbox"
+            <Input id="geolocation-enable-checkbox"
+                   type="checkbox"
                    ref="configEnabled"
                    label="Enable Geo-Location processor"
                    name="enabled"
                    checked={this.state.config.enabled}
                    onChange={this._onCheckboxClick('enabled', 'configEnabled')}/>
-            <Input label="Select the MaxMind database type"
+            <Input id="maxmind-db-select"
+                   label="Select the MaxMind database type"
                    help="Select the MaxMind database type you want to use to extract geo-location information.">
               <Select placeholder="Select MaxMind database type"
                       required
@@ -132,10 +134,10 @@ const GeoIpResolverConfig = React.createClass({
                       value={this.state.config.db_type}
                       onChange={this._onDbTypeSelect} />
             </Input>
-            <Input type="text"
+            <Input id="maxmind-db-path"
+                   type="text"
                    label="Path to the MaxMind database"
                    help={<span>You can download a free version of the database from <a href="https://dev.maxmind.com/geoip/geoip2/geolite2/" target="_blank">MaxMind</a>.</span>}
-
                    name="db_path"
                    value={this.state.config.db_path}
                    onChange={this._onUpdate('db_path')}/>
