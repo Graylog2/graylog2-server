@@ -53,6 +53,14 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <configuration>
+                    <!-- Ensure that .gitignore files are copied, too. See https://issues.apache.org/jira/browse/MRESOURCES-190 -->
+                    <addDefaultExcludes>false</addDefaultExcludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-release-plugin</artifactId>
                 <configuration>
                     <allowTimestampedSnapshots>true</allowTimestampedSnapshots>
