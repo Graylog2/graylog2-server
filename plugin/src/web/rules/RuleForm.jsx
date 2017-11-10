@@ -148,7 +148,7 @@ const RuleForm = React.createClass({
     let pipelinesUsingRule;
     if (!this.props.create) {
       pipelinesUsingRule = (
-        <Input label="Used in pipelines" help="Pipelines that use this rule in one or more of their stages.">
+        <Input id="used-in-pipelines" label="Used in pipelines" help="Pipelines that use this rule in one or more of their stages.">
           <div className="form-control-static">
             {this._formatPipelinesUsingRule()}
           </div>
@@ -174,7 +174,7 @@ const RuleForm = React.createClass({
 
           {pipelinesUsingRule}
 
-          <Input label="Rule source" help="Rule source, see quick reference for more information.">
+          <Input id="rule-source-editor" label="Rule source" help="Rule source, see quick reference for more information.">
             <div style={{ border: '1px solid lightgray', borderRadius: 5 }}>
               <AceEditor
                 mode="text"

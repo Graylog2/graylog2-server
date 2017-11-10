@@ -133,7 +133,8 @@ const StageForm = React.createClass({
                      onChange={this._onChange}
                      checked={!this.state.stage.match_all} />
 
-              <Input label="Stage rules"
+              <Input id="stage-rules-select"
+                     label="Stage rules"
                      help={rulesHelp}>
                 <SelectableList options={this._getFormattedOptions(this.state.rules)} isLoading={!this.state.rules}
                                 onChange={this._onRulesChange} selectedOptions={this.state.stage.rules} />
