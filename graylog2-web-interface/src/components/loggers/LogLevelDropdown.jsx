@@ -4,11 +4,9 @@ import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import lodash from 'lodash';
 
-import ActionsProvider from 'injection/ActionsProvider';
-const LoggersActions = ActionsProvider.getActions('Loggers');
+import CombinedProvider from 'injection/CombinedProvider';
 
-import StoreProvider from 'injection/StoreProvider';
-const LoggersStore = StoreProvider.getStore('Loggers');
+const { LoggersStore, LoggersActions } = CombinedProvider.get('Loggers');
 
 const LogLevelDropdown = React.createClass({
   propTypes: {
@@ -20,13 +18,24 @@ const LogLevelDropdown = React.createClass({
   _changeLoglevel(loglevel) {
     LoggersActions.setSubsystemLoggerLevel(this.props.nodeId, this.props.name, loglevel);
   },
+  _menuLevelClick(loglevel) {
+    return (event) => {
+      event.preventDefault();
+      this._changeLoglevel(loglevel);
+    };
+  },
   render() {
     const { subsystem, nodeId } = this.props;
     const loglevels = this.state.availableLoglevels
-      .map(loglevel =>
-        <MenuItem key={`${subsystem}-${nodeId}-${loglevel}`} active={subsystem.level === loglevel} onClick={(evt) => { evt.preventDefault(); this._changeLoglevel(loglevel); }}>
-          {lodash.capitalize(loglevel)}
-        </MenuItem>);
+      .map((loglevel) => {
+        return (
+          <MenuItem key={`${subsystem}-${nodeId}-${loglevel}`}
+                    active={subsystem.level === loglevel}
+                    onClick={this._menuLevelClick(loglevel)}>
+            {lodash.capitalize(loglevel)}
+          </MenuItem>
+        );
+      });
     return (
       <DropdownButton id="loglevel" bsSize="xsmall" title={lodash.capitalize(subsystem.level)}>
         {loglevels}

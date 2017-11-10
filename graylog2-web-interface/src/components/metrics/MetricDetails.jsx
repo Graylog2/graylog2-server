@@ -3,13 +3,10 @@ import React from 'react';
 import Reflux from 'reflux';
 import lodash from 'lodash';
 
-import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
-
-import ActionsProvider from 'injection/ActionsProvider';
-const MetricsActions = ActionsProvider.getActions('Metrics');
-
 import { CounterDetails, GaugeDetails, HistogramDetails, MeterDetails, TimerDetails } from 'components/metrics';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
 
 const MetricDetails = React.createClass({
   propTypes: {

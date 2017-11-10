@@ -5,13 +5,10 @@ import { Col } from 'react-bootstrap';
 import lodash from 'lodash';
 import numeral from 'numeral';
 
-import ActionsProvider from 'injection/ActionsProvider';
-const MetricsActions = ActionsProvider.getActions('Metrics');
-
-import StoreProvider from 'injection/StoreProvider';
-const MetricsStore = StoreProvider.getStore('Metrics');
-
 import { Spinner } from 'components/common';
+import CombinedProvider from 'injection/CombinedProvider';
+
+const { MetricsStore, MetricsActions } = CombinedProvider.get('Metrics');
 
 const LogLevelMetrics = React.createClass({
   propTypes: {
