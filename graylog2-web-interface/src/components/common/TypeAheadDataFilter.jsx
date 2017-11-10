@@ -7,7 +7,7 @@ import { TypeAheadInput } from 'components/common';
 
 const TypeAheadDataFilter = React.createClass({
   propTypes: {
-    id: PropTypes.id,
+    id: PropTypes.string,
     data: PropTypes.array,
     displayKey: PropTypes.string,
     filterBy: PropTypes.string,
