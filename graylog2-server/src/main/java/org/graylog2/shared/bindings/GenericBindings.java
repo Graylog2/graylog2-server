@@ -42,7 +42,6 @@ import org.graylog2.shared.buffers.InputBufferImpl;
 import org.graylog2.shared.buffers.ProcessBuffer;
 import org.graylog2.shared.buffers.processors.DecodingProcessor;
 import org.graylog2.shared.inputs.InputRegistry;
-import org.jboss.netty.util.HashedWheelTimer;
 
 import javax.activation.MimetypesFileTypeMap;
 import java.util.concurrent.ExecutorService;
@@ -64,7 +63,7 @@ public class GenericBindings extends AbstractModule {
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
 
-        bind(HashedWheelTimer.class).toInstance(new HashedWheelTimer());
+        // TODO: Dedicated scheduled executor
         bind(ThroughputCounter.class);
 
         bind(EventBus.class).toProvider(EventBusProvider.class).in(Scopes.SINGLETON);

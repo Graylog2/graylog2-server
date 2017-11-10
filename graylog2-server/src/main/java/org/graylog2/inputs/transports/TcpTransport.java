@@ -16,12 +16,11 @@
  */
 package org.graylog2.inputs.transports;
 
-import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.EventLoopGroup;
 import org.graylog2.inputs.transports.netty.LenientDelimiterBasedFrameDecoder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -36,73 +35,40 @@ import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 
-import javax.inject.Named;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 
-import static com.codahale.metrics.MetricRegistry.name;
-import static org.jboss.netty.handler.codec.frame.Delimiters.lineDelimiter;
-import static org.jboss.netty.handler.codec.frame.Delimiters.nulDelimiter;
+import static io.netty.handler.codec.Delimiters.lineDelimiter;
+import static io.netty.handler.codec.Delimiters.nulDelimiter;
 
 public class TcpTransport extends AbstractTcpTransport {
     public static final String CK_USE_NULL_DELIMITER = "use_null_delimiter";
     private static final String CK_MAX_MESSAGE_SIZE = "max_message_size";
+    private static final int DEFAULT_MAX_FRAME_LENGTH = 2 * 1024 * 1024;
 
-    protected final ChannelBuffer[] delimiter;
+    protected final ByteBuf[] delimiter;
     protected final int maxFrameLength;
 
     @AssistedInject
     public TcpTransport(@Assisted Configuration configuration,
-                        @Named("bossPool") Executor bossPool,
+                        EventLoopGroup eventLoopGroup,
+                        NettyTransportConfiguration nettyTransportConfiguration,
                         ThroughputCounter throughputCounter,
                         ConnectionCounter connectionCounter,
                         LocalMetricRegistry localRegistry) {
-        this(configuration,
-                bossPool,
-                executorService("worker", "tcp-transport-worker-%d", localRegistry),
-                throughputCounter,
-                connectionCounter,
-                localRegistry);
-    }
-
-    protected TcpTransport(final Configuration configuration,
-                           final Executor bossPool,
-                           final Executor workerPool,
-                           final ThroughputCounter throughputCounter,
-                           final ConnectionCounter connectionCounter,
-                           final LocalMetricRegistry localRegistry) {
-        super(configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter);
+        super(configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter);
 
         final boolean nulDelimiter = configuration.getBoolean(CK_USE_NULL_DELIMITER);
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();
-        this.maxFrameLength = configuration.getInt(CK_MAX_MESSAGE_SIZE, Config.DEFAULT_MAX_FRAME_LENGTH);
-    }
-
-    private static Executor executorService(final String executorName, final String threadNameFormat, final MetricRegistry metricRegistry) {
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(threadNameFormat).build();
-        return new InstrumentedExecutorService(
-                Executors.newCachedThreadPool(threadFactory),
-                metricRegistry,
-                name(TcpTransport.class, executorName, "executor-service"));
+        this.maxFrameLength = configuration.getInt(CK_MAX_MESSAGE_SIZE, DEFAULT_MAX_FRAME_LENGTH);
     }
 
     @Override
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = Maps.newLinkedHashMap();
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = new LinkedHashMap<>();
 
-        finalChannelHandlers.put("framer", new Callable<ChannelHandler>() {
-            @Override
-            public ChannelHandler call() throws Exception {
-                return new LenientDelimiterBasedFrameDecoder(maxFrameLength, delimiter);
-            }
-        });
+        finalChannelHandlers.put("framer", () -> new LenientDelimiterBasedFrameDecoder(maxFrameLength, delimiter));
         finalChannelHandlers.putAll(super.getFinalChannelHandlers(input));
 
         return finalChannelHandlers;
@@ -120,8 +86,6 @@ public class TcpTransport extends AbstractTcpTransport {
 
     @ConfigClass
     public static class Config extends AbstractTcpTransport.Config {
-        public static final int DEFAULT_MAX_FRAME_LENGTH = 2 * 1024 * 1024;
-
         @Override
         public ConfigurationRequest getRequestedConfiguration() {
             final ConfigurationRequest x = super.getRequestedConfiguration();

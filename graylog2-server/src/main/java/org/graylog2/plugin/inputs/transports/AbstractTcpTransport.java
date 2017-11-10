@@ -16,9 +16,23 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.Callables;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.PooledByteBufAllocator;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.FixedRecvByteBufAllocator;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.socket.ServerSocketChannelConfig;
+import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.util.SelfSignedCertificate;
+import org.graylog2.inputs.transports.NettyTransportConfiguration;
+import org.graylog2.inputs.transports.netty.ServerSocketChannelFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -27,17 +41,11 @@ import org.graylog2.plugin.configuration.fields.ConfigurationField;
 import org.graylog2.plugin.configuration.fields.DropdownField;
 import org.graylog2.plugin.configuration.fields.TextField;
 import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.transports.util.KeyUtil;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.jboss.netty.bootstrap.Bootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.jboss.netty.handler.ssl.SslHandler;
-import org.jboss.netty.handler.ssl.util.SelfSignedCertificate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +65,6 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -80,10 +87,9 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             TLS_CLIENT_AUTH_OPTIONAL, TLS_CLIENT_AUTH_OPTIONAL,
             TLS_CLIENT_AUTH_REQUIRED, TLS_CLIENT_AUTH_REQUIRED);
 
-    protected final Executor bossExecutor;
-    protected final Executor workerExecutor;
     protected final ConnectionCounter connectionCounter;
     protected final Configuration configuration;
+    private final NettyTransportConfiguration nettyTransportConfiguration;
 
     private final boolean tlsEnable;
     private final String tlsKeyPassword;
@@ -93,17 +99,18 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     private final String tlsClientAuth;
     private final boolean tcpKeepalive;
 
+    private ServerBootstrap bootstrap;
+
     public AbstractTcpTransport(
             Configuration configuration,
             ThroughputCounter throughputCounter,
             LocalMetricRegistry localRegistry,
-            Executor bossPool,
-            Executor workerPool,
+            EventLoopGroup eventLoopGroup,
+            NettyTransportConfiguration nettyTransportConfiguration,
             ConnectionCounter connectionCounter) {
-        super(configuration, throughputCounter, localRegistry);
+        super(configuration, eventLoopGroup, throughputCounter, localRegistry);
         this.configuration = configuration;
-        this.bossExecutor = bossPool;
-        this.workerExecutor = workerPool;
+        this.nettyTransportConfiguration = nettyTransportConfiguration;
         this.connectionCounter = connectionCounter;
 
         this.tlsEnable = configuration.getBoolean(CK_TLS_ENABLE);
@@ -123,25 +130,40 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         return new File(configuration.getString(configKey, ""));
     }
 
-    @Override
-    protected Bootstrap getBootstrap() {
-        final ServerBootstrap bootstrap =
-                new ServerBootstrap(new NioServerSocketChannelFactory(bossExecutor, workerExecutor));
+    @VisibleForTesting
+    ServerBootstrap getBootstrap(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseHandlers = getBaseChannelHandlers(input);
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalHandlers = getFinalChannelHandlers(input);
 
-        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(8192));
-        bootstrap.setOption("receiveBufferSize", getRecvBufferSize());
-        bootstrap.setOption("child.receiveBufferSize", getRecvBufferSize());
-        bootstrap.setOption("child.keepAlive", tcpKeepalive);
-
-        return bootstrap;
+        return new ServerBootstrap()
+                .group(eventLoopGroup)
+                .channelFactory(new ServerSocketChannelFactory(nettyTransportConfiguration.getType()))
+                .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
+                .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(8192))
+                .option(ChannelOption.SO_RCVBUF, getRecvBufferSize())
+                .childOption(ChannelOption.SO_RCVBUF, getRecvBufferSize())
+                .childOption(ChannelOption.SO_KEEPALIVE, tcpKeepalive)
+                .handler(getChannelInitializer(baseHandlers))
+                .childHandler(getChannelInitializer(finalHandlers));
     }
 
     @Override
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(
-            MessageInput input) {
+    public void launch(final MessageInput input) throws MisfireException {
+        try {
+            bootstrap = getBootstrap(input);
+
+            bootstrap.bind(socketAddress)
+                    .addListener(new InputLaunchListener(channels, input, getRecvBufferSize()))
+                    .syncUninterruptibly();
+        } catch (Exception e) {
+            throw new MisfireException(e);
+        }
+    }
+
+    @Override
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseChannelHandlers = super.getBaseChannelHandlers(input);
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = Maps.newLinkedHashMap();
-        baseChannelHandlers.put("connection-counter", Callables.returning(connectionCounter));
+        baseChannelHandlers.put("connection-counter", () -> connectionCounter);
 
         if (!tlsEnable) {
             return baseChannelHandlers;
@@ -153,7 +175,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             final String tmpDir = System.getProperty("java.io.tmpdir");
             checkState(tmpDir != null, "The temporary directory must not be null!");
             final Path tmpPath = Paths.get(tmpDir);
-            if(!Files.isDirectory(tmpPath) || !Files.isWritable(tmpPath)) {
+            if (!Files.isDirectory(tmpPath) || !Files.isWritable(tmpPath)) {
                 throw new IllegalStateException("Couldn't write to temporary directory: " + tmpPath.toAbsolutePath());
             }
 
@@ -168,6 +190,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             }
         }
 
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = new LinkedHashMap<>();
         if (tlsCertFile.exists() && tlsKeyFile.exists()) {
             handlerList.put("tls", buildSslHandlerCallable());
         }
@@ -294,10 +317,40 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                             "TCP keepalive",
                             false,
                             "Enable TCP keepalive packets"
-                )
+                    )
             );
 
             return x;
+        }
+    }
+
+    private static class InputLaunchListener implements ChannelFutureListener {
+        private final ChannelGroup channels;
+        private final MessageInput input;
+        private final int expectedRecvBufferSize;
+
+        public InputLaunchListener(ChannelGroup channels, MessageInput input, int expectedRecvBufferSize) {
+            this.channels = channels;
+            this.input = input;
+            this.expectedRecvBufferSize = expectedRecvBufferSize;
+        }
+
+        @Override
+        public void operationComplete(ChannelFuture future) throws Exception {
+            if (future.isSuccess()) {
+                final Channel channel = future.channel();
+                channels.add(channel);
+                LOG.debug("Started channel {}", channel);
+
+                final ServerSocketChannelConfig channelConfig = (ServerSocketChannelConfig) channel.config();
+                final int receiveBufferSize = channelConfig.getReceiveBufferSize();
+                if (receiveBufferSize != expectedRecvBufferSize) {
+                    LOG.warn("receiveBufferSize (SO_RCVBUF) for input {} (channel {}) should be {} but is {}.",
+                            input, channel, expectedRecvBufferSize, receiveBufferSize);
+                }
+            } else {
+                LOG.warn("Failed to start channel for input {}", input, future.cause());
+            }
         }
     }
 }

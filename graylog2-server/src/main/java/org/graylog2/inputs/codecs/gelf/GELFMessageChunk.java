@@ -16,10 +16,11 @@
  */
 package org.graylog2.inputs.codecs.gelf;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 
 public final class GELFMessageChunk {
 
@@ -54,14 +55,14 @@ public final class GELFMessageChunk {
     private int sequenceCount = -1;
     private long arrival = -1L;
 
-    private final ChannelBuffer payload;
+    private final ByteBuf payload;
     private final MessageInput sourceInput;
 
     public GELFMessageChunk(final byte[] payload, MessageInput sourceInput) {
         if (payload.length < HEADER_TOTAL_LENGTH) {
             throw new IllegalArgumentException("This GELF message chunk is too short. Cannot even contain the required header.");
         }
-        this.payload = ChannelBuffers.wrappedBuffer(payload);
+        this.payload = Unpooled.wrappedBuffer(payload);
         this.sourceInput = sourceInput;
         read();
     }
@@ -108,12 +109,10 @@ public final class GELFMessageChunk {
         this.arrival = Tools.nowUTC().getMillis();
     }
 
-    private String extractId() {
+    private void extractId() {
         if (this.id == null) {
-            this.id = ChannelBuffers.hexDump(payload, HEADER_PART_HASH_START, HEADER_PART_HASH_LENGTH);
+            this.id = ByteBufUtil.hexDump(payload, HEADER_PART_HASH_START, HEADER_PART_HASH_LENGTH);
         }
-
-        return this.id;
     }
 
     // lol duplication
@@ -152,20 +151,10 @@ public final class GELFMessageChunk {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
-
-        sb.append("ID: ");
-        sb.append(this.id);
-        sb.append("\tSequence: ");
-        sb.append(this.sequenceNumber + 1); // +1 for readability: 1/2 not 0/2
-        sb.append("/");
-        sb.append(this.sequenceCount);
-        sb.append("\tArrival: ");
-        sb.append(this.arrival);
-        sb.append("\tData size: ");
-        sb.append(this.payload.readableBytes());
-
-        return sb.toString();
+        return "ID: " + this.id +
+                "\tSequence: " + (this.sequenceNumber + 1) + // +1 for readability: 1/2 not 0/2
+                "/" + this.sequenceCount +
+                "\tArrival: " + this.arrival +
+                "\tData size: " + this.payload.readableBytes();
     }
-
 }

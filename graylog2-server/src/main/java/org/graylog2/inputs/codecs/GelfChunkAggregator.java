@@ -21,12 +21,12 @@ import com.codahale.metrics.MetricRegistry;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.MoreObjects;
 import com.google.common.collect.Maps;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.graylog2.inputs.codecs.gelf.GELFMessage;
 import org.graylog2.inputs.codecs.gelf.GELFMessageChunk;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,13 +85,13 @@ public class GelfChunkAggregator implements CodecAggregator {
 
     @Nonnull
     @Override
-    public Result addChunk(ChannelBuffer buffer) {
+    public Result addChunk(ByteBuf buffer) {
         final byte[] readable = new byte[buffer.readableBytes()];
-        buffer.toByteBuffer().get(readable, buffer.readerIndex(), buffer.readableBytes());
+        buffer.readBytes(readable, buffer.readerIndex(), buffer.readableBytes());
 
         final GELFMessage msg = new GELFMessage(readable);
 
-        final ChannelBuffer aggregatedBuffer;
+        final ByteBuf aggregatedBuffer;
         switch (msg.getGELFType()) {
             case CHUNKED:
                 try {
@@ -127,7 +127,7 @@ public class GelfChunkAggregator implements CodecAggregator {
      * @return null or a {@link org.graylog2.plugin.journal.RawMessage raw message} object
      */
     @Nullable
-    private ChannelBuffer checkForCompletion(GELFMessage gelfMessage) {
+    private ByteBuf checkForCompletion(GELFMessage gelfMessage) {
         if (!chunks.isEmpty() && log.isDebugEnabled()) {
             log.debug("Dumping GELF chunk map [chunks for {} messages]:\n{}", chunks.size(), humanReadableChunkMap());
         }
@@ -178,7 +178,7 @@ public class GelfChunkAggregator implements CodecAggregator {
                 }
             }
             completeMessages.inc();
-            return ChannelBuffers.wrappedBuffer(allChunks);
+            return Unpooled.wrappedBuffer(allChunks);
         }
 
         // message isn't complete yet, check if we should remove the other parts as well

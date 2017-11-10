@@ -17,15 +17,20 @@
 package org.graylog2.plugin.inputs.transports;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.MoreExecutors;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramChannelConfig;
+import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.jboss.netty.bootstrap.Bootstrap;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.util.HashedWheelTimer;
+import org.graylog2.shared.SuppressForbidden;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,9 +43,6 @@ import org.mockito.junit.MockitoRule;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeFalse;
@@ -65,17 +67,22 @@ public class AbstractTcpTransportTest {
 
     private ThroughputCounter throughputCounter;
     private LocalMetricRegistry localRegistry;
-    private Executor bossPool;
-    private Executor workerPool;
+    private NioEventLoopGroup eventLoopGroup;
+    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", 0);
     private ConnectionCounter connectionCounter;
 
     @Before
+    @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void setUp() {
-        throughputCounter = new ThroughputCounter(new HashedWheelTimer());
+        eventLoopGroup = new NioEventLoopGroup();
+        throughputCounter = new ThroughputCounter(eventLoopGroup);
         localRegistry = new LocalMetricRegistry();
-        bossPool = MoreExecutors.directExecutor();
-        workerPool = MoreExecutors.directExecutor();
         connectionCounter = new ConnectionCounter();
+    }
+
+    @After
+    public void tearDown() {
+        eventLoopGroup.shutdownGracefully();
     }
 
     @Test
@@ -87,16 +94,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter) {
-            @Override
-            protected Bootstrap getBootstrap() {
-                return super.getBootstrap();
-            }
-
-            @Override
-            protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-                return super.getBaseChannelHandlers(input);
-            }
+                configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter) {
         };
         final MessageInput input = mock(MessageInput.class);
         assertThat(transport.getBaseChannelHandlers(input)).containsKey("tls");
@@ -115,17 +113,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter) {
-            @Override
-            protected Bootstrap getBootstrap() {
-                return super.getBootstrap();
-            }
-
-            @Override
-            protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-                return super.getBaseChannelHandlers(input);
-            }
-        };
+            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
@@ -147,17 +135,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter) {
-            @Override
-            protected Bootstrap getBootstrap() {
-                return super.getBootstrap();
-            }
-
-            @Override
-            protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-                return super.getBaseChannelHandlers(input);
-            }
-        };
+            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
@@ -178,17 +156,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter) {
-            @Override
-            protected Bootstrap getBootstrap() {
-                return super.getBootstrap();
-            }
-
-            @Override
-            protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-                return super.getBaseChannelHandlers(input);
-            }
-        };
+            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + file.getAbsolutePath());

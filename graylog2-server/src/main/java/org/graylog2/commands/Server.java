@@ -54,6 +54,7 @@ import org.graylog2.decorators.DecoratorBindings;
 import org.graylog2.indexer.IndexerBindings;
 import org.graylog2.indexer.retention.RetentionStrategyBindings;
 import org.graylog2.indexer.rotation.RotationStrategyBindings;
+import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.messageprocessors.MessageProcessorModule;
 import org.graylog2.migrations.MigrationsModule;
 import org.graylog2.notifications.Notification;
@@ -63,6 +64,7 @@ import org.graylog2.plugin.ServerStatus;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.UI;
+import org.graylog2.shared.bindings.MessageInputBindings;
 import org.graylog2.shared.bindings.ObjectMapperModule;
 import org.graylog2.shared.bindings.RestApiBindings;
 import org.graylog2.shared.system.activities.Activity;
@@ -93,6 +95,7 @@ public class Server extends ServerBootstrap {
     private final MongoDbConfiguration mongoDbConfiguration = new MongoDbConfiguration();
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
     private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
+    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration();
 
     public Server() {
         super("server", configuration);
@@ -117,6 +120,7 @@ public class Server extends ServerBootstrap {
             new MessageProcessorModule(),
             new AlarmCallbackBindings(),
             new InitializerBindings(),
+            new MessageInputBindings(),
             new MessageOutputBindings(configuration, chainingClassLoader),
             new RotationStrategyBindings(),
             new RetentionStrategyBindings(),
@@ -145,7 +149,8 @@ public class Server extends ServerBootstrap {
                 emailConfiguration,
                 mongoDbConfiguration,
                 versionCheckConfiguration,
-                kafkaJournalConfiguration);
+                kafkaJournalConfiguration,
+                nettyTransportConfiguration);
     }
 
     @Override

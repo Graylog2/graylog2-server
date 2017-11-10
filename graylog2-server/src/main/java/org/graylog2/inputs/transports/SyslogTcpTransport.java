@@ -16,12 +16,10 @@
  */
 package org.graylog2.inputs.transports;
 
-import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.collect.Maps;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.EventLoopGroup;
 import org.graylog2.inputs.syslog.tcp.SyslogTCPFramingRouterHandler;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -31,54 +29,32 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.jboss.netty.channel.ChannelHandler;
 
-import javax.inject.Named;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-import static com.codahale.metrics.MetricRegistry.name;
 
 public class SyslogTcpTransport extends TcpTransport {
     @AssistedInject
     public SyslogTcpTransport(@Assisted Configuration configuration,
-                              @Named("bossPool") Executor bossPool,
+                              EventLoopGroup eventLoopGroup,
+                              NettyTransportConfiguration nettyTransportConfiguration,
                               ThroughputCounter throughputCounter,
                               ConnectionCounter connectionCounter,
                               LocalMetricRegistry localRegistry) {
         super(configuration,
-                bossPool,
-                executorService("worker", "syslog-tcp-transport-worker-%d", localRegistry),
+                eventLoopGroup,
+                nettyTransportConfiguration,
                 throughputCounter,
                 connectionCounter,
                 localRegistry);
     }
 
-    private static Executor executorService(final String executorName, final String threadNameFormat, final MetricRegistry metricRegistry) {
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(threadNameFormat).build();
-        return new InstrumentedExecutorService(
-                Executors.newCachedThreadPool(threadFactory),
-                metricRegistry,
-                name(SyslogTcpTransport.class, executorName, "executor-service"));
-    }
-
-
     @Override
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = Maps.newLinkedHashMap();
-
-        finalChannelHandlers.putAll(super.getFinalChannelHandlers(input));
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = new LinkedHashMap<>(super.getFinalChannelHandlers(input));
 
         // Replace the "framer" channel handler inserted by the parent.
-        finalChannelHandlers.put("framer", new Callable<ChannelHandler>() {
-            @Override
-            public ChannelHandler call() throws Exception {
-                return new SyslogTCPFramingRouterHandler(maxFrameLength, delimiter);
-            }
-        });
+        finalChannelHandlers.put("framer", () -> new SyslogTCPFramingRouterHandler(maxFrameLength, delimiter));
 
         return finalChannelHandlers;
     }

@@ -16,28 +16,30 @@
  */
 package org.graylog2.inputs.syslog.tcp;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.frame.FrameDecoder;
+
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.util.ByteProcessor;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 /**
- * Implements a Netty {@link FrameDecoder} for the Syslog octet counting framing. (RFC6587)
+ * Implements a Netty {@link ByteToMessageDecoder} for the Syslog octet counting framing. (RFC6587)
  *
  * @see <a href="http://tools.ietf.org/html/rfc6587#section-3.4.1">RFC6587 Octet Counting</a>
  */
-public class SyslogOctetCountFrameDecoder extends FrameDecoder {
+public class SyslogOctetCountFrameDecoder extends ByteToMessageDecoder {
+    private static final ByteProcessor BYTE_PROCESSOR = value -> value != ' ';
+
     @Override
-    protected Object decode(final ChannelHandlerContext ctx,
-                            final Channel channel,
-                            final ChannelBuffer buffer) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf buffer, List<Object> out) throws Exception {
         final int frameSizeValueLength = findFrameSizeValueLength(buffer);
 
         // We have not found the frame length value byte size yet.
         if (frameSizeValueLength <= 0) {
-            return null;
+            return;
         }
 
         // Convert the frame length value bytes into an integer without mutating the buffer reader index.
@@ -49,18 +51,14 @@ public class SyslogOctetCountFrameDecoder extends FrameDecoder {
         // the buffer has enough data to read the complete message.
         if (buffer.readableBytes() - skipLength < length) {
             // We cannot read the complete frame yet.
-            return null;
+            return;
         } else {
             // Skip the frame length value bytes and the whitespace that follows it.
             buffer.skipBytes(skipLength);
         }
 
-        final ChannelBuffer frame = extractFrame(buffer, buffer.readerIndex(), length);
-
-        // Advance the reader index because extractFrame() does not do that.
-        buffer.skipBytes(length);
-
-        return frame;
+        final ByteBuf frame = buffer.readRetainedSlice(length);
+        out.add(frame);
     }
 
     /**
@@ -69,17 +67,14 @@ public class SyslogOctetCountFrameDecoder extends FrameDecoder {
      * @param buffer The channel buffer
      * @return The length of the frame length value
      */
-    private int findFrameSizeValueLength(final ChannelBuffer buffer) {
-        final int n = buffer.writerIndex();
+    private int findFrameSizeValueLength(final ByteBuf buffer) {
+        final int readerIndex = buffer.readerIndex();
+        int index = buffer.forEachByte(BYTE_PROCESSOR);
 
-        for (int i = buffer.readerIndex(); i < n; i ++) {
-            final byte b = buffer.getByte(i);
-
-            if (b == ' ') {
-                return i - buffer.readerIndex();
-            }
+        if (index >= 0) {
+            return index - readerIndex;
+        } else {
+            return -1;
         }
-
-        return -1;  // Not found.
     }
 }

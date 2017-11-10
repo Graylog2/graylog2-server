@@ -16,64 +16,118 @@
  */
 package org.graylog2.inputs.transports;
 
-import com.codahale.metrics.InstrumentedExecutorService;
 import com.github.joschi.jadconfig.util.Size;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Ints;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.FixedRecvByteBufAllocator;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.socket.DatagramChannelConfig;
+import io.netty.channel.unix.UnixChannelOption;
+import io.netty.handler.codec.DatagramPacketDecoder;
+import org.graylog2.inputs.transports.netty.DatagramChannelFactory;
+import org.graylog2.inputs.transports.netty.DatagramPacketHandler;
+import org.graylog2.inputs.transports.netty.NettyTransportType;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.inputs.MessageInput;
+import org.graylog2.plugin.inputs.MisfireException;
 import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.jboss.netty.bootstrap.Bootstrap;
-import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
-import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
-import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-import static com.codahale.metrics.MetricRegistry.name;
+import java.net.SocketAddress;
+import java.util.LinkedHashMap;
+import java.util.concurrent.Callable;
 
 public class UdpTransport extends NettyTransport {
     private static final Logger LOG = LoggerFactory.getLogger(UdpTransport.class);
 
-    private final Executor workerExecutor;
+    private final NettyTransportConfiguration nettyTransportConfiguration;
+
+    private Bootstrap bootstrap;
 
     @AssistedInject
     public UdpTransport(@Assisted Configuration configuration,
+                        EventLoopGroup eventLoopGroup,
+                        NettyTransportConfiguration nettyTransportConfiguration,
                         ThroughputCounter throughputCounter,
                         LocalMetricRegistry localRegistry) {
-        super(configuration, throughputCounter, localRegistry);
-        this.workerExecutor = executorService("worker", "udp-transport-worker-%d", localRegistry);
+        super(configuration, eventLoopGroup, throughputCounter, localRegistry);
+        this.nettyTransportConfiguration = nettyTransportConfiguration;
     }
 
-    private static Executor executorService(final String executorName, final String threadNameFormat, final LocalMetricRegistry localRegistry) {
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(threadNameFormat).build();
-        return new InstrumentedExecutorService(
-                Executors.newCachedThreadPool(threadFactory),
-                localRegistry,
-                name(UdpTransport.class, executorName, "executor-service"));
+    @VisibleForTesting
+    Bootstrap getBootstrap(MessageInput input) {
+        LOG.debug("Setting UDP receive buffer size to {} bytes", getRecvBufferSize());
+        final NettyTransportType transportType = nettyTransportConfiguration.getType();
+
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseHandlers = getBaseChannelHandlers(input);
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalHandlers = getFinalChannelHandlers(input);
+
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>(baseHandlers);
+        handlers.put("udp-datagram", () -> DatagramPacketHandler.INSTANCE);
+        handlers.putAll(finalHandlers);
+
+        return new Bootstrap()
+                .group(eventLoopGroup)
+                .channelFactory(new DatagramChannelFactory(transportType))
+                .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(getRecvBufferSize()))
+                .option(ChannelOption.SO_RCVBUF, getRecvBufferSize())
+                .option(UnixChannelOption.SO_REUSEPORT, true)
+                .handler(getChannelInitializer(handlers))
+                .validate();
     }
 
     @Override
-    public Bootstrap getBootstrap() {
-        final ConnectionlessBootstrap bootstrap = new ConnectionlessBootstrap(new NioDatagramChannelFactory(workerExecutor));
+    public void launch(final MessageInput input) throws MisfireException {
+        try {
+            bootstrap = getBootstrap(input);
 
-        final int recvBufferSize = Ints.saturatedCast(getRecvBufferSize());
-        LOG.debug("Setting receive buffer size to {} bytes", recvBufferSize);
-        bootstrap.setOption("receiveBufferSizePredictorFactory", new FixedReceiveBufferSizePredictorFactory(recvBufferSize));
-        bootstrap.setOption("receiveBufferSize", recvBufferSize);
+            // TODO: Make number of channels configurable separately
+            final NettyTransportType transportType = nettyTransportConfiguration.getType();
+            int numChannels = (transportType == NettyTransportType.EPOLL || transportType == NettyTransportType.KQUEUE) ? 16 : 1;
+            for (int i = 0; i < numChannels; i++) {
+                LOG.debug("Starting channel on {}", socketAddress);
+                bootstrap.bind(socketAddress)
+                        .addListener(new InputLaunchListener(channels, input, getRecvBufferSize()))
+                        .syncUninterruptibly();
+            }
+        } catch (Exception e) {
+            throw new MisfireException(e);
+        }
+    }
 
-        return bootstrap;
+    @Override
+    public void stop() {
+        super.stop();
+        bootstrap = null;
+    }
+
+    /**
+     * Get the local socket address this transport is listening on after being launched.
+     *
+     * @return the listening address of this transport or {@code null} if the transport hasn't been launched yet.
+     */
+    public SocketAddress getLocalAddress() {
+        if (channels != null) {
+            return channels.stream().findFirst().map(Channel::localAddress).orElse(null);
+        }
+
+        return null;
     }
 
     @FactoryClass
@@ -95,6 +149,36 @@ public class UdpTransport extends NettyTransport {
             r.addField(ConfigurationRequest.Templates.recvBufferSize(CK_RECV_BUFFER_SIZE, recvBufferSize));
 
             return r;
+        }
+    }
+
+    private static class InputLaunchListener implements ChannelFutureListener {
+        private final ChannelGroup channels;
+        private final MessageInput input;
+        private final int expectedRecvBufferSize;
+
+        public InputLaunchListener(ChannelGroup channels, MessageInput input, int expectedRecvBufferSize) {
+            this.channels = channels;
+            this.input = input;
+            this.expectedRecvBufferSize = expectedRecvBufferSize;
+        }
+
+        @Override
+        public void operationComplete(ChannelFuture future) throws Exception {
+            if (future.isSuccess()) {
+                final Channel channel = future.channel();
+                channels.add(channel);
+                LOG.debug("Started channel {}", channel);
+
+                final DatagramChannelConfig channelConfig = (DatagramChannelConfig) channel.config();
+                final int receiveBufferSize = channelConfig.getReceiveBufferSize();
+                if (receiveBufferSize != expectedRecvBufferSize) {
+                    LOG.warn("receiveBufferSize (SO_RCVBUF) for input {} (channel {}) should be {} but is {}.",
+                            input, channel, expectedRecvBufferSize, receiveBufferSize);
+                }
+            } else {
+                LOG.warn("Failed to start channel for input {}", input, future.cause());
+            }
         }
     }
 }

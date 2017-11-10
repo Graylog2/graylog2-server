@@ -31,17 +31,16 @@
  */
 package org.graylog2.inputs.transports.netty;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.handler.codec.frame.Delimiters;
-import org.jboss.netty.handler.codec.frame.FrameDecoder;
-import org.jboss.netty.handler.codec.frame.LineBasedFrameDecoder;
-import org.jboss.netty.handler.codec.frame.TooLongFrameException;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.TooLongFrameException;
+
+import java.util.List;
 
 /**
- * A decoder that splits the received {@link ChannelBuffer}s by one or more
+ * A decoder that splits the received {@link ByteBuf}s by one or more
  * delimiters.  It is particularly useful for decoding the frames which ends
  * with a delimiter such as {@link Delimiters#nulDelimiter() NUL} or
  * {@linkplain Delimiters#lineDelimiter() newline characters}.
@@ -61,7 +60,7 @@ import org.jboss.netty.handler.codec.frame.TooLongFrameException;
  * | ABC\nDEF\r\n |
  * +--------------+
  * </pre>
- * a {@link LenientDelimiterBasedFrameDecoder}{@code (}{@link Delimiters#lineDelimiter() Delimiters.lineDelimiter()}{@code )}
+ * a {@link LenientDelimiterBasedFrameDecoder}({@link Delimiters#lineDelimiter() Delimiters.lineDelimiter()})
  * will choose {@code '\n'} as the first delimiter and produce two frames:
  * <pre>
  * +-----+-----+
@@ -74,120 +73,119 @@ import org.jboss.netty.handler.codec.frame.TooLongFrameException;
  * | ABC\nDEF |
  * +----------+
  * </pre>
- *
- *
- * @apiviz.uses org.jboss.netty.handler.codec.frame.Delimiters - - useful
  */
-public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
+public class LenientDelimiterBasedFrameDecoder extends ByteToMessageDecoder {
 
-    private final ChannelBuffer[] delimiters;
+    private final ByteBuf[] delimiters;
     private final int maxFrameLength;
     private final boolean stripDelimiter;
     private final boolean failFast;
     private final boolean emitLastLineWithoutDelimiter;
     private boolean discardingTooLongFrame;
     private int tooLongFrameLength;
-    /** Set only when decoding with "\n" and "\r\n" as the delimiter.  */
+    /**
+     * Set only when decoding with "\n" and "\r\n" as the delimiter.
+     */
     private final LenientLineBasedFrameDecoder lineBasedDecoder;
 
     /**
      * Creates a new instance.
      *
-     * @param maxFrameLength  the maximum length of the decoded frame.
-     *                        A {@link TooLongFrameException} is thrown if
-     *                        the length of the frame exceeds this value.
-     * @param delimiter  the delimiter
+     * @param maxFrameLength the maximum length of the decoded frame.
+     *                       A {@link TooLongFrameException} is thrown if
+     *                       the length of the frame exceeds this value.
+     * @param delimiter      the delimiter
      */
-    public LenientDelimiterBasedFrameDecoder(int maxFrameLength, ChannelBuffer delimiter) {
+    public LenientDelimiterBasedFrameDecoder(int maxFrameLength, ByteBuf delimiter) {
         this(maxFrameLength, true, delimiter);
     }
 
     /**
      * Creates a new instance.
      *
-     * @param maxFrameLength  the maximum length of the decoded frame.
-     *                        A {@link TooLongFrameException} is thrown if
-     *                        the length of the frame exceeds this value.
-     * @param stripDelimiter  whether the decoded frame should strip out the
-     *                        delimiter or not
-     * @param delimiter  the delimiter
+     * @param maxFrameLength the maximum length of the decoded frame.
+     *                       A {@link TooLongFrameException} is thrown if
+     *                       the length of the frame exceeds this value.
+     * @param stripDelimiter whether the decoded frame should strip out the
+     *                       delimiter or not
+     * @param delimiter      the delimiter
      */
     public LenientDelimiterBasedFrameDecoder(
-            int maxFrameLength, boolean stripDelimiter, ChannelBuffer delimiter) {
-        this(maxFrameLength, stripDelimiter, false, true, delimiter);
+            int maxFrameLength, boolean stripDelimiter, ByteBuf delimiter) {
+        this(maxFrameLength, stripDelimiter, true, delimiter);
     }
 
     /**
      * Creates a new instance.
      *
-     * @param maxFrameLength  the maximum length of the decoded frame.
-     *                        A {@link TooLongFrameException} is thrown if
-     *                        the length of the frame exceeds this value.
-     * @param stripDelimiter  whether the decoded frame should strip out the
-     *                        delimiter or not
-     * @param failFast  If <tt>true</tt>, a {@link TooLongFrameException} is
-     *                  thrown as soon as the decoder notices the length of the
-     *                  frame will exceed <tt>maxFrameLength</tt> regardless of
-     *                  whether the entire frame has been read.
-     *                  If <tt>false</tt>, a {@link TooLongFrameException} is
-     *                  thrown after the entire frame that exceeds
-     *                  <tt>maxFrameLength</tt> has been read.
-     * @param delimiter  the delimiter
+     * @param maxFrameLength the maximum length of the decoded frame.
+     *                       A {@link TooLongFrameException} is thrown if
+     *                       the length of the frame exceeds this value.
+     * @param stripDelimiter whether the decoded frame should strip out the
+     *                       delimiter or not
+     * @param failFast       If <tt>true</tt>, a {@link TooLongFrameException} is
+     *                       thrown as soon as the decoder notices the length of the
+     *                       frame will exceed <tt>maxFrameLength</tt> regardless of
+     *                       whether the entire frame has been read.
+     *                       If <tt>false</tt>, a {@link TooLongFrameException} is
+     *                       thrown after the entire frame that exceeds
+     *                       <tt>maxFrameLength</tt> has been read.
+     * @param delimiter      the delimiter
      */
     public LenientDelimiterBasedFrameDecoder(
             int maxFrameLength, boolean stripDelimiter, boolean failFast,
-            ChannelBuffer delimiter) {
+            ByteBuf delimiter) {
         this(maxFrameLength, stripDelimiter, failFast, true, delimiter.slice(delimiter.readerIndex(), delimiter.readableBytes()));
     }
 
     /**
      * Creates a new instance.
      *
-     * @param maxFrameLength  the maximum length of the decoded frame.
-     *                        A {@link TooLongFrameException} is thrown if
-     *                        the length of the frame exceeds this value.
-     * @param delimiters  the delimiters
+     * @param maxFrameLength the maximum length of the decoded frame.
+     *                       A {@link TooLongFrameException} is thrown if
+     *                       the length of the frame exceeds this value.
+     * @param delimiters     the delimiters
      */
-    public LenientDelimiterBasedFrameDecoder(int maxFrameLength, ChannelBuffer... delimiters) {
+    public LenientDelimiterBasedFrameDecoder(int maxFrameLength, ByteBuf... delimiters) {
         this(maxFrameLength, true, delimiters);
     }
 
     /**
      * Creates a new instance.
      *
-     * @param maxFrameLength  the maximum length of the decoded frame.
-     *                        A {@link TooLongFrameException} is thrown if
-     *                        the length of the frame exceeds this value.
-     * @param stripDelimiter  whether the decoded frame should strip out the
-     *                        delimiter or not
-     * @param delimiters  the delimiters
+     * @param maxFrameLength the maximum length of the decoded frame.
+     *                       A {@link TooLongFrameException} is thrown if
+     *                       the length of the frame exceeds this value.
+     * @param stripDelimiter whether the decoded frame should strip out the
+     *                       delimiter or not
+     * @param delimiters     the delimiters
      */
     public LenientDelimiterBasedFrameDecoder(
-            int maxFrameLength, boolean stripDelimiter, ChannelBuffer... delimiters) {
-        this(maxFrameLength, stripDelimiter, false, true, delimiters);
+            int maxFrameLength, boolean stripDelimiter, ByteBuf... delimiters) {
+        this(maxFrameLength, stripDelimiter, true, true, delimiters);
     }
 
     /**
      * Creates a new instance.
      *
-     * @param maxFrameLength  the maximum length of the decoded frame.
-     *                        A {@link TooLongFrameException} is thrown if
-     *                        the length of the frame exceeds this value.
-     * @param stripDelimiter  whether the decoded frame should strip out the
-     *                        delimiter or not
-     * @param failFast  If <tt>true</tt>, a {@link TooLongFrameException} is
-     *                  thrown as soon as the decoder notices the length of the
-     *                  frame will exceed <tt>maxFrameLength</tt> regardless of
-     *                  whether the entire frame has been read.
-     *                  If <tt>false</tt>, a {@link TooLongFrameException} is
-     *                  thrown after the entire frame that exceeds
-     *                  <tt>maxFrameLength</tt> has been read.
+     * @param maxFrameLength               the maximum length of the decoded frame.
+     *                                     A {@link TooLongFrameException} is thrown if
+     *                                     the length of the frame exceeds this value.
+     * @param stripDelimiter               whether the decoded frame should strip out the
+     *                                     delimiter or not
+     * @param failFast                     If <tt>true</tt>, a {@link TooLongFrameException} is
+     *                                     thrown as soon as the decoder notices the length of the
+     *                                     frame will exceed <tt>maxFrameLength</tt> regardless of
+     *                                     whether the entire frame has been read.
+     *                                     If <tt>false</tt>, a {@link TooLongFrameException} is
+     *                                     thrown after the entire frame that exceeds
+     *                                     <tt>maxFrameLength</tt> has been read.
      * @param emitLastLineWithoutDelimiter emit the last line even if it doesn't
      *                                     end with the delimiter
-     * @param delimiters  the delimiters
+     * @param delimiters                   the delimiters
      */
     public LenientDelimiterBasedFrameDecoder(
-            int maxFrameLength, boolean stripDelimiter, boolean failFast, boolean emitLastLineWithoutDelimiter, ChannelBuffer... delimiters) {
+            int maxFrameLength, boolean stripDelimiter, boolean failFast, boolean emitLastLineWithoutDelimiter, ByteBuf... delimiters) {
         validateMaxFrameLength(maxFrameLength);
         if (delimiters == null) {
             throw new NullPointerException("delimiters");
@@ -200,9 +198,9 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
             lineBasedDecoder = new LenientLineBasedFrameDecoder(maxFrameLength, stripDelimiter, failFast, emitLastLineWithoutDelimiter);
             this.delimiters = null;
         } else {
-            this.delimiters = new ChannelBuffer[delimiters.length];
-            for (int i = 0; i < delimiters.length; i ++) {
-                ChannelBuffer d = delimiters[i];
+            this.delimiters = new ByteBuf[delimiters.length];
+            for (int i = 0; i < delimiters.length; i++) {
+                ByteBuf d = delimiters[i];
                 validateDelimiter(d);
                 this.delimiters[i] = d.slice(d.readerIndex(), d.readableBytes());
             }
@@ -214,20 +212,22 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
         this.emitLastLineWithoutDelimiter = emitLastLineWithoutDelimiter;
     }
 
-    /** Returns true if the delimiters are "\n" and "\r\n".  */
-    private static boolean isLineBased(final ChannelBuffer[] delimiters) {
+    /**
+     * Returns true if the delimiters are "\n" and "\r\n".
+     */
+    private static boolean isLineBased(final ByteBuf[] delimiters) {
         if (delimiters.length != 2) {
             return false;
         }
-        ChannelBuffer a = delimiters[0];
-        ChannelBuffer b = delimiters[1];
+        ByteBuf a = delimiters[0];
+        ByteBuf b = delimiters[1];
         if (a.capacity() < b.capacity()) {
             a = delimiters[1];
             b = delimiters[0];
         }
         return a.capacity() == 2 && b.capacity() == 1
-            && a.getByte(0) == '\r' && a.getByte(1) == '\n'
-            && b.getByte(0) == '\n';
+                && a.getByte(0) == '\r' && a.getByte(1) == '\n'
+                && b.getByte(0) == '\n';
     }
 
     /**
@@ -238,15 +238,29 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
     }
 
     @Override
-    protected Object decode(
-            ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer) throws Exception {
+    protected final void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+        Object decoded = decode(ctx, in);
+        if (decoded != null) {
+            out.add(decoded);
+        }
+    }
+
+    /**
+     * Create a frame out of the {@link ByteBuf} and return it.
+     *
+     * @param ctx    the {@link ChannelHandlerContext} which this {@link ByteToMessageDecoder} belongs to
+     * @param buffer the {@link ByteBuf} from which to read data
+     * @return frame           the {@link ByteBuf} which represent the frame or {@code null} if no frame could
+     * be created.
+     */
+    protected Object decode(ChannelHandlerContext ctx, ByteBuf buffer) throws Exception {
         if (lineBasedDecoder != null) {
-            return lineBasedDecoder.decode(ctx, channel, buffer);
+            return lineBasedDecoder.decode(ctx, buffer);
         }
         // Try all delimiters and choose the delimiter which yields the shortest frame.
         int minFrameLength = Integer.MAX_VALUE;
-        ChannelBuffer minDelim = null;
-        for (ChannelBuffer delim: delimiters) {
+        ByteBuf minDelim = null;
+        for (ByteBuf delim : delimiters) {
             int frameLength = indexOf(buffer, delim);
             if (frameLength >= 0 && frameLength < minFrameLength) {
                 minFrameLength = frameLength;
@@ -256,7 +270,7 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
 
         if (minDelim != null) {
             int minDelimLength = minDelim.capacity();
-            ChannelBuffer frame;
+            ByteBuf frame;
 
             if (discardingTooLongFrame) {
                 // We've just finished discarding a very large frame.
@@ -267,7 +281,7 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
                 int tooLongFrameLength = this.tooLongFrameLength;
                 this.tooLongFrameLength = 0;
                 if (!failFast) {
-                    fail(ctx, tooLongFrameLength);
+                    fail(tooLongFrameLength);
                 }
                 return null;
             }
@@ -275,21 +289,21 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
             if (minFrameLength > maxFrameLength) {
                 // Discard read frame.
                 buffer.skipBytes(minFrameLength + minDelimLength);
-                fail(ctx, minFrameLength);
+                fail(minFrameLength);
                 return null;
             }
 
             if (stripDelimiter) {
-                frame = extractFrame(buffer, buffer.readerIndex(), minFrameLength);
+                frame = buffer.readRetainedSlice(minFrameLength);
+                buffer.skipBytes(minDelimLength);
             } else {
-                frame = extractFrame(buffer, buffer.readerIndex(), minFrameLength + minDelimLength);
+                frame = buffer.readRetainedSlice(minFrameLength + minDelimLength);
             }
-            buffer.skipBytes(minFrameLength + minDelimLength);
 
             return frame;
-        } else if (emitLastLineWithoutDelimiter && !channel.isConnected()) {
+        } else if (emitLastLineWithoutDelimiter && !ctx.channel().isActive()) {
             minFrameLength = buffer.readableBytes();
-            ChannelBuffer frame;
+            ByteBuf frame;
 
             if (discardingTooLongFrame) {
                 // We've just finished discarding a very large frame.
@@ -300,7 +314,7 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
                 int tooLongFrameLength = this.tooLongFrameLength;
                 this.tooLongFrameLength = 0;
                 if (!failFast) {
-                    fail(ctx, tooLongFrameLength);
+                    fail(tooLongFrameLength);
                 }
                 return null;
             }
@@ -308,12 +322,11 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
             if (minFrameLength > maxFrameLength) {
                 // Discard read frame.
                 buffer.skipBytes(minFrameLength);
-                fail(ctx, minFrameLength);
+                fail(minFrameLength);
                 return null;
             }
 
-            frame = extractFrame(buffer, buffer.readerIndex(), minFrameLength);
-            buffer.skipBytes(minFrameLength);
+            frame = buffer.readRetainedSlice(minFrameLength);
 
             return frame;
         } else {
@@ -324,7 +337,7 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
                     buffer.skipBytes(buffer.readableBytes());
                     discardingTooLongFrame = true;
                     if (failFast) {
-                        fail(ctx, tooLongFrameLength);
+                        fail(tooLongFrameLength);
                     }
                 }
             } else {
@@ -336,19 +349,15 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
         }
     }
 
-    private void fail(ChannelHandlerContext ctx, long frameLength) {
+    private void fail(long frameLength) {
         if (frameLength > 0) {
-            Channels.fireExceptionCaught(
-                    ctx.getChannel(),
-                    new TooLongFrameException(
-                            "frame length exceeds " + maxFrameLength +
-                            ": " + frameLength + " - discarded"));
+            throw new TooLongFrameException(
+                    "frame length exceeds " + maxFrameLength +
+                            ": " + frameLength + " - discarded");
         } else {
-            Channels.fireExceptionCaught(
-                    ctx.getChannel(),
-                    new TooLongFrameException(
-                            "frame length exceeds " + maxFrameLength +
-                            " - discarding"));
+            throw new TooLongFrameException(
+                    "frame length exceeds " + maxFrameLength +
+                            " - discarding");
         }
     }
 
@@ -357,17 +366,17 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
      * the first needle found in the haystack.  -1 is returned if no needle is
      * found in the haystack.
      */
-    private static int indexOf(ChannelBuffer haystack, ChannelBuffer needle) {
-        for (int i = haystack.readerIndex(); i < haystack.writerIndex(); i ++) {
+    private static int indexOf(ByteBuf haystack, ByteBuf needle) {
+        for (int i = haystack.readerIndex(); i < haystack.writerIndex(); i++) {
             int haystackIndex = i;
             int needleIndex;
-            for (needleIndex = 0; needleIndex < needle.capacity(); needleIndex ++) {
+            for (needleIndex = 0; needleIndex < needle.capacity(); needleIndex++) {
                 if (haystack.getByte(haystackIndex) != needle.getByte(needleIndex)) {
                     break;
                 } else {
-                    haystackIndex ++;
+                    haystackIndex++;
                     if (haystackIndex == haystack.writerIndex() &&
-                        needleIndex != needle.capacity() - 1) {
+                            needleIndex != needle.capacity() - 1) {
                         return -1;
                     }
                 }
@@ -381,11 +390,11 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
         return -1;
     }
 
-    private static void validateDelimiter(ChannelBuffer delimiter) {
+    private static void validateDelimiter(ByteBuf delimiter) {
         if (delimiter == null) {
             throw new NullPointerException("delimiter");
         }
-        if (!delimiter.readable()) {
+        if (!delimiter.isReadable()) {
             throw new IllegalArgumentException("empty delimiter");
         }
     }
@@ -394,7 +403,7 @@ public class LenientDelimiterBasedFrameDecoder extends FrameDecoder {
         if (maxFrameLength <= 0) {
             throw new IllegalArgumentException(
                     "maxFrameLength must be a positive integer: " +
-                    maxFrameLength);
+                            maxFrameLength);
         }
     }
 }

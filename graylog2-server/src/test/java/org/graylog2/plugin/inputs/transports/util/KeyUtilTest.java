@@ -17,7 +17,7 @@
 package org.graylog2.plugin.inputs.transports.util;
 
 import com.google.common.collect.ImmutableMap;
-import org.jboss.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.SslHandler;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
