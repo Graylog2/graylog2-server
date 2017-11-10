@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
-import String from 'string';
+import lodash from 'lodash';
 
 import StoreProvider from 'injection/StoreProvider';
 const MetricsStore = StoreProvider.getStore('Metrics');
@@ -43,7 +43,7 @@ const MetricDetails = React.createClass({
     const nodeId = this.props.nodeId;
     const metric = this.state.metrics && this.state.metrics[nodeId] && this.state.metrics[nodeId][metricName] ?
       this.state.metrics[nodeId][metricName] : this.props.metric;
-    const type = String(metric.type).capitalize().toString();
+    const type = lodash.capitalize(metric.type);
     const details = this._formatDetailsForType(type, metric);
     return (
       <div className="metric">

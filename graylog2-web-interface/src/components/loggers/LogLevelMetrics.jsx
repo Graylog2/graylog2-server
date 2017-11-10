@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Col } from 'react-bootstrap';
-import String from 'string';
+import lodash from 'lodash';
 import numeral from 'numeral';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -50,7 +50,7 @@ const LogLevelMetrics = React.createClass({
     return (
       <div className="loglevel-metrics-row">
         <Col md={4}>
-          <h3 className="u-light">Level: {String(loglevel).capitalize().toString()}</h3>
+          <h3 className="u-light">Level: {lodash.capitalize(loglevel)}</h3>
           {metricsDetails}
         </Col>
       </div>

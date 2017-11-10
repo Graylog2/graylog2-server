@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
-import String from 'string';
+import lodash from 'lodash';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const LoggersActions = ActionsProvider.getActions('Loggers');
@@ -25,10 +25,10 @@ const LogLevelDropdown = React.createClass({
     const loglevels = this.state.availableLoglevels
       .map(loglevel =>
         <MenuItem key={`${subsystem}-${nodeId}-${loglevel}`} active={subsystem.level === loglevel} onClick={(evt) => { evt.preventDefault(); this._changeLoglevel(loglevel); }}>
-          {String(loglevel).capitalize().toString()}
+          {lodash.capitalize(loglevel)}
         </MenuItem>);
     return (
-      <DropdownButton id="loglevel" bsSize="xsmall" title={subsystem.level}>
+      <DropdownButton id="loglevel" bsSize="xsmall" title={lodash.capitalize(subsystem.level)}>
         {loglevels}
       </DropdownButton>
     );
