@@ -391,9 +391,16 @@
             </dependency>
 
             <dependency>
-                <groupId>com.google.code.findbugs</groupId>
-                <artifactId>jsr305</artifactId>
-                <version>${jsr305.version}</version>
+                <groupId>net.jcip</groupId>
+                <artifactId>jcip-annotations</artifactId>
+                <version>${jcip-annotations.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-annotations</artifactId>
+                <version>${spotbugs-annotations.version}</version>
+                <scope>provided</scope>
             </dependency>
 
             <dependency>
@@ -720,10 +727,10 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>findbugs-maven-plugin</artifactId>
+                        <groupId>com.github.spotbugs</groupId>
+                        <artifactId>spotbugs-maven-plugin</artifactId>
                         <configuration>
-                            <excludeFilterFile>config/findbugs-exclude.xml</excludeFilterFile>
+                            <excludeFilterFile>config/spotbugs-exclude.xml</excludeFilterFile>
                             <effort>Max</effort>
                             <threshold>Default</threshold>
                             <failOnError>false</failOnError>
@@ -737,7 +744,7 @@
                                 <plugin>
                                     <groupId>com.mebigfatguy.fb-contrib</groupId>
                                     <artifactId>fb-contrib</artifactId>
-                                    <version>7.0.5</version>
+                                    <version>7.0.5.sb</version>
                                 </plugin>
                             </plugins>
                         </configuration>
