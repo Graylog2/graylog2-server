@@ -10,7 +10,7 @@ sh install-syslog4j-jar.sh
 
 echo 'Building graylog2-server...'
 mvn --batch-mode --fail-fast --quiet -DskipTests=true \
-  -Dmaven.javadoc.skip=true -Dmaven.findbugs.skip=true -Dsource.skip=true \
+  -Dmaven.javadoc.skip=true -Dspotbugs.skip=true -Dsource.skip=true \
   clean install
 
 echo 'Starting graylog2-server...'
