@@ -1,11 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Reflux from 'reflux';
 import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import { Col, Row } from 'react-bootstrap';
-import String from 'string';
 
-import { Spinner } from 'components/common';
 import { MetricsFilterInput, MetricsList } from 'components/metrics';
 
 const MetricsComponent = React.createClass({
