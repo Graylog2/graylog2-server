@@ -28,13 +28,19 @@ exports[`UserPreferencesButton should load user data when user clicks edit butto
       <BootstrapModalForm
         cancelButtonText="Cancel"
         formProps={Object {}}
+        onCancel={[Function]}
+        onModalClose={[Function]}
+        onModalOpen={[Function]}
         onSubmitForm={[Function]}
         submitButtonDisabled={false}
         submitButtonText="Save"
         title="Preferences for user Full"
       >
         <BootstrapModalWrapper
+          onClose={[Function]}
           onHide={[Function]}
+          onOpen={[Function]}
+          showModal={false}
         >
           <Modal
             animation={true}
