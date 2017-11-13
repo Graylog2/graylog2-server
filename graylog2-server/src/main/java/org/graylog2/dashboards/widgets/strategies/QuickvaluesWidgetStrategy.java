@@ -60,6 +60,7 @@ public class QuickvaluesWidgetStrategy extends QuickvaluesBaseWidgetStrategy {
 
         Map<String, Object> result = Maps.newHashMap();
         result.put("terms", terms.getTerms());
+        result.put("terms_mapping", terms.termsMapping());
         result.put("total", terms.getTotal());
         result.put("other", terms.getOther());
         result.put("missing", terms.getMissing());
