@@ -190,7 +190,7 @@ const QuickValuesVisualization = React.createClass({
         if (this.props.data.terms_mapping && this.props.data.terms_mapping[d.term]) {
           // Separate the terms with a character that is unusual in terms and use a different text color to make the
           // different terms in the stacked value more visible.
-          formattedTerm = this.props.data.terms_mapping[d.term].map(t => t.value).join(' <strong style="color: #e3e3e3;">&mdash;</strong> ');
+          formattedTerm = this.props.data.terms_mapping[d.term].map(t => t.value).join(' <strong style="color: #999999;">&mdash;</strong> ');
         }
 
         if (typeof this.pieChart !== 'undefined' && this.dataTable.group()(d) !== 'Others') {
