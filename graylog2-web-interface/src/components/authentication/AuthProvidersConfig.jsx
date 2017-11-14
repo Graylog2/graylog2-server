@@ -166,7 +166,7 @@ const AuthProvidersConfig = React.createClass({
               </Table>
 
               <IfPermitted permissions="clusterconfigentry:edit">
-                <Button bsStyle="primary" onClick={this._openModal} className="save-button-margin">Update</Button>
+                <Button bsStyle="primary" onClick={this._openModal} className="save-button-margin">Edit</Button>
                 <Button onClick={this._onCancel}>Cancel</Button>
               </IfPermitted>
 
