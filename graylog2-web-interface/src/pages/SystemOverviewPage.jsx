@@ -6,7 +6,6 @@ import { NotificationsList } from 'components/notifications';
 import { SystemJobsComponent } from 'components/systemjobs';
 import { SystemMessagesComponent } from 'components/systemmessages';
 import { TimesList } from 'components/times';
-import UsageStatsOptIn from 'components/usagestats/UsageStatsOptIn';
 import { GraylogClusterOverview } from 'components/cluster';
 
 const SystemOverviewPage = React.createClass({
@@ -33,10 +32,6 @@ const SystemOverviewPage = React.createClass({
           </IfPermitted>
 
           <TimesList />
-
-          <IfPermitted permissions="clusterconfigentry:edit:org.graylog.plugins.usagestatistics.UsageStatsOptOutState">
-            <UsageStatsOptIn />
-          </IfPermitted>
 
           <IfPermitted permissions="systemmessages:read">
             <SystemMessagesComponent />

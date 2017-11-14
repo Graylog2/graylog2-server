@@ -117,7 +117,6 @@ class CombinedProvider {
       SystemShutdown: () => require('stores/system-shutdown/SystemShutdownStore'),
       Tools: () => require('stores/tools/ToolsStore'),
       UniversalSearch: () => require('stores/search/UniversalSearchStore'),
-      UsageStatsOptOut: () => require('stores/usagestats/UsageStatsOptOutStore'),
       Users: () => require('stores/users/UsersStore'),
       Widgets: () => require('stores/widgets/WidgetsStore'),
     };
