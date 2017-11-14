@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 public class ESMessageList implements ESSearchTypeHandler<MessageList> {
     @Override
-    public void doGenerateQueryPart(MessageList messageList, SearchSourceBuilder searchSourceBuilder) {
+    public void doGenerateQueryPart(SearchJob job, Query query, MessageList messageList, SearchSourceBuilder searchSourceBuilder) {
         searchSourceBuilder
                 .size(messageList.limit() - messageList.offset())
                 .from(messageList.offset());

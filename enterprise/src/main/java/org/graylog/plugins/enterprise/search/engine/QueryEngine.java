@@ -49,7 +49,7 @@ public class QueryEngine {
             if (queryBackend == null) {
                 throw new IllegalStateException("Unknown query backend " + backendQuery.type() + ", cannot execute query");
             }
-            final Object generatedQuery = queryBackend.generate(query);
+            final Object generatedQuery = queryBackend.generate(searchJob, query);
             plannedQuery.setGeneratedQuery(generatedQuery);
             LOG.warn("Generated query: {}", generatedQuery.toString());
 

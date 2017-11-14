@@ -19,7 +19,7 @@ import java.util.Map;
 
 public class ESDateHistogram implements ESSearchTypeHandler<DateHistogram> {
     @Override
-    public void doGenerateQueryPart(DateHistogram dateHistogram, SearchSourceBuilder searchSourceBuilder) {
+    public void doGenerateQueryPart(SearchJob job, Query query, DateHistogram dateHistogram, SearchSourceBuilder searchSourceBuilder) {
         searchSourceBuilder.aggregation(
                 AggregationBuilders.dateHistogram(dateHistogram.id())
                         .field(Message.FIELD_TIMESTAMP)

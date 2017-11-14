@@ -8,8 +8,8 @@ import io.swagger.annotations.ApiParam;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
 import org.graylog.plugins.enterprise.search.Search;
 import org.graylog.plugins.enterprise.search.SearchJob;
-import org.graylog.plugins.enterprise.search.db.SearchJobService;
 import org.graylog.plugins.enterprise.search.db.SearchDbService;
+import org.graylog.plugins.enterprise.search.db.SearchJobService;
 import org.graylog.plugins.enterprise.search.engine.QueryEngine;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
@@ -17,12 +17,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -124,6 +127,23 @@ public class SearchResource extends RestResource implements PluginRestResource {
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(),5, TimeUnit.MILLISECONDS);
         } catch (ExecutionException | TimeoutException ignore) {
         }
+        return searchJob;
+    }
+
+    @POST
+    @ApiOperation(value = "Execute a new synchronous search", notes = "Executes a new search and waits for its result")
+    @Path("sync")
+    public SearchJob executeSyncJob(@ApiParam Search search,
+                                    @ApiParam(name = "timeout", defaultValue = "60000")
+                                    @QueryParam("timeout") @DefaultValue("60000") long timeout) {
+        final SearchJob searchJob = queryEngine.execute(searchJobService.create(search));
+
+        try {
+            Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);
+        } catch (ExecutionException | TimeoutException e) {
+            throw new InternalServerErrorException("Timeout while executing search job");
+        }
+
         return searchJob;
     }
 }

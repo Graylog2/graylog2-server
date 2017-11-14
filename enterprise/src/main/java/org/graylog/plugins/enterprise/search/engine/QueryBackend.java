@@ -9,10 +9,11 @@ public interface QueryBackend {
 
     /**
      * Generate a backend-specific query out of the logical query structure.
+     * @param job currently executing job
      * @param query the graylog query structure
      * @return a backend specific generated query
      */
-    Object generate(Query query);
+    Object generate(SearchJob job, Query query);
 
     /**
      * Run the generated query as part of the given query job.
