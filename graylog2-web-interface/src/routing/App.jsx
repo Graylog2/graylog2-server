@@ -4,7 +4,6 @@ import Reflux from 'reflux';
 import Navigation from 'components/navigation/Navigation';
 import Spinner from 'components/common/Spinner';
 import Footer from 'components/layout/Footer';
-import AppGlobalNotifications from './AppGlobalNotifications';
 
 import 'stylesheets/jquery.dynatable.css';
 import 'stylesheets/typeahead.less';
@@ -12,6 +11,7 @@ import 'c3/c3.css';
 import 'dc/dc.css';
 
 import StoreProvider from 'injection/StoreProvider';
+import AppGlobalNotifications from './AppGlobalNotifications';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const App = React.createClass({
