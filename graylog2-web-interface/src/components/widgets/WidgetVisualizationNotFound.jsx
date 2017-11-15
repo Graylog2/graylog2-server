@@ -5,13 +5,24 @@ import { Alert } from 'react-bootstrap';
 const WidgetVisualizationNotFound = React.createClass({
   propTypes: {
     widgetClassName: PropTypes.string.isRequired,
+    onRenderComplete: PropTypes.func,
   },
+
+  getDefaultProps() {
+    return {
+      onRenderComplete: () => {},
+    };
+  },
+
+  componentDidMount() {
+    this.props.onRenderComplete();
+  },
+
   render() {
     return (
       <Alert bsStyle="danger">
         <i className="fa fa-exclamation-circle" /> Widget Visualization (<i>{this.props.widgetClassName}</i>) not found.
-
-        Seems like the plugin supplying this widget is not loaded.
+        It looks like the plugin supplying this widget is not loaded.
       </Alert>
     );
   },
