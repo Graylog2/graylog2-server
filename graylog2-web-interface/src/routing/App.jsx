@@ -4,6 +4,7 @@ import Reflux from 'reflux';
 import Navigation from 'components/navigation/Navigation';
 import Spinner from 'components/common/Spinner';
 import Footer from 'components/layout/Footer';
+import AppGlobalNotifications from './AppGlobalNotifications';
 
 import 'stylesheets/jquery.dynatable.css';
 import 'stylesheets/typeahead.less';
@@ -31,6 +32,7 @@ const App = React.createClass({
       <div>
         <Navigation requestPath={this.props.location.pathname} fullName={this.state.currentUser.full_name}
                     loginName={this.state.currentUser.username} permissions={this.state.currentUser.permissions} />
+        <AppGlobalNotifications />
         <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
           <i className="fa fa-arrow-up" />
         </div>
