@@ -1,0 +1,20 @@
+{
+  "testString": "<132>Nov 13 13:17:41 CEF:0|Trend Micro Inc.|OSSEC HIDS|v2.9.2|1002|Unknown problem somewhere in the system.|2|dvc=log cs1=(proxy) any->/var/log/syslog cs1Label=Location classification= syslog,errors, msg=Nov 13 13:17:39 proxy tinyproxy[26954]: readbuff: recv() error \"Connection reset by peer\" on file descriptor 6",
+  "description": "https://github.com/Graylog2/graylog-plugin-cef/issues/23#issuecomment-343792271",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "log",
+  "cefVersion": 0,
+  "deviceVendor": "Trend Micro Inc.",
+  "deviceProduct": "OSSEC HIDS",
+  "deviceVersion": "v2.9.2",
+  "deviceEventClassId": "1002",
+  "name": "Unknown problem somewhere in the system.",
+  "severity": "2",
+  "extensions": {
+    "level": 4,
+    "facility": "local0",
+    "Location": "(proxy) any->/var/log/syslog",
+    "classification": "syslog,errors,",
+    "msg": "Nov 13 13:17:39 proxy tinyproxy[26954]: readbuff: recv() error \"Connection reset by peer\" on file descriptor 6"
+  }
+}
