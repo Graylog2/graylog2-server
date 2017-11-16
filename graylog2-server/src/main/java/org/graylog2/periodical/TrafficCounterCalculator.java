@@ -19,7 +19,7 @@ package org.graylog2.periodical;
 import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Size;
-import org.graylog2.indexer.messages.Messages;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.periodical.Periodical;
 import org.graylog2.plugin.system.NodeId;
@@ -35,7 +35,9 @@ public class TrafficCounterCalculator extends Periodical {
     private final NodeId nodeId;
     private final TrafficCounterService trafficService;
     private final MetricRegistry metricRegistry;
+    private long previousInputBytes = 0L;
     private long previousOutputBytes = 0L;
+    private Counter inputCounter;
     private Counter outputCounter;
 
     @Inject
@@ -47,7 +49,8 @@ public class TrafficCounterCalculator extends Periodical {
 
     @Override
     public void initialize() {
-        outputCounter = metricRegistry.counter(Messages.OUTPUT_BYTES_COUNTER_NAME);
+        inputCounter = metricRegistry.counter(GlobalMetricNames.INPUT_TRAFFIC);
+        outputCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
     }
 
     @Override
@@ -56,16 +59,23 @@ public class TrafficCounterCalculator extends Periodical {
         final int secondOfMinute = now.getSecondOfMinute();
         // on the top of every minute, we flush the current throughput
         if (secondOfMinute == 0) {
-            LOG.warn("Calculating previous minutes' output traffic");
+            LOG.trace("Calculating input and output traffic for the previous minute");
+
+            final long currentInputBytes = inputCounter.getCount();
             final long currentOutputBytes = outputCounter.getCount();
-            final long bytesLastMinute = currentOutputBytes - previousOutputBytes;
+
+            final long inputLastMinute = currentInputBytes - previousInputBytes;
+            previousInputBytes = currentInputBytes;
+            final long outputBytesLastMinute = currentOutputBytes - previousOutputBytes;
             previousOutputBytes = currentOutputBytes;
+
             if (LOG.isWarnEnabled()) {
-                final Size bytes = Size.bytes(bytesLastMinute);
-                LOG.warn("Elasticsearch output wrote {} ({} MB) during the previous minute.", bytes, bytes.toMegabytes());
+                final Size in = Size.bytes(inputLastMinute);
+                final Size out = Size.bytes(outputBytesLastMinute);
+                LOG.warn("Traffic in the last minute: {} bytes ({} MB), {} bytes ({} MB})", in, in.toMegabytes(), out, out.toMegabytes());
             }
             final DateTime previousMinute = now.minusMinutes(1);
-            trafficService.updateOutputTraffic(previousMinute, nodeId, bytesLastMinute);
+            trafficService.updateTraffic(previousMinute, nodeId, inputLastMinute, outputBytesLastMinute);
         }
     }
 

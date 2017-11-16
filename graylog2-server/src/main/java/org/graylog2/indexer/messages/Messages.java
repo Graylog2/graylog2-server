@@ -41,6 +41,7 @@ import org.graylog2.indexer.IndexFailureImpl;
 import org.graylog2.indexer.IndexMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.results.ResultMessage;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,7 +79,6 @@ public class Messages {
                 }
             })
             .build();
-    public static final String OUTPUT_BYTES_COUNTER_NAME = name(Messages.class, "output-bytes");
 
     private final Meter invalidTimestampMeter;
     private final JestClient client;
@@ -89,7 +89,7 @@ public class Messages {
     public Messages(MetricRegistry metricRegistry,
                     JestClient client) {
         invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
-        outputByteCounter = metricRegistry.counter(OUTPUT_BYTES_COUNTER_NAME);
+        outputByteCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
         this.client = client;
 
         // TODO: Magic number

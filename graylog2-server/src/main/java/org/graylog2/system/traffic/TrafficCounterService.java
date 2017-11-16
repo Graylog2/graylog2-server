@@ -1,16 +1,16 @@
 /**
  * This file is part of Graylog.
- *
+ * <p>
  * Graylog is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- *
+ * <p>
  * Graylog is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- *
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -57,24 +57,31 @@ public class TrafficCounterService {
         db.createIndex(new BasicDBObject(BUCKET, 1), new BasicDBObject("unique", true));
     }
 
+    private static DateTime getDayBucket(DateTime observationTime) {
+        return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+    }
 
-    public void updateOutputTraffic(DateTime observationTime, NodeId nodeId, long bytesLastMinute) {
+    public void updateTraffic(DateTime observationTime, NodeId nodeId, long inLastMinute, long outLastMinute) {
         // we bucket our database by days
         final DateTime dayBucket = getDayBucket(observationTime);
 
-        LOG.warn("Updating outgoing traffic for node {} at {}: {} bytes", nodeId.toString(), dayBucket, bytesLastMinute);
+        LOG.warn("Updating traffic for node {} at {}:  in {}/ out {} bytes", nodeId.toString(), dayBucket, inLastMinute, outLastMinute);
         final WriteResult<TrafficDto, ObjectId> update = db.update(DBQuery.is("bucket", dayBucket),
                 // sigh DBUpdate.inc only takes integers, but we have a long.
-                new DBUpdate.Builder().addOperation("$inc", "output." + nodeId.toString(),
-                        new SingleUpdateOperationValue(false, false, bytesLastMinute)),
+                new DBUpdate.Builder()
+                        .addOperation("$inc", "input." + nodeId.toString(),
+                                new SingleUpdateOperationValue(false, false, inLastMinute))
+                        .addOperation("$inc", "output." + nodeId.toString(),
+                                new SingleUpdateOperationValue(false, false, outLastMinute)),
                 true, false);
         if (update.getN() == 0) {
             LOG.warn("Unable to update traffic of node {}: {}", nodeId, update);
         }
     }
 
-    public TrafficHistogram getClusterOutputTrafficOfLastDays(Duration duration) {
-        final ImmutableMap.Builder<DateTime, Long> traffic = ImmutableMap.builder();
+    public TrafficHistogram clusterTrafficOfLastDays(Duration duration) {
+        final ImmutableMap.Builder<DateTime, Long> input = ImmutableMap.builder();
+        final ImmutableMap.Builder<DateTime, Long> output = ImmutableMap.builder();
         final DateTime to = getDayBucket(Tools.nowUTC());
         final DateTime from = to.minus(duration);
 
@@ -84,19 +91,24 @@ public class TrafficCounterService {
         );
         LOG.trace("Getting cluster traffic: {}", db.serializeQuery(query).toString());
         final DBCursor<TrafficDto> cursor = db.find(query);
-        cursor.forEach(trafficDto -> traffic.put(
-                trafficDto.bucket(), trafficDto.output().values().stream().mapToLong(Long::valueOf).sum()
-        ));
-        return TrafficHistogram.create(from, to, traffic.build());
-    }
-
-    private static DateTime getDayBucket(DateTime observationTime) {
-        return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
+        cursor.forEach(trafficDto -> {
+            input.put(trafficDto.bucket(), trafficDto.input().values().stream().mapToLong(Long::valueOf).sum());
+            output.put(trafficDto.bucket(), trafficDto.output().values().stream().mapToLong(Long::valueOf).sum());
+        });
+        return TrafficHistogram.create(from, to, input.build(), output.build());
     }
 
     @AutoValue
     @JsonAutoDetect
     public abstract static class TrafficHistogram {
+        @JsonCreator
+        public static TrafficHistogram create(@JsonProperty("from") DateTime from,
+                                              @JsonProperty("to") DateTime to,
+                                              @JsonProperty("input") Map<DateTime, Long> input,
+                                              @JsonProperty("output") Map<DateTime, Long> output) {
+            return new AutoValue_TrafficCounterService_TrafficHistogram(from, to, input, output);
+        }
+
         @JsonProperty
         public abstract DateTime from();
 
@@ -104,11 +116,9 @@ public class TrafficCounterService {
         public abstract DateTime to();
 
         @JsonProperty
-        public abstract Map<DateTime, Long> output();
+        public abstract Map<DateTime, Long> input();
 
-        @JsonCreator
-        public static TrafficHistogram create(@JsonProperty("from") DateTime from, @JsonProperty("to") DateTime to, Map<DateTime, Long> output) {
-            return new AutoValue_TrafficCounterService_TrafficHistogram(from, to, output);
-        }
+        @JsonProperty
+        public abstract Map<DateTime, Long> output();
     }
 }

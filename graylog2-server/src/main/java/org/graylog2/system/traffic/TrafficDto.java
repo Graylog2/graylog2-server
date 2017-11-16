@@ -38,6 +38,9 @@ public abstract class TrafficDto {
     public abstract DateTime bucket();
 
     @JsonProperty
+    public abstract Map<String, Long> input();
+
+    @JsonProperty
     public abstract Map<String, Long> output();
 
     public static Builder builder() {
@@ -54,6 +57,9 @@ public abstract class TrafficDto {
 
         @JsonProperty
         public abstract Builder bucket(DateTime bucket);
+
+        @JsonProperty
+        public abstract Builder input(Map<String, Long> inputTraffic);
 
         @JsonProperty
         public abstract Builder output(Map<String, Long> outputTraffic);

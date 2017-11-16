@@ -9,6 +9,8 @@ import crossfilter from 'crossfilter';
 const TrafficGraph = React.createClass({
 
   propTypes: {
+    from: PropTypes.string.isRequired,
+    to: PropTypes.string.isRequired,
     traffic: PropTypes.object.isRequired,
   },
 
@@ -27,8 +29,7 @@ const TrafficGraph = React.createClass({
       },
     };
 
-    const traffic = this.props.traffic;
-    const ndx = crossfilter(_.map(traffic.output, (value, key) => {
+    const ndx = crossfilter(_.map(this.props.traffic, (value, key) => {
       return { ts: key, bytes: value };
     }));
     const dailyTraffic = ndx.dimension((d) => {
@@ -44,7 +45,7 @@ const TrafficGraph = React.createClass({
                               config={config}
                               width={800}
                               interactive={false}
-                              computationTimeRange={{ from: traffic.from, to: traffic.to }} />
+                              computationTimeRange={{ from: this.props.from, to: this.props.to }} />
     );
   },
 });

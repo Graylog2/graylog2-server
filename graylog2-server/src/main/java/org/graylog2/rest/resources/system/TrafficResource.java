@@ -49,11 +49,11 @@ public class TrafficResource extends RestResource {
     }
 
     @GET
-    @ApiOperation(value = "Get the cluster output traffic stats")
-    public TrafficCounterService.TrafficHistogram get(@ApiParam(name = "days", value = "The last days of output traffic stats")
+    @ApiOperation(value = "Get the cluster traffic stats")
+    public TrafficCounterService.TrafficHistogram get(@ApiParam(name = "days", value = "For how many days the traffic stats should be returned")
                                  @QueryParam("days") @DefaultValue("30") int days) {
         final TrafficCounterService.TrafficHistogram trafficHistogram =
-                trafficCounterService.getClusterOutputTrafficOfLastDays(Duration.standardDays(days));
+                trafficCounterService.clusterTrafficOfLastDays(Duration.standardDays(days));
 
         return trafficHistogram;
     }
