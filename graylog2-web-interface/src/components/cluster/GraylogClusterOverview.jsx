@@ -3,7 +3,6 @@ import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
-import ObjectUtils from 'util/ObjectUtils';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
 
