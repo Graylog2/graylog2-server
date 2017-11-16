@@ -1,8 +1,6 @@
 import React from 'react';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
-import styles from './AppGlobalNotifications.css';
-
 const AppGlobalNotifications = React.createClass({
   render() {
     const globalNotifications = PluginStore.exports('globalNotifications')
@@ -22,7 +20,7 @@ const AppGlobalNotifications = React.createClass({
       .filter(component => !!component);
 
     return (
-      <div className={`container-fluid ${styles.globalNotifications}`} id="global-notifications">
+      <div id="global-notifications">
         {globalNotifications}
       </div>
     );
