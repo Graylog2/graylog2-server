@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin;
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.eaio.uuid.UUID;
@@ -61,6 +62,7 @@ public class MessageTest {
     private DateTime originalTimestamp;
     private MetricRegistry metricRegistry;
     private Meter invalidTimestampMeter;
+    private Counter outputByteCounter;
 
     @Before
     public void setUp() {
@@ -68,6 +70,7 @@ public class MessageTest {
         originalTimestamp = Tools.nowUTC();
         message = new Message("foo", "bar", originalTimestamp);
         invalidTimestampMeter = metricRegistry.meter("test");
+        outputByteCounter = metricRegistry.counter("output-bytes");
     }
 
     @Test
@@ -329,11 +332,12 @@ public class MessageTest {
         message.addField(Message.FIELD_TIMESTAMP,
                          dateTime.toDate());
 
-        final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(invalidTimestampMeter);
+        final Map<String, Object> elasticSearchObject = message.toElasticSearchObject(invalidTimestampMeter, outputByteCounter);
         final Object esTimestampFormatted = elasticSearchObject.get(Message.FIELD_TIMESTAMP);
 
         assertEquals("Setting message timestamp as java.util.Date results in correct format for elasticsearch",
                      Tools.buildElasticSearchTimeFormat(dateTime), esTimestampFormatted);
+        assertThat(outputByteCounter.getCount()).isPositive();
     }
 
     @Test
@@ -368,13 +372,14 @@ public class MessageTest {
         message.addField("field2", "that");
         message.addField(Message.FIELD_STREAMS, Collections.singletonList("test-stream"));
 
-        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
+        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter, outputByteCounter);
 
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));
         assertEquals("wat", object.get("field1"));
         assertEquals("that", object.get("field2"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
+        assertThat(outputByteCounter.getCount()).isPositive();
 
         @SuppressWarnings("unchecked")
         final Collection<String> streams = (Collection<String>) object.get("streams");
@@ -385,7 +390,7 @@ public class MessageTest {
     public void testToElasticSearchObjectWithInvalidKey() throws Exception {
         message.addField("field.3", "dot");
 
-        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
+        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter, outputByteCounter);
 
         // Elasticsearch >=2.0 does not allow "." in keys. Make sure we replace them before writing the message.
         assertEquals("#toElasticsearchObject() should replace \".\" in keys with a \"_\"",
@@ -394,6 +399,7 @@ public class MessageTest {
         assertEquals("foo", object.get("message"));
         assertEquals("bar", object.get("source"));
         assertEquals(Tools.buildElasticSearchTimeFormat((DateTime) message.getField("timestamp")), object.get("timestamp"));
+        assertThat(outputByteCounter.getCount()).isPositive();
 
         @SuppressWarnings("unchecked")
         final Collection<String> streams = (Collection<String>) object.get("streams");
@@ -405,10 +411,11 @@ public class MessageTest {
         message.addField("timestamp", "time!");
 
         final Meter errorMeter = metricRegistry.meter("test-meter");
-        final Map<String, Object> object = message.toElasticSearchObject(errorMeter);
+        final Map<String, Object> object = message.toElasticSearchObject(errorMeter, outputByteCounter);
 
         assertNotEquals("time!", object.get("timestamp"));
         assertEquals(1, errorMeter.getCount());
+        assertThat(outputByteCounter.getCount()).isPositive();
     }
 
     @Test
@@ -419,11 +426,12 @@ public class MessageTest {
 
         message.addStream(stream);
 
-        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter);
+        final Map<String, Object> object = message.toElasticSearchObject(invalidTimestampMeter, outputByteCounter);
 
         @SuppressWarnings("unchecked")
         final Collection<String> streams = (Collection<String>) object.get("streams");
         assertThat(streams).containsOnly("stream-id");
+        assertThat(outputByteCounter.getCount()).isPositive();
     }
 
     @Test

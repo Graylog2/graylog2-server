@@ -16,6 +16,7 @@
  */
 package org.graylog2.indexer.messages;
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Duration;
@@ -77,15 +78,18 @@ public class Messages {
                 }
             })
             .build();
+    public static final String OUTPUT_BYTES_COUNTER_NAME = name(Messages.class, "output-bytes");
 
     private final Meter invalidTimestampMeter;
     private final JestClient client;
     private final LinkedBlockingQueue<List<IndexFailure>> indexFailureQueue;
+    private final Counter outputByteCounter;
 
     @Inject
     public Messages(MetricRegistry metricRegistry,
                     JestClient client) {
         invalidTimestampMeter = metricRegistry.meter(name(Messages.class, "invalid-timestamps"));
+        outputByteCounter = metricRegistry.counter(OUTPUT_BYTES_COUNTER_NAME);
         this.client = client;
 
         // TODO: Magic number
@@ -126,7 +130,7 @@ public class Messages {
         final Bulk.Builder bulk = new Bulk.Builder();
         for (Map.Entry<IndexSet, Message> entry : messageList) {
             final String id = entry.getValue().getId();
-            bulk.addAction(new Index.Builder(entry.getValue().toElasticSearchObject(invalidTimestampMeter))
+            bulk.addAction(new Index.Builder(entry.getValue().toElasticSearchObject(invalidTimestampMeter, outputByteCounter))
                 .index(entry.getKey().getWriteIndexAlias())
                 .type(IndexMapping.TYPE_MESSAGE)
                 .id(id)

@@ -42,6 +42,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -139,6 +140,18 @@ public class Message implements Messages {
 
     private ArrayList<Recording> recordings;
 
+    private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
+    static {
+        classSizes.put(byte.class, 1);
+        classSizes.put(char.class, 2);
+        classSizes.put(short.class, 2);
+        classSizes.put(boolean.class, 4);
+        classSizes.put(int.class, 4);
+        classSizes.put(float.class, 4);
+        classSizes.put(long.class, 8);
+        classSizes.put(double.class, 8);
+    }
+
     public Message(final String message, final String source, final DateTime timestamp) {
         fields.put(FIELD_ID, new UUID().toString());
         addRequiredField(FIELD_MESSAGE, message);
@@ -189,8 +202,11 @@ public class Message implements Messages {
         return getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
     }
 
-    public Map<String, Object> toElasticSearchObject(@Nonnull final Meter invalidTimestampMeter) {
+    public Map<String, Object> toElasticSearchObject(@Nonnull final Meter invalidTimestampMeter, @Nonnull com.codahale.metrics.Counter outputByteCounter) {
         final Map<String, Object> obj = Maps.newHashMapWithExpectedSize(REQUIRED_FIELDS.size() + fields.size());
+        // we measure Strings according to their character count, and not their UTF-8 byte size for efficiency.
+        // this also more accurately captures the intent and the majority of fields in log messages are in fact ASCII encoded
+        long msgSize = 0;
 
         for (Map.Entry<String, Object> entry : fields.entrySet()) {
             final String key = entry.getKey();
@@ -198,37 +214,46 @@ public class Message implements Messages {
                 continue;
             }
 
+            final Object value = entry.getValue();
             // Elasticsearch does not allow "." characters in keys since version 2.0.
             // See: https://www.elastic.co/guide/en/elasticsearch/reference/2.0/breaking_20_mapping_changes.html#_field_names_may_not_contain_dots
-            if (key != null && key.contains(".")) {
+            if (key.contains(".")) {
                 final String newKey = key.replace('.', KEY_REPLACEMENT_CHAR);
 
                 // If the message already contains the transformed key, we skip the field and emit a warning.
                 // This is still not optimal but better than implementing expensive logic with multiple replacement
                 // character options. Conflicts should be rare...
                 if (!obj.containsKey(newKey)) {
-                    obj.put(newKey, entry.getValue());
+                    msgSize += sizeForField(newKey, value);
+                    obj.put(newKey, value);
                 } else {
                     LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
-                        key, entry.getValue(), getId(), KEY_REPLACEMENT_CHAR, newKey, obj.get(newKey));
+                        key, value, getId(), KEY_REPLACEMENT_CHAR, newKey, obj.get(newKey));
                     LOG.debug("Full message with \".\" in message key: {}", this);
                 }
             } else {
-                if (key != null && obj.containsKey(key)) {
+                if (obj.containsKey(key)) {
                     final String newKey = key.replace(KEY_REPLACEMENT_CHAR, '.');
                     // Deliberate warning duplicates because the key with the "." might be transformed before reaching
                     // the duplicate original key with a "_". Otherwise we would silently overwrite the transformed key.
                     LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
-                        newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, entry.getValue());
+                        newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, value);
                     LOG.debug("Full message with \".\" in message key: {}", this);
                 }
-                obj.put(key, entry.getValue());
+                msgSize += sizeForField(key, value);
+                obj.put(key, value);
             }
         }
 
-        obj.put(FIELD_MESSAGE, getMessage());
-        obj.put(FIELD_SOURCE, getSource());
-        obj.put(FIELD_STREAMS, getStreamIds());
+        final String message = getMessage();
+        msgSize += FIELD_MESSAGE.length() + message.length();
+        obj.put(FIELD_MESSAGE, message);
+        final String source = getSource();
+        msgSize += FIELD_SOURCE.length() + message.length();
+        obj.put(FIELD_SOURCE, source);
+        final Collection<String> streamIds = getStreamIds();
+        msgSize += FIELD_STREAMS.length() + streamIds.size() * 24; // stream ids are 24 chars long
+        obj.put(FIELD_STREAMS, streamIds);
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         DateTime dateTime;
@@ -253,10 +278,25 @@ public class Message implements Messages {
             dateTime = Tools.nowUTC();
         }
         if (dateTime != null) {
+            msgSize += FIELD_TIMESTAMP.length() + 23; // format string is 23 chars long
             obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
         }
 
+        outputByteCounter.inc(msgSize);
         return obj;
+    }
+
+    // estimate the byte/char length for a field and its value
+    private static long sizeForField(String key, Object value) {
+        long size = key.length();
+        long valueSize;
+        if (value instanceof CharSequence) {
+            valueSize = ((CharSequence) value).length();
+        } else {
+            final Integer classSize = classSizes.get(value.getClass());
+            valueSize = classSize == null ? 0 : classSize;
+        }
+        return size + valueSize;
     }
 
     @Override
