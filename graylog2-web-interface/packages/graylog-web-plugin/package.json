@@ -23,6 +23,13 @@
     "url": "https://github.com/Graylog2/graylog-web-plugin/issues"
   },
   "homepage": "https://github.com/Graylog2/graylog-web-plugin#readme",
+  "files": [
+    "lib/",
+    "templates/",
+    "index.js",
+    "plugin.js",
+    "README.md"
+  ],
   "dependencies": {
     "babel-eslint": "^7.2.3",
     "eslint": "^4.3.0",
