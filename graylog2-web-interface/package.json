@@ -83,7 +83,7 @@
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.8",
-    "@types/jquery": "^3.2.9",
+    "@types/jquery": "^2.0.0",
     "@types/node": "^8.0.17",
     "@types/sockjs-client": "^1.0.31",
     "@types/toastr": "^2.1.34",
