@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class TrafficCounterService {
     private static final Logger LOG = LoggerFactory.getLogger(TrafficCounterService.class);
@@ -79,9 +81,9 @@ public class TrafficCounterService {
         }
     }
 
-    public TrafficHistogram clusterTrafficOfLastDays(Duration duration) {
-        final ImmutableMap.Builder<DateTime, Long> input = ImmutableMap.builder();
-        final ImmutableMap.Builder<DateTime, Long> output = ImmutableMap.builder();
+    public TrafficHistogram clusterTrafficOfLastDays(Duration duration, Interval interval) {
+        final ImmutableMap.Builder<DateTime, Long> inputBuilder = ImmutableMap.builder();
+        final ImmutableMap.Builder<DateTime, Long> outputBuilder = ImmutableMap.builder();
         final DateTime to = getDayBucket(Tools.nowUTC());
         final DateTime from = to.minus(duration);
 
@@ -92,10 +94,29 @@ public class TrafficCounterService {
         LOG.trace("Getting cluster traffic: {}", db.serializeQuery(query).toString());
         final DBCursor<TrafficDto> cursor = db.find(query);
         cursor.forEach(trafficDto -> {
-            input.put(trafficDto.bucket(), trafficDto.input().values().stream().mapToLong(Long::valueOf).sum());
-            output.put(trafficDto.bucket(), trafficDto.output().values().stream().mapToLong(Long::valueOf).sum());
+            inputBuilder.put(trafficDto.bucket(), trafficDto.input().values().stream().mapToLong(Long::valueOf).sum());
+            outputBuilder.put(trafficDto.bucket(), trafficDto.output().values().stream().mapToLong(Long::valueOf).sum());
         });
-        return TrafficHistogram.create(from, to, input.build(), output.build());
+        Map<DateTime, Long> inputHistogram = inputBuilder.build();
+        Map<DateTime, Long> outputHistogram = outputBuilder.build();
+
+        // we might need to aggregate the hourly database values to their UTC daily buckets
+        if (interval == Interval.DAILY) {
+            inputHistogram = aggregateToDaily(inputHistogram);
+            outputHistogram = aggregateToDaily(outputHistogram);
+        }
+        return TrafficHistogram.create(from, to, inputHistogram, outputHistogram);
+    }
+
+    private TreeMap<DateTime, Long> aggregateToDaily(Map<DateTime, Long> histogram) {
+        return histogram.entrySet().stream()
+                .collect(Collectors.groupingBy(entry -> entry.getKey().withTimeAtStartOfDay(),
+                        TreeMap::new,
+                        Collectors.mapping(Map.Entry::getValue, Collectors.summingLong(Long::valueOf))));
+    }
+
+    public enum Interval {
+        HOURLY, DAILY
     }
 
     @AutoValue
