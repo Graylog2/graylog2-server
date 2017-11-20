@@ -5,6 +5,8 @@ import { Col, Row } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import ActionsProvider from 'injection/ActionsProvider';
+import NumberUtils from 'util/NumberUtils';
+import _ from 'lodash';
 
 import TrafficGraph from './TrafficGraph';
 
@@ -36,7 +38,14 @@ const GraylogClusterOverview = React.createClass({
         </dl>
       );
     }
-
+    let sumInput = null;
+    let sumOutput = null;
+    if (this.state.traffic) {
+      const bytesIn = _.reduce(this.state.traffic.input, (result, value) => result + value);
+      const bytesOut = _.reduce(this.state.traffic.output, (result, value) => result + value);
+      sumInput = <small>Last 30 days: {NumberUtils.formatBytes(bytesIn)}</small>;
+      sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
+    }
     return (
       <Row className="content">
         <Col md={12}>
@@ -45,14 +54,14 @@ const GraylogClusterOverview = React.createClass({
           <hr />
           <Row>
             <Col md={6}>
-              <h4 style={{ marginBottom: 10 }}>Incoming traffic</h4>
+              <h3 style={{ marginBottom: 10 }}>Incoming traffic {sumInput}</h3>
               { !this.state.traffic ? <Spinner /> : <TrafficGraph traffic={this.state.traffic.input}
                               from={this.state.traffic.from}
                               to={this.state.traffic.to} />
               }
             </Col>
             <Col md={6}>
-              <h4 style={{ marginBottom: 10 }}>Outgoing traffic</h4>
+              <h3 style={{ marginBottom: 10 }}>Outgoing traffic {sumOutput}</h3>
               { !this.state.traffic ? <Spinner /> : <TrafficGraph traffic={this.state.traffic.output}
                             from={this.state.traffic.from}
                             to={this.state.traffic.to} />
