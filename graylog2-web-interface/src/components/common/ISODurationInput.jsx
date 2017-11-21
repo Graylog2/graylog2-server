@@ -59,7 +59,7 @@ const ISODurationInput = React.createClass({
              help={this.props.help}
              addonAfter={ISODurationUtils.humanizeDuration(this.state.duration, this.props.validator, this.props.errorText)}
              bsStyle={ISODurationUtils.durationStyle(this.state.duration, this.props.validator)}
-             autofocus={this.props.autoFocus}
+             autoFocus={this.props.autoFocus}
              required={this.props.required} />
     );
   },
