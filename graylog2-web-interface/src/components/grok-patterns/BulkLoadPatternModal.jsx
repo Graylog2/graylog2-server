@@ -45,17 +45,19 @@ const BulkLoadPatternModal = React.createClass({
                               title="Import Grok patterns from file"
                               submitButtonText="Upload"
                               formProps={{ onSubmit: this._onSubmit }}>
-          <Input type="file"
-                   ref="pattern-file"
-                   name="patterns"
-                   label="Pattern file"
-                   help="A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace."
-                   required />
-          <Input type="checkbox"
-                   name="replace"
-                   label="Replace all existing patterns?"
-                   onChange={e => this.setState({ replacePatterns: e.target.checked })}
-            />
+          <Input id="pattern-file"
+                 type="file"
+                 ref="pattern-file"
+                 name="patterns"
+                 label="Pattern file"
+                 help="A file containing Grok patterns, one per line. Name and patterns should be separated by whitespace."
+                 required />
+          <Input id="replace-patterns-checkbox"
+                 type="checkbox"
+                 name="replace"
+                 label="Replace all existing patterns?"
+                 onChange={e => this.setState({ replacePatterns: e.target.checked })}
+          />
         </BootstrapModalForm>
       </span>
     );

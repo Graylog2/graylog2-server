@@ -41,7 +41,7 @@ const PaginatedList = React.createClass({
     }
     return (
       <div className="form-inline page-size" style={{ float: 'right' }}>
-        <Input type="select" bsSize="small" label="Show:" value={this.state.pageSize} onChange={this._onChangePageSize}>
+        <Input id="page-size" type="select" bsSize="small" label="Show:" value={this.state.pageSize} onChange={this._onChangePageSize}>
           {this.props.pageSizes.map(size => <option key={`option-${size}`} value={size}>{size}</option>)}
         </Input>
       </div>

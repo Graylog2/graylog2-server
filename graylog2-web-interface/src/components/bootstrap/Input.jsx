@@ -4,12 +4,6 @@ import { Checkbox, ControlLabel, FormControl, FormGroup, HelpBlock, InputGroup, 
 
 import InputWrapper from './InputWrapper';
 
-const generateId = () => {
-  console.warn('Input elements should have an id prop, generating one for you');
-  const randomNumericId = Math.floor(Math.random() * 1000);
-  return `input-${randomNumericId}`;
-};
-
 /*
  * Input adapter for react bootstrap.
  *
@@ -19,7 +13,7 @@ const generateId = () => {
  */
 const Input = React.createClass({
   propTypes: {
-    id: PropTypes.string,
+    id: PropTypes.string.isRequired,
     type: PropTypes.string,
     label: PropTypes.oneOfType([
       PropTypes.element,
@@ -49,7 +43,6 @@ const Input = React.createClass({
 
   getDefaultProps() {
     return {
-      id: generateId(),
       type: undefined,
       label: '',
       labelClassName: undefined,

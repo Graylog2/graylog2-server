@@ -134,8 +134,13 @@ const FieldAnalyzersSidebar = React.createClass({
     let shouldHighlightToggle;
     if (this.props.showHighlightToggle) {
       shouldHighlightToggle = (
-        <Input ref="highlightToggle" type="checkbox" bsSize="small" checked={this.props.shouldHighlight}
-               onChange={this.props.toggleShouldHighlight} label="Highlight results"
+        <Input ref="highlightToggle"
+               id="highligh-results-checkbox"
+               type="checkbox"
+               bsSize="small"
+               checked={this.props.shouldHighlight}
+               onChange={this.props.toggleShouldHighlight}
+               label="Highlight results"
                wrapperClassName="result-highlight-control" />
       );
     }

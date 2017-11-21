@@ -100,7 +100,8 @@ const StreamComponent = React.createClass({
       <div>
         <Row className="row-sm">
           <Col md={8}>
-            <TypeAheadDataFilter ref="streamFilter"
+            <TypeAheadDataFilter id="stream-data-filter"
+                                 ref="streamFilter"
                                  label="Filter streams"
                                  data={this.state.streams}
                                  displayKey={'title'}

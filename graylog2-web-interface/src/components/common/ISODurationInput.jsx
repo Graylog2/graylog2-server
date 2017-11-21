@@ -5,6 +5,7 @@ import ISODurationUtils from 'util/ISODurationUtils';
 
 const ISODurationInput = React.createClass({
   propTypes: {
+    id: PropTypes.string.isRequired,
     duration: PropTypes.string.isRequired,
     update: PropTypes.func.isRequired,
     label: PropTypes.string,
@@ -49,7 +50,8 @@ const ISODurationInput = React.createClass({
 
   render() {
     return (
-      <Input type="text"
+      <Input id={this.props.id}
+             type="text"
              ref="isoDuration"
              label={this.props.label}
              onChange={this._onUpdate}
@@ -57,7 +59,7 @@ const ISODurationInput = React.createClass({
              help={this.props.help}
              addonAfter={ISODurationUtils.humanizeDuration(this.state.duration, this.props.validator, this.props.errorText)}
              bsStyle={ISODurationUtils.durationStyle(this.state.duration, this.props.validator)}
-             autofocus={this.props.autoFocus}
+             autoFocus={this.props.autoFocus}
              required={this.props.required} />
     );
   },

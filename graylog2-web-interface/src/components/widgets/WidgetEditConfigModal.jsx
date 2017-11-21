@@ -139,7 +139,8 @@ const WidgetEditConfigModal = React.createClass({
 
   _getTimeRangeFormControls() {
     const rangeTypeSelector = (
-      <Input type="text"
+      <Input id="timerange-type"
+             type="text"
              label="Time range type"
              disabled
              value={StringUtils.capitalizeFirstLetter(this.state.config.timerange.type)}

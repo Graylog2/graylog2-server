@@ -223,51 +223,61 @@ const EditExtractor = React.createClass({
                                               onChange={this._onConfigurationChange}
                                               exampleMessage={this.state.exampleMessage} />
 
-                  <Input label="Condition" labelClassName="col-md-2" wrapperClassName="col-md-10"
+                  <Input id="condition-type"
+                         label="Condition"
+                         labelClassName="col-md-2"
+                         wrapperClassName="col-md-10"
                          help={conditionTypeHelpMessage}>
-                    <div className="radio">
-                      <label>
-                        <input type="radio" name="condition_type" value="none"
-                               onChange={this._onFieldChange('condition_type')}
-                               defaultChecked={!this.state.updatedExtractor.condition_type || this.state.updatedExtractor.condition_type === 'none'} />
-                        Always try to extract
-                      </label>
-                    </div>
-                    <div className="radio">
-                      <label>
-                        <input type="radio" name="condition_type" value="string"
-                               onChange={this._onFieldChange('condition_type')}
-                               defaultChecked={this.state.updatedExtractor.condition_type === 'string'} />
-                        Only attempt extraction if field contains string
-                      </label>
-                    </div>
-                    <div className="radio">
-                      <label>
-                        <input type="radio" name="condition_type" value="regex"
-                               onChange={this._onFieldChange('condition_type')}
-                               defaultChecked={this.state.updatedExtractor.condition_type === 'regex'} />
-                        Only attempt extraction if field matches regular expression
-                      </label>
-                    </div>
+                    <span>
+                      <div className="radio">
+                        <label>
+                          <input type="radio" name="condition_type" value="none"
+                                 onChange={this._onFieldChange('condition_type')}
+                                 defaultChecked={!this.state.updatedExtractor.condition_type || this.state.updatedExtractor.condition_type === 'none'} />
+                          Always try to extract
+                        </label>
+                      </div>
+                      <div className="radio">
+                        <label>
+                          <input type="radio" name="condition_type" value="string"
+                                 onChange={this._onFieldChange('condition_type')}
+                                 defaultChecked={this.state.updatedExtractor.condition_type === 'string'} />
+                          Only attempt extraction if field contains string
+                        </label>
+                      </div>
+                      <div className="radio">
+                        <label>
+                          <input type="radio" name="condition_type" value="regex"
+                                 onChange={this._onFieldChange('condition_type')}
+                                 defaultChecked={this.state.updatedExtractor.condition_type === 'regex'} />
+                          Only attempt extraction if field matches regular expression
+                        </label>
+                      </div>
+                    </span>
                   </Input>
                   {this._getExtractorConditionControls()}
 
                   {storeAsFieldInput}
 
-                  <Input label="Extraction strategy" labelClassName="col-md-2" wrapperClassName="col-md-10"
+                  <Input id="extraction-strategy"
+                         label="Extraction strategy"
+                         labelClassName="col-md-2"
+                         wrapperClassName="col-md-10"
                          help={cursorStrategyHelpMessage}>
-                    <label className="radio-inline">
-                      <input type="radio" name="cursor_strategy" value="copy"
-                             onChange={this._onFieldChange('cursor_strategy')}
-                             defaultChecked={!this.state.updatedExtractor.cursor_strategy || this.state.updatedExtractor.cursor_strategy === 'copy'} />
-                      Copy
-                    </label>
-                    <label className="radio-inline">
-                      <input type="radio" name="cursor_strategy" value="cut"
-                             onChange={this._onFieldChange('cursor_strategy')}
-                             defaultChecked={this.state.updatedExtractor.cursor_strategy === 'cut'} />
-                      Cut
-                    </label>
+                    <span>
+                      <label className="radio-inline">
+                        <input type="radio" name="cursor_strategy" value="copy"
+                               onChange={this._onFieldChange('cursor_strategy')}
+                               defaultChecked={!this.state.updatedExtractor.cursor_strategy || this.state.updatedExtractor.cursor_strategy === 'copy'} />
+                        Copy
+                      </label>
+                      <label className="radio-inline">
+                        <input type="radio" name="cursor_strategy" value="cut"
+                               onChange={this._onFieldChange('cursor_strategy')}
+                               defaultChecked={this.state.updatedExtractor.cursor_strategy === 'cut'} />
+                        Cut
+                      </label>
+                    </span>
                   </Input>
 
                   <Input type="text" id="title" label="Extractor title"
@@ -284,11 +294,13 @@ const EditExtractor = React.createClass({
                                              onChange={this._onConverterChange} />
                   </div>
 
-                  <Input wrapperClassName="col-md-offset-2 col-md-10">
-                    <Button type="submit" bsStyle="success">
-                      {this.props.action === 'create' ? 'Create extractor' : 'Update extractor'}
-                    </Button>
-                  </Input>
+                  <Row>
+                    <Col mdOffset={2} md={10}>
+                      <Button type="submit" bsStyle="success">
+                        {this.props.action === 'create' ? 'Create extractor' : 'Update extractor'}
+                      </Button>
+                    </Col>
+                  </Row>
                 </form>
               </Col>
             </Row>

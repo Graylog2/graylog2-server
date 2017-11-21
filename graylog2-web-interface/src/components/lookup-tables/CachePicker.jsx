@@ -35,7 +35,8 @@ const CachePicker = React.createClass({
 
     return (
       <fieldset>
-        <Input label="Cache"
+        <Input id="cache-select"
+               label="Cache"
                required
                autoFocus
                help="Select an existing cache"

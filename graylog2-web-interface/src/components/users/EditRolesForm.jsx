@@ -83,8 +83,11 @@ const EditRolesForm = React.createClass({
       <span>
         {externalUser}
         <form className="form-horizontal" style={{ marginTop: '10px' }} onSubmit={this._updateRoles}>
-          <Input label="Roles" help="Choose the roles the user should be a member of. All the granted permissions will be combined."
-                 labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+          <Input id="roles-select"
+                 label="Roles"
+                 help="Choose the roles the user should be a member of. All the granted permissions will be combined."
+                 labelClassName="col-sm-3"
+                 wrapperClassName="col-sm-9">
             <RolesSelect ref="roles" userRoles={user.roles} availableRoles={this.state.roles} onValueChange={this._onValueChange} />
           </Input>
           <div className="form-group">

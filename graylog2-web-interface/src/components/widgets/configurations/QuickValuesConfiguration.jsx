@@ -42,13 +42,15 @@ const QuickValuesConfiguration = React.createClass({
         {dataTableLimitForm}
         <FormGroup>
           <ControlLabel>Sort options</ControlLabel>
-          <Input type="radio"
+          <Input id="sort-order-desc"
+                 type="radio"
                  name="sort_order"
                  label="Top values"
                  checked={this.props.config.sort_order === 'desc'}
                  value="desc"
                  onChange={this.props.onChange} />
-          <Input type="radio"
+          <Input id="sort-order-asc"
+                 type="radio"
                  name="sort_order"
                  label="Bottom values"
                  checked={this.props.config.sort_order === 'asc'}

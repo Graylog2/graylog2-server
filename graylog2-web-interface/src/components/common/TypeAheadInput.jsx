@@ -9,6 +9,7 @@ import Typeahead from 'typeahead.js';
 
 const TypeAheadInput = React.createClass({
   propTypes: {
+    id: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     onKeyPress: PropTypes.func,
     displayKey: PropTypes.string,
@@ -50,19 +51,19 @@ const TypeAheadInput = React.createClass({
       highlight: true,
       minLength: 1,
     },
-      {
-        name: 'dataset-name',
-        displayKey: props.displayKey,
-        source: UniversalSearch.substringMatcher(props.suggestions, props.displayKey, 6),
-        templates: {
-          suggestion: (value) => {
-            if (props.suggestionText) {
-              return `<div><strong>${props.suggestionText}</strong> ${value[props.displayKey]}</div>`;
-            }
-            return `<div>${value.value}</div>`;
-          },
+    {
+      name: 'dataset-name',
+      displayKey: props.displayKey,
+      source: UniversalSearch.substringMatcher(props.suggestions, props.displayKey, 6),
+      templates: {
+        suggestion: (value) => {
+          if (props.suggestionText) {
+            return `<div><strong>${props.suggestionText}</strong> ${value[props.displayKey]}</div>`;
+          }
+          return `<div>${value.value}</div>`;
         },
-      });
+      },
+    });
 
     if (typeof props.onTypeaheadLoaded === 'function') {
       props.onTypeaheadLoaded();
@@ -76,7 +77,9 @@ const TypeAheadInput = React.createClass({
     });
   },
   render() {
-    return (<Input type="text" ref="fieldInput"
+    return (<Input id={this.props.id}
+                   type="text"
+                   ref="fieldInput"
                    wrapperClassName="typeahead-wrapper"
                    label={this.props.label}
                    onKeyPress={this.props.onKeyPress} />);

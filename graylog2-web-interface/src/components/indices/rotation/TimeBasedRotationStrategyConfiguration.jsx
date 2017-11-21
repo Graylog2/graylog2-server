@@ -55,7 +55,8 @@ const TimeBasedRotationStrategyConfiguration = React.createClass({
   render() {
     return (
       <div>
-        <Input type="text"
+        <Input id="rotation-period"
+               type="text"
                ref="rotation_period"
                label="Rotation period (ISO8601 Duration)"
                onChange={this._onPeriodUpdate('rotation_period')}

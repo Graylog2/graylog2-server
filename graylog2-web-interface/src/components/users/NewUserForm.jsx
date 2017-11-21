@@ -95,9 +95,11 @@ const NewUserForm = React.createClass({
                labelClassName="col-sm-2" wrapperClassName="col-sm-10"
                label="Email Address" help="Give the contact email address." required />
 
-        <Input label="Password"
+        <Input id="password-field"
+               label="Password"
                help="Passwords must be at least 6 characters long. We recommend using a strong password."
-               labelClassName="col-sm-2" wrapperClassName="col-sm-10">
+               labelClassName="col-sm-2"
+               wrapperClassName="col-sm-10">
           <Row>
             <Col sm={6}>
               <input className="form-control" ref="password" name="password" id="password" type="password"
@@ -110,17 +112,25 @@ const NewUserForm = React.createClass({
           </Row>
         </Input>
 
-        <Input label="Roles" help={rolesHelp}
-               labelClassName="col-sm-2" wrapperClassName="col-sm-10">
-          <RolesSelect ref="roles" availableRoles={this.props.roles} userRoles={['Reader']}
-                       className="form-control" onValueChange={this._onValueChange} />
-          {rolesAlert}
+        <Input id="roles-select"
+               label="Roles"
+               help={rolesHelp}
+               labelClassName="col-sm-2"
+               wrapperClassName="col-sm-10">
+          <span>
+            <RolesSelect ref="roles" availableRoles={this.props.roles} userRoles={['Reader']}
+                         className="form-control" onValueChange={this._onValueChange} />
+            {rolesAlert}
+          </span>
         </Input>
 
         <TimeoutInput ref="session_timeout_ms" />
 
-        <Input label="Time Zone" help="Choose the timezone to use to display times, or leave it as it is to use the system's default."
-               labelClassName="col-sm-2" wrapperClassName="col-sm-10">
+        <Input id="timezone-select"
+               label="Time Zone"
+               help="Choose the timezone to use to display times, or leave it as it is to use the system's default."
+               labelClassName="col-sm-2"
+               wrapperClassName="col-sm-10">
           <TimezoneSelect ref="timezone" className="timezone-select" />
         </Input>
 

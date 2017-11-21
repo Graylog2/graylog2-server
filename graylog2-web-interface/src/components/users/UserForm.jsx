@@ -276,9 +276,11 @@ const UserForm = React.createClass({
                                 onChange={this._onFieldChange('session_timeout_ms')} />
                 </IfPermitted>
 
-                <Input label="Time Zone"
+                <Input id="timezone-select"
+                       label="Time Zone"
                        help="Choose your local time zone or leave it as it is to use the system's default."
-                       labelClassName="col-sm-3" wrapperClassName="col-sm-9">
+                       labelClassName="col-sm-3"
+                       wrapperClassName="col-sm-9">
                   <TimezoneSelect ref="timezone" className="timezone-select" value={user.timezone}
                                   onChange={this._onFieldChange('timezone')} />
                 </Input>

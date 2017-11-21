@@ -7,6 +7,7 @@ import { TypeAheadInput } from 'components/common';
 
 const TypeAheadDataFilter = React.createClass({
   propTypes: {
+    id: PropTypes.string,
     data: PropTypes.array,
     displayKey: PropTypes.string,
     filterBy: PropTypes.string,
@@ -113,7 +114,8 @@ const TypeAheadDataFilter = React.createClass({
     return (
       <div className="filter">
         <form className="form-inline" onSubmit={this._onSearchTextChanged} style={{ display: 'inline' }}>
-          <TypeAheadInput ref="typeAheadInput"
+          <TypeAheadInput id={this.props.id}
+                          ref="typeAheadInput"
                           onSuggestionSelected={this._onFilterAdded}
                           suggestionText={`Filter by ${this.props.filterBy}: `}
                           suggestions={suggestions}

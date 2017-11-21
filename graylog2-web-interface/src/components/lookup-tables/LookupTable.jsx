@@ -97,12 +97,10 @@ const LookupTable = React.createClass({
                      help="Key to purge from cache"
                      required
                      value={this.state.purgeKey} />
-              <Input>
-                <ButtonToolbar>
-                  <Button type="submit" bsStyle="success">Purge key</Button>
-                  <Button type="button" bsStyle="info" onClick={this._onPurgeAll}>Purge all</Button>
-                </ButtonToolbar>
-              </Input>
+              <ButtonToolbar>
+                <Button type="submit" bsStyle="success">Purge key</Button>
+                <Button type="button" bsStyle="info" onClick={this._onPurgeAll}>Purge all</Button>
+              </ButtonToolbar>
             </fieldset>
           </form>
         </Col>
@@ -119,11 +117,7 @@ const LookupTable = React.createClass({
                      onChange={this._onChange}
                      help="Key to look up a value for."
                      value={this.state.lookupKey} />
-            </fieldset>
-            <fieldset>
-              <Input>
-                <Button type="submit" bsStyle="success">Look up</Button>
-              </Input>
+              <Button type="submit" bsStyle="success">Look up</Button>
             </fieldset>
           </form>
           { this.state.lookupResult && (
