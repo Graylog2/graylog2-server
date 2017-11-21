@@ -12,6 +12,7 @@ const TrafficGraph = React.createClass({
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,
     traffic: PropTypes.object.isRequired,
+    width: PropTypes.number.isRequired,
   },
 
   render() {
@@ -43,7 +44,7 @@ const TrafficGraph = React.createClass({
       <HistogramVisualization id="traffic-histogram"
                               data={unixTraffic}
                               config={config}
-                              width={800}
+                              width={this.props.width}
                               interactive={false}
                               computationTimeRange={{ from: this.props.from, to: this.props.to }} />
     );
