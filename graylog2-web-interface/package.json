@@ -10,6 +10,8 @@
   },
   "readme": "../README.md",
   "scripts": {
+    "docs:build": "styleguidist build",
+    "docs:server": "styleguidist server",
     "start": "webpack-dev-server --config webpack.bundled.js --history-api-fallback --hot --inline",
     "start-nohmr": "node devServer.js",
     "watch": "webpack --watch --config webpack.bundled.js",
