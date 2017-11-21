@@ -117,9 +117,11 @@ const NewUserForm = React.createClass({
                help={rolesHelp}
                labelClassName="col-sm-2"
                wrapperClassName="col-sm-10">
-          <RolesSelect ref="roles" availableRoles={this.props.roles} userRoles={['Reader']}
-                       className="form-control" onValueChange={this._onValueChange} />
-          {rolesAlert}
+          <span>
+            <RolesSelect ref="roles" availableRoles={this.props.roles} userRoles={['Reader']}
+                         className="form-control" onValueChange={this._onValueChange} />
+            {rolesAlert}
+          </span>
         </Input>
 
         <TimeoutInput ref="session_timeout_ms" />
