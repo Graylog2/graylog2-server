@@ -9,6 +9,7 @@ module.exports = {
     'stylesheets/bootstrap-submenus.less',
     'toastr/toastr.less',
     'rickshaw/rickshaw.css',
+    'stylesheets/typeahead.less',
     'stylesheets/graylog2.less',
   ],
   sections: [
