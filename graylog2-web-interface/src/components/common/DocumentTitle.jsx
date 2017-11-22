@@ -4,6 +4,14 @@ import React from 'react';
 /**
  * React component that modifies the page `document.title` dynamically. When the component is unmounted, it
  * resets the title to the default (`Graylog`).
+ *
+ * Example:
+ *
+ * ```js
+ * <DocumentTitle title="This site is great">
+ *   {contents}
+ * </DocumentTitle>
+ * ```
  */
 const DocumentTitle = React.createClass({
   propTypes: {
