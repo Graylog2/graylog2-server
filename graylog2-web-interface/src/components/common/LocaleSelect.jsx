@@ -7,9 +7,14 @@ import Select from "components/common/Select";
 import StoreProvider from "injection/StoreProvider";
 const SystemStore = StoreProvider.getStore('System');
 
+/**
+ * Component that renders a form input with all available locale settings. It also makes easy to filter
+ * values to quickly find the locale needed.
+ */
 const LocaleSelect = React.createClass({
   mixins: [Reflux.connect(SystemStore)],
   propTypes: {
+    /** Function to call when the input changes. It will receive the new locale value as argument. */
     onChange: PropTypes.func,
   },
   getValue() {

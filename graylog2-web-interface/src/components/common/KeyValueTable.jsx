@@ -11,13 +11,20 @@ import ObjectUtils from 'util/ObjectUtils';
  */
 const KeyValueTable = React.createClass({
   propTypes: {
-    pairs: PropTypes.object.isRequired, // Object containing key-values to represent in the table
-    headers: PropTypes.array, // Table headers. Must be an array with three elements [ key header, value header, actions header]
-    editable: PropTypes.bool, // Indicates if the user can create, edit or delete key-value pairs
-    onChange: PropTypes.func, // Callback when key-value pairs change
-    className: PropTypes.string, // Extra CSS classes for the rendered table
-    containerClassName: PropTypes.string, // Extra CSS classes for the table container
-    actionsSize: PropTypes.oneOf(['large', 'medium', 'small', 'xsmall']), // Size of action buttons
+    /** Object containing key-values to represent in the table. */
+    pairs: PropTypes.object.isRequired,
+    /** Table headers. Must be an array with three elements [ key header, value header, actions header]. */
+    headers: PropTypes.array,
+    /** Indicates if the user can create, edit or delete key-value pairs. */
+    editable: PropTypes.bool,
+    /** Callback when key-value pairs change. It receives the new key-value pairs as argument. */
+    onChange: PropTypes.func,
+    /** Extra CSS classes for the rendered table. */
+    className: PropTypes.string,
+    /** Extra CSS classes for the table container. */
+    containerClassName: PropTypes.string,
+    /** Size of action buttons. */
+    actionsSize: PropTypes.oneOf(['large', 'medium', 'small', 'xsmall']),
   },
 
   getInitialState() {

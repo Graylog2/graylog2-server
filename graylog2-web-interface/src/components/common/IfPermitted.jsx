@@ -7,13 +7,20 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 import PermissionsMixin from 'util/PermissionsMixin';
 
+/**
+ * Wrapper component that renders its children only if the current user fulfills certain permissions.
+ * Current user's permissions are fetched from the server.
+ */
 const IfPermitted = React.createClass({
   propTypes: {
+    /** Children to render if user has permissions. */
     children: PropTypes.node.isRequired,
+    /** Permissions the current user must fulfill. By default, the user must have all permissions that are passed in this prop. */
     permissions: PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.arrayOf(PropTypes.string),
     ]).isRequired,
+    /** This flag controls which permissions the user must fulfill: (all, at least one). */
     anyPermissions: PropTypes.bool,
   },
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
