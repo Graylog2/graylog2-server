@@ -2,6 +2,15 @@
 const webpackConfig = require('./webpack.config.js');
 
 module.exports = {
+  require: [
+    'bootstrap/less/bootstrap.less',
+    'font-awesome/css/font-awesome.css',
+    'opensans-npm-webfont',
+    'stylesheets/bootstrap-submenus.less',
+    'toastr/toastr.less',
+    'rickshaw/rickshaw.css',
+    'stylesheets/graylog2.less',
+  ],
   sections: [
     {
       name: 'Introduction',
