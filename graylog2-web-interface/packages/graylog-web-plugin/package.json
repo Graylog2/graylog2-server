@@ -5,8 +5,11 @@
   "main": "index.js",
   "scripts": {
     "test": "eslint src/*",
-    "compile": "babel -d lib/ src/",
-    "prepublish": "npm i --only=dev --ignore-scripts && npm run compile"
+    "build": "babel -d lib/ src/",
+    "preparebuild": "yarn install --ignore-scripts",
+    "compile": "yarn run preparebuild && yarn run build",
+    "prepublish": "yarn run compile",
+    "preinstall": "test -d src/ && yarn run compile || echo \"src\" folder missing, skipping preinstall"
   },
   "repository": {
     "type": "git",
@@ -23,6 +26,13 @@
     "url": "https://github.com/Graylog2/graylog-web-plugin/issues"
   },
   "homepage": "https://github.com/Graylog2/graylog-web-plugin#readme",
+  "files": [
+    "lib/",
+    "templates/",
+    "index.js",
+    "plugin.js",
+    "README.md"
+  ],
   "dependencies": {
     "babel-eslint": "^7.2.3",
     "eslint": "^4.3.0",

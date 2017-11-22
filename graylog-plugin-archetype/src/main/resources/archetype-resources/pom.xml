@@ -223,20 +223,20 @@
 
                         <executions>
                             <execution>
-                                <id>install node and npm</id>
+                                <id>install node and yarn</id>
                                 <goals>
-                                    <goal>install-node-and-npm</goal>
+                                    <goal>install-node-and-yarn</goal>
                                 </goals>
                                 <configuration>
-                                    <nodeVersion>v6.9.2</nodeVersion>
-                                    <npmVersion>4.0.3</npmVersion>
+                                    <nodeVersion>v8.9.1</nodeVersion>
+                                    <yarn.version>v1.3.2</yarn.version>
                                 </configuration>
                             </execution>
 
                             <execution>
-                                <id>npm install</id>
+                                <id>yarn install</id>
                                 <goals>
-                                    <goal>npm</goal>
+                                    <goal>yarn</goal>
                                 </goals>
                                 <!-- Optional configuration which provides for running any npm command -->
                                 <configuration>
@@ -245,9 +245,9 @@
                             </execution>
 
                             <execution>
-                                <id>npm run build</id>
+                                <id>yarn run build</id>
                                 <goals>
-                                    <goal>npm</goal>
+                                    <goal>yarn</goal>
                                 </goals>
                                 <configuration>
                                     <arguments>run build</arguments>
