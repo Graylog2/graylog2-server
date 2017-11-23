@@ -33,7 +33,7 @@ const PaginatedListExample = createReactClass({
                      pageSizes={[5, 10, 20]}>
         <table className="table">
           <thead>
-            <th><td>Item</td></th>
+            <tr><th>Item</th></tr>
           </thead>
           <tbody>
             {paginatedItems.map((item) => <tr key={item}><td>{item}</td></tr>)}
