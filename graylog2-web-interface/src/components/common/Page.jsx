@@ -3,9 +3,9 @@ import React from 'react';
 import { Pager } from 'react-bootstrap';
 
 /**
- * **DEPRECATED**: Please use `Pager.Item` directly, as this abstraction doesn't provide much value at the moment.
- *
  * Component that encapsulates react-bootstrap's `Pager.Item`.
+ *
+ * @deprecated Please use `Pager.Item` directly, as this abstraction doesn't provide much value at the moment.
  */
 const Page = React.createClass({
   propTypes: {
