@@ -69,10 +69,10 @@ public class TrafficCounterCalculator extends Periodical {
             final long outputBytesLastMinute = currentOutputBytes - previousOutputBytes;
             previousOutputBytes = currentOutputBytes;
 
-            if (LOG.isWarnEnabled()) {
+            if (LOG.isDebugEnabled()) {
                 final Size in = Size.bytes(inputLastMinute);
                 final Size out = Size.bytes(outputBytesLastMinute);
-                LOG.warn("Traffic in the last minute: {} bytes ({} MB), {} bytes ({} MB})", in, in.toMegabytes(), out, out.toMegabytes());
+                LOG.debug("Traffic in the last minute: {} bytes ({} MB), {} bytes ({} MB})", in, in.toMegabytes(), out, out.toMegabytes());
             }
             final DateTime previousMinute = now.minusMinutes(1);
             trafficService.updateTraffic(previousMinute, nodeId, inputLastMinute, outputBytesLastMinute);

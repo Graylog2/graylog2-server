@@ -67,7 +67,9 @@ public class TrafficCounterService {
         // we bucket our database by days
         final DateTime dayBucket = getDayBucket(observationTime);
 
-        LOG.warn("Updating traffic for node {} at {}:  in {}/ out {} bytes", nodeId.toString(), dayBucket, inLastMinute, outLastMinute);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Updating traffic for node {} at {}:  in {}/ out {} bytes", nodeId.toString(), dayBucket, inLastMinute, outLastMinute);
+        }
         final WriteResult<TrafficDto, ObjectId> update = db.update(DBQuery.is("bucket", dayBucket),
                 // sigh DBUpdate.inc only takes integers, but we have a long.
                 new DBUpdate.Builder()
@@ -91,7 +93,7 @@ public class TrafficCounterService {
                 DBQuery.lessThanEquals(BUCKET, to),
                 DBQuery.greaterThan(BUCKET, from)
         );
-        LOG.trace("Getting cluster traffic: {}", db.serializeQuery(query).toString());
+
         final DBCursor<TrafficDto> cursor = db.find(query);
         cursor.forEach(trafficDto -> {
             inputBuilder.put(trafficDto.bucket(), trafficDto.input().values().stream().mapToLong(Long::valueOf).sum());
