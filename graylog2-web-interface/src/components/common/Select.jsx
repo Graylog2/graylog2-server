@@ -5,8 +5,8 @@ import lodash from 'lodash';
 
 import AppConfig from 'util/AppConfig';
 
-// Pass all props react-select accepts, excepting `onChange`
-const filteredProps = ['onChange', 'value'];
+// Pass all props react-select accepts, except those we want to override
+const filteredProps = ['onChange', 'value', 'labelKey'];
 const acceptedReactSelectProps = lodash.without(lodash.keys(ReactSelect.propTypes), ...filteredProps);
 
 const Select = React.createClass({
@@ -102,7 +102,7 @@ const Select = React.createClass({
     });
   },
   render() {
-    const { allowCreate, size, onReactSelectChange, multi } = this.props;
+    const { allowCreate, displayKey, size, onReactSelectChange, multi } = this.props;
     const value = this.state.value;
     const reactSelectProps = lodash.pick(this.props, acceptedReactSelectProps);
     const SelectComponent = allowCreate ? ReactSelect.Creatable : ReactSelect;
@@ -117,6 +117,7 @@ const Select = React.createClass({
         <SelectComponent ref={(c) => { this._select = c; }}
                          onChange={onReactSelectChange || this._onChange}
                          {...reactSelectProps}
+                         labelKey={displayKey}
                          value={formattedValue} />
       </div>
     );
