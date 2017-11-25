@@ -4,17 +4,42 @@ import { Button, ListGroup, ListGroupItem } from 'react-bootstrap';
 
 import { Select } from 'components/common';
 
+/**
+ * Component that renders a `Select` component above a list of selected
+ * options.
+ *
+ * As opposed to `MultiSelect` or `Select`, which display the
+ * selected options in the Input itself, this component uses a list,
+ * avoiding to clutter the Input when there are too many selected options
+ * and/or those options have large names.
+ *
+ * This component also allows to select the same option many times, and
+ * it accepts both arrays of strings and objects as selected options.
+ */
 const SelectableList = React.createClass({
   propTypes: {
-    options: PropTypes.any,
+    /** Options to display in the input. See `Select`'s `options` prop for more information. */
+    options: PropTypes.array,
+    /** Specifies whether `selectedOptions` contains strings or objects. */
     selectedOptionsType: PropTypes.oneOf(['string', 'object']),
-    selectedOptions: PropTypes.arrayOf([
+    /**
+     * Array of string or objects containing the selected options.
+     */
+    selectedOptions: PropTypes.arrayOf(PropTypes.oneOfType([
       PropTypes.string,
       PropTypes.object,
-    ]),
+    ])),
+    /** Indicates which option object key contains the text to display in the select input. same as react-select's `labelkey` prop. */
     displayKey: PropTypes.string,
+    /** Indicates which option object key contains the value of the option. */
     idKey: PropTypes.string,
+    /**
+     * Function called when an option is added or deleted from the selected options.
+     * The function receives an array with selected options as an argument, with
+     * the type indicated in `selectedOptionsType`.
+     */
     onChange: PropTypes.func,
+    /** Specifies if the input should receive the input focus or not. */
     autoFocus: PropTypes.bool,
   },
 
