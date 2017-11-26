@@ -21,6 +21,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.util.Size;
+import com.github.joschi.jadconfig.validators.PositiveIntegerValidator;
 import org.joda.time.Duration;
 
 import javax.validation.constraints.NotNull;
@@ -28,6 +29,7 @@ import java.io.File;
 import java.util.Objects;
 
 public class KafkaJournalConfiguration {
+    private static final String PREFIX = "message_journal_";
 
     public KafkaJournalConfiguration() { }
 
@@ -38,7 +40,11 @@ public class KafkaJournalConfiguration {
                                      @JsonProperty("max_size") long messageJournalMaxSize,
                                      @JsonProperty("max_age") Duration messageJournalMaxAge,
                                      @JsonProperty("flush_interval") long messageJournalFlushInterval,
-                                     @JsonProperty("flush_age") Duration messageJournalFlushAge) {
+                                     @JsonProperty("flush_age") Duration messageJournalFlushAge,
+                                     @JsonProperty("check_enabled") boolean messageJournalCheckEnabled,
+                                     @JsonProperty("check_stop_inputs") boolean messageJournalCheckStopInputs,
+                                     @JsonProperty("check_interval") Duration messageJournalCheckInterval,
+                                     @JsonProperty("check_disk_free_percent") int messageJournalCheckDiskFreePercent) {
         this.messageJournalDir = Objects.requireNonNull(messageJournalDir);
         this.messageJournalSegmentSize = Size.bytes(messageJournalSegmentSize);
         this.messageJournalSegmentAge = messageJournalSegmentAge;
@@ -46,38 +52,59 @@ public class KafkaJournalConfiguration {
         this.messageJournalMaxAge = messageJournalMaxAge;
         this.messageJournalFlushInterval = messageJournalFlushInterval;
         this.messageJournalFlushAge = messageJournalFlushAge;
+        this.messageJournalCheckEnabled = messageJournalCheckEnabled;
+        this.messageJournalCheckStopInputs = messageJournalCheckStopInputs;
+        this.messageJournalCheckInterval = messageJournalCheckInterval;
+        this.messageJournalCheckDiskFreePercent = messageJournalCheckDiskFreePercent;
     }
 
-    @Parameter(value = "message_journal_dir", required = true)
+    @Parameter(value = PREFIX + "dir", required = true)
     @JsonProperty("directory")
     private File messageJournalDir = new File("data/journal");
 
-    @Parameter("message_journal_segment_size")
+    @Parameter(PREFIX + "segment_size")
     @JsonProperty("segment_size")
     private Size messageJournalSegmentSize = Size.megabytes(100L);
 
-    @Parameter("message_journal_segment_age")
+    @Parameter(PREFIX + "segment_age")
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     @JsonProperty("segment_age")
     private Duration messageJournalSegmentAge = Duration.standardHours(1L);
 
-    @Parameter("message_journal_max_size")
+    @Parameter(PREFIX + "max_size")
     @JsonProperty("max_size")
     private Size messageJournalMaxSize = Size.gigabytes(5L);
 
-    @Parameter("message_journal_max_age")
+    @Parameter(PREFIX + "max_age")
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     @JsonProperty("max_age")
     private Duration messageJournalMaxAge = Duration.standardHours(12L);
 
-    @Parameter("message_journal_flush_interval")
+    @Parameter(PREFIX + "flush_interval")
     @JsonProperty("flush_interval")
     private long messageJournalFlushInterval = 1_000_000L;
 
-    @Parameter("message_journal_flush_age")
+    @Parameter(PREFIX + "flush_age")
     @JsonFormat(shape = JsonFormat.Shape.NUMBER)
     @JsonProperty("flush_age")
     private Duration messageJournalFlushAge = Duration.standardMinutes(1L);
+
+    @Parameter(PREFIX + "check_enabled")
+    @JsonProperty("check_enabled")
+    private boolean messageJournalCheckEnabled = true;
+
+    @Parameter(PREFIX + "check_stop_inputs")
+    @JsonProperty("check_stop_inputs")
+    private boolean messageJournalCheckStopInputs = true;
+
+    @Parameter(PREFIX + "check_interval")
+    @JsonFormat(shape = JsonFormat.Shape.NUMBER)
+    @JsonProperty("check_interval")
+    private Duration messageJournalCheckInterval = Duration.standardMinutes(10L);
+
+    @Parameter(value = PREFIX + "check_disk_free_percent", validators = PositiveIntegerValidator.class)
+    @JsonProperty("check_disk_free_percent")
+    private int messageJournalCheckDiskFreePercent = 5;
 
     public File getMessageJournalDir() {
         return messageJournalDir;
@@ -105,5 +132,21 @@ public class KafkaJournalConfiguration {
 
     public Duration getMessageJournalFlushAge() {
         return messageJournalFlushAge;
+    }
+
+    public boolean isMessageJournalCheckEnabled() {
+        return messageJournalCheckEnabled;
+    }
+
+    public boolean isMessageJournalCheckStopInputs() {
+        return messageJournalCheckStopInputs;
+    }
+
+    public Duration getMessageJournalCheckInterval() {
+        return messageJournalCheckInterval;
+    }
+
+    public int getMessageJournalCheckDiskFreePercent() {
+        return messageJournalCheckDiskFreePercent;
     }
 }
