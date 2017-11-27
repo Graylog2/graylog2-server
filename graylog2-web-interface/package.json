@@ -134,7 +134,8 @@
     "webpack-dev-middleware": "^1.12.0",
     "webpack-dev-server": "^2.6.1",
     "webpack-hot-middleware": "^2.20.0",
-    "webpack-merge": "^4.1.0"
+    "webpack-merge": "^4.1.0",
+    "yargs": "^10.0.3"
   },
   "resolutions": {
     "@types/jquery": "2.0.48",

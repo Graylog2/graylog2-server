@@ -2,9 +2,13 @@ const express = require('express');
 const webpack = require('webpack');
 const compress = require('compression');
 const history = require('connect-history-api-fallback');
+const http = require('http');
+const yargs = require('yargs');
 const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const webpackConfig = require('./webpack.bundled');
+
+const DEFAULT_PORT = 8081;
 
 const app = express();
 const vendorConfig = webpackConfig[0];
@@ -32,6 +36,19 @@ app.use(webpackDevMiddleware(appCompiler, {
 
 app.use(webpackHotMiddleware(appCompiler));
 
-app.listen(8080, () => {
-  console.log('Graylog web interface listening on port 8080!\n');
-});
+const server = http.createServer(app);
+
+const argv = yargs.argv;
+
+server
+  .listen(argv.port || DEFAULT_PORT, () => {
+    console.log(`Graylog web interface listening on port ${server.address().port}!\n`);
+  })
+  .on('error', (error) => {
+    if (error.code === 'EADDRINUSE') {
+      console.error(`Port ${argv.port || DEFAULT_PORT} already in use, will use a random one instead...`);
+      server.listen(0);
+    } else {
+      throw error;
+    }
+  });
