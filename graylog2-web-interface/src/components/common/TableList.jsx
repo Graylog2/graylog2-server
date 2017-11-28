@@ -53,7 +53,7 @@ const TableList = React.createClass({
                label="Select all"
                checked={this.state.allSelected}
                onChange={this._toggleSelectAll}
-               groupClassName="form-group-inline" />
+               wrapperClassName="form-group-inline" />
       </div>
     );
     return <ListGroupItem className="list-group-header" header={header} />;
