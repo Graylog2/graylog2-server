@@ -80,6 +80,11 @@ function collectTarget(connect, monitor) {
   };
 }
 
+/**
+ * Component that renders an item entry in a `SortableList` component.
+ * You most likely don't want to use this component directly, so please
+ * check the `SortableList` documentation instead.
+ */
 const SortableListItem = React.createClass({
   propTypes: {
     connectDragSource: PropTypes.func.isRequired,
