@@ -97,7 +97,7 @@ const IndexSetsComponent = React.createClass({
     let statsString;
     const stats = this.state.indexSetStats[indexSet.id];
     if (stats) {
-      statsString = this._formatStatsString(stats)
+      statsString = this._formatStatsString(stats);
     }
 
     return (
@@ -131,9 +131,11 @@ const IndexSetsComponent = React.createClass({
       <div>
         <h4><strong>Total:</strong> {this._formatStatsString(this.state.globalIndexSetStats)}</h4>
 
-        <hr style={{ marginBottom: "0" }} />
+        <hr style={{ marginBottom: 0 }} />
 
-        <PaginatedList pageSize={this.PAGE_SIZE} totalItems={this.state.indexSetsCount} onChange={this._onChangePaginatedList}
+        <PaginatedList pageSize={this.PAGE_SIZE}
+                       totalItems={this.state.indexSetsCount}
+                       onChange={this._onChangePaginatedList}
                        showPageSizeSelect={false}>
           <EntityList bsNoItemsStyle="info"
                       noItemsText="There are no index sets to display"
