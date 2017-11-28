@@ -256,11 +256,15 @@ public class Message implements Messages {
         final String message = getMessage();
         msgSize += FIELD_MESSAGE.length() + message.length();
         obj.put(FIELD_MESSAGE, message);
+
         final String source = getSource();
-        msgSize += FIELD_SOURCE.length() + message.length();
+        msgSize += FIELD_SOURCE.length() + source.length();
         obj.put(FIELD_SOURCE, source);
+
         final Collection<String> streamIds = getStreamIds();
-        msgSize += FIELD_STREAMS.length() + streamIds.size() * 24; // stream ids are 24 chars long
+        if (!streamIds.isEmpty()) {
+            msgSize += FIELD_STREAMS.length() + streamIds.size() * 24; // stream ids are 24 chars long
+        }
         obj.put(FIELD_STREAMS, streamIds);
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);

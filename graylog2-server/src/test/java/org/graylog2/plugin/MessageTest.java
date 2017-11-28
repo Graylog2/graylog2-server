@@ -44,6 +44,7 @@ import java.util.regex.Pattern;
 
 import static com.google.common.collect.Sets.symmetricDifference;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.graylog2.plugin.streams.Stream.DEFAULT_STREAM_ID;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotEquals;
@@ -432,6 +433,26 @@ public class MessageTest {
         final Collection<String> streams = (Collection<String>) object.get("streams");
         assertThat(streams).containsOnly("stream-id");
         assertThat(outputByteCounter.getCount()).isPositive();
+    }
+
+    @Test
+    public void messageSizes() {
+        final Meter invalidTimestampMeter = new Meter();
+
+        final Message message = new Message("1234567890", "12345", Tools.nowUTC());
+        assertThat(countOutputBytes(message, invalidTimestampMeter)).isEqualTo(97);
+
+        final Stream defaultStream = mock(Stream.class);
+        when(defaultStream.getId()).thenReturn(DEFAULT_STREAM_ID);
+        message.addStream(defaultStream);
+
+        assertThat(countOutputBytes(message, invalidTimestampMeter)).isEqualTo(128);
+    }
+
+    private long countOutputBytes(Message message, Meter invalidTimestampMeter) {
+        Counter outputByteCounter = new Counter();
+        message.toElasticSearchObject(invalidTimestampMeter, outputByteCounter);
+        return outputByteCounter.getCount();
     }
 
     @Test
