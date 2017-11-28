@@ -11,7 +11,7 @@ const TrafficGraph = React.createClass({
   propTypes: {
     from: PropTypes.string.isRequired,
     to: PropTypes.string.isRequired,
-    traffic: PropTypes.object.isRequired,
+    traffic: PropTypes.object.isRequired, // traffic is: {"2017-11-15T15:00:00.000Z": 68287229, ...}
     width: PropTypes.number.isRequired,
   },
 
