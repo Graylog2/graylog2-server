@@ -17,7 +17,6 @@
 package org.graylog2.rest.resources.system;
 
 
-import com.google.common.collect.ImmutableSet;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -40,7 +39,6 @@ import javax.ws.rs.core.MediaType;
 @Produces(MediaType.APPLICATION_JSON)
 public class TrafficResource extends RestResource {
 
-    public static final ImmutableSet<String> RESOLUTION = ImmutableSet.of("days", "hours");
     private final TrafficCounterService trafficCounterService;
 
     @Inject
