@@ -39,17 +39,13 @@ const IndexSetsComponent = React.createClass({
   },
 
   _onSetDefault(indexSet) {
-    return (e) => {
-      e.preventDefault();
-
+    return () => {
       IndexSetsActions.setDefault(indexSet).then(() => this.loadData(this.currentPageNo, this.currentPageSize));
     };
   },
 
   _onDelete(indexSet) {
-    return (_, e) => {
-      e.preventDefault();
-
+    return () => {
       this.refs[`index-set-deletion-form-${indexSet.id}`].open();
     };
   },
