@@ -111,6 +111,9 @@ const IndexSetsComponent = React.createClass({
   },
 
   _formatStatsString(stats) {
+    if (!stats) {
+      return 'N/A';
+    }
     const indices = `${NumberUtils.formatNumber(stats.indices)} ${StringUtils.pluralize(stats.indices, 'index', 'indices')}`;
     const documents = `${NumberUtils.formatNumber(stats.documents)} ${StringUtils.pluralize(stats.documents, 'document', 'documents')}`;
     const size = NumberUtils.formatBytes(stats.size);
