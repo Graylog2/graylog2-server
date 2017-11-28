@@ -541,4 +541,16 @@ public class MessageTest {
         assertThat(message.getStreamIds()).containsOnly("test1", "test2");
 
     }
+
+    @Test
+    public void fieldTest() {
+        assertThat(Message.sizeForField("", true)).isEqualTo(4);
+        assertThat(Message.sizeForField("", (byte)1)).isEqualTo(1);
+        assertThat(Message.sizeForField("", (char)1)).isEqualTo(2);
+        assertThat(Message.sizeForField("", (short)1)).isEqualTo(2);
+        assertThat(Message.sizeForField("", 1)).isEqualTo(4);
+        assertThat(Message.sizeForField("", 1L)).isEqualTo(8);
+        assertThat(Message.sizeForField("", 1.0f)).isEqualTo(4);
+        assertThat(Message.sizeForField("", 1.0d)).isEqualTo(8);
+    }
 }

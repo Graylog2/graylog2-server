@@ -143,13 +143,21 @@ public class Message implements Messages {
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
     static {
         classSizes.put(byte.class, 1);
+        classSizes.put(Byte.class, 1);
         classSizes.put(char.class, 2);
+        classSizes.put(Character.class, 2);
         classSizes.put(short.class, 2);
+        classSizes.put(Short.class, 2);
         classSizes.put(boolean.class, 4);
+        classSizes.put(Boolean.class, 4);
         classSizes.put(int.class, 4);
+        classSizes.put(Integer.class, 4);
         classSizes.put(float.class, 4);
+        classSizes.put(Float.class, 4);
         classSizes.put(long.class, 8);
+        classSizes.put(Long.class, 8);
         classSizes.put(double.class, 8);
+        classSizes.put(Double.class, 8);
     }
 
     public Message(final String message, final String source, final DateTime timestamp) {
@@ -287,7 +295,7 @@ public class Message implements Messages {
     }
 
     // estimate the byte/char length for a field and its value
-    private static long sizeForField(String key, Object value) {
+    static long sizeForField(String key, Object value) {
         long size = key.length();
         long valueSize;
         if (value instanceof CharSequence) {
