@@ -123,6 +123,7 @@ public class Message implements Messages {
         FIELD_MESSAGE, FIELD_ID
     );
 
+    @Deprecated
     public static final Function<Message, String> ID_FUNCTION = new MessageIdFunction();
 
     private final Map<String, Object> fields = Maps.newHashMap();
@@ -188,6 +189,7 @@ public class Message implements Messages {
         return true;
     }
 
+    @Deprecated
     public String getValidationErrors() {
         final StringBuilder sb = new StringBuilder();
 
@@ -396,6 +398,7 @@ public class Message implements Messages {
         }
     }
 
+    @Deprecated
     public void addStringFields(final Map<String, String> fields) {
         if (fields == null) {
             return;
@@ -406,6 +409,7 @@ public class Message implements Messages {
         }
     }
 
+    @Deprecated
     public void addLongFields(final Map<String, Long> fields) {
         if (fields == null) {
             return;
@@ -416,6 +420,7 @@ public class Message implements Messages {
         }
     }
 
+    @Deprecated
     public void addDoubleFields(final Map<String, Double> fields) {
         if (fields == null) {
             return;
@@ -615,6 +620,7 @@ public class Message implements Messages {
     }
 
     @Override
+    @Nonnull
     public Iterator<Message> iterator() {
         if (getFilterOut()) {
             return Collections.emptyIterator();
@@ -623,7 +629,7 @@ public class Message implements Messages {
     }
 
     public static abstract class Recording {
-        public static Timing timing(String name, long elapsedNanos) {
+        static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
         public static Counter counter(String name, int counter) {
@@ -636,7 +642,7 @@ public class Message implements Messages {
         private final String name;
         private final long elapsedNanos;
 
-        public Timing(String name, long elapsedNanos) {
+        Timing(String name, long elapsedNanos) {
             this.name = name;
             this.elapsedNanos = elapsedNanos;
         }
