@@ -5,8 +5,23 @@ import jQuery from 'jquery';
 
 import Select from 'components/common/Select';
 
+/**
+ * Component that renders a select input for all supported time zones.
+ *
+ * As this component is based in the `Select` component, users can search a
+ * certain time zone easily. This component will pass through other props
+ * to the underlying `Select` component, so you can further customize how
+ * the `Select` input behaves. Check the `Select` documentation for more
+ * information.
+ */
 const TimezoneSelect = React.createClass({
   propTypes: {
+    /**
+     * Function that will be called when the selected timezone changes. The
+     * function will receive the new time zone identifier as argument. See
+     * https://en.wikipedia.org/wiki/List_of_tz_database_time_zones for
+     * a list of time zone identifiers.
+     */
     onChange: PropTypes.func,
   },
 
