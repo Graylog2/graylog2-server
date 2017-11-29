@@ -37,8 +37,10 @@ public class TrafficCounterCalculator extends Periodical {
     private final MetricRegistry metricRegistry;
     private long previousInputBytes = 0L;
     private long previousOutputBytes = 0L;
+    private long previousDecodedBytes = 0L;
     private Counter inputCounter;
     private Counter outputCounter;
+    private Counter decodedCounter;
 
     @Inject
     public TrafficCounterCalculator(NodeId nodeId, TrafficCounterService trafficService, MetricRegistry metricRegistry) {
@@ -51,6 +53,7 @@ public class TrafficCounterCalculator extends Periodical {
     public void initialize() {
         inputCounter = metricRegistry.counter(GlobalMetricNames.INPUT_TRAFFIC);
         outputCounter = metricRegistry.counter(GlobalMetricNames.OUTPUT_TRAFFIC);
+        decodedCounter = metricRegistry.counter(GlobalMetricNames.DECODED_TRAFFIC);
     }
 
     @Override
@@ -63,19 +66,24 @@ public class TrafficCounterCalculator extends Periodical {
 
             final long currentInputBytes = inputCounter.getCount();
             final long currentOutputBytes = outputCounter.getCount();
+            final long currentDecodedBytes = decodedCounter.getCount();
 
             final long inputLastMinute = currentInputBytes - previousInputBytes;
             previousInputBytes = currentInputBytes;
             final long outputBytesLastMinute = currentOutputBytes - previousOutputBytes;
             previousOutputBytes = currentOutputBytes;
+            final long decodedBytesLastMinute = currentDecodedBytes - previousDecodedBytes;
+            previousDecodedBytes = currentDecodedBytes;
 
             if (LOG.isDebugEnabled()) {
                 final Size in = Size.bytes(inputLastMinute);
                 final Size out = Size.bytes(outputBytesLastMinute);
-                LOG.debug("Traffic in the last minute: {} bytes ({} MB), {} bytes ({} MB})", in, in.toMegabytes(), out, out.toMegabytes());
+                final Size decoded = Size.bytes(decodedBytesLastMinute);
+                LOG.debug("Traffic in the last minute: in: {} bytes ({} MB), out: {} bytes ({} MB}), decoded: {} bytes ({} MB})",
+                        in, in.toMegabytes(), out, out.toMegabytes(), decoded, decoded.toMegabytes());
             }
             final DateTime previousMinute = now.minusMinutes(1);
-            trafficService.updateTraffic(previousMinute, nodeId, inputLastMinute, outputBytesLastMinute);
+            trafficService.updateTraffic(previousMinute, nodeId, inputLastMinute, outputBytesLastMinute, decodedBytesLastMinute);
         }
     }
 

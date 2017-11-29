@@ -67,11 +67,14 @@ const GraylogClusterOverview = React.createClass({
     }
     let sumInput = null;
     let sumOutput = null;
+    let sumDecoded = null;
     if (this.state.traffic) {
       const bytesIn = _.reduce(this.state.traffic.input, (result, value) => result + value);
       const bytesOut = _.reduce(this.state.traffic.output, (result, value) => result + value);
+      const bytesDecoded = _.reduce(this.state.traffic.decoded, (result, value) => result + value);
       sumInput = <small>Last 30 days: {NumberUtils.formatBytes(bytesIn)}</small>;
       sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
+      sumDecoded = <small>Last 30 days: {NumberUtils.formatBytes(bytesDecoded)}</small>;
     }
     return (
       <Row className="content">
@@ -80,7 +83,7 @@ const GraylogClusterOverview = React.createClass({
           {content}
           <hr />
           <Row>
-            <Col md={6}>
+            <Col md={4}>
               <h3 ref={(container) => { this._container = container; }} style={{ marginBottom: 10 }}>Incoming traffic {sumInput}</h3>
               {!this.state.traffic ? <Spinner /> : <TrafficGraph traffic={this.state.traffic.input}
                                                                  from={this.state.traffic.from}
@@ -88,7 +91,15 @@ const GraylogClusterOverview = React.createClass({
                                                                  width={this.state.graphWidth} />
               }
             </Col>
-            <Col md={6}>
+            <Col md={4}>
+              <h3 style={{ marginBottom: 10 }}>Decoded traffic {sumDecoded}</h3>
+              {!this.state.traffic ? <Spinner /> : <TrafficGraph traffic={this.state.traffic.decoded}
+                                                                 from={this.state.traffic.from}
+                                                                 to={this.state.traffic.to}
+                                                                 width={this.state.graphWidth} />
+              }
+            </Col>
+            <Col md={4}>
               <h3 style={{ marginBottom: 10 }}>Outgoing traffic {sumOutput}</h3>
               {!this.state.traffic ? <Spinner /> : <TrafficGraph traffic={this.state.traffic.output}
                                                                  from={this.state.traffic.from}

@@ -63,12 +63,13 @@ public class TrafficCounterService {
         return observationTime.withMinuteOfHour(0).withSecondOfMinute(0).withMillisOfSecond(0);
     }
 
-    public void updateTraffic(DateTime observationTime, NodeId nodeId, long inLastMinute, long outLastMinute) {
+    public void updateTraffic(DateTime observationTime, NodeId nodeId, long inLastMinute, long outLastMinute, long decodedLastMinute) {
         // we bucket our database by days
         final DateTime dayBucket = getDayBucket(observationTime);
 
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Updating traffic for node {} at {}:  in {}/ out {} bytes", nodeId.toString(), dayBucket, inLastMinute, outLastMinute);
+            LOG.debug("Updating traffic for node {} at {}:  in/decoded/out {}/{}/{} bytes",
+                    nodeId.toString(), dayBucket, inLastMinute, decodedLastMinute, outLastMinute);
         }
         final WriteResult<TrafficDto, ObjectId> update = db.update(DBQuery.is("bucket", dayBucket),
                 // sigh DBUpdate.inc only takes integers, but we have a long.
@@ -76,7 +77,9 @@ public class TrafficCounterService {
                         .addOperation("$inc", "input." + nodeId.toString(),
                                 new SingleUpdateOperationValue(false, false, inLastMinute))
                         .addOperation("$inc", "output." + nodeId.toString(),
-                                new SingleUpdateOperationValue(false, false, outLastMinute)),
+                                new SingleUpdateOperationValue(false, false, outLastMinute))
+                        .addOperation("$inc", "decoded." + nodeId.toString(),
+                                new SingleUpdateOperationValue(false, false, decodedLastMinute)),
                 true, false);
         if (update.getN() == 0) {
             LOG.warn("Unable to update traffic of node {}: {}", nodeId, update);
@@ -86,6 +89,7 @@ public class TrafficCounterService {
     public TrafficHistogram clusterTrafficOfLastDays(Duration duration, Interval interval) {
         final ImmutableMap.Builder<DateTime, Long> inputBuilder = ImmutableMap.builder();
         final ImmutableMap.Builder<DateTime, Long> outputBuilder = ImmutableMap.builder();
+        final ImmutableMap.Builder<DateTime, Long> decodedBuilder = ImmutableMap.builder();
         final DateTime to = getDayBucket(Tools.nowUTC());
         final DateTime from = to.minus(duration);
 
@@ -98,16 +102,19 @@ public class TrafficCounterService {
         cursor.forEach(trafficDto -> {
             inputBuilder.put(trafficDto.bucket(), trafficDto.input().values().stream().mapToLong(Long::valueOf).sum());
             outputBuilder.put(trafficDto.bucket(), trafficDto.output().values().stream().mapToLong(Long::valueOf).sum());
+            decodedBuilder.put(trafficDto.bucket(), trafficDto.decoded().values().stream().mapToLong(Long::valueOf).sum());
         });
         Map<DateTime, Long> inputHistogram = inputBuilder.build();
         Map<DateTime, Long> outputHistogram = outputBuilder.build();
+        Map<DateTime, Long> decodedHistogram = decodedBuilder.build();
 
         // we might need to aggregate the hourly database values to their UTC daily buckets
         if (interval == Interval.DAILY) {
             inputHistogram = aggregateToDaily(inputHistogram);
             outputHistogram = aggregateToDaily(outputHistogram);
+            decodedHistogram = aggregateToDaily(decodedHistogram);
         }
-        return TrafficHistogram.create(from, to, inputHistogram, outputHistogram);
+        return TrafficHistogram.create(from, to, inputHistogram, outputHistogram, decodedHistogram);
     }
 
     private TreeMap<DateTime, Long> aggregateToDaily(Map<DateTime, Long> histogram) {
@@ -128,8 +135,9 @@ public class TrafficCounterService {
         public static TrafficHistogram create(@JsonProperty("from") DateTime from,
                                               @JsonProperty("to") DateTime to,
                                               @JsonProperty("input") Map<DateTime, Long> input,
-                                              @JsonProperty("output") Map<DateTime, Long> output) {
-            return new AutoValue_TrafficCounterService_TrafficHistogram(from, to, input, output);
+                                              @JsonProperty("output") Map<DateTime, Long> output,
+                                              @JsonProperty("decoded") Map<DateTime, Long> decoded) {
+            return new AutoValue_TrafficCounterService_TrafficHistogram(from, to, input, output, decoded);
         }
 
         @JsonProperty
@@ -143,5 +151,8 @@ public class TrafficCounterService {
 
         @JsonProperty
         public abstract Map<DateTime, Long> output();
+
+        @JsonProperty
+        public abstract Map<DateTime, Long> decoded();
     }
 }

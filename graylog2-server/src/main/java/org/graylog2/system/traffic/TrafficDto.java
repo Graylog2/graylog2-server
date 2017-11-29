@@ -23,6 +23,7 @@ import org.joda.time.DateTime;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
+import java.util.Collections;
 import java.util.Map;
 
 @AutoValue
@@ -43,12 +44,19 @@ public abstract class TrafficDto {
     @JsonProperty
     public abstract Map<String, Long> output();
 
+    @JsonProperty
+    public abstract Map<String, Long> decoded();
+
     public static Builder builder() {
         return new AutoValue_TrafficDto.Builder();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
+
+        public Builder() {
+            decoded(Collections.emptyMap());
+        }
 
         @Id
         @ObjectId
@@ -63,6 +71,9 @@ public abstract class TrafficDto {
 
         @JsonProperty
         public abstract Builder output(Map<String, Long> outputTraffic);
+
+        @JsonProperty
+        public abstract Builder decoded(Map<String, Long> decodedTraffic);
 
         public abstract TrafficDto build();
     }
