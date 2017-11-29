@@ -51,8 +51,11 @@ const TimezoneSelect = React.createClass({
   },
   render() {
     const timezones = this._formatTimezones();
+    const { onChange, ...otherProps } = this.props;
+
     return (
-      <Select ref="timezone" {...this.props}
+      <Select ref="timezone" {...otherProps}
+              onChange={onChange}
               placeholder="Pick a time zone"
               options={timezones}
               optionRenderer={this._renderOption} />
