@@ -30,6 +30,7 @@ public final class GlobalMetricNames {
     public static final String OUTPUT_THROUGHPUT_RATE = name(OUTPUT_THROUGHPUT, RATE_SUFFIX);
 
     public static final String INPUT_TRAFFIC = "org.graylog2.traffic.input";
+    public static final String DECODED_TRAFFIC = "org.graylog2.traffic.decoded";
     public static final String OUTPUT_TRAFFIC = "org.graylog2.traffic.output";
     public static final String SYSTEM_OUTPUT_TRAFFIC = "org.graylog2.traffic.system-output-traffic";
 

@@ -37,6 +37,7 @@ import org.slf4j.LoggerFactory;
 import javax.annotation.Nonnull;
 import javax.annotation.concurrent.NotThreadSafe;
 import java.net.InetAddress;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -141,24 +142,37 @@ public class Message implements Messages {
 
     private ArrayList<Recording> recordings;
 
+    private com.codahale.metrics.Counter sizeCounter = new com.codahale.metrics.Counter();
+
     private static final IdentityHashMap<Class<?>, Integer> classSizes = Maps.newIdentityHashMap();
     static {
         classSizes.put(byte.class, 1);
         classSizes.put(Byte.class, 1);
+
         classSizes.put(char.class, 2);
         classSizes.put(Character.class, 2);
+
         classSizes.put(short.class, 2);
         classSizes.put(Short.class, 2);
+
         classSizes.put(boolean.class, 4);
         classSizes.put(Boolean.class, 4);
+
         classSizes.put(int.class, 4);
         classSizes.put(Integer.class, 4);
+
         classSizes.put(float.class, 4);
         classSizes.put(Float.class, 4);
+
         classSizes.put(long.class, 8);
         classSizes.put(Long.class, 8);
+
         classSizes.put(double.class, 8);
         classSizes.put(Double.class, 8);
+
+        classSizes.put(DateTime.class, 8);
+        classSizes.put(Date.class, 8);
+        classSizes.put(ZonedDateTime.class, 8);
     }
 
     public Message(final String message, final String source, final DateTime timestamp) {
@@ -212,11 +226,8 @@ public class Message implements Messages {
         return getFieldAs(DateTime.class, FIELD_TIMESTAMP).withZone(UTC);
     }
 
-    public Map<String, Object> toElasticSearchObject(@Nonnull final Meter invalidTimestampMeter, @Nonnull com.codahale.metrics.Counter outputByteCounter) {
+    public Map<String, Object> toElasticSearchObject(@Nonnull final Meter invalidTimestampMeter) {
         final Map<String, Object> obj = Maps.newHashMapWithExpectedSize(REQUIRED_FIELDS.size() + fields.size());
-        // we measure Strings according to their character count, and not their UTF-8 byte size for efficiency.
-        // this also more accurately captures the intent and the majority of fields in log messages are in fact ASCII encoded
-        long msgSize = 0;
 
         for (Map.Entry<String, Object> entry : fields.entrySet()) {
             final String key = entry.getKey();
@@ -234,7 +245,6 @@ public class Message implements Messages {
                 // This is still not optimal but better than implementing expensive logic with multiple replacement
                 // character options. Conflicts should be rare...
                 if (!obj.containsKey(newKey)) {
-                    msgSize += sizeForField(newKey, value);
                     obj.put(newKey, value);
                 } else {
                     LOG.warn("Keys must not contain a \".\" character! Ignoring field \"{}\"=\"{}\" in message [{}] - Unable to replace \".\" with a \"{}\" because of key conflict: \"{}\"=\"{}\"",
@@ -250,24 +260,13 @@ public class Message implements Messages {
                         newKey, fields.get(newKey), getId(), KEY_REPLACEMENT_CHAR, key, value);
                     LOG.debug("Full message with \".\" in message key: {}", this);
                 }
-                msgSize += sizeForField(key, value);
                 obj.put(key, value);
             }
         }
 
-        final String message = getMessage();
-        msgSize += FIELD_MESSAGE.length() + message.length();
-        obj.put(FIELD_MESSAGE, message);
-
-        final String source = getSource();
-        msgSize += FIELD_SOURCE.length() + source.length();
-        obj.put(FIELD_SOURCE, source);
-
-        final Collection<String> streamIds = getStreamIds();
-        if (!streamIds.isEmpty()) {
-            msgSize += FIELD_STREAMS.length() + streamIds.size() * 24; // stream ids are 24 chars long
-        }
-        obj.put(FIELD_STREAMS, streamIds);
+        obj.put(FIELD_MESSAGE, getMessage());
+        obj.put(FIELD_SOURCE, getSource());
+        obj.put(FIELD_STREAMS, getStreamIds());
 
         final Object timestampValue = getField(FIELD_TIMESTAMP);
         DateTime dateTime;
@@ -292,25 +291,15 @@ public class Message implements Messages {
             dateTime = Tools.nowUTC();
         }
         if (dateTime != null) {
-            msgSize += FIELD_TIMESTAMP.length() + 23; // format string is 23 chars long
             obj.put(FIELD_TIMESTAMP, buildElasticSearchTimeFormat(dateTime.withZone(UTC)));
         }
 
-        outputByteCounter.inc(msgSize);
         return obj;
     }
 
     // estimate the byte/char length for a field and its value
-    static long sizeForField(String key, Object value) {
-        long size = key.length();
-        long valueSize;
-        if (value instanceof CharSequence) {
-            valueSize = ((CharSequence) value).length();
-        } else {
-            final Integer classSize = classSizes.get(value.getClass());
-            valueSize = classSize == null ? 0 : classSize;
-        }
-        return size + valueSize;
+    static long sizeForField(@Nonnull String key, @Nonnull Object value) {
+        return key.length() + sizeForValue(value);
     }
 
     @Override
@@ -372,16 +361,66 @@ public class Message implements Messages {
         }
 
         if (FIELD_TIMESTAMP.equals(trimmedKey) && value != null && value instanceof Date) {
-            fields.put(FIELD_TIMESTAMP, new DateTime(value));
+            final DateTime timestamp = new DateTime(value);
+            final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
+            // only count it the first time, it is required and its length won't change
+            updateSize(trimmedKey, timestamp, previousValue);
         } else if (value instanceof String) {
             final String str = ((String) value).trim();
 
             if (isRequiredField || !str.isEmpty()) {
-                fields.put(trimmedKey, str);
+                final Object previousValue = fields.put(trimmedKey, str);
+                updateSize(trimmedKey, str, previousValue);
             }
         } else if (value != null) {
-            fields.put(trimmedKey, value);
+            final Object previousValue = fields.put(trimmedKey, value);
+            updateSize(trimmedKey, value, previousValue);
         }
+    }
+
+    private void updateSize(String fieldName, Object newValue, Object previousValue) {
+        // don't count internal fields
+        if (GRAYLOG_FIELDS.contains(fieldName)) {
+            return;
+        }
+        long newValueSize = 0;
+        long oldValueSize = 0;
+        final long oldSize = sizeCounter.getCount();
+        final int keyLength = fieldName.length();
+        // if the field is being removed, also subtract the name's length
+        if (newValue == null) {
+            sizeCounter.dec(keyLength);
+        } else {
+            newValueSize = sizeForValue(newValue);
+            sizeCounter.inc(newValueSize);
+        }
+        // if the field is new, also count its name's length
+        if (previousValue == null) {
+            sizeCounter.inc(keyLength);
+        } else {
+            oldValueSize = sizeForValue(previousValue);
+            sizeCounter.dec(oldValueSize);
+        }
+        if (LOG.isTraceEnabled()) {
+            final long newSize = sizeCounter.getCount();
+            LOG.trace("[Message size update][{}] key {}/{}, new/old/change: {}/{}/{} total: {}",
+                    getId(), fieldName, keyLength, newValueSize, oldValueSize, newSize - oldSize, newSize);
+        }
+    }
+
+    static long sizeForValue(@Nonnull Object value) {
+        long valueSize;
+        if (value instanceof CharSequence) {
+            valueSize = ((CharSequence) value).length();
+        } else {
+            final Integer classSize = classSizes.get(value.getClass());
+            valueSize = classSize == null ? 0 : classSize;
+        }
+        return valueSize;
+    }
+
+    public long getSize() {
+        return sizeCounter.getCount();
     }
 
     public static boolean validKey(final String key) {
@@ -433,7 +472,8 @@ public class Message implements Messages {
 
     public void removeField(final String key) {
         if (!RESERVED_FIELDS.contains(key)) {
-            fields.remove(key);
+            final Object removedValue = fields.remove(key);
+            updateSize(key, null, removedValue);
         }
     }
 
@@ -486,6 +526,10 @@ public class Message implements Messages {
     public void addStream(Stream stream) {
         indexSets.add(stream.getIndexSet());
         streams.add(stream);
+        sizeCounter.inc(8);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("[Message size update][{}] stream added: {}", getId(), sizeCounter.getCount());
+        }
     }
 
     /**
@@ -505,6 +549,10 @@ public class Message implements Messages {
      */
     public boolean removeStream(Stream stream) {
         final boolean removed = streams.remove(stream);
+        sizeCounter.dec(8);
+        if (LOG.isTraceEnabled()) {
+            LOG.trace("[Message size update][{}] stream removed: {}", getId(), sizeCounter.getCount());
+        }
 
         if (removed) {
             indexSets.clear();
@@ -632,7 +680,7 @@ public class Message implements Messages {
         static Timing timing(String name, long elapsedNanos) {
             return new Timing(name, elapsedNanos);
         }
-        public static Counter counter(String name, int counter) {
+        public static Message.Counter counter(String name, int counter) {
             return new Counter(name, counter);
         }
 

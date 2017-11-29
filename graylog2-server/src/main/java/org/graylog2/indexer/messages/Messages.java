@@ -135,12 +135,17 @@ public class Messages {
 
         final Bulk.Builder bulk = new Bulk.Builder();
         for (Map.Entry<IndexSet, Message> entry : messageList) {
-            final String id = entry.getValue().getId();
-            bulk.addAction(new Index.Builder(entry.getValue().toElasticSearchObject(invalidTimestampMeter,
-                    isSystemTraffic ? systemTrafficCounter : outputByteCounter))
+            final Message message = entry.getValue();
+            if (isSystemTraffic) {
+                systemTrafficCounter.inc(message.getSize());
+            } else {
+                outputByteCounter.inc(message.getSize());
+            }
+
+            bulk.addAction(new Index.Builder(message.toElasticSearchObject(invalidTimestampMeter))
                 .index(entry.getKey().getWriteIndexAlias())
                 .type(IndexMapping.TYPE_MESSAGE)
-                .id(id)
+                .id(message.getId())
                 .build());
         }
 
