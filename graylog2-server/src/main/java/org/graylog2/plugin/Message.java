@@ -668,6 +668,8 @@ public class Message implements Messages {
         }
     }
 
+    // since we are on Java8 we can replace this with a method reference where needed
+    @Deprecated
     public static class MessageIdFunction implements Function<Message, String> {
         @Override
         public String apply(final Message input) {

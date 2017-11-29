@@ -801,7 +801,9 @@
       "node_modules/moment-timezone/node_modules/moment/locale/zh-tw.js": 797,
       "node_modules/moment-timezone/node_modules/moment/locale ../../../../../../../../^/.//.*$": 798,
       "node_modules/react-router/node_modules/hoist-non-react-statics/index.js": 799,
-      "node_modules/timers-browserify/main.js": 800
+      "node_modules/timers-browserify/main.js": 800,
+      "node_modules/moment/locale ../../../../../../../^/.//.*$": 801,
+      "node_modules/moment-timezone/node_modules/moment/locale ../../../../../../../^/.//.*$": 802
     },
     "usedIds": {
       "0": 0,
@@ -1604,7 +1606,9 @@
       "797": 797,
       "798": 798,
       "799": 799,
-      "800": 800
+      "800": 800,
+      "801": 801,
+      "802": 802
     }
   },
   "chunks": {
