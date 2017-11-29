@@ -363,7 +363,6 @@ public class Message implements Messages {
         if (FIELD_TIMESTAMP.equals(trimmedKey) && value != null && value instanceof Date) {
             final DateTime timestamp = new DateTime(value);
             final Object previousValue = fields.put(FIELD_TIMESTAMP, timestamp);
-            // only count it the first time, it is required and its length won't change
             updateSize(trimmedKey, timestamp, previousValue);
         } else if (value instanceof String) {
             final String str = ((String) value).trim();
