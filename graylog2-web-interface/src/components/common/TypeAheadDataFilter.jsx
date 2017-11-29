@@ -10,8 +10,8 @@ import { TypeAheadInput } from 'components/common';
  * This component was thought to be able to filter a list of items by one
  * of their attributes, but also on tags, providing auto-completion for them.
  *
- * **Note** There are a few quirks around this component and it would be
- * helpful to refactor it to make it easier to use.
+ * **Note** There are a few quirks around this component and it will be
+ * refactored soon.
  */
 const TypeAheadDataFilter = React.createClass({
   propTypes: {
