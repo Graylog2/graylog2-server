@@ -81,6 +81,7 @@ public abstract class MessageInput implements Stoppable {
     private final Configuration codecConfig;
     private final Counter globalIncomingMessages;
     private final Counter emptyMessages;
+    private final Counter globalRawSize;
 
     protected String title;
     protected String creatorUserId;
@@ -113,6 +114,7 @@ public abstract class MessageInput implements Stoppable {
         this.serverStatus = serverStatus;
         this.requestedConfiguration = config.combinedRequestedConfiguration();
         this.codecConfig = config.codecConfig.getRequestedConfiguration().filter(codec.getConfiguration());
+        globalRawSize = metricRegistry.counter(GlobalMetricNames.INPUT_TRAFFIC);
         rawSize = localRegistry.meter("rawSize");
         incomingMessages = localRegistry.meter("incomingMessages");
         globalIncomingMessages = metricRegistry.counter(GlobalMetricNames.INPUT_THROUGHPUT);
@@ -328,7 +330,8 @@ public abstract class MessageInput implements Stoppable {
     }
 
     public void processRawMessage(RawMessage rawMessage) {
-        if (rawMessage.getPayload().length == 0) {
+        final int payloadLength = rawMessage.getPayload().length;
+        if (payloadLength == 0) {
             LOG.debug("Discarding empty message {} from input [{}/{}] (remote address {}). Turn logger org.graylog2.plugin.journal.RawMessage to TRACE to see originating stack trace.",
                       rawMessage.getId(),
                       getTitle(),
@@ -347,7 +350,8 @@ public abstract class MessageInput implements Stoppable {
 
         incomingMessages.mark();
         globalIncomingMessages.inc();
-        rawSize.mark(rawMessage.getPayload().length);
+        rawSize.mark(payloadLength);
+        globalRawSize.inc(payloadLength);
     }
 
     public String getType() {

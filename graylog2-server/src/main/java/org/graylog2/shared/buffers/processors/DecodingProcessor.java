@@ -17,6 +17,7 @@
 
 package org.graylog2.shared.buffers.processors;
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.google.common.base.Strings;
@@ -26,6 +27,7 @@ import com.google.common.net.InetAddresses;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
 import com.lmax.disruptor.EventHandler;
+import org.graylog2.plugin.GlobalMetricNames;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.ResolvableInetSocketAddress;
 import org.graylog2.plugin.ServerStatus;
@@ -52,6 +54,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
     private static final Logger LOG = LoggerFactory.getLogger(DecodingProcessor.class);
 
     private final Timer decodeTime;
+    private final Counter decodedTrafficCounter;
 
     public interface Factory {
         DecodingProcessor create(@Assisted("decodeTime") Timer decodeTime, @Assisted("parseTime") Timer parseTime);
@@ -78,6 +81,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         // these metrics are global to all processors, thus they are passed in directly to avoid relying on the class name
         this.parseTime = parseTime;
         this.decodeTime = decodeTime;
+        decodedTrafficCounter = metricRegistry.counter(GlobalMetricNames.DECODED_TRAFFIC);
     }
 
     @Override
@@ -246,6 +250,7 @@ public class DecodingProcessor implements EventHandler<MessageEvent> {
         }
 
         metricRegistry.meter(name(baseMetricName, "processedMessages")).mark();
+        decodedTrafficCounter.inc(message.getSize());
         return message;
     }
 }
