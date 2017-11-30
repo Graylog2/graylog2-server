@@ -3080,7 +3080,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
   dependencies:
     babel-eslint "^7.2.3"
     eslint "^4.3.0"
-    eslint-config-graylog "file:../../../../../../Library/Caches/Yarn/v1/eslint-config-graylog"
+    eslint-config-graylog "file:../../../../../.cache/yarn/v1/eslint-config-graylog"
     html-webpack-plugin "^2.22.0"
     javascript-natural-sort "^0.7.1"
     jquery "2.1.x"
