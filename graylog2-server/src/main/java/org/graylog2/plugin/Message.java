@@ -338,7 +338,8 @@ public class Message implements Messages {
     }
 
     public void setSource(final String source) {
-        fields.put(FIELD_SOURCE, source);
+        final Object previousSource = fields.put(FIELD_SOURCE, source);
+        updateSize(FIELD_SOURCE, source, previousSource);
     }
 
     public void addField(final String key, final Object value) {
@@ -524,10 +525,11 @@ public class Message implements Messages {
      */
     public void addStream(Stream stream) {
         indexSets.add(stream.getIndexSet());
-        streams.add(stream);
-        sizeCounter.inc(8);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("[Message size update][{}] stream added: {}", getId(), sizeCounter.getCount());
+        if (streams.add(stream)) {
+            sizeCounter.inc(8);
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("[Message size update][{}] stream added: {}", getId(), sizeCounter.getCount());
+            }
         }
     }
 
@@ -548,15 +550,15 @@ public class Message implements Messages {
      */
     public boolean removeStream(Stream stream) {
         final boolean removed = streams.remove(stream);
-        sizeCounter.dec(8);
-        if (LOG.isTraceEnabled()) {
-            LOG.trace("[Message size update][{}] stream removed: {}", getId(), sizeCounter.getCount());
-        }
 
         if (removed) {
             indexSets.clear();
             for (Stream s : streams) {
                 indexSets.add(s.getIndexSet());
+            }
+            sizeCounter.dec(8);
+            if (LOG.isTraceEnabled()) {
+                LOG.trace("[Message size update][{}] stream removed: {}", getId(), sizeCounter.getCount());
             }
         }
 
