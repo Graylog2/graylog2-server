@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Singleton
 public class DefaultStreamProvider implements Provider<Stream> {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultStreamProvider.class);
+    private static final Object lock  = new Object();
 
     private final StreamService service;
 
@@ -49,7 +50,7 @@ public class DefaultStreamProvider implements Provider<Stream> {
             return defaultStream;
         }
 
-        synchronized (this) {
+        synchronized (lock) {
             defaultStream = sharedInstance.get();
             if (defaultStream != null) {
                 return defaultStream;
