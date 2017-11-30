@@ -39,17 +39,13 @@ const IndexSetsComponent = React.createClass({
   },
 
   _onSetDefault(indexSet) {
-    return (e) => {
-      e.preventDefault();
-
+    return () => {
       IndexSetsActions.setDefault(indexSet).then(() => this.loadData(this.currentPageNo, this.currentPageSize));
     };
   },
 
   _onDelete(indexSet) {
-    return (_, e) => {
-      e.preventDefault();
-
+    return () => {
       this.refs[`index-set-deletion-form-${indexSet.id}`].open();
     };
   },
@@ -101,7 +97,7 @@ const IndexSetsComponent = React.createClass({
     let statsString;
     const stats = this.state.indexSetStats[indexSet.id];
     if (stats) {
-      statsString = this._formatStatsString(stats)
+      statsString = this._formatStatsString(stats);
     }
 
     return (
@@ -115,6 +111,9 @@ const IndexSetsComponent = React.createClass({
   },
 
   _formatStatsString(stats) {
+    if (!stats) {
+      return 'N/A';
+    }
     const indices = `${NumberUtils.formatNumber(stats.indices)} ${StringUtils.pluralize(stats.indices, 'index', 'indices')}`;
     const documents = `${NumberUtils.formatNumber(stats.documents)} ${StringUtils.pluralize(stats.documents, 'document', 'documents')}`;
     const size = NumberUtils.formatBytes(stats.size);
@@ -135,9 +134,11 @@ const IndexSetsComponent = React.createClass({
       <div>
         <h4><strong>Total:</strong> {this._formatStatsString(this.state.globalIndexSetStats)}</h4>
 
-        <hr style={{ marginBottom: "0" }} />
+        <hr style={{ marginBottom: 0 }} />
 
-        <PaginatedList pageSize={this.PAGE_SIZE} totalItems={this.state.indexSetsCount} onChange={this._onChangePaginatedList}
+        <PaginatedList pageSize={this.PAGE_SIZE}
+                       totalItems={this.state.indexSetsCount}
+                       onChange={this._onChangePaginatedList}
                        showPageSizeSelect={false}>
           <EntityList bsNoItemsStyle="info"
                       noItemsText="There are no index sets to display"
