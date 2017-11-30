@@ -1,44 +1,35 @@
 # Graylog Web Interface
 
+## Requirements
+- [Node.js](https://nodejs.org/), at this time we use v8.9.1
+- [Yarn](https://yarnpkg.com/)
+
+**Note:** NPM v5 changed completely the way it builds local modules, breaking the Graylog web interface build. Please use Yarn instead of NPM v5.
+
 ## Development Setup
 
-* Install [node.js](http://nodejs.org/) and npm.
-* Run `npm install`
-* Run `npm start` (if you don't want to include plugins in the build while developing, simply run `disable_plugins=true npm start`) 
-* Open http://localhost:8080
+* Install the requirements listed above
+* Run `yarn install`
+* Run `yarn start` to do a development build. You can exclude any Graylog frontend plugins from the build by running `disable_plugins=true npm start` instead
+* Open http://localhost:8080 in your browser to access the Graylog web interface
 
-The `npm start` (or `disable_plugins=true npm start`) command will run the `webpack-dev-server`, which allows in-browser hot reloading.
-In order to make switching between different branches faster, we use a script to store all `node_modules` folders
-into `.node_cache` and then symlink the folder for the current branch to `node_modules`.
+The `yarn start` (or `disable_plugins=true yarn start`) command will run an [Express](http://expressjs.com) web server which is configured to do a full page reload in your browser every time that you save a file. This ensures that you will always use the latest version of your code.
 
-When using IntelliJ or WebStorm, be sure to enable `JSX harmony` (available in IntelliJ 14 and WebStorm 9)
-as JavaScript language version to properly support react templates.
+We mainly develop using IntelliJ or WebStorm. If you also decide to use them to work in Graylog, be sure to enable `React JSX` as Javascript language version (called `JSX harmony` in previous versions) in order to support the JSX language extension. This setting is available since IntelliJ 14 and WebStorm 9.
 
-You might get an error message during `npm install` from `gyp` because the installed (default) Python version is too recent (sic!):
+## Update Javascript dependencies
 
-```
-gyp ERR! stack Error: Python executable "python" is v3.4.2, which is not supported by gyp.                                                                                                                 
-```
+1. Update a single dependency
 
-In this case just set the correct (installed!) Python binary before running `npm install`:
+    * Run `yarn upgrade <package>@<version>`
+    * Commit any changes in both `package.json` and `yarn.lock` files
+    * Do any changes required by the upgrade and test those changes
 
-```
-npm config set python python2.7
-```
+1. Update many dependencies
 
+    * It may be dangerous updating many dependencies at the same time, so be sure you checked the upgrade notes of all modules before getting started. Yarn provides some options for doing this:
+        * You can pass all packages you want to upgrade to Yarn: `yarn upgrade <package1> <package2>...`
+        * Yarn also supports upgrading packages matching a pattern, so you can execute `yarn upgrade --pattern <pattern>`
+        * You can execute `yarn upgrade` if you really want to upgrade all packages
+    * After doing the upgrade, remember to commit both the `package.json` and `yarn.lock` files
 
-#### Update Javascript dependencies
-
-a. Update a single dependency
-
-* Update `package.json` file with the new dependency
-* `npm update <npm-package>`
-* `npm shrinkwrap --dev` to save the whole dependency tree into the `npm-shrinkwrap.json` file
-
-b. Update devDependencies
-
-* `npm shinkwrap` to keep the dependency tree (without devDependencies) into `npm-shrinkwrap.json`
-* Update `package.json` file with the new devDependencies
-* `npm install`
-* Do more work with the new devDependencies
-* `npm shrinkwrap --dev` to export the whole dependency tree with the new devDependencies into `npm-shrinkwrap.json`
