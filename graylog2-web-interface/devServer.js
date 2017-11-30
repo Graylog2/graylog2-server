@@ -8,7 +8,7 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const webpackConfig = require('./webpack.bundled');
 
-const DEFAULT_PORT = 8081;
+const DEFAULT_PORT = 8080;
 
 const app = express();
 const vendorConfig = webpackConfig[0];
