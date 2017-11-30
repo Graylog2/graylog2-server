@@ -1787,7 +1787,8 @@
       "node_modules/moment/locale ../../^/.//.*$": 944,
       "node_modules/react/lib/createClass.js": 945,
       "node_modules/react/lib/getNextDebugID.js": 946,
-      "node_modules/react/lib/lowPriorityWarning.js": 947
+      "node_modules/react/lib/lowPriorityWarning.js": 947,
+      "node_modules/moment/locale ../../../../../../../^/.//.*$": 948
     },
     "usedIds": {
       "0": 0,
@@ -2738,6 +2739,7 @@
       "945": 945,
       "946": 946,
       "947": 947,
+      "948": 948,
       "1371": 1371,
       "1372": 1372,
       "1373": 1373,
