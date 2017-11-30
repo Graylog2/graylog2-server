@@ -24,18 +24,15 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.joda.time.DateTime;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import static java.util.Objects.requireNonNull;
-import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.DELETE;
-import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.GET;
-import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.POST;
-import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.PUT;
+import static org.graylog2.inputs.random.generators.FakeHttpRawMessageGenerator.GeneratorState.Method.*;
 
 public class FakeHttpRawMessageGenerator {
-    private static final Random RANDOM = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
     private static final int MAX_WEIGHT = 50;
 
     private static final List<Resource> GET_RESOURCES = ImmutableList.of(
@@ -60,7 +57,7 @@ public class FakeHttpRawMessageGenerator {
         this.source = requireNonNull(source);
     }
 
-    public static int rateDeviation(int val, int maxDeviation, Random rand) {
+    public static int rateDeviation(int val, int maxDeviation, SecureRandom rand) {
         final int deviationPercent = rand.nextInt(maxDeviation);
         final double x = val / 100.0 * deviationPercent;
 
@@ -173,7 +170,7 @@ public class FakeHttpRawMessageGenerator {
         return msg;
     }
 
-    public static Message simulateGET(GeneratorState state, Random rand) {
+    public static Message simulateGET(GeneratorState state, SecureRandom rand) {
         int msBase = 50;
         int deviation = 30;
         int code = state.isSuccessful ? 200 : 500;
@@ -195,7 +192,7 @@ public class FakeHttpRawMessageGenerator {
     }
 
 
-    private static Message simulatePOST(GeneratorState state, Random rand) {
+    private static Message simulatePOST(GeneratorState state, SecureRandom rand) {
         int msBase = 150;
         int deviation = 20;
         int code = state.isSuccessful ? 201 : 500;
@@ -216,7 +213,7 @@ public class FakeHttpRawMessageGenerator {
         return createMessage(state, code, resource, tookMs, ingestTime);
     }
 
-    private static Message simulatePUT(GeneratorState state, Random rand) {
+    private static Message simulatePUT(GeneratorState state, SecureRandom rand) {
         int msBase = 100;
         int deviation = 30;
         int code = state.isSuccessful ? 200 : 500;
@@ -237,7 +234,7 @@ public class FakeHttpRawMessageGenerator {
         return createMessage(state, code, resource, tookMs, ingestTime);
     }
 
-    private static Message simulateDELETE(GeneratorState state, Random rand) {
+    private static Message simulateDELETE(GeneratorState state, SecureRandom rand) {
         int msBase = 75;
         int deviation = 40;
         int code = state.isSuccessful ? 204 : 500;

@@ -40,6 +40,7 @@ public class Periodicals {
     private final Map<Periodical, ScheduledFuture> futures;
     private final ScheduledExecutorService scheduler;
     private final ScheduledExecutorService daemonScheduler;
+    private final Object lock = new Object();
 
     public Periodicals(ScheduledExecutorService scheduler, ScheduledExecutorService daemonScheduler) {
         this.scheduler = scheduler;
@@ -48,33 +49,35 @@ public class Periodicals {
         this.futures = Maps.newHashMap();
     }
 
-    public synchronized void registerAndStart(Periodical periodical) {
-        if (periodical.runsForever()) {
-            LOG.info("Starting [{}] periodical, running forever.", periodical.getClass().getCanonicalName());
+    public void registerAndStart(Periodical periodical) {
+        synchronized (lock) {
+            if (periodical.runsForever()) {
+                LOG.info("Starting [{}] periodical, running forever.", periodical.getClass().getCanonicalName());
 
-            for (int i = 0; i < periodical.getParallelism(); i++) {
-                Thread t = new Thread(periodical);
-                t.setDaemon(periodical.isDaemon());
-                t.setName("periodical-" + periodical.getClass().getCanonicalName() + "-" + i);
-                t.setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG));
-                t.start();
-            }
-        } else {
-            LOG.info(
+                for (int i = 0; i < periodical.getParallelism(); i++) {
+                    Thread t = new Thread(periodical);
+                    t.setDaemon(periodical.isDaemon());
+                    t.setName("periodical-" + periodical.getClass().getCanonicalName() + "-" + i);
+                    t.setUncaughtExceptionHandler(new Tools.LogUncaughtExceptionHandler(LOG));
+                    t.start();
+                }
+            } else {
+                LOG.info(
                     "Starting [{}] periodical in [{}s], polling every [{}s].",
                     periodical.getClass().getCanonicalName(),
                     periodical.getInitialDelaySeconds(),
                     periodical.getPeriodSeconds());
 
-            ScheduledExecutorService scheduler = periodical.isDaemon() ? this.daemonScheduler : this.scheduler;
-            ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
+                ScheduledExecutorService scheduler = periodical.isDaemon() ? this.daemonScheduler : this.scheduler;
+                ScheduledFuture<?> future = scheduler.scheduleAtFixedRate(
                     periodical,
                     periodical.getInitialDelaySeconds(),
                     periodical.getPeriodSeconds(),
                     TimeUnit.SECONDS
-            );
+                );
 
-            futures.put(periodical, future);
+                futures.put(periodical, future);
+            }
         }
 
         periodicals.add(periodical);

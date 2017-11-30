@@ -28,6 +28,7 @@ import javax.inject.Singleton;
 @Singleton
 public class SigarProcessProbe implements ProcessProbe {
     private final SigarService sigarService;
+    private final Object lock = new Object();
 
     @Inject
     public SigarProcessProbe(SigarService sigarService) {
@@ -35,7 +36,7 @@ public class SigarProcessProbe implements ProcessProbe {
     }
 
     @Override
-    public synchronized ProcessStats processStats() {
+    public ProcessStats processStats() {
         final Sigar sigar = sigarService.sigar();
 
         final long pid = sigar.getPid();
@@ -43,26 +44,30 @@ public class SigarProcessProbe implements ProcessProbe {
         final long maxFileDescriptorCount = JmxProcessProbe.getMaxFileDescriptorCount();
 
         ProcessStats.Cpu cpu;
-        try {
-            ProcCpu procCpu = sigar.getProcCpu(pid);
-            cpu = ProcessStats.Cpu.create(
+        ProcessStats.Memory memory;
+
+        synchronized (lock){
+
+            try {
+                ProcCpu procCpu = sigar.getProcCpu(pid);
+                cpu = ProcessStats.Cpu.create(
                     (short) (procCpu.getPercent() * 100),
                     procCpu.getSys(),
                     procCpu.getUser(),
                     procCpu.getTotal());
-        } catch (SigarException e) {
-            cpu = null;
-        }
+            } catch (SigarException e) {
+                cpu = null;
+            }
 
-        ProcessStats.Memory memory;
-        try {
-            ProcMem mem = sigar.getProcMem(sigar.getPid());
-            memory = ProcessStats.Memory.create(
+            try {
+                ProcMem mem = sigar.getProcMem(sigar.getPid());
+                memory = ProcessStats.Memory.create(
                     mem.getSize(),
                     mem.getResident(),
                     mem.getShare());
-        } catch (SigarException e) {
-            memory = null;
+            } catch (SigarException e) {
+                memory = null;
+            }
         }
 
         return ProcessStats.create(pid, openFileDescriptors, maxFileDescriptorCount, cpu, memory);

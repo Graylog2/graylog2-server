@@ -760,7 +760,7 @@ public class KafkaJournal extends AbstractIdleService implements Journal {
             if (committedOffset.get() == DEFAULT_COMMITTED_OFFSET) {
                 return;
             }
-            try (final FileOutputStream fos = new FileOutputStream(committedReadOffsetFile)) {
+            try (FileOutputStream fos = new FileOutputStream(committedReadOffsetFile)) {
                 fos.write(String.valueOf(committedOffset.get()).getBytes(StandardCharsets.UTF_8));
                 // flush stream
                 fos.flush();

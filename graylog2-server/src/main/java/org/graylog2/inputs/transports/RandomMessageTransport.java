@@ -36,7 +36,7 @@ import org.graylog2.plugin.journal.RawMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
 import static com.google.common.util.concurrent.Uninterruptibles.sleepUninterruptibly;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
@@ -49,7 +49,7 @@ public class RandomMessageTransport extends GeneratorTransport {
     public static final String CK_SLEEP = "sleep";
     public static final String CK_SLEEP_DEVIATION_PERCENT = "sleep_deviation";
 
-    private final Random rand = new Random();
+    private final SecureRandom rand = new SecureRandom();
     private final FakeHttpRawMessageGenerator generator;
     private final int sleepMs;
     private final int maxSleepDeviation;
