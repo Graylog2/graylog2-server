@@ -25,8 +25,3 @@ const manifest = new PluginManifest(packageJson, {
 });
 
 PluginStore.register(manifest);
-
-if (module.hot) {
-  module.hot.accept();
-  module.hot.dispose(() => PluginStore.unregister(manifest));
-}

@@ -12,8 +12,7 @@
   "scripts": {
     "docs:build": "styleguidist build",
     "docs:server": "styleguidist server",
-    "start": "webpack-dev-server --config webpack.bundled.js --history-api-fallback --hot --inline",
-    "start-nohmr": "node devServer.js",
+    "start": "node devServer.js",
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
     "lint": "eslint --ext js,jsx src",
     "test": "jest"
@@ -118,7 +117,6 @@
     "less": "^2.5.3",
     "less-loader": "^4.0.5",
     "phantomjs-prebuilt": ">=1.9",
-    "react-hot-loader": "^3.0.0-beta.6",
     "react-proxy-loader": "^0.3.4",
     "react-styleguidist": "^6.0.33",
     "react-test-renderer": "^15.6.1",

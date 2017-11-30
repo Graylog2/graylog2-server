@@ -44,7 +44,7 @@ pluginConfigs.filter(isNotDependency).forEach((pluginConfig) => {
 });
 
 // We need to inject webpack-hot-middleware to all entries, ensuring the app is able to reload on changes.
-if (TARGET === 'start-nohmr') {
+if (TARGET === 'start') {
   const hmrEntries = {};
   const webpackHotMiddlewareEntry = 'webpack-hot-middleware/client?reload=true';
 

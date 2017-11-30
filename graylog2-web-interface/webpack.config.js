@@ -93,39 +93,6 @@ const webpackConfig = {
 };
 
 if (TARGET === 'start') {
-  console.error('Running in development mode');
-  module.exports = merge(webpackConfig, {
-    entry: {
-      reacthot: 'react-hot-loader/patch',
-    },
-    devtool: 'eval',
-    devServer: {
-      historyApiFallback: true,
-      hot: true,
-      inline: true,
-      lazy: false,
-      watchOptions: {
-        ignored: /node_modules/,
-      },
-    },
-    output: {
-      path: BUILD_PATH,
-      filename: '[name].js',
-      publicPath: '/',
-      hotUpdateChunkFilename: '[id].hot-update.js',
-      hotUpdateMainFilename: 'hot-update.json',
-    },
-    plugins: [
-      new webpack.NamedModulesPlugin(),
-      new webpack.DefinePlugin({
-        DEVELOPMENT: true,
-        REPLACE_MODULES: true,
-      }),
-    ],
-  });
-}
-
-if (TARGET === 'start-nohmr') {
   console.error('Running in development (no HMR) mode');
   module.exports = merge(webpackConfig, {
     devtool: 'eval',
@@ -137,7 +104,6 @@ if (TARGET === 'start-nohmr') {
     plugins: [
       new webpack.DefinePlugin({
         DEVELOPMENT: true,
-        REPLACE_MODULES: false, // We don't intend to use HMR but for reloading the browser window
       }),
       new CopyWebpackPlugin([{ from: 'config.js' }]),
       new webpack.HotModuleReplacementPlugin(),
@@ -152,7 +118,6 @@ if (TARGET === 'build') {
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
-        REPLACE_MODULES: false, // Do not use HMR in production
       }),
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
