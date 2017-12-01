@@ -16,11 +16,12 @@ process.env.BABEL_ENV = TARGET;
 const BABELRC = path.resolve(ROOT_PATH, '.babelrc');
 const BABELOPTIONS = {
   cacheDirectory: 'cache',
-  'extends': BABELRC,
+  extends: BABELRC,
 };
 
 const BABELLOADER = { loader: 'babel-loader', options: BABELOPTIONS };
 
+// eslint-disable-next-line import/no-dynamic-require
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 
 const webpackConfig = {
@@ -41,16 +42,19 @@ const webpackConfig = {
       { test: /\.ts$/, use: [BABELLOADER, { loader: 'ts-loader' }], exclude: /node_modules|\.node_cache/ },
       { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, use: 'file-loader' },
       { test: /\.png$/, use: 'url-loader' },
-      { test: /bootstrap\.less$/, use: [
-        'style-loader',
-        'css-loader',
-        {
-          loader: 'less-loader',
-          options: {
-            modifyVars: BOOTSTRAPVARS,
+      {
+        test: /bootstrap\.less$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'less-loader',
+            options: {
+              modifyVars: BOOTSTRAPVARS,
+            },
           },
-        },
-      ] },
+        ],
+      },
       { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'], exclude: /bootstrap\.less$/ },
       { test: /\.css$/, use: ['style-loader', 'css-loader'] },
     ],
@@ -141,7 +145,7 @@ if (TARGET === 'test') {
   module.exports = merge(webpackConfig, {
     module: {
       rules: [
-        { test: /\.js(x)?$/, enforce: 'pre', loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
+        { test: /\.js(x)?$/, enforce: 'pre', loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ },
       ],
     },
   });

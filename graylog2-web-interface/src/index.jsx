@@ -1,6 +1,5 @@
 // We need to set the app prefix before doing anything else, so it applies to styles too.
-// eslint-disable-next-line no-unused-vars
-import webpackEntry from 'webpack-entry';
+import 'webpack-entry';
 
 import React from 'react';
 import ReactDOM from 'react-dom';
