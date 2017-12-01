@@ -311,10 +311,6 @@ const ApiRoutes = {
       return { url: this._buildUrl(url, queryString) };
     },
   },
-  UsageStatsApiController: {
-    pluginEnabled: () => { return { url: '/plugins/org.graylog.plugins.usagestatistics/config' }; },
-    setOptOutState: () => { return { url: '/plugins/org.graylog.plugins.usagestatistics/opt-out' }; },
-  },
   UsersApiController: {
     changePassword: (username) => { return { url: `/users/${username}/password` }; },
     create: () => { return { url: '/users' }; },
