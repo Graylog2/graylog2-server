@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import { Button } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
@@ -14,7 +13,6 @@ const InputDropdown = React.createClass({
     onLoadMessage: PropTypes.func,
     disabled: PropTypes.bool,
   },
-  mixins: [LinkedStateMixin],
   getInitialState() {
     return {
       selectedInput: this.props.preselectedInputId || this.PLACEHOLDER,
@@ -37,7 +35,11 @@ const InputDropdown = React.createClass({
       </Input>
     );
   },
+  onSelectedInputChange(event) {
+    this.setState({ selectedInput: event.target.value });
+  },
   render() {
+    const { selectedInput } = this.state;
     // When an input is pre-selected, show a static dropdown
     if (this.props.inputs && this.props.preselectedInputId) {
       return (
@@ -45,7 +47,7 @@ const InputDropdown = React.createClass({
           {this._formatStaticInput(this.props.inputs.get(this.props.preselectedInputId))}
 
           <Button bsStyle="info"
-                  disabled={this.state.selectedInput === this.PLACEHOLDER}
+                  disabled={selectedInput === this.PLACEHOLDER}
                   onClick={this._onLoadMessage}>
             {this.props.title}
           </Button>
@@ -60,14 +62,15 @@ const InputDropdown = React.createClass({
           <Input id="placeholder-select"
                  type="select"
                  style={{ float: 'left', width: 400, marginRight: 10 }}
-                 valueLink={this.linkState('selectedInput')}
+                 value={selectedInput}
+                 onChange={this.onSelectedInputChange}
                  placeholder={this.PLACEHOLDER}>
             <option value={this.PLACEHOLDER}>Select an input</option>
             {inputs.toArray()}
           </Input>
 
           <Button bsStyle="info"
-                  disabled={this.props.disabled || this.state.selectedInput === this.PLACEHOLDER}
+                  disabled={this.props.disabled || selectedInput === this.PLACEHOLDER}
                   onClick={this._onLoadMessage}>
             {this.props.title}
           </Button>
