@@ -4,7 +4,6 @@ import Reflux from 'reflux';
 
 import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
-import UsageStatsOptOut from 'components/usagestats/UsageStatsOptOut';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -32,9 +31,6 @@ const GettingStartedPage = React.createClass({
     return (
       <DocumentTitle title="Getting started">
         <div>
-          <IfPermitted permissions="clusterconfigentry:edit:org.graylog.plugins.usagestatistics.UsageStatsOptOutState">
-            <UsageStatsOptOut />
-          </IfPermitted>
           <GettingStarted clusterId={this.state.system.cluster_id}
                           masterOs={this.state.system.operating_system}
                           masterVersion={this.state.system.version}
