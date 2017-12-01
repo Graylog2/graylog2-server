@@ -15,6 +15,8 @@
 
 The `yarn start` (or `disable_plugins=true yarn start`) command will run an [Express](http://expressjs.com) web server which is configured to do a full page reload in your browser every time that you save a file. This ensures that you will always use the latest version of your code.
 
+You can start the development server in any other port that you like. To do so, use the `--port=<port>` option, e.g. `yarn start --port=8000` will start the development server in port 8000 instead of the default 8080. The server will also pick a random port if the port is already taken, so you don't need to worry if another process is already using that port.
+
 We mainly develop using IntelliJ or WebStorm. If you also decide to use them to work in Graylog, enable `React JSX` as Javascript language version to support the JSX language extension. This setting was called `JSX harmony` before, and it is available in one or the other form since IntelliJ 14 and WebStorm 9.
 
 ## Update Javascript dependencies
