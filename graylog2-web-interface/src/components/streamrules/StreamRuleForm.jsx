@@ -30,6 +30,7 @@ const StreamRuleForm = React.createClass({
   },
   FIELD_PRESENCE_RULE_TYPE: 5,
   ALWAYS_MATCH_RULE_TYPE: 7,
+  modal: undefined,
   _resetValues() {
     this.setState(this.props.streamRule);
   },
@@ -41,7 +42,7 @@ const StreamRuleForm = React.createClass({
       this.state.value = '';
     }
     this.props.onSubmit(this.props.streamRule.id, this.state);
-    this.refs.modal.close();
+    this.modal.close();
   },
   _formatStreamRuleType(streamRuleType) {
     return (
@@ -51,23 +52,23 @@ const StreamRuleForm = React.createClass({
   },
   open() {
     this._resetValues();
-    this.refs.modal.open();
+    this.modal.open();
   },
   close() {
-    this.refs.modal.close();
+    this.modal.close();
   },
   render() {
     const streamRuleTypes = this.props.streamRuleTypes.map(this._formatStreamRuleType);
     const fieldBox = (String(this.state.type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
-      <TypeAheadFieldInput id="field-input" ref="fieldInput" type="text" required label="Field" valueLink={this.linkState('field')} autoFocus /> : '');
+      <TypeAheadFieldInput id="field-input" type="text" required label="Field" valueLink={this.linkState('field')} autoFocus /> : '');
     const valueBox = (String(this.state.type) !== String(this.FIELD_PRESENCE_RULE_TYPE) && String(this.state.type) !== String(this.ALWAYS_MATCH_RULE_TYPE) ?
       <Input id="Value" type="text" required label="Value" name="Value" valueLink={this.linkState('value')} /> : '');
     return (
-      <BootstrapModalForm ref="modal"
+      <BootstrapModalForm ref={(c) => { this.modal = c; }}
                           title={this.props.title}
                           onSubmitForm={this._onSubmit}
                           submitButtonText="Save"
-                          formProps={{id: 'StreamRuleForm'}}>
+                          formProps={{ id: 'StreamRuleForm' }}>
         <div>
           <Col md={8}>
             {fieldBox}
