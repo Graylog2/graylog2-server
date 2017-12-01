@@ -44,8 +44,11 @@ const InputDropdown = React.createClass({
         <div>
           {this._formatStaticInput(this.props.inputs.get(this.props.preselectedInputId))}
 
-          <Button bsStyle="info" disabled={this.state.selectedInput === this.PLACEHOLDER}
-             onClick={this._onLoadMessage}>{this.props.title}</Button>
+          <Button bsStyle="info"
+                  disabled={this.state.selectedInput === this.PLACEHOLDER}
+                  onClick={this._onLoadMessage}>
+            {this.props.title}
+          </Button>
         </div>
       );
     }
@@ -54,14 +57,20 @@ const InputDropdown = React.createClass({
       const inputs = this.props.inputs.sort(this._sortByTitle).map(this._formatInput);
       return (
         <div>
-          <Input id="placeholder-select" type="select" style={{ float: 'left', width: 400, marginRight: 10 }}
-                 valueLink={this.linkState('selectedInput')} placeholder={this.PLACEHOLDER}>
+          <Input id="placeholder-select"
+                 type="select"
+                 style={{ float: 'left', width: 400, marginRight: 10 }}
+                 valueLink={this.linkState('selectedInput')}
+                 placeholder={this.PLACEHOLDER}>
             <option value={this.PLACEHOLDER}>Select an input</option>
             {inputs.toArray()}
           </Input>
 
-          <Button bsStyle="info" disabled={this.props.disabled || this.state.selectedInput === this.PLACEHOLDER}
-             onClick={this._onLoadMessage}>{this.props.title}</Button>
+          <Button bsStyle="info"
+                  disabled={this.props.disabled || this.state.selectedInput === this.PLACEHOLDER}
+                  onClick={this._onLoadMessage}>
+            {this.props.title}
+          </Button>
         </div>
       );
     }
