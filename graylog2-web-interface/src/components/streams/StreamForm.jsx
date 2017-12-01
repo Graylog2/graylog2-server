@@ -88,12 +88,16 @@ const StreamForm = React.createClass({
     let indexSetSelect;
     if (this.props.indexSets) {
       indexSetSelect = (
-        <div className="form-group">
-          <label>Index Set</label>
-          <Select placeholder="Select index set" options={this._formatSelectOptions()} matchProp="label"
-                  onChange={this._onIndexSetSelect} value={this.state.index_set_id} />
-          <p className="help-block">Messages that match this stream will be written to the configured index set.</p>
-        </div>
+        <Input id="index-set-selector"
+               label="Index Set"
+               help="Messages that match this stream will be written to the configured index set.">
+          <Select inputProps={{ id: 'index-set-selector' }}
+                  placeholder="Select index set"
+                  options={this._formatSelectOptions()}
+                  matchProp="label"
+                  onChange={this._onIndexSetSelect}
+                  value={this.state.index_set_id} />
+        </Input>
       );
     } else {
       indexSetSelect = <Spinner>Loading index sets...</Spinner>;
