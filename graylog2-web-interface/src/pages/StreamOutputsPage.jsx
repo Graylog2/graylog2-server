@@ -13,7 +13,7 @@ import { DocumentTitle, Spinner } from 'components/common';
 import Routes from 'routing/Routes';
 
 const StreamOutputsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser')],
   getInitialState() {
     return { stream: undefined };
   },

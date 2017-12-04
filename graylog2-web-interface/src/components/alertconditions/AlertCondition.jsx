@@ -15,7 +15,7 @@ const AlertCondition = React.createClass({
     alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object,
   },
-  mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
 
   _onDelete() {
     if (window.confirm('Really delete alert condition?')) {

@@ -22,7 +22,7 @@ const AppFacade = React.createClass({
   mixins: [
     Reflux.connect(SessionStore, 'session'),
     Reflux.connect(ServerAvailabilityStore, 'serverAvailability'),
-    Reflux.connect(CurrentUserStore),
+    Reflux.connect(CurrentUserStore, 'currentUser'),
   ],
 
   componentDidMount() {

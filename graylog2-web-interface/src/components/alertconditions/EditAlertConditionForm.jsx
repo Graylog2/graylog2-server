@@ -17,7 +17,7 @@ const EditAlertConditionForm = React.createClass({
     stream: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
 
   _onEdit() {
     this.refs.updateForm.open();

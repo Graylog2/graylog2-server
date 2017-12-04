@@ -19,7 +19,7 @@ const CurrentUserStore = Reflux.createStore({
   },
 
   getInitialState() {
-    return { currentUser: this.currentUser };
+    return this.currentUser;
   },
 
   get() {
@@ -32,7 +32,7 @@ const CurrentUserStore = Reflux.createStore({
       this.update(username);
     } else {
       this.currentUser = undefined;
-      this.trigger({ currentUser: this.currentUser });
+      this.trigger(this.currentUser);
     }
   },
 
@@ -46,7 +46,7 @@ const CurrentUserStore = Reflux.createStore({
     return fetch('GET', URLUtils.qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url))
       .then((resp) => {
         this.currentUser = resp;
-        this.trigger({ currentUser: this.currentUser });
+        this.trigger(this.currentUser);
       });
   },
 });

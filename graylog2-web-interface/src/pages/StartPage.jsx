@@ -15,7 +15,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 const StartPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
   getInitialState() {
     return {
       gettingStarted: undefined,

@@ -28,7 +28,7 @@ const UserForm = React.createClass({
   propTypes: {
     user: PropTypes.object.isRequired,
   },
-  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore), Reflux.connect(DashboardsStore)],
+  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.connect(DashboardsStore)],
   getInitialState() {
     return {
       streams: undefined,

@@ -27,7 +27,7 @@ const AuthenticationComponent = React.createClass({
     children: PropTypes.element,
   },
 
-  mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
 
   componentDidMount() {
     AuthenticationActions.load();

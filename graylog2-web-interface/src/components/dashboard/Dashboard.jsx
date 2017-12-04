@@ -21,7 +21,7 @@ const Dashboard = React.createClass({
     dashboard: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string),
   },
-  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
+  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore, 'currentUser')],
   _setStartpage() {
     StartpageStore.set(this.state.currentUser.username, 'dashboard', this.props.dashboard.id);
   },

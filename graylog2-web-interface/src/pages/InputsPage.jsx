@@ -9,7 +9,7 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import { InputsList } from 'components/inputs';
 
 const InputsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser')],
   componentDidMount() {
     this.interval = setInterval(InputStatesStore.list, 2000);
   },

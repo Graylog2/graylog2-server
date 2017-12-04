@@ -15,7 +15,7 @@ const StreamEditPage = React.createClass({
     params: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser')],
 
   componentDidMount() {
     StreamsStore.get(this.props.params.streamId, (stream) => {

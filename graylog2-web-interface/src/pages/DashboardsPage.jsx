@@ -6,7 +6,7 @@ import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const DashboardsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser')],
   render() {
     return (
       <DocumentTitle title="Dashboards">

@@ -31,7 +31,7 @@ const ShowDashboardPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.connect(FocusStore), PermissionsMixin],
 
   getInitialState() {
     return {

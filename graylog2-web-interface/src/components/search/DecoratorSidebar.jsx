@@ -24,7 +24,7 @@ const DecoratorSidebar = React.createClass({
     stream: PropTypes.string,
     maximumHeight: PropTypes.number,
   },
-  mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
   getInitialState() {
     return {
       maxDecoratorsHeight: 1000,

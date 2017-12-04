@@ -11,7 +11,7 @@ const SystemStore = StoreProvider.getStore('System');
 import { Spinner, Timestamp } from 'components/common';
 
 const TimesList = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(SystemStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.connect(SystemStore)],
   getInitialState() {
     return { time: moment() };
   },

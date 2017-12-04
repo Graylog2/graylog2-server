@@ -20,7 +20,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
 const StreamsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(IndexSetsStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.connect(IndexSetsStore)],
   getInitialState() {
     return {
       indexSets: undefined,

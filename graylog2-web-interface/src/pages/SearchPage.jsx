@@ -28,7 +28,7 @@ const SearchPage = React.createClass({
   mixins: [
     Reflux.connect(NodesStore),
     Reflux.connect(MessageFieldsStore),
-    Reflux.connect(CurrentUserStore),
+    Reflux.connect(CurrentUserStore, 'currentUser'),
     Reflux.listenTo(InputsStore, '_formatInputs'),
     Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'),
     Reflux.listenTo(DecoratorsStore, '_refreshDataFromDecoratorStore', '_refreshDataFromDecoratorStore'),

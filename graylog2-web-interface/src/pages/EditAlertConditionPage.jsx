@@ -21,7 +21,7 @@ const EditAlertConditionPage = React.createClass({
     params: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(AlertConditionsStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.connect(AlertConditionsStore)],
 
   getInitialState() {
     return {

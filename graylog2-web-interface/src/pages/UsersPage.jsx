@@ -13,7 +13,7 @@ import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import UserList from 'components/users/UserList';
 
 const UsersPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
   render() {
     return (
       <DocumentTitle title="Users">

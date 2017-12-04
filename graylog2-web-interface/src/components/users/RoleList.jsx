@@ -12,7 +12,7 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 import { DataTable } from 'components/common';
 
 const RoleList = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
   propTypes: {
     roles: PropTypes.instanceOf(Immutable.Set).isRequired,
     showEditRole: PropTypes.func.isRequired,

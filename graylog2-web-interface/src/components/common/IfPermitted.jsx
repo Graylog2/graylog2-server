@@ -23,7 +23,7 @@ const IfPermitted = React.createClass({
     /** This flag controls which permissions the user must fulfill: (all, at least one). */
     anyPermissions: PropTypes.bool,
   },
-  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
   getDefaultProps() {
     return {
       anyPermissions: false,

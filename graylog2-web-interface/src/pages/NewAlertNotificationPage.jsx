@@ -12,7 +12,7 @@ import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const NewAlertNotificationPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser')],
   render() {
     return (
       <DocumentTitle title="New alert notification">

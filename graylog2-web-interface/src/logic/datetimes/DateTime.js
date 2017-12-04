@@ -1,10 +1,11 @@
 import moment from 'moment-timezone';
 import AppConfig from 'util/AppConfig';
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 let currentUser = CurrentUserStore.get();
-CurrentUserStore.listen(state => currentUser = state.currentUser);
+CurrentUserStore.listen((state) => { currentUser = state; });
 
 class DateTime {
   static get Formats() {

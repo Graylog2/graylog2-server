@@ -21,7 +21,7 @@ const NodeInputsPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
   componentDidMount() {
     this.interval = setInterval(InputStatesStore.list, 2000);
   },

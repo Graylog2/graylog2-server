@@ -14,7 +14,7 @@ import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const NewAlertConditionPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser')],
   render() {
     return (
       <DocumentTitle title="New alert condition">

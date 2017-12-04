@@ -8,7 +8,7 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import { NodesList } from 'components/nodes';
 
 const NodesPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser')],
   render() {
     return (
       <DocumentTitle title="Nodes">

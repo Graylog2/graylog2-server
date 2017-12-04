@@ -21,7 +21,7 @@ const AlertNotification = React.createClass({
     onNotificationUpdate: PropTypes.func,
     onNotificationDelete: PropTypes.func,
   },
-  mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
 
   getInitialState() {
     return {

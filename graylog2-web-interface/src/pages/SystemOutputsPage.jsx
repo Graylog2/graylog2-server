@@ -8,7 +8,7 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 
 const SystemOutputsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser')],
   render() {
     return (
       <DocumentTitle title="Outputs">

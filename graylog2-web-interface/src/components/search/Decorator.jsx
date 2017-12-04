@@ -23,7 +23,7 @@ const Decorator = React.createClass({
     decorator: PropTypes.object.isRequired,
     typeDefinition: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
   componentDidMount() {
     DecoratorsActions.available();
   },
