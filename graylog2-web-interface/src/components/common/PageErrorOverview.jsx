@@ -4,8 +4,14 @@ import { Col, Jumbotron, Row } from 'react-bootstrap';
 
 import style from '!style/useable!css!pages/NotFoundPage.css';
 
+/**
+ * Component that renders a page when there was an error and certain information can't be fetched. Use it
+ * only when the page would make no sense if the information is not available (i.e. a node page where we
+ * can't reach the node).
+ */
 const PageErrorOverview = React.createClass({
   propTypes: {
+    /** Array of errors that prevented the original page to load. */
     errors: PropTypes.array.isRequired,
   },
   componentDidMount() {
@@ -17,7 +23,7 @@ const PageErrorOverview = React.createClass({
   },
 
   _formatErrors(errors) {
-    const formattedErrors = errors ? errors.map(error => <li>{error.toString()}</li>) : [];
+    const formattedErrors = errors ? errors.map(error => <li key={`key-${error.toString()}`}>{error.toString()}</li>) : [];
     return (
       <ul>
         {formattedErrors}

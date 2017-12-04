@@ -3,21 +3,50 @@ import React from 'react';
 import { Button } from 'react-bootstrap';
 import { Spinner } from 'components/common';
 
+/**
+ * Component that renders a customizable search form. The component
+ * supports a loading state, adding children next to the form, and
+ * styles customization.
+ */
 const SearchForm = React.createClass({
   propTypes: {
+    /**
+     * Callback when a search was submitted. The function receives the query
+     * and a callback to reset the loading state of the form as arguments.
+     */
     onSearch: PropTypes.func.isRequired,
+    /** Callback when the input was reset. The function is called with no arguments. */
     onReset: PropTypes.func,
+    /** Search field label. */
     label: PropTypes.string,
+    /** Search field placeholder. */
     placeholder: PropTypes.string,
+    /** Class name for the search form container. */
     wrapperClass: PropTypes.string,
+    /** Width to use in the search field. */
     queryWidth: PropTypes.any,
+    /** Top margin to use in the search form container. */
     topMargin: PropTypes.number,
+    /** Separation between search field and buttons. */
     buttonLeftMargin: PropTypes.number,
+    /** bsStyle for search button. */
     searchBsStyle: PropTypes.string,
+    /** Text to display in the search button. */
     searchButtonLabel: PropTypes.string,
+    /** Text to display in the reset button. */
     resetButtonLabel: PropTypes.string,
+    /**
+     * Text to display in the search button while the search is loading. This
+     * will only be used if `useLoadingState` is true.
+     */
     loadingLabel: PropTypes.string,
+    /**
+     * Specifies if it should display a loading state from the moment the
+     * search button is pressed until the component receives new props or
+     * the callback function in the `onSearch` method is called.
+     */
     useLoadingState: PropTypes.bool,
+    /** Elements to display on the right of the search form. */
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,

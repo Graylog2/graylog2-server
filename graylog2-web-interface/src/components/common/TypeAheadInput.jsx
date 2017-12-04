@@ -7,16 +7,56 @@ import $ from 'jquery';
 // eslint-disable-next-line no-unused-vars
 import Typeahead from 'typeahead.js';
 
+/**
+ * Component that renders a field input with auto-completion capabilities.
+ *
+ * **Note** There are a few quirks around this component and it will be
+ * refactored soon.
+ */
 const TypeAheadInput = React.createClass({
   propTypes: {
+    /** ID to use in the input field. */
     id: PropTypes.string.isRequired,
+    /** Label to use for the input field. */
     label: PropTypes.string.isRequired,
+    /**
+     * Function that will be called when a new key is pressed in the
+     * input field. The function will be called with the event generated
+     * by react for that input.
+     */
     onKeyPress: PropTypes.func,
+    /** Object key where to store auto-completion result. */
     displayKey: PropTypes.string,
-    suggestions: PropTypes.array, // [ "some string", "otherstring" ]
+    /**
+     * Array of strings providing auto-completion.
+     * E.g. `[ "some string", "otherstring" ]`
+     */
+    suggestions: PropTypes.array,
+    /** Text to display next to the auto-completion suggestion. */
     suggestionText: PropTypes.string,
+    /**
+     * Function that will be called once typeahead is loaded and ready
+     * to operate. The function will be called with no arguments.
+     */
     onTypeaheadLoaded: PropTypes.func,
+    /**
+     * Function that will be called when a suggestion is selected. The
+     * function will receive the typeahead event as first argument, and
+     * the selected suggestion as second argument. The selected suggestion
+     * will be returned in an object, as a value for the `displayKey` key,
+     * e.g. `{ suggestion: 'Foo' }`.
+     *
+     * For more information on typeahead events, see:
+     * https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#custom-events
+     *
+     */
     onSuggestionSelected: PropTypes.func,
+  },
+
+  getDefaultProps() {
+    return {
+      displayKey: 'suggestion',
+    };
   },
 
   componentDidMount() {
@@ -60,7 +100,7 @@ const TypeAheadInput = React.createClass({
           if (props.suggestionText) {
             return `<div><strong>${props.suggestionText}</strong> ${value[props.displayKey]}</div>`;
           }
-          return `<div>${value.value}</div>`;
+          return `<div>${value[props.displayKey]}</div>`;
         },
       },
     });

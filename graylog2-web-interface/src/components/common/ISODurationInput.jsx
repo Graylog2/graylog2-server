@@ -3,16 +3,32 @@ import React from 'react';
 import { Input } from 'components/bootstrap';
 import ISODurationUtils from 'util/ISODurationUtils';
 
+/**
+ * Displays an `Input` component for ISO8601 durations.
+ */
 const ISODurationInput = React.createClass({
   propTypes: {
+    /** Input id */
     id: PropTypes.string.isRequired,
+    /** Value to show in the Input. */
     duration: PropTypes.string.isRequired,
+    /** Callback that will receive the validated duration when the input changes. */
     update: PropTypes.func.isRequired,
+    /** Input label. */
     label: PropTypes.string,
+    /** Input help text. */
     help: PropTypes.string,
+    /**
+     * Function that validates the duration. It receives the duration in milliseconds and the duration itself as
+     * arguments, and must return `true` if the duration is valid or `false` if not. Only valid durations are propagated
+     * after the input changes.
+     */
     validator: PropTypes.func,
+    /** Text to display when duration is invalid. */
     errorText: PropTypes.string,
+    /** Specify that the Input should have input focus when the page loads. */
     autoFocus: PropTypes.bool,
+    /** Specify that the Input is required to submit the form. */
     required: PropTypes.bool,
   },
 

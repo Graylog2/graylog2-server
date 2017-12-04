@@ -29,15 +29,71 @@ const BREAKPOINTS = {
   xs: COLUMN_WIDTH * COLUMNS.xs,
 };
 
+/**
+ * Component that renders a draggable and resizable grid. You can control
+ * the grid elements' positioning, as well as if they should be resizable
+ * or draggable. Use this for dashboards or pages where the user should
+ * be able to decide how to arrange the content.
+ */
 const ReactGridContainer = React.createClass({
   propTypes: {
+    /**
+     * Object of positions in this format:
+     * ```
+     * {
+     *  id: { col: column, row: row, height: height, width: width },
+     *  // E.g.
+     *  '2': { col: 2, row: 0, height: 1, width: 4 },
+     * }
+     * ```
+     *
+     * **Important** All positions and sizes are specified in grid coordinates,
+     * not in pixels.
+     */
     positions: PropTypes.object.isRequired,
+    /**
+     * Array of children, each one being one element in the grid. Each
+     * children's outermost element must have a `key` prop set to the `id`
+     * specified in the position object. If you don't set that `key` to the
+     * right value, the positioning will be wrong.
+     */
     children: PropTypes.node.isRequired,
+    /**
+     * Function that will be called when positions change. The function
+     * receives the new positions in the same format as specified in the
+     * `positions` prop.
+     */
     onPositionsChange: PropTypes.func.isRequired,
+    /**
+     * Specifies if the grid is locked or not. A user cannot move or
+     * resize grid elements if this is set to true.
+     */
     locked: PropTypes.bool,
+    /**
+     * Specifies if the grid elements can be resized or not **only when the
+     * grid is unlocked**.
+     */
     isResizable: PropTypes.bool,
+    /** Height in pixels of a row. */
     rowHeight: PropTypes.number,
+    /**
+     * Specifies the number of columns the grid will have for different
+     * screen sizes. E.g.
+     * ```
+     * {
+     *   xxl: 6,
+     *   xl: 5,
+     *   lg: 4,
+     *   md: 3,
+     *   sm: 2,
+     *   xs: 1,
+     * }
+     * ```
+     *
+     * Each column is by default 350 pixels wide.
+     */
     columns: PropTypes.object,
+    /** Specifies whether the grid should use CSS animations or not. */
     animate: PropTypes.bool,
   },
 

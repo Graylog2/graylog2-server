@@ -5,22 +5,61 @@ import lodash from 'lodash';
 
 import AppConfig from 'util/AppConfig';
 
-// Pass all props react-select accepts, excepting `onChange`
-const filteredProps = ['onChange', 'value'];
+// Pass all props react-select accepts, except those we want to override
+const filteredProps = ['onChange', 'value', 'labelKey'];
 const acceptedReactSelectProps = lodash.without(lodash.keys(ReactSelect.propTypes), ...filteredProps);
 
+/**
+ * Component that abstracts a react-select input field. Compared to an standard
+ * select field, this one adds the possibility of searching options, which makes
+ * it convenient when showing a large number of options. It is also possible to
+ * use it as multi-value select, and even to create new options on the fly.
+ *
+ * You may also pass props directly into react-select, please look at
+ * https://github.com/JedWatson/react-select/tree/v1.0.0#usage
+ * for more information about the accepted props.
+ */
 const Select = React.createClass({
   propTypes: {
+    /**
+     * Callback when selected option changes. It receives the value of the
+     * selected option as an argument. If `multi` is enabled, the passed
+     * argument will be a string separated by `delimiter` with all selected
+     * options.
+     */
     onChange: PropTypes.func,
-    onValueChange: PropTypes.func, // deprecated
+    /**
+     * @deprecated Please use `onChange` instead.
+     */
+    onValueChange: PropTypes.func,
+    /**
+     * Callback when selected option changes. Use this if you want to
+     * use react-select directly, receiving the whole option in the callback.
+     */
     onReactSelectChange: PropTypes.func,
+    /** Size of the select input. */
     size: PropTypes.oneOf(['normal', 'small']),
+    /**
+     * String containing the selected value. If `multi` is enabled, it must
+     * be a string containig all values separated by the `delimiter`.
+     */
     value: PropTypes.string,
+    /** Specifies if multiple values can be selected or not. */
     multi: PropTypes.bool,
+    /** Indicates which option object key contains the text to display in the select input. Same as react-select's `labelKey` prop. */
     displayKey: PropTypes.string,
+    /** Indicates which option object key contains the value of the option. */
     valueKey: PropTypes.string,
+    /** Delimiter to use as value separator in `multi` Selects. */
     delimiter: PropTypes.string,
+    /** Specifies if the user can create new entries in `multi` Selects. */
     allowCreate: PropTypes.bool,
+    /**
+     * Available options shown in the select field. It should be an array of objects,
+     * each one with a display key (specified in `displayKey`), and a value key
+     * (specified in `valueKey`).
+     */
+    options: PropTypes.array.isRequired,
   },
 
   getDefaultProps() {
@@ -102,7 +141,7 @@ const Select = React.createClass({
     });
   },
   render() {
-    const { allowCreate, size, onReactSelectChange, multi } = this.props;
+    const { allowCreate, displayKey, size, onReactSelectChange, multi } = this.props;
     const value = this.state.value;
     const reactSelectProps = lodash.pick(this.props, acceptedReactSelectProps);
     const SelectComponent = allowCreate ? ReactSelect.Creatable : ReactSelect;
@@ -117,6 +156,7 @@ const Select = React.createClass({
         <SelectComponent ref={(c) => { this._select = c; }}
                          onChange={onReactSelectChange || this._onChange}
                          {...reactSelectProps}
+                         labelKey={displayKey}
                          value={formattedValue} />
       </div>
     );

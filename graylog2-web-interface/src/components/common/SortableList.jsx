@@ -6,10 +6,29 @@ import HTML5Backend from 'react-dnd-html5-backend';
 
 import SortableListItem from './SortableListItem';
 
+/**
+ * Component that renders a list of elements and let users manually
+ * sort them by dragging and dropping them.
+ *
+ * `SortableList` keeps the current sorting in its state, so that consumers
+ * using a different array or object to keep the sorting state can still
+ * use it.
+ */
 const SortableList = React.createClass({
   propTypes: {
+    /** Specifies if dragging and dropping is disabled or not. */
     disableDragging: PropTypes.bool,
+    /**
+     * Array of objects that will be displayed in the list. Each item is
+     * expected to have an `id` and a `title` key. `id` must be unique
+     * and will be used for sorting the item. `title` is used to display the
+     * element name in the list.
+     */
     items: PropTypes.arrayOf(PropTypes.object).isRequired,
+    /**
+     * Function that will be called when an item of the list was moved.
+     * The function will receive the newly sorted list as an argument.
+     */
     onMoveItem: PropTypes.func,
   },
   getDefaultProps() {

@@ -2,15 +2,26 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { OverlayTrigger } from 'react-bootstrap';
 
+/**
+ * Helper component for react-bootstrap's `OverlayTrigger`. It only wraps the content into a `span` element,
+ * so that the overlay can be displayed in disabled buttons and links.
+ *
+ * See: https://github.com/react-bootstrap/react-bootstrap/issues/364
+ */
 const OverlayElement = React.createClass({
   propTypes: {
+    /** Element that will be displayed in the overlay. */
     overlay: PropTypes.element,
+    /** Placement for the overlay. */
     placement: PropTypes.oneOf(['top', 'bottom', 'right', 'left']),
+    /** Action that will trigger the overlay. */
     trigger: PropTypes.oneOfType([
       PropTypes.oneOf(['click', 'hover', 'focus']),
       PropTypes.arrayOf(PropTypes.oneOf(['click', 'hover', 'focus'])),
     ]),
-    useOverlay: PropTypes.bool, // True if overlay should be applied, false otherwise
+    /** Use `false` to disable the overlay. */
+    useOverlay: PropTypes.bool,
+    /** Components to render. They will be wrapped in a `span` that will trigger the overlay element. */
     children: PropTypes.oneOfType([
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,

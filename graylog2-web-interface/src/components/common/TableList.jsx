@@ -7,15 +7,49 @@ import { Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { TypeAheadDataFilter } from 'components/common';
 
+/**
+ * Component that renders a list of items in a table-like structure. The list
+ * also includes a filter input that can be used to search for specific
+ * items or elements matching a string.
+ *
+ * The component can render action elements for each item, and also for
+ * performing bulk-operation. In that second case, action elements will
+ * appear in the header once the user selects more than one item by clicking
+ * in the checkboxes next to them.
+ */
 const TableList = React.createClass({
   propTypes: {
+    /** Specifies key to use as item ID. */
     idKey: PropTypes.string,
+    /** Specifies a key to use as item title. */
     titleKey: PropTypes.string,
+    /** Specifies key to use as item description. */
     descriptionKey: PropTypes.string,
-    filterKeys: PropTypes.arrayOf(PropTypes.string),
+    /** Object keys to use for filtering. Use an empty array to disable filtering. */
+    filterKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
+    /** Label to use next to the filter input. */
     filterLabel: PropTypes.string,
-    items: PropTypes.instanceOf(Immutable.List),
+    /**
+     * Immutable List of objects to display in the list. Objects are expected
+     * to have an ID (`idKey` prop), a title (`title` prop), and an optional
+     * description (`descriptionKey` prop).
+     */
+    items: PropTypes.instanceOf(Immutable.List).isRequired,
+    /**
+     * Function that generates react elements to render in the header.
+     * Those elements are meant to display actions that affect more than one
+     * item in the list, so they will only be displayed when more than one
+     * item is checked.
+     * The function receives a list of IDs corresponding to all selected
+     * elements as argument.
+     */
     headerActionsFactory: PropTypes.func,
+    /**
+     * Function that generates react elements to render for each item.
+     * Those elements are meant to display actions that affect that specific
+     * item.
+     * The function will receive the whole item object as an argument.
+     */
     itemActionsFactory: PropTypes.func,
   },
   getDefaultProps() {
@@ -23,6 +57,7 @@ const TableList = React.createClass({
       idKey: 'id',
       titleKey: 'title',
       descriptionKey: 'description',
+      filterLabel: 'Filter',
       headerActionsFactory: () => {},
       itemActionsFactory: () => {},
     };
@@ -52,7 +87,7 @@ const TableList = React.createClass({
                label="Select all"
                checked={this.state.allSelected}
                onChange={this._toggleSelectAll}
-               groupClassName="form-group-inline" />
+               wrapperClassName="form-group-inline" />
       </div>
     );
     return <ListGroupItem className="list-group-header" header={header} />;

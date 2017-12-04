@@ -13,11 +13,27 @@ import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
+/**
+ * Component that renders an input offering auto-completion for message fields.
+ * Fields are loaded from the Graylog server in the background.
+ */
 const TypeAheadFieldInput = React.createClass({
   propTypes: {
+    /** ID of the input. */
     id: PropTypes.string.isRequired,
+    /**
+     * @deprecated React v15 deprecated `valueLink`s. Please use `onChange`
+     * instead.
+     */
     valueLink: PropTypes.object,
+    /** Specifies if the input should have the input focus or not. */
     autoFocus: PropTypes.bool,
+    /**
+     * Function that is called when the input changes. The function receives
+     * the typeahead event object for the event that triggered the change. For
+     * more information on typeahead events, see:
+     * https://github.com/twitter/typeahead.js/blob/master/doc/jquery_typeahead.md#custom-events
+     */
     onChange: PropTypes.func,
   },
   componentDidMount() {

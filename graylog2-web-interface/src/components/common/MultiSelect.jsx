@@ -2,6 +2,10 @@ import React from 'react';
 
 import Select from 'components/common/Select';
 
+/**
+ * Component that wraps and render a `Select` where multiple options can be selected. It passes all
+ * props to the underlying `Select` component, so please look there to find more information about them.
+ */
 const MultiSelect = React.createClass({
   propTypes: Select.propTypes,
   _select: undefined,

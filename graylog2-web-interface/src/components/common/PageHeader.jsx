@@ -4,11 +4,27 @@ import { Row, Col, Label, OverlayTrigger, Tooltip } from 'react-bootstrap';
 
 import SupportLink from 'components/support/SupportLink';
 
+/**
+ * Component that renders a page header, with a title and some optional content.
+ * This ensures all pages look and feel the same way across the product, so
+ * please use it in your pages.
+ */
 const PageHeader = React.createClass({
   propTypes: {
+    /** Page header heading. */
     title: PropTypes.oneOfType([PropTypes.node, PropTypes.string]).isRequired,
+    /**
+     * One or more children, they will be used in the header in this order:
+     *  1. Page description
+     *  2. Support information or link
+     *  3. Action buttons
+     *
+     * Please see the examples to see how to use this in practice.
+     */
     children: PropTypes.oneOfType([PropTypes.array, PropTypes.node]),
+    /** Flag that specifies if the page is experimental or not. */
     experimental: PropTypes.bool,
+    /** Specifies if the page header is children of a content `Row` or not. */
     subpage: PropTypes.bool,
   },
   getDefaultProps() {
