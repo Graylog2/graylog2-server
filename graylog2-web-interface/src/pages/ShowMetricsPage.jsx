@@ -17,26 +17,27 @@ const ShowMetricsPage = React.createClass({
     location: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(NodesStore), Reflux.connect(MetricsStore), Reflux.listenTo(NodesStore, '_getMetrics')],
+  mixins: [Reflux.connect(NodesStore, 'nodes'), Reflux.connect(MetricsStore), Reflux.listenTo(NodesStore, '_getMetrics')],
 
   _getMetrics() {
     MetricsActions.names();
   },
 
   render() {
-    if (!this.state.nodes || !this.state.metricsNames) {
+    const { nodes } = this.state.nodes;
+    if (!nodes || !this.state.metricsNames) {
       return <Spinner />;
     }
 
     let nodeId = this.props.params.nodeId;
     // "master" node ID is a placeholder for master node, get first master node ID
     if (nodeId === 'master') {
-      const nodeIDs = Object.keys(this.state.nodes);
-      const masterNodes = nodeIDs.filter(nodeID => this.state.nodes[nodeID].is_master);
+      const nodeIDs = Object.keys(nodes);
+      const masterNodes = nodeIDs.filter(nodeID => nodes[nodeID].is_master);
       nodeId = masterNodes[0] || nodeIDs[0];
     }
 
-    const node = this.state.nodes[nodeId];
+    const node = nodes[nodeId];
     const title = <span>Metrics of node {node.short_node_id} / {node.hostname}</span>;
     const namespace = MetricsStore.namespace;
     const names = this.state.metricsNames[nodeId];

@@ -15,14 +15,14 @@ const InputStateBadge = React.createClass({
   propTypes: {
     input: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(InputStatesStore), Reflux.connect(NodesStore)],
+  mixins: [Reflux.connect(InputStatesStore), Reflux.connect(NodesStore, 'nodes')],
   comparator: new InputStateComparator(),
   _labelClassForState(sortedStates) {
     const nodesWithKnownState = sortedStates.reduce((numberOfNodes, state) => {
       return numberOfNodes + state.count;
     }, 0);
 
-    if (this.props.input.global && nodesWithKnownState !== Object.keys(this.state.nodes).length) {
+    if (this.props.input.global && nodesWithKnownState !== Object.keys(this.state.nodes.nodes).length) {
       return 'warning';
     }
 
@@ -45,7 +45,7 @@ const InputStateBadge = React.createClass({
     return sortedStates[0].state;
   },
   _isLoading() {
-    return !(this.state.inputStates && this.state.nodes);
+    return !(this.state.inputStates && this.state.nodes.nodes);
   },
   render() {
     if (this._isLoading()) {

@@ -14,7 +14,7 @@ const NodeOrGlobalSelect = React.createClass({
     onChange: PropTypes.func.isRequired,
     node: PropTypes.string,
   },
-  mixins: [Reflux.connect(NodesStore)],
+  mixins: [Reflux.connect(NodesStore, 'nodes')],
   getInitialState() {
     return {
       global: this.props.global !== undefined ? this.props.global : false,
@@ -37,13 +37,14 @@ const NodeOrGlobalSelect = React.createClass({
     this.props.onChange('node', evt.target.value);
   },
   render() {
-    if (!this.state.nodes) {
+    const { nodes } = this.state.nodes;
+    if (!nodes) {
       return <Spinner />;
     }
 
-    const options = Object.keys(this.state.nodes)
+    const options = Object.keys(nodes)
       .map((nodeId) => {
-        return <option key={nodeId} value={nodeId}>{this.state.nodes[nodeId].short_node_id} / {this.state.nodes[nodeId].hostname}</option>;
+        return <option key={nodeId} value={nodeId}>{nodes[nodeId].short_node_id} / {nodes[nodeId].hostname}</option>;
       });
 
     const nodeSelect = !this.state.global ? (

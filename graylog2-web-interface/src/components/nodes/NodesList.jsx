@@ -14,9 +14,9 @@ const NodesList = React.createClass({
   propTypes: {
     permissions: PropTypes.array.isRequired,
   },
-  mixins: [Reflux.connect(NodesStore), Reflux.connect(ClusterOverviewStore)],
+  mixins: [Reflux.connect(NodesStore, 'nodes'), Reflux.connect(ClusterOverviewStore)],
   _isLoading() {
-    return !(this.state.nodes && this.state.clusterOverview);
+    return !(this.state.nodes.nodes && this.state.clusterOverview);
   },
   _formatNodes(nodes, clusterOverview) {
     const nodeIDs = Object.keys(nodes);
@@ -30,7 +30,8 @@ const NodesList = React.createClass({
       return <Spinner />;
     }
 
-    const nodesNo = Object.keys(this.state.nodes).length;
+    const { nodes } = this.state.nodes;
+    const nodesNo = Object.keys(nodes).length;
 
     return (
       <Row className="content">
@@ -39,7 +40,7 @@ const NodesList = React.createClass({
             There <Pluralize value={nodesNo} singular="is" plural="are" /> {nodesNo} active <Pluralize value={nodesNo} singular="node" plural="nodes" />
           </h2>
           <EntityList bsNoItemsStyle="info" noItemsText="There are no active nodes."
-                      items={this._formatNodes(this.state.nodes, this.state.clusterOverview)} />
+                      items={this._formatNodes(nodes, this.state.clusterOverview)} />
         </Col>
       </Row>
     );

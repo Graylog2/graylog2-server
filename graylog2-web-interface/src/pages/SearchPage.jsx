@@ -26,7 +26,7 @@ const SearchPage = React.createClass({
     forceFetch: PropTypes.bool,
   },
   mixins: [
-    Reflux.connect(NodesStore),
+    Reflux.connect(NodesStore, 'nodes'),
     Reflux.connect(MessageFieldsStore),
     Reflux.connect(CurrentUserStore, 'currentUser'),
     Reflux.listenTo(InputsStore, '_formatInputs'),
@@ -183,7 +183,7 @@ const SearchPage = React.createClass({
   },
 
   _isLoading() {
-    return !this.state.searchResult || !this.state.inputs || !this.state.streams || !this.state.nodes || !this.state.fields || !this.state.histogram;
+    return !this.state.searchResult || !this.state.inputs || !this.state.streams || !this.state.nodes.nodes || !this.state.fields || !this.state.histogram;
   },
 
   render() {
@@ -211,7 +211,7 @@ const SearchPage = React.createClass({
         <SearchResult query={SearchStore.originalQuery} page={SearchStore.page} builtQuery={searchResult.built_query}
                       result={searchResult} histogram={this.state.histogram}
                       formattedHistogram={this.state.histogram.histogram}
-                      streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
+                      streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes.nodes)}
                       searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions}
                       searchConfig={this.props.searchConfig}
                       loadingSearch={this.state.updatingSearch || this.state.updatingHistogram}

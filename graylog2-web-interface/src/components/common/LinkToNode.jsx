@@ -22,12 +22,12 @@ const LinkToNode = React.createClass({
     /** Node ID that will be used to generate the link. */
     nodeId: PropTypes.string.isRequired,
   },
-  mixins: [Reflux.connect(NodesStore)],
+  mixins: [Reflux.connect(NodesStore, 'nodes')],
   render() {
-    if (!this.state.nodes) {
+    if (!this.state.nodes.nodes) {
       return <Spinner />;
     }
-    const node = this.state.nodes[this.props.nodeId];
+    const node = this.state.nodes.nodes[this.props.nodeId];
 
     if (node) {
       const iconClass = node.is_master ? 'fa fa-star master-node' : 'fa fa-code-fork';

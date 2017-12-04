@@ -22,7 +22,7 @@ const ShowMessagePage = React.createClass({
     params: PropTypes.object,
     searchConfig: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(NodesStore), Reflux.listenTo(InputsStore, '_formatInput')],
+  mixins: [Reflux.connect(NodesStore, 'nodes'), Reflux.listenTo(InputsStore, '_formatInput')],
   getInitialState() {
     return {
       streams: undefined,
@@ -50,13 +50,13 @@ const ShowMessagePage = React.createClass({
     this.setState({ inputs: Immutable.Map(input) });
   },
   _isLoaded() {
-    return this.state.message && this.state.streams && this.state.nodes && this.state.inputs;
+    return this.state.message && this.state.streams && this.state.nodes.nodes && this.state.inputs;
   },
   render() {
     if (this._isLoaded()) {
       return (
         <DocumentTitle title={`Message ${this.props.params.messageId} on ${this.props.params.index}`}>
-          <MessageShow message={this.state.message} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
+          <MessageShow message={this.state.message} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes.nodes)}
                        streams={this.state.streams} allStreamsLoaded searchConfig={this.props.searchConfig} />
         </DocumentTitle>
       );
