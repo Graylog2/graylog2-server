@@ -15,7 +15,7 @@ import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
 const LoginPage = React.createClass({
-  mixins: [Reflux.connect(SessionStore), Reflux.ListenerMethods],
+  mixins: [Reflux.connect(SessionStore, 'session'), Reflux.ListenerMethods],
 
   getInitialState() {
     return {
@@ -70,7 +70,7 @@ const LoginPage = React.createClass({
     this.setState({ lastError: undefined });
   },
   render() {
-    if (this.state.validatingSession) {
+    if (this.state.session.validatingSession) {
       return (
         <LoadingPage />
       );
