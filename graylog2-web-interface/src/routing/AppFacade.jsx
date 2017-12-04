@@ -21,7 +21,7 @@ import 'stylesheets/graylog2.less';
 const AppFacade = React.createClass({
   mixins: [
     Reflux.connect(SessionStore, 'session'),
-    Reflux.connect(ServerAvailabilityStore),
+    Reflux.connect(ServerAvailabilityStore, 'serverAvailability'),
     Reflux.connect(CurrentUserStore),
   ],
 
@@ -36,8 +36,8 @@ const AppFacade = React.createClass({
   },
 
   render() {
-    if (!this.state.server.up) {
-      return <ServerUnavailablePage server={this.state.server} />;
+    if (!this.state.serverAvailability.up) {
+      return <ServerUnavailablePage server={this.state.serverAvailability} />;
     }
     if (!this.state.session.sessionId) {
       return <LoginPage />;

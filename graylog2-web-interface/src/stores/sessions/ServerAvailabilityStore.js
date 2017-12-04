@@ -14,7 +14,7 @@ const ServerAvailabilityStore = Reflux.createStore({
     this.ping();
   },
   getInitialState() {
-    return { server: this.server };
+    return this.server;
   },
   ping() {
     return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.ping().url))
@@ -30,13 +30,13 @@ const ServerAvailabilityStore = Reflux.createStore({
   reportError(error) {
     if (this.server.up) {
       this.server = { up: false, error: error };
-      this.trigger({ server: this.server });
+      this.trigger(this.server);
     }
   },
   reportSuccess() {
     if (!this.server.up) {
       this.server = { up: true };
-      this.trigger({ server: this.server });
+      this.trigger(this.server);
     }
   },
 });
