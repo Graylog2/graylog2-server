@@ -2,12 +2,13 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 
-import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
+import { DocumentTitle, Spinner } from 'components/common';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
 
 import Routes from 'routing/Routes';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const SystemStore = StoreProvider.getStore('System');
 
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
