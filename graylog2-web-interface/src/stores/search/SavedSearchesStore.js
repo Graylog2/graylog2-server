@@ -65,7 +65,7 @@ const SavedSearchesStore = Reflux.createStore({
     const savedSearch = this.getSavedSearch(searchId);
     if (!savedSearch) {
       // show notification
-      SavedSearchesActions.load.triggerPromise();
+      SavedSearchesActions.list();
       return;
     }
 
