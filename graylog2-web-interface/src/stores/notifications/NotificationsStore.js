@@ -2,9 +2,9 @@ import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
-import fetch, { Builder, fetchPeriodically } from 'logic/rest/FetchProvider';
-
+import fetch, { fetchPeriodically } from 'logic/rest/FetchProvider';
 import ActionsProvider from 'injection/ActionsProvider';
+
 const NotificationsActions = ActionsProvider.getActions('Notifications');
 
 const NotificationsStore = Reflux.createStore({
@@ -24,8 +24,7 @@ const NotificationsStore = Reflux.createStore({
   },
   list() {
     const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.list().url);
-    const promise = this.promises.list || fetchPeriodically('GET', url)
-        .finally(() => delete this.promises.list);
+    const promise = this.promises.list || fetchPeriodically('GET', url).finally(() => delete this.promises.list);
 
     this.promises.list = promise;
 
@@ -33,7 +32,7 @@ const NotificationsStore = Reflux.createStore({
   },
   listCompleted(response) {
     this.notifications = response;
-    this.trigger(response);
+    this.trigger({ notifications: response.notifications, total: response.total });
   },
   delete(type) {
     const url = URLUtils.qualifyUrl(ApiRoutes.NotificationsApiController.delete(type).url);
