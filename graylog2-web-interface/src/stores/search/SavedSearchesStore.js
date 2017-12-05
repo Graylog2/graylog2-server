@@ -19,8 +19,8 @@ const SavedSearchesStore = Reflux.createStore({
   sourceUrl: '/search/saved',
   savedSearches: undefined,
 
-  init() {
-    this.trigger(this.savedSearches);
+  getInitialState() {
+    return this.savedSearches;
   },
 
   list() {
