@@ -14,6 +14,13 @@ const ConfigurationsStore = Reflux.createStore({
   configuration: {},
   searchesClusterConfig: undefined,
 
+  getInitialState() {
+    return {
+      configuration: this.configuration,
+      searchesClusterConfig: this.searchesClusterConfig,
+    };
+  },
+
   _url(path) {
     return URLUtils.qualifyUrl(urlPrefix + path);
   },
