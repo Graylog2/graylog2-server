@@ -6,6 +6,8 @@ module.exports = [
   'react-bootstrap',
   'react-router',
   'react-router-bootstrap',
+  'react-redux',
+  'redux',
   'reflux',
   'reflux-core',
   'moment',
