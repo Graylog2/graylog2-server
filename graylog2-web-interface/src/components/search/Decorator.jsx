@@ -23,7 +23,11 @@ const Decorator = React.createClass({
     decorator: PropTypes.object.isRequired,
     typeDefinition: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
+  mixins: [
+    Reflux.connect(DecoratorsStore, 'decorators'),
+    Reflux.connect(CurrentUserStore, 'currentUser'),
+    PermissionsMixin,
+  ],
   componentDidMount() {
     DecoratorsActions.available();
   },
@@ -81,12 +85,13 @@ const Decorator = React.createClass({
     );
   },
   render() {
-    if (!this.state.types || !this.state.currentUser) {
+    const { types } = this.state.decorators;
+    if (!types || !this.state.currentUser) {
       return <Spinner />;
     }
     const decorator = this.props.decorator;
     const config = this._resolveConfigurationIds(decorator.config);
-    const decoratorType = this.state.types[decorator.type] || this._decoratorTypeNotPresent();
+    const decoratorType = types[decorator.type] || this._decoratorTypeNotPresent();
 
     const decoratorActionsMenu = this._formatActionsMenu();
     return (

@@ -24,7 +24,11 @@ const DecoratorSidebar = React.createClass({
     stream: PropTypes.string,
     maximumHeight: PropTypes.number,
   },
-  mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore, 'currentUser'), PermissionsMixin],
+  mixins: [
+    Reflux.connect(DecoratorsStore, 'decorators'),
+    Reflux.connect(CurrentUserStore, 'currentUser'),
+    PermissionsMixin,
+  ],
   getInitialState() {
     return {
       maxDecoratorsHeight: 1000,
@@ -56,28 +60,31 @@ const DecoratorSidebar = React.createClass({
   },
 
   _formatDecorator(decorator) {
-    const typeDefinition = this.state.types[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
+    const { types } = this.state.decorators;
+    const typeDefinition = types[decorator.type] || { requested_configuration: {}, name: `Unknown type: ${decorator.type}` };
     return ({ id: decorator.id,
       title: <Decorator key={`decorator-${decorator.id}`}
                                                    decorator={decorator}
                                                    typeDefinition={typeDefinition} /> });
   },
-  _updateOrder(decorators) {
-    decorators.forEach((item, idx) => {
-      const decorator = this.state.decorators.find(i => i.id === item.id);
+  _updateOrder(orderedDecorators) {
+    const { decorators } = this.state.decorators;
+    orderedDecorators.forEach((item, idx) => {
+      const decorator = decorators.find(i => i.id === item.id);
       decorator.order = idx;
       DecoratorsActions.update(decorator.id, decorator);
     });
   },
   render() {
-    if (!this.state.decorators) {
+    const { decorators } = this.state.decorators;
+    if (!decorators) {
       return <Spinner />;
     }
-    const decorators = this.state.decorators
+    const streamDecorators = decorators
       .filter(decorator => (this.props.stream ? decorator.stream === this.props.stream : !decorator.stream))
       .sort((d1, d2) => d1.order - d2.order);
-    const nextDecoratorOrder = decorators.length > 0 ? decorators[decorators.length - 1].order + 1 : 0;
-    const decoratorItems = decorators.map(this._formatDecorator);
+    const nextDecoratorOrder = streamDecorators.length > 0 ? streamDecorators[streamDecorators.length - 1].order + 1 : 0;
+    const decoratorItems = streamDecorators.map(this._formatDecorator);
     const popoverHelp = (
       <Popover id="decorators-help" className={DecoratorStyles.helpPopover}>
         <p className="description">

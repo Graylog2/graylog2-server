@@ -22,7 +22,7 @@ const AddDecoratorButton = React.createClass({
     stream: PropTypes.string,
     disabled: PropTypes.bool,
   },
-  mixins: [Reflux.connect(DecoratorsStore), PureRenderMixin],
+  mixins: [Reflux.connect(DecoratorsStore, 'decorators'), PureRenderMixin],
   getDefaultProps() {
     return {
       disabled: false,
@@ -56,17 +56,19 @@ const AddDecoratorButton = React.createClass({
   },
   _onTypeChange(decoratorType) {
     this.setState({ typeName: decoratorType });
-    if (this.state.types[decoratorType]) {
-      this.setState({ typeDefinition: this.state.types[decoratorType] });
+    const { types } = this.state.decorators;
+    if (types[decoratorType]) {
+      this.setState({ typeDefinition: types[decoratorType] });
     } else {
       this.setState({ typeDefinition: {} });
     }
   },
   render() {
-    if (!this.state.types) {
+    const { types } = this.state.decorators;
+    if (!types) {
       return <Spinner />;
     }
-    const decoratorTypes = jQuery.map(this.state.types, this._formatDecoratorType);
+    const decoratorTypes = jQuery.map(types, this._formatDecoratorType);
     const configurationForm = (this.state.typeName !== this.PLACEHOLDER ?
       (<ConfigurationForm ref="configurationForm"
                          key="configuration-form-output" configFields={this.state.typeDefinition.requested_configuration}

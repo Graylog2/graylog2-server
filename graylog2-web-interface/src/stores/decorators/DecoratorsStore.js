@@ -9,7 +9,10 @@ const DecoratorsActions = ActionsProvider.getActions('Decorators');
 
 const DecoratorsStore = Reflux.createStore({
   listenables: [DecoratorsActions],
-  state: {},
+  state: {
+    decorators: undefined,
+    types: undefined,
+  },
   getInitialState() {
     return this.state;
   },
