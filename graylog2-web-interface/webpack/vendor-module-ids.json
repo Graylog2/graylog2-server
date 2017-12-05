@@ -436,7 +436,6 @@
       "node_modules/react-dom/lib/ReactVersion.js": 432,
       "node_modules/react-dom/lib/findDOMNode.js": 433,
       "node_modules/react-dom/lib/renderSubtreeIntoContainer.js": 434,
-      "node_modules/react-addons-linked-state-mixin/index.js": 435,
       "node_modules/react-addons-pure-render-mixin/index.js": 436,
       "node_modules/react-bootstrap/es/index.js": 437,
       "node_modules/react-bootstrap/es/Accordion.js": 438,

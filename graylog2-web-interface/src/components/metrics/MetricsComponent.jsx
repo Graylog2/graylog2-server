@@ -1,6 +1,5 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import LinkedStateMixin from 'react-addons-linked-state-mixin';
 import { Col, Row } from 'react-bootstrap';
 
 import { MetricsFilterInput, MetricsList } from 'components/metrics';
@@ -10,27 +9,41 @@ const MetricsComponent = React.createClass({
     names: PropTypes.arrayOf(PropTypes.object).isRequired,
     namespace: PropTypes.string.isRequired,
     nodeId: PropTypes.string.isRequired,
+    filter: PropTypes.string,
   },
-  mixins: [LinkedStateMixin],
+
   getInitialState() {
     return { filter: this.props.filter };
   },
+
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.filter !== this.props.filter) {
+      this.setState({ filter: nextProps.filter });
+    }
+  },
+
   getDefaultProps() {
     return { filter: '' };
   },
+
+  onFilterChange(nextFilter) {
+    this.setState({ filter: nextFilter });
+  },
+
   render() {
+    const { filter } = this.state;
+
     let filteredNames;
     try {
-      const filter = new RegExp(this.state.filter, 'i');
-      filteredNames = this.props.names
-        .filter(metric => String(metric.full_name).match(filter));
+      const filterRegex = new RegExp(filter, 'i');
+      filteredNames = this.props.names.filter(metric => String(metric.full_name).match(filterRegex));
     } catch (e) {
       filteredNames = [];
     }
     return (
       <Row className="content">
         <Col md={12}>
-          <MetricsFilterInput valueLink={this.linkState('filter')} />
+          <MetricsFilterInput filter={filter} onChange={this.onFilterChange} />
           <MetricsList names={filteredNames} namespace={this.props.namespace} nodeId={this.props.nodeId} />
         </Col>
       </Row>
