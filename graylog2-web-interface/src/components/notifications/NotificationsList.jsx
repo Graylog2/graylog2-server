@@ -9,7 +9,7 @@ import { Spinner } from 'components/common';
 import Notification from 'components/notifications/Notification';
 
 const NotificationsList = React.createClass({
-  mixins: [Reflux.connect(NotificationsStore)],
+  mixins: [Reflux.connect(NotificationsStore, 'notifications')],
   _formatNotificationCount(count) {
     if (count === 0) {
       return 'is no notification';
@@ -21,16 +21,15 @@ const NotificationsList = React.createClass({
     return `are ${count} notifications`;
   },
   render() {
-    if (!this.state.notifications) {
+    const { notifications, total } = this.state.notifications;
+    if (!notifications) {
       return <Spinner />;
     }
-
-    const count = this.state.total;
 
     let title;
     let content;
 
-    if (count === 0) {
+    if (total === 0) {
       title = 'No notifications';
       content = (
         <Alert bsStyle="success" className="notifications-none">
@@ -39,8 +38,8 @@ const NotificationsList = React.createClass({
         </Alert>
       );
     } else {
-      title = `There ${this._formatNotificationCount(count)}`;
-      content = this.state.notifications.map((notification) => {
+      title = `There ${this._formatNotificationCount(total)}`;
+      content = notifications.map((notification) => {
         return <Notification key={`${notification.type}-${notification.timestamp}`} notification={notification} />;
       });
     }
