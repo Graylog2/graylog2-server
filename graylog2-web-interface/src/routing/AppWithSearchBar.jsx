@@ -28,7 +28,7 @@ const AppWithSearchBar = React.createClass({
   mixins: [
     Reflux.connect(CurrentUserStore, 'currentUser'),
     Reflux.connect(SavedSearchesStore, 'savedSearches'),
-    Reflux.connect(ConfigurationsStore),
+    Reflux.connect(ConfigurationsStore, 'configurations'),
   ],
   getInitialState() {
     return {
@@ -67,11 +67,16 @@ const AppWithSearchBar = React.createClass({
     }
   },
   _isLoading() {
-    return !this.state.savedSearches || !this.state.searchesClusterConfig || (this.props.params.streamId && !this.state.stream);
+    return !this.state.savedSearches ||
+      !this.state.configurations.searchesClusterConfig ||
+      (this.props.params.streamId && !this.state.stream);
   },
   _decorateChildren(children) {
     return React.Children.map(children, (child) => {
-      return React.cloneElement(child, { searchConfig: this.state.searchesClusterConfig, forceFetch: this.state.forceFetch });
+      return React.cloneElement(child, {
+        searchConfig: this.state.configurations.searchesClusterConfig,
+        forceFetch: this.state.forceFetch,
+      });
     });
   },
   _searchBarShouldDisplayRefreshControls() {
@@ -94,7 +99,7 @@ const AppWithSearchBar = React.createClass({
       <div className="container-fluid">
         <SearchBar ref="searchBar" userPreferences={this.state.currentUser.preferences}
                    savedSearches={this.state.savedSearches}
-                   config={this.state.searchesClusterConfig}
+                   config={this.state.configurations.searchesClusterConfig}
                    displayRefreshControls={this._searchBarShouldDisplayRefreshControls()}
                    onExecuteSearch={this._onExecuteSearch} />
         <Row id="main-row">

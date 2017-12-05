@@ -14,7 +14,7 @@ import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
 
 const ConfigurationsPage = React.createClass({
-  mixins: [Reflux.connect(ConfigurationsStore)],
+  mixins: [Reflux.connect(ConfigurationsStore, 'configurations')],
 
   getInitialState() {
     return {
@@ -41,8 +41,9 @@ const ConfigurationsPage = React.createClass({
   MESSAGE_PROCESSORS_CONFIG: 'org.graylog2.messageprocessors.MessageProcessorsConfig',
 
   _getConfig(configType) {
-    if (this.state.configuration && this.state.configuration[configType]) {
-      return this.state.configuration[configType];
+    const configuration = this.state.configurations;
+    if (configuration && configuration[configType]) {
+      return configuration[configType];
     }
     return null;
   },

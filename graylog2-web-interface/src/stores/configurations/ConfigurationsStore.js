@@ -12,6 +12,7 @@ const ConfigurationsStore = Reflux.createStore({
   listenables: [ConfigurationActions],
 
   configuration: {},
+  searchesClusterConfig: undefined,
 
   _url(path) {
     return URLUtils.qualifyUrl(urlPrefix + path);
@@ -30,6 +31,7 @@ const ConfigurationsStore = Reflux.createStore({
 
   listSearchesClusterConfig() {
     const promise = fetch('GET', this._url('/org.graylog2.indexer.searches.SearchesClusterConfig')).then((response) => {
+      this.searchesClusterConfig = response;
       this.trigger({ searchesClusterConfig: response });
       return response;
     });
