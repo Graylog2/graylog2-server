@@ -19,6 +19,11 @@ const GlobalThroughputStore = Reflux.createStore({
     this.listenTo(MetricsStore, this.updateMetrics);
     setInterval(MetricsActions.list, this.INTERVAL);
   },
+
+  getInitialState() {
+    return undefined;
+  },
+
   INTERVAL: 2000,
   updateMetrics(update) {
     if (!update.metrics) {
