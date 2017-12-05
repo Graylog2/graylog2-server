@@ -117,7 +117,7 @@
         <joda-time.version>2.9.9</joda-time.version>
         <json-path.version>2.4.0</json-path.version>
         <kafka.version>0.9.0.1</kafka.version>
-        <log4j.version>2.9.1</log4j.version>
+        <log4j.version>2.10.0</log4j.version>
         <metrics.version>3.2.5</metrics.version>
         <mongodb-driver.version>3.5.0</mongodb-driver.version>
         <mongojack.version>2.8.0</mongojack.version>
