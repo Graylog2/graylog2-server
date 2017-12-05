@@ -27,7 +27,7 @@ const AppWithSearchBar = React.createClass({
   },
   mixins: [
     Reflux.connect(CurrentUserStore, 'currentUser'),
-    Reflux.connect(SavedSearchesStore),
+    Reflux.connect(SavedSearchesStore, 'savedSearches'),
     Reflux.connect(ConfigurationsStore),
   ],
   getInitialState() {

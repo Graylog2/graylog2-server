@@ -20,7 +20,7 @@ const SavedSearchesStore = Reflux.createStore({
   savedSearches: undefined,
 
   init() {
-    this.trigger({ savedSearches: this.savedSearches });
+    this.trigger(this.savedSearches);
   },
 
   list() {
@@ -28,7 +28,7 @@ const SavedSearchesStore = Reflux.createStore({
       .then(
         (response) => {
           this.savedSearches = response.searches;
-          this.trigger({ savedSearches: this.savedSearches });
+          this.trigger(this.savedSearches);
           return response;
         },
         (error) => {
