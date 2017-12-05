@@ -50,6 +50,7 @@ import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuil
 import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.graylog2.Configuration;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.indexer.ElasticsearchException;
@@ -792,11 +793,12 @@ public class Searches {
         }
 
         if (highlight && configuration.isAllowHighlighting()) {
-            searchSourceBuilder.highlighter()
+            final HighlightBuilder highlightBuilder = new HighlightBuilder()
                 .requireFieldMatch(false)
                 .field("*")
                 .fragmentSize(0)
                 .numOfFragments(0);
+            searchSourceBuilder.highlighter(highlightBuilder);
         }
 
         return searchSourceBuilder;
