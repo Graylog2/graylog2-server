@@ -24,7 +24,7 @@ const InputsActions = ActionsProvider.getActions('Inputs');
 const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
 const ExportContentPackPage = React.createClass({
-  mixins: [Reflux.connect(InputsStore), Reflux.connect(DashboardsStore)],
+  mixins: [Reflux.connect(InputsStore), Reflux.connect(DashboardsStore, 'dashboards')],
   getInitialState() {
     return {};
   },
@@ -184,6 +184,7 @@ const ExportContentPackPage = React.createClass({
     this.selectAll('lookup_data_adapter');
   },
   render() {
+    const { dashboards } = this.state.dashboards;
     return (
       <DocumentTitle title="Create a content pack">
         <span>
@@ -296,12 +297,12 @@ const ExportContentPackPage = React.createClass({
                     <label className="control-label" htmlFor="dashboards">Dashboards</label>
                   </Col>
                   <Col sm={10}>
-                    {this.isEmpty(this.state.dashboards) ?
+                    {this.isEmpty(dashboards) ?
                       <span className="help-block help-standalone">There are no dashboards to export.</span>
                       :
                       <span>
                         <Button className="btn btn-sm btn-link select-all" onClick={this.selectAllDashboards}>Select all</Button>
-                        {this.state.dashboards.sort((d1, d2) => { return d1.title.localeCompare(d2.title); }).map(this.formatDashboard)}
+                        {dashboards.sort((d1, d2) => { return d1.title.localeCompare(d2.title); }).map(this.formatDashboard)}
                       </span>
                       }
                   </Col>

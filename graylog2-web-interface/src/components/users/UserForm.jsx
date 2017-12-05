@@ -28,7 +28,11 @@ const UserForm = React.createClass({
   propTypes: {
     user: PropTypes.object.isRequired,
   },
-  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.connect(DashboardsStore)],
+  mixins: [
+    PermissionsMixin,
+    Reflux.connect(CurrentUserStore, 'currentUser'),
+    Reflux.connect(DashboardsStore, 'dashboards'),
+  ],
   getInitialState() {
     return {
       streams: undefined,
@@ -180,13 +184,14 @@ const UserForm = React.createClass({
   },
 
   render() {
-    if (!this.state.streams || !this.state.dashboards) {
+    const dashboards = this.state.dashboards;
+    if (!this.state.streams || !dashboards) {
       return <Spinner />;
     }
 
     const user = this.state.user;
     const permissions = this.state.currentUser.permissions;
-    const dashboards = this.state.dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title));
+    const sortedDashboards = dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title));
 
     let requiresOldPassword = true;
     if (this.isPermitted(permissions, 'users:passwordchange:*')) {
@@ -197,8 +202,8 @@ const UserForm = React.createClass({
     const streamReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'streams:read', this.state.streams);
     const streamEditOptions = this.formatSelectedOptions(this.state.user.permissions, 'streams:edit', this.state.streams);
 
-    const dashboardReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:read', dashboards);
-    const dashboardEditOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:edit', dashboards);
+    const dashboardReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:read', sortedDashboards);
+    const dashboardEditOptions = this.formatSelectedOptions(this.state.user.permissions, 'dashboards:edit', sortedDashboards);
 
     return (
       <div>
@@ -256,13 +261,13 @@ const UserForm = React.createClass({
                       <label className="col-sm-3 control-label" htmlFor="dashboardpermissions">Dashboard Permissions</label>
                       <Col sm={9}>
                         <MultiSelect ref="dashboardReadOptions" placeholder="Choose dashboards read permissions..."
-                                     options={this.formatMultiselectOptions(dashboards)}
+                                     options={this.formatMultiselectOptions(sortedDashboards)}
                                      value={dashboardReadOptions}
                                      onChange={this._onPermissionsChange('dashboards', 'read')} />
                         <span className="help-block">Choose dashboards the user can <strong>view</strong>
                           . Removing read access will remove edit access, too.</span>
                         <MultiSelect ref="dashboardEditOptions" placeholder="Choose dashboards edit permissions..."
-                                     options={this.formatMultiselectOptions(dashboards)}
+                                     options={this.formatMultiselectOptions(sortedDashboards)}
                                      value={dashboardEditOptions}
                                      onChange={this._onPermissionsChange('dashboards', 'edit')} />
                         <span className="help-block">Choose dashboards the user can <strong>edit</strong>

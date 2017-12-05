@@ -37,7 +37,7 @@ const AddToDashboardMenu = React.createClass({
     ]),
   },
 
-  mixins: [Reflux.connect(DashboardsStore), PermissionsMixin],
+  mixins: [Reflux.connect(DashboardsStore, 'dashboards'), PermissionsMixin],
 
   getInitialState() {
     return {
@@ -135,7 +135,7 @@ const AddToDashboardMenu = React.createClass({
   _renderDashboardMenu() {
     let dashboards = Immutable.List();
 
-    this.state.dashboards
+    this.state.dashboards.dashboards
       .sortBy(dashboard => dashboard.title)
       .forEach((dashboard) => {
         dashboards = dashboards.push(
@@ -181,10 +181,11 @@ const AddToDashboardMenu = React.createClass({
   },
   render() {
     let addToDashboardMenu;
-    if (this.state.dashboards === undefined) {
+    const { dashboards } = this.state.dashboards;
+    if (dashboards === undefined) {
       addToDashboardMenu = this._renderLoadingDashboardsMenu();
     } else {
-      addToDashboardMenu = (!this.props.hidden && (this.state.dashboards.size > 0 ? this._renderDashboardMenu() : this._renderNoDashboardsMenu()));
+      addToDashboardMenu = (!this.props.hidden && (dashboards.size > 0 ? this._renderDashboardMenu() : this._renderNoDashboardsMenu()));
     }
 
     const { appendMenus, children } = this.props;
