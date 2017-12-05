@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from "react";
 import Reflux from "reflux";
 
-import Select from "components/common/Select";
+import { Select, Spinner } from "components/common";
 
 import StoreProvider from "injection/StoreProvider";
 const SystemStore = StoreProvider.getStore('System');
@@ -12,7 +12,7 @@ const SystemStore = StoreProvider.getStore('System');
  * values to quickly find the locale needed.
  */
 const LocaleSelect = React.createClass({
-  mixins: [Reflux.connect(SystemStore)],
+  mixins: [Reflux.connect(SystemStore, 'system')],
   propTypes: {
     /** Function to call when the input changes. It will receive the new locale value as argument. */
     onChange: PropTypes.func,
@@ -45,15 +45,16 @@ const LocaleSelect = React.createClass({
       return <span key={option.value} title="{option.value} [{option.value}]">{option.label} [{option.value}]</span>;
   },
   render() {
-    if (!this.state.locales) {
+    const { locales } = this.state.system;
+    if (!locales) {
       return <Spinner />;
     }
 
-    const locales = this._formatLocales(this.state.locales);
+    const formattedLocales = this._formatLocales(locales);
     return (
       <Select ref="locale" {...this.props}
               placeholder="Pick a locale"
-              options={locales}
+              options={formattedLocales}
               optionRenderer={this._renderOption} />
     );
   },

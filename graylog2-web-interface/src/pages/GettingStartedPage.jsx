@@ -17,9 +17,9 @@ const GettingStartedPage = React.createClass({
   propTypes: {
     location: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(SystemStore)],
+  mixins: [Reflux.connect(SystemStore, 'system')],
   _isLoading() {
-    return !this.state.system;
+    return !this.state.system.system;
   },
   _onDismiss() {
     history.push(Routes.STARTPAGE);
@@ -29,12 +29,13 @@ const GettingStartedPage = React.createClass({
       return <Spinner />;
     }
 
+    const { system } = this.state.system;
     return (
       <DocumentTitle title="Getting started">
         <div>
-          <GettingStarted clusterId={this.state.system.cluster_id}
-                          masterOs={this.state.system.operating_system}
-                          masterVersion={this.state.system.version}
+          <GettingStarted clusterId={system.cluster_id}
+                          masterOs={system.operating_system}
+                          masterVersion={system.version}
                           gettingStartedUrl={GETTING_STARTED_URL}
                           noDismissButton={Boolean(this.props.location.query.menu)}
                           onDismiss={this._onDismiss} />

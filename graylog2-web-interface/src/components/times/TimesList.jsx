@@ -11,7 +11,7 @@ const SystemStore = StoreProvider.getStore('System');
 import { Spinner, Timestamp } from 'components/common';
 
 const TimesList = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.connect(SystemStore)],
+  mixins: [Reflux.connect(CurrentUserStore, 'currentUser'), Reflux.connect(SystemStore, 'system')],
   getInitialState() {
     return { time: moment() };
   },
@@ -22,13 +22,14 @@ const TimesList = React.createClass({
     clearInterval(this.interval);
   },
   render() {
-    if (!this.state.system) {
+    const { system } = this.state.system;
+    if (!system) {
       return <Spinner />;
     }
     const time = this.state.time;
     const timeFormat = DateTime.Formats.DATETIME_TZ;
     const currentUser = this.state.currentUser;
-    const serverTimezone = this.state.system.timezone;
+    const serverTimezone = system.timezone;
     return (
       <Row className="content">
         <Col md={12}>
