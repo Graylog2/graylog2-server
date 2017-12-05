@@ -12,10 +12,7 @@
   "scripts": {
     "docs:build": "styleguidist build",
     "docs:server": "styleguidist server",
-    "start": "webpack-dev-server --config webpack.bundled.js --history-api-fallback --hot --inline",
-    "start-nohmr": "node devServer.js",
-    "watch": "webpack --watch --config webpack.bundled.js",
-    "devd": "devd --livewatch --port=8080 --address=127.0.0.1 --notfound=index.html build/",
+    "start": "node devServer.js",
     "build": "disable_plugins=true webpack --config webpack.bundled.js",
     "lint": "eslint --ext js,jsx src",
     "test": "jest"
@@ -120,7 +117,6 @@
     "less": "^2.5.3",
     "less-loader": "^4.0.5",
     "phantomjs-prebuilt": ">=1.9",
-    "react-hot-loader": "^3.0.0-beta.6",
     "react-proxy-loader": "^0.3.4",
     "react-styleguidist": "^6.0.33",
     "react-test-renderer": "^15.6.1",
@@ -134,7 +130,8 @@
     "webpack-dev-middleware": "^1.12.0",
     "webpack-dev-server": "^2.6.1",
     "webpack-hot-middleware": "^2.20.0",
-    "webpack-merge": "^4.1.0"
+    "webpack-merge": "^4.1.0",
+    "yargs": "^10.0.3"
   },
   "resolutions": {
     "@types/jquery": "2.0.48",

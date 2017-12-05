@@ -1,55 +1,37 @@
 # Graylog Web Interface
 
+## Requirements
+- [Node.js](https://nodejs.org/), at this time we use v8.9.1
+- [Yarn](https://yarnpkg.com/)
+
+**Note:** NPM v5 changed completely the way it builds local modules, breaking the Graylog web interface build. Please use Yarn instead of NPM v5.
+
 ## Development Setup
 
-* Install [node.js](http://nodejs.org/) and npm.
-* Run `npm install`
-* Run `npm start` (if you don't want to include plugins in the build while developing, simply run `disable_plugins=true npm start`) 
-* Open http://localhost:8080
+* Install the requirements listed above
+* Run `yarn install`
+* Run `yarn start` to build the project for development and start the development server. You can exclude any Graylog frontend plugins from the build by running `disable_plugins=true npm start` instead
+* Open http://localhost:8080 in your browser to access the Graylog web interface
 
-The `npm start` (or `disable_plugins=true npm start`) command will run the `webpack-dev-server`, which allows in-browser hot reloading.
-In order to make switching between different branches faster, we use a script to store all `node_modules` folders
-into `.node_cache` and then symlink the folder for the current branch to `node_modules`.
+The `yarn start` (or `disable_plugins=true yarn start`) command will run an [Express](http://expressjs.com) web server which is configured to do a full page reload in your browser every time that you save a file. This ensures that you will always use the latest version of your code.
 
-When using IntelliJ or WebStorm, be sure to enable `JSX harmony` (available in IntelliJ 14 and WebStorm 9)
-as JavaScript language version to properly support react templates.
+You can start the development server in any other port that you like. To do so, use the `--port=<port>` option, e.g. `yarn start --port=8000` will start the development server in port 8000 instead of the default 8080. The server will also pick a random port if the port is already taken, so you don't need to worry if another process is already using that port.
 
-You might get an error message during `npm install` from `gyp` because the installed (default) Python version is too recent (sic!):
+We mainly develop using IntelliJ or WebStorm. If you also decide to use them to work in Graylog, enable `React JSX` as Javascript language version to support the JSX language extension. This setting was called `JSX harmony` before, and it is available in one or the other form since IntelliJ 14 and WebStorm 9.
 
-```
-gyp ERR! stack Error: Python executable "python" is v3.4.2, which is not supported by gyp.                                                                                                                 
-```
+## Update Javascript dependencies
 
-In this case just set the correct (installed!) Python binary before running `npm install`:
+1. Update a single dependency
 
-```
-npm config set python python2.7
-```
+    * Run `yarn upgrade <package>@<version>`
+    * Commit any changes in both `package.json` and `yarn.lock` files
+    * Do any changes required to adapt the code to the upgraded modules
 
-### Alternative Development Setup
+1. Update many dependencies
 
-Due to problems with webpack-dev-server there is another way to run the development setup.
+    * It may be dangerous updating many dependencies at the same time, so be sure you checked the upgrade notes of all modules before getting started. Once you are ready to upgrade the modules, Yarn provides a few options to do it:
+        * You can pass all packages you want to upgrade to Yarn: `yarn upgrade <package1> <package2>...`
+        * Yarn also supports upgrading packages matching a pattern, so you can execute `yarn upgrade --pattern <pattern>`
+        * You could execute `yarn upgrade` if you really want to upgrade all packages
+    * After doing the upgrade, remember to commit both the `package.json` and `yarn.lock` files
 
-* Install [devd](https://github.com/cortesi/devd)
-* Install [node.js](http://nodejs.org/) and npm.
-* Run `npm install`
-* Run `npm run watch` and **keep it running** to start webpack in watch mode so it rebuilds on source changes
-* Run `npm run devd` and **keep it running** once the `build/` directory exists
-* Open http://localhost:8080
-
-
-#### Update Javascript dependencies
-
-a. Update a single dependency
-
-* Update `package.json` file with the new dependency
-* `npm update <npm-package>`
-* `npm shrinkwrap --dev` to save the whole dependency tree into the `npm-shrinkwrap.json` file
-
-b. Update devDependencies
-
-* `npm shinkwrap` to keep the dependency tree (without devDependencies) into `npm-shrinkwrap.json`
-* Update `package.json` file with the new devDependencies
-* `npm install`
-* Do more work with the new devDependencies
-* `npm shrinkwrap --dev` to export the whole dependency tree with the new devDependencies into `npm-shrinkwrap.json`

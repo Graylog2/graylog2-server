@@ -1,5 +1,4 @@
-// eslint-disable-next-line no-unused-vars
-import webpackEntry from 'webpack-entry';
+import 'webpack-entry';
 
 import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 
@@ -25,8 +24,3 @@ const manifest = new PluginManifest(packageJson, {
 });
 
 PluginStore.register(manifest);
-
-if (module.hot) {
-  module.hot.accept();
-  module.hot.dispose(() => PluginStore.unregister(manifest));
-}

@@ -2,7 +2,6 @@ const webpack = require('webpack');
 const glob = require('glob');
 const path = require('path');
 const fs = require('fs');
-const merge = require('webpack-merge');
 
 const ROOT_PATH = path.resolve(__dirname);
 const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
@@ -10,12 +9,13 @@ const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json'
 const TARGET = process.env.npm_lifecycle_event;
 
 const pluginPrefix = '../../graylog-plugin-*/**/';
-const pluginConfigPattern = pluginPrefix + 'webpack.config.js';
+const pluginConfigPattern = `${pluginPrefix}webpack.config.js`;
 
 const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern);
 
 process.env.web_src_path = path.resolve(__dirname);
 
+// eslint-disable-next-line import/no-dynamic-require
 const webpackConfig = require(path.resolve(__dirname, './webpack.config.js'));
 
 function getPluginName(pluginConfig) {
@@ -44,7 +44,7 @@ pluginConfigs.filter(isNotDependency).forEach((pluginConfig) => {
 });
 
 // We need to inject webpack-hot-middleware to all entries, ensuring the app is able to reload on changes.
-if (TARGET === 'start-nohmr') {
+if (TARGET === 'start') {
   const hmrEntries = {};
   const webpackHotMiddlewareEntry = 'webpack-hot-middleware/client?reload=true';
 

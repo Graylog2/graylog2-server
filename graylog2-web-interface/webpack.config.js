@@ -16,11 +16,12 @@ process.env.BABEL_ENV = TARGET;
 const BABELRC = path.resolve(ROOT_PATH, '.babelrc');
 const BABELOPTIONS = {
   cacheDirectory: 'cache',
-  'extends': BABELRC,
+  extends: BABELRC,
 };
 
 const BABELLOADER = { loader: 'babel-loader', options: BABELOPTIONS };
 
+// eslint-disable-next-line import/no-dynamic-require
 const BOOTSTRAPVARS = require(path.resolve(ROOT_PATH, 'public', 'stylesheets', 'bootstrap-config.json')).vars;
 
 const webpackConfig = {
@@ -41,16 +42,19 @@ const webpackConfig = {
       { test: /\.ts$/, use: [BABELLOADER, { loader: 'ts-loader' }], exclude: /node_modules|\.node_cache/ },
       { test: /\.(woff(2)?|svg|eot|ttf|gif|jpg)(\?.+)?$/, use: 'file-loader' },
       { test: /\.png$/, use: 'url-loader' },
-      { test: /bootstrap\.less$/, use: [
-        'style-loader',
-        'css-loader',
-        {
-          loader: 'less-loader',
-          options: {
-            modifyVars: BOOTSTRAPVARS,
+      {
+        test: /bootstrap\.less$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'less-loader',
+            options: {
+              modifyVars: BOOTSTRAPVARS,
+            },
           },
-        },
-      ] },
+        ],
+      },
       { test: /\.less$/, use: ['style-loader', 'css-loader', 'less-loader'], exclude: /bootstrap\.less$/ },
       { test: /\.css$/, use: ['style-loader', 'css-loader'] },
     ],
@@ -93,39 +97,6 @@ const webpackConfig = {
 };
 
 if (TARGET === 'start') {
-  console.error('Running in development mode');
-  module.exports = merge(webpackConfig, {
-    entry: {
-      reacthot: 'react-hot-loader/patch',
-    },
-    devtool: 'eval',
-    devServer: {
-      historyApiFallback: true,
-      hot: true,
-      inline: true,
-      lazy: false,
-      watchOptions: {
-        ignored: /node_modules/,
-      },
-    },
-    output: {
-      path: BUILD_PATH,
-      filename: '[name].js',
-      publicPath: '/',
-      hotUpdateChunkFilename: '[id].hot-update.js',
-      hotUpdateMainFilename: 'hot-update.json',
-    },
-    plugins: [
-      new webpack.NamedModulesPlugin(),
-      new webpack.DefinePlugin({
-        DEVELOPMENT: true,
-        REPLACE_MODULES: true,
-      }),
-    ],
-  });
-}
-
-if (TARGET === 'start-nohmr') {
   console.error('Running in development (no HMR) mode');
   module.exports = merge(webpackConfig, {
     devtool: 'eval',
@@ -137,31 +108,9 @@ if (TARGET === 'start-nohmr') {
     plugins: [
       new webpack.DefinePlugin({
         DEVELOPMENT: true,
-        REPLACE_MODULES: false, // We don't intend to use HMR but for reloading the browser window
       }),
       new CopyWebpackPlugin([{ from: 'config.js' }]),
       new webpack.HotModuleReplacementPlugin(),
-    ],
-  });
-}
-
-if (TARGET === 'watch') {
-  console.error('Running in development (watch) mode');
-  module.exports = merge(webpackConfig, {
-    devtool: 'eval',
-    output: {
-      path: BUILD_PATH,
-      filename: '[name].js',
-      publicPath: '/',
-    },
-    plugins: [
-      new webpack.DefinePlugin({
-        DEVELOPMENT: true,
-        REPLACE_MODULES: false, // We don't intend to use HMR but for reloading the browser window
-      }),
-      // We need config.js in the "build/" folder. No idea how webpack-dev-server
-      // handles that, I found nothing in the config. (bernd)
-      new CopyWebpackPlugin([{ from: 'config.js' }]),
     ],
   });
 }
@@ -173,7 +122,6 @@ if (TARGET === 'build') {
     plugins: [
       new webpack.DefinePlugin({
         'process.env.NODE_ENV': JSON.stringify('production'),
-        REPLACE_MODULES: false, // Do not use HMR in production
       }),
       new webpack.optimize.UglifyJsPlugin({
         minimize: true,
@@ -197,7 +145,7 @@ if (TARGET === 'test') {
   module.exports = merge(webpackConfig, {
     module: {
       rules: [
-        { test: /\.js(x)?$/, enforce: 'pre', loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ }
+        { test: /\.js(x)?$/, enforce: 'pre', loader: 'eslint-loader', exclude: /node_modules|public\/javascripts/ },
       ],
     },
   });
