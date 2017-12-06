@@ -17,8 +17,10 @@
 package org.graylog2.plugin.inputs.transports;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBufAllocator;
 import io.netty.buffer.PooledByteBufAllocator;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -29,7 +31,11 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.socket.ServerSocketChannelConfig;
+import io.netty.handler.ssl.ClientAuth;
+import io.netty.handler.ssl.SslContext;
+import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
+import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.inputs.transports.netty.ServerSocketChannelFactory;
@@ -49,18 +55,17 @@ import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.net.ssl.SSLContext;
+import javax.annotation.Nullable;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
-import javax.net.ssl.TrustManager;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.security.GeneralSecurityException;
-import java.security.SecureRandom;
 import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -132,8 +137,15 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
     @VisibleForTesting
     ServerBootstrap getBootstrap(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseHandlers = getBaseChannelHandlers(input);
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalHandlers = getFinalChannelHandlers(input);
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> parentHandlers = getBaseChannelHandlers(input);
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> childHandlers = new LinkedHashMap<>();
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = getFinalChannelHandlers(input);
+
+        final Callable<ChannelHandler> sslHandlerCallable = getSslHandlerCallable(input);
+        if (sslHandlerCallable != null) {
+            childHandlers.put("tls", sslHandlerCallable);
+        }
+        childHandlers.putAll(finalChannelHandlers);
 
         return new ServerBootstrap()
                 .group(eventLoopGroup)
@@ -143,8 +155,8 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 .option(ChannelOption.SO_RCVBUF, getRecvBufferSize())
                 .childOption(ChannelOption.SO_RCVBUF, getRecvBufferSize())
                 .childOption(ChannelOption.SO_KEEPALIVE, tcpKeepalive)
-                .handler(getChannelInitializer(baseHandlers))
-                .childHandler(getChannelInitializer(finalHandlers));
+                .handler(getChannelInitializer(parentHandlers))
+                .childHandler(getChannelInitializer(childHandlers));
     }
 
     @Override
@@ -165,8 +177,13 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseChannelHandlers = super.getBaseChannelHandlers(input);
         baseChannelHandlers.put("connection-counter", () -> connectionCounter);
 
+        return baseChannelHandlers;
+    }
+
+    @Nullable
+    protected Callable<ChannelHandler> getSslHandlerCallable(MessageInput input) {
         if (!tlsEnable) {
-            return baseChannelHandlers;
+            return null;
         }
 
         if (!tlsCertFile.exists() || !tlsKeyFile.exists()) {
@@ -186,22 +203,33 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             } catch (CertificateException e) {
                 LOG.error(String.format(Locale.ENGLISH, "Problem creating a self-signed certificate for input [%s/%s].",
                         input.getName(), input.getId()), e);
-                return baseChannelHandlers;
+                return null;
             }
         }
 
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = new LinkedHashMap<>();
-        if (tlsCertFile.exists() && tlsKeyFile.exists()) {
-            handlerList.put("tls", buildSslHandlerCallable());
+        final ClientAuth clientAuth;
+        switch (tlsClientAuth) {
+            case TLS_CLIENT_AUTH_DISABLED:
+                LOG.debug("Not using TLS client authentication");
+                clientAuth = ClientAuth.NONE;
+                break;
+            case TLS_CLIENT_AUTH_OPTIONAL:
+                LOG.debug("Using optional TLS client authentication");
+                clientAuth = ClientAuth.OPTIONAL;
+                break;
+            case TLS_CLIENT_AUTH_REQUIRED:
+                LOG.debug("Using mandatory TLS client authentication");
+                clientAuth = ClientAuth.REQUIRE;
+                break;
+            default:
+                throw new IllegalArgumentException("Unknown TLS client authentication mode: " + tlsClientAuth);
         }
 
         LOG.info("Enabled TLS for input [{}/{}]. key-file=\"{}\" cert-file=\"{}\"", input.getName(), input.getId(), tlsKeyFile, tlsCertFile);
-        handlerList.putAll(baseChannelHandlers);
-
-        return handlerList;
+        return buildSslHandlerCallable(nettyTransportConfiguration.getTlsProvider(), tlsCertFile, tlsKeyFile, tlsKeyPassword, clientAuth, tlsClientAuthCertFile);
     }
 
-    private Callable<ChannelHandler> buildSslHandlerCallable() {
+    private Callable<ChannelHandler> buildSslHandlerCallable(SslProvider tlsProvider, File certFile, File keyFile, String password, ClientAuth clientAuth, File clientAuthCertFile) {
         return new Callable<ChannelHandler>() {
             @Override
             public ChannelHandler call() throws Exception {
@@ -213,40 +241,30 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 }
             }
 
-            private SSLEngine createSslEngine() throws IOException, GeneralSecurityException {
-                final SSLContext instance = SSLContext.getInstance("TLS");
-                TrustManager[] initTrustStore = new TrustManager[0];
-
-                if (TLS_CLIENT_AUTH_OPTIONAL.equals(tlsClientAuth) || TLS_CLIENT_AUTH_REQUIRED.equals(tlsClientAuth)) {
-                    if (tlsClientAuthCertFile.exists()) {
-                        initTrustStore = KeyUtil.initTrustStore(tlsClientAuthCertFile);
+            private SSLEngine createSslEngine() throws IOException, CertificateException {
+                final X509Certificate[] clientAuthCerts;
+                if (EnumSet.of(ClientAuth.OPTIONAL, ClientAuth.REQUIRE).contains(clientAuth)) {
+                    if (clientAuthCertFile.exists()) {
+                        clientAuthCerts = KeyUtil.loadCertificates(clientAuthCertFile.toPath()).stream()
+                                .filter(certificate -> certificate instanceof X509Certificate)
+                                .map(certificate -> (X509Certificate) certificate)
+                                .toArray(X509Certificate[]::new);
                     } else {
-                        LOG.warn("client auth configured, but no authorized certificates / certificate authorities configured");
+                        LOG.warn("Client auth configured, but no authorized certificates / certificate authorities configured");
+                        clientAuthCerts = null;
                     }
+                } else {
+                    clientAuthCerts = null;
                 }
 
-                instance.init(KeyUtil.initKeyStore(tlsKeyFile, tlsCertFile, tlsKeyPassword), initTrustStore, new SecureRandom());
-                final SSLEngine engine = instance.createSSLEngine();
+                final SslContext sslContext = SslContextBuilder.forServer(certFile, keyFile, Strings.emptyToNull(password))
+                        .sslProvider(tlsProvider)
+                        .clientAuth(clientAuth)
+                        .trustManager(clientAuthCerts)
+                        .build();
 
-                engine.setUseClientMode(false);
-
-                switch (tlsClientAuth) {
-                    case TLS_CLIENT_AUTH_DISABLED:
-                        LOG.debug("Not using TLS client authentication");
-                        break;
-                    case TLS_CLIENT_AUTH_OPTIONAL:
-                        LOG.debug("Using optional TLS client authentication");
-                        engine.setWantClientAuth(true);
-                        break;
-                    case TLS_CLIENT_AUTH_REQUIRED:
-                        LOG.debug("Using mandatory TLS client authentication");
-                        engine.setNeedClientAuth(true);
-                        break;
-                    default:
-                        throw new IllegalArgumentException("Unknown TLS client authentication mode: " + tlsClientAuth);
-                }
-
-                return engine;
+                // TODO: Use byte buffer allocator of channel
+                return sslContext.newEngine(ByteBufAllocator.DEFAULT);
             }
         };
     }

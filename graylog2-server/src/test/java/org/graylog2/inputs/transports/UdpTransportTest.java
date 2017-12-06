@@ -74,7 +74,7 @@ public class UdpTransportTest {
             NettyTransport.CK_RECV_BUFFER_SIZE, RECV_BUFFER_SIZE);
     private static final Configuration CONFIGURATION = new Configuration(CONFIG_SOURCE);
 
-    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", 1);
+    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 1);
     private UdpTransport udpTransport;
     private NioEventLoopGroup eventLoopGroup;
     private ThroughputCounter throughputCounter;

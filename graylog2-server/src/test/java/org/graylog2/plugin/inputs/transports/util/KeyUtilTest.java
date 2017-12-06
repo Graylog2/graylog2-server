@@ -32,6 +32,8 @@ import java.io.File;
 import java.net.URISyntaxException;
 import java.security.PrivateKey;
 import java.security.SecureRandom;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Map;
@@ -50,7 +52,7 @@ public class KeyUtilTest {
             "ECDSA", "server.crt.ecdsa"
     );
 
-    @Parameterized.Parameters
+    @Parameterized.Parameters(name = "{0} with file <{1}>, password <{2}>")
     public static Collection<Object[]> data() {
         return Arrays.asList(new Object[][]{
                 // algorithm, key filename, password, exception class, exception text
@@ -96,6 +98,15 @@ public class KeyUtilTest {
 
     private File resourceToFile(String fileName) throws URISyntaxException {
         return new File(getClass().getResource(fileName).toURI());
+    }
+
+    @Test
+    public void testLoadCertificates() throws Exception {
+        final File certFile = resourceToFile(CERTIFICATES.get(keyAlgorithm));
+        final Collection<? extends Certificate> certificates = KeyUtil.loadCertificates(certFile.toPath());
+        assertThat(certificates)
+                .isNotEmpty()
+                .hasOnlyElementsOfType(X509Certificate.class);
     }
 
     @Test

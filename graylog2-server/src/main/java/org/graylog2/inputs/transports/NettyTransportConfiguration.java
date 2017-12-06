@@ -22,6 +22,8 @@ import com.github.joschi.jadconfig.validators.StringNotBlankValidator;
 import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.epoll.Epoll;
 import io.netty.channel.kqueue.KQueue;
+import io.netty.handler.ssl.OpenSsl;
+import io.netty.handler.ssl.SslProvider;
 import org.graylog2.inputs.transports.netty.NettyTransportType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +37,9 @@ public class NettyTransportConfiguration {
     @Parameter(value = PREFIX + "type", required = true, validators = StringNotBlankValidator.class)
     private String type = "auto";
 
+    @Parameter(value = PREFIX + "tls_provider", required = true, validators = StringNotBlankValidator.class)
+    private String tlsProvider = "auto";
+
     @Parameter(value = PREFIX + "num_threads", required = true, validators = PositiveIntegerValidator.class)
     private int numThreads = Runtime.getRuntime().availableProcessors() * 2;
 
@@ -42,8 +47,9 @@ public class NettyTransportConfiguration {
     }
 
     @VisibleForTesting
-    public NettyTransportConfiguration(String type, int numThreads) {
+    public NettyTransportConfiguration(String type, String tlsProvider, int numThreads) {
         this.type = type;
+        this.tlsProvider = tlsProvider;
         this.numThreads = numThreads;
     }
 
@@ -73,6 +79,28 @@ public class NettyTransportConfiguration {
         } else {
             LOG.debug("Using NIO for Netty transport.");
             return NettyTransportType.NIO;
+        }
+    }
+
+    public SslProvider getTlsProvider() {
+        switch (tlsProvider.toLowerCase(Locale.ROOT)) {
+            case "openssl":
+                return SslProvider.OPENSSL;
+            case "jdk":
+                return SslProvider.JDK;
+            case "auto":
+            default:
+                return detectTlsProvider();
+        }
+    }
+
+    private SslProvider detectTlsProvider() {
+        if (OpenSsl.isAvailable()) {
+            LOG.debug("Using OpenSSL for Netty transports.");
+            return SslProvider.OPENSSL;
+        } else {
+            LOG.debug("Using default Java TLS provider for Netty transports.");
+            return SslProvider.JDK;
         }
     }
 

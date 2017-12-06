@@ -68,7 +68,7 @@ public class AbstractTcpTransportTest {
     private ThroughputCounter throughputCounter;
     private LocalMetricRegistry localRegistry;
     private NioEventLoopGroup eventLoopGroup;
-    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", 0);
+    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 0);
     private ConnectionCounter connectionCounter;
 
     @Before
