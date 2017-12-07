@@ -98,6 +98,7 @@ public class UdpTransportTest {
     public void transportReceivesDataSmallerThanRecvBufferSize() throws Exception {
         final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
         final UdpTransport transport = launchTransportForBootStrapTest(handler);
+        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
         final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
 
         sendUdpDatagram(BIND_ADDRESS, localAddress.getPort(), 100);
@@ -111,6 +112,7 @@ public class UdpTransportTest {
     public void transportReceivesDataExactlyRecvBufferSize() throws Exception {
         final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
         final UdpTransport transport = launchTransportForBootStrapTest(handler);
+        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
         final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
 
         // This will be variable depending on the version of the IP protocol and the UDP packet size.
@@ -130,6 +132,7 @@ public class UdpTransportTest {
 
         final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
         final UdpTransport transport = launchTransportForBootStrapTest(handler);
+        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
         final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
 
         sendUdpDatagram(BIND_ADDRESS, localAddress.getPort(), 2 * RECV_BUFFER_SIZE);
@@ -146,6 +149,7 @@ public class UdpTransportTest {
 
         final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
         final UdpTransport transport = launchTransportForBootStrapTest(handler);
+        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
         final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
 
         sendUdpDatagram(BIND_ADDRESS, localAddress.getPort(), 2 * RECV_BUFFER_SIZE);
