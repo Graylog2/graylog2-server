@@ -334,51 +334,6 @@ public class IndicesIT extends ElasticsearchBase {
     }
 
     @Test
-    public void testIndexTemplateCanBeOverridden_Elasticsearch2() throws Exception {
-        assumeTrue(getElasticsearchVersion().getMajorVersion() == 2);
-
-        final String testIndexName = "graylog_override_template";
-        final String customTemplateName = "custom-template";
-
-        // Create custom index template
-        final Map<String, Object> customMapping = ImmutableMap.of(
-                "_source", ImmutableMap.of("enabled", false),
-                "properties", ImmutableMap.of("source",
-                        ImmutableMap.of(
-                                "type", "string",
-                                "index", "not_analyzed"
-                        )));
-        final Map<String, Object> templateSource = ImmutableMap.of(
-                "template", indexSet.getIndexWildcard(),
-                "order", 1,
-                "mappings", ImmutableMap.of(IndexMapping.TYPE_MESSAGE, customMapping)
-        );
-
-        putTemplate(customTemplateName, templateSource);
-
-        try {
-            // Validate existing index templates
-            final JsonNode existingTemplate = getTemplate(customTemplateName);
-            assertThat(existingTemplate.path(customTemplateName).isObject()).isTrue();
-
-            // Create index with custom template
-            indices.create(testIndexName, indexSet);
-            waitForGreenStatus(testIndexName);
-
-            // Check index mapping
-            final JsonNode indexMappings = getMapping(testIndexName);
-            final JsonNode mapping = indexMappings.path(testIndexName).path("mappings").path(IndexMapping.TYPE_MESSAGE);
-
-            assertThat(mapping.path("_source").path("enabled")).isEqualTo(BooleanNode.getFalse());
-            assertThat(mapping.path("properties").path("source").path("index")).isEqualTo(new TextNode("not_analyzed"));
-        } finally {
-            // Clean up
-            deleteTemplate(customTemplateName);
-            deleteIndex(testIndexName);
-        }
-    }
-
-    @Test
     public void testIndexTemplateCanBeOverridden_Elasticsearch5() throws Exception {
         assumeTrue(getElasticsearchVersion().getMajorVersion() == 5);
 

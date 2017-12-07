@@ -39,7 +39,6 @@ import io.searchbox.indices.template.DeleteTemplate;
 import io.searchbox.indices.template.GetTemplate;
 import io.searchbox.indices.template.PutTemplate;
 import org.graylog2.indexer.IndexMapping;
-import org.graylog2.indexer.IndexMapping2;
 import org.graylog2.indexer.IndexMapping5;
 import org.junit.Rule;
 
@@ -120,12 +119,10 @@ public abstract class ElasticsearchBase {
 
     protected IndexMapping indexMapping() {
         switch (elasticsearchVersion.getMajorVersion()) {
-            case 2:
-                return new IndexMapping2();
             case 5:
                 return new IndexMapping5();
             default:
-                throw new IllegalStateException("Only Elasticsearch 2.x and 5.x are supported");
+                throw new IllegalStateException("Only Elasticsearch 5.x is supported");
         }
     }
 
