@@ -23,7 +23,7 @@ public class ESDateHistogram implements ESSearchTypeHandler<DateHistogram> {
         searchSourceBuilder.aggregation(
                 AggregationBuilders.dateHistogram(dateHistogram.id())
                         .field(Message.FIELD_TIMESTAMP)
-                        .interval(dateHistogram.interval().toESInterval()));
+                        .dateHistogramInterval(dateHistogram.interval().toESInterval()));
     }
 
     @SuppressWarnings("unchecked")

@@ -8,7 +8,7 @@ import io.searchbox.core.search.aggregation.TermsAggregation;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.script.Script;
-import org.elasticsearch.script.ScriptService;
+import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -19,6 +19,7 @@ import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
 import org.graylog.plugins.enterprise.search.searchtypes.GroupBy;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,8 +35,7 @@ public class ESGroupBy implements ESSearchTypeHandler<GroupBy> {
         if (stackedFields.isEmpty()) {
             // Wrap terms aggregation in a no-op filter to make sure the result structure is correct when not having
             // stacked fields.
-            return AggregationBuilders.filter(filterAggName(groupBy))
-                    .filter(QueryBuilders.matchAllQuery())
+            return AggregationBuilders.filter(filterAggName(groupBy), QueryBuilders.matchAllQuery())
                     .subAggregation(AggregationBuilders.terms(termsAggName(groupBy))
                             .field(field)
                             .size(size)
@@ -64,10 +64,9 @@ public class ESGroupBy implements ESSearchTypeHandler<GroupBy> {
             filterQuery.must(QueryBuilders.existsQuery(f));
         });
 
-        return AggregationBuilders.filter(filterAggName(groupBy))
-                .filter(filterQuery)
+        return AggregationBuilders.filter(filterAggName(groupBy), filterQuery)
                 .subAggregation(AggregationBuilders.terms(termsAggName(groupBy))
-                        .script(new Script(scriptStringBuilder.toString(), ScriptService.ScriptType.INLINE, "painless", null))
+                        .script(new Script(ScriptType.INLINE, "painless", scriptStringBuilder.toString(), Collections.emptyMap()))
                         .size(size)
                         .order(termsOrder));
     }

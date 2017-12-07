@@ -5,7 +5,7 @@ import io.searchbox.core.SearchResult;
 import io.searchbox.core.search.aggregation.DateHistogramAggregation;
 import io.searchbox.core.search.aggregation.TermsAggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramBuilder;
+import org.elasticsearch.search.aggregations.bucket.histogram.DateHistogramAggregationBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
@@ -42,9 +42,9 @@ public class ESGroupByHistogram implements ESSearchTypeHandler<GroupByHistogram>
         final GroupBy groupBy = createGroupBy(groupByHistogram);
         final ESGroupBy esGroupBy = new ESGroupBy();
 
-        final DateHistogramBuilder histogram = AggregationBuilders.dateHistogram(histogramAggName(groupByHistogram))
+        final DateHistogramAggregationBuilder histogram = AggregationBuilders.dateHistogram(histogramAggName(groupByHistogram))
                 .field(Message.FIELD_TIMESTAMP)
-                .interval(interval.toESInterval())
+                .dateHistogramInterval(interval.toESInterval())
                 .subAggregation(esGroupBy.createTermsBuilder(mainField, stackedFields, groupBy));
 
         queryBuilder.aggregation(histogram);
