@@ -14,6 +14,6 @@ then
   set_fields(invalid_json_fields);
 
   // Don't fail on missing field
-  let missing_fields = select_jsonpath(x, { some_field: "$.i_dont_exist" });
+  let missing_fields = select_jsonpath(x, { some_field: "$.i_dont_exist", this_should_exist: "$['store']['book'][-1:]['author']" });
   set_fields(missing_fields);
 end

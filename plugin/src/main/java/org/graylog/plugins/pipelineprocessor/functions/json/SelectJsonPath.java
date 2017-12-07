@@ -30,9 +30,11 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.google.common.collect.ImmutableList.of;
@@ -73,14 +75,16 @@ public class SelectJsonPath extends AbstractFunction<Map<String, Object>> {
         if (json == null || paths == null) {
             return Collections.emptyMap();
         }
-        return paths
-                .entrySet().stream()
-                .collect(toMap(
-                        Map.Entry::getKey,
-                        e -> unwrapJsonNode(e.getValue().read(json, configuration))
-                ));
+        // a plain Stream.collect(toMap(...)) will fail on null values, because of the HashMap#merge method in its implementation
+        // since json nodes at certain paths might be missing, the value could be null, so we use HashMap#put directly
+        final Map<String, Object> map = new HashMap<>();
+        for (Map.Entry<String, JsonPath> entry : paths.entrySet()) {
+            map.put(entry.getKey(), unwrapJsonNode(entry.getValue().read(json, configuration)));
+        }
+        return map;
     }
 
+    @Nullable
     private Object unwrapJsonNode(Object value) {
         if (!(value instanceof JsonNode)) {
             return value;
