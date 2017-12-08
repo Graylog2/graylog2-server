@@ -5,6 +5,9 @@ import { Button } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import ObjectUtils from 'util/ObjectUtils';
 
+// eslint-disable-next-line no-unused-vars
+import style from './KeyValueTable.css';
+
 /**
  * KeyValueTable displays a table for all key-value pairs in a JS object. If the editable prop is set to true, it also
  * provides inputs to create, edit and delete key-value pairs.
@@ -144,7 +147,7 @@ const KeyValueTable = React.createClass({
 
   render() {
     return (
-      <div>
+      <div className="key-value-table-component">
         <div className={`table-responsive ${this.props.containerClassName}`}>
           <table className={`table table-striped ${this.props.className}`}>
             <thead>{this._formattedHeaders(this.props.headers)}</thead>

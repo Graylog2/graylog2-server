@@ -1,0 +1,8 @@
+/*
+ * Nesting a form-group inside a form-group breaks the margins of input fields.
+ * We reset the margins in that case but scope it to the KeyValueTable component to avoid affecting others by accident.
+ */
+.form-horizontal .form-group .key-value-table-component .form-group {
+    margin-left: 0;
+    margin-right: 0;
+}
