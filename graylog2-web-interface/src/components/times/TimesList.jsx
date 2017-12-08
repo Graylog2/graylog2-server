@@ -1,19 +1,30 @@
 import React from 'react';
+import { PropTypes } from 'prop-types';
 import Reflux from 'reflux';
+import { connect } from 'react-redux';
 import { Col, Row } from 'react-bootstrap';
 import moment from 'moment';
 import DateTime from 'logic/datetimes/DateTime';
 
-import StoreProvider from 'injection/StoreProvider';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const SystemStore = StoreProvider.getStore('System');
-
 import { Spinner, Timestamp } from 'components/common';
+import StoreProvider from 'injection/StoreProvider';
+import { loadSystemInfo } from 'ducks/system';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const TimesList = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(SystemStore)],
+  propTypes: {
+    isLoading: PropTypes.bool,
+    system: PropTypes.object,
+    loadSystemInfo: PropTypes.func.isRequired,
+  },
+
+  mixins: [Reflux.connect(CurrentUserStore)],
   getInitialState() {
     return { time: moment() };
+  },
+  componentWillMount() {
+    this.props.loadSystemInfo();
   },
   componentDidMount() {
     this.interval = setInterval(() => this.setState(this.getInitialState()), 1000);
@@ -22,13 +33,14 @@ const TimesList = React.createClass({
     clearInterval(this.interval);
   },
   render() {
-    if (!this.state.system) {
+    const { isLoading, system } = this.props;
+    if (isLoading) {
       return <Spinner />;
     }
     const time = this.state.time;
     const timeFormat = DateTime.Formats.DATETIME_TZ;
     const currentUser = this.state.currentUser;
-    const serverTimezone = this.state.system.timezone;
+    const serverTimezone = system.timezone;
     return (
       <Row className="content">
         <Col md={12}>
@@ -53,4 +65,17 @@ const TimesList = React.createClass({
   },
 });
 
-export default TimesList;
+const mapStateToProps = (state) => {
+  return {
+    system: state.entities.systemInfo,
+    isLoading: state.frontend.isLoading,
+  };
+};
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    loadSystemInfo: () => dispatch(loadSystemInfo()),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TimesList);
