@@ -5,14 +5,20 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Promise from 'bluebird';
 import Reflux from 'reflux';
+import { Provider } from 'react-redux';
+
 import AppFacade from 'routing/AppFacade';
+import configureStore from 'stores/configureStore';
+import systemReducer from 'ducks/system';
 
 Promise.config({ cancellation: true });
 Reflux.setPromiseFactory(handlers => new Promise(handlers));
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(
-    <AppFacade />,
+    <Provider store={configureStore(systemReducer)}>
+      <AppFacade />
+    </Provider>,
     appContainer,
   );
 }
