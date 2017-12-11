@@ -36,9 +36,7 @@ const initialState = {
     isLoading: true,
     error: undefined,
   },
-  entities: {
-    jvmInfo: undefined,
-  },
+  jvmInfo: undefined,
 };
 
 export default function reducer(state = initialState, action) {
@@ -48,7 +46,7 @@ export default function reducer(state = initialState, action) {
     case JVM_INFO_SUCCESS:
       return combineState(state, {
         frontend: { isLoading: false },
-        entities: { jvmInfo: action.response },
+        jvmInfo: action.response,
       });
     case JVM_INFO_FAILURE:
       return combineState(state, {

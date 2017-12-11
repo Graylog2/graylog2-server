@@ -31,8 +31,8 @@ const Footer = React.createClass({
 
 const mapStateToProps = state => ({
   isLoading: state.system.frontend.isLoading || state.jvm.frontend.isLoading,
-  system: state.system.entities.systemInfo,
-  jvm: state.jvm.entities.jvmInfo,
+  system: state.system.systemInfo,
+  jvm: state.jvm.jvmInfo,
 });
 
 const mapDispatchToProps = dispatch => ({

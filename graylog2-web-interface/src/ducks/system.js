@@ -36,9 +36,7 @@ const initialState = {
     isLoading: true,
     error: undefined,
   },
-  entities: {
-    systemInfo: undefined,
-  },
+  systemInfo: undefined,
 };
 
 export default function reducer(state = initialState, action) {
@@ -48,7 +46,7 @@ export default function reducer(state = initialState, action) {
     case SYSTEM_INFO_SUCCESS:
       return combineState(state, {
         frontend: { isLoading: false },
-        entities: { systemInfo: action.response },
+        systemInfo: action.response,
       });
     case SYSTEM_INFO_FAILURE:
       return combineState(state, {
