@@ -14,7 +14,7 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const TimesList = React.createClass({
   propTypes: {
-    isLoading: PropTypes.bool,
+    isLoading: PropTypes.bool.isRequired,
     system: PropTypes.object,
   },
 
@@ -62,8 +62,8 @@ const TimesList = React.createClass({
 });
 
 const mapStateToProps = state => ({
-  system: state.entities.systemInfo,
-  isLoading: state.frontend.isLoading,
+  system: state.system.entities.systemInfo,
+  isLoading: state.system.frontend.isLoading,
 });
 
 const mapDispatchToProps = dispatch => ({

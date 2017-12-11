@@ -1,20 +1,19 @@
 import React from 'react';
-import Reflux from 'reflux';
+import { PropTypes } from 'prop-types';
 import Version from 'util/Version';
-
-import StoreProvider from 'injection/StoreProvider';
-const SystemStore = StoreProvider.getStore('System');
+import { loadSystemInfo } from 'ducks/system';
+import { loadJvmInfo } from 'ducks/jvm';
+import createContainer from 'components/createContainer';
 
 const Footer = React.createClass({
-  mixins: [Reflux.connect(SystemStore)],
-  componentDidMount() {
-    SystemStore.jvm().then(jvmInfo => this.setState({ jvm: jvmInfo }));
+  propTypes: {
+    isLoading: PropTypes.bool.isRequired,
+    system: PropTypes.object,
+    jvm: PropTypes.object,
   },
-  _isLoading() {
-    return !(this.state.system && this.state.jvm);
-  },
+
   render() {
-    if (this._isLoading()) {
+    if (this.props.isLoading) {
       return (
         <div id="footer">
           Graylog {Version.getFullVersion()}
@@ -24,10 +23,23 @@ const Footer = React.createClass({
 
     return (
       <div id="footer">
-        Graylog {this.state.system.version} on {this.state.system.hostname} ({this.state.jvm.info})
+        Graylog {this.props.system.version} on {this.props.system.hostname} ({this.props.jvm.info})
       </div>
     );
   },
 });
 
-export default Footer;
+const mapStateToProps = state => ({
+  isLoading: state.system.frontend.isLoading || state.jvm.frontend.isLoading,
+  system: state.system.entities.systemInfo,
+  jvm: state.jvm.entities.jvmInfo,
+});
+
+const mapDispatchToProps = dispatch => ({
+  loadSystemInfo: () => dispatch(loadSystemInfo()),
+  loadJvmInfo: () => dispatch(loadJvmInfo()),
+});
+
+export default createContainer(mapStateToProps, mapDispatchToProps)(Footer, {
+  componentWillMount: ['loadSystemInfo', 'loadJvmInfo'],
+});
