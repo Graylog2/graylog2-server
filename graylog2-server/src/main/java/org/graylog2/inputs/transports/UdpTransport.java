@@ -32,7 +32,6 @@ import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.socket.DatagramChannelConfig;
 import io.netty.channel.unix.UnixChannelOption;
-import io.netty.handler.codec.DatagramPacketDecoder;
 import org.graylog2.inputs.transports.netty.DatagramChannelFactory;
 import org.graylog2.inputs.transports.netty.DatagramPacketHandler;
 import org.graylog2.inputs.transports.netty.NettyTransportType;
@@ -74,13 +73,9 @@ public class UdpTransport extends NettyTransport {
     Bootstrap getBootstrap(MessageInput input) {
         LOG.debug("Setting UDP receive buffer size to {} bytes", getRecvBufferSize());
         final NettyTransportType transportType = nettyTransportConfiguration.getType();
-
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseHandlers = getBaseChannelHandlers(input);
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalHandlers = getFinalChannelHandlers(input);
-
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>(baseHandlers);
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>(getChannelHandlers(input));
         handlers.put("udp-datagram", () -> DatagramPacketHandler.INSTANCE);
-        handlers.putAll(finalHandlers);
+        handlers.putAll(getChildChannelHandlers(input));
 
         return new Bootstrap()
                 .group(eventLoopGroup)

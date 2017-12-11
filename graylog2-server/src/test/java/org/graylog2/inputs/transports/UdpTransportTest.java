@@ -25,8 +25,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.FixedRecvByteBufAllocator;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.nio.NioEventLoop;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.handler.codec.DatagramPacketDecoder;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -55,7 +53,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
@@ -162,11 +159,11 @@ public class UdpTransportTest {
     private UdpTransport launchTransportForBootStrapTest(final MessageToMessageDecoder<ByteBuf> channelHandler) throws MisfireException {
         final UdpTransport transport = new UdpTransport(CONFIGURATION, eventLoopGroup, nettyTransportConfiguration, throughputCounter, new LocalMetricRegistry()) {
             @Override
-            protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
+            protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChannelHandlers(MessageInput input) {
                 final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
                 handlers.put("logging", () -> new LoggingHandler(LogLevel.INFO));
                 handlers.put("counter", () -> new DatagramPacketDecoder(channelHandler));
-                handlers.putAll(super.getBaseChannelHandlers(input));
+                handlers.putAll(super.getChannelHandlers(input));
                 return handlers;
             }
         };

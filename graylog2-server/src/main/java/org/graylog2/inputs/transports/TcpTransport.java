@@ -65,13 +65,13 @@ public class TcpTransport extends AbstractTcpTransport {
     }
 
     @Override
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = new LinkedHashMap<>();
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> childChannelHandlers = new LinkedHashMap<>();
 
-        finalChannelHandlers.put("framer", () -> new LenientDelimiterBasedFrameDecoder(maxFrameLength, delimiter));
-        finalChannelHandlers.putAll(super.getFinalChannelHandlers(input));
+        childChannelHandlers.put("framer", () -> new LenientDelimiterBasedFrameDecoder(maxFrameLength, delimiter));
+        childChannelHandlers.putAll(super.getCustomChildChannelHandlers(input));
 
-        return finalChannelHandlers;
+        return childChannelHandlers;
     }
 
 
@@ -102,7 +102,7 @@ public class TcpTransport extends AbstractTcpTransport {
                     new NumberField(
                             CK_MAX_MESSAGE_SIZE,
                             "Maximum message size",
-                            2 * 1024 * 1024,
+                            DEFAULT_MAX_FRAME_LENGTH,
                             "The maximum length of a message.",
                             ConfigurationField.Optional.OPTIONAL,
                             NumberField.Attribute.ONLY_POSITIVE

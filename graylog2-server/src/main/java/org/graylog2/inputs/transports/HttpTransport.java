@@ -19,29 +19,14 @@ package org.graylog2.inputs.transports;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.inject.assistedinject.Assisted;
 import com.google.inject.assistedinject.AssistedInject;
-import io.netty.buffer.ByteBuf;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.EventLoopGroup;
-import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.handler.codec.http.DefaultHttpResponse;
-import io.netty.handler.codec.http.FullHttpRequest;
 import io.netty.handler.codec.http.HttpContentDecompressor;
-import io.netty.handler.codec.http.HttpHeaderNames;
-import io.netty.handler.codec.http.HttpHeaderValues;
-import io.netty.handler.codec.http.HttpMethod;
 import io.netty.handler.codec.http.HttpObjectAggregator;
-import io.netty.handler.codec.http.HttpRequest;
 import io.netty.handler.codec.http.HttpRequestDecoder;
-import io.netty.handler.codec.http.HttpResponse;
 import io.netty.handler.codec.http.HttpResponseEncoder;
-import io.netty.handler.codec.http.HttpResponseStatus;
-import io.netty.handler.codec.http.HttpUtil;
-import io.netty.handler.codec.http.HttpVersion;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import org.graylog2.inputs.transports.netty.HttpHandler;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -61,10 +46,10 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
 public class HttpTransport extends AbstractTcpTransport {
-    static final int DEFAULT_MAX_INITIAL_LINE_LENGTH = 4096;
-    static final int DEFAULT_MAX_HEADER_SIZE = 8192;
-    static final int DEFAULT_MAX_CHUNK_SIZE = (int) Size.kilobytes(64L).toBytes();
-    static final int DEFAULT_IDLE_WRITER_TIMEOUT = 60;
+    private static final int DEFAULT_MAX_INITIAL_LINE_LENGTH = 4096;
+    private static final int DEFAULT_MAX_HEADER_SIZE = 8192;
+    private static final int DEFAULT_MAX_CHUNK_SIZE = (int) Size.kilobytes(64L).toBytes();
+    private static final int DEFAULT_IDLE_WRITER_TIMEOUT = 60;
 
     static final String CK_ENABLE_CORS = "enable_cors";
     static final String CK_MAX_CHUNK_SIZE = "max_chunk_size";
@@ -96,33 +81,23 @@ public class HttpTransport extends AbstractTcpTransport {
     }
 
     @Override
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseChannelHandlers =
-                super.getBaseChannelHandlers(input);
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
 
         if (idleWriterTimeout > 0) {
             // Install read timeout handler to close idle connections after a timeout.
             // This avoids dangling HTTP connections when the HTTP client does not close the connection properly.
             // For details see: https://github.com/Graylog2/graylog2-server/issues/3223#issuecomment-270350500
-
-            baseChannelHandlers.put("read-timeout-handler", () -> new ReadTimeoutHandler(idleWriterTimeout, TimeUnit.SECONDS));
+            handlers.put("read-timeout-handler", () -> new ReadTimeoutHandler(idleWriterTimeout, TimeUnit.SECONDS));
         }
 
-        baseChannelHandlers.put("decoder", () -> new HttpRequestDecoder(DEFAULT_MAX_INITIAL_LINE_LENGTH, DEFAULT_MAX_HEADER_SIZE, maxChunkSize));
-        baseChannelHandlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
-        baseChannelHandlers.put("encoder", HttpResponseEncoder::new);
-        baseChannelHandlers.put("decompressor", HttpContentDecompressor::new);
+        handlers.put("decoder", () -> new HttpRequestDecoder(DEFAULT_MAX_INITIAL_LINE_LENGTH, DEFAULT_MAX_HEADER_SIZE, maxChunkSize));
+        handlers.put("aggregator", () -> new HttpObjectAggregator(maxChunkSize));
+        handlers.put("encoder", HttpResponseEncoder::new);
+        handlers.put("decompressor", HttpContentDecompressor::new);
+        handlers.put("http-handler", () -> new HttpHandler(enableCors));
+        handlers.putAll(super.getCustomChildChannelHandlers(input));
 
-        return baseChannelHandlers;
-    }
-
-    @Override
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
-
-        handlers.put("http-handler", () -> new Handler(enableCors));
-
-        handlers.putAll(super.getFinalChannelHandlers(input));
         return handlers;
     }
 
@@ -158,65 +133,5 @@ public class HttpTransport extends AbstractTcpTransport {
             return r;
         }
     }
-    public static class Handler extends SimpleChannelInboundHandler<HttpRequest> {
 
-        private final boolean enableCors;
-
-        public Handler(boolean enableCors) {
-            this.enableCors = enableCors;
-        }
-
-        @Override
-        protected void channelRead0(ChannelHandlerContext ctx, HttpRequest request) throws Exception {
-            final Channel channel = ctx.channel();
-            final boolean keepAlive = HttpUtil.isKeepAlive(request);
-            final HttpVersion httpRequestVersion = request.protocolVersion();
-            final String origin = request.headers().get(HttpHeaderNames.ORIGIN);
-
-            // to allow for future changes, let's be at least a little strict in what we accept here.
-            if (HttpMethod.OPTIONS.equals(request.method())) {
-                writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.OK, origin);
-                return;
-            } else if (!HttpMethod.POST.equals(request.method())) {
-                writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.METHOD_NOT_ALLOWED, origin);
-                return;
-            }
-
-            final boolean correctPath = "/gelf".equals(request.uri());
-            if (correctPath && request instanceof FullHttpRequest) {
-                final FullHttpRequest fullHttpRequest = (FullHttpRequest) request;
-                final ByteBuf buffer = fullHttpRequest.content();
-
-                // send on to raw message handler
-                writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.ACCEPTED, origin);
-                ctx.fireChannelRead(buffer);
-            } else {
-                writeResponse(channel, keepAlive, httpRequestVersion, HttpResponseStatus.NOT_FOUND, origin);
-            }
-        }
-
-        private void writeResponse(Channel channel,
-                                   boolean keepAlive,
-                                   HttpVersion httpRequestVersion,
-                                   HttpResponseStatus status,
-                                   String origin) {
-            final HttpResponse response =
-                    new DefaultHttpResponse(httpRequestVersion, status);
-
-            response.headers().set(HttpHeaderNames.CONTENT_LENGTH, 0);
-            response.headers().set(HttpHeaderNames.CONNECTION,
-                                   keepAlive ? HttpHeaderValues.KEEP_ALIVE : HttpHeaderValues.CLOSE);
-
-            if (enableCors && origin != null && !origin.isEmpty()) {
-                response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_ORIGIN, origin);
-                response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_CREDENTIALS, true);
-                response.headers().set(HttpHeaderNames.ACCESS_CONTROL_ALLOW_HEADERS, "Authorization, Content-Type");
-            }
-
-            final ChannelFuture channelFuture = channel.writeAndFlush(response);
-            if (!keepAlive) {
-                channelFuture.addListener(ChannelFutureListener.CLOSE);
-            }
-        }
-    }
 }

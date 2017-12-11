@@ -16,7 +16,6 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -55,7 +54,6 @@ import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import java.io.File;
@@ -135,17 +133,9 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         return new File(configuration.getString(configKey, ""));
     }
 
-    @VisibleForTesting
-    ServerBootstrap getBootstrap(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> parentHandlers = getBaseChannelHandlers(input);
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> childHandlers = new LinkedHashMap<>();
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = getFinalChannelHandlers(input);
-
-        final Callable<ChannelHandler> sslHandlerCallable = getSslHandlerCallable(input);
-        if (sslHandlerCallable != null) {
-            childHandlers.put("tls", sslHandlerCallable);
-        }
-        childHandlers.putAll(finalChannelHandlers);
+    protected ServerBootstrap getBootstrap(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> parentHandlers = getChannelHandlers(input);
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> childHandlers = getChildChannelHandlers(input);
 
         return new ServerBootstrap()
                 .group(eventLoopGroup)
@@ -173,20 +163,33 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     }
 
     @Override
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> baseChannelHandlers = super.getBaseChannelHandlers(input);
-        baseChannelHandlers.put("connection-counter", () -> connectionCounter);
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> channelHandlers = new LinkedHashMap<>(super.getChannelHandlers(input));
+        channelHandlers.put("connection-counter", () -> connectionCounter);
 
-        return baseChannelHandlers;
+        return channelHandlers;
     }
 
-    @Nullable
-    protected Callable<ChannelHandler> getSslHandlerCallable(MessageInput input) {
-        if (!tlsEnable) {
-            return null;
-        }
+    @Override
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChildChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
 
-        if (!tlsCertFile.exists() || !tlsKeyFile.exists()) {
+        if (tlsEnable) {
+            LOG.info("Enabled TLS for input [{}/{}]. key-file=\"{}\" cert-file=\"{}\"", input.getName(), input.getId(), tlsKeyFile, tlsCertFile);
+            handlers.put("tls", getSslHandlerCallable(input));
+        }
+        handlers.putAll(super.getChildChannelHandlers(input));
+
+        return handlers;
+    }
+
+    private Callable<ChannelHandler> getSslHandlerCallable(MessageInput input) {
+        final File certFile;
+        final File keyFile;
+        if (tlsCertFile.exists() && tlsKeyFile.exists()) {
+            certFile = tlsCertFile;
+            keyFile = tlsKeyFile;
+        } else {
             LOG.warn("TLS key file or certificate file does not exist, creating a self-signed certificate for input [{}/{}].", input.getName(), input.getId());
 
             final String tmpDir = System.getProperty("java.io.tmpdir");
@@ -198,12 +201,11 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
             try {
                 final SelfSignedCertificate ssc = new SelfSignedCertificate(configuration.getString(CK_BIND_ADDRESS) + ":" + configuration.getString(CK_PORT));
-                tlsCertFile = ssc.certificate();
-                tlsKeyFile = ssc.privateKey();
+                certFile = ssc.certificate();
+                keyFile = ssc.privateKey();
             } catch (CertificateException e) {
-                LOG.error(String.format(Locale.ENGLISH, "Problem creating a self-signed certificate for input [%s/%s].",
-                        input.getName(), input.getId()), e);
-                return null;
+                final String msg = String.format(Locale.ENGLISH, "Problem creating a self-signed certificate for input [%s/%s].", input.getName(), input.getId());
+                throw new IllegalStateException(msg, e);
             }
         }
 
@@ -225,8 +227,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
                 throw new IllegalArgumentException("Unknown TLS client authentication mode: " + tlsClientAuth);
         }
 
-        LOG.info("Enabled TLS for input [{}/{}]. key-file=\"{}\" cert-file=\"{}\"", input.getName(), input.getId(), tlsKeyFile, tlsCertFile);
-        return buildSslHandlerCallable(nettyTransportConfiguration.getTlsProvider(), tlsCertFile, tlsKeyFile, tlsKeyPassword, clientAuth, tlsClientAuthCertFile);
+        return buildSslHandlerCallable(nettyTransportConfiguration.getTlsProvider(), certFile, keyFile, tlsKeyPassword, clientAuth, tlsClientAuthCertFile);
     }
 
     private Callable<ChannelHandler> buildSslHandlerCallable(SslProvider tlsProvider, File certFile, File keyFile, String password, ClientAuth clientAuth, File clientAuthCertFile) {

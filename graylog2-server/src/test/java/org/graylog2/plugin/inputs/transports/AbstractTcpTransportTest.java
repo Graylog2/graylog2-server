@@ -17,12 +17,7 @@
 package org.graylog2.plugin.inputs.transports;
 
 import com.google.common.collect.ImmutableMap;
-import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.DatagramChannelConfig;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -68,7 +63,7 @@ public class AbstractTcpTransportTest {
     private ThroughputCounter throughputCounter;
     private LocalMetricRegistry localRegistry;
     private NioEventLoopGroup eventLoopGroup;
-    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 0);
+    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 1);
     private ConnectionCounter connectionCounter;
 
     @Before
@@ -86,7 +81,7 @@ public class AbstractTcpTransportTest {
     }
 
     @Test
-    public void getBaseChannelHandlersGeneratesSelfSignedCertificates() {
+    public void getChildChannelHandlersGeneratesSelfSignedCertificates() {
         final Configuration configuration = new Configuration(ImmutableMap.of(
             "bind_address", "localhost",
             "port", 12345,
@@ -97,11 +92,11 @@ public class AbstractTcpTransportTest {
                 configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter) {
         };
         final MessageInput input = mock(MessageInput.class);
-        assertThat(transport.getBaseChannelHandlers(input)).containsKey("tls");
+        assertThat(transport.getChildChannelHandlers(input)).containsKey("tls");
     }
 
     @Test
-    public void getBaseChannelHandlersFailsIfTempDirDoesNotExist() throws IOException {
+    public void getChildChannelHandlersFailsIfTempDirDoesNotExist() throws IOException {
         final File tmpDir = temporaryFolder.newFolder();
         assumeTrue(tmpDir.delete());
         System.setProperty("java.io.tmpdir", tmpDir.getAbsolutePath());
@@ -118,11 +113,11 @@ public class AbstractTcpTransportTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
 
-        transport.getBaseChannelHandlers(input);
+        transport.getChildChannelHandlers(input);
     }
 
     @Test
-    public void getBaseChannelHandlersFailsIfTempDirIsNotWritable() throws IOException {
+    public void getChildChannelHandlersFailsIfTempDirIsNotWritable() throws IOException {
         final File tmpDir = temporaryFolder.newFolder();
         assumeTrue(tmpDir.setWritable(false));
         assumeFalse(tmpDir.canWrite());
@@ -140,11 +135,11 @@ public class AbstractTcpTransportTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
 
-        transport.getBaseChannelHandlers(input);
+        transport.getChildChannelHandlers(input);
     }
 
     @Test
-    public void getBaseChannelHandlersFailsIfTempDirIsNoDirectory() throws IOException {
+    public void getChildChannelHandlersFailsIfTempDirIsNoDirectory() throws IOException {
         final File file = temporaryFolder.newFile();
         assumeTrue(file.isFile());
         System.setProperty("java.io.tmpdir", file.getAbsolutePath());
@@ -161,6 +156,6 @@ public class AbstractTcpTransportTest {
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + file.getAbsolutePath());
 
-        transport.getBaseChannelHandlers(input);
+        transport.getChildChannelHandlers(input);
     }
 }

@@ -50,11 +50,11 @@ public class SyslogTcpTransport extends TcpTransport {
     }
 
     @Override
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = new LinkedHashMap<>(super.getFinalChannelHandlers(input));
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = new LinkedHashMap<>(super.getCustomChildChannelHandlers(input));
 
         // Replace the "framer" channel handler inserted by the parent.
-        finalChannelHandlers.put("framer", () -> new SyslogTCPFramingRouterHandler(maxFrameLength, delimiter));
+        finalChannelHandlers.replace("framer", () -> new SyslogTCPFramingRouterHandler(maxFrameLength, delimiter));
 
         return finalChannelHandlers;
     }

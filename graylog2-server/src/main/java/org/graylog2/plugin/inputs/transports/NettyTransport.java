@@ -19,15 +19,12 @@ package org.graylog2.plugin.inputs.transports;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
 import io.netty.channel.Channel;
-import io.netty.channel.ChannelFuture;
-import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.channel.socket.DatagramChannelConfig;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.graylog2.inputs.transports.netty.ExceptionLoggingChannelHandler;
 import org.graylog2.inputs.transports.netty.MessageAggregationHandler;
@@ -75,7 +72,7 @@ public abstract class NettyTransport implements Transport {
                           LocalMetricRegistry localRegistry) {
         this.throughputCounter = throughputCounter;
 
-            final String hostname = configuration.getString(CK_BIND_ADDRESS);
+        final String hostname = configuration.getString(CK_BIND_ADDRESS);
         if (hostname != null && configuration.intIsSet(CK_PORT)) {
             this.socketAddress = new InetSocketAddress(hostname, configuration.getInt(CK_PORT));
         } else {
@@ -109,15 +106,21 @@ public abstract class NettyTransport implements Transport {
         this.aggregator = aggregator;
     }
 
+    @Nullable
+    protected CodecAggregator getAggregator() {
+        return aggregator;
+    }
+
     /**
-     * Subclasses can override this to add additional ChannelHandlers to the pipeline to support additional features.
-     * <p/>
-     * Some common use cases are to add SSL/TLS, connection counters or throttling traffic shapers.
+     * Subclasses can override this to add additional {@link ChannelHandler channel handlers} to the
+     * Netty {@link ChannelPipeline} to support additional features.
      *
-     * @param input
-     * @return the list of initial channelhandlers to add to the {@link org.jboss.netty.channel.ChannelPipelineFactory}
+     * Some common use cases are to add connection counters or traffic shapers.
+     *
+     * @param input The {@link MessageInput} for which these channel handlers are being added
+     * @return list of initial {@link ChannelHandler channel handlers} to add to the Netty {@link ChannelPipeline channel pipeline}
      */
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(final MessageInput input) {
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChannelHandlers(final MessageInput input) {
         LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = new LinkedHashMap<>();
 
         handlerList.put("exception-logger", () -> new ExceptionLoggingChannelHandler(input, log));
@@ -129,27 +132,39 @@ public abstract class NettyTransport implements Transport {
     }
 
     /**
-     * Subclasses can override this to modify the {@link org.jboss.netty.channel.ChannelHandler channel handlers} at the end of the pipeline.
-     * <p/>
-     * The default handlers in this group are the aggregation handler (e.g. for chunked GELF via UDP), which can be missing, and the {@link RawMessageHandler}.
-     * <p/>
-     * Usually this should not be necessary, only modify them if you have a codec that cannot create a {@link org.graylog2.plugin.journal.RawMessage} for
-     * incoming messages at the end of the pipeline.
-     * <p/>
-     * One valid use case would be to insert debug handlers in the middle of the list, though.
+     * Subclasses can override this to modify the {@link ChannelHandler channel handlers} at the end of the pipeline for child channels.
      *
-     * @param input
-     * @return the list of channel handlers at the end of the pipeline
+     * @param input The {@link MessageInput} for which these child channel handlers are being added
+     * @return list of custom {@link ChannelHandler channel handlers} to add to the Netty {@link ChannelPipeline channel pipeline} for child channels
      */
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(final MessageInput input) {
-        LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = new LinkedHashMap<>();
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(final MessageInput input) {
+        return new LinkedHashMap<>();
+    }
+
+    /**
+     * Subclasses can override this to modify the {@link ChannelHandler channel handlers} for child channels.
+     *
+     * The default handlers in this group are all channel handlers returned by {@link #getCustomChildChannelHandlers(MessageInput)},
+     * the optional aggregation handler (e.g. for chunked GELF via UDP) and the {@link RawMessageHandler} (in that order).
+     *
+     * Usually overriding this method should only be necessary if you have a codec that cannot create a
+     * {@link org.graylog2.plugin.journal.RawMessage} for incoming messages at the end of the pipeline.
+     *
+     * A valid use case would be to insert debug handlers in the middle of the list, though.
+     *
+     * @param input The {@link MessageInput} for which these child channel handlers are being added
+     * @return list of custom {@link ChannelHandler channel handlers} to add to the Netty {@link ChannelPipeline channel pipeline} for child channels
+     * @see #getCustomChildChannelHandlers(MessageInput)
+     */
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChildChannelHandlers(final MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlerList = new LinkedHashMap<>(getCustomChildChannelHandlers(input));
 
         if (aggregator != null) {
             log.debug("Adding codec aggregator {} to channel pipeline", aggregator);
             handlerList.put("codec-aggregator", () -> new MessageAggregationHandler(aggregator, localRegistry));
         }
-
         handlerList.put("rawmessage-handler", () -> new RawMessageHandler(input));
+
         return handlerList;
     }
 

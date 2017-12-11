@@ -14,9 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.inputs.transports;
+package org.graylog2.inputs.transports.netty;
 
-import io.netty.channel.ChannelInboundHandler;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.http.DefaultFullHttpRequest;
 import io.netty.handler.codec.http.DefaultHttpRequest;
@@ -36,18 +35,17 @@ import java.nio.charset.StandardCharsets;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class HttpTransportHandlerTest {
+public class HttpHandlerTest {
     private static final byte[] GELF_MESSAGE = "{\"version\":\"1.1\",\"short_message\":\"Foo\",\"host\":\"localhost\"}".getBytes(StandardCharsets.UTF_8);
     private EmbeddedChannel channel;
 
     @Before
-    public void setUp() throws Exception {
-        final ChannelInboundHandler channelHandler = new HttpTransport.Handler(true);
-        channel = new EmbeddedChannel(channelHandler);
+    public void setUp() {
+        channel = new EmbeddedChannel(new HttpHandler(true));
     }
 
     @Test
-    public void messageReceivedSuccessfullyProcessesPOSTRequest() throws Exception {
+    public void messageReceivedSuccessfullyProcessesPOSTRequest() {
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/gelf");
         httpRequest.headers().add(HttpHeaderNames.HOST, "localhost");
         httpRequest.headers().add(HttpHeaderNames.ORIGIN, "http://example.com");
@@ -70,7 +68,7 @@ public class HttpTransportHandlerTest {
 
 
     @Test
-    public void withKeepalive() throws Exception {
+    public void withKeepalive() {
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/gelf");
         httpRequest.headers().add(HttpHeaderNames.HOST, "localhost");
         httpRequest.headers().add(HttpHeaderNames.CONNECTION, HttpHeaderValues.KEEP_ALIVE);
@@ -88,7 +86,7 @@ public class HttpTransportHandlerTest {
     }
 
     @Test
-    public void withJSONContentType() throws Exception {
+    public void withJSONContentType() {
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/gelf");
         httpRequest.headers().add(HttpHeaderNames.HOST, "localhost");
         httpRequest.headers().add(HttpHeaderNames.CONTENT_TYPE, HttpHeaderValues.APPLICATION_JSON);
@@ -107,7 +105,7 @@ public class HttpTransportHandlerTest {
     }
 
     @Test
-    public void withCustomContentType() throws Exception {
+    public void withCustomContentType() {
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/gelf");
         httpRequest.headers().add(HttpHeaderNames.HOST, "localhost");
         httpRequest.headers().add(HttpHeaderNames.CONTENT_TYPE, "foo/bar");
@@ -126,7 +124,7 @@ public class HttpTransportHandlerTest {
     }
 
     @Test
-    public void successfullyProcessOPTIONSRequest() throws Exception {
+    public void successfullyProcessOPTIONSRequest() {
         final HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/gelf");
         httpRequest.headers().add(HttpHeaderNames.HOST, "localhost");
         httpRequest.headers().add(HttpHeaderNames.ORIGIN, "http://example.com");
@@ -146,7 +144,7 @@ public class HttpTransportHandlerTest {
     }
 
     @Test
-    public void successfullyProcessOPTIONSRequestWithoutOrigin() throws Exception {
+    public void successfullyProcessOPTIONSRequestWithoutOrigin() {
         final HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.OPTIONS, "/gelf");
         httpRequest.headers().add(HttpHeaderNames.HOST, "localhost");
         httpRequest.headers().add(HttpHeaderNames.CONNECTION, HttpHeaderValues.CLOSE);
@@ -165,7 +163,7 @@ public class HttpTransportHandlerTest {
     }
 
     @Test
-    public void return404ForWrongPath() throws Exception {
+    public void return404ForWrongPath() {
         final HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, "/");
         httpRequest.headers().add(HttpHeaderNames.HOST, "localhost");
         httpRequest.headers().add(HttpHeaderNames.ORIGIN, "http://example.com");
@@ -184,7 +182,7 @@ public class HttpTransportHandlerTest {
     }
 
     @Test
-    public void messageReceivedReturns405ForInvalidMethod() throws Exception {
+    public void messageReceivedReturns405ForInvalidMethod() {
         final HttpRequest httpRequest = new DefaultHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/");
         httpRequest.headers().add(HttpHeaderNames.HOST, "localhost");
         httpRequest.headers().add(HttpHeaderNames.ORIGIN, "http://example.com");
