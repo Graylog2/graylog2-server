@@ -7,7 +7,7 @@ import DateTime from 'logic/datetimes/DateTime';
 
 import { Spinner, Timestamp } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
-import { loadSystemInfo } from 'ducks/system';
+import { loadSystemInfo } from 'ducks/system/index';
 import createContainer from 'components/createContainer';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');

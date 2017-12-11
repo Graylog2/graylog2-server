@@ -8,17 +8,15 @@ import Reflux from 'reflux';
 import { Provider } from 'react-redux';
 
 import AppFacade from 'routing/AppFacade';
-import { combineReducers } from 'redux';
 import configureStore from 'stores/configureStore';
-import systemReducer from 'ducks/system';
-import jvmReducer from 'ducks/jvm';
+import systemReducers from 'ducks/system/index';
 
 Promise.config({ cancellation: true });
 Reflux.setPromiseFactory(handlers => new Promise(handlers));
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(
-    <Provider store={configureStore(combineReducers({ system: systemReducer, jvm: jvmReducer }))}>
+    <Provider store={configureStore(systemReducers)}>
       <AppFacade />
     </Provider>,
     appContainer,

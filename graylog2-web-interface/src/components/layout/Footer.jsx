@@ -1,8 +1,7 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
 import Version from 'util/Version';
-import { loadSystemInfo } from 'ducks/system';
-import { loadJvmInfo } from 'ducks/jvm';
+import { loadSystemInfo, loadJvmInfo } from 'ducks/system/index';
 import createContainer from 'components/createContainer';
 
 const Footer = React.createClass({
