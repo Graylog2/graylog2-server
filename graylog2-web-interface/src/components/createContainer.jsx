@@ -18,12 +18,19 @@ const createContainer = (mapStateToProps, mapDispatchToProps) => {
       }
 
       componentWillMount() {
-        if (dataLoaders.componentWillMount) {
-          const dataLoader = this.props[dataLoaders.componentWillMount];
-          if (dataLoader && typeof dataLoader === 'function') {
-            dataLoader();
-          }
+        const componentWillMountDataLoaders = dataLoaders.componentWillMount;
+        if (!componentWillMountDataLoaders) {
+          return;
         }
+        const dataLoaderFunctions = Array.isArray(componentWillMountDataLoaders) ? componentWillMountDataLoaders : [componentWillMountDataLoaders];
+        dataLoaderFunctions.forEach((dataLoaderFunctionName) => {
+          const dataLoader = this.props[dataLoaderFunctionName];
+          if (dataLoader) {
+            if (typeof dataLoader === 'function') {
+              dataLoader();
+            }
+          }
+        });
       }
 
       render() {
