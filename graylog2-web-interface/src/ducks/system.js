@@ -20,16 +20,14 @@ const failedSystemInfo = error => ({
   error: error,
 });
 
-export const loadSystemInfo = () => {
-  return (dispatch) => {
-    dispatch(requestSystemInfo());
-    const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.info().url);
-    return fetch('GET', url)
-      .then(
-        response => dispatch(receiveSystemInfo(response)),
-        error => dispatch(failedSystemInfo(error)),
-      );
-  };
+export const loadSystemInfo = () => (dispatch) => {
+  dispatch(requestSystemInfo());
+  const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.info().url);
+  return fetch('GET', url)
+    .then(
+      response => dispatch(receiveSystemInfo(response)),
+      error => dispatch(failedSystemInfo(error)),
+    );
 };
 
 const initialState = {
@@ -59,4 +57,3 @@ export default (state = initialState, action) => {
       return state;
   }
 };
-

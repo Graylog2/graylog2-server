@@ -61,18 +61,14 @@ const TimesList = React.createClass({
   },
 });
 
-const mapStateToProps = (state) => {
-  return {
-    system: state.entities.systemInfo,
-    isLoading: state.frontend.isLoading,
-  };
-};
+const mapStateToProps = state => ({
+  system: state.entities.systemInfo,
+  isLoading: state.frontend.isLoading,
+});
 
-const mapDispatchToProps = (dispatch) => {
-  return {
-    loadSystemInfo: () => dispatch(loadSystemInfo()),
-  };
-};
+const mapDispatchToProps = dispatch => ({
+  loadSystemInfo: () => dispatch(loadSystemInfo()),
+});
 
 export default createContainer(mapStateToProps, mapDispatchToProps)(TimesList, {
   componentWillMount: 'loadSystemInfo',
