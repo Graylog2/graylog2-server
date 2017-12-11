@@ -40,7 +40,7 @@ const initialState = {
   },
 };
 
-export default (state = initialState, action) => {
+export default function reducer(state = initialState, action) {
   switch (action.type) {
     case SYSTEM_INFO_REQUEST:
       return Object.assign({}, state, { frontend: { isLoading: true } });
@@ -56,4 +56,4 @@ export default (state = initialState, action) => {
     default:
       return state;
   }
-};
+}
