@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Reflux from 'reflux';
+import { loadSystemInfo } from 'ducks/system/index';
+import createContainer from 'components/createContainer';
 
 import { DocumentTitle, Spinner } from 'components/common';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
@@ -8,33 +9,27 @@ import GettingStarted from 'components/gettingstarted/GettingStarted';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
-import StoreProvider from 'injection/StoreProvider';
-
-const SystemStore = StoreProvider.getStore('System');
-
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
 const GettingStartedPage = React.createClass({
   propTypes: {
     location: PropTypes.object.isRequired,
-  },
-  mixins: [Reflux.connect(SystemStore)],
-  _isLoading() {
-    return !this.state.system;
+    isLoading: PropTypes.bool,
+    system: PropTypes.object,
   },
   _onDismiss() {
     history.push(Routes.STARTPAGE);
   },
   render() {
-    if (this._isLoading()) {
+    if (this.props.isLoading) {
       return <Spinner />;
     }
 
     return (
       <DocumentTitle title="Getting started">
         <div>
-          <GettingStarted clusterId={this.state.system.cluster_id}
-                          masterOs={this.state.system.operating_system}
-                          masterVersion={this.state.system.version}
+          <GettingStarted clusterId={this.props.system.cluster_id}
+                          masterOs={this.props.system.operating_system}
+                          masterVersion={this.props.system.version}
                           gettingStartedUrl={GETTING_STARTED_URL}
                           noDismissButton={Boolean(this.props.location.query.menu)}
                           onDismiss={this._onDismiss} />
@@ -44,4 +39,15 @@ const GettingStartedPage = React.createClass({
   },
 });
 
-export default GettingStartedPage;
+const mapStateToProps = state => ({
+  isLoading: state.system.frontend.isLoading,
+  system: state.system.systemInfo,
+});
+
+const mapDispatchToProps = dispatch => ({
+  loadSystemInfo: () => dispatch(loadSystemInfo()),
+});
+
+export default createContainer(mapStateToProps, mapDispatchToProps)(GettingStartedPage, {
+  componentWillMount: 'loadSystemInfo',
+});
