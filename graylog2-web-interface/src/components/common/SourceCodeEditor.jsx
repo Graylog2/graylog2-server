@@ -27,6 +27,8 @@ class SourceCodeEditor extends React.Component {
      * the new value and an event as arguments.
      */
     onChange: PropTypes.func.isRequired,
+    /** Specifies if the editor should be in read-only mode. */
+    readOnly: PropTypes.bool,
     /** Specifies the theme to use for the editor. */
     theme: PropTypes.oneOf(['light', 'dark']),
     /** Text to use in the editor. */
@@ -37,6 +39,7 @@ class SourceCodeEditor extends React.Component {
     focus: false,
     fontSize: 13,
     onLoad: () => {},
+    readOnly: false,
     theme: 'light',
     value: '',
   };
@@ -53,6 +56,7 @@ class SourceCodeEditor extends React.Component {
                    height="18em"
                    onLoad={this.props.onLoad}
                    onChange={this.props.onChange}
+                   readOnly={this.props.readOnly}
                    value={this.props.value}
                    width="100%" />
       </div>

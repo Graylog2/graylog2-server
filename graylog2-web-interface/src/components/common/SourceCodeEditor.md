@@ -34,13 +34,14 @@ const LightSourceEditor = createReactClass({
 <LightSourceEditor />
 ```
 
-Dark-themed editor:
+Read-only dark-themed editor:
 ```js
 const code = `function foobar() {
   console.log('this is some source code!');
 }
 `;
 <SourceCodeEditor id="editor-2"
+                  readOnly
                   theme="dark"
                   value={code} />
 ```
