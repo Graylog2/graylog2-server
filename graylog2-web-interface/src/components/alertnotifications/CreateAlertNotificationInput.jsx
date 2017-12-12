@@ -4,7 +4,7 @@ import naturalSort from 'javascript-natural-sort';
 import { Button, Col, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
-import { Select, Spinner } from 'components/common';
+import { ExternalLinkButton, Select, Spinner } from 'components/common';
 import { ConfigurationForm } from 'components/configurationforms';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
@@ -107,9 +107,11 @@ const CreateAlertNotificationInput = React.createClass({
 
     return (
       <div>
-        <Button bsStyle="info" href="https://marketplace.graylog.org/" target="_blank" className="pull-right">
-          <i className="fa fa-external-link" />&nbsp; Find more notifications
-        </Button>
+        <ExternalLinkButton href="https://marketplace.graylog.org/"
+                            bsStyle="info"
+                            className="pull-right">
+          Find more notifications
+        </ExternalLinkButton>
 
         <h2>Notification</h2>
         <p className="description">
