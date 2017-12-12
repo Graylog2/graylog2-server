@@ -26,6 +26,7 @@ export { default as Select } from './Select';
 export { default as SelectableList } from './SelectableList';
 export { default as SortableList } from './SortableList';
 export { default as SortableListItem } from './SortableListItem';
+export { default as SourceCodeEditor } from './SourceCodeEditor';
 export { default as Spinner } from './Spinner';
 export { default as TableList } from './TableList';
 export { default as Timestamp } from './Timestamp';
