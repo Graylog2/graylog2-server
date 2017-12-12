@@ -1,78 +1,71 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Col, Nav, NavItem, Row, Tab } from 'react-bootstrap';
+import { Col, Nav, NavItem, Row, Tab, ToggleButtonGroup, ToggleButton, Button } from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
 
 import SearchButton from 'enterprise/components/searchbar/SearchButton';
-import SearchStore from 'enterprise/stores/SearchStore';
-import SearchActions from 'enterprise/actions/SearchActions';
+import ViewStore from 'enterprise/stores/ViewStore';
+import ViewActions from 'enterprise/actions/ViewActions';
 import TimeRangeInput from 'enterprise/components/searchbar/TimeRangeInput';
 import TimeRangeTypeSelector from 'enterprise/components/searchbar/TimeRangeTypeSelector';
 import QueryInput from 'enterprise/components/searchbar/QueryInput';
-import SearchResult from 'enterprise/components/SearchResult';
 
 const SearchBar = React.createClass({
-  mixins: [Reflux.connect(SearchStore, 'search')],
+  mixins: [Reflux.connect(ViewStore, 'view')],
   getInitialState() {
     return {
       savedSearch: '',
       keywordPreview: Immutable.Map(),
-      selectedQuery: '1',
     };
   },
   _performSearch(event) {
     event.preventDefault();
-    const { search } = this.state;
-    this.props.onExecute(search.fullQuery);
+    this.props.onExecute();
   },
   _getSavedSearchesSelector() {
   },
 
-  _selectQuery(queryKey) {
-    if (queryKey === '__add') {
-      console.log('Creating new query');
-      // create a new root query, initially sharing the same timerange
-      const rootQuery = SearchActions.createRootQuery();
-      rootQuery.then((newIndex) => {
-        this.setState({ selectedQuery: newIndex });
-      });
-    } else {
-      this.setState({ selectedQuery: queryKey });
-    }
+  _selectQuery(queryId) {
+    ViewActions.selectQuery(queryId);
   },
 
   render() {
-    const { rangeParams, rangeType, query } = this.state.search;
+    const selectedQuery = this.state.view.selectedQuery;
+    const queries = this.state.view.queries;
+    const { rangeParams, rangeType, query } = queries.get(selectedQuery);
+
     const querySelector = (
-      <Tab.Container id="query-selector" defaultActiveKey="0" activeKey={this.state.selectedQuery} onSelect={this._selectQuery}>
-        <Nav bsStyle="pills">
-          <NavItem eventKey="0">
-            Query 1
-          </NavItem>
-          <NavItem eventKey="__add">
-            <i className="fa fa-plus" alt="Add a query" />
-          </NavItem>
-        </Nav>
-      </Tab.Container>
+      <ToggleButtonGroup name="selectedQuery" value={selectedQuery}>
+        {queries.valueSeq().map((q, i) => (<ToggleButton key={`query-${q.id}`} value={q.id} onChange={() => this._selectQuery(q.id)}>
+          {`Query ${i}`}
+        </ToggleButton>))}
+        <ToggleButton value={-2} onChange={() => ViewActions.removeRootQuery(this.state.view.selectedQuery)}>
+          <i className="fa fa-minus" alt="Remove current query" />
+        </ToggleButton>
+        <ToggleButton value={-1} onChange={() => ViewActions.createRootQuery()}>
+          <i className="fa fa-plus" alt="Add a query" />
+        </ToggleButton>
+      </ToggleButtonGroup>
     );
+
     return (
       <Row className="no-bm">
         <Col md={12}
              id="universalsearch-container"
              style={{ paddingLeft: '15px', paddingRight: '15px', paddingBottom: '10px' }}>
           <Row className="no-bm">
-            <Col md={8} id="universalsearch" style={{ marginTop: '0px' }}>
+            <Col md={12} id="universalsearch" style={{ marginTop: '0px' }}>
               <form className="universalsearch-form"
                     method="GET"
                     onSubmit={this._performSearch}>
                 <div className="timerange-selector-container">
                   <Row className="no-bm">
                     <Col md={6}>
-                      <TimeRangeTypeSelector onSelect={SearchActions.rangeType} value={rangeType} />
-                      <TimeRangeInput onChange={SearchActions.rangeParams}
+                      <TimeRangeTypeSelector onSelect={ViewActions.rangeType} value={rangeType} />
+                      <TimeRangeInput onChange={ViewActions.rangeParams}
                                       rangeType={rangeType}
                                       rangeParams={rangeParams}
                                       config={this.props.config} />
@@ -93,16 +86,11 @@ const SearchBar = React.createClass({
                                        text={<i className="fa fa-lightbulb-o" />} />
                   </div>
 
-                  <SearchButton running />
+                  <SearchButton running={this.state.running} />
 
-                  <QueryInput value={query} onChange={SearchActions.query} />
+                  <QueryInput value={query} onChange={ViewActions.query} />
                 </div>
               </form>
-            </Col>
-            <Col md={4}>
-              <Row className="no-bm">
-                <SearchResult />
-              </Row>
             </Col>
           </Row>
         </Col>

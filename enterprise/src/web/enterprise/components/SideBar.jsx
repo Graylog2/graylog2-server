@@ -6,10 +6,10 @@ import Reflux from 'reflux';
 import { AutoAffix } from 'react-overlays';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
-import SearchStore from 'enterprise/stores/SearchStore';
+import ViewStore from 'enterprise/stores/ViewStore';
 
-const FieldListSidebar = React.createClass({
-  mixins: [Reflux.connect(SearchStore, 'search')],
+const SideBar = React.createClass({
+  mixins: [Reflux.connect(ViewStore, 'view')],
   getInitialState() {
     return {
       availableHeight: 1000,
@@ -48,14 +48,11 @@ const FieldListSidebar = React.createClass({
     return (<div style={{ marginTop: -15 }}>
       <AutoAffix viewportOffsetTop={45}>
         <div className="content-col" ref="sidebar">
-          <div>
-            <h3>Fields</h3>
-            <div style={{ height: 1500 }}>&nbsp;</div>
-          </div>
+          {this.props.children}
         </div>
       </AutoAffix>
     </div>);
   },
 });
 
-export default FieldListSidebar;
+export default SideBar;

@@ -103,6 +103,11 @@ public abstract class GroupBy implements SearchType {
         public abstract String id();
 
         @JsonProperty
+        public String type() {
+            return NAME;
+        }
+
+        @JsonProperty
         public abstract List<Group> groups();
 
         public static Builder builder() {

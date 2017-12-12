@@ -16,22 +16,22 @@ public abstract class QueryResult {
     @JsonProperty
     public abstract Query query();
 
-    @JsonProperty
-    public abstract Map<String, SearchType.Result> results();
+    @JsonProperty("search_types")
+    public abstract Map<String, SearchType.Result> searchTypes();
 
     public static Builder builder() {
         return new AutoValue_QueryResult.Builder();
     }
 
     public static QueryResult emptyResult() {
-        return builder().results(Collections.emptyMap()).query(Query.emptyRoot()).build();
+        return builder().searchTypes(Collections.emptyMap()).query(Query.emptyRoot()).build();
     }
 
     @AutoValue.Builder
     public abstract static class Builder {
         public abstract Builder query(Query query);
 
-        public abstract Builder results(Map<String, SearchType.Result> results);
+        public abstract Builder searchTypes(Map<String, SearchType.Result> results);
 
         public abstract QueryResult build();
     }

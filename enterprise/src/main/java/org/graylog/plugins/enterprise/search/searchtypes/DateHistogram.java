@@ -73,6 +73,11 @@ public abstract class DateHistogram implements SearchType {
         public abstract String id();
 
         @JsonProperty
+        public String type() {
+            return NAME;
+        }
+
+        @JsonProperty
         public abstract Map<Long, Long> results();
 
         @JsonProperty

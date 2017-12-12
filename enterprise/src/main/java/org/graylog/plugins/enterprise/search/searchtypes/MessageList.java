@@ -93,6 +93,11 @@ public abstract class MessageList implements SearchType {
         public abstract String id();
 
         @JsonProperty
+        public String type() {
+            return NAME;
+        }
+
+        @JsonProperty
         public abstract List<ResultMessageSummary> messages();
 
         @JsonProperty

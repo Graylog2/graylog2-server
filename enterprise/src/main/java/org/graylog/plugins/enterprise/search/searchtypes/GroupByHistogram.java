@@ -107,6 +107,11 @@ public abstract class GroupByHistogram implements SearchType {
         public abstract String id();
 
         @JsonProperty
+        public String type() {
+            return NAME;
+        }
+
+        @JsonProperty
         public abstract Map<Long, Bucket> buckets();
 
         public static Builder builder() {

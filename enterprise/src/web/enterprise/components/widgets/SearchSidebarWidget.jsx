@@ -6,14 +6,14 @@ import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import SearchSidebar from 'enterprise/components/widgets/SearchSidebarWithoutBorder';
 
-import SearchStore from 'enterprise/stores/SearchStore';
-import SearchActions from 'enterprise/actions/SearchActions';
+import ViewStore from 'enterprise/stores/ViewStore';
+import ViewActions from 'enterprise/actions/ViewActions';
 
-const _fieldAnalyzers = (filter) => PluginStore.exports('fieldAnalyzers')
-  .filter(analyzer => filter !== undefined ? filter(analyzer) : true);
+const _fieldAnalyzers = filter => PluginStore.exports('fieldAnalyzers')
+  .filter(analyzer => (filter !== undefined ? filter(analyzer) : true));
 
 export default React.createClass({
-  mixins: [Reflux.connect(SearchStore, 'search')],
+  mixins: [Reflux.connect(ViewStore, 'view')],
   getInitialState() {
     return {
       showAllFields: false,
@@ -25,7 +25,7 @@ export default React.createClass({
   },
 
   _toggleField(field) {
-    SearchActions.toggleField(field);
+    ViewActions.toggleField(field);
   },
 
   render() {

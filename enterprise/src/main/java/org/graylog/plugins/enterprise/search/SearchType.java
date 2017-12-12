@@ -77,5 +77,11 @@ public interface SearchType {
     interface Result {
         @JsonProperty("id")
         String id();
+
+        /**
+         * The json type info property of the surrounding SearchType class. Must be set manually by subclasses.
+         */
+        @JsonProperty("type")
+        String type();
     }
 }

@@ -6,5 +6,7 @@ export default Reflux.createActions([
   'query',
   'toggleField',
   'createRootQuery',
+  'removeRootQuery',
   'trackQueryJob',
+  'selectQuery',
 ]);
