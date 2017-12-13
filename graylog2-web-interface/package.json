@@ -71,6 +71,7 @@
     "react-dnd-html5-backend": "^2.0.0",
     "react-grid-layout": "^0.14.3",
     "react-overlays": "^0.6.5",
+    "react-resizable": "^1.7.5",
     "react-select": "^v1.0.0-rc.10",
     "rickshaw": "^1.5.1",
     "sockjs-client": "1.1.x",

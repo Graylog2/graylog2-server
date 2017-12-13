@@ -6526,7 +6526,7 @@ react-proxy-loader@^0.3.4:
   dependencies:
     loader-utils "^1.0.2"
 
-react-resizable@^1.4.0:
+react-resizable@^1.4.0, react-resizable@^1.7.5:
   version "1.7.5"
   resolved "https://registry.yarnpkg.com/react-resizable/-/react-resizable-1.7.5.tgz#83eb75bb3684da6989bbbf4f826e1470f0af902e"
   dependencies:

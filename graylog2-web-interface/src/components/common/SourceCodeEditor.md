@@ -45,3 +45,16 @@ const code = `function foobar() {
                   theme="dark"
                   value={code} />
 ```
+
+Non-resizable editor with custom height and width:
+```js
+const code = `function foobar() {
+  console.log('this is some source code!');
+}
+`;
+<SourceCodeEditor id="editor-2"
+                  resizable={false}
+                  height={100}
+                  width={400}
+                  value={code} />
+```
