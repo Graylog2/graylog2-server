@@ -18,6 +18,12 @@ import style from './SourceCodeEditor.css';
  */
 class SourceCodeEditor extends React.Component {
   static propTypes = {
+    /**
+     * Annotations to show in the editor's gutter. The format should be:
+     * `[{ row: 0, column: 2, type: 'error', text: 'Some error.'}]`
+     * The type value must be one of `error`, `warning`, or `info`.
+     */
+    annotations: PropTypes.array,
     /** Specifies if the source code editor should have the input focus or not. */
     focus: PropTypes.bool,
     /** Specifies the font size in pixels to use in the text editor. */
@@ -45,6 +51,7 @@ class SourceCodeEditor extends React.Component {
   }
 
   static defaultProps = {
+    annotations: [],
     focus: false,
     fontSize: 13,
     height: 200,
@@ -163,6 +170,7 @@ class SourceCodeEditor extends React.Component {
                    onResize={this.handleResize}>
           <div className={containerStyle} style={{ height: height, width: validCssWidth }}>
             <AceEditor ref={(c) => { this.reactAce = c; }}
+                       annotations={this.props.annotations}
                        editorProps={{ $blockScrolling: 'Infinity' }}
                        focus={this.props.focus}
                        fontSize={this.props.fontSize}

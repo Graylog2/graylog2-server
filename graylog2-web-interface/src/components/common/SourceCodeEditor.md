@@ -40,7 +40,13 @@ const code = `function foobar() {
   console.log('this is some source code!');
 }
 `;
+const annotations = [
+  { row: 1, column: -1, text: 'oh noes!', type: 'error' },
+  { row: 2, column: -1, text: 'easy!', type: 'warning' },
+  { row: 3, column: -1, text: 'info!', type: 'info' },
+];
 <SourceCodeEditor id="editor-2"
+                  annotations={annotations}
                   readOnly
                   theme="dark"
                   value={code} />
