@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
-import { DataTable, Spinner } from 'components/common';
+import { DataTable, ExternalLink, Spinner } from 'components/common';
 
 const InputTypesDataTable = React.createClass({
   propTypes: {
@@ -18,7 +18,7 @@ const InputTypesDataTable = React.createClass({
         <td className="limited">{inputType.type}</td>
         <td className="limited" style={{ width: 150 }}>
           {inputType.link_to_docs &&
-          <a href={inputType.link_to_docs} target="_blank"><i className="fa fa-external-link" /> Documentation</a>
+          <ExternalLink href={inputType.link_to_docs}>Documentation</ExternalLink>
           }
         </td>
       </tr>
