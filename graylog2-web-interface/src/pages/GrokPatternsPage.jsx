@@ -1,13 +1,15 @@
 import React from 'react';
 
 import GrokPatterns from 'components/grok-patterns/GrokPatterns';
-import { DocumentTitle } from 'components/common';
+import { DocumentTitle, IfPermitted } from 'components/common';
 
 const GrokPatternsPage = React.createClass({
   render() {
     return (
       <DocumentTitle title="Grok patterns">
-        <GrokPatterns />
+        <IfPermitted permissions="inputs:read">
+          <GrokPatterns />
+        </IfPermitted>
       </DocumentTitle>
     );
   },
