@@ -93,6 +93,14 @@ class SourceCodeEditor extends React.Component {
     }
   }
 
+  isRedoDisabled = () => {
+    return this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasRedo();
+  }
+
+  isUndoDisabled = () => {
+    return this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasUndo();
+  }
+
   handleRedo = () => {
     const editor = this.reactAce.editor;
     editor.redo();
@@ -116,10 +124,10 @@ class SourceCodeEditor extends React.Component {
           <div className={style.toolbar} style={{ width: validCssWidth }}>
             <ButtonToolbar>
               <ButtonGroup>
-                <Button bsStyle="link" bsSize="sm" onClick={this.handleUndo} disabled={this.props.readOnly}>
+                <Button bsStyle="link" bsSize="sm" onClick={this.handleUndo} disabled={this.isUndoDisabled()}>
                   <i className="fa fa-undo fa-fw" />
                 </Button>
-                <Button bsStyle="link" bsSize="sm" onClick={this.handleRedo} disabled={this.props.readOnly}>
+                <Button bsStyle="link" bsSize="sm" onClick={this.handleRedo} disabled={this.isRedoDisabled()}>
                   <i className="fa fa-repeat fa-fw" />
                 </Button>
               </ButtonGroup>
