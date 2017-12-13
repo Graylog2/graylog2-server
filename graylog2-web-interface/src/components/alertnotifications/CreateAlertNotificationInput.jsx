@@ -4,7 +4,7 @@ import naturalSort from 'javascript-natural-sort';
 import { Button, Col, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
-import { Select, Spinner } from 'components/common';
+import { ExternalLinkButton, Select, Spinner } from 'components/common';
 import { ConfigurationForm } from 'components/configurationforms';
 import Routes from 'routing/Routes';
 import UserNotification from 'util/UserNotification';
@@ -99,6 +99,12 @@ const CreateAlertNotificationInput = React.createClass({
       .sort((s1, s2) => naturalSort(s1.label.toLowerCase(), s2.label.toLowerCase()));
     return (
       <div>
+        <ExternalLinkButton href="https://marketplace.graylog.org/"
+                            bsStyle="info"
+                            className="pull-right">
+          Find more notifications
+        </ExternalLinkButton>
+
         <h2>Notification</h2>
         <p className="description">
           Define the notification that will be triggered from the alert conditions in a stream.

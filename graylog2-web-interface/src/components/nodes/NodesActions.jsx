@@ -4,7 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Button, DropdownButton, MenuItem } from 'react-bootstrap';
 import URI from 'urijs';
 
-import { IfPermitted } from 'components/common';
+import { ExternalLinkButton, IfPermitted } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
 const SystemProcessingStore = StoreProvider.getStore('SystemProcessing');
@@ -51,9 +51,9 @@ const NodesActions = React.createClass({
           <Button bsStyle="info">Metrics</Button>
         </LinkContainer>
 
-        <Button bsStyle="info" href={apiBrowserURI} target="_blank">
-          <i className="fa fa-external-link" />&nbsp; API browser
-        </Button>
+        <ExternalLinkButton bsStyle="info" href={apiBrowserURI}>
+          API browser
+        </ExternalLinkButton>
 
         <DropdownButton title="More actions" id={`more-actions-dropdown-${this.props.node.node_id}`} pullRight>
           <IfPermitted permissions="processing:changestate">

@@ -4,7 +4,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { ButtonGroup, DropdownButton, MenuItem } from 'react-bootstrap';
 import URI from 'urijs';
 
-import { IfPermitted } from 'components/common';
+import { ExternalLink, IfPermitted } from 'components/common';
 
 import Routes from 'routing/Routes';
 
@@ -34,7 +34,7 @@ const NodeMaintenanceDropdown = React.createClass({
           </IfPermitted>
 
           <MenuItem href={apiBrowserURI} target="_blank">
-            API Browser <i className="fa fa-external-link" />
+            <ExternalLink>API Browser</ExternalLink>
           </MenuItem>
         </DropdownButton>
       </ButtonGroup>

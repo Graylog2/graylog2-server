@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Alert } from 'react-bootstrap';
 
-import { DataTable, Spinner } from 'components/common';
+import { DataTable, ExternalLink, Spinner } from 'components/common';
 
 const PluginsDataTable = React.createClass({
   propTypes: {
@@ -19,8 +19,8 @@ const PluginsDataTable = React.createClass({
         <td className="limited">{plugin.author}</td>
         <td className="limited" style={{ width: '50%' }}>
           {plugin.description}
-          &nbsp;
-          <a href={plugin.url} target="_blank" style={{ marginLeft: 10 }}><i className="fa fa-external-link" /> Website</a>
+          &nbsp;&nbsp;
+          <ExternalLink href={plugin.url} style={{ marginLeft: 10 }}>Website</ExternalLink>
         </td>
       </tr>
     );
