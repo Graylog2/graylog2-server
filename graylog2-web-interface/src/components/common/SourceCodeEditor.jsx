@@ -3,7 +3,9 @@ import { PropTypes } from 'prop-types';
 import { Resizable } from 'react-resizable';
 import 'brace';
 import AceEditor from 'react-ace';
-import { Button, ButtonGroup, ButtonToolbar } from 'react-bootstrap';
+import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'react-bootstrap';
+
+import { ClipboardButton } from 'components/common';
 
 import 'brace/mode/text';
 import 'brace/theme/tomorrow';
@@ -102,15 +104,22 @@ class SourceCodeEditor extends React.Component {
   }
 
   handleRedo = () => {
-    const editor = this.reactAce.editor;
-    editor.redo();
-    editor.focus();
+    this.reactAce.editor.redo();
+    this.focusEditor();
   }
 
   handleUndo = () => {
-    const editor = this.reactAce.editor;
-    editor.undo();
-    editor.focus();
+    this.reactAce.editor.undo();
+    this.focusEditor();
+  }
+
+  handleSelectionChange = (selection) => {
+    const selectedText = this.reactAce.editor.getSession().getTextRange(selection.getRange());
+    this.setState({ selectedText: selectedText });
+  }
+
+  focusEditor = () => {
+    this.reactAce.editor.focus();
   }
 
   render() {
@@ -118,11 +127,25 @@ class SourceCodeEditor extends React.Component {
     const validCssWidth = Number.isNaN(width) ? '100%' : width;
     const { theme, resizable } = this.props;
     const containerStyle = `${style.sourceCodeEditor} ${theme !== 'light' && style.darkMode} ${!resizable && style.static}`;
+    const overlay = <Tooltip id={'copy-button-tooltip'}>Click Paste on the Edit menu to paste.</Tooltip>;
     return (
       <div>
         {this.props.toolbar &&
           <div className={style.toolbar} style={{ width: validCssWidth }}>
             <ButtonToolbar>
+              <ButtonGroup>
+                <ClipboardButton title={<i className="fa fa-copy fa-fw" />}
+                                 bsStyle="link"
+                                 bsSize="sm"
+                                 onSuccess={this.focusEditor}
+                                 text={this.state.selectedText}
+                                 disabled={this.state.selectedText === ''} />
+                <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose>
+                  <Button bsStyle="link" bsSize="sm" onClick={this.handlePaste}>
+                    <i className="fa fa-paste fa-fw" />
+                  </Button>
+                </OverlayTrigger>
+              </ButtonGroup>
               <ButtonGroup>
                 <Button bsStyle="link" bsSize="sm" onClick={this.handleUndo} disabled={this.isUndoDisabled()}>
                   <i className="fa fa-undo fa-fw" />
@@ -150,6 +173,7 @@ class SourceCodeEditor extends React.Component {
                        onInput={this.resetUndoHistory}
                        onLoad={this.props.onLoad}
                        onChange={this.props.onChange}
+                       onSelectionChange={this.handleSelectionChange}
                        readOnly={this.props.readOnly}
                        defaultValue={this.props.value}
                        value={this.props.value}
