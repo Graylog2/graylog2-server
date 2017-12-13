@@ -46,15 +46,16 @@ const code = `function foobar() {
                   value={code} />
 ```
 
-Non-resizable editor with custom height and width:
+Non-resizable editor without toolbar and with custom height and width:
 ```js
 const code = `function foobar() {
   console.log('this is some source code!');
 }
 `;
 <SourceCodeEditor id="editor-2"
-                  resizable={false}
+                  resizable={true}
                   height={100}
+                  toolbar={false}
                   width={400}
                   value={code} />
 ```

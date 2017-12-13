@@ -1,3 +1,19 @@
+:local(.toolbar) {
+    background: #f8f8f8;
+    border: 1px solid #ccc;
+    border-bottom: 0;
+    border-radius: 5px 5px 0 0;
+}
+
+:local(.toolbar) .btn-link {
+    color: #333;
+}
+
+/* Do not add border radius if code editor comes after toolbar */
+:local(.toolbar) + :local(.sourceCodeEditor) .ace_editor {
+    border-radius: 0 0 5px 5px;
+}
+
 :local(.sourceCodeEditor) .ace_editor {
     border: 1px solid #ccc;
     border-radius: 5px;
