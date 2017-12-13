@@ -32,17 +32,17 @@ export default Reflux.createStore({
   trackTimeout: null,
 
   init() {
+    console.log('ViewStore init');
     this.state = this.getInitialState();
+    const defaultQuery = _defaultQuery(uuidv4());
+    this.state.selectedQuery = defaultQuery.id;
+    this.state.queries = Immutable.OrderedMap().set(defaultQuery.id, defaultQuery);
+    this._trigger();
     this.listenTo(SearchJobStore, this.onSearchJobsUpdate);
   },
 
   getInitialState() {
-    const defaultQuery = _defaultQuery(uuidv4());
-    return {
-      selectedQuery: defaultQuery.id,
-      queries: Immutable.OrderedMap().set(defaultQuery.id, defaultQuery),
-      currentJobId: null,
-    };
+    return this.state;
   },
 
   onSearchJobsUpdate(data) {
@@ -80,8 +80,9 @@ export default Reflux.createStore({
 
       this.state.currentJob = viewJob;
     } else {
-      this.state.currentJob = job;
+      this.state.currentJob = null;
     }
+
 
     this._trigger();
   },
@@ -167,6 +168,7 @@ export default Reflux.createStore({
   },
 
   selectQuery(queryId) {
+    console.log(`Selected query was ${this.state.selectedQuery}, now ${queryId}`);
     this.state.selectedQuery = queryId;
     this._trigger();
   },

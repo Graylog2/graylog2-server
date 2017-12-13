@@ -1,10 +1,11 @@
 import React from 'react';
 import Reflux from 'reflux';
-import { Col, Nav, NavItem, Row, Tab, ToggleButtonGroup, ToggleButton, Button } from 'react-bootstrap';
+import { Col, Row, ToggleButtonGroup, ToggleButton } from 'react-bootstrap';
 import Immutable from 'immutable';
 
 import DocumentationLink from 'components/support/DocumentationLink';
 import DocsHelper from 'util/DocsHelper';
+import Spinner from 'components/common/Spinner';
 
 import SearchButton from 'enterprise/components/searchbar/SearchButton';
 import ViewStore from 'enterprise/stores/ViewStore';
@@ -35,12 +36,15 @@ const SearchBar = React.createClass({
   render() {
     const selectedQuery = this.state.view.selectedQuery;
     const queries = this.state.view.queries;
+    if (queries.size === 0) {
+      return <Spinner />;
+    }
     const { rangeParams, rangeType, query } = queries.get(selectedQuery);
 
     const querySelector = (
       <ToggleButtonGroup name="selectedQuery" value={selectedQuery}>
         {queries.valueSeq().map((q, i) => (<ToggleButton key={`query-${q.id}`} value={q.id} onChange={() => this._selectQuery(q.id)}>
-          {`Query ${i}`}
+          {`Query ${q.id}`}
         </ToggleButton>))}
         <ToggleButton value={-2} onChange={() => ViewActions.removeRootQuery(this.state.view.selectedQuery)}>
           <i className="fa fa-minus" alt="Remove current query" />

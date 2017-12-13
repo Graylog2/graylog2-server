@@ -3,10 +3,12 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import _ from 'lodash';
 
+import Field from 'enterprise/components/Field';
+
 const FieldList = createReactClass({
   propTypes: {
     job: PropTypes.object.isRequired,
-    selectedQuery: PropTypes.object.isRequired,
+    selectedQuery: PropTypes.string.isRequired,
   },
 
   render() {
@@ -26,16 +28,13 @@ const FieldList = createReactClass({
     if (!messagesSearchType) {
       content = <span>No field information available.</span>;
     } else {
-      const fields = [];
-      messagesSearchType.fields.forEach((count, name) => {
-        // eslint-disable-next-line react/no-array-index-key
-        fields.push(<dt key={`t-${name}`}>{name}</dt>);
-        // eslint-disable-next-line react/no-array-index-key
-        fields.push(<dd key={`d-${name}`}>{count}</dd>);
-      });
-      content = (<dl>
-        {fields}
-      </dl>);
+      content = (<ul style={{ padding: 0 }}>
+        {
+          messagesSearchType.fields.entrySeq().map(([name]) => {
+            return <li key={`field-${name}`}><Field name={name} interactive /></li>;
+          })
+        }
+      </ul>);
     }
     return (
       <div>

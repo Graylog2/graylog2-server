@@ -73,7 +73,6 @@ export default Reflux.createStore({
     } else {
       const promise = fetch('POST', executeQueryUrl(searchId), executionState || {})
         .then((job) => {
-          // dummy object until we polled the result for the first time
           this.state.jobs[job.id] = job;
           this._trigger();
           return job;
@@ -95,6 +94,7 @@ export default Reflux.createStore({
           results: jobStatus.results,
         };
         this._trigger();
+        return jobStatus;
       });
     SearchJobActions.jobStatus.promise(promise);
   },
