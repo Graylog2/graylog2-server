@@ -26,7 +26,7 @@ class SourceCodeEditor extends React.Component {
     /** Function called on editor load. The first argument is the instance of the editor. */
     onLoad: PropTypes.func,
     /** Function called when the value of the text changes. It receives the the new value and an event as arguments. */
-    onChange: PropTypes.func.isRequired,
+    onChange: PropTypes.func,
     /** Specifies if the editor should be in read-only mode. */
     readOnly: PropTypes.bool,
     /** Specifies if the editor should be resizable by the user. */
@@ -43,6 +43,7 @@ class SourceCodeEditor extends React.Component {
     focus: false,
     fontSize: 13,
     height: 200,
+    onChange: () => {},
     onLoad: () => {},
     readOnly: false,
     resizable: true,
