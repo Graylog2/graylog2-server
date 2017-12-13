@@ -134,7 +134,7 @@ class SourceCodeEditor extends React.Component {
     const validCssWidth = Number.isNaN(width) ? '100%' : width;
     const { theme, resizable } = this.props;
     const containerStyle = `${style.sourceCodeEditor} ${theme !== 'light' && style.darkMode} ${!resizable && style.static}`;
-    const overlay = <Tooltip id={'paste-button-tooltip'}>Click Paste on the Edit menu to paste.</Tooltip>;
+    const overlay = <Tooltip id={'paste-button-tooltip'}>Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
     return (
       <div>
         {this.props.toolbar &&
