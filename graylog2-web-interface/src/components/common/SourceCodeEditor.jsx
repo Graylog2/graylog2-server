@@ -82,7 +82,6 @@ class SourceCodeEditor extends React.Component {
     return (
       <Resizable height={height}
                  width={width}
-                 axis="y"
                  minConstraints={[200, 200]}
                  onResize={this.handleResize}>
         <div className={containerStyle} style={{ height: height, width: Number.isNaN(width) ? '100%' : width }}>
