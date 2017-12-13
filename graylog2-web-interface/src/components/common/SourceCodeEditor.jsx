@@ -57,6 +57,7 @@ class SourceCodeEditor extends React.Component {
     this.state = {
       height: props.height,
       width: props.width,
+      selectedText: '',
     };
   }
 
@@ -73,6 +74,19 @@ class SourceCodeEditor extends React.Component {
 
   reloadEditor = () => {
     this.reactAce.editor.resize();
+  }
+
+  resetUndoHistory = () => {
+    // Hack to not clear editor form when executing undo action.
+    // See https://github.com/Graylog2/graylog-plugin-pipeline-processor/issues/224
+    if (!this.clearedUndoHistory) {
+      try {
+        this.reactAce.editor.getSession().getUndoManager().reset();
+        this.clearedUndoHistory = true;
+      } catch (e) {
+        // Do nothing
+      }
+    }
   }
 
   render() {
@@ -93,6 +107,7 @@ class SourceCodeEditor extends React.Component {
                      theme={this.props.theme === 'light' ? 'tomorrow' : 'monokai'}
                      name={this.props.id}
                      height="100%"
+                     onInput={this.resetUndoHistory}
                      onLoad={this.props.onLoad}
                      onChange={this.props.onChange}
                      readOnly={this.props.readOnly}
