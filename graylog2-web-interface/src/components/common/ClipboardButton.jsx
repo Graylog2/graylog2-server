@@ -65,7 +65,7 @@ const ClipboardButton = React.createClass({
   },
   _onError(event) {
     const key = event.action === 'cut' ? 'K' : 'C';
-    this.setState({ tooltipMessage: `Press Ctrl+${key} to ${event.action}` });
+    this.setState({ tooltipMessage: <span>Press Ctrl+{key}&thinsp;/&thinsp;&#8984;{key} to {event.action}</span> });
   },
   _getFilteredProps() {
     const { className, style, bsStyle, bsSize, disabled, buttonTitle } = this.props;
