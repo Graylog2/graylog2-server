@@ -134,7 +134,7 @@ class SourceCodeEditor extends React.Component {
     const validCssWidth = Number.isNaN(width) ? '100%' : width;
     const { theme, resizable } = this.props;
     const containerStyle = `${style.sourceCodeEditor} ${theme !== 'light' && style.darkMode} ${!resizable && style.static}`;
-    const overlay = <Tooltip id={'copy-button-tooltip'}>Click Paste on the Edit menu to paste.</Tooltip>;
+    const overlay = <Tooltip id={'paste-button-tooltip'}>Click Paste on the Edit menu to paste.</Tooltip>;
     return (
       <div>
         {this.props.toolbar &&
@@ -146,18 +146,27 @@ class SourceCodeEditor extends React.Component {
                                  bsSize="sm"
                                  onSuccess={this.focusEditor}
                                  text={this.state.selectedText}
+                                 buttonTitle="Copy (Ctrl+C / &#8984;C)"
                                  disabled={this.state.selectedText === ''} />
                 <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose>
-                  <Button bsStyle="link" bsSize="sm" onClick={this.handlePaste}>
+                  <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)">
                     <i className="fa fa-paste fa-fw" />
                   </Button>
                 </OverlayTrigger>
               </ButtonGroup>
               <ButtonGroup>
-                <Button bsStyle="link" bsSize="sm" onClick={this.handleUndo} disabled={this.isUndoDisabled()}>
+                <Button bsStyle="link"
+                        bsSize="sm"
+                        onClick={this.handleUndo}
+                        title="Undo (Ctrl+Z / &#8984;Z)"
+                        disabled={this.isUndoDisabled()}>
                   <i className="fa fa-undo fa-fw" />
                 </Button>
-                <Button bsStyle="link" bsSize="sm" onClick={this.handleRedo} disabled={this.isRedoDisabled()}>
+                <Button bsStyle="link"
+                        bsSize="sm"
+                        onClick={this.handleRedo}
+                        title="Redo (Ctrl+Shift+Z / &#8984;&#8679;Z)"
+                        disabled={this.isRedoDisabled()}>
                   <i className="fa fa-repeat fa-fw" />
                 </Button>
               </ButtonGroup>
