@@ -28,6 +28,8 @@ const HistogramVisualization = React.createClass({
     width: PropTypes.number,
     interactive: PropTypes.bool,
     onRenderComplete: PropTypes.func,
+    keyTitleRenderer: PropTypes.func,
+    valueTitleRenderer: PropTypes.func,
   },
 
   getDefaultProps() {
@@ -35,6 +37,8 @@ const HistogramVisualization = React.createClass({
       interactive: true,
       onRenderComplete: () => {
       },
+      keyTitleRenderer: d => `<span class="date">${new DateTime(d.x).toString(DateTime.Formats.COMPLETE)}</span>`,
+      valueTitleRenderer: d => `${numeral(d.y).format('0,0')} messages`,
     };
   },
 
@@ -100,8 +104,8 @@ const HistogramVisualization = React.createClass({
   _renderTooltip(histogram, histogramDomNode) {
     histogram.on('renderlet', () => {
       const formatTitle = (d) => {
-        const valueText = `${numeral(d.y).format('0,0')} messages`;
-        const keyText = `<span class="date">${new DateTime(d.x).toString(DateTime.Formats.COMPLETE)}</span>`;
+        const valueText = this.props.valueTitleRenderer(d);
+        const keyText = this.props.keyTitleRenderer(d);
 
         return `<div class="datapoint-info">${valueText}<br>${keyText}</div>`;
       };

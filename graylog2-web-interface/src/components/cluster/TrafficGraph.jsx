@@ -5,6 +5,8 @@ import HistogramVisualization from 'components/visualizations/HistogramVisualiza
 import _ from 'lodash';
 import moment from 'moment';
 import crossfilter from 'crossfilter';
+import numeral from 'numeral';
+import DateTime from 'logic/datetimes/DateTime';
 
 const TrafficGraph = React.createClass({
 
@@ -45,7 +47,9 @@ const TrafficGraph = React.createClass({
                               data={unixTraffic}
                               config={config}
                               width={this.props.width}
-                              interactive={false}
+                              interactive
+                              keyTitleRenderer={d => `<span class="date">${new DateTime(d.x).toString(DateTime.Formats.DATE)}</span>`}
+                              valueTitleRenderer={d => `${numeral(d.y).format('0.00b')}`}
                               computationTimeRange={{ from: this.props.from, to: this.props.to }} />
     );
   },
