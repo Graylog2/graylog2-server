@@ -157,6 +157,8 @@ const ApiRoutes = {
     update: (savedSearchId) => { return { url: `/search/saved/${savedSearchId}` }; },
   },
   SessionsApiController: {
+    login: () => ({ url: '/system/sessions' }),
+    logout: sessionId => ({ url: `/system/sessions/${sessionId}` }),
     validate: () => { return { url: '/system/sessions' }; },
   },
   StreamAlertsApiController: {
