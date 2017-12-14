@@ -1,12 +1,14 @@
 import React from 'react';
+import { PropTypes } from 'prop-types';
 import Reflux from 'reflux';
+import { connect } from 'react-redux';
+
 import LoginPage from 'react-proxy?name=LoginPage!pages/LoginPage';
 import LoadingPage from 'react-proxy?name=LoadingPage!pages/LoadingPage';
 import LoggedInPage from 'react-proxy?name=LoggedInPage!pages/LoggedInPage';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 
 import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
@@ -19,7 +21,11 @@ import 'rickshaw/rickshaw.css';
 import 'stylesheets/graylog2.less';
 
 const AppFacade = React.createClass({
-  mixins: [Reflux.connect(SessionStore), Reflux.connect(ServerAvailabilityStore), Reflux.connect(CurrentUserStore)],
+  propTypes: {
+    sessionId: PropTypes.string,
+  },
+
+  mixins: [Reflux.connect(ServerAvailabilityStore), Reflux.connect(CurrentUserStore)],
 
   componentDidMount() {
     this.interval = setInterval(ServerAvailabilityStore.ping, 20000);
@@ -35,7 +41,7 @@ const AppFacade = React.createClass({
     if (!this.state.server.up) {
       return <ServerUnavailablePage server={this.state.server} />;
     }
-    if (!this.state.sessionId) {
+    if (!this.props.sessionId) {
       return <LoginPage />;
     }
     if (!this.state.currentUser) {
@@ -45,4 +51,8 @@ const AppFacade = React.createClass({
   },
 });
 
-export default AppFacade;
+const mapStateToProps = state => ({
+  sessionId: state.sessions.sessionId,
+});
+
+export default connect(mapStateToProps)(AppFacade);

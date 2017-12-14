@@ -1,26 +1,20 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { connect } from 'react-redux';
 import { NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
-import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
-
-import ActionsProvider from 'injection/ActionsProvider';
-const SessionActions = ActionsProvider.getActions('Session');
-
 import Routes from 'routing/Routes';
-import history from 'util/History';
+import { logout } from 'ducks/sessions/sessions';
 
 const UserMenu = React.createClass({
   propTypes: {
     loginName: PropTypes.string.isRequired,
     fullName: PropTypes.string.isRequired,
+    logout: PropTypes.func,
   },
   onLogoutClicked() {
-    SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {
-      history.push(Routes.STARTPAGE);
-    });
+    this.props.logout();
   },
   render() {
     return (
@@ -35,5 +29,9 @@ const UserMenu = React.createClass({
   },
 });
 
-export default UserMenu;
+const mapDispatchToProps = dispatch => ({
+  logout: () => dispatch(logout()),
+});
+
+export default connect(() => ({}), mapDispatchToProps)(UserMenu);
 
