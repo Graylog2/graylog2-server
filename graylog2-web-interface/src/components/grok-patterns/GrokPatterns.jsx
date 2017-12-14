@@ -2,6 +2,7 @@ import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 import PageHeader from 'components/common/PageHeader';
@@ -65,13 +66,21 @@ const GrokPatterns = React.createClass({
         <td>{pattern.name}</td>
         <td>{pattern.pattern}</td>
         <td>
-          <Button style={{ marginRight: 5 }} bsStyle="primary" bsSize="xs"
-                  onClick={this.confirmedRemove.bind(this, pattern)}>
-            Delete
-          </Button>
-          <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false}
-                            reload={this.loadData} savePattern={this.savePattern}
-                            validPatternName={this.validPatternName} />
+          <IfPermitted permissions="inputs:edit">
+            <Button style={{ marginRight: 5 }}
+                    bsStyle="primary"
+                    bsSize="xs"
+                    onClick={() => this.confirmedRemove(pattern)}>
+              Delete
+            </Button>
+            <EditPatternModal id={pattern.id}
+                              name={pattern.name}
+                              pattern={pattern.pattern}
+                              create={false}
+                              reload={this.loadData}
+                              savePattern={this.savePattern}
+                              validPatternName={this.validPatternName} />
+          </IfPermitted>
         </td>
       </tr>
     );
@@ -91,7 +100,10 @@ const GrokPatterns = React.createClass({
           <IfPermitted permissions="inputs:edit">
             <span>
               <BulkLoadPatternModal onSuccess={this.loadData} />
-              <EditPatternModal id={''} name={''} pattern={''} create
+              <EditPatternModal id={''}
+                                name={''}
+                                pattern={''}
+                                create
                                 reload={this.loadData}
                                 savePattern={this.savePattern}
                                 validPatternName={this.validPatternName} />
