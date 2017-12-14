@@ -3,7 +3,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Button, Col, Row } from 'react-bootstrap';
 
-import { LinkToNode } from 'components/common';
+import { LinkToNode, IfPermitted } from 'components/common';
 import { LoggingSubsystem, LogLevelMetricsOverview } from 'components/loggers';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -50,23 +50,25 @@ const NodeLoggers = React.createClass({
     return (
       <Row className="row-sm log-writing-node content">
         <Col md={12}>
-          <div style={{ marginBottom: '20' }}>
-            <div className="pull-right">
-              <Button bsSize="sm" bsStyle="primary" className="trigger-log-level-metrics"
-                      onClick={() => this.setState({ showDetails: !this.state.showDetails })}>
-                <i className="fa fa-dashboard" />{' '}
-                {this.state.showDetails ? 'Hide' : 'Show'} log level metrics
-              </Button>
+          <IfPermitted permissions="loggers:read">
+            <div style={{ marginBottom: '20' }}>
+              <div className="pull-right">
+                <Button bsSize="sm" bsStyle="primary" className="trigger-log-level-metrics"
+                        onClick={() => this.setState({ showDetails: !this.state.showDetails })}>
+                  <i className="fa fa-dashboard" />{' '}
+                  {this.state.showDetails ? 'Hide' : 'Show'} log level metrics
+                </Button>
+              </div>
+              <h2>
+                <LinkToNode nodeId={nodeId} />
+                <span style={{ fontSize: '12px' }}> Has written a total of <strong>{this._formatThroughput()} internal log messages.</strong></span>
+              </h2>
             </div>
-            <h2>
-              <LinkToNode nodeId={nodeId} />
-              <span style={{ fontSize: '12px' }}> Has written a total of <strong>{this._formatThroughput()} internal log messages.</strong></span>
-            </h2>
-          </div>
-          <div className="subsystems">
-            {subsystems}
-          </div>
-          {this.state.showDetails && logLevelMetrics}
+            <div className="subsystems">
+              {subsystems}
+            </div>
+            {this.state.showDetails && logLevelMetrics}
+          </IfPermitted>
         </Col>
       </Row>
     );

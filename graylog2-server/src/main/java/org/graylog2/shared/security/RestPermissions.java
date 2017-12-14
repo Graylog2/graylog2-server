@@ -30,6 +30,7 @@ public class RestPermissions implements PluginPermissions {
      * These should all be in the form of "group:action", because {@link Permissions#allPermissionsMap()} below depends on it.
      * Should this ever change, you need to adapt the code below, too.
      */
+    public static final String AUTHENTICATION_READ = "authentication:read";
     public static final String AUTHENTICATION_EDIT = "authentication:edit";
     public static final String BLACKLISTENTRY_CREATE = "blacklistentry:create";
     public static final String BLACKLISTENTRY_DELETE = "blacklistentry:delete";
