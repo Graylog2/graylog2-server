@@ -2,12 +2,14 @@ import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
+
 const GrokPatternsStore = StoreProvider.getStore('GrokPatterns');
 
 import PageHeader from 'components/common/PageHeader';
 import EditPatternModal from 'components/grok-patterns/EditPatternModal';
 import BulkLoadPatternModal from 'components/grok-patterns/BulkLoadPatternModal';
 import DataTable from 'components/common/DataTable';
+import IfPermitted from 'components/common/IfPermitted';
 
 const GrokPatterns = React.createClass({
   getInitialState() {
@@ -64,13 +66,21 @@ const GrokPatterns = React.createClass({
         <td>{pattern.name}</td>
         <td>{pattern.pattern}</td>
         <td>
-          <Button style={{ marginRight: 5 }} bsStyle="primary" bsSize="xs"
-                  onClick={this.confirmedRemove.bind(this, pattern)}>
-            Delete
-          </Button>
-          <EditPatternModal id={pattern.id} name={pattern.name} pattern={pattern.pattern} create={false}
-                            reload={this.loadData} savePattern={this.savePattern}
-                            validPatternName={this.validPatternName} />
+          <IfPermitted permissions="inputs:edit">
+            <Button style={{ marginRight: 5 }}
+                    bsStyle="primary"
+                    bsSize="xs"
+                    onClick={() => this.confirmedRemove(pattern)}>
+              Delete
+            </Button>
+            <EditPatternModal id={pattern.id}
+                              name={pattern.name}
+                              pattern={pattern.pattern}
+                              create={false}
+                              reload={this.loadData}
+                              savePattern={this.savePattern}
+                              validPatternName={this.validPatternName} />
+          </IfPermitted>
         </td>
       </tr>
     );
@@ -87,26 +97,33 @@ const GrokPatterns = React.createClass({
             your own manually or import a whole list of patterns from a so called pattern file.
           </span>
           {null}
-          <span>
-            <BulkLoadPatternModal onSuccess={this.loadData} />
-            <EditPatternModal id={''} name={''} pattern={''} create
-                              reload={this.loadData}
-                              savePattern={this.savePattern}
-                              validPatternName={this.validPatternName} />
-          </span>
+          <IfPermitted permissions="inputs:edit">
+            <span>
+              <BulkLoadPatternModal onSuccess={this.loadData} />
+              <EditPatternModal id={''}
+                                name={''}
+                                pattern={''}
+                                create
+                                reload={this.loadData}
+                                savePattern={this.savePattern}
+                                validPatternName={this.validPatternName} />
+            </span>
+          </IfPermitted>
         </PageHeader>
 
         <Row className="content">
           <Col md={12}>
-            <DataTable id="grok-pattern-list"
-                       className="table-striped table-hover"
-                       headers={headers}
-                       headerCellFormatter={this._headerCellFormatter}
-                       sortByKey={'name'}
-                       rows={this.state.patterns}
-                       dataRowFormatter={this._patternFormatter}
-                       filterLabel="Filter patterns"
-                       filterKeys={filterKeys} />
+            <IfPermitted permissions="inputs:read">
+              <DataTable id="grok-pattern-list"
+                         className="table-striped table-hover"
+                         headers={headers}
+                         headerCellFormatter={this._headerCellFormatter}
+                         sortByKey={'name'}
+                         rows={this.state.patterns}
+                         dataRowFormatter={this._patternFormatter}
+                         filterLabel="Filter patterns"
+                         filterKeys={filterKeys} />
+            </IfPermitted>
           </Col>
         </Row>
       </div>
