@@ -44,8 +44,8 @@ const GettingStartedPage = React.createClass({
 });
 
 const mapStateToProps = state => ({
-  isLoading: state.system.frontend.isLoading,
-  system: state.system.systemInfo,
+  isLoading: state.system.system.frontend.isLoading,
+  system: state.system.system.systemInfo,
 });
 
 const mapDispatchToProps = dispatch => ({

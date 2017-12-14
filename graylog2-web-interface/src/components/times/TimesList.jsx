@@ -64,8 +64,8 @@ const TimesList = React.createClass({
 });
 
 const mapStateToProps = state => ({
-  system: state.system.systemInfo,
-  isLoading: state.system.frontend.isLoading,
+  system: state.system.system.systemInfo,
+  isLoading: state.system.system.frontend.isLoading,
 });
 
 const mapDispatchToProps = dispatch => ({
