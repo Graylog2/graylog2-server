@@ -3,12 +3,12 @@ import { PropTypes } from 'prop-types';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 import moment from 'moment';
+import { connect } from 'react-redux';
 import DateTime from 'logic/datetimes/DateTime';
 
 import { Spinner, Timestamp } from 'components/common';
 import StoreProvider from 'injection/StoreProvider';
 import { loadSystemInfo } from 'ducks/system/index';
-import createContainer from 'components/createContainer';
 
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
@@ -16,6 +16,7 @@ const TimesList = React.createClass({
   propTypes: {
     isLoading: PropTypes.bool.isRequired,
     system: PropTypes.object,
+    loadSystemInfo: PropTypes.func.isRequired,
   },
 
   mixins: [Reflux.connect(CurrentUserStore)],
@@ -23,6 +24,7 @@ const TimesList = React.createClass({
     return { time: moment() };
   },
   componentDidMount() {
+    this.props.loadSystemInfo();
     this.interval = setInterval(() => this.setState(this.getInitialState()), 1000);
   },
   componentWillUnmount() {
@@ -70,6 +72,4 @@ const mapDispatchToProps = dispatch => ({
   loadSystemInfo: () => dispatch(loadSystemInfo()),
 });
 
-export default createContainer(mapStateToProps, mapDispatchToProps)(TimesList, {
-  componentWillMount: 'loadSystemInfo',
-});
+export default connect(mapStateToProps, mapDispatchToProps)(TimesList);

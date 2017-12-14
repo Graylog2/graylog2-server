@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { loadSystemInfo } from 'ducks/system/index';
-import createContainer from 'components/createContainer';
+import { connect } from 'react-redux';
 
 import { DocumentTitle, Spinner } from 'components/common';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
@@ -15,6 +15,10 @@ const GettingStartedPage = React.createClass({
     location: PropTypes.object.isRequired,
     isLoading: PropTypes.bool,
     system: PropTypes.object,
+    loadSystemInfo: PropTypes.func.isRequired,
+  },
+  componentDidMount() {
+    this.props.loadSystemInfo();
   },
   _onDismiss() {
     history.push(Routes.STARTPAGE);
@@ -48,6 +52,4 @@ const mapDispatchToProps = dispatch => ({
   loadSystemInfo: () => dispatch(loadSystemInfo()),
 });
 
-export default createContainer(mapStateToProps, mapDispatchToProps)(GettingStartedPage, {
-  componentWillMount: 'loadSystemInfo',
-});
+export default connect(mapStateToProps, mapDispatchToProps)(GettingStartedPage);

@@ -1,14 +1,24 @@
 import React from 'react';
 import { PropTypes } from 'prop-types';
+import { connect } from 'react-redux';
+
 import Version from 'util/Version';
 import { loadSystemInfo, loadJvmInfo } from 'ducks/system/index';
-import createContainer from 'components/createContainer';
 
 const Footer = React.createClass({
   propTypes: {
     isLoading: PropTypes.bool.isRequired,
     system: PropTypes.object,
     jvm: PropTypes.object,
+  },
+
+  componentDidMount() {
+    this.loadData();
+  },
+
+  loadData() {
+    this.props.loadSystemInfo();
+    this.props.loadJvmInfo();
   },
 
   render() {
@@ -39,6 +49,4 @@ const mapDispatchToProps = dispatch => ({
   loadJvmInfo: () => dispatch(loadJvmInfo()),
 });
 
-export default createContainer(mapStateToProps, mapDispatchToProps)(Footer, {
-  componentWillMount: ['loadSystemInfo', 'loadJvmInfo'],
-});
+export default connect(mapStateToProps, mapDispatchToProps)(Footer);
