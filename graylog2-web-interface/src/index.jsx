@@ -9,14 +9,14 @@ import { Provider } from 'react-redux';
 
 import AppFacade from 'routing/AppFacade';
 import configureStore from 'stores/configureStore';
-import systemReducers from 'ducks/system/index';
+import reducers from 'ducks/index';
 
 Promise.config({ cancellation: true });
 Reflux.setPromiseFactory(handlers => new Promise(handlers));
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(
-    <Provider store={configureStore(systemReducers)}>
+    <Provider store={configureStore(reducers)}>
       <AppFacade />
     </Provider>,
     appContainer,
