@@ -26,6 +26,15 @@ const HistogramVisualization = React.createClass({
     computationTimeRange: PropTypes.object,
     height: PropTypes.number,
     width: PropTypes.number,
+    keyTitleRenderer: PropTypes.func,
+    valueTitleRenderer: PropTypes.func,
+  },
+
+  getDefaultProps() {
+    return {
+      keyTitleRenderer: d => `<span class="date">${new DateTime(d.x).toString(DateTime.Formats.COMPLETE)}</span>`,
+      valueTitleRenderer: d => `${numeral(d.y).format('0,0')} messages`,
+    };
   },
   getInitialState() {
     this.triggerRender = true;
@@ -102,8 +111,8 @@ const HistogramVisualization = React.createClass({
       .colors(D3Utils.glColourPalette())
       .on('renderlet', () => {
         const formatTitle = (d) => {
-          const valueText = `${numeral(d.y).format('0,0')} messages`;
-          const keyText = `<span class="date">${new DateTime(d.x).toString(DateTime.Formats.COMPLETE)}</span>`;
+          const valueText = this.props.valueTitleRenderer(d);
+          const keyText = this.props.keyTitleRenderer(d);
 
           return `<div class="datapoint-info">${valueText}<br>${keyText}</div>`;
         };
