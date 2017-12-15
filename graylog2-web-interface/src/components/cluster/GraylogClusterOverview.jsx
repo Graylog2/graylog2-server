@@ -84,7 +84,7 @@ const GraylogClusterOverview = React.createClass({
           <hr />
           <Row>
             <Col md={12}>
-              <h3 style={{ marginBottom: 10 }}>Outgoing traffic {sumOutput}</h3>
+              <h3 ref={(container) => { this._container = container; }} style={{ marginBottom: 10 }}>Outgoing traffic {sumOutput}</h3>
               {!this.state.traffic ? <Spinner /> : <TrafficGraph traffic={this.state.traffic.output}
                                                                  from={this.state.traffic.from}
                                                                  to={this.state.traffic.to}
