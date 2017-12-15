@@ -16,6 +16,7 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
+import com.codahale.metrics.Gauge;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -68,6 +69,8 @@ import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -90,7 +93,10 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             TLS_CLIENT_AUTH_OPTIONAL, TLS_CLIENT_AUTH_OPTIONAL,
             TLS_CLIENT_AUTH_REQUIRED, TLS_CLIENT_AUTH_REQUIRED);
 
-    protected final ConnectionCounter connectionCounter;
+    private final ConnectionCounter connectionCounter;
+    private final AtomicInteger connections;
+    private final AtomicLong totalConnections;
+
     protected final Configuration configuration;
     private final NettyTransportConfiguration nettyTransportConfiguration;
 
@@ -109,12 +115,10 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             ThroughputCounter throughputCounter,
             LocalMetricRegistry localRegistry,
             EventLoopGroup eventLoopGroup,
-            NettyTransportConfiguration nettyTransportConfiguration,
-            ConnectionCounter connectionCounter) {
+            NettyTransportConfiguration nettyTransportConfiguration) {
         super(configuration, eventLoopGroup, throughputCounter, localRegistry);
         this.configuration = configuration;
         this.nettyTransportConfiguration = nettyTransportConfiguration;
-        this.connectionCounter = connectionCounter;
 
         this.tlsEnable = configuration.getBoolean(CK_TLS_ENABLE);
         this.tlsCertFile = getTlsFile(configuration, CK_TLS_CERT_FILE);
@@ -125,8 +129,21 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
         this.tcpKeepalive = configuration.getBoolean(CK_TCP_KEEPALIVE);
 
-        this.localRegistry.register("open_connections", connectionCounter.gaugeCurrent());
-        this.localRegistry.register("total_connections", connectionCounter.gaugeTotal());
+        this.connections = new AtomicInteger();
+        this.totalConnections = new AtomicLong();
+        this.connectionCounter = new ConnectionCounter(connections, totalConnections);
+        this.localRegistry.register("open_connections", new Gauge<Integer>() {
+            @Override
+            public Integer getValue() {
+                return connections.get();
+            }
+        });
+        this.localRegistry.register("total_connections", new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return totalConnections.get();
+            }
+        });
     }
 
     private File getTlsFile(Configuration configuration, String configKey) {
@@ -163,17 +180,11 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     }
 
     @Override
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChannelHandlers(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> channelHandlers = new LinkedHashMap<>(super.getChannelHandlers(input));
-        channelHandlers.put("connection-counter", () -> connectionCounter);
-
-        return channelHandlers;
-    }
-
-    @Override
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChildChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
 
+        handlers.put("traffic-counter", () -> throughputCounter);
+        handlers.put("connection-counter", () -> connectionCounter);
         if (tlsEnable) {
             LOG.info("Enabled TLS for input [{}/{}]. key-file=\"{}\" cert-file=\"{}\"", input.getName(), input.getId(), tlsKeyFile, tlsCertFile);
             handlers.put("tls", getSslHandlerCallable(input));

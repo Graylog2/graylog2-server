@@ -32,38 +32,34 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.net.InetAddress;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConnectionCounterTest {
     private ConnectionCounter connectionCounter;
     private NioEventLoopGroup eventLoopGroup;
-    private ChannelFuture channelFuture;
     private Channel serverChannel;
 
     @Before
     public void setUp() throws Exception {
-        connectionCounter = new ConnectionCounter();
+        connectionCounter = new ConnectionCounter(new AtomicInteger(), new AtomicLong());
         eventLoopGroup = new NioEventLoopGroup(1);
         final ServerBootstrap serverBootstrap = new ServerBootstrap()
                 .group(eventLoopGroup)
                 .channel(NioServerSocketChannel.class)
                 .childHandler(connectionCounter);
 
-        channelFuture = serverBootstrap.bind(InetAddress.getLocalHost(), 0)
-                .addListener(new ChannelFutureListener() {
-                    @Override
-                    public void operationComplete(ChannelFuture future) throws Exception {
-                        assertThat(future).isDone();
-                        serverChannel = future.channel();
-                    }
-                })
-                .sync();
+        serverBootstrap.bind(InetAddress.getLocalHost(), 0)
+                .addListener((ChannelFutureListener) future -> serverChannel = future.channel())
+                .syncUninterruptibly();
     }
 
     @After
-    public void tearDown() throws Exception {
-        serverChannel.close().sync();
+    public void tearDown() {
+        serverChannel.close().syncUninterruptibly();
         eventLoopGroup.shutdownGracefully();
     }
 
@@ -71,9 +67,7 @@ public class ConnectionCounterTest {
     public void testConnectAndDisconnect() throws Exception {
         // Fresh channel, no connections so far
         assertThat(connectionCounter.getTotalConnections()).isEqualTo(0L);
-        assertThat(connectionCounter.gaugeTotal().getValue()).isEqualTo(0L);
         assertThat(connectionCounter.getConnectionCount()).isEqualTo(0);
-        assertThat(connectionCounter.gaugeCurrent().getValue()).isEqualTo(0);
 
         final EventLoopGroup clientEventLoopGroup = new NioEventLoopGroup(1);
         try {
@@ -87,28 +81,20 @@ public class ConnectionCounterTest {
             final Channel clientChannel = connectFuture.channel();
 
             assertThat(clientChannel.isWritable()).isTrue();
-            clientChannel.writeAndFlush(Unpooled.EMPTY_BUFFER).sync();
+            clientChannel.writeAndFlush(Unpooled.EMPTY_BUFFER).syncUninterruptibly();
 
             // One client active
             assertThat(connectionCounter.getTotalConnections()).isEqualTo(1L);
-            assertThat(connectionCounter.gaugeTotal().getValue()).isEqualTo(1L);
             assertThat(connectionCounter.getConnectionCount()).isEqualTo(1);
-            assertThat(connectionCounter.gaugeCurrent().getValue()).isEqualTo(1);
 
-            clientChannel.close();
-            clientChannel.closeFuture().sync();
+            clientChannel.close().syncUninterruptibly();
         } finally {
             clientEventLoopGroup.shutdownGracefully();
+            clientEventLoopGroup.awaitTermination(1, TimeUnit.SECONDS);
         }
-
-        // Give the server socket time to realize the client is gone
-        // TODO: How to avoid this arbitrary sleep?
-        Thread.sleep(100L);
 
         // No client, but 1 connection so far
         assertThat(connectionCounter.getTotalConnections()).isEqualTo(1L);
-        assertThat(connectionCounter.gaugeTotal().getValue()).isEqualTo(1L);
         assertThat(connectionCounter.getConnectionCount()).isEqualTo(0);
-        assertThat(connectionCounter.gaugeCurrent().getValue()).isEqualTo(0);
     }
 }

@@ -33,7 +33,6 @@ import org.graylog2.plugin.inputs.annotations.ConfigClass;
 import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
-import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
 
 import java.util.LinkedHashMap;
@@ -55,9 +54,8 @@ public class TcpTransport extends AbstractTcpTransport {
                         EventLoopGroup eventLoopGroup,
                         NettyTransportConfiguration nettyTransportConfiguration,
                         ThroughputCounter throughputCounter,
-                        ConnectionCounter connectionCounter,
                         LocalMetricRegistry localRegistry) {
-        super(configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter);
+        super(configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration);
 
         final boolean nulDelimiter = configuration.getBoolean(CK_USE_NULL_DELIMITER);
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();

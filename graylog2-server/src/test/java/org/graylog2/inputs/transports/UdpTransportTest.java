@@ -16,20 +16,22 @@
  */
 package org.graylog2.inputs.transports;
 
+import com.codahale.metrics.Gauge;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
 import com.google.common.util.concurrent.Uninterruptibles;
-import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.FixedRecvByteBufAllocator;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.handler.codec.DatagramPacketDecoder;
-import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
+import io.netty.util.ReferenceCountUtil;
 import org.apache.commons.lang3.SystemUtils;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -48,11 +50,11 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 import static com.jayway.awaitility.Awaitility.await;
@@ -156,13 +158,75 @@ public class UdpTransportTest {
         assertThat(handler.getBytesWritten()).containsExactly(RECV_BUFFER_SIZE);
     }
 
-    private UdpTransport launchTransportForBootStrapTest(final MessageToMessageDecoder<ByteBuf> channelHandler) throws MisfireException {
+    @Test
+    public void receiveBufferSizeIsDefaultSize() {
+        assertThat(udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.SO_RCVBUF)).isEqualTo(RECV_BUFFER_SIZE);
+    }
+
+    @Test
+    public void receiveBufferSizeIsNotLimited() {
+        final int recvBufferSize = Ints.saturatedCast(Size.megabytes(1L).toBytes());
+        ImmutableMap<String, Object> source = ImmutableMap.of(
+                NettyTransport.CK_BIND_ADDRESS, BIND_ADDRESS,
+                NettyTransport.CK_PORT, PORT,
+                NettyTransport.CK_RECV_BUFFER_SIZE, recvBufferSize);
+        Configuration config = new Configuration(source);
+        UdpTransport udpTransport = new UdpTransport(config, eventLoopGroup, nettyTransportConfiguration, throughputCounter, new LocalMetricRegistry());
+
+        assertThat(udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.SO_RCVBUF)).isEqualTo(recvBufferSize);
+    }
+
+    @Test
+    public void receiveBufferSizePredictorIsUsingDefaultSize() {
+        FixedRecvByteBufAllocator recvByteBufAllocator =
+                (FixedRecvByteBufAllocator) udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.RCVBUF_ALLOCATOR);
+        assertThat(recvByteBufAllocator.newHandle().guess()).isEqualTo(RECV_BUFFER_SIZE);
+    }
+
+    @Test
+    public void getMetricSetReturnsLocalMetricRegistry() {
+        assertThat(udpTransport.getMetricSet()).isSameAs(localMetricRegistry);
+    }
+
+    @Test
+    public void testDefaultReceiveBufferSize() {
+        final UdpTransport.Config config = new UdpTransport.Config();
+        final ConfigurationRequest requestedConfiguration = config.getRequestedConfiguration();
+
+        assertThat(requestedConfiguration.getField(NettyTransport.CK_RECV_BUFFER_SIZE).getDefaultValue()).isEqualTo(262144);
+    }
+
+    @Test
+    public void testTrafficCounter() throws Exception {
+        final CountingChannelUpstreamHandler handler = new CountingChannelUpstreamHandler();
+        final UdpTransport transport = launchTransportForBootStrapTest(handler);
+        try {
+            await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
+            final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
+
+            sendUdpDatagram(BIND_ADDRESS, localAddress.getPort(), 512);
+            await().atMost(5, TimeUnit.SECONDS).until(() -> handler.getBytesWritten().size() == 1);
+            assertThat(handler.getBytesWritten()).containsExactly(512);
+
+            sendUdpDatagram(BIND_ADDRESS, localAddress.getPort(), 512);
+            await().atMost(5, TimeUnit.SECONDS).until(() -> handler.getBytesWritten().size() == 2);
+            assertThat(handler.getBytesWritten()).containsExactly(512, 512);
+
+        } finally {
+            transport.stop();
+        }
+
+        final Map<String, Gauge<Long>> gauges = throughputCounter.gauges();
+        assertThat(gauges.get(ThroughputCounter.READ_BYTES_TOTAL).getValue()).isEqualTo(1024L);
+    }
+
+    private UdpTransport launchTransportForBootStrapTest(final ChannelInboundHandler channelHandler) throws MisfireException {
         final UdpTransport transport = new UdpTransport(CONFIGURATION, eventLoopGroup, nettyTransportConfiguration, throughputCounter, new LocalMetricRegistry()) {
             @Override
             protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChannelHandlers(MessageInput input) {
                 final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
                 handlers.put("logging", () -> new LoggingHandler(LogLevel.INFO));
-                handlers.put("counter", () -> new DatagramPacketDecoder(channelHandler));
+                handlers.put("counter", () -> channelHandler);
                 handlers.putAll(super.getChannelHandlers(input));
                 return handlers;
             }
@@ -177,44 +241,6 @@ public class UdpTransportTest {
         return transport;
     }
 
-    @Test
-    public void receiveBufferSizeIsDefaultSize() throws Exception {
-        assertThat(udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.SO_RCVBUF)).isEqualTo(RECV_BUFFER_SIZE);
-    }
-
-    @Test
-    public void receiveBufferSizeIsNotLimited() throws Exception {
-        final int recvBufferSize = Ints.saturatedCast(Size.megabytes(1L).toBytes());
-        ImmutableMap<String, Object> source = ImmutableMap.of(
-                NettyTransport.CK_BIND_ADDRESS, BIND_ADDRESS,
-                NettyTransport.CK_PORT, PORT,
-                NettyTransport.CK_RECV_BUFFER_SIZE, recvBufferSize);
-        Configuration config = new Configuration(source);
-        UdpTransport udpTransport = new UdpTransport(config, eventLoopGroup, nettyTransportConfiguration, throughputCounter, new LocalMetricRegistry());
-
-        assertThat(udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.SO_RCVBUF)).isEqualTo(recvBufferSize);
-    }
-
-    @Test
-    public void receiveBufferSizePredictorIsUsingDefaultSize() throws Exception {
-        FixedRecvByteBufAllocator recvByteBufAllocator =
-                (FixedRecvByteBufAllocator) udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.RCVBUF_ALLOCATOR);
-        assertThat(recvByteBufAllocator.newHandle().guess()).isEqualTo(RECV_BUFFER_SIZE);
-    }
-
-    @Test
-    public void getMetricSetReturnsLocalMetricRegistry() {
-        assertThat(udpTransport.getMetricSet()).isSameAs(localMetricRegistry);
-    }
-
-    @Test
-    public void testDefaultReceiveBufferSize() throws Exception {
-        final UdpTransport.Config config = new UdpTransport.Config();
-        final ConfigurationRequest requestedConfiguration = config.getRequestedConfiguration();
-
-        assertThat(requestedConfiguration.getField(NettyTransport.CK_RECV_BUFFER_SIZE).getDefaultValue()).isEqualTo(262144);
-    }
-
     private void sendUdpDatagram(String hostname, int port, int size) throws IOException {
         final InetAddress address = InetAddress.getByName(hostname);
         final byte[] data = new byte[size];
@@ -225,14 +251,13 @@ public class UdpTransportTest {
         }
     }
 
-    public static class CountingChannelUpstreamHandler extends MessageToMessageDecoder<ByteBuf> {
-        private final List<Integer> bytesWritten = new ArrayList<>();
+    public static class CountingChannelUpstreamHandler extends SimpleChannelInboundHandler< io.netty.channel.socket.DatagramPacket> {
+        private final List<Integer> bytesWritten = new CopyOnWriteArrayList<>();
 
         @Override
-        protected void decode(ChannelHandlerContext ctx, ByteBuf msg, List<Object> out) throws Exception {
-            synchronized (bytesWritten) {
-                bytesWritten.add(msg.readableBytes());
-            }
+        protected void channelRead0(ChannelHandlerContext ctx, io.netty.channel.socket.DatagramPacket msg) throws Exception {
+                bytesWritten.add(msg.content().readableBytes());
+                ctx.fireChannelRead(ReferenceCountUtil.retain(msg));
         }
 
         List<Integer> getBytesWritten() {

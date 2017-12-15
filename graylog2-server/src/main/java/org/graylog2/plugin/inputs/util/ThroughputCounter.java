@@ -25,11 +25,15 @@ import io.netty.handler.traffic.TrafficCounter;
 import javax.inject.Inject;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ScheduledExecutorService;
 
 // TODO: Dedicated scheduled executor
 @ChannelHandler.Sharable
 public class ThroughputCounter extends GlobalTrafficShapingHandler {
+    public static final String READ_BYTES_1_SEC = "read_bytes_1sec";
+    public static final String WRITTEN_BYTES_1_SEC = "written_bytes_1sec";
+    public static final String READ_BYTES_TOTAL = "read_bytes_total";
+    public static final String WRITTEN_BYTES_TOTAL = "written_bytes_total";
+
     @Inject
     public ThroughputCounter(EventLoopGroup executor) {
         super(executor, 1000);
@@ -40,28 +44,25 @@ public class ThroughputCounter extends GlobalTrafficShapingHandler {
 
         final TrafficCounter tc = trafficCounter();
 
-        gauges.put("read_bytes_1sec", new Gauge<Long>() {
+        gauges.put(READ_BYTES_1_SEC, new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return tc.lastReadBytes();
             }
         });
-
-        gauges.put("written_bytes_1sec", new Gauge<Long>() {
+        gauges.put(WRITTEN_BYTES_1_SEC, new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return tc.lastWrittenBytes();
             }
         });
-
-        gauges.put("read_bytes_total", new Gauge<Long>() {
+        gauges.put(READ_BYTES_TOTAL, new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return tc.cumulativeReadBytes();
             }
         });
-
-        gauges.put("written_bytes_total", new Gauge<Long>() {
+        gauges.put(WRITTEN_BYTES_TOTAL, new Gauge<Long>() {
             @Override
             public Long getValue() {
                 return tc.cumulativeWrittenBytes();

@@ -18,6 +18,7 @@ package org.graylog2.plugin.inputs.transports;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.MetricSet;
+import com.google.common.annotations.VisibleForTesting;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
@@ -43,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -125,7 +127,6 @@ public abstract class NettyTransport implements Transport {
 
         handlerList.put("exception-logger", () -> new ExceptionLoggingChannelHandler(input, log));
         handlerList.put("packet-meta-dumper", () -> new PacketInformationDumper(input));
-        handlerList.put("traffic-counter", () -> throughputCounter);
         handlerList.put("output-failure-logger", () -> PromiseFailureHandler.INSTANCE);
 
         return handlerList;
@@ -182,6 +183,21 @@ public abstract class NettyTransport implements Transport {
     @Override
     public MetricSet getMetricSet() {
         return localRegistry;
+    }
+
+    /**
+     * Get the local socket address this transport is listening on after being launched.
+     *
+     * @return the listening address of this transport or {@code null} if the transport hasn't been launched yet.
+     */
+    @VisibleForTesting
+    @Nullable
+    SocketAddress getLocalAddress() {
+        if (channels != null) {
+            return channels.stream().findFirst().map(Channel::localAddress).orElse(null);
+        }
+
+        return null;
     }
 
     public static class Config implements Transport.Config {

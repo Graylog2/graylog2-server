@@ -73,9 +73,6 @@ public class UdpTransport extends NettyTransport {
     Bootstrap getBootstrap(MessageInput input) {
         LOG.debug("Setting UDP receive buffer size to {} bytes", getRecvBufferSize());
         final NettyTransportType transportType = nettyTransportConfiguration.getType();
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>(getChannelHandlers(input));
-        handlers.put("udp-datagram", () -> DatagramPacketHandler.INSTANCE);
-        handlers.putAll(getChildChannelHandlers(input));
 
         return new Bootstrap()
                 .group(eventLoopGroup)
@@ -83,8 +80,18 @@ public class UdpTransport extends NettyTransport {
                 .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(getRecvBufferSize()))
                 .option(ChannelOption.SO_RCVBUF, getRecvBufferSize())
                 .option(UnixChannelOption.SO_REUSEPORT, true)
-                .handler(getChannelInitializer(handlers))
+                .handler(getChannelInitializer(getChannelHandlers(input)))
                 .validate();
+    }
+
+    @Override
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>(super.getChannelHandlers(input));
+        handlers.put("traffic-counter", () -> throughputCounter);
+        handlers.put("udp-datagram", () -> DatagramPacketHandler.INSTANCE);
+        handlers.putAll(getChildChannelHandlers(input));
+
+        return handlers;
     }
 
     @Override

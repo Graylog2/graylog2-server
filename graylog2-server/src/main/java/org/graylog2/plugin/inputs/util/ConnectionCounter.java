@@ -16,33 +16,30 @@
  */
 package org.graylog2.plugin.inputs.util;
 
-import com.codahale.metrics.Gauge;
+import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
+@ChannelHandler.Sharable
 public class ConnectionCounter extends ChannelInboundHandlerAdapter {
     private final AtomicInteger connections;
     private final AtomicLong totalConnections;
 
-    public ConnectionCounter() {
-        this.connections = new AtomicInteger();
-        this.totalConnections = new AtomicLong();
+    public ConnectionCounter(AtomicInteger connections, AtomicLong totalConnections) {
+        this.connections = connections;
+        this.totalConnections = totalConnections;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         connections.incrementAndGet();
         totalConnections.incrementAndGet();
-        super.channelActive(ctx);
-    }
+        ctx.channel().closeFuture().addListener(f -> connections.decrementAndGet());
 
-    @Override
-    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
-        connections.decrementAndGet();
-        super.channelInactive(ctx);
+        super.channelActive(ctx);
     }
 
     public int getConnectionCount() {
@@ -51,13 +48,5 @@ public class ConnectionCounter extends ChannelInboundHandlerAdapter {
 
     public long getTotalConnections() {
         return totalConnections.get();
-    }
-
-    public Gauge<Integer> gaugeCurrent() {
-        return this::getConnectionCount;
-    }
-
-    public Gauge<Long> gaugeTotal() {
-        return this::getTotalConnections;
     }
 }

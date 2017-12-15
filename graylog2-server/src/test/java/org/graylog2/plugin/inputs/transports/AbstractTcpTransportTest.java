@@ -17,7 +17,15 @@
 package org.graylog2.plugin.inputs.transports;
 
 import com.google.common.collect.ImmutableMap;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -38,7 +46,10 @@ import org.mockito.junit.MockitoRule;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 
+import static com.jayway.awaitility.Awaitility.await;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
@@ -63,8 +74,7 @@ public class AbstractTcpTransportTest {
     private ThroughputCounter throughputCounter;
     private LocalMetricRegistry localRegistry;
     private NioEventLoopGroup eventLoopGroup;
-    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 1);
-    private ConnectionCounter connectionCounter;
+    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 4);
 
     @Before
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
@@ -72,7 +82,6 @@ public class AbstractTcpTransportTest {
         eventLoopGroup = new NioEventLoopGroup();
         throughputCounter = new ThroughputCounter(eventLoopGroup);
         localRegistry = new LocalMetricRegistry();
-        connectionCounter = new ConnectionCounter();
     }
 
     @After
@@ -89,7 +98,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-                configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter) {
+                configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {
         };
         final MessageInput input = mock(MessageInput.class);
         assertThat(transport.getChildChannelHandlers(input)).containsKey("tls");
@@ -108,7 +117,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter) {};
+            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
@@ -130,7 +139,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter) {};
+            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
@@ -151,11 +160,92 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration, connectionCounter) {};
+            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + file.getAbsolutePath());
 
         transport.getChildChannelHandlers(input);
+    }
+
+    @Test
+    public void testTrafficCounter() throws Exception {
+        final Configuration configuration = new Configuration(ImmutableMap.of(
+                "bind_address", "127.0.0.1",
+                "port", 0));
+        final AbstractTcpTransport transport = new AbstractTcpTransport(
+                configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {
+        };
+        transport.launch(input);
+
+        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
+        final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
+        assertThat(localAddress).isNotNull();
+
+        final ChannelFuture channelFuture = clientChannel(localAddress.getHostString(), localAddress.getPort());
+
+        channelFuture.channel()
+                .writeAndFlush(Unpooled.copiedBuffer(new byte[1024]))
+                .syncUninterruptibly();
+        channelFuture.channel()
+                .writeAndFlush(Unpooled.copiedBuffer(new byte[1024]))
+                .addListener(ChannelFutureListener.CLOSE)
+                .syncUninterruptibly();
+
+        // Wait 1s so that the cumulative throughput can be calculated
+        Thread.sleep(1000L);
+
+        assertThat(throughputCounter.gauges().get(ThroughputCounter.READ_BYTES_TOTAL).getValue()).isEqualTo(2048L);
+        assertThat(throughputCounter.gauges().get(ThroughputCounter.READ_BYTES_1_SEC).getValue()).isEqualTo(2048L);
+    }
+
+    @Test
+    public void testConnectionCounter() throws Exception {
+        final Configuration configuration = new Configuration(ImmutableMap.of(
+                "bind_address", "127.0.0.1",
+                "port", 0));
+        final AbstractTcpTransport transport = new AbstractTcpTransport(
+                configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {
+        };
+        transport.launch(input);
+
+        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
+        final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
+        assertThat(localAddress).isNotNull();
+
+        final ChannelFuture future1 = clientChannel(localAddress.getHostString(), localAddress.getPort()).channel()
+                .writeAndFlush(Unpooled.EMPTY_BUFFER)
+                .addListener(ChannelFutureListener.CLOSE)
+                .syncUninterruptibly();
+        final ChannelFuture future2 = clientChannel(localAddress.getHostString(), localAddress.getPort()).channel()
+                .writeAndFlush(Unpooled.EMPTY_BUFFER)
+                .syncUninterruptibly();
+
+        // TODO: Get rid of this (arbitrary) wait time
+        Thread.sleep(100L);
+
+        assertThat(future1.channel().isActive()).isFalse();
+        assertThat(future2.channel().isActive()).isTrue();
+        assertThat(localRegistry.getGauges().get("open_connections").getValue()).isEqualTo(1);
+        assertThat(localRegistry.getGauges().get("total_connections").getValue()).isEqualTo(2L);
+
+        future2.channel().close().syncUninterruptibly();
+
+        // TODO: Get rid of this (arbitrary) wait time
+        Thread.sleep(100L);
+
+        assertThat(future1.channel().isActive()).isFalse();
+        assertThat(future2.channel().isActive()).isFalse();
+        assertThat(localRegistry.getGauges().get("open_connections").getValue()).isEqualTo(0);
+        assertThat(localRegistry.getGauges().get("total_connections").getValue()).isEqualTo(2L);
+    }
+
+    private ChannelFuture clientChannel(String hostname, int port) {
+        return new Bootstrap()
+                .group(eventLoopGroup)
+                .channel(NioSocketChannel.class)
+                .handler(new LoggingHandler())
+                .connect(hostname, port)
+                .syncUninterruptibly();
     }
 }
