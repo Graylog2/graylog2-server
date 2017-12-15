@@ -65,16 +65,10 @@ const GraylogClusterOverview = React.createClass({
         </dl>
       );
     }
-    let sumInput = null;
     let sumOutput = null;
-    let sumDecoded = null;
     if (this.state.traffic) {
-      const bytesIn = _.reduce(this.state.traffic.input, (result, value) => result + value);
       const bytesOut = _.reduce(this.state.traffic.output, (result, value) => result + value);
-      const bytesDecoded = _.reduce(this.state.traffic.decoded, (result, value) => result + value);
-      sumInput = <small>Last 30 days: {NumberUtils.formatBytes(bytesIn)}</small>;
       sumOutput = <small>Last 30 days: {NumberUtils.formatBytes(bytesOut)}</small>;
-      sumDecoded = <small>Last 30 days: {NumberUtils.formatBytes(bytesDecoded)}</small>;
     }
     return (
       <Row className="content">
