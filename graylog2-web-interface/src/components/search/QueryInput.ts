@@ -145,7 +145,7 @@ class QueryInput {
         this.fields.forEach((field) => {
             possibleMatches.push(field + ":");
             possibleMatches.push("_exists_:" + field);
-            possibleMatches.push("_missing_:" + field);
+            possibleMatches.push("NOT _exists_:" + field);
         });
         return possibleMatches;
     }
