@@ -8,6 +8,11 @@ This file only contains the upgrade note for the upcoming release.
 Please see `our documentation <http://docs.graylog.org/en/latest/pages/upgrade.html>`_
 for the complete upgrade notes.
 
+Elasticsearch Version Requirements
+==================================
+
+Graylog 3.0 drops support for Elasticsearch versions before 5.6.x. That means you have to upgrade Elasticsearch to at least version 5.6.5 before upgrading Graylog to version 3.0. Make sure to read the Elasticsearch upgrade guides before doing that.
+
 Simplified HTTP interface configuration
 =======================================
 
