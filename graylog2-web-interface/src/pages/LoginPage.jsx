@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Row, Button, FormGroup, Alert } from 'react-bootstrap';
 import { DocumentTitle } from 'components/common';
 
-import { login } from 'ducks/sessions/sessions';
+import { login, resetLoginError, validate } from 'ducks/sessions/sessions';
 
 import { Input } from 'components/bootstrap';
 import LoadingPage from './LoadingPage';
@@ -15,8 +15,10 @@ import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 const LoginPage = React.createClass({
   propTypes: {
     isLoading: PropTypes.bool,
-    error: PropTypes.string,
+    loginError: PropTypes.string,
     login: PropTypes.func.isRequired,
+    validateSession: PropTypes.func.isRequired,
+    resetLoginError: PropTypes.func.isRequired,
   },
 
   getInitialState() {
@@ -28,7 +30,7 @@ const LoginPage = React.createClass({
   componentDidMount() {
     disconnectedStyle.use();
     authStyle.use();
-    // SessionActions.validate();
+    this.props.validateSession();
   },
   componentWillUnmount() {
     disconnectedStyle.unuse();
@@ -37,8 +39,6 @@ const LoginPage = React.createClass({
 
   onSignInClicked(event) {
     event.preventDefault();
-    this.resetLastError();
-    this.setState({ loading: true });
     const username = this.refs.username.getValue();
     const password = this.refs.password.getValue();
     const location = document.location.host;
@@ -49,22 +49,19 @@ const LoginPage = React.createClass({
       return (
         <div className="form-group">
           <Alert bsStyle="danger">
-            <a className="close" onClick={this.resetLastError}>×</a>{error}
+            <a className="close" onClick={this.props.resetLoginError}>×</a>{error}
           </Alert>
         </div>
       );
     }
     return null;
   },
-  resetLastError() {
-    // this.setState({ lastError: undefined });
-  },
   render() {
-    // if (this.state.validatingSession) {
-    //   return (
-    //     <LoadingPage />
-    //   );
-    // }
+    if (this.props.isValidating) {
+      return (
+        <LoadingPage />
+      );
+    }
 
     return (
       <DocumentTitle title="Sign in">
@@ -74,7 +71,7 @@ const LoginPage = React.createClass({
               <form className="col-md-4 col-md-offset-4 well" id="login-box-content" onSubmit={this.onSignInClicked}>
                 <legend><i className="fa fa-group" /> Welcome to Graylog</legend>
 
-                {this.props.error && this.formatLastError(this.props.error)}
+                {this.props.loginError && this.formatLastError(this.props.loginError)}
 
                 <Input ref="username" id="username" type="text" placeholder="Username" autoFocus />
 
@@ -97,11 +94,13 @@ const LoginPage = React.createClass({
 
 const mapStateToProps = state => ({
   isLoading: state.sessions.frontend.isLoading,
-  error: state.sessions.frontend.error,
+  loginError: state.sessions.frontend.error,
 });
 
 const mapDispatchToProps = dispatch => ({
   login: (username, password, location) => dispatch(login(username, password, location)),
+  validateSession: () => dispatch(validate()),
+  resetLoginError: () => dispatch(resetLoginError()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);

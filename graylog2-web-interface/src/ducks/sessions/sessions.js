@@ -6,13 +6,19 @@ import { combineState } from 'ducks/ducksHelpers';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
-export const LOGIN_REQUEST = 'graylog/sessions/LOGIN_REQUEST';
-export const LOGIN_SUCCESS = 'graylog/sessions/LOGIN_SUCCESS';
-export const LOGIN_FAILURE = 'graylog/sessions/LOGIN_FAILURE';
+const LOGIN_REQUEST = 'graylog/sessions/LOGIN_REQUEST';
+const LOGIN_SUCCESS = 'graylog/sessions/LOGIN_SUCCESS';
+const LOGIN_FAILURE = 'graylog/sessions/LOGIN_FAILURE';
 
-export const LOGOUT_REQUEST = 'graylog/sessions/LOGOUT_REQUEST';
-export const LOGOUT_SUCCESS = 'graylog/sessions/LOGOUT_SUCCESS';
-export const LOGOUT_FAILURE = 'graylog/sessions/LOGOUT_FAILURE';
+const LOGOUT_REQUEST = 'graylog/sessions/LOGOUT_REQUEST';
+const LOGOUT_SUCCESS = 'graylog/sessions/LOGOUT_SUCCESS';
+const LOGOUT_FAILURE = 'graylog/sessions/LOGOUT_FAILURE';
+
+const VALIDATION_REQUEST = 'graylog/sessions/VALIDATION_REQUEST';
+const VALIDATION_SUCCESS = 'graylog/sessions/VALIDATION_SUCCESS';
+const VALIDATION_FAILURE = 'graylog/sessions/VALIDATION_FAILURE';
+
+const RESET_LOGIN_ERROR = 'graylog/sessions/RESET_LOGIN_ERROR';
 
 const requestLogin = () => ({
   type: LOGIN_REQUEST,
@@ -43,6 +49,26 @@ const failedLogout = error => ({
   error: error,
 });
 
+const requestValidation = () => ({
+  type: VALIDATION_REQUEST,
+});
+
+const receiveValidation = (isValid, sessionId, username) => ({
+  type: VALIDATION_SUCCESS,
+  isValid: isValid,
+  sessionId: sessionId,
+  username: username,
+});
+
+const failedValidation = error => ({
+  type: VALIDATION_FAILURE,
+  error: error,
+});
+
+export const resetLoginError = () => ({
+  type: RESET_LOGIN_ERROR,
+});
+
 export const login = (username, password, host) => (dispatch) => {
   dispatch(requestLogin());
 
@@ -64,6 +90,23 @@ export const logout = () => (dispatch, getState) => {
     .then(
       response => dispatch(receiveLogout(response.ok || response.status === 401)),
       error => dispatch(failedLogout(error)),
+    );
+};
+
+export const validate = () => (dispatch) => {
+  dispatch(requestValidation());
+
+  // Need to get sessionId and username from local storage, since state may not be initialized
+  const sessionId = Store.get('sessionId');
+  const username = Store.get('username');
+
+  return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
+    .session(sessionId)
+    .json()
+    .build()
+    .then(
+      response => dispatch(receiveValidation(response.is_valid, sessionId || response.session_id, username || response.username)),
+      error => dispatch(failedValidation(error)),
     );
 };
 
@@ -108,9 +151,14 @@ const logoutSuccessful = (state, error) => {
   });
 };
 
+const clearValidation = (state) => {
+  return state;
+};
+
 const initialState = {
   frontend: {
     isLoading: false,
+    isValidating: true,
     error: undefined,
   },
   loggedIn: false,
@@ -135,6 +183,17 @@ export default function reducer(state = initialState, action) {
       return state;
     case LOGOUT_FAILURE:
       return logoutSuccessful(state, action.error);
+    case VALIDATION_REQUEST:
+      return combineState(state, { frontend: { isValidating: true, error: undefined } });
+    case VALIDATION_SUCCESS:
+      if (action.isValid) {
+        return loginSuccessful(state, action.sessionId, action.username);
+      }
+      return clearValidation(state);
+    case VALIDATION_FAILURE:
+      return clearValidation(state);
+    case RESET_LOGIN_ERROR:
+      return combineState(state, { frontend: { error: undefined } });
     default:
       return state;
   }
