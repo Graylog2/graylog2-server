@@ -18,6 +18,7 @@ package org.graylog2;
 
 import com.github.joschi.jadconfig.Parameter;
 import com.github.joschi.jadconfig.ValidationException;
+import com.github.joschi.jadconfig.Validator;
 import com.github.joschi.jadconfig.ValidatorMethod;
 import com.github.joschi.jadconfig.converters.TrimmedStringSetConverter;
 import com.github.joschi.jadconfig.util.Duration;
@@ -33,6 +34,7 @@ import org.graylog2.utilities.IpSubnet;
 import org.joda.time.DateTimeZone;
 
 import java.net.URI;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -78,7 +80,7 @@ public class Configuration extends BaseConfiguration {
     @Parameter("rules_file")
     private String droolsRulesFile;
 
-    @Parameter(value = "node_id_file")
+    @Parameter(value = "node_id_file", validator = NodeIdFileValidator.class)
     private String nodeIdFile = "/etc/graylog/server/node-id";
 
     @Parameter(value = "root_username")
@@ -337,6 +339,37 @@ public class Configuration extends BaseConfiguration {
                 !restListenUri.getHost().equals(webListenUri.getHost()) &&
                 (WILDCARD_IP_ADDRESS.equals(restListenUri.getHost()) || WILDCARD_IP_ADDRESS.equals(webListenUri.getHost()))) {
             throw new ValidationException("Wildcard IP addresses cannot be used if the Graylog REST API and web interface listen on the same port.");
+        }
+    }
+
+    public static class NodeIdFileValidator implements Validator<String> {
+        @Override
+        public void validate(String name, String path) throws ValidationException {
+            if (path == null) {
+                return;
+            }
+            final File file = Paths.get(path).toFile();
+            final StringBuilder b = new StringBuilder();
+            if (!file.isFile()) {
+                b.append("a file");
+            }
+            if (!file.canRead()) {
+                if (b.length() > 0) {
+                    b.append(", ");
+                }
+                b.append("readable");
+            }
+            if (!file.canWrite()) {
+                if (b.length() > 0) {
+                    b.append(", ");
+                }
+                b.append("writable");
+            }
+            if (b.length() == 0) {
+                // all good
+                return;
+            }
+            throw new ValidationException("Node ID file at path " + path + " isn't " + b +". Please specify the correct path or change the permissions");
         }
     }
 }
