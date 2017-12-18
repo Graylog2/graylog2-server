@@ -10,6 +10,8 @@ const Footer = React.createClass({
     isLoading: PropTypes.bool.isRequired,
     system: PropTypes.object,
     jvm: PropTypes.object,
+    loadSystemInfo: PropTypes.func.isRequired,
+    loadJvmInfo: PropTypes.func.isRequired,
   },
 
   componentDidMount() {

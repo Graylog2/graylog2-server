@@ -15,6 +15,7 @@ import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 const LoginPage = React.createClass({
   propTypes: {
     isLoading: PropTypes.bool,
+    isValidating: PropTypes.bool,
     loginError: PropTypes.string,
     login: PropTypes.func.isRequired,
     validateSession: PropTypes.func.isRequired,
@@ -94,6 +95,7 @@ const LoginPage = React.createClass({
 
 const mapStateToProps = state => ({
   isLoading: state.sessions.frontend.isLoading,
+  isValidating: state.sessions.frontend.isValidating,
   loginError: state.sessions.frontend.error,
 });
 
