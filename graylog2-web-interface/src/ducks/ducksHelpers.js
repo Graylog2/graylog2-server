@@ -1,3 +1,1 @@
-import lodash from 'lodash';
-
-export const combineState = (oldState, update) => lodash.merge({}, oldState, update);
+export const combineState = (oldState, update) => Object.assign({}, oldState, update);

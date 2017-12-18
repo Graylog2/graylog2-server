@@ -161,13 +161,13 @@ const initialState = {
 export default function reducer(state = initialState, action) {
   switch (action.type) {
     case LOGIN_REQUEST:
-      return combineState(state, { frontend: { isLoading: true, error: undefined } });
+      return combineState(state, { frontend: { isLoading: true } });
     case LOGIN_SUCCESS:
       return storeSession(state, action.sessionId, action.username);
     case LOGIN_FAILURE:
       return loginFailure(state, action.error);
     case LOGOUT_REQUEST:
-      return combineState(state, { frontend: { isLoading: true, error: undefined } });
+      return combineState(state, { frontend: { isLoading: true } });
     case LOGOUT_SUCCESS:
       if (action.isLoggedOut) {
         return doLogout(state);
@@ -176,7 +176,7 @@ export default function reducer(state = initialState, action) {
     case LOGOUT_FAILURE:
       return doLogout(state, action.error);
     case VALIDATION_REQUEST:
-      return combineState(state, { frontend: { isValidating: true, error: undefined } });
+      return combineState(state, { frontend: { isValidating: true } });
     case VALIDATION_SUCCESS:
       if (action.isValid) {
         return storeSession(state, action.sessionId, action.username);
