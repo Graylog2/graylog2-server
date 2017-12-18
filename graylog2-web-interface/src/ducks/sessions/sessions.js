@@ -1,5 +1,4 @@
 import URLUtils from 'util/URLUtils';
-import Store from 'logic/local-storage/Store';
 import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
 import { combineState } from 'ducks/ducksHelpers';
@@ -93,12 +92,12 @@ export const logout = () => (dispatch, getState) => {
     );
 };
 
-export const validate = () => (dispatch) => {
+export const validate = () => (dispatch, getState) => {
   dispatch(requestValidation());
 
-  // Need to get sessionId and username from local storage, since state may not be initialized
-  const sessionId = Store.get('sessionId');
-  const username = Store.get('username');
+  const sessionsStore = getState().sessions;
+  const sessionId = sessionsStore.sessionId;
+  const username = sessionsStore.username;
 
   return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
     .session(sessionId)
@@ -110,13 +109,10 @@ export const validate = () => (dispatch) => {
     );
 };
 
-const loginSuccessful = (state, sessionId, username) => {
-  Store.set('sessionId', sessionId);
-  Store.set('username', username);
-
+const storeSession = (state, sessionId, username) => {
   return combineState(state, {
-    frontend: { isLoading: false },
-    loggedIn: true,
+    frontend: { isLoading: false, isValidating: false },
+    isLoggedIn: true,
     sessionId: sessionId,
     username: username,
   });
@@ -136,23 +132,19 @@ const loginFailure = (state, error) => {
   });
 };
 
-const logoutSuccessful = (state, error) => {
-  Store.delete('sessionId');
-  Store.delete('username');
-
-  history.push(Routes.STARTPAGE);
-
+const clearSession = (state, error) => {
   return combineState(state, {
-    frontend: { isLoading: false },
-    loggedIn: false,
+    frontend: { isLoading: false, isValidating: false, error: error },
+    isLoggedIn: false,
     sessionId: undefined,
     username: undefined,
-    error: error,
   });
 };
 
-const clearValidation = (state) => {
-  return state;
+const doLogout = (state, error) => {
+  history.push(Routes.STARTPAGE);
+
+  return clearSession(state, error);
 };
 
 const initialState = {
@@ -161,7 +153,7 @@ const initialState = {
     isValidating: true,
     error: undefined,
   },
-  loggedIn: false,
+  isLoggedIn: false,
   sessionId: undefined,
   username: undefined,
 };
@@ -171,27 +163,27 @@ export default function reducer(state = initialState, action) {
     case LOGIN_REQUEST:
       return combineState(state, { frontend: { isLoading: true, error: undefined } });
     case LOGIN_SUCCESS:
-      return loginSuccessful(state, action.sessionId, action.username);
+      return storeSession(state, action.sessionId, action.username);
     case LOGIN_FAILURE:
       return loginFailure(state, action.error);
     case LOGOUT_REQUEST:
       return combineState(state, { frontend: { isLoading: true, error: undefined } });
     case LOGOUT_SUCCESS:
       if (action.isLoggedOut) {
-        return logoutSuccessful(state);
+        return doLogout(state);
       }
-      return state;
+      return combineState(state, { frontend: { isLoading: false } });
     case LOGOUT_FAILURE:
-      return logoutSuccessful(state, action.error);
+      return doLogout(state, action.error);
     case VALIDATION_REQUEST:
       return combineState(state, { frontend: { isValidating: true, error: undefined } });
     case VALIDATION_SUCCESS:
       if (action.isValid) {
-        return loginSuccessful(state, action.sessionId, action.username);
+        return storeSession(state, action.sessionId, action.username);
       }
-      return clearValidation(state);
+      return clearSession(state);
     case VALIDATION_FAILURE:
-      return clearValidation(state);
+      return clearSession(state);
     case RESET_LOGIN_ERROR:
       return combineState(state, { frontend: { error: undefined } });
     default:

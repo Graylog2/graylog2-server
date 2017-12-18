@@ -22,7 +22,7 @@ import 'stylesheets/graylog2.less';
 
 const AppFacade = React.createClass({
   propTypes: {
-    sessionId: PropTypes.string,
+    isLoggedIn: PropTypes.bool,
   },
 
   mixins: [Reflux.connect(ServerAvailabilityStore), Reflux.connect(CurrentUserStore)],
@@ -41,7 +41,7 @@ const AppFacade = React.createClass({
     if (!this.state.server.up) {
       return <ServerUnavailablePage server={this.state.server} />;
     }
-    if (!this.props.sessionId) {
+    if (!this.props.isLoggedIn) {
       return <LoginPage />;
     }
     if (!this.state.currentUser) {
@@ -52,7 +52,7 @@ const AppFacade = React.createClass({
 });
 
 const mapStateToProps = state => ({
-  sessionId: state.sessions.sessionId,
+  isLoggedIn: state.sessions.isLoggedIn,
 });
 
 export default connect(mapStateToProps)(AppFacade);
