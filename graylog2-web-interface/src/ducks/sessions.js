@@ -108,22 +108,6 @@ selectors.getIsLoggedIn = state => state.session.isLoggedIn;
 selectors.getSessionId = state => state.session.sessionId;
 selectors.getUsername = state => state.session.username;
 
-const storeSession = (state, sessionId, username) => {
-  return combineState(state, {
-    isLoggedIn: true,
-    sessionId: sessionId,
-    username: username,
-  });
-};
-
-const clearSession = (state) => {
-  return combineState(state, {
-    isLoggedIn: false,
-    sessionId: undefined,
-    username: undefined,
-  });
-};
-
 const isLoadingReducer = (state = false, action) => {
   switch (action.type) {
     case actionTypes.LOGIN_REQUEST:
@@ -175,6 +159,22 @@ const errorReducer = (state = null, action) => {
     default:
       return state;
   }
+};
+
+const storeSession = (state, sessionId, username) => {
+  return combineState(state, {
+    isLoggedIn: true,
+    sessionId: sessionId,
+    username: username,
+  });
+};
+
+const clearSession = (state) => {
+  return combineState(state, {
+    isLoggedIn: false,
+    sessionId: undefined,
+    username: undefined,
+  });
 };
 
 const sessionReducer = (state = {
