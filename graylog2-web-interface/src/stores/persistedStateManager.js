@@ -1,5 +1,5 @@
 import Store from 'logic/local-storage/Store';
-import { selectors } from 'ducks/sessions/sessions';
+import { selectors } from 'ducks/sessions';
 
 export const getStateFromLocalStorage = () => {
   const sessionId = Store.get('sessionId');

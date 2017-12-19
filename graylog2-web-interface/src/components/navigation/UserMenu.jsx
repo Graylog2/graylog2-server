@@ -5,7 +5,7 @@ import { NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
-import { actions } from 'ducks/sessions/sessions';
+import { actions } from 'ducks/sessions';
 
 const UserMenu = React.createClass({
   propTypes: {

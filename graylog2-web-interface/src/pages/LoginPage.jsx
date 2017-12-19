@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Row, Button, FormGroup, Alert } from 'react-bootstrap';
 import { DocumentTitle } from 'components/common';
 
-import { actions, selectors } from 'ducks/sessions/sessions';
+import { actions, selectors } from 'ducks/sessions';
 
 import { Input } from 'components/bootstrap';
 import LoadingPage from './LoadingPage';

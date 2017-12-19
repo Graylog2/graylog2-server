@@ -3,7 +3,7 @@ import { PropTypes } from 'prop-types';
 import Reflux from 'reflux';
 import { connect } from 'react-redux';
 
-import { selectors } from 'ducks/sessions/sessions';
+import { selectors } from 'ducks/sessions';
 
 import LoginPage from 'react-proxy?name=LoginPage!pages/LoginPage';
 import LoadingPage from 'react-proxy?name=LoadingPage!pages/LoadingPage';
