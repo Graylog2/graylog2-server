@@ -97,6 +97,13 @@ actions.validate = () => (dispatch, getState) => {
     );
 };
 
+selectors.getIsLoading = state => state.frontend.isLoading;
+selectors.getIsValidating = state => state.frontend.isValidating;
+selectors.getError = state => state.frontend.error;
+selectors.getIsLoggedIn = state => state.isLoggedIn;
+selectors.getSessionId = state => state.sessionId;
+selectors.getUsername = state => state.username;
+
 const storeSession = (state, sessionId, username) => {
   return combineState(state, {
     frontend: { isLoading: false, isValidating: false },

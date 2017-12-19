@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Row, Button, FormGroup, Alert } from 'react-bootstrap';
 import { DocumentTitle } from 'components/common';
 
-import { actions } from 'ducks/sessions/sessions';
+import { actions, selectors } from 'ducks/sessions/sessions';
 
 import { Input } from 'components/bootstrap';
 import LoadingPage from './LoadingPage';
@@ -94,9 +94,9 @@ const LoginPage = React.createClass({
 });
 
 const mapStateToProps = state => ({
-  isLoading: state.sessions.frontend.isLoading,
-  isValidating: state.sessions.frontend.isValidating,
-  loginError: state.sessions.frontend.error,
+  isLoading: selectors.getIsLoading(state.sessions),
+  isValidating: selectors.getIsValidating(state.sessions),
+  loginError: selectors.getError(state.sessions),
 });
 
 const mapDispatchToProps = dispatch => ({

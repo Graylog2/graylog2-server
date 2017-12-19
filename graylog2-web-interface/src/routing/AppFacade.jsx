@@ -3,6 +3,8 @@ import { PropTypes } from 'prop-types';
 import Reflux from 'reflux';
 import { connect } from 'react-redux';
 
+import { selectors } from 'ducks/sessions/sessions';
+
 import LoginPage from 'react-proxy?name=LoginPage!pages/LoginPage';
 import LoadingPage from 'react-proxy?name=LoadingPage!pages/LoadingPage';
 import LoggedInPage from 'react-proxy?name=LoggedInPage!pages/LoggedInPage';
@@ -52,7 +54,7 @@ const AppFacade = React.createClass({
 });
 
 const mapStateToProps = state => ({
-  isLoggedIn: state.sessions.isLoggedIn,
+  isLoggedIn: selectors.getIsLoggedIn(state.sessions),
 });
 
 export default connect(mapStateToProps)(AppFacade);
