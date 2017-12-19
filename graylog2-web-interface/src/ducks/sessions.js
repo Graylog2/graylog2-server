@@ -1,3 +1,4 @@
+import { combineReducers } from 'redux';
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import { Builder } from 'logic/rest/FetchProvider';
@@ -52,15 +53,18 @@ actions.logout = () => (dispatch, getState) => {
     type: actionTypes.LOGOUT_REQUEST,
   });
 
-  return new Builder('DELETE', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.logout(getState().sessionId).url))
+  const sessionId = selectors.getSessionId(getState().sessions);
+  return new Builder('DELETE', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.logout(sessionId).url))
     .authenticated()
     .build()
     .then(
-      response =>
+      (response) => {
         dispatch({
           type: actionTypes.LOGOUT_SUCCESS,
           isLoggedOut: response.ok || response.status === 401,
-        }),
+        });
+        history.push(Routes.STARTPAGE);
+      },
       error =>
         dispatch({
           type: actionTypes.LOGOUT_FAILURE,
@@ -74,9 +78,9 @@ actions.validate = () => (dispatch, getState) => {
     type: actionTypes.VALIDATION_REQUEST,
   });
 
-  const sessionsStore = getState().sessions;
-  const sessionId = sessionsStore.sessionId;
-  const username = sessionsStore.username;
+  const sessionsState = getState().sessions;
+  const sessionId = selectors.getSessionId(sessionsState);
+  const username = selectors.getUsername(sessionsState);
 
   return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
     .session(sessionId)
@@ -100,78 +104,91 @@ actions.validate = () => (dispatch, getState) => {
 selectors.getIsLoading = state => state.frontend.isLoading;
 selectors.getIsValidating = state => state.frontend.isValidating;
 selectors.getError = state => state.frontend.error;
-selectors.getIsLoggedIn = state => state.isLoggedIn;
-selectors.getSessionId = state => state.sessionId;
-selectors.getUsername = state => state.username;
+selectors.getIsLoggedIn = state => state.session.isLoggedIn;
+selectors.getSessionId = state => state.session.sessionId;
+selectors.getUsername = state => state.session.username;
 
 const storeSession = (state, sessionId, username) => {
   return combineState(state, {
-    frontend: { isLoading: false, isValidating: false },
     isLoggedIn: true,
     sessionId: sessionId,
     username: username,
   });
 };
 
-const loginFailure = (state, error) => {
-  let errorMessage;
-  if (error) {
-    if (error.additional.status === 401) {
-      errorMessage = 'Invalid credentials, please verify them and retry.';
-    } else {
-      errorMessage = `Error - the server returned: ${error.additional.status} - ${error.message}`;
-    }
-  }
+const clearSession = (state) => {
   return combineState(state, {
-    frontend: { isLoading: false, error: errorMessage },
-  });
-};
-
-const clearSession = (state, error) => {
-  return combineState(state, {
-    frontend: { isLoading: false, isValidating: false, error: error },
     isLoggedIn: false,
     sessionId: undefined,
     username: undefined,
   });
 };
 
-const doLogout = (state, error) => {
-  history.push(Routes.STARTPAGE);
-
-  return clearSession(state, error);
+const isLoadingReducer = (state = false, action) => {
+  switch (action.type) {
+    case actionTypes.LOGIN_REQUEST:
+    case actionTypes.LOGOUT_REQUEST:
+      return true;
+    case actionTypes.LOGIN_SUCCESS:
+    case actionTypes.LOGIN_FAILURE:
+    case actionTypes.LOGOUT_SUCCESS:
+    case actionTypes.LOGOUT_FAILURE:
+      return false;
+    default:
+      return state;
+  }
 };
 
-const initialState = {
-  frontend: {
-    isLoading: false,
-    isValidating: true,
-    error: undefined,
-  },
+const isValidatingReducer = (state = true, action) => {
+  switch (action.type) {
+    case actionTypes.VALIDATION_REQUEST:
+      return true;
+    case actionTypes.VALIDATION_SUCCESS:
+    case actionTypes.VALIDATION_FAILURE:
+      return false;
+    default:
+      return state;
+  }
+};
+
+const errorReducer = (state = null, action) => {
+  let errorMessage;
+  switch (action.type) {
+    case actionTypes.LOGIN_FAILURE:
+      if (action.error.additional.status === 401) {
+        errorMessage = 'Invalid credentials, please verify them and retry.';
+      } else {
+        errorMessage = `Error - the server returned: ${action.error.additional.status} - ${action.error.message}`;
+      }
+      return errorMessage;
+    case actionTypes.LOGOUT_FAILURE:
+    case actionTypes.VALIDATION_FAILURE:
+      return action.error.message;
+    case actionTypes.RESET_LOGIN_ERROR:
+    case actionTypes.LOGIN_REQUEST:
+    case actionTypes.LOGOUT_REQUEST:
+    case actionTypes.VALIDATION_REQUEST:
+    case actionTypes.LOGIN_SUCCESS:
+    case actionTypes.LOGOUT_SUCCESS:
+    case actionTypes.VALIDATION_SUCCESS:
+      return null;
+    default:
+      return state;
+  }
+};
+
+const sessionReducer = (state = {
   isLoggedIn: false,
   sessionId: undefined,
   username: undefined,
-};
-
-export default function reducer(state = initialState, action) {
+}, action) => {
   switch (action.type) {
-    case actionTypes.LOGIN_REQUEST:
-      return combineState(state, { frontend: { isLoading: true } });
     case actionTypes.LOGIN_SUCCESS:
       return storeSession(state, action.sessionId, action.username);
-    case actionTypes.LOGIN_FAILURE:
-      return loginFailure(state, action.error);
-    case actionTypes.LOGOUT_REQUEST:
-      return combineState(state, { frontend: { isLoading: true } });
     case actionTypes.LOGOUT_SUCCESS:
-      if (action.isLoggedOut) {
-        return doLogout(state);
-      }
-      return combineState(state, { frontend: { isLoading: false } });
+      return action.isLoggedOut ? clearSession(state) : state;
     case actionTypes.LOGOUT_FAILURE:
-      return doLogout(state, action.error);
-    case actionTypes.VALIDATION_REQUEST:
-      return combineState(state, { frontend: { isValidating: true } });
+      return clearSession(state);
     case actionTypes.VALIDATION_SUCCESS:
       if (action.isValid) {
         return storeSession(state, action.sessionId, action.username);
@@ -179,11 +196,20 @@ export default function reducer(state = initialState, action) {
       return clearSession(state);
     case actionTypes.VALIDATION_FAILURE:
       return clearSession(state);
-    case actionTypes.RESET_LOGIN_ERROR:
-      return combineState(state, { frontend: { error: undefined } });
     default:
       return state;
   }
-}
+};
+
+const frontendReducers = combineReducers({
+  isLoading: isLoadingReducer,
+  isValidating: isValidatingReducer,
+  error: errorReducer,
+});
+
+export default combineReducers({
+  frontend: frontendReducers,
+  session: sessionReducer,
+});
 
 export { actions, selectors };

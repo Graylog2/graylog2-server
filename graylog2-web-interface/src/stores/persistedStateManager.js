@@ -5,10 +5,10 @@ export const getStateFromLocalStorage = () => {
   const sessionId = Store.get('sessionId');
   const username = Store.get('username');
 
-  return { sessions: { frontend: {}, isLoggedIn: false, sessionId: sessionId, username: username } };
+  return { sessions: { session: { isLoggedIn: false, sessionId: sessionId, username: username } } };
 };
 
-let previousSession = getStateFromLocalStorage().sessions;
+let previousSession = getStateFromLocalStorage().sessions.session;
 
 export const persistStateToLocalStorage = (state) => {
   try {
@@ -30,7 +30,7 @@ export const persistStateToLocalStorage = (state) => {
         }
       }
     }
-    previousSession = sessionsState;
+    previousSession = sessionsState.session;
   } catch (e) {
     console.error('Could not persist session change', e);
   }
