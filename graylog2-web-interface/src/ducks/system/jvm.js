@@ -7,27 +7,23 @@ const JVM_INFO_REQUEST = 'graylog/jvm/JVM_INFO_REQUEST';
 const JVM_INFO_SUCCESS = 'graylog/jvm/JVM_INFO_SUCCESS';
 const JVM_INFO_FAILURE = 'graylog/jvm/JVM_INFO_FAILURE';
 
-const requestJvmInfo = () => ({
-  type: JVM_INFO_REQUEST,
-});
-
-const receiveJvmInfo = response => ({
-  type: JVM_INFO_SUCCESS,
-  response: response,
-});
-
-const failedJvmInfo = error => ({
-  type: JVM_INFO_FAILURE,
-  error: error,
-});
-
 export const loadJvmInfo = () => (dispatch) => {
-  dispatch(requestJvmInfo());
+  dispatch({
+    type: JVM_INFO_REQUEST,
+  });
   const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.jvm().url);
   return fetch('GET', url)
     .then(
-      response => dispatch(receiveJvmInfo(response)),
-      error => dispatch(failedJvmInfo(error)),
+      response =>
+        dispatch({
+          type: JVM_INFO_SUCCESS,
+          response: response,
+        }),
+      error =>
+        dispatch({
+          type: JVM_INFO_FAILURE,
+          error: error,
+        }),
     );
 };
 

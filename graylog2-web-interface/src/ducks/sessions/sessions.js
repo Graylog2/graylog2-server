@@ -19,81 +19,59 @@ const VALIDATION_FAILURE = 'graylog/sessions/VALIDATION_FAILURE';
 
 const RESET_LOGIN_ERROR = 'graylog/sessions/RESET_LOGIN_ERROR';
 
-const requestLogin = () => ({
-  type: LOGIN_REQUEST,
-});
-
-const receiveLogin = (sessionId, username) => ({
-  type: LOGIN_SUCCESS,
-  sessionId: sessionId,
-  username: username,
-});
-
-const failedLogin = error => ({
-  type: LOGIN_FAILURE,
-  error: error,
-});
-
-const requestLogout = () => ({
-  type: LOGOUT_REQUEST,
-});
-
-const receiveLogout = isLoggedOut => ({
-  type: LOGOUT_SUCCESS,
-  isLoggedOut: isLoggedOut,
-});
-
-const failedLogout = error => ({
-  type: LOGOUT_FAILURE,
-  error: error,
-});
-
-const requestValidation = () => ({
-  type: VALIDATION_REQUEST,
-});
-
-const receiveValidation = (isValid, sessionId, username) => ({
-  type: VALIDATION_SUCCESS,
-  isValid: isValid,
-  sessionId: sessionId,
-  username: username,
-});
-
-const failedValidation = error => ({
-  type: VALIDATION_FAILURE,
-  error: error,
-});
-
 export const resetLoginError = () => ({
   type: RESET_LOGIN_ERROR,
 });
 
 export const login = (username, password, host) => (dispatch) => {
-  dispatch(requestLogin());
+  dispatch({
+    type: LOGIN_REQUEST,
+  });
 
   return new Builder('POST', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.login().url))
     .json({ username: username, password: password, host: host })
     .build()
     .then(
-      response => dispatch(receiveLogin(response.session_id, username)),
-      error => dispatch(failedLogin(error)),
+      response =>
+        dispatch({
+          type: LOGIN_SUCCESS,
+          sessionId: response.session_id,
+          username: username,
+        }),
+      error =>
+        dispatch({
+          type: LOGIN_FAILURE,
+          error: error,
+        }),
     );
 };
 
 export const logout = () => (dispatch, getState) => {
-  dispatch(requestLogout());
+  dispatch({
+    type: LOGOUT_REQUEST,
+  });
 
   return new Builder('DELETE', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.logout(getState().sessionId).url))
     .authenticated()
     .build()
     .then(
-      response => dispatch(receiveLogout(response.ok || response.status === 401)),
-      error => dispatch(failedLogout(error)),
+      response =>
+        dispatch({
+          type: LOGOUT_SUCCESS,
+          isLoggedOut: response.ok || response.status === 401,
+        }),
+      error =>
+        dispatch({
+          type: LOGOUT_FAILURE,
+          error: error,
+        }),
     );
 };
 
 export const validate = () => (dispatch, getState) => {
-  dispatch(requestValidation());
+  dispatch({
+    type: VALIDATION_REQUEST,
+  });
 
   const sessionsStore = getState().sessions;
   const sessionId = sessionsStore.sessionId;
@@ -104,8 +82,17 @@ export const validate = () => (dispatch, getState) => {
     .json()
     .build()
     .then(
-      response => dispatch(receiveValidation(response.is_valid, sessionId || response.session_id, username || response.username)),
-      error => dispatch(failedValidation(error)),
+      response =>
+        dispatch({
+          type: VALIDATION_SUCCESS,
+          isValid: response.is_valid,
+          sessionId: sessionId || response.session_id,
+          username: username || response.username,
+        }),
+      error => dispatch({
+        type: VALIDATION_FAILURE,
+        error: error,
+      }),
     );
 };
 

@@ -7,27 +7,23 @@ const SYSTEM_INFO_REQUEST = 'graylog/system/SYSTEM_INFO_REQUEST';
 const SYSTEM_INFO_SUCCESS = 'graylog/system/SYSTEM_INFO_SUCCESS';
 const SYSTEM_INFO_FAILURE = 'graylog/system/SYSTEM_INFO_FAILURE';
 
-const requestSystemInfo = () => ({
-  type: SYSTEM_INFO_REQUEST,
-});
-
-const receiveSystemInfo = response => ({
-  type: SYSTEM_INFO_SUCCESS,
-  response: response,
-});
-
-const failedSystemInfo = error => ({
-  type: SYSTEM_INFO_FAILURE,
-  error: error,
-});
-
 export const loadSystemInfo = () => (dispatch) => {
-  dispatch(requestSystemInfo());
+  dispatch({
+    type: SYSTEM_INFO_REQUEST,
+  });
   const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.info().url);
   return fetch('GET', url)
     .then(
-      response => dispatch(receiveSystemInfo(response)),
-      error => dispatch(failedSystemInfo(error)),
+      response =>
+        dispatch({
+          type: SYSTEM_INFO_SUCCESS,
+          response: response,
+        }),
+      error =>
+        dispatch({
+          type: SYSTEM_INFO_FAILURE,
+          error: error,
+        }),
     );
 };
 
