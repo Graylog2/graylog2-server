@@ -5,7 +5,7 @@ import { NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
-import { logout } from 'ducks/sessions/sessions';
+import { actions } from 'ducks/sessions/sessions';
 
 const UserMenu = React.createClass({
   propTypes: {
@@ -30,7 +30,7 @@ const UserMenu = React.createClass({
 });
 
 const mapDispatchToProps = dispatch => ({
-  logout: () => dispatch(logout()),
+  logout: () => dispatch(actions.logout()),
 });
 
 export default connect(() => ({}), mapDispatchToProps)(UserMenu);

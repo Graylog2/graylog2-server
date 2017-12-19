@@ -5,27 +5,28 @@ import { combineState } from 'ducks/ducksHelpers';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
-const LOGIN_REQUEST = 'graylog/sessions/LOGIN_REQUEST';
-const LOGIN_SUCCESS = 'graylog/sessions/LOGIN_SUCCESS';
-const LOGIN_FAILURE = 'graylog/sessions/LOGIN_FAILURE';
+const actionTypes = {
+  LOGIN_REQUEST: 'graylog/sessions/LOGIN_REQUEST',
+  LOGIN_SUCCESS: 'graylog/sessions/LOGIN_SUCCESS',
+  LOGIN_FAILURE: 'graylog/sessions/LOGIN_FAILURE',
+  LOGOUT_REQUEST: 'graylog/sessions/LOGOUT_REQUEST',
+  LOGOUT_SUCCESS: 'graylog/sessions/LOGOUT_SUCCESS',
+  LOGOUT_FAILURE: 'graylog/sessions/LOGOUT_FAILURE',
+  VALIDATION_REQUEST: 'graylog/sessions/VALIDATION_REQUEST',
+  VALIDATION_SUCCESS: 'graylog/sessions/VALIDATION_SUCCESS',
+  VALIDATION_FAILURE: 'graylog/sessions/VALIDATION_FAILURE',
+  RESET_LOGIN_ERROR: 'graylog/sessions/RESET_LOGIN_ERROR',
+};
+const actions = {};
+const selectors = {};
 
-const LOGOUT_REQUEST = 'graylog/sessions/LOGOUT_REQUEST';
-const LOGOUT_SUCCESS = 'graylog/sessions/LOGOUT_SUCCESS';
-const LOGOUT_FAILURE = 'graylog/sessions/LOGOUT_FAILURE';
-
-const VALIDATION_REQUEST = 'graylog/sessions/VALIDATION_REQUEST';
-const VALIDATION_SUCCESS = 'graylog/sessions/VALIDATION_SUCCESS';
-const VALIDATION_FAILURE = 'graylog/sessions/VALIDATION_FAILURE';
-
-const RESET_LOGIN_ERROR = 'graylog/sessions/RESET_LOGIN_ERROR';
-
-export const resetLoginError = () => ({
-  type: RESET_LOGIN_ERROR,
+actions.resetLoginError = () => ({
+  type: actionTypes.RESET_LOGIN_ERROR,
 });
 
-export const login = (username, password, host) => (dispatch) => {
+actions.login = (username, password, host) => (dispatch) => {
   dispatch({
-    type: LOGIN_REQUEST,
+    type: actionTypes.LOGIN_REQUEST,
   });
 
   return new Builder('POST', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.login().url))
@@ -34,21 +35,21 @@ export const login = (username, password, host) => (dispatch) => {
     .then(
       response =>
         dispatch({
-          type: LOGIN_SUCCESS,
+          type: actionTypes.LOGIN_SUCCESS,
           sessionId: response.session_id,
           username: username,
         }),
       error =>
         dispatch({
-          type: LOGIN_FAILURE,
+          type: actionTypes.LOGIN_FAILURE,
           error: error,
         }),
     );
 };
 
-export const logout = () => (dispatch, getState) => {
+actions.logout = () => (dispatch, getState) => {
   dispatch({
-    type: LOGOUT_REQUEST,
+    type: actionTypes.LOGOUT_REQUEST,
   });
 
   return new Builder('DELETE', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.logout(getState().sessionId).url))
@@ -57,20 +58,20 @@ export const logout = () => (dispatch, getState) => {
     .then(
       response =>
         dispatch({
-          type: LOGOUT_SUCCESS,
+          type: actionTypes.LOGOUT_SUCCESS,
           isLoggedOut: response.ok || response.status === 401,
         }),
       error =>
         dispatch({
-          type: LOGOUT_FAILURE,
+          type: actionTypes.LOGOUT_FAILURE,
           error: error,
         }),
     );
 };
 
-export const validate = () => (dispatch, getState) => {
+actions.validate = () => (dispatch, getState) => {
   dispatch({
-    type: VALIDATION_REQUEST,
+    type: actionTypes.VALIDATION_REQUEST,
   });
 
   const sessionsStore = getState().sessions;
@@ -84,13 +85,13 @@ export const validate = () => (dispatch, getState) => {
     .then(
       response =>
         dispatch({
-          type: VALIDATION_SUCCESS,
+          type: actionTypes.VALIDATION_SUCCESS,
           isValid: response.is_valid,
           sessionId: sessionId || response.session_id,
           username: username || response.username,
         }),
       error => dispatch({
-        type: VALIDATION_FAILURE,
+        type: actionTypes.VALIDATION_FAILURE,
         error: error,
       }),
     );
@@ -147,33 +148,35 @@ const initialState = {
 
 export default function reducer(state = initialState, action) {
   switch (action.type) {
-    case LOGIN_REQUEST:
+    case actionTypes.LOGIN_REQUEST:
       return combineState(state, { frontend: { isLoading: true } });
-    case LOGIN_SUCCESS:
+    case actionTypes.LOGIN_SUCCESS:
       return storeSession(state, action.sessionId, action.username);
-    case LOGIN_FAILURE:
+    case actionTypes.LOGIN_FAILURE:
       return loginFailure(state, action.error);
-    case LOGOUT_REQUEST:
+    case actionTypes.LOGOUT_REQUEST:
       return combineState(state, { frontend: { isLoading: true } });
-    case LOGOUT_SUCCESS:
+    case actionTypes.LOGOUT_SUCCESS:
       if (action.isLoggedOut) {
         return doLogout(state);
       }
       return combineState(state, { frontend: { isLoading: false } });
-    case LOGOUT_FAILURE:
+    case actionTypes.LOGOUT_FAILURE:
       return doLogout(state, action.error);
-    case VALIDATION_REQUEST:
+    case actionTypes.VALIDATION_REQUEST:
       return combineState(state, { frontend: { isValidating: true } });
-    case VALIDATION_SUCCESS:
+    case actionTypes.VALIDATION_SUCCESS:
       if (action.isValid) {
         return storeSession(state, action.sessionId, action.username);
       }
       return clearSession(state);
-    case VALIDATION_FAILURE:
+    case actionTypes.VALIDATION_FAILURE:
       return clearSession(state);
-    case RESET_LOGIN_ERROR:
+    case actionTypes.RESET_LOGIN_ERROR:
       return combineState(state, { frontend: { error: undefined } });
     default:
       return state;
   }
 }
+
+export { actions, selectors };

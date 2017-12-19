@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { Row, Button, FormGroup, Alert } from 'react-bootstrap';
 import { DocumentTitle } from 'components/common';
 
-import { login, resetLoginError, validate } from 'ducks/sessions/sessions';
+import { actions } from 'ducks/sessions/sessions';
 
 import { Input } from 'components/bootstrap';
 import LoadingPage from './LoadingPage';
@@ -100,9 +100,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  login: (username, password, location) => dispatch(login(username, password, location)),
-  validateSession: () => dispatch(validate()),
-  resetLoginError: () => dispatch(resetLoginError()),
+  login: (username, password, location) => dispatch(actions.login(username, password, location)),
+  validateSession: () => dispatch(actions.validate()),
+  resetLoginError: () => dispatch(actions.resetLoginError()),
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);
