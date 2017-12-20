@@ -353,20 +353,17 @@ public class Configuration extends BaseConfiguration {
             if (!file.isFile()) {
                 b.append("a file");
             }
-            final boolean readable = file.canRead();
-            final boolean writable = file.canWrite();
-            if (!readable) {
+            if (!file.canRead()) {
                 if (b.length() > 0) {
                     b.append(", ");
                 }
                 b.append("readable");
             }
-            final boolean empty = file.length() == 0;
-            if (!writable && readable && empty) {
+            if (!file.canWrite()) {
                 if (b.length() > 0) {
                     b.append(", ");
                 }
-                b.append("writable, but it is empty");
+                b.append("writable");
             }
             if (b.length() == 0) {
                 // all good
