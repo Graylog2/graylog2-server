@@ -19,6 +19,9 @@ import style from './SourceCodeEditor.css';
 /**
  * Component that renders a source code editor input. This is what powers the pipeline rules and collector
  * editors.
+ *
+ * **Note:** The component needs to be used in a [controlled way](https://reactjs.org/docs/forms.html#controlled-components).
+ * Letting the component handle its own internal state may lead to weird errors while typing.
  */
 class SourceCodeEditor extends React.Component {
   static propTypes = {
