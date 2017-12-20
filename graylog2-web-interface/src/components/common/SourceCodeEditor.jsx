@@ -7,7 +7,11 @@ import { Button, ButtonGroup, ButtonToolbar, OverlayTrigger, Tooltip } from 'rea
 
 import { ClipboardButton } from 'components/common';
 
+import 'brace/mode/json';
+import 'brace/mode/lua';
+import 'brace/mode/markdown';
 import 'brace/mode/text';
+import 'brace/mode/yaml';
 import 'brace/theme/tomorrow';
 import 'brace/theme/monokai';
 import style from './SourceCodeEditor.css';
@@ -32,6 +36,8 @@ class SourceCodeEditor extends React.Component {
     height: PropTypes.number,
     /** Specifies a unique ID for the source code editor. */
     id: PropTypes.string.isRequired,
+    /** Specifies the mode to use in the editor. This is used for highlighting and auto-completion. */
+    mode: PropTypes.oneOf(['json', 'lua', 'markdown', 'text', 'yaml']),
     /** Function called on editor load. The first argument is the instance of the editor. */
     onLoad: PropTypes.func,
     /** Function called when the value of the text changes. It receives the the new value and an event as arguments. */
@@ -55,6 +61,7 @@ class SourceCodeEditor extends React.Component {
     focus: false,
     fontSize: 13,
     height: 200,
+    mode: 'text',
     onChange: () => {},
     onLoad: () => {},
     readOnly: false,
@@ -183,7 +190,7 @@ class SourceCodeEditor extends React.Component {
                        editorProps={{ $blockScrolling: 'Infinity' }}
                        focus={this.props.focus}
                        fontSize={this.props.fontSize}
-                       mode="text"
+                       mode={this.props.mode}
                        theme={this.props.theme === 'light' ? 'tomorrow' : 'monokai'}
                        name={this.props.id}
                        height="100%"
