@@ -47,6 +47,7 @@ const annotations = [
 ];
 <SourceCodeEditor id="editor-2"
                   annotations={annotations}
+                  resizable={false}
                   readOnly
                   theme="dark"
                   value={code} />
@@ -59,7 +60,7 @@ const code = `function foobar() {
 }
 `;
 <SourceCodeEditor id="editor-2"
-                  resizable={true}
+                  resizable={false}
                   height={100}
                   toolbar={false}
                   width={400}
