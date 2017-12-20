@@ -93,7 +93,9 @@ class SourceCodeEditor extends React.Component {
   }
 
   reloadEditor = () => {
-    this.reactAce.editor.resize();
+    if (this.props.resizable) {
+      this.reactAce.editor.resize();
+    }
   }
 
   resetUndoHistory = () => {
@@ -128,6 +130,9 @@ class SourceCodeEditor extends React.Component {
   }
 
   handleSelectionChange = (selection) => {
+    if (!this.reactAce || !this.props.toolbar || this.props.readOnly) {
+      return;
+    }
     const selectedText = this.reactAce.editor.getSession().getTextRange(selection.getRange());
     this.setState({ selectedText: selectedText });
   }
@@ -138,8 +143,8 @@ class SourceCodeEditor extends React.Component {
 
   render() {
     const { height, width } = this.state;
-    const validCssWidth = Number.isNaN(width) ? '100%' : width;
     const { theme, resizable } = this.props;
+    const validCssWidth = Number.isNaN(width) ? '100%' : width;
     const containerStyle = `${style.sourceCodeEditor} ${theme !== 'light' && style.darkMode} ${!resizable && style.static}`;
     const overlay = <Tooltip id={'paste-button-tooltip'}>Press Ctrl+V (&#8984;V in macOS) or select Edit&thinsp;&rarr;&thinsp;Paste to paste from clipboard.</Tooltip>;
     return (
@@ -199,7 +204,6 @@ class SourceCodeEditor extends React.Component {
                        onChange={this.props.onChange}
                        onSelectionChange={this.handleSelectionChange}
                        readOnly={this.props.readOnly}
-                       defaultValue={this.props.value}
                        value={this.props.value}
                        width="100%" />
           </div>
