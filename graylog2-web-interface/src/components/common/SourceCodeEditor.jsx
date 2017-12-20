@@ -109,13 +109,13 @@ class SourceCodeEditor extends React.Component {
     }
   }
 
-  isRedoDisabled = () => {
-    return this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasRedo();
-  }
+  isCopyDisabled = () => this.props.readOnly || this.state.selectedText === '';
 
-  isUndoDisabled = () => {
-    return this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasUndo();
-  }
+  isPasteDisabled = () => this.props.readOnly;
+
+  isRedoDisabled = () => this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasRedo();
+
+  isUndoDisabled = () => this.props.readOnly || !this.reactAce || !this.reactAce.editor.getSession().getUndoManager().hasUndo();
 
   handleRedo = () => {
     this.reactAce.editor.redo();
@@ -154,9 +154,9 @@ class SourceCodeEditor extends React.Component {
                                  onSuccess={this.focusEditor}
                                  text={this.state.selectedText}
                                  buttonTitle="Copy (Ctrl+C / &#8984;C)"
-                                 disabled={this.state.selectedText === ''} />
+                                 disabled={this.isCopyDisabled} />
                 <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose>
-                  <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)">
+                  <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled}>
                     <i className="fa fa-paste fa-fw" />
                   </Button>
                 </OverlayTrigger>
