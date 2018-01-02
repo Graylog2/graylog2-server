@@ -101,19 +101,6 @@ class SourceCodeEditor extends React.Component {
     }
   }
 
-  resetUndoHistory = () => {
-    // Hack to not clear editor form when executing undo action.
-    // See https://github.com/Graylog2/graylog-plugin-pipeline-processor/issues/224
-    if (!this.clearedUndoHistory) {
-      try {
-        this.reactAce.editor.getSession().getUndoManager().reset();
-        this.clearedUndoHistory = true;
-      } catch (e) {
-        // Do nothing
-      }
-    }
-  }
-
   isCopyDisabled = () => this.props.readOnly || this.state.selectedText === '';
 
   isPasteDisabled = () => this.props.readOnly;
@@ -202,7 +189,6 @@ class SourceCodeEditor extends React.Component {
                        theme={this.props.theme === 'light' ? 'tomorrow' : 'monokai'}
                        name={this.props.id}
                        height="100%"
-                       onInput={this.resetUndoHistory}
                        onLoad={this.props.onLoad}
                        onChange={this.props.onChange}
                        onSelectionChange={this.handleSelectionChange}
