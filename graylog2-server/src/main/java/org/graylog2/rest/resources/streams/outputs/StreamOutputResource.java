@@ -23,7 +23,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -81,7 +80,6 @@ public class StreamOutputResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get a list of all outputs for a stream")
-    @RequiresPermissions(RestPermissions.STREAM_OUTPUTS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream on this node.")
@@ -112,7 +110,6 @@ public class StreamOutputResource extends RestResource {
     @Path("/{outputId}")
     @Timed
     @ApiOperation(value = "Get specific output of a stream")
-    @RequiresPermissions(RestPermissions.STREAM_OUTPUTS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
@@ -134,7 +131,6 @@ public class StreamOutputResource extends RestResource {
     @ApiOperation(value = "Associate outputs with a stream")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @RequiresPermissions(RestPermissions.STREAM_OUTPUTS_CREATE)
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Invalid output specification in input.")
     })
@@ -143,6 +139,9 @@ public class StreamOutputResource extends RestResource {
                         @PathParam("streamid") String streamid,
                         @ApiParam(name = "JSON body", required = true)
                         @Valid @NotNull AddOutputRequest aor) throws ValidationException, NotFoundException {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+        checkPermission(RestPermissions.STREAM_OUTPUTS_CREATE);
+
         final Stream stream = streamService.load(streamid);
         for (String outputId : aor.outputs()) {
             final Output output = outputService.load(outputId);
@@ -156,7 +155,6 @@ public class StreamOutputResource extends RestResource {
     @DELETE
     @Path("/{outputId}")
     @Timed
-    @RequiresPermissions(RestPermissions.STREAM_OUTPUTS_DELETE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiOperation(value = "Delete output of a stream")
     @ApiResponses(value = {
@@ -167,6 +165,9 @@ public class StreamOutputResource extends RestResource {
                        @PathParam("streamid") String streamid,
                        @ApiParam(name = "outputId", value = "The id of the output that should be deleted", required = true)
                        @PathParam("outputId") String outputId) throws NotFoundException {
+        checkPermission(RestPermissions.STREAMS_EDIT, streamid);
+        checkPermission(RestPermissions.STREAM_OUTPUTS_DELETE, outputId);
+
         final Stream stream = streamService.load(streamid);
         final Output output = outputService.load(outputId);
 
