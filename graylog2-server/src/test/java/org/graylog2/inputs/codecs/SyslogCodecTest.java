@@ -387,7 +387,7 @@ public class SyslogCodecTest {
                 .put(
                         "<190>: 2017 Mar 06 09:22:34 CET: %AUTHPRIV-6-SYSTEM_MSG: START: rsync pid=4311 from=::ffff:IP - xinetd[6219]",
                         ImmutableMap.<String, Object>builder()
-                                .put("timestamp", new DateTime(year, 3, 6, 9, 22, 34, DateTimeZone.forID("CET")).withZone(DateTimeZone.getDefault()))
+                                .put("timestamp", new DateTime(2017, 3, 6, 9, 22, 34, DateTimeZone.forID("CET")).withZone(DateTimeZone.getDefault()))
                                 .put("source", "127.0.0.1")
                                 .put("level", 6)
                                 .put("facility", "local7")
