@@ -1,0 +1,47 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`connect() connects component to store with state 1`] = `
+<span>
+  Value is: 
+  42
+</span>
+`;
+
+exports[`connect() connects component to store without state 1`] = `
+<span>
+  No value.
+</span>
+`;
+
+exports[`connect() does not do anything if no stores are provided 1`] = `
+<span>
+  Hello World!
+</span>
+`;
+
+exports[`connect() executes action on store upon mount 1`] = `
+<span>
+  Value is: 
+  23
+</span>
+`;
+
+exports[`connect() renders spinner when store is not ready 1`] = `
+<span>
+  <i
+    className="fa fa-spin fa-spinner"
+  />
+   
+  Loading...
+</span>
+`;
+
+exports[`connect() waits on store per default before rendering component when more than zero actions are passed 1`] = `
+<span>
+  <i
+    className="fa fa-spin fa-spinner"
+  />
+   
+  Loading...
+</span>
+`;

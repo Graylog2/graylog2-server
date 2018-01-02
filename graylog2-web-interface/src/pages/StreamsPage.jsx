@@ -1,12 +1,13 @@
 import React from 'react';
-import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
+
+import connect from 'stores/connect';
 
 import CreateStreamButton from 'components/streams/CreateStreamButton';
 import StreamComponent from 'components/streams/StreamComponent';
 import DocumentationLink from 'components/support/DocumentationLink';
 import PageHeader from 'components/common/PageHeader';
-import { DocumentTitle, IfPermitted, Spinner } from 'components/common';
+import { DocumentTitle, IfPermitted } from 'components/common';
 
 import DocsHelper from 'util/DocsHelper';
 import UserNotification from 'util/UserNotification';
@@ -19,29 +20,14 @@ const IndexSetsStore = StoreProvider.getStore('IndexSets');
 import ActionsProvider from 'injection/ActionsProvider';
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
-const StreamsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(IndexSetsStore)],
-  getInitialState() {
-    return {
-      indexSets: undefined,
-    };
-  },
-  componentDidMount() {
-    IndexSetsActions.list(false);
-  },
-  _isLoading() {
-    return !this.state.currentUser || !this.state.indexSets;
-  },
+class StreamsPage extends React.Component {
+  state = {};
   _onSave(_, stream) {
     StreamsStore.save(stream, () => {
       UserNotification.success('Stream has been successfully created.', 'Success');
     });
-  },
+  }
   render() {
-    if (this._isLoading()) {
-      return <Spinner />;
-    }
-
     return (
       <DocumentTitle title="Streams">
         <div>
@@ -56,21 +42,24 @@ const StreamsPage = React.createClass({
             </span>
 
             <IfPermitted permissions="streams:create">
-              <CreateStreamButton ref="createStreamButton" bsSize="large" bsStyle="success" onSave={this._onSave}
-                                  indexSets={this.state.indexSets} />
+              <CreateStreamButton bsSize="large"
+                                  bsStyle="success"
+                                  onSave={this._onSave}
+                                  indexSets={this.props.indexSets.indexSets} />
             </IfPermitted>
           </PageHeader>
 
           <Row className="content">
             <Col md={12}>
-              <StreamComponent currentUser={this.state.currentUser} onStreamSave={this._onSave}
-                               indexSets={this.state.indexSets} />
+              <StreamComponent currentUser={this.props.currentUser.currentUser}
+                               onStreamSave={this._onSave}
+                               indexSets={this.props.indexSets.indexSets} />
             </Col>
           </Row>
         </div>
       </DocumentTitle>
     );
-  },
-});
+  }
+}
 
-export default StreamsPage;
+export default connect(StreamsPage, { currentUser: CurrentUserStore, indexSets: IndexSetsStore }, [() => IndexSetsActions.list(false)]);
