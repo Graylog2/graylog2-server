@@ -4,6 +4,9 @@ import ApiRoutes = require('routing/ApiRoutes');
 const fetch = require('logic/rest/FetchProvider').default;
 const lodash = require('lodash');
 
+const CombinedProvider = require('injection/CombinedProvider');
+const CurrentUserStore = CombinedProvider.get('CurrentUser').CurrentUserStore;
+
 interface Stream {
   id: string;
   title: string;
@@ -34,7 +37,7 @@ class StreamsStore {
   listStreams() {
     const url = "/streams";
     const promise = fetch('GET', URLUtils.qualifyUrl(url))
-        .then((result: StreamSummaryResponse) => result.streams)
+        .then(result => result.streams)
         .catch((errorThrown) => {
           UserNotification.error("Loading streams failed with status: " + errorThrown,
               "Could not load streams");
@@ -62,7 +65,12 @@ class StreamsStore {
     };
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.delete(streamId).url);
-    fetch('DELETE', url).then(callback, failCallback).then(this._emitChange.bind(this));
+    fetch('DELETE', url)
+      .then(callback, failCallback)
+      .then(() =>
+        CurrentUserStore.reload()
+          .then(this._emitChange.bind(this))
+      );
   }
   pause(streamId: string, callback: (() => void)) {
     const failCallback = (errorThrown) => {
@@ -100,7 +108,10 @@ class StreamsStore {
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.create().url);
     fetch('POST', url, stream)
-      .then(callback, failCallback).then(this._emitChange.bind(this));
+      .then(callback, failCallback)
+      .then(() => CurrentUserStore.reload()
+        .then(this._emitChange.bind(this))
+      );
   }
   update(streamId: string, data: any, callback: (() => void)) {
     const failCallback = (errorThrown) => {
@@ -120,7 +131,10 @@ class StreamsStore {
 
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamsApiController.cloneStream(streamId).url);
     fetch('POST', url, data)
-      .then(callback, failCallback).then(this._emitChange.bind(this));
+      .then(callback, failCallback)
+      .then(() => CurrentUserStore.reload()
+        .then(this._emitChange.bind(this))
+      );
   }
   removeOutput(streamId: string, outputId: string, callback: (reponse) => void) {
     const url = URLUtils.qualifyUrl(ApiRoutes.StreamOutputsApiController.delete(streamId, outputId).url);

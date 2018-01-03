@@ -168,6 +168,7 @@ const ApiRoutes = {
     sendDummyAlert: (streamId) => { return { url: `/streams/${streamId}/alerts/sendDummyAlert` }; },
   },
   StreamsApiController: {
+    index: () => { return { url: '/streams' }; },
     get: (streamId) => { return { url: `/streams/${streamId}` }; },
     create: () => { return { url: '/streams' }; },
     update: (streamId) => { return { url: `/streams/${streamId}` }; },

@@ -481,6 +481,8 @@ public class StreamResource extends RestResource {
             streamService.addOutput(stream, output);
         }
 
+        ensureUserHasPermissionsForStream(getCurrentUser(), id);
+
         clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
 
         final Map<String, String> result = ImmutableMap.of("stream_id", id);
