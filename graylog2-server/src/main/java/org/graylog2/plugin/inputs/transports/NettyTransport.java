@@ -63,8 +63,6 @@ public abstract class NettyTransport implements Transport {
     protected final ThroughputCounter throughputCounter;
     private final int recvBufferSize;
 
-    protected final ChannelGroup channels;
-
     @Nullable
     private CodecAggregator aggregator;
 
@@ -85,7 +83,6 @@ public abstract class NettyTransport implements Transport {
                 : MessageInput.getDefaultRecvBufferSize();
 
         this.eventLoopGroup = eventLoopGroup;
-        this.channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
         this.localRegistry = localRegistry;
         localRegistry.registerAll(MetricSets.of(throughputCounter.gauges()));
@@ -102,6 +99,15 @@ public abstract class NettyTransport implements Transport {
             }
         };
     }
+
+    /**
+     * Get the local socket address this transport is listening on after being launched.
+     *
+     * @return the listening address of this transport or {@code null} if the transport hasn't been launched yet.
+     */
+    @VisibleForTesting
+    @Nullable
+    public abstract SocketAddress getLocalAddress();
 
     @Override
     public void setMessageAggregator(@Nullable CodecAggregator aggregator) {
@@ -169,13 +175,6 @@ public abstract class NettyTransport implements Transport {
         return handlerList;
     }
 
-    @Override
-    public void stop() {
-        if (channels != null) {
-            channels.close().syncUninterruptibly();
-        }
-    }
-
     protected int getRecvBufferSize() {
         return recvBufferSize;
     }
@@ -183,21 +182,6 @@ public abstract class NettyTransport implements Transport {
     @Override
     public MetricSet getMetricSet() {
         return localRegistry;
-    }
-
-    /**
-     * Get the local socket address this transport is listening on after being launched.
-     *
-     * @return the listening address of this transport or {@code null} if the transport hasn't been launched yet.
-     */
-    @VisibleForTesting
-    @Nullable
-    SocketAddress getLocalAddress() {
-        if (channels != null) {
-            return channels.stream().findFirst().map(Channel::localAddress).orElse(null);
-        }
-
-        return null;
     }
 
     public static class Config implements Transport.Config {

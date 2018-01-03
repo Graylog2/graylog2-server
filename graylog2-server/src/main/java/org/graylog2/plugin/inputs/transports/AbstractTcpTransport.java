@@ -29,7 +29,6 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.FixedRecvByteBufAllocator;
-import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.socket.ServerSocketChannelConfig;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
@@ -55,10 +54,12 @@ import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.net.ssl.SSLEngine;
 import javax.net.ssl.SSLException;
 import java.io.File;
 import java.io.IOException;
+import java.net.SocketAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -71,6 +72,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Preconditions.checkState;
 
@@ -99,6 +101,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
 
     protected final Configuration configuration;
     private final NettyTransportConfiguration nettyTransportConfiguration;
+    private final AtomicReference<Channel> channelReference;
 
     private final boolean tlsEnable;
     private final String tlsKeyPassword;
@@ -119,6 +122,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         super(configuration, eventLoopGroup, throughputCounter, localRegistry);
         this.configuration = configuration;
         this.nettyTransportConfiguration = nettyTransportConfiguration;
+        this.channelReference = new AtomicReference<>();
 
         this.tlsEnable = configuration.getBoolean(CK_TLS_ENABLE);
         this.tlsCertFile = getTlsFile(configuration, CK_TLS_CERT_FILE);
@@ -172,10 +176,29 @@ public abstract class AbstractTcpTransport extends NettyTransport {
             bootstrap = getBootstrap(input);
 
             bootstrap.bind(socketAddress)
-                    .addListener(new InputLaunchListener(channels, input, getRecvBufferSize()))
+                    .addListener(new InputLaunchListener(channelReference, input, getRecvBufferSize()))
                     .syncUninterruptibly();
         } catch (Exception e) {
             throw new MisfireException(e);
+        }
+    }
+
+    @Nullable
+    @Override
+    public SocketAddress getLocalAddress() {
+        final Channel channel = channelReference.get();
+        if (channel != null) {
+            return channel.localAddress();
+        }
+
+        return null;
+    }
+
+    @Override
+    public void stop() {
+        final Channel channel = channelReference.get();
+        if (channel != null) {
+            channel.close().syncUninterruptibly();
         }
     }
 
@@ -355,12 +378,12 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     }
 
     private static class InputLaunchListener implements ChannelFutureListener {
-        private final ChannelGroup channels;
+        private final AtomicReference<Channel> channelReference;
         private final MessageInput input;
         private final int expectedRecvBufferSize;
 
-        public InputLaunchListener(ChannelGroup channels, MessageInput input, int expectedRecvBufferSize) {
-            this.channels = channels;
+        public InputLaunchListener(AtomicReference<Channel> channelReference, MessageInput input, int expectedRecvBufferSize) {
+            this.channelReference = channelReference;
             this.input = input;
             this.expectedRecvBufferSize = expectedRecvBufferSize;
         }
@@ -369,7 +392,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         public void operationComplete(ChannelFuture future) throws Exception {
             if (future.isSuccess()) {
                 final Channel channel = future.channel();
-                channels.add(channel);
+                channelReference.set(channel);
                 LOG.debug("Started channel {}", channel);
 
                 final ServerSocketChannelConfig channelConfig = (ServerSocketChannelConfig) channel.config();

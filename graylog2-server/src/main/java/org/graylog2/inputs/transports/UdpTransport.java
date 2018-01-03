@@ -30,8 +30,10 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.socket.DatagramChannelConfig;
 import io.netty.channel.unix.UnixChannelOption;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import org.graylog2.inputs.transports.netty.DatagramChannelFactory;
 import org.graylog2.inputs.transports.netty.DatagramPacketHandler;
 import org.graylog2.inputs.transports.netty.NettyTransportType;
@@ -48,6 +50,7 @@ import org.graylog2.plugin.inputs.util.ThroughputCounter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.net.SocketAddress;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
@@ -56,7 +59,7 @@ public class UdpTransport extends NettyTransport {
     private static final Logger LOG = LoggerFactory.getLogger(UdpTransport.class);
 
     private final NettyTransportConfiguration nettyTransportConfiguration;
-
+    private final ChannelGroup channels;
     private Bootstrap bootstrap;
 
     @AssistedInject
@@ -67,6 +70,7 @@ public class UdpTransport extends NettyTransport {
                         LocalMetricRegistry localRegistry) {
         super(configuration, eventLoopGroup, throughputCounter, localRegistry);
         this.nettyTransportConfiguration = nettyTransportConfiguration;
+        this.channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     }
 
     @VisibleForTesting
@@ -113,17 +117,17 @@ public class UdpTransport extends NettyTransport {
         }
     }
 
+
     @Override
     public void stop() {
-        super.stop();
+        if (channels != null) {
+            channels.close().syncUninterruptibly();
+        }
         bootstrap = null;
     }
 
-    /**
-     * Get the local socket address this transport is listening on after being launched.
-     *
-     * @return the listening address of this transport or {@code null} if the transport hasn't been launched yet.
-     */
+    @Nullable
+    @Override
     public SocketAddress getLocalAddress() {
         if (channels != null) {
             return channels.stream().findFirst().map(Channel::localAddress).orElse(null);
@@ -131,6 +135,7 @@ public class UdpTransport extends NettyTransport {
 
         return null;
     }
+
 
     @FactoryClass
     public interface Factory extends Transport.Factory<UdpTransport> {
