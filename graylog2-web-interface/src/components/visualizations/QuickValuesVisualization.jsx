@@ -7,6 +7,7 @@ import dc from 'dc';
 import d3 from 'd3';
 import deepEqual from 'deep-equal';
 import $ from 'jquery';
+import DateTime from 'logic/datetimes/DateTime';
 
 import D3Utils from 'util/D3Utils';
 import StringUtils from 'util/StringUtils';
@@ -182,6 +183,10 @@ const QuickValuesVisualization = React.createClass({
     return addToSearchButton.outerHTML;
   },
   _getDataTableColumns() {
+    function formatTimestamp(d) {
+      return new DateTime(Number(d.term)).toString(DateTime.Formats.TIMESTAMP);
+    }
+
     const columns = [
       (d) => {
         let colourBadge = '';
@@ -192,7 +197,10 @@ const QuickValuesVisualization = React.createClass({
           // different terms in the stacked value more visible.
           formattedTerm = this.props.data.terms_mapping[d.term].map(t => t.value).join(' <strong style="color: #999999;">&mdash;</strong> ');
         }
-
+        if (this.props.field === 'timestamp') {
+          // convert unix timestamp to proper formatted value, so that add to search button works correctly
+          formattedTerm = formatTimestamp(d);
+        }
         if (typeof this.pieChart !== 'undefined' && this.dataTable.group()(d) !== 'Others') {
           const colour = this.pieChart.colors()(d.term);
           colourBadge = `<span class="datatable-badge" style="background-color: ${colour} !important;"></span>`;
@@ -205,7 +213,12 @@ const QuickValuesVisualization = React.createClass({
     ];
 
     if (this.props.displayAddToSearchButton) {
-      columns.push(d => this._getAddToSearchButton(d.term));
+      if (this.props.field === 'timestamp') {
+        // convert unix timestamp to proper formatted value, so that add to search button works correctly
+        columns.push(d => this._getAddToSearchButton(formatTimestamp(d)));
+      } else {
+        columns.push(d => this._getAddToSearchButton(d.term));
+      }
     }
 
     return columns;

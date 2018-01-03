@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { KeyValueTable } from 'components/common';
 
 const HTTPJSONPathAdapterSummary = ({ dataAdapter }) => {
   const { config } = dataAdapter;
@@ -13,7 +14,7 @@ const HTTPJSONPathAdapterSummary = ({ dataAdapter }) => {
     <dt>HTTP User-Agent</dt>
     <dd>{config.user_agent}</dd>
     <dt>HTTP Headers</dt>
-    <dd><pre>{config.headers ? Object.keys(config.headers).map(key => <p key={key} style={{ 'margin-bottom': 0 }}>{key}: {config.headers[key]}</p>) : <i>Empty</i>}</pre></dd>
+    <dd><KeyValueTable pairs={config.headers || {}} /></dd>
   </dl>);
 };
 

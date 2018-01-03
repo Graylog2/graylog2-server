@@ -2,7 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Button, Row, Col } from 'react-bootstrap';
 
-import { Select } from 'components/common';
+import { ExternalLinkButton, Select } from 'components/common';
 
 import ActionsProvider from 'injection/ActionsProvider';
 const InputTypesActions = ActionsProvider.getActions('InputTypes');
@@ -77,9 +77,11 @@ const CreateInputControl = React.createClass({
             </div>
             &nbsp;
             <Button bsStyle="success" type="submit" disabled={!this.state.selectedInput}>Launch new input</Button>
-            <Button href="https://marketplace.graylog.org/" target="_blank" bsStyle="info" style={{ marginLeft: 10 }}>
-              <i className="fa fa-external-link" />&nbsp;Find more inputs
-            </Button>
+            <ExternalLinkButton href="https://marketplace.graylog.org/"
+                                bsStyle="info"
+                                style={{ marginLeft: 10 }}>
+              Find more inputs
+            </ExternalLinkButton>
           </form>
           {inputModal}
         </Col>

@@ -37,6 +37,7 @@ import javax.ws.rs.core.MediaType;
 import java.util.Map;
 
 import static org.graylog2.shared.security.RestPermissions.AUTHENTICATION_EDIT;
+import static org.graylog2.shared.security.RestPermissions.AUTHENTICATION_READ;
 import static org.graylog2.shared.security.RestPermissions.CLUSTER_CONFIG_ENTRY_READ;
 
 @RequiresAuthentication
@@ -59,7 +60,7 @@ public class AuthenticationResource extends RestResource {
     @GET
     @Path("config")
     @ApiOperation("Retrieve authentication providers configuration")
-    @RequiresPermissions(CLUSTER_CONFIG_ENTRY_READ)
+    @RequiresPermissions({CLUSTER_CONFIG_ENTRY_READ, AUTHENTICATION_READ})
     public AuthenticationConfig getAuthenticators() {
         final AuthenticationConfig config = clusterConfigService.getOrDefault(AuthenticationConfig.class,
                                                                               AuthenticationConfig.defaultInstance());
