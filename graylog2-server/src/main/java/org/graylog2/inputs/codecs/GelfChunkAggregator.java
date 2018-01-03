@@ -108,7 +108,7 @@ public class GelfChunkAggregator implements CodecAggregator {
             case ZLIB:
             case GZIP:
             case UNCOMPRESSED:
-                aggregatedBuffer = buffer;
+                aggregatedBuffer = Unpooled.wrappedBuffer(readable);
                 break;
             case UNSUPPORTED:
                 return INVALID_RESULT;
