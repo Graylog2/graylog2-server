@@ -36,6 +36,7 @@ import org.graylog2.rest.models.system.inputs.responses.InputStatesList;
 import org.graylog2.rest.models.system.inputs.responses.InputSummary;
 import org.graylog2.shared.inputs.InputRegistry;
 import org.graylog2.shared.rest.resources.RestResource;
+import org.graylog2.shared.security.RestPermissions;
 
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
@@ -72,7 +73,8 @@ public class InputStatesResource extends RestResource {
     @ApiOperation(value = "Get all input states of this node")
     public InputStatesList list() {
         final Set<InputStateSummary> result = this.inputRegistry.stream()
-                .map(inputState -> getInputStateSummary(inputState))
+                .filter(inputState -> isPermitted(RestPermissions.INPUTS_READ, inputState.getStoppable().getId()))
+                .map(this::getInputStateSummary)
                 .collect(Collectors.toSet());
 
         return InputStatesList.create(result);
@@ -86,6 +88,7 @@ public class InputStatesResource extends RestResource {
             @ApiResponse(code = 404, message = "No such input on this node."),
     })
     public InputStateSummary get(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) {
+        checkPermission(RestPermissions.INPUTS_READ, inputId);
         final IOState<MessageInput> inputState = this.inputRegistry.getInputState(inputId);
         if (inputState == null) {
             throw new NotFoundException("No input state for input id <" + inputId + "> on this node.");
@@ -102,6 +105,7 @@ public class InputStatesResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_START)
     public InputCreated start(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+        checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         inputService.find(inputId);
         final InputCreated result = InputCreated.create(inputId);
         this.serverEventBus.post(result);
@@ -118,6 +122,7 @@ public class InputStatesResource extends RestResource {
     })
     @AuditEvent(type = AuditEventTypes.MESSAGE_INPUT_STOP)
     public InputDeleted stop(@ApiParam(name = "inputId", required = true) @PathParam("inputId") String inputId) throws org.graylog2.database.NotFoundException {
+        checkPermission(RestPermissions.INPUTS_CHANGESTATE, inputId);
         inputService.find(inputId);
         final InputDeleted result = InputDeleted.create(inputId);
         this.serverEventBus.post(result);
