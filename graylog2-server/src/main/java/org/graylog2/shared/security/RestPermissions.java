@@ -173,6 +173,7 @@ public class RestPermissions implements PluginPermissions {
         .add(create(INDICES_DELETE, ""))
         .add(create(INDICES_FAILURES, ""))
         .add(create(INDICES_READ, ""))
+        .add(create(INPUTS_CHANGESTATE, ""))
         .add(create(INPUTS_CREATE, ""))
         .add(create(INPUTS_EDIT, ""))
         .add(create(INPUTS_READ, ""))
