@@ -3357,6 +3357,7 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.2, graceful-fs@^4.1.6, graceful-fs@^4.1.9:
     jquery "2.1.x"
     mobx "^3.4.1"
     mobx-react "^4.3.5"
+    mobx-react-devtools "^4.2.15"
     moment "2.14.1"
     moment-timezone "0.5.7"
     prop-types "^15.5.10"
@@ -5253,6 +5254,10 @@ mkdirp@0.5.1, mkdirp@0.5.x, "mkdirp@>=0.5 0", mkdirp@^0.5.0, mkdirp@^0.5.1, mkdi
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.1.tgz#30057438eac6cf7f8c4767f38648d6697d75c903"
   dependencies:
     minimist "0.0.8"
+
+mobx-react-devtools@^4.2.15:
+  version "4.2.15"
+  resolved "https://registry.yarnpkg.com/mobx-react-devtools/-/mobx-react-devtools-4.2.15.tgz#881c038fb83db4dffd1e72bbaf5374d26b2fdebb"
 
 mobx-react@^4.3.5:
   version "4.3.5"
