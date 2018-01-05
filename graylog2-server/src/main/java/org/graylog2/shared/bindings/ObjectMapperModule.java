@@ -38,6 +38,8 @@ public class ObjectMapperModule extends Graylog2Module {
 
     @Override
     protected void configure() {
+        // the ObjectMapperProvider requires at least an empty JacksonSubtypes set.
+        // if the multibinder wasn't created that reference will be null, so we force its creation here
         jacksonSubTypesBinder();
         bind(ClassLoader.class).annotatedWith(GraylogClassLoader.class).toInstance(classLoader);
         bind(ObjectMapper.class).toProvider(ObjectMapperProvider.class).asEagerSingleton();
