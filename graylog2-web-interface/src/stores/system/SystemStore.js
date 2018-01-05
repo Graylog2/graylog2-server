@@ -26,11 +26,6 @@ const SystemStore = Reflux.createStore({
 
     return fetch('GET', url);
   },
-  jvm() {
-    const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.jvm().url);
-
-    return fetch('GET', url);
-  },
   systemLocales() {
     const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.locales().url);
 

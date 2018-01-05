@@ -1,20 +1,15 @@
 import React from 'react';
-import Reflux from 'reflux';
+import { observer } from 'mobx-react';
 import Version from 'util/Version';
 
-import StoreProvider from 'injection/StoreProvider';
-const SystemStore = StoreProvider.getStore('System');
+import RootStore from 'stores/RootStore';
 
 const Footer = React.createClass({
-  mixins: [Reflux.connect(SystemStore)],
   componentDidMount() {
-    SystemStore.jvm().then(jvmInfo => this.setState({ jvm: jvmInfo }));
-  },
-  _isLoading() {
-    return !(this.state.system && this.state.jvm);
+    RootStore.jvmInfoStore.getJvmInfo();
   },
   render() {
-    if (this._isLoading()) {
+    if (RootStore.systemInfoStore.isLoading || RootStore.jvmInfoStore.isLoading) {
       return (
         <div id="footer">
           Graylog {Version.getFullVersion()}
@@ -24,10 +19,10 @@ const Footer = React.createClass({
 
     return (
       <div id="footer">
-        Graylog {this.state.system.version} on {this.state.system.hostname} ({this.state.jvm.info})
+        Graylog {RootStore.systemInfoStore.systemInfo.version} on {RootStore.systemInfoStore.systemInfo.hostname} ({RootStore.jvmInfoStore.jvmInfo.info})
       </div>
     );
   },
 });
 
-export default Footer;
+export default observer(Footer);
