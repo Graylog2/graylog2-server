@@ -1,40 +1,33 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Reflux from 'reflux';
+import { observer } from 'mobx-react';
 
 import { DocumentTitle, Spinner } from 'components/common';
 import GettingStarted from 'components/gettingstarted/GettingStarted';
+import RootStore from 'stores/RootStore';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
-
-import StoreProvider from 'injection/StoreProvider';
-
-const SystemStore = StoreProvider.getStore('System');
 
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
 const GettingStartedPage = React.createClass({
   propTypes: {
     location: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(SystemStore)],
-  _isLoading() {
-    return !this.state.system;
-  },
   _onDismiss() {
     history.push(Routes.STARTPAGE);
   },
   render() {
-    if (this._isLoading()) {
+    if (RootStore.systemInfoStore.isLoading) {
       return <Spinner />;
     }
 
     return (
       <DocumentTitle title="Getting started">
         <div>
-          <GettingStarted clusterId={this.state.system.cluster_id}
-                          masterOs={this.state.system.operating_system}
-                          masterVersion={this.state.system.version}
+          <GettingStarted clusterId={RootStore.systemInfoStore.systemInfo.cluster_id}
+                          masterOs={RootStore.systemInfoStore.systemInfo.operating_system}
+                          masterVersion={RootStore.systemInfoStore.systemInfo.version}
                           gettingStartedUrl={GETTING_STARTED_URL}
                           noDismissButton={Boolean(this.props.location.query.menu)}
                           onDismiss={this._onDismiss} />
@@ -44,4 +37,4 @@ const GettingStartedPage = React.createClass({
   },
 });
 
-export default GettingStartedPage;
+export default observer(GettingStartedPage);
