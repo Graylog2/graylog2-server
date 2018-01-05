@@ -1,17 +1,19 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
+import { observer } from 'mobx-react';
 import moment from 'moment';
 import DateTime from 'logic/datetimes/DateTime';
 
+import SystemMobXStore from 'stores/system/SystemMobxStore';
+
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-const SystemStore = StoreProvider.getStore('System');
 
 import { Spinner, Timestamp } from 'components/common';
 
 const TimesList = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(SystemStore)],
+  mixins: [Reflux.connect(CurrentUserStore)],
   getInitialState() {
     return { time: moment() };
   },
@@ -22,13 +24,13 @@ const TimesList = React.createClass({
     clearInterval(this.interval);
   },
   render() {
-    if (!this.state.system) {
+    if (SystemMobXStore.isLoading) {
       return <Spinner />;
     }
     const time = this.state.time;
     const timeFormat = DateTime.Formats.DATETIME_TZ;
     const currentUser = this.state.currentUser;
-    const serverTimezone = this.state.system.timezone;
+    const serverTimezone = SystemMobXStore.systemInfo.timezone;
     return (
       <Row className="content">
         <Col md={12}>
@@ -53,4 +55,4 @@ const TimesList = React.createClass({
   },
 });
 
-export default TimesList;
+export default observer(TimesList);
