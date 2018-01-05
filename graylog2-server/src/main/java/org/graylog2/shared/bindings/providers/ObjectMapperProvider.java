@@ -73,7 +73,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addSerializer(new SizeSerializer())
                         .addSerializer(new ObjectIdSerializer()));
 
-        objectMapper.registerSubtypes(subtypes.toArray(new NamedType[]{}));
+        if (subtypes != null) {
+            objectMapper.registerSubtypes(subtypes.toArray(new NamedType[]{}));
+        }
     }
 
     @Override
