@@ -5,7 +5,7 @@ import { observer } from 'mobx-react';
 import moment from 'moment';
 import DateTime from 'logic/datetimes/DateTime';
 
-import SystemMobXStore from 'stores/system/SystemMobxStore';
+import RootStore from 'stores/RootStore';
 
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -24,13 +24,13 @@ const TimesList = React.createClass({
     clearInterval(this.interval);
   },
   render() {
-    if (SystemMobXStore.isLoading) {
+    if (RootStore.systemInfoStore.isLoading) {
       return <Spinner />;
     }
     const time = this.state.time;
     const timeFormat = DateTime.Formats.DATETIME_TZ;
     const currentUser = this.state.currentUser;
-    const serverTimezone = SystemMobXStore.systemInfo.timezone;
+    const serverTimezone = RootStore.systemInfoStore.systemInfo.timezone;
     return (
       <Row className="content">
         <Col md={12}>

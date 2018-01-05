@@ -4,7 +4,7 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 
-class SystemMobXStore {
+class SystemInfoStore {
   constructor() {
     this.state = observable({
       isLoading: true,
@@ -45,4 +45,4 @@ class SystemMobXStore {
   }
 }
 
-export default new SystemMobXStore();
+export default SystemInfoStore;
