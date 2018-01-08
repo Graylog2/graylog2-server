@@ -24,7 +24,6 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.epoll.EpollEventLoopGroup;
 import io.netty.channel.kqueue.KQueueEventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.oio.OioEventLoopGroup;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
 import org.graylog2.plugin.LocalMetricRegistry;
 
@@ -55,8 +54,6 @@ public class EventLoopGroupFactory {
                 return kqueueEventLoopGroup(numThreads, executor);
             case NIO:
                 return nioEventLoopGroup(numThreads, executor);
-            case OIO:
-                return oioEventLoopGroup(numThreads, executor);
             default:
                 throw new RuntimeException("Invalid or unknown netty transport type " + configuration.getType());
         }
@@ -79,10 +76,6 @@ public class EventLoopGroupFactory {
         return new NioEventLoopGroup(numThreads, executor);
     }
 
-
-    private EventLoopGroup oioEventLoopGroup(int numThreads, Executor executor) {
-        return new OioEventLoopGroup(numThreads, executor);
-    }
 
     private EventLoopGroup epollEventLoopGroup(int numThreads, Executor executor) {
         return new EpollEventLoopGroup(numThreads, executor);

@@ -21,7 +21,6 @@ import io.netty.channel.epoll.EpollDatagramChannel;
 import io.netty.channel.kqueue.KQueueDatagramChannel;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
-import io.netty.channel.socket.oio.OioDatagramChannel;
 
 public class DatagramChannelFactory implements ChannelFactory<DatagramChannel> {
     private final NettyTransportType transportType;
@@ -39,8 +38,6 @@ public class DatagramChannelFactory implements ChannelFactory<DatagramChannel> {
                 return new KQueueDatagramChannel();
             case NIO:
                 return new NioDatagramChannel();
-            case OIO:
-                return new OioDatagramChannel();
             default:
                 throw new IllegalArgumentException("Invalid or unknown Netty transport type " + transportType);
         }

@@ -21,7 +21,6 @@ import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.kqueue.KQueueServerSocketChannel;
 import io.netty.channel.socket.ServerSocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
-import io.netty.channel.socket.oio.OioServerSocketChannel;
 
 public class ServerSocketChannelFactory implements ChannelFactory<ServerSocketChannel> {
     private final NettyTransportType transportType;
@@ -39,8 +38,6 @@ public class ServerSocketChannelFactory implements ChannelFactory<ServerSocketCh
                 return new KQueueServerSocketChannel();
             case NIO:
                 return new NioServerSocketChannel();
-            case OIO:
-                return new OioServerSocketChannel();
             default:
                 throw new IllegalArgumentException("Invalid or unknown Netty transport type " + transportType);
         }

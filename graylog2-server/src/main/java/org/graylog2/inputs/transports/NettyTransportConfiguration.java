@@ -59,8 +59,6 @@ public class NettyTransportConfiguration {
                 return NettyTransportType.EPOLL;
             case "kqueue":
                 return NettyTransportType.KQUEUE;
-            case "oio":
-                return NettyTransportType.OIO;
             case "nio":
                 return NettyTransportType.NIO;
             case "auto":

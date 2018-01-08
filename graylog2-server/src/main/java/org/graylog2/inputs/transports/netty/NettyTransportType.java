@@ -17,5 +17,5 @@
 package org.graylog2.inputs.transports.netty;
 
 public enum NettyTransportType {
-    EPOLL, KQUEUE, NIO, OIO
+    EPOLL, KQUEUE, NIO
 }
