@@ -21,6 +21,7 @@ import com.google.inject.assistedinject.AssistedInject;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.EventLoopGroup;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.LenientDelimiterBasedFrameDecoder;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -52,10 +53,11 @@ public class TcpTransport extends AbstractTcpTransport {
     @AssistedInject
     public TcpTransport(@Assisted Configuration configuration,
                         EventLoopGroup eventLoopGroup,
+                        EventLoopGroupFactory eventLoopGroupFactory,
                         NettyTransportConfiguration nettyTransportConfiguration,
                         ThroughputCounter throughputCounter,
                         LocalMetricRegistry localRegistry) {
-        super(configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration);
+        super(configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration);
 
         final boolean nulDelimiter = configuration.getBoolean(CK_USE_NULL_DELIMITER);
         this.delimiter = nulDelimiter ? nulDelimiter() : lineDelimiter();

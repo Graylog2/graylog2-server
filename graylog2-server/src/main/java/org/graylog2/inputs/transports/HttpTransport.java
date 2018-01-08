@@ -26,6 +26,7 @@ import io.netty.handler.codec.http.HttpObjectAggregator;
 import io.netty.handler.codec.http.HttpRequestDecoder;
 import io.netty.handler.codec.http.HttpResponseEncoder;
 import io.netty.handler.timeout.ReadTimeoutHandler;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.HttpHandler;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -61,6 +62,7 @@ public class HttpTransport extends AbstractTcpTransport {
     @AssistedInject
     public HttpTransport(@Assisted Configuration configuration,
                          EventLoopGroup eventLoopGroup,
+                         EventLoopGroupFactory eventLoopGroupFactory,
                          NettyTransportConfiguration nettyTransportConfiguration,
                          ThroughputCounter throughputCounter,
                          LocalMetricRegistry localRegistry) {
@@ -68,6 +70,7 @@ public class HttpTransport extends AbstractTcpTransport {
               throughputCounter,
               localRegistry,
               eventLoopGroup,
+              eventLoopGroupFactory,
               nettyTransportConfiguration);
 
         enableCors = configuration.getBoolean(CK_ENABLE_CORS);

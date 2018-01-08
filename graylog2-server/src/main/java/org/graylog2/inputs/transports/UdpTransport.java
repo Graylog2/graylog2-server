@@ -16,6 +16,7 @@
  */
 package org.graylog2.inputs.transports;
 
+import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.primitives.Ints;
@@ -36,6 +37,7 @@ import io.netty.channel.unix.UnixChannelOption;
 import io.netty.util.concurrent.GlobalEventExecutor;
 import org.graylog2.inputs.transports.netty.DatagramChannelFactory;
 import org.graylog2.inputs.transports.netty.DatagramPacketHandler;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.NettyTransportType;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -60,15 +62,16 @@ public class UdpTransport extends NettyTransport {
 
     private final NettyTransportConfiguration nettyTransportConfiguration;
     private final ChannelGroup channels;
+    private EventLoopGroup eventLoopGroup;
     private Bootstrap bootstrap;
 
     @AssistedInject
     public UdpTransport(@Assisted Configuration configuration,
-                        EventLoopGroup eventLoopGroup,
+                        EventLoopGroupFactory eventLoopGroupFactory,
                         NettyTransportConfiguration nettyTransportConfiguration,
                         ThroughputCounter throughputCounter,
                         LocalMetricRegistry localRegistry) {
-        super(configuration, eventLoopGroup, throughputCounter, localRegistry);
+        super(configuration, eventLoopGroupFactory, throughputCounter, localRegistry);
         this.nettyTransportConfiguration = nettyTransportConfiguration;
         this.channels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
     }
@@ -77,6 +80,8 @@ public class UdpTransport extends NettyTransport {
     Bootstrap getBootstrap(MessageInput input) {
         LOG.debug("Setting UDP receive buffer size to {} bytes", getRecvBufferSize());
         final NettyTransportType transportType = nettyTransportConfiguration.getType();
+
+        eventLoopGroup = eventLoopGroupFactory.create(workerThreads, MetricRegistry.name(this.getClass(), "workers"));
 
         return new Bootstrap()
                 .group(eventLoopGroup)
@@ -105,7 +110,7 @@ public class UdpTransport extends NettyTransport {
 
             // TODO: Make number of channels configurable separately
             final NettyTransportType transportType = nettyTransportConfiguration.getType();
-            int numChannels = (transportType == NettyTransportType.EPOLL || transportType == NettyTransportType.KQUEUE) ? 16 : 1;
+            int numChannels = (transportType == NettyTransportType.EPOLL || transportType == NettyTransportType.KQUEUE) ? workerThreads : 1;
             for (int i = 0; i < numChannels; i++) {
                 LOG.debug("Starting channel on {}", socketAddress);
                 bootstrap.bind(socketAddress)
@@ -122,6 +127,9 @@ public class UdpTransport extends NettyTransport {
     public void stop() {
         if (channels != null) {
             channels.close().syncUninterruptibly();
+        }
+        if (eventLoopGroup != null) {
+            eventLoopGroup.shutdownGracefully();
         }
         bootstrap = null;
     }

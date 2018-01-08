@@ -23,10 +23,7 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.EventLoopGroup;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.inputs.transports.netty.ExceptionLoggingChannelHandler;
 import org.graylog2.inputs.transports.netty.MessageAggregationHandler;
 import org.graylog2.inputs.transports.netty.PromiseFailureHandler;
@@ -35,6 +32,8 @@ import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.MetricSets;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
+import org.graylog2.plugin.configuration.fields.ConfigurationField;
+import org.graylog2.plugin.configuration.fields.NumberField;
 import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.inputs.util.PacketInformationDumper;
@@ -53,21 +52,24 @@ public abstract class NettyTransport implements Transport {
     public static final String CK_BIND_ADDRESS = "bind_address";
     public static final String CK_PORT = "port";
     public static final String CK_RECV_BUFFER_SIZE = "recv_buffer_size";
+    public static final String CK_NUMBER_WORKER_THREADS = "number_worker_threads";
+    private static final int DEFAULT_NUMBER_WORKER_THREADS = Runtime.getRuntime().availableProcessors();
 
     private static final Logger log = LoggerFactory.getLogger(NettyTransport.class);
 
-    protected final EventLoopGroup eventLoopGroup;
+    protected final EventLoopGroupFactory eventLoopGroupFactory;
     protected final MetricRegistry localRegistry;
 
     protected final InetSocketAddress socketAddress;
     protected final ThroughputCounter throughputCounter;
+    protected final int workerThreads;
     private final int recvBufferSize;
 
     @Nullable
     private CodecAggregator aggregator;
 
     public NettyTransport(Configuration configuration,
-                          EventLoopGroup eventLoopGroup,
+                          EventLoopGroupFactory eventLoopGroupFactory,
                           ThroughputCounter throughputCounter,
                           LocalMetricRegistry localRegistry) {
         this.throughputCounter = throughputCounter;
@@ -82,7 +84,9 @@ public abstract class NettyTransport implements Transport {
                 ? configuration.getInt(CK_RECV_BUFFER_SIZE)
                 : MessageInput.getDefaultRecvBufferSize();
 
-        this.eventLoopGroup = eventLoopGroup;
+        this.eventLoopGroupFactory = eventLoopGroupFactory;
+
+        this.workerThreads = configuration.getInt(CK_NUMBER_WORKER_THREADS, DEFAULT_NUMBER_WORKER_THREADS);
 
         this.localRegistry = localRegistry;
         localRegistry.registerAll(MetricSets.of(throughputCounter.gauges()));
@@ -192,6 +196,15 @@ public abstract class NettyTransport implements Transport {
             r.addField(ConfigurationRequest.Templates.bindAddress(CK_BIND_ADDRESS));
             r.addField(ConfigurationRequest.Templates.portNumber(CK_PORT, 5555));
             r.addField(ConfigurationRequest.Templates.recvBufferSize(CK_RECV_BUFFER_SIZE, 1024 * 1024));
+            r.addField(new NumberField(
+                    CK_NUMBER_WORKER_THREADS,
+                    "No. of worker threads",
+                    DEFAULT_NUMBER_WORKER_THREADS,
+                    "Number of worker threads processing network connections for this input.",
+                    // Should be mandatory, but then all existing inputs are failing to start
+                    ConfigurationField.Optional.OPTIONAL,
+                    NumberField.Attribute.ONLY_POSITIVE)
+            );
 
             return r;
         }

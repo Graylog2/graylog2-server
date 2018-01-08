@@ -17,6 +17,7 @@
 package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
@@ -24,15 +25,15 @@ import com.google.common.util.concurrent.Uninterruptibles;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandler;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
 import io.netty.channel.FixedRecvByteBufAllocator;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.util.ReferenceCountUtil;
 import org.apache.commons.lang3.SystemUtils;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -70,22 +71,25 @@ public class UdpTransportTest {
     private static final Map<String, Object> CONFIG_SOURCE = ImmutableMap.of(
             NettyTransport.CK_BIND_ADDRESS, BIND_ADDRESS,
             NettyTransport.CK_PORT, PORT,
-            NettyTransport.CK_RECV_BUFFER_SIZE, RECV_BUFFER_SIZE);
+            NettyTransport.CK_RECV_BUFFER_SIZE, RECV_BUFFER_SIZE,
+            NettyTransport.CK_NUMBER_WORKER_THREADS, 1);
     private static final Configuration CONFIGURATION = new Configuration(CONFIG_SOURCE);
 
     private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 1);
     private UdpTransport udpTransport;
-    private NioEventLoopGroup eventLoopGroup;
+    private EventLoopGroup eventLoopGroup;
+    private EventLoopGroupFactory eventLoopGroupFactory;
     private ThroughputCounter throughputCounter;
     private LocalMetricRegistry localMetricRegistry;
 
     @Before
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void setUp() throws Exception {
-        eventLoopGroup = new NioEventLoopGroup();
+        eventLoopGroupFactory = new EventLoopGroupFactory(new MetricRegistry(), nettyTransportConfiguration);
+        eventLoopGroup = eventLoopGroupFactory.create(1, "test");
         throughputCounter = new ThroughputCounter(eventLoopGroup);
         localMetricRegistry = new LocalMetricRegistry();
-        udpTransport = new UdpTransport(CONFIGURATION, eventLoopGroup, nettyTransportConfiguration, throughputCounter, localMetricRegistry);
+        udpTransport = new UdpTransport(CONFIGURATION, eventLoopGroupFactory, nettyTransportConfiguration, throughputCounter, localMetricRegistry);
     }
 
     @After
@@ -171,7 +175,7 @@ public class UdpTransportTest {
                 NettyTransport.CK_PORT, PORT,
                 NettyTransport.CK_RECV_BUFFER_SIZE, recvBufferSize);
         Configuration config = new Configuration(source);
-        UdpTransport udpTransport = new UdpTransport(config, eventLoopGroup, nettyTransportConfiguration, throughputCounter, new LocalMetricRegistry());
+        UdpTransport udpTransport = new UdpTransport(config, eventLoopGroupFactory, nettyTransportConfiguration, throughputCounter, new LocalMetricRegistry());
 
         assertThat(udpTransport.getBootstrap(mock(MessageInput.class)).config().options().get(ChannelOption.SO_RCVBUF)).isEqualTo(recvBufferSize);
     }
@@ -221,7 +225,7 @@ public class UdpTransportTest {
     }
 
     private UdpTransport launchTransportForBootStrapTest(final ChannelInboundHandler channelHandler) throws MisfireException {
-        final UdpTransport transport = new UdpTransport(CONFIGURATION, eventLoopGroup, nettyTransportConfiguration, throughputCounter, new LocalMetricRegistry()) {
+        final UdpTransport transport = new UdpTransport(CONFIGURATION, eventLoopGroupFactory, nettyTransportConfiguration, throughputCounter, new LocalMetricRegistry()) {
             @Override
             protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChannelHandlers(MessageInput input) {
                 final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();

@@ -16,23 +16,21 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelHandlerAdapter;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.graylog2.shared.SuppressForbidden;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -74,12 +72,13 @@ public class AbstractTcpTransportTest {
     private ThroughputCounter throughputCounter;
     private LocalMetricRegistry localRegistry;
     private NioEventLoopGroup eventLoopGroup;
-    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 4);
+    private EventLoopGroupFactory eventLoopGroupFactory;
+    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 2);
 
     @Before
-    @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void setUp() {
         eventLoopGroup = new NioEventLoopGroup();
+        eventLoopGroupFactory = new EventLoopGroupFactory(new MetricRegistry(), nettyTransportConfiguration);
         throughputCounter = new ThroughputCounter(eventLoopGroup);
         localRegistry = new LocalMetricRegistry();
     }
@@ -98,7 +97,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-                configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {
+                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {
         };
         final MessageInput input = mock(MessageInput.class);
         assertThat(transport.getChildChannelHandlers(input)).containsKey("tls");
@@ -117,7 +116,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {};
+            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
@@ -139,7 +138,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {};
+            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
@@ -160,7 +159,7 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {};
+            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + file.getAbsolutePath());
@@ -174,7 +173,7 @@ public class AbstractTcpTransportTest {
                 "bind_address", "127.0.0.1",
                 "port", 0));
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-                configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {
+                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {
         };
         transport.launch(input);
 
@@ -205,7 +204,7 @@ public class AbstractTcpTransportTest {
                 "bind_address", "127.0.0.1",
                 "port", 0));
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-                configuration, throughputCounter, localRegistry, eventLoopGroup, nettyTransportConfiguration) {
+                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {
         };
         transport.launch(input);
 

@@ -17,6 +17,7 @@
 package org.graylog2.plugin.inputs.transports;
 
 import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import io.netty.bootstrap.ServerBootstrap;
@@ -29,6 +30,8 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.FixedRecvByteBufAllocator;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.socket.ServerSocketChannelConfig;
 import io.netty.handler.ssl.ClientAuth;
 import io.netty.handler.ssl.SslContext;
@@ -36,7 +39,11 @@ import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import org.graylog2.inputs.transports.NettyTransportConfiguration;
+import org.graylog2.inputs.transports.netty.ChannelRegistrationHandler;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
+import org.graylog2.inputs.transports.netty.ExceptionLoggingChannelHandler;
 import org.graylog2.inputs.transports.netty.ServerSocketChannelFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
@@ -100,6 +107,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     private final AtomicLong totalConnections;
 
     protected final Configuration configuration;
+    protected final EventLoopGroup parentEventLoopGroup;
     private final NettyTransportConfiguration nettyTransportConfiguration;
     private final AtomicReference<Channel> channelReference;
 
@@ -111,18 +119,23 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     private final String tlsClientAuth;
     private final boolean tcpKeepalive;
 
+    private ChannelGroup childChannels;
+    protected EventLoopGroup childEventLoopGroup;
     private ServerBootstrap bootstrap;
 
     public AbstractTcpTransport(
             Configuration configuration,
             ThroughputCounter throughputCounter,
             LocalMetricRegistry localRegistry,
-            EventLoopGroup eventLoopGroup,
+            EventLoopGroup parentEventLoopGroup,
+            EventLoopGroupFactory eventLoopGroupFactory,
             NettyTransportConfiguration nettyTransportConfiguration) {
-        super(configuration, eventLoopGroup, throughputCounter, localRegistry);
+        super(configuration, eventLoopGroupFactory, throughputCounter, localRegistry);
         this.configuration = configuration;
+        this.parentEventLoopGroup = parentEventLoopGroup;
         this.nettyTransportConfiguration = nettyTransportConfiguration;
         this.channelReference = new AtomicReference<>();
+        this.childChannels = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
         this.tlsEnable = configuration.getBoolean(CK_TLS_ENABLE);
         this.tlsCertFile = getTlsFile(configuration, CK_TLS_CERT_FILE);
@@ -158,8 +171,10 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> parentHandlers = getChannelHandlers(input);
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> childHandlers = getChildChannelHandlers(input);
 
+        childEventLoopGroup = eventLoopGroupFactory.create(workerThreads, MetricRegistry.name(this.getClass(), "workers"));
+
         return new ServerBootstrap()
-                .group(eventLoopGroup)
+                .group(parentEventLoopGroup, childEventLoopGroup)
                 .channelFactory(new ServerSocketChannelFactory(nettyTransportConfiguration.getType()))
                 .option(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .option(ChannelOption.RCVBUF_ALLOCATOR, new FixedRecvByteBufAllocator(8192))
@@ -174,7 +189,6 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     public void launch(final MessageInput input) throws MisfireException {
         try {
             bootstrap = getBootstrap(input);
-
             bootstrap.bind(socketAddress)
                     .addListener(new InputLaunchListener(channelReference, input, getRecvBufferSize()))
                     .syncUninterruptibly();
@@ -198,14 +212,23 @@ public abstract class AbstractTcpTransport extends NettyTransport {
     public void stop() {
         final Channel channel = channelReference.get();
         if (channel != null) {
-            channel.close().syncUninterruptibly();
+            channel.close();
+            channel.closeFuture().syncUninterruptibly();
         }
+
+        childChannels.close().syncUninterruptibly();
+
+        if (childEventLoopGroup != null) {
+            childEventLoopGroup.shutdownGracefully();
+        }
+        bootstrap = null;
     }
 
     @Override
     protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getChildChannelHandlers(MessageInput input) {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
 
+        handlers.put("channel-registration", () -> new ChannelRegistrationHandler(childChannels));
         handlers.put("traffic-counter", () -> throughputCounter);
         handlers.put("connection-counter", () -> connectionCounter);
         if (tlsEnable) {
