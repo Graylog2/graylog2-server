@@ -28,7 +28,6 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-
 import org.graylog2.database.ObjectIdSerializer;
 import org.graylog2.jackson.JodaTimePeriodKeyDeserializer;
 import org.graylog2.plugin.inject.JacksonSubTypes;
@@ -37,25 +36,24 @@ import org.graylog2.shared.plugins.GraylogClassLoader;
 import org.graylog2.shared.rest.RangeJsonSerializer;
 import org.joda.time.Period;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.util.Collections;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 @Singleton
 public class ObjectMapperProvider implements Provider<ObjectMapper> {
     protected final ObjectMapper objectMapper;
 
     public ObjectMapperProvider() {
-        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptyMap());
+        this(ObjectMapperProvider.class.getClassLoader(), Collections.emptySet());
     }
 
     @Inject
     public ObjectMapperProvider(@GraylogClassLoader final ClassLoader classLoader,
-                                @JacksonSubTypes Map<String, Object> subtypes) {
+                                @JacksonSubTypes Set<NamedType> subtypes) {
         final ObjectMapper mapper = new ObjectMapper();
         final TypeFactory typeFactory = mapper.getTypeFactory().withClassLoader(classLoader);
 
@@ -75,7 +73,9 @@ public class ObjectMapperProvider implements Provider<ObjectMapper> {
                         .addSerializer(new SizeSerializer())
                         .addSerializer(new ObjectIdSerializer()));
 
-        subtypes.forEach((name, klass) -> objectMapper.registerSubtypes(new NamedType((Class)klass, name)));
+        if (subtypes != null) {
+            objectMapper.registerSubtypes(subtypes.toArray(new NamedType[]{}));
+        }
     }
 
     @Override
