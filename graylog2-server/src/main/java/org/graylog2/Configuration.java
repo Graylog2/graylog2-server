@@ -317,6 +317,24 @@ public class Configuration extends BaseConfiguration {
             }
             final File file = Paths.get(path).toFile();
             final StringBuilder b = new StringBuilder();
+
+            if (!file.exists()) {
+                final File parent = file.getParentFile();
+                if (!parent.isDirectory()) {
+                    throw new ValidationException("Parent path " + parent + " for Node ID file at " + path + " is not a directory");
+                } else {
+                    if (!parent.canRead()) {
+                        throw new ValidationException("Parent directory " + parent + " for Node ID file at " + path + " is not readable");
+                    }
+                    if (!parent.canWrite()) {
+                        throw new ValidationException("Parent directory " + parent + " for Node ID file at " + path + " is not writable");
+                    }
+
+                    // parent directory exists and is readable and writable
+                    return;
+                }
+            }
+
             if (!file.isFile()) {
                 b.append("a file");
             }

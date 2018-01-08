@@ -25,11 +25,12 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.HashMap;
 import java.util.Map;
@@ -37,11 +38,13 @@ import java.util.Map;
 import static java.nio.file.StandardOpenOption.TRUNCATE_EXISTING;
 import static java.nio.file.StandardOpenOption.WRITE;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.util.Files.newTemporaryFile;
 
 public class ConfigurationTest {
     @Rule
     public final ExpectedException expectedException = ExpectedException.none();
+
+    @Rule
+    public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private Map<String, String> validProperties;
 
@@ -99,53 +102,71 @@ public class ConfigurationTest {
     }
 
     @Test
-    public void testNodeIdFilePermissions() throws IOException, ValidationException {
-        final Path nonEmptyNodeIdPath = newTemporaryFile().toPath();
-        final Path emptyNodeIdPath = newTemporaryFile().toPath();
-        try {
-            // create a node-id file and write some id
-            Files.write(nonEmptyNodeIdPath, "test-node-id".getBytes(StandardCharsets.UTF_8), WRITE, TRUNCATE_EXISTING);
-            assertThat(nonEmptyNodeIdPath.toFile().length()).isGreaterThan(0);
+    public void testNodeIdFilePermissions() throws IOException {
+        final File nonEmptyNodeIdFile = temporaryFolder.newFile("non-empty-node-id");
+        final File emptyNodeIdFile = temporaryFolder.newFile("empty-node-id");
 
-            // make sure this file isn't accidentally present
-            final Path missingNodeIdPath = newTemporaryFile().toPath();
-            assertThat(missingNodeIdPath.toFile().delete()).isTrue();
+        // create a node-id file and write some id
+        Files.write(nonEmptyNodeIdFile.toPath(), "test-node-id".getBytes(StandardCharsets.UTF_8), WRITE, TRUNCATE_EXISTING);
+        assertThat(nonEmptyNodeIdFile.length()).isGreaterThan(0);
 
-            // read/write permissions should make the validation pass
-            assertThat(validateWithPermissions(nonEmptyNodeIdPath, "rw-------")).isTrue();
-            assertThat(validateWithPermissions(emptyNodeIdPath, "rw-------")).isTrue();
+        // parent "directory" is not a directory is not ok
+        final File parentNotDirectory = new File(emptyNodeIdFile, "parent-is-file");
+        assertThat(validateWithPermissions(parentNotDirectory, "rw-------")).isFalse();
 
-            // existing, but not writable is ok if the file is not empty
-            assertThat(validateWithPermissions(nonEmptyNodeIdPath, "r--------")).isTrue();
+        // file missing and parent directory doesn't exist is not ok
+        final File directoryNotExist = temporaryFolder.newFolder("not-readable");
+        assertThat(directoryNotExist.delete()).isTrue();
+        final File parentNotExist = new File(directoryNotExist, "node-id");
+        assertThat(validateWithPermissions(parentNotExist, "rw-------")).isFalse();
 
-            // existing, but not writable is not ok if the file is empty
-            assertThat(validateWithPermissions(emptyNodeIdPath, "r--------")).isFalse();
+        // file missing and parent directory not readable is not ok
+        final File directoryNotReadable = temporaryFolder.newFolder("not-readable");
+        assertThat(directoryNotReadable.setReadable(false)).isTrue();
+        final File parentNotReadable = new File(directoryNotReadable, "node-id");
+        assertThat(validateWithPermissions(parentNotReadable, "rw-------")).isFalse();
 
-            // existing, but not readable is not ok
-            assertThat(validateWithPermissions(nonEmptyNodeIdPath, "-w-------")).isFalse();
+        // file missing and parent directory not writable is not ok
+        final File directoryNotWritable = temporaryFolder.newFolder("not-writable");
+        assertThat(directoryNotWritable.setWritable(false)).isTrue();
+        final File parentNotWritable = new File(directoryNotWritable, "node-id");
+        assertThat(validateWithPermissions(parentNotWritable, "rw-------")).isFalse();
 
-            // missing, but not writable is not ok
-            assertThat(validateWithPermissions(missingNodeIdPath, "r--------")).isFalse();
-        } finally {
-            Files.delete(nonEmptyNodeIdPath);
-            Files.delete(emptyNodeIdPath);
-        }
+        // file missing and parent directory readable and writable is ok
+        final File parentDirectory = temporaryFolder.newFolder();
+        assertThat(parentDirectory.setReadable(true)).isTrue();
+        assertThat(parentDirectory.setWritable(true)).isTrue();
+        final File parentOk = new File(parentDirectory, "node-id");
+        assertThat(validateWithPermissions(parentOk, "rw-------")).isTrue();
+
+        // read/write permissions should make the validation pass
+        assertThat(validateWithPermissions(nonEmptyNodeIdFile, "rw-------")).isTrue();
+        assertThat(validateWithPermissions(emptyNodeIdFile, "rw-------")).isTrue();
+
+        // existing, but not writable is ok if the file is not empty
+        assertThat(validateWithPermissions(nonEmptyNodeIdFile, "r--------")).isTrue();
+
+        // existing, but not writable is not ok if the file is empty
+        assertThat(validateWithPermissions(emptyNodeIdFile, "r--------")).isFalse();
+
+        // existing, but not readable is not ok
+        assertThat(validateWithPermissions(nonEmptyNodeIdFile, "-w-------")).isFalse();
     }
 
     /**
      * Run the NodeIDFileValidator on a file with the given permissions.
-     * @param nodeFilePath the path to the node id file, can be missing
+     * @param nodeIdFile the path to the node id file, can be missing
      * @param permissions the posix permission to set the file to, if it exists, before running the validator
      * @return true if the validation was successful, false otherwise
      * @throws IOException if any file related problem occurred
      */
-    private static boolean validateWithPermissions(Path nodeFilePath, String permissions) throws IOException {
+    private static boolean validateWithPermissions(File nodeIdFile, String permissions) throws IOException {
         try {
             final Configuration.NodeIdFileValidator validator = new Configuration.NodeIdFileValidator();
-            if (nodeFilePath.toFile().exists()) {
-                Files.setPosixFilePermissions(nodeFilePath, PosixFilePermissions.fromString(permissions));
+            if (nodeIdFile.exists()) {
+                Files.setPosixFilePermissions(nodeIdFile.toPath(), PosixFilePermissions.fromString(permissions));
             }
-            validator.validate("node-id", nodeFilePath.toString());
+            validator.validate("node-id", nodeIdFile.toString());
         } catch (ValidationException ve) {
             return false;
         }
