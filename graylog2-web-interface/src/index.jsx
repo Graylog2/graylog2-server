@@ -5,16 +5,23 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Promise from 'bluebird';
 import Reflux from 'reflux';
+import { Provider } from 'mobx-react';
 import DevTools from 'mobx-react-devtools';
 import AppFacade from 'routing/AppFacade';
 import AppConfig from 'util/AppConfig';
+import RootStore from 'stores/RootStore';
 
 Promise.config({ cancellation: true });
 Reflux.setPromiseFactory(handlers => new Promise(handlers));
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(
-    AppConfig.gl2DevMode() ? <div><AppFacade /><DevTools /></div> : <AppFacade />,
+    <Provider rootStore={RootStore}>
+      <div>
+        <AppFacade />
+        {AppConfig.gl2DevMode() && <DevTools />}
+      </div>
+    </Provider>,
     appContainer,
   );
 }

@@ -1,11 +1,10 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
-import { observer } from 'mobx-react';
+import { inject, observer } from 'mobx-react';
 import moment from 'moment';
 import DateTime from 'logic/datetimes/DateTime';
-
-import RootStore from 'stores/RootStore';
 
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -14,6 +13,11 @@ import { Spinner, Timestamp } from 'components/common';
 
 const TimesList = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
+  propTypes: {
+    isLoading: PropTypes.bool.isRequired,
+    systemInfo: PropTypes.object,
+  },
+
   getInitialState() {
     return { time: moment() };
   },
@@ -24,13 +28,14 @@ const TimesList = React.createClass({
     clearInterval(this.interval);
   },
   render() {
-    if (RootStore.systemInfoStore.isLoading) {
+    const { isLoading, systemInfo } = this.props;
+    if (isLoading) {
       return <Spinner />;
     }
     const time = this.state.time;
     const timeFormat = DateTime.Formats.DATETIME_TZ;
     const currentUser = this.state.currentUser;
-    const serverTimezone = RootStore.systemInfoStore.systemInfo.timezone;
+    const serverTimezone = systemInfo.timezone;
     return (
       <Row className="content">
         <Col md={12}>
@@ -55,4 +60,7 @@ const TimesList = React.createClass({
   },
 });
 
-export default observer(TimesList);
+export default inject(context => ({
+  isLoading: context.rootStore.systemInfoStore.isLoading,
+  systemInfo: context.rootStore.systemInfoStore.systemInfo,
+}))(observer(TimesList));

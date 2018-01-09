@@ -1,15 +1,22 @@
 import React from 'react';
-import { observer } from 'mobx-react';
+import PropTypes from 'prop-types';
+import { inject, observer } from 'mobx-react';
 import Version from 'util/Version';
 
-import RootStore from 'stores/RootStore';
-
 const Footer = React.createClass({
+  propTypes: {
+    isLoading: PropTypes.bool.isRequired,
+    systemInfo: PropTypes.object,
+    jvmInfo: PropTypes.object,
+    getJvmInfo: PropTypes.func.isRequired,
+  },
+
   componentDidMount() {
-    RootStore.jvmInfoStore.getJvmInfo();
+    this.props.getJvmInfo();
   },
   render() {
-    if (RootStore.systemInfoStore.isLoading || RootStore.jvmInfoStore.isLoading) {
+    const { isLoading, systemInfo, jvmInfo } = this.props;
+    if (isLoading) {
       return (
         <div id="footer">
           Graylog {Version.getFullVersion()}
@@ -19,10 +26,15 @@ const Footer = React.createClass({
 
     return (
       <div id="footer">
-        Graylog {RootStore.systemInfoStore.systemInfo.version} on {RootStore.systemInfoStore.systemInfo.hostname} ({RootStore.jvmInfoStore.jvmInfo.info})
+        Graylog {systemInfo.version} on {systemInfo.hostname} ({jvmInfo.info})
       </div>
     );
   },
 });
 
-export default observer(Footer);
+export default inject(context => ({
+  isLoading: context.rootStore.systemInfoStore.isLoading || context.rootStore.jvmInfoStore.isLoading,
+  systemInfo: context.rootStore.systemInfoStore.systemInfo,
+  jvmInfo: context.rootStore.jvmInfoStore.jvmInfo,
+  getJvmInfo: () => context.rootStore.jvmInfoStore.getJvmInfo(),
+}))(observer(Footer));
