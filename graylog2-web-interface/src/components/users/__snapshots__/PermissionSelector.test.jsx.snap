@@ -1,0 +1,1277 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<PermissionSelector /> should render with empty permissions 1`] = `
+<div>
+  <div
+    className={undefined}
+    id="permissionSelectorTabs"
+    style={undefined}
+  >
+    <ul
+      className="nav nav-tabs"
+      role="tablist"
+    >
+      <li
+        className="active"
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          aria-controls="permissionSelectorTabs-pane-1"
+          aria-selected={true}
+          href="#"
+          id="permissionSelectorTabs-tab-1"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="tab"
+          tabIndex={undefined}
+        >
+          Streams
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          aria-controls="permissionSelectorTabs-pane-2"
+          aria-selected={false}
+          href="#"
+          id="permissionSelectorTabs-tab-2"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="tab"
+          tabIndex={-1}
+        >
+          Dashboards
+        </a>
+      </li>
+    </ul>
+    <div
+      className="tab-content"
+    >
+      <div
+        aria-hidden={false}
+        aria-labelledby="permissionSelectorTabs-tab-1"
+        className="tab-pane active"
+        id="permissionSelectorTabs-pane-1"
+        role="tabpanel"
+      >
+        <div
+          style={
+            Object {
+              "marginTop": 10,
+            }
+          }
+        >
+          <div>
+            <div
+              className="row"
+            >
+              <div
+                className="col-md-5"
+              >
+                <div
+                  className="filter"
+                >
+                  <form
+                    className="form-inline"
+                    onSubmit={[Function]}
+                    style={
+                      Object {
+                        "display": "inline",
+                      }
+                    }
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <label
+                        className="control-label"
+                        htmlFor="filter-streams-data-filter"
+                      >
+                        Filter Streams
+                      </label>
+                      <div
+                        className="typeahead-wrapper"
+                      >
+                        <input
+                          className="form-control"
+                          id="filter-streams-data-filter"
+                          label="Filter Streams"
+                          onKeyPress={undefined}
+                          placeholder=""
+                          type="text"
+                          value={undefined}
+                        />
+                        
+                      </div>
+                    </div>
+                    <button
+                      className="btn btn-default"
+                      disabled={false}
+                      style={
+                        Object {
+                          "marginLeft": 5,
+                        }
+                      }
+                      type="submit"
+                    >
+                      Filter
+                    </button>
+                    <button
+                      className="btn btn-default"
+                      disabled={true}
+                      onClick={[Function]}
+                      style={
+                        Object {
+                          "marginLeft": 5,
+                        }
+                      }
+                      type="button"
+                    >
+                      Reset
+                    </button>
+                  </form>
+                  <ul
+                    className="pill-list"
+                  />
+                </div>
+              </div>
+            </div>
+            <ul
+              className="list-group"
+            >
+              <li
+                className="list-group-header list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="form-group"
+                  >
+                    <div
+                      className="form-group-inline"
+                    >
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            label="Select all"
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          Select all
+                        </label>
+                      </div>
+                      
+                    </div>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                />
+              </li>
+              <li
+                className="list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="pull-right"
+                    style={
+                      Object {
+                        "marginBottom": 10,
+                        "marginTop": 10,
+                      }
+                    }
+                  >
+                    <div
+                      className="btn-group btn-group-sm"
+                    >
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow reading
+                      </button>
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow editing
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="form-group"
+                  >
+                    <span>
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            groupClassName="form-group-inline"
+                            label=""
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          
+                        </label>
+                      </div>
+                      
+                    </span>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                >
+                  <span
+                    style={
+                      Object {
+                        "marginLeft": 20,
+                      }
+                    }
+                  >
+                    stream1
+                  </span>
+                </p>
+              </li>
+              <li
+                className="list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="pull-right"
+                    style={
+                      Object {
+                        "marginBottom": 10,
+                        "marginTop": 10,
+                      }
+                    }
+                  >
+                    <div
+                      className="btn-group btn-group-sm"
+                    >
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow reading
+                      </button>
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow editing
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="form-group"
+                  >
+                    <span>
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            groupClassName="form-group-inline"
+                            label=""
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          
+                        </label>
+                      </div>
+                      
+                    </span>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                >
+                  <span
+                    style={
+                      Object {
+                        "marginLeft": 20,
+                      }
+                    }
+                  >
+                    stream2
+                  </span>
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div
+        aria-hidden={true}
+        aria-labelledby="permissionSelectorTabs-tab-2"
+        className="tab-pane"
+        id="permissionSelectorTabs-pane-2"
+        role="tabpanel"
+      >
+        <div
+          style={
+            Object {
+              "marginTop": 10,
+            }
+          }
+        >
+          <div>
+            <div
+              className="row"
+            >
+              <div
+                className="col-md-5"
+              >
+                <div
+                  className="filter"
+                >
+                  <form
+                    className="form-inline"
+                    onSubmit={[Function]}
+                    style={
+                      Object {
+                        "display": "inline",
+                      }
+                    }
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <label
+                        className="control-label"
+                        htmlFor="filter-dashboards-data-filter"
+                      >
+                        Filter Dashboards
+                      </label>
+                      <div
+                        className="typeahead-wrapper"
+                      >
+                        <input
+                          className="form-control"
+                          id="filter-dashboards-data-filter"
+                          label="Filter Dashboards"
+                          onKeyPress={undefined}
+                          placeholder=""
+                          type="text"
+                          value={undefined}
+                        />
+                        
+                      </div>
+                    </div>
+                    <button
+                      className="btn btn-default"
+                      disabled={false}
+                      style={
+                        Object {
+                          "marginLeft": 5,
+                        }
+                      }
+                      type="submit"
+                    >
+                      Filter
+                    </button>
+                    <button
+                      className="btn btn-default"
+                      disabled={true}
+                      onClick={[Function]}
+                      style={
+                        Object {
+                          "marginLeft": 5,
+                        }
+                      }
+                      type="button"
+                    >
+                      Reset
+                    </button>
+                  </form>
+                  <ul
+                    className="pill-list"
+                  />
+                </div>
+              </div>
+            </div>
+            <ul
+              className="list-group"
+            >
+              <li
+                className="list-group-header list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="form-group"
+                  >
+                    <div
+                      className="form-group-inline"
+                    >
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            label="Select all"
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          Select all
+                        </label>
+                      </div>
+                      
+                    </div>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                />
+              </li>
+              <li
+                className="list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="pull-right"
+                    style={
+                      Object {
+                        "marginBottom": 10,
+                        "marginTop": 10,
+                      }
+                    }
+                  >
+                    <div
+                      className="btn-group btn-group-sm"
+                    >
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow reading
+                      </button>
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow editing
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="form-group"
+                  >
+                    <span>
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            groupClassName="form-group-inline"
+                            label=""
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          
+                        </label>
+                      </div>
+                      
+                    </span>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                >
+                  <span
+                    style={
+                      Object {
+                        "marginLeft": 20,
+                      }
+                    }
+                  >
+                    dashboard1
+                  </span>
+                </p>
+              </li>
+              <li
+                className="list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="pull-right"
+                    style={
+                      Object {
+                        "marginBottom": 10,
+                        "marginTop": 10,
+                      }
+                    }
+                  >
+                    <div
+                      className="btn-group btn-group-sm"
+                    >
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow reading
+                      </button>
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow editing
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="form-group"
+                  >
+                    <span>
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            groupClassName="form-group-inline"
+                            label=""
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          
+                        </label>
+                      </div>
+                      
+                    </span>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                >
+                  <span
+                    style={
+                      Object {
+                        "marginLeft": 20,
+                      }
+                    }
+                  >
+                    dashboard2
+                  </span>
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<PermissionSelector /> should render with set permissions 1`] = `
+<div>
+  <div
+    className={undefined}
+    id="permissionSelectorTabs"
+    style={undefined}
+  >
+    <ul
+      className="nav nav-tabs"
+      role="tablist"
+    >
+      <li
+        className="active"
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          aria-controls="permissionSelectorTabs-pane-1"
+          aria-selected={true}
+          href="#"
+          id="permissionSelectorTabs-tab-1"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="tab"
+          tabIndex={undefined}
+        >
+          Streams
+        </a>
+      </li>
+      <li
+        className=""
+        role="presentation"
+        style={undefined}
+      >
+        <a
+          aria-controls="permissionSelectorTabs-pane-2"
+          aria-selected={false}
+          href="#"
+          id="permissionSelectorTabs-tab-2"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          role="tab"
+          tabIndex={-1}
+        >
+          Dashboards
+        </a>
+      </li>
+    </ul>
+    <div
+      className="tab-content"
+    >
+      <div
+        aria-hidden={false}
+        aria-labelledby="permissionSelectorTabs-tab-1"
+        className="tab-pane active"
+        id="permissionSelectorTabs-pane-1"
+        role="tabpanel"
+      >
+        <div
+          style={
+            Object {
+              "marginTop": 10,
+            }
+          }
+        >
+          <div>
+            <div
+              className="row"
+            >
+              <div
+                className="col-md-5"
+              >
+                <div
+                  className="filter"
+                >
+                  <form
+                    className="form-inline"
+                    onSubmit={[Function]}
+                    style={
+                      Object {
+                        "display": "inline",
+                      }
+                    }
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <label
+                        className="control-label"
+                        htmlFor="filter-streams-data-filter"
+                      >
+                        Filter Streams
+                      </label>
+                      <div
+                        className="typeahead-wrapper"
+                      >
+                        <input
+                          className="form-control"
+                          id="filter-streams-data-filter"
+                          label="Filter Streams"
+                          onKeyPress={undefined}
+                          placeholder=""
+                          type="text"
+                          value={undefined}
+                        />
+                        
+                      </div>
+                    </div>
+                    <button
+                      className="btn btn-default"
+                      disabled={false}
+                      style={
+                        Object {
+                          "marginLeft": 5,
+                        }
+                      }
+                      type="submit"
+                    >
+                      Filter
+                    </button>
+                    <button
+                      className="btn btn-default"
+                      disabled={true}
+                      onClick={[Function]}
+                      style={
+                        Object {
+                          "marginLeft": 5,
+                        }
+                      }
+                      type="button"
+                    >
+                      Reset
+                    </button>
+                  </form>
+                  <ul
+                    className="pill-list"
+                  />
+                </div>
+              </div>
+            </div>
+            <ul
+              className="list-group"
+            >
+              <li
+                className="list-group-header list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="form-group"
+                  >
+                    <div
+                      className="form-group-inline"
+                    >
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            label="Select all"
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          Select all
+                        </label>
+                      </div>
+                      
+                    </div>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                />
+              </li>
+              <li
+                className="list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="pull-right"
+                    style={
+                      Object {
+                        "marginBottom": 10,
+                        "marginTop": 10,
+                      }
+                    }
+                  >
+                    <div
+                      className="btn-group btn-group-sm"
+                    >
+                      <button
+                        className="btn btn-info active"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow reading
+                      </button>
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow editing
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="form-group"
+                  >
+                    <span>
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            groupClassName="form-group-inline"
+                            label=""
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          
+                        </label>
+                      </div>
+                      
+                    </span>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                >
+                  <span
+                    style={
+                      Object {
+                        "marginLeft": 20,
+                      }
+                    }
+                  >
+                    stream1
+                  </span>
+                </p>
+              </li>
+              <li
+                className="list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="pull-right"
+                    style={
+                      Object {
+                        "marginBottom": 10,
+                        "marginTop": 10,
+                      }
+                    }
+                  >
+                    <div
+                      className="btn-group btn-group-sm"
+                    >
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow reading
+                      </button>
+                      <button
+                        className="btn btn-info active"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow editing
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="form-group"
+                  >
+                    <span>
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            groupClassName="form-group-inline"
+                            label=""
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          
+                        </label>
+                      </div>
+                      
+                    </span>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                >
+                  <span
+                    style={
+                      Object {
+                        "marginLeft": 20,
+                      }
+                    }
+                  >
+                    stream2
+                  </span>
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div
+        aria-hidden={true}
+        aria-labelledby="permissionSelectorTabs-tab-2"
+        className="tab-pane"
+        id="permissionSelectorTabs-pane-2"
+        role="tabpanel"
+      >
+        <div
+          style={
+            Object {
+              "marginTop": 10,
+            }
+          }
+        >
+          <div>
+            <div
+              className="row"
+            >
+              <div
+                className="col-md-5"
+              >
+                <div
+                  className="filter"
+                >
+                  <form
+                    className="form-inline"
+                    onSubmit={[Function]}
+                    style={
+                      Object {
+                        "display": "inline",
+                      }
+                    }
+                  >
+                    <div
+                      className="form-group"
+                    >
+                      <label
+                        className="control-label"
+                        htmlFor="filter-dashboards-data-filter"
+                      >
+                        Filter Dashboards
+                      </label>
+                      <div
+                        className="typeahead-wrapper"
+                      >
+                        <input
+                          className="form-control"
+                          id="filter-dashboards-data-filter"
+                          label="Filter Dashboards"
+                          onKeyPress={undefined}
+                          placeholder=""
+                          type="text"
+                          value={undefined}
+                        />
+                        
+                      </div>
+                    </div>
+                    <button
+                      className="btn btn-default"
+                      disabled={false}
+                      style={
+                        Object {
+                          "marginLeft": 5,
+                        }
+                      }
+                      type="submit"
+                    >
+                      Filter
+                    </button>
+                    <button
+                      className="btn btn-default"
+                      disabled={true}
+                      onClick={[Function]}
+                      style={
+                        Object {
+                          "marginLeft": 5,
+                        }
+                      }
+                      type="button"
+                    >
+                      Reset
+                    </button>
+                  </form>
+                  <ul
+                    className="pill-list"
+                  />
+                </div>
+              </div>
+            </div>
+            <ul
+              className="list-group"
+            >
+              <li
+                className="list-group-header list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="form-group"
+                  >
+                    <div
+                      className="form-group-inline"
+                    >
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            label="Select all"
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          Select all
+                        </label>
+                      </div>
+                      
+                    </div>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                />
+              </li>
+              <li
+                className="list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="pull-right"
+                    style={
+                      Object {
+                        "marginBottom": 10,
+                        "marginTop": 10,
+                      }
+                    }
+                  >
+                    <div
+                      className="btn-group btn-group-sm"
+                    >
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow reading
+                      </button>
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow editing
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="form-group"
+                  >
+                    <span>
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            groupClassName="form-group-inline"
+                            label=""
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          
+                        </label>
+                      </div>
+                      
+                    </span>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                >
+                  <span
+                    style={
+                      Object {
+                        "marginLeft": 20,
+                      }
+                    }
+                  >
+                    dashboard1
+                  </span>
+                </p>
+              </li>
+              <li
+                className="list-group-item"
+              >
+                <div
+                  className="list-group-item-heading"
+                >
+                  <div
+                    className="pull-right"
+                    style={
+                      Object {
+                        "marginBottom": 10,
+                        "marginTop": 10,
+                      }
+                    }
+                  >
+                    <div
+                      className="btn-group btn-group-sm"
+                    >
+                      <button
+                        className="btn btn-info active"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow reading
+                      </button>
+                      <button
+                        className="btn btn-default"
+                        disabled={false}
+                        onClick={[Function]}
+                        type="button"
+                      >
+                        Allow editing
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    className="form-group"
+                  >
+                    <span>
+                      <div
+                        className="checkbox"
+                        style={undefined}
+                      >
+                        <label
+                          title=""
+                        >
+                          <input
+                            checked={false}
+                            disabled={false}
+                            groupClassName="form-group-inline"
+                            label=""
+                            onChange={[Function]}
+                            placeholder=""
+                            type="checkbox"
+                            value={undefined}
+                          />
+                          
+                        </label>
+                      </div>
+                      
+                    </span>
+                  </div>
+                </div>
+                <p
+                  className="list-group-item-text"
+                >
+                  <span
+                    style={
+                      Object {
+                        "marginLeft": 20,
+                      }
+                    }
+                  >
+                    dashboard2
+                  </span>
+                </p>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
