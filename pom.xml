@@ -86,7 +86,7 @@
         <airline.version>2.3.0</airline.version>
         <amqp-client.version>5.0.0</amqp-client.version>
         <apache-directory-version>1.0.0</apache-directory-version>
-        <auto-value.version>1.5.2</auto-value.version>
+        <auto-value.version>1.5.3</auto-value.version>
         <auto-value-javabean.version>1.0.0</auto-value-javabean.version>
         <commons-codec.version>1.11</commons-codec.version>
         <commons-email.version>1.5</commons-email.version>
