@@ -93,7 +93,7 @@
         <commons-io.version>2.6</commons-io.version>
         <disruptor.version>3.3.7</disruptor.version>
         <drools.version>6.5.0.Final</drools.version>
-        <elasticsearch.version>5.6.4</elasticsearch.version>
+        <elasticsearch.version>5.6.5</elasticsearch.version>
         <jest.version>2.4.11+jackson</jest.version>
         <gelfclient.version>1.4.1</gelfclient.version>
         <grok.version>0.1.7-graylog</grok.version>
