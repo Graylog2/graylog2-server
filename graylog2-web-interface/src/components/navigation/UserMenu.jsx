@@ -1,13 +1,8 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { inject, observer } from 'mobx-react';
 import { NavDropdown, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
-
-import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
-
-import ActionsProvider from 'injection/ActionsProvider';
-const SessionActions = ActionsProvider.getActions('Session');
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
@@ -16,9 +11,11 @@ const UserMenu = React.createClass({
   propTypes: {
     loginName: PropTypes.string.isRequired,
     fullName: PropTypes.string.isRequired,
+    sessionId: PropTypes.string.isRequired,
+    logout: PropTypes.func.isRequired,
   },
   onLogoutClicked() {
-    SessionActions.logout.triggerPromise(SessionStore.getSessionId()).then(() => {
+    this.props.logout(this.props.sessionId).then(() => {
       history.push(Routes.STARTPAGE);
     });
   },
@@ -35,5 +32,8 @@ const UserMenu = React.createClass({
   },
 });
 
-export default UserMenu;
+export default inject(context => ({
+  sessionId: context.rootStore.sessionStore.sessionId,
+  logout: sessionId => context.rootStore.sessionStore.logout(sessionId),
+}))(observer(UserMenu));
 

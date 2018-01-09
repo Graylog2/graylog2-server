@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { inject, observer } from 'mobx-react';
 import ReactDOM from 'react-dom';
 import { Button, DropdownButton, MenuItem, Modal, Tab, Tabs } from 'react-bootstrap';
 import { AutoAffix } from 'react-overlays';
@@ -11,7 +12,6 @@ import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
 import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
 const SearchStore = StoreProvider.getStore('Search');
 
 import { AddSearchCountToDashboard,
@@ -46,6 +46,7 @@ const SearchSidebar = React.createClass({
     toggleShouldHighlight: PropTypes.func,
     loadingSearch: PropTypes.bool,
     searchConfig: PropTypes.object.isRequired,
+    sessionId: PropTypes.string.isRequired,
   },
 
   getInitialState() {
@@ -117,7 +118,7 @@ const SearchSidebar = React.createClass({
 
     if (URLUtils.areCredentialsInURLSupported()) {
       url
-        .username(SessionStore.getSessionId())
+        .username(this.props.sessionId)
         .password('session');
     }
 
@@ -276,4 +277,6 @@ const SearchSidebar = React.createClass({
   },
 });
 
-export default SearchSidebar;
+export default inject(context => ({
+  sessionId: context.rootStore.sessionStore.sessionId,
+}))(observer(SearchSidebar));

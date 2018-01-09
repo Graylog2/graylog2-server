@@ -1,32 +1,28 @@
 import React from 'react';
-import Reflux from 'reflux';
+import PropTypes from 'prop-types';
+import { inject, observer } from 'mobx-react';
 import { Row, Button, FormGroup, Alert } from 'react-bootstrap';
 import { DocumentTitle } from 'components/common';
 
 import { Input } from 'components/bootstrap';
 import LoadingPage from './LoadingPage';
 
-import StoreProvider from 'injection/StoreProvider';
-const SessionStore = StoreProvider.getStore('Session');
-import ActionsProvider from 'injection/ActionsProvider';
-const SessionActions = ActionsProvider.getActions('Session');
-
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';
 
 const LoginPage = React.createClass({
-  mixins: [Reflux.connect(SessionStore), Reflux.ListenerMethods],
-
-  getInitialState() {
-    return {
-      loading: false,
-    };
+  propTypes: {
+    isLoading: PropTypes.bool.isRequired,
+    isValidatingSession: PropTypes.bool.isRequired,
+    error: PropTypes.string,
+    login: PropTypes.func.isRequired,
+    validateSession: PropTypes.func.isRequired,
   },
 
   componentDidMount() {
     disconnectedStyle.use();
     authStyle.use();
-    SessionActions.validate();
+    this.props.validateSession();
   },
   componentWillUnmount() {
     disconnectedStyle.unuse();
@@ -35,24 +31,10 @@ const LoginPage = React.createClass({
 
   onSignInClicked(event) {
     event.preventDefault();
-    this.resetLastError();
-    this.setState({ loading: true });
     const username = this.refs.username.getValue();
     const password = this.refs.password.getValue();
     const location = document.location.host;
-    const promise = SessionActions.login.triggerPromise(username, password, location);
-    promise.catch((error) => {
-      if (error.additional.status === 401) {
-        this.setState({ lastError: 'Invalid credentials, please verify them and retry.' });
-      } else {
-        this.setState({ lastError: `Error - the server returned: ${error.additional.status} - ${error.message}` });
-      }
-    });
-    promise.finally(() => {
-      if (this.isMounted()) {
-        this.setState({ loading: false });
-      }
-    });
+    this.props.login(username, password, location);
   },
   formatLastError(error) {
     if (error) {
@@ -66,17 +48,14 @@ const LoginPage = React.createClass({
     }
     return null;
   },
-  resetLastError() {
-    this.setState({ lastError: undefined });
-  },
   render() {
-    if (this.state.validatingSession) {
+    if (this.props.isValidatingSession) {
       return (
         <LoadingPage />
       );
     }
 
-    const alert = this.formatLastError(this.state.lastError);
+    const alert = this.formatLastError(this.props.error);
     return (
       <DocumentTitle title="Sign in">
         <div>
@@ -92,8 +71,8 @@ const LoginPage = React.createClass({
                 <Input ref="password" id="password" type="password" placeholder="Password" />
 
                 <FormGroup>
-                  <Button type="submit" bsStyle="info" disabled={this.state.loading}>
-                    {this.state.loading ? 'Signing in...' : 'Sign in'}
+                  <Button type="submit" bsStyle="info" disabled={this.props.isLoading}>
+                    {this.props.isLoading ? 'Signing in...' : 'Sign in'}
                   </Button>
                 </FormGroup>
 
@@ -106,5 +85,11 @@ const LoginPage = React.createClass({
   },
 });
 
-export default LoginPage;
+export default inject(context => ({
+  isLoading: context.rootStore.sessionStore.isLoading,
+  isValidatingSession: context.rootStore.sessionStore.isValidatingSession,
+  error: context.rootStore.sessionStore.error,
+  login: (username, password, host) => context.rootStore.sessionStore.login(username, password, host),
+  validateSession: () => context.rootStore.sessionStore.validate(),
+}))(observer(LoginPage));
 

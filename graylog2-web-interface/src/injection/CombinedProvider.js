@@ -105,7 +105,7 @@ class CombinedProvider {
       SavedSearches: () => require('stores/search/SavedSearchesStore'),
       Search: () => require('stores/search/SearchStore'),
       ServerAvailability: () => require('stores/sessions/ServerAvailabilityStore'),
-      Session: () => require('stores/sessions/SessionStore'),
+      Session: () => require('stores/sessions/LegacySessionStore'),
       SingleNode: () => require('stores/nodes/SingleNodeStore'),
       Sources: () => require('stores/sources/SourcesStore'),
       Startpage: () => require('stores/users/StartpageStore'),
