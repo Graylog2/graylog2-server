@@ -15,6 +15,7 @@ events from a CISCO ASA 5500, including firewall and routing events.  Beware, th
 duplication of typical syslog reporting in the v9 reporting. 
 
 ## Installation
+> Since Graylog Version 2.4.0 this plugin is already included in the Graylog server installation package as default plugin.
 
 [Download the plugin](https://github.com/Graylog2/graylog-plugin-netflow/releases)
 and place the `.jar` file in your Graylog plugin directory. The plugin directory
