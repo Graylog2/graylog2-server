@@ -9,14 +9,12 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import java.io.File;
-import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +28,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -79,11 +78,13 @@ public class CEFCodecFixturesTest {
                 .enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
         final URL fixturesURL = Resources.getResource("fixtures");
         final Path fixturesPath = Paths.get(fixturesURL.toURI());
-        final File[] fixtureFiles = Files.list(fixturesPath)
-                .map(Path::toFile)
-                .toArray(File[]::new);
-        final List<Object[]> fixtures = new ArrayList<>(fixtureFiles.length);
+        final File[] fixtureFiles;
+        try (Stream<Path> stream = Files.list(fixturesPath)) {
+            fixtureFiles = stream.map(Path::toFile)
+                    .toArray(File[]::new);
+        }
 
+        final List<Object[]> fixtures = new ArrayList<>(fixtureFiles.length);
         for (File fixtureFile : fixtureFiles) {
             final Fixture fixture = mapper.readValue(fixtureFile, Fixture.class);
             fixtures.add(new Object[]{fixture, fixtureFile.getName(), fixture.description});
