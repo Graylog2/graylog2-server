@@ -11,6 +11,7 @@ This plugin is strictly following the CEF standard and will probably not work wi
 **Required Graylog version:** 2.4.x and later
 
 ## Installation
+> Since Graylog Version 2.4.0 this plugin is already included in the Graylog server installation package as default plugin.
 
 [Download the plugin](https://github.com/Graylog2/graylog-plugin-cef/releases)
 and place the `.jar` file in your Graylog plugin directory. The plugin directory
