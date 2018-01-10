@@ -84,6 +84,7 @@ import java.util.stream.Collectors;
 
 import static com.codahale.metrics.MetricRegistry.name;
 import static com.google.common.base.MoreObjects.firstNonNull;
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Objects.requireNonNull;
 
 public class JerseyService extends AbstractIdleService {
@@ -166,12 +167,13 @@ public class JerseyService extends AbstractIdleService {
                         configuration.getHttpTlsKeyPassword()) : null;
 
         final HostAndPort bindAddress = configuration.getHttpBindAddress();
+        final String contextPath = configuration.getHttpPublishUri().getPath();
         final URI listenUri = new URI(
                 configuration.getUriScheme(),
                 null,
                 bindAddress.getHost(),
                 bindAddress.getPort(),
-                "/",
+                isNullOrEmpty(contextPath) ? "/" : contextPath,
                 null,
                 null
         );
