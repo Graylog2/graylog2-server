@@ -62,7 +62,7 @@ public class RestToolsTest {
     @Test
     public void buildExternalUriReturnsDefaultUriIfHeaderIsMissing() throws Exception {
         final MultivaluedMap<String, String> httpHeaders = new MultivaluedHashMap<>();
-        final URI externalUri = URI.create("http://graylog.example.com");
+        final URI externalUri = URI.create("http://graylog.example.com/");
         assertThat(RestTools.buildExternalUri(httpHeaders, externalUri)).isEqualTo(externalUri);
     }
 
@@ -70,7 +70,7 @@ public class RestToolsTest {
     public void buildExternalUriReturnsDefaultUriIfHeaderIsEmpty() throws Exception {
         final MultivaluedMap<String, String> httpHeaders = new MultivaluedHashMap<>();
         httpHeaders.putSingle(HttpConfiguration.OVERRIDE_HEADER, "");
-        final URI externalUri = URI.create("http://graylog.example.com");
+        final URI externalUri = URI.create("http://graylog.example.com/");
         assertThat(RestTools.buildExternalUri(httpHeaders, externalUri)).isEqualTo(externalUri);
     }
 
@@ -79,7 +79,7 @@ public class RestToolsTest {
         final MultivaluedMap<String, String> httpHeaders = new MultivaluedHashMap<>();
         httpHeaders.putSingle(HttpConfiguration.OVERRIDE_HEADER, "http://header.example.com");
         final URI externalUri = URI.create("http://graylog.example.com");
-        assertThat(RestTools.buildExternalUri(httpHeaders, externalUri)).isEqualTo(URI.create("http://header.example.com"));
+        assertThat(RestTools.buildExternalUri(httpHeaders, externalUri)).isEqualTo(URI.create("http://header.example.com/"));
     }
 
     @Test
@@ -87,7 +87,23 @@ public class RestToolsTest {
         final MultivaluedMap<String, String> httpHeaders = new MultivaluedHashMap<>();
         httpHeaders.put(HttpConfiguration.OVERRIDE_HEADER, ImmutableList.of("http://header1.example.com", "http://header2.example.com"));
         final URI endpointUri = URI.create("http://graylog.example.com");
-        assertThat(RestTools.buildExternalUri(httpHeaders, endpointUri)).isEqualTo(URI.create("http://header1.example.com"));
+        assertThat(RestTools.buildExternalUri(httpHeaders, endpointUri)).isEqualTo(URI.create("http://header1.example.com/"));
+    }
+
+    @Test
+    public void buildEndpointUriEnsuresTrailingSlash() {
+        final MultivaluedMap<String, String> httpHeaders = new MultivaluedHashMap<>();
+        final URI endpointUri = URI.create("http://graylog.example.com");
+        final URI endpointUri2 = URI.create("http://graylog.example.com/");
+
+        assertThat(RestTools.buildExternalUri(httpHeaders, endpointUri)).isEqualTo(URI.create("http://graylog.example.com/"));
+        assertThat(RestTools.buildExternalUri(httpHeaders, endpointUri2)).isEqualTo(URI.create("http://graylog.example.com/"));
+
+        httpHeaders.putSingle(HttpConfiguration.OVERRIDE_HEADER, "http://header.example.com");
+        assertThat(RestTools.buildExternalUri(httpHeaders, endpointUri)).isEqualTo(URI.create("http://header.example.com/"));
+
+        httpHeaders.putSingle(HttpConfiguration.OVERRIDE_HEADER, "http://header.example.com/");
+        assertThat(RestTools.buildExternalUri(httpHeaders, endpointUri)).isEqualTo(URI.create("http://header.example.com/"));
     }
 
     @Test

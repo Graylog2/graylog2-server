@@ -27,7 +27,6 @@ import org.graylog2.utilities.IpSubnet;
 import javax.annotation.Nullable;
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
 import java.net.URI;
@@ -112,7 +111,13 @@ public class RestTools {
                     .findFirst();
         }
 
-        return externalUri.orElse(defaultUri);
+        final URI uri = externalUri.orElse(defaultUri);
+
+        // Make sure we return an URI object with a trailing slash
+        if (!uri.toString().endsWith("/")) {
+            return URI.create(uri.toString() + "/");
+        }
+        return uri;
     }
 
     public static String getPathFromResource(Resource resource) {
