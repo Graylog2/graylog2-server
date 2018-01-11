@@ -108,7 +108,6 @@ public class UdpTransport extends NettyTransport {
         try {
             bootstrap = getBootstrap(input);
 
-            // TODO: Make number of channels configurable separately
             final NettyTransportType transportType = nettyTransportConfiguration.getType();
             int numChannels = (transportType == NettyTransportType.EPOLL || transportType == NettyTransportType.KQUEUE) ? workerThreads : 1;
             for (int i = 0; i < numChannels; i++) {

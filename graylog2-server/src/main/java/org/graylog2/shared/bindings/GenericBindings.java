@@ -63,7 +63,6 @@ public class GenericBindings extends AbstractModule {
 
         bind(ServiceManager.class).toProvider(ServiceManagerProvider.class).asEagerSingleton();
 
-        // TODO: Dedicated scheduled executor
         bind(ThroughputCounter.class);
 
         bind(EventBus.class).toProvider(EventBusProvider.class).in(Scopes.SINGLETON);
