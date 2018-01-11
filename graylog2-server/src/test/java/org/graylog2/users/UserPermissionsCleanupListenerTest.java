@@ -22,6 +22,7 @@ import org.graylog2.dashboards.events.DashboardDeletedEvent;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.shared.security.RestPermissions;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.streams.events.StreamDeletedEvent;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,8 +35,13 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class UserPermissionsCleanupListenerTest {
     @Rule
@@ -59,7 +65,7 @@ public class UserPermissionsCleanupListenerTest {
     }
 
     @Test
-    public void doNothingWhenListOfUsersIsEmpty() throws Exception {
+    public void doNothingWhenListOfUsersIsEmptyForDashboardRemovals() throws Exception {
         when(userService.loadAll()).thenReturn(Collections.emptyList());
 
         this.userPermissionsCleanupListener.cleanupPermissionsOnDashboardRemoval(DashboardDeletedEvent.create("foobar"));
@@ -149,6 +155,118 @@ public class UserPermissionsCleanupListenerTest {
         final ArgumentCaptor<List<String>> permissionsCaptorUser3 = ArgumentCaptor.forClass(List.class);
 
         this.userPermissionsCleanupListener.cleanupPermissionsOnDashboardRemoval(DashboardDeletedEvent.create("foobar"));
+
+        verify(userService, never()).save(eq(user1));
+        verify(userService, times(1)).save(user2);
+        verify(userService, times(1)).save(user3);
+
+        verify(user2, times(1)).setPermissions(permissionsCaptorUser2.capture());
+        verify(user3, times(1)).setPermissions(permissionsCaptorUser3.capture());
+
+        assertThat(permissionsCaptorUser2.getValue())
+                .isNotNull()
+                .isNotEmpty()
+                .containsExactly(
+                        RestPermissions.STREAMS_READ,
+                        RestPermissions.SEARCHES_ABSOLUTE
+                );
+
+        assertThat(permissionsCaptorUser3.getValue())
+                .isNotNull()
+                .isEmpty();
+    }
+
+    @Test
+    public void doNothingWhenListOfUsersIsEmptyForStreamRemovals() throws Exception {
+        when(userService.loadAll()).thenReturn(Collections.emptyList());
+
+        this.userPermissionsCleanupListener.cleanupPermissionsOnStreamRemoval(StreamDeletedEvent.create("foobar"));
+
+        verify(userService, never()).save(any(User.class));
+    }
+
+    @Test
+    public void doNothingWhenStreamIsNotReferenced() throws Exception {
+        final User user1 = mock(User.class);
+        when(user1.getPermissions()).thenReturn(Collections.emptyList());
+
+        final User user2 = mock(User.class);
+        when(user2.getPermissions()).thenReturn(ImmutableList.of(RestPermissions.STREAMS_READ, RestPermissions.STREAMS_EDIT));
+
+        final List<User> users = ImmutableList.of(user1, user2);
+
+        when(userService.loadAll()).thenReturn(users);
+
+        this.userPermissionsCleanupListener.cleanupPermissionsOnStreamRemoval(StreamDeletedEvent.create("foobar"));
+
+        verify(userService, never()).save(any(User.class));
+    }
+
+    @Test
+    public void removePermissionsOfStreamIfReferenced() throws Exception {
+        final String streamId = "foobar";
+
+        final User user1 = mock(User.class);
+        when(user1.getPermissions()).thenReturn(ImmutableList.of(RestPermissions.DASHBOARDS_READ, RestPermissions.DASHBOARDS_EDIT));
+
+        final User user2 = mock(User.class);
+        when(user2.getPermissions()).thenReturn(ImmutableList.of(
+                RestPermissions.DASHBOARDS_READ,
+                RestPermissions.STREAMS_READ + ":" + streamId,
+                RestPermissions.STREAMS_EDIT + ":" + streamId,
+                RestPermissions.SEARCHES_ABSOLUTE
+        ));
+
+        final List<User> users = ImmutableList.of(user1, user2);
+
+        when(userService.loadAll()).thenReturn(users);
+        final ArgumentCaptor<List<String>> permissionsCaptor = ArgumentCaptor.forClass(List.class);
+
+        this.userPermissionsCleanupListener.cleanupPermissionsOnStreamRemoval(StreamDeletedEvent.create("foobar"));
+
+        verify(userService, never()).save(eq(user1));
+        verify(userService, times(1)).save(eq(user2));
+        verify(user2, times(1)).setPermissions(permissionsCaptor.capture());
+
+        assertThat(permissionsCaptor.getValue())
+                .isNotNull()
+                .isNotEmpty()
+                .containsExactly(
+                        RestPermissions.DASHBOARDS_READ,
+                        RestPermissions.SEARCHES_ABSOLUTE
+                );
+    }
+
+    @Test
+    public void removePermissionsOfStreamIfReferencedForMultipleUsers() throws Exception {
+        final String streamId = "foobar";
+
+        final User user1 = mock(User.class);
+        when(user1.getPermissions()).thenReturn(ImmutableList.of(
+                RestPermissions.STREAMS_READ + ":somethingelse",
+                RestPermissions.STREAMS_EDIT
+        ));
+
+        final User user2 = mock(User.class);
+        when(user2.getPermissions()).thenReturn(ImmutableList.of(
+                RestPermissions.STREAMS_READ,
+                RestPermissions.STREAMS_READ + ":" + streamId,
+                RestPermissions.STREAMS_EDIT + ":" + streamId,
+                RestPermissions.SEARCHES_ABSOLUTE
+        ));
+
+        final User user3 = mock(User.class);
+        when(user3.getPermissions()).thenReturn(ImmutableList.of(
+                RestPermissions.STREAMS_READ + ":" + streamId
+        ));
+
+        final List<User> users = ImmutableList.of(user1, user2, user3);
+
+        when(userService.loadAll()).thenReturn(users);
+        final ArgumentCaptor<List<String>> permissionsCaptorUser2 = ArgumentCaptor.forClass(List.class);
+        final ArgumentCaptor<List<String>> permissionsCaptorUser3 = ArgumentCaptor.forClass(List.class);
+
+        this.userPermissionsCleanupListener.cleanupPermissionsOnStreamRemoval(StreamDeletedEvent.create("foobar"));
 
         verify(userService, never()).save(eq(user1));
         verify(userService, times(1)).save(user2);

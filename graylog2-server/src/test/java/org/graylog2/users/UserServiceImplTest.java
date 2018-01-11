@@ -19,6 +19,7 @@ package org.graylog2.users;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import com.lordofthejars.nosqlunit.annotation.UsingDataSet;
 import com.lordofthejars.nosqlunit.core.LoadStrategyEnum;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
@@ -72,6 +73,8 @@ public class UserServiceImplTest {
     private RoleService roleService;
     @Mock
     private InMemoryRolePermissionResolver permissionsResolver;
+    @Mock
+    private EventBus serverEventBus;
 
     @Before
     public void setUp() throws Exception {
@@ -80,7 +83,7 @@ public class UserServiceImplTest {
         this.userFactory = new UserImplFactory(configuration);
         this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
         this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory,
-                                               permissionsResolver);
+                                               permissionsResolver, serverEventBus);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
@@ -207,7 +210,7 @@ public class UserServiceImplTest {
     public void testGetPermissionsForUser() throws Exception {
         final InMemoryRolePermissionResolver permissionResolver = mock(InMemoryRolePermissionResolver.class);
         final UserService userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory,
-                                                            permissionResolver);
+                                                            permissionResolver, serverEventBus);
 
         final UserImplFactory factory = new UserImplFactory(new Configuration());
         final UserImpl user = factory.create(new HashMap<>());

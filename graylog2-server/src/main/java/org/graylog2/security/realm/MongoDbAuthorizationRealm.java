@@ -17,6 +17,8 @@
 package org.graylog2.security.realm;
 
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
 import org.apache.shiro.authc.AuthenticationToken;
@@ -27,6 +29,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.security.MongoDbAuthorizationCacheManager;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.events.UserChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,10 +42,13 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
     private final UserService userService;
 
     @Inject
-    MongoDbAuthorizationRealm(UserService userService, MongoDbAuthorizationCacheManager mongoDbAuthorizationCacheManager) {
+    MongoDbAuthorizationRealm(UserService userService,
+                              MongoDbAuthorizationCacheManager mongoDbAuthorizationCacheManager,
+                              EventBus serverEventBus) {
         this.userService = userService;
         setCachingEnabled(true);
         setCacheManager(mongoDbAuthorizationCacheManager);
+        serverEventBus.register(this);
     }
 
     @Override
@@ -66,10 +72,14 @@ public class MongoDbAuthorizationRealm extends AuthorizingRealm {
         }
     }
 
-
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
         // this class does not authenticate at all
         return null;
+    }
+
+    @Subscribe
+    public void handleUserSave(UserChangedEvent event) {
+        getAuthorizationCache().clear();
     }
 }

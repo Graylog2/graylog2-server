@@ -18,6 +18,7 @@ package org.graylog2.rest.resources.streams;
 
 import com.codahale.metrics.annotation.Timed;
 import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -45,6 +46,7 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.alarms.AlertCondition;
 import org.graylog2.plugin.configuration.ConfigurationException;
 import org.graylog2.plugin.database.ValidationException;
+import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
@@ -160,6 +162,8 @@ public class StreamResource extends RestResource {
             streamRuleService.save(streamRule);
         }
 
+        ensureUserHasPermissionsForStream(getCurrentUser(), id);
+
         clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
 
         final Map<String, String> result = ImmutableMap.of("stream_id", id);
@@ -168,6 +172,31 @@ public class StreamResource extends RestResource {
             .build(id);
 
         return Response.created(streamUri).entity(result).build();
+    }
+
+    private boolean ensureUserHasPermissionsForStream(User user, String id) throws ValidationException {
+        boolean permissionsChanged = false;
+        final ImmutableList.Builder<String> permissionsBuilder = ImmutableList.<String>builder()
+                .addAll(user.getPermissions());
+        if (!isPermitted(RestPermissions.STREAMS_READ, id)) {
+            permissionsChanged = true;
+            permissionsBuilder.add(RestPermissions.STREAMS_READ + ":" + id);
+        }
+        if (!isPermitted(RestPermissions.STREAMS_EDIT, id)) {
+            permissionsChanged = true;
+            permissionsBuilder.add(RestPermissions.STREAMS_EDIT + ":" + id);
+        }
+        if (!isPermitted(RestPermissions.STREAMS_CHANGESTATE, id)) {
+            permissionsChanged = true;
+            permissionsBuilder.add(RestPermissions.STREAMS_CHANGESTATE + ":" + id);
+        }
+
+        if (permissionsChanged) {
+            user.setPermissions(permissionsBuilder.build());
+            userService.save(user);
+        }
+
+        return permissionsChanged;
     }
 
     @GET
@@ -451,6 +480,8 @@ public class StreamResource extends RestResource {
         for (Output output : sourceStream.getOutputs()) {
             streamService.addOutput(stream, output);
         }
+
+        ensureUserHasPermissionsForStream(getCurrentUser(), id);
 
         clusterEventBus.post(StreamsChangedEvent.create(stream.getId()));
 

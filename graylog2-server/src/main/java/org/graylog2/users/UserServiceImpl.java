@@ -23,6 +23,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
+import com.google.common.eventbus.EventBus;
 import com.mongodb.BasicDBObject;
 import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
@@ -38,6 +39,7 @@ import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
 import org.graylog2.shared.users.UserService;
+import org.graylog2.users.events.UserChangedEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,18 +59,21 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     private final RoleService roleService;
     private final UserImpl.Factory userFactory;
     private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
+    private final EventBus serverEventBus;
 
     @Inject
     public UserServiceImpl(final MongoConnection mongoConnection,
                            final Configuration configuration,
                            final RoleService roleService,
                            final UserImpl.Factory userFactory,
-                           final InMemoryRolePermissionResolver inMemoryRolePermissionResolver) {
+                           final InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
+                           final EventBus serverEventBus) {
         super(mongoConnection);
         this.configuration = configuration;
         this.roleService = roleService;
         this.userFactory = userFactory;
         this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
+        this.serverEventBus = serverEventBus;
 
         // ensure that the users' roles array is indexed
         collection(UserImpl.class).createIndex(UserImpl.ROLES);
@@ -143,7 +148,11 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
             throw new IllegalStateException("Cannot modify local root user, this is a bug.");
         }
 
-        return super.save(model);
+        final String userId = super.save(model);
+
+        serverEventBus.post(UserChangedEvent.create(userId));
+
+        return userId;
     }
 
     @Override
