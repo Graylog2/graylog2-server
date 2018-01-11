@@ -17,7 +17,6 @@
 package org.graylog2.inputs.transports;
 
 import com.codahale.metrics.Gauge;
-import com.codahale.metrics.MetricRegistry;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.primitives.Ints;
@@ -85,10 +84,10 @@ public class UdpTransportTest {
     @Before
     @SuppressForbidden("Executors#newSingleThreadExecutor() is okay for tests")
     public void setUp() throws Exception {
-        eventLoopGroupFactory = new EventLoopGroupFactory(new MetricRegistry(), nettyTransportConfiguration);
-        eventLoopGroup = eventLoopGroupFactory.create(1, "test");
-        throughputCounter = new ThroughputCounter(eventLoopGroup);
+        eventLoopGroupFactory = new EventLoopGroupFactory(nettyTransportConfiguration);
         localMetricRegistry = new LocalMetricRegistry();
+        eventLoopGroup = eventLoopGroupFactory.create(1, localMetricRegistry,"test");
+        throughputCounter = new ThroughputCounter(eventLoopGroup);
         udpTransport = new UdpTransport(CONFIGURATION, eventLoopGroupFactory, nettyTransportConfiguration, throughputCounter, localMetricRegistry);
     }
 

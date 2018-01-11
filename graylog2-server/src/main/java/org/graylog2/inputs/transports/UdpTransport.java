@@ -81,7 +81,7 @@ public class UdpTransport extends NettyTransport {
         LOG.debug("Setting UDP receive buffer size to {} bytes", getRecvBufferSize());
         final NettyTransportType transportType = nettyTransportConfiguration.getType();
 
-        eventLoopGroup = eventLoopGroupFactory.create(workerThreads, MetricRegistry.name(this.getClass(), "workers"));
+        eventLoopGroup = eventLoopGroupFactory.create(workerThreads, localRegistry, "workers");
 
         return new Bootstrap()
                 .group(eventLoopGroup)

@@ -34,16 +34,14 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 
 public class EventLoopGroupFactory {
-    private final MetricRegistry metricRegistry;
     private final NettyTransportConfiguration configuration;
 
     @Inject
-    public EventLoopGroupFactory(MetricRegistry metricRegistry, NettyTransportConfiguration configuration) {
-        this.metricRegistry = metricRegistry;
+    public EventLoopGroupFactory(NettyTransportConfiguration configuration) {
         this.configuration = configuration;
     }
 
-    public EventLoopGroup create(int numThreads, String metricPrefix) {
+    public EventLoopGroup create(int numThreads, MetricRegistry metricRegistry, String metricPrefix) {
         final ThreadFactory threadFactory = threadFactory(metricPrefix, metricRegistry);
         final Executor executor = executor(metricPrefix, numThreads, threadFactory, metricRegistry);
 

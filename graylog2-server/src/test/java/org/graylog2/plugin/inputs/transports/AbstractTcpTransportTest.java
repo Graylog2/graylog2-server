@@ -16,7 +16,6 @@
  */
 package org.graylog2.plugin.inputs.transports;
 
-import com.codahale.metrics.MetricRegistry;
 import com.google.common.collect.ImmutableMap;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.Unpooled;
@@ -78,7 +77,7 @@ public class AbstractTcpTransportTest {
     @Before
     public void setUp() {
         eventLoopGroup = new NioEventLoopGroup();
-        eventLoopGroupFactory = new EventLoopGroupFactory(new MetricRegistry(), nettyTransportConfiguration);
+        eventLoopGroupFactory = new EventLoopGroupFactory(nettyTransportConfiguration);
         throughputCounter = new ThroughputCounter(eventLoopGroup);
         localRegistry = new LocalMetricRegistry();
     }

@@ -171,7 +171,7 @@ public abstract class AbstractTcpTransport extends NettyTransport {
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> parentHandlers = getChannelHandlers(input);
         final LinkedHashMap<String, Callable<? extends ChannelHandler>> childHandlers = getChildChannelHandlers(input);
 
-        childEventLoopGroup = eventLoopGroupFactory.create(workerThreads, MetricRegistry.name(this.getClass(), "workers"));
+        childEventLoopGroup = eventLoopGroupFactory.create(workerThreads, localRegistry, "workers");
 
         return new ServerBootstrap()
                 .group(parentEventLoopGroup, childEventLoopGroup)
