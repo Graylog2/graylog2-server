@@ -24,7 +24,6 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
-import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.graylog2.audit.AuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.database.NotFoundException;
@@ -79,7 +78,6 @@ public class OutputResource extends RestResource {
     @GET
     @Timed
     @ApiOperation(value = "Get a list of all outputs")
-    @RequiresPermissions(RestPermissions.STREAM_OUTPUTS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
     public OutputListResponse get() {
         checkPermission(RestPermissions.OUTPUTS_READ);
@@ -103,7 +101,6 @@ public class OutputResource extends RestResource {
     @Path("/{outputId}")
     @Timed
     @ApiOperation(value = "Get specific output")
-    @RequiresPermissions(RestPermissions.OUTPUTS_CREATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such output on this node.")
@@ -161,7 +158,6 @@ public class OutputResource extends RestResource {
     @Path("/{outputId}")
     @Timed
     @ApiOperation(value = "Delete output")
-    @RequiresPermissions(RestPermissions.OUTPUTS_TERMINATE)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such stream/output on this node.")
@@ -178,9 +174,9 @@ public class OutputResource extends RestResource {
     @Path("/available")
     @Timed
     @ApiOperation(value = "Get all available output modules")
-    @RequiresPermissions(RestPermissions.STREAMS_READ)
     @Produces(MediaType.APPLICATION_JSON)
     public Map<String, Map<String, AvailableOutputSummary>> available() {
+        checkPermission(RestPermissions.OUTPUTS_READ);
         return ImmutableMap.of("types", messageOutputFactory.getAvailableOutputs());
     }
 
@@ -188,7 +184,6 @@ public class OutputResource extends RestResource {
     @Path("/{outputId}")
     @Timed
     @ApiOperation(value = "Update output")
-    @RequiresPermissions(RestPermissions.OUTPUTS_EDIT)
     @Produces(MediaType.APPLICATION_JSON)
     @ApiResponses(value = {
             @ApiResponse(code = 404, message = "No such output on this node.")
