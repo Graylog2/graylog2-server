@@ -14,10 +14,7 @@
   ],
   "author": "Graylog, Inc. <hello@graylog.com>",
   "license": "GPL-3.0",
-  "dependencies": {
-    "brace": "^0.7.0",
-    "react-ace": "^3.1.0"
-  },
+  "dependencies": {},
   "devDependencies": {
     "graylog-web-plugin": "file:../../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin"
   }
