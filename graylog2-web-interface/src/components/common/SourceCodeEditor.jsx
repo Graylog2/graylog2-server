@@ -149,9 +149,9 @@ class SourceCodeEditor extends React.Component {
                                  onSuccess={this.focusEditor}
                                  text={this.state.selectedText}
                                  buttonTitle="Copy (Ctrl+C / &#8984;C)"
-                                 disabled={this.isCopyDisabled} />
+                                 disabled={this.isCopyDisabled()} />
                 <OverlayTrigger placement="top" trigger="click" overlay={overlay} rootClose>
-                  <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled}>
+                  <Button bsStyle="link" bsSize="sm" title="Paste (Ctrl+V / &#8984;V)" disabled={this.isPasteDisabled()}>
                     <i className="fa fa-paste fa-fw" />
                   </Button>
                 </OverlayTrigger>
