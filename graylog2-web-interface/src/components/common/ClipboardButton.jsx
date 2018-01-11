@@ -27,10 +27,16 @@ const ClipboardButton = React.createClass({
     bsStyle: PropTypes.string,
     /** Button's bsSize. */
     bsSize: PropTypes.string,
+    /** Specifies if the button is disabled or not. */
+    disabled: PropTypes.bool,
+    /** Text to display when hovering over the button. */
+    buttonTitle: PropTypes.string,
   },
   getDefaultProps() {
     return {
       action: 'copy',
+      disabled: false,
+      buttonTitle: undefined,
     };
   },
   getInitialState() {
@@ -59,15 +65,17 @@ const ClipboardButton = React.createClass({
   },
   _onError(event) {
     const key = event.action === 'cut' ? 'K' : 'C';
-    this.setState({ tooltipMessage: `Press Ctrl+${key} to ${event.action}` });
+    this.setState({ tooltipMessage: <span>Press Ctrl+{key}&thinsp;/&thinsp;&#8984;{key} to {event.action}</span> });
   },
   _getFilteredProps() {
-    const { className, style, bsStyle, bsSize } = this.props;
+    const { className, style, bsStyle, bsSize, disabled, buttonTitle } = this.props;
     return {
       className: className,
       style: style,
       bsStyle: bsStyle,
       bsSize: bsSize,
+      disabled: disabled,
+      title: buttonTitle,
     };
   },
   render() {
