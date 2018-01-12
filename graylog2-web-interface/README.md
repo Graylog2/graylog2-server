@@ -19,6 +19,20 @@ You can start the development server in any other port that you like. To do so, 
 
 We mainly develop using IntelliJ or WebStorm. If you also decide to use them to work in Graylog, enable `React JSX` as Javascript language version to support the JSX language extension. This setting was called `JSX harmony` before, and it is available in one or the other form since IntelliJ 14 and WebStorm 9.
 
+## Frontend documentation and component gallery
+There's an online version of the frontend documentation and component gallery at:
+
+[https://graylog2.github.io/frontend-documentation/](https://graylog2.github.io/frontend-documentation/)
+
+The online version is automatically deployed and reflects the current state of the `master` branch in this repository.
+
+### Run documentation locally
+You may also run the documentation locally to contribute to it or see a different version than the current master:
+
+1. Run `yarn install`
+1. Run `yarn run docs:server`
+1. Go to [http://localhost:6060](http://localhost:6060) on your favourite browser to see the local documentation
+
 ## Update Javascript dependencies
 
 1. Update a single dependency
@@ -34,4 +48,3 @@ We mainly develop using IntelliJ or WebStorm. If you also decide to use them to 
         * Yarn also supports upgrading packages matching a pattern, so you can execute `yarn upgrade --pattern <pattern>`
         * You could execute `yarn upgrade` if you really want to upgrade all packages
     * After doing the upgrade, remember to commit both the `package.json` and `yarn.lock` files
-
