@@ -69,7 +69,7 @@ public class IndexHtmlGenerator {
                 .put("title", "Graylog Web Interface")
                 .put("cssFiles", cssFiles)
                 .put("jsFiles", sortedJsFiles)
-                .put("baseUri", RestTools.buildExternalUri(headers, httpConfiguration.getHttpExternalUri()))
+                .put("appPrefix", RestTools.buildExternalUri(headers, httpConfiguration.getHttpExternalUri()))
                 .build();
         return templateEngine.transform(template, model);
     }
