@@ -216,10 +216,10 @@ const Widget = React.createClass({
                              onUpdate={this.updateWidget} />
     );
 
-    let disabledTooltip = null;
+    let disabledReplay = false;
     if (this.props.streamIds != null && this.props.widget.config.stream_id &&
         !this.props.streamIds[this.props.widget.config.stream_id]) {
-      disabledTooltip = 'The stream is not available, cannot replay search.';
+      disabledReplay = true;
     }
     return (
       <div ref="widget" className="widget" data-widget-id={this.props.widget.id}>
@@ -234,7 +234,7 @@ const Widget = React.createClass({
                       onEditConfig={this._showEditConfig}
                       onDelete={this.deleteWidget}
                       replayHref={this.replayUrl()}
-                      replayToolTip={disabledTooltip}
+                      replayDisabled={disabledReplay}
                       calculatedAt={this.state.calculatedAt}
                       error={this.state.error}
                       errorMessage={this.state.errorMessage} />
