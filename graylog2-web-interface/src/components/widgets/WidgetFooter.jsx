@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { Timestamp } from 'components/common';
 
 const WidgetFooter = React.createClass({
@@ -47,7 +47,7 @@ const WidgetFooter = React.createClass({
     }
 
     // if we have a tooltip, we disable the button link and instead show a tooltip on hover
-    const replay = this.props.replayDisabled ? <div /> : (
+    const replay = this.props.replayDisabled ? null : (
       <div className="widget-replay">
         <Button bsStyle="link" className="btn-text" title={'Replay search'} href={this.props.replayHref}>
           <i className="fa fa-play" />
@@ -83,8 +83,8 @@ const WidgetFooter = React.createClass({
     return (
       <div>
         <div className="widget-update-info">
-        {loadErrorElement}
-        {calculatedAtTime}
+          {loadErrorElement}
+          {calculatedAtTime}
         </div>
         <div>
           {this.props.locked ? lockedActions : unlockedActions}

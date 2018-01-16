@@ -28,7 +28,6 @@ exports[`<WidgetFooter /> should render a widget footer locked and disabled repl
     <div
       className="actions"
     >
-      <div />
       <div
         className="widget-info"
       >
