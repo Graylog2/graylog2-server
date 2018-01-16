@@ -5,12 +5,10 @@ import WidgetFooter from 'components/widgets/WidgetFooter';
 
 describe('<WidgetFooter />', () => {
   const date = new Date('December 17, 1995 03:24:00');
-  const lockWidget = true;
-  const disableReplay = true;
 
   it('should render a widget footer locked and enabled replay', () => {
     const wrapper = renderer.create(<WidgetFooter
-      locked={lockWidget}
+      locked
       onShowConfig={() => {}}
       onEditConfig={() => {}}
       onDelete={() => {}}
@@ -24,12 +22,12 @@ describe('<WidgetFooter />', () => {
 
   it('should render a widget footer locked and disabled replay', () => {
     const wrapper = renderer.create(<WidgetFooter
-      locked={lockWidget}
+      locked
       onShowConfig={() => {}}
       onEditConfig={() => {}}
       onDelete={() => {}}
       replayHref={'http://example.org'}
-      replayDisabled={disableReplay}
+      replayDisabled
       calculatedAt={date.getTime()}
       error={{}}
       errorMessage={''} />);

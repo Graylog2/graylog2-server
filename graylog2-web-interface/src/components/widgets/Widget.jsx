@@ -216,11 +216,8 @@ const Widget = React.createClass({
                              onUpdate={this.updateWidget} />
     );
 
-    let disabledReplay = false;
-    if (this.props.streamIds != null && this.props.widget.config.stream_id &&
-        !this.props.streamIds[this.props.widget.config.stream_id]) {
-      disabledReplay = true;
-    }
+    const disabledReplay = this.props.streamIds != null && this.props.widget.config.stream_id &&
+      !this.props.streamIds[this.props.widget.config.stream_id];
     return (
       <div ref="widget" className="widget" data-widget-id={this.props.widget.id}>
         <WidgetHeader ref="widgetHeader"
