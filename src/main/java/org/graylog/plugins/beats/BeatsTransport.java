@@ -16,10 +16,11 @@
  */
 package org.graylog.plugins.beats;
 
-import com.codahale.metrics.InstrumentedExecutorService;
-import com.codahale.metrics.MetricRegistry;
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.assistedinject.Assisted;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.EventLoopGroup;
+import org.graylog2.inputs.transports.NettyTransportConfiguration;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.configuration.ConfigurationRequest;
@@ -29,53 +30,27 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.transports.AbstractTcpTransport;
 import org.graylog2.plugin.inputs.transports.NettyTransport;
 import org.graylog2.plugin.inputs.transports.Transport;
-import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.jboss.netty.channel.ChannelHandler;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import java.util.LinkedHashMap;
 import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
-
-import static com.codahale.metrics.MetricRegistry.name;
 
 public class BeatsTransport extends AbstractTcpTransport {
     @Inject
     public BeatsTransport(@Assisted Configuration configuration,
+                          EventLoopGroup eventLoopGroup,
+                          EventLoopGroupFactory eventLoopGroupFactory,
+                          NettyTransportConfiguration nettyTransportConfiguration,
                           ThroughputCounter throughputCounter,
-                          LocalMetricRegistry localRegistry,
-                          @Named("bossPool") Executor bossPool,
-                          ConnectionCounter connectionCounter) {
-        this(configuration, throughputCounter, localRegistry, bossPool, executorService("beats-worker", "beats-transport-worker-%d", localRegistry), connectionCounter);
-    }
-
-    private BeatsTransport(Configuration configuration,
-                           ThroughputCounter throughputCounter,
-                           LocalMetricRegistry localRegistry,
-                           Executor bossPool,
-                           Executor workerPool,
-                           ConnectionCounter connectionCounter) {
-        super(configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter);
-    }
-
-    private static Executor executorService(final String executorName, final String threadNameFormat, final MetricRegistry metricRegistry) {
-        final ThreadFactory threadFactory = new ThreadFactoryBuilder().setNameFormat(threadNameFormat).build();
-        return new InstrumentedExecutorService(
-                Executors.newCachedThreadPool(threadFactory),
-                metricRegistry,
-                name(BeatsTransport.class, executorName, "executor-service"));
+                          LocalMetricRegistry localRegistry) {
+        super(configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration);
     }
 
     @Override
-    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getFinalChannelHandlers(MessageInput input) {
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> finalChannelHandlers = super.getFinalChannelHandlers(input);
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>();
+    protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getCustomChildChannelHandlers(MessageInput input) {
+        final LinkedHashMap<String, Callable<? extends ChannelHandler>> handlers = new LinkedHashMap<>(super.getCustomChildChannelHandlers(input));
         handlers.put("beats", BeatsFrameDecoder::new);
-        handlers.putAll(finalChannelHandlers);
 
         return handlers;
     }

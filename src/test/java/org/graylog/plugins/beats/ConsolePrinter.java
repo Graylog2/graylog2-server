@@ -18,28 +18,26 @@ package org.graylog.plugins.beats;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.primitives.Ints;
+import io.netty.bootstrap.ServerBootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioServerSocketChannel;
+import io.netty.handler.logging.LoggingHandler;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.journal.RawMessage;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
-import org.jboss.netty.handler.logging.LoggingHandler;
-
-import java.net.InetSocketAddress;
-import java.util.concurrent.Executors;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
 public class ConsolePrinter {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         String hostname = "127.0.0.1";
         int port = 5044;
         if (args.length >= 2) {
@@ -50,25 +48,35 @@ public class ConsolePrinter {
             port = firstNonNull(Ints.tryParse(args[1]), 5044);
         }
 
-        final ChannelFactory factory =
-                new NioServerSocketChannelFactory(
-                        Executors.newCachedThreadPool(),
-                        Executors.newCachedThreadPool());
-        final ServerBootstrap b = new ServerBootstrap(factory);
-        b.getPipeline().addLast("beats-frame-decoder", new BeatsFrameDecoder());
-        b.getPipeline().addLast("beats-codec", new BeatsCodecHandler());
-        b.getPipeline().addLast("logging", new LoggingHandler());
-        System.out.println("Starting listener on " + hostname + ":" + port);
-        b.bind(new InetSocketAddress(hostname, port));
+
+        final EventLoopGroup eventLoopGroup = new NioEventLoopGroup();
+        try {
+            final ServerBootstrap b = new ServerBootstrap()
+                    .group(eventLoopGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        public void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast("logging", new LoggingHandler());
+                            ch.pipeline().addLast("beats-frame-decoder", new BeatsFrameDecoder());
+                            ch.pipeline().addLast("beats-codec", new BeatsCodecHandler());
+                        }
+                    });
+
+            System.out.println("Starting listener on " + hostname + ":" + port);
+            final ChannelFuture future = b.bind(hostname, port).sync();
+            future.channel().closeFuture().sync();
+        } finally {
+            eventLoopGroup.shutdownGracefully();
+        }
     }
 
-    public static class BeatsCodecHandler extends SimpleChannelUpstreamHandler {
+    public static class BeatsCodecHandler extends SimpleChannelInboundHandler<ByteBuf> {
         private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         private final BeatsCodec beatsCodec = new BeatsCodec(Configuration.EMPTY_CONFIGURATION, objectMapper);
 
         @Override
-        public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-            final ChannelBuffer message = (ChannelBuffer) e.getMessage();
+        protected void channelRead0(ChannelHandlerContext ctx, ByteBuf message) throws Exception {
             final int readableBytes = message.readableBytes();
             final byte[] messageBytes = new byte[readableBytes];
             message.readBytes(messageBytes);
@@ -77,15 +85,7 @@ public class ConsolePrinter {
             final Message decodedMessage = beatsCodec.decode(rawMessage);
             System.out.println(decodedMessage);
 
-            super.messageReceived(ctx, e);
-        }
-
-        @Override
-        public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e) throws Exception {
-            e.getCause().printStackTrace();
-
-            final Channel ch = e.getChannel();
-            ch.close();
+            ctx.fireChannelRead(decodedMessage);
         }
     }
 }

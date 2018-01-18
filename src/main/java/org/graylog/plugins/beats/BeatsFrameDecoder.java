@@ -19,25 +19,24 @@ package org.graylog.plugins.beats;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.google.common.annotations.VisibleForTesting;
-import com.google.common.collect.Iterables;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Ints;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.replay.ReplayingDecoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ReplayingDecoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nullable;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.zip.InflaterInputStream;
 
@@ -68,26 +67,13 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
     private long windowSize;
     private long sequenceNum;
 
-
     public BeatsFrameDecoder() {
-        super(DecodingState.PROTOCOL_VERSION, true);
+        super(DecodingState.PROTOCOL_VERSION);
     }
 
     @Override
-    protected Object decodeLast(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer, DecodingState state) throws Exception {
-        // ignore, because can't send ACK after frame read
-        if (buffer.readable()) {
-            buffer.readBytes(super.actualReadableBytes());
-        }
-		        
-        checkpoint(DecodingState.PROTOCOL_VERSION);
-        return null;
-    }
-	
-    @Override
-    protected Object decode(ChannelHandlerContext ctx, Channel channel, ChannelBuffer buffer, DecodingState state) throws Exception {
-        ChannelBuffer[] events = null;
-        switch (state) {
+    protected void decode(ChannelHandlerContext channelHandlerContext, ByteBuf buffer, List<Object> list) throws Exception {
+        switch (state()) {
             case PROTOCOL_VERSION:
                 checkVersion(buffer);
                 checkpoint(DecodingState.FRAME_TYPE);
@@ -110,57 +96,49 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
                     default:
                         throw new Exception("Unknown frame type: " + frameType);
                 }
-                return null;
+                return;
             case FRAME_WINDOW_SIZE:
                 processWindowSizeFrame(buffer);
                 break;
             case FRAME_DATA:
-                events = parseDataFrame(channel, buffer);
+                list.addAll(parseDataFrame(channelHandlerContext.channel(), buffer));
                 break;
             case FRAME_COMPRESSED:
-                events = processCompressedFrame(channel, buffer);
+                list.addAll(processCompressedFrame(channelHandlerContext.channel(), buffer));
                 break;
             case FRAME_JSON:
-                events = parseJsonFrame(channel, buffer);
+                list.addAll(parseJsonFrame(channelHandlerContext.channel(), buffer));
                 break;
             default:
-                throw new Exception("Unknown decoding state: " + state);
+                throw new Exception("Unknown decoding state: " + state());
         }
 
         checkpoint(DecodingState.PROTOCOL_VERSION);
-        return events;
     }
 
-    @Nullable
-    private ChannelBuffer[] processUncompressedBuffer(Channel channel, ChannelBuffer buffer) throws Exception {
+    private Collection<ByteBuf> processUncompressedBuffer(Channel channel, ByteBuf buffer) throws Exception {
         checkVersion(buffer);
         byte frameType = buffer.readByte();
 
-        ChannelBuffer[] events = null;
         switch (frameType) {
             case FRAME_WINDOW_SIZE:
                 processWindowSizeFrame(buffer);
-                break;
+                return Collections.emptyList();
             case FRAME_DATA:
-                events = parseDataFrame(channel, buffer);
-                break;
+                return parseDataFrame(channel, buffer);
             case FRAME_COMPRESSED:
-                events = processCompressedFrame(channel, buffer);
-                break;
+                return processCompressedFrame(channel, buffer);
             case FRAME_JSON:
-                events = parseJsonFrame(channel, buffer);
-                break;
+                return parseJsonFrame(channel, buffer);
             default:
                 throw new Exception("Unknown frame type: " + frameType);
         }
-
-        return events;
     }
 
-    private void checkVersion(ChannelBuffer channelBuffer) throws Exception {
+    private void checkVersion(ByteBuf channelBuffer) {
         byte version = channelBuffer.readByte();
         if (version != PROTOCOL_VERSION) {
-            throw new Exception("Unknown beats protocol version: " + version);
+            throw new IllegalStateException("Unknown beats protocol version: " + version);
         }
     }
 
@@ -169,60 +147,58 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
      */
     private void sendACK(Channel channel) throws IOException {
         if (sequenceNum == windowSize) {
-            final ChannelBuffer buffer = ChannelBuffers.buffer(6);
+            final ByteBuf buffer = channel.alloc().buffer(6);
             buffer.writeByte(PROTOCOL_VERSION);
             buffer.writeByte(FRAME_ACK);
             buffer.writeInt((int) sequenceNum);
 
             LOG.trace("Sending ACK for sequence number {} on channel {}", sequenceNum, channel);
-            channel.write(buffer);
+            channel.writeAndFlush(buffer);
         }
     }
 
     /**
      * <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/master/PROTOCOL.md#json-frame-type">'json' frame type</a>
      */
-    private ChannelBuffer[] parseJsonFrame(Channel channel, ChannelBuffer channelBuffer) throws IOException {
+    private Collection<ByteBuf> parseJsonFrame(Channel channel, ByteBuf channelBuffer) throws IOException {
         sequenceNum = channelBuffer.readUnsignedInt();
         LOG.trace("Received sequence number {}", sequenceNum);
 
         final int jsonLength = Ints.saturatedCast(channelBuffer.readUnsignedInt());
 
-        final ChannelBuffer buffer = channelBuffer.readSlice(jsonLength);
+        final ByteBuf buffer = channelBuffer.readBytes(jsonLength);
         sendACK(channel);
 
-        return new ChannelBuffer[]{buffer};
+        return Collections.singleton(buffer);
     }
 
     /**
      * @see <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/master/PROTOCOL.md#compressed-frame-type">'compressed' frame type</a>
      */
-    private ChannelBuffer[] processCompressedFrame(Channel channel, ChannelBuffer channelBuffer) throws Exception {
+    private Collection<ByteBuf> processCompressedFrame(Channel channel, ByteBuf channelBuffer) throws Exception {
         final long payloadLength = channelBuffer.readUnsignedInt();
         final byte[] data = new byte[(int) payloadLength];
         channelBuffer.readBytes(data);
         try (final ByteArrayInputStream dataStream = new ByteArrayInputStream(data);
-            final InputStream in = new InflaterInputStream(dataStream)) {
-            final ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(ByteStreams.toByteArray(in));
+             final InputStream in = new InflaterInputStream(dataStream)) {
+            final ByteBuf buffer = Unpooled.wrappedBuffer(ByteStreams.toByteArray(in));
             return processCompressedDataFrames(channel, buffer);
         }
     }
 
-    private ChannelBuffer[] processCompressedDataFrames(Channel channel, ChannelBuffer channelBuffer) throws Exception {
-        final List<ChannelBuffer> events = new ArrayList<>();
-        while (channelBuffer.readable()) {
-            final ChannelBuffer[] buffers = processUncompressedBuffer(channel, channelBuffer);
-            if (buffers != null) {
-                Iterables.addAll(events, Arrays.asList(buffers));
-            }
+    private Collection<ByteBuf> processCompressedDataFrames(Channel channel, ByteBuf channelBuffer) throws Exception {
+        final List<ByteBuf> events = new ArrayList<>();
+        while (channelBuffer.isReadable()) {
+            final Collection<ByteBuf> buffers = processUncompressedBuffer(channel, channelBuffer);
+            events.addAll(buffers);
         }
-        return events.toArray(new ChannelBuffer[0]);
+        return events;
     }
 
     /**
      * @see <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/master/PROTOCOL.md#window-size-frame-type">'window size' frame type</a>
      */
-    private void processWindowSizeFrame(ChannelBuffer channelBuffer) {
+    private void processWindowSizeFrame(ByteBuf channelBuffer) {
         windowSize = channelBuffer.readUnsignedInt();
         LOG.trace("Changed window size to {}", windowSize);
     }
@@ -230,7 +206,7 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
     /**
      * @see <a href="https://github.com/logstash-plugins/logstash-input-beats/blob/master/PROTOCOL.md#data-frame-type">'data' frame type</a>
      */
-    private ChannelBuffer[] parseDataFrame(Channel channel, ChannelBuffer channelBuffer) throws IOException {
+    private Collection<ByteBuf> parseDataFrame(Channel channel, ByteBuf channelBuffer) throws IOException {
         sequenceNum = channelBuffer.readUnsignedInt();
         LOG.trace("Received sequence number {}", sequenceNum);
 
@@ -247,17 +223,16 @@ public class BeatsFrameDecoder extends ReplayingDecoder<BeatsFrameDecoder.Decodi
             jg.writeEndObject();
         }
 
-        final ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(outputStream.toByteArray());
+        final ByteBuf buffer = Unpooled.wrappedBuffer(outputStream.toByteArray());
         sendACK(channel);
 
-        return new ChannelBuffer[]{buffer};
+        return Collections.singleton(buffer);
     }
 
-    private String parseDataItem(ChannelBuffer channelBuffer) {
-        long length = channelBuffer.readUnsignedInt();
-        final byte[] bytes = new byte[(int) length];
-        channelBuffer.readBytes(bytes);
-        return new String(bytes, StandardCharsets.UTF_8);
+    private String parseDataItem(ByteBuf buf) {
+        int length = Ints.saturatedCast(buf.readUnsignedInt());
+        final ByteBuf item = buf.readSlice(length);
+        return item.toString(StandardCharsets.UTF_8);
     }
 
     @VisibleForTesting

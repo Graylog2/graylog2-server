@@ -19,10 +19,11 @@ package org.graylog.plugins.beats;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableMap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.logging.LoggingHandler;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.handler.codec.embedder.DecoderEmbedder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -34,32 +35,31 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class BeatsFrameDecoderTest {
     private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-    private DecoderEmbedder<Iterable<ChannelBuffer>> channel;
+    private EmbeddedChannel channel;
     private BeatsFrameDecoder decoder;
 
     @Before
     public void setUp() throws Exception {
         decoder = new BeatsFrameDecoder();
-        channel = new DecoderEmbedder<>(decoder);
+        channel = new EmbeddedChannel(new LoggingHandler(), decoder);
     }
 
     @Test
     public void decodeWindowSizeFrame() throws Exception {
-        final ChannelBuffer buffer = buildWindowSizeFrame(1234);
+        final ByteBuf buffer = buildWindowSizeFrame(1234);
 
-        while (buffer.readable()) {
-            channel.offer(buffer);
+        while (buffer.isReadable()) {
+            channel.writeInbound(buffer);
         }
         channel.finish();
         assertThat(buffer.readableBytes()).isEqualTo(0);
 
-        final ChannelBuffer[] output = channel.pollAll(new ChannelBuffer[0]);
-        assertThat(output).isEmpty();
+        assertThat((Object) channel.readInbound()).isNull();
         assertThat(decoder.getWindowSize()).isEqualTo(1234L);
     }
 
-    private ChannelBuffer buildWindowSizeFrame(int windowSize) {
-        final ChannelBuffer buffer = ChannelBuffers.buffer(6);
+    private ByteBuf buildWindowSizeFrame(int windowSize) {
+        final ByteBuf buffer = Unpooled.buffer(6);
         buffer.writeByte('2');
         buffer.writeByte('W');
         buffer.writeInt(windowSize);
@@ -71,22 +71,19 @@ public class BeatsFrameDecoderTest {
         final String json = "{\"answer\": 42}";
         final byte[] jsonBytes = json.getBytes(StandardCharsets.UTF_8);
 
-        final ChannelBuffer buffer = buildJsonFrame(jsonBytes, 0);
+        final ByteBuf buffer = buildJsonFrame(jsonBytes, 0);
 
-        while (buffer.readable()) {
-            channel.offer(buffer);
+        while (buffer.isReadable()) {
+            channel.writeInbound(buffer);
         }
         channel.finish();
 
         assertThat(buffer.readableBytes()).isEqualTo(0);
 
-        final ChannelBuffer[] output = channel.pollAll(new ChannelBuffer[0]);
-        assertThat(output).hasSize(2);
-
-        final ChannelBuffer replyBuffer = output[0];
+        final ByteBuf replyBuffer = channel.readOutbound();
         assertThat(extractSequenceNumber(replyBuffer)).isEqualTo(0L);
 
-        final ChannelBuffer resultBuffer = output[1];
+        final ByteBuf resultBuffer = channel.readInbound();
         final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
         resultBuffer.readBytes(resultBytes);
         final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
@@ -96,8 +93,8 @@ public class BeatsFrameDecoderTest {
                 .containsEntry("answer", 42);
     }
 
-    private ChannelBuffer buildJsonFrame(byte[] jsonBytes, int sequenceNum) {
-        final ChannelBuffer buffer = ChannelBuffers.buffer(10 + jsonBytes.length);
+    private ByteBuf buildJsonFrame(byte[] jsonBytes, int sequenceNum) {
+        final ByteBuf buffer = Unpooled.buffer(10 + jsonBytes.length);
         buffer.writeByte('2');
         buffer.writeByte('J');
         // Sequence number
@@ -115,22 +112,19 @@ public class BeatsFrameDecoderTest {
                 "foo", "bar",
                 "quux", "baz");
 
-        final ChannelBuffer buffer = buildDataFrame(data, 0);
+        final ByteBuf buffer = buildDataFrame(data, 0);
 
-        while (buffer.readable()) {
-            channel.offer(buffer);
+        while (buffer.isReadable()) {
+            channel.writeInbound(buffer);
         }
         channel.finish();
 
         assertThat(buffer.readableBytes()).isEqualTo(0);
 
-        final ChannelBuffer[] output = channel.pollAll(new ChannelBuffer[0]);
-        assertThat(output).hasSize(2);
-
-        final ChannelBuffer replyBuffer = output[0];
+        final ByteBuf replyBuffer = channel.readOutbound();
         assertThat(extractSequenceNumber(replyBuffer)).isEqualTo(0L);
 
-        final ChannelBuffer resultBuffer = output[1];
+        final ByteBuf resultBuffer = channel.readInbound();
         final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
         resultBuffer.readBytes(resultBytes);
         final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
@@ -138,8 +132,8 @@ public class BeatsFrameDecoderTest {
         assertThat(result).isEqualTo(data);
     }
 
-    private ChannelBuffer buildDataFrame(Map<String, String> data, int sequenceNum) {
-        final ChannelBuffer buffer = ChannelBuffers.dynamicBuffer();
+    private ByteBuf buildDataFrame(Map<String, String> data, int sequenceNum) {
+        final ByteBuf buffer = Unpooled.buffer();
         buffer.writeByte('2');
         buffer.writeByte('D');
         // Sequence number
@@ -163,23 +157,20 @@ public class BeatsFrameDecoderTest {
         final String json = "{\"answer\": 42}";
         final byte[] jsonBytes = json.getBytes(StandardCharsets.UTF_8);
 
-        final ChannelBuffer innerBuffer = buildJsonFrame(jsonBytes, 0);
-        final ChannelBuffer buffer = buildCompressedFrame(innerBuffer.array(), 3);
+        final ByteBuf innerBuffer = buildJsonFrame(jsonBytes, 0);
+        final ByteBuf buffer = buildCompressedFrame(innerBuffer.array(), 3);
 
-        while (buffer.readable()) {
-            channel.offer(buffer);
+        while (buffer.isReadable()) {
+            channel.writeInbound(buffer);
         }
         channel.finish();
 
         assertThat(buffer.readableBytes()).isEqualTo(0);
 
-        final ChannelBuffer[] output = channel.pollAll(new ChannelBuffer[0]);
-        assertThat(output).hasSize(2);
-
-        final ChannelBuffer replyBuffer = output[0];
+        final ByteBuf replyBuffer = channel.readOutbound();
         assertThat(extractSequenceNumber(replyBuffer)).isEqualTo(0L);
 
-        final ChannelBuffer resultBuffer = output[1];
+        final ByteBuf resultBuffer = channel.readInbound();
         final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
         resultBuffer.readBytes(resultBytes);
         final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
@@ -189,7 +180,7 @@ public class BeatsFrameDecoderTest {
                 .containsEntry("answer", 42);
     }
 
-    private ChannelBuffer buildCompressedFrame(byte[] payload, int compressionLevel) {
+    private ByteBuf buildCompressedFrame(byte[] payload, int compressionLevel) {
         final Deflater deflater = new Deflater(compressionLevel);
         deflater.setInput(payload);
         deflater.finish();
@@ -198,7 +189,7 @@ public class BeatsFrameDecoderTest {
         final int compressedPayloadLength = deflater.deflate(compressedPayload);
         deflater.end();
 
-        final ChannelBuffer buffer = ChannelBuffers.buffer(6 + compressedPayloadLength);
+        final ByteBuf buffer = Unpooled.buffer(6 + compressedPayloadLength);
         buffer.writeByte('2');
         buffer.writeByte('C');
         // Compressed payload length
@@ -211,30 +202,31 @@ public class BeatsFrameDecoderTest {
     @Test
     public void decodeMultipleFrames() throws Exception {
         final Map<String, String> data = ImmutableMap.of("foo", "bar");
-        final ChannelBuffer buffer = ChannelBuffers.copiedBuffer(
+        final ByteBuf buffer = Unpooled.copiedBuffer(
                 buildWindowSizeFrame(2),
                 buildDataFrame(data, 0),
                 buildDataFrame(data, 1),
                 buildDataFrame(data, 2)
         );
 
-        while (buffer.readable()) {
-            channel.offer(buffer);
+        while (buffer.isReadable()) {
+            channel.writeInbound(buffer);
         }
         channel.finish();
 
         assertThat(buffer.readableBytes()).isEqualTo(0);
 
-        final ChannelBuffer[] output = channel.pollAll(new ChannelBuffer[0]);
-        assertThat(output).hasSize(4);
+        final ByteBuf output1 = channel.readInbound();
+        final ByteBuf output2 = channel.readInbound();
+        final ByteBuf output3 = channel.readInbound();
         assertThat(decoder.getWindowSize()).isEqualTo(2);
         assertThat(decoder.getSequenceNum()).isEqualTo(2L);
 
-        final ChannelBuffer replyBuffer = output[2];
+        final ByteBuf replyBuffer = channel.readOutbound();
         assertThat(extractSequenceNumber(replyBuffer)).isEqualTo(2L);
 
-        final ChannelBuffer[] received = {output[0], output[1], output[3]};
-        for (ChannelBuffer resultBuffer : received) {
+        final ByteBuf[] received = {output1, output2, output3};
+        for (ByteBuf resultBuffer : received) {
             final byte[] resultBytes = new byte[resultBuffer.readableBytes()];
             resultBuffer.readBytes(resultBytes);
             final Map<String, Object> result = objectMapper.readValue(resultBytes, new TypeReference<Map<String, Object>>() {
@@ -243,7 +235,7 @@ public class BeatsFrameDecoderTest {
         }
     }
 
-    private long extractSequenceNumber(ChannelBuffer buffer) {
+    private long extractSequenceNumber(ByteBuf buffer) {
         assertThat(buffer.readByte()).isEqualTo((byte) '2');
         assertThat(buffer.readByte()).isEqualTo((byte) 'A');
         final long seqNum = buffer.readUnsignedInt();

@@ -16,35 +16,47 @@
  */
 package org.graylog.plugins.beats;
 
+import io.netty.channel.nio.NioEventLoopGroup;
+import org.graylog2.inputs.transports.NettyTransportConfiguration;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.util.HashedWheelTimer;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
-
-import java.util.LinkedHashMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
 public class BeatsTransportTest {
+    private NioEventLoopGroup eventLoopGroup;
+
+    @Before
+    public void setUp() {
+        eventLoopGroup = new NioEventLoopGroup(1);
+    }
+
+    @After
+    public void tearDown() {
+        eventLoopGroup.shutdownGracefully();
+    }
+
     @Test
-    public void getFinalChannelHandlers() throws Exception {
+    public void customChildChannelHandlersContainBeatsHandler() {
+        final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 1);
+        final EventLoopGroupFactory eventLoopGroupFactory = new EventLoopGroupFactory(nettyTransportConfiguration);
         final BeatsTransport transport = new BeatsTransport(
-                new Configuration(null),
-                new ThroughputCounter(new HashedWheelTimer()),
-                new LocalMetricRegistry(),
-                Executors.newSingleThreadExecutor(),
-                new ConnectionCounter()
+                Configuration.EMPTY_CONFIGURATION,
+                eventLoopGroup,
+                eventLoopGroupFactory,
+                nettyTransportConfiguration,
+                new ThroughputCounter(eventLoopGroup),
+                new LocalMetricRegistry()
         );
 
         final MessageInput input = mock(MessageInput.class);
-        final LinkedHashMap<String, Callable<? extends ChannelHandler>> channelHandlers = transport.getFinalChannelHandlers(input);
-        assertThat(channelHandlers).containsKey("beats");
+        assertThat(transport.getCustomChildChannelHandlers(input)).containsKey("beats");
     }
 }
