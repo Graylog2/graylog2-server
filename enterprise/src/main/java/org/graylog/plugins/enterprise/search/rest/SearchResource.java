@@ -140,7 +140,10 @@ public class SearchResource extends RestResource implements PluginRestResource {
 
         try {
             Uninterruptibles.getUninterruptibly(searchJob.getResultFuture(), timeout, TimeUnit.MILLISECONDS);
-        } catch (ExecutionException | TimeoutException e) {
+        } catch (ExecutionException  e) {
+            LOG.error("Error executing search job <{}>", searchJob.getId(), e);
+            throw new InternalServerErrorException("Error executing search job: " + e.getMessage());
+        } catch (TimeoutException e) {
             throw new InternalServerErrorException("Timeout while executing search job");
         }
 
