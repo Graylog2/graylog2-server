@@ -16,14 +16,12 @@
  */
 package org.graylog2.inputs.transports;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.google.inject.multibindings.MapBinder;
-import com.google.inject.name.Names;
+import io.netty.channel.EventLoopGroup;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
+import org.graylog2.inputs.transports.netty.EventLoopGroupProvider;
 import org.graylog2.plugin.inject.Graylog2Module;
 import org.graylog2.plugin.inputs.transports.Transport;
-
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 public class TransportsModule extends Graylog2Module {
     @Override
@@ -39,11 +37,7 @@ public class TransportsModule extends Graylog2Module {
         installTransport(mapBinder, "httppoll", HttpPollTransport.class);
         installTransport(mapBinder, "syslog-tcp", SyslogTcpTransport.class);
 
-        // TODO Add instrumentation to ExecutorService and ThreadFactory
-        bind(Executor.class)
-                .annotatedWith(Names.named("bossPool"))
-                .toInstance(Executors.newCachedThreadPool(new ThreadFactoryBuilder()
-                                                                  .setNameFormat("transport-boss-%d")
-                                                                  .build()));
+        bind(EventLoopGroupFactory.class).asEagerSingleton();
+        bind(EventLoopGroup.class).toProvider(EventLoopGroupProvider.class).asEagerSingleton();
     }
 }

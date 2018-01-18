@@ -14,39 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.plugin.inputs.util;
+package org.graylog2.inputs.transports.netty;
 
-import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.group.ChannelGroup;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
+public class ChannelRegistrationHandler extends ChannelInboundHandlerAdapter {
+    private final ChannelGroup channels;
 
-@ChannelHandler.Sharable
-public class ConnectionCounter extends ChannelInboundHandlerAdapter {
-    private final AtomicInteger connections;
-    private final AtomicLong totalConnections;
-
-    public ConnectionCounter(AtomicInteger connections, AtomicLong totalConnections) {
-        this.connections = connections;
-        this.totalConnections = totalConnections;
+    public ChannelRegistrationHandler(ChannelGroup channels) {
+        this.channels = channels;
     }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
-        connections.incrementAndGet();
-        totalConnections.incrementAndGet();
-        ctx.channel().closeFuture().addListener(f -> connections.decrementAndGet());
-
+        channels.add(ctx.channel());
         super.channelActive(ctx);
     }
 
-    public int getConnectionCount() {
-        return connections.get();
-    }
-
-    public long getTotalConnections() {
-        return totalConnections.get();
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        channels.remove(ctx.channel());
+        super.channelInactive(ctx);
     }
 }

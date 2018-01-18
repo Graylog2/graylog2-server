@@ -17,15 +17,20 @@
 package org.graylog2.plugin.inputs.transports;
 
 import com.google.common.collect.ImmutableMap;
-import com.google.common.util.concurrent.MoreExecutors;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LoggingHandler;
+import org.graylog2.inputs.transports.NettyTransportConfiguration;
+import org.graylog2.inputs.transports.netty.EventLoopGroupFactory;
 import org.graylog2.plugin.LocalMetricRegistry;
 import org.graylog2.plugin.configuration.Configuration;
 import org.graylog2.plugin.inputs.MessageInput;
-import org.graylog2.plugin.inputs.util.ConnectionCounter;
 import org.graylog2.plugin.inputs.util.ThroughputCounter;
-import org.jboss.netty.bootstrap.Bootstrap;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.util.HashedWheelTimer;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,10 +43,10 @@ import org.mockito.junit.MockitoRule;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Executor;
+import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 
+import static com.jayway.awaitility.Awaitility.await;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
@@ -65,21 +70,25 @@ public class AbstractTcpTransportTest {
 
     private ThroughputCounter throughputCounter;
     private LocalMetricRegistry localRegistry;
-    private Executor bossPool;
-    private Executor workerPool;
-    private ConnectionCounter connectionCounter;
+    private NioEventLoopGroup eventLoopGroup;
+    private EventLoopGroupFactory eventLoopGroupFactory;
+    private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration("nio", "jdk", 2);
 
     @Before
     public void setUp() {
-        throughputCounter = new ThroughputCounter(new HashedWheelTimer());
+        eventLoopGroup = new NioEventLoopGroup();
+        eventLoopGroupFactory = new EventLoopGroupFactory(nettyTransportConfiguration);
+        throughputCounter = new ThroughputCounter(eventLoopGroup);
         localRegistry = new LocalMetricRegistry();
-        bossPool = MoreExecutors.directExecutor();
-        workerPool = MoreExecutors.directExecutor();
-        connectionCounter = new ConnectionCounter();
+    }
+
+    @After
+    public void tearDown() {
+        eventLoopGroup.shutdownGracefully();
     }
 
     @Test
-    public void getBaseChannelHandlersGeneratesSelfSignedCertificates() {
+    public void getChildChannelHandlersGeneratesSelfSignedCertificates() {
         final Configuration configuration = new Configuration(ImmutableMap.of(
             "bind_address", "localhost",
             "port", 12345,
@@ -87,23 +96,14 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter) {
-            @Override
-            protected Bootstrap getBootstrap() {
-                return super.getBootstrap();
-            }
-
-            @Override
-            protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-                return super.getBaseChannelHandlers(input);
-            }
+                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {
         };
         final MessageInput input = mock(MessageInput.class);
-        assertThat(transport.getBaseChannelHandlers(input)).containsKey("tls");
+        assertThat(transport.getChildChannelHandlers(input)).containsKey("tls");
     }
 
     @Test
-    public void getBaseChannelHandlersFailsIfTempDirDoesNotExist() throws IOException {
+    public void getChildChannelHandlersFailsIfTempDirDoesNotExist() throws IOException {
         final File tmpDir = temporaryFolder.newFolder();
         assumeTrue(tmpDir.delete());
         System.setProperty("java.io.tmpdir", tmpDir.getAbsolutePath());
@@ -115,26 +115,16 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter) {
-            @Override
-            protected Bootstrap getBootstrap() {
-                return super.getBootstrap();
-            }
-
-            @Override
-            protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-                return super.getBaseChannelHandlers(input);
-            }
-        };
+            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
 
-        transport.getBaseChannelHandlers(input);
+        transport.getChildChannelHandlers(input);
     }
 
     @Test
-    public void getBaseChannelHandlersFailsIfTempDirIsNotWritable() throws IOException {
+    public void getChildChannelHandlersFailsIfTempDirIsNotWritable() throws IOException {
         final File tmpDir = temporaryFolder.newFolder();
         assumeTrue(tmpDir.setWritable(false));
         assumeFalse(tmpDir.canWrite());
@@ -147,26 +137,16 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter) {
-            @Override
-            protected Bootstrap getBootstrap() {
-                return super.getBootstrap();
-            }
-
-            @Override
-            protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-                return super.getBaseChannelHandlers(input);
-            }
-        };
+            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + tmpDir.getAbsolutePath());
 
-        transport.getBaseChannelHandlers(input);
+        transport.getChildChannelHandlers(input);
     }
 
     @Test
-    public void getBaseChannelHandlersFailsIfTempDirIsNoDirectory() throws IOException {
+    public void getChildChannelHandlersFailsIfTempDirIsNoDirectory() throws IOException {
         final File file = temporaryFolder.newFile();
         assumeTrue(file.isFile());
         System.setProperty("java.io.tmpdir", file.getAbsolutePath());
@@ -178,21 +158,92 @@ public class AbstractTcpTransportTest {
         );
 
         final AbstractTcpTransport transport = new AbstractTcpTransport(
-            configuration, throughputCounter, localRegistry, bossPool, workerPool, connectionCounter) {
-            @Override
-            protected Bootstrap getBootstrap() {
-                return super.getBootstrap();
-            }
-
-            @Override
-            protected LinkedHashMap<String, Callable<? extends ChannelHandler>> getBaseChannelHandlers(MessageInput input) {
-                return super.getBaseChannelHandlers(input);
-            }
-        };
+            configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {};
 
         expectedException.expect(IllegalStateException.class);
         expectedException.expectMessage("Couldn't write to temporary directory: " + file.getAbsolutePath());
 
-        transport.getBaseChannelHandlers(input);
+        transport.getChildChannelHandlers(input);
+    }
+
+    @Test
+    public void testTrafficCounter() throws Exception {
+        final Configuration configuration = new Configuration(ImmutableMap.of(
+                "bind_address", "127.0.0.1",
+                "port", 0));
+        final AbstractTcpTransport transport = new AbstractTcpTransport(
+                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {
+        };
+        transport.launch(input);
+
+        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
+        final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
+        assertThat(localAddress).isNotNull();
+
+        final ChannelFuture channelFuture = clientChannel(localAddress.getHostString(), localAddress.getPort());
+
+        channelFuture.channel()
+                .writeAndFlush(Unpooled.copiedBuffer(new byte[1024]))
+                .syncUninterruptibly();
+        channelFuture.channel()
+                .writeAndFlush(Unpooled.copiedBuffer(new byte[1024]))
+                .addListener(ChannelFutureListener.CLOSE)
+                .syncUninterruptibly();
+
+        // Wait 1s so that the cumulative throughput can be calculated
+        Thread.sleep(1000L);
+
+        assertThat(throughputCounter.gauges().get(ThroughputCounter.READ_BYTES_TOTAL).getValue()).isEqualTo(2048L);
+        assertThat(throughputCounter.gauges().get(ThroughputCounter.READ_BYTES_1_SEC).getValue()).isEqualTo(2048L);
+    }
+
+    @Test
+    public void testConnectionCounter() throws Exception {
+        final Configuration configuration = new Configuration(ImmutableMap.of(
+                "bind_address", "127.0.0.1",
+                "port", 0));
+        final AbstractTcpTransport transport = new AbstractTcpTransport(
+                configuration, throughputCounter, localRegistry, eventLoopGroup, eventLoopGroupFactory, nettyTransportConfiguration) {
+        };
+        transport.launch(input);
+
+        await().atMost(5, TimeUnit.SECONDS).until(() -> transport.getLocalAddress() != null);
+        final InetSocketAddress localAddress = (InetSocketAddress) transport.getLocalAddress();
+        assertThat(localAddress).isNotNull();
+
+        final ChannelFuture future1 = clientChannel(localAddress.getHostString(), localAddress.getPort()).channel()
+                .writeAndFlush(Unpooled.EMPTY_BUFFER)
+                .addListener(ChannelFutureListener.CLOSE)
+                .syncUninterruptibly();
+        final ChannelFuture future2 = clientChannel(localAddress.getHostString(), localAddress.getPort()).channel()
+                .writeAndFlush(Unpooled.EMPTY_BUFFER)
+                .syncUninterruptibly();
+
+        // TODO: Get rid of this (arbitrary) wait time
+        Thread.sleep(100L);
+
+        assertThat(future1.channel().isActive()).isFalse();
+        assertThat(future2.channel().isActive()).isTrue();
+        assertThat(localRegistry.getGauges().get("open_connections").getValue()).isEqualTo(1);
+        assertThat(localRegistry.getGauges().get("total_connections").getValue()).isEqualTo(2L);
+
+        future2.channel().close().syncUninterruptibly();
+
+        // TODO: Get rid of this (arbitrary) wait time
+        Thread.sleep(100L);
+
+        assertThat(future1.channel().isActive()).isFalse();
+        assertThat(future2.channel().isActive()).isFalse();
+        assertThat(localRegistry.getGauges().get("open_connections").getValue()).isEqualTo(0);
+        assertThat(localRegistry.getGauges().get("total_connections").getValue()).isEqualTo(2L);
+    }
+
+    private ChannelFuture clientChannel(String hostname, int port) {
+        return new Bootstrap()
+                .group(eventLoopGroup)
+                .channel(NioSocketChannel.class)
+                .handler(new LoggingHandler())
+                .connect(hostname, port)
+                .syncUninterruptibly();
     }
 }

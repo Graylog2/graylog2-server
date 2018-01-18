@@ -16,132 +16,238 @@
  */
 package org.graylog2.inputs.transports.netty;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.handler.codec.embedder.CodecEmbedderException;
-import org.jboss.netty.handler.codec.embedder.DecoderEmbedder;
-import org.jboss.netty.handler.codec.frame.Delimiters;
-import org.jboss.netty.handler.codec.frame.TooLongFrameException;
-import org.jboss.netty.util.CharsetUtil;
-import org.junit.Assert;
-import org.junit.Ignore;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.embedded.EmbeddedChannel;
+import io.netty.handler.codec.DecoderException;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.TooLongFrameException;
+import io.netty.util.CharsetUtil;
+import io.netty.util.ReferenceCountUtil;
 import org.junit.Test;
+
+import java.nio.charset.Charset;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class LenientDelimiterBasedFrameDecoderTest {
     @Test
-    public void testFailSlowTooLongFrameRecovery() throws Exception {
-        DecoderEmbedder<ChannelBuffer> embedder = new DecoderEmbedder<>(
-                new LenientDelimiterBasedFrameDecoder(1, Delimiters.nulDelimiter()));
+    public void testMultipleLinesStrippedDelimiters() {
+        EmbeddedChannel ch = new EmbeddedChannel(new LenientDelimiterBasedFrameDecoder(8192, true,
+                Delimiters.lineDelimiter()));
+        ch.writeInbound(Unpooled.copiedBuffer("TestLine\r\ng\r\n", Charset.defaultCharset()));
 
-        for (int i = 0; i < 2; i ++) {
-            embedder.offer(ChannelBuffers.wrappedBuffer(new byte[] { 1, 2 }));
+        ByteBuf buf = ch.readInbound();
+        assertEquals("TestLine", buf.toString(Charset.defaultCharset()));
+
+        ByteBuf buf2 = ch.readInbound();
+        assertEquals("g", buf2.toString(Charset.defaultCharset()));
+        assertNull(ch.readInbound());
+        ch.finish();
+
+        buf.release();
+        buf2.release();
+    }
+
+    @Test
+    public void testIncompleteLinesStrippedDelimiters() {
+        EmbeddedChannel ch = new EmbeddedChannel(new LenientDelimiterBasedFrameDecoder(8192, true,
+                Delimiters.lineDelimiter()));
+        ch.writeInbound(Unpooled.copiedBuffer("Test", Charset.defaultCharset()));
+        assertNull(ch.readInbound());
+        ch.writeInbound(Unpooled.copiedBuffer("Line\r\ng\r\n", Charset.defaultCharset()));
+
+        ByteBuf buf = ch.readInbound();
+        assertEquals("TestLine", buf.toString(Charset.defaultCharset()));
+
+        ByteBuf buf2 = ch.readInbound();
+        assertEquals("g", buf2.toString(Charset.defaultCharset()));
+        assertNull(ch.readInbound());
+        ch.finish();
+
+        buf.release();
+        buf2.release();
+    }
+
+    @Test
+    public void testMultipleLines() {
+        EmbeddedChannel ch = new EmbeddedChannel(new LenientDelimiterBasedFrameDecoder(8192, false,
+                Delimiters.lineDelimiter()));
+        ch.writeInbound(Unpooled.copiedBuffer("TestLine\r\ng\r\n", Charset.defaultCharset()));
+
+        ByteBuf buf = ch.readInbound();
+        assertEquals("TestLine\r\n", buf.toString(Charset.defaultCharset()));
+
+        ByteBuf buf2 = ch.readInbound();
+        assertEquals("g\r\n", buf2.toString(Charset.defaultCharset()));
+        assertNull(ch.readInbound());
+        ch.finish();
+
+        buf.release();
+        buf2.release();
+    }
+
+    @Test
+    public void testIncompleteLines() {
+        EmbeddedChannel ch = new EmbeddedChannel(new LenientDelimiterBasedFrameDecoder(8192, false,
+                Delimiters.lineDelimiter()));
+        ch.writeInbound(Unpooled.copiedBuffer("Test", Charset.defaultCharset()));
+        assertNull(ch.readInbound());
+        ch.writeInbound(Unpooled.copiedBuffer("Line\r\ng\r\n", Charset.defaultCharset()));
+
+        ByteBuf buf = ch.readInbound();
+        assertEquals("TestLine\r\n", buf.toString(Charset.defaultCharset()));
+
+        ByteBuf buf2 = ch.readInbound();
+        assertEquals("g\r\n", buf2.toString(Charset.defaultCharset()));
+        assertNull(ch.readInbound());
+        ch.finish();
+
+        buf.release();
+        buf2.release();
+    }
+
+    @Test
+    public void testDecode() throws Exception {
+        EmbeddedChannel ch = new EmbeddedChannel(
+                new LenientDelimiterBasedFrameDecoder(8192, true, Delimiters.lineDelimiter()));
+
+        ch.writeInbound(Unpooled.copiedBuffer("first\r\nsecond\nthird", CharsetUtil.US_ASCII));
+
+        ByteBuf buf = ch.readInbound();
+        assertEquals("first", buf.toString(CharsetUtil.US_ASCII));
+
+        ByteBuf buf2 = ch.readInbound();
+        assertEquals("second", buf2.toString(CharsetUtil.US_ASCII));
+        assertNull(ch.readInbound());
+        ch.finish();
+
+        ReferenceCountUtil.release(ch.readInbound());
+
+        buf.release();
+        buf2.release();
+    }
+
+    @Test
+    public void testFailSlowTooLongFrameRecovery() throws Exception {
+        EmbeddedChannel ch = new EmbeddedChannel(
+                new LenientDelimiterBasedFrameDecoder(1, true, false, false, Delimiters.nulDelimiter()));
+
+        for (int i = 0; i < 2; i++) {
+            ch.writeInbound(Unpooled.wrappedBuffer(new byte[]{1, 2}));
             try {
-                embedder.offer(ChannelBuffers.wrappedBuffer(new byte[] { 0 }));
-                Assert.fail(CodecEmbedderException.class.getSimpleName() + " must be raised.");
-            } catch (CodecEmbedderException e) {
-                Assert.assertTrue(e.getCause() instanceof TooLongFrameException);
+                assertTrue(ch.writeInbound(Unpooled.wrappedBuffer(new byte[]{0})));
+                fail(DecoderException.class.getSimpleName() + " must be raised.");
+            } catch (TooLongFrameException e) {
                 // Expected
             }
 
-            embedder.offer(ChannelBuffers.wrappedBuffer(new byte[] { 'A', 0 }));
-            ChannelBuffer buf = embedder.poll();
-            Assert.assertEquals("A", buf.toString(CharsetUtil.ISO_8859_1));
+            ch.writeInbound(Unpooled.wrappedBuffer(new byte[]{'A', 0}));
+            ByteBuf buf = ch.readInbound();
+            assertEquals("A", buf.toString(CharsetUtil.ISO_8859_1));
+
+            buf.release();
         }
     }
 
     @Test
     public void testFailFastTooLongFrameRecovery() throws Exception {
-        DecoderEmbedder<ChannelBuffer> embedder = new DecoderEmbedder<>(
-                new LenientDelimiterBasedFrameDecoder(1, true, true, false, Delimiters.nulDelimiter()));
+        EmbeddedChannel ch = new EmbeddedChannel(
+                new LenientDelimiterBasedFrameDecoder(1, Delimiters.nulDelimiter()));
 
-        for (int i = 0; i < 2; i ++) {
+        for (int i = 0; i < 2; i++) {
             try {
-                embedder.offer(ChannelBuffers.wrappedBuffer(new byte[] { 1, 2 }));
-                Assert.fail(CodecEmbedderException.class.getSimpleName() + " must be raised.");
-            } catch (CodecEmbedderException e) {
-                Assert.assertTrue(e.getCause() instanceof TooLongFrameException);
+                assertTrue(ch.writeInbound(Unpooled.wrappedBuffer(new byte[]{1, 2})));
+                fail(DecoderException.class.getSimpleName() + " must be raised.");
+            } catch (TooLongFrameException e) {
                 // Expected
             }
 
-            embedder.offer(ChannelBuffers.wrappedBuffer(new byte[] { 0, 'A', 0 }));
-            ChannelBuffer buf = embedder.poll();
-            Assert.assertEquals("A", buf.toString(CharsetUtil.ISO_8859_1));
+            ch.writeInbound(Unpooled.wrappedBuffer(new byte[]{0, 'A', 0}));
+            ByteBuf buf = ch.readInbound();
+            assertEquals("A", buf.toString(CharsetUtil.ISO_8859_1));
+
+            buf.release();
         }
     }
 
     @Test
-    public void testLenientFailFastTooLongFrameRecovery() throws Exception {
-        DecoderEmbedder<ChannelBuffer> embedder = new DecoderEmbedder<>(
-                new LenientDelimiterBasedFrameDecoder(1, true, true, true, Delimiters.nulDelimiter()));
+    public void testDecodeNulDelimiter() throws Exception {
+        EmbeddedChannel ch = new EmbeddedChannel(
+                new LenientDelimiterBasedFrameDecoder(8192, true, Delimiters.nulDelimiter()));
 
-        for (int i = 0; i < 2; i ++) {
-            try {
-                embedder.offer(ChannelBuffers.wrappedBuffer(new byte[] { 1, 2 }));
-                Assert.fail(CodecEmbedderException.class.getSimpleName() + " must be raised.");
-            } catch (CodecEmbedderException e) {
-                Assert.assertTrue(e.getCause() instanceof TooLongFrameException);
-                // Expected
-            }
+        ch.writeInbound(Unpooled.copiedBuffer("first\0second\0third", CharsetUtil.US_ASCII));
 
-            embedder.offer(ChannelBuffers.wrappedBuffer(new byte[] { 0, 'A', 0 }));
-            ChannelBuffer buf = embedder.poll();
-            Assert.assertEquals("A", buf.toString(CharsetUtil.ISO_8859_1));
-        }
+        ByteBuf buf = ch.readInbound();
+        assertEquals("first", buf.toString(CharsetUtil.US_ASCII));
+
+        ByteBuf buf2 = ch.readInbound();
+        assertEquals("second", buf2.toString(CharsetUtil.US_ASCII));
+        assertNull(ch.readInbound());
+        ch.finish();
+
+        ReferenceCountUtil.release(ch.readInbound());
+
+        buf.release();
+        buf2.release();
     }
 
     @Test
-    public void testDecodeNewlines() throws Exception {
-        DecoderEmbedder<ChannelBuffer> embedder = new DecoderEmbedder<>(
+    public void testDecodeAndEmitLastLine() throws Exception {
+        EmbeddedChannel ch = new EmbeddedChannel(
                 new LenientDelimiterBasedFrameDecoder(8192, true, Delimiters.lineDelimiter()));
 
-        Assert.assertTrue(embedder.offer(ChannelBuffers.copiedBuffer("first\r\nsecond\nthird", CharsetUtil.US_ASCII)));
-        Assert.assertTrue(embedder.finish());
-        Assert.assertEquals("first", embedder.poll().toString(CharsetUtil.US_ASCII));
-        Assert.assertEquals("second", embedder.poll().toString(CharsetUtil.US_ASCII));
-        Assert.assertNull(embedder.poll());
+        ch.writeInbound(Unpooled.copiedBuffer("first\r\nsecond\nthird", CharsetUtil.US_ASCII));
 
+        ByteBuf buf = ch.readInbound();
+        assertEquals("first", buf.toString(CharsetUtil.US_ASCII));
+
+        ByteBuf buf2 = ch.readInbound();
+        assertEquals("second", buf2.toString(CharsetUtil.US_ASCII));
+
+        // Close channel
+        assertTrue(ch.finish());
+        ByteBuf buf3 = ch.readInbound();
+        assertEquals("third", buf3.toString(CharsetUtil.US_ASCII));
+
+        assertNull(ch.readInbound());
+        assertFalse(ch.finish());
+
+        ReferenceCountUtil.release(ch.readInbound());
+
+        buf.release();
+        buf2.release();
+        buf3.release();
     }
 
     @Test
-    @Ignore("Doesn't work because EmbeddedChannel#isConnected() returns always true")
-    public void testDecodeLenientNewlines() throws Exception {
-        DecoderEmbedder<ChannelBuffer> embedder = new DecoderEmbedder<>(
-                new LenientDelimiterBasedFrameDecoder(8192, true, false, true, Delimiters.lineDelimiter()));
+    public void testDecodeNulDelimiterAndEmitLastLine() throws Exception {
+        EmbeddedChannel ch = new EmbeddedChannel(
+                new LenientDelimiterBasedFrameDecoder(8192, true, true, true, Delimiters.nulDelimiter()));
 
-        Assert.assertTrue(embedder.offer(ChannelBuffers.copiedBuffer("first\r\nsecond\nthird", CharsetUtil.US_ASCII)));
-        Assert.assertTrue(embedder.finish());
-        Assert.assertEquals("first", embedder.poll().toString(CharsetUtil.US_ASCII));
-        Assert.assertEquals("second", embedder.poll().toString(CharsetUtil.US_ASCII));
-        Assert.assertEquals("third", embedder.poll().toString(CharsetUtil.US_ASCII));
-        Assert.assertNull(embedder.poll());
+        ch.writeInbound(Unpooled.copiedBuffer("first\0second\0third", CharsetUtil.US_ASCII));
 
-    }
+        ByteBuf buf = ch.readInbound();
+        assertEquals("first", buf.toString(CharsetUtil.US_ASCII));
 
-    @Test
-    public void testDecodeNul() throws Exception {
-        DecoderEmbedder<ChannelBuffer> embedder = new DecoderEmbedder<>(
-                new LenientDelimiterBasedFrameDecoder(8192, true, false, false, Delimiters.nulDelimiter()));
+        ByteBuf buf2 = ch.readInbound();
+        assertEquals("second", buf2.toString(CharsetUtil.US_ASCII));
 
-        Assert.assertTrue(embedder.offer(ChannelBuffers.copiedBuffer("first\0second\0third", CharsetUtil.US_ASCII)));
-        Assert.assertTrue(embedder.finish());
-        Assert.assertEquals("first", embedder.poll().toString(CharsetUtil.US_ASCII));
-        Assert.assertEquals("second", embedder.poll().toString(CharsetUtil.US_ASCII));
-        Assert.assertNull(embedder.poll());
+        // Close channel
+        assertTrue(ch.finish());
+        ByteBuf buf3 = ch.readInbound();
+        assertEquals("third", buf3.toString(CharsetUtil.US_ASCII));
 
-    }
+        assertNull(ch.readInbound());
+        assertFalse(ch.finish());
 
-    @Test
-    @Ignore("Doesn't work because EmbeddedChannel#isConnected() returns always true")
-    public void testDecodeLenientNul() throws Exception {
-        DecoderEmbedder<ChannelBuffer> embedder = new DecoderEmbedder<>(
-                new LenientDelimiterBasedFrameDecoder(8192, true, false, true, Delimiters.nulDelimiter()));
+        ReferenceCountUtil.release(ch.readInbound());
 
-        Assert.assertTrue(embedder.offer(ChannelBuffers.copiedBuffer("first\0second\0third", CharsetUtil.US_ASCII)));
-        Assert.assertTrue(embedder.finish());
-        Assert.assertEquals("first", embedder.poll().toString(CharsetUtil.US_ASCII));
-        Assert.assertEquals("second", embedder.poll().toString(CharsetUtil.US_ASCII));
-        Assert.assertEquals("third", embedder.poll().toString(CharsetUtil.US_ASCII));
-        Assert.assertNull(embedder.poll());
-
+        buf.release();
+        buf2.release();
     }
 }

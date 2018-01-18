@@ -16,46 +16,46 @@
  */
 package org.graylog2.inputs.syslog.tcp;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandler;
+import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.util.ReferenceCountUtil;
 
-public class SyslogTCPFramingRouterHandler extends SimpleChannelUpstreamHandler {
+public class SyslogTCPFramingRouterHandler extends SimpleChannelInboundHandler<ByteBuf> {
     private final int maxFrameLength;
-    private final ChannelBuffer[] delimiter;
-    private boolean routed = false;
+    private final ByteBuf[] delimiter;
+    private ChannelInboundHandler handler = null;
 
-    public SyslogTCPFramingRouterHandler(int maxFrameLength, ChannelBuffer[] delimiter) {
+    public SyslogTCPFramingRouterHandler(int maxFrameLength, ByteBuf[] delimiter) {
         this.maxFrameLength = maxFrameLength;
         this.delimiter = delimiter;
     }
 
     @Override
-    public void messageReceived(ChannelHandlerContext ctx, MessageEvent e) throws Exception {
-        final ChannelBuffer message = (ChannelBuffer) e.getMessage();
-
-        if (! message.readable()) {
-            return;
-        }
-
-        if (! routed) {
-            if (usesOctetCountFraming(message)) {
-                ctx.getPipeline().addAfter(ctx.getName(), "framer-octet", new SyslogOctetCountFrameDecoder());
-            } else {
-                ctx.getPipeline().addAfter(ctx.getName(), "framer-delimiter", new DelimiterBasedFrameDecoder(maxFrameLength, delimiter));
+    protected void channelRead0(ChannelHandlerContext ctx, ByteBuf msg) throws Exception {
+        if (msg.isReadable()) {
+            // "Dynamically manipulating a pipeline is relatively an expensive operation."
+            // https://stackoverflow.com/a/28846565
+            if (handler == null) {
+                if (usesOctetCountFraming(msg)) {
+                    handler = new SyslogOctetCountFrameDecoder();
+                } else {
+                    handler = new DelimiterBasedFrameDecoder(maxFrameLength, delimiter);
+                }
             }
 
-            routed = true;
+            handler.channelRead(ctx, ReferenceCountUtil.retain(msg));
+        } else {
+            ctx.fireChannelRead(msg);
         }
-
-        ctx.sendUpstream(e);
     }
 
-    private boolean usesOctetCountFraming(ChannelBuffer message) {
+    private boolean usesOctetCountFraming(ByteBuf message) {
         // Octet counting framing needs to start with a non-zero digit.
         // See: http://tools.ietf.org/html/rfc6587#section-3.4.1
-        return '0' < message.getByte(0) && message.getByte(0) <= '9';
+        final byte firstByte = message.getByte(0);
+        return '0' < firstByte && firstByte <= '9';
     }
 }

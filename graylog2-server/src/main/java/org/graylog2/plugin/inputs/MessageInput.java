@@ -61,7 +61,7 @@ public abstract class MessageInput implements Stoppable {
     public static final String FIELD_CONTENT_PACK = "content_pack";
 
     @SuppressWarnings("StaticNonFinalField")
-    private static long defaultRecvBufferSize = 1024 * 1024;
+    private static int defaultRecvBufferSize = 1024 * 1024;
 
     private final MetricRegistry metricRegistry;
     private final Transport transport;
@@ -121,11 +121,11 @@ public abstract class MessageInput implements Stoppable {
         emptyMessages = localRegistry.counter("emptyMessages");
     }
 
-    public static long getDefaultRecvBufferSize() {
+    public static int getDefaultRecvBufferSize() {
         return defaultRecvBufferSize;
     }
 
-    public static void setDefaultRecvBufferSize(long size) {
+    public static void setDefaultRecvBufferSize(int size) {
         defaultRecvBufferSize = size;
     }
 

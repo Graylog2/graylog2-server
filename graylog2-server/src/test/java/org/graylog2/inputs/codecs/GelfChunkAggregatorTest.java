@@ -19,10 +19,10 @@ package org.graylog2.inputs.codecs;
 import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricFilter;
 import com.codahale.metrics.MetricRegistry;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeUtils;
 import org.joda.time.DateTimeZone;
@@ -77,7 +77,7 @@ public class GelfChunkAggregatorTest {
 
     @Test
     public void addSingleChunk() {
-        final ChannelBuffer[] singleChunk = createChunkedMessage(512, 1024);
+        final ByteBuf[] singleChunk = createChunkedMessage(512, 1024);
 
         final CodecAggregator.Result result = aggregator.addChunk(singleChunk[0]);
 
@@ -93,10 +93,10 @@ public class GelfChunkAggregatorTest {
 
     @Test
     public void manyChunks() {
-        final ChannelBuffer[] chunks = createChunkedMessage(4096 + 512, 1024); // creates 5 chunks
+        final ByteBuf[] chunks = createChunkedMessage(4096 + 512, 1024); // creates 5 chunks
 
         int i = 0;
-        for (final ChannelBuffer chunk : chunks) {
+        for (final ByteBuf chunk : chunks) {
             i++;
             final CodecAggregator.Result result = aggregator.addChunk(chunk);
             assertTrue(result.isValid());
@@ -125,9 +125,9 @@ public class GelfChunkAggregatorTest {
 
     @Test
     public void tooManyChunks() {
-        final ChannelBuffer[] chunks = createChunkedMessage(129 * 1024, 1024);
+        final ByteBuf[] chunks = createChunkedMessage(129 * 1024, 1024);
         int i = 1;
-        for (final ChannelBuffer chunk : chunks) {
+        for (final ByteBuf chunk : chunks) {
             final CodecAggregator.Result result = aggregator.addChunk(chunk);
             if (i == 129) {
                 assertFalse("Message invalidated (chunk #" + i + ")", result.isValid());
@@ -153,10 +153,10 @@ public class GelfChunkAggregatorTest {
         aggregator = new GelfChunkAggregator(poolExecutor, metricRegistry);
         final GelfChunkAggregator.ChunkEvictionTask evictionTask = aggregator.new ChunkEvictionTask();
 
-        final ChannelBuffer[] chunks = createChunkedMessage(4096 + 512, 1024); // creates 5 chunks
+        final ByteBuf[] chunks = createChunkedMessage(4096 + 512, 1024); // creates 5 chunks
 
         int i = 0;
-        for (final ChannelBuffer chunk : chunks) {
+        for (final ByteBuf chunk : chunks) {
             final CodecAggregator.Result result;
             // skip first chunk
             if (i++ == 0) {
@@ -190,7 +190,7 @@ public class GelfChunkAggregatorTest {
 
     @Test
     public void outOfOrderChunks() {
-        final ChannelBuffer[] chunks = createChunkedMessage(4096 + 512, 1024); // creates 5 chunks
+        final ByteBuf[] chunks = createChunkedMessage(4096 + 512, 1024); // creates 5 chunks
         CodecAggregator.Result result = null;
         for (int i = chunks.length - 1; i >= 0; i--) {
             result = aggregator.addChunk(chunks[i]);
@@ -210,8 +210,8 @@ public class GelfChunkAggregatorTest {
 
     @Test
     public void differentIdsDoNotInterfere() {
-        final ChannelBuffer[] msg1 = createChunkedMessage(4096 + 1, 1024, generateMessageId(1));// 5 chunks;
-        final ChannelBuffer[] msg2 = createChunkedMessage(4096 + 1, 1024, generateMessageId(2));// 5 chunks;
+        final ByteBuf[] msg1 = createChunkedMessage(4096 + 1, 1024, generateMessageId(1));// 5 chunks;
+        final ByteBuf[] msg2 = createChunkedMessage(4096 + 1, 1024, generateMessageId(2));// 5 chunks;
 
         CodecAggregator.Result result1 = null;
         CodecAggregator.Result result2 = null;
@@ -238,11 +238,11 @@ public class GelfChunkAggregatorTest {
     public void duplicateChunk() {
         final byte[] messageId1 = generateMessageId(1);
         final byte[] messageId2 = generateMessageId(2);
-        final ChannelBuffer chunk1 = createChunk(messageId1, (byte) 0, (byte) 2, new byte[16]);
-        final ChannelBuffer chunk2 = createChunk(messageId1, (byte) 0, (byte) 2, new byte[16]);
-        final ChannelBuffer chunk3 = createChunk(messageId2, (byte) 0, (byte) 2, new byte[16]);
-        final ChannelBuffer chunk4 = createChunk(messageId1, (byte) 1, (byte) 2, new byte[16]);
-        final ChannelBuffer chunk5 = createChunk(messageId2, (byte) 1, (byte) 2, new byte[16]);
+        final ByteBuf chunk1 = createChunk(messageId1, (byte) 0, (byte) 2, new byte[16]);
+        final ByteBuf chunk2 = createChunk(messageId1, (byte) 0, (byte) 2, new byte[16]);
+        final ByteBuf chunk3 = createChunk(messageId2, (byte) 0, (byte) 2, new byte[16]);
+        final ByteBuf chunk4 = createChunk(messageId1, (byte) 1, (byte) 2, new byte[16]);
+        final ByteBuf chunk5 = createChunk(messageId2, (byte) 1, (byte) 2, new byte[16]);
 
         assertNull("message should not be complete", aggregator.addChunk(chunk1).getMessage());
         assertNull("message should not be complete", aggregator.addChunk(chunk2).getMessage());
@@ -299,11 +299,11 @@ public class GelfChunkAggregatorTest {
         assertThat(entry.hashCode()).isNotEqualTo(new ChunkEntry(1, 0L, "foo").hashCode());
     }
 
-    private ChannelBuffer[] createChunkedMessage(int messageSize, int maxChunkSize) {
+    private ByteBuf[] createChunkedMessage(int messageSize, int maxChunkSize) {
         return createChunkedMessage(messageSize, maxChunkSize, generateMessageId());
     }
 
-    private ChannelBuffer[] createChunkedMessage(int messageSize, int maxChunkSize, byte[] messageId) {
+    private ByteBuf[] createChunkedMessage(int messageSize, int maxChunkSize, byte[] messageId) {
         // partially copied from GelfClient (can't use here, because it uses netty4)
 
         int sequenceCount = (messageSize / maxChunkSize);
@@ -313,7 +313,7 @@ public class GelfChunkAggregatorTest {
             sequenceCount++;
         }
 
-        final ChannelBuffer[] buffers = new ChannelBuffer[sequenceCount];
+        final ByteBuf[] buffers = new ByteBuf[sequenceCount];
         for (int sequenceNumber = 0; sequenceNumber < sequenceCount; sequenceNumber++) {
             // fake payload, we don't care about actually parsing it in this test
             int payloadSize = maxChunkSize;
@@ -328,8 +328,8 @@ public class GelfChunkAggregatorTest {
         return buffers;
     }
 
-    private ChannelBuffer createChunk(byte[] messageId, byte sequenceNumber, byte sequenceCount, byte[] payload) {
-        final ChannelBuffer channelBuffer = ChannelBuffers.dynamicBuffer(payload.length + 12);
+    private ByteBuf createChunk(byte[] messageId, byte sequenceNumber, byte sequenceCount, byte[] payload) {
+        final ByteBuf channelBuffer = Unpooled.buffer(payload.length + 12);
 
         channelBuffer.writeBytes(CHUNK_MAGIC_BYTES);
         channelBuffer.writeBytes(messageId);
@@ -341,7 +341,7 @@ public class GelfChunkAggregatorTest {
     }
 
     private byte[] generateMessageId(int id) {
-        final ChannelBuffer messageId = ChannelBuffers.buffer(8);
+        final ByteBuf messageId = Unpooled.buffer(8);
 
         // 4 bytes of current time.
         messageId.writeInt((int) System.currentTimeMillis());

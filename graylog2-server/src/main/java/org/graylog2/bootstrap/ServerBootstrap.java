@@ -31,7 +31,6 @@ import org.graylog2.plugin.inputs.MessageInput;
 import org.graylog2.plugin.system.NodeId;
 import org.graylog2.shared.bindings.GenericBindings;
 import org.graylog2.shared.bindings.GenericInitializerBindings;
-import org.graylog2.shared.bindings.MessageInputBindings;
 import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.bindings.ServerStatusBindings;
 import org.graylog2.shared.bindings.SharedPeriodicalBindings;
@@ -199,7 +198,6 @@ public abstract class ServerBootstrap extends CmdLineTool {
         result.add(new SharedPeriodicalBindings());
         result.add(new SchedulerBindings());
         result.add(new GenericInitializerBindings());
-        result.add(new MessageInputBindings());
         result.add(new SystemStatsModule(configuration.isDisableSigar()));
 
         return result;

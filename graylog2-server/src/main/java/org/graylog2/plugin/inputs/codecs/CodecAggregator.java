@@ -17,7 +17,7 @@
 package org.graylog2.plugin.inputs.codecs;
 
 import com.google.common.base.MoreObjects;
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -25,19 +25,19 @@ import javax.annotation.Nullable;
 public interface CodecAggregator {
 
     @Nonnull
-    Result addChunk(ChannelBuffer buf);
+    Result addChunk(ByteBuf buf);
 
     final class Result {
-        private final ChannelBuffer message;
+        private final ByteBuf message;
         private final boolean valid;
 
-        public Result(@Nullable ChannelBuffer message, boolean valid) {
+        public Result(@Nullable ByteBuf message, boolean valid) {
             this.message = message;
             this.valid = valid;
         }
 
         @Nullable
-        public ChannelBuffer getMessage() {
+        public ByteBuf getMessage() {
             return message;
         }
 
