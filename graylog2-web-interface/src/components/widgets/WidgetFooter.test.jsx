@@ -4,7 +4,7 @@ import renderer from 'react-test-renderer';
 import WidgetFooter from 'components/widgets/WidgetFooter';
 
 describe('<WidgetFooter />', () => {
-  const date = new Date('December 17, 1995 03:24:00');
+  const date = new Date(Date.UTC(1995, 12, 17, 3, 24, 0));
 
   it('should render a widget footer locked and enabled replay', () => {
     const wrapper = renderer.create(<WidgetFooter
