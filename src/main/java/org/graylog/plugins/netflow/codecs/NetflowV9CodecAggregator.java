@@ -18,9 +18,7 @@ package org.graylog.plugins.netflow.codecs;
 import com.github.joschi.jadconfig.util.Size;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
+import com.google.common.cache.RemovalListener;
 import com.google.protobuf.ByteString;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -29,14 +27,14 @@ import org.graylog.plugins.netflow.v9.NetFlowV9Journal;
 import org.graylog.plugins.netflow.v9.NetFlowV9Parser;
 import org.graylog.plugins.netflow.v9.RawNetFlowV9Packet;
 import org.graylog2.shared.utilities.ExceptionUtils;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import javax.inject.Inject;
 import java.net.SocketAddress;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Queue;
@@ -44,7 +42,6 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
 
 /**
  * For Netflow v9 packets we want to prepend the corresponding flow template.
@@ -54,40 +51,43 @@ import java.util.stream.Collectors;
 public class NetflowV9CodecAggregator implements RemoteAddressCodecAggregator {
     private static final Logger LOG = LoggerFactory.getLogger(NetflowV9CodecAggregator.class);
 
-    private static final ChannelBuffer PASSTHROUGH_MARKER = ChannelBuffers.wrappedBuffer(new byte[]{NetFlowCodec.PASSTHROUGH_MARKER});
+    private static final ByteBuf PASSTHROUGH_MARKER = Unpooled.wrappedBuffer(new byte[]{NetFlowCodec.PASSTHROUGH_MARKER});
 
-    private final Cache<TemplateKey, Queue<PacketByteBuf>> packetCache;
-    private final Cache<TemplateKey, TemplateByteBuf> templateCache;
+    private final Cache<TemplateKey, TemplateBytes> templateCache;
+    private final Cache<TemplateKey, Queue<PacketBytes>> packetCache;
 
     @Inject
     public NetflowV9CodecAggregator() {
         // TODO customize
         this.templateCache = CacheBuilder.newBuilder()
                 .maximumSize(5000)
+                .removalListener(notification -> LOG.debug("Removed {} from template cache for reason {}", notification.getKey(), notification.getCause()))
                 .recordStats()
                 .build();
-        packetCache = CacheBuilder.newBuilder()
+        this.packetCache = CacheBuilder.newBuilder()
                 .expireAfterWrite(1, TimeUnit.MINUTES)
                 .maximumWeight(Size.megabytes(1).toBytes())
-                .<Object, Queue<PacketByteBuf>>weigher((key, value) -> value.stream().map(PacketByteBuf::readableBytes).reduce(0, Integer::sum))
+                .removalListener((RemovalListener<TemplateKey, Queue<PacketBytes>>) notification -> LOG.debug("Removed {} from packet cache for reason {}", notification.getKey(), notification.getCause()))
+                .weigher((key, value) -> value.stream().map(PacketBytes::readableBytes).reduce(0, Integer::sum))
                 .recordStats()
                 .build();
     }
 
     @Nonnull
     @Override
-    public Result addChunk(ChannelBuffer buf, SocketAddress remoteAddress) {
+    public Result addChunk(ByteBuf buf, SocketAddress remoteAddress) {
         if (buf.readableBytes() < 2) {
             // the buffer doesn't contain enough bytes to be a netflow packet, discard the packet
             return new Result(null, false);
         }
 
+        // This thing is using *WAY* too many copies. :'(
         try {
             final int netFlowVersion = buf.getShort(0);
 
             // only netflow v9 needs special treatment, everything else we just pass on
             if (netFlowVersion != 9) {
-                return new Result(ChannelBuffers.wrappedBuffer(PASSTHROUGH_MARKER, buf), true);
+                return new Result(Unpooled.copiedBuffer(PASSTHROUGH_MARKER, buf), true);
             }
 
             // for NetFlow V9 we check that we have previously received template flows for each data flow.
@@ -102,47 +102,58 @@ public class NetflowV9CodecAggregator implements RemoteAddressCodecAggregator {
             // We then cache the raw bytes for template flows, keyed by remote ip and source id. These are used to reassemble the packet for the journal later.
             // For each netflow v9 packet that we do not have a matching template for yet, we put it into a queue.
             // Once the template flow arrives we go back through the queue and remove now matching packets for further processing.
-            final ByteBuf byteBuf = Unpooled.wrappedBuffer(buf.toByteBuffer());
             if (LOG.isTraceEnabled()) {
-                LOG.trace("Received V9 packet:\n{}", ByteBufUtil.prettyHexDump(byteBuf));
+                LOG.trace("Received V9 packet:\n{}", ByteBufUtil.prettyHexDump(buf));
             }
-            final RawNetFlowV9Packet rawNetFlowV9Packet = NetFlowV9Parser.parsePacketShallow(byteBuf);
+            final RawNetFlowV9Packet rawNetFlowV9Packet = NetFlowV9Parser.parsePacketShallow(buf);
             final long sourceId = rawNetFlowV9Packet.header().sourceId();
 
             LOG.trace("Incoming NetFlow V9 packet contains: {}", rawNetFlowV9Packet);
-            // the list of template keys to return in the result
-            final Set<TemplateKey> templates = Sets.newHashSet();
-            // this list of flows to return in the result
-            final Set<ChannelBuffer> packetsToSend = Sets.newHashSet();
 
             // register templates and check for buffered flows
-            rawNetFlowV9Packet.templates().forEach((templateId, buffer) -> {
-                final TemplateKey templateKey = new TemplateKey(remoteAddress, sourceId, templateId);
-                templateCache.put(templateKey, new TemplateByteBuf(buffer, false));
-            });
+            for (Map.Entry<Integer, byte[]> template : rawNetFlowV9Packet.templates().entrySet()) {
+                final int templateId = template.getKey();
+                final byte[] bytes = template.getValue();
 
-            final Map.Entry<Integer, ByteBuf> optionTemplate = rawNetFlowV9Packet.optionTemplate();
-            if (optionTemplate != null) {
-                final TemplateKey templateKey = new TemplateKey(remoteAddress, sourceId, optionTemplate.getKey());
-                templateCache.put(templateKey, new TemplateByteBuf(optionTemplate.getValue(), true));
+                final TemplateKey templateKey = new TemplateKey(remoteAddress, sourceId, templateId);
+                final TemplateBytes templateBytes = new TemplateBytes(bytes, false);
+                templateCache.put(templateKey, templateBytes);
             }
+
+            final Map.Entry<Integer, byte[]> optionTemplate = rawNetFlowV9Packet.optionTemplate();
+            if (optionTemplate != null) {
+                final int templateId = optionTemplate.getKey();
+                final byte[] bytes = optionTemplate.getValue();
+
+                final TemplateKey templateKey = new TemplateKey(remoteAddress, sourceId, templateId);
+                final TemplateBytes templateBytes = new TemplateBytes(bytes, true);
+
+                templateCache.put(templateKey, templateBytes);
+            }
+
+            // this list of flows to return in the result
+            // Using ByteBuf here to enable de-duplication with the hash set.
+            final Set<ByteBuf> packetsToSend = new HashSet<>();
 
             // if we have new templates, figure out which buffered packets template requirements are now satisfied
             if (!rawNetFlowV9Packet.templates().isEmpty() || rawNetFlowV9Packet.optionTemplate() != null) {
-                final Set<Integer> knownTemplateIds = templateCache.asMap().keySet().stream()
-                        .filter(templateKey -> templateKey.getRemoteAddress() == remoteAddress && templateKey.getSourceId() == sourceId)
-                        .map(TemplateKey::getTemplateId)
-                        .collect(Collectors.toSet());
+                final Set<Integer> knownTemplateIds = new HashSet<>();
+                for (TemplateKey templateKey : templateCache.asMap().keySet()) {
+                    if (templateKey.getRemoteAddress() == remoteAddress && templateKey.getSourceId() == sourceId) {
+                        final Integer templateId = templateKey.getTemplateId();
+                        knownTemplateIds.add(templateId);
+                    }
+                }
 
-                final Queue<PacketByteBuf> bufferedPackets = packetCache.getIfPresent(TemplateKey.idForExporter(remoteAddress, sourceId));
+                final Queue<PacketBytes> bufferedPackets = packetCache.getIfPresent(TemplateKey.idForExporter(remoteAddress, sourceId));
                 if (bufferedPackets != null) {
-                    final List<PacketByteBuf> tempQueue = Lists.newArrayListWithExpectedSize(bufferedPackets.size());
-                    PacketByteBuf previousPacket;
+                    final List<PacketBytes> tempQueue = new ArrayList<>(bufferedPackets.size());
+                    PacketBytes previousPacket;
                     int addedPackets = 0;
                     while (null != (previousPacket = bufferedPackets.poll())) {
                         // are all templates the packet references there?
-                        if (knownTemplateIds.containsAll(previousPacket.usedTemplates)) {
-                            packetsToSend.add(ChannelBuffers.wrappedBuffer(previousPacket.rawPacket.toByteBuffer()));
+                        if (knownTemplateIds.containsAll(previousPacket.getUsedTemplates())) {
+                            packetsToSend.add(Unpooled.wrappedBuffer(previousPacket.getBytes()));
                             addedPackets++;
                         } else {
                             tempQueue.add(previousPacket);
@@ -156,29 +167,40 @@ public class NetflowV9CodecAggregator implements RemoteAddressCodecAggregator {
                 }
             }
 
-            final boolean[] packetBuffered = {false};
+            boolean packetBuffered = false;
+
+            // the list of template keys to return in the result
+            final Set<TemplateKey> templates = new HashSet<>();
+
             // find out which templates we need to include for the current packet
-            rawNetFlowV9Packet.usedTemplates().forEach(templateId -> {
+            for (int templateId : rawNetFlowV9Packet.usedTemplates()) {
                 final TemplateKey templateKey = new TemplateKey(remoteAddress, sourceId, templateId);
-                final TemplateByteBuf template = templateCache.getIfPresent(templateKey);
+                final TemplateBytes template = templateCache.getIfPresent(templateKey);
+
                 if (template == null) {
                     // we don't have the template, this packet needs to be buffered until we receive the templates
                     try {
-                        final Queue<PacketByteBuf> bufferedPackets = packetCache.get(TemplateKey.idForExporter(remoteAddress, sourceId), ConcurrentLinkedQueue::new);
-                        bufferedPackets.add(new PacketByteBuf(buf, rawNetFlowV9Packet.usedTemplates()));
-                        packetBuffered[0] = true;
+                        final TemplateKey newTemplateKey = TemplateKey.idForExporter(remoteAddress, sourceId);
+                        final Queue<PacketBytes> bufferedPackets = packetCache.get(newTemplateKey, ConcurrentLinkedQueue::new);
+                        final byte[] bytes = ByteBufUtil.getBytes(buf);
+                        bufferedPackets.add(new PacketBytes(bytes, rawNetFlowV9Packet.usedTemplates()));
+                        packetBuffered = true;
                     } catch (ExecutionException ignored) {
                         // the loader cannot fail, it only creates a new queue
                     }
                 } else {
                     // include the template in our result
                     templates.add(templateKey);
-                    packetsToSend.add(buf);
+
+                    // .slice is enough here, because we convert it into a byte array when creating the result below
+                    // no need to copy or retain anything, the buffer only lives as long as this method's scope
+                    final ByteBuf packet = buf.slice();
+                    packetsToSend.add(packet);
                 }
-            });
+            }
 
             // if we have buffered this packet, don't try to process it now. we still need all the templates for it
-            if (packetBuffered[0]) {
+            if (packetBuffered) {
                 return new Result(null, true);
             }
 
@@ -187,32 +209,34 @@ public class NetflowV9CodecAggregator implements RemoteAddressCodecAggregator {
                 return new Result(null, true);
             }
 
-            // if we have any packets to forward, prepare a result
-            final ChannelBuffer resultBuffer = ChannelBuffers.dynamicBuffer();
-            resultBuffer.writeByte(NetFlowCodec.ORDERED_V9_MARKER);
-
-            final NetFlowV9Journal.RawNetflowV9.Builder builder = NetFlowV9Journal.RawNetflowV9.newBuilder();
-
             // add the used templates and option template to the journal message builder
-            templates.stream()
-                    .map(templateKey -> Maps.immutableEntry(templateKey, templateCache.getIfPresent(templateKey)))
-                    .forEach(entry -> {
-                        final TemplateKey templateKey = entry.getKey();
-                        final TemplateByteBuf templateByteBuf = entry.getValue();
-                        if (templateByteBuf == null) {
-                            LOG.warn("Template {} expired while processing, discarding netflow packet", templateKey);
-                        } else if (templateByteBuf.optionTemplate) {
-                            LOG.debug("Writing options template flow {}", templateKey);
-                            builder.putOptionTemplate(1, ByteString.copyFrom(templateByteBuf.buf.nioBuffer()));
-                        } else {
-                            LOG.debug("Writing template {}", templateKey);
-                            builder.putTemplates(templateKey.getTemplateId(), ByteString.copyFrom(templateByteBuf.buf.nioBuffer()));
-                        }
-                    });
+            final NetFlowV9Journal.RawNetflowV9.Builder builder = NetFlowV9Journal.RawNetflowV9.newBuilder();
+            for (TemplateKey templateKey : templates) {
+                final TemplateBytes templateBytes = templateCache.getIfPresent(templateKey);
+                if (templateBytes == null) {
+                    LOG.warn("Template {} expired while processing, discarding netflow packet", templateKey);
+                } else if (templateBytes.isOptionTemplate()) {
+                    LOG.debug("Writing options template flow {}", templateKey);
+                    final byte[] bytes = templateBytes.getBytes();
+                    builder.putOptionTemplate(1, ByteString.copyFrom(bytes));
+                } else {
+                    LOG.debug("Writing template {}", templateKey);
+                    final byte[] bytes = templateBytes.getBytes();
+                    builder.putTemplates(templateKey.getTemplateId(), ByteString.copyFrom(bytes));
+                }
+            }
 
             // finally write out all the packets we had buffered as well as the current one
-            packetsToSend.forEach(packetBuffer -> builder.addPackets(ByteString.copyFrom(packetBuffer.toByteBuffer())));
-            resultBuffer.writeBytes(builder.build().toByteArray());
+            for (ByteBuf packetBuffer : packetsToSend) {
+                final byte[] bytes = ByteBufUtil.getBytes(packetBuffer);
+                final ByteString value = ByteString.copyFrom(bytes);
+                builder.addPackets(value);
+            }
+
+            final byte[] bytes = builder.build().toByteArray();
+            final ByteBuf resultBuffer = Unpooled.buffer(bytes.length + 1)
+                    .writeByte(NetFlowCodec.ORDERED_V9_MARKER)
+                    .writeBytes(bytes);
             return new Result(resultBuffer, true);
 
         } catch (Exception e) {
@@ -221,27 +245,43 @@ public class NetflowV9CodecAggregator implements RemoteAddressCodecAggregator {
         }
     }
 
-    private class TemplateByteBuf {
+    private class TemplateBytes {
+        private final byte[] bytes;
         private final boolean optionTemplate;
-        ByteBuf buf;
 
-        public TemplateByteBuf(ByteBuf buffer, boolean optionTemplate) {
-            buf = buffer;
+        public TemplateBytes(byte[] bytes, boolean optionTemplate) {
+            this.bytes = bytes;
             this.optionTemplate = optionTemplate;
+        }
+
+        public byte[] getBytes() {
+            return bytes;
+        }
+
+        public boolean isOptionTemplate() {
+            return optionTemplate;
         }
     }
 
-    private class PacketByteBuf {
-        private final ChannelBuffer rawPacket;
+    public static class PacketBytes {
+        private final byte[] bytes;
         private final Set<Integer> usedTemplates;
 
-        private PacketByteBuf(ChannelBuffer rawPacket, Set<Integer> usedTemplates) {
-            this.rawPacket = rawPacket;
+        public PacketBytes(byte[] bytes, Set<Integer> usedTemplates) {
+            this.bytes = bytes;
             this.usedTemplates = usedTemplates;
         }
 
+        public byte[] getBytes() {
+            return bytes;
+        }
+
+        public Set<Integer> getUsedTemplates() {
+            return usedTemplates;
+        }
+
         public int readableBytes() {
-            return rawPacket.readableBytes();
+            return bytes.length;
         }
     }
 }

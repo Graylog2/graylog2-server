@@ -79,10 +79,12 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
     static final String CK_NETFLOW9_DEFINITION_PATH = "netflow9_definitions_Path";
     private static final Logger LOG = LoggerFactory.getLogger(NetFlowCodec.class);
     private final NetFlowV9FieldTypeRegistry typeRegistry;
+    private final NetflowV9CodecAggregator netflowV9CodecAggregator;
 
     @Inject
-    protected NetFlowCodec(@Assisted Configuration configuration) throws IOException {
+    protected NetFlowCodec(@Assisted Configuration configuration, NetflowV9CodecAggregator netflowV9CodecAggregator) throws IOException {
         super(configuration);
+        this.netflowV9CodecAggregator = netflowV9CodecAggregator;
 
         final String netFlow9DefinitionsPath = configuration.getString(CK_NETFLOW9_DEFINITION_PATH);
         if (netFlow9DefinitionsPath == null || netFlow9DefinitionsPath.trim().isEmpty()) {
@@ -97,8 +99,7 @@ public class NetFlowCodec extends AbstractCodec implements MultiMessageCodec {
     @Nullable
     @Override
     public CodecAggregator getAggregator() {
-        // this is intentional: we replace the entire channel handler in NetFlowUdpTransport because we need a different signature
-        return null;
+        return netflowV9CodecAggregator;
     }
 
     @Nullable

@@ -28,13 +28,12 @@ public class NetFlowCodecTest {
     public final TemporaryFolder temporaryFolder = new TemporaryFolder();
 
     private NetFlowCodec codec;
+    private NetflowV9CodecAggregator codecAggregator;
 
     @Before
     public void setUp() throws Exception {
-        final ImmutableMap<String, Object> configMap = ImmutableMap.of();
-        final Configuration configuration = new Configuration(configMap);
-
-        codec = new NetFlowCodec(configuration);
+        codecAggregator = new NetflowV9CodecAggregator();
+        codec = new NetFlowCodec(Configuration.EMPTY_CONFIGURATION, codecAggregator);
     }
 
     @Test
@@ -47,7 +46,7 @@ public class NetFlowCodecTest {
         final Configuration configuration = new Configuration(configMap);
 
         assertThatExceptionOfType(FileNotFoundException.class)
-                .isThrownBy(() -> new NetFlowCodec(configuration))
+                .isThrownBy(() -> new NetFlowCodec(configuration, codecAggregator))
                 .withMessageEndingWith("(No such file or directory)");
     }
 
@@ -57,7 +56,7 @@ public class NetFlowCodecTest {
                 NetFlowCodec.CK_NETFLOW9_DEFINITION_PATH, "");
         final Configuration configuration = new Configuration(configMap);
 
-        assertThat(new NetFlowCodec(configuration)).isNotNull();
+        assertThat(new NetFlowCodec(configuration, codecAggregator)).isNotNull();
     }
 
     @Test
@@ -66,7 +65,7 @@ public class NetFlowCodecTest {
                 NetFlowCodec.CK_NETFLOW9_DEFINITION_PATH, "   ");
         final Configuration configuration = new Configuration(configMap);
 
-        assertThat(new NetFlowCodec(configuration)).isNotNull();
+        assertThat(new NetFlowCodec(configuration, codecAggregator)).isNotNull();
     }
 
     @Test
@@ -79,7 +78,7 @@ public class NetFlowCodecTest {
         final Configuration configuration = new Configuration(configMap);
 
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new NetFlowCodec(configuration))
+                .isThrownBy(() -> new NetFlowCodec(configuration, codecAggregator))
                 .withMessageMatching("Unable to parse NetFlow 9 definitions");
     }
 

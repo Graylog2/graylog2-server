@@ -15,8 +15,8 @@
  */
 package org.graylog.plugins.netflow.codecs;
 
+import io.netty.buffer.ByteBuf;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
-import org.jboss.netty.buffer.ChannelBuffer;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -26,10 +26,10 @@ public interface RemoteAddressCodecAggregator extends CodecAggregator {
 
     @Nonnull
     @Override
-    default Result addChunk(ChannelBuffer buf) {
+    default Result addChunk(ByteBuf buf) {
         return addChunk(buf, null);
     }
 
     @Nonnull
-    Result addChunk(ChannelBuffer buf, @Nullable SocketAddress remoteAddress);
+    Result addChunk(ByteBuf buf, @Nullable SocketAddress remoteAddress);
 }

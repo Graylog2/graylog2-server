@@ -1,12 +1,12 @@
 /*
  * Copyright 2013 Eediom Inc.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  * http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
 import org.graylog.plugins.netflow.flows.EmptyTemplateException;
 import org.graylog.plugins.netflow.flows.InvalidFlowVersionException;
 import org.slf4j.Logger;
@@ -157,8 +158,8 @@ public class NetFlowV9Parser {
     /**
      * Like above, but only retrieves the bytes and template ids
      */
-    public static List<Map.Entry<Integer, ByteBuf>> parseTemplatesShallow(ByteBuf bb) {
-        final ImmutableList.Builder<Map.Entry<Integer, ByteBuf>> templates = ImmutableList.builder();
+    public static List<Map.Entry<Integer, byte[]>> parseTemplatesShallow(ByteBuf bb) {
+        final ImmutableList.Builder<Map.Entry<Integer, byte[]>> templates = ImmutableList.builder();
         int len = bb.readUnsignedShort();
 
         int p = 4; // flow set id and length field itself
@@ -168,10 +169,12 @@ public class NetFlowV9Parser {
             final int fieldCount = bb.readUnsignedShort();
             final ImmutableList.Builder<NetFlowV9FieldDef> fieldDefs = ImmutableList.builder();
             for (int i = 0; i < fieldCount; i++) {
-                /* int fieldType = */ bb.readUnsignedShort();
-                /* int fieldLength = */ bb.readUnsignedShort();
+                int fieldType = bb.readUnsignedShort();
+                int fieldLength = bb.readUnsignedShort();
             }
-            templates.add(Maps.immutableEntry(templateId, bb.copy(start, bb.readerIndex() - start)));
+            final byte[] bytes = ByteBufUtil.getBytes(bb, start, bb.readerIndex() - start);
+            final Map.Entry<Integer, byte[]> template = Maps.immutableEntry(templateId, bytes);
+            templates.add(template);
 
             p += 4 + fieldCount * 4;
         }
@@ -240,7 +243,7 @@ public class NetFlowV9Parser {
         return NetFlowV9OptionTemplate.create(templateId, scopeDefs.build(), optionDefs.build());
     }
 
-    public static Map.Entry<Integer, ByteBuf> parseOptionTemplateShallow(ByteBuf bb) {
+    public static Map.Entry<Integer, byte[]> parseOptionTemplateShallow(ByteBuf bb) {
         final int start = bb.readerIndex();
         int length = bb.readUnsignedShort();
         final int templateId = bb.readUnsignedShort();
@@ -269,7 +272,8 @@ public class NetFlowV9Parser {
         // skip padding
         bb.readerIndex(endOfTemplate);
 
-        return Maps.immutableEntry(templateId, bb.copy(start, bb.readerIndex() - start));
+        final byte[] bytes = ByteBufUtil.getBytes(bb, start, bb.readerIndex() - start);
+        return Maps.immutableEntry(templateId, bytes);
     }
 
     /**
@@ -354,29 +358,30 @@ public class NetFlowV9Parser {
 
 
     public static RawNetFlowV9Packet parsePacketShallow(ByteBuf bb) {
-        final int dataLength = bb.readableBytes();
-        final NetFlowV9Header header = parseHeader(bb);
+        final ByteBuf buf = bb.duplicate();
 
-        Map<Integer, ByteBuf> allTemplates = Maps.newHashMap();
-        Set<Integer> usedTemplates = Sets.newHashSet();
-        Map.Entry<Integer, ByteBuf> optTemplate = null;
-        while (bb.isReadable()) {
-            bb.markReaderIndex();
-            int flowSetId = bb.readUnsignedShort();
+        final int dataLength = buf.readableBytes();
+        final NetFlowV9Header header = parseHeader(buf);
+        final Map<Integer, byte[]> allTemplates = Maps.newHashMap();
+        Map.Entry<Integer, byte[]> optTemplate = null;
+        final Set<Integer> usedTemplates = Sets.newHashSet();
+
+        while (buf.isReadable()) {
+            buf.markReaderIndex();
+            int flowSetId = buf.readUnsignedShort();
             if (flowSetId == 0) {
-                final List<Map.Entry<Integer, ByteBuf>> templates = parseTemplatesShallow(bb);
-                for (Map.Entry<Integer, ByteBuf> t : templates) {
+                final List<Map.Entry<Integer, byte[]>> templates = parseTemplatesShallow(buf);
+                for (Map.Entry<Integer, byte[]> t : templates) {
                     allTemplates.put(t.getKey(), t.getValue());
                 }
             } else if (flowSetId == 1) {
-                optTemplate = parseOptionTemplateShallow(bb);
+                optTemplate = parseOptionTemplateShallow(buf);
             } else {
-                bb.resetReaderIndex();
-                usedTemplates.add(parseRecordShallow(bb));
+                buf.resetReaderIndex();
+                usedTemplates.add(parseRecordShallow(buf));
             }
         }
 
         return RawNetFlowV9Packet.create(header, dataLength, allTemplates, optTemplate, usedTemplates);
     }
-
 }

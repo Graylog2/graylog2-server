@@ -16,14 +16,14 @@ public abstract class RawNetFlowV9Packet {
 
     public abstract int dataLength();
 
-    public abstract Map<Integer, ByteBuf> templates();
+    public abstract Map<Integer, byte[]> templates();
 
     @Nullable
-    public abstract Map.Entry<Integer, ByteBuf> optionTemplate();
+    public abstract Map.Entry<Integer, byte[]> optionTemplate();
 
     public abstract Set<Integer> usedTemplates();
 
-    public static RawNetFlowV9Packet create(NetFlowV9Header header, int dataLength, Map<Integer, ByteBuf> templates, @Nullable Map.Entry<Integer, ByteBuf> optTemplate, Set<Integer> usedTemplates) {
+    public static RawNetFlowV9Packet create(NetFlowV9Header header, int dataLength, Map<Integer, byte[]> templates, @Nullable Map.Entry<Integer, byte[]> optTemplate, Set<Integer> usedTemplates) {
         return new AutoValue_RawNetFlowV9Packet(header, dataLength, templates, optTemplate, usedTemplates);
     }
 
@@ -33,11 +33,11 @@ public abstract class RawNetFlowV9Packet {
         sb.append(ByteBufUtil.prettyHexDump(Unpooled.wrappedBuffer(header().encode().toByteBuffer()))).append("\n");
         sb.append("\nTemplates:\n");
         templates().forEach((integer, byteBuf) -> {
-            sb.append("\n").append(integer).append(":\n").append(ByteBufUtil.prettyHexDump(byteBuf));
+            sb.append("\n").append(integer).append(":\n").append(ByteBufUtil.prettyHexDump(Unpooled.wrappedBuffer(byteBuf)));
         });
-        final Map.Entry<Integer, ByteBuf> optionTemplate = optionTemplate();
+        final Map.Entry<Integer, byte[]> optionTemplate = optionTemplate();
         if (optionTemplate != null) {
-            sb.append("\nOption Template:\n").append(ByteBufUtil.prettyHexDump(optionTemplate.getValue()));
+            sb.append("\nOption Template:\n").append(ByteBufUtil.prettyHexDump(Unpooled.wrappedBuffer(optionTemplate.getValue())));
         }
         sb.append("\nData flows using these templates:\n");
         usedTemplates().forEach(templateId -> sb.append(templateId).append(" "));
