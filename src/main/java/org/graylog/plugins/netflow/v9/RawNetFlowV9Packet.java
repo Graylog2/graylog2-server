@@ -30,7 +30,7 @@ public abstract class RawNetFlowV9Packet {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("\n");
-        sb.append(ByteBufUtil.prettyHexDump(Unpooled.wrappedBuffer(header().encode().toByteBuffer()))).append("\n");
+        sb.append(header().prettyHexDump()).append("\n");
         sb.append("\nTemplates:\n");
         templates().forEach((integer, byteBuf) -> {
             sb.append("\n").append(integer).append(":\n").append(ByteBufUtil.prettyHexDump(Unpooled.wrappedBuffer(byteBuf)));

@@ -16,8 +16,10 @@
 package org.graylog.plugins.netflow.v9;
 
 import com.google.auto.value.AutoValue;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.buffer.Unpooled;
+import io.netty.util.ReferenceCountUtil;
 
 @AutoValue
 public abstract class NetFlowV9Header {
@@ -45,14 +47,19 @@ public abstract class NetFlowV9Header {
         return new AutoValue_NetFlowV9Header(version, count, sysUptime, unixSecs, sequence, sourceId);
     }
 
-    public ChannelBuffer encode() {
-        final ChannelBuffer buffer = ChannelBuffers.dynamicBuffer(20);
-        buffer.writeShort(version());
-        buffer.writeShort(count());
-        buffer.writeInt(Math.toIntExact(sysUptime()));
-        buffer.writeInt(Math.toIntExact(unixSecs()));
-        buffer.writeInt(Math.toIntExact(sequence()));
-        buffer.writeInt(Math.toIntExact(sourceId()));
-        return buffer;
+    public String prettyHexDump() {
+        final ByteBuf buffer = Unpooled.buffer(20);
+        try {
+            buffer.writeShort(version());
+            buffer.writeShort(count());
+            buffer.writeInt(Math.toIntExact(sysUptime()));
+            buffer.writeInt(Math.toIntExact(unixSecs()));
+            buffer.writeInt(Math.toIntExact(sequence()));
+            buffer.writeInt(Math.toIntExact(sourceId()));
+
+            return ByteBufUtil.prettyHexDump(buffer);
+        } finally {
+            ReferenceCountUtil.release(buffer);
+        }
     }
 }
