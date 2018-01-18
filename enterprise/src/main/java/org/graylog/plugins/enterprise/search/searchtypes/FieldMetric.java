@@ -79,6 +79,11 @@ public abstract class FieldMetric implements SearchType {
         public abstract String id();
 
         @JsonProperty
+        public String type() {
+            return NAME;
+        }
+
+        @JsonProperty
         public abstract double value();
 
         public static Builder builder() {
@@ -100,6 +105,11 @@ public abstract class FieldMetric implements SearchType {
         @Override
         @JsonProperty
         public abstract String id();
+
+        @JsonProperty
+        public String type() {
+            return NAME;
+        }
 
         @JsonProperty
         public abstract long value();
