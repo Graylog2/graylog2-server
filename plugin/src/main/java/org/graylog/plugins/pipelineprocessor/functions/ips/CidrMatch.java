@@ -21,7 +21,7 @@ import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionArgs;
 import org.graylog.plugins.pipelineprocessor.ast.functions.FunctionDescriptor;
 import org.graylog.plugins.pipelineprocessor.ast.functions.ParameterDescriptor;
-import org.jboss.netty.handler.ipfilter.CIDR;
+import org.graylog2.utilities.IpSubnet;
 
 import java.net.UnknownHostException;
 
@@ -32,14 +32,14 @@ public class CidrMatch extends AbstractFunction<Boolean> {
     public static final String NAME = "cidr_match";
     public static final String IP = "ip";
 
-    private final ParameterDescriptor<String, CIDR> cidrParam;
+    private final ParameterDescriptor<String, IpSubnet> cidrParam;
     private final ParameterDescriptor<IpAddress, IpAddress> ipParam;
 
     public CidrMatch() {
         // a little ugly because newCIDR throws a checked exception :(
-        cidrParam = ParameterDescriptor.string("cidr", CIDR.class).transform(cidrString -> {
+        cidrParam = ParameterDescriptor.string("cidr", IpSubnet.class).transform(cidrString -> {
             try {
-                return CIDR.newCIDR(cidrString);
+                return new IpSubnet(cidrString);
             } catch (UnknownHostException e) {
                 throw new IllegalArgumentException(e);
             }
@@ -49,7 +49,7 @@ public class CidrMatch extends AbstractFunction<Boolean> {
 
     @Override
     public Boolean evaluate(FunctionArgs args, EvaluationContext context) {
-        final CIDR cidr = cidrParam.required(args, context);
+        final IpSubnet cidr = cidrParam.required(args, context);
         final IpAddress ipAddress = ipParam.required(args, context);
         if (cidr == null || ipAddress == null) {
             return null;
