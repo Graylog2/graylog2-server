@@ -46,10 +46,9 @@ const WidgetFooter = React.createClass({
       calculatedAtTime = 'Loading...';
     }
 
-    // if we have a tooltip, we disable the button link and instead show a tooltip on hover
     const replay = this.props.replayDisabled ? null : (
       <div className="widget-replay">
-        <Button bsStyle="link" className="btn-text" title={'Replay search'} href={this.props.replayHref}>
+        <Button bsStyle="link" className="btn-text" title="Replay search" href={this.props.replayHref}>
           <i className="fa fa-play" />
         </Button>
       </div>
