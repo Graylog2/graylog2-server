@@ -35,6 +35,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.graylog2.shared.security.RestPermissions.AUTHENTICATION_EDIT;
 import static org.graylog2.shared.security.RestPermissions.AUTHENTICATION_READ;
@@ -60,11 +61,13 @@ public class AuthenticationResource extends RestResource {
     @GET
     @Path("config")
     @ApiOperation("Retrieve authentication providers configuration")
-    @RequiresPermissions({CLUSTER_CONFIG_ENTRY_READ, AUTHENTICATION_READ})
+    @RequiresPermissions({CLUSTER_CONFIG_ENTRY_READ})
     public AuthenticationConfig getAuthenticators() {
         final AuthenticationConfig config = clusterConfigService.getOrDefault(AuthenticationConfig.class,
                                                                               AuthenticationConfig.defaultInstance());
-        return config.withRealms(availableRealms.keySet());
+        return config.withRealms(availableRealms.keySet().stream()
+                .filter(realmName -> isPermitted(AUTHENTICATION_READ, realmName))
+                .collect(Collectors.toSet()));
     }
 
     @PUT
