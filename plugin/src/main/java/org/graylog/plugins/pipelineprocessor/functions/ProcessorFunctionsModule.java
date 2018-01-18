@@ -30,6 +30,7 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
+import org.graylog.plugins.pipelineprocessor.functions.dates.ParseUnixMilliseconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Days;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Hours;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Millis;
@@ -147,6 +148,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(DateConversion.NAME, DateConversion.class);
         addMessageProcessorFunction(Now.NAME, Now.class);
         addMessageProcessorFunction(ParseDate.NAME, ParseDate.class);
+        addMessageProcessorFunction(ParseUnixMilliseconds.NAME, ParseUnixMilliseconds.class);
         addMessageProcessorFunction(FlexParseDate.NAME, FlexParseDate.class);
         addMessageProcessorFunction(FormatDate.NAME, FormatDate.class);
         addMessageProcessorFunction(Years.NAME, Years.class);
