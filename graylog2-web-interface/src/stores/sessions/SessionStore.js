@@ -35,11 +35,6 @@ class SessionStore {
     return this.state.sessionId;
   }
 
-  // To avoid changing all consumers of this API
-  getSessionId() {
-    return this.sessionId;
-  }
-
   get username() {
     return this.state.username;
   }

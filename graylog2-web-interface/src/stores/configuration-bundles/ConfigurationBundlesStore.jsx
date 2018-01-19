@@ -5,7 +5,6 @@ import fetch, { Builder, FetchError } from 'logic/rest/FetchProvider';
 import ApiRoutes from 'routing/ApiRoutes';
 
 import ActionsProvider from 'injection/ActionsProvider';
-const SessionActions = ActionsProvider.getActions('Session');
 const ConfigurationBundlesActions = ActionsProvider.getActions('ConfigurationBundles');
 
 import StoreProvider from 'injection/StoreProvider';
@@ -56,7 +55,7 @@ const ConfigurationBundlesStore = Reflux.createStore({
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
         if (error.status === 401) {
-          SessionActions.logout(SessionStore.getSessionId());
+          SessionStore.logout(SessionStore.sessionId);
         }
 
         throw new FetchError(error.statusText, error);

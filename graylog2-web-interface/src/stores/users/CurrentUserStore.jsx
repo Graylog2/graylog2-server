@@ -1,4 +1,5 @@
 import Reflux from 'reflux';
+import { reaction } from 'mobx';
 
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -6,15 +7,22 @@ import ApiRoutes from 'routing/ApiRoutes';
 
 import CombinedProvider from 'injection/CombinedProvider';
 
-const { SessionStore, SessionActions } = CombinedProvider.get('Session');
+const { SessionStore } = CombinedProvider.get('Session');
 const { StartpageStore } = CombinedProvider.get('Startpage');
 
 const CurrentUserStore = Reflux.createStore({
-  listenables: [SessionActions],
   currentUser: undefined,
 
   init() {
-    this.listenTo(SessionStore, this.sessionUpdate, this.sessionUpdate);
+    reaction(
+      () => ({
+        sessionId: SessionStore.sessionId,
+        username: SessionStore.username,
+      }),
+      (sessionInfo) => {
+        this.sessionUpdate(sessionInfo);
+      },
+    );
     this.listenTo(StartpageStore, this.reload, this.reload);
   },
 

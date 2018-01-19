@@ -41,7 +41,6 @@ class CombinedProvider {
       Refresh: () => require('actions/tools/RefreshActions'),
       SavedSearches: () => require('actions/search/SavedSearchesActions'),
       ServerAvailability: () => require('actions/sessions/ServerAvailabilityActions'),
-      Session: () => require('actions/sessions/SessionActions'),
       SingleNode: () => require('actions/nodes/SingleNodeActions'),
       Streams: () => require('actions/streams/StreamsActions'),
       SystemJobs: () => require('actions/systemjobs/SystemJobsActions'),
