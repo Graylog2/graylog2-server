@@ -12,7 +12,6 @@ import { Timestamp } from 'components/common';
 import DateTime from 'logic/datetimes/DateTime';
 
 import StoreProvider from 'injection/StoreProvider';
-const SearchStore = StoreProvider.getStore('Search');
 
 import { AddSearchCountToDashboard,
   DecoratorSidebar,
@@ -25,6 +24,9 @@ import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
 
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
+
+const SearchStore = StoreProvider.getStore('Search');
+const SessionStore = StoreProvider.getStore('Session');
 
 const SearchSidebar = React.createClass({
   propTypes: {
@@ -278,5 +280,5 @@ const SearchSidebar = React.createClass({
 });
 
 export default inject(context => ({
-  sessionId: context.rootStore.sessionStore.sessionId,
+  sessionId: SessionStore.sessionId,
 }))(observer(SearchSidebar));

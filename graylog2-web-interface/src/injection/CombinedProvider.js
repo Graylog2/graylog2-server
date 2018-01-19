@@ -105,7 +105,6 @@ class CombinedProvider {
       SavedSearches: () => require('stores/search/SavedSearchesStore'),
       Search: () => require('stores/search/SearchStore'),
       ServerAvailability: () => require('stores/sessions/ServerAvailabilityStore'),
-      Session: () => require('stores/sessions/LegacySessionStore'),
       SingleNode: () => require('stores/nodes/SingleNodeStore'),
       Sources: () => require('stores/sources/SourcesStore'),
       Startpage: () => require('stores/users/StartpageStore'),
@@ -121,6 +120,11 @@ class CombinedProvider {
       UniversalSearch: () => require('stores/search/UniversalSearchStore'),
       Users: () => require('stores/users/UsersStore'),
       Widgets: () => require('stores/widgets/WidgetsStore'),
+
+      // MobX Stores
+      JvmInfo: () => require('stores/system/JvmInfoStore'),
+      Session: () => require('stores/sessions/SessionStore'),
+      SystemInfo: () => require('stores/system/SystemInfoStore'),
     };
     /* eslint-enable import/no-require, global-require */
   }

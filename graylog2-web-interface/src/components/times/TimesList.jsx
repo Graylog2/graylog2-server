@@ -5,11 +5,11 @@ import { Col, Row } from 'react-bootstrap';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
 import DateTime from 'logic/datetimes/DateTime';
-
-import StoreProvider from 'injection/StoreProvider';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-
 import { Spinner, Timestamp } from 'components/common';
+import StoreProvider from 'injection/StoreProvider';
+
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+const SystemInfoStore = StoreProvider.getStore('SystemInfo');
 
 const TimesList = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore)],
@@ -60,7 +60,7 @@ const TimesList = React.createClass({
   },
 });
 
-export default inject(context => ({
-  isLoading: context.rootStore.systemInfoStore.isLoading,
-  systemInfo: context.rootStore.systemInfoStore.systemInfo,
+export default inject(() => ({
+  isLoading: SystemInfoStore.isLoading,
+  systemInfo: SystemInfoStore.systemInfo,
 }))(observer(TimesList));

@@ -8,6 +8,10 @@ import GettingStarted from 'components/gettingstarted/GettingStarted';
 import Routes from 'routing/Routes';
 import history from 'util/History';
 
+import StoreProvider from 'injection/StoreProvider';
+
+const SystemInfoStore = StoreProvider.getStore('SystemInfo');
+
 const GETTING_STARTED_URL = 'https://gettingstarted.graylog.org/';
 const GettingStartedPage = React.createClass({
   propTypes: {
@@ -39,7 +43,7 @@ const GettingStartedPage = React.createClass({
   },
 });
 
-export default inject(context => ({
-  isLoading: context.rootStore.systemInfoStore.isLoading,
-  systemInfo: context.rootStore.systemInfoStore.systemInfo,
+export default inject(() => ({
+  isLoading: SystemInfoStore.isLoading,
+  systemInfo: SystemInfoStore.systemInfo,
 }))(observer(GettingStartedPage));

@@ -6,11 +6,11 @@ import fetch from 'logic/rest/FetchProvider';
 
 class JvmInfoStore {
   constructor() {
-    this.state = observable({
+    this.state = observable.object({
       isLoading: true,
       error: undefined,
       jvmInfo: undefined,
-    });
+    }, 'JvmInfoStore state');
   }
 
   get jvmInfo() {
@@ -44,4 +44,4 @@ class JvmInfoStore {
   }
 }
 
-export default JvmInfoStore;
+export default new JvmInfoStore();

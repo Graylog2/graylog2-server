@@ -6,11 +6,11 @@ import fetch from 'logic/rest/FetchProvider';
 
 class SystemInfoStore {
   constructor() {
-    this.state = observable({
+    this.state = observable.object({
       isLoading: true,
       error: undefined,
       systemInfo: undefined,
-    });
+    }, 'SystemInfoStore state');
     this.getSystemInfo();
   }
 
@@ -45,4 +45,4 @@ class SystemInfoStore {
   }
 }
 
-export default SystemInfoStore;
+export default new SystemInfoStore();

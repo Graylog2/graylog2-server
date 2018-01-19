@@ -9,13 +9,13 @@ const sourceUrl = '/system/sessions';
 
 class SessionStore {
   constructor() {
-    this.state = observable({
+    this.state = observable.shallowObject({
       sessionId: undefined,
       username: undefined,
       error: undefined,
       isLoading: false,
       isValidatingSession: true,
-    });
+    }, 'SessionStore state');
     this.validate();
   }
 
@@ -35,6 +35,11 @@ class SessionStore {
     return this.state.sessionId;
   }
 
+  // To avoid changing all consumers of this API
+  getSessionId() {
+    return this.sessionId;
+  }
+
   get username() {
     return this.state.username;
   }
@@ -51,6 +56,7 @@ class SessionStore {
             sessionId: sessionInfo.session_id,
             username: username,
           });
+          return sessionInfo;
         },
         (error) => {
           if (error.additional.status === 401) {
@@ -69,10 +75,11 @@ class SessionStore {
     return new Builder('DELETE', URLUtils.qualifyUrl(`${sourceUrl}/${sessionId}`))
       .authenticated()
       .build()
-      .then((resp) => {
-        if (resp.ok || resp.status === 401) {
+      .then((response) => {
+        if (response.ok || response.status === 401) {
           this.removeSession();
         }
+        return response;
       }, this.removeSession);
   }
 
@@ -126,4 +133,4 @@ class SessionStore {
   }
 }
 
-export default SessionStore;
+export default new SessionStore();

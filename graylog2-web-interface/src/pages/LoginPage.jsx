@@ -5,7 +5,10 @@ import { Row, Button, FormGroup, Alert } from 'react-bootstrap';
 import { DocumentTitle } from 'components/common';
 
 import { Input } from 'components/bootstrap';
+import StoreProvider from 'injection/StoreProvider';
 import LoadingPage from './LoadingPage';
+
+const SessionStore = StoreProvider.getStore('Session');
 
 import disconnectedStyle from '!style/useable!css!less!stylesheets/disconnected.less';
 import authStyle from '!style/useable!css!less!stylesheets/auth.less';
@@ -85,11 +88,11 @@ const LoginPage = React.createClass({
   },
 });
 
-export default inject(context => ({
-  isLoading: context.rootStore.sessionStore.isLoading,
-  isValidatingSession: context.rootStore.sessionStore.isValidatingSession,
-  error: context.rootStore.sessionStore.error,
-  login: (username, password, host) => context.rootStore.sessionStore.login(username, password, host),
-  validateSession: () => context.rootStore.sessionStore.validate(),
+export default inject(() => ({
+  isLoading: SessionStore.isLoading,
+  isValidatingSession: SessionStore.isValidatingSession,
+  error: SessionStore.error,
+  login: (username, password, host) => SessionStore.login(username, password, host),
+  validateSession: () => SessionStore.validate(),
 }))(observer(LoginPage));
 

@@ -6,6 +6,9 @@ import { LinkContainer } from 'react-router-bootstrap';
 
 import Routes from 'routing/Routes';
 import history from 'util/History';
+import StoreProvider from 'injection/StoreProvider';
+
+const SessionStore = StoreProvider.getStore('Session');
 
 const UserMenu = React.createClass({
   propTypes: {
@@ -32,8 +35,8 @@ const UserMenu = React.createClass({
   },
 });
 
-export default inject(context => ({
-  sessionId: context.rootStore.sessionStore.sessionId,
-  logout: sessionId => context.rootStore.sessionStore.logout(sessionId),
+export default inject(() => ({
+  sessionId: SessionStore.sessionId,
+  logout: sessionId => SessionStore.logout(sessionId),
 }))(observer(UserMenu));
 

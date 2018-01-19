@@ -1,6 +1,7 @@
 import request from 'superagent-bluebird-promise';
 import BluebirdPromise from 'bluebird';
 
+import { reaction } from 'mobx';
 import StoreProvider from 'injection/StoreProvider';
 
 import ActionsProvider from 'injection/ActionsProvider';
@@ -32,7 +33,7 @@ export class Builder {
 
   authenticated() {
     const SessionStore = StoreProvider.getStore('Session');
-    const token = SessionStore.getSessionId();
+    const token = SessionStore.sessionId;
 
     return this.session(token);
   }
@@ -65,8 +66,7 @@ export class Builder {
       }, (error) => {
         const SessionStore = StoreProvider.getStore('Session');
         if (SessionStore.isLoggedIn() && error.status === 401) {
-          const SessionActions = ActionsProvider.getActions('Session');
-          SessionActions.logout(SessionStore.getSessionId());
+          SessionStore.logout(SessionStore.sessionId);
         }
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
@@ -101,8 +101,7 @@ export class Builder {
       }, (error) => {
         const SessionStore = StoreProvider.getStore('Session');
         if (SessionStore.isLoggedIn() && error.status === 401) {
-          const SessionActions = ActionsProvider.getActions('Session');
-          SessionActions.logout(SessionStore.getSessionId());
+          SessionStore.logout(SessionStore.sessionId);
         }
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
@@ -137,10 +136,13 @@ function queuePromiseIfNotLoggedin(promise) {
 
   if (!SessionStore.isLoggedIn()) {
     return () => new BluebirdPromise((resolve, reject) => {
-      const SessionActions = ActionsProvider.getActions('Session');
-      SessionActions.login.completed.listen(() => {
-        promise().then(resolve, reject);
-      });
+      const disposerFunction = reaction(
+        () => SessionStore.isLoggedIn(),
+        () => {
+          promise().then(resolve, reject);
+          disposerFunction();
+        },
+      );
     });
   }
 

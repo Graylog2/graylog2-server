@@ -8,6 +8,8 @@ import LoggedInPage from 'react-proxy?name=LoggedInPage!pages/LoggedInPage';
 import ServerUnavailablePage from 'pages/ServerUnavailablePage';
 
 import StoreProvider from 'injection/StoreProvider';
+
+const SessionStore = StoreProvider.getStore('Session');
 const ServerAvailabilityStore = StoreProvider.getStore('ServerAvailability');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
@@ -49,6 +51,6 @@ const AppFacade = React.createClass({
   },
 });
 
-export default inject(context => ({
-  sessionId: context.rootStore.sessionStore.sessionId,
+export default inject(() => ({
+  sessionId: SessionStore.sessionId,
 }))(observer(AppFacade));
