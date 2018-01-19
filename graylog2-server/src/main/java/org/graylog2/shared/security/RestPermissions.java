@@ -138,6 +138,8 @@ public class RestPermissions implements PluginPermissions {
     public static final String USERS_TOKENREMOVE = "users:tokenremove";
 
     protected static final ImmutableSet<Permission> PERMISSIONS = ImmutableSet.<Permission>builder()
+        .add(create(AUTHENTICATION_EDIT, ""))
+        .add(create(AUTHENTICATION_READ, ""))
         .add(create(BLACKLISTENTRY_CREATE, ""))
         .add(create(BLACKLISTENTRY_DELETE, ""))
         .add(create(BLACKLISTENTRY_EDIT, ""))
