@@ -16,6 +16,7 @@
  */
 package org.graylog2.shared.metrics;
 
+import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
@@ -72,38 +73,41 @@ public class MetricUtils {
     }
 
     public static Map<String, Object> map(String metricName, Metric metric) {
-        String type = metric.getClass().getSimpleName().toLowerCase(Locale.ENGLISH);
-
-        if (type.isEmpty()) {
-            type = "gauge";
-        }
-
-        Map<String, Object> metricMap = Maps.newHashMap();
+        final Map<String, Object> metricMap = Maps.newHashMap();
         metricMap.put("full_name", metricName);
         metricMap.put("name", metricName.substring(metricName.lastIndexOf(".") + 1));
-        metricMap.put("type", type);
 
         if (metric instanceof Timer) {
             metricMap.put("metric", buildTimerMap((Timer) metric));
+            metricMap.put("type", "timer");
         } else if(metric instanceof Meter) {
             metricMap.put("metric", buildMeterMap((Meter) metric));
+            metricMap.put("type", "meter");
         } else if(metric instanceof Histogram) {
             metricMap.put("metric", buildHistogramMap((Histogram) metric));
+            metricMap.put("type", "histogram");
+        } else if(metric instanceof Counter) {
+            metricMap.put("metric", ((Counter) metric).getCount());
+            metricMap.put("type", "counter");
+        } else if(metric instanceof Gauge) {
+            metricMap.put("metric", ((Gauge) metric).getValue());
+            metricMap.put("type", "gauge");
         } else {
             metricMap.put("metric", metric);
+            // best guess
+            metricMap.put("type", "gauge");
         }
         return metricMap;
     }
 
     public static TimerRateMetricsResponse buildTimerMap(Timer t) {
         final TimerRateMetricsResponse result = new TimerRateMetricsResponse();
-        final TimerMetricsResponse time = new TimerMetricsResponse();
-        final RateMetricsResponse rate = new RateMetricsResponse();
 
         if (t == null) {
             return result;
         }
 
+        final TimerMetricsResponse time = new TimerMetricsResponse();
         time.max = TimeUnit.MICROSECONDS.convert(t.getSnapshot().getMax(), TimeUnit.NANOSECONDS);
         time.min = TimeUnit.MICROSECONDS.convert(t.getSnapshot().getMin(), TimeUnit.NANOSECONDS);
         time.mean = TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().getMean(), TimeUnit.NANOSECONDS);
@@ -112,6 +116,7 @@ public class MetricUtils {
         time.percentile99th = TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().get99thPercentile(), TimeUnit.NANOSECONDS);
         time.stdDev = TimeUnit.MICROSECONDS.convert((long) t.getSnapshot().getStdDev(), TimeUnit.NANOSECONDS);
 
+        final RateMetricsResponse rate = new RateMetricsResponse();
         rate.oneMinute = t.getOneMinuteRate();
         rate.fiveMinute = t.getFiveMinuteRate();
         rate.fifteenMinute = t.getFifteenMinuteRate();
