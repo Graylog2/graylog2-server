@@ -79,7 +79,7 @@ const MetricsStore = Reflux.createStore({
     return metrics;
   },
   list() {
-    if (!SessionStore.isLoggedIn()) {
+    if (!SessionStore.isLoggedIn) {
       return;
     }
 

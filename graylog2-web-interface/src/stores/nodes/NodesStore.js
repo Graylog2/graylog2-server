@@ -24,7 +24,7 @@ const NodesStore = Reflux.createStore({
   },
 
   _triggerList() {
-    if (SessionStore.isLoggedIn()) {
+    if (SessionStore.isLoggedIn) {
       NodesActions.list();
     }
   },

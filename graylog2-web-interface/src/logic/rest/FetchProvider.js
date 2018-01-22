@@ -65,12 +65,12 @@ export class Builder {
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
         const SessionStore = StoreProvider.getStore('Session');
-        if (SessionStore.isLoggedIn() && error.status === 401) {
+        if (SessionStore.isLoggedIn && error.status === 401) {
           SessionStore.logout(SessionStore.sessionId);
         }
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-        if (SessionStore.isLoggedIn() && error.status === 403) {
+        if (SessionStore.isLoggedIn && error.status === 403) {
           history.replace(Routes.NOTFOUND);
         }
 
@@ -100,12 +100,12 @@ export class Builder {
         throw new FetchError(resp.statusText, resp);
       }, (error) => {
         const SessionStore = StoreProvider.getStore('Session');
-        if (SessionStore.isLoggedIn() && error.status === 401) {
+        if (SessionStore.isLoggedIn && error.status === 401) {
           SessionStore.logout(SessionStore.sessionId);
         }
 
         // Redirect to the start page if a user is logged in but not allowed to access a certain HTTP API.
-        if (SessionStore.isLoggedIn() && error.status === 403) {
+        if (SessionStore.isLoggedIn && error.status === 403) {
           history.replace(Routes.STARTPAGE);
         }
 
@@ -134,10 +134,10 @@ export class Builder {
 function queuePromiseIfNotLoggedin(promise) {
   const SessionStore = StoreProvider.getStore('Session');
 
-  if (!SessionStore.isLoggedIn()) {
+  if (!SessionStore.isLoggedIn) {
     return () => new BluebirdPromise((resolve, reject) => {
       const disposerFunction = reaction(
-        () => SessionStore.isLoggedIn(),
+        () => SessionStore.isLoggedIn,
         () => {
           promise().then(resolve, reject);
           disposerFunction();

@@ -39,6 +39,10 @@ class SessionStore {
     return this.state.username;
   }
 
+  get isLoggedIn() {
+    return this.state.sessionId !== undefined && this.state.sessionId !== null;
+  }
+
   login(username, password, host) {
     this.state.isLoading = true;
     this.state.error = undefined;
@@ -121,10 +125,6 @@ class SessionStore {
     Store.set('username', sessionInfo.username);
     this.state.sessionId = sessionInfo.sessionId;
     this.state.username = sessionInfo.username;
-  }
-
-  isLoggedIn() {
-    return this.state.sessionId !== undefined && this.state.sessionId !== null;
   }
 }
 
