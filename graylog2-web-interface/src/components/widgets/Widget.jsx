@@ -185,10 +185,10 @@ const Widget = React.createClass({
     return Routes.search(config.query, this._getTimeRange(), config.interval);
   },
   _showConfig() {
-    this.refs.configModal.open();
+    this.configModal.open();
   },
   _showEditConfig() {
-    this.refs.editModal.open();
+    this.editModal.open();
   },
   updateWidget(newWidgetData) {
     const realNewWidgetData = newWidgetData;
@@ -207,21 +207,27 @@ const Widget = React.createClass({
       return <span />;
     }
     const showConfigModal = (
-      <WidgetConfigModal dashboardId={this.props.dashboardId}
+      <WidgetConfigModal ref={(node) => { this.configModal = node; }}
+                         dashboardId={this.props.dashboardId}
                          widget={this.props.widget}
                          boundToStream={this._isBoundToStream()} />
     );
 
     const editConfigModal = (
-      <WidgetEditConfigModal widget={this.props.widget}
+      <WidgetEditConfigModal ref={(node) => { this.editModal = node; }}
+                             widget={this.props.widget}
                              onUpdate={this.updateWidget} />
     );
 
-    const disabledReplay = !((!this.props.widget.config.stream_id &&
+    /* Note that we consider two cases here: a dashboard configured from
+       a stream and a dashboard configured from global search. */
+    const canReadConfiguredStream = this.props.widget.config.stream_id && this.props.streamIds != null &&
+      this.props.streamIds[this.props.widget.config.stream_id];
+    const canSearchGlobally = !this.props.widget.config.stream_id &&
       this.isPermitted(this.state.currentUser.permissions,
-        ['searches:absolute', 'searches:keyword', 'searches:relative'])) ||
-      (this.props.widget.config.stream_id && this.props.streamIds != null &&
-      this.props.streamIds[this.props.widget.config.stream_id]));
+        ['searches:absolute', 'searches:keyword', 'searches:relative']);
+
+    const disabledReplay = !canReadConfiguredStream && !canSearchGlobally;
 
     return (
       <div ref={(node) => { this.node = node; }} className="widget" data-widget-id={this.props.widget.id}>
