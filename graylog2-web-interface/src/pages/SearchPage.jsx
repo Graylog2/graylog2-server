@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { inject, observer } from 'mobx-react';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
 import moment from 'moment';
@@ -20,6 +21,7 @@ import { MalformedSearchQuery, SearchExecutionError, SearchResult } from 'compon
 
 const SearchPage = React.createClass({
   propTypes: {
+    currentUser: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
     searchConfig: PropTypes.object.isRequired,
     searchInStream: PropTypes.object,
@@ -28,7 +30,6 @@ const SearchPage = React.createClass({
   mixins: [
     Reflux.connect(NodesStore),
     Reflux.connect(MessageFieldsStore),
-    Reflux.connect(CurrentUserStore),
     Reflux.listenTo(InputsStore, '_formatInputs'),
     Reflux.listenTo(RefreshStore, '_setupTimer', '_setupTimer'),
     Reflux.listenTo(DecoratorsStore, '_refreshDataFromDecoratorStore', '_refreshDataFromDecoratorStore'),
@@ -212,7 +213,7 @@ const SearchPage = React.createClass({
                       result={searchResult} histogram={this.state.histogram}
                       formattedHistogram={this.state.histogram.histogram}
                       streams={this.state.streams} inputs={this.state.inputs} nodes={Immutable.Map(this.state.nodes)}
-                      searchInStream={this.props.searchInStream} permissions={this.state.currentUser.permissions}
+                      searchInStream={this.props.searchInStream} permissions={this.props.currentUser.permissions}
                       searchConfig={this.props.searchConfig}
                       loadingSearch={this.state.updatingSearch || this.state.updatingHistogram}
                       forceFetch={this.props.forceFetch} />
@@ -221,4 +222,6 @@ const SearchPage = React.createClass({
   },
 });
 
-export default SearchPage;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(SearchPage));

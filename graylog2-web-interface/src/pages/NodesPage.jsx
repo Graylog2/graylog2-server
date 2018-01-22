@@ -1,14 +1,17 @@
 import React from 'react';
-import Reflux from 'reflux';
-
-import StoreProvider from 'injection/StoreProvider';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
+import PropTypes from 'prop-types';
+import { inject, observer } from 'mobx-react';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { NodesList } from 'components/nodes';
+import StoreProvider from 'injection/StoreProvider';
+const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const NodesPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  propTypes: {
+    currentUser: PropTypes.object.isRequired,
+  },
+
   render() {
     return (
       <DocumentTitle title="Nodes">
@@ -22,11 +25,13 @@ const NodesPage = React.createClass({
               will be persisted to disk, even when processing is disabled.
             </span>
           </PageHeader>
-          <NodesList permissions={this.state.currentUser.permissions} />
+          <NodesList permissions={this.props.currentUser.permissions} />
         </div>
       </DocumentTitle>
     );
   },
 });
 
-export default NodesPage;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(NodesPage));

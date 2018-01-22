@@ -58,7 +58,6 @@ class CombinedProvider {
       CodecTypes: () => require('stores/codecs/CodecTypesStore'),
       ConfigurationBundles: () => require('stores/configuration-bundles/ConfigurationBundlesStore'),
       Configurations: () => require('stores/configurations/ConfigurationsStore'),
-      CurrentUser: () => require('stores/users/CurrentUserStore'),
       Dashboards: () => require('stores/dashboards/DashboardsStore'),
       Decorators: () => require('stores/decorators/DecoratorsStore'),
       Deflector: () => require('stores/indices/DeflectorStore'),
@@ -121,6 +120,7 @@ class CombinedProvider {
       Widgets: () => require('stores/widgets/WidgetsStore'),
 
       // MobX Stores
+      CurrentUser: () => require('stores/users/CurrentUserStore'),
       JvmInfo: () => require('stores/system/JvmInfoStore'),
       Session: () => require('stores/sessions/SessionStore'),
       SystemInfo: () => require('stores/system/SystemInfoStore'),

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import { Alert, Nav, NavItem, Row, Col } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 import Routes from 'routing/Routes';
@@ -14,6 +15,7 @@ import ActionsProvider from 'injection/ActionsProvider';
 const AuthenticationActions = ActionsProvider.getActions('Authentication');
 
 import StoreProvider from 'injection/StoreProvider';
+
 const AuthenticationStore = StoreProvider.getStore('Authentication');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
@@ -25,9 +27,10 @@ const AuthenticationComponent = React.createClass({
     location: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
     children: PropTypes.element,
+    currentUser: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connect(AuthenticationStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(AuthenticationStore), PermissionsMixin],
 
   componentDidMount() {
     AuthenticationActions.load();
@@ -74,7 +77,7 @@ const AuthenticationComponent = React.createClass({
     const auths = this.state.authenticators;
     if (auths) {
       // only show the entries if the user is permitted to change them, makes no sense otherwise
-      if (this.isPermitted(this.state.currentUser.permissions, ['authentication:edit'])) {
+      if (this.isPermitted(this.props.currentUser.permissions, ['authentication:edit'])) {
         authenticators = auths.realm_order.map((name, idx) => {
           const auth = this.authenticatorConfigurations[name];
           const title = (auth || { displayName: name }).displayName;
@@ -98,14 +101,14 @@ const AuthenticationComponent = React.createClass({
     }
 
     // add submenu items based on permissions
-    if (this.isPermitted(this.state.currentUser.permissions, ['roles:read'])) {
+    if (this.isPermitted(this.props.currentUser.permissions, ['roles:read'])) {
       authenticators.unshift(
         <LinkContainer key="roles" to={Routes.SYSTEM.AUTHENTICATION.ROLES}>
           <NavItem title="Roles">Roles</NavItem>
         </LinkContainer>,
       );
     }
-    if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
+    if (this.isPermitted(this.props.currentUser.permissions, ['users:list'])) {
       authenticators.unshift(
         <LinkContainer key="users" to={Routes.SYSTEM.AUTHENTICATION.USERS.LIST}>
           <NavItem title="Users">Users</NavItem>
@@ -115,7 +118,7 @@ const AuthenticationComponent = React.createClass({
 
     if (authenticators.length === 0) {
       // special case, this is a user editing their own profile
-      authenticators = [<LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(this.state.currentUser.username))}>
+      authenticators = [<LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(this.props.currentUser.username))}>
         <NavItem title="Edit User">Edit User</NavItem>
       </LinkContainer>];
     }
@@ -134,4 +137,6 @@ const AuthenticationComponent = React.createClass({
   },
 });
 
-export default AuthenticationComponent;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(AuthenticationComponent));

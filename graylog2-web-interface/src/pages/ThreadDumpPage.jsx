@@ -7,7 +7,6 @@ import { DocumentTitle, PageHeader, Spinner } from 'components/common';
 
 import StoreProvider from 'injection/StoreProvider';
 const NodesStore = StoreProvider.getStore('Nodes');
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const ClusterOverviewStore = StoreProvider.getStore('ClusterOverview');
 
 import DateTime from 'logic/datetimes/DateTime';
@@ -20,7 +19,7 @@ const ThreadDumpPage = React.createClass({
   propTypes: {
     params: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
+  mixins: [Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
   componentDidMount() {
     ClusterOverviewStore.threadDump(this.props.params.nodeId).then(threadDump => this.setState({ threadDump: threadDump }));
   },

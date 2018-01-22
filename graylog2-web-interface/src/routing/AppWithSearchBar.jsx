@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import { Row, Col } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
@@ -22,11 +23,11 @@ const ConfigurationActions = ActionsProvider.getActions('Configuration');
 const AppWithSearchBar = React.createClass({
   propTypes: {
     children: PropTypes.element.isRequired,
+    currentUser: PropTypes.object.isRequired,
     location: PropTypes.object,
     params: PropTypes.object,
   },
   mixins: [
-    Reflux.connect(CurrentUserStore),
     Reflux.connect(SavedSearchesStore),
     Reflux.connect(ConfigurationsStore),
   ],
@@ -92,7 +93,8 @@ const AppWithSearchBar = React.createClass({
 
     return (
       <div className="container-fluid">
-        <SearchBar ref="searchBar" userPreferences={this.state.currentUser.preferences}
+        <SearchBar ref="searchBar"
+                   userPreferences={this.props.currentUser.preferences}
                    savedSearches={this.state.savedSearches}
                    config={this.state.searchesClusterConfig}
                    displayRefreshControls={this._searchBarShouldDisplayRefreshControls()}
@@ -107,4 +109,6 @@ const AppWithSearchBar = React.createClass({
   },
 });
 
-export default AppWithSearchBar;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(AppWithSearchBar));

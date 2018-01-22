@@ -1,5 +1,5 @@
 import Reflux from 'reflux';
-import { reaction } from 'mobx';
+import { autorun, observable } from 'mobx';
 
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -10,53 +10,61 @@ import CombinedProvider from 'injection/CombinedProvider';
 const { SessionStore } = CombinedProvider.get('Session');
 const { StartpageStore } = CombinedProvider.get('Startpage');
 
-const CurrentUserStore = Reflux.createStore({
-  currentUser: undefined,
+class CurrentUserStore {
+  constructor() {
+    this.state = observable.shallowObject({
+      isLoading: false,
+      currentUser: undefined,
+    }, 'CurrentUserStore state');
+  }
 
-  init() {
-    reaction(
-      () => ({
-        sessionId: SessionStore.sessionId,
-        username: SessionStore.username,
-      }),
-      (sessionInfo) => {
-        this.sessionUpdate(sessionInfo);
-      },
-    );
-    this.listenTo(StartpageStore, this.reload, this.reload);
-  },
+  get isLoading() {
+    return this.state.isLoading;
+  }
 
-  getInitialState() {
-    return { currentUser: this.currentUser };
-  },
-
-  get() {
-    return this.currentUser;
-  },
+  get currentUser() {
+    return this.state.currentUser;
+  }
 
   sessionUpdate(sessionInfo) {
     if (sessionInfo.sessionId && sessionInfo.username) {
       const username = sessionInfo.username;
       this.update(username);
     } else {
-      this.currentUser = undefined;
-      this.trigger({ currentUser: this.currentUser });
+      this.state.currentUser = undefined;
     }
-  },
+  }
 
   reload() {
-    if (this.currentUser !== undefined) {
-      return this.update(this.currentUser.username);
+    if (this.state.currentUser !== undefined) {
+      return this.update(this.state.currentUser.username);
     }
-  },
+
+    return null;
+  }
 
   update(username) {
+    this.state.isLoading = true;
     return fetch('GET', URLUtils.qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url))
-      .then((resp) => {
-        this.currentUser = resp;
-        this.trigger({ currentUser: this.currentUser });
+      .then((response) => {
+        this.state.currentUser = response;
+        return response;
+      })
+      .finally(() => {
+        this.state.isLoading = false;
       });
-  },
+  }
+}
+
+const currentUserStore = new CurrentUserStore();
+
+autorun('Update current user', () => {
+  currentUserStore.sessionUpdate({
+    sessionId: SessionStore.sessionId,
+    username: SessionStore.username,
+  });
 });
 
-export default CurrentUserStore;
+// TODO: Fix listenTo: this.listenTo(StartpageStore, this.reload, this.reload);
+
+export default currentUserStore;

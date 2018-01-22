@@ -1,19 +1,26 @@
 import React from 'react';
-import Reflux from 'reflux';
+import PropTypes from 'prop-types';
+import { inject, observer } from 'mobx-react';
 import { DocumentTitle } from 'components/common';
 import DashboardListPage from 'components/dashboard/DashboardListPage';
 import StoreProvider from 'injection/StoreProvider';
+
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const DashboardsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  propTypes: {
+    currentUser: PropTypes.object.isRequired,
+  },
+
   render() {
     return (
       <DocumentTitle title="Dashboards">
-        <DashboardListPage permissions={this.state.currentUser.permissions} />
+        <DashboardListPage permissions={this.props.currentUser.permissions} />
       </DocumentTitle>
     );
   },
 });
 
-export default DashboardsPage;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(DashboardsPage));

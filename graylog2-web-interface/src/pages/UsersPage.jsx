@@ -1,5 +1,6 @@
 import React from 'react';
-import Reflux from 'reflux';
+import PropTypes from 'prop-types';
+import { inject, observer } from 'mobx-react';
 import { Row, Col, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -13,7 +14,11 @@ import { DocumentTitle, IfPermitted, PageHeader } from 'components/common';
 import UserList from 'components/users/UserList';
 
 const UsersPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+  propTypes: {
+    currentUser: PropTypes.object.isRequired,
+  },
+
+  mixins: [PermissionsMixin],
   render() {
     return (
       <DocumentTitle title="Users">
@@ -32,7 +37,7 @@ const UsersPage = React.createClass({
 
           <Row>
             <Col md={12}>
-              <UserList currentUsername={this.state.currentUser.username} currentUser={this.state.currentUser} />
+              <UserList currentUsername={this.props.currentUser.username} currentUser={this.props.currentUser} />
             </Col>
           </Row>
         </span>
@@ -41,4 +46,6 @@ const UsersPage = React.createClass({
   },
 });
 
-export default UsersPage;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(UsersPage));

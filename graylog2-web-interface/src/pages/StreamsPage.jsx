@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import { Row, Col } from 'react-bootstrap';
 
 import CreateStreamButton from 'components/streams/CreateStreamButton';
@@ -20,7 +22,11 @@ import ActionsProvider from 'injection/ActionsProvider';
 const IndexSetsActions = ActionsProvider.getActions('IndexSets');
 
 const StreamsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(IndexSetsStore)],
+  propTypes: {
+    currentUser: PropTypes.object.isRequired,
+  },
+
+  mixins: [Reflux.connect(IndexSetsStore)],
   getInitialState() {
     return {
       indexSets: undefined,
@@ -30,7 +36,7 @@ const StreamsPage = React.createClass({
     IndexSetsActions.list(false);
   },
   _isLoading() {
-    return !this.state.currentUser || !this.state.indexSets;
+    return !this.props.currentUser || !this.state.indexSets;
   },
   _onSave(_, stream) {
     StreamsStore.save(stream, () => {
@@ -63,7 +69,7 @@ const StreamsPage = React.createClass({
 
           <Row className="content">
             <Col md={12}>
-              <StreamComponent currentUser={this.state.currentUser} onStreamSave={this._onSave}
+              <StreamComponent currentUser={this.props.currentUser} onStreamSave={this._onSave}
                                indexSets={this.state.indexSets} />
             </Col>
           </Row>
@@ -73,4 +79,6 @@ const StreamsPage = React.createClass({
   },
 });
 
-export default StreamsPage;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(StreamsPage));

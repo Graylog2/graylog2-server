@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 import { inject, observer } from 'mobx-react';
 import moment from 'moment';
@@ -12,8 +11,8 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 const SystemInfoStore = StoreProvider.getStore('SystemInfo');
 
 const TimesList = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
   propTypes: {
+    currentUser: PropTypes.object.isRequired,
     isLoading: PropTypes.bool.isRequired,
     systemInfo: PropTypes.object,
   },
@@ -34,7 +33,7 @@ const TimesList = React.createClass({
     }
     const time = this.state.time;
     const timeFormat = DateTime.Formats.DATETIME_TZ;
-    const currentUser = this.state.currentUser;
+    const currentUser = this.props.currentUser;
     const serverTimezone = systemInfo.timezone;
     return (
       <Row className="content">
@@ -61,6 +60,7 @@ const TimesList = React.createClass({
 });
 
 export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
   isLoading: SystemInfoStore.isLoading,
   systemInfo: SystemInfoStore.systemInfo,
 }))(observer(TimesList));

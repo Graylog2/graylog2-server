@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import { Button, Row, Col, Alert, Panel } from 'react-bootstrap';
 import Routes from 'routing/Routes';
 
@@ -26,9 +27,10 @@ import { IfPermitted, MultiSelect, TimezoneSelect, Spinner } from 'components/co
 
 const UserForm = React.createClass({
   propTypes: {
+    currentUser: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
   },
-  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore), Reflux.connect(DashboardsStore)],
+  mixins: [PermissionsMixin, Reflux.connect(DashboardsStore)],
   getInitialState() {
     return {
       streams: undefined,
@@ -95,7 +97,7 @@ const UserForm = React.createClass({
 
     UsersStore.changePassword(this.props.user.username, request).then(() => {
       UserNotification.success('Password updated successfully.', 'Success');
-      if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
+      if (this.isPermitted(this.props.currentUser.permissions, ['users:list'])) {
         history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }
     }, () => {
@@ -108,10 +110,10 @@ const UserForm = React.createClass({
 
     UsersStore.update(this.props.user.username, this.state.user).then(() => {
       UserNotification.success('User updated successfully.', 'Success');
-      if (this.isPermitted(this.state.currentUser.permissions, ['users:list'])) {
+      if (this.isPermitted(this.props.currentUser.permissions, ['users:list'])) {
         history.replace(Routes.SYSTEM.AUTHENTICATION.USERS.LIST);
       }
-      if (this.props.user.username === this.state.currentUser.username) {
+      if (this.props.user.username === this.props.currentUser.username) {
         CurrentUserStore.reload();
       }
     }, () => {
@@ -185,13 +187,13 @@ const UserForm = React.createClass({
     }
 
     const user = this.state.user;
-    const permissions = this.state.currentUser.permissions;
+    const permissions = this.props.currentUser.permissions;
     const dashboards = this.state.dashboards.toArray().sort((d1, d2) => d1.title.localeCompare(d2.title));
 
     let requiresOldPassword = true;
     if (this.isPermitted(permissions, 'users:passwordchange:*')) {
       // Ask for old password if user is editing their own account
-      requiresOldPassword = this.props.user.username === this.state.currentUser.username;
+      requiresOldPassword = this.props.user.username === this.props.currentUser.username;
     }
 
     const streamReadOptions = this.formatSelectedOptions(this.state.user.permissions, 'streams:read', this.state.streams);
@@ -351,4 +353,6 @@ const UserForm = React.createClass({
   },
 });
 
-export default UserForm;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(UserForm));

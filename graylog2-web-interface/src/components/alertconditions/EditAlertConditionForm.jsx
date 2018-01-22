@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import { Button } from 'react-bootstrap';
 
 import { EntityList, Spinner } from 'components/common';
@@ -15,9 +16,10 @@ const EditAlertConditionForm = React.createClass({
   propTypes: {
     alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object.isRequired,
+    currentUser: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(AlertConditionsStore), PermissionsMixin],
 
   _onEdit() {
     this.refs.updateForm.open();
@@ -35,7 +37,7 @@ const EditAlertConditionForm = React.createClass({
     const condition = this.props.alertCondition;
     const typeDefinition = this.state.types[type];
 
-    const permissions = this.state.currentUser.permissions;
+    const permissions = this.props.currentUser.permissions;
     let actions = [];
     if (this.isPermitted(permissions, `streams:edit:${stream.id}`)) {
       actions = [
@@ -75,4 +77,6 @@ const EditAlertConditionForm = React.createClass({
   },
 });
 
-export default EditAlertConditionForm;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(EditAlertConditionForm));

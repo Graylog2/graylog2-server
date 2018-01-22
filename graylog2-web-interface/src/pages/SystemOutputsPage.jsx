@@ -1,5 +1,6 @@
 import React from 'react';
-import Reflux from 'reflux';
+import PropTypes from 'prop-types';
+import { inject, observer } from 'mobx-react';
 
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -8,7 +9,10 @@ import { DocumentTitle, PageHeader } from 'components/common';
 import OutputsComponent from 'components/outputs/OutputsComponent';
 
 const SystemOutputsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
+  propTypes: {
+    currentUser: PropTypes.object.isRequired,
+  },
+
   render() {
     return (
       <DocumentTitle title="Outputs">
@@ -24,11 +28,13 @@ const SystemOutputsPage = React.createClass({
             </span>
           </PageHeader>
 
-          <OutputsComponent permissions={this.state.currentUser.permissions} />
+          <OutputsComponent permissions={this.props.currentUser.permissions} />
         </span>
       </DocumentTitle>
     );
   },
 });
 
-export default SystemOutputsPage;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(SystemOutputsPage));

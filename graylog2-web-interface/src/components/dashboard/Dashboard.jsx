@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -18,12 +18,13 @@ import Routes from 'routing/Routes';
 
 const Dashboard = React.createClass({
   propTypes: {
+    currentUser: PropTypes.object.isRequired,
     dashboard: PropTypes.object,
     permissions: PropTypes.arrayOf(PropTypes.string),
   },
-  mixins: [PermissionsMixin, Reflux.connect(CurrentUserStore)],
+  mixins: [PermissionsMixin],
   _setStartpage() {
-    StartpageStore.set(this.state.currentUser.username, 'dashboard', this.props.dashboard.id);
+    StartpageStore.set(this.props.currentUser.username, 'dashboard', this.props.dashboard.id);
   },
   _onDashboardDelete() {
     if (window.confirm(`Do you really want to delete the dashboard ${this.props.dashboard.title}?`)) {
@@ -33,7 +34,7 @@ const Dashboard = React.createClass({
   _getDashboardActions() {
     let dashboardActions;
     const setAsStartpageMenuItem = (
-      <MenuItem onSelect={this._setStartpage} disabled={this.state.currentUser.read_only}>Set as startpage</MenuItem>
+      <MenuItem onSelect={this._setStartpage} disabled={this.props.currentUser.read_only}>Set as startpage</MenuItem>
     );
 
     if (this.isPermitted(this.props.permissions, [`dashboards:edit:${this.props.dashboard.id}`])) {
@@ -85,4 +86,6 @@ const Dashboard = React.createClass({
   },
 });
 
-export default Dashboard;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(Dashboard));

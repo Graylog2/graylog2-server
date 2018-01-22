@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -15,6 +15,8 @@ const IfPermitted = React.createClass({
   propTypes: {
     /** Children to render if user has permissions. */
     children: PropTypes.node.isRequired,
+    /** Current user logged into the system. */
+    currentUser: PropTypes.object.isRequired,
     /** Permissions the current user must fulfill. By default, the user must have all permissions that are passed in this prop. */
     permissions: PropTypes.oneOfType([
       PropTypes.string,
@@ -23,7 +25,7 @@ const IfPermitted = React.createClass({
     /** This flag controls which permissions the user must fulfill: (all, at least one). */
     anyPermissions: PropTypes.bool,
   },
-  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [PermissionsMixin],
   getDefaultProps() {
     return {
       anyPermissions: false,
@@ -31,13 +33,13 @@ const IfPermitted = React.createClass({
   },
   _checkPermissions() {
     if (this.props.anyPermissions) {
-      return this.isAnyPermitted(this.state.currentUser.permissions, this.props.permissions);
+      return this.isAnyPermitted(this.props.currentUser.permissions, this.props.permissions);
     }
 
-    return this.isPermitted(this.state.currentUser.permissions, this.props.permissions);
+    return this.isPermitted(this.props.currentUser.permissions, this.props.permissions);
   },
   render() {
-    if (this.state.currentUser && this._checkPermissions()) {
+    if (this.props.currentUser && this._checkPermissions()) {
       return React.Children.count(this.props.children) > 1 ? <span>{this.props.children}</span> : this.props.children;
     }
 
@@ -45,4 +47,6 @@ const IfPermitted = React.createClass({
   },
 });
 
-export default IfPermitted;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(IfPermitted));

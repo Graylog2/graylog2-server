@@ -1,5 +1,7 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 
 import { Spinner } from 'components/common';
 import Routes from 'routing/Routes';
@@ -15,7 +17,11 @@ import ActionsProvider from 'injection/ActionsProvider';
 const GettingStartedActions = ActionsProvider.getActions('GettingStarted');
 
 const StartPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
+  propTypes: {
+    currentUser: PropTypes.object.isRequired,
+  },
+
+  mixins: [Reflux.listenTo(GettingStartedStore, 'onGettingStartedUpdate')],
   getInitialState() {
     return {
       gettingStarted: undefined,
@@ -38,7 +44,7 @@ const StartPage = React.createClass({
   },
   _redirectToStartpage() {
     // Show getting started page if user is an admin and getting started wasn't dismissed
-    if (PermissionsMixin.isPermitted(this.state.currentUser.permissions, ['inputs:create'])) {
+    if (PermissionsMixin.isPermitted(this.props.currentUser.permissions, ['inputs:create'])) {
       if (this.state.gettingStarted.show) {
         this._redirect(Routes.GETTING_STARTED);
         return;
@@ -46,7 +52,7 @@ const StartPage = React.createClass({
     }
 
     // Show custom startpage if it was set
-    const startpage = this.state.currentUser.startpage;
+    const startpage = this.props.currentUser.startpage;
     if (startpage !== null && Object.keys(startpage).length > 0) {
       if (startpage.type === 'stream') {
         this._redirect(Routes.stream_search(startpage.id));
@@ -57,18 +63,20 @@ const StartPage = React.createClass({
     }
 
     // Show search page if permitted, or streams page in other case
-    if (PermissionsMixin.isAnyPermitted(this.state.currentUser.permissions, ['searches:absolute', 'searches:keyword', 'searches:relative'])) {
+    if (PermissionsMixin.isAnyPermitted(this.props.currentUser.permissions, ['searches:absolute', 'searches:keyword', 'searches:relative'])) {
       this._redirect(Routes.SEARCH);
     } else {
       this._redirect(Routes.STREAMS);
     }
   },
   _isLoading() {
-    return !this.state.currentUser || !this.state.gettingStarted;
+    return !this.props.currentUser || !this.state.gettingStarted;
   },
   render() {
     return <Spinner />;
   },
 });
 
-export default StartPage;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(StartPage));

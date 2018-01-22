@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
+import { inject, observer } from 'mobx-react';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
 
@@ -19,9 +20,10 @@ function nodeFilter(state) {
 
 const NodeInputsPage = React.createClass({
   propTypes: {
+    currentUser: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
+  mixins: [Reflux.connectFilter(NodesStore, 'node', nodeFilter)],
   componentDidMount() {
     this.interval = setInterval(InputStatesStore.list, 2000);
   },
@@ -48,11 +50,13 @@ const NodeInputsPage = React.createClass({
               You can launch and terminate inputs on your cluster <LinkContainer to={Routes.SYSTEM.INPUTS}><a>here</a></LinkContainer>.
             </span>
           </PageHeader>
-          <InputsList permissions={this.state.currentUser.permissions} node={this.state.node} />
+          <InputsList permissions={this.props.currentUser.permissions} node={this.state.node} />
         </div>
       </DocumentTitle>
     );
   },
 });
 
-export default NodeInputsPage;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(NodeInputsPage));

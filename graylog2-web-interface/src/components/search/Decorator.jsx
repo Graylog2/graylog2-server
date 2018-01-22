@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
@@ -20,10 +21,11 @@ import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
 const Decorator = React.createClass({
   propTypes: {
+    currentUser: PropTypes.object.isRequired,
     decorator: PropTypes.object.isRequired,
     typeDefinition: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(DecoratorsStore), PermissionsMixin],
   componentDidMount() {
     DecoratorsActions.available();
   },
@@ -69,7 +71,7 @@ const Decorator = React.createClass({
     return Object.assign({}, config, resolvedConfig);
   },
   _formatActionsMenu() {
-    const permissions = this.state.currentUser.permissions;
+    const permissions = this.props.currentUser.permissions;
     const decorator = this.props.decorator;
     const editPermission = this.isPermitted(permissions, `decorators:edit:${decorator.stream}`);
     return (
@@ -81,7 +83,7 @@ const Decorator = React.createClass({
     );
   },
   render() {
-    if (!this.state.types || !this.state.currentUser) {
+    if (!this.state.types || !this.props.currentUser) {
       return <Spinner />;
     }
     const decorator = this.props.decorator;
@@ -113,4 +115,6 @@ const Decorator = React.createClass({
   },
 });
 
-export default Decorator;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(Decorator));

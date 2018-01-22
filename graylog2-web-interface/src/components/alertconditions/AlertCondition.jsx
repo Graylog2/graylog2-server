@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
 
 import CombinedProvider from 'injection/CombinedProvider';
@@ -14,8 +15,9 @@ const AlertCondition = React.createClass({
   propTypes: {
     alertCondition: PropTypes.object.isRequired,
     stream: PropTypes.object,
+    currentUser: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(AlertConditionsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(AlertConditionsStore), PermissionsMixin],
 
   _onDelete() {
     if (window.confirm('Really delete alert condition?')) {
@@ -33,7 +35,7 @@ const AlertCondition = React.createClass({
       return <UnknownAlertCondition alertCondition={condition} onDelete={this._onDelete} stream={stream} />;
     }
 
-    const permissions = this.state.currentUser.permissions;
+    const permissions = this.props.currentUser.permissions;
     let actions = [];
     if (this.isPermitted(permissions, `streams:edit:${stream.id}`)) {
       actions = [
@@ -51,4 +53,6 @@ const AlertCondition = React.createClass({
   },
 });
 
-export default AlertCondition;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(AlertCondition));

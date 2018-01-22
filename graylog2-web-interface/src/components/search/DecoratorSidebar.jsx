@@ -2,6 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
 
 import { Spinner } from 'components/common';
@@ -21,10 +22,11 @@ import DecoratorStyles from '!style!css!components/search/decoratorStyles.css';
 
 const DecoratorSidebar = React.createClass({
   propTypes: {
+    currentUser: PropTypes.object.isRequired,
     stream: PropTypes.string,
     maximumHeight: PropTypes.number,
   },
-  mixins: [Reflux.connect(DecoratorsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(DecoratorsStore), PermissionsMixin],
   getInitialState() {
     return {
       maxDecoratorsHeight: 1000,
@@ -93,7 +95,7 @@ const DecoratorSidebar = React.createClass({
       </Popover>
     );
 
-    const editPermissions = this.isPermitted(this.state.currentUser.permissions, `decorators:edit:${this.props.stream}`);
+    const editPermissions = this.isPermitted(this.props.currentUser.permissions, `decorators:edit:${this.props.stream}`);
     return (
       <div>
         <AddDecoratorButton stream={this.props.stream} nextOrder={nextDecoratorOrder} disabled={!editPermissions} />
@@ -110,4 +112,6 @@ const DecoratorSidebar = React.createClass({
   },
 });
 
-export default DecoratorSidebar;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(DecoratorSidebar));

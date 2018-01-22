@@ -22,8 +22,9 @@ import 'rickshaw/rickshaw.css';
 import 'stylesheets/graylog2.less';
 
 const AppFacade = React.createClass({
-  mixins: [Reflux.connect(ServerAvailabilityStore), Reflux.connect(CurrentUserStore)],
+  mixins: [Reflux.connect(ServerAvailabilityStore)],
   propTypes: {
+    currentUser: PropTypes.object,
     sessionId: PropTypes.string,
   },
 
@@ -44,7 +45,7 @@ const AppFacade = React.createClass({
     if (!this.props.sessionId) {
       return <LoginPage />;
     }
-    if (!this.state.currentUser) {
+    if (!this.props.currentUser) {
       return <LoadingPage text="We are preparing Graylog for you..." />;
     }
     return <LoggedInPage />;
@@ -52,5 +53,6 @@ const AppFacade = React.createClass({
 });
 
 export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
   sessionId: SessionStore.sessionId,
 }))(observer(AppFacade));

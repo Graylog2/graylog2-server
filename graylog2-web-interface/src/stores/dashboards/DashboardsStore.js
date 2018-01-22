@@ -1,5 +1,6 @@
 import Reflux from 'reflux';
 import Immutable from 'immutable';
+import { autorun } from 'mobx';
 
 import ActionsProvider from 'injection/ActionsProvider';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -19,13 +20,15 @@ export default Reflux.createStore({
   permissions: [],
 
   init() {
-    this.listenTo(CurrentUserStore, this.currentUserUpdated);
+    autorun('Update current user in DashboardsStore', () => {
+      this.currentUserUpdated(CurrentUserStore.currentUser);
+    });
     DashboardsActions.list();
   },
 
-  currentUserUpdated(state) {
-    if (state && state.currentUser) {
-      this.permissions = state.currentUser.permissions;
+  currentUserUpdated(currentUser) {
+    if (currentUser) {
+      this.permissions = currentUser.permissions;
       DashboardsActions.list();
     }
   },

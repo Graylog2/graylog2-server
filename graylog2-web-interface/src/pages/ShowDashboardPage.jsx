@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
 import { PluginStore } from 'graylog-web-plugin/plugin';
 import deepEqual from 'deep-equal';
@@ -29,9 +30,10 @@ import style from './ShowDashboardPage.css';
 
 const ShowDashboardPage = React.createClass({
   propTypes: {
+    currentUser: PropTypes.object.isRequired,
     params: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(FocusStore), PermissionsMixin],
+  mixins: [Reflux.connect(FocusStore), PermissionsMixin],
 
   getInitialState() {
     return {
@@ -54,7 +56,7 @@ const ShowDashboardPage = React.createClass({
     });
     this.loadInterval = setInterval(this.loadData, 2000);
     // eslint-disable-next-line react/no-did-mount-set-state
-    this.setState({ forceUpdateInBackground: this.state.currentUser.preferences.updateUnfocussed });
+    this.setState({ forceUpdateInBackground: this.props.currentUser.preferences.updateUnfocussed });
   },
   componentWillUnmount() {
     if (this.loadInterval) {
@@ -263,4 +265,6 @@ const ShowDashboardPage = React.createClass({
   },
 });
 
-export default ShowDashboardPage;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(ShowDashboardPage));

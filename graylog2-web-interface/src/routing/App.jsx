@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import Navigation from 'components/navigation/Navigation';
-import Spinner from 'components/common/Spinner';
 import Footer from 'components/layout/Footer';
 
 import 'stylesheets/jquery.dynatable.css';
@@ -20,20 +19,18 @@ const App = React.createClass({
       PropTypes.arrayOf(PropTypes.element),
       PropTypes.element,
     ]).isRequired,
+    currentUser: PropTypes.object.isRequired,
     location: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connect(CurrentUserStore)],
   render() {
-    if (!this.state.currentUser) {
-      return <Spinner />;
-    }
+    const currentUser = this.props.currentUser;
     return (
       <div>
         <Navigation requestPath={this.props.location.pathname}
-                    fullName={this.state.currentUser.full_name}
-                    loginName={this.state.currentUser.username}
-                    permissions={this.state.currentUser.permissions} />
+                    fullName={currentUser.full_name}
+                    loginName={currentUser.username}
+                    permissions={currentUser.permissions} />
         <div id="scroll-to-hint" style={{ display: 'none' }} className="alpha80">
           <i className="fa fa-arrow-up" />
         </div>
@@ -44,4 +41,6 @@ const App = React.createClass({
   },
 });
 
-export default App;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(App));

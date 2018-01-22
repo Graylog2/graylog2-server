@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import { Button, Col, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -20,8 +21,9 @@ const AlertNotification = React.createClass({
     stream: PropTypes.object,
     onNotificationUpdate: PropTypes.func,
     onNotificationDelete: PropTypes.func,
+    currentUser: PropTypes.object.isRequired,
   },
-  mixins: [Reflux.connect(AlertNotificationsStore), Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [Reflux.connect(AlertNotificationsStore), PermissionsMixin],
 
   getInitialState() {
     return {
@@ -76,7 +78,7 @@ const AlertNotification = React.createClass({
       <span>Executed once per triggered alert condition in stream <em>{stream.title}</em></span>
       : 'Not executed, as it is not connected to a stream');
 
-    const actions = this.isPermitted(this.state.currentUser.permissions, [`streams:edit:${stream.id}`]) && [
+    const actions = this.isPermitted(this.props.currentUser.permissions, [`streams:edit:${stream.id}`]) && [
       <Button key="test-button" bsStyle="info" disabled={this.state.isTestingAlert} onClick={this._onTestNotification}>
         {this.state.isTestingAlert ? 'Testing...' : 'Test'}
       </Button>,
@@ -115,4 +117,6 @@ const AlertNotification = React.createClass({
   },
 });
 
-export default AlertNotification;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(AlertNotification));

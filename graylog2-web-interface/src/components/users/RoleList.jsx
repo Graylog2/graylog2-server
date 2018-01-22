@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Reflux from 'reflux';
+import { inject, observer } from 'mobx-react';
 import Immutable from 'immutable';
 import { Button } from 'react-bootstrap';
 
@@ -12,8 +12,9 @@ const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 import { DataTable } from 'components/common';
 
 const RoleList = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
+  mixins: [PermissionsMixin],
   propTypes: {
+    currentUser: PropTypes.object.isRequired,
     roles: PropTypes.instanceOf(Immutable.Set).isRequired,
     showEditRole: PropTypes.func.isRequired,
     deleteRole: PropTypes.func.isRequired,
@@ -24,13 +25,13 @@ const RoleList = React.createClass({
     return <th className={className}>{header}</th>;
   },
   _editButton(role) {
-    if (this.isPermitted(this.state.currentUser.permissions, ['roles:edit:' + role.name]) === false || role.read_only) {
+    if (this.isPermitted(this.props.currentUser.permissions, ['roles:edit:' + role.name]) === false || role.read_only) {
         return null;
     }
     return (<Button key="edit" bsSize="xsmall" bsStyle="info" onClick={() => this.props.showEditRole(role)} title="Edit role">Edit</Button>);
   },
   _deleteButton(role) {
-    if (this.isPermitted(this.state.currentUser.permissions, ['roles:delete:' + role.name]) === false || role.read_only) {
+    if (this.isPermitted(this.props.currentUser.permissions, ['roles:delete:' + role.name]) === false || role.read_only) {
         return null;
     }
     return (<Button key="delete" bsSize="xsmall" bsStyle="primary" onClick={() => this.props.deleteRole(role)} title="Delete role">Delete</Button>);
@@ -69,4 +70,6 @@ const RoleList = React.createClass({
   },
 });
 
-export default RoleList;
+export default inject(() => ({
+  currentUser: CurrentUserStore.currentUser,
+}))(observer(RoleList));

@@ -1,5 +1,4 @@
 import React from 'react';
-import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 
 import DocumentationLink from 'components/support/DocumentationLink';
@@ -10,11 +9,7 @@ import { AlertConditionsComponent } from 'components/alertconditions';
 import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
-import StoreProvider from 'injection/StoreProvider';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-
 const AlertConditionsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
   render() {
     return (
       <DocumentTitle title="Alert conditions">
