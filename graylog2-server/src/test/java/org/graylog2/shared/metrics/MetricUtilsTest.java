@@ -74,7 +74,9 @@ public class MetricUtilsTest {
         final Map<String, Object> map = MetricUtils.map("metric", counter);
         assertThat(map)
                 .containsEntry("type", "counter")
-                .containsEntry("metric", 23L);
+                .extracting("metric")
+                .extracting("count")
+                .containsExactly(23L);
     }
 
     @Test
@@ -89,7 +91,9 @@ public class MetricUtilsTest {
         final Map<String, Object> map = MetricUtils.map("metric", gauge);
         assertThat(map)
                 .containsEntry("type", "gauge")
-                .containsEntry("metric", 23);
+                .extracting("metric")
+                .extracting("value")
+                .containsExactly(23);
     }
 
     @Test
@@ -99,7 +103,9 @@ public class MetricUtilsTest {
         final Map<String, Object> map = MetricUtils.map("metric", gauge);
         assertThat(map)
                 .containsEntry("type", "gauge")
-                .containsEntry("metric", 23);
+                .extracting("metric")
+                .extracting("value")
+                .containsExactly(23);
     }
 
     @Test

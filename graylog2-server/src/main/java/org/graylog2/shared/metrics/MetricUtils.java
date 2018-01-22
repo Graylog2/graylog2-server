@@ -87,10 +87,10 @@ public class MetricUtils {
             metricMap.put("metric", buildHistogramMap((Histogram) metric));
             metricMap.put("type", "histogram");
         } else if(metric instanceof Counter) {
-            metricMap.put("metric", ((Counter) metric).getCount());
+            metricMap.put("metric", metric);
             metricMap.put("type", "counter");
         } else if(metric instanceof Gauge) {
-            metricMap.put("metric", ((Gauge) metric).getValue());
+            metricMap.put("metric", metric);
             metricMap.put("type", "gauge");
         } else {
             throw new IllegalArgumentException("Unknown metric type " + metric.getClass());
