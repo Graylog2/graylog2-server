@@ -1,17 +1,17 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import $ from 'jquery';
-import { PluginStore } from 'graylog-web-plugin/plugin';
+import Reflux from 'reflux';
+
 import { WidgetConfigModal, WidgetEditConfigModal, WidgetFooter, WidgetHeader, WidgetVisualizationNotFound } from 'components/widgets';
+import { PluginStore } from 'graylog-web-plugin/plugin';
 import StoreProvider from 'injection/StoreProvider';
-import ActionsProvider from 'injection/ActionsProvider';
 import Routes from 'routing/Routes';
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
-import Reflux from 'reflux';
 import PermissionsMixin from 'util/PermissionsMixin';
+import CombinedProvider from '../../injection/CombinedProvider';
 
-const WidgetsStore = StoreProvider.getStore('Widgets');
-const WidgetsActions = ActionsProvider.getActions('Widgets');
+const { WidgetsStore, WidgetsActions } = CombinedProvider.get('Widgets');
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
 
 const Widget = React.createClass({
