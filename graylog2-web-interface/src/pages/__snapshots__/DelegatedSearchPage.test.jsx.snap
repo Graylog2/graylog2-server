@@ -1,5 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Renders SearchPage by default 1`] = `<SearchPage />`;
+exports[`Renders SearchPage by default 1`] = `<inject-SearchPage />`;
 
 exports[`Renders other component if registered 1`] = `<SimpleComponent />`;
