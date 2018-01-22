@@ -1,0 +1,175 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<WidgetFooter /> should render a widget footer locked and disabled replay 1`] = `
+<div>
+  <div
+    className="widget-update-info"
+  >
+    <span
+      className="load-error"
+      title=""
+    >
+      <i
+        className="fa fa-exclamation-triangle"
+      />
+    </span>
+    <span
+      title={821849040000}
+    >
+      <time
+        dateTime={821849040000}
+        title={821849040000}
+      >
+        22 years ago
+      </time>
+    </span>
+  </div>
+  <div>
+    <div
+      className="actions"
+    >
+      <div
+        className="widget-info"
+      >
+        <button
+          className="btn-text btn btn-link"
+          disabled={false}
+          onClick={[Function]}
+          title="Show widget configuration"
+          type="button"
+        >
+          <i
+            className="fa fa-info-circle"
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<WidgetFooter /> should render a widget footer locked and enabled replay 1`] = `
+<div>
+  <div
+    className="widget-update-info"
+  >
+    <span
+      className="load-error"
+      title=""
+    >
+      <i
+        className="fa fa-exclamation-triangle"
+      />
+    </span>
+    <span
+      title={821849040000}
+    >
+      <time
+        dateTime={821849040000}
+        title={821849040000}
+      >
+        22 years ago
+      </time>
+    </span>
+  </div>
+  <div>
+    <div
+      className="actions"
+    >
+      <div
+        className="widget-replay"
+      >
+        <a
+          className="btn-text btn btn-link"
+          href="http://example.org"
+          onClick={[Function]}
+          onKeyDown={[Function]}
+          title="Replay search"
+        >
+          <i
+            className="fa fa-play"
+          />
+        </a>
+      </div>
+      <div
+        className="widget-info"
+      >
+        <button
+          className="btn-text btn btn-link"
+          disabled={false}
+          onClick={[Function]}
+          title="Show widget configuration"
+          type="button"
+        >
+          <i
+            className="fa fa-info-circle"
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<WidgetFooter /> should render a widget footer with unlocked 1`] = `
+<div>
+  <div
+    className="widget-update-info"
+  >
+    <span
+      className="load-error"
+      title=""
+    >
+      <i
+        className="fa fa-exclamation-triangle"
+      />
+    </span>
+    <span
+      title={821849040000}
+    >
+      <time
+        dateTime={821849040000}
+        title={821849040000}
+      >
+        22 years ago
+      </time>
+    </span>
+  </div>
+  <div>
+    <div
+      className="actions"
+    >
+      <div
+        className="widget-delete"
+      >
+        <button
+          className="btn-text btn btn-link"
+          disabled={false}
+          onClick={[Function]}
+          title="Delete widget"
+          type="button"
+        >
+          <i
+            className="fa fa-trash"
+          />
+        </button>
+      </div>
+      <div
+        className="widget-edit"
+      >
+        <button
+          className="btn-text btn btn-link"
+          disabled={false}
+          onClick={[Function]}
+          title="Edit widget"
+          type="button"
+        >
+          <i
+            className="fa fa-pencil"
+          />
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+`;

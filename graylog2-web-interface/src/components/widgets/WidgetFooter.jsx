@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import { Button, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import { Button } from 'react-bootstrap';
 import { Timestamp } from 'components/common';
 
 const WidgetFooter = React.createClass({
@@ -13,7 +13,7 @@ const WidgetFooter = React.createClass({
     error: PropTypes.any,
     errorMessage: PropTypes.string,
     calculatedAt: PropTypes.string,
-    replayToolTip: PropTypes.string,
+    replayDisabled: PropTypes.bool,
   },
   _showConfig(e) {
     e.preventDefault();
@@ -46,26 +46,16 @@ const WidgetFooter = React.createClass({
       calculatedAtTime = 'Loading...';
     }
 
-    // if we have a tooltip, we disable the button link and instead show a tooltip on hover
-    const title = this.props.replayToolTip ? null : 'Replay search';
-    const href = this.props.replayToolTip ? null : this.props.replayHref;
-    let replay = (
-      <Button bsStyle="link" className="btn-text" title={title} href={href}>
-        <i className="fa fa-play" />
-      </Button>
+    const replay = this.props.replayDisabled ? null : (
+      <div className="widget-replay">
+        <Button bsStyle="link" className="btn-text" title="Replay search" href={this.props.replayHref}>
+          <i className="fa fa-play" />
+        </Button>
+      </div>
     );
-    if (this.props.replayToolTip) {
-      replay = (
-        <OverlayTrigger placement="bottom" overlay={<Tooltip id="tooltip">{this.props.replayToolTip}</Tooltip>}>
-          {replay}
-        </OverlayTrigger>
-      );
-    }
     const lockedActions = (
       <div className="actions">
-        <div className="widget-replay">
-          {replay}
-        </div>
+        {replay}
         <div className="widget-info">
           <Button bsStyle="link" className="btn-text" title="Show widget configuration" onClick={this._showConfig}>
             <i className="fa fa-info-circle" />
@@ -92,8 +82,8 @@ const WidgetFooter = React.createClass({
     return (
       <div>
         <div className="widget-update-info">
-        {loadErrorElement}
-        {calculatedAtTime}
+          {loadErrorElement}
+          {calculatedAtTime}
         </div>
         <div>
           {this.props.locked ? lockedActions : unlockedActions}

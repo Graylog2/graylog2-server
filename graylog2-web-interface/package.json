@@ -22,7 +22,8 @@
       "src/**/*.{js,jsx,ts,tsx}"
     ],
     "setupFiles": [
-      "jest-localstorage-mock"
+      "jest-localstorage-mock",
+      "./test/setup-jest.jsx"
     ],
     "setupTestFrameworkScriptFile": "./node_modules/jest-enzyme/lib/index.js",
     "moduleDirectories": [
@@ -36,7 +37,8 @@
       "ts"
     ],
     "moduleNameMapper": {
-      "\\.(css|less)$": "identity-obj-proxy"
+      "\\.(css|less)$": "identity-obj-proxy",
+      "c3": "<rootDir>/test/helpers/mocking/c3_mock.jsx"
     },
     "transform": {
       "^.+\\.jsx?$": "<rootDir>/node_modules/babel-jest",
