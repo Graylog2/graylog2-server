@@ -93,9 +93,7 @@ public class MetricUtils {
             metricMap.put("metric", ((Gauge) metric).getValue());
             metricMap.put("type", "gauge");
         } else {
-            metricMap.put("metric", metric);
-            // best guess
-            metricMap.put("type", "gauge");
+            throw new IllegalArgumentException("Unknown metric type " + metric.getClass());
         }
         return metricMap;
     }

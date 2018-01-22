@@ -21,6 +21,7 @@ import com.codahale.metrics.Counter;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.Histogram;
 import com.codahale.metrics.Meter;
+import com.codahale.metrics.Metric;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.codahale.metrics.UniformReservoir;
@@ -29,6 +30,7 @@ import org.junit.Test;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -155,6 +157,15 @@ public class MetricUtilsTest {
                 .extracting("rate")
                 .extracting("total")
                 .containsExactly(1.0D);
+    }
+
+    @Test
+    public void mapThrowsIllegalArgumentExceptionForUnknownMetricType() {
+        final Metric metric = new Metric() {};
+
+        assertThatIllegalArgumentException()
+                .isThrownBy(() -> MetricUtils.map("metric", metric))
+                .withMessageStartingWith("Unknown metric type class org.graylog2.shared.metrics.MetricUtilsTest");
     }
 
     private static class TestClock extends Clock {
