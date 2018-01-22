@@ -8,6 +8,7 @@ const webpackDevMiddleware = require('webpack-dev-middleware');
 const webpackHotMiddleware = require('webpack-hot-middleware');
 const webpackConfig = require('./webpack.bundled');
 
+const DEFAULT_HOST = '127.0.0.1';
 const DEFAULT_PORT = 8080;
 
 const app = express();
@@ -39,15 +40,17 @@ app.use(webpackHotMiddleware(appCompiler));
 const server = http.createServer(app);
 
 const argv = yargs.argv;
+const host = argv.host || DEFAULT_HOST;
+const port = argv.port || DEFAULT_PORT;
 
 server
-  .listen(argv.port || DEFAULT_PORT, () => {
-    console.log(`Graylog web interface listening on port ${server.address().port}!\n`);
+  .listen(port, host, () => {
+    console.log(`Graylog web interface listening on http://${server.address().address}:${server.address().port}!\n`);
   })
   .on('error', (error) => {
     if (error.code === 'EADDRINUSE') {
-      console.error(`Port ${argv.port || DEFAULT_PORT} already in use, will use a random one instead...`);
-      server.listen(0);
+      console.error(`Address http://${host}:${port} already in use, will use a random one instead...`);
+      server.listen(0, host);
     } else {
       throw error;
     }

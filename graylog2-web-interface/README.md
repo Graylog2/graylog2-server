@@ -15,9 +15,14 @@
 
 The `yarn start` (or `disable_plugins=true yarn start`) command will run an [Express](http://expressjs.com) web server which is configured to do a full page reload in your browser every time that you save a file. This ensures that you will always use the latest version of your code.
 
-You can start the development server in any other port that you like. To do so, use the `--port=<port>` option, e.g. `yarn start --port=8000` will start the development server in port 8000 instead of the default 8080. The server will also pick a random port if the port is already taken, so you don't need to worry if another process is already using that port.
+### Run development server in a different host and port
 
-We mainly develop using IntelliJ or WebStorm. If you also decide to use them to work in Graylog, enable `React JSX` as Javascript language version to support the JSX language extension. This setting was called `JSX harmony` before, and it is available in one or the other form since IntelliJ 14 and WebStorm 9.
+You can start the development server in any other host and port that you like:
+
+- Use the `--host=<hostname>` option to change the default host the development server uses. The default host is `127.0.0.1`
+- Use the `--port=<port>` option to change the default port number the development server uses. The default value is `8080`. The server will pick a random port if the port you try to use is already in use
+
+E.g. `yarn start --host=0.0.0.0 --port=8000` will start the development server in all available network interfaces using the port 8000.
 
 ## Frontend documentation and component gallery
 There's an online version of the frontend documentation and component gallery at:
@@ -32,6 +37,10 @@ You may also run the documentation locally to contribute to it or see a differen
 1. Run `yarn install`
 1. Run `yarn run docs:server`
 1. Go to [http://localhost:6060](http://localhost:6060) on your favourite browser to see the local documentation
+
+## Configure your editor
+
+We mainly develop using IntelliJ or WebStorm. If you also decide to use them to work in Graylog, enable `React JSX` as Javascript language version to support the JSX language extension. This setting was called `JSX harmony` before, and it is available in one or the other form since IntelliJ 14 and WebStorm 9.
 
 ## Update Javascript dependencies
 
