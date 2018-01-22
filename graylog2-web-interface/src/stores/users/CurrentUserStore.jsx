@@ -65,6 +65,9 @@ autorun('Update current user', () => {
   });
 });
 
-// TODO: Fix listenTo: this.listenTo(StartpageStore, this.reload, this.reload);
+// Reloads user after their start page changes, allowing us to redirect them to the right page.
+StartpageStore.listen(() => {
+  this.reload();
+});
 
 export default currentUserStore;
