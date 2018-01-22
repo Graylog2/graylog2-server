@@ -12,7 +12,7 @@ import Routes from 'routing/Routes';
 import DocsHelper from 'util/DocsHelper';
 
 import CombinedProvider from 'injection/CombinedProvider';
-const { CurrentUserStore } = CombinedProvider.get('CurrentUser');
+
 const { StreamsStore } = CombinedProvider.get('Streams');
 const { AlertConditionsStore, AlertConditionsActions } = CombinedProvider.get('AlertConditions');
 
@@ -21,7 +21,7 @@ const EditAlertConditionPage = React.createClass({
     params: PropTypes.object.isRequired,
   },
 
-  mixins: [Reflux.connect(CurrentUserStore), Reflux.connect(AlertConditionsStore)],
+  mixins: [Reflux.connect(AlertConditionsStore)],
 
   getInitialState() {
     return {

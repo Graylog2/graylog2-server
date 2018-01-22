@@ -1,5 +1,4 @@
 import React from 'react';
-import Reflux from 'reflux';
 import { Col, Row } from 'react-bootstrap';
 
 import { DocumentTitle, PageHeader } from 'components/common';
@@ -7,11 +6,7 @@ import { AlertsHeaderToolbar } from 'components/alerts';
 import { AlertNotificationsComponent } from 'components/alertnotifications';
 import Routes from 'routing/Routes';
 
-import StoreProvider from 'injection/StoreProvider';
-const CurrentUserStore = StoreProvider.getStore('CurrentUser');
-
 const AlertNotificationsPage = React.createClass({
-  mixins: [Reflux.connect(CurrentUserStore)],
   render() {
     return (
       <DocumentTitle title="Alert notifications">
