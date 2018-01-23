@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import moment from 'moment-timezone';
-import jQuery from 'jquery';
+import lodash from 'lodash';
 
 import Select from 'components/common/Select';
 
@@ -35,6 +35,7 @@ const TimezoneSelect = React.createClass({
 
   _formatTimezones() {
     const timezones = {};
+    // Group time zones by area
     moment.tz.names().forEach((timezone) => {
       const splitted = timezone.split('/');
       const area = (splitted.length > 1 ? splitted[0] : this._UNCLASSIFIED_AREA);
@@ -47,16 +48,24 @@ const TimezoneSelect = React.createClass({
       timezones[area].push(location);
     });
 
-    return [].concat.apply([], Object.keys(timezones).sort().map((area) => {
-      return [{ label: area, disabled: true, value: area }]
-        .concat(jQuery.unique(timezones[area])
-          .sort()
-          .map((location) => {
-            const timezone = (area === this._UNCLASSIFIED_AREA ? location : `${area}/${location}`);
-            return { value: timezone, label: location.replace('_', ' ') };
-          }),
-        );
-    }));
+    const labels = [];
+
+    Object.keys(timezones)
+      .sort()
+      .forEach((area) => {
+        // Add disabled area option to use as TZ separator
+        labels.push({ label: area, disabled: true, value: area });
+
+        // Now add a label per timezone in the area
+        const effectiveTimezones = lodash.uniq(timezones[area]).sort();
+        const timezoneLabels = effectiveTimezones.map((location) => {
+          const timezone = (area === this._UNCLASSIFIED_AREA ? location : `${area}/${location}`);
+          return { value: timezone, label: location.replace('_', ' ') };
+        });
+        labels.push(...timezoneLabels);
+      });
+
+    return labels;
   },
   _renderOption(option) {
     if (!option.disabled) {
