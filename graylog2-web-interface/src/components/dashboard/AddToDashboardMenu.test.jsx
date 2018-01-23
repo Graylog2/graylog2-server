@@ -6,8 +6,8 @@ import 'jquery-ui/ui/widgets/mouse';
 import React from 'react';
 import Immutable from 'immutable';
 import { mount } from 'enzyme';
-import AddToDashboardMenu from './AddToDashboardMenu';
 import PermissionsMixin from 'util/PermissionsMixin';
+import AddToDashboardMenu from './AddToDashboardMenu';
 
 describe('<AddToDashboardMenu />', () => {
   const exampleProps = {
