@@ -115,7 +115,7 @@ export default Reflux.createStore({
   },
 
   getWritableDashboardList(dashboards, permissions) {
-    return dashboards.toArray().filter(dashboard => PermissionsMixin.isPermitted(permissions, `dashboards:edit:${dashboard.id}`));
+    return dashboards.filter(dashboard => PermissionsMixin.isPermitted(permissions, `dashboards:edit:${dashboard.id}`));
   },
 
   update(dashboard) {
