@@ -185,8 +185,8 @@ const QuickValuesVisualization = React.createClass({
     return addToSearchButton.outerHTML;
   },
   _getDataTableColumns() {
-    function formatTimestamp(d) {
-      return new DateTime(Number(d.term)).toString(DateTime.Formats.TIMESTAMP);
+    function formatTimestamp(timestamp) {
+      return new DateTime(Number(timestamp)).toString(DateTime.Formats.TIMESTAMP);
     }
 
     const columns = [
@@ -203,7 +203,7 @@ const QuickValuesVisualization = React.createClass({
             .join(' <strong style="color: #999999;">&mdash;</strong> ');
         } else if (this.props.field === 'timestamp') { // only a single field, just check for the timestamp
           // convert unix timestamp to proper formatted value, so that add to search button works correctly
-          formattedTerm = formatTimestamp(d);
+          formattedTerm = formatTimestamp(d.term);
         }
         if (typeof this.pieChart !== 'undefined' && this.dataTable.group()(d) !== 'Others') {
           const colour = this.pieChart.colors()(d.term);
