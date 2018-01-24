@@ -19,7 +19,7 @@ export default Reflux.createStore({
   permissions: [],
 
   init() {
-    this.listenTo(CurrentUserStore, this.currentUserUpdated);
+    this.listenTo(CurrentUserStore, this.currentUserUpdated, this.currentUserUpdated);
     DashboardsActions.list();
   },
 
@@ -115,7 +115,7 @@ export default Reflux.createStore({
   },
 
   getWritableDashboardList(dashboards, permissions) {
-    return dashboards.toArray().filter(dashboard => PermissionsMixin.isPermitted(permissions, `dashboards:edit:${dashboard.id}`));
+    return dashboards.filter(dashboard => PermissionsMixin.isPermitted(permissions, `dashboards:edit:${dashboard.id}`));
   },
 
   update(dashboard) {
