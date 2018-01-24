@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-import { Panel, ListGroup, ListGroupItem } from 'react-bootstrap';
+import { ListGroup, ListGroupItem, Panel } from 'react-bootstrap';
 import crossfilter from 'crossfilter';
 import dc from 'dc';
 import d3 from 'd3';
@@ -33,6 +33,7 @@ const QuickValuesVisualization = React.createClass({
   propTypes: {
     id: PropTypes.string.isRequired,
     field: PropTypes.string.isRequired,
+    fields: PropTypes.arrayOf(PropTypes.string).isRequired,
     config: PropTypes.shape({
       show_pie_chart: PropTypes.bool,
       show_data_table: PropTypes.bool,
@@ -52,6 +53,7 @@ const QuickValuesVisualization = React.createClass({
   getDefaultProps() {
     return {
       config: this.DEFAULT_CONFIG,
+      fields: [],
       width: undefined,
       height: undefined,
       horizontal: false,
@@ -182,9 +184,19 @@ const QuickValuesVisualization = React.createClass({
 
     return addToSearchButton.outerHTML;
   },
+  _getFieldName(i) {
+    if (this.props.fields.length === 0) {
+      // calculate the fields from the data props
+      const anyKey = Object.keys(this.props.data.terms_mapping)[0];
+      const fields = this.props.data.terms_mapping[anyKey].map(a => a.field);
+      return fields[i];
+    } else {
+      return this.props.fields[i];
+    }
+  },
   _getDataTableColumns() {
-    function formatTimestamp(d) {
-      return new DateTime(Number(d.term)).toString(DateTime.Formats.TIMESTAMP);
+    function formatTimestamp(timestamp) {
+      return new DateTime(Number(timestamp)).toString(DateTime.Formats.TIMESTAMP);
     }
 
     const columns = [
@@ -192,14 +204,16 @@ const QuickValuesVisualization = React.createClass({
         let colourBadge = '';
 
         let formattedTerm = d.term;
+        // if we have terms_mapping, this is a stacked quick values, check every term for its field type
         if (this.props.data.terms_mapping && this.props.data.terms_mapping[d.term]) {
           // Separate the terms with a character that is unusual in terms and use a different text color to make the
           // different terms in the stacked value more visible.
-          formattedTerm = this.props.data.terms_mapping[d.term].map(t => t.value).join(' <strong style="color: #999999;">&mdash;</strong> ');
-        }
-        if (this.props.field === 'timestamp') {
+          formattedTerm = this.props.data.terms_mapping[d.term]
+            .map((t, i) => (this._getFieldName(i) === 'timestamp' ? formatTimestamp(t.value) : t.value))
+            .join(' <strong style="color: #999999;">&mdash;</strong> ');
+        } else if (this.props.field === 'timestamp') { // only a single field, just check for the timestamp
           // convert unix timestamp to proper formatted value, so that add to search button works correctly
-          formattedTerm = formatTimestamp(d);
+          formattedTerm = formatTimestamp(d.term);
         }
         if (typeof this.pieChart !== 'undefined' && this.dataTable.group()(d) !== 'Others') {
           const colour = this.pieChart.colors()(d.term);
@@ -213,12 +227,10 @@ const QuickValuesVisualization = React.createClass({
     ];
 
     if (this.props.displayAddToSearchButton) {
-      if (this.props.field === 'timestamp') {
-        // convert unix timestamp to proper formatted value, so that add to search button works correctly
-        columns.push(d => this._getAddToSearchButton(formatTimestamp(d)));
-      } else {
-        columns.push(d => this._getAddToSearchButton(d.term));
-      }
+      // the timestamp formatting needs to be done in SearchStore.addSearchTerm based on the parameter `field`
+      // if we format it here, it won't match the raw data and not all fields will be added if the first stacked
+      // field is timestamp. See https://github.com/Graylog2/graylog2-server/issues/4509
+      columns.push(d => this._getAddToSearchButton(d.term));
     }
 
     return columns;
