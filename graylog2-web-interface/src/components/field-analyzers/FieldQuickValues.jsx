@@ -281,6 +281,7 @@ const FieldQuickValues = React.createClass({
         <div className={style.visualizationWrapper}>
           <QuickValuesVisualization id={this.state.field}
                                     field={this.state.field}
+                                    fields={[this.state.field].concat(this.state.options.stackedFields.split(','))}
                                     config={config}
                                     data={this.state.data}
                                     horizontal
