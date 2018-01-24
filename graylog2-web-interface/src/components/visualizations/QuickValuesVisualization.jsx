@@ -184,6 +184,16 @@ const QuickValuesVisualization = React.createClass({
 
     return addToSearchButton.outerHTML;
   },
+  _getFieldName(i) {
+    if (this.props.fields.length === 0) {
+      // calculate the fields from the data props
+      const anyKey = Object.keys(this.props.data.terms_mapping)[0];
+      const fields = this.props.data.terms_mapping[anyKey].map(a => a.field);
+      return fields[i];
+    } else {
+      return this.props.fields[i];
+    }
+  },
   _getDataTableColumns() {
     function formatTimestamp(timestamp) {
       return new DateTime(Number(timestamp)).toString(DateTime.Formats.TIMESTAMP);
@@ -199,7 +209,7 @@ const QuickValuesVisualization = React.createClass({
           // Separate the terms with a character that is unusual in terms and use a different text color to make the
           // different terms in the stacked value more visible.
           formattedTerm = this.props.data.terms_mapping[d.term]
-            .map((t, i) => (this.props.fields[i] === 'timestamp' ? formatTimestamp(t.value) : t.value))
+            .map((t, i) => (this._getFieldName(i) === 'timestamp' ? formatTimestamp(t.value) : t.value))
             .join(' <strong style="color: #999999;">&mdash;</strong> ');
         } else if (this.props.field === 'timestamp') { // only a single field, just check for the timestamp
           // convert unix timestamp to proper formatted value, so that add to search button works correctly
