@@ -229,7 +229,18 @@ class SearchStore {
     appendToQueryString(query: string, field: string, value: any, operator: any) {
       let effectiveValue = value;
       if (field === 'timestamp') {
-        effectiveValue = new DateTime(Number(value)).toString(DateTime.Formats.TIMESTAMP);
+        // when the timestamp comes from a quickvalues source, it is a unix timestamp with millis
+        // otherwise it is a datetime string in UTC (from a message list detail view)
+        if (isNaN(Number(value))) {
+          // convert back to UTC because DateTime always gives us the user timezone
+          const dateTime = new DateTime(value).toTimeZone('UTC');
+          // search expects UTC datetimes
+          effectiveValue = dateTime.toString(DateTime.Formats.TIMESTAMP);
+        } else {
+          // when this comes from quickvalues (stacked or not) the value is a unix millis timestamp and needs to be
+          // converted to a UTC datetime string for search
+          effectiveValue = new DateTime(new Date(Number(value))).toTimeZone('UTC').toString(DateTime.Formats.TIMESTAMP);
+        }
       }
       const term = `${field}:${SearchStore.escape(effectiveValue)}`;
       const effectiveOperator = operator || SearchStore.AND_OPERATOR;
