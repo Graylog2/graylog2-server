@@ -312,6 +312,13 @@ const FieldQuickValues = React.createClass({
         </DropdownButton>
       );
 
+      let fields;
+      if (!this.state.options.stackedFields) {
+        fields = this.state.field;
+      } else {
+        fields = `${this.state.field}, ${this.state.options.stackedFields}`;
+      }
+
       content = (
         <div className="content-col">
           <div className="pull-right">
@@ -324,7 +331,7 @@ const FieldQuickValues = React.createClass({
               <Button bsSize="small" onClick={() => this._resetStatus()}><i className="fa fa-close" /></Button>
             </AddToDashboardMenu>
           </div>
-          <h1>Quick Values for <em>{this.state.field}</em> {this.state.loadPending && <i
+          <h1>Quick Values for <em>{fields}</em> {this.state.loadPending && <i
             className="fa fa-spin fa-spinner" />}</h1>
 
           {inner}

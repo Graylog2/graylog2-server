@@ -53,7 +53,7 @@ const QuickValuesVisualization = React.createClass({
   getDefaultProps() {
     return {
       config: this.DEFAULT_CONFIG,
-      allFields: [],
+      fields: [],
       width: undefined,
       height: undefined,
       horizontal: false,
