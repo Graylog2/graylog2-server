@@ -229,8 +229,7 @@ class SearchStore {
     appendToQueryString(query: string, field: string, value: any, operator: any) {
       let effectiveValue = value;
       if (field === 'timestamp') {
-        const dateTime = new DateTime(value).toTimeZone('UTC');
-        effectiveValue = dateTime.toString(DateTime.Formats.TIMESTAMP);
+        effectiveValue = new DateTime(Number(value)).toString(DateTime.Formats.TIMESTAMP);
       }
       const term = `${field}:${SearchStore.escape(effectiveValue)}`;
       const effectiveOperator = operator || SearchStore.AND_OPERATOR;
