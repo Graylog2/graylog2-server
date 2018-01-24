@@ -135,7 +135,7 @@ const AddToDashboardMenu = React.createClass({
   _renderDashboardMenu() {
     let dashboards = Immutable.List();
 
-    this.state.dashboards
+    this.state.writableDashboards
       .sortBy(dashboard => dashboard.title)
       .forEach((dashboard) => {
         dashboards = dashboards.push(
@@ -181,10 +181,10 @@ const AddToDashboardMenu = React.createClass({
   },
   render() {
     let addToDashboardMenu;
-    if (this.state.dashboards === undefined) {
+    if (this.state.writableDashboards === undefined) {
       addToDashboardMenu = this._renderLoadingDashboardsMenu();
     } else {
-      addToDashboardMenu = (!this.props.hidden && (this.state.dashboards.size > 0 ? this._renderDashboardMenu() : this._renderNoDashboardsMenu()));
+      addToDashboardMenu = (!this.props.hidden && (this.state.writableDashboards.size > 0 ? this._renderDashboardMenu() : this._renderNoDashboardsMenu()));
     }
 
     const { appendMenus, children } = this.props;
