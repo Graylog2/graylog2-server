@@ -196,6 +196,9 @@ public class Message implements Messages {
         for (final String key : REQUIRED_FIELDS) {
             final Object field = getField(key);
             if (field == null || field instanceof String && ((String) field).isEmpty()) {
+                if (LOG.isTraceEnabled()) {
+                    LOG.trace("Message <{}> is incomplete because the field <{}> is <{}>", fields.get(FIELD_ID), key, field);
+                }
                 return false;
             }
         }
