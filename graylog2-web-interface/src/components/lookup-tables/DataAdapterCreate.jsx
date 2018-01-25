@@ -53,6 +53,10 @@ const DataAdapterCreate = React.createClass({
 
     const sortedAdapters = Object.keys(this.props.types).map((key) => {
       const type = this.props.types[key];
+      if (adapterPlugins[type.type] === undefined) {
+        console.error(`Plugin component for data adapter type ${type.type} is missing - invalid or missing plugin?`);
+        return { value: type.type, disabled: true, label: `${type.type} - missing or invalid plugin` };
+      }
       return { value: type.type, label: adapterPlugins[type.type].displayName };
     }).sort((a, b) => naturalSort(a.label.toLowerCase(), b.label.toLowerCase()));
 
