@@ -12,6 +12,7 @@ import { mount } from 'enzyme';
 import MessageTableEntry from 'components/search/MessageTableEntry';
 
 describe('<MessageTableEntry />', () => {
+  DateTime.getBrowserTimezone = () => { return 'Europe/Berlin'; };
   const allStreams = Immutable.List([
     { id: '01', description: 'stream1' },
     { id: '02', description: 'stream2' },
