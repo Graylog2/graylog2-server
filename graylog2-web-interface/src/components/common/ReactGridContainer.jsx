@@ -151,6 +151,9 @@ const ReactGridContainer = React.createClass({
                                     cols={columns}
                                     rowHeight={rowHeight}
                                     margin={[10, 10]}
+                                    // Do not allow dragging from elements inside a `.actions` css class. This is
+                                    // meant to avoid calling `onDragStop` callbacks when clicking on an action button.
+                                    draggableCancel=".actions"
                                     onDragStop={this._onLayoutChange}
                                     onResizeStop={this._onLayoutChange}
                                     useCSSTransforms={animate}
