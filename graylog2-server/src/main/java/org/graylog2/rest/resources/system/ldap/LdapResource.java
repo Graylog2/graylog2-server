@@ -100,7 +100,7 @@ public class LdapResource extends RestResource {
         return LdapSettingsResponse.create(
                 ldapSettings.isEnabled(),
                 ldapSettings.getSystemUserName(),
-                ldapSettings.getSystemPassword(),
+                ldapSettings.getSystemPasswordPlaceholder(),
                 ldapSettings.getUri(),
                 ldapSettings.isUseStartTls(),
                 ldapSettings.isTrustAllCertificates(),
