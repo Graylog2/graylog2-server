@@ -1,0 +1,148 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<DataAdapterCreate /> should render for types with defined frontend components 1`] = `
+<div>
+  <div
+    className="content row"
+  >
+    <div
+      className="col-lg-8"
+    >
+      <form
+        className="form form-horizontal"
+        onSubmit={[Function]}
+      >
+        <span
+          className="InputMock"
+        >
+          <span
+            autoFocus={true}
+            help="The type of data adapter to configure."
+            id="data-adapter-type-select"
+            label="Data Adapter Type"
+            labelClassName="col-sm-3"
+            required={true}
+            wrapperClassName="col-sm-9"
+          >
+            <span
+              className="SelectMock"
+            >
+              <span
+                clearable={false}
+                matchProp="value"
+                onChange={[Function]}
+                options={
+                  Array [
+                    Object {
+                      "label": "Some Mocked Data Adapter Type",
+                      "value": "someType",
+                    },
+                  ]
+                }
+                placeholder="Select Data Adapter Type"
+                value={null}
+              />
+            </span>
+          </span>
+        </span>
+      </form>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<DataAdapterCreate /> should render for types without defined frontend components 1`] = `
+<div>
+  <div
+    className="content row"
+  >
+    <div
+      className="col-lg-8"
+    >
+      <form
+        className="form form-horizontal"
+        onSubmit={[Function]}
+      >
+        <span
+          className="InputMock"
+        >
+          <span
+            autoFocus={true}
+            help="The type of data adapter to configure."
+            id="data-adapter-type-select"
+            label="Data Adapter Type"
+            labelClassName="col-sm-3"
+            required={true}
+            wrapperClassName="col-sm-9"
+          >
+            <span
+              className="SelectMock"
+            >
+              <span
+                clearable={false}
+                matchProp="value"
+                onChange={[Function]}
+                options={
+                  Array [
+                    Object {
+                      "disabled": true,
+                      "label": "unknownType - missing or invalid plugin",
+                      "value": "unknownType",
+                    },
+                  ]
+                }
+                placeholder="Select Data Adapter Type"
+                value={null}
+              />
+            </span>
+          </span>
+        </span>
+      </form>
+    </div>
+  </div>
+</div>
+`;
+
+exports[`<DataAdapterCreate /> should render with empty parameters 1`] = `
+<div>
+  <div
+    className="content row"
+  >
+    <div
+      className="col-lg-8"
+    >
+      <form
+        className="form form-horizontal"
+        onSubmit={[Function]}
+      >
+        <span
+          className="InputMock"
+        >
+          <span
+            autoFocus={true}
+            help="The type of data adapter to configure."
+            id="data-adapter-type-select"
+            label="Data Adapter Type"
+            labelClassName="col-sm-3"
+            required={true}
+            wrapperClassName="col-sm-9"
+          >
+            <span
+              className="SelectMock"
+            >
+              <span
+                clearable={false}
+                matchProp="value"
+                onChange={[Function]}
+                options={Array []}
+                placeholder="Select Data Adapter Type"
+                value={null}
+              />
+            </span>
+          </span>
+        </span>
+      </form>
+    </div>
+  </div>
+</div>
+`;
