@@ -144,6 +144,8 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
 
     @Override
     public String getSystemPasswordPlaceholder() {
+        final Object o = fields.get(SYSTEM_PASSWORD);
+        if (o == null) return "";
         return SYSTEM_PASSWORD_PLACEHOLDER;
     }
 
