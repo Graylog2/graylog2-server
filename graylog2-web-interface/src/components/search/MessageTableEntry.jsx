@@ -5,6 +5,7 @@ import Immutable from 'immutable';
 import MessageDetail from './MessageDetail';
 import { Timestamp } from 'components/common';
 import StringUtils from 'util/StringUtils';
+import DateTime from 'logic/datetimes/DateTime';
 
 const MessageTableEntry = React.createClass({
   propTypes: {
@@ -61,11 +62,21 @@ const MessageTableEntry = React.createClass({
     }
     return false;
   },
-  possiblyHighlight(fieldName, truncate) {
-    const fullOrigValue = this.props.message.fields[fieldName];
+
+  renderForDisplay(fieldName, truncate) {
+    let fullOrigValue = this.props.message.fields[fieldName];
+
     if (fullOrigValue === undefined) {
       return '';
     }
+
+    if (fieldName === 'timestamp') {
+      fullOrigValue = this._toUserTime(fullOrigValue);
+    }
+    return this.possiblyHighlight(fieldName, fullOrigValue, truncate);
+  },
+
+  possiblyHighlight(fieldName, fullOrigValue, truncate) {
     // Ensure the field is a string for later processing
     const fullStringOrigValue = StringUtils.stringify(fullOrigValue);
 
@@ -102,6 +113,12 @@ const MessageTableEntry = React.createClass({
   _toggleDetail() {
     this.props.toggleDetail(`${this.props.message.index}-${this.props.message.id}`);
   },
+
+  _toUserTime(value) {
+    const dateTime = new DateTime(value);
+    return dateTime.toString(DateTime.Formats.TIMESTAMP);
+  },
+
   render() {
     const colSpanFixup = this.props.selectedFields.size + 1;
 
@@ -112,19 +129,20 @@ const MessageTableEntry = React.createClass({
     if (this.props.message.id === this.props.highlightMessage) {
       classes += ' message-highlight';
     }
+
     return (
       <tbody className={classes}>
         <tr className="fields-row" onClick={this._toggleDetail}>
           <td><strong>
             <Timestamp dateTime={this.props.message.fields.timestamp} />
           </strong></td>
-          { this.props.selectedFields.toSeq().map(selectedFieldName => <td
-          key={selectedFieldName}>{this.possiblyHighlight(selectedFieldName, true)}</td>) }
+          { this.props.selectedFields.toSeq().map(selectedFieldName => (<td
+            key={selectedFieldName}>{this.renderForDisplay(selectedFieldName, true)} </td>)) }
         </tr>
 
         {this.props.showMessageRow &&
         <tr className="message-row" onClick={this._toggleDetail}>
-          <td colSpan={colSpanFixup}><div className="message-wrapper">{this.possiblyHighlight('message', true)}</div></td>
+          <td colSpan={colSpanFixup}><div className="message-wrapper">{this.renderForDisplay('message', true)}</div></td>
         </tr>
         }
         {this.props.expanded &&
@@ -136,10 +154,10 @@ const MessageTableEntry = React.createClass({
                            allStreams={this.props.allStreams}
                            allStreamsLoaded={this.props.allStreamsLoaded}
                            nodes={this.props.nodes}
-                           possiblyHighlight={this.possiblyHighlight}
+                           renderForDisplay={this.renderForDisplay}
                            disableSurroundingSearch={this.props.disableSurroundingSearch}
                            expandAllRenderAsync={this.props.expandAllRenderAsync}
-                           searchConfig={this.props.searchConfig}/>
+                           searchConfig={this.props.searchConfig} />
           </td>
         </tr>
         }
