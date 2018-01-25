@@ -60,8 +60,15 @@ const ReactGridContainer = React.createClass({
     children: PropTypes.node.isRequired,
     /**
      * Function that will be called when positions change. The function
-     * receives the new positions in the same format as specified in the
-     * `positions` prop.
+     * receives the new positions in the format:
+     *
+     * ```
+     * [
+     *   { id: widgetId, col: column, row: row, height: height, width: width },
+     *   // E.g.
+     *   { id: '2', col: 2, row: 0, height: 1, width: 4 },
+     * ]
+     * ```
      */
     onPositionsChange: PropTypes.func.isRequired,
     /**
