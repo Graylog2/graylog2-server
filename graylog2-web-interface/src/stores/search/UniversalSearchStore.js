@@ -52,7 +52,7 @@ const UniversalSearchStore = Reflux.createStore({
 UniversalSearchStore.extractTimeRange = (type, timerange) => {
   // The server API uses the `range` parameter instead of `relative` for indicating a relative time range.
   if (type === 'relative') {
-    return { range: timerange.relative };
+    return { range: timerange.range || timerange.relative };
   }
 
   return timerange;
