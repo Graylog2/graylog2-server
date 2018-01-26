@@ -138,7 +138,7 @@
     "yargs": "^10.0.3"
   },
   "resolutions": {
-    "@types/jquery": "2.0.48",
-    "jquery": "2.1.4"
+    "@types/jquery": "3.3.0",
+    "jquery": "3.3.1"
   }
 }
