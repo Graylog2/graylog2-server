@@ -13,3 +13,4 @@ node_modules
 node
 build
 cache/
+*.mmdb

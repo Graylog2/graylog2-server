@@ -21,11 +21,14 @@ import com.codahale.metrics.MetricRegistry;
 import com.eaio.uuid.UUID;
 import com.google.common.collect.Maps;
 import com.google.common.net.InetAddresses;
+import org.graylog.plugins.map.ConditionalRunner;
+import org.graylog.plugins.map.ResourceExistsCondition;
 import org.graylog.plugins.map.config.GeoIpResolverConfig;
 import org.graylog2.plugin.Message;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -37,7 +40,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
+@RunWith(ConditionalRunner.class)
+@ResourceExistsCondition(GeoIpResolverEngineTest.GEO_LITE2_CITY_MMDB)
 public class GeoIpResolverEngineTest {
+    static final String GEO_LITE2_CITY_MMDB = "/GeoLite2-City.mmdb";
 
     private MetricRegistry metricRegistry;
     private GeoIpResolverConfig config;
@@ -55,7 +61,7 @@ public class GeoIpResolverEngineTest {
     }
 
     private String getTestDatabasePath() throws URISyntaxException {
-        return this.getClass().getResource("/GeoLite2-City.mmdb").toURI().getPath();
+        return this.getClass().getResource(GEO_LITE2_CITY_MMDB).toURI().getPath();
     }
 
     @Test

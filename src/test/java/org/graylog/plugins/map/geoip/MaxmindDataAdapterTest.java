@@ -5,7 +5,8 @@ import com.google.common.collect.ImmutableMap;
 import com.maxmind.geoip2.DatabaseReader;
 import com.maxmind.geoip2.model.CityResponse;
 import com.maxmind.geoip2.model.CountryResponse;
-import com.maxmind.geoip2.record.City;
+import org.graylog.plugins.map.ConditionalRunner;
+import org.graylog.plugins.map.ResourceExistsCondition;
 import org.graylog.plugins.map.config.DatabaseType;
 import org.graylog2.plugin.lookup.LookupResult;
 import org.junit.After;
@@ -29,9 +30,12 @@ import static org.mockito.Mockito.when;
         MaxmindDataAdapterTest.CountryDatabaseTest.class
 })
 public class MaxmindDataAdapterTest {
+    private static final String GEO_LITE2_CITY_MMDB = "/GeoLite2-City.mmdb";
+    private static final String GEO_LITE2_COUNTRY_MMDB = "/GeoLite2-Country.mmdb";
+
     private static final Map<DatabaseType, String> DB_PATH = ImmutableMap.of(
-            DatabaseType.MAXMIND_CITY, "/GeoLite2-City.mmdb",
-            DatabaseType.MAXMIND_COUNTRY, "/GeoLite2-Country.mmdb"
+            DatabaseType.MAXMIND_CITY, GEO_LITE2_CITY_MMDB,
+            DatabaseType.MAXMIND_COUNTRY, GEO_LITE2_COUNTRY_MMDB
     );
 
     abstract static class Base {
@@ -99,6 +103,8 @@ public class MaxmindDataAdapterTest {
         }
     }
 
+    @RunWith(ConditionalRunner.class)
+    @ResourceExistsCondition(GEO_LITE2_CITY_MMDB)
     public static class CityDatabaseTest extends Base {
         public CityDatabaseTest() {
             super(DatabaseType.MAXMIND_CITY);
@@ -138,6 +144,8 @@ public class MaxmindDataAdapterTest {
         }
     }
 
+    @RunWith(ConditionalRunner.class)
+    @ResourceExistsCondition(GEO_LITE2_COUNTRY_MMDB)
     public static class CountryDatabaseTest extends Base {
         public CountryDatabaseTest() {
             super(DatabaseType.MAXMIND_COUNTRY);
