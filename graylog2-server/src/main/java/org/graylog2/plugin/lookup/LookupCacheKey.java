@@ -17,6 +17,7 @@
 package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -70,6 +71,7 @@ public abstract class LookupCacheKey {
      *
      * @return true if there is no key object, false otherwise
      */
+    @JsonIgnore
     public boolean isPrefixOnly() {
         return key() == null;
     }
