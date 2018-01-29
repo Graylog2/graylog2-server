@@ -16,6 +16,8 @@
  */
 package org.graylog2.plugin.lookup;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.lookup.LookupDefaultMultiValue;
@@ -44,7 +46,7 @@ public abstract class LookupResult {
     @JsonProperty("ttl")
     public abstract long cacheTTL();
 
-    @JsonProperty("empty")
+    @JsonIgnore
     public boolean isEmpty() {
         return singleValue() == null && multiValue() == null;
     }
@@ -104,6 +106,18 @@ public abstract class LookupResult {
 
             return builder.build();
     }
+
+    @JsonCreator
+    public static LookupResult createFromJSON(@JsonProperty("single_value") final Object singleValue,
+                                              @JsonProperty("multi_value") final Map<Object, Object> multiValue,
+                                              @JsonProperty("ttl") final long cacheTTL) {
+        return builder()
+                .singleValue(singleValue)
+                .multiValue(multiValue)
+                .cacheTTL(cacheTTL)
+                .build();
+    }
+
 
     public static Builder withoutTTL() {
         return builder().cacheTTL(Long.MAX_VALUE);
