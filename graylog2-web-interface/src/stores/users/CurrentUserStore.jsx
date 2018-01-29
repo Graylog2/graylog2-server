@@ -66,7 +66,7 @@ autorun('Update current user', () => {
 
 // Reloads user after their start page changes, allowing us to redirect them to the right page.
 StartpageStore.listen(() => {
-  this.reload();
+  currentUserStore.reload();
 });
 
 export default currentUserStore;
