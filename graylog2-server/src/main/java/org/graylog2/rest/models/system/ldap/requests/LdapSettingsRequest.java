@@ -42,6 +42,9 @@ public abstract class LdapSettingsRequest {
     public abstract String systemPassword();
 
     @JsonProperty
+    public abstract boolean isSystemPasswordSet();
+
+    @JsonProperty
     public abstract URI ldapUri();
 
     @JsonProperty
@@ -89,6 +92,7 @@ public abstract class LdapSettingsRequest {
     public static LdapSettingsRequest create(@JsonProperty("enabled") boolean enabled,
                                              @JsonProperty("system_username") @NotEmpty String systemUsername,
                                              @JsonProperty("system_password") @NotEmpty String systemPassword,
+                                             @JsonProperty("system_password_set") boolean isSystemPasswordSet,
                                              @JsonProperty("ldap_uri") URI ldapUri,
                                              @JsonProperty("use_start_tls") boolean useStartTls,
                                              @JsonProperty("trust_all_certificates") boolean trustAllCertificates,
@@ -105,6 +109,7 @@ public abstract class LdapSettingsRequest {
         return new AutoValue_LdapSettingsRequest(enabled,
                                                  systemUsername,
                                                  systemPassword,
+                                                 isSystemPasswordSet,
                                                  ldapUri,
                                                  useStartTls,
                                                  trustAllCertificates,

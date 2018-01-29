@@ -84,8 +84,6 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     public static final String LDAP_GROUP_MAPPING_NAMEKEY = "group";
     public static final String LDAP_GROUP_MAPPING_ROLEKEY = "role_id";
 
-    public static final String SYSTEM_PASSWORD_PLACEHOLDER = "*************";
-
     protected Configuration configuration;
     private final RoleService roleService;
 
@@ -143,17 +141,13 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
     }
 
     @Override
-    public String getSystemPasswordPlaceholder() {
+    public boolean isSystemPasswordSet() {
         final Object o = fields.get(SYSTEM_PASSWORD);
-        if (o == null) return "";
-        return SYSTEM_PASSWORD_PLACEHOLDER;
+        return o != null;
     }
 
     @Override
     public void setSystemPassword(String systemPassword) {
-        if (systemPassword == SYSTEM_PASSWORD_PLACEHOLDER) {
-            return;
-        }
         // set new salt value, if we didn't have any.
         if (getSystemPasswordSalt().isEmpty()) {
             LOG.debug("Generating new salt for LDAP system password.");

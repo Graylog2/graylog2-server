@@ -33,7 +33,7 @@ public interface LdapSettings extends Persisted {
 
     String getSystemPassword();
 
-    String getSystemPasswordPlaceholder();
+    boolean isSystemPasswordSet();
 
     void setSystemPassword(String systemPassword);
 

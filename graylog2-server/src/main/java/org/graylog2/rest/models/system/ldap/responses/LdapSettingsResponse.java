@@ -38,7 +38,7 @@ public abstract class LdapSettingsResponse {
     public abstract String systemUsername();
 
     @JsonProperty
-    public abstract String systemPassword();
+    public abstract boolean isSystemPasswordSet();
 
     @JsonProperty
     public abstract URI ldapUri();
@@ -88,7 +88,7 @@ public abstract class LdapSettingsResponse {
     @JsonCreator
     public static LdapSettingsResponse create(@JsonProperty("enabled") boolean enabled,
                                               @JsonProperty("system_username") String systemUsername,
-                                              @JsonProperty("system_password") String systemPassword,
+                                              @JsonProperty("system_password_set") boolean isSystemPasswordSet ,
                                               @JsonProperty("ldap_uri") URI ldapUri,
                                               @JsonProperty("use_start_tls") boolean useStartTls,
                                               @JsonProperty("trust_all_certificates") boolean trustAllCertificates,
@@ -104,7 +104,7 @@ public abstract class LdapSettingsResponse {
                                               @JsonProperty("group_search_pattern") @Nullable String groupSearchPattern) {
         return new AutoValue_LdapSettingsResponse(enabled,
                                                   systemUsername,
-                                                  systemPassword,
+                                                  isSystemPasswordSet,
                                                   ldapUri,
                                                   useStartTls,
                                                   trustAllCertificates,
@@ -123,7 +123,7 @@ public abstract class LdapSettingsResponse {
     public static LdapSettingsResponse emptyDisabled() {
         return new AutoValue_LdapSettingsResponse(false,
                                                   "",
-                                                  "",
+                                                  false,
                                                   URI.create("ldap://localhost:389"),
                                                   false,
                                                   false,

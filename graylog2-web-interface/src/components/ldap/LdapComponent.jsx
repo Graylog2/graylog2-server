@@ -261,6 +261,9 @@ const LdapComponent = React.createClass({
 
     const rolesOptions = this.state.roles;
 
+    const ldapPasswordPlaceHolder = this.state.ldapSettings.system_password_set ?
+      '*** PASSWORD SET ***' : 'System Password';
+
     return (
       <Row>
         <Col lg={8}>
@@ -332,7 +335,7 @@ const LdapComponent = React.createClass({
                      onChange={this._bindValue} disabled={disabled} />
 
               <Input type="password" id="system_password" name="system_password" labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" placeholder="System Password" label="System Password"
+                     wrapperClassName="col-sm-9" placeholder={ldapPasswordPlaceHolder} label="System Password"
                      value={this.state.ldapSettings.system_password} help={help.SYSTEM_PASSWORD}
                      onChange={this._bindValue} disabled={disabled} />
             </fieldset>
