@@ -116,7 +116,7 @@ const MessageTableEntry = React.createClass({
 
   _toUserTime(value) {
     const dateTime = new DateTime(value);
-    return dateTime.toString(DateTime.Formats.TIMESTAMP);
+    return dateTime.toString(DateTime.Formats.TIMESTAMP_TZ);
   },
 
   render() {

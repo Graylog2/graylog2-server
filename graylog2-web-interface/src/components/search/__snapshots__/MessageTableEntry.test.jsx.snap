@@ -580,7 +580,7 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                     <div
                       className="field-value"
                     >
-                      2018-01-22 16:36:02.189
+                      2018-01-22 16:36:02.189 +01:00
                     </div>
                   </dd>
                 </span>

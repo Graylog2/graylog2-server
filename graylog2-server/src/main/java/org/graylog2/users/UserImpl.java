@@ -273,10 +273,9 @@ public class UserImpl extends PersistedImpl implements User {
         DateTimeZone dateTimeZone = null;
         if (timeZone != null) {
             try {
-                dateTimeZone = DateTimeZone.forID(firstNonNull(timeZone, DateTimeZone.UTC.getID()));
+                dateTimeZone = DateTimeZone.forID(timeZone);
             } catch (IllegalArgumentException e) {
-                LOG.info("Invalid timezone \"{}\", falling back to UTC.", timeZone);
-                dateTimeZone = DateTimeZone.UTC;
+                LOG.error("Invalid timezone \"{}\", falling back to UTC.", timeZone);
             }
         }
         setTimeZone(dateTimeZone);
