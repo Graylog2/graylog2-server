@@ -1,4 +1,3 @@
-import Reflux from 'reflux';
 import { autorun, observable } from 'mobx';
 
 import URLUtils from 'util/URLUtils';
