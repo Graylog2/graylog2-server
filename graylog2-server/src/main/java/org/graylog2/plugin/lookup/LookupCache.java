@@ -60,7 +60,13 @@ public abstract class LookupCache extends AbstractIdleService {
         this.hitCount = metricRegistry.meter(MetricRegistry.name("org.graylog2.lookup.caches", id, "hits"));
         this.missCount = metricRegistry.meter(MetricRegistry.name("org.graylog2.lookup.caches", id, "misses"));
         this.lookupTimer = metricRegistry.timer(MetricRegistry.name("org.graylog2.lookup.caches", id, "lookupTime"));
-        MetricUtils.safelyRegister(metricRegistry, MetricRegistry.name("org.graylog2.lookup.caches", id, "entries"), (Gauge<Long>) this::entryCount);
+        final Gauge<Long> entriesGauge = new Gauge<Long>() {
+            @Override
+            public Long getValue() {
+                return entryCount();
+            }
+        };
+        MetricUtils.safelyRegister(metricRegistry, MetricRegistry.name("org.graylog2.lookup.caches", id, "entries"), entriesGauge);
     }
 
     public void incrTotalCount() {
