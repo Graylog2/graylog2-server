@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -25,23 +25,23 @@ class JvmInfoStore {
     return this.state.error;
   }
 
-  getJvmInfo() {
+  getJvmInfo = action(function getJvmInfo() {
     this.state.isLoading = true;
 
     const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.jvm().url);
     return fetch('GET', url)
       .then(
-        (response) => {
+        action((response) => {
           this.state.jvmInfo = response;
-        },
-        (error) => {
+        }),
+        action((error) => {
           this.state.error = error;
-        },
+        }),
       )
-      .finally(() => {
+      .finally(action(() => {
         this.state.isLoading = false;
-      });
-  }
+      }));
+  })
 }
 
 export default new JvmInfoStore();

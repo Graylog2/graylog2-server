@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 
 import URLUtils from 'util/URLUtils';
 import ApiRoutes from 'routing/ApiRoutes';
@@ -32,16 +32,16 @@ class SystemInfoStore {
     const url = URLUtils.qualifyUrl(ApiRoutes.SystemApiController.info().url);
     return fetch('GET', url)
       .then(
-        (response) => {
+        action((response) => {
           this.state.systemInfo = response;
-        },
-        (error) => {
+        }),
+        action((error) => {
           this.state.error = error;
-        },
+        }),
       )
-      .finally(() => {
+      .finally(action(() => {
         this.state.isLoading = false;
-      });
+      }));
   }
 }
 

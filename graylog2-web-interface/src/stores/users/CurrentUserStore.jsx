@@ -1,4 +1,4 @@
-import { autorun, observable } from 'mobx';
+import { action, autorun, observable } from 'mobx';
 
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
@@ -25,34 +25,34 @@ class CurrentUserStore {
     return this.state.currentUser;
   }
 
-  sessionUpdate(sessionInfo) {
+  sessionUpdate = action(function sessionUpdate(sessionInfo) {
     if (sessionInfo.sessionId && sessionInfo.username) {
       const username = sessionInfo.username;
       this.update(username);
     } else {
       this.state.currentUser = undefined;
     }
-  }
+  })
 
-  reload() {
+  reload = action(function reload() {
     if (this.state.currentUser !== undefined) {
       return this.update(this.state.currentUser.username);
     }
 
     return null;
-  }
+  })
 
-  update(username) {
+  update = action(function update(username) {
     this.state.isLoading = true;
     return fetch('GET', URLUtils.qualifyUrl(ApiRoutes.UsersApiController.load(encodeURIComponent(username)).url))
-      .then((response) => {
+      .then(action((response) => {
         this.state.currentUser = response;
         return response;
-      })
-      .finally(() => {
+      }))
+      .finally(action(() => {
         this.state.isLoading = false;
-      });
-  }
+      }));
+  })
 }
 
 const currentUserStore = new CurrentUserStore();

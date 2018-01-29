@@ -1,4 +1,4 @@
-import { observable } from 'mobx';
+import { action, observable } from 'mobx';
 
 import Store from 'logic/local-storage/Store';
 import URLUtils from 'util/URLUtils';
@@ -43,7 +43,7 @@ class SessionStore {
     return this.state.sessionId !== undefined && this.state.sessionId !== null;
   }
 
-  login(username, password, host) {
+  login = action(function login(username, password, host) {
     this.state.isLoading = true;
     this.state.error = undefined;
     const builder = new Builder('POST', URLUtils.qualifyUrl(sourceUrl))
@@ -65,12 +65,12 @@ class SessionStore {
           }
         },
       )
-      .finally(() => {
+      .finally(action(() => {
         this.state.isLoading = false;
-      });
-  }
+      }));
+  })
 
-  logout(sessionId) {
+  logout = action(function logout(sessionId) {
     return new Builder('DELETE', URLUtils.qualifyUrl(`${sourceUrl}/${sessionId}`))
       .authenticated()
       .build()
@@ -80,9 +80,9 @@ class SessionStore {
         }
         return response;
       }, this.removeSession);
-  }
+  })
 
-  validate() {
+  validate = action(function validate() {
     const sessionId = Store.get('sessionId');
     const username = Store.get('username');
     this.state.isValidatingSession = true;
@@ -101,10 +101,10 @@ class SessionStore {
 
         return response;
       })
-      .finally(() => {
+      .finally(action(() => {
         this.state.isValidatingSession = false;
-      });
-  }
+      }));
+  })
 
   validateSession(sessionId) {
     return new Builder('GET', URLUtils.qualifyUrl(ApiRoutes.SessionsApiController.validate().url))
@@ -113,19 +113,19 @@ class SessionStore {
       .build();
   }
 
-  removeSession() {
+  removeSession = action(function removeSession() {
     Store.delete('sessionId');
     Store.delete('username');
     this.state.sessionId = undefined;
     this.state.username = undefined;
-  }
+  })
 
-  persistSession(sessionInfo) {
+  persistSession = action(function persistSession(sessionInfo) {
     Store.set('sessionId', sessionInfo.sessionId);
     Store.set('username', sessionInfo.username);
     this.state.sessionId = sessionInfo.sessionId;
     this.state.username = sessionInfo.username;
-  }
+  })
 }
 
 export default new SessionStore();

@@ -5,12 +5,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import Promise from 'bluebird';
 import Reflux from 'reflux';
+import { useStrict } from 'mobx';
 import DevTools from 'mobx-react-devtools';
 import AppFacade from 'routing/AppFacade';
 import AppConfig from 'util/AppConfig';
 
 Promise.config({ cancellation: true });
 Reflux.setPromiseFactory(handlers => new Promise(handlers));
+useStrict(true);
 
 function renderAppContainer(appContainer) {
   ReactDOM.render(
