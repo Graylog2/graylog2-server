@@ -16,7 +16,6 @@
  */
 package org.graylog2.lookup.caches;
 
-import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
@@ -82,11 +81,11 @@ public class GuavaLookupCache extends LookupCache {
     }
 
     @Override
-    public Gauge<Long> entryCount() {
+    public long entryCount() {
         if (cache != null) {
-            return cache::size;
+            return cache.size();
         } else {
-            return () -> 0L;
+            return 0L;
         }
     }
 
