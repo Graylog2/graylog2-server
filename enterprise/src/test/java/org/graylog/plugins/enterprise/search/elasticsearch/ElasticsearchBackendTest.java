@@ -34,6 +34,7 @@ public class ElasticsearchBackendTest {
     @Test
     public void parse() throws Exception {
         final QueryInfo queryInfo = backend.parse(Query.builder()
+                .id("abc123")
                 .query(ElasticsearchQueryString.builder().queryString("user_name:$username$ http_method:$foo$").build())
                 .timerange(RelativeRange.create(600))
                 .build());

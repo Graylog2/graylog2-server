@@ -75,6 +75,7 @@ public class QueryTest {
     public void mergeWithExecutionState() throws Exception {
         final String messageListId = UUID.randomUUID().toString();
         Query query = Query.builder()
+                .id("abc123")
                 .timerange(RelativeRange.create(600))
                 .query(ElasticsearchQueryString.builder().queryString("*").build())
                 .searchTypes(ImmutableList.of(MessageList.builder().id(messageListId).build()))
