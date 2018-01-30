@@ -62,7 +62,7 @@ describe('<MessageTableEntry />', () => {
         streams={streams}
         toggleDetail={jest.fn}
       />);
-      expect(wrapper.find('time').text()).toEqual('2018-01-22 16:36:02.189');
+      expect(wrapper.find('time').at(1).text()).toEqual('2018-01-22 16:36:02.189 +01:00');
     });
 
     it('should render a in the USA/Honolulu timezone', () => {
@@ -80,7 +80,7 @@ describe('<MessageTableEntry />', () => {
         streams={streams}
         toggleDetail={jest.fn}
       />);
-      expect(wrapper.find('time').text()).toEqual('2018-01-22 05:36:02.189');
+      expect(wrapper.find('time').at(1).text()).toEqual('2018-01-22 05:36:02.189 -10:00');
     });
   });
 });

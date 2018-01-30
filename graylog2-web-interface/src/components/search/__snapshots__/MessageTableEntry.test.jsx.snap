@@ -580,7 +580,20 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
                     <div
                       className="field-value"
                     >
-                      2018-01-22 16:36:02.189 +01:00
+                      <span>
+                        <time
+                          dateTime="2018-01-22T15:36:02.189Z"
+                          title="2018-01-22T15:36:02.189Z"
+                        >
+                          2018-01-22 16:36:02.189 +01:00
+                        </time>
+                        <i
+                          className="fa fa-fw fa-info timezoneInfo"
+                          onClick={null}
+                          onMouseOut={[Function]}
+                          onMouseOver={[Function]}
+                        />
+                      </span>
                     </div>
                   </dd>
                 </span>

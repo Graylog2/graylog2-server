@@ -1,11 +1,14 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
+import { Popover, OverlayTrigger } from 'react-bootstrap';
 
 import MessageDetail from './MessageDetail';
 import { Timestamp } from 'components/common';
 import StringUtils from 'util/StringUtils';
 import DateTime from 'logic/datetimes/DateTime';
+
+const style = require('!style!css!./MessageTableEntry.css');
 
 const MessageTableEntry = React.createClass({
   propTypes: {
@@ -64,16 +67,19 @@ const MessageTableEntry = React.createClass({
   },
 
   renderForDisplay(fieldName, truncate) {
-    let fullOrigValue = this.props.message.fields[fieldName];
+    const fullOrigValue = this.props.message.fields[fieldName];
 
     if (fullOrigValue === undefined) {
       return '';
     }
 
+    /* Timestamp can not be highlighted by elastic search. So we can safely
+     * skip them from highlighting. */
     if (fieldName === 'timestamp') {
-      fullOrigValue = this._toUserTime(fullOrigValue);
+      return this._toTimestamp(fullOrigValue);
+    } else {
+      return this.possiblyHighlight(fieldName, fullOrigValue, truncate);
     }
-    return this.possiblyHighlight(fieldName, fullOrigValue, truncate);
   },
 
   possiblyHighlight(fieldName, fullOrigValue, truncate) {
@@ -114,9 +120,21 @@ const MessageTableEntry = React.createClass({
     this.props.toggleDetail(`${this.props.message.index}-${this.props.message.id}`);
   },
 
-  _toUserTime(value) {
-    const dateTime = new DateTime(value);
-    return dateTime.toString(DateTime.Formats.TIMESTAMP_TZ);
+  _toTimestamp(value) {
+    const popoverHoverFocus = (
+      <Popover id="popover-trigger-hover-focus">
+        This timestamp is rendered in your timezone.
+      </Popover>
+    );
+
+    return (
+      <span>
+        <Timestamp dateTime={value} format={DateTime.Formats.TIMESTAMP_TZ} />
+        <OverlayTrigger trigger={['hover']} overlay={popoverHoverFocus} >
+          <i className={`fa fa-fw fa-info ${style.timezoneInfo}`} />
+        </OverlayTrigger>
+      </span>
+    );
   },
 
   render() {
