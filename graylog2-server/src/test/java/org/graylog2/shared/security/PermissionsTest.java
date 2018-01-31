@@ -88,7 +88,8 @@ public class PermissionsTest {
     @Test
     public void testUserSelfEditPermissions() throws Exception {
         assertThat(permissions.userSelfEditPermissions("john"))
-                .containsExactly("users:edit:john", "users:passwordchange:john");
+                .containsExactly("users:edit:john", "users:passwordchange:john", "users:tokenlist:john",
+                        "users:tokencreate:john", "users:tokenremove:john");
     }
 
     @Test
@@ -98,6 +99,9 @@ public class PermissionsTest {
         readerPermissions.addAll(permissions.readerBasePermissions());
         readerPermissions.add("users:edit:john");
         readerPermissions.add("users:passwordchange:john");
+        readerPermissions.add("users:tokenlist:john");
+        readerPermissions.add("users:tokencreate:john");
+        readerPermissions.add("users:tokenremove:john");
 
         assertThat(permissions.readerPermissions("john"))
                 .containsOnlyElementsOf(readerPermissions);

@@ -79,6 +79,9 @@ public class Permissions {
         ImmutableSet.Builder<String> perms = ImmutableSet.builder();
         perms.add(perInstance(RestPermissions.USERS_EDIT, username));
         perms.add(perInstance(RestPermissions.USERS_PASSWORDCHANGE, username));
+        perms.add(perInstance(RestPermissions.USERS_TOKENLIST, username));
+        perms.add(perInstance(RestPermissions.USERS_TOKENCREATE, username));
+        perms.add(perInstance(RestPermissions.USERS_TOKENREMOVE, username));
         return perms.build();
     }
 

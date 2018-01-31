@@ -423,11 +423,14 @@ public class UsersResource extends RestResource {
 
     @GET
     @Path("{username}/tokens")
-    @RequiresPermissions(RestPermissions.USERS_TOKENLIST)
     @ApiOperation("Retrieves the list of access tokens for a user")
     public TokenList listTokens(@ApiParam(name = "username", required = true)
                                 @PathParam("username") String username) {
-        final User user = _tokensCheckAndLoadUser(username);
+        final User user = _tokensLoadUser(username);
+
+        if (!getSubject().isPermitted(RestPermissions.USERS_TOKENLIST + ":" + user.getName())) {
+            throw new ForbiddenException("Not allowed to list tokens for user " + username);
+        }
 
         final ImmutableList.Builder<Token> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
@@ -439,28 +442,36 @@ public class UsersResource extends RestResource {
 
     @POST
     @Path("{username}/tokens/{name}")
-    @RequiresPermissions(RestPermissions.USERS_TOKENCREATE)
     @ApiOperation("Generates a new access token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_CREATE)
     public Token generateNewToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
             @ApiParam(name = "JSON Body", value = "Placeholder because POST requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body) {
-        final User user = _tokensCheckAndLoadUser(username);
+        final User user = _tokensLoadUser(username);
+
+        if (!getSubject().isPermitted(RestPermissions.USERS_TOKENCREATE + ":" + user.getName())) {
+            throw new ForbiddenException("Not allowed to list tokens for user " + username);
+        }
+
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
 
         return Token.create(accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }
 
     @DELETE
-    @RequiresPermissions(RestPermissions.USERS_TOKENREMOVE)
     @Path("{username}/tokens/{token}")
     @ApiOperation("Removes a token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_DELETE)
     public void revokeToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
             @ApiParam(name = "token", required = true) @PathParam("token") String token) {
-        _tokensCheckAndLoadUser(username);
+        final User user = _tokensLoadUser(username);
+
+        if (!getSubject().isPermitted(RestPermissions.USERS_TOKENREMOVE + ":" + user.getName())) {
+            throw new ForbiddenException("Not allowed to list tokens for user " + username);
+        }
+
         final AccessToken accessToken = accessTokenService.load(token);
 
         if (accessToken != null) {
@@ -470,13 +481,10 @@ public class UsersResource extends RestResource {
         }
     }
 
-    private User _tokensCheckAndLoadUser(String username) {
+    private User _tokensLoadUser(String username) {
         final User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Unknown user " + username);
-        }
-        if (!getSubject().getPrincipal().equals(username)) {
-            throw new ForbiddenException("Cannot access other people's tokens.");
         }
         return user;
     }
