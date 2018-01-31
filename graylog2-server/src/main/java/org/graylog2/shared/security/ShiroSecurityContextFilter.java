@@ -75,7 +75,7 @@ public class ShiroSecurityContextFilter implements ContainerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Basic")) {
             final String base64UserPass = authHeader.substring(authHeader.indexOf(' ') + 1);
             final String userPass = decodeBase64(base64UserPass);
-            final String[] split = userPass.split(":");
+            final String[] split = userPass.split(":", 2);
 
             if (split.length != 2) {
                 throw new BadRequestException("Invalid credentials in Authorization header");
