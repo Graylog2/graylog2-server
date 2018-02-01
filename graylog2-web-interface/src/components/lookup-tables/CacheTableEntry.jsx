@@ -44,7 +44,7 @@ const LUTTableEntry = React.createClass({
   _onEntriesMetrics(metrics) {
     let total = 0;
 
-    Object.keys(metrics).map(nodeId => metrics[nodeId].count.metric.value.value).forEach((v) => { total += v; });
+    Object.keys(metrics).map(nodeId => metrics[nodeId].count.metric.value).forEach((v) => { total += v; });
 
     if (total < 0) {
       return 'n/a';
