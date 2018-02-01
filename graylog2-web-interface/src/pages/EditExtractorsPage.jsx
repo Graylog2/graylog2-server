@@ -34,7 +34,7 @@ const EditExtractorsPage = React.createClass({
   componentDidMount() {
     InputsActions.get.triggerPromise(this.props.params.inputId);
     ExtractorsActions.get.triggerPromise(this.props.params.inputId, this.props.params.extractorId);
-    UniversalSearchstore.search('relative', `gl2_source_input:${this.props.params.inputId} OR gl2_source_radio_input:${this.props.params.inputId}`, { range: 0 }, undefined, 1)
+    UniversalSearchstore.search('relative', `gl2_source_input:${this.props.params.inputId} OR gl2_source_radio_input:${this.props.params.inputId}`, { relative: 3600 }, undefined, 1)
       .then((response) => {
         if (response.total_results > 0) {
           this.setState({ exampleMessage: response.messages[0] });
