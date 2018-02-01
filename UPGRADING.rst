@@ -27,6 +27,7 @@ The path of the Graylog REST API is now hard-coded to ``/api``, so if you're sti
 If you are using a reverse proxy in front of Graylog (like nginx) and configured it to set the ``X-Graylog-Server-URL`` HTTP header, you have to remove the ``api/`` suffix because that is now the default. (as mentioned above)
 
 Example::
+
     # This nginx setting in Graylog <3.0 ...
     header_upstream X-Graylog-Server-URL http://{host}/api
 
