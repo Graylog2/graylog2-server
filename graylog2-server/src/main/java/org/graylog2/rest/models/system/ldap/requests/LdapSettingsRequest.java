@@ -39,6 +39,7 @@ public abstract class LdapSettingsRequest {
     public abstract String systemUsername();
 
     @JsonProperty
+    @Nullable
     public abstract String systemPassword();
 
     @JsonProperty
@@ -91,7 +92,7 @@ public abstract class LdapSettingsRequest {
     @JsonCreator
     public static LdapSettingsRequest create(@JsonProperty("enabled") boolean enabled,
                                              @JsonProperty("system_username") @NotEmpty String systemUsername,
-                                             @JsonProperty("system_password") @NotEmpty String systemPassword,
+                                             @JsonProperty("system_password") @Nullable String systemPassword,
                                              @JsonProperty("system_password_set") boolean isSystemPasswordSet,
                                              @JsonProperty("ldap_uri") URI ldapUri,
                                              @JsonProperty("use_start_tls") boolean useStartTls,

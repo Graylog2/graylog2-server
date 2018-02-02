@@ -148,6 +148,9 @@ public class LdapSettingsImpl extends PersistedImpl implements LdapSettings {
 
     @Override
     public void setSystemPassword(String systemPassword) {
+        if (systemPassword == null || systemPassword.isEmpty()) {
+            return;
+        }
         // set new salt value, if we didn't have any.
         if (getSystemPasswordSalt().isEmpty()) {
             LOG.debug("Generating new salt for LDAP system password.");
