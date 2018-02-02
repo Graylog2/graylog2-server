@@ -24,6 +24,16 @@ The changes in this release finally merge the HTTP listeners for the Graylog RES
 
 The path of the Graylog REST API is now hard-coded to ``/api``, so if you're still using the legacy URI on port 12900/tcp or have been using a custom path (via the ``rest_listen_uri`` or ``rest_transport_uri`` settings), you'll have to update the URI used to access the Graylog REST API.
 
+If you are using a reverse proxy in front of Graylog (like nginx) and configured it to set the ``X-Graylog-Server-URL`` HTTP header, you have to remove the ``api/`` suffix because that is now the default. (as mentioned above)
+
+Example::
+
+    # This nginx setting in Graylog <3.0 ...
+    header_upstream X-Graylog-Server-URL http://{host}/api
+
+    # ... needs to be changed to the following with Graylog 3.0
+    header_upstream X-Graylog-Server-URL http://{host}/
+
 For a more detailed description of the new HTTP settings, please consult the annotated `Graylog configuration file <https://github.com/Graylog2/graylog2-server/blob/d9bb656275eeac7027e3fe12d9ee1b6a0905dcd1/misc/graylog.conf#L79-L81>`__.
 
 
