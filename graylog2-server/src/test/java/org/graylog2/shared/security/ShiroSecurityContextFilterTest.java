@@ -167,4 +167,24 @@ public class ShiroSecurityContextFilterTest {
         assertThat(securityContext.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH);
         assertThat(securityContext.getToken()).isExactlyInstanceOf(AccessTokenAuthToken.class);
     }
+
+
+    @Test
+    public void filterWithBasicAuthAndPasswordWithColonShouldCreateShiroSecurityContextWithUsernamePasswordToken() throws Exception {
+        final MultivaluedHashMap<String, String> headers = new MultivaluedHashMap<>();
+        final String credentials = Base64.getEncoder().encodeToString("user:pass:word".getBytes(StandardCharsets.US_ASCII));
+        headers.putSingle(HttpHeaders.AUTHORIZATION, "Basic " + credentials);
+        when(requestContext.getHeaders()).thenReturn(headers);
+
+        filter.filter(requestContext);
+
+        final ArgumentCaptor<ShiroSecurityContext> argument = ArgumentCaptor.forClass(ShiroSecurityContext.class);
+        verify(requestContext).setSecurityContext(argument.capture());
+        final ShiroSecurityContext securityContext = argument.getValue();
+        assertThat(securityContext).isExactlyInstanceOf(ShiroSecurityContext.class);
+        assertThat(securityContext.getAuthenticationScheme()).isEqualTo(SecurityContext.BASIC_AUTH);
+        assertThat(securityContext.getUsername()).isEqualTo("user");
+        assertThat(securityContext.getPassword()).isEqualTo("pass:word");
+        assertThat(securityContext.getToken()).isExactlyInstanceOf(UsernamePasswordToken.class);
+    }
 }
