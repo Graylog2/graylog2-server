@@ -7,8 +7,7 @@ import MessageDetail from './MessageDetail';
 import { Timestamp } from 'components/common';
 import StringUtils from 'util/StringUtils';
 import DateTime from 'logic/datetimes/DateTime';
-
-const style = require('!style!css!./MessageTableEntry.css');
+import style from './MessageTableEntry.css';
 
 const MessageTableEntry = React.createClass({
   propTypes: {
