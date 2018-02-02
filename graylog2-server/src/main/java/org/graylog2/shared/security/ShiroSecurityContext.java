@@ -19,11 +19,13 @@ package org.graylog2.shared.security;
 import com.google.common.annotations.VisibleForTesting;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationToken;
+import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.apache.shiro.util.ThreadContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.ws.rs.core.MultivaluedHashMap;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.SecurityContext;
@@ -49,6 +51,7 @@ public class ShiroSecurityContext implements SecurityContext {
         this.headers = new MultivaluedHashMap<String, String>(headers);
     }
 
+    @Nullable
     public String getUsername() {
         if (token == null || token.getPrincipal() == null) {
             return null;
@@ -56,11 +59,14 @@ public class ShiroSecurityContext implements SecurityContext {
         return token.getPrincipal().toString();
     }
 
+    @Nullable
     public String getPassword() {
-        if (token == null || token.getCredentials() == null) {
+        if (token instanceof UsernamePasswordToken) {
+            final char[] credentials = (char[]) token.getCredentials();
+            return String.valueOf(credentials);
+        } else {
             return null;
         }
-        return token.getCredentials().toString();
     }
 
     public Subject getSubject() {
