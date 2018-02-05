@@ -84,12 +84,13 @@ const TableList = React.createClass({
       bulkHeaderActions = this.props.headerActionsFactory(this.state.selected);
     }
 
+    const selectedItems = this.state.selected.size;
     const header = (
       <div>
         {bulkHeaderActions}
         <Input id="select-all-checkbox"
                type="checkbox"
-               label="Select all"
+               label={selectedItems === 0 ? 'Select all' : `${selectedItems} selected`}
                checked={this.state.allSelected}
                onChange={this._toggleSelectAll}
                wrapperClassName="form-group-inline" />
