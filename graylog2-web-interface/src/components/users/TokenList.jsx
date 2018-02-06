@@ -126,7 +126,9 @@ class TokenList extends React.Component {
           descriptionKey="token"
           hideDescription={this.state.hide_tokens}
           itemActionsFactory={this.itemActionsFactory} />
-        <Checkbox onChange={this._onShowTokensChanged} checked={this.state.hide_tokens}>Hide Tokens</Checkbox>
+        <Checkbox id="hide-tokens" onChange={this._onShowTokensChanged} checked={this.state.hide_tokens}>
+          Hide Tokens
+        </Checkbox>
       </span>
     );
   }
