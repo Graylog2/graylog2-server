@@ -29,6 +29,8 @@ const TableList = React.createClass({
     filterKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
     /** Label to use next to the filter input. */
     filterLabel: PropTypes.string,
+    /** Hide description */
+    hideDescription: PropTypes.bool,
     /**
      * Immutable List of objects to display in the list. Objects are expected
      * to have an ID (`idKey` prop), a title (`title` prop), and an optional
@@ -68,6 +70,9 @@ const TableList = React.createClass({
       allSelected: false,
       selected: Immutable.Set(),
     };
+  },
+  componentWillReceiveProps(nextProps) {
+    this.setState({ filteredItems: Immutable.List(nextProps.items) });
   },
   _filterItems(filteredItems) {
     this.setState({ filteredItems: Immutable.List(filteredItems), allSelected: false });
@@ -113,7 +118,7 @@ const TableList = React.createClass({
     );
     return (
       <ListGroupItem key={`item-${item[this.props.idKey]}`} header={header}>
-        <span style={{ marginLeft: 20 }}>{item[this.props.descriptionKey]}</span>
+        {this.props.hideDescription ? null : <span style={{ marginLeft: 20 }}>{item[this.props.descriptionKey]}</span>}
       </ListGroupItem>
     );
   },
