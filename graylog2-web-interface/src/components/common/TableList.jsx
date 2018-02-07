@@ -69,21 +69,34 @@ const TableList = React.createClass({
   getInitialState() {
     return {
       filteredItems: Immutable.List(this.props.items),
-      allSelected: false,
       selected: Immutable.Set(),
     };
   },
-  componentWillReceiveProps(nextProps) {
-    this.setState({ filteredItems: Immutable.List(nextProps.items) });
+
+  componentDidUpdate() {
+    const { filteredItems, selected } = this.state;
+    const selectAllCheckbox = this.selectAllInput ? this.selectAllInput.getInputDOMNode() : undefined;
+    if (!selectAllCheckbox) {
+      return;
+    }
+    // Set the select all checkbox as indeterminate if some but not items are selected.
+    selectAllCheckbox.indeterminate = selected.count() > 0 && !this._isAllSelected(filteredItems, selected);
   },
+
   _filterItems(filteredItems) {
     const nextFilteredItems = Immutable.List(filteredItems);
     const nextFilteredIds = Immutable.Set(filteredItems.map(item => item[this.props.idKey]));
     const filteredSelected = this.state.selected.intersect(nextFilteredIds);
-    this.setState({ filteredItems: nextFilteredItems, selected: filteredSelected, allSelected: false });
+    this.setState({ filteredItems: nextFilteredItems, selected: filteredSelected });
   },
+
+  _isAllSelected(filteredItems, selected) {
+    return filteredItems.count() === selected.count();
+  },
+
   _headerItem() {
-    const selectedItems = this.state.selected.count();
+    const { filteredItems, selected } = this.state;
+    const selectedItems = selected.count();
     let bulkHeaderActions;
 
     if (selectedItems > 0) {
@@ -95,10 +108,11 @@ const TableList = React.createClass({
         <div className={style.headerComponentsWrapper}>
           {bulkHeaderActions}
         </div>
-        <Input id="select-all-checkbox"
+        <Input ref={(c) => { this.selectAllInput = c; }}
+               id="select-all-checkbox"
                type="checkbox"
                label={selectedItems === 0 ? 'Select all' : `${selectedItems} selected`}
-               checked={this.state.allSelected}
+               checked={this._isAllSelected(filteredItems, selected)}
                onChange={this._toggleSelectAll}
                wrapperClassName="form-group-inline" />
       </div>
@@ -107,7 +121,7 @@ const TableList = React.createClass({
   },
   _toggleSelectAll(event) {
     const newSelected = event.target.checked ? Immutable.Set(this.state.filteredItems.map(item => item[this.props.idKey])) : Immutable.Set();
-    this.setState({ selected: newSelected, allSelected: !this.state.allSelected });
+    this.setState({ selected: newSelected });
   },
   _formatItem(item) {
     const header = (
