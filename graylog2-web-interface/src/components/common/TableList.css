@@ -1,0 +1,17 @@
+:local(.headerComponentsWrapper) {
+    float: right;
+    margin-top: 10px;
+}
+
+:local(.itemActionsWrapper) {
+    float: right;
+    margin-top: 10px;
+}
+
+:local(.description) {
+    margin-left: 20px;
+}
+
+:local(.itemWrapper) .form-group {
+    margin-bottom: 0;
+}

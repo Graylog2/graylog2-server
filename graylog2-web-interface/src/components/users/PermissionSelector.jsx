@@ -36,7 +36,7 @@ const PermissionSelector = React.createClass({
       const editActionLabel = allEdit ? 'Clear' : 'Set';
 
       return (
-        <div className="pull-right" style={{ marginTop: 10, marginBottom: 10 }}>
+        <div>
           <Button bsSize="xsmall" bsStyle="info" onClick={() => this._toggleAllStreamsRead(streamIds, allRead)}>{readActionLabel} read permissions</Button>
           &nbsp;
           <Button bsSize="xsmall" bsStyle="info" onClick={() => this._toggleAllStreamsEdit(streamIds, allEdit)}>{editActionLabel} edit permissions</Button>

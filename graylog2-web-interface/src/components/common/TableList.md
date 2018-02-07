@@ -24,13 +24,11 @@ const TableListExample = createReactClass({
 
   headerActionsFactory(selectedNumbers) {
     return (
-      <div className="pull-right" style={{ marginTop: 10 }}>
-        <Button bsStyle="info"
-                bsSize="xsmall"
-                onClick={this.action(selectedNumbers.join(', '))}>
-          Bulk-operation
-        </Button>
-      </div>
+      <Button bsStyle="info"
+              bsSize="xsmall"
+              onClick={this.action(selectedNumbers.join(', '))}>
+        Bulk-operation
+      </Button>
     );
   },
 

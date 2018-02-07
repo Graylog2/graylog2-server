@@ -7,6 +7,8 @@ import { Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { TypeAheadDataFilter } from 'components/common';
 
+import style from './TableList.css';
+
 /**
  * Component that renders a list of items in a table-like structure. The list
  * also includes a filter input that can be used to search for specific
@@ -78,16 +80,18 @@ const TableList = React.createClass({
     this.setState({ filteredItems: Immutable.List(filteredItems), allSelected: false });
   },
   _headerItem() {
+    const selectedItems = this.state.selected.count();
     let bulkHeaderActions;
 
-    if (this.state.selected.count() > 0) {
+    if (selectedItems > 0) {
       bulkHeaderActions = this.props.headerActionsFactory(this.state.selected);
     }
 
-    const selectedItems = this.state.selected.size;
     const header = (
       <div>
-        {bulkHeaderActions}
+        <div className={style.headerComponentsWrapper}>
+          {bulkHeaderActions}
+        </div>
         <Input id="select-all-checkbox"
                type="checkbox"
                label={selectedItems === 0 ? 'Select all' : `${selectedItems} selected`}
@@ -104,8 +108,8 @@ const TableList = React.createClass({
   },
   _formatItem(item) {
     const header = (
-      <div>
-        <div className="pull-right" style={{ marginTop: 10, marginBottom: 10 }}>
+      <div className={style.itemWrapper}>
+        <div className={style.itemActionsWrapper}>
           {this.props.itemActionsFactory(item)}
         </div>
 
@@ -114,12 +118,12 @@ const TableList = React.createClass({
                label={item[this.props.titleKey]}
                checked={this.state.selected.includes(item[this.props.idKey])}
                onChange={this._onItemSelect(item[this.props.idKey])}
-               groupClassName="form-group-inline" />
+               wrapperClassName="form-group-inline" />
       </div>
     );
     return (
       <ListGroupItem key={`item-${item[this.props.idKey]}`} header={header}>
-        {this.props.hideDescription ? null : <span style={{ marginLeft: 20 }}>{item[this.props.descriptionKey]}</span>}
+        {this.props.hideDescription ? null : <span className={style.description}>{item[this.props.descriptionKey]}</span>}
       </ListGroupItem>
     );
   },
