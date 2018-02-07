@@ -42,8 +42,8 @@ const TableList = React.createClass({
     /**
      * Function that generates react elements to render in the header.
      * Those elements are meant to display actions that affect more than one
-     * item in the list, so they will only be displayed when more than one
-     * item is checked.
+     * item in the list, so they will only be displayed when one or more items
+     * are checked.
      * The function receives a list of IDs corresponding to all selected
      * elements as argument.
      */
@@ -77,7 +77,10 @@ const TableList = React.createClass({
     this.setState({ filteredItems: Immutable.List(nextProps.items) });
   },
   _filterItems(filteredItems) {
-    this.setState({ filteredItems: Immutable.List(filteredItems), allSelected: false });
+    const nextFilteredItems = Immutable.List(filteredItems);
+    const nextFilteredIds = Immutable.Set(filteredItems.map(item => item[this.props.idKey]));
+    const filteredSelected = this.state.selected.intersect(nextFilteredIds);
+    this.setState({ filteredItems: nextFilteredItems, selected: filteredSelected, allSelected: false });
   },
   _headerItem() {
     const selectedItems = this.state.selected.count();
