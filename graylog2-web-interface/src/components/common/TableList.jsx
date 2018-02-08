@@ -41,6 +41,14 @@ const TableList = React.createClass({
     items: PropTypes.instanceOf(Immutable.List).isRequired,
     /**
      * Function that generates react elements to render in the header.
+     * Those elements are meant to display easy to use filters that help
+     * filtering the data in a visual way. There will only be displayed when
+     * no items are checked.
+     * The function does not receive any arguments.
+     */
+    headerFiltersFactory: PropTypes.func,
+    /**
+     * Function that generates react elements to render in the header.
      * Those elements are meant to display actions that affect more than one
      * item in the list, so they will only be displayed when one or more items
      * are checked.
@@ -62,6 +70,7 @@ const TableList = React.createClass({
       titleKey: 'title',
       descriptionKey: 'description',
       filterLabel: 'Filter',
+      headerFiltersFactory: () => {},
       headerActionsFactory: () => {},
       itemActionsFactory: () => {},
     };
@@ -112,8 +121,10 @@ const TableList = React.createClass({
     const selectedItems = selected.count();
     let bulkHeaderActions;
 
-    if (selectedItems > 0) {
-      bulkHeaderActions = this.props.headerActionsFactory(this.state.selected);
+    if (selectedItems === 0) {
+      bulkHeaderActions = this.props.headerFiltersFactory();
+    } else {
+      bulkHeaderActions = this.props.headerActionsFactory(selected);
     }
 
     const header = (
