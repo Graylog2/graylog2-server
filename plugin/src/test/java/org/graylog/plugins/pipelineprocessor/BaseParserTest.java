@@ -32,6 +32,7 @@ import org.graylog.plugins.pipelineprocessor.parser.PipelineRuleParser;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.streams.Stream;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.rules.TestName;
@@ -142,7 +143,7 @@ public class BaseParserTest {
 
     @Nullable
     protected Message evaluateRule(Rule rule, Consumer<Message> messageModifier) {
-        final Message message = new Message("hello test", "source", DateTime.now());
+        final Message message = new Message("hello test", "source", DateTime.now(DateTimeZone.UTC));
         message.addStream(defaultStream);
         messageModifier.accept(message);
         return evaluateRule(rule, message);
