@@ -99,7 +99,7 @@ const TableList = React.createClass({
   },
 
   _isAllSelected(filteredItems, selected) {
-    return filteredItems.count() === selected.count();
+    return filteredItems.count() > 0 && filteredItems.count() === selected.count();
   },
 
   _headerItem() {
@@ -116,10 +116,12 @@ const TableList = React.createClass({
         <div className={style.headerComponentsWrapper}>
           {bulkHeaderActions}
         </div>
+
         <Input ref={(c) => { this.selectAllInput = c; }}
                id="select-all-checkbox"
                type="checkbox"
                label={selectedItems === 0 ? 'Select all' : `${selectedItems} selected`}
+               disabled={filteredItems.count() === 0}
                checked={this._isAllSelected(filteredItems, selected)}
                onChange={this._toggleSelectAll}
                wrapperClassName="form-group-inline" />
