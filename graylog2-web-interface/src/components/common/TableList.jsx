@@ -83,10 +83,14 @@ const TableList = React.createClass({
     selectAllCheckbox.indeterminate = selected.count() > 0 && !this._isAllSelected(filteredItems, selected);
   },
 
+  _recalculateSelection(selected, nextFilteredItems) {
+    const nextFilteredIds = Immutable.Set(nextFilteredItems.map(item => item[this.props.idKey]));
+    return selected.intersect(nextFilteredIds);
+  },
+
   _filterItems(filteredItems) {
     const nextFilteredItems = Immutable.List(filteredItems);
-    const nextFilteredIds = Immutable.Set(filteredItems.map(item => item[this.props.idKey]));
-    const filteredSelected = this.state.selected.intersect(nextFilteredIds);
+    const filteredSelected = this._recalculateSelection(this.state.selected, nextFilteredItems);
     this.setState({ filteredItems: nextFilteredItems, selected: filteredSelected });
   },
 
