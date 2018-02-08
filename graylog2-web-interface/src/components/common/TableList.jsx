@@ -75,7 +75,11 @@ const TableList = React.createClass({
 
   componentDidUpdate() {
     const { filteredItems, selected } = this.state;
-    const selectAllCheckbox = this.selectAllInput ? this.selectAllInput.getInputDOMNode() : undefined;
+    this._setSelectAllCheckboxState(this.selectAllInput, filteredItems, selected);
+  },
+
+  _setSelectAllCheckboxState(selectAllInput, filteredItems, selected) {
+    const selectAllCheckbox = selectAllInput ? selectAllInput.getInputDOMNode() : undefined;
     if (!selectAllCheckbox) {
       return;
     }
