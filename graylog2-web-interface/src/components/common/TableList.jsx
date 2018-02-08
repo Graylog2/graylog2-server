@@ -161,19 +161,7 @@ const TableList = React.createClass({
     };
   },
   render() {
-    if (this.props.items.count() === 0) {
-      return (
-        <Row>
-          <Col md={12}>
-            <div>No items to display.</div>
-          </Col>
-        </Row>
-      );
-    }
-
-    const formattedItems = this.state.filteredItems.map(item => this._formatItem(item)).toJS();
     let filter;
-
     if (this.props.filterKeys.length !== 0) {
       filter = (
         <Row>
@@ -190,13 +178,16 @@ const TableList = React.createClass({
       );
     }
 
-    if (this.state.filteredItems.count() === 0) {
-      return (
-        <div>
-          {filter}
-          <div>No items match your filter criteria</div>
-        </div>
+    let formattedItems;
+
+    if (this.props.items.count() === 0) {
+      formattedItems = <ListGroupItem header={<div className={style.itemWrapper}>No items to display</div>} />;
+    } else if (this.state.filteredItems.count() === 0) {
+      formattedItems = (
+        <ListGroupItem header={<div className={style.itemWrapper}>No items match your filter criteria</div>} />
       );
+    } else {
+      formattedItems = this.state.filteredItems.map(item => this._formatItem(item)).toJS();
     }
 
     return (
