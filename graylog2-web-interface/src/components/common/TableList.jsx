@@ -68,7 +68,7 @@ const TableList = React.createClass({
   },
   getInitialState() {
     return {
-      filteredItems: Immutable.List(this.props.items),
+      filteredItems: this.props.items,
       selected: Immutable.Set(),
     };
   },
@@ -174,7 +174,7 @@ const TableList = React.createClass({
           <Col md={5}>
             <TypeAheadDataFilter id={`${lodash.kebabCase(this.props.filterLabel)}-data-filter`}
                                  label={this.props.filterLabel}
-                                 data={this.props.items}
+                                 data={this.props.items.toJS()}
                                  displayKey="value"
                                  filterSuggestions={[]}
                                  searchInKeys={this.props.filterKeys}
