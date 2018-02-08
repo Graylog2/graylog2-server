@@ -73,9 +73,14 @@ const TableList = React.createClass({
     };
   },
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     const { filteredItems, selected } = this.state;
     this._setSelectAllCheckboxState(this.selectAllInput, filteredItems, selected);
+
+    if (!this.props.items.equals(prevProps.items)) {
+      // This will update both filteredItems and selected
+      this.filter.filterData();
+    }
   },
 
   _setSelectAllCheckboxState(selectAllInput, filteredItems, selected) {
@@ -166,7 +171,8 @@ const TableList = React.createClass({
       filter = (
         <Row>
           <Col md={5}>
-            <TypeAheadDataFilter id={`${lodash.kebabCase(this.props.filterLabel)}-data-filter`}
+            <TypeAheadDataFilter ref={(c) => { this.filter = c; }}
+                                 id={`${lodash.kebabCase(this.props.filterLabel)}-data-filter`}
                                  label={this.props.filterLabel}
                                  data={this.props.items.toJS()}
                                  displayKey="value"
