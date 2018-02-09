@@ -27,6 +27,8 @@ const TableList = React.createClass({
     titleKey: PropTypes.string,
     /** Specifies key to use as item description. */
     descriptionKey: PropTypes.string,
+    /** Indicates whether the component should render a filter or not. */
+    isFilterEnabled: PropTypes.bool,
     /** Object keys to use for filtering. Use an empty array to disable filtering. */
     filterKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
     /** Label to use next to the filter input. */
@@ -69,6 +71,7 @@ const TableList = React.createClass({
       idKey: 'id',
       titleKey: 'title',
       descriptionKey: 'description',
+      isFilterEnabled: true,
       filterLabel: 'Filter',
       headerFiltersFactory: () => {},
       headerActionsFactory: () => {},
@@ -87,9 +90,23 @@ const TableList = React.createClass({
     this._setSelectAllCheckboxState(this.selectAllInput, filteredItems, selected);
 
     if (!this.props.items.equals(prevProps.items)) {
-      // This will update both filteredItems and selected
-      this.filter.filterData();
+      if (this.props.isFilterEnabled) {
+        // This will apply the current filter to new items and update the state
+        this.filter.filterData();
+      } else {
+        this._updateFilteredItems(this.props.items);
+      }
     }
+  },
+
+  _recalculateSelection(selected, nextFilteredItems) {
+    const nextFilteredIds = Immutable.Set(nextFilteredItems.map(item => item[this.props.idKey]));
+    return selected.intersect(nextFilteredIds);
+  },
+
+  _updateFilteredItems(nextFilteredItems) {
+    const filteredSelected = this._recalculateSelection(this.state.selected, nextFilteredItems);
+    this.setState({ filteredItems: nextFilteredItems, selected: filteredSelected });
   },
 
   _setSelectAllCheckboxState(selectAllInput, filteredItems, selected) {
@@ -101,15 +118,8 @@ const TableList = React.createClass({
     selectAllCheckbox.indeterminate = selected.count() > 0 && !this._isAllSelected(filteredItems, selected);
   },
 
-  _recalculateSelection(selected, nextFilteredItems) {
-    const nextFilteredIds = Immutable.Set(nextFilteredItems.map(item => item[this.props.idKey]));
-    return selected.intersect(nextFilteredIds);
-  },
-
   _filterItems(filteredItems) {
-    const nextFilteredItems = Immutable.List(filteredItems);
-    const filteredSelected = this._recalculateSelection(this.state.selected, nextFilteredItems);
-    this.setState({ filteredItems: nextFilteredItems, selected: filteredSelected });
+    this._updateFilteredItems(Immutable.List(filteredItems));
   },
 
   _isAllSelected(filteredItems, selected) {
@@ -178,7 +188,7 @@ const TableList = React.createClass({
   },
   render() {
     let filter;
-    if (this.props.filterKeys.length !== 0) {
+    if (this.props.isFilterEnabled) {
       filter = (
         <Row>
           <Col md={5}>
