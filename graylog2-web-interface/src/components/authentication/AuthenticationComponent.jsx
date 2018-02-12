@@ -121,7 +121,7 @@ const AuthenticationComponent = React.createClass({
         </LinkContainer>,
         <LinkContainer key="profile-edit-tokens" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit_tokens(encodeURIComponent(this.state.currentUser.username))}>
           <NavItem title="Edit Tokens">Edit Tokens</NavItem>
-        </LinkContainer>
+        </LinkContainer>,
       ];
     }
     const subnavigation = (

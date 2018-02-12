@@ -1,18 +1,12 @@
 import React from 'react';
 import renderer from 'react-test-renderer';
 import { mount } from 'enzyme';
+import 'helpers/mocking/react-dom_mock';
 
 import TokenList from 'components/users/TokenList';
 
-/* https://github.com/facebook/react/issues/7371
- *
- * findDomNode with refs is not supported by the react-test-renderer.
- * So we need to mock the findDOMNode function for TableList respectievly
- * for its child component TypeAheadDataFilter.
- */
-jest.mock('react-dom', () => ({
-  findDOMNode: () => ({}),
-}));
+jest.mock('components/common/ClipboardButton', () => 'ClipboardButton');
+
 
 describe('<TokenList />', () => {
   const tokens = [
@@ -39,11 +33,11 @@ describe('<TokenList />', () => {
     });
     const wrapper = mount(<TokenList
       tokens={tokens}
-      create={createFn}
-      delete={deleteFn}
+      onCreate={createFn}
+      onDelete={deleteFn}
     />);
     wrapper.find('#create-token-input').simulate('change', { target: { value: 'hans' } });
-    wrapper.find('button[type="submit"]').at(0).simulate('click');
+    wrapper.find('form').at(0).simulate('submit');
     expect(createFn.mock.calls.length).toBe(1);
 
     wrapper.find('button[children="Delete"]').at(0).simulate('click');

@@ -86,9 +86,7 @@ import java.util.Set;
 import static com.google.common.base.MoreObjects.firstNonNull;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.maxBy;
-import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
-import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
-import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
+import static org.graylog2.shared.security.RestPermissions.*;
 
 @RequiresAuthentication
 @Path("/users")
@@ -428,7 +426,7 @@ public class UsersResource extends RestResource {
                                 @PathParam("username") String username) {
         final User user = _tokensLoadUser(username);
 
-        if (!getSubject().isPermitted(RestPermissions.USERS_TOKENLIST + ":" + user.getName())) {
+        if (!isPermitted(USERS_TOKENLIST, username)) {
             throw new ForbiddenException("Not allowed to list tokens for user " + username);
         }
 
@@ -450,8 +448,8 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "JSON Body", value = "Placeholder because POST requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body) {
         final User user = _tokensLoadUser(username);
 
-        if (!getSubject().isPermitted(RestPermissions.USERS_TOKENCREATE + ":" + user.getName())) {
-            throw new ForbiddenException("Not allowed to list tokens for user " + username);
+        if (!isPermitted(USERS_TOKENCREATE, username)) {
+            throw new ForbiddenException("Not allowed to create tokens for user " + username);
         }
 
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
@@ -468,8 +466,8 @@ public class UsersResource extends RestResource {
             @ApiParam(name = "token", required = true) @PathParam("token") String token) {
         final User user = _tokensLoadUser(username);
 
-        if (!getSubject().isPermitted(RestPermissions.USERS_TOKENREMOVE + ":" + user.getName())) {
-            throw new ForbiddenException("Not allowed to list tokens for user " + username);
+        if (!isPermitted(USERS_TOKENREMOVE, username)) {
+            throw new ForbiddenException("Not allowed to remove tokens for user " + username);
         }
 
         final AccessToken accessToken = accessTokenService.load(token);

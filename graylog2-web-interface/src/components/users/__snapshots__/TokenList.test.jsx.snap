@@ -2,7 +2,9 @@
 
 exports[`<TokenList /> should render with empty tokens 1`] = `
 <span>
-  <form>
+  <form
+    onSubmit={[Function]}
+  >
     <div
       className="form-group"
     >
@@ -38,7 +40,6 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
             className="btn btn-primary"
             disabled={true}
             id="create-token"
-            onClick={[Function]}
             type="submit"
           >
             Create Token
@@ -81,7 +82,9 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
 
 exports[`<TokenList /> should render with tokens 1`] = `
 <span>
-  <form>
+  <form
+    onSubmit={[Function]}
+  >
     <div
       className="form-group"
     >
@@ -117,7 +120,6 @@ exports[`<TokenList /> should render with tokens 1`] = `
             className="btn btn-primary"
             disabled={true}
             id="create-token"
-            onClick={[Function]}
             type="submit"
           >
             Create Token
@@ -259,16 +261,14 @@ exports[`<TokenList /> should render with tokens 1`] = `
               }
             }
           >
-            <span>
-              <button
-                className="btn btn-xs btn-default"
-                data-clipboard-button={true}
-                data-clipboard-text="beef2001"
-                disabled={false}
-                type="button"
-              >
-                Copy to clipboard
-              </button>
+            <div
+              className="btn-group"
+            >
+              <ClipboardButton
+                bsSize="xsmall"
+                text="beef2001"
+                title="Copy to clipboard"
+              />
               <button
                 className="btn btn-xs btn-primary"
                 disabled={false}
@@ -277,7 +277,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
               >
                 Delete
               </button>
-            </span>
+            </div>
           </div>
           <div
             className="form-group"
@@ -326,16 +326,14 @@ exports[`<TokenList /> should render with tokens 1`] = `
               }
             }
           >
-            <span>
-              <button
-                className="btn btn-xs btn-default"
-                data-clipboard-button={true}
-                data-clipboard-text="beef2002"
-                disabled={false}
-                type="button"
-              >
-                Copy to clipboard
-              </button>
+            <div
+              className="btn-group"
+            >
+              <ClipboardButton
+                bsSize="xsmall"
+                text="beef2002"
+                title="Copy to clipboard"
+              />
               <button
                 className="btn btn-xs btn-primary"
                 disabled={false}
@@ -344,7 +342,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
               >
                 Delete
               </button>
-            </span>
+            </div>
           </div>
           <div
             className="form-group"

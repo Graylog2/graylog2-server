@@ -20,6 +20,8 @@ const EditTokensPage = React.createClass({
   getInitialState() {
     return {
       username: undefined,
+      creatingToken: false,
+      deletingToken: undefined,
       tokens: [],
     };
   },
@@ -49,14 +51,22 @@ const EditTokensPage = React.createClass({
       [`users:tokenlist:${username}`]);
   },
 
-  _deleteToken(token) {
-    const promise = UsersStore.deleteToken(this.props.params.username, token);
-    promise.then(() => this._loadTokens(this.props.params.username));
+  _deleteToken(token, tokenName) {
+    const promise = UsersStore.deleteToken(this.props.params.username, token, tokenName);
+    this.setState({ deletingToken: token });
+    promise.then(() => {
+      this._loadTokens(this.props.params.username);
+      this.setState({ deletingToken: undefined });
+    });
   },
 
   _createToken(tokenName) {
     const promise = UsersStore.createToken(this.props.params.username, tokenName);
-    promise.then(() => this._loadTokens(this.props.params.username));
+    this.setState({ creatingToken: true });
+    promise.then(() => {
+      this._loadTokens(this.props.params.username);
+      this.setState({ creatingToken: false });
+    });
   },
 
   render() {
@@ -68,8 +78,11 @@ const EditTokensPage = React.createClass({
             {null}
           </PageHeader>
           <TokenList tokens={this.state.tokens}
-                     delete={this._deleteToken}
-                     create={this._createToken} />
+                     onDelete={this._deleteToken}
+                     onCreate={this._createToken}
+                     creatingToken={this.state.creatingToken}
+                     deletingToken={this.state.deletingToken}
+          />
         </span>
       </DocumentTitle>
     );

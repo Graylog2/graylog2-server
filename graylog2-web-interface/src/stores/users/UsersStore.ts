@@ -109,9 +109,9 @@ export const UsersStore = {
     return promise;
   },
 
-  deleteToken(username: string, token_name: string): Promise<string[]> {
+  deleteToken(username: string, token: string, token_name: string): Promise<string[]> {
     const  url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(username),
-      encodeURIComponent(token_name)).url, {});
+      encodeURIComponent(token)).url, {});
     const  promise = fetch('DELETE', url);
 
     promise.then(() => {

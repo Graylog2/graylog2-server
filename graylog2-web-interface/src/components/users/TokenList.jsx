@@ -1,24 +1,28 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
-import Clipboard from 'clipboard';
 
-import { Row, Col, FormControl, ControlLabel, Button, Checkbox } from 'react-bootstrap';
-import UserNotification from 'util/UserNotification';
+import ClipboardButton from 'components/common/ClipboardButton';
+import { Row, Col, FormControl, ControlLabel, Button, Checkbox, ButtonGroup } from 'react-bootstrap';
 import TableList from 'components/common/TableList';
+import Spinner from 'components/common/Spinner';
 import TokenListStyle from './TokenList.css';
 
 class TokenList extends React.Component {
   static propTypes = {
     tokens: PropTypes.arrayOf(PropTypes.object),
-    delete: PropTypes.func,
-    create: PropTypes.func,
+    onDelete: PropTypes.func,
+    onCreate: PropTypes.func,
+    creatingToken: PropTypes.bool,
+    deletingToken: PropTypes.string,
   };
 
   static defaultProps = {
     tokens: [],
-    delete: () => {},
-    create: () => {},
+    onDelete: () => {},
+    onCreate: () => {},
+    creatingToken: false,
+    deletingToken: undefined,
   };
 
   constructor(props) {
@@ -35,22 +39,6 @@ class TokenList extends React.Component {
     this.itemActionsFactory = this.itemActionsFactory.bind(this);
   }
 
-  componentDidMount() {
-    this.clipboard = new Clipboard('[data-clipboard-button]');
-    this.clipboard.on('success', () => {
-      UserNotification.success('Copied to clipboard!');
-    });
-    this.clipboard.on('error', () => {
-      UserNotification.error('Coping failed!');
-    });
-  }
-
-  componentWillUnmount() {
-    if (this.clipboard) {
-      this.clipboard.destroy();
-    }
-  }
-
   _onNewTokeChanged(event) {
     this.setState({ token_name: event.target.value });
   }
@@ -61,36 +49,36 @@ class TokenList extends React.Component {
 
   _deleteToken(token) {
     return () => {
-      this.props.delete(token.token);
+      this.props.onDelete(token.token, token.name);
     };
   }
 
-  _createToken() {
-    this.props.create(this.state.token_name);
+  _createToken(e) {
+    this.props.onCreate(this.state.token_name);
     this.setState({ token_name: '' });
+    e.preventDefault();
   }
 
   itemActionsFactory(token) {
-    const copyButtonProps = {};
-    copyButtonProps['data-clipboard-text'] = token.token;
-
+    const deleteButton = this.props.deletingToken === token.token ? <Spinner text="Deleting..." /> : 'Delete';
     return (
-      <span>
-        <Button data-clipboard-button {...copyButtonProps} bsSize="xsmall">
-          Copy to clipboard
-        </Button>
+      <ButtonGroup>
+        <ClipboardButton title={'Copy to clipboard'} text={token.token} bsSize="xsmall" />
         <Button bsSize="xsmall"
-          bsStyle="primary"
-          onClick={this._deleteToken(token)}>
-          Delete
+                disabled={this.props.deletingToken === token.token}
+                bsStyle="primary"
+                onClick={this._deleteToken(token)}>
+          {deleteButton}
         </Button>
-      </span>
+      </ButtonGroup>
     );
   }
 
   render() {
+    const submitButton = (this.props.creatingToken ? <Spinner text="Creating..." /> : 'Create Token');
+
     const createTokenForm = (
-      <form>
+      <form onSubmit={this._createToken}>
         <div className="form-group">
           <Row>
             <Col sm={2}>
@@ -106,10 +94,9 @@ class TokenList extends React.Component {
             </Col>
             <Col sm={2}>
               <Button id="create-token"
-                      disabled={this.state.token_name === ''}
-                      onClick={this._createToken}
-                      type="submit"
-                      bsStyle="primary" >Create Token</Button>
+              disabled={this.state.token_name === '' || this.props.creatingToken}
+              type="submit"
+              bsStyle="primary" >{submitButton}</Button>
             </Col>
           </Row>
         </div>
