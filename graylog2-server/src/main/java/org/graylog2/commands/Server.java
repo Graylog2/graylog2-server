@@ -24,6 +24,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import org.graylog.plugins.map.MapWidgetModule;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
 import org.graylog2.audit.AuditActor;
@@ -134,7 +135,8 @@ public class Server extends ServerBootstrap {
             new AuditBindings(),
             new AlertConditionBindings(),
             new IndexerBindings(),
-            new MigrationsModule()
+            new MigrationsModule(),
+            new MapWidgetModule()
         );
 
         return modules.build();

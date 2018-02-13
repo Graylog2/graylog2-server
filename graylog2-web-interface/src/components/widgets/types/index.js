@@ -17,6 +17,7 @@ import {
   StackedChartWidgetConfiguration,
   StatisticalCountWidgetCreateConfiguration,
   StatisticalCountWidgetEditConfiguration } from 'components/widgets/configurations';
+import {} from 'components/maps/widgets';
 
 PluginStore.register(new PluginManifest({}, {
   widgets: [

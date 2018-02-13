@@ -96,6 +96,7 @@
         <elasticsearch.version>5.6.5</elasticsearch.version>
         <jest.version>2.4.11+jackson</jest.version>
         <gelfclient.version>1.4.1</gelfclient.version>
+        <geoip2.version>2.8.1</geoip2.version>
         <grok.version>0.1.7-graylog</grok.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
         <guava.version>23.6-jre</guava.version>
