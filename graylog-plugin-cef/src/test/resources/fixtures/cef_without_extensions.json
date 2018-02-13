@@ -1,0 +1,14 @@
+{
+  "testString": "CEF:0|Trend Micro Inc.|OSSEC HIDS|v2.8.3|2502|User missed the password more than one time|10|",
+  "description": "Raw CEF message without extensions",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "/127.0.0.1",
+  "cefVersion": 0,
+  "deviceVendor": "Trend Micro Inc.",
+  "deviceProduct": "OSSEC HIDS",
+  "deviceVersion": "v2.8.3",
+  "deviceEventClassId": "2502",
+  "name": "User missed the password more than one time",
+  "severity": "10",
+  "extensions": {}
+}

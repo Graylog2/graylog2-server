@@ -1,0 +1,27 @@
+{
+  "testString": "CEF:0|log2timeline|timeline_cef_output|0.2|REG|Timeline Event|5|dvc=10.0.0.1 dvchost=SMITHSLAPTOP smac=00:11:22:33:44:55 fsize=0 filePermission=0 suid=0 fileID=1534979 fname=NTUSER.DAT suser=joe act=LastWritten rt=1249398822000 msg=[MACB] UEME_RUNPATH:C:/Program Files/Internet Explorer/iexplore.exe [Count: 1]",
+  "description": "https://www.sans.org/reading-room/whitepapers/logging/mastering-super-timeline-log2timeline-33438#page=58",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "10.0.0.1",
+  "cefVersion": 0,
+  "deviceVendor": "log2timeline",
+  "deviceProduct": "timeline_cef_output",
+  "deviceVersion": "0.2",
+  "deviceEventClassId": "REG",
+  "name": "Timeline Event",
+  "severity": "5",
+  "extensions": {
+    "dvc": "10.0.0.1",
+    "dvchost": "SMITHSLAPTOP",
+    "smac": "00:11:22:33:44:55",
+    "fsize": 0,
+    "filePermission": "0",
+    "suid": "0",
+    "fileID": "1534979",
+    "fname": "NTUSER.DAT",
+    "suser": "joe",
+    "act": "LastWritten",
+    "rt": "2009-08-04T15:13:42.000Z",
+    "msg": "[MACB] UEME_RUNPATH:C:/Program Files/Internet Explorer/iexplore.exe [Count: 1]"
+  }
+}

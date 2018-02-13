@@ -1,0 +1,23 @@
+{
+  "testString": "CEF:0|ArcSight|Logger|5.0.0.5355.2|sensor:115|Logger Internal Event|1|cat=/Monitor/Sensor/Fan5 cs2=Current Value cnt=1 dvc=10.0.0.1 cs3=Ok cs1=null type=0 cs1Label=unit rt=1305034099211 cs3Label=Status cn1Label=value cs2Label=timeframe",
+  "description": "https://blog.rootshell.be/2011/05/11/ossec-speaks-arcsight/",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "10.0.0.1",
+  "cefVersion": 0,
+  "deviceVendor": "ArcSight",
+  "deviceProduct": "Logger",
+  "deviceVersion": "5.0.0.5355.2",
+  "deviceEventClassId": "sensor:115",
+  "name": "Logger Internal Event",
+  "severity": "1",
+  "extensions": {
+    "cat": "/Monitor/Sensor/Fan5",
+    "timeframe": "Current Value",
+    "cnt": 1,
+    "dvc": "10.0.0.1",
+    "Status": "Ok",
+    "unit": "null",
+    "type": 0,
+    "rt": "2011-05-10T13:28:19.211Z"
+  }
+}
