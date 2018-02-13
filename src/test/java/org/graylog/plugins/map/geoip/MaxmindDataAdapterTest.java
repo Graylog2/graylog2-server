@@ -126,6 +126,16 @@ public class MaxmindDataAdapterTest {
         }
 
         @Test
+        public void doGetIncludesCoordinatesInMultiValueResult() {
+            // This test will possibly get flaky when the entry for 8.8.8.8 changes!
+            final LookupResult lookupResult = adapter.doGet("8.8.8.8");
+            assertThat(lookupResult.isEmpty()).isFalse();
+            assertThat(lookupResult.multiValue()).isNotEmpty();
+            assertThat(lookupResult.multiValue())
+                    .hasEntrySatisfying("coordinates", value -> assertThat((String) value).matches("[0-9.\\-]+,[0-9.\\-]+"));
+        }
+
+        @Test
         public void doGetReturnsResultIfCityResponseFieldsAreNull() throws Exception {
             final CityResponse cityResponse = new CityResponse(null, null, null, null, null, null, null, null, null, null);
             final DatabaseReader mockDatabaseReader = mock(DatabaseReader.class);

@@ -173,6 +173,7 @@ public class MaxmindDataAdapter extends LookupDataAdapter {
                         singleValue = null;
                     } else {
                         singleValue = location.getLatitude() + "," + location.getLongitude();
+                        map.put("coordinates", singleValue);
                     }
                     return LookupResult.multi(singleValue, map);
                 } catch (AddressNotFoundException nfe) {
