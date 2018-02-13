@@ -14,7 +14,7 @@ import style from './TableList.css';
  * also includes a filter input that can be used to search for specific items
  * or elements matching a string.
  *
- * The component can render action elements for each item and also for
+ * The component can render action elements for each item and (optionally) for
  * performing bulk operations. In that second case, action elements will
  * appear in the header once the user selects one or more items by checking
  * the checkboxes next to them.
@@ -45,6 +45,8 @@ const TableList = React.createClass({
      * description (`descriptionKey` prop).
      */
     items: PropTypes.instanceOf(Immutable.List).isRequired,
+    /** Indicates whether the component will enable bulk actions or not. */
+    enableBulkActions: PropTypes.bool,
     /**
      * Function that generates react elements to render in the header.
      * Those elements are meant to display actions that affect more than one
@@ -52,6 +54,7 @@ const TableList = React.createClass({
      * are checked.
      * The function receives a list of IDs corresponding to all selected
      * elements as argument.
+     * This function will not be called if `enableBulkActions` is set to `false`.
      */
     bulkActionsFactory: PropTypes.func,
     /**
@@ -69,6 +72,7 @@ const TableList = React.createClass({
       descriptionKey: 'description',
       isFilterEnabled: true,
       filterLabel: 'Filter',
+      enableBulkActions: true,
       bulkActionsFactory: () => {},
       itemActionsFactory: () => {},
     };
@@ -122,6 +126,10 @@ const TableList = React.createClass({
   },
 
   _headerItem() {
+    if (!this.props.enableBulkActions) {
+      return <ControlledTableList.Header />;
+    }
+
     const { filteredItems, selected } = this.state;
     const selectedItems = selected.count();
 
@@ -148,19 +156,30 @@ const TableList = React.createClass({
     this.setState({ selected: newSelected });
   },
   _formatItem(item) {
+    let formattedItem;
+
+    if (this.props.enableBulkActions) {
+      formattedItem = (
+        <Input id={`${this.props.idKey}-checkbox`}
+               type="checkbox"
+               label={item[this.props.titleKey]}
+               checked={this.state.selected.includes(item[this.props.idKey])}
+               onChange={this._onItemSelect(item[this.props.idKey])}
+               wrapperClassName="form-group-inline" />
+      );
+    } else {
+      formattedItem = <div id={`${this.props.idKey}-input`} className="header">{item[this.props.titleKey]}</div>;
+    }
+
     return (
       <ControlledTableList.Item key={`item-${item[this.props.idKey]}`}>
-        <div className={style.itemWrapper}>
+        <div className={`${style.itemWrapper} ${this.props.enableBulkActions ? '' : style.itemWrapperStatic}`}>
           <div className={style.itemActionsWrapper}>
             {this.props.itemActionsFactory(item)}
           </div>
 
-          <Input id={`${this.props.idKey}-checkbox`}
-                 type="checkbox"
-                 label={item[this.props.titleKey]}
-                 checked={this.state.selected.includes(item[this.props.idKey])}
-                 onChange={this._onItemSelect(item[this.props.idKey])}
-                 wrapperClassName="form-group-inline" />
+          {formattedItem}
+          <div className="description">{item[this.props.descriptionKey]}</div>
         </div>
         {this.props.hideDescription ? null : <span className={style.description}>{item[this.props.descriptionKey]}</span>}
       </ControlledTableList.Item>

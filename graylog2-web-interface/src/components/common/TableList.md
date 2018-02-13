@@ -62,7 +62,7 @@ const createReactClass = require('create-react-class');
 const Immutable = require('immutable');
 const Button = require('react-bootstrap').Button;
 
-const TableListExampleExternalFilter = createReactClass({
+const TableListExampleNoBulkActions = createReactClass({
   getInitialState() {
     return {
       items: Immutable.List([
@@ -96,11 +96,11 @@ const TableListExampleExternalFilter = createReactClass({
 
     return (
       <TableList items={items}
-                 filterKeys={['title', 'secret_key']}
+                 enableBulkActions={false}
                  itemActionsFactory={this.itemActionsFactory} />
     );
   },
 });
 
-<TableListExampleExternalFilter />
+<TableListExampleNoBulkActions />
 ```
