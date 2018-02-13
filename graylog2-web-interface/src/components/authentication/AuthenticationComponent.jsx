@@ -119,7 +119,7 @@ const AuthenticationComponent = React.createClass({
         <LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(this.state.currentUser.username))}>
           <NavItem title="Edit Profile">Edit Profile</NavItem>
         </LinkContainer>,
-        <LinkContainer key="profile-edit-tokens" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit_tokens(encodeURIComponent(this.state.currentUser.username))}>
+        <LinkContainer key="profile-edit-tokens" to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(encodeURIComponent(this.state.currentUser.username))}>
           <NavItem title="Edit Tokens">Edit Tokens</NavItem>
         </LinkContainer>,
       ];

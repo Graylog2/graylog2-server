@@ -111,7 +111,7 @@ const UserList = React.createClass({
     let actions = null;
     if (user.read_only) {
       const editTokensAction = (
-        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit_tokens(encodeURIComponent(user.username))}>
+        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(encodeURIComponent(user.username))}>
           <Button id={`edit-tokens-${user.username}`} bsStyle="info" bsSize="xs" title={`Edit tokens of user ${user.username}`}>
             Edit tokens
           </Button>
@@ -132,7 +132,7 @@ const UserList = React.createClass({
       );
     } else {
       const editTokensAction = (
-        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.edit_tokens(encodeURIComponent(user.username))}>
+        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(encodeURIComponent(user.username))}>
           <MenuItem eventKey="1" id={`edit-tokens-${user.username}`} bsStyle="info" bsSize="xs" title={`Edit tokens of user ${user.username}`}>
             Edit tokens
           </MenuItem>
