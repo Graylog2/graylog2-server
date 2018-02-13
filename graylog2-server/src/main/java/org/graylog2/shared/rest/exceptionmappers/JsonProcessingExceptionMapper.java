@@ -31,7 +31,8 @@ import static javax.ws.rs.core.Response.status;
 public class JsonProcessingExceptionMapper implements ExceptionMapper<JsonProcessingException> {
     @Override
     public Response toResponse(JsonProcessingException e) {
-        final ApiError apiError = new ApiError(firstNonNull(e.getMessage(), "Couldn't process JSON input"));
+        final String message = firstNonNull(e.getMessage(), "Couldn't process JSON input");
+        final ApiError apiError = ApiError.create(message);
         return status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(apiError).build();
     }
 }

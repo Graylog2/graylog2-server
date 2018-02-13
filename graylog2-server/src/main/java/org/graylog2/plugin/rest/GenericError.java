@@ -14,21 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with Graylog.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.graylog2.rest;
+package org.graylog2.plugin.rest;
 
-import org.graylog2.indexer.ElasticsearchException;
-import org.graylog2.rest.resources.search.responses.SearchError;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
-import javax.ws.rs.core.Response;
-import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
-
-@Provider
-public class ElasticsearchExceptionMapper implements ExceptionMapper<ElasticsearchException> {
-    @Override
-    public Response toResponse(ElasticsearchException exception) {
-        final SearchError searchError = SearchError.create(exception.getMessage(), exception.getErrorDetails());
-
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(searchError).build();
-    }
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+public interface GenericError {
+    @JsonProperty
+    String message();
 }

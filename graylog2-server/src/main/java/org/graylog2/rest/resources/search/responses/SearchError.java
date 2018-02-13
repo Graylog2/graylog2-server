@@ -17,20 +17,14 @@
 package org.graylog2.rest.resources.search.responses;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
+import org.graylog2.plugin.rest.DetailedError;
 
 import java.util.Collection;
 
 @JsonAutoDetect
 @AutoValue
-public abstract class SearchError {
-    @JsonProperty
-    public abstract String message();
-
-    @JsonProperty
-    public abstract Collection<String> details();
-
+public abstract class SearchError implements DetailedError {
     public static SearchError create(String message,
                                      Collection<String> details) {
         return new AutoValue_SearchError(message, details);

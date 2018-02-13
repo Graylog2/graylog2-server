@@ -41,10 +41,12 @@ public class AnyExceptionClassMapper implements ExtendedExceptionMapper<Exceptio
     @Override
     public Response toResponse(Exception exception) {
         LOG.error("Unhandled exception in REST resource", exception);
+        final String message = nullToEmpty(exception.getMessage());
+        final ApiError apiError = ApiError.create(message);
 
         return Response.serverError()
                 .type(MediaType.APPLICATION_JSON_TYPE)
-                .entity(new ApiError(nullToEmpty(exception.getMessage())))
+                .entity(apiError)
                 .build();
     }
 }

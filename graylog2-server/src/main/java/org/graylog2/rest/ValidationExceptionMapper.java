@@ -17,17 +17,21 @@
 package org.graylog2.rest;
 
 import org.graylog2.plugin.database.ValidationException;
-import org.graylog2.plugin.rest.ApiError;
 import org.graylog2.plugin.rest.ValidationApiError;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
+import javax.ws.rs.ext.Provider;
 
+@Provider
 public class ValidationExceptionMapper implements ExceptionMapper<ValidationException> {
     @Override
     public Response toResponse(ValidationException exception) {
-        ApiError error = new ValidationApiError("Validation failed!", exception.getErrors());
-        return Response.status(Response.Status.BAD_REQUEST).type(MediaType.APPLICATION_JSON_TYPE).entity(error).build();
+        final ValidationApiError error = ValidationApiError.create("Validation failed!", exception.getErrors());
+        return Response.status(Response.Status.BAD_REQUEST)
+                .type(MediaType.APPLICATION_JSON_TYPE)
+                .entity(error)
+                .build();
     }
 }
