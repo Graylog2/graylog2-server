@@ -11,13 +11,17 @@ import style from './TableList.css';
 
 /**
  * Component that renders a list of items in a table-like structure. The list
- * also includes a filter input that can be used to search for specific
- * items or elements matching a string.
+ * also includes a filter input that can be used to search for specific items
+ * or elements matching a string.
  *
- * The component can render action elements for each item, and also for
- * performing bulk-operation. In that second case, action elements will
- * appear in the header once the user selects more than one item by clicking
- * in the checkboxes next to them.
+ * The component can render action elements for each item and also for
+ * performing bulk operations. In that second case, action elements will
+ * appear in the header once the user selects one or more items by checking
+ * the checkboxes next to them.
+ *
+ * This component uses `ControlledTableList` underneath. If you need to further
+ * customize how the list of components should look like, or how filtering works,
+ * please use that component instead of this one.
  */
 const TableList = React.createClass({
   propTypes: {
@@ -29,7 +33,7 @@ const TableList = React.createClass({
     descriptionKey: PropTypes.string,
     /** Indicates whether the component should render a filter or not. */
     isFilterEnabled: PropTypes.bool,
-    /** Object keys to use for filtering. Use an empty array to disable filtering. */
+    /** Object keys to use for filtering. */
     filterKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
     /** Label to use next to the filter input. */
     filterLabel: PropTypes.string,
@@ -41,14 +45,6 @@ const TableList = React.createClass({
      * description (`descriptionKey` prop).
      */
     items: PropTypes.instanceOf(Immutable.List).isRequired,
-    /**
-     * Function that generates react elements to render in the header.
-     * Those elements are meant to display easy to use filters that help
-     * filtering the data in a visual way. There will only be displayed when
-     * no items are checked.
-     * The function does not receive any arguments.
-     */
-    headerFiltersFactory: PropTypes.func,
     /**
      * Function that generates react elements to render in the header.
      * Those elements are meant to display actions that affect more than one
@@ -73,7 +69,6 @@ const TableList = React.createClass({
       descriptionKey: 'description',
       isFilterEnabled: true,
       filterLabel: 'Filter',
-      headerFiltersFactory: () => {},
       headerActionsFactory: () => {},
       itemActionsFactory: () => {},
     };
@@ -129,19 +124,14 @@ const TableList = React.createClass({
   _headerItem() {
     const { filteredItems, selected } = this.state;
     const selectedItems = selected.count();
-    let bulkHeaderActions;
-
-    if (selectedItems === 0) {
-      bulkHeaderActions = this.props.headerFiltersFactory();
-    } else {
-      bulkHeaderActions = this.props.headerActionsFactory(selected);
-    }
 
     return (
       <ControlledTableList.Header>
+        {selectedItems > 0 &&
         <div className={style.headerComponentsWrapper}>
-          {bulkHeaderActions}
+          {this.props.headerActionsFactory(selected)}
         </div>
+        }
         <Input ref={(c) => { this.selectAllInput = c; }}
                id="select-all-checkbox"
                type="checkbox"
