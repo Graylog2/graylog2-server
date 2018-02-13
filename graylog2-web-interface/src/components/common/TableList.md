@@ -96,6 +96,7 @@ const TableListExampleNoBulkActions = createReactClass({
 
     return (
       <TableList items={items}
+                 enableFilter={false}
                  enableBulkActions={false}
                  itemActionsFactory={this.itemActionsFactory} />
     );

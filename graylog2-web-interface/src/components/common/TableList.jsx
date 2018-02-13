@@ -32,7 +32,7 @@ const TableList = React.createClass({
     /** Specifies key to use as item description. */
     descriptionKey: PropTypes.string,
     /** Indicates whether the component should render a filter or not. */
-    isFilterEnabled: PropTypes.bool,
+    enableFilter: PropTypes.bool,
     /** Object keys to use for filtering. */
     filterKeys: PropTypes.arrayOf(PropTypes.string).isRequired,
     /** Label to use next to the filter input. */
@@ -70,7 +70,7 @@ const TableList = React.createClass({
       idKey: 'id',
       titleKey: 'title',
       descriptionKey: 'description',
-      isFilterEnabled: true,
+      enableFilter: true,
       filterLabel: 'Filter',
       enableBulkActions: true,
       bulkActionsFactory: () => {},
@@ -89,7 +89,7 @@ const TableList = React.createClass({
     this._setSelectAllCheckboxState(this.selectAllInput, filteredItems, selected);
 
     if (!this.props.items.equals(prevProps.items)) {
-      if (this.props.isFilterEnabled) {
+      if (this.props.enableFilter) {
         // This will apply the current filter to new items and update the state
         this.filter.filterData();
       } else {
@@ -193,7 +193,7 @@ const TableList = React.createClass({
   },
   render() {
     let filter;
-    if (this.props.isFilterEnabled) {
+    if (this.props.enableFilter) {
       filter = (
         <Row>
           <Col md={5}>
