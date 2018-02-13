@@ -53,7 +53,7 @@ const TableList = React.createClass({
      * The function receives a list of IDs corresponding to all selected
      * elements as argument.
      */
-    headerActionsFactory: PropTypes.func,
+    bulkActionsFactory: PropTypes.func,
     /**
      * Function that generates react elements to render for each item.
      * Those elements are meant to display actions that affect that specific
@@ -69,7 +69,7 @@ const TableList = React.createClass({
       descriptionKey: 'description',
       isFilterEnabled: true,
       filterLabel: 'Filter',
-      headerActionsFactory: () => {},
+      bulkActionsFactory: () => {},
       itemActionsFactory: () => {},
     };
   },
@@ -129,7 +129,7 @@ const TableList = React.createClass({
       <ControlledTableList.Header>
         {selectedItems > 0 &&
         <div className={style.headerComponentsWrapper}>
-          {this.props.headerActionsFactory(selected)}
+          {this.props.bulkActionsFactory(selected)}
         </div>
         }
         <Input ref={(c) => { this.selectAllInput = c; }}

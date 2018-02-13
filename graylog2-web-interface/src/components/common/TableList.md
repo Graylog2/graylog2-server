@@ -22,7 +22,7 @@ const TableListExample = createReactClass({
     };
   },
 
-  headerActionsFactory(selectedNumbers) {
+  bulkActionsFactory(selectedNumbers) {
     return (
       <Button bsStyle="info"
               bsSize="xsmall"
@@ -48,8 +48,7 @@ const TableListExample = createReactClass({
     return (
       <TableList items={items}
                  filterKeys={['title', 'secret_key']}
-                 filterLabel=""
-                 headerActionsFactory={this.headerActionsFactory}
+                 bulkActionsFactory={this.bulkActionsFactory}
                  itemActionsFactory={this.itemActionsFactory} />
     );
   },
