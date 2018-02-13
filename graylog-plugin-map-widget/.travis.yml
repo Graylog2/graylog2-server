@@ -1,0 +1,27 @@
+sudo: required
+dist: trusty
+language: java
+jdk:
+  - oraclejdk8
+addons:
+  apt:
+    packages:
+      - rpm
+before_deploy:
+  - mvn jdeb:jdeb && export RELEASE_DEB_FILE=$(ls target/*.deb)
+  - mvn rpm:rpm && export RELEASE_RPM_FILE=$(find target/ -name '*.rpm' | tail -1)
+  - rm -f target/original-*.jar
+  - export RELEASE_PKG_FILE=$(ls target/*.jar)
+  - echo "Deploying release to GitHub releases"
+deploy:
+  provider: releases
+  api_key:
+    secure: ahTygNbfkfvdfk2GOqNxRkWRkOVrs3ae0cwlKh9jMsWuJxnEHzb9dBYIoXKySXjjNLG8NbVvyFCYH85cgxhI3628TdV0qlP4eSj5NCC8snbaXkZMNJ+V0fHlm50oKU959YUOaipx//xx+2zwq6QJ3Ds2Z8I+xWDpZFrzsp7xXXf7QXMU5WPUkpazgRtl/2OiQ44/AX20gQhsveNu4+/CXS4bzdE6kT9ic3ttPuVzgceA8PA7HLVlwlHUdpQsULEsOIoJQkcwrZ5+c1c01+1F+z9xntG3QMADL26d2Npod2itIGjZ7G2ILXtrpFdoRqWuIC+rR6mA9u1uoHL+FNTJOud086jpkq3r6leDEdWVm7ZnK+06DFZ7vR4z8iQPNbKF4S0++/4PVxT2x43mtqh9fannFkIOAOWfU+oVt4I0Paf20RgXhco6+ESsJn8PIxkV6yaNv9aHhiWtPC0kbKql7U5GuxgVjvU5o9GpQj6NFFcE7cTNwNpg093YZI3CcwLXO1W/F/G1NBytLFpL7NanNWd5q2qoPo+CawSnshnLk/1lPcxL72etGjFRZuHDkAkUpkFWKg+sPifAvjMyB4aEt9bdbmLxbkugqw9XMgxTY908u/p+iyVEyrSo7YTfWTSqZE/9dS65mN+izwgkaAd0nUDDq3eeBTBByNjBWZ9IIik=
+  file:
+    - "${RELEASE_PKG_FILE}"
+    - "${RELEASE_DEB_FILE}"
+    - "${RELEASE_RPM_FILE}"
+  skip_cleanup: true
+  on:
+    tags: true
+    jdk: oraclejdk8
