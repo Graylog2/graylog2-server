@@ -1,0 +1,21 @@
+syntax = "proto2";
+
+package org.graylog.plugins.netflow.v9;
+
+// to regenerate:
+// install protobuf compiler (this was generated with 3.0.0)
+// protoc --java_out=src/main/java src/main/resources/netflow_v9.proto
+
+option java_package = "org.graylog.plugins.netflow.v9";
+option java_outer_classname = "NetFlowV9Journal";
+
+message RawNetflowV9 {
+    // all applicable templates that are referenced by the packets
+    map<uint32, bytes> templates = 1;
+    // there is only one option template, but we need to know its template id, so a map is the easiest way to find it
+    map<uint32, bytes> optionTemplate = 2;
+    // the raw packets as received. it might contain templates as well, but even if it does the above fields will have that information, too
+    // in case we previously buffered flows, this may contain more than one flow. in situations when we have all templates already
+    // this will be a single packet sent by the exporter
+    repeated bytes packets = 3;
+}
