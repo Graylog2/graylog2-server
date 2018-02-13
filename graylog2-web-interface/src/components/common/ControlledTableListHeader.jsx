@@ -2,7 +2,7 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
-import { ListGroupItem } from 'react-bootstrap';
+import style from './ControlledTableListHeader.css';
 
 const ControlledTableListHeader = createReactClass({
   propTypes: {
@@ -16,7 +16,7 @@ const ControlledTableListHeader = createReactClass({
       </div>
     );
 
-    return <ListGroupItem className="list-group-header" header={header} />;
+    return <ListGroupItem className={style.listGroupHeader} header={{header} />;
   },
 });
 
