@@ -88,6 +88,7 @@
         <apache-directory-version>1.0.0</apache-directory-version>
         <auto-value.version>1.5.3</auto-value.version>
         <auto-value-javabean.version>1.0.0</auto-value-javabean.version>
+        <cef-parser.version>0.0.1.10</cef-parser.version>
         <commons-codec.version>1.11</commons-codec.version>
         <commons-email.version>1.5</commons-email.version>
         <commons-io.version>2.6</commons-io.version>

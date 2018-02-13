@@ -485,6 +485,10 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.graylog.cef</groupId>
+            <artifactId>cef-parser</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>nl.jqno.equalsverifier</groupId>
