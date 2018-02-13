@@ -5,7 +5,6 @@ import { ListGroup } from 'react-bootstrap';
 
 import ControlledTableListHeader from './ControlledTableListHeader';
 import ControlledTableListItem from './ControlledTableListItem';
-import style from './ControlledTableList.css';
 
 const ControlledTableList = createReactClass({
   propTypes: {
