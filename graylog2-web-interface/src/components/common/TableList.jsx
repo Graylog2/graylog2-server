@@ -2,10 +2,10 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 import lodash from 'lodash';
-import { Col, ListGroup, ListGroupItem, Row } from 'react-bootstrap';
+import { Col, Row } from 'react-bootstrap';
 
 import { Input } from 'components/bootstrap';
-import { TypeAheadDataFilter } from 'components/common';
+import { ControlledTableList, TypeAheadDataFilter } from 'components/common';
 
 import style from './TableList.css';
 
@@ -137,12 +137,11 @@ const TableList = React.createClass({
       bulkHeaderActions = this.props.headerActionsFactory(selected);
     }
 
-    const header = (
-      <div>
+    return (
+      <ControlledTableList.Header>
         <div className={style.headerComponentsWrapper}>
           {bulkHeaderActions}
         </div>
-
         <Input ref={(c) => { this.selectAllInput = c; }}
                id="select-all-checkbox"
                type="checkbox"
@@ -151,33 +150,30 @@ const TableList = React.createClass({
                checked={this._isAllSelected(filteredItems, selected)}
                onChange={this._toggleSelectAll}
                wrapperClassName="form-group-inline" />
-      </div>
+      </ControlledTableList.Header>
     );
-    return <ListGroupItem className="list-group-header" header={header} />;
   },
   _toggleSelectAll(event) {
     const newSelected = event.target.checked ? Immutable.Set(this.state.filteredItems.map(item => item[this.props.idKey])) : Immutable.Set();
     this.setState({ selected: newSelected });
   },
   _formatItem(item) {
-    const header = (
-      <div className={style.itemWrapper}>
-        <div className={style.itemActionsWrapper}>
-          {this.props.itemActionsFactory(item)}
-        </div>
-
-        <Input id={`${this.props.idKey}-checkbox`}
-               type="checkbox"
-               label={item[this.props.titleKey]}
-               checked={this.state.selected.includes(item[this.props.idKey])}
-               onChange={this._onItemSelect(item[this.props.idKey])}
-               wrapperClassName="form-group-inline" />
-      </div>
-    );
     return (
-      <ListGroupItem key={`item-${item[this.props.idKey]}`} header={header}>
+      <ControlledTableList.Item key={`item-${item[this.props.idKey]}`}>
+        <div className={style.itemWrapper}>
+          <div className={style.itemActionsWrapper}>
+            {this.props.itemActionsFactory(item)}
+          </div>
+
+          <Input id={`${this.props.idKey}-checkbox`}
+                 type="checkbox"
+                 label={item[this.props.titleKey]}
+                 checked={this.state.selected.includes(item[this.props.idKey])}
+                 onChange={this._onItemSelect(item[this.props.idKey])}
+                 wrapperClassName="form-group-inline" />
+        </div>
         {this.props.hideDescription ? null : <span className={style.description}>{item[this.props.descriptionKey]}</span>}
-      </ListGroupItem>
+      </ControlledTableList.Item>
     );
   },
   _onItemSelect(id) {
@@ -208,10 +204,12 @@ const TableList = React.createClass({
     let formattedItems;
 
     if (this.props.items.count() === 0) {
-      formattedItems = <ListGroupItem header={<div className={style.itemWrapper}>No items to display</div>} />;
+      formattedItems = (
+        <ControlledTableList.Item>No items to display</ControlledTableList.Item>
+      );
     } else if (this.state.filteredItems.count() === 0) {
       formattedItems = (
-        <ListGroupItem header={<div className={style.itemWrapper}>No items match your filter criteria</div>} />
+        <ControlledTableList.Item>No items match your filter criteria</ControlledTableList.Item>
       );
     } else {
       formattedItems = this.state.filteredItems.map(item => this._formatItem(item)).toJS();
@@ -220,10 +218,10 @@ const TableList = React.createClass({
     return (
       <div>
         {filter}
-        <ListGroup>
+        <ControlledTableList>
           {this._headerItem()}
           {formattedItems}
-        </ListGroup>
+        </ControlledTableList>
       </div>
     );
   },
