@@ -2,6 +2,8 @@ import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 
+import { ListGroupItem } from 'react-bootstrap';
+
 import style from './ControlledTableListHeader.css';
 
 const ControlledTableListHeader = createReactClass({
@@ -9,14 +11,22 @@ const ControlledTableListHeader = createReactClass({
     children: PropTypes.node,
   },
 
-  render() {
-    const header = (
-      <div style={{ height: 40, paddingTop: 10, paddingBottom: 10, margin: 0, fontSize: 14 }}>
-        {this.props.children}
-      </div>
-    );
+  getDefaultProps() {
+    return {
+      children: '',
+    };
+  },
 
-    return <ListGroupItem className={style.listGroupHeader} header={{header} />;
+  // We wrap string children to ensure they are displayed properly in the header
+  wrapStringChildren(text) {
+    return <div className={style.headerWrapper}>{text}</div>;
+  },
+
+  render() {
+    const { children } = this.props;
+
+    const header = typeof children === 'string' ? this.wrapStringChildren(children) : children;
+    return <ListGroupItem className={style.listGroupHeader}>{header}</ListGroupItem>;
   },
 });
 
