@@ -105,6 +105,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static java.util.stream.Collectors.toList;
 import static org.elasticsearch.search.builder.SearchSourceBuilder.searchSource;
@@ -513,6 +514,31 @@ public class Indices {
 
     public Set<String> getClosedIndices(final IndexSet indexSet) {
         return getClosedIndices(Collections.singleton(indexSet.getIndexWildcard()));
+    }
+
+    /**
+     * Retrieves all indices in the given {@link IndexSet}.
+     * <p>
+     * If any status filter parameter are present, only indices with the given status are returned.
+     *
+     * @param indexSet the index set
+     * @param statusFilter only indices with the given status are returned. (available: "open", "close")
+     * @return the set of indices in the given index set
+     */
+    public Set<String> getIndices(final IndexSet indexSet, final String... statusFilter) {
+        final List<String> status = Arrays.asList(statusFilter);
+        final Cat catRequest = new Cat.IndicesBuilder()
+                .addIndex(indexSet.getIndexWildcard())
+                .setParameter("h", "index,status")
+                .build();
+
+        final CatResult result = JestUtils.execute(jestClient, catRequest,
+                () -> "Couldn't get index list for index set <" + indexSet.getConfig().id() + ">");
+
+        return StreamSupport.stream(result.getJsonObject().path("result").spliterator(), false)
+                .filter(cat -> status.isEmpty() || status.contains(cat.path("status").asText()))
+                .map(cat -> cat.path("index").asText())
+                .collect(Collectors.toSet());
     }
 
     public boolean isClosed(final String indexName) {
