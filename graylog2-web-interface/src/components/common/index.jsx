@@ -1,5 +1,6 @@
 export { default as ClipboardButton } from './ClipboardButton';
 export { default as ContentPackMarker } from './ContentPackMarker';
+export { default as ControlledTableList } from './ControlledTableList';
 export { default as DataTable } from './DataTable';
 export { default as DatePicker } from './DatePicker';
 export { default as DocumentTitle } from './DocumentTitle';
