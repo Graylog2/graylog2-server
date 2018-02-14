@@ -77,7 +77,7 @@ const PermissionSelector = React.createClass({
           <Tab eventKey={1} title="Streams">
             <div style={{ marginTop: 10 }}>
               <TableList
-                items={this.props.streams}
+                items={Immutable.List(this.props.streams)}
                 filterLabel="Filter Streams"
                 filterKeys={['title']}
                 itemActionsFactory={streamItemButtons}
@@ -88,7 +88,7 @@ const PermissionSelector = React.createClass({
           <Tab eventKey={2} title="Dashboards">
             <div style={{ marginTop: 10 }}>
               <TableList
-                items={this.props.dashboards}
+                items={Immutable.List(this.props.dashboards)}
                 filterLabel="Filter Dashboards"
                 filterKeys={['title']}
                 itemActionsFactory={dashboardItemButtons}
