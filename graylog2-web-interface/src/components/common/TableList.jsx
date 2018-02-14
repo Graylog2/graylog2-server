@@ -196,7 +196,7 @@ const TableList = React.createClass({
     if (this.props.enableFilter) {
       filter = (
         <Row>
-          <Col md={5}>
+          <Col md={12}>
             <TypeAheadDataFilter ref={(c) => { this.filter = c; }}
                                  id={`${lodash.kebabCase(this.props.filterLabel)}-data-filter`}
                                  label={this.props.filterLabel}
