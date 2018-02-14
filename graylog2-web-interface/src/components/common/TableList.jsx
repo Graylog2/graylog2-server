@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import lodash from 'lodash';
 import { Col, Row } from 'react-bootstrap';
 
@@ -44,7 +45,7 @@ const TableList = React.createClass({
      * to have an ID (`idKey` prop), a title (`title` prop), and an optional
      * description (`descriptionKey` prop).
      */
-    items: PropTypes.instanceOf(Immutable.List).isRequired,
+    items: ImmutablePropTypes.list.isRequired,
     /** Indicates whether the component will enable bulk actions or not. */
     enableBulkActions: PropTypes.bool,
     /**
