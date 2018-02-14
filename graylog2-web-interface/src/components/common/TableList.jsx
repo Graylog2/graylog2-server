@@ -179,9 +179,8 @@ const TableList = React.createClass({
           </div>
 
           {formattedItem}
-          <div className="description">{item[this.props.descriptionKey]}</div>
+          {this.props.hideDescription ? null : <span className="description">{item[this.props.descriptionKey]}</span>}
         </div>
-        {this.props.hideDescription ? null : <span className={style.description}>{item[this.props.descriptionKey]}</span>}
       </ControlledTableList.Item>
     );
   },
