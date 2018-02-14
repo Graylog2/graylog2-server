@@ -234,11 +234,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         
                       </div>
                     </div>
-                    <div
+                    <span
                       className="description"
                     >
                       stream1
-                    </div>
+                    </span>
                   </div>
                 </span>
                 <span
@@ -299,11 +299,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         
                       </div>
                     </div>
-                    <div
+                    <span
                       className="description"
                     >
                       stream2
-                    </div>
+                    </span>
                   </div>
                 </span>
               </div>
@@ -494,11 +494,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         
                       </div>
                     </div>
-                    <div
+                    <span
                       className="description"
                     >
                       dashboard1
-                    </div>
+                    </span>
                   </div>
                 </span>
                 <span
@@ -559,11 +559,11 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                         
                       </div>
                     </div>
-                    <div
+                    <span
                       className="description"
                     >
                       dashboard2
-                    </div>
+                    </span>
                   </div>
                 </span>
               </div>
@@ -810,11 +810,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         
                       </div>
                     </div>
-                    <div
+                    <span
                       className="description"
                     >
                       stream1
-                    </div>
+                    </span>
                   </div>
                 </span>
                 <span
@@ -875,11 +875,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         
                       </div>
                     </div>
-                    <div
+                    <span
                       className="description"
                     >
                       stream2
-                    </div>
+                    </span>
                   </div>
                 </span>
               </div>
@@ -1070,11 +1070,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         
                       </div>
                     </div>
-                    <div
+                    <span
                       className="description"
                     >
                       dashboard1
-                    </div>
+                    </span>
                   </div>
                 </span>
                 <span
@@ -1135,11 +1135,11 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                         
                       </div>
                     </div>
-                    <div
+                    <span
                       className="description"
                     >
                       dashboard2
-                    </div>
+                    </span>
                   </div>
                 </span>
               </div>

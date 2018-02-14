@@ -49,14 +49,99 @@ exports[`<TokenList /> should render with empty tokens 1`] = `
     </div>
     <hr />
   </form>
-  <div
-    className="row"
-  >
+  <div>
     <div
-      className="col-md-12"
+      className="row"
     >
-      <div>
-        No items to display.
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="filter"
+        >
+          <form
+            className="form-inline"
+            onSubmit={[Function]}
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+          >
+            <div
+              className="form-group"
+            >
+              <label
+                className="control-label"
+                htmlFor="filter-data-filter"
+              >
+                Filter
+              </label>
+              <div
+                className="typeahead-wrapper"
+              >
+                <input
+                  className="form-control"
+                  id="filter-data-filter"
+                  label="Filter"
+                  onKeyPress={undefined}
+                  placeholder=""
+                  type="text"
+                  value={undefined}
+                />
+                
+              </div>
+            </div>
+            <button
+              className="btn btn-default"
+              disabled={false}
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+              type="submit"
+            >
+              Filter
+            </button>
+            <button
+              className="btn btn-default"
+              disabled={true}
+              onClick={[Function]}
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+              type="button"
+            >
+              Reset
+            </button>
+          </form>
+          <ul
+            className="pill-list"
+          />
+        </div>
+      </div>
+    </div>
+    <div>
+      <div
+        className="list-group"
+      >
+        <span
+          className="listGroupHeader list-group-item"
+        >
+          <div
+            className="headerWrapper"
+          >
+            
+          </div>
+        </span>
+        <span
+          className="list-group-item"
+        >
+          No items to display
+        </span>
       </div>
     </div>
   </div>
@@ -134,7 +219,7 @@ exports[`<TokenList /> should render with tokens 1`] = `
       className="row"
     >
       <div
-        className="col-md-5"
+        className="col-md-12"
       >
         <div
           className="filter"
@@ -204,179 +289,91 @@ exports[`<TokenList /> should render with tokens 1`] = `
         </div>
       </div>
     </div>
-    <ul
-      className="list-group"
-    >
-      <li
-        className="list-group-header list-group-item"
+    <div>
+      <div
+        className="list-group"
       >
-        <div
-          className="list-group-item-heading"
+        <span
+          className="listGroupHeader list-group-item"
         >
           <div
-            className="form-group"
+            className="headerWrapper"
           >
-            <div
-              className="form-group-inline"
-            >
-              <div
-                className="checkbox"
-                style={undefined}
-              >
-                <label
-                  title=""
-                >
-                  <input
-                    checked={false}
-                    disabled={false}
-                    label="Select all"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="checkbox"
-                    value={undefined}
-                  />
-                  Select all
-                </label>
-              </div>
-              
-            </div>
+            
           </div>
-        </div>
-        <p
-          className="list-group-item-text"
-        />
-      </li>
-      <li
-        className="list-group-item"
-      >
-        <div
-          className="list-group-item-heading"
+        </span>
+        <span
+          className="list-group-item"
         >
           <div
-            className="pull-right"
-            style={
-              Object {
-                "marginBottom": 10,
-                "marginTop": 10,
-              }
-            }
+            className="itemWrapper itemWrapperStatic"
           >
             <div
-              className="btn-group"
+              className="itemActionsWrapper"
             >
-              <ClipboardButton
-                bsSize="xsmall"
-                text="beef2001"
-                title="Copy to clipboard"
-              />
-              <button
-                className="btn btn-xs btn-primary"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
+              <div
+                className="btn-group"
               >
-                Delete
-              </button>
+                <ClipboardButton
+                  bsSize="xsmall"
+                  text="beef2001"
+                  title="Copy to clipboard"
+                />
+                <button
+                  className="btn btn-xs btn-primary"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div
+              className="header"
+              id="token-input"
+            >
+              Acme
             </div>
           </div>
-          <div
-            className="form-group"
-          >
-            <span>
-              <div
-                className="checkbox"
-                style={undefined}
-              >
-                <label
-                  title=""
-                >
-                  <input
-                    checked={false}
-                    disabled={false}
-                    groupClassName="form-group-inline"
-                    label="Acme"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="checkbox"
-                    value={undefined}
-                  />
-                  Acme
-                </label>
-              </div>
-              
-            </span>
-          </div>
-        </div>
-        <p
-          className="list-group-item-text"
-        />
-      </li>
-      <li
-        className="list-group-item"
-      >
-        <div
-          className="list-group-item-heading"
+        </span>
+        <span
+          className="list-group-item"
         >
           <div
-            className="pull-right"
-            style={
-              Object {
-                "marginBottom": 10,
-                "marginTop": 10,
-              }
-            }
+            className="itemWrapper itemWrapperStatic"
           >
             <div
-              className="btn-group"
+              className="itemActionsWrapper"
             >
-              <ClipboardButton
-                bsSize="xsmall"
-                text="beef2002"
-                title="Copy to clipboard"
-              />
-              <button
-                className="btn btn-xs btn-primary"
-                disabled={false}
-                onClick={[Function]}
-                type="button"
+              <div
+                className="btn-group"
               >
-                Delete
-              </button>
+                <ClipboardButton
+                  bsSize="xsmall"
+                  text="beef2002"
+                  title="Copy to clipboard"
+                />
+                <button
+                  className="btn btn-xs btn-primary"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div
+              className="header"
+              id="token-input"
+            >
+              Hamfred
             </div>
           </div>
-          <div
-            className="form-group"
-          >
-            <span>
-              <div
-                className="checkbox"
-                style={undefined}
-              >
-                <label
-                  title=""
-                >
-                  <input
-                    checked={false}
-                    disabled={false}
-                    groupClassName="form-group-inline"
-                    label="Hamfred"
-                    onChange={[Function]}
-                    placeholder=""
-                    type="checkbox"
-                    value={undefined}
-                  />
-                  Hamfred
-                </label>
-              </div>
-              
-            </span>
-          </div>
-        </div>
-        <p
-          className="list-group-item-text"
-        />
-      </li>
-    </ul>
+        </span>
+      </div>
+    </div>
   </div>
   <div
     className="checkbox"
