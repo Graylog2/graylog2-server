@@ -1,4 +1,4 @@
-:local(.listGroupHeader) {
+:local(.listGroupHeader).list-group-item {
     background-color: #F1F2F2;
     font-size: 14px;
     padding: 0 15px;
