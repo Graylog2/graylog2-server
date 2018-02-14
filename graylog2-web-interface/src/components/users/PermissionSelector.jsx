@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
-import { Tabs, Tab, Button, ButtonGroup } from 'react-bootstrap';
+import { Button, ButtonGroup, ButtonToolbar, Tab, Tabs } from 'react-bootstrap';
 
 import { TableList } from 'components/common';
 
@@ -36,11 +36,10 @@ const PermissionSelector = React.createClass({
       const editActionLabel = allEdit ? 'Clear' : 'Set';
 
       return (
-        <div>
+        <ButtonToolbar>
           <Button bsSize="xsmall" bsStyle="info" onClick={() => this._toggleAllStreamsRead(streamIds, allRead)}>{readActionLabel} read permissions</Button>
-          &nbsp;
           <Button bsSize="xsmall" bsStyle="info" onClick={() => this._toggleAllStreamsEdit(streamIds, allEdit)}>{editActionLabel} edit permissions</Button>
-        </div>
+        </ButtonToolbar>
       );
     };
 
@@ -82,7 +81,7 @@ const PermissionSelector = React.createClass({
                 filterLabel="Filter Streams"
                 filterKeys={['title']}
                 itemActionsFactory={streamItemButtons}
-                headerActionsFactory={multiStreamButtons}
+                bulkActionsFactory={multiStreamButtons}
               />
             </div>
           </Tab>
@@ -93,7 +92,7 @@ const PermissionSelector = React.createClass({
                 filterLabel="Filter Dashboards"
                 filterKeys={['title']}
                 itemActionsFactory={dashboardItemButtons}
-                headerActionsFactory={multiDashboardButtons}
+                bulkActionsFactory={multiDashboardButtons}
               />
             </div>
           </Tab>
