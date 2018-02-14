@@ -1,0 +1,399 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<TokenList /> should render with empty tokens 1`] = `
+<span>
+  <form
+    onSubmit={[Function]}
+  >
+    <div
+      className="form-group"
+    >
+      <div
+        className="row"
+      >
+        <div
+          className="col-sm-2"
+        >
+          <label
+            className="tokenNewNameLabel control-label"
+            htmlFor={undefined}
+          >
+            Token Name
+          </label>
+        </div>
+        <div
+          className="col-sm-4"
+        >
+          <input
+            className="form-control"
+            id="create-token-input"
+            onChange={[Function]}
+            placeholder="e.g ServiceName"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          className="col-sm-2"
+        >
+          <button
+            className="btn btn-primary"
+            disabled={true}
+            id="create-token"
+            type="submit"
+          >
+            Create Token
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr />
+  </form>
+  <div
+    className="row"
+  >
+    <div
+      className="col-md-12"
+    >
+      <div>
+        No items to display.
+      </div>
+    </div>
+  </div>
+  <div
+    className="checkbox"
+    style={undefined}
+  >
+    <label
+      title=""
+    >
+      <input
+        checked={true}
+        disabled={false}
+        id="hide-tokens"
+        onChange={[Function]}
+        type="checkbox"
+      />
+      Hide Tokens
+    </label>
+  </div>
+</span>
+`;
+
+exports[`<TokenList /> should render with tokens 1`] = `
+<span>
+  <form
+    onSubmit={[Function]}
+  >
+    <div
+      className="form-group"
+    >
+      <div
+        className="row"
+      >
+        <div
+          className="col-sm-2"
+        >
+          <label
+            className="tokenNewNameLabel control-label"
+            htmlFor={undefined}
+          >
+            Token Name
+          </label>
+        </div>
+        <div
+          className="col-sm-4"
+        >
+          <input
+            className="form-control"
+            id="create-token-input"
+            onChange={[Function]}
+            placeholder="e.g ServiceName"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          className="col-sm-2"
+        >
+          <button
+            className="btn btn-primary"
+            disabled={true}
+            id="create-token"
+            type="submit"
+          >
+            Create Token
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr />
+  </form>
+  <div>
+    <div
+      className="row"
+    >
+      <div
+        className="col-md-5"
+      >
+        <div
+          className="filter"
+        >
+          <form
+            className="form-inline"
+            onSubmit={[Function]}
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+          >
+            <div
+              className="form-group"
+            >
+              <label
+                className="control-label"
+                htmlFor="filter-data-filter"
+              >
+                Filter
+              </label>
+              <div
+                className="typeahead-wrapper"
+              >
+                <input
+                  className="form-control"
+                  id="filter-data-filter"
+                  label="Filter"
+                  onKeyPress={undefined}
+                  placeholder=""
+                  type="text"
+                  value={undefined}
+                />
+                
+              </div>
+            </div>
+            <button
+              className="btn btn-default"
+              disabled={false}
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+              type="submit"
+            >
+              Filter
+            </button>
+            <button
+              className="btn btn-default"
+              disabled={true}
+              onClick={[Function]}
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+              type="button"
+            >
+              Reset
+            </button>
+          </form>
+          <ul
+            className="pill-list"
+          />
+        </div>
+      </div>
+    </div>
+    <ul
+      className="list-group"
+    >
+      <li
+        className="list-group-header list-group-item"
+      >
+        <div
+          className="list-group-item-heading"
+        >
+          <div
+            className="form-group"
+          >
+            <div
+              className="form-group-inline"
+            >
+              <div
+                className="checkbox"
+                style={undefined}
+              >
+                <label
+                  title=""
+                >
+                  <input
+                    checked={false}
+                    disabled={false}
+                    label="Select all"
+                    onChange={[Function]}
+                    placeholder=""
+                    type="checkbox"
+                    value={undefined}
+                  />
+                  Select all
+                </label>
+              </div>
+              
+            </div>
+          </div>
+        </div>
+        <p
+          className="list-group-item-text"
+        />
+      </li>
+      <li
+        className="list-group-item"
+      >
+        <div
+          className="list-group-item-heading"
+        >
+          <div
+            className="pull-right"
+            style={
+              Object {
+                "marginBottom": 10,
+                "marginTop": 10,
+              }
+            }
+          >
+            <div
+              className="btn-group"
+            >
+              <ClipboardButton
+                bsSize="xsmall"
+                text="beef2001"
+                title="Copy to clipboard"
+              />
+              <button
+                className="btn btn-xs btn-primary"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          <div
+            className="form-group"
+          >
+            <span>
+              <div
+                className="checkbox"
+                style={undefined}
+              >
+                <label
+                  title=""
+                >
+                  <input
+                    checked={false}
+                    disabled={false}
+                    groupClassName="form-group-inline"
+                    label="Acme"
+                    onChange={[Function]}
+                    placeholder=""
+                    type="checkbox"
+                    value={undefined}
+                  />
+                  Acme
+                </label>
+              </div>
+              
+            </span>
+          </div>
+        </div>
+        <p
+          className="list-group-item-text"
+        />
+      </li>
+      <li
+        className="list-group-item"
+      >
+        <div
+          className="list-group-item-heading"
+        >
+          <div
+            className="pull-right"
+            style={
+              Object {
+                "marginBottom": 10,
+                "marginTop": 10,
+              }
+            }
+          >
+            <div
+              className="btn-group"
+            >
+              <ClipboardButton
+                bsSize="xsmall"
+                text="beef2002"
+                title="Copy to clipboard"
+              />
+              <button
+                className="btn btn-xs btn-primary"
+                disabled={false}
+                onClick={[Function]}
+                type="button"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+          <div
+            className="form-group"
+          >
+            <span>
+              <div
+                className="checkbox"
+                style={undefined}
+              >
+                <label
+                  title=""
+                >
+                  <input
+                    checked={false}
+                    disabled={false}
+                    groupClassName="form-group-inline"
+                    label="Hamfred"
+                    onChange={[Function]}
+                    placeholder=""
+                    type="checkbox"
+                    value={undefined}
+                  />
+                  Hamfred
+                </label>
+              </div>
+              
+            </span>
+          </div>
+        </div>
+        <p
+          className="list-group-item-text"
+        />
+      </li>
+    </ul>
+  </div>
+  <div
+    className="checkbox"
+    style={undefined}
+  >
+    <label
+      title=""
+    >
+      <input
+        checked={true}
+        disabled={false}
+        id="hide-tokens"
+        onChange={[Function]}
+        type="checkbox"
+      />
+      Hide Tokens
+    </label>
+  </div>
+</span>
+`;

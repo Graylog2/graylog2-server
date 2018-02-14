@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
-import { Button, OverlayTrigger, Popover, Tooltip } from 'react-bootstrap';
+import { Button, OverlayTrigger, Popover, Tooltip, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import PermissionsMixin from 'util/PermissionsMixin';
 import Routes from 'routing/Routes';
@@ -110,20 +110,47 @@ const UserList = React.createClass({
 
     let actions = null;
     if (user.read_only) {
+      const editTokensAction = (
+        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(encodeURIComponent(user.username))}>
+          <Button id={`edit-tokens-${user.username}`} bsStyle="info" bsSize="xs" title={`Edit tokens of user ${user.username}`}>
+            Edit tokens
+          </Button>
+        </LinkContainer>
+      );
+
       const tooltip = <Tooltip id="system-user">System users can only be modified in the Graylog configuration file.</Tooltip>;
       actions = (
-        <OverlayTrigger placement="left" overlay={tooltip}>
-          <span className={UserListStyle.help}>
-            <Button bsSize="xs" bsStyle="info" disabled>System user</Button>
-          </span>
-        </OverlayTrigger>
+        <span>
+          <OverlayTrigger placement="left" overlay={tooltip}>
+            <span className={UserListStyle.help}>
+              <Button bsSize="xs" bsStyle="info" disabled>System user</Button>
+            </span>
+          </OverlayTrigger>
+          &nbsp;
+          {editTokensAction}
+        </span>
       );
     } else {
+      const editTokensAction = (
+        <LinkContainer to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(encodeURIComponent(user.username))}>
+          <MenuItem eventKey="1" id={`edit-tokens-${user.username}`} bsStyle="info" bsSize="xs" title={`Edit tokens of user ${user.username}`}>
+            Edit tokens
+          </MenuItem>
+        </LinkContainer>
+      );
+
       const deleteAction = (
-        <Button id={`delete-user-${user.username}`} bsStyle="primary" bsSize="xs" title="Delete user"
+        <MenuItem eventKey="2" id={`delete-user-${user.username}`} bsStyle="primary" bsSize="xs" title="Delete user"
                 onClick={this._deleteUserFunction(user.username)}>
           Delete
-        </Button>
+        </MenuItem>
+      );
+
+      const actionDropDown = (
+        <DropdownButton bsSize="xs" title="More actions" pullRight>
+          {editTokensAction}
+          {deleteAction}
+        </DropdownButton>
       );
 
       const editAction = (
@@ -136,9 +163,9 @@ const UserList = React.createClass({
 
       actions = (
         <div>
-          {this.isPermitted(this.props.currentUser.permissions, ['users:edit']) ? deleteAction : null}
-          &nbsp;
           {this.isPermitted(this.props.currentUser.permissions, [`users:edit:${user.username}`]) ? editAction : null}
+          &nbsp;
+          {actionDropDown}
         </div>
       );
     }
@@ -151,7 +178,7 @@ const UserList = React.createClass({
         <td className="limited">{user.email}</td>
         <td className="limited">{user.client_address}</td>
         <td className={UserListStyle.limitedWide}>{roleBadges}</td>
-        <td>{actions}</td>
+        <td className={UserListStyle.actions}>{actions}</td>
       </tr>
     );
   },

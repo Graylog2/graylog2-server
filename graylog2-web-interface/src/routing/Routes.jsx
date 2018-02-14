@@ -93,6 +93,9 @@ const Routes = {
       USERS: {
         CREATE: '/system/authentication/users/new',
         edit: username => `/system/authentication/users/edit/${username}`,
+        TOKENS: {
+          edit: username => `/system/authentication/users/tokens/${username}`,
+        },
         LIST: '/system/authentication/users',
       },
       PROVIDERS: {

@@ -89,6 +89,9 @@ import static java.util.stream.Collectors.maxBy;
 import static org.graylog2.shared.security.RestPermissions.USERS_EDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_PERMISSIONSEDIT;
 import static org.graylog2.shared.security.RestPermissions.USERS_ROLESEDIT;
+import static org.graylog2.shared.security.RestPermissions.USERS_TOKENCREATE;
+import static org.graylog2.shared.security.RestPermissions.USERS_TOKENREMOVE;
+import static org.graylog2.shared.security.RestPermissions.USERS_TOKENLIST;
 
 @RequiresAuthentication
 @Path("/users")
@@ -233,10 +236,7 @@ public class UsersResource extends RestResource {
                            @Valid @NotNull ChangeUserRequest cr) throws ValidationException {
         checkPermission(USERS_EDIT, username);
 
-        final User user = userService.load(username);
-        if (user == null) {
-            throw new NotFoundException("Couldn't find user " + username);
-        }
+        final User user = loadUser(username);
 
         if (user.isReadOnly()) {
             throw new BadRequestException("Cannot modify readonly user " + username);
@@ -423,11 +423,14 @@ public class UsersResource extends RestResource {
 
     @GET
     @Path("{username}/tokens")
-    @RequiresPermissions(RestPermissions.USERS_TOKENLIST)
     @ApiOperation("Retrieves the list of access tokens for a user")
     public TokenList listTokens(@ApiParam(name = "username", required = true)
                                 @PathParam("username") String username) {
-        final User user = _tokensCheckAndLoadUser(username);
+        if (!isPermitted(USERS_TOKENLIST, username)) {
+            throw new ForbiddenException("Not allowed to list tokens for user " + username);
+        }
+
+        final User user = loadUser(username);
 
         final ImmutableList.Builder<Token> tokenList = ImmutableList.builder();
         for (AccessToken token : accessTokenService.loadAll(user.getName())) {
@@ -439,28 +442,35 @@ public class UsersResource extends RestResource {
 
     @POST
     @Path("{username}/tokens/{name}")
-    @RequiresPermissions(RestPermissions.USERS_TOKENCREATE)
     @ApiOperation("Generates a new access token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_CREATE)
     public Token generateNewToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
             @ApiParam(name = "name", value = "Descriptive name for this token (e.g. 'cronjob') ", required = true) @PathParam("name") String name,
             @ApiParam(name = "JSON Body", value = "Placeholder because POST requests should have a body. Set to '{}', the content will be ignored.", defaultValue = "{}") String body) {
-        final User user = _tokensCheckAndLoadUser(username);
+        if (!isPermitted(USERS_TOKENCREATE, username)) {
+            throw new ForbiddenException("Not allowed to create tokens for user " + username);
+        }
+
+        final User user = loadUser(username);
+
+
         final AccessToken accessToken = accessTokenService.create(user.getName(), name);
 
         return Token.create(accessToken.getName(), accessToken.getToken(), accessToken.getLastAccess());
     }
 
     @DELETE
-    @RequiresPermissions(RestPermissions.USERS_TOKENREMOVE)
     @Path("{username}/tokens/{token}")
     @ApiOperation("Removes a token for a user")
     @AuditEvent(type = AuditEventTypes.USER_ACCESS_TOKEN_DELETE)
     public void revokeToken(
             @ApiParam(name = "username", required = true) @PathParam("username") String username,
             @ApiParam(name = "token", required = true) @PathParam("token") String token) {
-        _tokensCheckAndLoadUser(username);
+        if (!isPermitted(USERS_TOKENREMOVE, username)) {
+            throw new ForbiddenException("Not allowed to remove tokens for user " + username);
+        }
+
         final AccessToken accessToken = accessTokenService.load(token);
 
         if (accessToken != null) {
@@ -470,13 +480,10 @@ public class UsersResource extends RestResource {
         }
     }
 
-    private User _tokensCheckAndLoadUser(String username) {
+    private User loadUser(String username) {
         final User user = userService.load(username);
         if (user == null) {
             throw new NotFoundException("Unknown user " + username);
-        }
-        if (!getSubject().getPrincipal().equals(username)) {
-            throw new ForbiddenException("Cannot access other people's tokens.");
         }
         return user;
     }
