@@ -12,8 +12,8 @@ import com.fasterxml.jackson.datatype.guava.GuavaModule;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.joda.JodaModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.graylog.plugins.enterprise.search.elasticsearch.ElasticsearchQueryString;
 import org.graylog.plugins.enterprise.search.filter.StreamFilter;
 import org.graylog.plugins.enterprise.search.searchtypes.DateHistogram;
@@ -78,7 +78,7 @@ public class QueryTest {
                 .id("abc123")
                 .timerange(RelativeRange.create(600))
                 .query(ElasticsearchQueryString.builder().queryString("*").build())
-                .searchTypes(ImmutableList.of(MessageList.builder().id(messageListId).build()))
+                .searchTypes(ImmutableSet.of(MessageList.builder().id(messageListId).build()))
                 .build();
         Map<String, Object> executionState = of(
                 "timerange", of("type", RelativeRange.RELATIVE, "range", "60"),

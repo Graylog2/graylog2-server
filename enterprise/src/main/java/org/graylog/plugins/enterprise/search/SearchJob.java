@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.google.common.collect.Maps;
 import one.util.streamex.EntryStream;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -45,20 +46,25 @@ public class SearchJob {
         return resultFuture;
     }
 
-    public void setResultFuture(CompletableFuture<Void> resultFuture) {
-        this.resultFuture = resultFuture;
-    }
-
     public void addQueryResultFuture(String queryId, CompletableFuture<QueryResult> resultFuture) {
         queryResults.put(queryId, resultFuture);
     }
 
     @JsonProperty("results")
     public Map<String, QueryResult> results() {
-        final Map<String, QueryResult> results = EntryStream.of(queryResults)
+        return EntryStream.of(queryResults)
                 .mapValues(future -> future.getNow(QueryResult.emptyResult()))
+                .filterValues(queryResult -> !queryResult.query().equals(Query.emptyRoot()))
                 .toMap();
+    }
 
-        return results;
+    public CompletableFuture<QueryResult> getQueryResultFuture(String queryId) {
+        return queryResults.get(queryId);
+    }
+
+    public SearchJob seal() {
+        final Collection<CompletableFuture<QueryResult>> futures = queryResults.values();
+        this.resultFuture = CompletableFuture.allOf(futures.toArray(new CompletableFuture[futures.size()]));
+        return this;
     }
 }

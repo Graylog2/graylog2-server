@@ -1,6 +1,7 @@
 package org.graylog.plugins.enterprise.search;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,8 +9,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.enterprise.search.engine.BackendQuery;
 import org.graylog.plugins.enterprise.search.engine.EmptyTimeRange;
@@ -18,14 +19,17 @@ import org.mongojack.Id;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static com.google.common.collect.ImmutableSortedSet.of;
 
 @AutoValue
 @JsonAutoDetect
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonDeserialize(builder = AutoValue_Query.Builder.class)
+@JsonDeserialize(builder = Query.Builder.class)
 public abstract class Query {
     private static final Logger LOG = LoggerFactory.getLogger(Query.class);
 
@@ -46,17 +50,17 @@ public abstract class Query {
     @JsonProperty
     public abstract Filter filter();
 
-    @Nullable
+    @Nonnull
     @JsonProperty
     public abstract BackendQuery query();
 
-    @Nullable
+    @Nonnull
     @JsonProperty("search_types")
-    public abstract ImmutableList<SearchType> searchTypes();
+    public abstract ImmutableSet<SearchType> searchTypes();
 
-    @Nullable
+    @Nonnull
     @JsonProperty
-    public abstract Map<String, ParameterBinding> parameters();
+    public abstract ImmutableSet<Parameter> parameters();
 
     @Nullable
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -65,7 +69,9 @@ public abstract class Query {
     public abstract Builder toBuilder();
 
     public static Builder builder() {
-        return new AutoValue_Query.Builder();
+        return new AutoValue_Query.Builder()
+                .searchTypes(of())
+                .parameters(of());
     }
 
     public Query applyExecutionState(ObjectMapper objectMapper, Map<String, Object> state) {
@@ -96,7 +102,7 @@ public abstract class Query {
                     final SearchType updatedSearchType = searchType.applyExecutionContext(objectMapper, (Map<String, Object>) stateEntry.getValue());
                     updatedSearchTypes.put(id, updatedSearchType);
                 }
-                builder.searchTypes(ImmutableList.copyOf(updatedSearchTypes.values()));
+                builder.searchTypes(ImmutableSet.copyOf(updatedSearchTypes.values()));
             }
             return builder.build();
         }
@@ -111,10 +117,8 @@ public abstract class Query {
         return Query.builder()
                 .id("")
                 .timerange(EmptyTimeRange.emptyTimeRange())
-                .query(null)
+                .query(new BackendQuery.Fallback())
                 .filter(null)
-                .searchTypes(null)
-                .parameters(null)
                 .info(null)
                 .build();
     }
@@ -135,22 +139,24 @@ public abstract class Query {
         public abstract Builder query(BackendQuery query);
 
         @JsonProperty("search_types")
-        public abstract Builder searchTypes(@Nullable List<SearchType> searchTypes);
+        public abstract Builder searchTypes(@Nullable Set<SearchType> searchTypes);
 
         @JsonProperty
-        public abstract Builder parameters(Map<String, ParameterBinding> parameters);
+        public abstract Builder parameters(ImmutableSet<Parameter> parameters);
 
         @JsonIgnore
         public abstract Builder info(@Nullable QueryInfo info);
 
         abstract Query autoBuild();
 
+        @JsonCreator
+        public static Builder createWithDefaults() {
+            return Query.builder().parameters(ImmutableSet.of());
+        }
+
         public Query build() {
             final Query query = autoBuild();
-            final ImmutableList<SearchType> searchTypes = query.searchTypes();
-            if (searchTypes != null) {
-                query.searchTypesIndex = Maps.uniqueIndex(searchTypes, SearchType::id);
-            }
+            query.searchTypesIndex = Maps.uniqueIndex(query.searchTypes(), SearchType::id);
             return query;
         }
     }

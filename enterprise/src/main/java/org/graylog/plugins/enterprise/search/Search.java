@@ -5,8 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
@@ -29,13 +29,13 @@ public abstract class Search {
     public abstract String id();
 
     @JsonProperty
-    public abstract ImmutableList<Query> queries();
+    public abstract ImmutableSet<Query> queries();
 
     public Search applyExecutionState(ObjectMapper objectMapper, Map<String, Object> executionState) {
         //noinspection unchecked
-        final ImmutableList<Query> queries = queries().stream()
+        final ImmutableSet<Query> queries = queries().stream()
                 .map(query -> query.applyExecutionState(objectMapper, (Map<String, Object>) executionState.get(query.id())))
-                .collect(ImmutableList.toImmutableList());
+                .collect(ImmutableSet.toImmutableSet());
         return toBuilder().queries(queries).build();
     }
 
@@ -56,7 +56,7 @@ public abstract class Search {
         public abstract Builder id(String id);
 
         @JsonProperty
-        public abstract Builder queries(ImmutableList<Query> queries);
+        public abstract Builder queries(ImmutableSet<Query> queries);
 
         abstract Search autoBuild();
 

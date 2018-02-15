@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * A search type represents parts of a query that generates a {@see Result result}.
@@ -66,6 +67,24 @@ public interface SearchType {
         @JsonAnySetter
         public void setType(String key, Object value) {
             // we ignore all the other values, we only want to be able to deserialize unknown search types
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Fallback fallback = (Fallback) o;
+            return Objects.equals(type, fallback.type) &&
+                    Objects.equals(id, fallback.id);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type, id);
         }
     }
 

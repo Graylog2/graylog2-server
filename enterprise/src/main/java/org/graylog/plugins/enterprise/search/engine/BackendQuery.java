@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
+import java.util.Objects;
+
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.PROPERTY,
@@ -30,6 +32,23 @@ public interface BackendQuery {
         @JsonAnySetter
         public void setType(String key, Object value) {
             // we ignore all the other values, we only want to be able to deserialize unknown objects
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            Fallback fallback = (Fallback) o;
+            return Objects.equals(type, fallback.type);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(type);
         }
     }
 }
