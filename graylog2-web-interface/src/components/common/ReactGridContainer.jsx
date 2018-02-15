@@ -8,16 +8,16 @@ import style from './ReactGridContainer.css';
 
 const WidthAdjustedReactGridLayout = WidthProvider(Responsive);
 
-const COLUMN_WIDTH = 350;
-const ROW_HEIGHT = 200;
+const COLUMN_WIDTH = 175;
+const ROW_HEIGHT = 100;
 
 const COLUMNS = {
-  xxl: 6,
-  xl: 5,
-  lg: 4,
-  md: 3,
-  sm: 2,
-  xs: 1,
+  xxl: 12,
+  xl: 10,
+  lg: 8,
+  md: 6,
+  sm: 4,
+  xs: 2,
 };
 
 const BREAKPOINTS = {
