@@ -8,10 +8,15 @@ const MANIFESTS_PATH = path.resolve(ROOT_PATH, 'manifests');
 const VENDOR_MANIFEST_PATH = path.resolve(MANIFESTS_PATH, 'vendor-manifest.json');
 const TARGET = process.env.npm_lifecycle_event;
 
-const pluginPrefix = '../../graylog-plugin-*/**/';
-const pluginConfigPattern = `${pluginPrefix}webpack.config.js`;
+const pluginConfigPattern = 'graylog-plugin-*/**/webpack.config.js';
+const globCwd = '../..';
+const globOptions = {
+  ignore: '**/node_modules/**',
+  cwd: globCwd,
+  nodir: true,
+};
 
-const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern);
+const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern, globOptions);
 
 process.env.web_src_path = path.resolve(__dirname);
 
