@@ -23,15 +23,25 @@ import com.google.inject.multibindings.MapBinder;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsDouble;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsList;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsLong;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsMap;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsNumber;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
+import org.graylog.plugins.pipelineprocessor.functions.dates.IsDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Days;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Hours;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.IsPeriod;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Millis;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Minutes;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Months;
@@ -60,6 +70,8 @@ import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA256;
 import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
 import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
+import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
+import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.lookup.Lookup;
@@ -94,6 +106,7 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogFacilityConv
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogLevelConversion;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConversion;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog2.plugin.PluginModule;
 
@@ -105,6 +118,21 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(DoubleConversion.NAME, DoubleConversion.class);
         addMessageProcessorFunction(LongConversion.NAME, LongConversion.class);
         addMessageProcessorFunction(StringConversion.NAME, StringConversion.class);
+
+        // Comparison functions
+        addMessageProcessorFunction(IsBoolean.NAME, IsBoolean.class);
+        addMessageProcessorFunction(IsNumber.NAME, IsNumber.class);
+        addMessageProcessorFunction(IsDouble.NAME, IsDouble.class);
+        addMessageProcessorFunction(IsLong.NAME, IsLong.class);
+        addMessageProcessorFunction(IsString.NAME, IsString.class);
+        addMessageProcessorFunction(IsCollection.NAME, IsCollection.class);
+        addMessageProcessorFunction(IsList.NAME, IsList.class);
+        addMessageProcessorFunction(IsMap.NAME, IsMap.class);
+        addMessageProcessorFunction(IsDate.NAME, IsDate.class);
+        addMessageProcessorFunction(IsPeriod.NAME, IsPeriod.class);
+        addMessageProcessorFunction(IsIp.NAME, IsIp.class);
+        addMessageProcessorFunction(IsJson.NAME, IsJson.class);
+        addMessageProcessorFunction(IsUrl.NAME, IsUrl.class);
 
         // message related functions
         addMessageProcessorFunction(HasField.NAME, HasField.class);

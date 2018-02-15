@@ -29,15 +29,25 @@ import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.Function;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.BooleanConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.DoubleConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsBoolean;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsCollection;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsDouble;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsList;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsLong;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsMap;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsNumber;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
+import org.graylog.plugins.pipelineprocessor.functions.dates.IsDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Days;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Hours;
+import org.graylog.plugins.pipelineprocessor.functions.dates.periods.IsPeriod;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Millis;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Minutes;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Months;
@@ -66,6 +76,8 @@ import org.graylog.plugins.pipelineprocessor.functions.hashing.SHA512;
 import org.graylog.plugins.pipelineprocessor.functions.ips.CidrMatch;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddress;
 import org.graylog.plugins.pipelineprocessor.functions.ips.IpAddressConversion;
+import org.graylog.plugins.pipelineprocessor.functions.ips.IsIp;
+import org.graylog.plugins.pipelineprocessor.functions.json.IsJson;
 import org.graylog.plugins.pipelineprocessor.functions.json.JsonParse;
 import org.graylog.plugins.pipelineprocessor.functions.json.SelectJsonPath;
 import org.graylog.plugins.pipelineprocessor.functions.messages.CloneMessage;
@@ -98,6 +110,7 @@ import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogFacilityConv
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogLevelConversion;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityConversion;
 import org.graylog.plugins.pipelineprocessor.functions.syslog.SyslogPriorityToStringConversion;
+import org.graylog.plugins.pipelineprocessor.functions.urls.IsUrl;
 import org.graylog.plugins.pipelineprocessor.functions.urls.UrlConversion;
 import org.graylog.plugins.pipelineprocessor.parser.FunctionRegistry;
 import org.graylog.plugins.pipelineprocessor.parser.ParseException;
@@ -256,6 +269,20 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(SyslogLevelConversion.NAME, new SyslogLevelConversion());
 
         functions.put(UrlConversion.NAME, new UrlConversion());
+
+        functions.put(IsBoolean.NAME, new IsBoolean());
+        functions.put(IsNumber.NAME, new IsNumber());
+        functions.put(IsDouble.NAME, new IsDouble());
+        functions.put(IsLong.NAME, new IsLong());
+        functions.put(IsString.NAME, new IsString());
+        functions.put(IsCollection.NAME, new IsCollection());
+        functions.put(IsList.NAME, new IsList());
+        functions.put(IsMap.NAME, new IsMap());
+        functions.put(IsDate.NAME, new IsDate());
+        functions.put(IsPeriod.NAME, new IsPeriod());
+        functions.put(IsIp.NAME, new IsIp());
+        functions.put(IsJson.NAME, new IsJson());
+        functions.put(IsUrl.NAME, new IsUrl());
 
         final GrokPatternService grokPatternService = mock(GrokPatternService.class);
         Set<GrokPattern> patterns = Sets.newHashSet(
@@ -642,6 +669,15 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.hasField("field_1")).isFalse();
         assertThat(message.hasField("field_2")).isTrue();
         assertThat(message.hasField("field_b")).isTrue();
+    }
+
+    @Test
+    public void comparisons() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final EvaluationContext context = contextForRuleEval(rule, new Message("", "", Tools.nowUTC()));
+        assertThat(context.hasEvaluationErrors()).isFalse();
+        assertThat(evaluateRule(rule)).isNotNull();
+        assertThat(actionsTriggered.get()).isTrue();
     }
 
     @Test

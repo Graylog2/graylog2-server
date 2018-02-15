@@ -14,7 +14,11 @@ when
     parse_date("2010-07-30T18:03:25+02:00", "yyyy-MM-dd'T'HH:mm:ssZZ") <= parse_date("2010-07-30T16:03:25Z", "yyyy-MM-dd'T'HH:mm:ssZZ") &&
     !(parse_date("2010-07-30T18:03:25+02:00", "yyyy-MM-dd'T'HH:mm:ssZZ") > parse_date("2010-07-30T16:03:25Z", "yyyy-MM-dd'T'HH:mm:ssZZ")) &&
     parse_date("2010-07-30T18:03:25+02:00", "yyyy-MM-dd'T'HH:mm:ssZZ") >= parse_date("2010-07-30T16:03:25Z", "yyyy-MM-dd'T'HH:mm:ssZZ") &&
-    !(parse_date("2010-07-30T18:03:25+02:00", "yyyy-MM-dd'T'HH:mm:ssZZ") < parse_date("2010-07-30T16:03:25Z", "yyyy-MM-dd'T'HH:mm:ssZZ"))
+    !(parse_date("2010-07-30T18:03:25+02:00", "yyyy-MM-dd'T'HH:mm:ssZZ") < parse_date("2010-07-30T16:03:25Z", "yyyy-MM-dd'T'HH:mm:ssZZ")) &&
+    is_date(now("CET")) == true &&
+    is_date("foobar") == false &&
+    is_date(1234) == false &&
+    is_date(12.34) == false
 then
     trigger_test();
     let date = parse_date("2010-07-30T18:03:25+02:00", "yyyy-MM-dd'T'HH:mm:ssZZ");

@@ -1,7 +1,12 @@
 rule "ip handling"
 when
     cidr_match("192.0.0.0/8", to_ip("192.168.1.50")) &&
-    ! cidr_match("191.0.0.0/8", to_ip("192.168.1.50"))
+    ! cidr_match("191.0.0.0/8", to_ip("192.168.1.50")) &&
+    is_ip(to_ip("127.0.0.1")) == true &&
+    is_ip("foobar") == false &&
+    is_ip(1234) == false &&
+    is_ip(12.34) == false &&
+    is_ip(true) == false
 then
     set_field("ip_anon", to_string(to_ip($message.ip).anonymized));
     set_field("ipv6_anon", to_string(to_ip("2001:db8::1").anonymized));

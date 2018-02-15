@@ -19,8 +19,21 @@ when
     now() - minutes(1) < now() &&
     now() - seconds(1) < now() &&
     now() - millis(1) < now() &&
-    now() - period("P1YT1M") < now()
+    now() - period("P1YT1M") < now() &&
 
+    is_period(years(1)) == true &&
+    is_period(months(1)) == true &&
+    is_period(weeks(1)) == true &&
+    is_period(days(1)) == true &&
+    is_period(hours(1)) == true &&
+    is_period(minutes(1)) == true &&
+    is_period(seconds(1)) == true &&
+    is_period(millis(1)) == true &&
+    is_period(period("P1YT1M")) == true &&
+    is_period("foobar") == false &&
+    is_period(1234) == false &&
+    is_period(12.34) == false &&
+    is_period(true) == false
 then
     set_field("interval", now() - (now() - days(1))); // is a duration of 1 day
     set_field("long_time_ago", now() - years(10000));

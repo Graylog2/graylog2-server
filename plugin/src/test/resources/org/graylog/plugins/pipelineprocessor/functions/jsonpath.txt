@@ -1,5 +1,10 @@
 rule "jsonpath"
-when true
+when
+  is_json(parse_json("{}")) == true &&
+  is_json("foobar") == false &&
+  is_json(1234) == false &&
+  is_json(12.34) == false &&
+  is_json(true) == false
 then
   let x = parse_json(to_string($message.message));
   let new_fields = select_jsonpath(x,

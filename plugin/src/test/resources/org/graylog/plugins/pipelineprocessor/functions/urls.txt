@@ -1,6 +1,10 @@
 rule "urls"
 when
-    true
+    is_url("foobar") == false &&
+    is_url(1234) == false &&
+    is_url(12.34) == false &&
+    is_url(true) == false &&
+    is_url(to_url("http://example.org/")) == true
 then
     let url = to_url("https://admin:s3cr31@some.host.with.lots.of.subdomains.com:9999/path1/path2/three?q1=something&with_spaces=hello%20graylog&equal=can=containanotherone#anchorstuff");
     set_fields({
