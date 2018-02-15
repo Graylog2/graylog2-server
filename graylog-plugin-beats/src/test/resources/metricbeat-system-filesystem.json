@@ -1,0 +1,32 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "metricset": {
+    "module": "system",
+    "name": "filesystem",
+    "rtt": 247
+  },
+  "system": {
+    "filesystem": {
+      "available": 89979559936,
+      "device_name": "/dev/disk1",
+      "files": 4294967279,
+      "free": 90241703936,
+      "free_files": 4291952338,
+      "mount_point": "/",
+      "total": 499055067136,
+      "used": {
+        "bytes": 408813363200,
+        "pct": 0.819200
+      }
+    }
+  },
+  "type": "metricsets"
+}

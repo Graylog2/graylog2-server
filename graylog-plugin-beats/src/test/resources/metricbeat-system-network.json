@@ -1,0 +1,34 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "metricset": {
+    "module": "system",
+    "name": "network",
+    "rtt": 5132
+  },
+  "system": {
+    "network": {
+      "in": {
+        "bytes": 5623461,
+        "dropped": 0,
+        "errors": 1600703317,
+        "packets": 0
+      },
+      "name": "lo0",
+      "out": {
+        "bytes": 0,
+        "dropped": 0,
+        "errors": 1600703317,
+        "packets": 0
+      }
+    }
+  },
+  "type": "metricsets"
+}

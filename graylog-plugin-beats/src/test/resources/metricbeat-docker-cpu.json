@@ -1,0 +1,59 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "docker": {
+    "container": {
+      "id": "f36c43096b5b0a35073094a8b31092629e4b086ec74a4e23dcb6f39e0f934e0c",
+      "name": "adoring_ride"
+    },
+    "cpu": {
+      "core": {
+        "0": {
+          "pct": 0.020539,
+          "ticks": 3046249056
+        },
+        "1": {
+          "pct": 0.300202,
+          "ticks": 5797356115
+        },
+        "2": {
+          "pct": 0.008397,
+          "ticks": 997668790
+        },
+        "3": {
+          "pct": 0.011293,
+          "ticks": 3929776903
+        }
+      },
+      "kernel": {
+        "pct": 0.010000,
+        "ticks": 1950000000
+      },
+      "system": {
+        "pct": 3.890000,
+        "ticks": 5410010000000
+      },
+      "total": {
+        "pct": 0.340430
+      },
+      "user": {
+        "pct": 0.320000,
+        "ticks": 10510000000
+      }
+    }
+  },
+  "metricset": {
+    "host": "/var/run/docker.sock",
+    "module": "docker",
+    "name": "cpu",
+    "rtt": 1843344
+  },
+  "type": "metricsets"
+}

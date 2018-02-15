@@ -1,0 +1,30 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "docker": {
+    "info": {
+      "containers": {
+        "paused": 0,
+        "running": 1,
+        "stopped": 1,
+        "total": 2
+      },
+      "id": "7KNJ:JX7T:D47P:RKD6:UUUP:DVEE:54RU:CWTN:53T4:NVVT:ILHE:JFTV",
+      "images": 21
+    }
+  },
+  "metricset": {
+    "host": "/var/run/docker.sock",
+    "module": "docker",
+    "name": "info",
+    "rtt": 392861
+  },
+  "type": "metricsets"
+}

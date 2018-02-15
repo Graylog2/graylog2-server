@@ -1,0 +1,13 @@
+{
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "kubernetes": {
+    "pod": {
+      "name": "testpod"
+    },
+    "namespace": "testns",
+    "labels": {
+      "labelkey": "labelvalue"
+    }
+  },
+  "foo": "bar"
+}

@@ -1,0 +1,42 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "metricset": {
+    "module": "system",
+    "name": "process",
+    "rtt": 8131
+  },
+  "system": {
+    "process": {
+      "cmdline": "./metricbeat",
+      "cpu": {
+        "start_time": "2016-12-14T12:13:45.819Z",
+        "total": {
+          "pct": 2.272900
+        }
+      },
+      "memory": {
+        "rss": {
+          "bytes": 15327232,
+          "pct": 0.000900
+        },
+        "share": 0,
+        "size": 570048241664
+      },
+      "name": "metricbeat",
+      "pgid": 51926,
+      "pid": 51926,
+      "ppid": 50971,
+      "state": "running",
+      "username": "joschi"
+    }
+  },
+  "type": "metricsets"
+}
