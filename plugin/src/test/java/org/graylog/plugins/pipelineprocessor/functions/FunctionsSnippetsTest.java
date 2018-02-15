@@ -38,6 +38,7 @@ import org.graylog.plugins.pipelineprocessor.functions.conversion.IsMap;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsNumber;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.IsString;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.LongConversion;
+import org.graylog.plugins.pipelineprocessor.functions.conversion.MapConversion;
 import org.graylog.plugins.pipelineprocessor.functions.conversion.StringConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.DateConversion;
 import org.graylog.plugins.pipelineprocessor.functions.dates.FlexParseDate;
@@ -135,6 +136,8 @@ import org.junit.Test;
 import org.mockito.ArgumentMatchers;
 
 import javax.inject.Provider;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
@@ -162,6 +165,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(DoubleConversion.NAME, new DoubleConversion());
         functions.put(LongConversion.NAME, new LongConversion());
         functions.put(StringConversion.NAME, new StringConversion());
+        functions.put(MapConversion.NAME, new MapConversion());
 
         // message related functions
         functions.put(HasField.NAME, new HasField());
@@ -350,6 +354,43 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("author_first")).isEqualTo("Nigel Rees");
         assertThat(message.hasField("author_last")).isTrue();
         assertThat(message.hasField("this_should_exist")).isTrue();
+    }
+
+    @Test
+    public void json() {
+        final String flatJson = "{\"str\":\"foobar\",\"int\":42,\"float\":2.5,\"bool\":true,\"array\":[1,2,3]}";
+        final String nestedJson = "{\n" +
+                "    \"store\": {\n" +
+                "        \"book\": {\n" +
+                "            \"category\": \"reference\",\n" +
+                "            \"author\": \"Nigel Rees\",\n" +
+                "            \"title\": \"Sayings of the Century\",\n" +
+                "            \"price\": 8.95\n" +
+                "        },\n" +
+                "        \"bicycle\": {\n" +
+                "            \"color\": \"red\",\n" +
+                "            \"price\": 19.95\n" +
+                "        }\n" +
+                "    },\n" +
+                "    \"expensive\": 10\n" +
+                "}";
+
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        final Message message = new Message("JSON", "test", Tools.nowUTC());
+        message.addField("flat_json", flatJson);
+        message.addField("nested_json", nestedJson);
+        final Message evaluatedMessage = evaluateRule(rule, message);
+
+        assertThat(evaluatedMessage.getField("message")).isEqualTo("JSON");
+        assertThat(evaluatedMessage.getField("flat_json")).isEqualTo(flatJson);
+        assertThat(evaluatedMessage.getField("nested_json")).isEqualTo(nestedJson);
+        assertThat(evaluatedMessage.getField("str")).isEqualTo("foobar");
+        assertThat(evaluatedMessage.getField("int")).isEqualTo(42);
+        assertThat(evaluatedMessage.getField("float")).isEqualTo(2.5);
+        assertThat(evaluatedMessage.getField("bool")).isEqualTo(true);
+        assertThat(evaluatedMessage.getField("array")).isEqualTo(Arrays.asList(1, 2, 3));
+        assertThat(evaluatedMessage.getField("store")).isInstanceOf(Map.class);
+        assertThat(evaluatedMessage.getField("expensive")).isEqualTo(10);
     }
 
     @Test
@@ -747,6 +788,12 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         assertThat(message.getField("ip_3")).isEqualTo(new IpAddress(InetAddresses.forString("0.0.0.0")));
         assertThat(message.getField("ip_4")).isEqualTo(new IpAddress(InetAddresses.forString("::1")));
 
+        assertThat(message.getField("map_1")).isEqualTo(Collections.singletonMap("foo", "bar"));
+        assertThat(message.getField("map_2")).isEqualTo(Collections.emptyMap());
+        assertThat(message.getField("map_3")).isEqualTo(Collections.emptyMap());
+        assertThat(message.getField("map_4")).isEqualTo(Collections.emptyMap());
+        assertThat(message.getField("map_5")).isEqualTo(Collections.emptyMap());
+        assertThat(message.getField("map_6")).isEqualTo(Collections.emptyMap());
     }
 
     @Test

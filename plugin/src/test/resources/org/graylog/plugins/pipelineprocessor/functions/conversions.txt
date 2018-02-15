@@ -45,6 +45,13 @@ then
         ip_1: to_ip("127.0.0.1"),                 // 127.0.0.1
         ip_2: to_ip("127.0.0.1", "2001:db8::1"),  // 127.0.0.1
         ip_3: to_ip($message.not_there),          // 0.0.0.0
-        ip_4: to_ip($message.not_there, "::1")    // ::1 (v6)
+        ip_4: to_ip($message.not_there, "::1"),   // ::1 (v6)
+
+        map_1: to_map({foo:"bar"}),       // Map.of("foo", "bar")
+        map_2: to_map("foobar"),          // empty map
+        map_3: to_map(23),                // empty map
+        map_4: to_map(23.42),             // empty map
+        map_5: to_map(true),              // empty map
+        map_6: to_map($message.not_there) // empty map
     });
 end
