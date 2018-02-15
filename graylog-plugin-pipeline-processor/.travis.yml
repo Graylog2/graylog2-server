@@ -1,0 +1,9 @@
+sudo: required
+dist: trusty
+language: java
+jdk:
+  - oraclejdk8
+install:
+  - mvn install -DskipTests=true -Dmaven.javadoc.skip=true -Dskip.web.build=true -B -V
+script:
+  - mvn test -Dskip.web.build=true -B

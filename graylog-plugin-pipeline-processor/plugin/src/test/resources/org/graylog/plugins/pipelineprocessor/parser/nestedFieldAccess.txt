@@ -1,0 +1,15 @@
+// Test nested field/bean access with camel case and snake case
+rule "nested field access"
+when
+    beanObject("1", "john", "doe").id == "1" &&
+    beanObject("1", "john", "doe").theName.firstName == "john" &&
+    beanObject("1", "john", "doe").theName.lastName == "doe" &&
+    beanObject("1", "john", "doe").theName.first_name == "john" &&
+    beanObject("1", "john", "doe").theName.last_name == "doe" &&
+    beanObject("1", "john", "doe").the_name.firstName == "john" &&
+    beanObject("1", "john", "doe").the_name.lastName == "doe" &&
+    beanObject("1", "john", "doe").the_name.first_name == "john" &&
+    beanObject("1", "john", "doe").the_name.last_name == "doe"
+then
+    trigger_test();
+end

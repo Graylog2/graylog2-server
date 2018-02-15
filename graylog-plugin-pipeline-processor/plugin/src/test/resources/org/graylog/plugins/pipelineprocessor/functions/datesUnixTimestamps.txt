@@ -1,0 +1,8 @@
+rule "dates"
+when
+    parse_unix_milliseconds(0) == parse_date("1970-01-01T00:00:00.000Z", "yyyy-MM-dd'T'HH:mm:ss.SSSZ") &&
+    parse_unix_milliseconds(1516272143555) == parse_date("2018-01-18T10:42:23.555Z", "yyyy-MM-dd'T'HH:mm:ss.SSSZ") &&
+    parse_unix_milliseconds(1516272143555, "Europe/Berlin") == parse_date(value: "2018-01-18T11:42:23.555", pattern: "yyyy-MM-dd'T'HH:mm:ss.SSS", timezone: "Europe/Berlin")
+then
+    trigger_test();
+end

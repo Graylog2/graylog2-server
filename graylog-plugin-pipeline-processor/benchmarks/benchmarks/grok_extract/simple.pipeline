@@ -1,0 +1,4 @@
+pipeline "grok"
+stage 0 match all
+  rule "grok jenkins extraction"
+end

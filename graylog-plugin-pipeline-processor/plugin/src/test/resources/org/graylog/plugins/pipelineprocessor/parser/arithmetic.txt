@@ -1,0 +1,13 @@
+rule "arithmetic operators"
+when
+    1.0 + 1.0 == 2.0 &&
+    8 * 2 > 15 &&
+    double_valued_func() / 20.0 == 0.0 &&
+    21 % 20 == 1 &&
+    10.0 / 20.0 == 0.5 &&
+    +10.0 / -5.0 == -2.0 &&
+    -double_valued_func() == -0.0 &&
+    double_valued_func() + 1.0 > 0.0
+then
+    trigger_test();
+end

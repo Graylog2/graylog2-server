@@ -1,0 +1,7 @@
+rule "stream routing"
+when true
+then
+    remove_from_stream(name: "some name");
+    // if a message is taken off all stream it was on, the default stream will be added back to avoid dropping the message
+    remove_from_stream(id: "000000000000000000000001");
+end

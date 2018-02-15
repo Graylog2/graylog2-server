@@ -1,0 +1,32 @@
+.pipeline-stage {
+    border: 1px solid #666;
+    border-radius: 4px;
+    display: inline-block;
+    margin-right: 15px;
+    padding: 20px;
+    text-align: center;
+    width: 120px;
+}
+
+.pipeline-stage.idle-stage {
+    background-color: #E3E5E5;
+    border-color: #D0D4D4;
+}
+
+.pipeline-stage.used-stage {
+    background-color: #FFFFFF;
+}
+
+.pipeline-name {
+    max-width: 300px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 300px;
+}
+
+.stream-list {
+    max-width: 150px;
+    width: 150px;
+    word-wrap: break-word;
+}

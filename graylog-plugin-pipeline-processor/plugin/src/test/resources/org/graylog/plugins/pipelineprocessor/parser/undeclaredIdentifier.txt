@@ -1,0 +1,5 @@
+rule "undeclared variable"
+when true
+then
+    one_arg(one: x);
+end

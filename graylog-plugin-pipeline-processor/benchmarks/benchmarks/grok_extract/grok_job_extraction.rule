@@ -1,0 +1,9 @@
+rule "grok jenkins extraction"
+when
+    to_string($message.source) == "jenkins.torch.sh" &&
+    regex("#\\d+", to_string($message.message)).matches == true && !has_field("something_that_doesnt_exist")
+then
+    let fields = grok("%{NOTSPACE:job_name}%{SPACE:unwanted}#%{NUMBER:job_number}\\sStarted by\\s%{USERNAME:user}", to_string($message.message), true);
+
+    set_fields(fields);
+end

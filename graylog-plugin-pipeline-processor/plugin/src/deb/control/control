@@ -1,0 +1,8 @@
+Package: [[name]]
+Version: [[version]]
+Architecture: all
+Maintainer: Kay Roepke <kay@graylog.com>
+Section: web
+Priority: optional
+Depends: graylog-server | graylog-radio
+Description: [[description]]

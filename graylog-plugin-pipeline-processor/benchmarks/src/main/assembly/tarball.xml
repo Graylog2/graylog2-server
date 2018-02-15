@@ -1,0 +1,30 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+    <id>benchmarks-tarball</id>
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+    <fileSets>
+        <fileSet>
+            <directory>${project.basedir}/benchmarks</directory>
+            <includes>
+                <include>**/*</include>
+            </includes>
+            <outputDirectory>benchmarks</outputDirectory>
+            <useDefaultExcludes>true</useDefaultExcludes>
+        </fileSet>
+    </fileSets>
+    <files>
+        <file>
+            <source>${project.build.directory}/${uberjar.name}.jar</source>
+            <destName>${uberjar.name}-${git.commit.id.describe}.jar</destName>
+        </file>
+        <file>
+            <source>scripts/benchmark-filtered.sh</source>
+            <destName>benchmark.sh</destName>
+            <fileMode>755</fileMode>
+            <filtered>true</filtered>
+        </file>
+    </files>
+</assembly>

@@ -1,0 +1,4 @@
+rule "using declared function 'nein'"
+when true == nein()
+then
+end

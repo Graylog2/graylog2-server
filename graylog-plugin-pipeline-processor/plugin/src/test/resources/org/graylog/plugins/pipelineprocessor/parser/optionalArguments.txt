@@ -1,0 +1,6 @@
+rule "optional function arguments"
+when
+    optional(d: 3, a: true, b: "string")
+then
+    trigger_test();
+end

@@ -1,0 +1,5 @@
+rule "stream routing"
+when true
+then
+    remove_from_stream(name: "some name");
+end

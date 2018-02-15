@@ -1,0 +1,6 @@
+rule "typed field access"
+when
+    to_long(customObject("1").id, 0) < 2
+then
+    trigger_test();
+end
