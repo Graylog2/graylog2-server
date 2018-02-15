@@ -45,15 +45,15 @@ const Rule = React.createClass({
           </span>
 
           <span>
-              <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES')}>
+              <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
                 <Button bsStyle="info">Manage pipelines</Button>
               </LinkContainer>
             &nbsp;
-            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}>
+            <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}>
                 <Button bsStyle="info" className="active">Manage rules</Button>
               </LinkContainer>
             &nbsp;
-            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_SIMULATE')}>
+            <LinkContainer to={Routes.SYSTEM.PIPELINES.SIMULATOR}>
                 <Button bsStyle="info">Simulator</Button>
               </LinkContainer>
             </span>

@@ -37,7 +37,7 @@ const Stage = React.createClass({
       };
       ruleTitle = <span><i className="fa fa-warning text-danger"/> {stage.rules[ruleIdx]}</span>;
     } else {
-      ruleTitle = (<LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES_RULEID')(rule.id)}>
+      ruleTitle = (<LinkContainer to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
           <a>{rule.title}</a>
         </LinkContainer>
       );

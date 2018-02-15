@@ -17,7 +17,7 @@ const NewPipeline = React.createClass({
   },
 
   _goToPipeline(pipeline) {
-    history.push(Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')(pipeline.id));
+    history.push(Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id));
   },
 
   _goBack() {

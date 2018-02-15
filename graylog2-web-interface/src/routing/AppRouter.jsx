@@ -134,9 +134,9 @@ const AppRouter = React.createClass({
 
               <Route path={Routes.SYSTEM.PIPELINES.OVERVIEW} component={PipelinesOverviewPage} />
               <Route path={Routes.SYSTEM.PIPELINES.RULES} component={RulesPage} />
-              <Route path={Routes.SYSTEM.PIPELINES.RULE.DETAILS(':rulesId')} component={RuleDetailsPage} />
+              <Route path={Routes.SYSTEM.PIPELINES.RULE(':ruleId')} component={RuleDetailsPage} />
               <Route path={Routes.SYSTEM.PIPELINES.SIMULATOR} component={SimulatorPage} />
-              <Route path={Routes.SYSTEM.PIPELINES.PIPELINE.DETAILS(':pipelineId')} component={PipelineDetailsPage} />
+              <Route path={Routes.SYSTEM.PIPELINES.PIPELINE(':pipelineId')} component={PipelineDetailsPage} />
 
               <Route path={Routes.SYSTEM.LOGGING} component={LoggersPage} />
               <Route path={Routes.SYSTEM.METRICS(':nodeId')} component={ShowMetricsPage} />

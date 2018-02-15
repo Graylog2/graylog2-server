@@ -123,14 +123,10 @@ const Routes = {
     },
     PIPELINES: {
       OVERVIEW: '/system/pipelines',
+      PIPELINE: pipelineId => `/system/pipelines/${pipelineId}`,
       RULES: '/system/pipelines/rules',
-      RULE: {
-        DETAILS: ruleId => `/system/pipelines/rules/${ruleId}`,
-      },
+      RULE: ruleId => `/system/pipelines/rules/${ruleId}`,
       SIMULATOR: '/system/pipelines/simulate',
-      PIPELINE: {
-        DETAILS: pipelineId => `/system/pipelines/${pipelineId}`,
-      },
     }
   },
   search_with_query: (query, rangeType, timeRange) => {

@@ -34,7 +34,7 @@ const RuleList = React.createClass({
         Delete
       </Button>,
       <span key="space">&nbsp;</span>,
-      <LinkContainer key="edit" to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES_RULEID')(rule.id)}>
+      <LinkContainer key="edit" to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
         <Button bsStyle="info" bsSize="xsmall">Edit</Button>
       </LinkContainer>,
     ];
@@ -42,7 +42,7 @@ const RuleList = React.createClass({
     return (
       <tr key={rule.title}>
         <td>
-          <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES_RULEID')(rule.id)}>
+          <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
             <a>{rule.title}</a>
           </LinkContainer>
         </td>
@@ -80,7 +80,7 @@ const RuleList = React.createClass({
                    filterLabel="Filter Rules"
                    filterKeys={filterKeys}>
           <div className="pull-right">
-            <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES_RULEID')('new')}>
+            <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE('new')}>
               <Button bsStyle="success">Create Rule</Button>
             </LinkContainer>
           </div>

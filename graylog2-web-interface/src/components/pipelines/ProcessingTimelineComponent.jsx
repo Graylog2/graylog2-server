@@ -83,7 +83,7 @@ const ProcessingTimelineComponent = React.createClass({
     return (
       <tr key={pipeline.id}>
         <td className="pipeline-name">
-          <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')(pipeline.id)}><a>{pipeline.title}</a></LinkContainer><br />
+          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}><a>{pipeline.title}</a></LinkContainer><br />
           {pipeline.description}
           <br />
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>
@@ -99,7 +99,7 @@ const ProcessingTimelineComponent = React.createClass({
         <td>
           <Button bsStyle="primary" bsSize="xsmall" onClick={this._deletePipeline(pipeline)}>Delete</Button>
           &nbsp;
-          <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')(pipeline.id)}>
+          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
             <Button bsStyle="info" bsSize="xsmall">Edit</Button>
           </LinkContainer>
         </td>
@@ -126,7 +126,7 @@ const ProcessingTimelineComponent = React.createClass({
 
     const addNewPipelineButton = (
       <div className="pull-right">
-        <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')('new')}>
+        <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE('new')}>
           <Button bsStyle="success">Add new pipeline</Button>
         </LinkContainer>
       </div>

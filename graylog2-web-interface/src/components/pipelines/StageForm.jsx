@@ -92,7 +92,7 @@ const StageForm = React.createClass({
     const rulesHelp = (
       <span>
         Select the rules evaluated on this stage, or create one in the{' '}
-        <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_RULES')}><a>Pipeline Rules page</a></LinkContainer>.
+        <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}><a>Pipeline Rules page</a></LinkContainer>.
       </span>
     );
 

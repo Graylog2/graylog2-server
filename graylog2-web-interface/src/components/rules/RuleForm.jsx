@@ -94,7 +94,7 @@ const RuleForm = React.createClass({
   },
 
   _saved() {
-    history.push(Routes.pluginRoute('SYSTEM_PIPELINES_RULES'));
+    history.push(Routes.SYSTEM.PIPELINES.RULES);
   },
 
   _save() {
@@ -116,7 +116,7 @@ const RuleForm = React.createClass({
     const formattedPipelines = this.props.usedInPipelines.map(pipeline => {
       return (
         <li key={pipeline.id}>
-          <LinkContainer to={Routes.pluginRoute('SYSTEM_PIPELINES_PIPELINEID')(pipeline.id)}>
+          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
             <a>{pipeline.title}</a>
           </LinkContainer>
         </li>
