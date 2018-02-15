@@ -24,6 +24,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
 import org.graylog2.audit.AuditActor;
@@ -96,6 +97,7 @@ public class Server extends ServerBootstrap {
     private final VersionCheckConfiguration versionCheckConfiguration = new VersionCheckConfiguration();
     private final KafkaJournalConfiguration kafkaJournalConfiguration = new KafkaJournalConfiguration();
     private final NettyTransportConfiguration nettyTransportConfiguration = new NettyTransportConfiguration();
+    private final PipelineConfig pipelineConfiguration = new PipelineConfig();
 
     public Server() {
         super("server", configuration);
@@ -150,7 +152,8 @@ public class Server extends ServerBootstrap {
                 mongoDbConfiguration,
                 versionCheckConfiguration,
                 kafkaJournalConfiguration,
-                nettyTransportConfiguration);
+                nettyTransportConfiguration,
+                pipelineConfiguration);
     }
 
     @Override
