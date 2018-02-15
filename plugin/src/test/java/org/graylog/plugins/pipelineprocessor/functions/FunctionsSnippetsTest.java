@@ -368,6 +368,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     }
 
     @Test
+    public void datesUnixTimestamps() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
+    }
+
+    @Test
     public void digests() {
         final Rule rule = parser.parseRule(ruleForTest(), false);
         evaluateRule(rule);
