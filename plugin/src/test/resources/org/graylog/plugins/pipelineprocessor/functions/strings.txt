@@ -14,7 +14,19 @@ when
     abbreviate("abcdefg", 7) == "abcdefg" &&
     abbreviate("abcdefg", 8) == "abcdefg" &&
     abbreviate("abcdefg", 4) == "a..." &&
-    concat("foo", "bar") == "foobar"
+    concat("foo", "bar") == "foobar" &&
+    starts_with("foobar", "foo") == true &&
+    starts_with("foobar", "") == true &&
+    starts_with("", "foo") == false &&
+    starts_with("foobar", "abc") == false &&
+    starts_with("foobar", "FOO") == false &&
+    starts_with("foobar", "FOO", true) == true &&
+    ends_with("foobar", "bar") == true &&
+    ends_with("foobar", "") == true &&
+    ends_with("", "bar") == false &&
+    ends_with("foobar", "abc") == false &&
+    ends_with("foobar", "BAR") == false &&
+    ends_with("foobar", "BAR", true) == true
 then
     set_field("has_xyz", contains("abcdef", "xyz"));
     set_field("string_literal", "abcd\\.e\tfg\u03a9\363");

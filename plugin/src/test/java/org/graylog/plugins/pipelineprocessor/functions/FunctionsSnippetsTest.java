@@ -83,11 +83,13 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
+import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Split;
+import org.graylog.plugins.pipelineprocessor.functions.strings.StartsWith;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
@@ -192,6 +194,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Capitalize.NAME, new Capitalize());
         functions.put(Concat.NAME, new Concat());
         functions.put(Contains.NAME, new Contains());
+        functions.put(EndsWith.NAME, new EndsWith());
         functions.put(Lowercase.NAME, new Lowercase());
         functions.put(Substring.NAME, new Substring());
         functions.put(Swapcase.NAME, new Swapcase());
@@ -199,6 +202,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Uppercase.NAME, new Uppercase());
         functions.put(KeyValue.NAME, new KeyValue());
         functions.put(Split.NAME, new Split());
+        functions.put(StartsWith.NAME, new StartsWith());
 
         final ObjectMapper objectMapper = new ObjectMapperProvider().get();
         functions.put(JsonParse.NAME, new JsonParse(objectMapper));

@@ -79,11 +79,13 @@ import org.graylog.plugins.pipelineprocessor.functions.strings.Abbreviate;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Capitalize;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Concat;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Contains;
+import org.graylog.plugins.pipelineprocessor.functions.strings.EndsWith;
 import org.graylog.plugins.pipelineprocessor.functions.strings.GrokMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.KeyValue;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Lowercase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.RegexMatch;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Split;
+import org.graylog.plugins.pipelineprocessor.functions.strings.StartsWith;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Substring;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Swapcase;
 import org.graylog.plugins.pipelineprocessor.functions.strings.Uncapitalize;
@@ -130,6 +132,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(Abbreviate.NAME, Abbreviate.class);
         addMessageProcessorFunction(Capitalize.NAME, Capitalize.class);
         addMessageProcessorFunction(Contains.NAME, Contains.class);
+        addMessageProcessorFunction(EndsWith.NAME, EndsWith.class);
         addMessageProcessorFunction(Lowercase.NAME, Lowercase.class);
         addMessageProcessorFunction(Substring.NAME, Substring.class);
         addMessageProcessorFunction(Swapcase.NAME, Swapcase.class);
@@ -138,6 +141,7 @@ public class ProcessorFunctionsModule extends PluginModule {
         addMessageProcessorFunction(Concat.NAME, Concat.class);
         addMessageProcessorFunction(KeyValue.NAME, KeyValue.class);
         addMessageProcessorFunction(Split.NAME, Split.class);
+        addMessageProcessorFunction(StartsWith.NAME, StartsWith.class);
 
         // json
         addMessageProcessorFunction(JsonParse.NAME, JsonParse.class);
