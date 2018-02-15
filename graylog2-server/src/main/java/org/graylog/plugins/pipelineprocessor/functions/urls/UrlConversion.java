@@ -38,7 +38,7 @@ public class UrlConversion extends AbstractFunction<URL> {
         final String urlString = String.valueOf(urlParam.required(args, context));
         try {
             return new URL(urlString);
-        } catch (IllegalArgumentException | MalformedURLException e) {
+        } catch (IllegalArgumentException e) {
             log.debug("Unable to parse URL for string {}", urlString, e);
 
             final Optional<String> defaultUrl = defaultParam.optional(args, context);
@@ -47,7 +47,7 @@ public class UrlConversion extends AbstractFunction<URL> {
             }
             try {
                 return new URL(defaultUrl.get());
-            } catch (IllegalArgumentException | MalformedURLException e1) {
+            } catch (IllegalArgumentException e1) {
                 log.warn("Parameter `default` for to_url() is not a valid URL: {}", defaultUrl.get());
                 throw Throwables.propagate(e1);
             }

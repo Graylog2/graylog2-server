@@ -16,105 +16,94 @@
  */
 package org.graylog.plugins.pipelineprocessor.functions.urls;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.Maps;
+import okhttp3.HttpUrl;
 
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URI;
-import java.net.URLDecoder;
+import java.util.List;
 import java.util.Map;
 
 /**
- * This class simply delegates the safe methods to the java.net.URL.
+ * This class simply delegates the safe methods to the {@link java.net.URL}.
  *
- * Specifically we want to disallow called java.net.URL#getContent from a rule.
+ * Specifically we want to disallow called {@link java.net.URL#getContent()} from a rule.
  */
 public class URL {
-
-    private final java.net.URL url;
+    private final HttpUrl url;
     private Map<String, String> queryMap;
 
     public URL(java.net.URL url) {
-        this.url = url;
+        this.url = HttpUrl.get(url);
     }
 
-    public URL(String urlString) throws MalformedURLException {
-        url = URI.create(urlString).toURL();
+    public URL(java.net.URI uri) {
+        this.url = HttpUrl.get(uri);
+    }
+
+    public URL(String urlString) {
+        url = HttpUrl.parse(urlString);
     }
 
     public String getQuery() {
-        return url.getQuery();
+        return url.encodedQuery();
     }
 
     public Map<String, String> getQueryParams() {
         if (queryMap == null) {
-            queryMap = splitQuery(getQuery());
+            final Map<String, String> queryMap = Maps.newHashMapWithExpectedSize(url.querySize());
+            for(String name : url.queryParameterNames()) {
+                final List<String> values = url.queryParameterValues(name);
+                final String valueString = Joiner.on(',').join(values);
+                queryMap.put(name, valueString);
+            }
+            this.queryMap = queryMap;
         }
         return queryMap;
     }
 
-    private static Map<String, String> splitQuery(String query) {
-        final Map<String, String> nameValues = Maps.newHashMap();
-        final String[] kvPairs = query.split("&");
-        for (String pair : kvPairs) {
-            try {
-                final int idx = pair.indexOf("=");
-                final String key = idx > 0 ? URLDecoder.decode(pair.substring(0, idx), "UTF-8") : pair;
-                final String value = idx > 0 && pair.length() > idx + 1 ? URLDecoder.decode(pair.substring(idx + 1),
-                                                                                            "UTF-8") : null;
-                if (nameValues.containsKey(key)) {
-                    nameValues.put(key, nameValues.get(key) + "," + value); // TODO well, this is also crappy
-                } else {
-                    nameValues.put(key, value);
-                }
-            } catch (UnsupportedEncodingException ignored) {
-                // ignored because UTF-8 is a required encoding
-            }
-        }
-        return nameValues;
-    }
-
     public String getUserInfo() {
-        return url.getUserInfo();
+        final String username = url.encodedUsername();
+        return username.isEmpty() ? "" : username + ':' + url.encodedPassword();
     }
 
     public String getHost() {
-        return url.getHost();
+        return url.host();
     }
 
     public String getPath() {
-        return url.getPath();
+        return url.encodedPath();
     }
 
     public String getFile() {
-        return url.getFile();
+        return url.querySize() == 0 ? url.encodedPath() : url.encodedPath() + '?' + url.encodedQuery();
     }
 
     public String getProtocol() {
-        return url.getProtocol();
+        return url.scheme();
     }
 
     public int getDefaultPort() {
-        return url.getDefaultPort();
+        return url.port();
     }
 
     /**
      * alias for #getRef, fragment is more commonly used
      */
     public String getFragment() {
-        return url.getRef();
+        return url.encodedFragment();
     }
 
     public String getRef() {
-        return url.getRef();
+        return getFragment();
     }
 
     public String getAuthority() {
-        return url.getAuthority();
+        final String userInfo = getUserInfo();
+        return userInfo.isEmpty() ? getHost() + ':' + getPort() : getUserInfo() + '@' + getHost() + ':' + getPort();
     }
 
     public int getPort() {
-        return url.getPort();
+        return url.port();
     }
 
     @SuppressWarnings("EqualsWhichDoesntCheckParameterClass")
