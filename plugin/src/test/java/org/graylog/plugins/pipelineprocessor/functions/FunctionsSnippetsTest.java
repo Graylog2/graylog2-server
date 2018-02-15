@@ -45,6 +45,7 @@ import org.graylog.plugins.pipelineprocessor.functions.dates.FormatDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.IsDate;
 import org.graylog.plugins.pipelineprocessor.functions.dates.Now;
 import org.graylog.plugins.pipelineprocessor.functions.dates.ParseDate;
+import org.graylog.plugins.pipelineprocessor.functions.dates.ParseUnixMilliseconds;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Days;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.Hours;
 import org.graylog.plugins.pipelineprocessor.functions.dates.periods.IsPeriod;
@@ -225,6 +226,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         functions.put(Now.NAME, new Now());
         functions.put(FlexParseDate.NAME, new FlexParseDate());
         functions.put(ParseDate.NAME, new ParseDate());
+        functions.put(ParseUnixMilliseconds.NAME, new ParseUnixMilliseconds());
         functions.put(FormatDate.NAME, new FormatDate());
 
         functions.put(Years.NAME, new Years());
@@ -397,6 +399,14 @@ public class FunctionsSnippetsTest extends BaseParserTest {
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }
+    }
+
+    @Test
+    public void datesUnixTimestamps() {
+        final Rule rule = parser.parseRule(ruleForTest(), false);
+        evaluateRule(rule);
+
+        assertThat(actionsTriggered.get()).isTrue();
     }
 
     @Test
