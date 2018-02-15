@@ -27,6 +27,19 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * The result of looking up a key in a lookup table (i. e. lookup data adapter or lookup cache).
+ * <p>
+ * For convenience, this class can be serialized and deserialized with Jackson (see
+ * {@link com.fasterxml.jackson.databind.ObjectMapper}, but we strongly recommend implementing your own
+ * serialization and deserialization logic if you're implementing a lookup cache.
+ * <p>
+ * There are <em>no guarantees</em> about binary compatibility of this class across Graylog releases!
+ *
+ * @see LookupDataAdapter#get(Object)
+ * @see LookupCache#get(LookupCacheKey, java.util.concurrent.Callable)
+ * @see LookupCacheKey
+ */
 @AutoValue
 public abstract class LookupResult {
     private static final LookupResult EMPTY_LOOKUP_RESULT = builder()
