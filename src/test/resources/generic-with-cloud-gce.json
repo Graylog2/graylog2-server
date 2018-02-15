@@ -1,0 +1,13 @@
+{
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "meta": {
+    "cloud": {
+      "availability_zone": "projects/1234567890/zones/us-east1-b",
+      "instance_id": "1234556778987654321",
+      "machine_type": "projects/1234567890/machineTypes/f1-micro",
+      "project_id": "my-dev",
+      "provider": "gce"
+    }
+  },
+  "foo": "bar"
+}
