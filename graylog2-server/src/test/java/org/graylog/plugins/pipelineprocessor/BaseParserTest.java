@@ -16,7 +16,6 @@
  */
 package org.graylog.plugins.pipelineprocessor;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.Maps;
 import org.graylog.plugins.pipelineprocessor.ast.Rule;
 import org.graylog.plugins.pipelineprocessor.ast.functions.AbstractFunction;
@@ -41,6 +40,7 @@ import javax.annotation.Nullable;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -154,7 +154,7 @@ public class BaseParserTest {
             final URL resource = this.getClass().getResource(name.getMethodName().concat(".txt"));
             final Path path = Paths.get(resource.toURI());
             final byte[] bytes = Files.readAllBytes(path);
-            return new String(bytes, Charsets.UTF_8);
+            return new String(bytes, StandardCharsets.UTF_8);
         } catch (IOException | URISyntaxException e) {
             throw new RuntimeException(e);
         }

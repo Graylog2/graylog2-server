@@ -124,6 +124,7 @@ import org.graylog2.plugin.InstantMillisProvider;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 import org.graylog2.streams.StreamService;
 import org.joda.time.DateTime;
@@ -158,6 +159,7 @@ public class FunctionsSnippetsTest extends BaseParserTest {
     private static Stream otherStream;
 
     @BeforeClass
+    @SuppressForbidden("Allow using default thread factory")
     public static void registerFunctions() {
         final Map<String, Function<?>> functions = commonFunctions();
 

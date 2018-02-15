@@ -49,6 +49,7 @@ import org.graylog2.plugin.Message;
 import org.graylog2.plugin.Messages;
 import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.journal.Journal;
 import org.junit.Test;
 
@@ -245,6 +246,7 @@ public class PipelineInterpreterTest {
         assertThat(actualMessage.hasField("foobar")).isFalse();
     }
 
+    @SuppressForbidden("Allow using default thread factory")
     private PipelineInterpreter createPipelineInterpreter(RuleService ruleService, PipelineService pipelineService, Map<String, Function<?>> functions) {
         final PipelineStreamConnectionsService pipelineStreamConnectionsService = mock(MongoDbPipelineStreamConnectionsService.class);
         final PipelineConnections pipelineConnections = PipelineConnections.create("p1", DEFAULT_STREAM_ID, Collections.singleton("p1"));
@@ -271,6 +273,7 @@ public class PipelineInterpreterTest {
     }
 
     @Test
+    @SuppressForbidden("Allow using default thread factory")
     public void testMetrics() {
         final RuleService ruleService = new InMemoryRuleService();
         ruleService.save(RuleDao.create("abc",

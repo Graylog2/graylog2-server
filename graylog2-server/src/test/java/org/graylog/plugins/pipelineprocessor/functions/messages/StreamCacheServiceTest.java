@@ -19,6 +19,7 @@ package org.graylog.plugins.pipelineprocessor.functions.messages;
 import com.google.common.eventbus.EventBus;
 
 import org.graylog2.plugin.streams.Stream;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.streams.StreamService;
 import org.junit.Test;
 
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.mock;
 
 public class StreamCacheServiceTest {
     @Test
+    @SuppressForbidden("Allow using default thread factory")
     public void getByName() throws Exception {
         final StreamCacheService streamCacheService = new StreamCacheService(new EventBus(), mock(StreamService.class), Executors.newSingleThreadScheduledExecutor());
 

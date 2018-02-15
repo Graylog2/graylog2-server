@@ -38,6 +38,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,12 +95,13 @@ public class RuleResource extends RestResource implements PluginRestResource {
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
         final RuleDao newRuleSource = RuleDao.builder()
                 .title(rule.name()) // use the name from the parsed rule source.
                 .description(ruleSource.description())
                 .source(ruleSource.source())
-                .createdAt(DateTime.now())
-                .modifiedAt(DateTime.now())
+                .createdAt(now)
+                .modifiedAt(now)
                 .build();
         final RuleDao save = ruleService.save(newRuleSource);
         // TODO determine which pipelines could change because of this new rule (there could be pipelines referring to a previously unresolved rule)
@@ -120,12 +122,13 @@ public class RuleResource extends RestResource implements PluginRestResource {
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
         return RuleSource.builder()
                 .title(rule.name())
                 .description(ruleSource.description())
                 .source(ruleSource.source())
-                .createdAt(DateTime.now())
-                .modifiedAt(DateTime.now())
+                .createdAt(now)
+                .modifiedAt(now)
                 .build();
     }
 
@@ -179,7 +182,7 @@ public class RuleResource extends RestResource implements PluginRestResource {
                 .title(rule.name())
                 .description(update.description())
                 .source(update.source())
-                .modifiedAt(DateTime.now())
+                .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
         final RuleDao savedRule = ruleService.save(toSave);
 

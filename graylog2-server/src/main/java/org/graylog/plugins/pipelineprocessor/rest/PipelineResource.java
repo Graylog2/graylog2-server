@@ -37,6 +37,7 @@ import org.graylog2.events.ClusterEventBus;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.shared.rest.resources.RestResource;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,12 +90,13 @@ public class PipelineResource extends RestResource implements PluginRestResource
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
         final PipelineDao pipelineDao = PipelineDao.builder()
                 .title(pipeline.name())
                 .description(pipelineSource.description())
                 .source(pipelineSource.source())
-                .createdAt(DateTime.now())
-                .modifiedAt(DateTime.now())
+                .createdAt(now)
+                .modifiedAt(now)
                 .build();
         final PipelineDao save = pipelineService.save(pipelineDao);
         clusterBus.post(PipelinesChangedEvent.updatedPipelineId(save.id()));
@@ -113,12 +115,13 @@ public class PipelineResource extends RestResource implements PluginRestResource
         } catch (ParseException e) {
             throw new BadRequestException(Response.status(Response.Status.BAD_REQUEST).entity(e.getErrors()).build());
         }
+        final DateTime now = DateTime.now(DateTimeZone.UTC);
         return PipelineSource.builder()
                 .title(pipeline.name())
                 .description(pipelineSource.description())
                 .source(pipelineSource.source())
-                .createdAt(DateTime.now())
-                .modifiedAt(DateTime.now())
+                .createdAt(now)
+                .modifiedAt(now)
                 .build();
     }
 
@@ -164,7 +167,7 @@ public class PipelineResource extends RestResource implements PluginRestResource
                 .title(pipeline.name())
                 .description(update.description())
                 .source(update.source())
-                .modifiedAt(DateTime.now())
+                .modifiedAt(DateTime.now(DateTimeZone.UTC))
                 .build();
         final PipelineDao savedPipeline = pipelineService.save(toSave);
         clusterBus.post(PipelinesChangedEvent.updatedPipelineId(savedPipeline.id()));

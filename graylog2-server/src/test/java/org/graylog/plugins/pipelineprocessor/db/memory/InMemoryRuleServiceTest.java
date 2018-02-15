@@ -20,6 +20,7 @@ import com.google.common.collect.ImmutableList;
 import org.graylog.plugins.pipelineprocessor.db.RuleDao;
 import org.graylog2.database.NotFoundException;
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -90,7 +91,7 @@ public class InMemoryRuleServiceTest {
         }
 
         try {
-            service.save(saved.toBuilder().createdAt(DateTime.now()).build());
+            service.save(saved.toBuilder().createdAt(DateTime.now(DateTimeZone.UTC)).build());
         } catch (IllegalArgumentException e) {
             fail("Updating an existing rule should be possible");
         }

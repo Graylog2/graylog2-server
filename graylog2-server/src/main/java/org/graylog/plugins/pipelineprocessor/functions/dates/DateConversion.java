@@ -46,7 +46,9 @@ public class DateConversion extends TimezoneAwareFunction {
             return new DateTime(datish);
         }
         if (datish instanceof ZonedDateTime) {
-            return new DateTime(((ZonedDateTime) datish).toInstant().toEpochMilli());
+            final ZonedDateTime zonedDateTime = (ZonedDateTime) datish;
+            final DateTimeZone timeZone = DateTimeZone.forID(zonedDateTime.getZone().getId());
+            return new DateTime(zonedDateTime.toInstant().toEpochMilli(), timeZone);
         }
         return null;
     }

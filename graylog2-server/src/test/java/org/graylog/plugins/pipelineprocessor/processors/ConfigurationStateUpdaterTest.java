@@ -63,6 +63,7 @@ import org.graylog2.plugin.streams.Output;
 import org.graylog2.plugin.streams.Stream;
 import org.graylog2.plugin.streams.StreamRule;
 import org.graylog2.rest.resources.streams.requests.CreateStreamRequest;
+import org.graylog2.shared.SuppressForbidden;
 import org.graylog2.shared.bindings.SchedulerBindings;
 import org.graylog2.shared.bindings.providers.MetricRegistryProvider;
 import org.graylog2.streams.StreamImpl;
@@ -81,6 +82,7 @@ public class ConfigurationStateUpdaterTest {
     private static final Logger log = LoggerFactory.getLogger(ConfigurationStateUpdaterTest.class);
     private PipelineInterpreter.State reload;
 
+    @SuppressForbidden("Allow calling System#gc()")
     @Test
     public void testClassUnloading() {
 
