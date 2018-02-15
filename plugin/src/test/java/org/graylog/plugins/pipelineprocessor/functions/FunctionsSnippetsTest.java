@@ -364,6 +364,9 @@ public class FunctionsSnippetsTest extends BaseParserTest {
             assertThat(message.getField("french_month")).isEqualTo(7);
             assertThat(message.getField("french_day")).isEqualTo(24);
 
+            assertThat(message.getField("ts_hour")).isEqualTo(16);
+            assertThat(message.getField("ts_minute")).isEqualTo(3);
+            assertThat(message.getField("ts_second")).isEqualTo(25);
         } finally {
             DateTimeUtils.setCurrentMillisSystem();
         }

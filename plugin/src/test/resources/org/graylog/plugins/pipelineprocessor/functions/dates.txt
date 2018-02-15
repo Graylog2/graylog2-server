@@ -36,4 +36,8 @@ then
     set_field("french_day", frenchDate.dayOfMonth);
     set_field("french_month", frenchDate.monthOfYear);
     set_field("french_year", frenchDate.year);
+
+    set_field("ts_hour", $message.timestamp.hourOfDay);
+    set_field("ts_minute", $message.timestamp.minuteOfHour);
+    set_field("ts_second", $message.timestamp.secondOfMinute);
 end
