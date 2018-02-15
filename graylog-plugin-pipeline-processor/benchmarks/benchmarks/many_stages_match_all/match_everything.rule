@@ -1,5 +1,0 @@
-rule "match everything"
-when
-    true
-then
-end
