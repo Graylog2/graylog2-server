@@ -70,7 +70,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
               className="row"
             >
               <div
-                className="col-md-5"
+                className="col-md-12"
               >
                 <div
                   className="filter"
@@ -140,14 +140,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                 </div>
               </div>
             </div>
-            <ul
-              className="list-group"
-            >
-              <li
-                className="list-group-header list-group-item"
+            <div>
+              <div
+                className="list-group"
               >
-                <div
-                  className="list-group-item-heading"
+                <span
+                  className="listGroupHeader list-group-item"
                 >
                   <div
                     className="form-group"
@@ -177,168 +175,139 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       
                     </div>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                />
-              </li>
-              <li
-                className="list-group-item"
-              >
-                <div
-                  className="list-group-item-heading"
+                </span>
+                <span
+                  className="list-group-item"
                 >
                   <div
-                    className="pull-right"
-                    style={
-                      Object {
-                        "marginBottom": 10,
-                        "marginTop": 10,
-                      }
-                    }
+                    className="itemWrapper "
                   >
                     <div
-                      className="btn-group btn-group-sm"
+                      className="itemActionsWrapper"
                     >
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow reading
-                      </button>
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow editing
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    className="form-group"
-                  >
-                    <span>
                       <div
-                        className="checkbox"
-                        style={undefined}
+                        className="btn-group btn-group-sm"
                       >
-                        <label
-                          title=""
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
                         >
-                          <input
-                            checked={false}
-                            disabled={false}
-                            groupClassName="form-group-inline"
-                            label=""
-                            onChange={[Function]}
-                            placeholder=""
-                            type="checkbox"
-                            value={undefined}
-                          />
-                          
-                        </label>
+                          Allow reading
+                        </button>
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Allow editing
+                        </button>
                       </div>
-                      
+                    </div>
+                    <div
+                      className="form-group"
+                    >
+                      <div
+                        className="form-group-inline"
+                      >
+                        <div
+                          className="checkbox"
+                          style={undefined}
+                        >
+                          <label
+                            title=""
+                          >
+                            <input
+                              checked={false}
+                              disabled={false}
+                              label=""
+                              onChange={[Function]}
+                              placeholder=""
+                              type="checkbox"
+                              value={undefined}
+                            />
+                            
+                          </label>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <span
+                      className="description"
+                    >
+                      stream1
                     </span>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                >
-                  <span
-                    style={
-                      Object {
-                        "marginLeft": 20,
-                      }
-                    }
-                  >
-                    stream1
-                  </span>
-                </p>
-              </li>
-              <li
-                className="list-group-item"
-              >
-                <div
-                  className="list-group-item-heading"
+                </span>
+                <span
+                  className="list-group-item"
                 >
                   <div
-                    className="pull-right"
-                    style={
-                      Object {
-                        "marginBottom": 10,
-                        "marginTop": 10,
-                      }
-                    }
+                    className="itemWrapper "
                   >
                     <div
-                      className="btn-group btn-group-sm"
+                      className="itemActionsWrapper"
                     >
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow reading
-                      </button>
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow editing
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    className="form-group"
-                  >
-                    <span>
                       <div
-                        className="checkbox"
-                        style={undefined}
+                        className="btn-group btn-group-sm"
                       >
-                        <label
-                          title=""
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
                         >
-                          <input
-                            checked={false}
-                            disabled={false}
-                            groupClassName="form-group-inline"
-                            label=""
-                            onChange={[Function]}
-                            placeholder=""
-                            type="checkbox"
-                            value={undefined}
-                          />
-                          
-                        </label>
+                          Allow reading
+                        </button>
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Allow editing
+                        </button>
                       </div>
-                      
+                    </div>
+                    <div
+                      className="form-group"
+                    >
+                      <div
+                        className="form-group-inline"
+                      >
+                        <div
+                          className="checkbox"
+                          style={undefined}
+                        >
+                          <label
+                            title=""
+                          >
+                            <input
+                              checked={false}
+                              disabled={false}
+                              label=""
+                              onChange={[Function]}
+                              placeholder=""
+                              type="checkbox"
+                              value={undefined}
+                            />
+                            
+                          </label>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <span
+                      className="description"
+                    >
+                      stream2
                     </span>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                >
-                  <span
-                    style={
-                      Object {
-                        "marginLeft": 20,
-                      }
-                    }
-                  >
-                    stream2
-                  </span>
-                </p>
-              </li>
-            </ul>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -361,7 +330,7 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
               className="row"
             >
               <div
-                className="col-md-5"
+                className="col-md-12"
               >
                 <div
                   className="filter"
@@ -431,14 +400,12 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                 </div>
               </div>
             </div>
-            <ul
-              className="list-group"
-            >
-              <li
-                className="list-group-header list-group-item"
+            <div>
+              <div
+                className="list-group"
               >
-                <div
-                  className="list-group-item-heading"
+                <span
+                  className="listGroupHeader list-group-item"
                 >
                   <div
                     className="form-group"
@@ -468,168 +435,139 @@ exports[`<PermissionSelector /> should render with empty permissions 1`] = `
                       
                     </div>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                />
-              </li>
-              <li
-                className="list-group-item"
-              >
-                <div
-                  className="list-group-item-heading"
+                </span>
+                <span
+                  className="list-group-item"
                 >
                   <div
-                    className="pull-right"
-                    style={
-                      Object {
-                        "marginBottom": 10,
-                        "marginTop": 10,
-                      }
-                    }
+                    className="itemWrapper "
                   >
                     <div
-                      className="btn-group btn-group-sm"
+                      className="itemActionsWrapper"
                     >
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow reading
-                      </button>
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow editing
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    className="form-group"
-                  >
-                    <span>
                       <div
-                        className="checkbox"
-                        style={undefined}
+                        className="btn-group btn-group-sm"
                       >
-                        <label
-                          title=""
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
                         >
-                          <input
-                            checked={false}
-                            disabled={false}
-                            groupClassName="form-group-inline"
-                            label=""
-                            onChange={[Function]}
-                            placeholder=""
-                            type="checkbox"
-                            value={undefined}
-                          />
-                          
-                        </label>
+                          Allow reading
+                        </button>
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Allow editing
+                        </button>
                       </div>
-                      
+                    </div>
+                    <div
+                      className="form-group"
+                    >
+                      <div
+                        className="form-group-inline"
+                      >
+                        <div
+                          className="checkbox"
+                          style={undefined}
+                        >
+                          <label
+                            title=""
+                          >
+                            <input
+                              checked={false}
+                              disabled={false}
+                              label=""
+                              onChange={[Function]}
+                              placeholder=""
+                              type="checkbox"
+                              value={undefined}
+                            />
+                            
+                          </label>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <span
+                      className="description"
+                    >
+                      dashboard1
                     </span>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                >
-                  <span
-                    style={
-                      Object {
-                        "marginLeft": 20,
-                      }
-                    }
-                  >
-                    dashboard1
-                  </span>
-                </p>
-              </li>
-              <li
-                className="list-group-item"
-              >
-                <div
-                  className="list-group-item-heading"
+                </span>
+                <span
+                  className="list-group-item"
                 >
                   <div
-                    className="pull-right"
-                    style={
-                      Object {
-                        "marginBottom": 10,
-                        "marginTop": 10,
-                      }
-                    }
+                    className="itemWrapper "
                   >
                     <div
-                      className="btn-group btn-group-sm"
+                      className="itemActionsWrapper"
                     >
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow reading
-                      </button>
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow editing
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    className="form-group"
-                  >
-                    <span>
                       <div
-                        className="checkbox"
-                        style={undefined}
+                        className="btn-group btn-group-sm"
                       >
-                        <label
-                          title=""
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
                         >
-                          <input
-                            checked={false}
-                            disabled={false}
-                            groupClassName="form-group-inline"
-                            label=""
-                            onChange={[Function]}
-                            placeholder=""
-                            type="checkbox"
-                            value={undefined}
-                          />
-                          
-                        </label>
+                          Allow reading
+                        </button>
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Allow editing
+                        </button>
                       </div>
-                      
+                    </div>
+                    <div
+                      className="form-group"
+                    >
+                      <div
+                        className="form-group-inline"
+                      >
+                        <div
+                          className="checkbox"
+                          style={undefined}
+                        >
+                          <label
+                            title=""
+                          >
+                            <input
+                              checked={false}
+                              disabled={false}
+                              label=""
+                              onChange={[Function]}
+                              placeholder=""
+                              type="checkbox"
+                              value={undefined}
+                            />
+                            
+                          </label>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <span
+                      className="description"
+                    >
+                      dashboard2
                     </span>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                >
-                  <span
-                    style={
-                      Object {
-                        "marginLeft": 20,
-                      }
-                    }
-                  >
-                    dashboard2
-                  </span>
-                </p>
-              </li>
-            </ul>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -708,7 +646,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
               className="row"
             >
               <div
-                className="col-md-5"
+                className="col-md-12"
               >
                 <div
                   className="filter"
@@ -778,14 +716,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                 </div>
               </div>
             </div>
-            <ul
-              className="list-group"
-            >
-              <li
-                className="list-group-header list-group-item"
+            <div>
+              <div
+                className="list-group"
               >
-                <div
-                  className="list-group-item-heading"
+                <span
+                  className="listGroupHeader list-group-item"
                 >
                   <div
                     className="form-group"
@@ -815,168 +751,139 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       
                     </div>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                />
-              </li>
-              <li
-                className="list-group-item"
-              >
-                <div
-                  className="list-group-item-heading"
+                </span>
+                <span
+                  className="list-group-item"
                 >
                   <div
-                    className="pull-right"
-                    style={
-                      Object {
-                        "marginBottom": 10,
-                        "marginTop": 10,
-                      }
-                    }
+                    className="itemWrapper "
                   >
                     <div
-                      className="btn-group btn-group-sm"
+                      className="itemActionsWrapper"
                     >
-                      <button
-                        className="btn btn-info active"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow reading
-                      </button>
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow editing
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    className="form-group"
-                  >
-                    <span>
                       <div
-                        className="checkbox"
-                        style={undefined}
+                        className="btn-group btn-group-sm"
                       >
-                        <label
-                          title=""
+                        <button
+                          className="btn btn-info active"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
                         >
-                          <input
-                            checked={false}
-                            disabled={false}
-                            groupClassName="form-group-inline"
-                            label=""
-                            onChange={[Function]}
-                            placeholder=""
-                            type="checkbox"
-                            value={undefined}
-                          />
-                          
-                        </label>
+                          Allow reading
+                        </button>
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Allow editing
+                        </button>
                       </div>
-                      
+                    </div>
+                    <div
+                      className="form-group"
+                    >
+                      <div
+                        className="form-group-inline"
+                      >
+                        <div
+                          className="checkbox"
+                          style={undefined}
+                        >
+                          <label
+                            title=""
+                          >
+                            <input
+                              checked={false}
+                              disabled={false}
+                              label=""
+                              onChange={[Function]}
+                              placeholder=""
+                              type="checkbox"
+                              value={undefined}
+                            />
+                            
+                          </label>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <span
+                      className="description"
+                    >
+                      stream1
                     </span>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                >
-                  <span
-                    style={
-                      Object {
-                        "marginLeft": 20,
-                      }
-                    }
-                  >
-                    stream1
-                  </span>
-                </p>
-              </li>
-              <li
-                className="list-group-item"
-              >
-                <div
-                  className="list-group-item-heading"
+                </span>
+                <span
+                  className="list-group-item"
                 >
                   <div
-                    className="pull-right"
-                    style={
-                      Object {
-                        "marginBottom": 10,
-                        "marginTop": 10,
-                      }
-                    }
+                    className="itemWrapper "
                   >
                     <div
-                      className="btn-group btn-group-sm"
+                      className="itemActionsWrapper"
                     >
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow reading
-                      </button>
-                      <button
-                        className="btn btn-info active"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow editing
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    className="form-group"
-                  >
-                    <span>
                       <div
-                        className="checkbox"
-                        style={undefined}
+                        className="btn-group btn-group-sm"
                       >
-                        <label
-                          title=""
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
                         >
-                          <input
-                            checked={false}
-                            disabled={false}
-                            groupClassName="form-group-inline"
-                            label=""
-                            onChange={[Function]}
-                            placeholder=""
-                            type="checkbox"
-                            value={undefined}
-                          />
-                          
-                        </label>
+                          Allow reading
+                        </button>
+                        <button
+                          className="btn btn-info active"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Allow editing
+                        </button>
                       </div>
-                      
+                    </div>
+                    <div
+                      className="form-group"
+                    >
+                      <div
+                        className="form-group-inline"
+                      >
+                        <div
+                          className="checkbox"
+                          style={undefined}
+                        >
+                          <label
+                            title=""
+                          >
+                            <input
+                              checked={false}
+                              disabled={false}
+                              label=""
+                              onChange={[Function]}
+                              placeholder=""
+                              type="checkbox"
+                              value={undefined}
+                            />
+                            
+                          </label>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <span
+                      className="description"
+                    >
+                      stream2
                     </span>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                >
-                  <span
-                    style={
-                      Object {
-                        "marginLeft": 20,
-                      }
-                    }
-                  >
-                    stream2
-                  </span>
-                </p>
-              </li>
-            </ul>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -999,7 +906,7 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
               className="row"
             >
               <div
-                className="col-md-5"
+                className="col-md-12"
               >
                 <div
                   className="filter"
@@ -1069,14 +976,12 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                 </div>
               </div>
             </div>
-            <ul
-              className="list-group"
-            >
-              <li
-                className="list-group-header list-group-item"
+            <div>
+              <div
+                className="list-group"
               >
-                <div
-                  className="list-group-item-heading"
+                <span
+                  className="listGroupHeader list-group-item"
                 >
                   <div
                     className="form-group"
@@ -1106,168 +1011,139 @@ exports[`<PermissionSelector /> should render with set permissions 1`] = `
                       
                     </div>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                />
-              </li>
-              <li
-                className="list-group-item"
-              >
-                <div
-                  className="list-group-item-heading"
+                </span>
+                <span
+                  className="list-group-item"
                 >
                   <div
-                    className="pull-right"
-                    style={
-                      Object {
-                        "marginBottom": 10,
-                        "marginTop": 10,
-                      }
-                    }
+                    className="itemWrapper "
                   >
                     <div
-                      className="btn-group btn-group-sm"
+                      className="itemActionsWrapper"
                     >
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow reading
-                      </button>
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow editing
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    className="form-group"
-                  >
-                    <span>
                       <div
-                        className="checkbox"
-                        style={undefined}
+                        className="btn-group btn-group-sm"
                       >
-                        <label
-                          title=""
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
                         >
-                          <input
-                            checked={false}
-                            disabled={false}
-                            groupClassName="form-group-inline"
-                            label=""
-                            onChange={[Function]}
-                            placeholder=""
-                            type="checkbox"
-                            value={undefined}
-                          />
-                          
-                        </label>
+                          Allow reading
+                        </button>
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Allow editing
+                        </button>
                       </div>
-                      
+                    </div>
+                    <div
+                      className="form-group"
+                    >
+                      <div
+                        className="form-group-inline"
+                      >
+                        <div
+                          className="checkbox"
+                          style={undefined}
+                        >
+                          <label
+                            title=""
+                          >
+                            <input
+                              checked={false}
+                              disabled={false}
+                              label=""
+                              onChange={[Function]}
+                              placeholder=""
+                              type="checkbox"
+                              value={undefined}
+                            />
+                            
+                          </label>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <span
+                      className="description"
+                    >
+                      dashboard1
                     </span>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                >
-                  <span
-                    style={
-                      Object {
-                        "marginLeft": 20,
-                      }
-                    }
-                  >
-                    dashboard1
-                  </span>
-                </p>
-              </li>
-              <li
-                className="list-group-item"
-              >
-                <div
-                  className="list-group-item-heading"
+                </span>
+                <span
+                  className="list-group-item"
                 >
                   <div
-                    className="pull-right"
-                    style={
-                      Object {
-                        "marginBottom": 10,
-                        "marginTop": 10,
-                      }
-                    }
+                    className="itemWrapper "
                   >
                     <div
-                      className="btn-group btn-group-sm"
+                      className="itemActionsWrapper"
                     >
-                      <button
-                        className="btn btn-info active"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow reading
-                      </button>
-                      <button
-                        className="btn btn-default"
-                        disabled={false}
-                        onClick={[Function]}
-                        type="button"
-                      >
-                        Allow editing
-                      </button>
-                    </div>
-                  </div>
-                  <div
-                    className="form-group"
-                  >
-                    <span>
                       <div
-                        className="checkbox"
-                        style={undefined}
+                        className="btn-group btn-group-sm"
                       >
-                        <label
-                          title=""
+                        <button
+                          className="btn btn-info active"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
                         >
-                          <input
-                            checked={false}
-                            disabled={false}
-                            groupClassName="form-group-inline"
-                            label=""
-                            onChange={[Function]}
-                            placeholder=""
-                            type="checkbox"
-                            value={undefined}
-                          />
-                          
-                        </label>
+                          Allow reading
+                        </button>
+                        <button
+                          className="btn btn-default"
+                          disabled={false}
+                          onClick={[Function]}
+                          type="button"
+                        >
+                          Allow editing
+                        </button>
                       </div>
-                      
+                    </div>
+                    <div
+                      className="form-group"
+                    >
+                      <div
+                        className="form-group-inline"
+                      >
+                        <div
+                          className="checkbox"
+                          style={undefined}
+                        >
+                          <label
+                            title=""
+                          >
+                            <input
+                              checked={false}
+                              disabled={false}
+                              label=""
+                              onChange={[Function]}
+                              placeholder=""
+                              type="checkbox"
+                              value={undefined}
+                            />
+                            
+                          </label>
+                        </div>
+                        
+                      </div>
+                    </div>
+                    <span
+                      className="description"
+                    >
+                      dashboard2
                     </span>
                   </div>
-                </div>
-                <p
-                  className="list-group-item-text"
-                >
-                  <span
-                    style={
-                      Object {
-                        "marginLeft": 20,
-                      }
-                    }
-                  >
-                    dashboard2
-                  </span>
-                </p>
-              </li>
-            </ul>
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </div>

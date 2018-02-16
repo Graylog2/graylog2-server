@@ -1,0 +1,396 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<TokenList /> should render with empty tokens 1`] = `
+<span>
+  <form
+    onSubmit={[Function]}
+  >
+    <div
+      className="form-group"
+    >
+      <div
+        className="row"
+      >
+        <div
+          className="col-sm-2"
+        >
+          <label
+            className="tokenNewNameLabel control-label"
+            htmlFor={undefined}
+          >
+            Token Name
+          </label>
+        </div>
+        <div
+          className="col-sm-4"
+        >
+          <input
+            className="form-control"
+            id="create-token-input"
+            onChange={[Function]}
+            placeholder="e.g ServiceName"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          className="col-sm-2"
+        >
+          <button
+            className="btn btn-primary"
+            disabled={true}
+            id="create-token"
+            type="submit"
+          >
+            Create Token
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr />
+  </form>
+  <div>
+    <div
+      className="row"
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="filter"
+        >
+          <form
+            className="form-inline"
+            onSubmit={[Function]}
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+          >
+            <div
+              className="form-group"
+            >
+              <label
+                className="control-label"
+                htmlFor="filter-data-filter"
+              >
+                Filter
+              </label>
+              <div
+                className="typeahead-wrapper"
+              >
+                <input
+                  className="form-control"
+                  id="filter-data-filter"
+                  label="Filter"
+                  onKeyPress={undefined}
+                  placeholder=""
+                  type="text"
+                  value={undefined}
+                />
+                
+              </div>
+            </div>
+            <button
+              className="btn btn-default"
+              disabled={false}
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+              type="submit"
+            >
+              Filter
+            </button>
+            <button
+              className="btn btn-default"
+              disabled={true}
+              onClick={[Function]}
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+              type="button"
+            >
+              Reset
+            </button>
+          </form>
+          <ul
+            className="pill-list"
+          />
+        </div>
+      </div>
+    </div>
+    <div>
+      <div
+        className="list-group"
+      >
+        <span
+          className="listGroupHeader list-group-item"
+        >
+          <div
+            className="headerWrapper"
+          >
+            
+          </div>
+        </span>
+        <span
+          className="list-group-item"
+        >
+          No items to display
+        </span>
+      </div>
+    </div>
+  </div>
+  <div
+    className="checkbox"
+    style={undefined}
+  >
+    <label
+      title=""
+    >
+      <input
+        checked={true}
+        disabled={false}
+        id="hide-tokens"
+        onChange={[Function]}
+        type="checkbox"
+      />
+      Hide Tokens
+    </label>
+  </div>
+</span>
+`;
+
+exports[`<TokenList /> should render with tokens 1`] = `
+<span>
+  <form
+    onSubmit={[Function]}
+  >
+    <div
+      className="form-group"
+    >
+      <div
+        className="row"
+      >
+        <div
+          className="col-sm-2"
+        >
+          <label
+            className="tokenNewNameLabel control-label"
+            htmlFor={undefined}
+          >
+            Token Name
+          </label>
+        </div>
+        <div
+          className="col-sm-4"
+        >
+          <input
+            className="form-control"
+            id="create-token-input"
+            onChange={[Function]}
+            placeholder="e.g ServiceName"
+            type="text"
+            value=""
+          />
+        </div>
+        <div
+          className="col-sm-2"
+        >
+          <button
+            className="btn btn-primary"
+            disabled={true}
+            id="create-token"
+            type="submit"
+          >
+            Create Token
+          </button>
+        </div>
+      </div>
+    </div>
+    <hr />
+  </form>
+  <div>
+    <div
+      className="row"
+    >
+      <div
+        className="col-md-12"
+      >
+        <div
+          className="filter"
+        >
+          <form
+            className="form-inline"
+            onSubmit={[Function]}
+            style={
+              Object {
+                "display": "inline",
+              }
+            }
+          >
+            <div
+              className="form-group"
+            >
+              <label
+                className="control-label"
+                htmlFor="filter-data-filter"
+              >
+                Filter
+              </label>
+              <div
+                className="typeahead-wrapper"
+              >
+                <input
+                  className="form-control"
+                  id="filter-data-filter"
+                  label="Filter"
+                  onKeyPress={undefined}
+                  placeholder=""
+                  type="text"
+                  value={undefined}
+                />
+                
+              </div>
+            </div>
+            <button
+              className="btn btn-default"
+              disabled={false}
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+              type="submit"
+            >
+              Filter
+            </button>
+            <button
+              className="btn btn-default"
+              disabled={true}
+              onClick={[Function]}
+              style={
+                Object {
+                  "marginLeft": 5,
+                }
+              }
+              type="button"
+            >
+              Reset
+            </button>
+          </form>
+          <ul
+            className="pill-list"
+          />
+        </div>
+      </div>
+    </div>
+    <div>
+      <div
+        className="list-group"
+      >
+        <span
+          className="listGroupHeader list-group-item"
+        >
+          <div
+            className="headerWrapper"
+          >
+            
+          </div>
+        </span>
+        <span
+          className="list-group-item"
+        >
+          <div
+            className="itemWrapper itemWrapperStatic"
+          >
+            <div
+              className="itemActionsWrapper"
+            >
+              <div
+                className="btn-group"
+              >
+                <ClipboardButton
+                  bsSize="xsmall"
+                  text="beef2001"
+                  title="Copy to clipboard"
+                />
+                <button
+                  className="btn btn-xs btn-primary"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div
+              className="header"
+              id="token-input"
+            >
+              Acme
+            </div>
+          </div>
+        </span>
+        <span
+          className="list-group-item"
+        >
+          <div
+            className="itemWrapper itemWrapperStatic"
+          >
+            <div
+              className="itemActionsWrapper"
+            >
+              <div
+                className="btn-group"
+              >
+                <ClipboardButton
+                  bsSize="xsmall"
+                  text="beef2002"
+                  title="Copy to clipboard"
+                />
+                <button
+                  className="btn btn-xs btn-primary"
+                  disabled={false}
+                  onClick={[Function]}
+                  type="button"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <div
+              className="header"
+              id="token-input"
+            >
+              Hamfred
+            </div>
+          </div>
+        </span>
+      </div>
+    </div>
+  </div>
+  <div
+    className="checkbox"
+    style={undefined}
+  >
+    <label
+      title=""
+    >
+      <input
+        checked={true}
+        disabled={false}
+        id="hide-tokens"
+        onChange={[Function]}
+        type="checkbox"
+      />
+      Hide Tokens
+    </label>
+  </div>
+</span>
+`;

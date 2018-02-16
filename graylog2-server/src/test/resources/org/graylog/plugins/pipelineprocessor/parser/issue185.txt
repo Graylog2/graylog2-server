@@ -1,0 +1,6 @@
+rule "issue-185"
+when
+  true
+then
+  let a = "\s+$"
+end

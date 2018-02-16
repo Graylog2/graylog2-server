@@ -17,6 +17,7 @@
 package org.graylog2.plugin.lookup;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 
@@ -39,6 +40,12 @@ import javax.annotation.Nullable;
  * // Key with prefix only
  * LookupCacheKey.prefix(dataAdapter.id());
  * }</pre>
+ * <p>
+ * For convenience, this class can be serialized and deserialized with Jackson (see
+ * {@link com.fasterxml.jackson.databind.ObjectMapper}, but we strongly recommend implementing your own
+ * serialization and deserialization logic if you're implementing a lookup cache.
+ * <p>
+ * There are <em>no guarantees</em> about binary compatibility of this class across Graylog releases!
  */
 @AutoValue
 public abstract class LookupCacheKey {
@@ -70,6 +77,7 @@ public abstract class LookupCacheKey {
      *
      * @return true if there is no key object, false otherwise
      */
+    @JsonIgnore
     public boolean isPrefixOnly() {
         return key() == null;
     }

@@ -1,0 +1,21 @@
+rule "digests"
+when
+    base16_encode(value: "graylog") == "677261796C6F67" &&
+    base16_decode(value: "677261796C6F67") == "graylog" &&
+    base16_encode(value: "graylog", omit_padding: true) == "677261796C6F67" &&
+    base16_decode(value: "677261796C6F67", omit_padding: true) == "graylog" &&
+    base32_encode(value: "graylog") == "CTP62UBCDTJG====" &&
+    base32_decode(value: "CTP62UBCDTJG====") == "graylog" &&
+    base32_encode(value: "graylog", omit_padding: true) == "CTP62UBCDTJG" &&
+    base32_decode(value: "CTP62UBCDTJG", omit_padding: true) == "graylog" &&
+    base32human_encode(value: "graylog") == "M5ZGC6LMN5TQ====" &&
+    base32human_decode(value: "M5ZGC6LMN5TQ====") == "graylog" &&
+    base32human_encode(value: "graylog", omit_padding: true) == "M5ZGC6LMN5TQ" &&
+    base32human_decode(value: "M5ZGC6LMN5TQ", omit_padding: true) == "graylog" &&
+    base64_encode(value: "graylog") == "Z3JheWxvZw==" &&
+    base64_decode(value: "Z3JheWxvZw==") == "graylog" &&
+    base64url_encode(value: "graylog", omit_padding: true) == "Z3JheWxvZw" &&
+    base64url_decode(value: "Z3JheWxvZw", omit_padding: true) == "graylog"
+then
+    trigger_test();
+end

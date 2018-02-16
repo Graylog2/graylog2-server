@@ -1,0 +1,9 @@
+rule "split"
+when
+    true
+then
+    set_field("limit_0", split("_", "foo_bar_baz"));
+    set_field("limit_1", split(":", "foo:bar:baz", 1));
+    set_field("limit_2", split("\\|", "foo|bar|baz", 2));
+    trigger_test();
+end

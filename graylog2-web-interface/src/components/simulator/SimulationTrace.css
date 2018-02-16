@@ -1,0 +1,12 @@
+.dl-simulation-trace {
+    padding-top: 15px;
+}
+
+.dl-simulation-trace dt {
+    width: 80px;
+}
+
+.dl-simulation-trace dd {
+    margin-left: 100px;
+    margin-bottom: 5px;
+}

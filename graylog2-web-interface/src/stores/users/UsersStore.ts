@@ -25,6 +25,12 @@ export interface User {
   startpage?: StartPage;
 }
 
+export interface Token {
+  token_name: string;
+  token: string;
+  last_access: string;
+}
+
 export interface ChangePasswordRequest {
   old_password: string;
   password: string;
@@ -92,6 +98,43 @@ export const UsersStore = {
   update(username: string, request: any): void {
     const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.update(encodeURIComponent(username)).url);
     const promise = fetch('PUT', url, request);
+
+    return promise;
+  },
+
+  createToken(username: string, token_name: string): Promise<Token> {
+    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.create_token(encodeURIComponent(username),
+      encodeURIComponent(token_name), ).url);
+    const promise = fetch('POST', url);
+    return promise;
+  },
+
+  deleteToken(username: string, token: string, token_name: string): Promise<string[]> {
+    const  url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.delete_token(encodeURIComponent(username),
+      encodeURIComponent(token)).url, {});
+    const  promise = fetch('DELETE', url);
+
+    promise.then(() => {
+      UserNotification.success("Token \"" + token_name + "\" of user \"" + username + "\" was deleted successfully");
+    }, (error) => {
+      if (error.additional.status !== 404) {
+        UserNotification.error("Delete token \"" + token_name + "\" of user failed with status: " + error,
+          "Could not delete token.");
+      }
+    });
+
+    return promise;
+  },
+
+  loadTokens(username: string): Promise<Token[]> {
+    const url = URLUtils.qualifyUrl(ApiRoutes.UsersApiController.list_tokens(encodeURIComponent(username)).url);
+    const promise = fetch('GET', url)
+      .then(
+        response => response.tokens,
+        (error) => {
+          UserNotification.error("Loading tokens of user failed with status: " + error,
+            "Could not load tokens of user " + username);
+        });
 
     return promise;
   },

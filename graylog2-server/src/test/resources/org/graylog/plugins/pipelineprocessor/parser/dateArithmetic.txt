@@ -1,0 +1,27 @@
+// now() is fixed to "2010-07-30T18:03:25+02:00" to provide a better testing experience
+rule "date math"
+when
+    now() + years(1) > now() &&
+    now() + months(1) > now() &&
+    now() + weeks(1) > now() &&
+    now() + days(1) > now() &&
+    now() + hours(1) > now() &&
+    now() + minutes(1) > now() &&
+    now() + seconds(1) > now() &&
+    now() + millis(1) > now() &&
+    now() + period("P1YT1M") > now() &&
+
+    now() - years(1) < now() &&
+    now() - months(1) < now() &&
+    now() - weeks(1) < now() &&
+    now() - days(1) < now() &&
+    now() - hours(1) < now() &&
+    now() - minutes(1) < now() &&
+    now() - seconds(1) < now() &&
+    now() - millis(1) < now() &&
+    now() - period("P1YT1M") < now()
+
+then
+    set_field("interval", now() - (now() - days(1))); // is a duration of 1 day
+    trigger_test();
+end
