@@ -28,7 +28,7 @@ const MessageShow = React.createClass({
     };
   },
 
-  possiblyHighlight(fieldName) {
+  renderForDisplay(fieldName) {
     // No highlighting for the message details view.
     return StringUtils.stringify(this.props.message.fields[fieldName]);
   },
@@ -40,7 +40,7 @@ const MessageShow = React.createClass({
                                          inputs={this.props.inputs}
                                          streams={this.state.streams}
                                          nodes={this.state.nodes}
-                                         possiblyHighlight={this.possiblyHighlight}
+                                         renderForDisplay={this.renderForDisplay}
                                          showTimestamp />
         </Col>
       </Row>

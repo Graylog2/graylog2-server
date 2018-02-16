@@ -115,9 +115,14 @@ const AuthenticationComponent = React.createClass({
 
     if (authenticators.length === 0) {
       // special case, this is a user editing their own profile
-      authenticators = [<LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(this.state.currentUser.username))}>
-        <NavItem title="Edit User">Edit User</NavItem>
-      </LinkContainer>];
+      authenticators = [
+        <LinkContainer key="profile-edit" to={Routes.SYSTEM.AUTHENTICATION.USERS.edit(encodeURIComponent(this.state.currentUser.username))}>
+          <NavItem title="Edit Profile">Edit Profile</NavItem>
+        </LinkContainer>,
+        <LinkContainer key="profile-edit-tokens" to={Routes.SYSTEM.AUTHENTICATION.USERS.TOKENS.edit(encodeURIComponent(this.state.currentUser.username))}>
+          <NavItem title="Edit Tokens">Edit Tokens</NavItem>
+        </LinkContainer>,
+      ];
     }
     const subnavigation = (
       <Nav stacked bsStyle="pills">

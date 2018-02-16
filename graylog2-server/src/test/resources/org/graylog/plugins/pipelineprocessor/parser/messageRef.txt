@@ -1,0 +1,5 @@
+rule "message field ref"
+when to_long(value: $message.responseCode, default: 200) >= 500
+then
+    set_field(field: "response_category", value: "server_error");
+end

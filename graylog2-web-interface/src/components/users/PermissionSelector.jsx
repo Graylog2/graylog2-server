@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
 
-import { Tabs, Tab, Button, ButtonGroup } from 'react-bootstrap';
+import { Button, ButtonGroup, ButtonToolbar, Tab, Tabs } from 'react-bootstrap';
 
 import { TableList } from 'components/common';
 
@@ -36,11 +36,10 @@ const PermissionSelector = React.createClass({
       const editActionLabel = allEdit ? 'Clear' : 'Set';
 
       return (
-        <div className="pull-right" style={{ marginTop: 10, marginBottom: 10 }}>
+        <ButtonToolbar>
           <Button bsSize="xsmall" bsStyle="info" onClick={() => this._toggleAllStreamsRead(streamIds, allRead)}>{readActionLabel} read permissions</Button>
-          &nbsp;
           <Button bsSize="xsmall" bsStyle="info" onClick={() => this._toggleAllStreamsEdit(streamIds, allEdit)}>{editActionLabel} edit permissions</Button>
-        </div>
+        </ButtonToolbar>
       );
     };
 
@@ -78,22 +77,22 @@ const PermissionSelector = React.createClass({
           <Tab eventKey={1} title="Streams">
             <div style={{ marginTop: 10 }}>
               <TableList
-                items={this.props.streams}
+                items={Immutable.List(this.props.streams)}
                 filterLabel="Filter Streams"
                 filterKeys={['title']}
                 itemActionsFactory={streamItemButtons}
-                headerActionsFactory={multiStreamButtons}
+                bulkActionsFactory={multiStreamButtons}
               />
             </div>
           </Tab>
           <Tab eventKey={2} title="Dashboards">
             <div style={{ marginTop: 10 }}>
               <TableList
-                items={this.props.dashboards}
+                items={Immutable.List(this.props.dashboards)}
                 filterLabel="Filter Dashboards"
                 filterKeys={['title']}
                 itemActionsFactory={dashboardItemButtons}
-                headerActionsFactory={multiDashboardButtons}
+                bulkActionsFactory={multiDashboardButtons}
               />
             </div>
           </Tab>

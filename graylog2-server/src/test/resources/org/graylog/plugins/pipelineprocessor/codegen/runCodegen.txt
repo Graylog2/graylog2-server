@@ -1,0 +1,11 @@
+rule "grok jenkins extraction"
+when
+    to_string($message.source) == "jenkins.torch.sh" &&
+    (regex("#\\d+", to_string($message.message)).matches == true || !has_field("something_that_doesnt_exist"))
+then
+    let number = 1;
+    let string = "sadfasdf";
+    let fields = {some_identifier: 1, `something with spaces`: "some expression"};
+    let ary = [1,3,4,5,"object", string];
+    set_fields(fields);
+end

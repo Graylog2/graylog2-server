@@ -1,0 +1,54 @@
+rule "comparison"
+when
+    is_string("") == true &&
+    is_string("foobar") == true &&
+    is_string(false) == false &&
+    is_string(1000) == false &&
+    is_string(1.234d) == false &&
+
+    is_bool(true) == true &&
+    is_bool(false) == true &&
+    is_bool("foobar") == false &&
+    is_bool(1234) == false &&
+    is_bool(23.42) == false &&
+
+    is_double(23.42) == true &&
+    is_double(23) == false &&
+    is_double(true) == false &&
+    is_double("foobar") == false &&
+
+    is_long(23) == true &&
+    is_long(23.42) == false &&
+    is_long(true) == false &&
+    is_long("foobar") == false &&
+
+    is_number(23) == true &&
+    is_number(23.42) == true &&
+    is_number(true) == false &&
+    is_number("foobar") == false &&
+
+    is_collection(["foobar", "foobaz"]) == true &&
+    is_collection({foo:"bar"}) == false &&
+    is_collection("foobar") == false &&
+    is_collection(true) == false &&
+    is_collection(23) == false &&
+    is_collection(23.42) == false &&
+    is_collection("foobar") == false &&
+
+    is_list(["foobar", "foobaz"]) == true &&
+    is_list({foo:"bar"}) == false &&
+    is_list("foobar") == false &&
+    is_list(true) == false &&
+    is_list(23) == false &&
+    is_list(23.42) == false &&
+    is_list("foobar") == false &&
+
+    is_map({foo:"bar"}) == true &&
+    is_map(["foobar", "foobaz"]) == false &&
+    is_map(true) == false &&
+    is_map(23) == false &&
+    is_map(23.42) == false &&
+    is_map("foobar") == false
+then
+    trigger_test();
+end

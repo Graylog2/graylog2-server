@@ -8,7 +8,7 @@ const MessageFields = React.createClass({
     customFieldActions: PropTypes.node,
     disableFieldActions: PropTypes.bool,
     message: PropTypes.object.isRequired,
-    possiblyHighlight: PropTypes.func.isRequired,
+    renderForDisplay: PropTypes.func.isRequired,
     showDecoration: PropTypes.bool,
   },
 

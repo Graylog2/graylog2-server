@@ -1,0 +1,24 @@
+rule "jsonpath"
+when
+  is_json(parse_json("{}")) == true &&
+  is_json("foobar") == false &&
+  is_json(1234) == false &&
+  is_json(12.34) == false &&
+  is_json(true) == false
+then
+  let x = parse_json(to_string($message.message));
+  let new_fields = select_jsonpath(x,
+            { author_first: "$['store']['book'][0]['author']",
+              author_last: "$['store']['book'][-1:]['author']"
+            });
+  set_fields(new_fields);
+
+  // Don't fail on empty input
+  let invalid_json = parse_json("#FOOBAR#");
+  let invalid_json_fields = select_jsonpath(invalid_json, { some_field: "$.message" });
+  set_fields(invalid_json_fields);
+
+  // Don't fail on missing field
+  let missing_fields = select_jsonpath(x, { some_field: "$.i_dont_exist", this_should_exist: "$['store']['book'][-1:]['author']" });
+  set_fields(missing_fields);
+end

@@ -1,0 +1,4 @@
+rule "cannot add dates"
+when
+    now() + now() == now()
+end

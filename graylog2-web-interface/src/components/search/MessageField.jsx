@@ -9,7 +9,7 @@ const MessageField = React.createClass({
     disableFieldActions: PropTypes.bool,
     fieldName: PropTypes.string.isRequired,
     message: PropTypes.object.isRequired,
-    possiblyHighlight: PropTypes.func.isRequired,
+    renderForDisplay: PropTypes.func.isRequired,
     value: PropTypes.any.isRequired,
   },
   SPECIAL_FIELDS: ['full_message', 'level'],
@@ -38,7 +38,7 @@ const MessageField = React.createClass({
                                  message={this.props.message}
                                  fieldName={key}
                                  fieldValue={innerValue}
-                                 possiblyHighlight={this.props.possiblyHighlight}
+                                 renderForDisplay={this.props.renderForDisplay}
                                  disableFieldActions={this._isAdded(key) || this.props.disableFieldActions}
                                  customFieldActions={this.props.customFieldActions}
                                  isDecorated={this._isDecorated(key)} />

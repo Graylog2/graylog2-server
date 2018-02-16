@@ -319,6 +319,9 @@ const ApiRoutes = {
     load: (username) => { return { url: `/users/${username}` }; },
     delete: (username) => { return { url: `/users/${username}` }; },
     update: (username) => { return { url: `/users/${username}` }; },
+    create_token: (username, tokenName) => { return { url: `/users/${username}/tokens/${tokenName}` }; },
+    delete_token: (username, tokenName) => { return { url: `/users/${username}/tokens/${tokenName}` }; },
+    list_tokens: (username) => { return { url: `/users/${username}/tokens` }; },
   },
   DashboardsController: {
     show: (id) => { return { url: `/dashboards/${id}` }; },

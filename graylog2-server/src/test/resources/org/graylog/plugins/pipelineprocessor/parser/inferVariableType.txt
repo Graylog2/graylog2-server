@@ -1,0 +1,6 @@
+rule "infer"
+when true
+then
+    let x = one_arg("string");
+    one_arg(x);
+end
