@@ -36,6 +36,7 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import org.graylog2.plugin.inputs.codecs.Codec;
 import org.graylog2.plugin.inputs.codecs.CodecAggregator;
 import org.graylog2.plugin.journal.RawMessage;
+import org.graylog2.shared.SuppressForbidden;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
 import org.slf4j.Logger;
@@ -53,6 +54,7 @@ import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
+@SuppressForbidden("Intentionally use system default timezone")
 public class CEFCodec implements Codec {
     public static final String NAME = "CEF";
 
@@ -63,6 +65,8 @@ public class CEFCodec implements Codec {
     private static final String CK_TIMEZONE = "timezone";
     private static final String CK_LOCALE = "locale";
     private static final String CK_USE_FULL_NAMES = "use_full_names";
+
+    private static final DateTimeZone DEFAULT_TIMEZONE = DateTimeZone.getDefault();
 
     private final Configuration configuration;
     private final DateTimeZone timezone;
@@ -80,7 +84,7 @@ public class CEFCodec implements Codec {
             timezone = DateTimeZone.forID(configuration.getString(CK_TIMEZONE));
         } catch (Exception e) {
             LOG.warn("Could not configure CEF input timezone. Falling back to local default. Please check the error message:", e);
-            timezone = DateTimeZone.getDefault();
+            timezone = DEFAULT_TIMEZONE;
         }
         this.timezone = timezone;
         this.locale = Locale.forLanguageTag(configuration.getString(CK_LOCALE, ""));
@@ -204,7 +208,7 @@ public class CEFCodec implements Codec {
             cr.addField(new TextField(
                     CK_TIMEZONE,
                     "Timezone",
-                    DateTimeZone.getDefault().getID(),
+                    DEFAULT_TIMEZONE.getID(),
                     "Timezone of the timestamps in CEF messages. Set this to the local timezone if in doubt. Format example: \"+01:00\" or \"America/Chicago\"",
                     ConfigurationField.Optional.NOT_OPTIONAL
             ));
