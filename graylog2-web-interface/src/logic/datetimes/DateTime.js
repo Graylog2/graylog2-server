@@ -60,7 +60,15 @@ class DateTime {
   }
 
   static getUserTimezone() {
-    return currentUser ? currentUser.timezone : AppConfig.rootTimeZone();
+    if (currentUser && currentUser.timezone) {
+      return currentUser.timezone;
+    } else {
+      return this.getBrowserTimezone() || AppConfig.rootTimeZone() || 'UTC';
+    }
+  }
+
+  static getBrowserTimezone() {
+    return moment.tz.guess();
   }
 
   constructor(dateTime) {

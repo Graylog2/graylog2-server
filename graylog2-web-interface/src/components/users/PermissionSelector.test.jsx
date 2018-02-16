@@ -2,18 +2,9 @@ import React from 'react';
 import renderer from 'react-test-renderer';
 import Immutable from 'immutable';
 import { mount } from 'enzyme';
+import 'helpers/mocking/react-dom_mock';
 
 import PermissionSelector from 'components/users/PermissionSelector';
-
-/* https://github.com/facebook/react/issues/7371
- *
- * findDomNode with refs is not supported by the react-test-renderer.
- * So we need to mock the findDOMNode function for TableList respectievly
- * for its child component TypeAheadDataFilter.
- */
-jest.mock('react-dom', () => ({
-  findDOMNode: () => ({}),
-}));
 
 describe('<PermissionSelector />', () => {
   const streams = Immutable.List([

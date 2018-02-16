@@ -1,0 +1,6 @@
+rule "incompatible numeric types inference"
+when
+    1.0 + 10 == 11   // error: no automatic long -> double conversion!
+then
+    trigger_test();
+end

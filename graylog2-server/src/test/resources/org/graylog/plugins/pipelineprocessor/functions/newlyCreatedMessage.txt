@@ -1,0 +1,12 @@
+rule "operate on newly created message"
+when true
+then
+  let x = create_message("new", "synthetic", now());
+
+  set_field(field: "removed_again", value: "foo", message: x);
+  set_field(field: "only_in", value: "new message", message: x);
+  set_fields(fields: { multi: "new message" }, message: x);
+  set_field(field: "has_source", value: has_field("source", x), message: x);
+  route_to_stream(name: "some stream", message: x);
+  remove_field("removed_again", x);
+end

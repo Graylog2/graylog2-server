@@ -1,0 +1,8 @@
+rule "fieldRenaming"
+when true
+then
+
+    rename_field("no_such_field", "field_1");
+    rename_field("field_a", "field_2");
+    rename_field("field_b", "field_b");
+end

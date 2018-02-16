@@ -1,0 +1,5 @@
+rule "operate on cloned message"
+when true
+then
+  let cloned = clone_message();
+end

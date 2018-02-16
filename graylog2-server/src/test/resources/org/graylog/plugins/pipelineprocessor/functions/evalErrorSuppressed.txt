@@ -1,0 +1,6 @@
+rule "suppressing exceptions/nulls"
+when
+    is_null(to_ip($message.does_not_exist, "d.f.f.f")) && is_not_null($message.this_field_was_set)
+then
+    trigger_test();
+end

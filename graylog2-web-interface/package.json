@@ -123,6 +123,7 @@
     "less": "^2.5.3",
     "less-loader": "^4.0.5",
     "phantomjs-prebuilt": ">=1.9",
+    "react-immutable-proptypes": "^2.1.0",
     "react-proxy-loader": "^0.3.4",
     "react-styleguidist": "^6.0.33",
     "react-test-renderer": "^15.6.1",

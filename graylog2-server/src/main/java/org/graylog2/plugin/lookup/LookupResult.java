@@ -16,6 +16,8 @@
  */
 package org.graylog2.plugin.lookup;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.auto.value.AutoValue;
 import org.graylog2.lookup.LookupDefaultMultiValue;
@@ -25,6 +27,19 @@ import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Map;
 
+/**
+ * The result of looking up a key in a lookup table (i. e. lookup data adapter or lookup cache).
+ * <p>
+ * For convenience, this class can be serialized and deserialized with Jackson (see
+ * {@link com.fasterxml.jackson.databind.ObjectMapper}, but we strongly recommend implementing your own
+ * serialization and deserialization logic if you're implementing a lookup cache.
+ * <p>
+ * There are <em>no guarantees</em> about binary compatibility of this class across Graylog releases!
+ *
+ * @see LookupDataAdapter#get(Object)
+ * @see LookupCache#get(LookupCacheKey, java.util.concurrent.Callable)
+ * @see LookupCacheKey
+ */
 @AutoValue
 public abstract class LookupResult {
     private static final LookupResult EMPTY_LOOKUP_RESULT = builder()
@@ -44,7 +59,7 @@ public abstract class LookupResult {
     @JsonProperty("ttl")
     public abstract long cacheTTL();
 
-    @JsonProperty("empty")
+    @JsonIgnore
     public boolean isEmpty() {
         return singleValue() == null && multiValue() == null;
     }
@@ -104,6 +119,18 @@ public abstract class LookupResult {
 
             return builder.build();
     }
+
+    @JsonCreator
+    public static LookupResult createFromJSON(@JsonProperty("single_value") final Object singleValue,
+                                              @JsonProperty("multi_value") final Map<Object, Object> multiValue,
+                                              @JsonProperty("ttl") final long cacheTTL) {
+        return builder()
+                .singleValue(singleValue)
+                .multiValue(multiValue)
+                .cacheTTL(cacheTTL)
+                .build();
+    }
+
 
     public static Builder withoutTTL() {
         return builder().cacheTTL(Long.MAX_VALUE);
