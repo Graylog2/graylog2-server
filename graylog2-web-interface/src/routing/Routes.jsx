@@ -121,13 +121,6 @@ const Routes = {
         edit: adapterName => `/system/lookuptables/data_adapter/${adapterName}/edit`,
       },
     },
-    PIPELINES: {
-      OVERVIEW: '/system/pipelines',
-      PIPELINE: pipelineId => `/system/pipelines/${pipelineId}`,
-      RULES: '/system/pipelines/rules',
-      RULE: ruleId => `/system/pipelines/rules/${ruleId}`,
-      SIMULATOR: '/system/pipelines/simulate',
-    }
   },
   search_with_query: (query, rangeType, timeRange) => {
     const route = new URI(Routes.SEARCH);

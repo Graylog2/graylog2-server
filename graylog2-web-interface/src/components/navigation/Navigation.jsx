@@ -84,9 +84,6 @@ const Navigation = React.createClass({
     if (this._isActive('/system/configurations')) {
       return `${prefix} / Configurations`;
     }
-    if (this._isActive('/system/pipelines')) {
-      return `${prefix} / Pipelines`;
-    }
 
     const pluginRoute = PluginStore.exports('systemnavigation').filter(route => this._isActive(route.path))[0];
     if (pluginRoute) {
@@ -234,11 +231,6 @@ const Navigation = React.createClass({
               {this.isPermitted(this.props.permissions, ['inputs:edit']) &&
               <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>
                 <MenuItem>Lookup Tables</MenuItem>
-              </LinkContainer>
-              }
-              {this.isPermitted(this.props.permissions, ['inputs:create']) &&
-              <LinkContainer to={Routes.SYSTEM.PIPELINES.OVERVIEW}>
-                <MenuItem>Pipelines</MenuItem>
               </LinkContainer>
               }
               {pluginSystemNavigations}
