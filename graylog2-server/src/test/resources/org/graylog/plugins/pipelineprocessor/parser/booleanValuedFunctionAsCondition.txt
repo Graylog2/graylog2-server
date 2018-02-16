@@ -1,5 +1,0 @@
-rule "bool function as top level"
-when doch()
-then
-    trigger_test();
-end

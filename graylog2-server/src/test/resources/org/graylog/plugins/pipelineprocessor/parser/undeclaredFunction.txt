@@ -1,4 +1,0 @@
-rule "undeclared function"
-when false == unknown()
-then
-end

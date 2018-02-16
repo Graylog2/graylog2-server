@@ -1,6 +1,0 @@
-rule "booleanNot"
-when
-    !false == false
-then
-    trigger_test();
-end

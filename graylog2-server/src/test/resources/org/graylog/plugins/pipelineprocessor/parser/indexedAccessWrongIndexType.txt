@@ -1,6 +1,0 @@
-rule "indexed array and map access"
-when
-    ["first"][true] == "first"
-then
-    trigger_test();
-end
