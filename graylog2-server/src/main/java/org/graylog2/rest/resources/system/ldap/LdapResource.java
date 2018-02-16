@@ -137,9 +137,21 @@ public class LdapResource extends RestResource {
             config.setTrustManagers(new TrustAllX509TrustManager());
         }
 
-        if (!isNullOrEmpty(request.systemUsername()) && !isNullOrEmpty(request.systemPassword())) {
+        if (!isNullOrEmpty(request.systemUsername())) {
             config.setName(request.systemUsername());
-            config.setCredentials(request.systemPassword());
+
+            if (!isNullOrEmpty(request.systemPassword())) {
+                // Use the given password for the connection test
+                config.setCredentials(request.systemPassword());
+            } else {
+                // If the config request has a username but no password set, we have to use the password from the database.
+                // This is because we don't expose the plain-text password through the API anymore and the settings form
+                // doesn't submit a password.
+                final LdapSettings ldapSettings = ldapSettingsService.load();
+                if (ldapSettings != null && !isNullOrEmpty(ldapSettings.getSystemPassword())) {
+                    config.setCredentials(ldapSettings.getSystemPassword());
+                }
+            }
         }
 
         LdapNetworkConnection connection = null;
