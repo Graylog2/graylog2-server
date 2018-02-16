@@ -16,7 +16,7 @@ const globOptions = {
   nodir: true,
 };
 
-const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern, globOptions);
+const pluginConfigs = process.env.disable_plugins === 'true' ? [] : glob.sync(pluginConfigPattern, globOptions).map(config => `${globCwd}/${config}`);
 
 process.env.web_src_path = path.resolve(__dirname);
 
