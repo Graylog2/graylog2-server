@@ -1,0 +1,13 @@
+rule "digests"
+when
+    crc32("graylog") == "e3018c57" &&
+    crc32c("graylog") == "82390e89" &&
+    md5("graylog") == "6f9efb466e043b9f3635827ce446e13c" &&
+    murmur3_32("graylog") == "67285534" &&
+    murmur3_128("graylog") == "945d5b1aaa8fdfe9b880b31e814972b3" &&
+    sha1("graylog") == "6d88bccf40bf65b911fe79d78c7af98e382f0c1a" &&
+    sha256("graylog") == "4bbdd5a829dba09d7a7ff4c1367be7d36a017b4267d728d31bd264f63debeaa6" &&
+    sha512("graylog") == "f6cb3a96450fb9c9174299a651333c926cd67b6f5c25d8daeede1589ffa006f4dd31da4f0625b7f281051a34c8352b3a9c1a9babf90020360e911a380b5c3f4f"
+then
+    trigger_test();
+end

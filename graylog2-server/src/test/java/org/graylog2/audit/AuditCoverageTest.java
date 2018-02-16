@@ -18,6 +18,7 @@ package org.graylog2.audit;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEvent;
 import org.graylog2.audit.jersey.NoAuditEvent;
 import org.junit.Test;
@@ -41,7 +42,11 @@ public class AuditCoverageTest {
         final ConfigurationBuilder configurationBuilder = new ConfigurationBuilder()
                 .setUrls(ClasspathHelper.forPackage("org.graylog2"))
                 .setScanners(new MethodAnnotationsScanner());
-        final Set<String> auditEventTypes = new AuditEventTypes().auditEventTypes();
+        // TODO: Dynamically discover event types?
+        final Set<String> auditEventTypes = ImmutableSet.<String>builder()
+                .addAll(new AuditEventTypes().auditEventTypes())
+                .addAll(new PipelineProcessorAuditEventTypes().auditEventTypes())
+                .build();
         final Reflections reflections = new Reflections(configurationBuilder);
 
         final ImmutableSet.Builder<Method> methods = ImmutableSet.builder();

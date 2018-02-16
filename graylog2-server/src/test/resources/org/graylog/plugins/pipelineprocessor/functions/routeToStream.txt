@@ -1,0 +1,5 @@
+rule "stream routing"
+when true
+then
+    route_to_stream(name: "some name");
+end
