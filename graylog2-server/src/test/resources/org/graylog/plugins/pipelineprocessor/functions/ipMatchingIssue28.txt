@@ -1,0 +1,6 @@
+rule "IP subnet"
+when
+  cidr_match("10.20.30.0/24", to_ip($message.source))
+then
+  trigger_test();
+end

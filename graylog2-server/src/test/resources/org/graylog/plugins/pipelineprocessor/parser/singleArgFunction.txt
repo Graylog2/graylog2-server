@@ -1,0 +1,5 @@
+rule "single arg"
+when one_arg("arg") == one_arg(one: "arg")
+then
+    trigger_test();
+end

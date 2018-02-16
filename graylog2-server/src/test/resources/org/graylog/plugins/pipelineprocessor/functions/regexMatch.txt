@@ -1,0 +1,13 @@
+rule "regexMatch"
+when
+    regex("^.*(cde\\.)(:(\\d+))?.*$", "abcde.fg").matches == true &&
+    regex(".*(cde\\.)(:(\\d+))?.*", "abcde.fg").matches == true &&
+    regex("(cde\\.)(:(\\d+))?", "abcde.fg").matches == true &&
+    regex("^(cde\\.)(:(\\d+))?$", "abcde.fg").matches == false
+then
+    let result = regex("(cd\\.e)", "abcd.efg");
+    set_field("group_1", result["0"]);
+    let result = regex("(cd\\.e)", "abcd.efg", ["name"]);
+    set_field("named_group", result["name"]);
+    set_field("matched_regex", result.matches);
+end

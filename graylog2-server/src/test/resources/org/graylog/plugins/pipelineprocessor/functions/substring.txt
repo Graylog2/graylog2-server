@@ -1,0 +1,15 @@
+rule "substrings"
+when
+    substring("abc", 0, 2)   == "ab" &&
+    substring("abc", 0, 2)   == "ab" &&
+    substring("abc", 2, 0)   == ""   &&
+    substring("abc", 2, 4)   == "c"  &&
+    substring("abc", 4, 6)   == ""   &&
+    substring("abc", 2, 2)   == ""   &&
+    substring("abc", -2, -1) == "b"  &&
+    substring("abc", -4, 2)  == "ab" &&
+    substring("abc", 1)      == "bc" &&
+    substring("abc", 0, -1)  == "ab"
+then
+    trigger_test();
+end
