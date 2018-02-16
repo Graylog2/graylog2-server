@@ -23,7 +23,7 @@ const MessageDetail = React.createClass({
     expandAllRenderAsync: PropTypes.bool,
     showTimestamp: PropTypes.bool,
     disableFieldActions: PropTypes.bool,
-    possiblyHighlight: PropTypes.func,
+    renderForDisplay: PropTypes.func,
     inputs: PropTypes.object,
     nodes: PropTypes.object,
     message: PropTypes.object,
@@ -263,7 +263,7 @@ const MessageDetail = React.createClass({
         <Col md={9}>
           <div ref="messageList">
             <MessageFields message={this.props.message}
-                           possiblyHighlight={this.props.possiblyHighlight}
+                           renderForDisplay={this.props.renderForDisplay}
                            disableFieldActions={this.props.disableFieldActions}
                            customFieldActions={this.props.customFieldActions}
                            showDecoration={this.state.showOriginal}

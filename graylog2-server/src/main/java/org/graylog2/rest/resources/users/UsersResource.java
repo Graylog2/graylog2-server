@@ -524,7 +524,7 @@ public class UsersResource extends RestResource {
                 user.getFullName(),
                 includePermissions ? userService.getPermissionsForUser(user) : Collections.emptyList(),
                 user.getPreferences(),
-                firstNonNull(user.getTimeZone(), DateTimeZone.UTC).getID(),
+                user.getTimeZone() == null ? null : user.getTimeZone().getID(),
                 user.getSessionTimeoutMs(),
                 user.isReadOnly(),
                 user.isExternalUser(),

@@ -20,7 +20,7 @@ const MessageFieldDescription = React.createClass({
     message: PropTypes.object.isRequired,
     fieldName: PropTypes.string.isRequired,
     fieldValue: PropTypes.any.isRequired,
-    possiblyHighlight: PropTypes.func.isRequired,
+    renderForDisplay: PropTypes.func.isRequired,
     disableFieldActions: PropTypes.bool,
     customFieldActions: PropTypes.node,
     isDecorated: PropTypes.bool,
@@ -79,7 +79,7 @@ const MessageFieldDescription = React.createClass({
     return (
       <dd className={className} key={`${this.props.fieldName}dd`}>
         {this._getFormattedFieldActions()}
-        <div className="field-value">{this.props.possiblyHighlight(this.props.fieldName)}</div>
+        <div className="field-value">{this.props.renderForDisplay(this.props.fieldName)}</div>
         {this._shouldShowTerms() &&
         <Alert bsStyle="info" onDismiss={() => this.setState({ messageTerms: Immutable.Map() })}>
           Field terms: &nbsp;{this._getFormattedTerms()}
