@@ -5,12 +5,14 @@ import { Row, Col, Button, Panel } from 'react-bootstrap';
 import URI from 'urijs';
 import naturalSort from 'javascript-natural-sort';
 
-import { Input } from 'components/bootstrap';
+import { Input, InputWrapper } from 'components/bootstrap';
+import { FormGroup, ControlLabel } from 'react-bootstrap';
 import { MultiSelect, Spinner } from 'components/common';
 import ObjectUtils from 'util/ObjectUtils';
 
 import TestLdapConnection from './TestLdapConnection';
 import TestLdapLogin from './TestLdapLogin';
+import LdapComponentStyle from './LdapComponent.css';
 
 import StoreProvider from 'injection/StoreProvider';
 const RolesStore = StoreProvider.getStore('Roles');
@@ -141,6 +143,7 @@ const LdapComponent = React.createClass({
       ldapSettings: undefined,
       ldapUri: undefined,
       roles: undefined,
+      showPasswordInput: true,
     };
   },
 
@@ -167,7 +170,7 @@ const LdapComponent = React.createClass({
     // Clone settings object, so we don't the store reference
     const settings = ObjectUtils.clone(state.ldapSettings);
     const ldapUri = new URI(settings.ldap_uri);
-    this.setState({ ldapSettings: settings, ldapUri: ldapUri });
+    this.setState({ ldapSettings: settings, ldapUri: ldapUri, hidePasswordInput: settings.system_password_set });
   },
 
   _isLoading() {
@@ -250,6 +253,10 @@ const LdapComponent = React.createClass({
     this.props.onShowGroups();
   },
 
+  _showPasswordInput() {
+    this.setState({hidePasswordInput: false});
+  },
+
   render() {
     if (this._isLoading()) {
       return <Spinner />;
@@ -260,6 +267,26 @@ const LdapComponent = React.createClass({
     const help = isAD ? HelperText.activeDirectory : HelperText.ldap;
 
     const rolesOptions = this.state.roles;
+
+    const ldapPasswordInput = this.state.hidePasswordInput ?
+      (<FormGroup controlId="system_password">
+        <ControlLabel className="col-sm-3">System Password</ControlLabel>
+        <InputWrapper className="col-sm-9">
+          <span className={LdapComponentStyle.passwordSet}>Password is set</span>
+          <Button onClick={this._showPasswordInput} >Reset Password</Button>
+        </InputWrapper>
+      </FormGroup>) :
+      (<Input type="password"
+             id="system_password"
+             name="system_password"
+             labelClassName="col-sm-3"
+             wrapperClassName="col-sm-9"
+             placeholder="System Password"
+             label="System Password"
+             value={this.state.ldapSettings.system_password}
+             help={help.SYSTEM_PASSWORD}
+             onChange={this._bindValue}
+             disabled={disabled} />);
 
     return (
       <Row>
@@ -331,10 +358,7 @@ const LdapComponent = React.createClass({
                      value={this.state.ldapSettings.system_username} help={help.SYSTEM_USERNAME}
                      onChange={this._bindValue} disabled={disabled} />
 
-              <Input type="password" id="system_password" name="system_password" labelClassName="col-sm-3"
-                     wrapperClassName="col-sm-9" placeholder="System Password" label="System Password"
-                     value={this.state.ldapSettings.system_password} help={help.SYSTEM_PASSWORD}
-                     onChange={this._bindValue} disabled={disabled} />
+              {ldapPasswordInput}
             </fieldset>
 
             <fieldset>

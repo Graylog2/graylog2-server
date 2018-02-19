@@ -639,6 +639,12 @@
                 <version>${okhttp.version}</version>
                 <scope>test</scope>
             </dependency>
+            <dependency>
+                <groupId>io.pkts</groupId>
+                <artifactId>pkts-core</artifactId>
+                <version>${pkts.version}</version>
+                <scope>test</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
