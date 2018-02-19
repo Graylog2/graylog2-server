@@ -24,6 +24,7 @@ import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.spi.Message;
 import com.mongodb.MongoException;
+import org.graylog.plugins.netflow.NetFlowPluginModule;
 import org.graylog.plugins.pipelineprocessor.PipelineConfig;
 import org.graylog2.Configuration;
 import org.graylog2.alerts.AlertConditionBindings;
@@ -136,7 +137,8 @@ public class Server extends ServerBootstrap {
             new AuditBindings(),
             new AlertConditionBindings(),
             new IndexerBindings(),
-            new MigrationsModule()
+            new MigrationsModule(),
+            new NetFlowPluginModule()
         );
 
         return modules.build();
