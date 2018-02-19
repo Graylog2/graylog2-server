@@ -17,6 +17,7 @@
 package org.graylog2.migrations;
 
 import com.google.common.collect.Maps;
+
 import com.mongodb.BasicDBObject;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.dashboards.Dashboard;
@@ -67,14 +68,16 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
 
         Map<String, String> dashboardIds = Maps.newHashMap();
         for (Dashboard dashboard : dashboardService.all()) {
-            BasicDBObject posistions = (BasicDBObject) dashboard.getFields().get(DashboardImpl.EMBEDDED_POSITIONS);
-            if (posistions == null) {
+            BasicDBObject fields = (BasicDBObject) dashboard.getFields();
+            BasicDBObject positions = (BasicDBObject) fields.get(DashboardImpl.EMBEDDED_POSITIONS);
+            if (positions == null) {
                 dashboardIds.put(dashboard.getId(), "skipped");
                 continue;
             }
             Map<String, Map<String, Object>> newPosition = Maps.newHashMap();
-            for ( String positionId : posistions.keySet() ) {
-                BasicDBObject position = (BasicDBObject)posistions.get(positionId);
+
+            for ( String positionId : positions.keySet() ) {
+                BasicDBObject position = (BasicDBObject) positions.get(positionId);
                 Integer newWidth = parseInt(position.get("width").toString()) * 2;
                 Integer newHeight = parseInt(position.get("height").toString()) * 2;
                 Integer newCol = adjustPosition(parseInt(position.get("col").toString()));
