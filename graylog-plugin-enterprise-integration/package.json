@@ -1,0 +1,22 @@
+{
+  "name": "EnterpriseIntegration",
+  "version": "3.0.0-SNAPSHOT",
+  "description": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Graylog2/graylog-plugin-enterprise-integration"
+  },
+  "scripts": {
+    "build": "webpack --bail"
+  },
+  "keywords": [
+    "graylog"
+  ],
+  "author": "Edmundo Alvarez <edmundo@graylog.com>",
+  "license": "GPL-3.0",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "graylog-web-plugin": "file:../graylog2-server/graylog2-web-interface/packages/graylog-web-plugin"
+  }
+}
