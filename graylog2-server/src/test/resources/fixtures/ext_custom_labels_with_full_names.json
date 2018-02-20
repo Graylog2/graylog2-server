@@ -1,0 +1,21 @@
+{
+  "testString": "CEF:0|security|threatmanager|1.0|100|name|10|dvc=ip-172-30-2-212 c6a1=fe80::5626:96ff:fed0:943 c6a1Label=TestTest foobar=quux",
+  "description": "Support custom labels with full names",
+  "codecConfiguration": {
+    "use_full_names": true
+  },
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "ip-172-30-2-212",
+  "cefVersion": 0,
+  "deviceVendor": "security",
+  "deviceProduct": "threatmanager",
+  "deviceVersion": "1.0",
+  "deviceEventClassId": "100",
+  "name": "name",
+  "severity": "10",
+  "extensions": {
+    "deviceAddress": "ip-172-30-2-212",
+    "TestTest": "fe80::5626:96ff:fed0:943",
+    "foobar": "quux"
+  }
+}

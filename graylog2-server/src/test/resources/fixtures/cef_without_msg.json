@@ -1,0 +1,20 @@
+{
+  "testString": "CEF:0|Trend Micro Inc.|OSSEC HIDS|v2.8.3|2502|User missed the password more than one time|10|dvc=ip-172-30-2-212 cs2=ip-172-30-2-212->/var/log/auth.log cs2Label=Location cfp2=90.01 cfp2Label=SomeFloat spt=22",
+  "description": "Raw CEF message without \"msg\" extension",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "ip-172-30-2-212",
+  "cefVersion": 0,
+  "deviceVendor": "Trend Micro Inc.",
+  "deviceProduct": "OSSEC HIDS",
+  "deviceVersion": "v2.8.3",
+  "deviceEventClassId": "2502",
+  "name": "User missed the password more than one time",
+  "severity": "10",
+  "extensions": {
+    "dvc": "ip-172-30-2-212",
+    "spt": 22,
+    "SomeFloat": 90.01,
+    "Location": "ip-172-30-2-212->/var/log/auth.log"
+  }
+}
+

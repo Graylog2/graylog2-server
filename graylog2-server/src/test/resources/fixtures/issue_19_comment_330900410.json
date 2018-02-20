@@ -1,0 +1,16 @@
+{
+  "testString": "CEF:0|Unix|Unix||arcsight:143:22|Created slice|Low| eventId=212113 msg=Created slice user-994.slice catdt=Operating System art=1505922484252 deviceSeverity=info act=Created rt=1505922481000 dhost=centos7 dst=10.11.3.170 destinationZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 10.0.0.0-10.255.255.255 cs1=systemd cs2=daemon cs1Label=Module cs2Label=Facility cn1Label=File Descriptor ahost=centos7 agt=10.11.3.170 agentZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 10.0.0.0-10.255.255.255 amac=00-50-56-8E-C0-90 av=7.6.0.8009.0 atz=America/Argentina/Buenos_Aires at=syslog dvchost=centos7 dvc=10.11.3.170 deviceZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 10.0.0.0-10.255.255.255 dtz=America/Argentina/Buenos_Aires deviceFacility=daemon deviceProcessName=systemd _cefVer=0.1 ad.slice=user-994.slice aid=3SNQJV10BABCAIi+-ZH5gxQ\\=\\=",
+  "description": "https://github.com/Graylog2/graylog-plugin-cef/issues/19#issuecomment-330900410",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "10.11.3.170",
+  "cefVersion": 0,
+  "deviceVendor": "Unix",
+  "deviceProduct": "Unix",
+  "deviceEventClassId": "arcsight:143:22",
+  "name": "Created slice",
+  "severity": "Low",
+  "extensions": {
+    "eventId": 212113,
+    "msg": "Created slice user-994.slice"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "testString": "Sep 19 08:26:10 example.com CEF:0|security|threatmanager|1.0|100|detected a threat in message|10|src=10.0.0.1 dst=1.1.1.1",
+  "description": "CEF message with syslog header (timestamp and hostname)",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "example.com",
+  "cefVersion": 0,
+  "deviceVendor": "security",
+  "deviceProduct": "threatmanager",
+  "deviceVersion": "1.0",
+  "deviceEventClassId": "100",
+  "name": "detected a threat in message",
+  "severity": "10",
+  "extensions": {
+    "src": "10.0.0.1",
+    "dst": "1.1.1.1"
+  }
+}
