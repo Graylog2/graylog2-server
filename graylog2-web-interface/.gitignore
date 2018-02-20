@@ -12,3 +12,4 @@ manifests/*-manifest.json
 plugin
 cache
 
+__snapshots__/
