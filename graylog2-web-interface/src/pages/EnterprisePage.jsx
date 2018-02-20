@@ -3,7 +3,7 @@ import Reflux from 'reflux';
 
 import { DocumentTitle, PageHeader } from 'components/common';
 import { GraylogClusterOverview } from 'components/cluster';
-import PluginList from './PluginList';
+import PluginList from 'components/enterprise/PluginList';
 
 import StoreProvider from 'injection/StoreProvider';
 const NodesStore = StoreProvider.getStore('Nodes');

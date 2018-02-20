@@ -87,6 +87,9 @@ const Navigation = React.createClass({
     if (this._isActive('/system/pipelines')) {
       return `${prefix} / Pipelines`;
     }
+    if (this._isActive('/system/enterprise')) {
+      return `${prefix} / Enterprise`;
+    }
 
     const pluginRoute = PluginStore.exports('systemnavigation').filter(route => this._isActive(route.path))[0];
     if (pluginRoute) {
@@ -241,6 +244,9 @@ const Navigation = React.createClass({
                 <MenuItem>Pipelines</MenuItem>
               </LinkContainer>
               }
+              <LinkContainer to={Routes.SYSTEM.ENTERPRISE}>
+                  <MenuItem>Enterprise</MenuItem>
+              </LinkContainer>
               {pluginSystemNavigations}
             </NavDropdown>
           </Nav>

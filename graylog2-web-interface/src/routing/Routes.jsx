@@ -127,7 +127,8 @@ const Routes = {
       RULES: '/system/pipelines/rules',
       RULE: ruleId => `/system/pipelines/rules/${ruleId}`,
       SIMULATOR: '/system/pipelines/simulate',
-    }
+    },
+    ENTERPRISE: '/system/enterprise',
   },
   search_with_query: (query, rangeType, timeRange) => {
     const route = new URI(Routes.SEARCH);
