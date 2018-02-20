@@ -7,7 +7,7 @@ import { PluginManifest, PluginStore } from 'graylog-web-plugin/plugin';
 import FieldStatistics from './FieldStatistics';
 import FieldQuickValues from './FieldQuickValues';
 import FieldGraphs from './FieldGraphs';
-import {} from 'components/maps/field-analyzers';
+import FieldAnalyzerMapComponent from 'components/maps/field-analyzers/FieldAnalyzerMapComponent';
 
 const pluginManifest = new PluginManifest({}, {
   fieldAnalyzers: [
@@ -28,6 +28,12 @@ const pluginManifest = new PluginManifest({}, {
       displayName: 'Generate chart',
       component: FieldGraphs,
       displayPriority: 0,
+    },
+    {
+      refId: 'fieldAnalyzerMapComponent',
+      displayName: 'World Map',
+      component: FieldAnalyzerMapComponent,
+      displayPriority: 100,
     },
   ],
 });
