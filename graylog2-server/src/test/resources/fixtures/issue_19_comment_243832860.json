@@ -1,0 +1,17 @@
+{
+  "testString": "CEF:0|Unix|Unix||arcsight:143:1|Started Session|Low| eventId=31 msg=Started Session 21 of user root categorySignificance=/Informational categoryBehavior=/Access/Start categoryDeviceGroup=/Operating System catdt=Operating System categoryOutcome=/Success categoryObject=/Host/Application/Service art=1500404470493 deviceSeverity=info act=Started rt=1500404461000 suser=root dhost=centos7 cs1=systemd cs2=daemon cs1Label=Module cs2Label=Facility cn1Label=File Descriptor ahost=centos7.neolab agt=10.11.3.170 agentZoneURI=/All Zones/ArcSight System/Private Address Space Zones/RFC1918: 10.0.0.0-10.255.255.255 amac=00-50-56-8E-C0-90 av=7.6.0.8009.0 atz=America/Argentina/Buenos_Aires at=syslog dvchost=centos7 dtz=America/Argentina/Buenos_Aires deviceFacility=daemon deviceProcessName=systemd _cefVer=0.1 aid=3SNQJV10BABCAIi+-ZH5gxQ\\=\\=",
+  "description": "https://github.com/Graylog2/graylog-plugin-cef/issues/19#issue-243832860",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "/127.0.0.1",
+  "cefVersion": 0,
+  "deviceVendor": "Unix",
+  "deviceProduct": "Unix",
+  "deviceVersion": null,
+  "deviceEventClassId": "arcsight:143:1",
+  "name": "Started Session",
+  "severity": "Low",
+  "extensions": {
+    "eventId": 31,
+    "msg": "Started Session 21 of user root"
+  }
+}

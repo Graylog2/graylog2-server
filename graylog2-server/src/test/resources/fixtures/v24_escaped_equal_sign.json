@@ -1,0 +1,19 @@
+{
+  "testString": "CEF:0|security|threatmanager|1.0|100|detected a = in message|10|src=10.0.0.1 act=blocked a \\= dst=1.1.1.1",
+  "description": "If an equal sign (=) is used in the extensions, it has to be escaped with a backslash (\\). Equal signs in the header need no escaping.",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "/127.0.0.1",
+  "cefVersion": 0,
+  "deviceVendor": "security",
+  "deviceProduct": "threatmanager",
+  "deviceVersion": "1.0",
+  "deviceEventClassId": "100",
+  "name": "detected a = in message",
+  "severity": "10",
+  "extensions": {
+    "src": "10.0.0.1",
+    "dst": "1.1.1.1",
+    "act": "blocked a ="
+  }
+}
+

@@ -1,0 +1,29 @@
+{
+  "testString": "Sep 10 16:03:01 172.30.0.20 ASM:CEF:0|F5|ASM|11.0.0|Web Scraping Attack|Web Scraping Attack|8|dvchost=3600.lab.asm.f5net.com dvc=172.30.0.20 cs1=maui_app_default cs1Label=policy_name cs2=maui_app cs2Label=web_application_name deviceCustomDate1=Sep 10 2010 15:58:23 deviceCustomDate1Label=policy_apply_date act=Blocked cn3=3263585818 cn3Label=attack_id cs4=Ongoing cs4Label=attack_status src=192.168.74.216 cs6=N/A cs6Label=geo_location rt=Sep 10 2010 16:03:00 cn2=0 cn2Label=dropped_requests cnt=0",
+  "description": "Web Scraping Attack message sample - https://www.f5.com/images/solution-center/arcsight-f5-asm-certified-cef-onfiguration-guide.pdf#page=10",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "172.30.0.20",
+  "cefVersion": 0,
+  "deviceVendor": "F5",
+  "deviceProduct": "ASM",
+  "deviceVersion": "11.0.0",
+  "deviceEventClassId": "Web Scraping Attack",
+  "name": "Web Scraping Attack",
+  "severity": "8",
+  "extensions": {
+    "dvchost": "3600.lab.asm.f5net.com",
+    "dvc": "172.30.0.20",
+    "policy_name": "maui_app_default",
+    "web_application_name": "maui_app",
+    "policy_apply_date": "2010-09-10T15:58:23Z",
+    "act": "Blocked",
+    "attack_id": 3263585818,
+    "attack_status": "Ongoing",
+    "src": "192.168.74.216",
+    "geo_location": "N/A",
+    "rt": "2010-09-10T16:03:00Z",
+    "dropped_requests": 0,
+    "cnt": 0
+  }
+}
+

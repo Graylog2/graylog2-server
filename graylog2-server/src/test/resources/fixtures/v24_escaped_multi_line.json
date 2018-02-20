@@ -1,0 +1,19 @@
+{
+  "testString": "CEF:0|security|threatmanager|1.0|100|Detected a threat. No action needed.|10|src=10.0.0.1 custom=foo\\rbar msg=Detected a threat.\\nNo action needed.",
+  "description": "Multi-line fields can be sent by CEF by encoding the newline character as \\n or \\r. Note that multiple lines are only allowed in the value part of the extensions.",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "/127.0.0.1",
+  "cefVersion": 0,
+  "deviceVendor": "security",
+  "deviceProduct": "threatmanager",
+  "deviceVersion": "1.0",
+  "deviceEventClassId": "100",
+  "name": "Detected a threat. No action needed.",
+  "severity": "10",
+  "extensions": {
+    "src": "10.0.0.1",
+    "custom": "foo\rbar",
+    "msg": "Detected a threat.\nNo action needed."
+  }
+}
+

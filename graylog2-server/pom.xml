@@ -494,6 +494,10 @@
             <artifactId>geoip2</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.graylog.cef</groupId>
+            <artifactId>cef-parser</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.antlr</groupId>
             <artifactId>antlr4-runtime</artifactId>
         </dependency>

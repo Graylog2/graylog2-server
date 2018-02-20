@@ -1,0 +1,18 @@
+{
+  "testString": "CEF:0|security|threatmanager|1.0|100|name|10|eventId=9001 cs2=ip-172-30-2-212 -> /var/log/auth.log cs2Label=Location msg=Aug 14 14:26:53 ip-172-30-2-212 sshd[16217]: message repeated 2 times",
+  "description": "Support spaced values in CEF extensions",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "/127.0.0.1",
+  "cefVersion": 0,
+  "deviceVendor": "security",
+  "deviceProduct": "threatmanager",
+  "deviceVersion": "1.0",
+  "deviceEventClassId": "100",
+  "name": "name",
+  "severity": "10",
+  "extensions": {
+    "eventId": 9001,
+    "Location": "ip-172-30-2-212 -> /var/log/auth.log",
+    "msg": "Aug 14 14:26:53 ip-172-30-2-212 sshd[16217]: message repeated 2 times"
+  }
+}

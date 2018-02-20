@@ -1,0 +1,16 @@
+{
+  "testString": "CEF:0|security|threatmanager|1.0|100|name|10|dvc=ip-172-30-2-212 cfp2=90.01 cfp2Label=TestTest cs2=ip-172-30-2-212->/var/log/auth.log cs2Label=Location msg=Aug 14 14:26:53 ip-172-30-2-212 sshd[16217]: message repeated 2 times",
+  "description": "Support custom float values",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "ip-172-30-2-212",
+  "cefVersion": 0,
+  "deviceVendor": "security",
+  "deviceProduct": "threatmanager",
+  "deviceVersion": "1.0",
+  "deviceEventClassId": "100",
+  "name": "name",
+  "severity": "10",
+  "extensions": {
+    "TestTest": 90.01
+  }
+}

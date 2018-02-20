@@ -1,0 +1,31 @@
+{
+  "testString": "Sep 11 00:12:00 172.30.0.20 ASM:CEF:0|F5|ASM|11.0.0|Brute Force Attack|Transparent|8|dvchost=3600.lab.asm.f5net.com dvc=172.30.0.20 cs1=maui_app_default cs1Label=policy_name cs2=maui_app cs2Label=web_application_name deviceCustomDate1=Sep 11 2010 00:05:11 deviceCustomDate1Label=policy_apply_date act=Alerted cn3=3263585820 cn3Label=attack_id cs4=Ongoing cs4Label=attack_status request=/bf/login1.php src=120.20.20.120 cs6=AU cs6Label=geo_location cs5=Number of Failed Logins Increased cs5Label=detection_mode rt=Sep 11 2010 00:12:00 cn1=109 cn1Label=detection_average cn2=0 cn2Label=dropped_requests",
+  "description": "BF Attack message sample - https://www.f5.com/images/solution-center/arcsight-f5-asm-certified-cef-onfiguration-guide.pdf#page=9",
+  "remoteAddress": "127.0.0.1",
+  "expectedSource": "172.30.0.20",
+  "cefVersion": 0,
+  "deviceVendor": "F5",
+  "deviceProduct": "ASM",
+  "deviceVersion": "11.0.0",
+  "deviceEventClassId": "Brute Force Attack",
+  "name": "Transparent",
+  "severity": "8",
+  "extensions": {
+    "dvchost": "3600.lab.asm.f5net.com",
+    "dvc": "172.30.0.20",
+    "policy_name": "maui_app_default",
+    "web_application_name": "maui_app",
+    "policy_apply_date": "2010-09-11T00:05:11Z",
+    "act": "Alerted",
+    "attack_id": 3263585820,
+    "attack_status": "Ongoing",
+    "request": "/bf/login1.php",
+    "src": "120.20.20.120",
+    "geo_location": "AU",
+    "detection_mode": "Number of Failed Logins Increased",
+    "rt": "2010-09-11T00:12:00Z",
+    "detection_average": 109,
+    "dropped_requests": 0
+  }
+}
+
