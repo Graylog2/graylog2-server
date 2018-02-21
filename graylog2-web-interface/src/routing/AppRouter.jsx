@@ -67,6 +67,7 @@ import PipelineDetailsPage from 'pages/PipelineDetailsPage';
 import SimulatorPage from 'pages/SimulatorPage';
 import RulesPage from 'pages/RulesPage';
 import RuleDetailsPage from 'pages/RuleDetailsPage';
+import EnterprisePage from 'pages/EnterprisePage';
 
 const AppRouter = React.createClass({
   render() {
@@ -155,6 +156,7 @@ const AppRouter = React.createClass({
               </Route>
               <Route path={Routes.SYSTEM.OVERVIEW} component={SystemOverviewPage} />
               <Route path={Routes.SYSTEM.THREADDUMP(':nodeId')} component={ThreadDumpPage} />
+              <Route path={Routes.SYSTEM.ENTERPRISE} component={EnterprisePage} />
               {pluginRoutes}
             </Route>
           </Route>
