@@ -47,7 +47,7 @@
   },
   "dependencies": {
     "bluebird": "^3.4.0",
-    "bootstrap": "^4.0.0",
+    "bootstrap": "^3.4.0",
     "c3": "^0.4.11-rc4",
     "classnames": "^2.2.0",
     "clipboard": "^1.5.5",
