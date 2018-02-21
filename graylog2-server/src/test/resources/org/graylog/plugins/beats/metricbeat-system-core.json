@@ -1,0 +1,46 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "metricset": {
+    "module": "system",
+    "name": "core",
+    "rtt": 171
+  },
+  "system": {
+    "core": {
+      "id": 0,
+      "idle": {
+        "pct": 0.000000
+      },
+      "iowait": {
+        "pct": 0.000000
+      },
+      "irq": {
+        "pct": 0.000000
+      },
+      "nice": {
+        "pct": 0.000000
+      },
+      "softirq": {
+        "pct": 0.000000
+      },
+      "steal": {
+        "pct": 0.000000
+      },
+      "system": {
+        "pct": 0.000000
+      },
+      "user": {
+        "pct": 0.000000
+      }
+    }
+  },
+  "type": "metricsets"
+}

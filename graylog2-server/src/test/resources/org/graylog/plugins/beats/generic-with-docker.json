@@ -1,0 +1,11 @@
+{
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "docker": {
+    "id": "123",
+    "name": "container-1",
+    "labels": {
+      "docker-kubernetes-pod": "hello"
+    }
+  },
+  "foo": "bar"
+}

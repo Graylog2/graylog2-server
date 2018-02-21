@@ -1,0 +1,12 @@
+{
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "meta": {
+    "cloud": {
+      "availability_zone": "cn-shenzhen",
+      "instance_id": "i-wz9g2hqiikg0aliyun2b",
+      "provider": "ecs",
+      "region": "cn-shenzhen-a"
+    }
+  },
+  "foo": "bar"
+}

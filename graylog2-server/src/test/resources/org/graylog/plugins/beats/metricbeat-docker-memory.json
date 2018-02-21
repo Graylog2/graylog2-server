@@ -1,0 +1,39 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "docker": {
+    "container": {
+      "id": "f36c43096b5b0a35073094a8b31092629e4b086ec74a4e23dcb6f39e0f934e0c",
+      "name": "adoring_ride"
+    },
+    "memory": {
+      "fail": {
+        "count": 0
+      },
+      "limit": 2094673920,
+      "rss": {
+        "pct": 0.927002,
+        "total": 1941766144
+      },
+      "usage": {
+        "max": 1984221184,
+        "pct": 0.931658,
+        "total": 1951518720
+      }
+    }
+  },
+  "metricset": {
+    "host": "/var/run/docker.sock",
+    "module": "docker",
+    "name": "memory",
+    "rtt": 1841936
+  },
+  "type": "metricsets"
+}

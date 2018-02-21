@@ -1,0 +1,28 @@
+{
+  "@metadata": {
+    "beat": "metricbeat"
+  },
+  "@timestamp": "2016-12-14T12:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local",
+    "version": "5.1.1"
+  },
+  "metricset": {
+    "module": "system",
+    "name": "fsstat",
+    "rtt": 236
+  },
+  "system": {
+    "fsstat": {
+      "count": 4,
+      "total_files": 4294968429,
+      "total_size": {
+        "free": 90241703936,
+        "total": 499055406592,
+        "used": 408813702656
+      }
+    }
+  },
+  "type": "metricsets"
+}

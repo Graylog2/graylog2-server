@@ -1,0 +1,44 @@
+{
+  "@metadata": {
+    "beat": "topbeat"
+  },
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local"
+  },
+  "count": 1,
+  "cpu": {
+    "user": 28658197,
+    "user_p": 0,
+    "nice": 0,
+    "system": 17275182,
+    "system_p": 0,
+    "idle": 432053774,
+    "iowait": 0,
+    "irq": 0,
+    "softirq": 0,
+    "steal": 0
+  },
+  "load": {
+    "load1": 3.06884765625,
+    "load5": 2.8984375,
+    "load15": 2.71484375
+  },
+  "mem": {
+    "total": 17179869184,
+    "used": 16906035200,
+    "free": 273833984,
+    "used_p": 0.98,
+    "actual_used": 10500239360,
+    "actual_free": 6679629824,
+    "actual_used_p": 0.61
+  },
+  "swap": {
+    "total": 15032385536,
+    "used": 14523039744,
+    "free": 509345792,
+    "used_p": 0.97
+  },
+  "type": "system"
+}

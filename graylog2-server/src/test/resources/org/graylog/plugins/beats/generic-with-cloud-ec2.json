@@ -1,0 +1,13 @@
+{
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "meta": {
+    "cloud": {
+      "availability_zone": "us-east-1c",
+      "instance_id": "i-4e123456",
+      "machine_type": "t2.medium",
+      "provider": "ec2",
+      "region": "us-east-1"
+    }
+  },
+  "foo": "bar"
+}

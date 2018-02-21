@@ -1,0 +1,21 @@
+{
+  "@metadata": {
+    "beat": "filebeat"
+  },
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "beat": {
+    "hostname": "example.local",
+    "name": "example.local"
+  },
+  "count": 1,
+  "fields": null,
+  "input_type": "log",
+  "message": "TEST",
+  "offset": 0,
+  "source": "/tmp/test.log",
+  "tags": [
+    "foobar",
+    "test"
+  ],
+  "type": "log"
+}

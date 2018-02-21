@@ -1,0 +1,12 @@
+{
+  "@timestamp": "2016-04-01T00:00:00.000Z",
+  "meta": {
+    "cloud": {
+      "availability_zone": "gz-azone2",
+      "instance_id": "ins-qcloudv5",
+      "provider": "qcloud",
+      "region": "china-south-gz"
+    }
+  },
+  "foo": "bar"
+}
