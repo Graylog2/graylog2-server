@@ -9,6 +9,7 @@ import DSVHTTPAdapterDocumentation from './DSVHTTPAdapterDocumentation';
 import HTTPJSONPathAdapterFieldSet from './HTTPJSONPathAdapterFieldSet';
 import HTTPJSONPathAdapterSummary from './HTTPJSONPathAdapterSummary';
 import HTTPJSONPathAdapterDocumentation from './HTTPJSONPathAdapterDocumentation';
+import {} from 'components/maps/adapter';
 
 PluginStore.register(new PluginManifest({}, {
   lookupTableAdapters: [

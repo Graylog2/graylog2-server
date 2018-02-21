@@ -12,6 +12,7 @@ const ConfigurationActions = ActionsProvider.getActions('Configuration');
 
 import SearchesConfig from 'components/configurations/SearchesConfig';
 import MessageProcessorsConfig from 'components/configurations/MessageProcessorsConfig';
+import {} from 'components/maps/configurations'
 
 const ConfigurationsPage = React.createClass({
   mixins: [Reflux.connect(ConfigurationsStore)],
