@@ -16,15 +16,13 @@
  */
 package org.graylog.plugins.beats;
 
-import org.graylog2.plugin.PluginModule;
+import org.junit.Test;
 
-public class BeatsInputPluginModule extends PluginModule {
-    @Override
-    protected void configure() {
-        addTransport("beats", BeatsTransport.class);
-        addCodec("beats", BeatsCodec.class);
-        addCodec("beats", Beats2Codec.class);
-        addMessageInput(BeatsInput.class);
-        addMessageInput(Beats2Input.class);
+import static org.assertj.core.api.Assertions.assertThat;
+
+public class Beats2InputDescriptorTest {
+    @Test
+    public void descriptorNameIsCorrect() {
+        assertThat(new Beats2Input.Descriptor().getName()).isEqualTo("Beats");
     }
 }
