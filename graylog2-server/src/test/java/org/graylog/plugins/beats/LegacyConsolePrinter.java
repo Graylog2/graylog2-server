@@ -36,7 +36,7 @@ import org.graylog2.shared.bindings.providers.ObjectMapperProvider;
 
 import static com.google.common.base.MoreObjects.firstNonNull;
 
-public class ConsolePrinter {
+public class LegacyConsolePrinter {
     public static void main(String[] args) throws Exception {
         String hostname = "127.0.0.1";
         int port = 5044;
@@ -59,7 +59,7 @@ public class ConsolePrinter {
                         public void initChannel(SocketChannel ch) throws Exception {
                             ch.pipeline().addLast("logging", new LoggingHandler());
                             ch.pipeline().addLast("beats-frame-decoder", new BeatsFrameDecoder());
-                            ch.pipeline().addLast("beats-codec", new BeatsCodecHandler());
+                            ch.pipeline().addLast("beats-legacy-codec", new BeatsCodecHandler());
                         }
                     });
 
@@ -73,7 +73,7 @@ public class ConsolePrinter {
 
     public static class BeatsCodecHandler extends SimpleChannelInboundHandler<ByteBuf> {
         private final ObjectMapper objectMapper = new ObjectMapperProvider().get();
-        private final Beats2Codec beatsCodec = new Beats2Codec(Configuration.EMPTY_CONFIGURATION, objectMapper);
+        private final BeatsCodec beatsCodec = new BeatsCodec(Configuration.EMPTY_CONFIGURATION, objectMapper);
 
         @Override
         protected void channelRead0(ChannelHandlerContext ctx, ByteBuf message) throws Exception {

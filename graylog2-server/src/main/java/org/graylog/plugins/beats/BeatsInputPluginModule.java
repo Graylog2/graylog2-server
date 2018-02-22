@@ -22,9 +22,14 @@ public class BeatsInputPluginModule extends PluginModule {
     @Override
     protected void configure() {
         addTransport("beats", BeatsTransport.class);
-        addCodec("beats", BeatsCodec.class);
-        addCodec("beats", Beats2Codec.class);
+
+        // Beats legacy input
+        addCodec("beats-legacy", BeatsCodec.class);
         addMessageInput(BeatsInput.class);
+
+        // Beats input with improved field handling
+        // see https://github.com/Graylog2/graylog-plugin-beats/pull/29
+        addCodec("beats", Beats2Codec.class);
         addMessageInput(Beats2Input.class);
     }
 }

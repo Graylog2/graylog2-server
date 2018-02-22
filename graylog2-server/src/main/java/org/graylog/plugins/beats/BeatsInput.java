@@ -28,7 +28,7 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 import javax.inject.Inject;
 
 public class BeatsInput extends MessageInput {
-    private static final String NAME = "Beats";
+    private static final String NAME = "Beats Legacy";
 
     @Inject
     public BeatsInput(@Assisted Configuration configuration,

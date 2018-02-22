@@ -40,7 +40,7 @@ import java.util.Map;
 
 import static java.util.Objects.requireNonNull;
 
-@Codec(name = "beats", displayName = "Beats")
+@Codec(name = "beats-legacy", displayName = "Beats Legacy")
 public class BeatsCodec extends AbstractCodec {
     private static final Logger LOG = LoggerFactory.getLogger(BeatsCodec.class);
     private static final String MAP_KEY_SEPARATOR = "_";
