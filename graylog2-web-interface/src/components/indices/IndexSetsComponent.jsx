@@ -1,6 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 import { Col, Button, Label, DropdownButton, MenuItem } from 'react-bootstrap';
 
 import { EntityList, EntityListItem, PaginatedList, Spinner } from 'components/common';
@@ -82,9 +83,9 @@ const IndexSetsComponent = React.createClass({
     );
 
     const indexSetTitle = (
-      <LinkContainer to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
-        <a>{indexSet.title}</a>
-      </LinkContainer>
+      <Link to={Routes.SYSTEM.INDEX_SETS.SHOW(indexSet.id)}>
+        {indexSet.title}
+      </Link>
     );
 
     const isDefault = indexSet.default ? <Label key={`index-set-${indexSet.id}-default-label`} bsStyle="primary">default</Label> : '';

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import { Input } from 'components/bootstrap';
 import { Select, Spinner } from 'components/common';
@@ -72,7 +72,7 @@ const LookupTableConverterConfiguration = React.createClass({
 
     const helpMessage = (
       <span>
-        Lookup tables can be created <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}><a>here</a></LinkContainer>.
+        Lookup tables can be created <Link to={Routes.SYSTEM.LOOKUPTABLES.OVERVIEW}>here</Link>.
       </span>
     );
 

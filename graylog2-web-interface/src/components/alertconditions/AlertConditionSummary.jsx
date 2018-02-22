@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Col } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import Routes from 'routing/Routes';
 
@@ -38,9 +38,9 @@ const AlertConditionSummary = React.createClass({
     let title;
     if (this.props.linkToDetails) {
       title = (
-        <LinkContainer to={Routes.show_alert_condition(stream.id, condition.id)}>
-          <a>{condition.title ? condition.title : 'Untitled'}</a>
-        </LinkContainer>
+        <Link to={Routes.show_alert_condition(stream.id, condition.id)}>
+          {condition.title ? condition.title : 'Untitled'}
+        </Link>
       );
     } else {
       title = (condition.title ? condition.title : 'Untitled');

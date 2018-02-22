@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Button } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import { SelectableList } from 'components/common';
 import { BootstrapModalForm, Input } from 'components/bootstrap';
@@ -92,7 +92,7 @@ const StageForm = React.createClass({
     const rulesHelp = (
       <span>
         Select the rules evaluated on this stage, or create one in the{' '}
-        <LinkContainer to={Routes.SYSTEM.PIPELINES.RULES}><a>Pipeline Rules page</a></LinkContainer>.
+        <Link to={Routes.SYSTEM.PIPELINES.RULES}>Pipeline Rules page</Link>.
       </span>
     );
 

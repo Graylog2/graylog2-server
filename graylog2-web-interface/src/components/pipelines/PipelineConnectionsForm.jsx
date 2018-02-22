@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, ControlLabel, FormGroup, HelpBlock } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 import naturalSort from 'javascript-natural-sort';
 
 import { SelectableList } from 'components/common';
@@ -76,7 +76,7 @@ const PipelineConnectionsForm = React.createClass({
     const streamsHelp = (
       <span>
         Select the streams you want to connect to this pipeline, or create one in the{' '}
-        <LinkContainer to={Routes.STREAMS}><a>Streams page</a></LinkContainer>.
+        <Link to={Routes.STREAMS}>Streams page</Link>.
       </span>
     );
 

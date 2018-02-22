@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import EditDashboardModalTrigger from './EditDashboardModalTrigger';
 import PermissionsMixin from 'util/PermissionsMixin';
@@ -68,9 +68,7 @@ const Dashboard = React.createClass({
     return (
       <li className="stream">
         <h2>
-          <LinkContainer to={Routes.dashboard_show(this.props.dashboard.id)}>
-            <a><span ref="dashboardTitle">{this.props.dashboard.title}</span></a>
-          </LinkContainer>
+          <Link to={Routes.dashboard_show(this.props.dashboard.id)}><span ref="dashboardTitle">{this.props.dashboard.title}</span></Link>
         </h2>
 
         <div className="stream-data">

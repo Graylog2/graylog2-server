@@ -3,6 +3,7 @@ import React from 'react';
 import { Button, ButtonToolbar, Row, Col } from 'react-bootstrap';
 import { Input } from 'components/bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 import Routes from 'routing/Routes';
 
 import FormsUtils from 'util/FormsUtils';
@@ -67,10 +68,10 @@ const LookupTable = React.createClass({
           <dl>
             <dt>Data adapter</dt>
             <dd>
-              <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(this.props.dataAdapter.name)}><a>{this.props.dataAdapter.title}</a></LinkContainer>
+              <Link to={Routes.SYSTEM.LOOKUPTABLES.DATA_ADAPTERS.show(this.props.dataAdapter.name)}>{this.props.dataAdapter.title}</Link>
             </dd>
             <dt>Cache</dt>
-            <dd><LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(this.props.cache.name)}><a>{this.props.cache.title}</a></LinkContainer></dd>
+            <dd><Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(this.props.cache.name)}>{this.props.cache.title}</Link></dd>
           </dl>
           <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.edit(this.props.table.name)}>
             <Button bsStyle="success">Edit</Button>

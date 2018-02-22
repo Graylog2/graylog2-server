@@ -4,6 +4,7 @@ import { DataTable, Timestamp } from 'components/common';
 
 import { Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import RulesActions from 'actions/rules/RulesActions';
 
@@ -42,9 +43,9 @@ const RuleList = React.createClass({
     return (
       <tr key={rule.title}>
         <td>
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
-            <a>{rule.title}</a>
-          </LinkContainer>
+          <Link to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
+            {rule.title}
+          </Link>
         </td>
         <td className="limited">{rule.description}</td>
         <td className="limited"><Timestamp dateTime={rule.created_at} relative /></td>

@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
 import { Col, Button } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import { DataTable, EntityListItem, Spinner } from 'components/common';
 import RulesStore from 'stores/rules/RulesStore';
@@ -37,11 +37,11 @@ const Stage = React.createClass({
       };
       ruleTitle = <span><i className="fa fa-warning text-danger"/> {stage.rules[ruleIdx]}</span>;
     } else {
-      ruleTitle = (<LinkContainer to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
-          <a>{rule.title}</a>
-        </LinkContainer>
+      ruleTitle = (
+        <Link to={Routes.SYSTEM.PIPELINES.RULE(rule.id)}>
+          {rule.title}
+        </Link>
       );
-
     }
     return (
       <tr key={rule.id}>

@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, Label } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import { EntityListItem, Timestamp } from 'components/common';
 
@@ -34,9 +34,9 @@ const Alert = React.createClass({
     if (condition) {
       alertTitle = (
         <span>
-          <LinkContainer to={Routes.show_alert(alert.id)}>
-            <a>{condition.title || 'Untitled alert'}</a>
-          </LinkContainer>
+          <Link to={Routes.show_alert(alert.id)}>
+            {condition.title || 'Untitled alert'}
+          </Link>
           {' '}
           <small>on stream <em>{stream.title}</em></small>
         </span>
@@ -44,7 +44,7 @@ const Alert = React.createClass({
     } else {
       alertTitle = (
         <span>
-          <LinkContainer to={Routes.show_alert(alert.id)}><a>Unknown alert</a></LinkContainer>
+          <Link to={Routes.show_alert(alert.id)}>Unknown alert</Link>
         </span>
       );
     }

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import { Button } from 'react-bootstrap';
 
@@ -66,7 +67,7 @@ const LUTTableEntry = React.createClass({
       <tbody>
         <tr>
           <td>
-            <LinkContainer to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(this.props.cache.name)}><a>{this.props.cache.title}</a></LinkContainer>
+            <Link to={Routes.SYSTEM.LOOKUPTABLES.CACHES.show(this.props.cache.name)}>{this.props.cache.title}</Link>
             <ContentPackMarker contentPack={this.props.cache.content_pack} marginLeft={5} />
           </td>
           <td>{this.props.cache.description}</td>

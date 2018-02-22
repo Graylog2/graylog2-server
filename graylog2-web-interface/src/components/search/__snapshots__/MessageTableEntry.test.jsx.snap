@@ -125,9 +125,8 @@ exports[`<MessageTableEntry /> rendering should render a MessageTableEntry 1`] =
               />
                
               <a
-                action="push"
-                href="#"
                 onClick={[Function]}
+                style={Object {}}
               >
                 01
               </a>
