@@ -47,7 +47,7 @@ import javax.ws.rs.core.MediaType;
 
 @RequiresAuthentication
 @Api(value = "MapWidget", description = "Get map data")
-@Path("/mapdata")
+@Path("/search/mapdata")
 public class MapDataResource extends SearchResource implements PluginRestResource {
     private static final Logger LOG = LoggerFactory.getLogger(MapDataResource.class);
 

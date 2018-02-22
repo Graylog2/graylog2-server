@@ -17,21 +17,12 @@
 package org.graylog.plugins.pipelineprocessor;
 
 import com.google.inject.assistedinject.FactoryModuleBuilder;
-
 import org.graylog.plugins.pipelineprocessor.audit.PipelineProcessorAuditEventTypes;
 import org.graylog.plugins.pipelineprocessor.functions.ProcessorFunctionsModule;
 import org.graylog.plugins.pipelineprocessor.periodical.LegacyDefaultStreamMigration;
 import org.graylog.plugins.pipelineprocessor.processors.PipelineInterpreter;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineConnectionsResource;
-import org.graylog.plugins.pipelineprocessor.rest.PipelineResource;
 import org.graylog.plugins.pipelineprocessor.rest.PipelineRestPermissions;
-import org.graylog.plugins.pipelineprocessor.rest.RuleResource;
-import org.graylog.plugins.pipelineprocessor.rest.SimulatorResource;
-import org.graylog2.plugin.PluginConfigBean;
 import org.graylog2.plugin.PluginModule;
-
-import java.util.Collections;
-import java.util.Set;
 
 public class PipelineProcessorModule extends PluginModule {
     @Override
@@ -39,11 +30,9 @@ public class PipelineProcessorModule extends PluginModule {
         addPeriodical(LegacyDefaultStreamMigration.class);
 
         addMessageProcessor(PipelineInterpreter.class, PipelineInterpreter.Descriptor.class);
-        addRestResource(RuleResource.class);
-        addRestResource(PipelineResource.class);
-        addRestResource(PipelineConnectionsResource.class);
-        addRestResource(SimulatorResource.class);
         addPermissions(PipelineRestPermissions.class);
+
+        registerRestControllerPackage(getClass().getPackage().getName());
 
         install(new ProcessorFunctionsModule());
 

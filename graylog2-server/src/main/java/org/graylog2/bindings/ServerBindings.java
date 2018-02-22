@@ -37,7 +37,6 @@ import org.graylog2.bindings.providers.SystemJobFactoryProvider;
 import org.graylog2.bindings.providers.SystemJobManagerProvider;
 import org.graylog2.bundles.BundleService;
 import org.graylog2.cluster.ClusterConfigServiceImpl;
-import org.graylog2.users.UserPermissionsCleanupListener;
 import org.graylog2.dashboards.widgets.WidgetCacheTime;
 import org.graylog2.dashboards.widgets.WidgetEventsListener;
 import org.graylog2.database.MongoConnection;
@@ -94,11 +93,10 @@ import org.graylog2.users.RoleService;
 import org.graylog2.users.RoleServiceImpl;
 import org.graylog2.users.StartPageCleanupListener;
 import org.graylog2.users.UserImpl;
+import org.graylog2.users.UserPermissionsCleanupListener;
 
 import javax.ws.rs.container.DynamicFeature;
 import javax.ws.rs.ext.ExceptionMapper;
-
-import static com.google.inject.name.Names.named;
 
 public class ServerBindings extends Graylog2Module {
     private final Configuration configuration;
@@ -174,10 +172,8 @@ public class ServerBindings extends Graylog2Module {
         bind(Engine.class).toInstance(Engine.createEngine());
         bind(ErrorPageGenerator.class).to(GraylogErrorPageGenerator.class).asEagerSingleton();
 
-        bind(String[].class).annotatedWith(named("RestControllerPackages")).toInstance(new String[]{
-                "org.graylog2.rest.resources",
-                "org.graylog2.shared.rest.resources"
-        });
+        registerRestControllerPackage("org.graylog2.rest.resources");
+        registerRestControllerPackage("org.graylog2.shared.rest.resources");
     }
 
     private void bindInterfaces() {
