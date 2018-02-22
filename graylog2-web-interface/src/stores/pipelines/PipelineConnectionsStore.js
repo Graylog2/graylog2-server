@@ -1,12 +1,11 @@
 import Reflux from 'reflux';
 
 import UserNotification from 'util/UserNotification';
+import ApiRoutes from 'routing/ApiRoutes';
 import URLUtils from 'util/URLUtils';
 import fetch from 'logic/rest/FetchProvider';
 
 import PipelineConnectionsActions from 'actions/pipelines/PipelineConnectionsActions';
-
-const urlPrefix = '/plugins/org.graylog.plugins.pipelineprocessor';
 
 const PipelineConnectionsStore = Reflux.createStore({
   listenables: [PipelineConnectionsActions],
@@ -22,7 +21,7 @@ const PipelineConnectionsStore = Reflux.createStore({
         'Could not retrieve pipeline connections');
     };
 
-    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/connections');
+    const url = URLUtils.qualifyUrl(ApiRoutes.ConnectionsController.list().url);
     const promise = fetch('GET', url);
     promise.then((response) => {
       this.connections = response;
@@ -31,7 +30,7 @@ const PipelineConnectionsStore = Reflux.createStore({
   },
 
   connectToStream(connection) {
-    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/connections/to_stream');
+    const url = URLUtils.qualifyUrl(ApiRoutes.ConnectionsController.to_stream().url);
     const updatedConnection = {
       stream_id: connection.stream,
       pipeline_ids: connection.pipelines,
@@ -52,7 +51,7 @@ const PipelineConnectionsStore = Reflux.createStore({
   },
 
   connectToPipeline(reverseConnection) {
-    const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/connections/to_pipeline`);
+    const url = URLUtils.qualifyUrl(ApiRoutes.ConnectionsController.to_pipeline().url);
     const updatedConnection = {
       pipeline_id: reverseConnection.pipeline,
       stream_ids: reverseConnection.streams,

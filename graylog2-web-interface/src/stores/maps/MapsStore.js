@@ -1,6 +1,7 @@
 import Reflux from 'reflux';
 
 import URLUtils from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import UserNotification from 'util/UserNotification';
 
@@ -26,7 +27,7 @@ export const MapsStore = Reflux.createStore({
     // The TimeRange object needs a type to correctly deserialize on the server.
     timerange.type = rangeType;
 
-    const promise = fetch('POST', URLUtils.qualifyUrl('/plugins/org.graylog.plugins.map/mapdata'), {
+    const promise = fetch('POST', URLUtils.qualifyUrl(ApiRoutes.MapDataController.search().url), {
       query: q,
       timerange: timerange,
       limit: 50,

@@ -4,10 +4,9 @@ import RulesActions from 'actions/rules/RulesActions';
 
 import UserNotification from 'util/UserNotification';
 import URLUtils from 'util/URLUtils';
+import ApiRoutes from 'routing/ApiRoutes';
 import fetch from 'logic/rest/FetchProvider';
 import naturalSort from 'javascript-natural-sort';
-
-const urlPrefix = '/plugins/org.graylog.plugins.pipelineprocessor';
 
 const RulesStore = Reflux.createStore({
   listenables: [RulesActions],
@@ -45,7 +44,7 @@ const RulesStore = Reflux.createStore({
         'Could not retrieve processing rules');
     };
 
-    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/rule');
+    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.list().url);
     return fetch('GET', url).then((response) => {
       this.rules = response;
       this.trigger({ rules: response, functionDescriptors: this.functionDescriptors });
@@ -58,7 +57,7 @@ const RulesStore = Reflux.createStore({
         `Could not retrieve processing rule "${ruleId}"`);
     };
 
-    const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/rule/${ruleId}`);
+    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.get(ruleId).url);
     const promise = fetch('GET', url);
     promise.then(this._updateRulesState, failCallback);
 
@@ -70,7 +69,7 @@ const RulesStore = Reflux.createStore({
       UserNotification.error(`Saving rule "${ruleSource.title}" failed with status: ${error.message}`,
         `Could not save processing rule "${ruleSource.title}"`);
     };
-    const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/rule`);
+    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.create().url);
     const rule = {
       title: ruleSource.title,
       description: ruleSource.description,
@@ -91,7 +90,7 @@ const RulesStore = Reflux.createStore({
       UserNotification.error(`Updating rule "${ruleSource.title}" failed with status: ${error.message}`,
         `Could not update processing rule "${ruleSource.title}"`);
     };
-    const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/rule/${ruleSource.id}`);
+    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.update(ruleSource.id).url);
     const rule = {
       id: ruleSource.id,
       title: ruleSource.title,
@@ -112,7 +111,7 @@ const RulesStore = Reflux.createStore({
       UserNotification.error(`Deleting rule "${rule.title}" failed with status: ${error.message}`,
         `Could not delete processing rule "${rule.title}"`);
     };
-    const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/rule/${rule.id}`);
+    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.delete(rule.id).url);
     return fetch('DELETE', url).then(() => {
       this.rules = this.rules.filter((el) => el.id !== rule.id);
       this.trigger({ rules: this.rules, functionDescriptors: this.functionDescriptors });
@@ -120,7 +119,7 @@ const RulesStore = Reflux.createStore({
     }, failCallback);
   },
   parse(ruleSource, callback) {
-    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/rule/parse');
+    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.parse().url);
     const rule = {
       title: ruleSource.title,
       description: ruleSource.description,
@@ -141,7 +140,7 @@ const RulesStore = Reflux.createStore({
     );
   },
   multiple(ruleNames, callback) {
-    const url = URLUtils.qualifyUrl(urlPrefix + '/system/pipelines/rule/multiple');
+    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.multiple().url);
     const promise = fetch('POST', url, { rules: ruleNames });
     promise.then(callback);
 
@@ -151,7 +150,7 @@ const RulesStore = Reflux.createStore({
     if (this.functionDescriptors) {
       return;
     }
-    const url = URLUtils.qualifyUrl(`${urlPrefix}/system/pipelines/rule/functions`);
+    const url = URLUtils.qualifyUrl(ApiRoutes.RulesController.functions().url);
     return fetch('GET', url)
       .then(this._updateFunctionDescriptors);
   },
