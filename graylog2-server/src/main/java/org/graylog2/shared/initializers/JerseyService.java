@@ -156,7 +156,7 @@ public class JerseyService extends AbstractIdleService {
     private void startUpApi() throws Exception {
         final List<String> resourcePackages = ImmutableList.<String>builder()
                 .addAll(restControllerPackages.stream()
-                        .map(RestControllerPackage::getPackageName)
+                        .map(RestControllerPackage::name)
                         .collect(Collectors.toList()))
                 .add(RESOURCE_PACKAGE_WEB)
                 .build();

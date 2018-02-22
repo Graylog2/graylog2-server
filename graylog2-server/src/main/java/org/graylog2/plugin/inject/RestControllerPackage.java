@@ -16,18 +16,13 @@
  */
 package org.graylog2.plugin.inject;
 
-public class RestControllerPackage {
-    public static RestControllerPackage create(String packageName) {
-        return new RestControllerPackage(packageName);
-    }
+import com.google.auto.value.AutoValue;
 
-    private final String packageName;
+@AutoValue
+public abstract class RestControllerPackage {
+    public abstract String name();
 
-    private RestControllerPackage(String packageName) {
-        this.packageName = packageName;
-    }
-
-    public String getPackageName() {
-        return packageName;
+    public static RestControllerPackage create(String name) {
+        return new AutoValue_RestControllerPackage(name);
     }
 }

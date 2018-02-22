@@ -65,7 +65,7 @@ public class DocumentationResource extends RestResource {
 
         final ImmutableSet.Builder<String> packageNames = ImmutableSet.<String>builder()
                 .addAll(restControllerPackages.stream()
-                        .map(RestControllerPackage::getPackageName)
+                        .map(RestControllerPackage::name)
                         .collect(Collectors.toList()));
 
         // All plugin resources get the plugin prefix + the plugin package.
