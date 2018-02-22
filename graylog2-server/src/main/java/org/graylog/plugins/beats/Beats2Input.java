@@ -27,26 +27,26 @@ import org.graylog2.plugin.inputs.annotations.FactoryClass;
 
 import javax.inject.Inject;
 
-public class BeatsInput extends MessageInput {
-    private static final String NAME = "Beats Legacy";
+public class Beats2Input extends MessageInput {
+    private static final String NAME = "Beats";
 
     @Inject
-    public BeatsInput(@Assisted Configuration configuration,
-                      BeatsTransport.Factory transportFactory,
-                      BeatsCodec.Factory codecFactory,
-                      Config config,
-                      Descriptor descriptor,
-                      MetricRegistry metricRegistry,
-                      LocalMetricRegistry localRegistry,
-                      ServerStatus serverStatus) {
+    public Beats2Input(@Assisted Configuration configuration,
+                       BeatsTransport.Factory transportFactory,
+                       Beats2Codec.Factory codecFactory,
+                       Config config,
+                       Descriptor descriptor,
+                       MetricRegistry metricRegistry,
+                       LocalMetricRegistry localRegistry,
+                       ServerStatus serverStatus) {
         super(metricRegistry, configuration, transportFactory.create(configuration),
                 localRegistry, codecFactory.create(configuration), config, descriptor, serverStatus);
     }
 
     @FactoryClass
-    public interface Factory extends MessageInput.Factory<BeatsInput> {
+    public interface Factory extends MessageInput.Factory<Beats2Input> {
         @Override
-        BeatsInput create(Configuration configuration);
+        Beats2Input create(Configuration configuration);
 
         @Override
         Config getConfig();
@@ -64,7 +64,7 @@ public class BeatsInput extends MessageInput {
     @ConfigClass
     public static class Config extends MessageInput.Config {
         @Inject
-        public Config(BeatsTransport.Factory transport, BeatsCodec.Factory codec) {
+        public Config(BeatsTransport.Factory transport, Beats2Codec.Factory codec) {
             super(transport.getConfig(), codec.getConfig());
         }
     }
