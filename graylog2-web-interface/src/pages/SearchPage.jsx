@@ -63,6 +63,9 @@ const SearchPage = React.createClass({
     }
   },
   componentWillUnmount() {
+    if (this.promise) {
+      this.promise.cancel();
+    }
     this._stopTimer();
   },
   _setupTimer(refresh) {
@@ -93,9 +96,7 @@ const SearchPage = React.createClass({
     this.promise = UniversalSearchStore.search(SearchStore.originalRangeType, query, SearchStore.originalRangeParams.toJS(), streamId, null, SearchStore.page, SearchStore.sortField, SearchStore.sortOrder)
       .then(
         (response) => {
-          if (this.isMounted()) {
-            this.setState({ searchResult: response, error: undefined });
-          }
+          this.setState({ searchResult: response, error: undefined });
 
           const interval = this.props.location.query.interval ? this.props.location.query.interval : this._determineHistogramResolution(response);
 

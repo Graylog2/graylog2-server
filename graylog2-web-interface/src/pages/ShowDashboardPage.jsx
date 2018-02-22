@@ -60,15 +60,18 @@ const ShowDashboardPage = React.createClass({
     if (this.loadInterval) {
       clearInterval(this.loadInterval);
     }
+    if (this.promise) {
+      this.promise.cancel();
+    }
   },
   DASHBOARDS_EDIT: 'dashboards:edit',
   DEFAULT_HEIGHT: 1,
   DEFAULT_WIDTH: 2,
   loadData() {
     const dashboardId = this.props.params.dashboardId;
-    DashboardsStore.get(dashboardId)
+    this.promise = DashboardsStore.get(dashboardId)
       .then((dashboard) => {
-        if (!this.isMounted()) {
+        if (this.promise.isCancelled()) {
           return;
         }
 
