@@ -96,10 +96,10 @@ Overview of removed Graylog web interface settings:
 | ``web_tls_key_password``        | ``http_tls_key_password``        | Empty              |
 +---------------------------------+----------------------------------+--------------------+
 
-Plugins moved into the Graylog server
+Plugins merged into the Graylog server
 =====================================
 
-In 3.0 we merged the following plugins into the server Graylog server repository:
+Starting with Graylog 3.0.0, the following official plugins were merged into the Graylog server:
 
 - `Beats Input <https://github.com/Graylog2/graylog-plugin-beats>`_
 - `CEF Input <https://github.com/Graylog2/graylog-plugin-cef>`_
@@ -109,6 +109,6 @@ In 3.0 we merged the following plugins into the server Graylog server repository
 - `NetFlow Input <https://github.com/Graylog2/graylog-plugin-netflow>`_
 - `Pipeline Processor <https://github.com/Graylog2/graylog-plugin-pipeline-processor>`_
 
-That means these plugins are not available as separate plugins anymore. If you manually update your Graylog installation (without using operating system packages), make sure to remove all old plugin files from the ``plugin/`` folder.
+That means these plugins are not available as separate plugins anymore. If you manually update your Graylog installation (without using operating system packages), make sure to remove all old plugin files from the `plugin_dir <http://docs.graylog.org/en/3.0/pages/configuration/server.conf.html>`_ folder.
 
-The old issues in these repositories are still available for reference but new issues should only be created in the `Graylog server issue tracker <https://github.com/Graylog2/graylog2-server/issues`.
+The old issues in these repositories are still available for reference but new issues should only be created in the `Graylog server issue tracker <https://github.com/Graylog2/graylog2-server/issues>`_.
