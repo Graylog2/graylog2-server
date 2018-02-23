@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Responsive, WidthProvider } from 'react-grid-layout';
+import lodash from 'lodash';
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -60,8 +61,15 @@ const ReactGridContainer = React.createClass({
     children: PropTypes.node.isRequired,
     /**
      * Function that will be called when positions change. The function
-     * receives the new positions in the same format as specified in the
-     * `positions` prop.
+     * receives the new positions in the format:
+     *
+     * ```
+     * [
+     *   { id: widgetId, col: column, row: row, height: height, width: width },
+     *   // E.g.
+     *   { id: '2', col: 2, row: 0, height: 1, width: 4 },
+     * ]
+     * ```
      */
     onPositionsChange: PropTypes.func.isRequired,
     /**
@@ -107,7 +115,39 @@ const ReactGridContainer = React.createClass({
     };
   },
 
+  getInitialState() {
+    return {
+      layout: this.computeLayout(this.props.positions),
+    };
+  },
+
+  componentWillReceiveProps(nextProps) {
+    if (!lodash.isEqual(nextProps.positions, this.props.positions)) {
+      this.setState({ layout: this.computeLayout(nextProps.positions) });
+    }
+  },
+
+  computeLayout(positions) {
+    return Object.keys(positions).map((id) => {
+      const { col, row, height, width } = positions[id];
+      return {
+        i: id,
+        x: col ? Math.max(col - 1, 0) : 0,
+        y: (row === undefined || row <= 0 ? Infinity : row - 1),
+        h: height || 1,
+        w: width || 1,
+      };
+    });
+  },
+
   _onLayoutChange(newLayout) {
+    // `onLayoutChange` may be triggered when clicking somewhere in a widget, check before propagating the change.
+    // Filter out additional Object properties in nextLayout, as it comes directly from react-grid-layout
+    const filteredNewLayout = newLayout.map(item => ({ i: item.i, x: item.x, y: item.y, h: item.h, w: item.w }));
+    if (lodash.isEqual(this.state.layout, filteredNewLayout)) {
+      return;
+    }
+
     const newPositions = [];
     newLayout.forEach((widget) => {
       newPositions.push({
@@ -123,17 +163,8 @@ const ReactGridContainer = React.createClass({
   },
 
   render() {
-    const { children, locked, isResizable, positions, rowHeight, columns, animate } = this.props;
-    const layout = Object.keys(positions).map((id) => {
-      const { col, row, height, width } = positions[id];
-      return {
-        i: id,
-        x: col ? Math.max(col - 1, 0) : 0,
-        y: (row === undefined || row <= 0 ? Infinity : row - 1),
-        h: height || 1,
-        w: width || 1,
-      };
-    });
+    const { children, locked, isResizable, rowHeight, columns, animate } = this.props;
+    const { layout } = this.state;
 
     // We need to use a className and draggableHandle to avoid re-rendering all graphs on lock/unlock. See:
     // https://github.com/STRML/react-grid-layout/issues/371
@@ -144,6 +175,9 @@ const ReactGridContainer = React.createClass({
                                     cols={columns}
                                     rowHeight={rowHeight}
                                     margin={[10, 10]}
+                                    // Do not allow dragging from elements inside a `.actions` css class. This is
+                                    // meant to avoid calling `onDragStop` callbacks when clicking on an action button.
+                                    draggableCancel=".actions"
                                     onDragStop={this._onLayoutChange}
                                     onResizeStop={this._onLayoutChange}
                                     useCSSTransforms={animate}
