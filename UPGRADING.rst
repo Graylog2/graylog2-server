@@ -97,7 +97,7 @@ Overview of removed Graylog web interface settings:
 +---------------------------------+----------------------------------+--------------------+
 
 Plugins merged into the Graylog server
-=====================================
+======================================
 
 Starting with Graylog 3.0.0, the following official plugins were merged into the Graylog server:
 
