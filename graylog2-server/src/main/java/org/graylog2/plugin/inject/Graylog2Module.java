@@ -440,4 +440,9 @@ public abstract class Graylog2Module extends AbstractModule {
     private static class ContainerResponseFilterType extends TypeLiteral<Class<? extends ContainerResponseFilter>> {}
 
     private static class ExceptionMapperType extends TypeLiteral<Class<? extends ExceptionMapper>> {}
+
+    protected void registerRestControllerPackage(String packageName) {
+        final Multibinder<RestControllerPackage> restControllerPackages = Multibinder.newSetBinder(binder(), RestControllerPackage.class);
+        restControllerPackages.addBinding().toInstance(RestControllerPackage.create(packageName));
+    }
 }

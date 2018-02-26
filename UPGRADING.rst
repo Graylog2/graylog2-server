@@ -112,3 +112,31 @@ Starting with Graylog 3.0.0, the following official plugins were merged into the
 That means these plugins are not available as separate plugins anymore. If you manually update your Graylog installation (without using operating system packages), make sure to remove all old plugin files from the `plugin_dir <http://docs.graylog.org/en/3.0/pages/configuration/server.conf.html>`_ folder.
 
 The old issues in these repositories are still available for reference but new issues should only be created in the `Graylog server issue tracker <https://github.com/Graylog2/graylog2-server/issues>`_.
+
+The following HTTP API paths changed due to the plugin merge:
+
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| Old Path                                                                                    | New Path                                      |
++=============================================================================================+===============================================+
+| ``/plugins/org.graylog.plugins.map/mapdata``                                                | ``/search/mapdata``                           |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/pipeline``                | ``/system/pipelines/pipeline``                |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/pipeline/parse``          | ``/system/pipelines/pipeline/parse``          |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/rule``                    | ``/system/pipelines/rule``                    |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/rule/functions``          | ``/system/pipelines/rule/functions``          |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/rule/multiple``           | ``/system/pipelines/rule/multiple``           |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/rule/parse``              | ``/system/pipelines/rule/parse``              |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/connections``             | ``/system/pipelines/connections``             |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/connections/to_stream``   | ``/system/pipelines/connections/to_stream``   |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/connections/to_pipeline`` | ``/system/pipelines/connections/to_pipeline`` |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+
+| ``/plugins/org.graylog.plugins.pipelineprocessor/system/pipelines/simulate``                | ``/system/pipelines/simulate``                |
++---------------------------------------------------------------------------------------------+-----------------------------------------------+

@@ -39,6 +39,7 @@ import org.graylog2.audit.PluginAuditEventTypes;
 import org.graylog2.audit.jersey.AuditEventModelProcessor;
 import org.graylog2.configuration.HttpConfiguration;
 import org.graylog2.jersey.PrefixAddingModelProcessor;
+import org.graylog2.plugin.inject.RestControllerPackage;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.filter.WebAppNotFoundResponseFilter;
 import org.graylog2.shared.rest.CORSFilter;
@@ -94,7 +95,7 @@ public class JerseyService extends AbstractIdleService {
 
     private final HttpConfiguration configuration;
     private final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources;
-    private final String[] restControllerPackages;
+    private final Set<RestControllerPackage> restControllerPackages;
 
     private final Set<Class<? extends DynamicFeature>> dynamicFeatures;
     private final Set<Class<? extends ContainerResponseFilter>> containerResponseFilters;
@@ -114,7 +115,7 @@ public class JerseyService extends AbstractIdleService {
                          Set<Class<? extends ExceptionMapper>> exceptionMappers,
                          @Named("additionalJerseyComponents") final Set<Class> additionalComponents,
                          final Map<String, Set<Class<? extends PluginRestResource>>> pluginRestResources,
-                         @Named("RestControllerPackages") final String[] restControllerPackages,
+                         final Set<RestControllerPackage> restControllerPackages,
                          Set<PluginAuditEventTypes> pluginAuditEventTypes,
                          ObjectMapper objectMapper,
                          MetricRegistry metricRegistry,
@@ -154,7 +155,9 @@ public class JerseyService extends AbstractIdleService {
 
     private void startUpApi() throws Exception {
         final List<String> resourcePackages = ImmutableList.<String>builder()
-                .add(restControllerPackages)
+                .addAll(restControllerPackages.stream()
+                        .map(RestControllerPackage::name)
+                        .collect(Collectors.toList()))
                 .add(RESOURCE_PACKAGE_WEB)
                 .build();
 

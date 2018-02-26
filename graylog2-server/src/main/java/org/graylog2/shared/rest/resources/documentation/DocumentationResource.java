@@ -23,6 +23,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.graylog2.configuration.HttpConfiguration;
+import org.graylog2.plugin.inject.RestControllerPackage;
 import org.graylog2.plugin.rest.PluginRestResource;
 import org.graylog2.rest.RestTools;
 import org.graylog2.shared.plugins.PluginRestResourceClasses;
@@ -30,7 +31,6 @@ import org.graylog2.shared.rest.documentation.generator.Generator;
 import org.graylog2.shared.rest.resources.RestResource;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -43,6 +43,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 import static org.graylog2.shared.initializers.JerseyService.PLUGIN_PREFIX;
@@ -56,14 +57,16 @@ public class DocumentationResource extends RestResource {
 
     @Inject
     public DocumentationResource(HttpConfiguration httpConfiguration,
-                                 @Named("RestControllerPackages") String[] restControllerPackages,
+                                 Set<RestControllerPackage> restControllerPackages,
                                  ObjectMapper objectMapper,
                                  PluginRestResourceClasses pluginRestResourceClasses) {
 
         this.httpConfiguration = requireNonNull(httpConfiguration, "httpConfiguration");
 
         final ImmutableSet.Builder<String> packageNames = ImmutableSet.<String>builder()
-                .add(restControllerPackages);
+                .addAll(restControllerPackages.stream()
+                        .map(RestControllerPackage::name)
+                        .collect(Collectors.toList()));
 
         // All plugin resources get the plugin prefix + the plugin package.
         final Map<Class<?>, String> pluginRestControllerMapping = new HashMap<>();
