@@ -63,6 +63,26 @@ public class IndexFieldTypesService {
         return save.getSavedObject();
     }
 
+    public Optional<IndexFieldTypes> upsert(IndexFieldTypes dto) {
+        final WriteResult<IndexFieldTypes, ObjectId> update = db.update(
+                DBQuery.and(
+                        DBQuery.is(IndexFieldTypes.FIELD_INDEX_NAME, dto.indexName()),
+                        DBQuery.is(IndexFieldTypes.FIELD_INDEX_SET_ID, dto.indexSetId())
+                ),
+                dto,
+                true,
+                false
+        );
+
+        final Object upsertedId = update.getUpsertedId();
+        if (upsertedId instanceof ObjectId) {
+            return get(((ObjectId) upsertedId).toHexString());
+        } else if (upsertedId instanceof String) {
+            return get((String) upsertedId);
+        }
+        return Optional.empty();
+    }
+
     public void delete(String idOrIndexName) {
         try {
             db.removeById(new ObjectId(idOrIndexName));

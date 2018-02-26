@@ -56,6 +56,7 @@ public class IndexFieldTypesServiceTest {
     private IndexFieldTypes createDto(String indexName, Map<String, FieldType> fields) {
         return IndexFieldTypes.builder()
                 .indexName(indexName)
+                .indexSetId("abc123")
                 .fields(ImmutableMap.<String, FieldType>builder()
                         .put("message", FieldType.create("message", "text"))
                         .put("source", FieldType.create("source", "text"))
@@ -100,5 +101,29 @@ public class IndexFieldTypesServiceTest {
 
         dbService.delete(dto1.id());
         assertThat(dbService.get(dto1.id())).as("check that delete works").isNotPresent();
+    }
+
+    @Test
+    public void upsert() {
+        final IndexFieldTypes newDto1 = createDto("graylog_0", Collections.emptyMap());
+        final IndexFieldTypes newDto2 = createDto("graylog_1", Collections.emptyMap());
+
+        assertThat(dbService.streamAll().count()).isEqualTo(0);
+
+        final IndexFieldTypes upsertedDto1 = dbService.upsert(newDto1).orElse(null);
+        final IndexFieldTypes upsertedDto2 = dbService.upsert(newDto2).orElse(null);
+
+        assertThat(upsertedDto1).isNotNull();
+        assertThat(upsertedDto2).isNotNull();
+
+        assertThat(upsertedDto1.indexName()).isEqualTo("graylog_0");
+        assertThat(upsertedDto2.indexName()).isEqualTo("graylog_1");
+
+        assertThat(dbService.streamAll().count()).isEqualTo(2);
+
+        assertThat(dbService.upsert(newDto1)).isNotPresent();
+        assertThat(dbService.upsert(newDto2)).isNotPresent();
+
+        assertThat(dbService.streamAll().count()).isEqualTo(2);
     }
 }
