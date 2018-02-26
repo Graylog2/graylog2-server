@@ -27,7 +27,7 @@ const SelectPopoverExample = createReactClass({
 
     return (
       <div>
-        <div className="pull-right">
+        <div style={{ display: 'inline-block', marginRight: 20 }}>
           <SelectPopover id="example-popover" 
                          title="Filter by colour"
                          triggerNode={<Button bsStyle="info" bsSize="small">Select colour</Button>} 
@@ -35,12 +35,69 @@ const SelectPopoverExample = createReactClass({
                          selectedItem={selectedItem}
                          onItemSelect={this.handleItemSelect} />
         </div>
-                       
-        <p>{selectedItem ? `You have selected ${selectedItem}` : 'Please select a colour!'}</p>
+        
+        {selectedItem ? `You have selected ${selectedItem}` : 'Please select a colour!'}
       </div>
     );
   }
 });
 
 <SelectPopoverExample />
+```
+
+```js
+const createReactClass = require('create-react-class');
+const Badge = require('react-bootstrap').Badge;
+const Button = require('react-bootstrap').Button;
+
+const items = [
+  'Black',
+  'Blue',
+  'Green',
+  'Red',
+  'White',
+  'Yellow',
+];
+
+const SelectPopoverFormattedExample = createReactClass({
+  getInitialState() {
+    return {
+      selectedItem: undefined,
+    };
+  },
+  
+  handleItemSelect(item) {
+    this.setState({ selectedItem: item });
+  },
+  
+  formatItem(item) {
+    return (
+      <span>
+        <Badge style={{ backgroundColor: item }}>&nbsp;</Badge> {item}
+      </span>
+    )
+  },
+  
+  render() {
+    const selectedItem = this.state.selectedItem;
+
+    return (
+      <div>
+        <div style={{ display: 'inline-block', marginRight: 20 }}>
+          <SelectPopover id="example-popover-formatted" 
+                         title="Filter by colour"
+                         triggerNode={<Button bsStyle="info" bsSize="small">Select colour</Button>} 
+                         items={items}
+                         itemFormatter={this.formatItem}
+                         selectedItem={selectedItem}
+                         onItemSelect={this.handleItemSelect} />
+        </div>
+        
+        {selectedItem ? `You have selected ${selectedItem}` : 'Please select a colour!'}
+      </div>
+    );
+  }
+});
+
+<SelectPopoverFormattedExample />
 ```
