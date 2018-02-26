@@ -135,14 +135,14 @@ public class QueryPlanTest {
                 .build();
         SearchJob job = new SearchJob(randomUUID(), search);
 
-        final Map<String, ESSearchTypeHandler<? extends SearchType>> handlers =
-                ImmutableMap.of(MessageList.NAME, new ESMessageList());
+        final Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers =
+                ImmutableMap.of(MessageList.NAME, ESMessageList::new);
         Map<String, Provider<Parameter.BindingHandler>> bindingHandlers = Maps.newHashMap();
         bindingHandlers.put(ValueBinding.NAME, ValueBinding.Handler::new);
         bindingHandlers.put(QueryReferenceBinding.NAME, () -> new QueryReferenceBinding.Handler(new ObjectMapper()));
 
         final QueryStringParser queryStringParser = new QueryStringParser();
-        final ElasticsearchQueryGenerator queryGenerator = new ElasticsearchQueryGenerator(handlers, bindingHandlers, queryStringParser) {
+        final ElasticsearchQueryGenerator queryGenerator = new ElasticsearchQueryGenerator() {
             @Override
             public Object generate(SearchJob job, Query query, Set<QueryResult> results) {
                 final Object generated = super.generate(job, query, results);
@@ -154,7 +154,7 @@ public class QueryPlanTest {
                 return generated;
             }
         };
-        final ElasticsearchBackend esBackend = spy(new ElasticsearchBackend(handlers, queryGenerator, queryStringParser, mock(JestClient.class)));
+        final ElasticsearchBackend esBackend = spy(new ElasticsearchBackend(handlers, bindingHandlers, queryStringParser, mock(JestClient.class)));
 
         doReturn(QueryResult.builder()
                 .searchTypes(ImmutableMap.of("messages", MessageList.Result.builder()
@@ -171,7 +171,8 @@ public class QueryPlanTest {
         doReturn(QueryResult.emptyResult())
                 .when(esBackend).run(eq(job), argThat(argument -> subQuery.id().equals(argument.id())), any(), any());
 
-        QueryEngine engine = new QueryEngine(ImmutableMap.of("elasticsearch", esBackend));
+        final ImmutableMap<String, QueryBackend<?>> elasticsearch = ImmutableMap.of("elasticsearch", esBackend);
+        QueryEngine engine = new QueryEngine(elasticsearch);
 
         final SearchJob execute = engine.execute(job);
         execute.getResultFuture().join();

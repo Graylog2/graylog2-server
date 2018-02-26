@@ -12,11 +12,11 @@ import org.elasticsearch.script.ScriptType;
 import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
+import org.graylog.plugins.enterprise.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.enterprise.search.searchtypes.GroupBy;
 
 import java.util.Collections;
@@ -72,15 +72,15 @@ public class ESGroupBy implements ESSearchTypeHandler<GroupBy> {
     }
 
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, GroupBy groupBy, SearchSourceBuilder queryBuilder) {
+    public void doGenerateQueryPart(SearchJob job, Query query, GroupBy groupBy, ESGeneratedQueryContext queryContext) {
         final String mainField = groupBy.fields().get(0);
         final List<String> stackedFields = groupBy.fields().subList(1, groupBy.fields().size());
 
-        queryBuilder.aggregation(createTermsBuilder(mainField, stackedFields, groupBy));
+        queryContext.searchSourceBuilder().aggregation(createTermsBuilder(mainField, stackedFields, groupBy));
     }
 
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, GroupBy groupBy, SearchResult queryResult) {
+    public SearchType.Result doExtractResult(SearchJob job, Query query, GroupBy groupBy, SearchResult queryResult, ESGeneratedQueryContext queryContext) {
         final TermsAggregation termsAggregation = queryResult.getAggregations()
                 .getFilterAggregation(filterAggName(groupBy))
                 .getTermsAggregation(termsAggName(groupBy));

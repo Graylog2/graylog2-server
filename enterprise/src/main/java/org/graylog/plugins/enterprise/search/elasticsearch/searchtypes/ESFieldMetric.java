@@ -7,6 +7,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
+import org.graylog.plugins.enterprise.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.enterprise.search.searchtypes.FieldMetric;
 
 import javax.annotation.Nullable;
@@ -14,7 +15,8 @@ import java.util.Locale;
 
 public class ESFieldMetric implements ESSearchTypeHandler<FieldMetric> {
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, FieldMetric fieldMetric, SearchSourceBuilder queryBuilder) {
+    public void doGenerateQueryPart(SearchJob job, Query query, FieldMetric fieldMetric, ESGeneratedQueryContext queryContext) {
+        final SearchSourceBuilder queryBuilder = queryContext.searchSourceBuilder();
         switch (fieldMetric.operation()) {
             case AVG:
                 queryBuilder.aggregation(AggregationBuilders.avg(aggName(fieldMetric)).field(fieldMetric.field()));
@@ -40,7 +42,7 @@ public class ESFieldMetric implements ESSearchTypeHandler<FieldMetric> {
     }
 
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, FieldMetric fieldMetric, SearchResult queryResult) {
+    public SearchType.Result doExtractResult(SearchJob job, Query query, FieldMetric fieldMetric, SearchResult queryResult, ESGeneratedQueryContext queryContext) {
         final MetricAggregation aggregations = queryResult.getAggregations();
         final String id = fieldMetric.id();
         final SearchType.Result result;

@@ -5,10 +5,10 @@ import io.searchbox.core.search.aggregation.Bucket;
 import io.searchbox.core.search.aggregation.DateHistogramAggregation;
 import one.util.streamex.StreamEx;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.graylog.plugins.enterprise.search.Query;
 import org.graylog.plugins.enterprise.search.SearchJob;
 import org.graylog.plugins.enterprise.search.SearchType;
+import org.graylog.plugins.enterprise.search.elasticsearch.ESGeneratedQueryContext;
 import org.graylog.plugins.enterprise.search.searchtypes.DateHistogram;
 import org.graylog2.plugin.Message;
 import org.graylog2.plugin.indexer.searches.timeranges.AbsoluteRange;
@@ -19,8 +19,8 @@ import java.util.Map;
 
 public class ESDateHistogram implements ESSearchTypeHandler<DateHistogram> {
     @Override
-    public void doGenerateQueryPart(SearchJob job, Query query, DateHistogram dateHistogram, SearchSourceBuilder searchSourceBuilder) {
-        searchSourceBuilder.aggregation(
+    public void doGenerateQueryPart(SearchJob job, Query query, DateHistogram dateHistogram, ESGeneratedQueryContext queryContext) {
+        queryContext.searchSourceBuilder().aggregation(
                 AggregationBuilders.dateHistogram(dateHistogram.id())
                         .field(Message.FIELD_TIMESTAMP)
                         .dateHistogramInterval(dateHistogram.interval().toESInterval()));
@@ -28,7 +28,7 @@ public class ESDateHistogram implements ESSearchTypeHandler<DateHistogram> {
 
     @SuppressWarnings("unchecked")
     @Override
-    public SearchType.Result doExtractResult(SearchJob job, Query query, DateHistogram searchType, SearchResult result) {
+    public SearchType.Result doExtractResult(SearchJob job, Query query, DateHistogram searchType, SearchResult result, ESGeneratedQueryContext queryContext) {
         final DateHistogramAggregation dateHistogramAggregation = result.getAggregations().getDateHistogramAggregation(searchType.id());
         final Map<Long, Long> buckets = StreamEx.of(dateHistogramAggregation.getBuckets())
                 .mapToEntry(bucket -> new DateTime(bucket.getKey()).getMillis() / 1000L,

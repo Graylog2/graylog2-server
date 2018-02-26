@@ -29,15 +29,15 @@ public class ElasticsearchBackendTest {
 
     @BeforeClass
     public static void setup() {
-        Map<String, ESSearchTypeHandler<? extends SearchType>> handlers = Maps.newHashMap();
-        handlers.put(MessageList.NAME, new ESMessageList());
-        handlers.put(DateHistogram.NAME, new ESDateHistogram());
+        Map<String, Provider<ESSearchTypeHandler<? extends SearchType>>> handlers = Maps.newHashMap();
+        handlers.put(MessageList.NAME, ESMessageList::new);
+        handlers.put(DateHistogram.NAME, ESDateHistogram::new);
         Map<String, Provider<Parameter.BindingHandler>> bindingHandlers = Maps.newHashMap();
         bindingHandlers.put(ValueBinding.NAME, ValueBinding.Handler::new);
         bindingHandlers.put(QueryReferenceBinding.NAME, () -> new QueryReferenceBinding.Handler(new ObjectMapper()));
 
         final QueryStringParser queryStringParser = new QueryStringParser();
-        backend = new ElasticsearchBackend(handlers, new ElasticsearchQueryGenerator(handlers, bindingHandlers,  queryStringParser), queryStringParser, null);
+        backend = new ElasticsearchBackend(handlers, bindingHandlers, queryStringParser, null);
     }
 
     @Test
