@@ -32,7 +32,6 @@ export default Reflux.createStore({
   trackTimeout: null,
 
   init() {
-    console.log('ViewStore init');
     this.state = this.getInitialState();
     const defaultQuery = _defaultQuery(uuidv4());
     this.state.selectedQuery = defaultQuery.id;
