@@ -45,7 +45,7 @@ import static java.lang.Integer.parseInt;
  */
 public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migration {
 
-    private static final Logger LOG = LoggerFactory.getLogger(V20161116172200_CreateDefaultStreamMigration.class);
+    private static final Logger LOG = LoggerFactory.getLogger(V20180214093600_AdjustDashboardPositionToNewResolution.class);
     private final DashboardService dashboardService;
     private final ClusterConfigService clusterConfigService;
 
