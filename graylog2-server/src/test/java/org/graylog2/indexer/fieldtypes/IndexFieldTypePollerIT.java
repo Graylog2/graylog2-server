@@ -130,4 +130,29 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
             deleteIndex("graylog_1");
         }
     }
+
+    @Test
+    @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
+    public void pollIndex() throws Exception {
+        final String indexSetId = indexSet.getConfig().id();
+
+        final IndexFieldTypes dto = poller.pollIndex("graylog_0", indexSetId).orElse(null);
+
+        try {
+            assertThat(dto).isNotNull();
+            assertThat(dto.indexSetId()).isEqualTo(indexSetId);
+            assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
+            assertThat(dto.id()).isNull();
+            assertThat(dto.fields())
+                    .containsEntry("message", FieldType.create("message", "text"))
+                    .containsEntry("full_message", FieldType.create("full_message", "text"))
+                    .containsEntry("source", FieldType.create("source", "text"))
+                    .containsEntry("http_status", FieldType.create("http_status", "keyword"))
+                    .containsEntry("http_response_time", FieldType.create("http_response_time", "long"))
+                    .containsEntry("timestamp", FieldType.create("timestamp", "date"));
+        } finally {
+            deleteIndex(INDEX_NAME);
+            deleteIndex("graylog_1");
+        }
+    }
 }

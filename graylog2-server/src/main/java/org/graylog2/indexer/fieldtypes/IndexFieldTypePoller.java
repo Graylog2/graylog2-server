@@ -78,13 +78,20 @@ public class IndexFieldTypePoller {
                 // We always poll the active write index because the mapping can change for every ingested message.
                 // Other indices will only be polled if we don't have the mapping data already.
                 .filter(indexName -> indexName.equals(activeWriteIndex) || !existingIndexNames.contains(indexName))
-                .map(indexName -> pollIndex(indexSet.getConfig().id(), indexName))
+                .map(indexName -> pollIndex(indexName, indexSet.getConfig().id()))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toSet());
     }
 
-    private Optional<IndexFieldTypes> pollIndex(final String indexSetId, final String indexName) {
+    /**
+     * Returns the index field types for the given index.
+     *
+     * @param indexName index name to poll types for
+     * @param indexSetId index set ID of the given index
+     * @return the polled index field type data for the given index
+     */
+    public Optional<IndexFieldTypes> pollIndex(final String indexName, final String indexSetId) {
         final GetMapping getMapping = new GetMapping.Builder()
                 .addIndex(indexName)
                 .build();
