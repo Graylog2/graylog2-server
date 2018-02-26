@@ -91,7 +91,7 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
                 mock(NodeId.class),
                 new NullAuditEventSender(),
                 new EventBus("index-field-type-poller-it"));
-        poller = new IndexFieldTypePoller(client(), indices);
+        poller = new IndexFieldTypePoller(client(), indices, new MetricRegistry());
         indexSet = new TestIndexSet(indexSetConfig);
     }
 

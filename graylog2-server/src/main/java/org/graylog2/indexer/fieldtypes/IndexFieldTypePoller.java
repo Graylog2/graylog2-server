@@ -16,6 +16,8 @@
  */
 package org.graylog2.indexer.fieldtypes;
 
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
 import com.fasterxml.jackson.databind.JsonNode;
 import io.searchbox.client.JestClient;
 import io.searchbox.client.JestResult;
@@ -36,6 +38,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
+import static com.codahale.metrics.MetricRegistry.name;
+
 /**
  * This class can be used to poll index field type information for indices in an {@link IndexSet}.
  */
@@ -44,11 +48,14 @@ public class IndexFieldTypePoller {
 
     private final JestClient jestClient;
     private final Indices indices;
+    private final Timer pollTimer;
 
     @Inject
-    public IndexFieldTypePoller(final JestClient jestClient, final Indices indices) {
+    public IndexFieldTypePoller(final JestClient jestClient, final Indices indices, final MetricRegistry metricRegistry) {
         this.jestClient = jestClient;
         this.indices = indices;
+
+        this.pollTimer = metricRegistry.timer(name(getClass(), "indexPollTime"));
     }
 
     /**
@@ -83,7 +90,7 @@ public class IndexFieldTypePoller {
                 .build();
 
         final JestResult result;
-        try {
+        try (final Timer.Context ignored = pollTimer.time()) {
             result = JestUtils.execute(jestClient, getMapping, () -> "Unable to get index mapping for index: " + indexName);
         } catch (Exception e) {
             LOG.error("Couldn't get mapping for index <{}>", indexName, e);
