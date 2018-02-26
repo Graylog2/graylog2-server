@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Popover, OverlayTrigger } from 'react-bootstrap';
 
 import MessageDetail from './MessageDetail';
@@ -11,25 +12,25 @@ import style from './MessageTableEntry.css';
 
 const MessageTableEntry = React.createClass({
   propTypes: {
-    allStreams: PropTypes.instanceOf(Immutable.List).isRequired,
+    allStreams: ImmutablePropTypes.list.isRequired,
     allStreamsLoaded: PropTypes.bool.isRequired,
     disableSurroundingSearch: PropTypes.bool,
     expandAllRenderAsync: PropTypes.bool.isRequired,
     expanded: PropTypes.bool.isRequired,
     highlight: PropTypes.bool,
     highlightMessage: PropTypes.string,
-    inputs: PropTypes.instanceOf(Immutable.Map).isRequired,
+    inputs: ImmutablePropTypes.map.isRequired,
     message: PropTypes.shape({
       fields: PropTypes.object.isRequired,
       highlight_ranges: PropTypes.object,
       id: PropTypes.string.isRequired,
       index: PropTypes.string.isRequired,
     }).isRequired,
-    nodes: PropTypes.instanceOf(Immutable.Map).isRequired,
+    nodes: ImmutablePropTypes.map.isRequired,
     searchConfig: PropTypes.object,
-    selectedFields: PropTypes.instanceOf(Immutable.OrderedSet),
+    selectedFields: ImmutablePropTypes.orderedSet,
     showMessageRow: PropTypes.bool,
-    streams: PropTypes.instanceOf(Immutable.Map).isRequired,
+    streams: ImmutablePropTypes.map.isRequired,
     toggleDetail: PropTypes.func.isRequired,
   },
   getDefaultProps() {
