@@ -62,8 +62,8 @@ const ShowDashboardPage = React.createClass({
     }
   },
   DASHBOARDS_EDIT: 'dashboards:edit',
-  DEFAULT_HEIGHT: 1,
-  DEFAULT_WIDTH: 2,
+  DEFAULT_HEIGHT: 2,
+  DEFAULT_WIDTH: 4,
   loadData() {
     const dashboardId = this.props.params.dashboardId;
     DashboardsStore.get(dashboardId)

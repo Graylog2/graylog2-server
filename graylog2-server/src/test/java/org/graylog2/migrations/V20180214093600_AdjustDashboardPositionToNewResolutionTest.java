@@ -38,6 +38,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.Map;
 import java.util.Set;
 
 public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
@@ -102,7 +103,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
         keySet.add("my-position-id");
         when(positions.keySet()).thenReturn(keySet);
 
-        final BasicDBObject fields = mock(BasicDBObject.class);
+        final Map<String, Object> fields = mock(BasicDBObject.class);
         when(fields.get(any())).thenReturn(positions);
 
         final Dashboard dashboard = mock(Dashboard.class, Mockito.RETURNS_DEEP_STUBS);

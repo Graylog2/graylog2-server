@@ -68,7 +68,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
 
         Map<String, String> dashboardIds = Maps.newHashMap();
         for (Dashboard dashboard : dashboardService.all()) {
-            BasicDBObject fields = (BasicDBObject) dashboard.getFields();
+            Map<String, Object> fields = dashboard.getFields();
             BasicDBObject positions = (BasicDBObject) fields.get(DashboardImpl.EMBEDDED_POSITIONS);
             if (positions == null) {
                 dashboardIds.put(dashboard.getId(), "skipped");
