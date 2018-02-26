@@ -80,7 +80,7 @@ const PipelinesStore = Reflux.createStore({
       UserNotification.error('Updating pipeline failed with status: ' + error.message,
         'Could not update processing pipeline');
     };
-    const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.get(pipelineSource.id).url);
+    const url = URLUtils.qualifyUrl(ApiRoutes.PipelinesController.update(pipelineSource.id).url);
     const pipeline = {
       id: pipelineSource.id,
       title: pipelineSource.title,
