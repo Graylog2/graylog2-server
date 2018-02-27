@@ -52,10 +52,20 @@ const Badge = require('react-bootstrap').Badge;
 const Button = require('react-bootstrap').Button;
 
 const items = [
+  'AliceBlue',
+  'Aqua',
   'Black',
   'Blue',
+  'Brown',
+  'Cyan',
+  'DarkMagenta',
+  'Gold',
   'Green',
+  'Magenta',
+  'Navy',
   'Red',
+  'SeaGreen',
+  'Turquoise',
   'White',
   'Yellow',
 ];

@@ -27,6 +27,11 @@
     border-bottom: 0;
 }
 
+:local(.scrollableList) {
+    max-height: 340px; /* 10 items */
+    overflow: auto;
+}
+
 :local(.dataFilterInput) {
     margin-bottom: 0;
     padding: 5px;

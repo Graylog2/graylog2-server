@@ -3,6 +3,7 @@ import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
 import { FormControl, FormGroup, ListGroup, ListGroupItem, OverlayTrigger, Popover } from 'react-bootstrap';
 import lodash from 'lodash';
+import IsolatedScroll from 'react-isolated-scroll';
 
 import style from './SelectPopover.css';
 
@@ -97,16 +98,20 @@ const SelectPopover = createReactClass({
     const popover = (
       <Popover {...popoverProps} className={style.customPopover}>
         {displayDataFilter && this.renderDataFilter(items)}
-        <ListGroup>
-          {selectedItem && this.renderClearSelectionItem()}
-          {filteredItems.map((item) => {
-            return (
-              <ListGroupItem key={item} onClick={this.handleItemSelection(item)} active={this.state.selectedItem === item}>
-                {itemFormatter(item)}
-              </ListGroupItem>
-            );
-          })}
-        </ListGroup>
+        {selectedItem && this.renderClearSelectionItem()}
+        <IsolatedScroll className={style.scrollableList}>
+          <ListGroup>
+            {filteredItems.map((item) => {
+              return (
+                <ListGroupItem key={item}
+                               onClick={this.handleItemSelection(item)}
+                               active={this.state.selectedItem === item}>
+                  {itemFormatter(item)}
+                </ListGroupItem>
+              );
+            })}
+          </ListGroup>
+        </IsolatedScroll>
       </Popover>
     );
 
