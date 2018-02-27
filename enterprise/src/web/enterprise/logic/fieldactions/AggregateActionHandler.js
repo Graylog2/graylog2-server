@@ -1,0 +1,16 @@
+import uuid from 'uuid/v4';
+
+import WidgetActions from 'enterprise/actions/WidgetActions';
+
+export default function (viewId, queryId, field) {
+  console.log(`New action for field ${field}.`);
+  const newWidget = {
+    id: uuid(),
+    title: `Values of field ${field}`,
+    type: 'AGGREGATION',
+    config: {
+      fields: [field],
+    },
+  };
+  WidgetActions.create(viewId, queryId, newWidget);
+}

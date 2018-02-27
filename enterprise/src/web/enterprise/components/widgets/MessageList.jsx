@@ -2,20 +2,26 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Reflux from 'reflux';
 import Immutable from 'immutable';
-import moment from 'moment';
 
-import { MessageTableEntry, MessageTablePaginator } from 'components/search';
+import { MessageTableEntry } from 'enterprise/components/messagelist';
+import { MessageTablePaginator } from 'components/search';
+import Field from 'enterprise/components/Field';
+
 import ActionsProvider from 'injection/ActionsProvider';
-
 import CombinedProvider from 'injection/CombinedProvider';
+import CurrentViewStore from 'enterprise/stores/CurrentViewStore';
+import QueriesStore from 'enterprise/stores/QueriesStore';
 
 const { ConfigurationActions } = CombinedProvider.get('Configuration');
 const { ConfigurationsStore } = CombinedProvider.get('Configurations');
-
 const RefreshActions = ActionsProvider.getActions('Refresh');
 
 const MessageList = React.createClass({
-  mixins: [Reflux.connect(ConfigurationsStore, 'configurations')],
+  mixins: [
+    Reflux.connect(ConfigurationsStore, 'configurations'),
+    Reflux.connect(CurrentViewStore, 'currentViewStore'),
+    Reflux.connect(QueriesStore, 'queries'),
+  ],
   propTypes: {
     data: PropTypes.shape({
       messages: PropTypes.arrayOf(PropTypes.object).isRequired,
@@ -59,7 +65,8 @@ const MessageList = React.createClass({
   },
 
   render() {
-    const pageSize = this.props.config.pageSize || 7;
+    const config = this.props.config || {};
+    const pageSize = config.pageSize || 7;
     const messages = this.props.data.messages || [];
     const messageSlice = messages
       .slice((this.state.currentPage - 1) * pageSize, this.state.currentPage * pageSize)
@@ -71,7 +78,7 @@ const MessageList = React.createClass({
           index: m.index,
         };
       });
-    const selectedFields = Immutable.OrderedSet(this.props.config.fields);
+    const selectedFields = this.state.queries.getIn([this.state.currentViewStore.selectedQuery, 'fields']);
     const selectedColumns = this._fieldColumns(selectedFields);
     return (
       <span>
@@ -87,12 +94,12 @@ const MessageList = React.createClass({
               <table className="table table-condensed messages">
                 <thead>
                   <tr>
-                    <th style={{ width: 180 }}>Timestamp</th>
+                    <th style={{ width: 180 }}><Field interactive name="Timestamp" queryId="FIXME" /></th>
                     {selectedColumns.toSeq().map((selectedFieldName) => {
                       return (
                         <th key={selectedFieldName}
                           style={this._columnStyle(selectedFieldName)}>
-                          {selectedFieldName}
+                          <Field interactive name={selectedFieldName} queryId="FIXME" />
                         </th>
                       );
                     })}

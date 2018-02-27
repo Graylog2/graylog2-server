@@ -2,7 +2,6 @@ import _ from 'lodash';
 import Immutable from 'immutable';
 
 export default {
-
   convert(result) {
     const fieldNames = Immutable.Map().withMutations((map) => {
       _.forEach(result.messages, (msg) => {

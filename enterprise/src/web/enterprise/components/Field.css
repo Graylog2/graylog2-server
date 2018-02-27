@@ -1,0 +1,11 @@
+:local(.dropdowntoggle) {
+    cursor: pointer;
+}
+
+:local(.dropdowntoggle) .caret {
+    display: none;
+}
+
+:local(.dropdowntoggle):hover .caret {
+    display: inline-block;
+}

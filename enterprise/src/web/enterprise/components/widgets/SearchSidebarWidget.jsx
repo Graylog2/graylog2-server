@@ -1,19 +1,14 @@
 import React from 'react';
-import Reflux from 'reflux';
 import md5 from 'md5';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
 import SearchSidebar from 'enterprise/components/widgets/SearchSidebarWithoutBorder';
 
-import ViewStore from 'enterprise/stores/ViewStore';
-import ViewActions from 'enterprise/actions/ViewActions';
-
 const _fieldAnalyzers = filter => PluginStore.exports('fieldAnalyzers')
   .filter(analyzer => (filter !== undefined ? filter(analyzer) : true));
 
 export default React.createClass({
-  mixins: [Reflux.connect(ViewStore, 'view')],
   getInitialState() {
     return {
       showAllFields: false,
@@ -25,7 +20,6 @@ export default React.createClass({
   },
 
   _toggleField(field) {
-    ViewActions.toggleField(field);
   },
 
   render() {
@@ -56,4 +50,3 @@ export default React.createClass({
     return <SearchSidebar {...sidebarProps} />;
   },
 });
-

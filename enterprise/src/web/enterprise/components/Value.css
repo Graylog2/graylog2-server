@@ -1,0 +1,8 @@
+:local(.dropdowntoggle) {
+    cursor: pointer;
+}
+
+:local(.dropdowntoggle):hover {
+    color: #3967ff;
+    text-decoration: underline;
+}

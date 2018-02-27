@@ -1,47 +1,60 @@
 import React from 'react';
-import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { Button, OverlayTrigger, Popover } from 'react-bootstrap';
+import { Dropdown, MenuItem, Well } from 'react-bootstrap';
 
 import { PluginStore } from 'graylog-web-plugin/plugin';
 
+import styles from './Field.css';
 
-const Field = createReactClass({
-  propTypes: {
-    name: PropTypes.string.isRequired,
-    interactive: PropTypes.bool,
-    placement: PropTypes.oneOf(['right', 'left', 'top', 'bottom']),
-  },
+const Field = ({ children, interactive, name, queryId, viewId }) => {
+  const element = children || name;
+  if (interactive) {
+    const fieldActions = PluginStore.exports('fieldActions').map((fieldAction) => {
+      return (<MenuItem eventKey={{ action: fieldAction.type, field: name }}
+                       onSelect={({ field }) => fieldAction.handler(viewId, queryId, field)}>{fieldAction.title}</MenuItem>);
+    });
 
-  getDefaultProps() {
-    return {
-      interactive: false,
-      placement: 'right',
-    };
-  },
+    return (
+      <Dropdown>
+        <span className={styles.dropdowntoggle} bsRole="toggle">{element}<span className="caret" /></span>
+        <Dropdown.Menu style={{ paddingLeft: '5px', paddingRight: '5px', minWidth: 'max-content', color: '#666666' }}>
+          <div style={{ marginBottom: '10px' }}>
+            <span style={{
+              paddingLeft: '10px',
+              paddingRight: '10px',
+              paddingBottom: '5px',
+              marginBottom: '5px',
+              fontWeight: 600,
+            }}>
+              {name}
+            </span>
+          </div>
 
-  render() {
-    const name = this.props.name;
+          <MenuItem divider />
+          <MenuItem header>Actions</MenuItem>
+          {fieldActions}
 
-    if (this.props.interactive) {
-      const actionOverlay = (
-        <Popover id={`field-action-overlay-${name}`} title={`${name} actions`}>
-          <span>How does this get layouted properly?!</span>
-        </Popover>
-      );
-      PluginStore.exports('fieldActions').map((fieldAction) => {
-        return fieldAction;
-      });
+          <Well style={{ marginTop: '10px', fontWeight: 200 }}>These are very useful stats about the field.</Well>
+        </Dropdown.Menu>
+      </Dropdown>
+    );
+  }
+  return (
+    <span>{element}</span>
+  );
+};
 
-      return (<OverlayTrigger trigger="click" rootClose animation={false} placement={this.props.placement} overlay={actionOverlay}>
-        <Button bsSize="xs" bsStyle="link" style={{ color: '#16ace3' }}>{name}</Button>
-      </OverlayTrigger>);
-    } else {
-      return (
-        <span>{name}</span>
-      );
-    }
-  },
-});
+Field.propTypes = {
+  children: PropTypes.element.isRequired,
+  interactive: PropTypes.bool.isRequired,
+  name: PropTypes.string.isRequired,
+  onToggleSelected: PropTypes.func.isRequired,
+  selected: PropTypes.bool.isRequired,
+  queryId: PropTypes.string.isRequired,
+};
+
+Field.defaultProps = {
+  interactive: false,
+};
 
 export default Field;

@@ -1,10 +1,11 @@
 import Reflux from 'reflux';
 import _ from 'lodash';
-import uuidv4 from 'uuid/v4';
 
 import SearchJobActions from 'enterprise/actions/SearchJobActions';
 import fetch from 'logic/rest/FetchProvider';
 import URLUtils from 'util/URLUtils';
+
+import SearchRequest from 'enterprise/logic/SearchRequest';
 
 const createSearchUrl = URLUtils.qualifyUrl('/plugins/org.graylog.plugins.enterprise/search');
 const executeQueryUrl = id => URLUtils.qualifyUrl(`/plugins/org.graylog.plugins.enterprise/search/${id}/execute`);
@@ -25,39 +26,8 @@ export default Reflux.createStore({
     };
   },
 
-  create(queries) {
-    // queries is the state of the view. We need to transform it to the correct format for the server
-    const searchRequest = {
-      queries: queries.map((query) => {
-        const transformed = {
-          id: query.id,
-          // TODO create conversion objects for query objects
-          query: {
-            type: 'elasticsearch',
-            query_string: query.query,
-          },
-          // TODO create conversion objects for timerange objects
-          timerange: {
-            type: query.rangeType,
-            range: query.rangeParams.get('range'),
-          },
-          // TODO the view state should reflect what search types we will be requesting for each query
-          search_types: [
-            // for now always include messages as search type
-            {
-              type: 'messages',
-              id: uuidv4(),
-              limit: 150,
-              offset: 0,
-              sort: [{ field: 'timestamp', order: 'DESC' }],
-            },
-          ],
-        };
-        // console.log(query, transformed);
-        return transformed;
-      }),
-    };
-    const promise = fetch('POST', createSearchUrl, searchRequest)
+  create(searchRequest) {
+    const promise = fetch('POST', createSearchUrl, searchRequest.toRequest())
       .then((search) => {
         this.state.searches[search.id] = search;
         this._trigger();

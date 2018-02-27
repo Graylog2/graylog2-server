@@ -2,14 +2,11 @@
 /* global window */
 import React from 'react';
 import ReactDOM from 'react-dom';
-import Reflux from 'reflux';
 import { AutoAffix } from 'react-overlays';
+
 import EventHandlersThrottler from 'util/EventHandlersThrottler';
 
-import ViewStore from 'enterprise/stores/ViewStore';
-
 const SideBar = React.createClass({
-  mixins: [Reflux.connect(ViewStore, 'view')],
   getInitialState() {
     return {
       availableHeight: 1000,
@@ -45,7 +42,7 @@ const SideBar = React.createClass({
   },
 
   render() {
-    return (<div style={{ marginTop: -15 }}>
+    return (<div style={{ marginTop: -20 }}>
       <AutoAffix viewportOffsetTop={45}>
         <div className="content-col" ref="sidebar">
           {this.props.children}

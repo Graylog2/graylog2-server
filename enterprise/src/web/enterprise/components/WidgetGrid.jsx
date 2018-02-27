@@ -1,21 +1,21 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Row } from 'react-bootstrap';
-import { PluginStore } from 'graylog-web-plugin/plugin';
 import _ from 'lodash';
 
 import { ReactGridContainer } from 'components/common';
 import style from 'pages/ShowDashboardPage.css';
 import ViewWidget from 'enterprise/components/widgets/ViewWidget';
+import { widgetDefinition } from 'enterprise/logic/Widget';
 
 export default class WidgetGrid extends React.Component {
   static _defaultDimensions(type) {
-    const widgetDefinition = PluginStore.exports('widgets').filter(widget => widget.type.toUpperCase() === type.toUpperCase())[0];
-    return { col: 1, row: 1, height: widgetDefinition.defaultHeight, width: widgetDefinition.defaultWidth };
+    const widgetDef = widgetDefinition(type);
+    return { col: 1, row: 1, height: widgetDef.defaultHeight, width: widgetDef.defaultWidth };
   }
 
   static _visualizationForType(type) {
-    return PluginStore.exports('widgets').filter(widget => widget.type.toUpperCase() === type.toUpperCase())[0].visualizationComponent;
+    return widgetDefinition(type).visualizationComponent;
   }
 
   static propTypes = {
@@ -86,6 +86,7 @@ export default class WidgetGrid extends React.Component {
     const grid = widgets && widgets.length > 0 ? (
       <ReactGridContainer locked={this.props.locked}
                           positions={positions}
+                          animate={false}
                           onPositionsChange={this.props.onPositionsChange}>
         {widgets}
       </ReactGridContainer>
