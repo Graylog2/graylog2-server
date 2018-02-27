@@ -3,7 +3,8 @@ import _ from 'lodash';
 import { searchTypeDefinition } from 'enterprise/logic/SearchType';
 
 const _searchTypePlugin = (type) => {
-  return searchTypeDefinition(type).handler ||
+  const typeDefinition = searchTypeDefinition(type);
+  return typeDefinition && typeDefinition.handler ? searchTypeDefinition(type).handler :
     {
       convert: (result) => {
         console.log(`No search type handler for type '${type}' result:`, result);
