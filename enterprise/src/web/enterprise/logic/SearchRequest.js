@@ -12,7 +12,7 @@ export default class SearchRequest {
         const searchTypes = widgets.get(id, new Immutable.Map())
           .map(widget => widgetDefinition(widget.get('type')).searchTypes(widget.get('config')).map(searchType => Object.assign(searchType, { widgetId: widget.get('id') })))
           .reduce((acc, cur) => acc.merge(cur), Immutable.Set());
-        const transformed = {
+        return {
           id: id,
           // TODO create conversion objects for query objects
           query: {
@@ -28,7 +28,12 @@ export default class SearchRequest {
           search_types: searchTypes.map((searchType) => {
             const searchTypeId = uuid();
             this.widgetMapping = this.widgetMapping.update(searchType.widgetId, new Immutable.Set(), widgetSearchTypes => widgetSearchTypes.add(searchTypeId));
-            return new Immutable.Map(searchTypeDefinition(searchType.type).defaults)
+            const typeDefinition = searchTypeDefinition(searchType.type);
+            if (!typeDefinition || !typeDefinition.defaults) {
+              console.warn(`Unable to find type definition or defaults for search type ${searchType.type} - skipping!`);
+            }
+            const defaults = typeDefinition ? typeDefinition.defaults : {};
+            return new Immutable.Map(defaults)
               .merge(searchType.config)
               .merge(
                 {
@@ -37,9 +42,6 @@ export default class SearchRequest {
                 });
           }),
         };
-
-        // console.log(query, transformed);
-        return transformed;
       }).valueSeq().toJS(),
     };
   }
