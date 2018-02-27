@@ -29,15 +29,15 @@ const SelectPopoverExample = createReactClass({
       <div>
         <div style={{ display: 'inline-block', marginRight: 20 }}>
           <SelectPopover id="example-popover" 
-                         title="Filter by colour"
-                         triggerNode={<Button bsStyle="info" bsSize="small">Select colour</Button>} 
+                         title="Filter by color"
+                         triggerNode={<Button bsStyle="info" bsSize="small">Select color</Button>}
                          items={items}
                          selectedItem={selectedItem}
                          onItemSelect={this.handleItemSelect}
                          displayDataFilter={false} />
         </div>
         
-        {selectedItem ? `You have selected ${selectedItem}` : 'Please select a colour!'}
+        {selectedItem ? `You have selected ${selectedItem}` : 'Please select a color!'}
       </div>
     );
   }
@@ -96,16 +96,16 @@ const SelectPopoverFormattedExample = createReactClass({
       <div>
         <div style={{ display: 'inline-block', marginRight: 20 }}>
           <SelectPopover id="example-popover-formatted" 
-                         title="Filter by colour"
-                         triggerNode={<Button bsStyle="info" bsSize="small">Select colour</Button>} 
+                         title="Filter by color"
+                         triggerNode={<Button bsStyle="info" bsSize="small">Select color</Button>}
                          items={items}
                          itemFormatter={this.formatItem}
                          selectedItem={selectedItem}
                          onItemSelect={this.handleItemSelect}
-                         filterPlaceholder="Filter by colour" />
+                         filterPlaceholder="Filter by color" />
         </div>
         
-        {selectedItem ? `You have selected ${selectedItem}` : 'Please select another colour!'}
+        {selectedItem ? `You have selected ${selectedItem}` : 'Please select another color!'}
       </div>
     );
   }
