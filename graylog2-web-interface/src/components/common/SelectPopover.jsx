@@ -83,15 +83,22 @@ const SelectPopover = createReactClass({
     );
   },
 
+  renderClearSelectionItem() {
+    return (
+      <ListGroupItem onClick={this.handleItemSelection()}><i className="fa fa-fw fa-times text-danger" /> Clear selection</ListGroupItem>
+    );
+  },
+
   render() {
     const { displayDataFilter, itemFormatter, items, placement, triggerAction, triggerNode, ...otherProps } = this.props;
     const popoverProps = this.pickPopoverProps(otherProps);
-    const { filteredItems } = this.state;
+    const { filteredItems, selectedItem } = this.state;
 
     const popover = (
       <Popover {...popoverProps} className={style.customPopover}>
         {displayDataFilter && this.renderDataFilter(items)}
         <ListGroup>
+          {selectedItem && this.renderClearSelectionItem()}
           {filteredItems.map((item) => {
             return (
               <ListGroupItem key={item} onClick={this.handleItemSelection(item)} active={this.state.selectedItem === item}>

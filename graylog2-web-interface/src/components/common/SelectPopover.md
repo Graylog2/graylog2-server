@@ -74,7 +74,7 @@ const SelectPopoverFormattedExample = createReactClass({
   formatItem(item) {
     return (
       <span>
-        <Badge style={{ backgroundColor: item }}>&nbsp;</Badge> {item}
+        <i className="fa fa-fw fa-square" style={{ color: item }} /> {item}
       </span>
     )
   },
@@ -95,7 +95,7 @@ const SelectPopoverFormattedExample = createReactClass({
                          filterPlaceholder="Filter by colour" />
         </div>
         
-        {selectedItem ? `You have selected ${selectedItem}` : 'Please select a colour!'}
+        {selectedItem ? `You have selected ${selectedItem}` : 'Please select another colour!'}
       </div>
     );
   }
