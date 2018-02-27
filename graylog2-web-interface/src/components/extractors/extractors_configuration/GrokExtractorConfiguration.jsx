@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Row, Col, Button } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import { Input } from 'components/bootstrap';
 import Routes from 'routing/Routes';
@@ -60,8 +60,8 @@ const GrokExtractorConfiguration = React.createClass({
     const helpMessage = (
       <span>
           Matches the field against the current Grok pattern list, use <b>{'%{PATTERN-NAME}'}</b> to refer to a{' '}
-        <LinkContainer to={Routes.SYSTEM.GROKPATTERNS}><a>stored pattern</a></LinkContainer>.
-        </span>
+        <Link to={Routes.SYSTEM.GROKPATTERNS}>stored pattern</Link>.
+      </span>
     );
 
     return (

@@ -2,6 +2,7 @@ import React from 'react';
 import Reflux from 'reflux';
 import { Alert, Button } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 import naturalSort from 'javascript-natural-sort';
 
 import { DataTable, Spinner } from 'components/common';
@@ -83,7 +84,7 @@ const ProcessingTimelineComponent = React.createClass({
     return (
       <tr key={pipeline.id}>
         <td className="pipeline-name">
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}><a>{pipeline.title}</a></LinkContainer><br />
+          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>{pipeline.title}</Link><br />
           {pipeline.description}
           <br />
           <MetricContainer name={`org.graylog.plugins.pipelineprocessor.ast.Pipeline.${pipeline.id}.executed`}>

@@ -31,6 +31,9 @@ const LoginPage = React.createClass({
   componentWillUnmount() {
     disconnectedStyle.unuse();
     authStyle.unuse();
+    if (this.promise) {
+      this.promise.cancel();
+    }
   },
 
   onSignInClicked(event) {
@@ -40,16 +43,16 @@ const LoginPage = React.createClass({
     const username = this.refs.username.getValue();
     const password = this.refs.password.getValue();
     const location = document.location.host;
-    const promise = SessionActions.login.triggerPromise(username, password, location);
-    promise.catch((error) => {
+    this.promise = SessionActions.login.triggerPromise(username, password, location);
+    this.promise.catch((error) => {
       if (error.additional.status === 401) {
         this.setState({ lastError: 'Invalid credentials, please verify them and retry.' });
       } else {
         this.setState({ lastError: `Error - the server returned: ${error.additional.status} - ${error.message}` });
       }
     });
-    promise.finally(() => {
-      if (this.isMounted()) {
+    this.promise.finally(() => {
+      if (!this.promise.isCancelled()) {
         this.setState({ loading: false });
       }
     });

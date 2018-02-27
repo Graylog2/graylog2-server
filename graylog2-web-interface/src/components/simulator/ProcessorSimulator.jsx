@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { Col, ControlLabel, FormGroup, HelpBlock, Panel, Row } from 'react-bootstrap';
 import naturalSort from 'javascript-natural-sort';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import { Select } from 'components/common';
 import RawMessageLoader from 'components/messageloaders/RawMessageLoader';
@@ -74,7 +74,7 @@ const ProcessorSimulator = React.createClass({
             <Col md={8} mdOffset={2}>
               <Panel bsStyle="danger" header="No streams found">
                 Pipelines operate on streams, but your system currently has no streams. Please{' '}
-                <LinkContainer to={Routes.STREAMS}><a>create a stream</a></LinkContainer>{' '}
+                <Link to={Routes.STREAMS}>create a stream</Link>{' '}
                 and come back here later to test pipelines processing messages in your new stream.
               </Panel>
             </Col>

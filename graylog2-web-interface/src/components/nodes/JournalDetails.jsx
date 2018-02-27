@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 import { ProgressBar, Row, Col, Alert } from 'react-bootstrap';
 import numeral from 'numeral';
 import moment from 'moment';
@@ -97,7 +97,7 @@ const JournalDetails = React.createClass({
       overcommittedWarning = (
         <span>
           <strong>Warning!</strong> The journal utilization is exceeding the maximum size defined.
-          {' '}<LinkContainer to={Routes.SYSTEM.OVERVIEW}><a>Click here</a></LinkContainer> for more information.<br />
+          {' '}<Link to={Routes.SYSTEM.OVERVIEW}>Click here</Link> for more information.<br />
         </span>
       );
     }

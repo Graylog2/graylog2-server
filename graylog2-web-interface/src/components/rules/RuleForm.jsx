@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { Button, Col, ControlLabel, FormControl, FormGroup, Row } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import { SourceCodeEditor } from 'components/common';
 import { Input } from 'components/bootstrap';
@@ -116,9 +116,9 @@ const RuleForm = React.createClass({
     const formattedPipelines = this.props.usedInPipelines.map(pipeline => {
       return (
         <li key={pipeline.id}>
-          <LinkContainer to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
-            <a>{pipeline.title}</a>
-          </LinkContainer>
+          <Link to={Routes.SYSTEM.PIPELINES.PIPELINE(pipeline.id)}>
+            {pipeline.title}
+          </Link>
         </li>
       );
     });

@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import { DropdownButton, MenuItem } from 'react-bootstrap';
+import { LinkContainer } from 'react-router-bootstrap';
 import ExtractorUtils from 'util/ExtractorUtils';
 
 const MessageFieldExtractorActions = React.createClass({
@@ -20,9 +21,11 @@ const MessageFieldExtractorActions = React.createClass({
   },
   _formatExtractorMenuItem(extractorType) {
     return (
-      <MenuItem key={`menu-item-${extractorType}`} href={this.newExtractorRoutes[extractorType]}>
-        {ExtractorUtils.getReadableExtractorTypeName(extractorType)}
-      </MenuItem>
+      <LinkContainer to={this.newExtractorRoutes[extractorType]}>
+        <MenuItem key={`menu-item-${extractorType}`}>
+          {ExtractorUtils.getReadableExtractorTypeName(extractorType)}
+        </MenuItem>
+      </LinkContainer>
     );
   },
   render() {

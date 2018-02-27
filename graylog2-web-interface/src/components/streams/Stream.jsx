@@ -15,6 +15,7 @@ import { OverlayElement, Pluralize } from 'components/common';
 import UserNotification from 'util/UserNotification';
 import { Button, Tooltip } from 'react-bootstrap';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 import Routes from 'routing/Routes';
 
 import style from './Stream.css';
@@ -184,9 +185,7 @@ const Stream = React.createClass({
         </div>
 
         <h2 className={style.streamTitle}>
-          <LinkContainer to={Routes.stream_search(stream.id)}>
-            <a>{stream.title}</a>
-          </LinkContainer>
+          <Link to={Routes.stream_search(stream.id)}>{stream.title}</Link>
           {' '}
           <small>{indexSetDetails}<StreamStateBadge stream={stream} /></small>
         </h2>

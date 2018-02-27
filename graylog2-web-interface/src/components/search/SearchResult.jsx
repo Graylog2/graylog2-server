@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Col, Row } from 'react-bootstrap';
 
 import { LoadingIndicator } from 'components/common';
@@ -20,9 +21,9 @@ const SearchResult = React.createClass({
     histogram: PropTypes.object.isRequired,
     formattedHistogram: PropTypes.array,
     searchInStream: PropTypes.object,
-    streams: PropTypes.instanceOf(Immutable.Map),
-    inputs: PropTypes.instanceOf(Immutable.Map),
-    nodes: PropTypes.instanceOf(Immutable.Map),
+    streams: ImmutablePropTypes.map,
+    inputs: ImmutablePropTypes.map,
+    nodes: ImmutablePropTypes.map,
     permissions: PropTypes.array.isRequired,
     searchConfig: PropTypes.object.isRequired,
     loadingSearch: PropTypes.bool,

@@ -3,6 +3,7 @@ import React from 'react';
 import { ButtonGroup, Button, Row, Col, DropdownButton, MenuItem, Label } from 'react-bootstrap';
 import Immutable from 'immutable';
 import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import StoreProvider from 'injection/StoreProvider';
 const StreamsStore = StoreProvider.getStore('Streams');
@@ -222,9 +223,9 @@ const MessageDetail = React.createClass({
     let messageTitle;
     if (this.props.message.index) {
       messageTitle = (
-        <LinkContainer to={Routes.message_show(this.props.message.index, this.props.message.id)}>
-          <a href="#">{this.props.message.id}</a>
-        </LinkContainer>
+        <Link to={Routes.message_show(this.props.message.index, this.props.message.id)}>
+          {this.props.message.id}
+        </Link>
       );
     } else {
       messageTitle = <span>{this.props.message.id} <Label bsStyle="warning">Not stored</Label></span>;

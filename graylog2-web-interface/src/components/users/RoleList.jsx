@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
 import Reflux from 'reflux';
-import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Button } from 'react-bootstrap';
 
 import StoreProvider from 'injection/StoreProvider';
@@ -14,7 +14,7 @@ import { DataTable } from 'components/common';
 const RoleList = React.createClass({
   mixins: [Reflux.connect(CurrentUserStore), PermissionsMixin],
   propTypes: {
-    roles: PropTypes.instanceOf(Immutable.Set).isRequired,
+    roles: ImmutablePropTypes.set.isRequired,
     showEditRole: PropTypes.func.isRequired,
     deleteRole: PropTypes.func.isRequired,
   },

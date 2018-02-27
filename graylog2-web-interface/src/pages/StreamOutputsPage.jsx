@@ -1,7 +1,7 @@
 import React from 'react';
 import Reflux from 'reflux';
 import { Row, Col } from 'react-bootstrap';
-import { LinkContainer } from 'react-router-bootstrap';
+import { Link } from 'react-router';
 
 import StoreProvider from 'injection/StoreProvider';
 const CurrentUserStore = StoreProvider.getStore('CurrentUser');
@@ -46,7 +46,7 @@ const StreamOutputsPage = React.createClass({
               <SupportLink>
                 <i>Removing</i> an output removes it from this stream but it will still be in the list of available outputs.
                 Deleting an output <i>globally</i> will remove it from this and all other streams and terminate it.
-                You can see all defined outputs in details at the {' '} <LinkContainer to={Routes.SYSTEM.OUTPUTS}><a>global output list</a></LinkContainer>.
+                You can see all defined outputs in details at the {' '} <Link to={Routes.SYSTEM.OUTPUTS}>global output list</Link>.
               </SupportLink>
             </Col>
           </Row>

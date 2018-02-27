@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import Immutable from 'immutable';
+import ImmutablePropTypes from 'react-immutable-proptypes';
 import { Alert } from 'react-bootstrap';
 
 import Dashboard from './Dashboard';
@@ -9,7 +9,7 @@ import PermissionsMixin from '../../util/PermissionsMixin';
 
 const DashboardList = React.createClass({
   propTypes: {
-    dashboards: PropTypes.instanceOf(Immutable.List),
+    dashboards: ImmutablePropTypes.list,
     onDashboardAdd: PropTypes.func,
     permissions: PropTypes.arrayOf(PropTypes.string),
   },

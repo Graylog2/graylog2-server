@@ -45,7 +45,7 @@ const SourceOverview = React.createClass({
     this.valueGroup = this.valueDimension.group().reduceSum(d => d.y);
 
     return {
-      range: null,
+      range: '',
       resolution: 'minute',
       filter: '',
       loading: false,
