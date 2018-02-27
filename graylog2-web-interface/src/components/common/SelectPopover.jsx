@@ -1,7 +1,8 @@
 import React from 'react';
 import createReactClass from 'create-react-class';
 import PropTypes from 'prop-types';
-import { ListGroup, ListGroupItem, OverlayTrigger, Popover } from 'react-bootstrap';
+import { FormControl, FormGroup, ListGroup, ListGroupItem, OverlayTrigger, Popover } from 'react-bootstrap';
+import lodash from 'lodash';
 
 import style from './SelectPopover.css';
 
@@ -16,6 +17,8 @@ const SelectPopover = createReactClass({
     itemFormatter: PropTypes.func,
     selectedItem: PropTypes.string,
     onItemSelect: PropTypes.func.isRequired,
+    displayDataFilter: PropTypes.bool,
+    filterPlaceholder: PropTypes.string,
   },
 
   getDefaultProps() {
@@ -26,11 +29,15 @@ const SelectPopover = createReactClass({
       itemFormatter: item => item,
       selectedItem: undefined,
       onItemSelect: () => {},
+      displayDataFilter: true,
+      filterPlaceholder: 'Type to filter',
     };
   },
 
   getInitialState() {
     return {
+      filterText: '',
+      filteredItems: this.props.items,
       selectedItem: this.props.selectedItem,
     };
   },
@@ -38,6 +45,9 @@ const SelectPopover = createReactClass({
   componentWillReceiveProps(nextProps) {
     if (this.props.selectedItem !== nextProps.selectedItem) {
       this.setState({ selectedItem: nextProps.selectedItem });
+    }
+    if (this.props.items !== nextProps.items) {
+      this.filterData(this.state.filterText, nextProps.items);
     }
   },
 
@@ -48,12 +58,41 @@ const SelectPopover = createReactClass({
     };
   },
 
+  filterData(filterText, items) {
+    const newFilteredItems = items.filter(item => item.match(new RegExp(filterText, 'i')));
+    this.setState({ filterText: filterText, filteredItems: newFilteredItems });
+  },
+
+  handleFilterChange(items) {
+    return (event) => {
+      const filterText = event.target.value.trim();
+      this.filterData(filterText, items);
+    };
+  },
+
+  pickPopoverProps(props) {
+    const popoverPropKeys = Object.keys(Popover.propTypes);
+    return lodash.pick(props, popoverPropKeys);
+  },
+
+  renderDataFilter(items) {
+    return (
+      <FormGroup controlId="dataFilterInput" className={style.dataFilterInput}>
+        <FormControl type="text" placeholder={this.props.filterPlaceholder} onChange={this.handleFilterChange(items)} />
+      </FormGroup>
+    );
+  },
+
   render() {
-    const { itemFormatter, items, placement, triggerAction, triggerNode, ...popoverProps } = this.props;
+    const { displayDataFilter, itemFormatter, items, placement, triggerAction, triggerNode, ...otherProps } = this.props;
+    const popoverProps = this.pickPopoverProps(otherProps);
+    const { filteredItems } = this.state;
+
     const popover = (
       <Popover {...popoverProps} className={style.customPopover}>
+        {displayDataFilter && this.renderDataFilter(items)}
         <ListGroup>
-          {items.map((item) => {
+          {filteredItems.map((item) => {
             return (
               <ListGroupItem key={item} onClick={this.handleItemSelection(item)} active={this.state.selectedItem === item}>
                 {itemFormatter(item)}

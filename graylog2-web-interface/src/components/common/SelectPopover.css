@@ -26,3 +26,8 @@
 :local(.customPopover) .list-group-item:last-child {
     border-bottom: 0;
 }
+
+:local(.dataFilterInput) {
+    margin-bottom: 0;
+    padding: 5px;
+}

@@ -33,7 +33,8 @@ const SelectPopoverExample = createReactClass({
                          triggerNode={<Button bsStyle="info" bsSize="small">Select colour</Button>} 
                          items={items}
                          selectedItem={selectedItem}
-                         onItemSelect={this.handleItemSelect} />
+                         onItemSelect={this.handleItemSelect}
+                         displayDataFilter={false} />
         </div>
         
         {selectedItem ? `You have selected ${selectedItem}` : 'Please select a colour!'}
@@ -90,7 +91,8 @@ const SelectPopoverFormattedExample = createReactClass({
                          items={items}
                          itemFormatter={this.formatItem}
                          selectedItem={selectedItem}
-                         onItemSelect={this.handleItemSelect} />
+                         onItemSelect={this.handleItemSelect}
+                         filterPlaceholder="Filter by colour" />
         </div>
         
         {selectedItem ? `You have selected ${selectedItem}` : 'Please select a colour!'}
