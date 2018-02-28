@@ -1,0 +1,38 @@
+:local(.customPopover) {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+:local(.customPopover) .popover-content {
+    min-width: 200px;
+    padding: 0;
+}
+
+:local(.customPopover) .list-group {
+    margin-bottom: 0;
+}
+
+:local(.customPopover) .list-group-item {
+    border-right: 0;
+    border-left: 0;
+    padding: 6px 15px;
+}
+
+:local(.customPopover) .list-group-item:first-child {
+    border-top-right-radius: 0;
+    border-top-left-radius: 0;
+}
+
+:local(.customPopover) .list-group-item:last-child {
+    border-bottom: 0;
+}
+
+:local(.scrollableList) {
+    max-height: 340px; /* 10 items */
+    overflow: auto;
+}
+
+:local(.dataFilterInput) {
+    margin-bottom: 0;
+    padding: 5px;
+}
