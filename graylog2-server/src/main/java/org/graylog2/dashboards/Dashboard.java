@@ -26,6 +26,10 @@ public interface Dashboard extends Persisted {
 
     void setTitle(String title);
 
+    Map<String, Map<String, Integer>> getPositions();
+
+    void setPostions(Map<String, Map<String, Object>> positions);
+
     String getDescription();
 
     void setDescription(String description);

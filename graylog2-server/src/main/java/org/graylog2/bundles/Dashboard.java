@@ -23,6 +23,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 @JsonAutoDetect
 public class Dashboard {
@@ -35,12 +36,18 @@ public class Dashboard {
     @NotNull
     private List<DashboardWidget> dashboardWidgets = Collections.emptyList();
 
+    private Map<String, Integer> positions;
+
     public String getTitle() {
         return title;
     }
 
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    public Map<String, Integer> getPositions() {
+        return this.positions;
     }
 
     public String getDescription() {

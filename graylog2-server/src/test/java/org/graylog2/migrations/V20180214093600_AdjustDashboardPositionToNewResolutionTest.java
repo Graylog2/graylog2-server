@@ -17,8 +17,6 @@
 package org.graylog2.migrations;
 
 import com.google.common.collect.ImmutableList;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBCollection;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
@@ -38,8 +36,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
     @Rule
@@ -53,34 +51,30 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
     @Mock
     private DashboardService dashboardService;
 
-
-    @Mock
-    private DBCollection dbCollection;
-
     @Before
     public void setUp() throws Exception {
         this.clusterConfigService = mock(ClusterConfigService.class);
         when(clusterConfigService.get(any())).thenReturn(null);
         this.adjustDashboardResolutionMigration = new V20180214093600_AdjustDashboardPositionToNewResolution(
                 dashboardService,
-                clusterConfigService);
+                clusterConfigService
+        );
     }
 
     @Test
     public void doNotMigrateAnythingWithoutDashboards() throws Exception {
-      when(this.dashboardService.all()).thenReturn(Collections.emptyList());
+        when(this.dashboardService.all()).thenReturn(Collections.emptyList());
 
-      this.adjustDashboardResolutionMigration.upgrade();
+        this.adjustDashboardResolutionMigration.upgrade();
 
-      verify(this.dashboardService, never()).save(any());
+        verify(this.dashboardService, never()).save(any());
     }
 
     @Test
     public void doNotMigrateAnythingWithDashboardsWithoutPositions() throws Exception {
-        final BasicDBObject fields = mock(BasicDBObject.class);
         final Dashboard dashboard = mock(Dashboard.class);
         when(dashboard.getId()).thenReturn("uuu-iii-ddd");
-        when(dashboard.getFields()).thenReturn(fields);
+        when(dashboard.getPositions()).thenReturn(null);
         when(this.dashboardService.all()).thenReturn(ImmutableList.of(dashboard));
 
         this.adjustDashboardResolutionMigration.upgrade();
@@ -91,28 +85,30 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
     @Test
     public void doMigrateOneDashboardsPositions() throws Exception {
 
-        final BasicDBObject position = mock(BasicDBObject.class);
-        when(position.get("width")).thenReturn(5);
-        when(position.get("height")).thenReturn(4);
-        when(position.get("col")).thenReturn(1);
-        when(position.get("row")).thenReturn(1);
+        final Map<String, Map<String, Integer>> oldPositions = new HashMap<>(1);
+        final Map<String, Integer> position = new HashMap<>(4);
+        position.put("width", 5);
+        position.put("height", 4);
+        position.put("col", 2);
+        position.put("row", 2);
+        oldPositions.put("my-position-id", position);
 
-        final BasicDBObject positions = mock(BasicDBObject.class);
-        when(positions.get(any())).thenReturn(position);
-        Set keySet = new java.util.HashSet();
-        keySet.add("my-position-id");
-        when(positions.keySet()).thenReturn(keySet);
-
-        final Map<String, Object> fields = mock(BasicDBObject.class);
-        when(fields.get(any())).thenReturn(positions);
+        final Map<String, Map<String, Object>> newPositions = new HashMap<>(1);
+        final Map<String, Object> newPosition = new HashMap<>(4);
+        newPosition.put("width", 10);
+        newPosition.put("height", 8);
+        newPosition.put("col", 3);
+        newPosition.put("row", 3);
+        newPositions.put("my-position-id", newPosition);
 
         final Dashboard dashboard = mock(Dashboard.class, Mockito.RETURNS_DEEP_STUBS);
-        when(dashboard.getFields()).thenReturn(fields);
+        when(dashboard.getPositions()).thenReturn(oldPositions);
         when(dashboard.getId()).thenReturn("uuu-iii-ddd");
         when(this.dashboardService.all()).thenReturn(ImmutableList.of(dashboard));
 
         this.adjustDashboardResolutionMigration.upgrade();
 
+        verify(dashboard).setPostions(newPositions);
         verify(this.dashboardService, times(1)).save(dashboard);
     }
 }

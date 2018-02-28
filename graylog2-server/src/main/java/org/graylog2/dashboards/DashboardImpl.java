@@ -18,6 +18,7 @@ package org.graylog2.dashboards;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.database.CollectionName;
@@ -30,7 +31,10 @@ import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+
+import static java.lang.Integer.parseInt;
 
 @CollectionName("dashboards")
 public class DashboardImpl extends PersistedImpl implements Dashboard {
@@ -70,6 +74,32 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
     @Override
     public void setDescription(String description) {
         this.fields.put(FIELD_DESCRIPTION, description);
+    }
+
+    @Override
+    public Map<String, Map<String, Integer>> getPositions() {
+        final Map<String, Map<String, Integer>> result = new HashMap<>();
+
+        final BasicDBObject positions = (BasicDBObject) fields.get(DashboardImpl.EMBEDDED_POSITIONS);
+        if (positions == null) {
+            return null;
+        }
+
+        for ( String positionId : positions.keySet() ) {
+            final BasicDBObject position = (BasicDBObject) positions.get(positionId);
+            final Map<String, Integer> positionResult = new HashMap<>(4);
+            positionResult.put("width", parseInt(position.get("width").toString()));
+            positionResult.put("height", parseInt(position.get("height").toString()));
+            positionResult.put("col", parseInt(position.get("col").toString()));
+            positionResult.put("row", parseInt(position.get("row").toString()));
+            result.put(positionId, positionResult);
+        }
+        return result;
+    }
+
+    @Override
+    public void setPostions(Map<String, Map<String, Object>> positions) {
+        getFields().put(DashboardImpl.EMBEDDED_POSITIONS, positions);
     }
 
     @Override
@@ -144,5 +174,4 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
 
         return result;
     }
-
 }

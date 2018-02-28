@@ -18,10 +18,8 @@ package org.graylog2.migrations;
 
 import com.google.common.collect.Maps;
 
-import com.mongodb.BasicDBObject;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.dashboards.Dashboard;
-import org.graylog2.dashboards.DashboardImpl;
 import org.graylog2.dashboards.DashboardService;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
@@ -33,11 +31,10 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
-
-import static java.lang.Integer.parseInt;
 
 /**
  * Migration adjusting the position of dashboard widgets to the higher resolution of the
@@ -51,7 +48,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
 
     @Inject
     public V20180214093600_AdjustDashboardPositionToNewResolution(DashboardService dashboardService,
-                                                                ClusterConfigService clusterConfigService) {
+                                                                  ClusterConfigService clusterConfigService) {
         this.dashboardService = dashboardService;
         this.clusterConfigService = clusterConfigService;
     }
@@ -68,31 +65,25 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
 
         Map<String, String> dashboardIds = Maps.newHashMap();
         for (Dashboard dashboard : dashboardService.all()) {
-            Map<String, Object> fields = dashboard.getFields();
-            BasicDBObject positions = (BasicDBObject) fields.get(DashboardImpl.EMBEDDED_POSITIONS);
-            if (positions == null) {
+            final Map<String, Map<String, Integer>> oldPosition = dashboard.getPositions();
+            if (oldPosition == null) {
                 dashboardIds.put(dashboard.getId(), "skipped");
                 continue;
             }
-            Map<String, Map<String, Object>> newPosition = Maps.newHashMap();
+            final Map<String, Map<String, Object>> newPosition = new HashMap<>();
 
-            for ( String positionId : positions.keySet() ) {
-                BasicDBObject position = (BasicDBObject) positions.get(positionId);
-                Integer newWidth = parseInt(position.get("width").toString()) * 2;
-                Integer newHeight = parseInt(position.get("height").toString()) * 2;
-                Integer newCol = adjustPosition(parseInt(position.get("col").toString()));
-                Integer newRow = adjustPosition(parseInt(position.get("row").toString()));
-
-                Map<String, Object> x = Maps.newHashMap();
-                x.put("col", newCol);
-                x.put("row", newRow);
-                x.put("height", newHeight);
-                x.put("width", newWidth);
+            for ( String positionId : oldPosition.keySet() ) {
+                final Map<String, Integer> position = oldPosition.get(positionId);
+                final Map<String, Object> x = new HashMap<>(4);
+                x.put("width", position.get("width") * 2);
+                x.put("height", position.get("height") * 2);
+                x.put("col", adjustPosition(position.get("col")));
+                x.put("row", adjustPosition(position.get("row")));
 
                 newPosition.put(positionId, x);
             }
             try {
-                dashboard.getFields().put(DashboardImpl.EMBEDDED_POSITIONS, newPosition);
+                dashboard.setPostions(newPosition);
                 dashboardService.save(dashboard);
                 dashboardIds.put(dashboard.getId(), "updated");
             } catch (ValidationException e) {

@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -107,10 +108,10 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
 
     @Override
     public void updateWidgetPositions(Dashboard dashboard, WidgetPositionsRequest positions) throws ValidationException {
-        Map<String, Map<String, Object>> map = Maps.newHashMap();
+        final Map<String, Map<String, Object>> map = new HashMap<>(1);
 
         for (WidgetPositionsRequest.WidgetPosition position : positions.positions()) {
-            Map<String, Object> x = Maps.newHashMap();
+            Map<String, Object> x = new HashMap<>(4);
             x.put("col", position.col());
             x.put("row", position.row());
             x.put("height", position.height());
@@ -119,8 +120,7 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
             map.put(position.id(), x);
         }
 
-        dashboard.getFields().put(DashboardImpl.EMBEDDED_POSITIONS, map);
-
+        dashboard.setPostions(map);
         save(dashboard);
     }
 
