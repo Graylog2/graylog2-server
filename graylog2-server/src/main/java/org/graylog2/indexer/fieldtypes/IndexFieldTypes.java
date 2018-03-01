@@ -20,12 +20,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 import org.mongojack.Id;
 import org.mongojack.ObjectId;
 
 import javax.annotation.Nullable;
-import java.util.Map;
+import java.util.Set;
 
 @AutoValue
 @JsonDeserialize(builder = IndexFieldTypes.Builder.class)
@@ -48,9 +48,9 @@ public abstract class IndexFieldTypes {
     public abstract String indexName();
 
     @JsonProperty(FIELD_FIELDS)
-    public abstract ImmutableMap<String, FieldType> fields();
+    public abstract ImmutableSet<FieldType> fields();
 
-    public static IndexFieldTypes create(String indexSetId, String indexName, Map<String, FieldType> fields) {
+    public static IndexFieldTypes create(String indexSetId, String indexName, Set<FieldType> fields) {
         return builder()
                 .indexSetId(indexSetId)
                 .indexName(indexName)
@@ -82,11 +82,11 @@ public abstract class IndexFieldTypes {
         @JsonProperty(FIELD_INDEX_NAME)
         public abstract Builder indexName(String indexName);
 
-        abstract ImmutableMap.Builder<String, FieldType> fieldsBuilder();
+        abstract ImmutableSet.Builder<FieldType> fieldsBuilder();
 
         @JsonProperty(FIELD_FIELDS)
-        public Builder fields(Map<String, FieldType> fields) {
-            fieldsBuilder().putAll(fields);
+        public Builder fields(Set<FieldType> fields) {
+            fieldsBuilder().addAll(fields);
             return this;
         }
 

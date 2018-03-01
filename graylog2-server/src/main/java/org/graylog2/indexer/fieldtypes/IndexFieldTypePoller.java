@@ -35,7 +35,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.Spliterator;
 import java.util.Spliterators;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -122,9 +121,9 @@ public class IndexFieldTypePoller {
 
         final Spliterator<Map.Entry<String, JsonNode>> fieldSpliterator = Spliterators.spliteratorUnknownSize(properties.fields(), Spliterator.IMMUTABLE);
 
-        final Map<String, FieldType> fieldsMap = StreamSupport.stream(fieldSpliterator, false)
+        final Set<FieldType> fieldsMap = StreamSupport.stream(fieldSpliterator, false)
                 .map(field -> FieldType.create(field.getKey(), field.getValue().path("type").asText()))
-                .collect(Collectors.toMap(FieldType::fieldName, Function.identity()));
+                .collect(Collectors.toSet());
 
         return Optional.of(IndexFieldTypes.create(indexSetId, indexName, fieldsMap));
     }

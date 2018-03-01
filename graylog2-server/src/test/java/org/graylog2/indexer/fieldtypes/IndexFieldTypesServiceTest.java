@@ -17,8 +17,7 @@
 package org.graylog2.indexer.fieldtypes;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import com.google.common.collect.ImmutableSet;
 import com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb;
 import org.graylog2.bindings.providers.MongoJackObjectMapperProvider;
 import org.graylog2.database.MongoConnectionRule;
@@ -29,7 +28,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.Map;
+import java.util.Set;
 
 import static com.lordofthejars.nosqlunit.mongodb.InMemoryMongoDb.InMemoryMongoRuleBuilder.newInMemoryMongoDbRule;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -53,29 +52,29 @@ public class IndexFieldTypesServiceTest {
         mongoRule.getMongoConnection().getMongoDatabase().drop();
     }
 
-    private IndexFieldTypes createDto(String indexName, String indexSetId, Map<String, FieldType> fields) {
+    private IndexFieldTypes createDto(String indexName, String indexSetId, Set<FieldType> fields) {
         return IndexFieldTypes.builder()
                 .indexName(indexName)
                 .indexSetId(indexSetId)
-                .fields(ImmutableMap.<String, FieldType>builder()
-                        .put("message", FieldType.create("message", "text"))
-                        .put("source", FieldType.create("source", "text"))
-                        .put("timestamp", FieldType.create("timestamp", "date"))
-                        .put("http_method", FieldType.create("http_method", "keyword"))
-                        .put("http_status", FieldType.create("http_status", "long"))
-                        .putAll(fields)
+                .fields(ImmutableSet.<FieldType>builder()
+                        .add(FieldType.create("message", "text"))
+                        .add(FieldType.create("source", "text"))
+                        .add(FieldType.create("timestamp", "date"))
+                        .add(FieldType.create("http_method", "keyword"))
+                        .add(FieldType.create("http_status", "long"))
+                        .addAll(fields)
                         .build())
                 .build();
     }
 
-    private IndexFieldTypes createDto(String indexName, Map<String, FieldType> fields) {
+    private IndexFieldTypes createDto(String indexName, Set<FieldType> fields) {
         return createDto(indexName, "abc123", fields);
     }
 
     @Test
     public void saveGetDeleteStream() {
-        final IndexFieldTypes newDto1 = createDto("graylog_0", Collections.emptyMap());
-        final IndexFieldTypes newDto2 = createDto("graylog_1", Collections.emptyMap());
+        final IndexFieldTypes newDto1 = createDto("graylog_0", Collections.emptySet());
+        final IndexFieldTypes newDto2 = createDto("graylog_1", Collections.emptySet());
 
         final IndexFieldTypes savedDto1 = dbService.save(newDto1);
         final IndexFieldTypes savedDto2 = dbService.save(newDto2);
@@ -85,11 +84,11 @@ public class IndexFieldTypesServiceTest {
         assertThat(dto1.id()).isNotBlank();
         assertThat(dto1.indexName()).isEqualTo("graylog_0");
         assertThat(dto1.fields()).containsOnly(
-                Maps.immutableEntry("message", FieldType.create("message", "text")),
-                Maps.immutableEntry("source", FieldType.create("source", "text")),
-                Maps.immutableEntry("timestamp", FieldType.create("timestamp", "date")),
-                Maps.immutableEntry("http_method", FieldType.create("http_method", "keyword")),
-                Maps.immutableEntry("http_status", FieldType.create("http_status", "long"))
+                FieldType.create("message", "text"),
+                FieldType.create("source", "text"),
+                FieldType.create("timestamp", "date"),
+                FieldType.create("http_method", "keyword"),
+                FieldType.create("http_status", "long")
         );
 
         final IndexFieldTypes dto2 = dbService.get(savedDto2.indexName()).orElse(null);
@@ -109,8 +108,8 @@ public class IndexFieldTypesServiceTest {
 
     @Test
     public void upsert() {
-        final IndexFieldTypes newDto1 = createDto("graylog_0", Collections.emptyMap());
-        final IndexFieldTypes newDto2 = createDto("graylog_1", Collections.emptyMap());
+        final IndexFieldTypes newDto1 = createDto("graylog_0", Collections.emptySet());
+        final IndexFieldTypes newDto2 = createDto("graylog_1", Collections.emptySet());
 
         assertThat(dbService.streamAll().count()).isEqualTo(0);
 
@@ -133,9 +132,9 @@ public class IndexFieldTypesServiceTest {
 
     @Test
     public void streamForIndexSet() {
-        final IndexFieldTypes newDto1 = createDto("graylog_0", "abc", Collections.emptyMap());
-        final IndexFieldTypes newDto2 = createDto("graylog_1", "xyz", Collections.emptyMap());
-        final IndexFieldTypes newDto3 = createDto("graylog_2", "xyz", Collections.emptyMap());
+        final IndexFieldTypes newDto1 = createDto("graylog_0", "abc", Collections.emptySet());
+        final IndexFieldTypes newDto2 = createDto("graylog_1", "xyz", Collections.emptySet());
+        final IndexFieldTypes newDto3 = createDto("graylog_2", "xyz", Collections.emptySet());
 
         final IndexFieldTypes savedDto1 = dbService.save(newDto1);
         final IndexFieldTypes savedDto2 = dbService.save(newDto2);
