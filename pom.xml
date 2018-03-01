@@ -152,7 +152,7 @@
         <apacheds-server.version>2.0.0-M24</apacheds-server.version>
         <assertj-core.version>3.9.1</assertj-core.version>
         <assertj-joda-time.version>2.0.0</assertj-joda-time.version>
-        <awaitility.version>1.7.0</awaitility.version>
+        <awaitility.version>3.0.0</awaitility.version>
         <equalsverifier.version>2.4.3</equalsverifier.version>
         <fongo.version>2.1.0</fongo.version>
         <jukito.version>1.5</jukito.version>
