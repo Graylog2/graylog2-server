@@ -109,6 +109,30 @@ public class IndexFieldTypesServiceTest {
 
     @Test
     public void upsert() {
+        final IndexFieldTypes newDto1 = createDto("graylog_0", Collections.emptyMap());
+        final IndexFieldTypes newDto2 = createDto("graylog_1", Collections.emptyMap());
+
+        assertThat(dbService.streamAll().count()).isEqualTo(0);
+
+        final IndexFieldTypes upsertedDto1 = dbService.upsert(newDto1).orElse(null);
+        final IndexFieldTypes upsertedDto2 = dbService.upsert(newDto2).orElse(null);
+
+        assertThat(upsertedDto1).isNotNull();
+        assertThat(upsertedDto2).isNotNull();
+
+        assertThat(upsertedDto1.indexName()).isEqualTo("graylog_0");
+        assertThat(upsertedDto2.indexName()).isEqualTo("graylog_1");
+
+        assertThat(dbService.streamAll().count()).isEqualTo(2);
+
+        assertThat(dbService.upsert(newDto1)).isNotPresent();
+        assertThat(dbService.upsert(newDto2)).isNotPresent();
+
+        assertThat(dbService.streamAll().count()).isEqualTo(2);
+    }
+
+    @Test
+    public void streamForIndexSet() {
         final IndexFieldTypes newDto1 = createDto("graylog_0", "abc", Collections.emptyMap());
         final IndexFieldTypes newDto2 = createDto("graylog_1", "xyz", Collections.emptyMap());
         final IndexFieldTypes newDto3 = createDto("graylog_2", "xyz", Collections.emptyMap());
@@ -122,10 +146,5 @@ public class IndexFieldTypesServiceTest {
 
         assertThat(dbService.streamForIndexSet("abc").findFirst().orElse(null)).isEqualTo(savedDto1);
         assertThat(dbService.streamForIndexSet("xyz").toArray()).containsExactly(savedDto2, savedDto3);
-    }
-
-    @Test
-    public void streamForIndexSet() throws Exception {
-
     }
 }
