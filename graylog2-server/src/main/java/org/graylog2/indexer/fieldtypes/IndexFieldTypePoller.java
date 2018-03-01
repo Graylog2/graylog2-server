@@ -25,6 +25,7 @@ import io.searchbox.indices.mapping.GetMapping;
 import org.graylog2.indexer.IndexSet;
 import org.graylog2.indexer.cluster.jest.JestUtils;
 import org.graylog2.indexer.indices.Indices;
+import org.graylog2.shared.utilities.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +101,11 @@ public class IndexFieldTypePoller {
         try (final Timer.Context ignored = pollTimer.time()) {
             result = JestUtils.execute(jestClient, getMapping, () -> "Unable to get index mapping for index: " + indexName);
         } catch (Exception e) {
-            LOG.error("Couldn't get mapping for index <{}>", indexName, e);
+            if (LOG.isDebugEnabled()) {
+                LOG.error("Couldn't get mapping for index <{}>", indexName, e);
+            } else {
+                LOG.error("Couldn't get mapping for index <{}>: {}", indexName, ExceptionUtils.getRootCauseMessage(e));
+            }
             return Optional.empty();
         }
 

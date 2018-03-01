@@ -92,6 +92,10 @@ public class IndexFieldTypesService {
         }
     }
 
+    public Stream<IndexFieldTypes> streamForIndexSet(String indexSetId) {
+        return Streams.stream((Iterable<IndexFieldTypes>) db.find(DBQuery.is(IndexFieldTypes.FIELD_INDEX_SET_ID, indexSetId)));
+    }
+
     public Stream<IndexFieldTypes> streamAll() {
         return Streams.stream((Iterable<IndexFieldTypes>) db.find());
     }
