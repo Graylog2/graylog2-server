@@ -140,7 +140,7 @@
         <shiro.version>1.4.0</shiro.version>
         <sigar.version>1.6.4</sigar.version>
         <slf4j.version>1.7.25</slf4j.version>
-        <spotbugs-annotations.version>3.1.1</spotbugs-annotations.version>
+        <spotbugs-annotations.version>3.1.2</spotbugs-annotations.version>
         <swagger.version>1.5.13</swagger.version>
         <syslog4j.version>0.9.60</syslog4j.version>
         <uuid.version>3.2</uuid.version>
@@ -280,7 +280,7 @@
                 <plugin>
                     <groupId>com.github.spotbugs</groupId>
                     <artifactId>spotbugs-maven-plugin</artifactId>
-                    <version>3.1.1</version>
+                    <version>3.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
