@@ -512,7 +512,7 @@
             </dependency>
             <dependency>
                 <groupId>org.jooq</groupId>
-                <artifactId>jool</artifactId>
+                <artifactId>jool-java-8</artifactId>
                 <version>${jool.version}</version>
             </dependency>
             <dependency>
