@@ -93,7 +93,7 @@
         <commons-codec.version>1.11</commons-codec.version>
         <commons-email.version>1.5</commons-email.version>
         <commons-io.version>2.6</commons-io.version>
-        <disruptor.version>3.3.7</disruptor.version>
+        <disruptor.version>3.4.0</disruptor.version>
         <drools.version>6.5.0.Final</drools.version>
         <elasticsearch.version>5.6.8</elasticsearch.version>
         <jest.version>2.4.11+jackson</jest.version>
