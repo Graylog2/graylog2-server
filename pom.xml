@@ -110,7 +110,7 @@
         <jadconfig.version>0.13.0</jadconfig.version>
         <java-semver.version>0.9.0</java-semver.version>
         <javapoet.version>1.7.0</javapoet.version>
-        <javax.annotation-api.version>1.3</javax.annotation-api.version>
+        <javax.annotation-api.version>1.3.2</javax.annotation-api.version>
         <javax.el-api.version>3.0.0</javax.el-api.version>
         <javax.inject.version>1</javax.inject.version>
         <javax.ws.rs-api.version>2.0.1</javax.ws.rs-api.version>
