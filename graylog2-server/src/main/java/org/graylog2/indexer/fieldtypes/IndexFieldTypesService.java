@@ -27,6 +27,7 @@ import org.mongojack.JacksonDBCollection;
 import org.mongojack.WriteResult;
 
 import javax.inject.Inject;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -45,10 +46,12 @@ public class IndexFieldTypesService {
                 ObjectId.class,
                 objectMapperProvider.get());
 
-        // TODO: Check which fields need an index!
-        //       - indexName
-        //       - fields.fieldName? fields[].fieldName?
-        //this.db.createIndex(new BasicDBObject(IndexFieldTypesDTO.FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
+        this.db.createIndex(new BasicDBObject(ImmutableMap.of(
+                IndexFieldTypes.FIELD_INDEX_NAME, 1,
+                IndexFieldTypes.FIELD_INDEX_SET_ID, 1
+        )), new BasicDBObject("unique", true));
+        this.db.createIndex(new BasicDBObject(IndexFieldTypes.FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
+        this.db.createIndex(new BasicDBObject(String.format(Locale.US, "%s.%s", IndexFieldTypes.FIELD_FIELDS, FieldType.FIELD_NAME), 1));
     }
 
     public Optional<IndexFieldTypes> get(String idOrIndexName) {

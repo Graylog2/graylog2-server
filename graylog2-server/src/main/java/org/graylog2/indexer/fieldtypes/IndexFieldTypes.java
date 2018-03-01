@@ -33,7 +33,7 @@ public abstract class IndexFieldTypes {
     private static final String FIELD_ID = "id";
     static final String FIELD_INDEX_SET_ID = "index_set_id";
     static final String FIELD_INDEX_NAME = "index_name";
-    private static final String FIELD_FIELDS = "fields";
+    static final String FIELD_FIELDS = "fields";
 
     @Id
     @ObjectId

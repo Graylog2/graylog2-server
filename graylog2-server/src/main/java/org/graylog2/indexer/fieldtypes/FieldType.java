@@ -24,8 +24,8 @@ import com.google.auto.value.AutoValue;
 @AutoValue
 @JsonDeserialize(builder = FieldType.Builder.class)
 public abstract class FieldType {
-    private static final String FIELD_NAME = "field_name";
-    private static final String FIELD_PHYSICAL_TYPE = "physical_type";
+    static final String FIELD_NAME = "field_name";
+    static final String FIELD_PHYSICAL_TYPE = "physical_type";
 
     @JsonProperty(FIELD_NAME)
     public abstract String fieldName();
