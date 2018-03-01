@@ -85,7 +85,7 @@
         <!-- Dependencies -->
         <airline.version>2.3.0</airline.version>
         <amqp-client.version>5.1.1</amqp-client.version>
-        <antlr.version>4.5.1</antlr.version>
+        <antlr.version>4.7.1</antlr.version>
         <apache-directory-version>1.0.0</apache-directory-version>
         <auto-value.version>1.5.3</auto-value.version>
         <auto-value-javabean.version>1.0.0</auto-value-javabean.version>
@@ -308,7 +308,7 @@
                 <plugin>
                     <groupId>org.antlr</groupId>
                     <artifactId>antlr4-maven-plugin</artifactId>
-                    <version>4.5</version>
+                    <version>${antlr.version}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
