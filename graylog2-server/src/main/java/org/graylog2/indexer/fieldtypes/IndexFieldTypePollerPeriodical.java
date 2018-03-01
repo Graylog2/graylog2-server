@@ -122,7 +122,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
 
             // Cleanup orphaned field type entries that haven't been removed by the event handler
             dbService.streamForIndexSet(indexSetId)
-                    .filter(types -> indices.exists(types.indexName()))
+                    .filter(types -> !indices.exists(types.indexName()))
                     .forEach(types -> dbService.delete(types.id()));
         });
     }
