@@ -33,6 +33,6 @@
 }
 
 :local(.dataFilterInput) {
-    margin-bottom: 0;
+    margin-bottom: 0 !important;
     padding: 5px;
 }

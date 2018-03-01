@@ -26,6 +26,7 @@ export { default as ReactGridContainer } from './ReactGridContainer';
 export { default as SearchForm } from './SearchForm';
 export { default as Select } from './Select';
 export { default as SelectableList } from './SelectableList';
+export { default as SelectPopover } from './SelectPopover';
 export { default as SortableList } from './SortableList';
 export { default as SortableListItem } from './SortableListItem';
 export { default as SourceCodeEditor } from './SourceCodeEditor';

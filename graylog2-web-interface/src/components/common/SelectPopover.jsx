@@ -7,6 +7,11 @@ import IsolatedScroll from 'react-isolated-scroll';
 
 import style from './SelectPopover.css';
 
+/**
+ * Component that displays a list of items in a popover and enable users to pick one of
+ * the options with the mouse. The component can (optionally) filter options with a text input
+ * and customize how items are displayed with a function.
+ */
 const SelectPopover = createReactClass({
   propTypes: {
     /** Provides an ID for this popover element. */
