@@ -5,6 +5,7 @@ import { DateHistogramHandler, MessageListHandler } from 'enterprise/logic/searc
 import DataTable from 'enterprise/components/datatable/DataTable';
 import ChartActionHandler from 'enterprise/logic/fieldactions/ChartActionHandler';
 import AggregateActionHandler from 'enterprise/logic/fieldactions/AggregateActionHandler';
+import FieldHistogramTransformer from 'enterprise/logic/searchresulttransformers/FieldHistogramTransformer';
 
 const extendedSearchPath = '/extendedsearch';
 
@@ -50,8 +51,21 @@ export default {
       defaultHeight: 1,
       defaultWidth: 2,
       visualizationComponent: Histogram,
-      searchResultTransformer: data => data.find(d => d && d.type && d.type.toLocaleUpperCase() === 'FIELD_HISTOGRAM'),
-      searchTypes: config => [{ type: 'messages' }, { type: 'field_histogram', config: { field: config.field } }],
+      searchResultTransformer: FieldHistogramTransformer,
+      searchTypes: config => [{
+        type: 'aggregation',
+        config: {
+          groups: [{
+            type: 'time',
+            field: 'timestamp',
+            interval: '1m',
+            metrics: [{
+              type: 'sum',
+              field: config.field,
+            }],
+          }],
+        },
+      }],
     },
     {
       type: 'DATATABLE',
@@ -68,7 +82,7 @@ export default {
       defaultHeight: 3,
       defaultWidth: 2,
       visualizationComponent: DataTable,
-      searchResultTransformer: (results, config) => results,
+      searchResultTransformer: (results) => results,
       searchTypes: config => [{
         type: 'group_by',
         config: {
