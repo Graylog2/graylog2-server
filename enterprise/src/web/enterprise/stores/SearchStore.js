@@ -19,15 +19,12 @@ export default Reflux.createStore({
   state: new Immutable.Map(),
 
   init() {
-    this.listenTo(WidgetStore, this.onWidgetStoreUpdate, (widgets) => this.onWidgetStoreUpdate(widgets, true));
+    this.listenTo(WidgetStore, this.onWidgetStoreUpdate, this.onWidgetStoreUpdate);
     this.listenTo(QueriesStore, this.onQueriesStoreUpdate, this.onQueriesStoreUpdate);
   },
 
-  onWidgetStoreUpdate(widgets, initial = false) {
+  onWidgetStoreUpdate(widgets) {
     this.widgets = widgets;
-    if (!initial) {
-      SearchActions.execute();
-    }
   },
   onQueriesStoreUpdate(queries) {
     this.queries = queries;
