@@ -485,7 +485,7 @@ public class NetflowV9CodecAggregatorTest {
             pcap.loop(packet -> {
                         if (packet.hasProtocol(Protocol.UDP)) {
                             final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
-                            final InetSocketAddress source = new InetSocketAddress(udp.getSourceIP(), udp.getSourcePort());
+                            final InetSocketAddress source = new InetSocketAddress(udp.getParentPacket().getSourceIP(), udp.getSourcePort());
                             final CodecAggregator.Result result = codecAggregator.addChunk(Unpooled.copiedBuffer(udp.getPayload().getArray()), source);
                             if (result.isValid() && result.getMessage() != null) {
                                 final ByteBuf buffer = result.getMessage();
@@ -509,7 +509,7 @@ public class NetflowV9CodecAggregatorTest {
             pcap.loop(packet -> {
                         if (packet.hasProtocol(Protocol.UDP)) {
                             final UDPPacket udp = (UDPPacket) packet.getPacket(Protocol.UDP);
-                            final InetSocketAddress source = new InetSocketAddress(udp.getSourceIP(), udp.getSourcePort());
+                            final InetSocketAddress source = new InetSocketAddress(udp.getParentPacket().getSourceIP(), udp.getSourcePort());
                             final CodecAggregator.Result result = codecAggregator.addChunk(Unpooled.copiedBuffer(udp.getPayload().getArray()), source);
                             if (result.isValid() && result.getMessage() != null) {
                                 final Collection<Message> c = codec.decodeMessages(convertToRawMessage(result, source));
