@@ -26,8 +26,9 @@ import org.joda.time.DateTime;
 
 import java.util.Map;
 
-@CollectionName("access_tokens")
+@CollectionName(AccessTokenImpl.COLLECTION_NAME)
 public class AccessTokenImpl extends PersistedImpl implements AccessToken {
+    public static final String COLLECTION_NAME = "access_tokens";
     public static final String USERNAME = "username";
     public static final String TOKEN = "token";
     public static final String NAME = "NAME";

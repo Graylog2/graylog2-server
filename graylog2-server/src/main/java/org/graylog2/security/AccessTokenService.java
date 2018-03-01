@@ -36,4 +36,6 @@ public interface AccessTokenService extends PersistedService {
     void touch(AccessToken accessToken) throws ValidationException;
 
     String save(AccessToken accessToken) throws ValidationException;
+
+    int deleteAllForUser(String username);
 }

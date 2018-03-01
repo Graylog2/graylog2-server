@@ -19,6 +19,7 @@ package org.graylog2.security;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
+import com.mongodb.BasicDBObjectBuilder;
 import com.mongodb.DBObject;
 import com.mongodb.DuplicateKeyException;
 import org.bson.types.ObjectId;
@@ -117,5 +118,14 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
         // make sure we cannot overwrite an existing access token
         collection(AccessTokenImpl.class).createIndex(new BasicDBObject(AccessTokenImpl.TOKEN, 1), new BasicDBObject("unique", true));
         return super.save(accessToken);
+    }
+
+    @Override
+    public int deleteAllForUser(String username) {
+        LOG.debug("Deleting all access tokens of username \"{}\"", username);
+        final DBObject query = BasicDBObjectBuilder.start(AccessTokenImpl.USERNAME, username).get();
+        final int result = destroy(query, AccessTokenImpl.COLLECTION_NAME);
+        LOG.debug("Deleted {} access tokens", result);
+        return result;
     }
 }
