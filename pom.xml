@@ -101,7 +101,7 @@
         <geoip2.version>2.11.0</geoip2.version>
         <grok.version>0.1.7-graylog</grok.version>
         <guava-retrying.version>2.0.0</guava-retrying.version>
-        <guava.version>23.6-jre</guava.version>
+        <guava.version>24.0-jre</guava.version>
         <guice.version>4.2.0</guice.version>
         <HdrHistogram.version>2.1.10</HdrHistogram.version>
         <hibernate-validator.version>6.0.7.Final</hibernate-validator.version>
