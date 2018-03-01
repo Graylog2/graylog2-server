@@ -97,7 +97,9 @@ const Query = ({ onToggleMessages, showMessages, results, view, widgetMapping, w
 };
 
 Query.propTypes = {
+  onToggleMessages: PropTypes.func.isRequired,
   results: PropTypes.object.isRequired,
+  showMessages: PropTypes.bool.isRequired,
   view: PropTypes.object.isRequired,
   widgetMapping: PropTypes.object.isRequired,
   widgets: PropTypes.object.isRequired,
