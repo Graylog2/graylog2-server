@@ -103,10 +103,6 @@
             <groupId>com.google.inject.extensions</groupId>
             <artifactId>guice-assistedinject</artifactId>
         </dependency>
-        <dependency>
-            <groupId>com.google.inject.extensions</groupId>
-            <artifactId>guice-multibindings</artifactId>
-        </dependency>
         <!-- fishy -->
         <dependency>
             <groupId>org.glassfish.hk2.external</groupId>
