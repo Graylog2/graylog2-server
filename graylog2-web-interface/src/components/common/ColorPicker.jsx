@@ -4,8 +4,7 @@ import PropTypes from 'prop-types';
 import { SwatchesPicker } from 'react-color';
 
 /**
- * Scrollable color picker component that let the user select a color from a list
- * of 95 colors grouped by hue and saturation.
+ * Color picker component that let the user select a color from a list of 95 colors grouped by hue.
  */
 const ColorPicker = createReactClass({
   propTypes: {
@@ -21,6 +20,8 @@ const ColorPicker = createReactClass({
      * of the third row, indicating users that they can scroll through the list:
      *
      * `135px height per color row * 2 rows + 24px first color of 3rd row + 16px padding = 310px`
+     *
+     * You can set `Infinity` as `height` if you don't want the component to scroll.
      */
     height: PropTypes.number,
     /**
