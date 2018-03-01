@@ -165,7 +165,7 @@
 
         <!-- Nodejs dependencies -->
         <nodejs.version>v8.9.4</nodejs.version>
-        <yarn.version>v1.3.2</yarn.version>
+        <yarn.version>v1.5.1</yarn.version>
     </properties>
 
     <repositories>
