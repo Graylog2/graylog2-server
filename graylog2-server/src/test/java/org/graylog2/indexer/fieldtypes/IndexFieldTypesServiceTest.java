@@ -52,46 +52,46 @@ public class IndexFieldTypesServiceTest {
         mongoRule.getMongoConnection().getMongoDatabase().drop();
     }
 
-    private IndexFieldTypes createDto(String indexName, String indexSetId, Set<FieldType> fields) {
-        return IndexFieldTypes.builder()
+    private IndexFieldTypesDTO createDto(String indexName, String indexSetId, Set<FieldTypeDTO> fields) {
+        return IndexFieldTypesDTO.builder()
                 .indexName(indexName)
                 .indexSetId(indexSetId)
-                .fields(ImmutableSet.<FieldType>builder()
-                        .add(FieldType.create("message", "text"))
-                        .add(FieldType.create("source", "text"))
-                        .add(FieldType.create("timestamp", "date"))
-                        .add(FieldType.create("http_method", "keyword"))
-                        .add(FieldType.create("http_status", "long"))
+                .fields(ImmutableSet.<FieldTypeDTO>builder()
+                        .add(FieldTypeDTO.create("message", "text"))
+                        .add(FieldTypeDTO.create("source", "text"))
+                        .add(FieldTypeDTO.create("timestamp", "date"))
+                        .add(FieldTypeDTO.create("http_method", "keyword"))
+                        .add(FieldTypeDTO.create("http_status", "long"))
                         .addAll(fields)
                         .build())
                 .build();
     }
 
-    private IndexFieldTypes createDto(String indexName, Set<FieldType> fields) {
+    private IndexFieldTypesDTO createDto(String indexName, Set<FieldTypeDTO> fields) {
         return createDto(indexName, "abc123", fields);
     }
 
     @Test
     public void saveGetDeleteStream() {
-        final IndexFieldTypes newDto1 = createDto("graylog_0", Collections.emptySet());
-        final IndexFieldTypes newDto2 = createDto("graylog_1", Collections.emptySet());
+        final IndexFieldTypesDTO newDto1 = createDto("graylog_0", Collections.emptySet());
+        final IndexFieldTypesDTO newDto2 = createDto("graylog_1", Collections.emptySet());
 
-        final IndexFieldTypes savedDto1 = dbService.save(newDto1);
-        final IndexFieldTypes savedDto2 = dbService.save(newDto2);
+        final IndexFieldTypesDTO savedDto1 = dbService.save(newDto1);
+        final IndexFieldTypesDTO savedDto2 = dbService.save(newDto2);
 
-        final IndexFieldTypes dto1 = dbService.get(savedDto1.id()).orElse(null);
+        final IndexFieldTypesDTO dto1 = dbService.get(savedDto1.id()).orElse(null);
         assertThat(dto1).as("check that saving the DTO worked").isNotNull();
         assertThat(dto1.id()).isNotBlank();
         assertThat(dto1.indexName()).isEqualTo("graylog_0");
         assertThat(dto1.fields()).containsOnly(
-                FieldType.create("message", "text"),
-                FieldType.create("source", "text"),
-                FieldType.create("timestamp", "date"),
-                FieldType.create("http_method", "keyword"),
-                FieldType.create("http_status", "long")
+                FieldTypeDTO.create("message", "text"),
+                FieldTypeDTO.create("source", "text"),
+                FieldTypeDTO.create("timestamp", "date"),
+                FieldTypeDTO.create("http_method", "keyword"),
+                FieldTypeDTO.create("http_status", "long")
         );
 
-        final IndexFieldTypes dto2 = dbService.get(savedDto2.indexName()).orElse(null);
+        final IndexFieldTypesDTO dto2 = dbService.get(savedDto2.indexName()).orElse(null);
         assertThat(dto2)
                 .as("check that get by index_name works")
                 .isNotNull()
@@ -108,13 +108,13 @@ public class IndexFieldTypesServiceTest {
 
     @Test
     public void upsert() {
-        final IndexFieldTypes newDto1 = createDto("graylog_0", Collections.emptySet());
-        final IndexFieldTypes newDto2 = createDto("graylog_1", Collections.emptySet());
+        final IndexFieldTypesDTO newDto1 = createDto("graylog_0", Collections.emptySet());
+        final IndexFieldTypesDTO newDto2 = createDto("graylog_1", Collections.emptySet());
 
         assertThat(dbService.streamAll().count()).isEqualTo(0);
 
-        final IndexFieldTypes upsertedDto1 = dbService.upsert(newDto1).orElse(null);
-        final IndexFieldTypes upsertedDto2 = dbService.upsert(newDto2).orElse(null);
+        final IndexFieldTypesDTO upsertedDto1 = dbService.upsert(newDto1).orElse(null);
+        final IndexFieldTypesDTO upsertedDto2 = dbService.upsert(newDto2).orElse(null);
 
         assertThat(upsertedDto1).isNotNull();
         assertThat(upsertedDto2).isNotNull();
@@ -132,13 +132,13 @@ public class IndexFieldTypesServiceTest {
 
     @Test
     public void streamForIndexSet() {
-        final IndexFieldTypes newDto1 = createDto("graylog_0", "abc", Collections.emptySet());
-        final IndexFieldTypes newDto2 = createDto("graylog_1", "xyz", Collections.emptySet());
-        final IndexFieldTypes newDto3 = createDto("graylog_2", "xyz", Collections.emptySet());
+        final IndexFieldTypesDTO newDto1 = createDto("graylog_0", "abc", Collections.emptySet());
+        final IndexFieldTypesDTO newDto2 = createDto("graylog_1", "xyz", Collections.emptySet());
+        final IndexFieldTypesDTO newDto3 = createDto("graylog_2", "xyz", Collections.emptySet());
 
-        final IndexFieldTypes savedDto1 = dbService.save(newDto1);
-        final IndexFieldTypes savedDto2 = dbService.save(newDto2);
-        final IndexFieldTypes savedDto3 = dbService.save(newDto3);
+        final IndexFieldTypesDTO savedDto1 = dbService.save(newDto1);
+        final IndexFieldTypesDTO savedDto2 = dbService.save(newDto2);
+        final IndexFieldTypesDTO savedDto3 = dbService.save(newDto3);
 
         assertThat(dbService.streamForIndexSet("abc").count()).isEqualTo(1);
         assertThat(dbService.streamForIndexSet("xyz").count()).isEqualTo(2);

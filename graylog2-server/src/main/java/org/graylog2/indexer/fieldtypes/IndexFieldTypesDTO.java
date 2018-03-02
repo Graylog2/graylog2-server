@@ -28,8 +28,8 @@ import javax.annotation.Nullable;
 import java.util.Set;
 
 @AutoValue
-@JsonDeserialize(builder = IndexFieldTypes.Builder.class)
-public abstract class IndexFieldTypes {
+@JsonDeserialize(builder = IndexFieldTypesDTO.Builder.class)
+public abstract class IndexFieldTypesDTO {
     private static final String FIELD_ID = "id";
     static final String FIELD_INDEX_SET_ID = "index_set_id";
     static final String FIELD_INDEX_NAME = "index_name";
@@ -48,9 +48,9 @@ public abstract class IndexFieldTypes {
     public abstract String indexName();
 
     @JsonProperty(FIELD_FIELDS)
-    public abstract ImmutableSet<FieldType> fields();
+    public abstract ImmutableSet<FieldTypeDTO> fields();
 
-    public static IndexFieldTypes create(String indexSetId, String indexName, Set<FieldType> fields) {
+    public static IndexFieldTypesDTO create(String indexSetId, String indexName, Set<FieldTypeDTO> fields) {
         return builder()
                 .indexSetId(indexSetId)
                 .indexName(indexName)
@@ -68,7 +68,7 @@ public abstract class IndexFieldTypes {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_IndexFieldTypes.Builder();
+            return new AutoValue_IndexFieldTypesDTO.Builder();
         }
 
         @Id
@@ -82,14 +82,14 @@ public abstract class IndexFieldTypes {
         @JsonProperty(FIELD_INDEX_NAME)
         public abstract Builder indexName(String indexName);
 
-        abstract ImmutableSet.Builder<FieldType> fieldsBuilder();
+        abstract ImmutableSet.Builder<FieldTypeDTO> fieldsBuilder();
 
         @JsonProperty(FIELD_FIELDS)
-        public Builder fields(Set<FieldType> fields) {
+        public Builder fields(Set<FieldTypeDTO> fields) {
             fieldsBuilder().addAll(fields);
             return this;
         }
 
-        public abstract IndexFieldTypes build();
+        public abstract IndexFieldTypesDTO build();
     }
 }

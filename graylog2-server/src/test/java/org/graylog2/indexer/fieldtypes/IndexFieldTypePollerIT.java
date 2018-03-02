@@ -99,15 +99,15 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
     @UsingDataSet(loadStrategy = LoadStrategyEnum.CLEAN_INSERT)
     public void poll() throws Exception {
         final String indexSetId = indexSet.getConfig().id();
-        final IndexFieldTypes existingFieldTypes = IndexFieldTypes.builder()
+        final IndexFieldTypesDTO existingFieldTypes = IndexFieldTypesDTO.builder()
                 .indexSetId(indexSetId)
                 .indexName("graylog_1")
                 .build();
 
-        final Set<IndexFieldTypes> dtosNoExisting = poller.poll(indexSet, Collections.emptySet());
-        final Set<IndexFieldTypes> dtos = poller.poll(indexSet, ImmutableSet.of(existingFieldTypes));
+        final Set<IndexFieldTypesDTO> dtosNoExisting = poller.poll(indexSet, Collections.emptySet());
+        final Set<IndexFieldTypesDTO> dtos = poller.poll(indexSet, ImmutableSet.of(existingFieldTypes));
 
-        final IndexFieldTypes dto = dtos.stream()
+        final IndexFieldTypesDTO dto = dtos.stream()
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No result polling index set " + indexSetId));
 
@@ -119,12 +119,12 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
             assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
             assertThat(dto.id()).isNull();
             assertThat(dto.fields())
-                    .contains(FieldType.create("message", "text"))
-                    .contains(FieldType.create("full_message", "text"))
-                    .contains(FieldType.create("source", "text"))
-                    .contains(FieldType.create("http_status", "keyword"))
-                    .contains(FieldType.create("http_response_time", "long"))
-                    .contains(FieldType.create("timestamp", "date"));
+                    .contains(FieldTypeDTO.create("message", "text"))
+                    .contains(FieldTypeDTO.create("full_message", "text"))
+                    .contains(FieldTypeDTO.create("source", "text"))
+                    .contains(FieldTypeDTO.create("http_status", "keyword"))
+                    .contains(FieldTypeDTO.create("http_response_time", "long"))
+                    .contains(FieldTypeDTO.create("timestamp", "date"));
         } finally {
             deleteIndex(INDEX_NAME);
             deleteIndex("graylog_1");
@@ -136,7 +136,7 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
     public void pollIndex() throws Exception {
         final String indexSetId = indexSet.getConfig().id();
 
-        final IndexFieldTypes dto = poller.pollIndex("graylog_0", indexSetId).orElse(null);
+        final IndexFieldTypesDTO dto = poller.pollIndex("graylog_0", indexSetId).orElse(null);
 
         try {
             assertThat(dto).isNotNull();
@@ -144,12 +144,12 @@ public class IndexFieldTypePollerIT extends ElasticsearchBase {
             assertThat(dto.indexName()).isEqualTo(INDEX_NAME);
             assertThat(dto.id()).isNull();
             assertThat(dto.fields())
-                    .contains(FieldType.create("message", "text"))
-                    .contains(FieldType.create("full_message", "text"))
-                    .contains(FieldType.create("source", "text"))
-                    .contains(FieldType.create("http_status", "keyword"))
-                    .contains(FieldType.create("http_response_time", "long"))
-                    .contains(FieldType.create("timestamp", "date"));
+                    .contains(FieldTypeDTO.create("message", "text"))
+                    .contains(FieldTypeDTO.create("full_message", "text"))
+                    .contains(FieldTypeDTO.create("source", "text"))
+                    .contains(FieldTypeDTO.create("http_status", "keyword"))
+                    .contains(FieldTypeDTO.create("http_response_time", "long"))
+                    .contains(FieldTypeDTO.create("timestamp", "date"));
         } finally {
             deleteIndex(INDEX_NAME);
             deleteIndex("graylog_1");

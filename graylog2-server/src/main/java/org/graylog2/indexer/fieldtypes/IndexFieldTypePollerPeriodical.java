@@ -106,7 +106,7 @@ public class IndexFieldTypePollerPeriodical extends Periodical {
         indexSetService.findAll().forEach(indexSetConfig -> {
             final String indexSetId = indexSetConfig.id();
             final String indexSetTitle = indexSetConfig.title();
-            final Set<IndexFieldTypes> existingIndexTypes = dbService.streamForIndexSet(indexSetId)
+            final Set<IndexFieldTypesDTO> existingIndexTypes = dbService.streamForIndexSet(indexSetId)
                     .collect(Collectors.toSet());
 
             final IndexSet indexSet = mongoIndexSetFactory.create(indexSetConfig);

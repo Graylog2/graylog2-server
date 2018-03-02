@@ -22,8 +22,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.google.auto.value.AutoValue;
 
 @AutoValue
-@JsonDeserialize(builder = FieldType.Builder.class)
-public abstract class FieldType {
+@JsonDeserialize(builder = FieldTypeDTO.Builder.class)
+public abstract class FieldTypeDTO {
     static final String FIELD_NAME = "field_name";
     static final String FIELD_PHYSICAL_TYPE = "physical_type";
 
@@ -33,7 +33,7 @@ public abstract class FieldType {
     @JsonProperty(FIELD_PHYSICAL_TYPE)
     public abstract String physicalType();
 
-    public static FieldType create(String fieldName, String physicalType) {
+    public static FieldTypeDTO create(String fieldName, String physicalType) {
         return builder().fieldName(fieldName).physicalType(physicalType).build();
     }
 
@@ -47,7 +47,7 @@ public abstract class FieldType {
     public static abstract class Builder {
         @JsonCreator
         public static Builder create() {
-            return new AutoValue_FieldType.Builder();
+            return new AutoValue_FieldTypeDTO.Builder();
         }
 
         @JsonProperty(FIELD_NAME)
@@ -56,6 +56,6 @@ public abstract class FieldType {
         @JsonProperty(FIELD_PHYSICAL_TYPE)
         public abstract Builder physicalType(String physicalType);
 
-        public abstract FieldType build();
+        public abstract FieldTypeDTO build();
     }
 }

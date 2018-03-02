@@ -36,43 +36,43 @@ import java.util.stream.Stream;
  */
 public class IndexFieldTypesService {
 
-    private final JacksonDBCollection<IndexFieldTypes, ObjectId> db;
+    private final JacksonDBCollection<IndexFieldTypesDTO, ObjectId> db;
 
     @Inject
     public IndexFieldTypesService(MongoConnection mongoConnection,
                                   MongoJackObjectMapperProvider objectMapperProvider) {
         this.db = JacksonDBCollection.wrap(mongoConnection.getDatabase().getCollection("index_field_types"),
-                IndexFieldTypes.class,
+                IndexFieldTypesDTO.class,
                 ObjectId.class,
                 objectMapperProvider.get());
 
         this.db.createIndex(new BasicDBObject(ImmutableMap.of(
-                IndexFieldTypes.FIELD_INDEX_NAME, 1,
-                IndexFieldTypes.FIELD_INDEX_SET_ID, 1
+                IndexFieldTypesDTO.FIELD_INDEX_NAME, 1,
+                IndexFieldTypesDTO.FIELD_INDEX_SET_ID, 1
         )), new BasicDBObject("unique", true));
-        this.db.createIndex(new BasicDBObject(IndexFieldTypes.FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
-        this.db.createIndex(new BasicDBObject(String.format(Locale.US, "%s.%s", IndexFieldTypes.FIELD_FIELDS, FieldType.FIELD_NAME), 1));
+        this.db.createIndex(new BasicDBObject(IndexFieldTypesDTO.FIELD_INDEX_NAME, 1), new BasicDBObject("unique", true));
+        this.db.createIndex(new BasicDBObject(String.format(Locale.US, "%s.%s", IndexFieldTypesDTO.FIELD_FIELDS, FieldTypeDTO.FIELD_NAME), 1));
     }
 
-    public Optional<IndexFieldTypes> get(String idOrIndexName) {
+    public Optional<IndexFieldTypesDTO> get(String idOrIndexName) {
         try {
             return Optional.ofNullable(db.findOneById(new ObjectId(idOrIndexName)));
         } catch (IllegalArgumentException e) {
             // Not an ObjectId, try again with index_name
-            return Optional.ofNullable(db.findOne(DBQuery.is(IndexFieldTypes.FIELD_INDEX_NAME, idOrIndexName)));
+            return Optional.ofNullable(db.findOne(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_NAME, idOrIndexName)));
         }
     }
 
-    public IndexFieldTypes save(IndexFieldTypes dto) {
-        final WriteResult<IndexFieldTypes, ObjectId> save = db.save(dto);
+    public IndexFieldTypesDTO save(IndexFieldTypesDTO dto) {
+        final WriteResult<IndexFieldTypesDTO, ObjectId> save = db.save(dto);
         return save.getSavedObject();
     }
 
-    public Optional<IndexFieldTypes> upsert(IndexFieldTypes dto) {
-        final WriteResult<IndexFieldTypes, ObjectId> update = db.update(
+    public Optional<IndexFieldTypesDTO> upsert(IndexFieldTypesDTO dto) {
+        final WriteResult<IndexFieldTypesDTO, ObjectId> update = db.update(
                 DBQuery.and(
-                        DBQuery.is(IndexFieldTypes.FIELD_INDEX_NAME, dto.indexName()),
-                        DBQuery.is(IndexFieldTypes.FIELD_INDEX_SET_ID, dto.indexSetId())
+                        DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_NAME, dto.indexName()),
+                        DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, dto.indexSetId())
                 ),
                 dto,
                 true,
@@ -93,15 +93,15 @@ public class IndexFieldTypesService {
             db.removeById(new ObjectId(idOrIndexName));
         } catch (IllegalArgumentException e) {
             // Not an ObjectId, try again with index_name
-            db.remove(DBQuery.is(IndexFieldTypes.FIELD_INDEX_NAME, idOrIndexName));
+            db.remove(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_NAME, idOrIndexName));
         }
     }
 
-    public Stream<IndexFieldTypes> streamForIndexSet(String indexSetId) {
-        return Streams.stream((Iterable<IndexFieldTypes>) db.find(DBQuery.is(IndexFieldTypes.FIELD_INDEX_SET_ID, indexSetId)));
+    public Stream<IndexFieldTypesDTO> streamForIndexSet(String indexSetId) {
+        return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find(DBQuery.is(IndexFieldTypesDTO.FIELD_INDEX_SET_ID, indexSetId)));
     }
 
-    public Stream<IndexFieldTypes> streamAll() {
-        return Streams.stream((Iterable<IndexFieldTypes>) db.find());
+    public Stream<IndexFieldTypesDTO> streamAll() {
+        return Streams.stream((Iterable<IndexFieldTypesDTO>) db.find());
     }
 }

@@ -68,10 +68,10 @@ public class IndexFieldTypePoller {
      * @param existingIndexTypes existing index field type data
      * @return the polled index field type data for the given index set
      */
-    public Set<IndexFieldTypes> poll(final IndexSet indexSet, final Set<IndexFieldTypes> existingIndexTypes) {
+    public Set<IndexFieldTypesDTO> poll(final IndexSet indexSet, final Set<IndexFieldTypesDTO> existingIndexTypes) {
         final String activeWriteIndex = indexSet.getActiveWriteIndex();
         final Set<String> existingIndexNames = existingIndexTypes.stream()
-                .map(IndexFieldTypes::indexName)
+                .map(IndexFieldTypesDTO::indexName)
                 .collect(Collectors.toSet());
 
         return indices.getIndices(indexSet, "open").stream()
@@ -91,7 +91,7 @@ public class IndexFieldTypePoller {
      * @param indexSetId index set ID of the given index
      * @return the polled index field type data for the given index
      */
-    public Optional<IndexFieldTypes> pollIndex(final String indexName, final String indexSetId) {
+    public Optional<IndexFieldTypesDTO> pollIndex(final String indexName, final String indexSetId) {
         final GetMapping getMapping = new GetMapping.Builder()
                 .addIndex(indexName)
                 .build();
@@ -121,10 +121,10 @@ public class IndexFieldTypePoller {
 
         final Spliterator<Map.Entry<String, JsonNode>> fieldSpliterator = Spliterators.spliteratorUnknownSize(properties.fields(), Spliterator.IMMUTABLE);
 
-        final Set<FieldType> fieldsMap = StreamSupport.stream(fieldSpliterator, false)
-                .map(field -> FieldType.create(field.getKey(), field.getValue().path("type").asText()))
+        final Set<FieldTypeDTO> fieldsMap = StreamSupport.stream(fieldSpliterator, false)
+                .map(field -> FieldTypeDTO.create(field.getKey(), field.getValue().path("type").asText()))
                 .collect(Collectors.toSet());
 
-        return Optional.of(IndexFieldTypes.create(indexSetId, indexName, fieldsMap));
+        return Optional.of(IndexFieldTypesDTO.create(indexSetId, indexName, fieldsMap));
     }
 }
