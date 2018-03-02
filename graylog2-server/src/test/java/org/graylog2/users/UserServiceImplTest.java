@@ -31,6 +31,7 @@ import org.graylog2.database.MongoConnection;
 import org.graylog2.database.MongoConnectionRule;
 import org.graylog2.plugin.database.users.User;
 import org.graylog2.plugin.security.PasswordAlgorithm;
+import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.security.PasswordAlgorithmFactory;
 import org.graylog2.security.hashing.SHA1HashPasswordAlgorithm;
@@ -72,6 +73,8 @@ public class UserServiceImplTest {
     @Mock
     private RoleService roleService;
     @Mock
+    private AccessTokenService accessTokenService;
+    @Mock
     private InMemoryRolePermissionResolver permissionsResolver;
     @Mock
     private EventBus serverEventBus;
@@ -82,8 +85,8 @@ public class UserServiceImplTest {
         this.configuration = new Configuration();
         this.userFactory = new UserImplFactory(configuration);
         this.permissions = new Permissions(ImmutableSet.of(new RestPermissions()));
-        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory,
-                                               permissionsResolver, serverEventBus);
+        this.userService = new UserServiceImpl(mongoConnection, configuration, roleService, accessTokenService,
+                                               userFactory, permissionsResolver, serverEventBus);
 
         when(roleService.getAdminRoleObjectId()).thenReturn("deadbeef");
     }
@@ -209,8 +212,9 @@ public class UserServiceImplTest {
     @Test
     public void testGetPermissionsForUser() throws Exception {
         final InMemoryRolePermissionResolver permissionResolver = mock(InMemoryRolePermissionResolver.class);
-        final UserService userService = new UserServiceImpl(mongoConnection, configuration, roleService, userFactory,
-                                                            permissionResolver, serverEventBus);
+        final UserService userService = new UserServiceImpl(mongoConnection, configuration, roleService,
+                                                            accessTokenService,userFactory, permissionResolver,
+                                                            serverEventBus);
 
         final UserImplFactory factory = new UserImplFactory(new Configuration());
         final UserImpl user = factory.create(new HashMap<>());

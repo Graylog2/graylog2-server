@@ -35,6 +35,7 @@ import org.graylog2.database.PersistedServiceImpl;
 import org.graylog2.plugin.database.Persisted;
 import org.graylog2.plugin.database.ValidationException;
 import org.graylog2.plugin.database.users.User;
+import org.graylog2.security.AccessTokenService;
 import org.graylog2.security.InMemoryRolePermissionResolver;
 import org.graylog2.shared.users.Role;
 import org.graylog2.shared.users.Roles;
@@ -57,6 +58,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
 
     private final Configuration configuration;
     private final RoleService roleService;
+    private final AccessTokenService accesstokenService;
     private final UserImpl.Factory userFactory;
     private final InMemoryRolePermissionResolver inMemoryRolePermissionResolver;
     private final EventBus serverEventBus;
@@ -65,12 +67,14 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
     public UserServiceImpl(final MongoConnection mongoConnection,
                            final Configuration configuration,
                            final RoleService roleService,
+                           final AccessTokenService accessTokenService,
                            final UserImpl.Factory userFactory,
                            final InMemoryRolePermissionResolver inMemoryRolePermissionResolver,
                            final EventBus serverEventBus) {
         super(mongoConnection);
         this.configuration = configuration;
         this.roleService = roleService;
+        this.accesstokenService = accessTokenService;
         this.userFactory = userFactory;
         this.inMemoryRolePermissionResolver = inMemoryRolePermissionResolver;
         this.serverEventBus = serverEventBus;
@@ -120,7 +124,7 @@ public class UserServiceImpl extends PersistedServiceImpl implements UserService
         if (result > 1) {
             LOG.warn("Removed {} users matching username \"{}\".", result, username);
         }
-
+        accesstokenService.deleteAllForUser(username);
         return result;
     }
 
