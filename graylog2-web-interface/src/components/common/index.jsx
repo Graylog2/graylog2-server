@@ -1,4 +1,6 @@
 export { default as ClipboardButton } from './ClipboardButton';
+export { default as ColorPicker } from './ColorPicker';
+export { default as ColorPickerPopover } from './ColorPickerPopover';
 export { default as ContentPackMarker } from './ContentPackMarker';
 export { default as ControlledTableList } from './ControlledTableList';
 export { default as DataTable } from './DataTable';
@@ -25,6 +27,7 @@ export { default as ReactGridContainer } from './ReactGridContainer';
 export { default as SearchForm } from './SearchForm';
 export { default as Select } from './Select';
 export { default as SelectableList } from './SelectableList';
+export { default as SelectPopover } from './SelectPopover';
 export { default as SortableList } from './SortableList';
 export { default as SortableListItem } from './SortableListItem';
 export { default as SourceCodeEditor } from './SourceCodeEditor';
