@@ -39,7 +39,7 @@
         <graylog.plugin-dir>/usr/share/graylog-server/plugin</graylog.plugin-dir>
 
         <!-- Dependencies -->
-        <auto-service.version>1.0-rc2</auto-service.version>
+        <auto-service.version>1.0-rc4</auto-service.version>
 
         <!-- Plugin versions -->
         <jdeb.version>1.5</jdeb.version>
