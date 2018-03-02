@@ -58,7 +58,7 @@ public class NodeImpl extends PersistedImpl implements Node {
 
     @Override
     public DateTime getLastSeen() {
-        return new DateTime(((Integer) fields.get("last_seen")) * 1000L, DateTimeZone.UTC);
+        return new DateTime(((Integer) fields.getOrDefault("last_seen", 0)) * 1000L, DateTimeZone.UTC);
     }
 
     @Override

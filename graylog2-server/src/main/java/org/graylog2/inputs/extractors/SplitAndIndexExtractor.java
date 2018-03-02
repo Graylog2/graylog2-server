@@ -46,13 +46,19 @@ public class SplitAndIndexExtractor extends Extractor {
                                   String conditionValue) throws ReservedFieldException, ConfigurationException {
         super(metricRegistry, id, title, order, Type.SPLIT_AND_INDEX, cursorStrategy, sourceField, targetField, extractorConfig, creatorUserId, converters, conditionType, conditionValue);
 
-        if (extractorConfig == null || extractorConfig.get("index") == null || extractorConfig.get("split_by") == null) {
+        if (extractorConfig == null) {
+            throw new ConfigurationException("Missing configuration.");
+        }
+
+        final Object indexConfig = extractorConfig.get("index");
+        final Object splitCharConfig = extractorConfig.get("split_by");
+        if (indexConfig == null || splitCharConfig == null) {
             throw new ConfigurationException("Missing configuration fields. Required: index, split_by");
         }
 
         try {
-            index = ((Integer) extractorConfig.get("index")) - 1;
-            splitChar = (String) extractorConfig.get("split_by");
+            this.index = ((Integer) indexConfig) - 1;
+            splitChar = (String) splitCharConfig;
         } catch (ClassCastException e) {
             throw new ConfigurationException("Parameters cannot be casted.");
         }
