@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-import DataTableElement from './DataTableElement';
 import { TypeAheadDataFilter } from 'components/common';
+import DataTableElement from './DataTableElement';
 
 /**
  * Component that renders a data table, letting consumers of the component to
@@ -46,6 +46,13 @@ const DataTable = React.createClass({
     rows: PropTypes.array.isRequired,
     /** Object key to use to sort data table. */
     sortByKey: PropTypes.string,
+    /**
+     * Indicates whether the table should use a bootstrap responsive table or not:
+     * https://getbootstrap.com/docs/3.3/css/#tables-responsive
+     *
+     * The main reason to disable this is if the table is clipping a dropdown menu or another component in a table edge.
+     */
+    useResponsiveTable: PropTypes.bool,
   },
   getDefaultProps() {
     return {
@@ -53,6 +60,7 @@ const DataTable = React.createClass({
       displayKey: 'value',
       noDataText: 'No data available.',
       rowClassName: '',
+      useResponsiveTable: true,
     };
   },
   getInitialState() {
@@ -143,7 +151,7 @@ const DataTable = React.createClass({
         {filter}
         <div className={`row ${this.props.rowClassName}`}>
           <div className="col-md-12">
-            <div id={this.props.id} className="data-table table-responsive">
+            <div id={this.props.id} className={`data-table ${this.props.useResponsiveTable ? 'table-responsive' : ''}`}>
               {data}
             </div>
           </div>
