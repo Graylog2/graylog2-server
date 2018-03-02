@@ -122,10 +122,10 @@ public class AccessTokenServiceImpl extends PersistedServiceImpl implements Acce
 
     @Override
     public int deleteAllForUser(String username) {
-        LOG.debug("Deleting all access tokens of username \"{}\"", username);
+        LOG.debug("Deleting all access tokens of user \"{}\"", username);
         final DBObject query = BasicDBObjectBuilder.start(AccessTokenImpl.USERNAME, username).get();
         final int result = destroy(query, AccessTokenImpl.COLLECTION_NAME);
-        LOG.debug("Deleted {} access tokens", result);
+        LOG.debug("Deleted {} access tokens of user \"{}\"", result, username);
         return result;
     }
 }
