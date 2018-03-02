@@ -129,6 +129,7 @@
         <natty.version>0.13</natty.version>
         <netty.version>4.1.22.Final</netty.version>
         <netty-tcnative-boringssl-static.version>2.0.7.Final</netty-tcnative-boringssl-static.version>
+        <nullaway.version>0.3.5</nullaway.version>
         <okhttp.version>3.9.1</okhttp.version>
         <opencsv.version>2.3</opencsv.version>
         <os-platform-finder.version>1.2.2</os-platform-finder.version>
@@ -324,10 +325,30 @@
                     <forceJavacCompilerUse>true</forceJavacCompilerUse>
                     <compilerArgs>
                         <arg>-XepDisableWarningsInGeneratedCode</arg>
+                        <arg>-Xep:NullAway:ERROR</arg>
+                        <arg>-XepOpt:NullAway:AnnotatedPackages=com.uber</arg>
+                        <arg>-XepOpt:NullAway:ExcludedFieldAnnotations=javax.inject.Inject,javax.ws.rs.core.Context</arg>
                     </compilerArgs>
                     <annotationProcessors>
                         <annotationProcessor>com.google.auto.value.processor.AutoValueProcessor</annotationProcessor>
                     </annotationProcessors>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>com.uber.nullaway</groupId>
+                            <artifactId>nullaway</artifactId>
+                            <version>${nullaway.version}</version>
+                        </path>
+                        <path>
+                            <groupId>com.google.auto.value</groupId>
+                            <artifactId>auto-value</artifactId>
+                            <version>${auto-value.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.graylog.autovalue</groupId>
+                            <artifactId>auto-value-javabean</artifactId>
+                            <version>${auto-value-javabean.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
                 </configuration>
                 <dependencies>
                     <dependency>
