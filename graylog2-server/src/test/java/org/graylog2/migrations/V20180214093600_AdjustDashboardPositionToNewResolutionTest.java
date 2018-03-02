@@ -19,6 +19,7 @@ package org.graylog2.migrations;
 import com.google.common.collect.ImmutableList;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
+import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.junit.Before;
 import org.junit.Rule;
@@ -35,8 +36,10 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
@@ -74,7 +77,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
     public void doNotMigrateAnythingWithDashboardsWithoutPositions() throws Exception {
         final Dashboard dashboard = mock(Dashboard.class);
         when(dashboard.getId()).thenReturn("uuu-iii-ddd");
-        when(dashboard.getPositions()).thenReturn(null);
+        when(dashboard.getPositions()).thenReturn(Collections.emptyList());
         when(this.dashboardService.all()).thenReturn(ImmutableList.of(dashboard));
 
         this.adjustDashboardResolutionMigration.upgrade();
@@ -84,22 +87,11 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
 
     @Test
     public void doMigrateOneDashboardsPositions() throws Exception {
+        final List<WidgetPosition> oldPositions = new ArrayList<>(1);
+        oldPositions.add(WidgetPosition.create("my-position-id", 5, 4,2,2 ));
 
-        final Map<String, Map<String, Integer>> oldPositions = new HashMap<>(1);
-        final Map<String, Integer> position = new HashMap<>(4);
-        position.put("width", 5);
-        position.put("height", 4);
-        position.put("col", 2);
-        position.put("row", 2);
-        oldPositions.put("my-position-id", position);
-
-        final Map<String, Map<String, Object>> newPositions = new HashMap<>(1);
-        final Map<String, Object> newPosition = new HashMap<>(4);
-        newPosition.put("width", 10);
-        newPosition.put("height", 8);
-        newPosition.put("col", 3);
-        newPosition.put("row", 3);
-        newPositions.put("my-position-id", newPosition);
+        final List<WidgetPosition> newPositions = new ArrayList<>(1);
+        newPositions.add(WidgetPosition.create("my-position-id", 10,8,3,3 ));
 
         final Dashboard dashboard = mock(Dashboard.class, Mockito.RETURNS_DEEP_STUBS);
         when(dashboard.getPositions()).thenReturn(oldPositions);
@@ -108,7 +100,7 @@ public class V20180214093600_AdjustDashboardPositionToNewResolutionTest {
 
         this.adjustDashboardResolutionMigration.upgrade();
 
-        verify(dashboard).setPostions(newPositions);
+        verify(dashboard).setPositions(newPositions);
         verify(this.dashboardService, times(1)).save(dashboard);
     }
 }

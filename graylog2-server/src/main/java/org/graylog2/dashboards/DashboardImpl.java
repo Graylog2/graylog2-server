@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import com.mongodb.BasicDBObject;
 import org.bson.types.ObjectId;
 import org.graylog2.dashboards.widgets.DashboardWidget;
+import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.database.CollectionName;
 import org.graylog2.database.PersistedImpl;
 import org.graylog2.database.validators.DateValidator;
@@ -30,8 +31,10 @@ import org.graylog2.plugin.Tools;
 import org.graylog2.plugin.database.validators.Validator;
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static java.lang.Integer.parseInt;
@@ -77,28 +80,38 @@ public class DashboardImpl extends PersistedImpl implements Dashboard {
     }
 
     @Override
-    public Map<String, Map<String, Integer>> getPositions() {
-        final Map<String, Map<String, Integer>> result = new HashMap<>();
-
+    public List<WidgetPosition> getPositions() {
         final BasicDBObject positions = (BasicDBObject) fields.get(DashboardImpl.EMBEDDED_POSITIONS);
         if (positions == null) {
-            return null;
+            return Collections.emptyList();
         }
 
+        final List<WidgetPosition> result = new ArrayList<>(positions.size());
         for ( String positionId : positions.keySet() ) {
             final BasicDBObject position = (BasicDBObject) positions.get(positionId);
-            final Map<String, Integer> positionResult = new HashMap<>(4);
-            positionResult.put("width", parseInt(position.get("width").toString()));
-            positionResult.put("height", parseInt(position.get("height").toString()));
-            positionResult.put("col", parseInt(position.get("col").toString()));
-            positionResult.put("row", parseInt(position.get("row").toString()));
-            result.put(positionId, positionResult);
+            final Integer width = parseInt(position.get("width").toString());
+            final Integer height = parseInt(position.get("height").toString());
+            final Integer col = parseInt(position.get("col").toString());
+            final Integer row = parseInt(position.get("row").toString());
+            result.add(WidgetPosition.create(positionId, width, height, col, row));
         }
         return result;
     }
 
     @Override
-    public void setPostions(Map<String, Map<String, Object>> positions) {
+    public void setPositions(List<WidgetPosition> widgetPositions) {
+        if (widgetPositions == null) {
+            return;
+        }
+        final Map<String, Map<String, Object>> positions = new HashMap<>(widgetPositions.size());
+        for (WidgetPosition widgetPosition : widgetPositions) {
+            Map<String, Object> position = new HashMap<>(4);
+            position.put("width", widgetPosition.width());
+            position.put("height", widgetPosition.height());
+            position.put("col", widgetPosition.col());
+            position.put("row", widgetPosition.row());
+            positions.put(widgetPosition.id(), position);
+        }
         getFields().put(DashboardImpl.EMBEDDED_POSITIONS, positions);
     }
 

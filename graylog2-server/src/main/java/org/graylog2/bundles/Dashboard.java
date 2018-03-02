@@ -18,12 +18,12 @@ package org.graylog2.bundles;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.graylog2.dashboards.widgets.WidgetPosition;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @JsonAutoDetect
 public class Dashboard {
@@ -36,7 +36,7 @@ public class Dashboard {
     @NotNull
     private List<DashboardWidget> dashboardWidgets = Collections.emptyList();
 
-    private Map<String, Integer> positions;
+    private List<WidgetPosition> positions;
 
     public String getTitle() {
         return title;
@@ -46,8 +46,12 @@ public class Dashboard {
         this.title = title;
     }
 
-    public Map<String, Integer> getPositions() {
+    public List<WidgetPosition> getPositions() {
         return this.positions;
+    }
+
+    public void setPositions(List<WidgetPosition> widgetPositions) {
+        this.positions = widgetPositions;
     }
 
     public String getDescription() {

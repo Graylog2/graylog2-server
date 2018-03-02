@@ -17,8 +17,10 @@
 package org.graylog2.dashboards;
 
 import org.graylog2.dashboards.widgets.DashboardWidget;
+import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.plugin.database.Persisted;
 
+import java.util.List;
 import java.util.Map;
 
 public interface Dashboard extends Persisted {
@@ -26,9 +28,9 @@ public interface Dashboard extends Persisted {
 
     void setTitle(String title);
 
-    Map<String, Map<String, Integer>> getPositions();
+    List<WidgetPosition> getPositions();
 
-    void setPostions(Map<String, Map<String, Object>> positions);
+    void setPositions(List<WidgetPosition> widgetPositions);
 
     String getDescription();
 

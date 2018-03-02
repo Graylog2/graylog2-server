@@ -21,6 +21,7 @@ import com.google.common.collect.Maps;
 import org.graylog.autovalue.WithBeanGetter;
 import org.graylog2.dashboards.Dashboard;
 import org.graylog2.dashboards.DashboardService;
+import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.plugin.cluster.ClusterConfigService;
 import org.graylog2.plugin.database.ValidationException;
 import org.slf4j.Logger;
@@ -31,7 +32,9 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -65,25 +68,22 @@ public class V20180214093600_AdjustDashboardPositionToNewResolution extends Migr
 
         Map<String, String> dashboardIds = Maps.newHashMap();
         for (Dashboard dashboard : dashboardService.all()) {
-            final Map<String, Map<String, Integer>> oldPosition = dashboard.getPositions();
-            if (oldPosition == null) {
+            final List<WidgetPosition> oldPositions = dashboard.getPositions();
+            if (oldPositions.isEmpty()) {
                 dashboardIds.put(dashboard.getId(), "skipped");
                 continue;
             }
-            final Map<String, Map<String, Object>> newPosition = new HashMap<>();
+            final List<WidgetPosition> widgetPositions = new ArrayList<>(oldPositions.size());
 
-            for ( String positionId : oldPosition.keySet() ) {
-                final Map<String, Integer> position = oldPosition.get(positionId);
-                final Map<String, Object> x = new HashMap<>(4);
-                x.put("width", position.get("width") * 2);
-                x.put("height", position.get("height") * 2);
-                x.put("col", adjustPosition(position.get("col")));
-                x.put("row", adjustPosition(position.get("row")));
-
-                newPosition.put(positionId, x);
+            for (WidgetPosition position : oldPositions) {
+                Integer newWidth = position.width() * 2;
+                Integer newHeight = position.height() * 2;
+                Integer newCol = adjustPosition(position.col());
+                Integer newRow = adjustPosition(position.row());
+                widgetPositions.add(WidgetPosition.create(position.id(), newWidth, newHeight, newCol, newRow));
             }
             try {
-                dashboard.setPostions(newPosition);
+                dashboard.setPositions(widgetPositions);
                 dashboardService.save(dashboard);
                 dashboardIds.put(dashboard.getId(), "updated");
             } catch (ValidationException e) {

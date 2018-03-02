@@ -23,6 +23,7 @@ import org.bson.types.ObjectId;
 import org.graylog2.dashboards.widgets.DashboardWidget;
 import org.graylog2.dashboards.widgets.DashboardWidgetCreator;
 import org.graylog2.dashboards.widgets.InvalidWidgetConfigurationException;
+import org.graylog2.dashboards.widgets.WidgetPosition;
 import org.graylog2.database.MongoConnection;
 import org.graylog2.database.NotFoundException;
 import org.graylog2.database.PersistedServiceImpl;
@@ -34,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.inject.Inject;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,19 +110,15 @@ public class DashboardServiceImpl extends PersistedServiceImpl implements Dashbo
 
     @Override
     public void updateWidgetPositions(Dashboard dashboard, WidgetPositionsRequest positions) throws ValidationException {
-        final Map<String, Map<String, Object>> map = new HashMap<>(1);
+        final List<WidgetPosition> widgetPositions = new ArrayList<>();
 
         for (WidgetPositionsRequest.WidgetPosition position : positions.positions()) {
-            Map<String, Object> x = new HashMap<>(4);
-            x.put("col", position.col());
-            x.put("row", position.row());
-            x.put("height", position.height());
-            x.put("width", position.width());
-
-            map.put(position.id(), x);
+            widgetPositions.add(WidgetPosition.create(position.id(), position.width(), position.height(),
+                    position.col(), position.row())
+            );
         }
 
-        dashboard.setPostions(map);
+        dashboard.setPositions(widgetPositions);
         save(dashboard);
     }
 
